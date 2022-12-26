@@ -107,7 +107,7 @@ class ProcessListJobSeekerTest(ProcessListTest):
         total_applications = len(response.context["job_applications_page"].object_list)
 
         # Result page should contain all SIAE's job applications.
-        self.assertEqual(total_applications, self.maggie.job_applications.count())
+        assert total_applications == self.maggie.job_applications.count()
 
     def test_list_for_job_seeker_view_filtered_by_state(self):
         """
@@ -125,8 +125,8 @@ class ProcessListJobSeekerTest(ProcessListTest):
 
         # Result page should only contain job applications which status
         # matches the one selected by the user.
-        self.assertEqual(len(applications), 1)
-        self.assertEqual(applications[0].state, expected_state)
+        assert len(applications) == 1
+        assert applications[0].state == expected_state
 
     def test_list_for_job_seeker_view_filtered_by_dates(self):
         """
@@ -156,9 +156,9 @@ class ProcessListJobSeekerTest(ProcessListTest):
         response = self.client.get(url)
         applications = response.context["job_applications_page"].object_list
 
-        self.assertEqual(len(applications), 2)
-        self.assertGreaterEqual(applications[0].created_at, start_date)
-        self.assertLessEqual(applications[0].created_at, end_date)
+        assert len(applications) == 2
+        assert applications[0].created_at >= start_date
+        assert applications[0].created_at <= end_date
 
 
 ###################################################
@@ -177,7 +177,7 @@ class ProcessListSiaeTest(ProcessListTest):
         total_applications = len(response.context["job_applications_page"].object_list)
 
         # Result page should contain all SIAE's job applications.
-        self.assertEqual(total_applications, self.hit_pit.job_applications_received.not_archived().count())
+        assert total_applications == self.hit_pit.job_applications_received.not_archived().count()
 
     def test_list_for_siae_view__filtered_by_one_state(self):
         """
@@ -191,8 +191,8 @@ class ProcessListSiaeTest(ProcessListTest):
 
         applications = response.context["job_applications_page"].object_list
 
-        self.assertEqual(len(applications), 1)
-        self.assertEqual(applications[0].state, state_accepted)
+        assert len(applications) == 1
+        assert applications[0].state == state_accepted
 
     def test_list_for_siae_view__filtered_by_many_states(self):
         """
@@ -206,8 +206,8 @@ class ProcessListSiaeTest(ProcessListTest):
 
         applications = response.context["job_applications_page"].object_list
 
-        self.assertEqual(len(applications), 3)
-        self.assertIn(applications[0].state.name, job_applications_states)
+        assert len(applications) == 3
+        assert applications[0].state.name in job_applications_states
 
     def test_list_for_siae_view__filtered_by_dates(self):
         """
@@ -231,9 +231,9 @@ class ProcessListSiaeTest(ProcessListTest):
         response = self.client.get(url)
         applications = response.context["job_applications_page"].object_list
 
-        self.assertEqual(len(applications), 5)
-        self.assertGreaterEqual(applications[0].created_at, start_date)
-        self.assertLessEqual(applications[0].created_at, end_date)
+        assert len(applications) == 5
+        assert applications[0].created_at >= start_date
+        assert applications[0].created_at <= end_date
 
     def test_list_for_siae_view__empty_dates_in_params(self):
         """
@@ -246,7 +246,7 @@ class ProcessListSiaeTest(ProcessListTest):
         response = self.client.get(url)
         total_applications = len(response.context["job_applications_page"].object_list)
 
-        self.assertEqual(total_applications, self.hit_pit.job_applications_received.not_archived().count())
+        assert total_applications == self.hit_pit.job_applications_received.not_archived().count()
 
     def test_view__filtered_by_sender_organization_name(self):
         """
@@ -260,8 +260,8 @@ class ProcessListSiaeTest(ProcessListTest):
 
         applications = response.context["job_applications_page"].object_list
 
-        self.assertEqual(len(applications), 8)
-        self.assertEqual(applications[0].sender_prescriber_organization.id, sender_organization.id)
+        assert len(applications) == 8
+        assert applications[0].sender_prescriber_organization.id == sender_organization.id
 
     def test_view__filtered_by_sender_name(self):
         """
@@ -275,8 +275,8 @@ class ProcessListSiaeTest(ProcessListTest):
 
         applications = response.context["job_applications_page"].object_list
 
-        self.assertEqual(len(applications), 7)
-        self.assertEqual(applications[0].sender.id, sender.id)
+        assert len(applications) == 7
+        assert applications[0].sender.id == sender.id
 
     def test_view__filtered_by_job_seeker_name(self):
         """
@@ -290,8 +290,8 @@ class ProcessListSiaeTest(ProcessListTest):
 
         applications = response.context["job_applications_page"].object_list
 
-        self.assertEqual(len(applications), 2)
-        self.assertIn(applications[0].job_seeker.id, job_seekers_ids)
+        assert len(applications) == 2
+        assert applications[0].job_seeker.id in job_seekers_ids
 
     def test_view__filtered_by_many_organization_names(self):
         """
@@ -305,8 +305,8 @@ class ProcessListSiaeTest(ProcessListTest):
 
         applications = response.context["job_applications_page"].object_list
 
-        self.assertEqual(len(applications), 8)
-        self.assertIn(applications[0].sender_prescriber_organization.id, senders_ids)
+        assert len(applications) == 8
+        assert applications[0].sender_prescriber_organization.id in senders_ids
 
     def test_view__filtered_by_pass_state(self):
         """
@@ -324,7 +324,7 @@ class ProcessListSiaeTest(ProcessListTest):
             True,
         )
         response = self.client.get(f"{self.siae_base_url}?{params}")
-        self.assertEqual(len(response.context["job_applications_page"].object_list), 0)
+        assert len(response.context["job_applications_page"].object_list) == 0
 
         job_application = JobApplicationFactory(
             with_approval=True,
@@ -335,8 +335,8 @@ class ProcessListSiaeTest(ProcessListTest):
         )
         response = self.client.get(f"{self.siae_base_url}?{params}")
         applications = response.context["job_applications_page"].object_list
-        self.assertEqual(len(applications), 1)
-        self.assertIn(job_application, applications)
+        assert len(applications) == 1
+        assert job_application in applications
 
         params = urlencode(
             {
@@ -346,7 +346,7 @@ class ProcessListSiaeTest(ProcessListTest):
             True,
         )
         response = self.client.get(f"{self.siae_base_url}?{params}")
-        self.assertEqual(len(response.context["job_applications_page"].object_list), 0)
+        assert len(response.context["job_applications_page"].object_list) == 0
 
         SuspensionFactory(
             approval=job_application.approval,
@@ -356,8 +356,8 @@ class ProcessListSiaeTest(ProcessListTest):
         response = self.client.get(f"{self.siae_base_url}?{params}")
 
         applications = response.context["job_applications_page"].object_list
-        self.assertEqual(len(applications), 1)
-        self.assertIn(job_application, applications)
+        assert len(applications) == 1
+        assert job_application in applications
 
     def test_view__filtered_by_eligibility_validated(self):
         """
@@ -370,13 +370,13 @@ class ProcessListSiaeTest(ProcessListTest):
         url = f"{self.siae_base_url}?{params}"
 
         response = self.client.get(url)
-        self.assertEqual(len(response.context["job_applications_page"].object_list), 0)
+        assert len(response.context["job_applications_page"].object_list) == 0
 
         EligibilityDiagnosisFactory(job_seeker=self.maggie)
 
         response = self.client.get(url)
         # Maggie has two applications, one created in the state loop and the other created by SentByPrescriberFactory
-        self.assertEqual(len(response.context["job_applications_page"].object_list), 2)
+        assert len(response.context["job_applications_page"].object_list) == 2
 
     def test_view__filtered_by_administrative_criteria(self):
         """
@@ -402,28 +402,28 @@ class ProcessListSiaeTest(ProcessListTest):
         url = f"{self.siae_base_url}?{params}"
         response = self.client.get(url)
         applications = response.context["job_applications_page"].object_list
-        self.assertEqual(len(applications), 2)
+        assert len(applications) == 2
 
         # Filter by level2 criterion
         params = urlencode({"criteria": [level2_criterion.pk]}, True)
         url = f"{self.siae_base_url}?{params}"
         response = self.client.get(url)
         applications = response.context["job_applications_page"].object_list
-        self.assertEqual(len(applications), 2)
+        assert len(applications) == 2
 
         # Filter by two criteria
         params = urlencode({"criteria": [level1_criterion.pk, level2_criterion.pk]}, True)
         url = f"{self.siae_base_url}?{params}"
         response = self.client.get(url)
         applications = response.context["job_applications_page"].object_list
-        self.assertEqual(len(applications), 2)
+        assert len(applications) == 2
 
         # Filter by other criteria
         params = urlencode({"criteria": [level1_other_criterion.pk]}, True)
         url = f"{self.siae_base_url}?{params}"
         response = self.client.get(url)
         applications = response.context["job_applications_page"].object_list
-        self.assertEqual(len(applications), 0)
+        assert len(applications) == 0
 
     def test_view__filtered_by_jobseeker_department(self):
         """
@@ -441,7 +441,7 @@ class ProcessListSiaeTest(ProcessListTest):
         applications = response.context["job_applications_page"].object_list
 
         # Maggie has two applications and is the only one living in department 37.
-        self.assertEqual(len(applications), 2)
+        assert len(applications) == 2
 
     def test_view__filtered_by_selected_job(self):
         """
@@ -459,8 +459,8 @@ class ProcessListSiaeTest(ProcessListTest):
         response = self.client.get(url)
         applications = response.context["job_applications_page"].object_list
 
-        self.assertEqual(len(applications), 1)
-        self.assertIn(appellation1, [job_desc.appellation for job_desc in applications[0].selected_jobs.all()])
+        assert len(applications) == 1
+        assert appellation1 in [job_desc.appellation for job_desc in applications[0].selected_jobs.all()]
 
 
 ####################################################
@@ -480,7 +480,7 @@ class ProcessListPrescriberTest(ProcessListTest):
         # Count job applications used by the template
         total_applications = len(response.context["job_applications_page"].object_list)
 
-        self.assertEqual(total_applications, self.pole_emploi.jobapplication_set.count())
+        assert total_applications == self.pole_emploi.jobapplication_set.count()
 
     def test_list_for_prescriber_exports_view(self):
         """
@@ -489,7 +489,7 @@ class ProcessListPrescriberTest(ProcessListTest):
         self.client.force_login(self.thibault_pe)
         response = self.client.get(self.prescriber_exports_url)
 
-        self.assertEqual(200, response.status_code)
+        assert 200 == response.status_code
 
     def test_list_for_prescriber_exports_download_view(self):
         """
@@ -506,8 +506,8 @@ class ProcessListPrescriberTest(ProcessListTest):
 
         response = self.client.get(download_url)
 
-        self.assertEqual(200, response.status_code)
-        self.assertIn("text/csv", response.get("Content-Type"))
+        assert 200 == response.status_code
+        assert "text/csv" in response.get("Content-Type")
 
     def test_view__filtered_by_state(self):
         """
@@ -521,8 +521,8 @@ class ProcessListPrescriberTest(ProcessListTest):
         response = self.client.get(url)
 
         applications = response.context["job_applications_page"].object_list
-        self.assertEqual(len(applications), 2)
-        self.assertEqual(applications[0].state, expected_state)
+        assert len(applications) == 2
+        assert applications[0].state == expected_state
 
     def test_view__filtered_by_sender_name(self):
         """
@@ -536,8 +536,8 @@ class ProcessListPrescriberTest(ProcessListTest):
         response = self.client.get(url)
 
         applications = response.context["job_applications_page"].object_list
-        self.assertEqual(len(applications), 1)
-        self.assertEqual(applications[0].sender.id, sender_id)
+        assert len(applications) == 1
+        assert applications[0].sender.id == sender_id
 
     def test_view__filtered_by_job_seeker_name(self):
         """
@@ -550,8 +550,8 @@ class ProcessListPrescriberTest(ProcessListTest):
         response = self.client.get(url)
 
         applications = response.context["job_applications_page"].object_list
-        self.assertEqual(len(applications), 2)
-        self.assertIn(applications[0].job_seeker.id, job_seekers_ids)
+        assert len(applications) == 2
+        assert applications[0].job_seeker.id in job_seekers_ids
 
     def test_view__filtered_by_siae_name(self):
         """
@@ -564,8 +564,8 @@ class ProcessListPrescriberTest(ProcessListTest):
         response = self.client.get(url)
 
         applications = response.context["job_applications_page"].object_list
-        self.assertEqual(len(applications), 8)
-        self.assertIn(applications[0].to_siae.pk, to_siaes_ids)
+        assert len(applications) == 8
+        assert applications[0].to_siae.pk in to_siaes_ids
 
 
 ####################################################
@@ -581,7 +581,7 @@ class ProcessListExportsPrescriberTest(ProcessListTest):
         self.client.force_login(self.thibault_pe)
         response = self.client.get(self.prescriber_exports_url)
 
-        self.assertEqual(200, response.status_code)
+        assert 200 == response.status_code
 
     def test_list_for_prescriber_exports_as_siae_view(self):
         """
@@ -590,7 +590,7 @@ class ProcessListExportsPrescriberTest(ProcessListTest):
         self.client.force_login(self.eddie_hit_pit)
         response = self.client.get(self.prescriber_exports_url)
 
-        self.assertEqual(302, response.status_code)
+        assert 302 == response.status_code
 
 
 ####################################################
@@ -606,7 +606,7 @@ class ProcessListExportsSiaeTest(ProcessListTest):
         self.client.force_login(self.eddie_hit_pit)
         response = self.client.get(self.siae_exports_url)
 
-        self.assertEqual(200, response.status_code)
+        assert 200 == response.status_code
 
     def test_list_for_siae_exports_as_prescriber_view(self):
         """
@@ -615,7 +615,7 @@ class ProcessListExportsSiaeTest(ProcessListTest):
         self.client.force_login(self.thibault_pe)
         response = self.client.get(self.siae_exports_url)
 
-        self.assertEqual(404, response.status_code)
+        assert 404 == response.status_code
 
 
 ####################################################
@@ -639,8 +639,8 @@ class ProcessListExportsDownloadPrescriberTest(ProcessListTest):
 
         response = self.client.get(download_url)
 
-        self.assertEqual(200, response.status_code)
-        self.assertIn("text/csv", response.get("Content-Type"))
+        assert 200 == response.status_code
+        assert "text/csv" in response.get("Content-Type")
 
     def test_list_for_siae_exports_download_view(self):
         """
@@ -655,7 +655,7 @@ class ProcessListExportsDownloadPrescriberTest(ProcessListTest):
 
         response = self.client.get(download_url)
 
-        self.assertEqual(404, response.status_code)
+        assert 404 == response.status_code
 
 
 ####################################################
@@ -677,8 +677,8 @@ class ProcessListExportsDownloadSiaeTest(ProcessListTest):
 
         response = self.client.get(download_url)
 
-        self.assertEqual(200, response.status_code)
-        self.assertIn("text/csv", response.get("Content-Type"))
+        assert 200 == response.status_code
+        assert "text/csv" in response.get("Content-Type")
 
     def test_list_for_prescriber_exports_download_view(self):
         """
@@ -695,4 +695,4 @@ class ProcessListExportsDownloadSiaeTest(ProcessListTest):
 
         response = self.client.get(download_url)
 
-        self.assertEqual(302, response.status_code)
+        assert 302 == response.status_code

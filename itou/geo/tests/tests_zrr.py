@@ -13,12 +13,12 @@ class ZRRModelTest(TestCase):
     def test_factory_traits(self):
         status = ZRRFactory(in_zrr=True).status
 
-        self.assertIs(ZRRStatus.IN_ZRR, status)
+        assert ZRRStatus.IN_ZRR is status
 
         status = ZRRFactory(not_in_zrr=True).status
 
-        self.assertIs(ZRRStatus.NOT_IN_ZRR, status)
+        assert ZRRStatus.NOT_IN_ZRR is status
 
         status = ZRRFactory(partially_in_zrr=True).status
 
-        self.assertIs(ZRRStatus.PARTIALLY_IN_ZRR, status)
+        assert ZRRStatus.PARTIALLY_IN_ZRR is status

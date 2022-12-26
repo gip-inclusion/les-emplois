@@ -48,9 +48,9 @@ class TestSendPrescriberWithOrgInvitation(TestCase):
 
     def assert_created_invitation(self):
         invitation = PrescriberWithOrgInvitation.objects.get(organization=self.organization)
-        self.assertEqual(invitation.first_name, self.post_data["form-0-first_name"])
-        self.assertEqual(invitation.last_name, self.post_data["form-0-last_name"])
-        self.assertEqual(invitation.email, self.post_data["form-0-email"])
+        assert invitation.first_name == self.post_data["form-0-first_name"]
+        assert invitation.last_name == self.post_data["form-0-last_name"]
+        assert invitation.email == self.post_data["form-0-email"]
 
     def test_invite_not_existing_user(self):
         response = self.client.post(INVITATION_URL, data=self.post_data, follow=True)
@@ -93,12 +93,12 @@ class TestSendPrescriberWithOrgInvitation(TestCase):
         membership = guest.prescribermembership_set.first()
         membership.deactivate_membership_by_user(self.organization.members.first())
         membership.save()
-        self.assertFalse(guest in self.organization.active_members)
+        assert not (guest in self.organization.active_members)
         # Invite user (the revenge)
         response = self.client.post(INVITATION_URL, data=self.post_data, follow=True)
         self.assertRedirects(response, INVITATION_URL)
         invitations_count = PrescriberWithOrgInvitation.objects.filter(organization=self.organization).count()
-        self.assertEqual(invitations_count, 2)
+        assert invitations_count == 2
 
 
 class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
@@ -108,9 +108,9 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
         self.post_data = POST_DATA
 
     def assert_invalid_user(self, response, reason):
-        self.assertFalse(response.context["formset"].is_valid())
-        self.assertEqual(response.context["formset"].errors[0]["email"][0], reason)
-        self.assertFalse(PrescriberWithOrgInvitation.objects.exists())
+        assert not response.context["formset"].is_valid()
+        assert response.context["formset"].errors[0]["email"][0] == reason
+        assert not PrescriberWithOrgInvitation.objects.exists()
 
     def test_invite_existing_user_is_employer(self):
         guest = SiaeFactory(with_membership=True).members.first()
@@ -119,7 +119,7 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
             {"form-0-first_name": guest.first_name, "form-0-last_name": guest.last_name, "form-0-email": guest.email}
         )
         response = self.client.post(INVITATION_URL, data=self.post_data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assert_invalid_user(response, "Cet utilisateur n'est pas un prescripteur.")
 
     def test_invite_existing_user_is_job_seeker(self):
@@ -129,7 +129,7 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
             {"form-0-first_name": guest.first_name, "form-0-last_name": guest.last_name, "form-0-email": guest.email}
         )
         response = self.client.post(INVITATION_URL, data=self.post_data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assert_invalid_user(response, "Cet utilisateur n'est pas un prescripteur.")
 
     def test_already_a_member(self):
@@ -141,7 +141,7 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
             {"form-0-first_name": guest.first_name, "form-0-last_name": guest.last_name, "form-0-email": guest.email}
         )
         response = self.client.post(INVITATION_URL, data=self.post_data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assert_invalid_user(response, "Cette personne fait déjà partie de votre organisation.")
 
 
@@ -172,9 +172,9 @@ class TestPEOrganizationInvitation(TestCase):
 
         response = self.client.post(INVITATION_URL, data=post_data)
         # Make sure form is invalid
-        self.assertFalse(response.context["formset"].is_valid())
-        self.assertEqual(
-            response.context["formset"].errors[0]["email"][0], "L'adresse e-mail doit être une adresse Pôle emploi"
+        assert not response.context["formset"].is_valid()
+        assert (
+            response.context["formset"].errors[0]["email"][0] == "L'adresse e-mail doit être une adresse Pôle emploi"
         )
 
 
@@ -196,11 +196,11 @@ class TestAcceptPrescriberWithOrgInvitation(InclusionConnectBaseTestCase):
 
         user.refresh_from_db()
         invitation.refresh_from_db()
-        self.assertTrue(user.is_prescriber)
+        assert user.is_prescriber
 
-        self.assertTrue(invitation.accepted)
-        self.assertTrue(invitation.accepted_at)
-        self.assertEqual(self.organization.members.count(), 3)
+        assert invitation.accepted
+        assert invitation.accepted_at
+        assert self.organization.members.count() == 3
 
         # Make sure there's a welcome message.
         self.assertContains(
@@ -208,14 +208,14 @@ class TestAcceptPrescriberWithOrgInvitation(InclusionConnectBaseTestCase):
         )
 
         # A confirmation e-mail is sent to the invitation sender.
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(len(mail.outbox[0].to), 1)
-        self.assertEqual(invitation.sender.email, mail.outbox[0].to[0])
+        assert len(mail.outbox) == 1
+        assert len(mail.outbox[0].to) == 1
+        assert invitation.sender.email == mail.outbox[0].to[0]
 
         # Assert the user sees his new organization dashboard.
         current_org = get_current_org_or_404(response.wsgi_request)
         # A user can be member of one or more organizations
-        self.assertTrue(current_org in user.prescriberorganization_set.all())
+        assert current_org in user.prescriberorganization_set.all()
 
     @respx.mock
     def test_accept_prescriber_org_invitation(self):
@@ -250,10 +250,10 @@ class TestAcceptPrescriberWithOrgInvitation(InclusionConnectBaseTestCase):
         response = self.client.get(response.url, follow=True)
         # Signup should have failed : as the email used in IC isn't the one from the invitation
         messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 1)
-        self.assertIn("ne correspond pas à l’adresse e-mail de l’invitation", messages[0].message)
-        self.assertEqual(response.wsgi_request.get_full_path(), previous_url)
-        self.assertFalse(User.objects.filter(email=invitation.email).exists())
+        assert len(messages) == 1
+        assert "ne correspond pas à l’adresse e-mail de l’invitation" in messages[0].message
+        assert response.wsgi_request.get_full_path() == previous_url
+        assert not User.objects.filter(email=invitation.email).exists()
 
         # Singup works on Inclusion Connect with the correct email
         invitation.email = OIDC_USERINFO["email"]
@@ -316,8 +316,8 @@ class TestAcceptPrescriberWithOrgInvitation(InclusionConnectBaseTestCase):
             email=user.email,
         )
         response = self.client.get(invitation.acceptance_link, follow=True)
-        self.assertIn(reverse("login:prescriber"), response.wsgi_request.get_full_path())
-        self.assertFalse(invitation.accepted)
+        assert reverse("login:prescriber") in response.wsgi_request.get_full_path()
+        assert not invitation.accepted
 
         next_url = reverse("invitations_views:join_prescriber_organization", args=(invitation.pk,))
         previous_url = f"{reverse('login:prescriber')}?{urlencode({'next': next_url})}"
@@ -341,7 +341,7 @@ class TestAcceptPrescriberWithOrgInvitation(InclusionConnectBaseTestCase):
         # Follow the redirection.
         response = self.client.get(response.url, follow=True)
 
-        self.assertTrue(response.context["user"].is_authenticated)
+        assert response.context["user"].is_authenticated
         self.assert_invitation_is_accepted(response, user, invitation, new_user=False)
 
     def test_accept_existing_user_not_logged_in_using_django_auth(self):
@@ -357,15 +357,15 @@ class TestAcceptPrescriberWithOrgInvitation(InclusionConnectBaseTestCase):
             email=user.email,
         )
         response = self.client.get(invitation.acceptance_link, follow=True)
-        self.assertIn(reverse("login:prescriber"), response.wsgi_request.get_full_path())
-        self.assertFalse(invitation.accepted)
+        assert reverse("login:prescriber") in response.wsgi_request.get_full_path()
+        assert not invitation.accepted
 
         response = self.client.post(
             response.wsgi_request.get_full_path(),
             data={"login": user.email, "password": DEFAULT_PASSWORD},
             follow=True,
         )
-        self.assertTrue(response.context["user"].is_authenticated)
+        assert response.context["user"].is_authenticated
         self.assert_invitation_is_accepted(response, user, invitation, new_user=False)
 
 
@@ -386,9 +386,9 @@ class TestAcceptPrescriberWithOrgInvitationExceptions(TestCase):
 
         self.client.force_login(user)
         response = self.client.get(invitation.acceptance_link, follow=True)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
         invitation.refresh_from_db()
-        self.assertFalse(invitation.accepted)
+        assert not invitation.accepted
 
     def test_connected_user_is_not_the_invited_user(self):
         invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
@@ -396,14 +396,14 @@ class TestAcceptPrescriberWithOrgInvitationExceptions(TestCase):
         response = self.client.get(invitation.acceptance_link, follow=True)
         self.assertRedirects(response, reverse("account_logout"))
         invitation.refresh_from_db()
-        self.assertFalse(invitation.accepted)
+        assert not invitation.accepted
         self.assertContains(response, escape("Un utilisateur est déjà connecté."))
 
     def test_expired_invitation_with_new_user(self):
         invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
         invitation.sent_at -= timedelta(days=invitation.EXPIRATION_DAYS)
         invitation.save()
-        self.assertTrue(invitation.has_expired)
+        assert invitation.has_expired
 
         post_data = {
             "first_name": invitation.first_name,
@@ -425,7 +425,7 @@ class TestAcceptPrescriberWithOrgInvitationExceptions(TestCase):
         )
         invitation.sent_at -= timedelta(days=invitation.EXPIRATION_DAYS)
         invitation.save()
-        self.assertTrue(invitation.has_expired)
+        assert invitation.has_expired
 
         # GET or POST in this case
         response = self.client.get(invitation.acceptance_link, follow=True)

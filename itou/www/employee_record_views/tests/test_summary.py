@@ -21,13 +21,13 @@ class SummaryEmployeeRecordsTest(TestCase):
         # Must have access
         self.client.force_login(self.user)
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_hiring_end_at_date_in_header(self):
         hiring_end_at = self.job_application.hiring_end_at
         self.client.force_login(self.user)
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, f"Fin du contrat : <b>{hiring_end_at.strftime('%e').lstrip()}")
 
     def test_no_hiring_end_at_in_header(self):
@@ -35,5 +35,5 @@ class SummaryEmployeeRecordsTest(TestCase):
         self.job_application.save()
         self.client.force_login(self.user)
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, "Fin du contrat : <b>Non renseigné")

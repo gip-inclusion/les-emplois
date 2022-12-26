@@ -50,8 +50,8 @@ class ApplyTest(TestCase):
         for route in routes:
             with self.subTest(route=route):
                 response = self.client.get(reverse(route, kwargs={"siae_pk": siae.pk}))
-                self.assertEqual(response.status_code, 403)
-                self.assertEqual(response.context["exception"], "A session namespace doesn't exist.")
+                assert response.status_code == 403
+                assert response.context["exception"] == "A session namespace doesn't exist."
 
     def test_we_raise_a_permission_denied_on_missing_temporary_session_for_create_job_seeker(self):
         routes = {
@@ -67,8 +67,8 @@ class ApplyTest(TestCase):
         for route in routes:
             with self.subTest(route=route):
                 response = self.client.get(reverse(route, kwargs={"siae_pk": siae.pk, "session_uuid": uuid.uuid4()}))
-                self.assertEqual(response.status_code, 403)
-                self.assertEqual(response.context["exception"], "A session namespace doesn't exist.")
+                assert response.status_code == 403
+                assert response.context["exception"] == "A session namespace doesn't exist."
 
     def test_start_coalesce_back_url(self):
         siae = SiaeFactory(with_membership=True)
@@ -76,33 +76,25 @@ class ApplyTest(TestCase):
 
         # Default / Fallback
         self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}))
-        self.assertEqual(
-            self.client.session[f"job_application-{siae.pk}"]["back_url"],
-            reverse("siaes_views:card", kwargs={"siae_id": siae.pk}),
+        assert self.client.session[f"job_application-{siae.pk}"]["back_url"] == reverse(
+            "siaes_views:card", kwargs={"siae_id": siae.pk}
         )
 
         # With a job description
         self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"job_description_id": 42})
-        self.assertEqual(
-            self.client.session[f"job_application-{siae.pk}"]["back_url"],
-            reverse("siaes_views:job_description_card", kwargs={"job_description_id": 42}),
+        assert self.client.session[f"job_application-{siae.pk}"]["back_url"] == reverse(
+            "siaes_views:job_description_card", kwargs={"job_description_id": 42}
         )
 
         # With an already present back url
         self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"})
-        self.assertEqual(
-            self.client.session[f"job_application-{siae.pk}"]["back_url"],
-            "/",
-        )
+        assert self.client.session[f"job_application-{siae.pk}"]["back_url"] == "/"
 
         # With both
         self.client.get(
             reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"job_description_id": 42, "back_url": "/"}
         )
-        self.assertEqual(
-            self.client.session[f"job_application-{siae.pk}"]["back_url"],
-            "/",
-        )
+        assert self.client.session[f"job_application-{siae.pk}"]["back_url"] == "/"
 
 
 class ApplyAsJobSeekerTest(S3AccessingTestCase):
@@ -127,103 +119,99 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
         # ----------------------------------------------------------------------
 
         response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"})
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         session_data = self.client.session[f"job_application-{siae.pk}"]
         expected_session_data = self.default_session_data | {
             "job_seeker_pk": user.pk,
         }
-        self.assertDictEqual(session_data, expected_session_data)
+        assert session_data == expected_session_data
 
         next_url = reverse("apply:check_nir_for_job_seeker", kwargs={"siae_pk": siae.pk})
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         # Step check job seeker NIR.
         # ----------------------------------------------------------------------
 
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         nir = "141068078200557"
         post_data = {"nir": nir, "confirm": 1}
 
         response = self.client.post(next_url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         user = User.objects.get(pk=user.pk)
-        self.assertEqual(user.nir, nir)
+        assert user.nir == nir
 
         session_data = self.client.session[f"job_application-{siae.pk}"]
         expected_session_data = self.default_session_data | {
             "job_seeker_pk": user.pk,
         }
-        self.assertDictEqual(session_data, expected_session_data)
+        assert session_data == expected_session_data
 
         next_url = reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk})
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         # Step check job seeker info.
         # ----------------------------------------------------------------------
 
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         post_data = {"birthdate": "20/12/1978", "phone": "0610203040", "pole_emploi_id": "1234567A"}
 
         response = self.client.post(next_url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         user = User.objects.get(pk=user.pk)
-        self.assertEqual(user.birthdate.strftime("%d/%m/%Y"), post_data["birthdate"])
-        self.assertEqual(user.phone, post_data["phone"])
+        assert user.birthdate.strftime("%d/%m/%Y") == post_data["birthdate"]
+        assert user.phone == post_data["phone"]
 
-        self.assertEqual(user.pole_emploi_id, post_data["pole_emploi_id"])
+        assert user.pole_emploi_id == post_data["pole_emploi_id"]
 
         next_url = reverse("apply:step_check_prev_applications", kwargs={"siae_pk": siae.pk})
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         # Step check previous job applications.
         # ----------------------------------------------------------------------
 
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         next_url = reverse("apply:application_jobs", kwargs={"siae_pk": siae.pk})
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         # Step application's jobs.
         # ----------------------------------------------------------------------
 
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         response = self.client.post(next_url, data={"selected_jobs": [siae.job_description_through.first().pk]})
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
-        self.assertDictEqual(
-            self.client.session[f"job_application-{siae.pk}"],
-            self.default_session_data
-            | {
-                "job_seeker_pk": user.pk,
-                "selected_jobs": [siae.job_description_through.first().pk],
-            },
-        )
+        assert self.client.session[f"job_application-{siae.pk}"] == self.default_session_data | {
+            "job_seeker_pk": user.pk,
+            "selected_jobs": [siae.job_description_through.first().pk],
+        }
 
         next_url = reverse("apply:application_eligibility", kwargs={"siae_pk": siae.pk})
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         # Step application's eligibility.
         # ----------------------------------------------------------------------
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         next_url = reverse("apply:application_resume", kwargs={"siae_pk": siae.pk})
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         # Step application's resume.
         # ----------------------------------------------------------------------
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Test fields mandatory to upload to S3
         s3_upload = S3Upload(kind="resume")
@@ -242,27 +230,27 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
                 "resume_link": "https://server.com/rocky-balboa.pdf",
             },
         )
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         job_application = JobApplication.objects.get(sender=user, to_siae=siae)
-        self.assertEqual(job_application.job_seeker, user)
-        self.assertEqual(job_application.sender_kind, SenderKind.JOB_SEEKER)
-        self.assertEqual(job_application.sender_siae, None)
-        self.assertEqual(job_application.sender_prescriber_organization, None)
-        self.assertEqual(job_application.state, job_application.state.workflow.STATE_NEW)
-        self.assertEqual(job_application.message, "Lorem ipsum dolor sit amet, consectetur adipiscing elit.")
-        self.assertEqual(list(job_application.selected_jobs.all()), [siae.job_description_through.first()])
-        self.assertEqual(job_application.resume_link, "https://server.com/rocky-balboa.pdf")
+        assert job_application.job_seeker == user
+        assert job_application.sender_kind == SenderKind.JOB_SEEKER
+        assert job_application.sender_siae is None
+        assert job_application.sender_prescriber_organization is None
+        assert job_application.state == job_application.state.workflow.STATE_NEW
+        assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+        assert list(job_application.selected_jobs.all()) == [siae.job_description_through.first()]
+        assert job_application.resume_link == "https://server.com/rocky-balboa.pdf"
 
-        self.assertNotIn(f"job_application-{siae.pk}", self.client.session)
+        assert f"job_application-{siae.pk}" not in self.client.session
 
         next_url = reverse("apply:application_end", kwargs={"siae_pk": siae.pk, "application_pk": job_application.pk})
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         # Step application's end.
         # ----------------------------------------------------------------------
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         # 1 in desktop header
         # + 1 in mobile header
         # + 1 in the page content
@@ -281,25 +269,23 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
         # ----------------------------------------------------------------------
 
         response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"}, follow=True)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Follow all redirections until NIR.
         # ----------------------------------------------------------------------
         next_url = reverse("apply:check_nir_for_job_seeker", kwargs={"siae_pk": siae.pk})
 
         response = self.client.post(next_url, data={"nir": "123456789KLOIU"})
-        self.assertEqual(response.status_code, 200)
-        self.assertFalse(response.context["form"].is_valid())
+        assert response.status_code == 200
+        assert not response.context["form"].is_valid()
 
         # Temporary number should be skipped.
         response = self.client.post(next_url, data={"nir": "123456789KLOIU", "skip": 1}, follow=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            response.redirect_chain[-1][0], reverse("apply:application_jobs", kwargs={"siae_pk": siae.pk})
-        )
+        assert response.status_code == 200
+        assert response.redirect_chain[-1][0] == reverse("apply:application_jobs", kwargs={"siae_pk": siae.pk})
 
         user.refresh_from_db()
-        self.assertFalse(user.nir)
+        assert not user.nir
 
     def test_apply_as_jobseeker_to_siae_with_approval_in_waiting_period(self):
         """
@@ -327,10 +313,10 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
             )
 
             # …until the expected 403.
-            self.assertEqual(response.status_code, 403)
-            self.assertIn("Vous avez terminé un parcours", response.context["exception"])
+            assert response.status_code == 403
+            assert "Vous avez terminé un parcours" in response.context["exception"]
             last_url = response.redirect_chain[-1][0]
-            self.assertEqual(last_url, reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk}))
+            assert last_url == reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk})
 
     def test_apply_as_job_seeker_on_sender_tunnel(self):
         siae = SiaeFactory()
@@ -339,13 +325,13 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
 
         # Without a session namespace
         response = self.client.get(reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk}))
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
         # With a session namespace
         self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"})  # Init the session
         response = self.client.get(reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk}))
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("apply:start", kwargs={"siae_pk": siae.pk}))
+        assert response.status_code == 302
+        assert response.url == reverse("apply:start", kwargs={"siae_pk": siae.pk})
 
 
 class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
@@ -377,20 +363,20 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
         # ----------------------------------------------------------------------
 
         response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"})
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         session = self.client.session
         session_data = session[f"job_application-{siae.pk}"]
-        self.assertDictEqual(session_data, self.default_session_data)
+        assert session_data == self.default_session_data
 
         next_url = reverse("apply:pending_authorization_for_sender", kwargs={"siae_pk": siae.pk})
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         # Step show warning message about pending authorization.
         # ----------------------------------------------------------------------
 
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         next_url = reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk})
         self.assertContains(response, "Status de prescripteur habilité non vérifié")
@@ -400,27 +386,27 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
         # ----------------------------------------------------------------------
 
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         response = self.client.post(next_url, data={"nir": dummy_job_seeker_profile.user.nir, "confirm": 1})
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
         session = self.client.session
         expected_session_data = self.default_session_data | {
             "nir": dummy_job_seeker_profile.user.nir,
         }
-        self.assertDictEqual(self.client.session[f"job_application-{siae.pk}"], expected_session_data)
+        assert self.client.session[f"job_application-{siae.pk}"] == expected_session_data
 
         next_url = reverse("apply:check_email_for_sender", kwargs={"siae_pk": siae.pk})
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         # Step get job seeker e-mail.
         # ----------------------------------------------------------------------
 
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         response = self.client.post(next_url, data={"email": dummy_job_seeker_profile.user.email, "confirm": "1"})
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
         job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
 
         expected_job_seeker_session = {
@@ -429,19 +415,19 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
                 "nir": dummy_job_seeker_profile.user.nir,
             }
         }
-        self.assertEqual(self.client.session[job_seeker_session_name], expected_job_seeker_session)
+        assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
             "apply:create_job_seeker_step_1_for_sender",
             kwargs={"siae_pk": siae.pk, "session_uuid": job_seeker_session_name},
         )
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         # Step create a job seeker.
         # ----------------------------------------------------------------------
 
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         post_data = {
             "title": dummy_job_seeker_profile.user.title,
@@ -450,18 +436,18 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
             "birthdate": dummy_job_seeker_profile.user.birthdate,
         }
         response = self.client.post(next_url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
         expected_job_seeker_session["user"] |= post_data
-        self.assertEqual(self.client.session[job_seeker_session_name], expected_job_seeker_session)
+        assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
             "apply:create_job_seeker_step_2_for_sender",
             kwargs={"siae_pk": siae.pk, "session_uuid": job_seeker_session_name},
         )
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         post_data = {
             "address_line_1": dummy_job_seeker_profile.user.address_line_1,
@@ -471,24 +457,24 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
             "phone": dummy_job_seeker_profile.user.phone,
         }
         response = self.client.post(next_url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
         expected_job_seeker_session["user"] |= post_data | {"department": "67", "address_line_2": ""}
-        self.assertEqual(self.client.session[job_seeker_session_name], expected_job_seeker_session)
+        assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
             "apply:create_job_seeker_step_3_for_sender",
             kwargs={"siae_pk": siae.pk, "session_uuid": job_seeker_session_name},
         )
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         post_data = {
             "education_level": dummy_job_seeker_profile.education_level,
         }
         response = self.client.post(next_url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
         expected_job_seeker_session["profile"] = post_data | {
             "resourceless": False,
             "rqth_employee": False,
@@ -510,65 +496,61 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
             "pole_emploi_id": "",
             "lack_of_pole_emploi_id_reason": User.REASON_NOT_REGISTERED,
         }
-        self.assertEqual(self.client.session[job_seeker_session_name], expected_job_seeker_session)
+        assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
             "apply:create_job_seeker_step_end_for_sender",
             kwargs={"siae_pk": siae.pk, "session_uuid": job_seeker_session_name},
         )
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         response = self.client.post(next_url)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
-        self.assertNotIn(job_seeker_session_name, self.client.session)
+        assert job_seeker_session_name not in self.client.session
         new_job_seeker = User.objects.get(email=dummy_job_seeker_profile.user.email)
         expected_session_data = self.default_session_data | {
             "nir": dummy_job_seeker_profile.user.nir,
             "job_seeker_pk": new_job_seeker.pk,
         }
-        self.assertEqual(self.client.session[f"job_application-{siae.pk}"], expected_session_data)
+        assert self.client.session[f"job_application-{siae.pk}"] == expected_session_data
 
         next_url = reverse("apply:application_jobs", kwargs={"siae_pk": siae.pk})
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         # Step application's jobs.
         # ----------------------------------------------------------------------
 
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         response = self.client.post(next_url, data={"selected_jobs": [siae.job_description_through.first().pk]})
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
-        self.assertDictEqual(
-            self.client.session[f"job_application-{siae.pk}"],
-            self.default_session_data
-            | {
-                "nir": dummy_job_seeker_profile.user.nir,
-                "job_seeker_pk": new_job_seeker.pk,
-                "selected_jobs": [siae.job_description_through.first().pk],
-            },
-        )
+        assert self.client.session[f"job_application-{siae.pk}"] == self.default_session_data | {
+            "nir": dummy_job_seeker_profile.user.nir,
+            "job_seeker_pk": new_job_seeker.pk,
+            "selected_jobs": [siae.job_description_through.first().pk],
+        }
 
         next_url = reverse("apply:application_eligibility", kwargs={"siae_pk": siae.pk})
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         # Step application's eligibility.
         # ----------------------------------------------------------------------
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         next_url = reverse("apply:application_resume", kwargs={"siae_pk": siae.pk})
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         # Step application's resume.
         # ----------------------------------------------------------------------
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Test fields mandatory to upload to S3
         s3_upload = S3Upload(kind="resume")
@@ -587,30 +569,30 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
                 "resume_link": "https://server.com/rocky-balboa.pdf",
             },
         )
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         job_application = JobApplication.objects.get(sender=user, to_siae=siae)
-        self.assertEqual(job_application.job_seeker, new_job_seeker)
-        self.assertEqual(job_application.sender_kind, SenderKind.PRESCRIBER)
-        self.assertEqual(job_application.sender_siae, None)
-        self.assertEqual(job_application.sender_prescriber_organization, prescriber_organization)
-        self.assertEqual(job_application.state, job_application.state.workflow.STATE_NEW)
-        self.assertEqual(job_application.message, "Lorem ipsum dolor sit amet, consectetur adipiscing elit.")
-        self.assertEqual(
-            list(job_application.selected_jobs.all()),
-            [siae.job_description_through.first(), siae.job_description_through.last()],
-        )
-        self.assertEqual(job_application.resume_link, "https://server.com/rocky-balboa.pdf")
+        assert job_application.job_seeker == new_job_seeker
+        assert job_application.sender_kind == SenderKind.PRESCRIBER
+        assert job_application.sender_siae is None
+        assert job_application.sender_prescriber_organization == prescriber_organization
+        assert job_application.state == job_application.state.workflow.STATE_NEW
+        assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+        assert list(job_application.selected_jobs.all()) == [
+            siae.job_description_through.first(),
+            siae.job_description_through.last(),
+        ]
+        assert job_application.resume_link == "https://server.com/rocky-balboa.pdf"
 
-        self.assertNotIn(f"job_application-{siae.pk}", self.client.session)
+        assert f"job_application-{siae.pk}" not in self.client.session
 
         next_url = reverse("apply:application_end", kwargs={"siae_pk": siae.pk, "application_pk": job_application.pk})
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         # Step application's end.
         # ----------------------------------------------------------------------
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_apply_as_authorized_prescriber(self):
         """Apply as authorized prescriber."""
@@ -631,38 +613,38 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
         # ----------------------------------------------------------------------
 
         response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"})
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         session_data = self.client.session[f"job_application-{siae.pk}"]
-        self.assertDictEqual(session_data, self.default_session_data)
+        assert session_data == self.default_session_data
 
         next_url = reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk})
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         # Step determine the job seeker with a NIR.
         # ----------------------------------------------------------------------
 
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         response = self.client.post(next_url, data={"nir": dummy_job_seeker_profile.user.nir, "confirm": 1})
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
         expected_session_data = self.default_session_data | {
             "nir": dummy_job_seeker_profile.user.nir,
         }
-        self.assertDictEqual(self.client.session[f"job_application-{siae.pk}"], expected_session_data)
+        assert self.client.session[f"job_application-{siae.pk}"] == expected_session_data
 
         next_url = reverse("apply:check_email_for_sender", kwargs={"siae_pk": siae.pk})
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         # Step get job seeker e-mail.
         # ----------------------------------------------------------------------
 
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         response = self.client.post(next_url, data={"email": dummy_job_seeker_profile.user.email, "confirm": "1"})
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
         job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
 
         expected_job_seeker_session = {
@@ -671,19 +653,19 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
                 "nir": dummy_job_seeker_profile.user.nir,
             }
         }
-        self.assertEqual(self.client.session[job_seeker_session_name], expected_job_seeker_session)
+        assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
             "apply:create_job_seeker_step_1_for_sender",
             kwargs={"siae_pk": siae.pk, "session_uuid": job_seeker_session_name},
         )
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         # Step create a job seeker.
         # ----------------------------------------------------------------------
 
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         post_data = {
             "title": dummy_job_seeker_profile.user.title,
@@ -692,18 +674,18 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
             "birthdate": dummy_job_seeker_profile.user.birthdate,
         }
         response = self.client.post(next_url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
         expected_job_seeker_session["user"] |= post_data
-        self.assertEqual(self.client.session[job_seeker_session_name], expected_job_seeker_session)
+        assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
             "apply:create_job_seeker_step_2_for_sender",
             kwargs={"siae_pk": siae.pk, "session_uuid": job_seeker_session_name},
         )
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         post_data = {
             "address_line_1": dummy_job_seeker_profile.user.address_line_1,
@@ -713,24 +695,24 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
             "phone": dummy_job_seeker_profile.user.phone,
         }
         response = self.client.post(next_url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
         expected_job_seeker_session["user"] |= post_data | {"department": "12", "address_line_2": ""}
-        self.assertEqual(self.client.session[job_seeker_session_name], expected_job_seeker_session)
+        assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
             "apply:create_job_seeker_step_3_for_sender",
             kwargs={"siae_pk": siae.pk, "session_uuid": job_seeker_session_name},
         )
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         post_data = {
             "education_level": dummy_job_seeker_profile.education_level,
         }
         response = self.client.post(next_url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
         expected_job_seeker_session["profile"] = post_data | {
             "resourceless": False,
             "rqth_employee": False,
@@ -752,71 +734,67 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
             "pole_emploi_id": "",
             "lack_of_pole_emploi_id_reason": User.REASON_NOT_REGISTERED,
         }
-        self.assertEqual(self.client.session[job_seeker_session_name], expected_job_seeker_session)
+        assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
             "apply:create_job_seeker_step_end_for_sender",
             kwargs={"siae_pk": siae.pk, "session_uuid": job_seeker_session_name},
         )
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         response = self.client.post(next_url)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
-        self.assertNotIn(job_seeker_session_name, self.client.session)
+        assert job_seeker_session_name not in self.client.session
         new_job_seeker = User.objects.get(email=dummy_job_seeker_profile.user.email)
         expected_session_data = self.default_session_data | {
             "nir": dummy_job_seeker_profile.user.nir,
             "job_seeker_pk": new_job_seeker.pk,
         }
-        self.assertEqual(self.client.session[f"job_application-{siae.pk}"], expected_session_data)
+        assert self.client.session[f"job_application-{siae.pk}"] == expected_session_data
 
         next_url = reverse("apply:application_jobs", kwargs={"siae_pk": siae.pk})
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         # Step application's jobs.
         # ----------------------------------------------------------------------
 
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         response = self.client.post(next_url, data={"selected_jobs": [siae.job_description_through.first().pk]})
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
-        self.assertDictEqual(
-            self.client.session[f"job_application-{siae.pk}"],
-            self.default_session_data
-            | {
-                "nir": dummy_job_seeker_profile.user.nir,
-                "job_seeker_pk": new_job_seeker.pk,
-                "selected_jobs": [siae.job_description_through.first().pk],
-            },
-        )
+        assert self.client.session[f"job_application-{siae.pk}"] == self.default_session_data | {
+            "nir": dummy_job_seeker_profile.user.nir,
+            "job_seeker_pk": new_job_seeker.pk,
+            "selected_jobs": [siae.job_description_through.first().pk],
+        }
 
         next_url = reverse("apply:application_eligibility", kwargs={"siae_pk": siae.pk})
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         # Step application's eligibility.
         # ----------------------------------------------------------------------
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
-        self.assertFalse(EligibilityDiagnosis.objects.has_considered_valid(new_job_seeker, for_siae=siae))
+        assert response.status_code == 200
+        assert not EligibilityDiagnosis.objects.has_considered_valid(new_job_seeker, for_siae=siae)
         self.assertTemplateUsed(response, "apply/includes/known_criteria.html", count=1)
 
         response = self.client.post(next_url, {"level_1_1": True})
-        self.assertEqual(response.status_code, 302)
-        self.assertTrue(EligibilityDiagnosis.objects.has_considered_valid(new_job_seeker, for_siae=siae))
+        assert response.status_code == 302
+        assert EligibilityDiagnosis.objects.has_considered_valid(new_job_seeker, for_siae=siae)
 
         next_url = reverse("apply:application_resume", kwargs={"siae_pk": siae.pk})
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         # Step application's resume.
         # ----------------------------------------------------------------------
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Test fields mandatory to upload to S3
         s3_upload = S3Upload(kind="resume")
@@ -835,30 +813,30 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
                 "resume_link": "https://server.com/rocky-balboa.pdf",
             },
         )
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         job_application = JobApplication.objects.get(sender=user, to_siae=siae)
-        self.assertEqual(job_application.job_seeker, new_job_seeker)
-        self.assertEqual(job_application.sender_kind, SenderKind.PRESCRIBER)
-        self.assertEqual(job_application.sender_siae, None)
-        self.assertEqual(job_application.sender_prescriber_organization, prescriber_organization)
-        self.assertEqual(job_application.state, job_application.state.workflow.STATE_NEW)
-        self.assertEqual(job_application.message, "Lorem ipsum dolor sit amet, consectetur adipiscing elit.")
-        self.assertEqual(
-            list(job_application.selected_jobs.all()),
-            [siae.job_description_through.first(), siae.job_description_through.last()],
-        )
-        self.assertEqual(job_application.resume_link, "https://server.com/rocky-balboa.pdf")
+        assert job_application.job_seeker == new_job_seeker
+        assert job_application.sender_kind == SenderKind.PRESCRIBER
+        assert job_application.sender_siae is None
+        assert job_application.sender_prescriber_organization == prescriber_organization
+        assert job_application.state == job_application.state.workflow.STATE_NEW
+        assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+        assert list(job_application.selected_jobs.all()) == [
+            siae.job_description_through.first(),
+            siae.job_description_through.last(),
+        ]
+        assert job_application.resume_link == "https://server.com/rocky-balboa.pdf"
 
-        self.assertNotIn(f"job_application-{siae.pk}", self.client.session)
+        assert f"job_application-{siae.pk}" not in self.client.session
 
         next_url = reverse("apply:application_end", kwargs={"siae_pk": siae.pk, "application_pk": job_application.pk})
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         # Step application's end.
         # ----------------------------------------------------------------------
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_apply_as_authorized_prescriber_to_siae_for_approval_in_waiting_period(self):
         """
@@ -883,18 +861,18 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
         response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"}, follow=True)
 
         # …until a job seeker has to be determined…
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         last_url = response.redirect_chain[-1][0]
-        self.assertEqual(last_url, reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk}))
+        assert last_url == reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk})
 
         # …choose one, then follow all redirections…
         post_data = {"nir": job_seeker.nir, "confirm": 1}
         response = self.client.post(last_url, data=post_data, follow=True)
 
         # …until the eligibility step which should trigger a 200 OK.
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         last_url = response.redirect_chain[-1][0]
-        self.assertEqual(last_url, reverse("apply:application_jobs", kwargs={"siae_pk": siae.pk}))
+        assert last_url == reverse("apply:application_jobs", kwargs={"siae_pk": siae.pk})
 
 
 class ApplyAsPrescriberTest(S3AccessingTestCase):
@@ -923,39 +901,39 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
         # ----------------------------------------------------------------------
 
         response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"})
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         session_data = self.client.session[f"job_application-{siae.pk}"]
-        self.assertDictEqual(session_data, self.default_session_data)
+        assert session_data == self.default_session_data
 
         next_url = reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk})
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         # Step determine the job seeker with a NIR.
         # ----------------------------------------------------------------------
 
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         response = self.client.post(next_url, data={"nir": dummy_job_seeker_profile.user.nir, "confirm": 1})
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         expected_session_data = self.default_session_data | {
             "nir": dummy_job_seeker_profile.user.nir,
         }
-        self.assertDictEqual(self.client.session[f"job_application-{siae.pk}"], expected_session_data)
+        assert self.client.session[f"job_application-{siae.pk}"] == expected_session_data
 
         next_url = reverse("apply:check_email_for_sender", kwargs={"siae_pk": siae.pk})
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         # Step get job seeker e-mail.
         # ----------------------------------------------------------------------
 
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         response = self.client.post(next_url, data={"email": dummy_job_seeker_profile.user.email, "confirm": "1"})
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
         job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
 
         expected_job_seeker_session = {
@@ -964,19 +942,19 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
                 "nir": dummy_job_seeker_profile.user.nir,
             }
         }
-        self.assertEqual(self.client.session[job_seeker_session_name], expected_job_seeker_session)
+        assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
             "apply:create_job_seeker_step_1_for_sender",
             kwargs={"siae_pk": siae.pk, "session_uuid": job_seeker_session_name},
         )
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         # Step create a job seeker.
         # ----------------------------------------------------------------------
 
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         post_data = {
             "title": dummy_job_seeker_profile.user.title,
@@ -985,18 +963,18 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
             "birthdate": dummy_job_seeker_profile.user.birthdate,
         }
         response = self.client.post(next_url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
         expected_job_seeker_session["user"] |= post_data
-        self.assertEqual(self.client.session[job_seeker_session_name], expected_job_seeker_session)
+        assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
             "apply:create_job_seeker_step_2_for_sender",
             kwargs={"siae_pk": siae.pk, "session_uuid": job_seeker_session_name},
         )
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         post_data = {
             "address_line_1": dummy_job_seeker_profile.user.address_line_1,
@@ -1006,24 +984,24 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
             "phone": dummy_job_seeker_profile.user.phone,
         }
         response = self.client.post(next_url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
         expected_job_seeker_session["user"] |= post_data | {"department": "67", "address_line_2": ""}
-        self.assertEqual(self.client.session[job_seeker_session_name], expected_job_seeker_session)
+        assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
             "apply:create_job_seeker_step_3_for_sender",
             kwargs={"siae_pk": siae.pk, "session_uuid": job_seeker_session_name},
         )
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         post_data = {
             "education_level": dummy_job_seeker_profile.education_level,
         }
         response = self.client.post(next_url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
         expected_job_seeker_session["profile"] = post_data | {
             "resourceless": False,
             "rqth_employee": False,
@@ -1045,16 +1023,16 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
             "pole_emploi_id": "",
             "lack_of_pole_emploi_id_reason": User.REASON_NOT_REGISTERED,
         }
-        self.assertEqual(self.client.session[job_seeker_session_name], expected_job_seeker_session)
+        assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
             "apply:create_job_seeker_step_end_for_sender",
             kwargs={"siae_pk": siae.pk, "session_uuid": job_seeker_session_name},
         )
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Let's add another job seeker with exactly the same NIR, in the middle of the process.
         # ----------------------------------------------------------------------
@@ -1071,53 +1049,49 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
         other_job_seeker.delete()
 
         response = self.client.post(next_url)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
-        self.assertNotIn(job_seeker_session_name, self.client.session)
+        assert job_seeker_session_name not in self.client.session
         new_job_seeker = User.objects.get(email=dummy_job_seeker_profile.user.email)
         expected_session_data = self.default_session_data | {
             "nir": dummy_job_seeker_profile.user.nir,
             "job_seeker_pk": new_job_seeker.pk,
         }
-        self.assertEqual(self.client.session[f"job_application-{siae.pk}"], expected_session_data)
+        assert self.client.session[f"job_application-{siae.pk}"] == expected_session_data
 
         next_url = reverse("apply:application_jobs", kwargs={"siae_pk": siae.pk})
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         # Step application's jobs.
         # ----------------------------------------------------------------------
 
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         response = self.client.post(next_url, data={"selected_jobs": [siae.job_description_through.first().pk]})
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
-        self.assertDictEqual(
-            self.client.session[f"job_application-{siae.pk}"],
-            self.default_session_data
-            | {
-                "nir": dummy_job_seeker_profile.user.nir,
-                "job_seeker_pk": new_job_seeker.pk,
-                "selected_jobs": [siae.job_description_through.first().pk],
-            },
-        )
+        assert self.client.session[f"job_application-{siae.pk}"] == self.default_session_data | {
+            "nir": dummy_job_seeker_profile.user.nir,
+            "job_seeker_pk": new_job_seeker.pk,
+            "selected_jobs": [siae.job_description_through.first().pk],
+        }
 
         next_url = reverse("apply:application_eligibility", kwargs={"siae_pk": siae.pk})
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         # Step application's eligibility.
         # ----------------------------------------------------------------------
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         next_url = reverse("apply:application_resume", kwargs={"siae_pk": siae.pk})
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         # Step application's resume.
         # ----------------------------------------------------------------------
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Test fields mandatory to upload to S3
         s3_upload = S3Upload(kind="resume")
@@ -1136,30 +1110,30 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
                 "resume_link": "https://server.com/rocky-balboa.pdf",
             },
         )
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         job_application = JobApplication.objects.get(sender=user, to_siae=siae)
-        self.assertEqual(job_application.job_seeker, new_job_seeker)
-        self.assertEqual(job_application.sender_kind, SenderKind.PRESCRIBER)
-        self.assertEqual(job_application.sender_siae, None)
-        self.assertEqual(job_application.sender_prescriber_organization, None)
-        self.assertEqual(job_application.state, job_application.state.workflow.STATE_NEW)
-        self.assertEqual(job_application.message, "Lorem ipsum dolor sit amet, consectetur adipiscing elit.")
-        self.assertEqual(
-            list(job_application.selected_jobs.all()),
-            [siae.job_description_through.first(), siae.job_description_through.last()],
-        )
-        self.assertEqual(job_application.resume_link, "https://server.com/rocky-balboa.pdf")
+        assert job_application.job_seeker == new_job_seeker
+        assert job_application.sender_kind == SenderKind.PRESCRIBER
+        assert job_application.sender_siae is None
+        assert job_application.sender_prescriber_organization is None
+        assert job_application.state == job_application.state.workflow.STATE_NEW
+        assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+        assert list(job_application.selected_jobs.all()) == [
+            siae.job_description_through.first(),
+            siae.job_description_through.last(),
+        ]
+        assert job_application.resume_link == "https://server.com/rocky-balboa.pdf"
 
-        self.assertNotIn(f"job_application-{siae.pk}", self.client.session)
+        assert f"job_application-{siae.pk}" not in self.client.session
 
         next_url = reverse("apply:application_end", kwargs={"siae_pk": siae.pk, "application_pk": job_application.pk})
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         # Step application's end.
         # ----------------------------------------------------------------------
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_apply_as_prescriber_for_approval_in_waiting_period(self):
         """Apply as prescriber for a job seeker with an approval in waiting period."""
@@ -1180,19 +1154,19 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
         response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"}, follow=True)
 
         # …until a job seeker has to be determined…
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         last_url = response.redirect_chain[-1][0]
-        self.assertEqual(last_url, reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk}))
+        assert last_url == reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk})
 
         # …choose one, then follow all redirections…
         post_data = {"nir": job_seeker.nir, "confirm": 1}
         response = self.client.post(last_url, data=post_data, follow=True)
 
         # …until the expected 403.
-        self.assertEqual(response.status_code, 403)
-        self.assertIn("Le candidat a terminé un parcours", response.context["exception"])
+        assert response.status_code == 403
+        assert "Le candidat a terminé un parcours" in response.context["exception"]
         last_url = response.redirect_chain[-1][0]
-        self.assertEqual(last_url, reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk}))
+        assert last_url == reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk})
 
     def test_apply_as_prescriber_on_job_seeker_tunnel(self):
         siae = SiaeFactory()
@@ -1201,15 +1175,15 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
 
         # Without a session namespace
         response = self.client.get(reverse("apply:check_nir_for_job_seeker", kwargs={"siae_pk": siae.pk}))
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
         # With a session namespace
         self.client.get(
             reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"}
         )  # Use that view to init the session
         response = self.client.get(reverse("apply:check_nir_for_job_seeker", kwargs={"siae_pk": siae.pk}))
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("apply:start", kwargs={"siae_pk": siae.pk}))
+        assert response.status_code == 302
+        assert response.url == reverse("apply:start", kwargs={"siae_pk": siae.pk})
 
 
 class ApplyAsPrescriberNirExceptionsTest(S3AccessingTestCase):
@@ -1249,9 +1223,9 @@ class ApplyAsPrescriberNirExceptionsTest(S3AccessingTestCase):
         response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"}, follow=True)
 
         # …until a job seeker has to be determined.
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         last_url = response.redirect_chain[-1][0]
-        self.assertEqual(last_url, reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk}))
+        assert last_url == reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk})
 
         # Enter a non-existing NIR.
         # ----------------------------------------------------------------------
@@ -1269,11 +1243,10 @@ class ApplyAsPrescriberNirExceptionsTest(S3AccessingTestCase):
         # ----------------------------------------------------------------------
         post_data = {"email": job_seeker.email, "confirm": "1"}
         response = self.client.post(next_url, data=post_data)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(
+        assert response.status_code == 200
+        assert (
             "Le<b> numéro de sécurité sociale</b> renseigné (141068078200557) "
-            "est déjà utilisé par un autre candidat sur la Plateforme.",
-            str(list(response.context["messages"])[0]),
+            "est déjà utilisé par un autre candidat sur la Plateforme." in str(list(response.context["messages"])[0])
         )
 
         # Remove that extra job seeker and proceed with "normal" flow
@@ -1286,13 +1259,13 @@ class ApplyAsPrescriberNirExceptionsTest(S3AccessingTestCase):
         )
 
         response = self.client.post(next_url, data=post_data, follow=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(0, len(list(response.context["messages"])))
+        assert response.status_code == 200
+        assert 0 == len(list(response.context["messages"]))
 
         # Make sure the job seeker NIR is now filled in.
         # ----------------------------------------------------------------------
         job_seeker.refresh_from_db()
-        self.assertEqual(job_seeker.nir, nir)
+        assert job_seeker.nir == nir
 
 
 class ApplyAsSiaeTest(S3AccessingTestCase):
@@ -1318,7 +1291,7 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
         self.client.force_login(user)
 
         response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae2.pk}), {"back_url": "/"})
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
     def test_apply_as_siae(self):
         """Apply as SIAE."""
@@ -1334,39 +1307,39 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
         # ----------------------------------------------------------------------
 
         response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"})
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         session_data = self.client.session[f"job_application-{siae.pk}"]
-        self.assertDictEqual(session_data, self.default_session_data)
+        assert session_data == self.default_session_data
 
         next_url = reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk})
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         # Step determine the job seeker with a NIR.
         # ----------------------------------------------------------------------
 
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         response = self.client.post(next_url, data={"nir": dummy_job_seeker_profile.user.nir, "confirm": 1})
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         expected_session_data = self.default_session_data | {
             "nir": dummy_job_seeker_profile.user.nir,
         }
-        self.assertDictEqual(self.client.session[f"job_application-{siae.pk}"], expected_session_data)
+        assert self.client.session[f"job_application-{siae.pk}"] == expected_session_data
 
         next_url = reverse("apply:check_email_for_sender", kwargs={"siae_pk": siae.pk})
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         # Step get job seeker e-mail.
         # ----------------------------------------------------------------------
 
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         response = self.client.post(next_url, data={"email": dummy_job_seeker_profile.user.email, "confirm": "1"})
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
         job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
 
         expected_job_seeker_session = {
@@ -1375,19 +1348,19 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
                 "nir": dummy_job_seeker_profile.user.nir,
             }
         }
-        self.assertEqual(self.client.session[job_seeker_session_name], expected_job_seeker_session)
+        assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
             "apply:create_job_seeker_step_1_for_sender",
             kwargs={"siae_pk": siae.pk, "session_uuid": job_seeker_session_name},
         )
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         # Step create a job seeker.
         # ----------------------------------------------------------------------
 
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         post_data = {
             "title": dummy_job_seeker_profile.user.title,
@@ -1396,18 +1369,18 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
             "birthdate": dummy_job_seeker_profile.user.birthdate,
         }
         response = self.client.post(next_url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
         expected_job_seeker_session["user"] |= post_data
-        self.assertEqual(self.client.session[job_seeker_session_name], expected_job_seeker_session)
+        assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
             "apply:create_job_seeker_step_2_for_sender",
             kwargs={"siae_pk": siae.pk, "session_uuid": job_seeker_session_name},
         )
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         post_data = {
             "address_line_1": dummy_job_seeker_profile.user.address_line_1,
@@ -1417,24 +1390,24 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
             "phone": dummy_job_seeker_profile.user.phone,
         }
         response = self.client.post(next_url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
         expected_job_seeker_session["user"] |= post_data | {"department": "67", "address_line_2": ""}
-        self.assertEqual(self.client.session[job_seeker_session_name], expected_job_seeker_session)
+        assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
             "apply:create_job_seeker_step_3_for_sender",
             kwargs={"siae_pk": siae.pk, "session_uuid": job_seeker_session_name},
         )
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         post_data = {
             "education_level": dummy_job_seeker_profile.education_level,
         }
         response = self.client.post(next_url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
         expected_job_seeker_session["profile"] = post_data | {
             "resourceless": False,
             "rqth_employee": False,
@@ -1456,65 +1429,61 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
             "pole_emploi_id": "",
             "lack_of_pole_emploi_id_reason": User.REASON_NOT_REGISTERED,
         }
-        self.assertEqual(self.client.session[job_seeker_session_name], expected_job_seeker_session)
+        assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
             "apply:create_job_seeker_step_end_for_sender",
             kwargs={"siae_pk": siae.pk, "session_uuid": job_seeker_session_name},
         )
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         response = self.client.post(next_url)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
-        self.assertNotIn(job_seeker_session_name, self.client.session)
+        assert job_seeker_session_name not in self.client.session
         new_job_seeker = User.objects.get(email=dummy_job_seeker_profile.user.email)
         expected_session_data = self.default_session_data | {
             "nir": dummy_job_seeker_profile.user.nir,
             "job_seeker_pk": new_job_seeker.pk,
         }
-        self.assertEqual(self.client.session[f"job_application-{siae.pk}"], expected_session_data)
+        assert self.client.session[f"job_application-{siae.pk}"] == expected_session_data
 
         next_url = reverse("apply:application_jobs", kwargs={"siae_pk": siae.pk})
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         # Step application's jobs.
         # ----------------------------------------------------------------------
 
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         response = self.client.post(next_url, data={"selected_jobs": [siae.job_description_through.first().pk]})
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
-        self.assertDictEqual(
-            self.client.session[f"job_application-{siae.pk}"],
-            self.default_session_data
-            | {
-                "nir": dummy_job_seeker_profile.user.nir,
-                "job_seeker_pk": new_job_seeker.pk,
-                "selected_jobs": [siae.job_description_through.first().pk],
-            },
-        )
+        assert self.client.session[f"job_application-{siae.pk}"] == self.default_session_data | {
+            "nir": dummy_job_seeker_profile.user.nir,
+            "job_seeker_pk": new_job_seeker.pk,
+            "selected_jobs": [siae.job_description_through.first().pk],
+        }
 
         next_url = reverse("apply:application_eligibility", kwargs={"siae_pk": siae.pk})
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         # Step application's eligibility.
         # ----------------------------------------------------------------------
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         next_url = reverse("apply:application_resume", kwargs={"siae_pk": siae.pk})
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         # Step application's resume.
         # ----------------------------------------------------------------------
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Test fields mandatory to upload to S3
         s3_upload = S3Upload(kind="resume")
@@ -1533,30 +1502,30 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
                 "resume_link": "https://server.com/rocky-balboa.pdf",
             },
         )
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         job_application = JobApplication.objects.get(sender=user, to_siae=siae)
-        self.assertEqual(job_application.job_seeker, new_job_seeker)
-        self.assertEqual(job_application.sender_kind, SenderKind.SIAE_STAFF)
-        self.assertEqual(job_application.sender_siae, siae)
-        self.assertEqual(job_application.sender_prescriber_organization, None)
-        self.assertEqual(job_application.state, job_application.state.workflow.STATE_NEW)
-        self.assertEqual(job_application.message, "Lorem ipsum dolor sit amet, consectetur adipiscing elit.")
-        self.assertEqual(
-            list(job_application.selected_jobs.all()),
-            [siae.job_description_through.first(), siae.job_description_through.last()],
-        )
-        self.assertEqual(job_application.resume_link, "https://server.com/rocky-balboa.pdf")
+        assert job_application.job_seeker == new_job_seeker
+        assert job_application.sender_kind == SenderKind.SIAE_STAFF
+        assert job_application.sender_siae == siae
+        assert job_application.sender_prescriber_organization is None
+        assert job_application.state == job_application.state.workflow.STATE_NEW
+        assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+        assert list(job_application.selected_jobs.all()) == [
+            siae.job_description_through.first(),
+            siae.job_description_through.last(),
+        ]
+        assert job_application.resume_link == "https://server.com/rocky-balboa.pdf"
 
-        self.assertNotIn(f"job_application-{siae.pk}", self.client.session)
+        assert f"job_application-{siae.pk}" not in self.client.session
 
         next_url = reverse("apply:application_end", kwargs={"siae_pk": siae.pk, "application_pk": job_application.pk})
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         # Step application's end.
         # ----------------------------------------------------------------------
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_apply_as_siae_for_approval_in_waiting_period(self):
         """Apply as SIAE for a job seeker with an approval in waiting period."""
@@ -1577,9 +1546,9 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
         response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"}, follow=True)
 
         # …until a job seeker has to be determined…
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         last_url = response.redirect_chain[-1][0]
-        self.assertEqual(last_url, reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk}))
+        assert last_url == reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk})
 
         # …choose one, then follow all redirections…
         post_data = {
@@ -1589,10 +1558,10 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
         response = self.client.post(last_url, data=post_data, follow=True)
 
         # …until the expected 403.
-        self.assertEqual(response.status_code, 403)
-        self.assertIn("Le candidat a terminé un parcours", response.context["exception"])
+        assert response.status_code == 403
+        assert "Le candidat a terminé un parcours" in response.context["exception"]
         last_url = response.redirect_chain[-1][0]
-        self.assertEqual(last_url, reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk}))
+        assert last_url == reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk})
 
 
 class ApplyAsOtherTest(TestCase):
@@ -1611,7 +1580,7 @@ class ApplyAsOtherTest(TestCase):
         for route in self.ROUTES:
             with self.subTest(route=route):
                 response = self.client.get(reverse(route, kwargs={"siae_pk": siae.pk}), follow=True)
-                self.assertEqual(response.status_code, 403)
+                assert response.status_code == 403
 
     def test_an_account_without_rights_is_not_allowed_to_submit_application(self):
         siae = SiaeFactory()
@@ -1622,7 +1591,7 @@ class ApplyAsOtherTest(TestCase):
         for route in self.ROUTES:
             with self.subTest(route=route):
                 response = self.client.get(reverse(route, kwargs={"siae_pk": siae.pk}), follow=True)
-                self.assertEqual(response.status_code, 403)
+                assert response.status_code == 403
 
 
 class ApplicationViewTest(S3AccessingTestCase):
@@ -1640,11 +1609,10 @@ class ApplicationViewTest(S3AccessingTestCase):
         apply_session.save()
 
         response = self.client.get(reverse("apply:application_jobs", kwargs={"siae_pk": siae.pk}))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            response.context["form"].initial["selected_jobs"],
-            [jd.pk for jd in siae.job_description_through.all()],
-        )
+        assert response.status_code == 200
+        assert response.context["form"].initial["selected_jobs"] == [
+            jd.pk for jd in siae.job_description_through.all()
+        ]
 
     def test_application_resume_hidden_fields(self):
         siae = SiaeFactory(with_membership=True, with_jobs=True)
@@ -1660,7 +1628,7 @@ class ApplicationViewTest(S3AccessingTestCase):
         apply_session.save()
 
         response = self.client.get(reverse("apply:application_resume", kwargs={"siae_pk": siae.pk}))
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, 'name="selected_jobs"')
         self.assertContains(response, 'name="resume_link"')
 
@@ -1723,9 +1691,8 @@ class ApplicationViewTest(S3AccessingTestCase):
         self.assertRedirects(
             response, reverse("apply:application_resume", kwargs={"siae_pk": siae.pk}), fetch_redirect_response=False
         )
-        self.assertEqual(
-            [eligibility_diagnosis],
-            list(EligibilityDiagnosis.objects.for_job_seeker(eligibility_diagnosis.job_seeker)),
+        assert [eligibility_diagnosis] == list(
+            EligibilityDiagnosis.objects.for_job_seeker(eligibility_diagnosis.job_seeker)
         )
 
         # If "shrouded" is NOT present then we update the eligibility diagnosis
@@ -1739,5 +1706,5 @@ class ApplicationViewTest(S3AccessingTestCase):
         new_eligibility_diagnosis = (
             EligibilityDiagnosis.objects.for_job_seeker(eligibility_diagnosis.job_seeker).order_by().last()
         )
-        self.assertNotEqual(new_eligibility_diagnosis, eligibility_diagnosis)
-        self.assertEqual(new_eligibility_diagnosis.author, prescriber)
+        assert new_eligibility_diagnosis != eligibility_diagnosis
+        assert new_eligibility_diagnosis.author == prescriber

@@ -101,18 +101,10 @@ class SiaeJobApplicationListViewTest(S3AccessingTestCase):
         ):
             response = self.client.get(self.url(evaluated_siae))
 
-        self.assertEqual(
-            evaluated_siae.evaluation_campaign.evaluations_asked_at, response.context["evaluations_asked_at"]
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            evaluated_job_application,
-            response.context["evaluated_job_applications"][0],
-        )
-        self.assertEqual(
-            reverse("dashboard:index"),
-            response.context["back_url"],
-        )
+        assert evaluated_siae.evaluation_campaign.evaluations_asked_at == response.context["evaluations_asked_at"]
+        assert response.status_code == 200
+        assert evaluated_job_application == response.context["evaluated_job_applications"][0]
+        assert reverse("dashboard:index") == response.context["back_url"]
 
         self.assertContains(
             response,
@@ -128,7 +120,7 @@ class SiaeJobApplicationListViewTest(S3AccessingTestCase):
 
         # no criterion selected
         response = self.client.get(self.url(evaluated_siae))
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(
             response,
             reverse(
@@ -143,7 +135,7 @@ class SiaeJobApplicationListViewTest(S3AccessingTestCase):
             proof_url="",
         )
         response = self.client.get(self.url(evaluated_siae))
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(
             response,
             reverse(
@@ -159,7 +151,7 @@ class SiaeJobApplicationListViewTest(S3AccessingTestCase):
         )
         self.client.force_login(self.user)
         response = self.client.get(self.url(evaluated_job_application.evaluated_siae))
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(
             response,
             reverse(
@@ -249,7 +241,7 @@ class SiaeSelectCriteriaViewTest(TestCase):
             )
         )
 
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
     def test_access_on_ended_campaign(self):
         self.client.force_login(self.user)
@@ -264,7 +256,7 @@ class SiaeSelectCriteriaViewTest(TestCase):
             )
         )
 
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
     def test_access(self):
         self.client.force_login(self.user)
@@ -279,32 +271,20 @@ class SiaeSelectCriteriaViewTest(TestCase):
             )
         )
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
-        self.assertEqual(
-            evaluated_job_application.job_application.job_seeker,
-            response.context["job_seeker"],
-        )
-        self.assertEqual(
-            evaluated_job_application.job_application.approval,
-            response.context["approval"],
-        )
-        self.assertEqual(
+        assert evaluated_job_application.job_application.job_seeker == response.context["job_seeker"]
+        assert evaluated_job_application.job_application.approval == response.context["approval"]
+        assert (
             reverse(
                 "siae_evaluations_views:siae_job_applications_list",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
-            + f"#{evaluated_job_application.pk}",
-            response.context["back_url"],
+            + f"#{evaluated_job_application.pk}"
+            == response.context["back_url"]
         )
-        self.assertEqual(
-            evaluated_job_application.state,
-            response.context["state"],
-        )
-        self.assertEqual(
-            evaluated_siae.siae.kind,
-            response.context["kind"],
-        )
+        assert evaluated_job_application.state == response.context["state"]
+        assert evaluated_siae.siae.kind == response.context["kind"]
 
     def test_context_fields_list(self):
         self.client.force_login(self.user)
@@ -326,9 +306,9 @@ class SiaeSelectCriteriaViewTest(TestCase):
                     kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
                 )
             )
-            self.assertEqual(response.status_code, 200)
-            self.assertIs(level_1, bool(response.context["level_1_fields"]))
-            self.assertIs(level_2, bool(response.context["level_2_fields"]))
+            assert response.status_code == 200
+            assert level_1 is bool(response.context["level_1_fields"])
+            assert level_2 is bool(response.context["level_2_fields"])
 
     def test_post(self):
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
@@ -344,15 +324,15 @@ class SiaeSelectCriteriaViewTest(TestCase):
         self.client.force_login(self.user)
 
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         post_data = {criterion.administrative_criteria.key: True}
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(1, EvaluatedAdministrativeCriteria.objects.count())
-        self.assertEqual(
-            criterion.administrative_criteria,
-            EvaluatedAdministrativeCriteria.objects.first().administrative_criteria,
+        assert response.status_code == 302
+        assert 1 == EvaluatedAdministrativeCriteria.objects.count()
+        assert (
+            criterion.administrative_criteria
+            == EvaluatedAdministrativeCriteria.objects.first().administrative_criteria
         )
 
     def test_initial_data_form(self):
@@ -367,14 +347,14 @@ class SiaeSelectCriteriaViewTest(TestCase):
         self.client.force_login(self.user)
 
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         for i in range(len(response.context["level_1_fields"])):
             with self.subTest(i):
-                self.assertNotIn("checked", response.context["level_1_fields"][i].subwidgets[0].data["attrs"])
+                assert "checked" not in response.context["level_1_fields"][i].subwidgets[0].data["attrs"]
         for i in range(len(response.context["level_2_fields"])):
             with self.subTest(i):
-                self.assertNotIn("checked", response.context["level_2_fields"][i].subwidgets[0].data["attrs"])
+                assert "checked" not in response.context["level_2_fields"][i].subwidgets[0].data["attrs"]
 
         # preselected criteria
         criterion = (
@@ -386,15 +366,15 @@ class SiaeSelectCriteriaViewTest(TestCase):
         )
 
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
-        self.assertIn("checked", response.context["level_1_fields"][0].subwidgets[0].data["attrs"])
+        assert "checked" in response.context["level_1_fields"][0].subwidgets[0].data["attrs"]
         for i in range(1, len(response.context["level_1_fields"])):
             with self.subTest(i):
-                self.assertNotIn("checked", response.context["level_1_fields"][i].subwidgets[0].data["attrs"])
+                assert "checked" not in response.context["level_1_fields"][i].subwidgets[0].data["attrs"]
         for i in range(len(response.context["level_2_fields"])):
             with self.subTest(i):
-                self.assertNotIn("checked", response.context["level_2_fields"][i].subwidgets[0].data["attrs"])
+                assert "checked" not in response.context["level_2_fields"][i].subwidgets[0].data["attrs"]
 
 
 class SiaeUploadDocsViewTest(S3AccessingTestCase):
@@ -411,7 +391,7 @@ class SiaeUploadDocsViewTest(S3AccessingTestCase):
                 kwargs={"evaluated_administrative_criteria_pk": 10000},
             )
         )
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
     def test_access_without_ownership(self):
         membership = SiaeMembershipFactory()
@@ -433,7 +413,7 @@ class SiaeUploadDocsViewTest(S3AccessingTestCase):
                 kwargs={"evaluated_administrative_criteria_pk": evaluated_administrative_criteria.pk},
             )
         )
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
     def test_access_on_ended_campaign(self):
         self.client.force_login(self.user)
@@ -451,7 +431,7 @@ class SiaeUploadDocsViewTest(S3AccessingTestCase):
             kwargs={"evaluated_administrative_criteria_pk": evaluated_administrative_criteria.pk},
         )
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
     @freeze_time("2022-09-14 11:11:11")
     def test_access(self):
@@ -474,29 +454,26 @@ class SiaeUploadDocsViewTest(S3AccessingTestCase):
             kwargs={"evaluated_administrative_criteria_pk": evaluated_administrative_criteria.pk},
         )
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
-        self.assertEqual(
-            evaluated_administrative_criteria,
-            response.context["evaluated_administrative_criteria"],
-        )
-        self.assertEqual(
+        assert evaluated_administrative_criteria == response.context["evaluated_administrative_criteria"]
+        assert (
             reverse(
                 "siae_evaluations_views:siae_job_applications_list",
                 kwargs={"evaluated_siae_pk": evaluated_job_application.evaluated_siae_id},
             )
-            + f"#{evaluated_job_application.pk}",
-            response.context["back_url"],
+            + f"#{evaluated_job_application.pk}"
+            == response.context["back_url"]
         )
-        self.assertEqual(evaluated_administrative_criteria, response.context["evaluated_administrative_criteria"])
+        assert evaluated_administrative_criteria == response.context["evaluated_administrative_criteria"]
 
         for k, v in s3_upload.form_values.items():
             with self.subTest("s3_upload.form_values", k=k):
-                self.assertEqual(v, response.context["s3_upload"].form_values[k])
+                assert v == response.context["s3_upload"].form_values[k]
 
         for k, v in s3_upload.config.items():
             with self.subTest("s3_upload.config", k=k):
-                self.assertEqual(v, response.context["s3_upload"].config[k])
+                assert v == response.context["s3_upload"].config[k]
 
     def test_post(self):
         fake_now = timezone.now()
@@ -518,7 +495,7 @@ class SiaeUploadDocsViewTest(S3AccessingTestCase):
             kwargs={"evaluated_administrative_criteria_pk": evaluated_administrative_criteria.pk},
         )
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Test fields mandatory to upload to S3
         s3_upload = S3Upload(kind="evaluations")
@@ -535,7 +512,7 @@ class SiaeUploadDocsViewTest(S3AccessingTestCase):
             "proof_url": "https://server.com/rocky-balboa.pdf",
         }
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         next_url = (
             reverse(
@@ -544,15 +521,15 @@ class SiaeUploadDocsViewTest(S3AccessingTestCase):
             )
             + f"#{evaluated_job_application.pk}"
         )
-        self.assertEqual(response.url, next_url)
+        assert response.url == next_url
 
         # using already setup test data to control save method of the form
         evaluated_administrative_criteria.refresh_from_db()
-        self.assertIsNone(evaluated_administrative_criteria.submitted_at)
-        self.assertGreater(evaluated_administrative_criteria.uploaded_at, fake_now - relativedelta(days=1))
-        self.assertEqual(
-            evaluated_administrative_criteria.review_state,
-            evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING,
+        assert evaluated_administrative_criteria.submitted_at is None
+        assert evaluated_administrative_criteria.uploaded_at > fake_now - relativedelta(days=1)
+        assert (
+            evaluated_administrative_criteria.review_state
+            == evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
         )
 
 
@@ -589,10 +566,10 @@ class SiaeSubmitProofsViewTest(TestCase):
 
             response = self.client.post(self.url(evaluated_job_application.evaluated_siae))
 
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("dashboard:index"))
+        assert response.status_code == 302
+        assert response.url == reverse("dashboard:index")
         evaluated_administrative_criteria.refresh_from_db()
-        self.assertNotEqual(evaluated_administrative_criteria.submitted_at, None)
+        assert evaluated_administrative_criteria.submitted_at is not None
 
     def test_is_not_submittable(self):
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
@@ -600,13 +577,10 @@ class SiaeSubmitProofsViewTest(TestCase):
         self.client.force_login(self.user)
 
         response = self.client.post(self.url(evaluated_job_application.evaluated_siae))
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(
-            response.url,
-            reverse(
-                "siae_evaluations_views:siae_job_applications_list",
-                kwargs={"evaluated_siae_pk": evaluated_job_application.evaluated_siae_id},
-            ),
+        assert response.status_code == 302
+        assert response.url == reverse(
+            "siae_evaluations_views:siae_job_applications_list",
+            kwargs={"evaluated_siae_pk": evaluated_job_application.evaluated_siae_id},
         )
 
     def test_is_submittable_with_accepted(self):
@@ -624,22 +598,20 @@ class SiaeSubmitProofsViewTest(TestCase):
 
         self.client.force_login(self.user)
         response = self.client.post(self.url(evaluated_job_application.evaluated_siae))
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         evaluated_administrative_criteria0.refresh_from_db()
-        self.assertEqual(
-            evaluated_administrative_criteria0.review_state,
-            evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING,
+        assert (
+            evaluated_administrative_criteria0.review_state
+            == evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
         )
 
         evaluated_administrative_criteria1.refresh_from_db()
-        self.assertEqual(
-            evaluated_administrative_criteria1.review_state,
-            evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+        assert (
+            evaluated_administrative_criteria1.review_state
+            == evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         )
-        self.assertLess(
-            evaluated_administrative_criteria1.submitted_at, evaluated_administrative_criteria0.submitted_at
-        )
+        assert evaluated_administrative_criteria1.submitted_at < evaluated_administrative_criteria0.submitted_at
 
     def test_is_submittable_with_a_forgotten_submitted_doc(self):
         fake_now = timezone.now()
@@ -661,8 +633,8 @@ class SiaeSubmitProofsViewTest(TestCase):
 
         self.client.force_login(self.user)
         response = self.client.post(self.url(submitted_job_application.evaluated_siae))
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, "/dashboard/")
+        assert response.status_code == 302
+        assert response.url == "/dashboard/"
 
     def test_submitted_email(self):
         institution_membership = InstitutionMembershipFactory()
@@ -672,27 +644,21 @@ class SiaeSubmitProofsViewTest(TestCase):
         EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_application)
         self.client.force_login(self.user)
         response = self.client.post(self.url(evaluated_job_application.evaluated_siae))
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
-        self.assertEqual(len(mail.outbox), 1)
+        assert len(mail.outbox) == 1
         email = mail.outbox[0]
-        self.assertEqual(
-            (
-                f"[Contrôle a posteriori] La structure { evaluated_job_application.evaluated_siae.siae.kind } "
-                f"{ evaluated_job_application.evaluated_siae.siae.name } a transmis ses pièces justificatives."
-            ),
-            email.subject,
-        )
-        self.assertIn(
-            (
-                f"La structure { evaluated_job_application.evaluated_siae.siae.kind } "
-                f"{ evaluated_job_application.evaluated_siae.siae.name } vient de vous transmettre ses pièces"
-            ),
-            email.body,
-        )
-        self.assertEqual(
-            email.to[0],
-            evaluated_job_application.evaluated_siae.evaluation_campaign.institution.active_members.first().email,
+        assert (
+            f"[Contrôle a posteriori] La structure { evaluated_job_application.evaluated_siae.siae.kind } "
+            f"{ evaluated_job_application.evaluated_siae.siae.name } a transmis ses pièces justificatives."
+        ) == email.subject
+        assert (
+            f"La structure { evaluated_job_application.evaluated_siae.siae.kind } "
+            f"{ evaluated_job_application.evaluated_siae.siae.name } vient de vous transmettre ses pièces"
+        ) in email.body
+        assert (
+            email.to[0]
+            == evaluated_job_application.evaluated_siae.evaluation_campaign.institution.active_members.first().email
         )
 
     def test_campaign_is_ended(self):
@@ -711,6 +677,6 @@ class SiaeSubmitProofsViewTest(TestCase):
         self.client.force_login(self.user)
         response = self.client.post(self.url(evaluated_job_application.evaluated_siae))
 
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
         evaluated_administrative_criteria.refresh_from_db()
-        self.assertEqual(evaluated_administrative_criteria.submitted_at, None)
+        assert evaluated_administrative_criteria.submitted_at is None

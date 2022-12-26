@@ -30,7 +30,7 @@ class ApprovalSuspendViewTest(TestCase):
         EmployeeRecordFactory(job_application=job_application, status=Status.PROCESSED)
 
         approval = job_application.approval
-        self.assertEqual(0, approval.suspension_set.count())
+        assert 0 == approval.suspension_set.count()
 
         siae_user = job_application.to_siae.members.first()
         self.client.force_login(siae_user)
@@ -41,8 +41,8 @@ class ApprovalSuspendViewTest(TestCase):
         url = f"{url}?{params}"
 
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["preview"], False)
+        assert response.status_code == 200
+        assert response.context["preview"] is False
 
         start_at = today
         end_at = today + relativedelta(days=10)
@@ -58,20 +58,20 @@ class ApprovalSuspendViewTest(TestCase):
 
         # Go to preview.
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["preview"], True)
+        assert response.status_code == 200
+        assert response.context["preview"] is True
 
         # Save to DB.
         del post_data["preview"]
         post_data["save"] = 1
 
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
         self.assertRedirects(response, back_url)
 
-        self.assertEqual(1, approval.suspension_set.count())
+        assert 1 == approval.suspension_set.count()
         suspension = approval.suspension_set.first()
-        self.assertEqual(suspension.created_by, siae_user)
+        assert suspension.created_by == siae_user
 
         # Ensure suspension reason is not displayed in details page
         detail_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
@@ -104,15 +104,15 @@ class ApprovalSuspendViewTest(TestCase):
 
         form = SuspensionForm(approval=job_application.approval, siae=job_application.to_siae, data=post_data)
 
-        self.assertFalse(form.is_valid())
-        self.assertIsNotNone(form.errors["end_at"][0])
+        assert not form.is_valid()
+        assert form.errors["end_at"][0] is not None
 
         # Check 'set_default_end_date' and expect a default end date to be set
         post_data["set_default_end_date"] = True
         form = SuspensionForm(approval=job_application.approval, siae=job_application.to_siae, data=post_data)
 
-        self.assertTrue(form.is_valid())
-        self.assertEqual(form.cleaned_data["end_at"], Suspension.get_max_end_at(today))
+        assert form.is_valid()
+        assert form.cleaned_data["end_at"] == Suspension.get_max_end_at(today)
 
     def test_clean_form(self):
         # Ensure `clean()` is running OK in case of `start_at` error (Sentry issue):
@@ -133,7 +133,7 @@ class ApprovalSuspendViewTest(TestCase):
             "preview": "1",
         }
         form = SuspensionForm(approval=job_application.approval, siae=job_application.to_siae, data=post_data)
-        self.assertFalse(form.is_valid())
+        assert not form.is_valid()
 
     def test_update_suspension(self):
         """
@@ -163,7 +163,7 @@ class ApprovalSuspendViewTest(TestCase):
         url = f"{url}?{params}"
 
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         new_end_at = end_at + relativedelta(days=30)
 
@@ -175,13 +175,13 @@ class ApprovalSuspendViewTest(TestCase):
         }
 
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
         self.assertRedirects(response, back_url)
 
-        self.assertEqual(1, approval.suspension_set.count())
+        assert 1 == approval.suspension_set.count()
         suspension = approval.suspension_set.first()
-        self.assertEqual(suspension.updated_by, siae_user)
-        self.assertEqual(suspension.end_at, new_end_at)
+        assert suspension.updated_by == siae_user
+        assert suspension.end_at == new_end_at
 
     def test_delete_suspension(self):
         """
@@ -211,12 +211,12 @@ class ApprovalSuspendViewTest(TestCase):
         url = f"{url}?{params}"
 
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         post_data = {"confirm": "true"}
 
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
         self.assertRedirects(response, back_url)
 
-        self.assertEqual(0, approval.suspension_set.count())
+        assert 0 == approval.suspension_set.count()

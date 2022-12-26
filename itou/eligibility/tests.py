@@ -29,15 +29,15 @@ class EligibilityDiagnosisQuerySetTest(TestCase):
         expected_num = 5
         EligibilityDiagnosisFactory.create_batch(expected_num)
         ExpiredEligibilityDiagnosisFactory.create_batch(expected_num)
-        self.assertEqual(expected_num * 2, EligibilityDiagnosis.objects.all().count())
-        self.assertEqual(expected_num, EligibilityDiagnosis.objects.valid().count())
+        assert expected_num * 2 == EligibilityDiagnosis.objects.all().count()
+        assert expected_num == EligibilityDiagnosis.objects.valid().count()
 
     def test_expired(self):
         expected_num = 3
         EligibilityDiagnosisFactory.create_batch(expected_num)
         ExpiredEligibilityDiagnosisFactory.create_batch(expected_num)
-        self.assertEqual(expected_num * 2, EligibilityDiagnosis.objects.all().count())
-        self.assertEqual(expected_num, EligibilityDiagnosis.objects.expired().count())
+        assert expected_num * 2 == EligibilityDiagnosis.objects.all().count()
+        assert expected_num == EligibilityDiagnosis.objects.expired().count()
 
 
 class EligibilityDiagnosisManagerTest(TestCase):
@@ -55,29 +55,29 @@ class EligibilityDiagnosisManagerTest(TestCase):
         has_considered_valid = EligibilityDiagnosis.objects.has_considered_valid(job_seeker=job_seeker)
         last_considered_valid = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=job_seeker)
         last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=job_seeker)
-        self.assertIsNone(last_considered_valid)
-        self.assertIsNone(last_expired)
-        self.assertFalse(has_considered_valid)
+        assert last_considered_valid is None
+        assert last_expired is None
+        assert not has_considered_valid
 
         # Has Itou diagnosis.
         diagnosis = EligibilityDiagnosisFactory()
         has_considered_valid = EligibilityDiagnosis.objects.has_considered_valid(job_seeker=diagnosis.job_seeker)
         last_considered_valid = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=diagnosis.job_seeker)
         last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=diagnosis.job_seeker)
-        self.assertEqual(last_considered_valid, diagnosis)
-        self.assertIsNone(last_expired)
-        self.assertTrue(has_considered_valid)
+        assert last_considered_valid == diagnosis
+        assert last_expired is None
+        assert has_considered_valid
 
         # Has a valid PASS IAE but NO diagnosis.
         approval = ApprovalFactory()
         job_seeker = approval.user
-        self.assertEqual(0, job_seeker.eligibility_diagnoses.count())
+        assert 0 == job_seeker.eligibility_diagnoses.count()
         has_considered_valid = EligibilityDiagnosis.objects.has_considered_valid(job_seeker=job_seeker)
         last_considered_valid = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=job_seeker)
         last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=job_seeker)
-        self.assertTrue(has_considered_valid)
-        self.assertIsNone(last_considered_valid)
-        self.assertIsNone(last_expired)
+        assert has_considered_valid
+        assert last_considered_valid is None
+        assert last_expired is None
 
         # Has valid Pôle emploi diagnosis.
         job_seeker = JobSeekerFactory()
@@ -85,9 +85,9 @@ class EligibilityDiagnosisManagerTest(TestCase):
         has_considered_valid = EligibilityDiagnosis.objects.has_considered_valid(job_seeker=job_seeker)
         last_considered_valid = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=job_seeker)
         last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=job_seeker)
-        self.assertTrue(has_considered_valid)
-        self.assertIsNone(last_considered_valid)
-        self.assertIsNone(last_expired)
+        assert has_considered_valid
+        assert last_considered_valid is None
+        assert last_expired is None
 
         # Has expired Pôle emploi diagnosis.
         job_seeker = JobSeekerFactory()
@@ -99,9 +99,9 @@ class EligibilityDiagnosisManagerTest(TestCase):
         has_considered_valid = EligibilityDiagnosis.objects.has_considered_valid(job_seeker=job_seeker)
         last_considered_valid = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=job_seeker)
         last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=job_seeker)
-        self.assertFalse(has_considered_valid)
-        self.assertIsNone(last_considered_valid)
-        self.assertIsNone(last_expired)
+        assert not has_considered_valid
+        assert last_considered_valid is None
+        assert last_expired is None
 
         # Has expired Itou diagnosis.
         expired_diagnosis = ExpiredEligibilityDiagnosisFactory()
@@ -112,9 +112,9 @@ class EligibilityDiagnosisManagerTest(TestCase):
             job_seeker=expired_diagnosis.job_seeker
         )
         last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=expired_diagnosis.job_seeker)
-        self.assertFalse(has_considered_valid)
-        self.assertIsNone(last_considered_valid)
-        self.assertIsNotNone(last_expired)
+        assert not has_considered_valid
+        assert last_considered_valid is None
+        assert last_expired is not None
 
         # Has expired Itou diagnosis but has an ongoing PASS IAE.
         expired_diagnosis = ExpiredEligibilityDiagnosisFactory()
@@ -127,9 +127,9 @@ class EligibilityDiagnosisManagerTest(TestCase):
         )
         last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=expired_diagnosis.job_seeker)
 
-        self.assertTrue(has_considered_valid)
-        self.assertEqual(last_considered_valid, expired_diagnosis)
-        self.assertIsNone(last_expired)
+        assert has_considered_valid
+        assert last_considered_valid == expired_diagnosis
+        assert last_expired is None
 
         # Has Itou diagnosis made by an SIAE.
         siae1 = SiaeFactory(with_membership=True)
@@ -143,9 +143,9 @@ class EligibilityDiagnosisManagerTest(TestCase):
             job_seeker=diagnosis.job_seeker, for_siae=siae1
         )
         last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=diagnosis.job_seeker, for_siae=siae1)
-        self.assertTrue(has_considered_valid)
-        self.assertEqual(last_considered_valid, diagnosis)
-        self.assertIsNone(last_expired)
+        assert has_considered_valid
+        assert last_considered_valid == diagnosis
+        assert last_expired is None
         # From `siae2` perspective.
         has_considered_valid = EligibilityDiagnosis.objects.has_considered_valid(
             job_seeker=diagnosis.job_seeker, for_siae=siae2
@@ -154,9 +154,9 @@ class EligibilityDiagnosisManagerTest(TestCase):
             job_seeker=diagnosis.job_seeker, for_siae=siae2
         )
         last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=diagnosis.job_seeker, for_siae=siae2)
-        self.assertFalse(has_considered_valid)
-        self.assertIsNone(last_considered_valid)
-        self.assertIsNone(last_expired)
+        assert not has_considered_valid
+        assert last_considered_valid is None
+        assert last_expired is None
 
         # Has Itou diagnosis made by a prescriber.
         siae = SiaeFactory(with_membership=True)
@@ -171,9 +171,9 @@ class EligibilityDiagnosisManagerTest(TestCase):
         last_expired = EligibilityDiagnosis.objects.last_expired(
             job_seeker=prescriber_diagnosis.job_seeker, for_siae=siae
         )
-        self.assertTrue(has_considered_valid)
-        self.assertEqual(last_considered_valid, prescriber_diagnosis)
-        self.assertIsNone(last_expired)
+        assert has_considered_valid
+        assert last_considered_valid == prescriber_diagnosis
+        assert last_expired is None
 
         # Has 2 Itou diagnoses: 1 made by an SIAE prior to another one by a prescriber.
         job_seeker = JobSeekerFactory()
@@ -185,10 +185,10 @@ class EligibilityDiagnosisManagerTest(TestCase):
             job_seeker=job_seeker, for_siae=siae
         )
         last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=job_seeker, for_siae=siae)
-        self.assertTrue(has_considered_valid)
+        assert has_considered_valid
         # A diagnosis made by a prescriber takes precedence.
-        self.assertEqual(last_considered_valid, prescriber_diagnosis)
-        self.assertIsNone(last_expired)
+        assert last_considered_valid == prescriber_diagnosis
+        assert last_expired is None
 
         # Has an expired Itou diagnoses made by another SIAE.
         job_seeker = JobSeekerFactory()
@@ -198,9 +198,9 @@ class EligibilityDiagnosisManagerTest(TestCase):
 
         # From `siae` perspective.
         last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=job_seeker, for_siae=siae1)
-        self.assertEqual(last_expired, expired_diagnosis)
+        assert last_expired == expired_diagnosis
         last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=job_seeker, for_siae=siae2)
-        self.assertIsNone(last_expired)
+        assert last_expired is None
 
         # Has 2 Itou diagnoses: 1 is considered expired and the second is considered valid.
         job_seeker = JobSeekerFactory()
@@ -210,8 +210,8 @@ class EligibilityDiagnosisManagerTest(TestCase):
         last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=job_seeker)
         last_considered_valid = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=job_seeker)
         # When has a valid diagnosis, `last_expired` return None
-        self.assertIsNotNone(last_considered_valid)
-        self.assertIsNone(last_expired)
+        assert last_considered_valid is not None
+        assert last_expired is None
 
         # Has 2 Itou diagnoses expired: the last one expired must be returned.
         job_seeker = JobSeekerFactory()
@@ -223,11 +223,11 @@ class EligibilityDiagnosisManagerTest(TestCase):
 
         expired_diagnosis_old = EligibilityDiagnosisFactory(job_seeker=job_seeker, created_at=date_12m)
         last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=job_seeker)
-        self.assertEqual(last_expired, expired_diagnosis_old)
+        assert last_expired == expired_diagnosis_old
 
         expired_diagnosis_last = EligibilityDiagnosisFactory(job_seeker=job_seeker, created_at=date_6m)
         last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=job_seeker)
-        self.assertEqual(last_expired, expired_diagnosis_last)
+        assert last_expired == expired_diagnosis_last
 
 
 class EligibilityDiagnosisModelTest(TestCase):
@@ -241,12 +241,12 @@ class EligibilityDiagnosisModelTest(TestCase):
 
         diagnosis = EligibilityDiagnosis.create_diagnosis(job_seeker, user_info)
 
-        self.assertEqual(diagnosis.job_seeker, job_seeker)
-        self.assertEqual(diagnosis.author, user)
-        self.assertEqual(diagnosis.author_kind, KIND_SIAE_STAFF)
-        self.assertEqual(diagnosis.author_siae, siae)
-        self.assertEqual(diagnosis.author_prescriber_organization, None)
-        self.assertEqual(diagnosis.administrative_criteria.count(), 0)
+        assert diagnosis.job_seeker == job_seeker
+        assert diagnosis.author == user
+        assert diagnosis.author_kind == KIND_SIAE_STAFF
+        assert diagnosis.author_siae == siae
+        assert diagnosis.author_prescriber_organization is None
+        assert diagnosis.administrative_criteria.count() == 0
 
     def test_create_diagnosis_with_administrative_criteria(self):
 
@@ -271,17 +271,17 @@ class EligibilityDiagnosisModelTest(TestCase):
             job_seeker, user_info, administrative_criteria=[criteria1, criteria2, criteria3]
         )
 
-        self.assertEqual(diagnosis.job_seeker, job_seeker)
-        self.assertEqual(diagnosis.author, user)
-        self.assertEqual(diagnosis.author_kind, KIND_PRESCRIBER)
-        self.assertEqual(diagnosis.author_siae, None)
-        self.assertEqual(diagnosis.author_prescriber_organization, prescriber_organization)
+        assert diagnosis.job_seeker == job_seeker
+        assert diagnosis.author == user
+        assert diagnosis.author_kind == KIND_PRESCRIBER
+        assert diagnosis.author_siae is None
+        assert diagnosis.author_prescriber_organization == prescriber_organization
 
         administrative_criteria = diagnosis.administrative_criteria.all()
-        self.assertEqual(3, administrative_criteria.count())
-        self.assertIn(criteria1, administrative_criteria)
-        self.assertIn(criteria2, administrative_criteria)
-        self.assertIn(criteria3, administrative_criteria)
+        assert 3 == administrative_criteria.count()
+        assert criteria1 in administrative_criteria
+        assert criteria2 in administrative_criteria
+        assert criteria3 in administrative_criteria
 
     def test_update_diagnosis(self):
         siae = SiaeFactory(with_membership=True)
@@ -298,18 +298,18 @@ class EligibilityDiagnosisModelTest(TestCase):
         current_diagnosis.refresh_from_db()
 
         # Some information should be copied...
-        self.assertEqual(new_diagnosis.job_seeker, current_diagnosis.job_seeker)
+        assert new_diagnosis.job_seeker == current_diagnosis.job_seeker
         # ... or updated.
-        self.assertEqual(new_diagnosis.author, user_info.user)
-        self.assertEqual(new_diagnosis.author_kind, KIND_SIAE_STAFF)
-        self.assertEqual(new_diagnosis.author_siae, siae)
-        self.assertEqual(new_diagnosis.author_prescriber_organization, None)
-        self.assertEqual(new_diagnosis.administrative_criteria.count(), 0)
+        assert new_diagnosis.author == user_info.user
+        assert new_diagnosis.author_kind == KIND_SIAE_STAFF
+        assert new_diagnosis.author_siae == siae
+        assert new_diagnosis.author_prescriber_organization is None
+        assert new_diagnosis.administrative_criteria.count() == 0
 
         # And the old diagnosis should now be expired (thus considered invalid)
-        self.assertEqual(current_diagnosis.expires_at, new_diagnosis.created_at)
-        self.assertFalse(current_diagnosis.is_valid)
-        self.assertTrue(new_diagnosis.is_valid)
+        assert current_diagnosis.expires_at == new_diagnosis.created_at
+        assert not current_diagnosis.is_valid
+        assert new_diagnosis.is_valid
 
     def test_update_diagnosis_extend_the_validity_only_when_we_have_the_same_author_and_the_same_criteria(self):
         first_diagnosis = EligibilityDiagnosisFactory()
@@ -323,9 +323,9 @@ class EligibilityDiagnosisModelTest(TestCase):
 
         # Same author, same criteria
         previous_expires_at = first_diagnosis.expires_at
-        self.assertIs(EligibilityDiagnosis.update_diagnosis(first_diagnosis, user_info, []), first_diagnosis)
+        assert EligibilityDiagnosis.update_diagnosis(first_diagnosis, user_info, []) is first_diagnosis
         first_diagnosis.refresh_from_db()
-        self.assertGreater(first_diagnosis.expires_at, previous_expires_at)
+        assert first_diagnosis.expires_at > previous_expires_at
 
         criteria = [
             AdministrativeCriteria.objects.get(level=AdministrativeCriteria.Level.LEVEL_1, name="Bénéficiaire du RSA"),
@@ -334,9 +334,9 @@ class EligibilityDiagnosisModelTest(TestCase):
         second_diagnosis = EligibilityDiagnosis.update_diagnosis(first_diagnosis, user_info, criteria)
         first_diagnosis.refresh_from_db()
 
-        self.assertIsNot(second_diagnosis, first_diagnosis)
-        self.assertEqual(first_diagnosis.expires_at, second_diagnosis.created_at)
-        self.assertGreater(second_diagnosis.expires_at, first_diagnosis.expires_at)
+        assert second_diagnosis is not first_diagnosis
+        assert first_diagnosis.expires_at == second_diagnosis.created_at
+        assert second_diagnosis.expires_at > first_diagnosis.expires_at
 
         # Different author, same criteria
         other_prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
@@ -350,32 +350,32 @@ class EligibilityDiagnosisModelTest(TestCase):
         third_diagnosis = EligibilityDiagnosis.update_diagnosis(second_diagnosis, other_user_info, criteria)
         second_diagnosis.refresh_from_db()
 
-        self.assertIsNot(second_diagnosis, third_diagnosis)
-        self.assertEqual(second_diagnosis.expires_at, third_diagnosis.created_at)
-        self.assertGreater(third_diagnosis.expires_at, second_diagnosis.expires_at)
+        assert second_diagnosis is not third_diagnosis
+        assert second_diagnosis.expires_at == third_diagnosis.created_at
+        assert third_diagnosis.expires_at > second_diagnosis.expires_at
 
     def test_is_valid(self):
         # Valid diagnosis.
         diagnosis = EligibilityDiagnosisFactory()
-        self.assertTrue(diagnosis.is_valid)
+        assert diagnosis.is_valid
 
         # Expired diagnosis.
         diagnosis = ExpiredEligibilityDiagnosisFactory()
-        self.assertFalse(diagnosis.is_valid)
+        assert not diagnosis.is_valid
 
     def test_is_considered_valid(self):
         # Valid diagnosis.
         diagnosis = EligibilityDiagnosisFactory()
-        self.assertTrue(diagnosis.is_considered_valid)
+        assert diagnosis.is_considered_valid
 
         # Expired diagnosis.
         diagnosis = ExpiredEligibilityDiagnosisFactory()
-        self.assertFalse(diagnosis.is_considered_valid)
+        assert not diagnosis.is_considered_valid
 
         # Expired diagnosis but ongoing PASS IAE.
         diagnosis = ExpiredEligibilityDiagnosisFactory()
         ApprovalFactory(user=diagnosis.job_seeker)
-        self.assertTrue(diagnosis.is_considered_valid)
+        assert diagnosis.is_considered_valid
 
 
 class AdministrativeCriteriaModelTest(TestCase):
@@ -385,12 +385,12 @@ class AdministrativeCriteriaModelTest(TestCase):
         level2_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_2).first()
 
         qs = AdministrativeCriteria.objects.level1()
-        self.assertIn(level1_criterion, qs)
-        self.assertNotIn(level2_criterion, qs)
+        assert level1_criterion in qs
+        assert level2_criterion not in qs
 
         qs = AdministrativeCriteria.objects.level2()
-        self.assertIn(level2_criterion, qs)
-        self.assertNotIn(level1_criterion, qs)
+        assert level2_criterion in qs
+        assert level1_criterion not in qs
 
     def test_for_job_application(self):
         siae = SiaeFactory(department="14", with_membership=True)
@@ -423,18 +423,17 @@ class AdministrativeCriteriaModelTest(TestCase):
             hiring_start_at=timezone.now() - relativedelta(months=2),
         )
 
-        self.assertIsInstance(
-            AdministrativeCriteria.objects.for_job_application(job_application1),
-            AdministrativeCriteriaQuerySet,
+        assert isinstance(
+            AdministrativeCriteria.objects.for_job_application(job_application1), AdministrativeCriteriaQuerySet
         )
 
-        self.assertEqual(1, AdministrativeCriteria.objects.for_job_application(job_application1).count())
-        self.assertEqual(criteria1, AdministrativeCriteria.objects.for_job_application(job_application1).first())
-        self.assertEqual(0, AdministrativeCriteria.objects.for_job_application(job_application2).count())
+        assert 1 == AdministrativeCriteria.objects.for_job_application(job_application1).count()
+        assert criteria1 == AdministrativeCriteria.objects.for_job_application(job_application1).first()
+        assert 0 == AdministrativeCriteria.objects.for_job_application(job_application2).count()
 
     def test_key_property(self):
         criterion_level_1 = AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_1).first()
-        self.assertEqual(criterion_level_1.key, f"level_{criterion_level_1.level}_{criterion_level_1.pk}")
+        assert criterion_level_1.key == f"level_{criterion_level_1.level}_{criterion_level_1.pk}"
 
         criterion_level_2 = AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_2).first()
-        self.assertEqual(criterion_level_2.key, f"level_{criterion_level_2.level}_{criterion_level_2.pk}")
+        assert criterion_level_2.key == f"level_{criterion_level_2.level}_{criterion_level_2.pk}"

@@ -42,23 +42,23 @@ class ProbeStatusModelTest(TestCase):
     def test_is_success_with_neither_success_or_failure(self):
         status = factories.ProbeStatusFactory()
 
-        self.assertIsNone(status.last_success_at)
-        self.assertIsNone(status.last_failure_at)
-        self.assertIsNone(status.is_success())
+        assert status.last_success_at is None
+        assert status.last_failure_at is None
+        assert status.is_success() is None
 
     def test_is_success_with_success(self):
         status = factories.ProbeStatusFactory(with_success=True)
 
-        self.assertIsNotNone(status.last_success_at)
-        self.assertIsNone(status.last_failure_at)
-        self.assertIs(status.is_success(), True)
+        assert status.last_success_at is not None
+        assert status.last_failure_at is None
+        assert status.is_success() is True
 
     def test_is_success_with_failure(self):
         status = factories.ProbeStatusFactory(with_failure=True)
 
-        self.assertIsNone(status.last_success_at)
-        self.assertIsNotNone(status.last_failure_at)
-        self.assertIs(status.is_success(), False)
+        assert status.last_success_at is None
+        assert status.last_failure_at is not None
+        assert status.is_success() is False
 
     def test_is_success_with_success_after_failure(self):
         status = factories.ProbeStatusFactory(
@@ -67,9 +67,9 @@ class ProbeStatusModelTest(TestCase):
             last_success_at=factory.Faker("future_datetime", tzinfo=timezone.get_default_timezone()),
         )
 
-        self.assertIsNotNone(status.last_success_at)
-        self.assertIsNotNone(status.last_failure_at)
-        self.assertIs(status.is_success(), True)
+        assert status.last_success_at is not None
+        assert status.last_failure_at is not None
+        assert status.is_success() is True
 
     def test_is_success_with_success_before_failure(self):
         status = factories.ProbeStatusFactory(
@@ -78,19 +78,19 @@ class ProbeStatusModelTest(TestCase):
             last_failure_at=factory.Faker("future_datetime", tzinfo=timezone.get_default_timezone()),
         )
 
-        self.assertIsNotNone(status.last_success_at)
-        self.assertIsNotNone(status.last_failure_at)
-        self.assertIs(status.is_success(), False)
+        assert status.last_success_at is not None
+        assert status.last_failure_at is not None
+        assert status.is_success() is False
 
     def test_is_success_with_success_and_failure_at_the_same_time(self):
         status = factories.ProbeStatusFactory(
             with_success=True, with_failure=True, last_failure_at=factory.SelfAttribute("last_success_at")
         )
 
-        self.assertIsNotNone(status.last_success_at)
-        self.assertIsNotNone(status.last_failure_at)
-        self.assertEqual(status.last_success_at, status.last_failure_at)
-        self.assertIs(status.is_success(), False)
+        assert status.last_success_at is not None
+        assert status.last_failure_at is not None
+        assert status.last_success_at == status.last_failure_at
+        assert status.is_success() is False
 
 
 class RunStatusProbesCommandTest(TestCase):
@@ -102,17 +102,14 @@ class RunStatusProbesCommandTest(TestCase):
         stdout = io.StringIO()
 
         management.call_command("run_status_probes", stdout=stdout, stderr=io.StringIO())
-        self.assertEqual(
-            stdout.getvalue(),
-            textwrap.dedent(
-                """\
+        assert stdout.getvalue() == textwrap.dedent(
+            """\
                 Start probing
                 Check dangling probes
                 No dangling probes found
                 Running probes
                 Finished probing
                 """
-            ),
         )
 
     def test_run_probes_when_probe_is_successful(self):
@@ -121,10 +118,10 @@ class RunStatusProbesCommandTest(TestCase):
                 self.cmd._run_probes([SuccessProbe])
 
                 status = models.ProbeStatus.objects.get(name=SuccessProbe.name)
-                self.assertIsNotNone(status.last_success_at)
-                self.assertEqual(status.last_success_info, "OK")
-                self.assertIsNone(status.last_failure_at)
-                self.assertIsNone(status.last_failure_info)
+                assert status.last_success_at is not None
+                assert status.last_success_info == "OK"
+                assert status.last_failure_at is None
+                assert status.last_failure_info is None
 
     def test_run_probes_when_probe_fail(self):
         for reason in ["Create", "Update"]:
@@ -132,74 +129,67 @@ class RunStatusProbesCommandTest(TestCase):
                 self.cmd._run_probes([FailureProbe])
 
                 status = models.ProbeStatus.objects.get(name=FailureProbe.name)
-                self.assertIsNotNone(status.last_failure_at)
-                self.assertEqual(status.last_failure_info, "KO")
-                self.assertIsNone(status.last_success_at)
-                self.assertIsNone(status.last_success_info)
+                assert status.last_failure_at is not None
+                assert status.last_failure_info == "KO"
+                assert status.last_success_at is None
+                assert status.last_success_info is None
 
     def test_run_probes_when_probe_raise_an_exception(self):
         with self.assertLogs() as cm:
             self.cmd._run_probes([ExceptionProbe])
 
         status = models.ProbeStatus.objects.get(name=ExceptionProbe.name)
-        self.assertIsNotNone(status.last_failure_at)
-        self.assertEqual(status.last_failure_info, "Error")
-        self.assertIsNone(status.last_success_at)
-        self.assertIsNone(status.last_success_info)
+        assert status.last_failure_at is not None
+        assert status.last_failure_info == "Error"
+        assert status.last_success_at is None
+        assert status.last_success_info is None
 
-        self.assertEqual(cm.records[0].message, f"Probe {ExceptionProbe.name!r} failed")
-        self.assertIs(cm.records[0].exc_info[0], Exception)
+        assert cm.records[0].message == f"Probe {ExceptionProbe.name!r} failed"
+        assert cm.records[0].exc_info[0] is Exception
 
     def test_run_probes_when_everything_is_empty(self):
-        self.assertEqual(models.ProbeStatus.objects.count(), 0)
+        assert models.ProbeStatus.objects.count() == 0
 
         self.cmd._run_probes([])
 
-        self.assertEqual(models.ProbeStatus.objects.count(), 0)
+        assert models.ProbeStatus.objects.count() == 0
 
     def test_run_probes_when_adding_probes(self):
         factories.ProbeStatusFactory.create_batch(4)
 
-        self.assertEqual(models.ProbeStatus.objects.count(), 4)
+        assert models.ProbeStatus.objects.count() == 4
 
         self.cmd._run_probes([SuccessProbe])
 
-        self.assertEqual(models.ProbeStatus.objects.count(), 5)
+        assert models.ProbeStatus.objects.count() == 5
 
     def test_run_probes_when_removing_probes(self):
         factories.ProbeStatusFactory(name=SuccessProbe.name)
         factories.ProbeStatusFactory.create_batch(4)
 
-        self.assertEqual(models.ProbeStatus.objects.count(), 5)
+        assert models.ProbeStatus.objects.count() == 5
 
         self.cmd._run_probes([SuccessProbe])
 
-        self.assertEqual(models.ProbeStatus.objects.count(), 5)
+        assert models.ProbeStatus.objects.count() == 5
 
     def test_check_and_remove_dangling_probes_when_everything_is_empty(self):
-        self.assertEqual(models.ProbeStatus.objects.count(), 0)
+        assert models.ProbeStatus.objects.count() == 0
 
         self.cmd._check_and_remove_dangling_probes([])
 
-        self.assertEqual(models.ProbeStatus.objects.count(), 0)
-        self.assertEqual(
-            self.cmd.stdout.getvalue(),
-            "Check dangling probes\nNo dangling probes found\n",
-        )
+        assert models.ProbeStatus.objects.count() == 0
+        assert self.cmd.stdout.getvalue() == "Check dangling probes\nNo dangling probes found\n"
 
     def test_check_and_remove_dangling_probes_with_existing_probes(self):
         non_dangling_probes = factories.ProbeStatusFactory.create_batch(3)
 
         self.cmd._check_and_remove_dangling_probes(non_dangling_probes)
 
-        self.assertEqual(
-            list(models.ProbeStatus.objects.values_list("name", flat=True)),
-            [probe.name for probe in non_dangling_probes],
-        )
-        self.assertEqual(
-            self.cmd.stdout.getvalue(),
-            "Check dangling probes\nNo dangling probes found\n",
-        )
+        assert list(models.ProbeStatus.objects.values_list("name", flat=True)) == [
+            probe.name for probe in non_dangling_probes
+        ]
+        assert self.cmd.stdout.getvalue() == "Check dangling probes\nNo dangling probes found\n"
 
     def test_check_and_remove_dangling_probes_when_adding_probes(self):
         old_probes = factories.ProbeStatusFactory.create_batch(3)
@@ -207,14 +197,8 @@ class RunStatusProbesCommandTest(TestCase):
 
         self.cmd._check_and_remove_dangling_probes(old_probes + new_probes)
 
-        self.assertEqual(
-            list(models.ProbeStatus.objects.values_list("name", flat=True)),
-            [probe.name for probe in old_probes],
-        )
-        self.assertEqual(
-            self.cmd.stdout.getvalue(),
-            "Check dangling probes\nNo dangling probes found\n",
-        )
+        assert list(models.ProbeStatus.objects.values_list("name", flat=True)) == [probe.name for probe in old_probes]
+        assert self.cmd.stdout.getvalue() == "Check dangling probes\nNo dangling probes found\n"
 
     def test_check_and_remove_dangling_probes_when_removing_probes(self):
         all_probes = factories.ProbeStatusFactory.create_batch(5)
@@ -222,14 +206,11 @@ class RunStatusProbesCommandTest(TestCase):
 
         self.cmd._check_and_remove_dangling_probes(probes_kept)
 
-        self.assertEqual(
-            list(models.ProbeStatus.objects.values_list("name", flat=True)),
-            [probe.name for probe in probes_kept],
-        )
+        assert list(models.ProbeStatus.objects.values_list("name", flat=True)) == [probe.name for probe in probes_kept]
         expected_dangling_names = set(sorted({probe.name for probe in probes_removed}))
-        self.assertEqual(
-            self.cmd.stdout.getvalue(),
-            f"Check dangling probes\nRemoving dangling probes: {expected_dangling_names}\n",
+        assert (
+            self.cmd.stdout.getvalue()
+            == f"Check dangling probes\nRemoving dangling probes: {expected_dangling_names}\n"
         )
 
     def test_check_and_remove_dangling_probes_when_replacing_all_probes(self):
@@ -238,11 +219,11 @@ class RunStatusProbesCommandTest(TestCase):
 
         self.cmd._check_and_remove_dangling_probes(new_probes)
 
-        self.assertEqual(models.ProbeStatus.objects.count(), 0)
+        assert models.ProbeStatus.objects.count() == 0
         expected_dangling_names = set(sorted({probe.name for probe in old_probes}))
-        self.assertEqual(
-            self.cmd.stdout.getvalue(),
-            f"Check dangling probes\nRemoving dangling probes: {expected_dangling_names}\n",
+        assert (
+            self.cmd.stdout.getvalue()
+            == f"Check dangling probes\nRemoving dangling probes: {expected_dangling_names}\n"
         )
 
 

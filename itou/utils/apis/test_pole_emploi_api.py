@@ -1,6 +1,7 @@
 import json
 
 import httpx
+import pytest
 import respx
 from django.core.cache import cache
 from freezegun import freeze_time
@@ -40,11 +41,11 @@ class PoleEmploiAPIClientTest(TestCase):
         respx.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").mock(
             side_effect=httpx.ConnectTimeout
         )
-        with self.assertRaises(PoleEmploiAPIException) as ctx:
+        with pytest.raises(PoleEmploiAPIException) as ctx:
             self.api_client.recherche_individu_certifie(
                 job_seeker.first_name, job_seeker.last_name, job_seeker.birthdate, job_seeker.nir
             )
-        self.assertEqual(ctx.exception.error_code, "http_error")
+        assert ctx.value.error_code == "http_error"
 
     @respx.mock
     def test_recherche_individu_certifie_api_nominal(self):
@@ -55,7 +56,7 @@ class PoleEmploiAPIClientTest(TestCase):
         id_national = self.api_client.recherche_individu_certifie(
             job_seeker.first_name, job_seeker.last_name, job_seeker.birthdate, job_seeker.nir
         )
-        self.assertEqual(id_national, "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ")
+        assert id_national == "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ"
 
         # now with weird payloads
         job_seeker.first_name = "marié%{-christine}  aéïèêë " + "a" * 50
@@ -64,8 +65,8 @@ class PoleEmploiAPIClientTest(TestCase):
             job_seeker.first_name, job_seeker.last_name, job_seeker.birthdate, job_seeker.nir
         )
         payload = json.loads(respx.calls.last.request.content)
-        self.assertEqual(payload["nomNaissance"], "GH'IKN BIND-N'QICI BBBBBB")  # 25 chars
-        self.assertEqual(payload["prenom"], "MARIE-CHRISTI")  # 13 chars
+        assert payload["nomNaissance"] == "GH'IKN BIND-N'QICI BBBBBB"  # 25 chars
+        assert payload["prenom"] == "MARIE-CHRISTI"  # 13 chars
 
     @respx.mock
     def test_recherche_individu_certifie_individual_api_errors(self):
@@ -73,32 +74,32 @@ class PoleEmploiAPIClientTest(TestCase):
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
             200, json=pole_emploi_api_mocks.API_RECHERCHE_ERROR
         )
-        with self.assertRaises(PoleEmploiAPIBadResponse) as ctx:
+        with pytest.raises(PoleEmploiAPIBadResponse) as ctx:
             self.api_client.recherche_individu_certifie(
                 job_seeker.first_name, job_seeker.last_name, job_seeker.birthdate, job_seeker.nir
             )
-        self.assertEqual(ctx.exception.response_code, "R010")
+        assert ctx.value.response_code == "R010"
 
     @respx.mock
     def test_recherche_individu_certifie_retryable_errors(self):
         job_seeker = JobSeekerFactory()
 
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(401, json="")
-        with self.assertRaises(PoleEmploiAPIException) as ctx:
+        with pytest.raises(PoleEmploiAPIException) as ctx:
             self.api_client.recherche_individu_certifie(
                 job_seeker.first_name, job_seeker.last_name, job_seeker.birthdate, job_seeker.nir
             )
-        self.assertEqual(ctx.exception.error_code, 401)
+        assert ctx.value.error_code == 401
 
         job_seeker = JobSeekerFactory()
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").mock(
             side_effect=httpx.ConnectTimeout
         )
-        with self.assertRaises(PoleEmploiAPIException) as ctx:
+        with pytest.raises(PoleEmploiAPIException) as ctx:
             self.api_client.recherche_individu_certifie(
                 job_seeker.first_name, job_seeker.last_name, job_seeker.birthdate, job_seeker.nir
             )
-        self.assertEqual(ctx.exception.error_code, "http_error")
+        assert ctx.value.error_code == "http_error"
 
     @respx.mock
     def test_mise_a_jour_pass_iae_success_with_approval_accepted(self):
@@ -120,20 +121,20 @@ class PoleEmploiAPIClientTest(TestCase):
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(
             200, json=pole_emploi_api_mocks.API_MAJPASS_RESULT_ERROR
         )
-        with self.assertRaises(PoleEmploiAPIBadResponse):
+        with pytest.raises(PoleEmploiAPIBadResponse):
             self.api_client.mise_a_jour_pass_iae(job_application.approval, "foo", "bar", 42, "DEAD")
 
         # timeout
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").mock(side_effect=httpx.ConnectTimeout)
-        with self.assertRaises(PoleEmploiAPIException) as ctx:
+        with pytest.raises(PoleEmploiAPIException) as ctx:
             self.api_client.mise_a_jour_pass_iae(job_application.approval, "foo", "bar", 42, "DEAD")
-        self.assertEqual(ctx.exception.error_code, "http_error")
+        assert ctx.value.error_code == "http_error"
 
         # auth failed
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(401, json={})
-        with self.assertRaises(PoleEmploiAPIException):
+        with pytest.raises(PoleEmploiAPIException):
             self.api_client.mise_a_jour_pass_iae(job_application.approval, "foo", "bar", 42, "DEAD")
-        self.assertEqual(ctx.exception.error_code, "http_error")
+        assert ctx.value.error_code == "http_error"
 
     @respx.mock
     def test_referentiel(self):

@@ -50,8 +50,8 @@ class EditContractTest(TestCase):
         )
 
     def test_approval_can_be_postponed(self):
-        self.assertTrue(self.job_application_1.approval.can_postpone_start_date)
-        self.assertFalse(self.old_job_application.approval.can_postpone_start_date)
+        assert self.job_application_1.approval.can_postpone_start_date
+        assert not self.old_job_application.approval.can_postpone_start_date
 
     def test_future_contract_date(self):
         """
@@ -61,7 +61,7 @@ class EditContractTest(TestCase):
 
         response = self.client.get(self.url)
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         future_start_date = (timezone.now() + relativedelta(days=10)).date()
         future_end_date = (timezone.now() + relativedelta(days=15)).date()
@@ -77,12 +77,12 @@ class EditContractTest(TestCase):
 
         self.job_application_1.refresh_from_db()
 
-        self.assertEqual(self.job_application_1.hiring_start_at, future_start_date)
-        self.assertEqual(self.job_application_1.hiring_end_at, future_end_date)
+        assert self.job_application_1.hiring_start_at == future_start_date
+        assert self.job_application_1.hiring_end_at == future_end_date
 
         # test how hiring_end_date is displayed
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, f"Fin : {future_end_date.strftime('%d')}")
 
     def test_future_contract_date_without_hiring_end_at(self):
@@ -93,7 +93,7 @@ class EditContractTest(TestCase):
 
         response = self.client.get(self.url)
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         future_start_date = (timezone.now() + relativedelta(days=11)).date()
         future_end_date = None
@@ -110,8 +110,8 @@ class EditContractTest(TestCase):
 
         self.job_application_1.refresh_from_db()
 
-        self.assertEqual(self.job_application_1.hiring_start_at, future_start_date)
-        self.assertEqual(self.job_application_1.hiring_end_at, future_end_date)
+        assert self.job_application_1.hiring_start_at == future_start_date
+        assert self.job_application_1.hiring_end_at == future_end_date
 
         # no "hiring_end_at"
         post_data = {
@@ -124,12 +124,12 @@ class EditContractTest(TestCase):
 
         self.job_application_1.refresh_from_db()
 
-        self.assertEqual(self.job_application_1.hiring_start_at, future_start_date)
-        self.assertEqual(self.job_application_1.hiring_end_at, future_end_date)
+        assert self.job_application_1.hiring_start_at == future_start_date
+        assert self.job_application_1.hiring_end_at == future_end_date
 
         # test how hiring_end_date is displayed
         response = self.client.get(next_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, "Fin : Non renseigné")
 
     def test_past_contract_date(self):
@@ -140,7 +140,7 @@ class EditContractTest(TestCase):
 
         response = self.client.get(self.url)
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         future_start_date = (timezone.now() - relativedelta(days=10)).date()
 
@@ -150,7 +150,7 @@ class EditContractTest(TestCase):
         }
 
         response = self.client.post(self.url, data=post_data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_max_postpone_contract_date(self):
         """
@@ -162,7 +162,7 @@ class EditContractTest(TestCase):
         url = reverse("apply:edit_contract_start_date", kwargs={"job_application_id": self.job_application_1.id})
         response = self.client.get(url)
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         future_start_date = timezone.localdate() + relativedelta(days=JobApplication.MAX_CONTRACT_POSTPONE_IN_DAYS + 1)
 
@@ -172,7 +172,7 @@ class EditContractTest(TestCase):
         }
 
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_postpone_approval(self):
         """
@@ -196,8 +196,8 @@ class EditContractTest(TestCase):
 
         self.job_application_1.refresh_from_db()
 
-        self.assertIsNotNone(self.job_application_1.approval)
-        self.assertEqual(self.job_application_1.hiring_start_at, self.job_application_1.approval.start_at)
+        assert self.job_application_1.approval is not None
+        assert self.job_application_1.hiring_start_at == self.job_application_1.approval.start_at
 
     def test_start_date_with_previous_approval(self):
         """
@@ -217,8 +217,8 @@ class EditContractTest(TestCase):
 
         response = self.client.post(self.old_url, data=post_data)
 
-        self.assertEqual(response.status_code, 302)
-        self.assertTrue(self.job_application_2.hiring_start_at > self.job_application_2.approval.start_at)
+        assert response.status_code == 302
+        assert self.job_application_2.hiring_start_at > self.job_application_2.approval.start_at
 
     def test_do_not_update_approval(self):
         """
@@ -239,4 +239,4 @@ class EditContractTest(TestCase):
         }
 
         response = self.client.post(self.old_url, data=post_data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200

@@ -20,7 +20,7 @@ class CommunesFixtureTest(TestCase):
         # Smoke tests, sort of
         # Will enforce checking structure if any update of test fixtures occurs
         # Reminder: these are referential, read-only, *external* data supplied by ASP
-        self.assertEqual(commune_set.count(), self._NUMBER_OF_ENTRIES)
+        assert commune_set.count() == self._NUMBER_OF_ENTRIES
 
     def test_communes_with_history(self):
         codes_with_history = Commune.objects.exclude(code__in=self._CODES_WITHOUT_HISTORY).values_list(
@@ -32,7 +32,7 @@ class CommunesFixtureTest(TestCase):
                 # 2 entries for a code with history:
                 communes = Commune.objects.filter(code=code)
 
-                self.assertEqual(2, communes.count())
+                assert 2 == communes.count()
 
     def test_communes_without_history(self):
         for code in self._CODES_WITHOUT_HISTORY:
@@ -40,21 +40,21 @@ class CommunesFixtureTest(TestCase):
                 # Will error if many entries
                 commune = Commune.objects.get(code=code)
 
-                self.assertIsNone(commune.end_date)
+                assert commune.end_date is None
 
     def test_current_entries(self):
         communes = Commune.objects.filter(end_date__isnull=True)
 
-        self.assertEqual(26, communes.count())
+        assert 26 == communes.count()
 
         for commune in communes:
             with self.subTest():
-                self.assertIsNone(commune.end_date)
+                assert commune.end_date is None
 
     def test_lowest_period_date(self):
         communes = Commune.objects.filter(start_date__lt=self._PERIOD_MIN_DATE)
 
-        self.assertEqual(0, communes.count())
+        assert 0 == communes.count()
 
 
 class CommuneModelTest(TestCase):
@@ -69,7 +69,7 @@ class CommuneModelTest(TestCase):
         Commune.objects.bulk_create([old_commune, new_commune])
 
         result = Commune.by_insee_code(99999)
-        self.assertEqual(new_commune, result)
+        assert new_commune == result
 
     def test_by_insee_code_ignore_manually_created(self):
         user = UserFactory()
@@ -83,7 +83,7 @@ class CommuneModelTest(TestCase):
             created_by=user,
         )
         result = Commune.by_insee_code(commune.code)
-        self.assertEqual(result, commune)
+        assert result == commune
 
     def test_by_insee_code_and_period(self):
         old_commune = Commune(
@@ -96,10 +96,10 @@ class CommuneModelTest(TestCase):
         Commune.objects.bulk_create([old_commune, new_commune])
 
         result = Commune.by_insee_code_and_period(99999, datetime.datetime(1988, 4, 28))
-        self.assertEqual(old_commune, result)
+        assert old_commune == result
 
         result = Commune.by_insee_code_and_period(99999, datetime.datetime(2022, 11, 28))
-        self.assertEqual(new_commune, result)
+        assert new_commune == result
 
     def test_by_insee_code_and_period_ignore_manually_created(self):
         user = UserFactory()
@@ -116,4 +116,4 @@ class CommuneModelTest(TestCase):
         # Look for the same commune (one day after commune.start_date should still be in the commune period)
         # We should not raise a Commune.MultipleObjectsReturned because we exclude mannually created objects
         result = Commune.by_insee_code_and_period(commune.code, commune.start_date + datetime.timedelta(days=1))
-        self.assertEqual(result, commune)
+        assert result == commune

@@ -39,29 +39,29 @@ class DeduplicateJobSeekersManagementCommandsTest(TestCase):
         job_app1 = JobApplicationFactory(with_approval=True, job_seeker__nir=None, **kwargs)
         user1 = job_app1.job_seeker
 
-        self.assertIsNone(user1.nir)
-        self.assertEqual(1, user1.approvals.count())
-        self.assertEqual(1, user1.job_applications.count())
-        self.assertEqual(1, user1.eligibility_diagnoses.count())
+        assert user1.nir is None
+        assert 1 == user1.approvals.count()
+        assert 1 == user1.job_applications.count()
+        assert 1 == user1.eligibility_diagnoses.count()
 
         # Create `user2`.
         job_app2 = JobApplicationFactory(with_eligibility_diagnosis=True, job_seeker__nir=None, **kwargs)
         user2 = job_app2.job_seeker
 
-        self.assertIsNone(user2.nir)
-        self.assertEqual(0, user2.approvals.count())
-        self.assertEqual(1, user2.job_applications.count())
-        self.assertEqual(1, user2.eligibility_diagnoses.count())
+        assert user2.nir is None
+        assert 0 == user2.approvals.count()
+        assert 1 == user2.job_applications.count()
+        assert 1 == user2.eligibility_diagnoses.count()
 
         # Create `user3`.
         job_app3 = JobApplicationFactory(with_eligibility_diagnosis=True, **kwargs)
         user3 = job_app3.job_seeker
         expected_nir = user3.nir
 
-        self.assertIsNotNone(user3.nir)
-        self.assertEqual(0, user3.approvals.count())
-        self.assertEqual(1, user3.job_applications.count())
-        self.assertEqual(1, user3.eligibility_diagnoses.count())
+        assert user3.nir is not None
+        assert 0 == user3.approvals.count()
+        assert 1 == user3.job_applications.count()
+        assert 1 == user3.eligibility_diagnoses.count()
 
         # Merge all users into `user1`.
         call_command("deduplicate_job_seekers", verbosity=0, no_csv=True, wet_run=True)
@@ -69,20 +69,20 @@ class DeduplicateJobSeekersManagementCommandsTest(TestCase):
         # If only one NIR exists for all the duplicates, it should
         # be reassigned to the target account.
         user1.refresh_from_db()
-        self.assertEqual(user1.nir, expected_nir)
+        assert user1.nir == expected_nir
 
-        self.assertEqual(3, user1.job_applications.count())
-        self.assertEqual(3, user1.eligibility_diagnoses.count())
-        self.assertEqual(1, user1.approvals.count())
+        assert 3 == user1.job_applications.count()
+        assert 3 == user1.eligibility_diagnoses.count()
+        assert 1 == user1.approvals.count()
 
-        self.assertEqual(0, User.objects.filter(email=user2.email).count())
-        self.assertEqual(0, User.objects.filter(email=user3.email).count())
+        assert 0 == User.objects.filter(email=user2.email).count()
+        assert 0 == User.objects.filter(email=user3.email).count()
 
-        self.assertEqual(0, JobApplication.objects.filter(job_seeker=user2).count())
-        self.assertEqual(0, JobApplication.objects.filter(job_seeker=user3).count())
+        assert 0 == JobApplication.objects.filter(job_seeker=user2).count()
+        assert 0 == JobApplication.objects.filter(job_seeker=user3).count()
 
-        self.assertEqual(0, EligibilityDiagnosis.objects.filter(job_seeker=user2).count())
-        self.assertEqual(0, EligibilityDiagnosis.objects.filter(job_seeker=user3).count())
+        assert 0 == EligibilityDiagnosis.objects.filter(job_seeker=user2).count()
+        assert 0 == EligibilityDiagnosis.objects.filter(job_seeker=user3).count()
 
     def test_deduplicate_job_seekers_without_empty_sender_field(self):
         """
@@ -101,50 +101,50 @@ class DeduplicateJobSeekersManagementCommandsTest(TestCase):
         job_app1 = JobApplicationSentByJobSeekerFactory(job_seeker__nir=None, **kwargs)
         user1 = job_app1.job_seeker
 
-        self.assertEqual(1, user1.job_applications.count())
-        self.assertEqual(job_app1.sender, user1)
+        assert 1 == user1.job_applications.count()
+        assert job_app1.sender == user1
 
         # Create `user2` through a job application sent by him.
         job_app2 = JobApplicationSentByJobSeekerFactory(job_seeker__nir=None, **kwargs)
         user2 = job_app2.job_seeker
 
-        self.assertEqual(1, user2.job_applications.count())
-        self.assertEqual(job_app2.sender, user2)
+        assert 1 == user2.job_applications.count()
+        assert job_app2.sender == user2
 
         # Create `user3` through a job application sent by a prescriber.
         job_app3 = JobApplicationFactory(with_eligibility_diagnosis=True, job_seeker__nir=None, **kwargs)
         user3 = job_app3.job_seeker
-        self.assertNotEqual(job_app3.sender, user3)
+        assert job_app3.sender != user3
         job_app3_sender = job_app3.sender  # The sender is a prescriber.
 
         # Ensure that `user1` will always be the target into which duplicates will be merged
         # by attaching a PASS IAE to him.
-        self.assertEqual(0, user1.approvals.count())
-        self.assertEqual(0, user2.approvals.count())
-        self.assertEqual(0, user3.approvals.count())
+        assert 0 == user1.approvals.count()
+        assert 0 == user2.approvals.count()
+        assert 0 == user3.approvals.count()
         ApprovalFactory(user=user1)
 
         # Merge all users into `user1`.
         call_command("deduplicate_job_seekers", verbosity=0, no_csv=True, wet_run=True)
 
-        self.assertEqual(3, user1.job_applications.count())
+        assert 3 == user1.job_applications.count()
 
         job_app1.refresh_from_db()
         job_app2.refresh_from_db()
         job_app3.refresh_from_db()
 
-        self.assertEqual(job_app1.sender, user1)
-        self.assertEqual(job_app2.sender, user1)  # The sender must now be user1.
-        self.assertEqual(job_app3.sender, job_app3_sender)  # The sender must still be a prescriber.
+        assert job_app1.sender == user1
+        assert job_app2.sender == user1  # The sender must now be user1.
+        assert job_app3.sender == job_app3_sender  # The sender must still be a prescriber.
 
-        self.assertEqual(0, User.objects.filter(email=user2.email).count())
-        self.assertEqual(0, User.objects.filter(email=user3.email).count())
+        assert 0 == User.objects.filter(email=user2.email).count()
+        assert 0 == User.objects.filter(email=user3.email).count()
 
-        self.assertEqual(0, JobApplication.objects.filter(job_seeker=user2).count())
-        self.assertEqual(0, JobApplication.objects.filter(job_seeker=user3).count())
+        assert 0 == JobApplication.objects.filter(job_seeker=user2).count()
+        assert 0 == JobApplication.objects.filter(job_seeker=user3).count()
 
-        self.assertEqual(0, EligibilityDiagnosis.objects.filter(job_seeker=user2).count())
-        self.assertEqual(0, EligibilityDiagnosis.objects.filter(job_seeker=user3).count())
+        assert 0 == EligibilityDiagnosis.objects.filter(job_seeker=user2).count()
+        assert 0 == EligibilityDiagnosis.objects.filter(job_seeker=user3).count()
 
 
 class TestSyncPermsTestCase(TestCase):
@@ -153,17 +153,14 @@ class TestSyncPermsTestCase(TestCase):
         call_command("sync_group_and_perms", stdout=stdout)
         stdout.seek(0)
         output = stdout.readlines()
-        self.assertEqual(
-            output,
-            [
-                "group name=itou-admin created\n",
-                "group name=itou-support-externe created\n",
-                "All done!\n",
-            ],
-        )
-        self.assertEqual(Group.objects.all().count(), 2)
+        assert output == [
+            "group name=itou-admin created\n",
+            "group name=itou-support-externe created\n",
+            "All done!\n",
+        ]
+        assert Group.objects.all().count() == 2
         admin_group = Group.objects.all()[0]
-        self.assertEqual(admin_group.name, "itou-admin")
+        assert admin_group.name == "itou-admin"
         assert [perm.codename for perm in admin_group.permissions.all()] == [
             "add_emailaddress",
             "change_emailaddress",
@@ -250,7 +247,7 @@ class TestSyncPermsTestCase(TestCase):
             "view_user",
         ]
         support_group = Group.objects.all()[1]
-        self.assertEqual(support_group.name, "itou-support-externe")
+        assert support_group.name == "itou-support-externe"
         assert [perm.codename for perm in support_group.permissions.all()] == [
             "view_emailaddress",
             "view_approval",

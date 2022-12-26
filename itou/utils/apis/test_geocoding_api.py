@@ -1,5 +1,6 @@
 from unittest import mock
 
+import pytest
 from django.contrib.gis.geos import GEOSGeometry
 
 from itou.utils.apis.exceptions import GeocodingDataError
@@ -27,11 +28,11 @@ class UtilsGeocodingTest(TestCase):
             "latitude": 48.838411,
             "coords": GEOSGeometry("POINT(2.316754 48.838411)"),
         }
-        self.assertEqual(result, expected)
+        assert result == expected
 
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_NO_RESULT_MOCK)
     def test_get_geocoding_data_error(self, mock_call_ban_geocoding_api):
         geocoding_data = mock_call_ban_geocoding_api()
 
-        with self.assertRaises(GeocodingDataError):
+        with pytest.raises(GeocodingDataError):
             get_geocoding_data(geocoding_data)

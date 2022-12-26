@@ -8,6 +8,7 @@ from pathlib import Path
 from unittest import mock
 
 import pandas as pd
+import pytest
 from django.conf import settings
 from django.core import mail
 from django.test import TransactionTestCase, override_settings
@@ -65,8 +66,8 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
 
     def test_uncreatable_conventions_for_active_siae_with_active_convention(self):
         siae = SiaeFactory(source=Siae.SOURCE_ASP)
-        self.assertTrue(siae.is_active)
-        self.assertFalse(self.mod.get_creatable_conventions())
+        assert siae.is_active
+        assert not self.mod.get_creatable_conventions()
 
     def test_uncreatable_conventions_when_convention_exists_for_asp_id_and_kind(self):
         # siae without convention, but a convention already exists for this
@@ -77,7 +78,7 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         siae = SiaeFactory(source=Siae.SOURCE_ASP, siret=SIRET, convention=None)
         SiaeConventionFactory(kind=siae.kind, asp_id=ASP_ID)
 
-        with self.assertRaises(AssertionError):
+        with pytest.raises(AssertionError):
             self.mod.get_creatable_conventions()
 
     def test_creatable_conventions_for_active_siae_where_siret_equals_siret_signature(self):
@@ -87,20 +88,17 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         siae = SiaeFactory(source=Siae.SOURCE_ASP, siret=SIRET, kind=SiaeKind.ACI, convention=None)
         results = self.mod.get_creatable_conventions()
 
-        self.assertEqual(len(results), 1)
+        assert len(results) == 1
 
         convention, siae = results[0]
-        self.assertEqual(
-            (
-                convention.asp_id,
-                convention.kind,
-                convention.siret_signature,
-                convention.is_active,
-                convention.deactivated_at,
-            ),
-            (ASP_ID, siae.kind, SIRET_SIGNATURE, True, None),
-        )
-        self.assertEqual((siae.source, siae.siret, siae.kind), (Siae.SOURCE_ASP, SIRET, SiaeKind.ACI))
+        assert (
+            convention.asp_id,
+            convention.kind,
+            convention.siret_signature,
+            convention.is_active,
+            convention.deactivated_at,
+        ) == (ASP_ID, siae.kind, SIRET_SIGNATURE, True, None)
+        assert (siae.source, siae.siret, siae.kind) == (Siae.SOURCE_ASP, SIRET, SiaeKind.ACI)
 
     def test_creatable_conventions_for_active_siae_where_siret_not_equals_siret_signature(self):
         SIRET = "34950857200055"
@@ -110,20 +108,17 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         siae = SiaeFactory(source=Siae.SOURCE_ASP, siret=SIRET, kind=SiaeKind.AI, convention=None)
         results = self.mod.get_creatable_conventions()
 
-        self.assertEqual(len(results), 1)
+        assert len(results) == 1
 
         convention, siae = results[0]
-        self.assertEqual(
-            (
-                convention.asp_id,
-                convention.kind,
-                convention.siret_signature,
-                convention.is_active,
-                convention.deactivated_at,
-            ),
-            (ASP_ID, siae.kind, SIRET_SIGNATURE, True, None),
-        )
-        self.assertEqual((siae.source, siae.siret, siae.kind), (Siae.SOURCE_ASP, SIRET, SiaeKind.AI))
+        assert (
+            convention.asp_id,
+            convention.kind,
+            convention.siret_signature,
+            convention.is_active,
+            convention.deactivated_at,
+        ) == (ASP_ID, siae.kind, SIRET_SIGNATURE, True, None)
+        assert (siae.source, siae.siret, siae.kind) == (Siae.SOURCE_ASP, SIRET, SiaeKind.AI)
 
     def test_creatable_conventions_inactive_siae(self):
         SIRET = SIRET_SIGNATURE = "41294123900011"
@@ -131,34 +126,31 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         siae = SiaeFactory(source=Siae.SOURCE_ASP, siret=SIRET, kind=SiaeKind.ACI, convention=None)
         results = self.mod.get_creatable_conventions()
 
-        self.assertEqual(len(results), 1)
+        assert len(results) == 1
 
         convention, siae = results[0]
-        self.assertEqual(
-            (
-                convention.asp_id,
-                convention.kind,
-                convention.siret_signature,
-                convention.is_active,
-                convention.deactivated_at.to_pydatetime(),
-            ),
-            (ASP_ID, siae.kind, SIRET_SIGNATURE, False, datetime.datetime(2020, 2, 29, 0, 0)),
-        )
-        self.assertEqual((siae.source, siae.siret, siae.kind), (Siae.SOURCE_ASP, SIRET, SiaeKind.ACI))
+        assert (
+            convention.asp_id,
+            convention.kind,
+            convention.siret_signature,
+            convention.is_active,
+            convention.deactivated_at.to_pydatetime(),
+        ) == (ASP_ID, siae.kind, SIRET_SIGNATURE, False, datetime.datetime(2020, 2, 29, 0, 0))
+        assert (siae.source, siae.siret, siae.kind) == (Siae.SOURCE_ASP, SIRET, SiaeKind.ACI)
 
     def test_check_signup_possible_for_a_siae_without_members_but_with_auth_email(self):
         instance = lazy_import_siae_command()
         SiaeFactory(auth_email="tadaaa")
         with self.assertNumQueries(1):
             instance.check_whether_signup_is_possible_for_all_siaes()
-        self.assertEqual(instance.fatal_errors, 0)
+        assert instance.fatal_errors == 0
 
     def test_check_signup_possible_for_a_siae_without_members_nor_auth_email(self):
         instance = lazy_import_siae_command()
         SiaeFactory(auth_email="")
         with self.assertNumQueries(1):
             instance.check_whether_signup_is_possible_for_all_siaes()
-        self.assertEqual(instance.fatal_errors, 1)
+        assert instance.fatal_errors == 1
 
     def test_check_signup_possible_for_a_siae_with_members_but_no_auth_email_case_one(self):
         instance = lazy_import_siae_command()
@@ -169,7 +161,7 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         )
         with self.assertNumQueries(1):
             instance.check_whether_signup_is_possible_for_all_siaes()
-        self.assertEqual(instance.fatal_errors, 0)
+        assert instance.fatal_errors == 0
 
     def test_check_signup_possible_for_a_siae_with_members_but_no_auth_email_case_two(self):
         instance = lazy_import_siae_command()
@@ -182,26 +174,23 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         )
         with self.assertNumQueries(1):
             instance.check_whether_signup_is_possible_for_all_siaes()
-        self.assertEqual(instance.fatal_errors, 1)
+        assert instance.fatal_errors == 1
 
     def test_check_signup_possible_for_a_siae_with_members_but_no_auth_email_case_three(self):
         instance = lazy_import_siae_command()
         SiaeWith2MembershipsFactory(auth_email="")
         with self.assertNumQueries(1):
             instance.check_whether_signup_is_possible_for_all_siaes()
-        self.assertEqual(instance.fatal_errors, 0)
+        assert instance.fatal_errors == 0
 
     def test_activate_your_account_email_for_a_siae_without_members_but_with_auth_email(self):
         instance = lazy_import_siae_command()
         instance.create_new_siaes()
-        self.assertIn(reverse("signup:siae_select"), mail.outbox[0].body)
-        self.assertEqual(
-            [
-                f"Activez le compte de votre {kind} {name} sur les emplois de l'inclusion"
-                for (kind, name) in Siae.objects.values_list("kind", "name")
-            ],
-            [mail.subject for mail in mail.outbox],
-        )
+        assert reverse("signup:siae_select") in mail.outbox[0].body
+        assert [
+            f"Activez le compte de votre {kind} {name} sur les emplois de l'inclusion"
+            for (kind, name) in Siae.objects.values_list("kind", "name")
+        ] == [mail.subject for mail in mail.outbox]
 
 
 @override_settings(METABASE_HASH_SALT="foobar2000")

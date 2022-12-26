@@ -27,8 +27,8 @@ class FormatASPBadAdresses(TestCase):
             address_line_1="9, avenue de Huet", post_code="32531", city="MalletVille", department="32"
         )
         result, error = format_address(job_seeker)
-        self.assertFalse(result)
-        self.assertIn("Erreur de geocoding, impossible d'obtenir un résultat", error)
+        assert not result
+        assert "Erreur de geocoding, impossible d'obtenir un résultat" in error
 
 
 @mock.patch(
@@ -38,13 +38,13 @@ class FormatASPBadAdresses(TestCase):
 class FormatASPAdresses(TestCase):
     def test_empty(self, _mock):
         result, error = format_address({})
-        self.assertFalse(result)
-        self.assertEqual(error, "Impossible de transformer cet objet en adresse HEXA")
+        assert not result
+        assert error == "Impossible de transformer cet objet en adresse HEXA"
 
     def test_none(self, _mock):
         result, error = format_address(None)
-        self.assertFalse(result)
-        self.assertEqual(error, "Impossible de transformer cet objet en adresse HEXA")
+        assert not result
+        assert error == "Impossible de transformer cet objet en adresse HEXA"
 
     def test_sanity(self, _):
         """
@@ -54,8 +54,8 @@ class FormatASPAdresses(TestCase):
         for idx, _elt in enumerate(RESULTS_BY_ADDRESS):
             user = _users_with_mock_address(idx)
             result, error = format_address(user)
-            self.assertIsNone(error)
-            self.assertIsNotNone(result)
+            assert error is None
+            assert result is not None
 
     def test_asp_addresses(self, _):
         """
@@ -64,96 +64,96 @@ class FormatASPAdresses(TestCase):
         """
         user = _users_with_mock_address(0)
         result, error = format_address(user)
-        self.assertIsNone(error)
-        self.assertEqual(result.get("lane_type"), LaneType.RUE.name)
-        self.assertEqual(result.get("number"), "37")
+        assert error is None
+        assert result.get("lane_type") == LaneType.RUE.name
+        assert result.get("number") == "37"
 
         user = _users_with_mock_address(1)
         result, error = format_address(user)
-        self.assertIsNone(error)
-        self.assertEqual(result.get("lane_type"), LaneType.RTE.name)
-        self.assertEqual(result.get("number"), "382")
+        assert error is None
+        assert result.get("lane_type") == LaneType.RTE.name
+        assert result.get("number") == "382"
 
         user = _users_with_mock_address(2)
         result, error = format_address(user)
-        self.assertIsNone(error)
-        self.assertEqual(result.get("lane_type"), LaneType.RUE.name)
-        self.assertEqual(result.get("number"), "5")
+        assert error is None
+        assert result.get("lane_type") == LaneType.RUE.name
+        assert result.get("number") == "5"
 
         user = _users_with_mock_address(3)
         result, error = format_address(user)
-        self.assertIsNone(error)
-        self.assertEqual(result.get("lane_type"), LaneType.AV.name)
-        self.assertEqual(result.get("number"), "35")
+        assert error is None
+        assert result.get("lane_type") == LaneType.AV.name
+        assert result.get("number") == "35"
 
         user = _users_with_mock_address(4)
         result, error = format_address(user)
-        self.assertIsNone(error)
-        self.assertEqual(result.get("lane_type"), LaneType.BD.name)
-        self.assertEqual(result.get("number"), "67")
+        assert error is None
+        assert result.get("lane_type") == LaneType.BD.name
+        assert result.get("number") == "67"
 
         user = _users_with_mock_address(5)
         result, error = format_address(user)
-        self.assertIsNone(error)
-        self.assertEqual(result.get("lane_type"), LaneType.PL.name)
-        self.assertEqual(result.get("number"), "2")
+        assert error is None
+        assert result.get("lane_type") == LaneType.PL.name
+        assert result.get("number") == "2"
 
         user = _users_with_mock_address(6)
         result, error = format_address(user)
-        self.assertIsNone(error)
-        self.assertEqual(result.get("lane_type"), LaneType.CITE.name)
+        assert error is None
+        assert result.get("lane_type") == LaneType.CITE.name
 
         user = _users_with_mock_address(7)
         result, error = format_address(user)
-        self.assertIsNone(error)
-        self.assertEqual(result.get("lane_type"), LaneType.CHEM.name)
-        self.assertEqual(result.get("number"), "261")
+        assert error is None
+        assert result.get("lane_type") == LaneType.CHEM.name
+        assert result.get("number") == "261"
 
         user = _users_with_mock_address(8)
         result, error = format_address(user)
-        self.assertIsNone(error)
-        self.assertEqual(result.get("lane_type"), LaneType.LD.name)
+        assert error is None
+        assert result.get("lane_type") == LaneType.LD.name
 
         user = _users_with_mock_address(9)
         result, error = format_address(user)
-        self.assertIsNone(error)
-        self.assertEqual(result.get("lane_type"), LaneType.PAS.name)
-        self.assertEqual(result.get("number"), "1")
+        assert error is None
+        assert result.get("lane_type") == LaneType.PAS.name
+        assert result.get("number") == "1"
 
         user = _users_with_mock_address(10)
         result, error = format_address(user)
-        self.assertIsNone(error)
-        self.assertEqual(result.get("lane_type"), LaneType.SQ.name)
-        self.assertEqual(result.get("number"), "2")
+        assert error is None
+        assert result.get("lane_type") == LaneType.SQ.name
+        assert result.get("number") == "2"
 
         user = _users_with_mock_address(11)
         result, error = format_address(user)
-        self.assertIsNone(error)
-        self.assertEqual(result.get("lane_type"), LaneType.HAM.name)
+        assert error is None
+        assert result.get("lane_type") == LaneType.HAM.name
 
         user = _users_with_mock_address(12)
         result, error = format_address(user)
-        self.assertIsNone(error)
-        self.assertEqual(result.get("lane_type"), LaneType.QUAR.name)
-        self.assertEqual(result.get("number"), "16")
+        assert error is None
+        assert result.get("lane_type") == LaneType.QUAR.name
+        assert result.get("number") == "16"
 
         user = _users_with_mock_address(13)
         result, error = format_address(user)
-        self.assertIsNone(error)
-        self.assertEqual(result.get("lane_type"), LaneType.RES.name)
-        self.assertEqual(result.get("number"), "1")
+        assert error is None
+        assert result.get("lane_type") == LaneType.RES.name
+        assert result.get("number") == "1"
 
         user = _users_with_mock_address(14)
         result, error = format_address(user)
-        self.assertIsNone(error)
-        self.assertEqual(result.get("lane_type"), LaneType.VOIE.name)
-        self.assertEqual(result.get("number"), "172")
+        assert error is None
+        assert result.get("lane_type") == LaneType.VOIE.name
+        assert result.get("number") == "172"
 
         user = _users_with_mock_address(15)
         result, error = format_address(user)
-        self.assertIsNone(error)
-        self.assertEqual(result.get("lane_type"), LaneType.ALL.name)
-        self.assertEqual(result.get("number"), "3")
+        assert error is None
+        assert result.get("lane_type") == LaneType.ALL.name
+        assert result.get("number") == "3"
 
 
 class LaneTypeTest(TestCase):
@@ -161,14 +161,14 @@ class LaneTypeTest(TestCase):
         """
         Test some variants / alternatives used by api.geo.gouv.fr for lane types
         """
-        self.assertEqual(LaneType.GR, find_lane_type_aliases("grand rue"))
-        self.assertEqual(LaneType.GR, find_lane_type_aliases("grande-rue"))
-        self.assertIsNone(None, find_lane_type_aliases("grande'rue"))
-        self.assertEqual(LaneType.RUE, find_lane_type_aliases("R"))
-        self.assertEqual(LaneType.RUE, find_lane_type_aliases("r"))
-        self.assertEqual(LaneType.LD, find_lane_type_aliases("lieu dit"))
-        self.assertEqual(LaneType.LD, find_lane_type_aliases("lieu-dit"))
-        self.assertIsNone(find_lane_type_aliases("XXX"))
+        assert LaneType.GR == find_lane_type_aliases("grand rue")
+        assert LaneType.GR == find_lane_type_aliases("grande-rue")
+        assert None is None, find_lane_type_aliases("grande'rue")
+        assert LaneType.RUE == find_lane_type_aliases("R")
+        assert LaneType.RUE == find_lane_type_aliases("r")
+        assert LaneType.LD == find_lane_type_aliases("lieu dit")
+        assert LaneType.LD == find_lane_type_aliases("lieu-dit")
+        assert find_lane_type_aliases("XXX") is None
 
 
 @mock.patch(
@@ -182,11 +182,11 @@ class LaneExtensionTest(TestCase):
         """
         user = _users_with_mock_address(0)
         result, _error = format_address(user)
-        self.assertEqual(result.get("std_extension"), LaneExtension.B.name)
+        assert result.get("std_extension") == LaneExtension.B.name
 
         user = _users_with_mock_address(16)
         result, _error = format_address(user)
-        self.assertEqual(result.get("std_extension"), LaneExtension.T.name)
+        assert result.get("std_extension") == LaneExtension.T.name
 
     def test_non_standard_extension(self, _):
         """
@@ -194,5 +194,5 @@ class LaneExtensionTest(TestCase):
         """
         user = _users_with_mock_address(17)
         result, _error = format_address(user)
-        self.assertEqual(result.get("non_std_extension"), "G")
-        self.assertIsNone(result.get("std_extension"))
+        assert result.get("non_std_extension") == "G"
+        assert result.get("std_extension") is None

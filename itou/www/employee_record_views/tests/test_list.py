@@ -32,7 +32,7 @@ class ListEmployeeRecordsTest(TestCase):
 
         response = self.client.get(self.url)
 
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
     def test_new_employee_records(self):
         """
@@ -42,7 +42,7 @@ class ListEmployeeRecordsTest(TestCase):
 
         response = self.client.get(self.url)
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, self.job_seeker.get_full_name().title())
 
     def test_status_filter(self):
@@ -72,7 +72,7 @@ class ListEmployeeRecordsTest(TestCase):
 
         response = self.client.get(self.url)
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, f"Fin de contrat :&nbsp;<b>{hiring_end_at.strftime('%e').lstrip()}")
 
     def test_employee_records_without_hiring_end_at(self):
@@ -82,7 +82,7 @@ class ListEmployeeRecordsTest(TestCase):
 
         response = self.client.get(self.url)
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, "Fin de contrat :&nbsp;<b>Non renseigné")
 
     def test_rejected_without_custom_message(self):
@@ -94,7 +94,7 @@ class ListEmployeeRecordsTest(TestCase):
         record.update_as_rejected("0012", "JSON Invalide")
 
         response = self.client.get(self.url + "?status=REJECTED")
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, "Erreur 0012")
         self.assertContains(response, "JSON Invalide")
 
@@ -131,14 +131,14 @@ class ListEmployeeRecordsTest(TestCase):
                 record.update_as_rejected(err_code, err_message)
 
                 response = self.client.get(self.url + "?status=REJECTED")
-                self.assertEqual(response.status_code, 200)
+                assert response.status_code == 200
                 self.assertContains(response, f"Erreur {err_code}")
                 self.assertNotContains(response, err_message)
                 self.assertContains(response, custom_err_message)
 
     def _check_employee_record_order(self, url, first_job_seeker, second_job_seeker):
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         response_text = response.content.decode(response.charset)
         # The index method raises ValueError if the value isn't found
         first_job_seeker_position = response_text.index(first_job_seeker.get_full_name().title())

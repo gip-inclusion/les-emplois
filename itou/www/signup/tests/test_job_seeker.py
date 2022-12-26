@@ -31,13 +31,13 @@ class JobSeekerSignupTest(TestCase):
         # Check if the form page is displayed correctly.
         url = reverse("signup:job_seeker_situation")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Check if none of the boxes are checked 'some data' needed to raise
         # form error.
         post_data = {"some": "data"}
         response = self.client.post(url, post_data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertFormError(response.context["form"], "situation", [JobSeekerSituationForm.ERROR_NOTHING_CHECKED])
 
         # Check if one of eligibility criterion is checked.
@@ -45,31 +45,31 @@ class JobSeekerSignupTest(TestCase):
         for choice in JobSeekerSituationForm.ELIGIBLE_SITUATION:
             post_data = {"situation": [choice]}
             response = self.client.post(url, data=post_data)
-            self.assertEqual(response.status_code, 302)
+            assert response.status_code == 302
             self.assertRedirects(response, next_url)
 
             post_data["situation"].append("autre")
             response = self.client.post(url, data=post_data)
-            self.assertEqual(response.status_code, 302)
+            assert response.status_code == 302
             self.assertRedirects(response, next_url)
 
         # Check if all the eligibility criteria are checked.
         post_data = {"situation": JobSeekerSituationForm.ELIGIBLE_SITUATION}
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
         self.assertRedirects(response, next_url)
 
         # Check if "Autre" is the only one checked.
         post_data = {"situation": "autre"}
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
         next_url = reverse("signup:job_seeker_situation_not_eligible")
         self.assertRedirects(response, next_url)
 
         # Check not eligible destination page.
         url = reverse("signup:job_seeker_situation_not_eligible")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_job_seeker_nir(self):
         nir = "141068078200557"
@@ -78,18 +78,18 @@ class JobSeekerSignupTest(TestCase):
         # It will be saved in the next view.
         url = reverse("signup:job_seeker_nir")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         post_data = {"nir": nir}
         response = self.client.post(url, post_data)
         self.assertRedirects(response, reverse("signup:job_seeker"))
-        self.assertIn(global_constants.ITOU_SESSION_NIR_KEY, list(self.client.session.keys()))
-        self.assertTrue(self.client.session.get(global_constants.ITOU_SESSION_NIR_KEY))
+        assert global_constants.ITOU_SESSION_NIR_KEY in list(self.client.session.keys())
+        assert self.client.session.get(global_constants.ITOU_SESSION_NIR_KEY)
 
         # NIR is stored with user information.
         url = reverse("signup:job_seeker")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         address_line_1 = "Test adresse"
         address_line_2 = "Test adresse complémentaire"
@@ -110,11 +110,11 @@ class JobSeekerSignupTest(TestCase):
         }
 
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
         self.assertRedirects(response, reverse("account_email_verification_sent"))
 
         job_seeker = User.objects.get(email=post_data["email"])
-        self.assertEqual(nir, job_seeker.nir)
+        assert nir == job_seeker.nir
 
     def test_job_seeker_temporary_nir(self):
         """
@@ -128,19 +128,19 @@ class JobSeekerSignupTest(TestCase):
         url = reverse("signup:job_seeker_nir")
         post_data = {"nir": nir}
         response = self.client.post(url, post_data)
-        self.assertEqual(response.status_code, 200)
-        self.assertFalse(response.context.get("form").is_valid())
+        assert response.status_code == 200
+        assert not response.context.get("form").is_valid()
 
         post_data = {"nir": nir, "skip": 1}
         response = self.client.post(url, post_data)
         self.assertRedirects(response, reverse("signup:job_seeker"))
-        self.assertNotIn(global_constants.ITOU_SESSION_NIR_KEY, list(self.client.session.keys()))
-        self.assertFalse(self.client.session.get(global_constants.ITOU_SESSION_NIR_KEY))
+        assert global_constants.ITOU_SESSION_NIR_KEY not in list(self.client.session.keys())
+        assert not self.client.session.get(global_constants.ITOU_SESSION_NIR_KEY)
 
         # Temporary NIR is not stored with user information.
         url = reverse("signup:job_seeker")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         address_line_1 = "Test adresse"
         address_line_2 = "Test adresse complémentaire"
@@ -161,11 +161,11 @@ class JobSeekerSignupTest(TestCase):
         }
 
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
         self.assertRedirects(response, reverse("account_email_verification_sent"))
 
         job_seeker = User.objects.get(email=post_data["email"])
-        self.assertFalse(job_seeker.nir)
+        assert not job_seeker.nir
 
     def test_job_seeker_signup(self):
         """Job-seeker signup."""
@@ -176,7 +176,7 @@ class JobSeekerSignupTest(TestCase):
 
         url = reverse("signup:job_seeker")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, '<button type="submit" class="btn btn-primary">Inscription</button>', html=True)
 
         address_line_1 = "Test adresse"
@@ -198,46 +198,46 @@ class JobSeekerSignupTest(TestCase):
         }
 
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
         self.assertRedirects(response, reverse("account_email_verification_sent"))
 
         # Check `User` state.
         user = User.objects.get(email=post_data["email"])
         # `username` should be a valid UUID, see `User.generate_unique_username()`.
-        self.assertEqual(user.username, uuid.UUID(user.username, version=4).hex)
-        self.assertTrue(user.is_job_seeker)
-        self.assertFalse(user.is_prescriber)
-        self.assertFalse(user.is_siae_staff)
+        assert user.username == uuid.UUID(user.username, version=4).hex
+        assert user.is_job_seeker
+        assert not user.is_prescriber
+        assert not user.is_siae_staff
 
         # Check `EmailAddress` state.
-        self.assertEqual(user.emailaddress_set.count(), 1)
+        assert user.emailaddress_set.count() == 1
         user_email = user.emailaddress_set.first()
-        self.assertFalse(user_email.verified)
+        assert not user_email.verified
 
         # Check sent email.
-        self.assertEqual(len(mail.outbox), 1)
+        assert len(mail.outbox) == 1
         email = mail.outbox[0]
-        self.assertIn("Confirmez votre adresse e-mail", email.subject)
-        self.assertIn("Afin de finaliser votre inscription, cliquez sur le lien suivant", email.body)
-        self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(len(email.to), 1)
-        self.assertEqual(email.to[0], user.email)
+        assert "Confirmez votre adresse e-mail" in email.subject
+        assert "Afin de finaliser votre inscription, cliquez sur le lien suivant" in email.body
+        assert email.from_email == settings.DEFAULT_FROM_EMAIL
+        assert len(email.to) == 1
+        assert email.to[0] == user.email
 
         # User cannot log in until confirmation.
         post_data = {"login": user.email, "password": DEFAULT_PASSWORD}
         url = reverse("login:job_seeker")
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("account_email_verification_sent"))
+        assert response.status_code == 302
+        assert response.url == reverse("account_email_verification_sent")
 
         # Confirm email + auto login.
         confirmation_token = EmailConfirmationHMAC(user_email).key
         confirm_email_url = reverse("account_confirm_email", kwargs={"key": confirmation_token})
         response = self.client.post(confirm_email_url)
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("welcoming_tour:index"))
+        assert response.status_code == 302
+        assert response.url == reverse("welcoming_tour:index")
         user_email = user.emailaddress_set.first()
-        self.assertTrue(user_email.verified)
+        assert user_email.verified
 
     @respx.mock
     @override_settings(
@@ -251,18 +251,18 @@ class JobSeekerSignupTest(TestCase):
         # See self.test_job_seeker_nir
         nir = "141068078200557"
         self.client.post(reverse("signup:job_seeker_nir"), {"nir": nir})
-        self.assertIn(global_constants.ITOU_SESSION_NIR_KEY, list(self.client.session.keys()))
-        self.assertTrue(self.client.session.get(global_constants.ITOU_SESSION_NIR_KEY))
+        assert global_constants.ITOU_SESSION_NIR_KEY in list(self.client.session.keys())
+        assert self.client.session.get(global_constants.ITOU_SESSION_NIR_KEY)
 
         url = reverse("signup:job_seeker")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         fc_url = reverse("france_connect:authorize")
         self.assertContains(response, fc_url)
 
         mock_oauth_dance(self)
         job_seeker = User.objects.get(email=FC_USERINFO["email"])
-        self.assertEqual(nir, job_seeker.nir)
+        assert nir == job_seeker.nir
 
     @respx.mock
     @override_settings(
@@ -275,16 +275,16 @@ class JobSeekerSignupTest(TestCase):
         # temporary NIR is discarded on a previous step and tested separately.
         # See self.test_job_seeker_temporary_nir
 
-        self.assertNotIn(global_constants.ITOU_SESSION_NIR_KEY, list(self.client.session.keys()))
-        self.assertFalse(self.client.session.get(global_constants.ITOU_SESSION_NIR_KEY))
+        assert global_constants.ITOU_SESSION_NIR_KEY not in list(self.client.session.keys())
+        assert not self.client.session.get(global_constants.ITOU_SESSION_NIR_KEY)
 
         # Temporary NIR is not stored with user information.
         url = reverse("signup:job_seeker")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         fc_url = reverse("france_connect:authorize")
         self.assertContains(response, fc_url)
 
         mock_oauth_dance(self)
         job_seeker = User.objects.get(email=FC_USERINFO["email"])
-        self.assertIsNone(job_seeker.nir)
+        assert job_seeker.nir is None

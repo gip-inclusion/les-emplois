@@ -14,8 +14,8 @@ class UserAdminFormTest(TestCase):
         data_user["is_job_seeker"] = True
         data_user["is_prescriber"] = True
         form = UserAdminForm(data=data_user, instance=user)
-        self.assertFalse(form.is_valid())
-        self.assertIn("Un utilisateur ne peut avoir qu'un rôle à la fois", form.errors["__all__"][0])
+        assert not form.is_valid()
+        assert "Un utilisateur ne peut avoir qu'un rôle à la fois" in form.errors["__all__"][0]
 
     def test_pass_iae_and_job_seeker(self):
         user = JobSeekerFactory()
@@ -26,8 +26,8 @@ class UserAdminFormTest(TestCase):
         data_user["is_siae_staff"] = False
         data_user["is_labor_inspector"] = False
         form = UserAdminForm(data=data_user, instance=user)
-        self.assertFalse(form.is_valid())
-        self.assertIn("Cet utilisateur possède déjà un PASS IAE", form.errors["__all__"][0])
+        assert not form.is_valid()
+        assert "Cet utilisateur possède déjà un PASS IAE" in form.errors["__all__"][0]
 
     # email unicity
     def test_email_already_exists(self):
@@ -50,29 +50,29 @@ class UserAdminFormTest(TestCase):
 
         # new user - email doesn't exist
         form = UserAdminForm(data_new_user)
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
 
         # new user - email already exist
         data_new_user["email"] = user.email
 
         form = UserAdminForm(data_new_user)
-        self.assertFalse(form.is_valid())
-        self.assertIn("Cet e-mail existe déjà.", form.errors["__all__"])
+        assert not form.is_valid()
+        assert "Cet e-mail existe déjà." in form.errors["__all__"]
 
         # updating user - email not modified
         form = UserAdminForm(data=data_user, instance=user)
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
 
         # updating user - email modified - email doesn't exist
         data_user["email"] = "ridley@scott.com"
         form = UserAdminForm(data=data_user, instance=user)
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
 
         # updating user - email modified - email exist (other user)
         data_user["email"] = email
         form = UserAdminForm(data=data_user, instance=user)
-        self.assertFalse(form.is_valid())
-        self.assertIn("Cet e-mail existe déjà.", form.errors["__all__"])
+        assert not form.is_valid()
+        assert "Cet e-mail existe déjà." in form.errors["__all__"]
 
     # nir unicity
     def test_nir_already_exists(self):
@@ -96,36 +96,36 @@ class UserAdminFormTest(TestCase):
 
         # new user - no nir
         form = UserAdminForm(data_new_user)
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
 
         # new user - nir doesn't exist
         data_new_user["nir"] = new_nir
         form = UserAdminForm(data_new_user)
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
 
         # new user - nir already exist
         data_new_user["nir"] = existing_nir
 
         form = UserAdminForm(data_new_user)
-        self.assertFalse(form.is_valid())
-        self.assertIn("Le NIR de ce candidat est déjà associé à un autre utilisateur.", form.errors["__all__"])
+        assert not form.is_valid()
+        assert "Le NIR de ce candidat est déjà associé à un autre utilisateur." in form.errors["__all__"]
 
         # updating user - nir not modified
         form = UserAdminForm(data=data_user, instance=user)
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
 
         # updating user - nir modified - no nir
         data_user["nir"] = ""
         form = UserAdminForm(data=data_user, instance=user)
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
 
         # updating user - nir modified - nir doesn't exist
         data_user["nir"] = new_nir
         form = UserAdminForm(data=data_user, instance=user)
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
 
         # updating user - nir modified - nir exist (other user)
         data_user["nir"] = existing_nir
         form = UserAdminForm(data=data_user, instance=user)
-        self.assertFalse(form.is_valid())
-        self.assertIn("Le NIR de ce candidat est déjà associé à un autre utilisateur.", form.errors["__all__"])
+        assert not form.is_valid()
+        assert "Le NIR de ce candidat est déjà associé à un autre utilisateur." in form.errors["__all__"]

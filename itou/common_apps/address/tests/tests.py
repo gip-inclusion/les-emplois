@@ -1,5 +1,6 @@
 from unittest import mock
 
+import pytest
 from django import forms
 from django.contrib.gis.geos import Point
 
@@ -25,14 +26,14 @@ class UtilsAddressMixinTest(TestCase):
         """
         prescriber = PrescriberOrganization.objects.create(siret="12000015300011")
 
-        self.assertEqual(prescriber.address_line_1, "")
-        self.assertEqual(prescriber.address_line_2, "")
-        self.assertEqual(prescriber.post_code, "")
-        self.assertEqual(prescriber.city, "")
-        self.assertEqual(prescriber.coords, None)
-        self.assertEqual(prescriber.geocoding_score, None)
-        self.assertEqual(prescriber.latitude, None)
-        self.assertEqual(prescriber.longitude, None)
+        assert prescriber.address_line_1 == ""
+        assert prescriber.address_line_2 == ""
+        assert prescriber.post_code == ""
+        assert prescriber.city == ""
+        assert prescriber.coords is None
+        assert prescriber.geocoding_score is None
+        assert prescriber.latitude is None
+        assert prescriber.longitude is None
 
         prescriber.set_coords("10 PL 5 MARTYRS LYCEE BUFFON", post_code="75015")
         prescriber.save()
@@ -43,10 +44,10 @@ class UtilsAddressMixinTest(TestCase):
         expected_longitude = 2.316754
         expected_geocoding_score = 0.587663373207207
 
-        self.assertEqual(prescriber.coords, expected_coords)
-        self.assertEqual(prescriber.geocoding_score, expected_geocoding_score)
-        self.assertEqual(prescriber.latitude, expected_latitude)
-        self.assertEqual(prescriber.longitude, expected_longitude)
+        assert prescriber.coords == expected_coords
+        assert prescriber.geocoding_score == expected_geocoding_score
+        assert prescriber.latitude == expected_latitude
+        assert prescriber.longitude == expected_longitude
 
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_NO_RESULT_MOCK)
     def test_set_coords_with_bad_address(self, _mock_call_ban_geocoding_api):
@@ -56,7 +57,7 @@ class UtilsAddressMixinTest(TestCase):
         """
         prescriber = PrescriberOrganization.objects.create(siret="12000015300011")
 
-        with self.assertRaises(GeocodingDataError):
+        with pytest.raises(GeocodingDataError):
             prescriber.set_coords("10 PL 5 ANATOLE", post_code="75010")
 
 
@@ -65,22 +66,22 @@ class UtilsDepartmentsTest(TestCase):
         # Corsica south == 2A
         post_codes = ["20000", "20137", "20700"]
         for post_code in post_codes:
-            self.assertEqual(department_from_postcode(post_code), "2A")
+            assert department_from_postcode(post_code) == "2A"
 
         # Corsica north == 2B
         post_codes = ["20240", "20220", "20407", "20660"]
         for post_code in post_codes:
-            self.assertEqual(department_from_postcode(post_code), "2B")
+            assert department_from_postcode(post_code) == "2B"
 
         # DOM
         post_codes = ["97500", "97000", "98800", "98000"]
         for post_code in post_codes:
-            self.assertEqual(department_from_postcode(post_code), post_code[:3])
+            assert department_from_postcode(post_code) == post_code[:3]
 
         # Any other city
         post_codes = ["13150", "30210", "17000"]
         for post_code in post_codes:
-            self.assertEqual(department_from_postcode(post_code), post_code[:2])
+            assert department_from_postcode(post_code) == post_code[:2]
 
 
 class DummyUserModelForm(OptionalAddressFormMixin, forms.ModelForm):
@@ -110,7 +111,7 @@ class UtilsOptionalAddressFormMixinTest(TestCase):
         """
         form_data = {}
         form = OptionalAddressFormMixin(data=form_data)
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
         expected_cleaned_data = {
             "city_slug": "",
             "city": "",
@@ -118,7 +119,7 @@ class UtilsOptionalAddressFormMixinTest(TestCase):
             "address_line_2": "",
             "post_code": "",
         }
-        self.assertDictEqual(form.cleaned_data, expected_cleaned_data)
+        assert form.cleaned_data == expected_cleaned_data
 
     def test_missing_address_line_1(self):
         """
@@ -132,10 +133,10 @@ class UtilsOptionalAddressFormMixinTest(TestCase):
             "post_code": "",
         }
         form = OptionalAddressFormMixin(data=form_data)
-        self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors["address_line_1"][0], "Adresse : ce champ est obligatoire.")
-        self.assertEqual(form.errors["post_code"][0], "Code postal : ce champ est obligatoire.")
-        self.assertEqual(form.errors["city"][0], "Ville : ce champ est obligatoire.")
+        assert not form.is_valid()
+        assert form.errors["address_line_1"][0] == "Adresse : ce champ est obligatoire."
+        assert form.errors["post_code"][0] == "Code postal : ce champ est obligatoire."
+        assert form.errors["city"][0] == "Ville : ce champ est obligatoire."
 
     def test_fecth_city(self):
         """
@@ -156,7 +157,7 @@ class UtilsOptionalAddressFormMixinTest(TestCase):
         form = OptionalAddressFormMixin(data=form_data)
 
         with self.assertNumQueries(1):
-            self.assertTrue(form.is_valid())
+            assert form.is_valid()
             expected_cleaned_data = {
                 "city_slug": city.slug,
                 "city": city.name,
@@ -164,7 +165,7 @@ class UtilsOptionalAddressFormMixinTest(TestCase):
                 "address_line_2": form_data["address_line_2"],
                 "post_code": form_data["post_code"],
             }
-            self.assertDictEqual(form.cleaned_data, expected_cleaned_data)
+            assert form.cleaned_data == expected_cleaned_data
 
     def test_with_instance(self):
         """
@@ -185,8 +186,8 @@ class UtilsOptionalAddressFormMixinTest(TestCase):
 
             form = DummyUserModelForm(data={}, instance=user)
 
-            self.assertEqual(form.initial["city_slug"], city.slug)
-            self.assertEqual(form.initial["city"], city.name)
+            assert form.initial["city_slug"] == city.slug
+            assert form.initial["city"] == city.name
 
 
 class UtilsMandatoryAddressFormMixinTest(TestCase):
@@ -200,16 +201,16 @@ class UtilsMandatoryAddressFormMixinTest(TestCase):
         """
         form_data = {}
         form = MandatoryAddressFormMixin(data=form_data)
-        self.assertFalse(form.is_valid())
+        assert not form.is_valid()
 
-        self.assertEqual(form.errors["address_line_1"][0], "Ce champ est obligatoire.")
-        self.assertEqual(form.errors["post_code"][0], "Ce champ est obligatoire.")
-        self.assertEqual(form.errors["city"][0], "Ce champ est obligatoire.")
+        assert form.errors["address_line_1"][0] == "Ce champ est obligatoire."
+        assert form.errors["post_code"][0] == "Ce champ est obligatoire."
+        assert form.errors["city"][0] == "Ce champ est obligatoire."
 
 
 class UtilsMiscTestCase(TestCase):
     def test_lat_lon_to_coords(self):
-        self.assertEqual(lat_lon_to_coords(None, None), None)
-        self.assertEqual(lat_lon_to_coords(1, None), None)
-        self.assertEqual(lat_lon_to_coords(None, 1), None)
-        self.assertEqual(lat_lon_to_coords(13, 42), Point(42, 13))
+        assert lat_lon_to_coords(None, None) is None
+        assert lat_lon_to_coords(1, None) is None
+        assert lat_lon_to_coords(None, 1) is None
+        assert lat_lon_to_coords(13, 42) == Point(42, 13)

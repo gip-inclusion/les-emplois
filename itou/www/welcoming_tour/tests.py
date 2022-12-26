@@ -29,7 +29,7 @@ class WelcomingTourTest(InclusionConnectBaseTestCase):
         # User verifies its email clicking on the email he received
         confirm_email_url = get_confirm_email_url(request, email)
         response = self.client.post(confirm_email_url, follow=True)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         return response
 
     def test_new_job_seeker_sees_welcoming_tour_test(self):
@@ -52,14 +52,14 @@ class WelcomingTourTest(InclusionConnectBaseTestCase):
         response = self.verify_email(response.wsgi_request, email=job_seeker.email)
 
         # User should be redirected to the welcoming tour as he just signed up
-        self.assertEqual(response.wsgi_request.path, reverse("welcoming_tour:index"))
+        assert response.wsgi_request.path == reverse("welcoming_tour:index")
         self.assertTemplateUsed(response, "welcoming_tour/job_seeker.html")
 
         self.client.logout()
         response = self.client.post(
             reverse("login:job_seeker"), follow=True, data={"login": job_seeker.email, "password": DEFAULT_PASSWORD}
         )
-        self.assertNotEqual(response.wsgi_request.path, reverse("welcoming_tour:index"))
+        assert response.wsgi_request.path != reverse("welcoming_tour:index")
         self.assertContains(response, "Revoir le message")
 
     @respx.mock
@@ -71,13 +71,13 @@ class WelcomingTourTest(InclusionConnectBaseTestCase):
         response = self.client.get(response.url, follow=True)
 
         # User should be redirected to the welcoming tour as he just signed up
-        self.assertEqual(response.wsgi_request.path, reverse("welcoming_tour:index"))
+        assert response.wsgi_request.path == reverse("welcoming_tour:index")
         self.assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
         self.client.logout()
         response = mock_oauth_dance(self, KIND_PRESCRIBER, assert_redirects=False)
         response = self.client.get(response.url, follow=True)
-        self.assertNotEqual(response.wsgi_request.path, reverse("welcoming_tour:index"))
+        assert response.wsgi_request.path != reverse("welcoming_tour:index")
         self.assertContains(response, "Revoir le message")
 
     @respx.mock
@@ -96,13 +96,13 @@ class WelcomingTourTest(InclusionConnectBaseTestCase):
         response = self.client.get(response.url, follow=True)
 
         # User should be redirected to the welcoming tour as he just signed up
-        self.assertEqual(response.wsgi_request.path, reverse("welcoming_tour:index"))
+        assert response.wsgi_request.path == reverse("welcoming_tour:index")
         self.assertTemplateUsed(response, "welcoming_tour/siae_staff.html")
 
         self.client.logout()
         response = mock_oauth_dance(self, KIND_SIAE_STAFF, assert_redirects=False)
         response = self.client.get(response.url, follow=True)
-        self.assertNotEqual(response.wsgi_request.path, reverse("welcoming_tour:index"))
+        assert response.wsgi_request.path != reverse("welcoming_tour:index")
         self.assertContains(response, "Revoir le message")
 
 
@@ -111,7 +111,7 @@ class WelcomingTourExceptions(TestCase):
         # User verifies its email clicking on the email he received
         confirm_email_url = get_confirm_email_url(request, email)
         response = self.client.post(confirm_email_url, follow=True)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         return response
 
     def test_new_job_seeker_is_redirected_after_welcoming_tour_test(self):
@@ -137,13 +137,13 @@ class WelcomingTourExceptions(TestCase):
 
         # The user should not be redirected to the welcoming path if he wanted to perform
         # another action before signing up.
-        self.assertNotIn(response.wsgi_request.path, reverse("welcoming_tour:index"))
+        assert response.wsgi_request.path not in reverse("welcoming_tour:index")
 
         # The user is redirected to "apply:step_check_job_seeker_info"
         # as birthdate and pole_emploi_id are missing from the signup form.
         # This is a valid behavior that may change in the future so
         # let's avoid too specific tests.
-        self.assertTrue(response.wsgi_request.path.startswith("/apply"))
+        assert response.wsgi_request.path.startswith("/apply")
 
         content = mail.outbox[0].body
-        self.assertIn(next_to, content)
+        assert next_to in content

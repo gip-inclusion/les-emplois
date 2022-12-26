@@ -35,7 +35,7 @@ class ReactivateEmployeeRecordsTest(TestCase):
         self.assertRedirects(response, f"{self.next_url}?status=DISABLED")
 
         self.employee_record.refresh_from_db()
-        self.assertEqual(self.employee_record.status, Status.NEW)
+        assert self.employee_record.status == Status.NEW
 
         job_seeker_name = self.employee_record.job_seeker.get_full_name().title()
 

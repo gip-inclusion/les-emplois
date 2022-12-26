@@ -43,9 +43,9 @@ class GeolocateJobseekerManagementCommandTest(TestCase):
 
         out, _ = self.run_command("update")
 
-        self.assertIn("Geolocation of active job seekers addresses (updating DB)", out)
-        self.assertIn("+ NOT storing data", out)
-        self.assertIn("+ NOT calling geo API", out)
+        assert "Geolocation of active job seekers addresses (updating DB)" in out
+        assert "+ NOT storing data" in out
+        assert "+ NOT calling geo API" in out
 
     @respx.mock
     def test_update_wet_run(self):
@@ -55,21 +55,21 @@ class GeolocateJobseekerManagementCommandTest(TestCase):
 
         out, _ = self.run_command("update", wet_run=True)
 
-        self.assertIn("Geolocation of active job seekers addresses (updating DB)", out)
-        self.assertNotIn("+ NOT storing data", out)
-        self.assertNotIn("+ NOT calling geo API", out)
+        assert "Geolocation of active job seekers addresses (updating DB)" in out
+        assert "+ NOT storing data" not in out
+        assert "+ NOT calling geo API" not in out
 
         user.refresh_from_db()
 
-        self.assertEqual("SRID=4326;POINT (5.944871 49.205293)", user.coords)
-        self.assertEqual(0.94, user.geocoding_score)
-        self.assertIn("+ updated: 1, errors: 0, total: 1", out)
+        assert "SRID=4326;POINT (5.944871 49.205293)" == user.coords
+        assert 0.94 == user.geocoding_score
+        assert "+ updated: 1, errors: 0, total: 1" in out
 
     def test_export_dry_run(self):
         out, _ = self.run_command("export")
 
-        self.assertIn("Export job seeker geocoding data to file:", out)
-        self.assertIn("+ implicit 'dry-run': NOT creating file", out)
+        assert "Export job seeker geocoding data to file:" in out
+        assert "+ implicit 'dry-run': NOT creating file" in out
 
     def test_export_wet_run(self):
         coords = "SRID=4326;POINT (5.944871 49.205293)"
@@ -83,21 +83,21 @@ class GeolocateJobseekerManagementCommandTest(TestCase):
 
         out, _ = self.run_command("export", filename=path, wet_run=True)
 
-        self.assertIn("+ found 1 geocoding entries with score > 0.0", out)
+        assert "+ found 1 geocoding entries with score > 0.0" in out
 
         # Could not find an elegant way to mock file creation
         # `mock_open()` does not seem to be the right thing to use for write ops
         # Works well for reading ops though
         with open(path) as f:
             [_, row] = csv.reader(f, delimiter=";")
-            self.assertIn(coords, row)
-            self.assertIn(str(score), row)
+            assert coords in row
+            assert str(score) in row
 
     def test_import_dry_run(self):
         out, _ = self.run_command("import", filename="foo")
 
-        self.assertIn("Import job seeker geocoding data from file:", out)
-        self.assertIn("+ implicit `dry-run`: reading file but NOT writing into DB", out)
+        assert "Import job seeker geocoding data from file:" in out
+        assert "+ implicit `dry-run`: reading file but NOT writing into DB" in out
 
     def test_import_wet_run(self):
         user = JobSeekerWithAddressFactory(is_active=True)
@@ -109,10 +109,10 @@ class GeolocateJobseekerManagementCommandTest(TestCase):
 
         out, _ = self.run_command("import", filename=path, wet_run=True)
 
-        self.assertIn("Import job seeker geocoding data from file:", out)
+        assert "Import job seeker geocoding data from file:" in out
 
         user.refresh_from_db()
 
-        self.assertEqual(0.95, user.geocoding_score)
-        self.assertEqual("SRID=4326;POINT (5.944871 49.205293)", user.coords)
-        self.assertIn("+ updated 1 'user.User' objects", out)
+        assert 0.95 == user.geocoding_score
+        assert "SRID=4326;POINT (5.944871 49.205293)" == user.coords
+        assert "+ updated 1 'user.User' objects" in out

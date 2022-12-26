@@ -1,5 +1,6 @@
 from unittest.mock import PropertyMock, patch
 
+import pytest
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.urls import reverse
@@ -25,9 +26,9 @@ class TestDisplayApproval(TestCase):
             reverse("approvals:display_printable_approval", kwargs={"approval_id": job_application.approval_id})
         )
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["approval"], job_application.approval)
-        self.assertEqual(response.context["siae"], job_application.to_siae)
+        assert response.status_code == 200
+        assert response.context["approval"] == job_application.approval
+        assert response.context["siae"] == job_application.to_siae
         self.assertContains(response, global_constants.ITOU_ASSISTANCE_URL)
         self.assertContains(response, "Imprimer ce PASS IAE")
         self.assertContains(response, "Astuce pour conserver cette attestation en format PDF")
@@ -49,9 +50,9 @@ class TestDisplayApproval(TestCase):
             reverse("approvals:display_printable_approval", kwargs={"approval_id": job_application.approval_id})
         )
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["approval"], job_application.approval)
-        self.assertEqual(response.context["siae"], job_application.to_siae)
+        assert response.status_code == 200
+        assert response.context["approval"] == job_application.approval
+        assert response.context["siae"] == job_application.to_siae
         self.assertContains(response, global_constants.ITOU_ASSISTANCE_URL)
         self.assertContains(response, "Imprimer ce PASS IAE")
         self.assertContains(response, "Astuce pour conserver cette attestation en format PDF")
@@ -65,7 +66,7 @@ class TestDisplayApproval(TestCase):
             reverse("approvals:display_printable_approval", kwargs={"approval_id": approval.pk})
         )
 
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
     def test_display_approval_even_if_diagnosis_is_missing(self, *args, **kwargs):
         # An approval has been delivered but it does not come from Itou.
@@ -81,9 +82,9 @@ class TestDisplayApproval(TestCase):
             reverse("approvals:display_printable_approval", kwargs={"approval_id": job_application.approval_id})
         )
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["approval"], job_application.approval)
-        self.assertEqual(response.context["siae"], job_application.to_siae)
+        assert response.status_code == 200
+        assert response.context["approval"] == job_application.approval
+        assert response.context["siae"] == job_application.to_siae
         self.assertContains(response, global_constants.ITOU_ASSISTANCE_URL)
         self.assertContains(response, "Imprimer ce PASS IAE")
         self.assertContains(response, "Astuce pour conserver cette attestation en format PDF")
@@ -107,9 +108,9 @@ class TestDisplayApproval(TestCase):
             reverse("approvals:display_printable_approval", kwargs={"approval_id": job_application.approval_id})
         )
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["approval"], job_application.approval)
-        self.assertEqual(response.context["siae"], job_application.to_siae)
+        assert response.status_code == 200
+        assert response.context["approval"] == job_application.approval
+        assert response.context["siae"] == job_application.to_siae
         self.assertContains(response, global_constants.ITOU_ASSISTANCE_URL)
         self.assertContains(response, "Imprimer ce PASS IAE")
         self.assertContains(response, "Astuce pour conserver cette attestation en format PDF")
@@ -124,7 +125,7 @@ class TestDisplayApproval(TestCase):
         siae_member = job_application.to_siae.members.first()
         self.client.force_login(siae_member)
 
-        with self.assertRaisesRegex(Exception, "had no eligibility diagnosis and also was not mass-imported"):
+        with pytest.raises(Exception, match="had no eligibility diagnosis and also was not mass-imported"):
             self.client.get(
                 reverse("approvals:display_printable_approval", kwargs={"approval_id": job_application.approval_id})
             )

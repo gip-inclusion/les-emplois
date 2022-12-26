@@ -26,15 +26,15 @@ class EmployeeRecordAddressSerializerTest(TestCase):
         serializer = _AddressSerializer(job_seeker)
         data = serializer.data
 
-        self.assertIsNotNone(data)
-        self.assertIsNone(data["adrCpltDistribution"])
+        assert data is not None
+        assert data["adrCpltDistribution"] is None
 
         profile.hexa_additional_address = "Bad additional address because it is really over 32 characters"
         serializer = _AddressSerializer(job_seeker)
         data = serializer.data
 
-        self.assertIsNotNone(data)
-        self.assertIsNone(data["adrCpltDistribution"])
+        assert data is not None
+        assert data["adrCpltDistribution"] is None
 
         good_address = "Good additional address"
         profile.hexa_additional_address = good_address
@@ -42,8 +42,8 @@ class EmployeeRecordAddressSerializerTest(TestCase):
         serializer = _AddressSerializer(job_seeker)
         data = serializer.data
 
-        self.assertIsNotNone(data)
-        self.assertEqual(good_address, data["adrCpltDistribution"])
+        assert data is not None
+        assert good_address == data["adrCpltDistribution"]
 
     def test_hexa_lane_name(self):
         # If lane name contains parens,
@@ -57,16 +57,16 @@ class EmployeeRecordAddressSerializerTest(TestCase):
         serializer = _AddressSerializer(job_seeker)
         data = serializer.data
 
-        self.assertIsNotNone(data)
-        self.assertEqual("Lane name with parens", data["adrLibelleVoie"])
+        assert data is not None
+        assert "Lane name with parens" == data["adrLibelleVoie"]
 
         good_lane_name = "Lane name without parens"
         profile.hexa_lane_name = good_lane_name
         serializer = _AddressSerializer(job_seeker)
         data = serializer.data
 
-        self.assertIsNotNone(data)
-        self.assertEqual(good_lane_name, data["adrLibelleVoie"])
+        assert data is not None
+        assert good_lane_name == data["adrLibelleVoie"]
 
 
 class EmployeeRecordUpdateNotificationSerializerTest(TestCase):
@@ -84,17 +84,17 @@ class EmployeeRecordUpdateNotificationSerializerTest(TestCase):
         serializer = EmployeeRecordUpdateNotificationSerializer(notification)
         data = serializer.data
 
-        self.assertIsNotNone(data)
-        self.assertEqual(data.get("siret"), employee_record.siret)
-        self.assertEqual(data.get("mesure"), employee_record.asp_siae_type)
-        self.assertEqual(data.get("typeMouvement"), EmployeeRecordUpdateNotification.ASP_MOVEMENT_TYPE)
+        assert data is not None
+        assert data.get("siret") == employee_record.siret
+        assert data.get("mesure") == employee_record.asp_siae_type
+        assert data.get("typeMouvement") == EmployeeRecordUpdateNotification.ASP_MOVEMENT_TYPE
 
         personnal_data = data.get("personnePhysique")
 
-        self.assertIsNotNone(personnal_data)
-        self.assertEqual(personnal_data.get("passIae"), employee_record.approval_number)
-        self.assertEqual(personnal_data.get("passDateDeb"), start_at.strftime("%d/%m/%Y"))
-        self.assertEqual(personnal_data.get("passDateFin"), end_at.strftime("%d/%m/%Y"))
+        assert personnal_data is not None
+        assert personnal_data.get("passIae") == employee_record.approval_number
+        assert personnal_data.get("passDateDeb") == start_at.strftime("%d/%m/%Y")
+        assert personnal_data.get("passDateFin") == end_at.strftime("%d/%m/%Y")
 
     def test_batch_serializer(self):
         # This is the same serializer used for employee record batches.
@@ -120,13 +120,13 @@ class EmployeeRecordUpdateNotificationSerializerTest(TestCase):
         batch = EmployeeRecordBatch(new_notifications)
         data = EmployeeRecordUpdateNotificationBatchSerializer(batch).data
 
-        self.assertIsNotNone(data)
+        assert data is not None
 
         elements = data.get("lignesTelechargement")
 
-        self.assertEqual(len(new_notifications), len(elements))
+        assert len(new_notifications) == len(elements)
         for idx, element in enumerate(elements, 1):
             with self.subTest(idx):
-                self.assertEqual(element.get("numLigne"), idx)
-                self.assertIsNotNone(element.get("siret"))
-                self.assertEqual(element.get("typeMouvement"), EmployeeRecordUpdateNotification.ASP_MOVEMENT_TYPE)
+                assert element.get("numLigne") == idx
+                assert element.get("siret") is not None
+                assert element.get("typeMouvement") == EmployeeRecordUpdateNotification.ASP_MOVEMENT_TYPE

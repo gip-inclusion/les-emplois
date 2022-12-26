@@ -23,7 +23,7 @@ class DataInclusionStructureTest(APITestCase):
         url = reverse("v1:structures-list")
 
         response = authenticated_client.get(url, format="json")
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
 
 class DataInclusionSiaeStructureTest(APITestCase):
@@ -38,7 +38,7 @@ class DataInclusionSiaeStructureTest(APITestCase):
 
     def test_list_structures_unauthenticated(self):
         response = self.client.get(self.url, format="json", data={"type": "siae"})
-        self.assertEqual(response.status_code, 401)
+        assert response.status_code == 401
 
     def test_list_structures(self):
         siae = SiaeFactory(siret="10000000000001")
@@ -48,40 +48,37 @@ class DataInclusionSiaeStructureTest(APITestCase):
             format="json",
             data={"type": "siae"},
         )
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            response.json()["results"],
-            [
-                {
-                    "id": str(siae.uid),
-                    "typologie": siae.kind.value,
-                    "nom": siae.display_name,
-                    "siret": siae.siret,
-                    "rna": "",
-                    "presentation_resume": "",
-                    "presentation_detail": "",
-                    "site_web": siae.website,
-                    "telephone": siae.phone,
-                    "courriel": siae.email,
-                    "code_postal": siae.post_code,
-                    "code_insee": "",
-                    "commune": siae.city,
-                    "adresse": siae.address_line_1,
-                    "complement_adresse": siae.address_line_2,
-                    "longitude": siae.longitude,
-                    "latitude": siae.latitude,
-                    "source": siae.source,
-                    "date_maj": _str_with_tz(siae.updated_at),
-                    "antenne": False,
-                    "lien_source": f"http://testserver{reverse('siaes_views:card', kwargs={'siae_id': siae.pk})}",
-                    "horaires_ouverture": "",
-                    "accessibilite": "",
-                    "labels_nationaux": [],
-                    "labels_autres": [],
-                    "thematiques": [],
-                }
-            ],
-        )
+        assert response.status_code == 200
+        assert response.json()["results"] == [
+            {
+                "id": str(siae.uid),
+                "typologie": siae.kind.value,
+                "nom": siae.display_name,
+                "siret": siae.siret,
+                "rna": "",
+                "presentation_resume": "",
+                "presentation_detail": "",
+                "site_web": siae.website,
+                "telephone": siae.phone,
+                "courriel": siae.email,
+                "code_postal": siae.post_code,
+                "code_insee": "",
+                "commune": siae.city,
+                "adresse": siae.address_line_1,
+                "complement_adresse": siae.address_line_2,
+                "longitude": siae.longitude,
+                "latitude": siae.latitude,
+                "source": siae.source,
+                "date_maj": _str_with_tz(siae.updated_at),
+                "antenne": False,
+                "lien_source": f"http://testserver{reverse('siaes_views:card', kwargs={'siae_id': siae.pk})}",
+                "horaires_ouverture": "",
+                "accessibilite": "",
+                "labels_nationaux": [],
+                "labels_autres": [],
+                "thematiques": [],
+            }
+        ]
 
     def test_list_structures_antenne_with_user_created_with_proper_siret(self):
         siae_1 = SiaeFactory(siret="10000000000001")
@@ -93,7 +90,7 @@ class DataInclusionSiaeStructureTest(APITestCase):
             format="json",
             data={"type": "siae"},
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         structure_data_list = response.json()["results"]
 
@@ -123,7 +120,7 @@ class DataInclusionSiaeStructureTest(APITestCase):
             format="json",
             data={"type": "siae"},
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         structure_data_list = response.json()["results"]
 
@@ -150,7 +147,7 @@ class DataInclusionSiaeStructureTest(APITestCase):
             format="json",
             data={"type": "siae"},
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         structure_data_list = response.json()["results"]
         assert len(structure_data_list) == 1
@@ -166,7 +163,7 @@ class DataInclusionSiaeStructureTest(APITestCase):
             format="json",
             data={"type": "siae"},
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         structure_data_list = response.json()["results"]
 
@@ -195,10 +192,10 @@ class DataInclusionSiaeStructureTest(APITestCase):
             data={"type": "siae"},
         )
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         structure_data = response.json()["results"][0]
-        self.assertEqual(structure_data["presentation_resume"], siae.description[:279] + "…")
-        self.assertEqual(structure_data["presentation_detail"], siae.description)
+        assert structure_data["presentation_resume"] == siae.description[:279] + "…"
+        assert structure_data["presentation_detail"] == siae.description
 
     def test_list_structures_inactive_excluded(self):
         convention = SiaeConventionFactory(is_active=False)
@@ -210,8 +207,8 @@ class DataInclusionSiaeStructureTest(APITestCase):
             data={"type": "siae"},
         )
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["results"], [])
+        assert response.status_code == 200
+        assert response.json()["results"] == []
 
 
 class DataInclusionPrescriberStructureTest(APITestCase):
@@ -226,7 +223,7 @@ class DataInclusionPrescriberStructureTest(APITestCase):
 
     def test_list_structures_unauthenticated(self):
         response = self.client.get(self.url, format="json", data={"type": "orga"})
-        self.assertEqual(response.status_code, 401)
+        assert response.status_code == 401
 
     def test_list_structures(self):
         orga = PrescriberOrganizationFactory(is_authorized=True)
@@ -236,40 +233,37 @@ class DataInclusionPrescriberStructureTest(APITestCase):
             format="json",
             data={"type": "orga"},
         )
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            response.json()["results"],
-            [
-                {
-                    "id": str(orga.uid),
-                    "typologie": orga.kind.value,
-                    "nom": orga.name,
-                    "siret": orga.siret,
-                    "rna": "",
-                    "presentation_resume": "",
-                    "presentation_detail": "",
-                    "site_web": orga.website,
-                    "telephone": orga.phone,
-                    "courriel": orga.email,
-                    "code_postal": orga.post_code,
-                    "code_insee": "",
-                    "commune": orga.city,
-                    "adresse": orga.address_line_1,
-                    "complement_adresse": orga.address_line_2,
-                    "longitude": orga.longitude,
-                    "latitude": orga.latitude,
-                    "source": "",
-                    "date_maj": _str_with_tz(orga.created_at),
-                    "antenne": False,
-                    "lien_source": f"http://testserver{reverse('prescribers_views:card', kwargs={'org_id': orga.pk})}",
-                    "horaires_ouverture": "",
-                    "accessibilite": "",
-                    "labels_nationaux": [],
-                    "labels_autres": [],
-                    "thematiques": [],
-                }
-            ],
-        )
+        assert response.status_code == 200
+        assert response.json()["results"] == [
+            {
+                "id": str(orga.uid),
+                "typologie": orga.kind.value,
+                "nom": orga.name,
+                "siret": orga.siret,
+                "rna": "",
+                "presentation_resume": "",
+                "presentation_detail": "",
+                "site_web": orga.website,
+                "telephone": orga.phone,
+                "courriel": orga.email,
+                "code_postal": orga.post_code,
+                "code_insee": "",
+                "commune": orga.city,
+                "adresse": orga.address_line_1,
+                "complement_adresse": orga.address_line_2,
+                "longitude": orga.longitude,
+                "latitude": orga.latitude,
+                "source": "",
+                "date_maj": _str_with_tz(orga.created_at),
+                "antenne": False,
+                "lien_source": f"http://testserver{reverse('prescribers_views:card', kwargs={'org_id': orga.pk})}",
+                "horaires_ouverture": "",
+                "accessibilite": "",
+                "labels_nationaux": [],
+                "labels_autres": [],
+                "thematiques": [],
+            }
+        ]
 
     def test_list_structures_date_maj_value(self):
         orga = PrescriberOrganizationFactory()
@@ -280,9 +274,9 @@ class DataInclusionPrescriberStructureTest(APITestCase):
             data={"type": "orga"},
         )
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         structure_data = response.json()["results"][0]
-        self.assertEqual(structure_data["date_maj"], _str_with_tz(orga.created_at))
+        assert structure_data["date_maj"] == _str_with_tz(orga.created_at)
 
         orga.description = "lorem ipsum"
         orga.save()
@@ -292,9 +286,9 @@ class DataInclusionPrescriberStructureTest(APITestCase):
             format="json",
             data={"type": "orga"},
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         structure_data = response.json()["results"][0]
-        self.assertEqual(structure_data["date_maj"], _str_with_tz(orga.updated_at))
+        assert structure_data["date_maj"] == _str_with_tz(orga.updated_at)
 
     def test_list_structures_description_longer_than_280(self):
         orga = PrescriberOrganizationFactory(description="a" * 300)
@@ -305,7 +299,7 @@ class DataInclusionPrescriberStructureTest(APITestCase):
             data={"type": "orga"},
         )
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         structure_data = response.json()["results"][0]
-        self.assertEqual(structure_data["presentation_resume"], orga.description[:279] + "…")
-        self.assertEqual(structure_data["presentation_detail"], orga.description)
+        assert structure_data["presentation_resume"] == orga.description[:279] + "…"
+        assert structure_data["presentation_detail"] == orga.description

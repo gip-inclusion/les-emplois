@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 import django.contrib.gis.geos as gis_geos
+import pytest
 
 from itou.geo.factories import QPVFactory
 from itou.geo.models import QPV
@@ -36,15 +37,16 @@ class QPVModelTest(TestCase):
             )
         )
 
-        self.assertIsNotNone(qpv)
-        self.assertEqual("QP093028", qpv.code)
+        assert qpv is not None
+        assert "QP093028" == qpv.code
 
     def test_user_not_in_qpv(self):
         # Somewhere not in a QPV near Aubervilliers
-        self.assertIsNone(
+        assert (
             QPV.in_qpv(
                 _GoodCoordsType(geom=coords_to_geometry("48.899", "2.412")),
             )
+            is None
         )
 
     def test_obj_with_custom_coords_field(self):
@@ -56,15 +58,15 @@ class QPVModelTest(TestCase):
             geom_field="coords",
         )
 
-        self.assertIsNotNone(qpv)
-        self.assertEqual("QP075019", qpv.code)
+        assert qpv is not None
+        assert "QP075019" == qpv.code
 
     def test_obj_without_coords(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             QPV.in_qpv("A str has no coords")
 
     def test_obj_with_bad_coords_type(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             QPV.in_qpv(_BadCoordsType(geom="A str is not a Point"))
 
     def test_dunder_contains(self):
@@ -72,5 +74,5 @@ class QPVModelTest(TestCase):
         in_qpv = coords_to_geometry("48.917735", "2.387311")
         not_in_qpv = coords_to_geometry("48.899", "2.412")
 
-        self.assertIn(in_qpv, qpv)
-        self.assertNotIn(not_in_qpv, qpv)
+        assert in_qpv in qpv
+        assert not_in_qpv not in qpv

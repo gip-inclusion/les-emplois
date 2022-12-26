@@ -55,28 +55,28 @@ class PEAMUTests(OAuth2TestsMixin, TestCase):
         test_email = "john.doe@example.com"
         response = self.get_mocked_response()
         self.login(response)
-        self.assertEqual(mock_login_signal.call_count, 1)
+        assert mock_login_signal.call_count == 1
         email_address = EmailAddress.objects.get(email=test_email)
         account = email_address.user.socialaccount_set.get()
-        self.assertEqual(account.extra_data["email"], "john.doe@example.com")
-        self.assertEqual(account.extra_data["gender"], "male")
-        self.assertEqual(account.extra_data["given_name"], "John")
-        self.assertEqual(account.extra_data["family_name"], "Doe")
+        assert account.extra_data["email"] == "john.doe@example.com"
+        assert account.extra_data["gender"] == "male"
+        assert account.extra_data["given_name"] == "John"
+        assert account.extra_data["family_name"] == "Doe"
         # This mysterious 'testac' value actually comes from
         # https://github.com/pennersr/django-allauth/blob/master/allauth/socialaccount/tests.py#L150
-        self.assertEqual(account.extra_data["id_token"], "testac")
-        self.assertEqual(account.extra_data["sub"], "108204268033311374519")
-        self.assertEqual(email_address.user.email, "john.doe@example.com")
-        self.assertEqual(email_address.user.first_name, "John")
-        self.assertEqual(email_address.user.last_name, "Doe")
-        self.assertEqual(email_address.user.username, "john")
-        self.assertEqual(email_address.user.is_active, True)
-        self.assertEqual(email_address.user.identity_provider, users_enums.IdentityProvider.PE_CONNECT)
+        assert account.extra_data["id_token"] == "testac"
+        assert account.extra_data["sub"] == "108204268033311374519"
+        assert email_address.user.email == "john.doe@example.com"
+        assert email_address.user.first_name == "John"
+        assert email_address.user.last_name == "Doe"
+        assert email_address.user.username == "john"
+        assert email_address.user.is_active is True
+        assert email_address.user.identity_provider == users_enums.IdentityProvider.PE_CONNECT
         # Note that a PEAMU user is automatically set as a job seeker.
-        self.assertEqual(email_address.user.is_job_seeker, True)
-        self.assertEqual(email_address.user.is_prescriber, False)
-        self.assertEqual(email_address.user.is_siae_staff, False)
-        self.assertEqual(email_address.user.is_staff, False)
+        assert email_address.user.is_job_seeker is True
+        assert email_address.user.is_prescriber is False
+        assert email_address.user.is_siae_staff is False
+        assert email_address.user.is_staff is False
 
     @mock.patch("itou.external_data.signals.import_user_pe_data_on_peamu_login")
     def test_peamu_connection_for_existing_non_peamu_user(self, mock_login_signal):
@@ -85,30 +85,30 @@ class PEAMUTests(OAuth2TestsMixin, TestCase):
         user.set_password("test")
         user.save()
         EmailAddress.objects.create(user=user, email=email, primary=True)
-        self.assertFalse(SocialAccount.objects.filter(user=user, provider=PEAMUProvider.id).exists())
+        assert not SocialAccount.objects.filter(user=user, provider=PEAMUProvider.id).exists()
         self.client.login(username=user.username, password="test")
-        self.assertEqual(mock_login_signal.call_count, 0)
+        assert mock_login_signal.call_count == 0
 
         self.login(self.get_mocked_response(), process="connect")
         # FIXME Seems strange to me
-        self.assertEqual(mock_login_signal.call_count, 0)
+        assert mock_login_signal.call_count == 0
 
-        self.assertTrue(SocialAccount.objects.filter(user=user, provider=PEAMUProvider.id).exists())
-        self.assertEqual(EmailAddress.objects.filter(user=user).count(), 1)
+        assert SocialAccount.objects.filter(user=user, provider=PEAMUProvider.id).exists()
+        assert EmailAddress.objects.filter(user=user).count() == 1
         # User email is not updated.
-        self.assertEqual(EmailAddress.objects.filter(email=email).count(), 1)
-        self.assertEqual(EmailAddress.objects.filter(email="john.doe@example.com").count(), 0)
+        assert EmailAddress.objects.filter(email=email).count() == 1
+        assert EmailAddress.objects.filter(email="john.doe@example.com").count() == 0
 
     @mock.patch("itou.external_data.signals.import_user_pe_data_on_peamu_login")
     def test_email_verification_is_skipped_for_peamu_account(self, mock_login_signal):
         test_email = "john.doe@example.com"
         self.login(self.get_mocked_response())
-        self.assertEqual(mock_login_signal.call_count, 1)
+        assert mock_login_signal.call_count == 1
 
         email_address = EmailAddress.objects.get(email=test_email)
-        self.assertFalse(email_address.verified)
-        self.assertFalse(EmailConfirmation.objects.filter(email_address__email=test_email).exists())
-        self.assertEqual(len(mail.outbox), 0)
+        assert not email_address.verified
+        assert not EmailConfirmation.objects.filter(email_address__email=test_email).exists()
+        assert len(mail.outbox) == 0
 
     @mock.patch("itou.external_data.signals.import_user_pe_data_on_peamu_login")
     def test_username_is_based_on_first_name(self, mock_login_signal):
@@ -116,9 +116,9 @@ class PEAMUTests(OAuth2TestsMixin, TestCase):
         last_name = "parker"
         email = "john.doe@example.com"
         self.login(self.get_mocked_response(email=email, given_name=first_name, family_name=last_name))
-        self.assertEqual(mock_login_signal.call_count, 1)
+        assert mock_login_signal.call_count == 1
         user = User.objects.get(email=email)
-        self.assertEqual(user.username, "jessica")
+        assert user.username == "jessica"
 
     @mock.patch("itou.external_data.signals.import_user_pe_data_on_peamu_login")
     def test_username_is_based_on_email_if_first_name_is_exotic(self, mock_login_signal):
@@ -126,9 +126,9 @@ class PEAMUTests(OAuth2TestsMixin, TestCase):
         last_name = "小"
         email = "john.doe@example.com"
         self.login(self.get_mocked_response(email=email, given_name=first_name, family_name=last_name))
-        self.assertEqual(mock_login_signal.call_count, 1)
+        assert mock_login_signal.call_count == 1
         user = User.objects.get(email=email)
-        self.assertEqual(user.username, "john.doe")
+        assert user.username == "john.doe"
 
     @mock.patch("itou.external_data.signals.import_user_pe_data_on_peamu_login")
     def test_user_signed_up_signal(self, mock_login_signal):
@@ -136,14 +136,14 @@ class PEAMUTests(OAuth2TestsMixin, TestCase):
 
         def on_signed_up(sender, request, user, **kwargs):
             sociallogin = kwargs["sociallogin"]
-            self.assertEqual(sociallogin.account.provider, PEAMUProvider.id)
-            self.assertEqual(sociallogin.account.user, user)
+            assert sociallogin.account.provider == PEAMUProvider.id
+            assert sociallogin.account.user == user
             sent_signals.append(sender)
 
         user_signed_up.connect(on_signed_up)
         self.login(self.get_mocked_response())
-        self.assertEqual(mock_login_signal.call_count, 1)
-        self.assertTrue(len(sent_signals) > 0)
+        assert mock_login_signal.call_count == 1
+        assert len(sent_signals) > 0
 
     def test_redirect_to_dashboard_after_signup(self):
         """
@@ -171,37 +171,37 @@ class PEAMUTests(OAuth2TestsMixin, TestCase):
 
         nir = "141068078200557"
         self.client.post(reverse("signup:job_seeker_nir"), {"nir": nir})
-        self.assertIn(global_constants.ITOU_SESSION_NIR_KEY, list(self.client.session.keys()))
-        self.assertTrue(self.client.session.get(global_constants.ITOU_SESSION_NIR_KEY))
+        assert global_constants.ITOU_SESSION_NIR_KEY in list(self.client.session.keys())
+        assert self.client.session.get(global_constants.ITOU_SESSION_NIR_KEY)
 
         url = reverse("signup:job_seeker")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         pe_url = reverse("peamu_login")
         self.assertContains(response, pe_url)
 
         self.login(self.get_mocked_response())
         job_seeker = User.objects.get(email="john.doe@example.com")
-        self.assertEqual(nir, job_seeker.nir)
+        assert nir == job_seeker.nir
 
     @mock.patch("itou.external_data.signals.import_user_pe_data_on_peamu_login")
     def test_job_seeker_temporary_nir_with_pe_conect(self, mock_login_signal):
         # Complete signup with a discarded temporary NIR is tested in
         # JobSeekerSignupTest.test_job_seeker_temporary_nir
 
-        self.assertNotIn(global_constants.ITOU_SESSION_NIR_KEY, list(self.client.session.keys()))
-        self.assertFalse(self.client.session.get(global_constants.ITOU_SESSION_NIR_KEY))
+        assert global_constants.ITOU_SESSION_NIR_KEY not in list(self.client.session.keys())
+        assert not self.client.session.get(global_constants.ITOU_SESSION_NIR_KEY)
 
         # Temporary NIR is not stored with user information.
         url = reverse("signup:job_seeker")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         pe_url = reverse("peamu_login")
         self.assertContains(response, pe_url)
 
         self.login(self.get_mocked_response())
         job_seeker = User.objects.get(email="john.doe@example.com")
-        self.assertIsNone(job_seeker.nir)
+        assert job_seeker.nir is None
 
     def test_anonymous_user_logout(self):
         # An AnonymousUser does not have the peamu_id_token attribute

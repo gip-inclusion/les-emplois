@@ -75,24 +75,21 @@ class PoleEmploiApprovalsSendToPeManagementTestCase(TestCase):
             delay=3,
             stdout=stdout,
         )
-        self.assertEqual(
-            stdout.getvalue().split("\n"),
-            [
-                "PE approvals needing to be sent count=2",
-                f"pe_approval={other_pe_approval} start_at={other_pe_approval.start_at.isoformat()} "
-                "pe_state=notification_pending",
-                f"pe_approval={pe_approval} start_at={pe_approval.start_at.isoformat()} "
-                "pe_state=notification_should_retry",
-                "",
-            ],
-        )
+        assert stdout.getvalue().split("\n") == [
+            "PE approvals needing to be sent count=2",
+            f"pe_approval={other_pe_approval} start_at={other_pe_approval.start_at.isoformat()} "
+            "pe_state=notification_pending",
+            f"pe_approval={pe_approval} start_at={pe_approval.start_at.isoformat()} "
+            "pe_state=notification_should_retry",
+            "",
+        ]
         sleep_mock.assert_called_with(3)
-        self.assertEqual(sleep_mock.call_count, 2)
-        self.assertEqual(notify_mock.call_count, 2)
+        assert sleep_mock.call_count == 2
+        assert notify_mock.call_count == 2
 
         ignored_approval.refresh_from_db()
-        self.assertEqual(ignored_approval.pe_notification_status, "notification_error")
-        self.assertEqual(ignored_approval.pe_notification_exit_code, "MISSING_USER_DATA")
+        assert ignored_approval.pe_notification_status == "notification_error"
+        assert ignored_approval.pe_notification_exit_code == "MISSING_USER_DATA"
 
 
 class ImportPEApprovalTestCase(TransactionTestCase):
@@ -106,35 +103,29 @@ class ImportPEApprovalTestCase(TransactionTestCase):
         stderr.seek(0)
         output = stdout.readlines()
         errput = stderr.readlines()
-        self.assertEqual(
-            output,
-            [
-                "Ready to import up to length=4 approvals from " "file=itou/scripts/liste-agrements-22_03-fake.xlsx\n",
-                "- will add number=666112110666 last_name=SPAGHETTI\n",
-                "PEApprovals import summary:\n",
-                "  Number of approvals, before    : 0\n",
-                "  Number of approvals, after     : 0\n",
-                "  Actually added approvals       : 0\n",
-                "Parsing:\n",
-                "  Sucessfully parsed lines       : 1\n",
-                "  Unexpected parsing errors      : 1\n",
-                "  Invalid approval number errors : 1\n",
-                "  Canceled approvals             : 1\n",
-                "Detail of expected modifications:\n",
-                "  Added approvals                : 1\n",
-                "  Updated approvals              : 0\n",
-                "  Skipped approvals (no changes) : 0\n",
-                "Done.\n",
-            ],
-        )
-        self.assertEqual(
-            errput,
-            [
-                "> canceled approval found AGR_DEC=592292010007 NOM=BAUDRICOURT PRENOM=ANTOINE, skipping...\n",
-                "! invalid NUM_AGR_DEC=80222012208 len=11, skipping…\n",
-                "! unable to parse PRENOM_BENE=nan err=instance, skipping…\n",
-            ],
-        )
+        assert output == [
+            "Ready to import up to length=4 approvals from " "file=itou/scripts/liste-agrements-22_03-fake.xlsx\n",
+            "- will add number=666112110666 last_name=SPAGHETTI\n",
+            "PEApprovals import summary:\n",
+            "  Number of approvals, before    : 0\n",
+            "  Number of approvals, after     : 0\n",
+            "  Actually added approvals       : 0\n",
+            "Parsing:\n",
+            "  Sucessfully parsed lines       : 1\n",
+            "  Unexpected parsing errors      : 1\n",
+            "  Invalid approval number errors : 1\n",
+            "  Canceled approvals             : 1\n",
+            "Detail of expected modifications:\n",
+            "  Added approvals                : 1\n",
+            "  Updated approvals              : 0\n",
+            "  Skipped approvals (no changes) : 0\n",
+            "Done.\n",
+        ]
+        assert errput == [
+            "> canceled approval found AGR_DEC=592292010007 NOM=BAUDRICOURT PRENOM=ANTOINE, skipping...\n",
+            "! invalid NUM_AGR_DEC=80222012208 len=11, skipping…\n",
+            "! unable to parse PRENOM_BENE=nan err=instance, skipping…\n",
+        ]
 
     def test_command_write(self):
         stdout = io.StringIO()
@@ -147,17 +138,17 @@ class ImportPEApprovalTestCase(TransactionTestCase):
             "  Actually added approvals       : 1\n",
         ]
         approvals = PoleEmploiApproval.objects.all()
-        self.assertEqual(len(approvals), 1)
+        assert len(approvals) == 1
         pe_approval = approvals[0]
-        self.assertEqual(pe_approval.pe_structure_code, "80022")
-        self.assertEqual(pe_approval.pole_emploi_id, "0009966M")
-        self.assertEqual(pe_approval.number, "666112110666")
-        self.assertEqual(pe_approval.first_name, "BOLOGNESE")
-        self.assertEqual(pe_approval.last_name, "SPAGHETTI")
-        self.assertEqual(pe_approval.birth_name, "SPAGHETTI")
-        self.assertEqual(pe_approval.birthdate, datetime.date(1975, 5, 21))
-        self.assertEqual(pe_approval.start_at, datetime.date(2021, 4, 8))
-        self.assertEqual(pe_approval.end_at, datetime.date(2023, 4, 8))
+        assert pe_approval.pe_structure_code == "80022"
+        assert pe_approval.pole_emploi_id == "0009966M"
+        assert pe_approval.number == "666112110666"
+        assert pe_approval.first_name == "BOLOGNESE"
+        assert pe_approval.last_name == "SPAGHETTI"
+        assert pe_approval.birth_name == "SPAGHETTI"
+        assert pe_approval.birthdate == datetime.date(1975, 5, 21)
+        assert pe_approval.start_at == datetime.date(2021, 4, 8)
+        assert pe_approval.end_at == datetime.date(2023, 4, 8)
 
         # overwrite: check idempotency
         stdout = io.StringIO()  # clear it
@@ -170,7 +161,7 @@ class ImportPEApprovalTestCase(TransactionTestCase):
             "  Actually added approvals       : 0\n",
         ]
         approvals = PoleEmploiApproval.objects.all()
-        self.assertEqual(len(approvals), 1)
+        assert len(approvals) == 1
 
 
 class ImportPEApprovalSiretKindTestCase(TransactionTestCase):
@@ -193,10 +184,10 @@ class ImportPEApprovalSiretKindTestCase(TransactionTestCase):
         ]
         pe_approval_1.refresh_from_db()
         pe_approval_2.refresh_from_db()
-        self.assertEqual(pe_approval_1.siae_kind, "AI")
-        self.assertEqual(pe_approval_1.siae_siret, "123456789")
-        self.assertEqual(pe_approval_2.siae_kind, "ETTI")
-        self.assertEqual(pe_approval_2.siae_siret, "123456789")
+        assert pe_approval_1.siae_kind == "AI"
+        assert pe_approval_1.siae_siret == "123456789"
+        assert pe_approval_2.siae_kind == "ETTI"
+        assert pe_approval_2.siae_siret == "123456789"
 
 
 @dataclass
@@ -260,32 +251,32 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         df = pandas.DataFrame([AiCSVFileMock()])
         df = command.clean_df(df)
         row = df.iloc[0]
-        self.assertTrue(isinstance(row[BIRTHDATE_COL], datetime.datetime))
-        self.assertTrue(isinstance(row[CONTRACT_STARTDATE_COL], datetime.datetime))
-        self.assertTrue(row["nir_is_valid"])
-        self.assertTrue(row["siret_validated_by_asp"])
+        assert isinstance(row[BIRTHDATE_COL], datetime.datetime)
+        assert isinstance(row[CONTRACT_STARTDATE_COL], datetime.datetime)
+        assert row["nir_is_valid"]
+        assert row["siret_validated_by_asp"]
 
         # Invalid birth date.
         df = pandas.DataFrame([AiCSVFileMock(**{BIRTHDATE_COL: "1668-11-09"})])
         df = command.clean_df(df)
         row = df.iloc[0]
-        self.assertEqual(row[BIRTHDATE_COL].strftime(DATE_FORMAT), "1968-11-09")
-        self.assertTrue(isinstance(row[BIRTHDATE_COL], datetime.datetime))
+        assert row[BIRTHDATE_COL].strftime(DATE_FORMAT) == "1968-11-09"
+        assert isinstance(row[BIRTHDATE_COL], datetime.datetime)
 
         # Invalid NIR.
         df = pandas.DataFrame([AiCSVFileMock(**{NIR_COL: "56987534"})])
         df = command.clean_df(df)
         row = df.iloc[0]
-        self.assertEqual(row[NIR_COL], "")
-        self.assertFalse(row["nir_is_valid"])
+        assert row[NIR_COL] == ""
+        assert not row["nir_is_valid"]
 
         # Excluded SIRET from the ASP.
         siret = "33491197100029"
         df = pandas.DataFrame([AiCSVFileMock(**{SIRET_COL: siret})])
         df = command.clean_df(df)
         row = df.iloc[0]
-        self.assertEqual(row[SIRET_COL], siret)
-        self.assertFalse(row["siret_validated_by_asp"])
+        assert row[SIRET_COL] == siret
+        assert not row["siret_validated_by_asp"]
 
         # Employer email.
         domain = "unenouvellechance.fr"
@@ -293,7 +284,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         df = pandas.DataFrame([AiCSVFileMock(**{EMAIL_COL: f"colette@{domain}", SIRET_COL: siae.siret})])
         df = command.clean_df(df)
         row = df.iloc[0]
-        self.assertEqual(row[EMAIL_COL], "")
+        assert row[EMAIL_COL] == ""
 
         # Generic email.
         domain = "gmail.fr"
@@ -301,7 +292,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         df = pandas.DataFrame([AiCSVFileMock(**{EMAIL_COL: f"colette@{domain}"})])
         df = command.clean_df(df)
         row = df.iloc[0]
-        self.assertEqual(row[EMAIL_COL], "colette@gmail.fr")
+        assert row[EMAIL_COL] == "colette@gmail.fr"
 
     def test_filter_invalid_nirs(self):
         # Create a dataframe with one valid and one invalid NIR.
@@ -312,15 +303,15 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         df, invalid_nirs_df = command.filter_invalid_nirs(df)
 
         # Filtered rows.
-        self.assertEqual(len(df), 2)
-        self.assertEqual(len(invalid_nirs_df), 1)
-        self.assertFalse(invalid_nirs_df.iloc[0]["nir_is_valid"])
+        assert len(df) == 2
+        assert len(invalid_nirs_df) == 1
+        assert not invalid_nirs_df.iloc[0]["nir_is_valid"]
 
         # A comment has been added to invalid rows.
         expected_comment = "NIR invalide. Utilisateur potentiellement créé sans NIR."
-        self.assertEqual(df.iloc[0][COMMENTS_COL], "")
-        self.assertEqual(df.iloc[1][COMMENTS_COL], expected_comment)
-        self.assertEqual(invalid_nirs_df.iloc[0][COMMENTS_COL], expected_comment)
+        assert df.iloc[0][COMMENTS_COL] == ""
+        assert df.iloc[1][COMMENTS_COL] == expected_comment
+        assert invalid_nirs_df.iloc[0][COMMENTS_COL] == expected_comment
 
     def test_remove_ignored_rows(self):
         command = self.command
@@ -329,17 +320,17 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         # Ended contracts are removed.
         df = pandas.DataFrame([CleanedAiCsvFileMock(), CleanedAiCsvFileMock(**{CONTRACT_ENDDATE_COL: "2020-11-30"})])
         total_df, filtered_df = command.remove_ignored_rows(df)
-        self.assertEqual(len(total_df), 2)
-        self.assertEqual(len(filtered_df), 1)
+        assert len(total_df) == 2
+        assert len(filtered_df) == 1
         expected_comment = "Ligne ignorée : contrat terminé."
-        self.assertEqual(total_df.iloc[1][COMMENTS_COL], expected_comment)
+        assert total_df.iloc[1][COMMENTS_COL] == expected_comment
 
         # Continue even if df.CONTRACT_ENDDATE_COL does not exists.
         df = pandas.DataFrame([CleanedAiCsvFileMock(), CleanedAiCsvFileMock(**{CONTRACT_ENDDATE_COL: "2020-11-30"})])
         df = df.drop(columns=[CONTRACT_ENDDATE_COL])
         total_df, filtered_df = command.remove_ignored_rows(df)
-        self.assertEqual(len(total_df), 2)
-        self.assertEqual(len(filtered_df), 2)
+        assert len(total_df) == 2
+        assert len(filtered_df) == 2
 
         # SIRET provided by the ASP are removed.
         df = pandas.DataFrame(
@@ -349,26 +340,26 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
             ]
         )
         total_df, filtered_df = command.remove_ignored_rows(df)
-        self.assertEqual(len(total_df), 2)
-        self.assertEqual(len(filtered_df), 1)
+        assert len(total_df) == 2
+        assert len(filtered_df) == 1
         expected_comment = "Ligne ignorée : entreprise inexistante communiquée par l'ASP."
-        self.assertEqual(total_df.iloc[1][COMMENTS_COL], expected_comment)
+        assert total_df.iloc[1][COMMENTS_COL] == expected_comment
 
         # Inexistent structures are removed.
         df = pandas.DataFrame([CleanedAiCsvFileMock(), CleanedAiCsvFileMock(**{SIRET_COL: "202020202"})])
         total_df, filtered_df = command.remove_ignored_rows(df)
-        self.assertEqual(len(total_df), 2)
-        self.assertEqual(len(filtered_df), 1)
+        assert len(total_df) == 2
+        assert len(filtered_df) == 1
         expected_comment = "Ligne ignorée : entreprise inexistante."
-        self.assertEqual(total_df.iloc[1][COMMENTS_COL], expected_comment)
+        assert total_df.iloc[1][COMMENTS_COL] == expected_comment
 
         # Rows with approvals are removed.
         df = pandas.DataFrame([CleanedAiCsvFileMock(), CleanedAiCsvFileMock(**{APPROVAL_COL: "670929"})])
         total_df, filtered_df = command.remove_ignored_rows(df)
-        self.assertEqual(len(total_df), 2)
-        self.assertEqual(len(filtered_df), 1)
+        assert len(total_df) == 2
+        assert len(filtered_df) == 1
         expected_comment = "Ligne ignorée : agrément ou PASS IAE renseigné."
-        self.assertEqual(total_df.iloc[1][COMMENTS_COL], expected_comment)
+        assert total_df.iloc[1][COMMENTS_COL] == expected_comment
 
     def test_find_or_create_job_seeker__find(self):
         developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
@@ -380,10 +371,10 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         JobSeekerFactory(nir=nir)
         df = pandas.DataFrame([CleanedAiCsvFileMock()])
         created, job_seeker = command.find_or_create_job_seeker(row=df.iloc[0], created_by=developer)
-        self.assertFalse(created)
-        self.assertTrue(job_seeker)
-        self.assertEqual(job_seeker.nir, nir)
-        self.assertEqual(User.objects.all().count(), 2)
+        assert not created
+        assert job_seeker
+        assert job_seeker.nir == nir
+        assert User.objects.all().count() == 2
         # Clean
         job_seeker.delete()
 
@@ -392,10 +383,10 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         JobSeekerFactory(nir="", email=email)
         df = pandas.DataFrame([CleanedAiCsvFileMock()])
         created, job_seeker = command.find_or_create_job_seeker(row=df.iloc[0], created_by=developer)
-        self.assertFalse(created)
-        self.assertTrue(job_seeker)
-        self.assertEqual(job_seeker.email, email)
-        self.assertEqual(User.objects.all().count(), 2)
+        assert not created
+        assert job_seeker
+        assert job_seeker.email == email
+        assert User.objects.all().count() == 2
         # Clean
         job_seeker.delete()
 
@@ -415,10 +406,10 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         )
         df = pandas.DataFrame([CleanedAiCsvFileMock()])
         created, job_seeker = command.find_or_create_job_seeker(row=df.iloc[0], created_by=developer)
-        self.assertFalse(created)
-        self.assertTrue(job_seeker)
-        self.assertEqual(job_seeker.birthdate, birthdate.date())
-        self.assertEqual(User.objects.all().count(), 2)
+        assert not created
+        assert job_seeker
+        assert job_seeker.birthdate == birthdate.date()
+        assert User.objects.all().count() == 2
         # Clean
         job_seeker.delete()
 
@@ -430,9 +421,9 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         # Job seeker not found: create user.
         df = pandas.DataFrame([CleanedAiCsvFileMock()])
         created, job_seeker = command.find_or_create_job_seeker(row=df.iloc[0], created_by=developer)
-        self.assertTrue(created)
-        self.assertTrue(job_seeker)
-        self.assertEqual(User.objects.all().count(), 2)
+        assert created
+        assert job_seeker
+        assert User.objects.all().count() == 2
         # Clean
         job_seeker.delete()
 
@@ -440,10 +431,10 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         previous_job_seekers_pk = [JobSeekerFactory(nir="").pk, JobSeekerFactory(nir=None).pk]
         df = pandas.DataFrame([CleanedAiCsvFileMock(**{NIR_COL: "", "nir_is_valid": False})])
         created, job_seeker = command.find_or_create_job_seeker(row=df.iloc[0], created_by=developer)
-        self.assertTrue(created)
-        self.assertTrue(job_seeker)
-        self.assertEqual(User.objects.all().count(), 4)
-        self.assertEqual(job_seeker.nir, None)
+        assert created
+        assert job_seeker
+        assert User.objects.all().count() == 4
+        assert job_seeker.nir is None
         # Clean
         job_seeker.delete()
         User.objects.filter(pk__in=previous_job_seekers_pk).delete()
@@ -452,11 +443,11 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         prescriber = PrescriberFactory(email=getattr(CleanedAiCsvFileMock(), EMAIL_COL))
         df = pandas.DataFrame([CleanedAiCsvFileMock()])
         created, job_seeker = command.find_or_create_job_seeker(row=df.iloc[0], created_by=developer)
-        self.assertTrue(created)
-        self.assertTrue(job_seeker)
-        self.assertEqual(User.objects.all().count(), 3)
-        self.assertEqual(job_seeker.nir, getattr(CleanedAiCsvFileMock(), NIR_COL))
-        self.assertNotEqual(job_seeker.email, prescriber.email)
+        assert created
+        assert job_seeker
+        assert User.objects.all().count() == 3
+        assert job_seeker.nir == getattr(CleanedAiCsvFileMock(), NIR_COL)
+        assert job_seeker.email != prescriber.email
         # Clean
         job_seeker.delete()
         prescriber.delete()
@@ -467,28 +458,28 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         base_data = CleanedAiCsvFileMock()
         df = pandas.DataFrame([base_data])
         created, job_seeker = command.find_or_create_job_seeker(row=df.iloc[0], created_by=developer)
-        self.assertTrue(created)
-        self.assertEqual(job_seeker.created_by.pk, developer.pk)
-        self.assertEqual(job_seeker.date_joined, settings.AI_EMPLOYEES_STOCK_IMPORT_DATE)
-        self.assertEqual(job_seeker.first_name, getattr(base_data, FIRST_NAME_COL).title())
-        self.assertEqual(job_seeker.last_name, getattr(base_data, LAST_NAME_COL).title())
-        self.assertEqual(job_seeker.birthdate, getattr(base_data, BIRTHDATE_COL))
-        self.assertEqual(job_seeker.email, getattr(base_data, EMAIL_COL))
-        self.assertTrue(job_seeker.address_line_1)
-        self.assertTrue(job_seeker.address_line_2)
-        self.assertEqual(job_seeker.post_code, getattr(base_data, POST_CODE_COL))
-        self.assertEqual(job_seeker.city, commune.name.title())
-        self.assertTrue(job_seeker.department)
-        self.assertEqual(job_seeker.phone, getattr(base_data, PHONE_COL))
-        self.assertEqual(job_seeker.nir, getattr(base_data, NIR_COL))
+        assert created
+        assert job_seeker.created_by.pk == developer.pk
+        assert job_seeker.date_joined == settings.AI_EMPLOYEES_STOCK_IMPORT_DATE
+        assert job_seeker.first_name == getattr(base_data, FIRST_NAME_COL).title()
+        assert job_seeker.last_name == getattr(base_data, LAST_NAME_COL).title()
+        assert job_seeker.birthdate == getattr(base_data, BIRTHDATE_COL)
+        assert job_seeker.email == getattr(base_data, EMAIL_COL)
+        assert job_seeker.address_line_1
+        assert job_seeker.address_line_2
+        assert job_seeker.post_code == getattr(base_data, POST_CODE_COL)
+        assert job_seeker.city == commune.name.title()
+        assert job_seeker.department
+        assert job_seeker.phone == getattr(base_data, PHONE_COL)
+        assert job_seeker.nir == getattr(base_data, NIR_COL)
         # Clean
         job_seeker.delete()
 
         # If no email provided: fake email.
         df = pandas.DataFrame([CleanedAiCsvFileMock(**{EMAIL_COL: ""})])
         created, job_seeker = command.find_or_create_job_seeker(row=df.iloc[0], created_by=developer)
-        self.assertTrue(created)
-        self.assertTrue(job_seeker.email.endswith("@email-temp.com"))
+        assert created
+        assert job_seeker.email.endswith("@email-temp.com")
         job_seeker.delete()
 
         # A job seeker is found by email address but its NIR is different.
@@ -497,8 +488,8 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         JobSeekerFactory(nir="141062a78200555", email=email)
         df = pandas.DataFrame([CleanedAiCsvFileMock()])
         created, job_seeker = command.find_or_create_job_seeker(row=df.iloc[0], created_by=developer)
-        self.assertTrue(created)
-        self.assertTrue(job_seeker.email.endswith("@email-temp.com"))
+        assert created
+        assert job_seeker.email.endswith("@email-temp.com")
         job_seeker.delete()
 
     def test_find_or_create_approval__find(self):
@@ -513,12 +504,12 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         created, expected_approval, _ = command.find_or_create_approval(
             job_seeker=existing_approval.user, created_by=developer
         )
-        self.assertFalse(created)
-        self.assertTrue(expected_approval.is_valid)
+        assert not created
+        assert expected_approval.is_valid
         # Make sure no update was made.
-        self.assertEqual(existing_approval.pk, expected_approval.pk)
-        self.assertEqual(existing_approval.start_at, expected_approval.start_at)
-        self.assertEqual(existing_approval.user.pk, expected_approval.user.pk)
+        assert existing_approval.pk == expected_approval.pk
+        assert existing_approval.start_at == expected_approval.start_at
+        assert existing_approval.user.pk == expected_approval.user.pk
         # Clean
         existing_approval.user.delete()
 
@@ -532,9 +523,9 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         created, expected_approval, _ = command.find_or_create_approval(
             job_seeker=existing_approval.user, created_by=developer
         )
-        self.assertFalse(created)
-        self.assertEqual(existing_approval.pk, expected_approval.pk)
-        self.assertTrue(expected_approval.is_valid)
+        assert not created
+        assert existing_approval.pk == expected_approval.pk
+        assert expected_approval.is_valid
         # Clean
         existing_approval.user.delete()
 
@@ -545,15 +536,15 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         # No PASS IAE.
         job_seeker = JobSeekerFactory(nir=getattr(CleanedAiCsvFileMock(), NIR_COL))
         created, approval, _ = command.find_or_create_approval(job_seeker=job_seeker, created_by=developer)
-        self.assertTrue(created)
-        self.assertTrue(approval.is_valid)
+        assert created
+        assert approval.is_valid
         # Check attributes
-        self.assertEqual(approval.user.pk, job_seeker.pk)
-        self.assertEqual(approval.start_at, datetime.date(2021, 12, 1))
-        self.assertEqual(approval.end_at, datetime.date(2023, 11, 30))
-        self.assertEqual(approval.created_by.pk, developer.pk)
-        self.assertEqual(approval.created_at, settings.AI_EMPLOYEES_STOCK_IMPORT_DATE)
-        self.assertTrue(approval.is_from_ai_stock)
+        assert approval.user.pk == job_seeker.pk
+        assert approval.start_at == datetime.date(2021, 12, 1)
+        assert approval.end_at == datetime.date(2023, 11, 30)
+        assert approval.created_by.pk == developer.pk
+        assert approval.created_at == settings.AI_EMPLOYEES_STOCK_IMPORT_DATE
+        assert approval.is_from_ai_stock
 
         # Clean
         job_seeker.delete()
@@ -565,10 +556,10 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         )
         job_seeker = expired_approval.user
         created, approval, _ = command.find_or_create_approval(job_seeker=job_seeker, created_by=developer)
-        self.assertTrue(created)
-        self.assertEqual(approval.user.pk, job_seeker.pk)
-        self.assertTrue(approval.is_valid)
-        self.assertEqual(job_seeker.approvals.count(), 2)
+        assert created
+        assert approval.user.pk == job_seeker.pk
+        assert approval.is_valid
+        assert job_seeker.approvals.count() == 2
         # Clean
         job_seeker.delete()
 
@@ -587,12 +578,12 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         created, _, redelivered_approval = command.find_or_create_approval(job_seeker=job_seeker, created_by=developer)
 
         # assert previous approval does not exist anymore.
-        self.assertFalse(Approval.objects.filter(pk=previous_approval.pk).exists())
+        assert not Approval.objects.filter(pk=previous_approval.pk).exists()
         # assert previous job application does not exist anymore.
-        self.assertFalse(JobApplication.objects.filter(pk=job_application.pk).exists())
+        assert not JobApplication.objects.filter(pk=job_application.pk).exists()
         # assert a new PASS IAE has been delivered.
-        self.assertTrue(created)
-        self.assertTrue(redelivered_approval)
+        assert created
+        assert redelivered_approval
 
         # Clean
         job_seeker.delete()
@@ -610,12 +601,12 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         created, _, redelivered_approval = command.find_or_create_approval(job_seeker=job_seeker, created_by=developer)
 
         # assert previous approval does not exist anymore.
-        self.assertFalse(Approval.objects.filter(pk=previous_approval.pk).exists())
+        assert not Approval.objects.filter(pk=previous_approval.pk).exists()
         # assert previous job application does not exist anymore.
-        self.assertFalse(JobApplication.objects.filter(pk=job_application.pk).exists())
+        assert not JobApplication.objects.filter(pk=job_application.pk).exists()
         # assert a new PASS IAE has been delivered.
-        self.assertTrue(created)
-        self.assertTrue(redelivered_approval)
+        assert created
+        assert redelivered_approval
 
         # Clean
         job_seeker.delete()
@@ -641,9 +632,9 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         created, approval, redelivered_approval = command.find_or_create_approval(
             job_seeker=job_seeker, created_by=developer
         )
-        self.assertFalse(created)
-        self.assertFalse(redelivered_approval)
-        self.assertTrue(previous_approval.pk, approval.pk)
+        assert not created
+        assert not redelivered_approval
+        assert previous_approval.pk, approval.pk
         job_seeker.delete()
 
     def test_find_or_create_job_application__find(self):
@@ -670,12 +661,12 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
             row=df.iloc[0],
             approval_manually_delivered_by=developer,
         )
-        self.assertFalse(created)
-        self.assertEqual(expected_job_app.pk, found_job_application.pk)
-        self.assertFalse(found_job_application.can_be_cancelled)
+        assert not created
+        assert expected_job_app.pk == found_job_application.pk
+        assert not found_job_application.can_be_cancelled
         # Assert job application has been updated to block employee records creation.
-        self.assertNotIn(
-            found_job_application, JobApplication.objects.eligible_as_employee_record(found_job_application.to_siae)
+        assert found_job_application not in JobApplication.objects.eligible_as_employee_record(
+            found_job_application.to_siae
         )
 
     def test_find_or_create_job_application__create(self):
@@ -705,17 +696,17 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
             row=df.iloc[0],
             approval_manually_delivered_by=developer,
         )
-        self.assertTrue(created)
-        self.assertTrue(cancelled_job_app_deleted)
+        assert created
+        assert cancelled_job_app_deleted
         # Assert employee records creation is blocked.
-        self.assertNotIn(
-            new_job_application, JobApplication.objects.eligible_as_employee_record(new_job_application.to_siae)
+        assert new_job_application not in JobApplication.objects.eligible_as_employee_record(
+            new_job_application.to_siae
         )
-        self.assertEqual(new_job_application.approval.pk, approval.pk)
-        self.assertFalse(JobApplication.objects.filter(pk=job_application.pk).exists())
-        self.assertFalse(new_job_application.can_be_cancelled)
-        self.assertTrue(new_job_application.is_from_ai_stock)
-        self.assertEqual(JobApplication.objects.count(), 1)
+        assert new_job_application.approval.pk == approval.pk
+        assert not JobApplication.objects.filter(pk=job_application.pk).exists()
+        assert not new_job_application.can_be_cancelled
+        assert new_job_application.is_from_ai_stock
+        assert JobApplication.objects.count() == 1
         job_application.job_seeker.delete()
 
         # Different contract starting date.
@@ -740,9 +731,9 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
             row=df.iloc[0],
             approval_manually_delivered_by=developer,
         )
-        self.assertTrue(created)
-        self.assertNotEqual(job_application.pk, new_job_application.pk)
-        self.assertFalse(cancelled_job_app_deleted)
+        assert created
+        assert job_application.pk != new_job_application.pk
+        assert not cancelled_job_app_deleted
         job_application.job_seeker.delete()
 
     def test_import_data_into_itou(self):
@@ -755,12 +746,12 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         # User, approval and job application creation.
         input_df = pandas.DataFrame([base_data])
         output_df = command.import_data_into_itou(df=input_df, to_be_imported_df=input_df)
-        self.assertEqual(User.objects.count(), 2)
-        self.assertEqual(Approval.objects.count(), 1)
-        self.assertEqual(JobApplication.objects.count(), 1)
+        assert User.objects.count() == 2
+        assert Approval.objects.count() == 1
+        assert JobApplication.objects.count() == 1
         job_seeker = User.objects.filter(is_job_seeker=True).get()
-        self.assertEqual(job_seeker.job_applications.count(), 1)
-        self.assertEqual(job_seeker.approvals.count(), 1)
+        assert job_seeker.job_applications.count() == 1
+        assert job_seeker.approvals.count() == 1
         job_seeker.delete()
 
         # User, approval and job application retrieval.
@@ -778,9 +769,9 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         )
         input_df = pandas.DataFrame([CleanedAiCsvFileMock()])
         output_df = command.import_data_into_itou(df=input_df, to_be_imported_df=input_df)
-        self.assertEqual(User.objects.filter(is_job_seeker=True).count(), 1)
-        self.assertEqual(Approval.objects.count(), 1)
-        self.assertEqual(JobApplication.objects.count(), 1)
+        assert User.objects.filter(is_job_seeker=True).count() == 1
+        assert Approval.objects.count() == 1
+        assert JobApplication.objects.count() == 1
         job_seeker.delete()
 
         # Only values to be imported are imported but the whole input data frame
@@ -805,33 +796,33 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         input_df, to_be_imported_df = command.remove_ignored_rows(input_df)
         output_df = command.import_data_into_itou(df=input_df, to_be_imported_df=to_be_imported_df)
 
-        self.assertEqual(User.objects.count(), 3)
-        self.assertEqual(Approval.objects.count(), 2)
-        self.assertEqual(JobApplication.objects.count(), 3)
+        assert User.objects.count() == 3
+        assert Approval.objects.count() == 2
+        assert JobApplication.objects.count() == 3
 
         job_seeker = User.objects.get(email=getattr(base_data, EMAIL_COL))
-        self.assertEqual(job_seeker.job_applications.count(), 2)
-        self.assertEqual(job_seeker.approvals.count(), 1)
+        assert job_seeker.job_applications.count() == 2
+        assert job_seeker.approvals.count() == 1
 
         # Different contract start date.
         job_seeker = User.objects.get(email="tartarin@gmail.fr")
-        self.assertEqual(job_seeker.job_applications.count(), 1)
-        self.assertEqual(job_seeker.approvals.count(), 1)
+        assert job_seeker.job_applications.count() == 1
+        assert job_seeker.approvals.count() == 1
 
         # Ignored rows.
         for _, row in output_df[:2].iterrows():
-            self.assertTrue(row[COMMENTS_COL])
-            self.assertFalse(row[PASS_IAE_NUMBER_COL])
-            self.assertFalse(row[USER_PK_COL])
+            assert row[COMMENTS_COL]
+            assert not row[PASS_IAE_NUMBER_COL]
+            assert not row[USER_PK_COL]
 
         for _, row in output_df[2:].iterrows():
             job_seeker = User.objects.get(nir=row[NIR_COL])
             approval = job_seeker.approvals.first()
-            self.assertEqual(row[PASS_IAE_NUMBER_COL], approval.number)
-            self.assertEqual(row[PASS_IAE_START_DATE_COL], approval.start_at.strftime(DATE_FORMAT))
-            self.assertEqual(row[PASS_IAE_END_DATE_COL], approval.end_at.strftime(DATE_FORMAT))
-            self.assertEqual(row[USER_PK_COL], job_seeker.jobseeker_hash_id)
-            self.assertEqual(row[USER_ITOU_EMAIL_COL], job_seeker.email)
+            assert row[PASS_IAE_NUMBER_COL] == approval.number
+            assert row[PASS_IAE_START_DATE_COL] == approval.start_at.strftime(DATE_FORMAT)
+            assert row[PASS_IAE_END_DATE_COL] == approval.end_at.strftime(DATE_FORMAT)
+            assert row[USER_PK_COL] == job_seeker.jobseeker_hash_id
+            assert row[USER_ITOU_EMAIL_COL] == job_seeker.email
 
         # Clean
         job_seeker = User.objects.get(nir=getattr(base_data, NIR_COL))
@@ -858,4 +849,4 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
 
         output_df = None
         output_df = command.import_data_into_itou(df=input_df, to_be_imported_df=input_df)
-        self.assertEqual(len(output_df), 2)
+        assert len(output_df) == 2

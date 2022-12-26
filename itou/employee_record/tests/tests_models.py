@@ -30,7 +30,7 @@ class EmployeeRecordModelTest(TestCase):
     # Validation tests
 
     def test_creation_with_jobseeker_without_title(self):
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             # If the job seeker has no title (optional by default),
             # Then the job seeker profile must not be valid
             job_application = JobApplicationWithJobSeekerProfileFactory()
@@ -38,7 +38,7 @@ class EmployeeRecordModelTest(TestCase):
             EmployeeRecord.from_job_application(job_application)
 
     def test_creation_with_empty_value(self):
-        with self.assertRaises(AssertionError):
+        with pytest.raises(AssertionError):
             EmployeeRecord.from_job_application(None)
 
     def test_creation_with_bad_job_application_status(self):
@@ -87,7 +87,7 @@ class EmployeeRecordModelTest(TestCase):
         # Standard / normal case
         job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
         employee_record = EmployeeRecord.from_job_application(job_application)
-        self.assertIsNotNone(employee_record)
+        assert employee_record is not None
 
     @mock.patch(
         "itou.common_apps.address.format.get_geocoding_data",
@@ -102,11 +102,11 @@ class EmployeeRecordModelTest(TestCase):
         employee_record.update_as_ready()
 
         job_seeker = job_application.job_seeker
-        self.assertIsNotNone(job_seeker.jobseeker_profile)
+        assert job_seeker.jobseeker_profile is not None
 
         # Surface check, this is not a job seeker profile test
         profile = job_seeker.jobseeker_profile
-        self.assertIsNotNone(profile.hexa_commune)
+        assert profile.hexa_commune is not None
 
     def test_prepare_failed_geoloc(self):
         """
@@ -118,7 +118,7 @@ class EmployeeRecordModelTest(TestCase):
         # Complete profile, but geoloc API not reachable
         job_application = JobApplicationWithJobSeekerProfileFactory()
 
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             employee_record = EmployeeRecord.from_job_application(job_application)
             employee_record.update_as_ready()
 
@@ -126,13 +126,13 @@ class EmployeeRecordModelTest(TestCase):
         """
         Check format of ASP batch file name
         """
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             validate_asp_batch_filename(None)
 
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             validate_asp_batch_filename("xyz")
 
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             validate_asp_batch_filename("RiAE_20210410130000.json")
 
         validate_asp_batch_filename("RIAE_FS_20210410130000.json")
@@ -144,13 +144,13 @@ class EmployeeRecordModelTest(TestCase):
         filename = "RIAE_FS_20210410130000.json"
         employee_record = EmployeeRecordFactory(asp_batch_file=filename, asp_batch_line_number=2)
 
-        self.assertEqual(EmployeeRecord.objects.find_by_batch("X", 3).count(), 0)
-        self.assertEqual(EmployeeRecord.objects.find_by_batch(filename, 3).count(), 0)
-        self.assertEqual(EmployeeRecord.objects.find_by_batch("X", 2).count(), 0)
+        assert EmployeeRecord.objects.find_by_batch("X", 3).count() == 0
+        assert EmployeeRecord.objects.find_by_batch(filename, 3).count() == 0
+        assert EmployeeRecord.objects.find_by_batch("X", 2).count() == 0
 
         result = EmployeeRecord.objects.find_by_batch(filename, 2).first()
 
-        self.assertEqual(result.id, employee_record.id)
+        assert result.id == employee_record.id
 
     def test_archivable(self):
         """
@@ -165,7 +165,7 @@ class EmployeeRecordModelTest(TestCase):
         )
 
         # Processed to recently, should not be found
-        self.assertEqual(EmployeeRecord.objects.archivable().count(), 0)
+        assert EmployeeRecord.objects.archivable().count() == 0
 
         # Fake older date
         employee_record.processed_at = timezone.now() - timezone.timedelta(
@@ -174,7 +174,7 @@ class EmployeeRecordModelTest(TestCase):
 
         employee_record.save()
 
-        self.assertEqual(EmployeeRecord.objects.archivable().count(), 1)
+        assert EmployeeRecord.objects.archivable().count() == 1
 
     def test_clone_orphan(self):
         # Check employee record clone features and properties
@@ -192,22 +192,22 @@ class EmployeeRecordModelTest(TestCase):
         disabled_employee_record.siret = "99999999999999"
         disabled_employee_record.save()
 
-        self.assertTrue(good_employee_record.is_orphan)
+        assert good_employee_record.is_orphan
 
         clone = good_employee_record.clone_orphan(previous_asp_id)
-        self.assertTrue(clone.pk != good_employee_record.pk)
-        self.assertNotEqual(good_employee_record.created_at, clone.created_at)
-        self.assertEqual(Status.NEW, clone.status)
-        self.assertEqual(previous_asp_id, clone.asp_id)
-        self.assertEqual(good_employee_record.approval_number, clone.approval_number)
-        self.assertEqual(good_employee_record.job_application, clone.job_application)
-        self.assertEqual(clone.job_application.to_siae.siret, clone.siret)
-        self.assertIsNone(clone.asp_batch_file)
-        self.assertIsNone(clone.asp_batch_line_number)
-        self.assertIsNone(clone.asp_processing_code)
-        self.assertIn(EmployeeRecord.ASP_CLONE_MESSAGE, clone.asp_processing_label)
-        self.assertEqual(Status.DISABLED, good_employee_record.status)
-        self.assertIsNone(clone.archived_json)
+        assert clone.pk != good_employee_record.pk
+        assert good_employee_record.created_at != clone.created_at
+        assert Status.NEW == clone.status
+        assert previous_asp_id == clone.asp_id
+        assert good_employee_record.approval_number == clone.approval_number
+        assert good_employee_record.job_application == clone.job_application
+        assert clone.job_application.to_siae.siret == clone.siret
+        assert clone.asp_batch_file is None
+        assert clone.asp_batch_line_number is None
+        assert clone.asp_processing_code is None
+        assert EmployeeRecord.ASP_CLONE_MESSAGE in clone.asp_processing_label
+        assert Status.DISABLED == good_employee_record.status
+        assert clone.archived_json is None
 
         bad_asp_id = disabled_employee_record.asp_id + 1
         with self.assertRaisesMessage(
@@ -220,19 +220,19 @@ class EmployeeRecordModelTest(TestCase):
         # Cloning in DISABLED state must work
         disabled_employee_record.clone_orphan(previous_disabled_asp_id)
 
-        self.assertIs(disabled_employee_record.is_orphan, True)
+        assert disabled_employee_record.is_orphan is True
 
         # Check conditions are required
 
-        with self.assertRaises(CloningError):
+        with pytest.raises(CloningError):
             # Clone with previous asp_id
             bad_employee_record.clone_orphan(previous_asp_id)
 
-        with self.assertRaises(CloningError):
+        with pytest.raises(CloningError):
             # Not an orphan
             bad_employee_record.clone_orphan(bad_employee_record.asp_id)
 
-        with self.assertRaises(CloningError):
+        with pytest.raises(CloningError):
             # Not saved (no PK)
             bad_employee_record.pk = None
             bad_employee_record.clone_orphan(-1)
@@ -242,7 +242,7 @@ class EmployeeRecordModelTest(TestCase):
         bad_employee_record.save()
         bad_employee_record.asp_id = -2
 
-        with self.assertRaises(CloningError):
+        with pytest.raises(CloningError):
             # Other case: duplicate in db (pair approval_number,asp_id)
             bad_employee_record.clone_orphan(-1)
 
@@ -253,21 +253,19 @@ class EmployeeRecordBatchTest(TestCase):
     """
 
     def test_format_feedback_filename(self):
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             EmployeeRecordBatch.feedback_filename("test.json")
 
-        self.assertEqual(
-            "RIAE_FS_20210410130000_FichierRetour.json",
-            EmployeeRecordBatch.feedback_filename("RIAE_FS_20210410130000.json"),
+        assert "RIAE_FS_20210410130000_FichierRetour.json" == EmployeeRecordBatch.feedback_filename(
+            "RIAE_FS_20210410130000.json"
         )
 
     def test_batch_filename_from_feedback(self):
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             EmployeeRecordBatch.batch_filename_from_feedback("test.json")
 
-        self.assertEqual(
-            "RIAE_FS_20210410130000.json",
-            EmployeeRecordBatch.batch_filename_from_feedback("RIAE_FS_20210410130000_FichierRetour.json"),
+        assert "RIAE_FS_20210410130000.json" == EmployeeRecordBatch.batch_filename_from_feedback(
+            "RIAE_FS_20210410130000_FichierRetour.json"
         )
 
 
@@ -291,7 +289,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
         side_effect=mock_get_geocoding_data,
     )
     def test_state_ready(self, _mock):
-        self.assertEqual(self.employee_record.status, Status.READY)
+        assert self.employee_record.status == Status.READY
 
     @mock.patch(
         "itou.common_apps.address.format.get_geocoding_data",
@@ -301,8 +299,8 @@ class EmployeeRecordLifeCycleTest(TestCase):
         filename = "RIAE_FS_20210410130000.json"
         self.employee_record.update_as_sent(filename, 1)
 
-        self.assertEqual(filename, self.employee_record.asp_batch_file)
-        self.assertEqual(self.employee_record.status, Status.SENT)
+        assert filename == self.employee_record.asp_batch_file
+        assert self.employee_record.status == Status.SENT
 
     @mock.patch(
         "itou.common_apps.address.format.get_geocoding_data",
@@ -315,9 +313,9 @@ class EmployeeRecordLifeCycleTest(TestCase):
         err_code, err_message = "12", "JSON Invalide"
 
         self.employee_record.update_as_rejected(err_code, err_message)
-        self.assertEqual(self.employee_record.status, Status.REJECTED)
-        self.assertEqual(self.employee_record.asp_processing_code, err_code)
-        self.assertEqual(self.employee_record.asp_processing_label, err_message)
+        assert self.employee_record.status == Status.REJECTED
+        assert self.employee_record.asp_processing_code == err_code
+        assert self.employee_record.asp_processing_label == err_message
 
     @mock.patch(
         "itou.common_apps.address.format.get_geocoding_data",
@@ -333,10 +331,10 @@ class EmployeeRecordLifeCycleTest(TestCase):
         )
         self.employee_record.update_as_processed(process_code, process_message, "{}")
 
-        self.assertEqual(self.employee_record.status, Status.PROCESSED)
-        self.assertEqual(self.employee_record.asp_processing_code, process_code)
-        self.assertEqual(self.employee_record.asp_processing_label, process_message)
-        self.assertEqual(self.employee_record.archived_json, {})
+        assert self.employee_record.status == Status.PROCESSED
+        assert self.employee_record.asp_processing_code == process_code
+        assert self.employee_record.asp_processing_label == process_message
+        assert self.employee_record.archived_json == {}
 
     @mock.patch(
         "itou.common_apps.address.format.get_geocoding_data",
@@ -352,10 +350,10 @@ class EmployeeRecordLifeCycleTest(TestCase):
         )
         self.employee_record.update_as_processed(process_code, process_message, None)
 
-        self.assertEqual(self.employee_record.status, Status.PROCESSED)
-        self.assertEqual(self.employee_record.asp_processing_code, process_code)
-        self.assertEqual(self.employee_record.asp_processing_label, process_message)
-        self.assertIsNone(self.employee_record.archived_json)
+        assert self.employee_record.status == Status.PROCESSED
+        assert self.employee_record.asp_processing_code == process_code
+        assert self.employee_record.asp_processing_label == process_message
+        assert self.employee_record.archived_json is None
 
     @mock.patch(
         "itou.common_apps.address.format.get_geocoding_data",
@@ -371,10 +369,10 @@ class EmployeeRecordLifeCycleTest(TestCase):
         )
         self.employee_record.update_as_processed(process_code, process_message, "")
 
-        self.assertEqual(self.employee_record.status, Status.PROCESSED)
-        self.assertEqual(self.employee_record.asp_processing_code, process_code)
-        self.assertEqual(self.employee_record.asp_processing_label, process_message)
-        self.assertEqual(self.employee_record.archived_json, "")
+        assert self.employee_record.status == Status.PROCESSED
+        assert self.employee_record.asp_processing_code == process_code
+        assert self.employee_record.asp_processing_label == process_message
+        assert self.employee_record.archived_json == ""
 
     @mock.patch(
         "itou.common_apps.address.format.get_geocoding_data",
@@ -390,10 +388,10 @@ class EmployeeRecordLifeCycleTest(TestCase):
         )
         self.employee_record.update_as_processed(process_code, process_message, "whatever")
 
-        self.assertEqual(self.employee_record.status, Status.PROCESSED)
-        self.assertEqual(self.employee_record.asp_processing_code, process_code)
-        self.assertEqual(self.employee_record.asp_processing_label, process_message)
-        self.assertEqual(self.employee_record.archived_json, "whatever")
+        assert self.employee_record.status == Status.PROCESSED
+        assert self.employee_record.asp_processing_code == process_code
+        assert self.employee_record.asp_processing_label == process_message
+        assert self.employee_record.archived_json == "whatever"
 
     @mock.patch(
         "itou.common_apps.address.format.get_geocoding_data",
@@ -402,21 +400,20 @@ class EmployeeRecordLifeCycleTest(TestCase):
     def test_state_disabled(self, _mock):
         filename = "RIAE_FS_20210410130001.json"
 
-        self.assertNotIn(
-            self.employee_record.job_application,
-            JobApplication.objects.eligible_as_employee_record(self.employee_record.job_application.to_siae),
+        assert self.employee_record.job_application not in JobApplication.objects.eligible_as_employee_record(
+            self.employee_record.job_application.to_siae
         )
 
         # Employee record in READY state can't be disabled
         with self.assertRaisesMessage(InvalidStatusError, EmployeeRecord.ERROR_EMPLOYEE_RECORD_INVALID_STATE):
             self.employee_record.update_as_disabled()
-        self.assertEqual(self.employee_record.status, Status.READY)
+        assert self.employee_record.status == Status.READY
 
         # Employee record in SENT state can't be disabled
         self.employee_record.update_as_sent(filename, 1)
         with self.assertRaisesMessage(InvalidStatusError, EmployeeRecord.ERROR_EMPLOYEE_RECORD_INVALID_STATE):
             self.employee_record.update_as_disabled()
-        self.assertEqual(self.employee_record.status, Status.SENT)
+        assert self.employee_record.status == Status.SENT
 
         # Employee record in ACCEPTED state can be disabled
         process_code, process_message = (
@@ -425,22 +422,22 @@ class EmployeeRecordLifeCycleTest(TestCase):
         )
         self.employee_record.update_as_processed(process_code, process_message, "{}")
         self.employee_record.update_as_disabled()
-        self.assertEqual(self.employee_record.status, Status.DISABLED)
+        assert self.employee_record.status == Status.DISABLED
 
         # Now, can create new employee record on same job_application
         new_employee_record = EmployeeRecord.from_job_application(self.employee_record.job_application)
-        self.assertEqual(new_employee_record.status, Status.NEW)
+        assert new_employee_record.status == Status.NEW
 
         # Employee record in NEW state can be disable
         new_employee_record.update_as_disabled()
-        self.assertEqual(new_employee_record.status, Status.DISABLED)
+        assert new_employee_record.status == Status.DISABLED
 
         # Now, can create another one employee record on same job_application
         new_employee_record = EmployeeRecord.from_job_application(new_employee_record.job_application)
-        self.assertEqual(new_employee_record.status, Status.NEW)
+        assert new_employee_record.status == Status.NEW
 
         new_employee_record.update_as_ready()
-        self.assertEqual(new_employee_record.status, Status.READY)
+        assert new_employee_record.status == Status.READY
 
     @mock.patch(
         "itou.common_apps.address.format.get_geocoding_data",
@@ -450,21 +447,20 @@ class EmployeeRecordLifeCycleTest(TestCase):
         filename = "RIAE_FS_20210410130001.json"
         self.employee_record.update_as_sent(filename, 1)
 
-        self.assertNotIn(
-            self.employee_record.job_application,
-            JobApplication.objects.eligible_as_employee_record(self.employee_record.job_application.to_siae),
+        assert self.employee_record.job_application not in JobApplication.objects.eligible_as_employee_record(
+            self.employee_record.job_application.to_siae
         )
 
         err_code, err_message = "12", "JSON Invalide"
         self.employee_record.update_as_rejected(err_code, err_message)
         self.employee_record.update_as_disabled()
-        self.assertEqual(self.employee_record.status, Status.DISABLED)
+        assert self.employee_record.status == Status.DISABLED
 
         # Now, can create new employee record on same job_application
         new_employee_record = EmployeeRecord.from_job_application(self.employee_record.job_application)
-        self.assertEqual(new_employee_record.status, Status.NEW)
+        assert new_employee_record.status == Status.NEW
         new_employee_record.update_as_ready()
-        self.assertEqual(new_employee_record.status, Status.READY)
+        assert new_employee_record.status == Status.READY
 
     @mock.patch(
         "itou.common_apps.address.format.get_geocoding_data",
@@ -479,19 +475,19 @@ class EmployeeRecordLifeCycleTest(TestCase):
         archive_first = '{"libelleTraitement":"La ligne de la fiche salarié a été enregistrée avec succès [1]."}'
         self.employee_record.update_as_processed(process_code, process_message, archive_first)
         self.employee_record.update_as_disabled()
-        self.assertEqual(self.employee_record.status, Status.DISABLED)
+        assert self.employee_record.status == Status.DISABLED
 
         # Employee record in DISABLE state can be reactivate (set state NEW)
         self.employee_record.update_as_new()
-        self.assertEqual(self.employee_record.status, Status.NEW)
+        assert self.employee_record.status == Status.NEW
 
         # Employee record can now be changed to the ready state
         self.employee_record.update_as_ready()
-        self.assertEqual(self.employee_record.status, Status.READY)
+        assert self.employee_record.status == Status.READY
 
         filename_second = "RIAE_FS_20210410130002.json"
         self.employee_record.update_as_sent(filename_second, 1)
-        self.assertEqual(self.employee_record.archived_json, json.loads(archive_first))
+        assert self.employee_record.archived_json == json.loads(archive_first)
 
         process_code, process_message = (
             EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
@@ -499,8 +495,8 @@ class EmployeeRecordLifeCycleTest(TestCase):
         )
         archive_second = '{"libelleTraitement":"La ligne de la fiche salarié a été enregistrée avec succès [2]."}'
         self.employee_record.update_as_processed(process_code, process_message, archive_second)
-        self.assertEqual(self.employee_record.archived_json, json.loads(archive_second))
-        self.assertEqual(self.employee_record.asp_batch_file, filename_second)
+        assert self.employee_record.archived_json == json.loads(archive_second)
+        assert self.employee_record.asp_batch_file == filename_second
 
     @mock.patch(
         "itou.common_apps.address.format.get_geocoding_data",
@@ -511,7 +507,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
         self.employee_record.update_as_sent(filename, 1)
 
         # No processing date at the moment
-        self.assertIsNone(self.employee_record.processed_at)
+        assert self.employee_record.processed_at is None
 
         process_code, process_message = (
             EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
@@ -520,7 +516,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
         self.employee_record.update_as_processed(process_code, process_message, "{}")
 
         # Can't archive, too recent
-        with self.assertRaises(InvalidStatusError):
+        with pytest.raises(InvalidStatusError):
             self.employee_record.update_as_archived()
 
         # Fake old date, but not to old
@@ -528,7 +524,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
             days=constants.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS - 1
         )
 
-        with self.assertRaises(InvalidStatusError):
+        with pytest.raises(InvalidStatusError):
             self.employee_record.update_as_archived()
 
         # Fake a date older than archiving delay
@@ -539,8 +535,8 @@ class EmployeeRecordLifeCycleTest(TestCase):
         self.employee_record.update_as_archived()
 
         # Check correct status and empty archived JSON
-        self.assertEqual(self.employee_record.status, Status.ARCHIVED)
-        self.assertIsNone(self.employee_record.archived_json)
+        assert self.employee_record.status == Status.ARCHIVED
+        assert self.employee_record.archived_json is None
 
     def test_processed_as_duplicate(self):
         # Check correct status when "manually" forcing status of an employee record
@@ -561,15 +557,15 @@ class EmployeeRecordLifeCycleTest(TestCase):
             asp_processing_label="Meh Meh Meh",
         )
         employee_record_code_3436.update_as_processed_as_duplicate()
-        self.assertTrue(employee_record_code_3436.processed_as_duplicate)
-        self.assertEqual(Status.PROCESSED, employee_record_code_3436.status)
-        self.assertEqual("Statut forcé suite à doublon ASP", employee_record_code_3436.asp_processing_label)
-        self.assertIsNone(employee_record_code_3436.archived_json)
+        assert employee_record_code_3436.processed_as_duplicate
+        assert Status.PROCESSED == employee_record_code_3436.status
+        assert "Statut forcé suite à doublon ASP" == employee_record_code_3436.asp_processing_label
+        assert employee_record_code_3436.archived_json is None
 
-        with self.assertRaises(InvalidStatusError):
+        with pytest.raises(InvalidStatusError):
             employee_record_other_code.update_as_processed_as_duplicate()
 
-        with self.assertRaises(InvalidStatusError):
+        with pytest.raises(InvalidStatusError):
             employee_record_other_status.update_as_processed_as_duplicate()
 
 
@@ -599,17 +595,17 @@ class EmployeeRecordJobApplicationConstraintsTest(TestCase):
         # linked employee records with ACCEPTED or SENT status
 
         # status is READY
-        self.assertTrue(self.job_application.can_be_cancelled)
+        assert self.job_application.can_be_cancelled
 
         # status is SENT
         filename = "RIAE_FS_20210410130000.json"
         self.employee_record.update_as_sent(filename, 1)
-        self.assertFalse(self.job_application.can_be_cancelled)
+        assert not self.job_application.can_be_cancelled
 
         # status is REJECTED
         err_code, err_message = "12", "JSON Invalide"
         self.employee_record.update_as_rejected(err_code, err_message)
-        self.assertTrue(self.job_application.can_be_cancelled)
+        assert self.job_application.can_be_cancelled
 
         # status is PROCESSED
         self.employee_record.update_as_ready()
@@ -619,7 +615,7 @@ class EmployeeRecordJobApplicationConstraintsTest(TestCase):
             "La ligne de la fiche salarié a été enregistrée avec succès.",
         )
         self.employee_record.update_as_processed(process_code, process_message, "{}")
-        self.assertFalse(self.job_application.can_be_cancelled)
+        assert not self.job_application.can_be_cancelled
 
 
 class TestEmployeeRecordQueryset:
