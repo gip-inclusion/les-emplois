@@ -170,6 +170,12 @@ class JobApplicationQuerySet(models.QuerySet):
         )
         return self.annotate(
             accepted_at=Case(
+                # Mega Super duper special case to handle job applications created to generate AI's PASS IAE
+                When(
+                    approval_manually_delivered_by__email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL,
+                    created_at=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE,
+                    then=F("hiring_start_at"),
+                ),
                 When(created_from_pe_approval=True, then=F("created_at")),
                 # A job_application created at the accepted status, still accepted
                 When(
@@ -179,6 +185,7 @@ class JobApplicationQuerySet(models.QuerySet):
                     then=F("created_at"),
                 ),
                 When(created_from_pe_approval=False, then=created_at_from_transition),
+                output_field=models.DateTimeField(),
             )
         )
 

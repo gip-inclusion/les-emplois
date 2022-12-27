@@ -572,6 +572,13 @@ class JobApplicationQuerySetTest(TestCase):
         job_application = JobApplication.objects.with_accepted_at().first()
         self.assertEqual(job_application.accepted_at, job_application.created_at)
 
+    def test_with_accepted_at_for_ai_stock(self):
+        JobApplicationFactory(is_from_ai_stock=True)
+
+        job_application = JobApplication.objects.with_accepted_at().first()
+        assert job_application.accepted_at.date() == job_application.hiring_start_at
+        assert job_application.accepted_at != settings.AI_EMPLOYEES_STOCK_IMPORT_DATE
+
 
 class JobApplicationNotificationsTest(TestCase):
     @classmethod

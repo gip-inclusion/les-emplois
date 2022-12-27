@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 import factory
 import factory.fuzzy
 from dateutil.relativedelta import relativedelta
+from django.conf import settings
 
 from itou.approvals.factories import ApprovalFactory
 from itou.eligibility.factories import EligibilityDiagnosisFactory
@@ -21,6 +22,7 @@ from itou.users.factories import (
     JobSeekerProfileWithHexaAddressFactory,
     JobSeekerWithMockedAddressFactory,
     PrescriberFactory,
+    UserFactory,
 )
 
 
@@ -49,6 +51,12 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
             ),
             sender=factory.LazyAttribute(lambda obj: obj.sender_prescriber_organization.members.first()),
             sender_kind=SenderKind.PRESCRIBER,
+        )
+        is_from_ai_stock = factory.Trait(
+            approval_manually_delivered_by=factory.SubFactory(
+                UserFactory, email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL
+            ),
+            created_at=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE,
         )
 
     job_seeker = factory.SubFactory(JobSeekerFactory)
