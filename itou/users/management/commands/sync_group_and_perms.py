@@ -26,6 +26,7 @@ def get_permissions_dict():
     import itou.job_applications.models as job_applications_models
     import itou.jobs.models as jobs_models
     import itou.prescribers.models as prescribers_models
+    import itou.siae_evaluations.models as siae_evaluations_models
     import itou.siaes.models as siaes_models
     import itou.users.models as users_models
 
@@ -60,6 +61,10 @@ def get_permissions_dict():
             siaes_models.SiaeFinancialAnnex: PERMS_READ,
             siaes_models.SiaeJobDescription: PERMS_ALL,
             siaes_models.SiaeMembership: PERMS_ALL,
+            siae_evaluations_models.EvaluationCampaign: PERMS_READ,
+            siae_evaluations_models.EvaluatedSiae: PERMS_READ,
+            siae_evaluations_models.EvaluatedJobApplication: PERMS_READ,
+            siae_evaluations_models.EvaluatedAdministrativeCriteria: PERMS_READ,
             users_models.User: PERMS_ADD,
             users_models.JobSeekerProfile: PERMS_EDIT,
         },
