@@ -8,7 +8,7 @@ from itou.job_applications.factories import JobApplicationFactory
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation, Rome
 from itou.prescribers.factories import PrescriberOrganizationFactory
-from itou.siaes.enums import POLE_EMPLOI_SIRET, ContractType, JobSource, SiaeKind
+from itou.siaes.enums import POLE_EMPLOI_SIRET, ContractNature, ContractType, JobSource, SiaeKind
 from itou.siaes.factories import SiaeFactory, SiaeJobDescriptionFactory
 from itou.siaes.models import Siae
 from itou.utils.test import TestCase
@@ -382,17 +382,6 @@ class JobDescriptionSearchViewTest(TestCase):
         )
         job3 = SiaeJobDescriptionFactory(siae=inactive_siae, contract_type=ContractType.APPRENTICESHIP)
 
-        # FIXME(vperron): do not display this PEC offer for now
-        pe_siae = Siae.unfiltered_objects.get(siret=POLE_EMPLOI_SIRET)
-        job_pec = SiaeJobDescriptionFactory(
-            siae=pe_siae,
-            appellation=appellations[2],
-            contract_type=ContractType.APPRENTICESHIP,
-            location=city,
-            source_id="GNEH",
-            source_kind=JobSource.PE_API,
-        )
-
         # no filter: returns everything.
         response = self.client.get(
             self.url,
@@ -402,7 +391,6 @@ class JobDescriptionSearchViewTest(TestCase):
         self.assertContains(response, capfirst(job1.display_name), html=True)
         self.assertContains(response, capfirst(job2.display_name), html=True)
         self.assertNotContains(response, capfirst(job3.display_name), html=True)
-        self.assertNotContains(response, capfirst(job_pec.display_name), html=True)
 
         # pass both contract types, should have the same result.
         response = self.client.get(
@@ -495,3 +483,101 @@ class JobDescriptionSearchViewTest(TestCase):
         self.assertNotContains(response, displayed_job_name_1, html=True)
         self.assertNotContains(response, displayed_job_name_2, html=True)
         self.assertNotContains(response, displayed_job_name_3, html=True)
+
+    def test_pec_display(self):
+        create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
+        city = create_city_saint_andre()
+        siae = SiaeFactory(department="44", coords=city.coords, post_code="44117")
+        appellations = Appellation.objects.all()
+        job1 = SiaeJobDescriptionFactory(
+            siae=siae, appellation=appellations[0], contract_type=ContractType.APPRENTICESHIP
+        )
+        pe_siae = Siae.unfiltered_objects.get(siret=POLE_EMPLOI_SIRET)
+        job_pec = SiaeJobDescriptionFactory(
+            siae=pe_siae,
+            location=city,
+            source_kind=JobSource.PE_API,
+            source_id="fuuuuuuuu",
+            source_url="https://external.pec.link/fuuuu",
+            appellation=appellations[2],
+            contract_type=ContractType.FIXED_TERM,
+            other_contract_type="Super catégorie de genre de job",
+            market_context_description="",
+        )
+
+        # no filter: returns everything.
+        response = self.client.get(
+            self.url,
+            {"city": city.slug},
+        )
+
+        self.assertContains(response, "(2 résultats)")
+        assert [job for job in response.context["results_page"]] == [job1, job_pec]
+        self.assertContains(response, capfirst(job1.display_name), html=True)
+        self.assertContains(response, capfirst(job_pec.display_name), html=True)
+
+        self.assertContains(response, "Contrat PEC - Parcours Emploi Compétences")
+        self.assertContains(response, "logo-pole-emploi.svg")
+        self.assertContains(response, "Offre proposée et gérée par pole-emploi.fr")
+        self.assertContains(response, "https://external.pec.link/fuuuu")
+
+        self.assertContains(response, "Entreprise anonyme")
+        self.assertContains(response, "Super catégorie de genre de job")
+        self.assertNotContains(response, "Réservé au public éligible au contrat PEC")
+
+        job_pec.contract_nature = ContractNature.PEC_OFFER
+        job_pec.save(update_fields=["contract_nature"])
+        response = self.client.get(
+            self.url,
+            {"city": city.slug},
+        )
+        self.assertContains(response, "Réservé au public éligible au contrat PEC")
+
+        # filter with "PEC offer" contract type: only returns the PEC offers
+        # (whatever the actual contract_type of those)
+        # no filter: returns everything.
+        response = self.client.get(
+            self.url,
+            {"city": city.slug, "contract_types": ["PEC_OFFER"]},
+        )
+        self.assertContains(response, "(1 résultat)")
+        self.assertNotContains(response, capfirst(job1.display_name), html=True)
+        self.assertContains(response, capfirst(job_pec.display_name), html=True)
+
+        # filter with PEC offer, apprenticeship: returns both
+        response = self.client.get(
+            self.url,
+            {"city": city.slug, "contract_types": ["PEC_OFFER", "APPRENTICESHIP"]},
+        )
+        self.assertContains(response, "(2 résultats)")
+        self.assertContains(response, capfirst(job1.display_name), html=True)
+        self.assertContains(response, capfirst(job_pec.display_name), html=True)
+
+        # filter with only apprenticeship: PEC offer not displayed (it's fixed term)
+        response = self.client.get(
+            self.url,
+            {"city": city.slug, "contract_types": ["APPRENTICESHIP"]},
+        )
+        self.assertContains(response, "(1 résultat)")
+        self.assertContains(response, capfirst(job1.display_name), html=True)
+        self.assertNotContains(response, capfirst(job_pec.display_name), html=True)
+
+        # filter with FIXED_TERM : PEC offer displayed because it's its underlying contract type
+        response = self.client.get(
+            self.url,
+            {"city": city.slug, "contract_types": ["FIXED_TERM"]},
+        )
+        self.assertContains(response, "(1 résultat)")
+        self.assertNotContains(response, capfirst(job1.display_name), html=True)
+        self.assertContains(response, capfirst(job_pec.display_name), html=True)
+
+        # Show external company name
+        job_pec.market_context_description = "MaPetiteEntreprise"
+        job_pec.save(update_fields=["market_context_description"])
+        response = self.client.get(
+            self.url,
+            {"city": city.slug},
+        )
+        self.assertContains(response, "(2 résultats)")
+        self.assertContains(response, capfirst(job_pec.display_name), html=True)
+        self.assertContains(response, "MaPetiteEntreprise")

@@ -5,7 +5,7 @@ from django.utils.datastructures import MultiValueDict
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS, DEPARTMENTS_WITH_DISTRICTS, format_district
 from itou.jobs.models import ROME_DOMAINS
-from itou.siaes.enums import ContractType, SiaeKind
+from itou.siaes.enums import ContractNature, ContractType, SiaeKind
 
 
 class SiaeSearchForm(forms.Form):
@@ -99,6 +99,8 @@ class JobDescriptionSearchForm(SiaeSearchForm):
         [(k, v) for k, v in ContractType.choices if k not in (ContractType.OTHER, ContractType.BUSINESS_CREATION)],
         key=lambda d: d[1],
     ) + [
+        # FIXME(vperron): note that JS is used to add a "Nouveau" badge next to this entry until March 2023
+        (ContractNature.PEC_OFFER, ContractNature.PEC_OFFER.label),
         (ContractType.BUSINESS_CREATION, ContractType.BUSINESS_CREATION.label),
         (ContractType.OTHER, ContractType.OTHER.label),
         ("", "Contrat non précisé"),

@@ -511,7 +511,7 @@ class SiaeJobDescriptionQuerySet(models.QuerySet):
 
     def active(self):
         subquery = Subquery(
-            Siae.objects.filter(
+            Siae.unfiltered_objects.filter(
                 pk=OuterRef("siae"),
             ).active()
         )
@@ -631,7 +631,21 @@ class SiaeJobDescription(models.Model):
     def display_contract_type(self):
         return self.other_contract_type or self.get_contract_type_display
 
+    @property
+    def is_external(self):
+        return self.source_kind is not None
+
+    @property
+    def is_from_pole_emploi(self):
+        return self.siae.siret == POLE_EMPLOI_SIRET
+
+    @property
+    def is_pec_offer(self):
+        return self.is_from_pole_emploi and self.contract_nature == ContractNature.PEC_OFFER
+
     def get_absolute_url(self):
+        if self.is_external:
+            return self.source_url
         return reverse("siaes_views:job_description_card", kwargs={"job_description_id": self.pk})
 
 

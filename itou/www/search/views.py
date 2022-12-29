@@ -8,7 +8,7 @@ from django.views.generic import FormView
 
 from itou.common_apps.address.departments import DEPARTMENTS_WITH_DISTRICTS
 from itou.prescribers.models import PrescriberOrganization
-from itou.siaes.enums import SiaeKind
+from itou.siaes.enums import ContractNature, JobSource, SiaeKind
 from itou.siaes.models import Siae, SiaeJobDescription
 from itou.utils.pagination import pager
 from itou.www.search.forms import JobDescriptionSearchForm, PrescriberSearchForm, SiaeSearchForm
@@ -63,7 +63,10 @@ class EmployerSearchBaseView(FormView):
             job_descriptions = job_descriptions.filter(siae__kind__in=kinds)
 
         if contract_types:
-            job_descriptions = job_descriptions.filter(contract_type__in=contract_types)
+            clauses = Q(contract_type__in=[c for c in contract_types if c != ContractNature.PEC_OFFER.value])
+            if ContractNature.PEC_OFFER.value in contract_types:
+                clauses |= Q(source_kind=JobSource.PE_API)
+            job_descriptions = job_descriptions.filter(clauses)
 
         departments = self.request.GET.getlist("departments")
 
@@ -206,7 +209,7 @@ class JobDescriptionSearchView(EmployerSearchBaseView):
 
     def get_results_page(self, _siaes, job_descriptions):
         job_descriptions = job_descriptions.with_annotation_is_popular().order_by(
-            F("updated_at").asc(nulls_last=True), "-created_at"
+            F("source_kind").asc(nulls_first=True), F("updated_at").asc(nulls_last=True), "-created_at"
         )
 
         return pager(job_descriptions, self.request.GET.get("page"), items_per_page=10)

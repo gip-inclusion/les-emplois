@@ -22,6 +22,9 @@
             $('#search-filter-form').collapse();
         }
         $("#siae-number-results").focus();
+        // FIXME(vperron): Remove this after March 2023; especially it might break the display if the number
+        // or order of the contract types filter changes.
+        $("#id_contract_types > div:nth-child(12) > label:nth-child(1)").append('<span class="badge badge-base badge-xs badge-pill badge-important ml-1 text-white">Nouveau</span>');
     </script>
 {% endblock %}
 
@@ -35,10 +38,6 @@
                     Emplois inclusifs à <strong>{{ distance }} km</strong> du centre de <strong>{{ city }}</strong>
                 </h2>
             {% endif %}
-
-            <p class="fs-sm">
-                Les résultats de recherche affichent en priorité les emplois inclusifs qui ont reçu peu de candidatures.
-            </p>
 
             <ul class="nav nav-tabs nav-tabs--emploi">
                 <li class="nav-item">
