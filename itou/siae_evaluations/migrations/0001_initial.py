@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("siaes", "0055_alter_siaejobdescription_location"),
+        ("siaes", "0001_initial"),
         ("job_applications", "0001_initial"),
         ("institutions", "0001_initial"),
         ("eligibility", "0001_initial"),
