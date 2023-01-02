@@ -6,7 +6,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [("approvals", "0006_auto_20200130_1948"), ("job_applications", "0016_auto_20200129_1445")]
+    dependencies = [("approvals", "0001_initial"), ("job_applications", "0016_auto_20200129_1445")]
 
     operations = [
         migrations.AddField(

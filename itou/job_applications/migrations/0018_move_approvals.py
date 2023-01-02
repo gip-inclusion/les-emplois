@@ -29,6 +29,6 @@ def move_data_forward(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    dependencies = [("approvals", "0006_auto_20200130_1948"), ("job_applications", "0017_jobapplication_approval")]
+    dependencies = [("approvals", "0001_initial"), ("job_applications", "0017_jobapplication_approval")]
 
     operations = [migrations.RunPython(move_data_forward, migrations.RunPython.noop)]
