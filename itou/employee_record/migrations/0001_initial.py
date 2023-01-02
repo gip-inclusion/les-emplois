@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("job_applications", "0001_initial"),
-        ("siaes", "0044_auto_20210202_1142"),
+        ("siaes", "0001_initial"),
     ]
 
     operations = [

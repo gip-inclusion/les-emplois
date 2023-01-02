@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("prescribers", "0001_initial"),
-        ("siaes", "0010_auto_20191028_1143"),
+        ("siaes", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
