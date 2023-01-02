@@ -177,6 +177,18 @@ class ListEmployeeRecordsTest(TestCase):
             self.url + "?order=-name", job_applicationZ.job_seeker, job_applicationA.job_seeker
         )
 
+        # Count queries
+        num_queries = 1  # Get django session
+        num_queries += 3  # Get current user and siae
+        num_queries += 1  # Select employee_records status count
+        num_queries += 1  # Get Siae Convention
+        num_queries += 1  # Select ordered job applications
+        num_queries += 1  # Select EmployeeRecords
+        num_queries += 1  # Select siae members
+        num_queries += 1  # Get user social_account
+        with self.assertNumQueries(num_queries):
+            self.client.get(self.url)
+
     def test_rejected_employee_records_sorted(self):
         self.client.force_login(self.user)
 
