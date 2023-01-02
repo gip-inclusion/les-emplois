@@ -397,8 +397,8 @@ class JobApplicationQuerySet(models.QuerySet):
         return (
             self.filter(pk__in=eligible_job_applications.values("id"))
             .exclude(approval__number__in=approvals_to_exclude)
-            .select_related("to_siae", "to_siae__convention", "approval", "job_seeker")
-            .prefetch_related("employee_record", "approval__suspension_set", "approval__prolongation_set")
+            .select_related("approval", "job_seeker")
+            .prefetch_related("employee_record")
             .order_by("-hiring_start_at")
         )
 

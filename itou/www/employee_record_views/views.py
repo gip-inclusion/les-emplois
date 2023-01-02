@@ -1,12 +1,13 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db.models import Count
+from django.db.models import Count, Exists, OuterRef
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.decorators.http import require_safe
 
+from itou.approvals.models import Prolongation, Suspension
 from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
@@ -75,29 +76,6 @@ def list_employee_records(request, template_name="employee_record/list.html"):
     navigation_pages = None
     data = None
 
-    # Construct badges
-
-    # Badges for "real" employee records
-    employee_record_statuses = (
-        EmployeeRecord.objects.for_siae(siae).values("status").annotate(cnt=Count("status")).order_by("-status")
-    )
-    employee_record_badges = {row["status"]: row["cnt"] for row in employee_record_statuses}
-
-    eligibible_job_applications = JobApplication.objects.eligible_as_employee_record(siae)
-
-    # Set count of each status for badge display
-    status_badges = [
-        (
-            eligibible_job_applications.count(),
-            "info",
-        ),
-        (employee_record_badges.get(Status.READY, 0), "secondary"),
-        (employee_record_badges.get(Status.SENT, 0), "warning"),
-        (employee_record_badges.get(Status.REJECTED, 0), "danger"),
-        (employee_record_badges.get(Status.PROCESSED, 0), "success"),
-        (employee_record_badges.get(Status.DISABLED, 0), "emploi-lightest"),
-    ]
-
     # See comment above on `employee_records_list` var
     form.full_clean()  # We do not use is_valid to validate each field independently
     status = Status(form.cleaned_data.get("status") or Status.NEW)
@@ -114,19 +92,47 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         for order_by_item in job_application_order_by
     )
 
+    # Construct badges
+
+    # Badges for "real" employee records
+    employee_record_statuses = (
+        EmployeeRecord.objects.for_siae(siae).values("status").annotate(cnt=Count("status")).order_by("-status")
+    )
+    employee_record_badges = {row["status"]: row["cnt"] for row in employee_record_statuses}
+
+    eligible_job_applications = JobApplication.objects.eligible_as_employee_record(siae)
+    if status == Status.NEW:
+        # When showing NEW job applications, we need more infos
+        eligible_job_applications = eligible_job_applications.annotate(
+            has_suspension=Exists(Suspension.objects.filter(siae=siae, approval__jobapplication__pk=OuterRef("pk"))),
+            has_prolongation=Exists(
+                Prolongation.objects.filter(declared_by_siae=siae, approval__jobapplication__pk=OuterRef("pk"))
+            ),
+        ).order_by(*job_application_order_by)
+
+    # Set count of each status for badge display
+    status_badges = [
+        (
+            # Don't use count() since we also need the list when status is NEW
+            len(eligible_job_applications) if status == Status.NEW else eligible_job_applications.count(),
+            "info",
+        ),
+        (employee_record_badges.get(Status.READY, 0), "secondary"),
+        (employee_record_badges.get(Status.SENT, 0), "warning"),
+        (employee_record_badges.get(Status.REJECTED, 0), "danger"),
+        (employee_record_badges.get(Status.PROCESSED, 0), "success"),
+        (employee_record_badges.get(Status.DISABLED, 0), "emploi-lightest"),
+    ]
+
     # Not needed every time (not pulled-up), and DRY here
     base_query = EmployeeRecord.objects.full_fetch().order_by(*employee_record_order_by)
     has_outdated_date = False
 
     if status == Status.NEW:
         # Browse to get only the linked employee record in "new" state
-        data = eligibible_job_applications.order_by(*job_application_order_by)
+        data = eligible_job_applications
         for item in data:
-            item.has_outdated_date = (
-                item.approval.suspension_set.filter(siae=siae).exists()
-                or item.approval.prolongation_set.filter(declared_by_siae=siae).exists()
-            )
-            has_outdated_date |= item.has_outdated_date
+            has_outdated_date |= item.has_suspension or item.has_prolongation
 
             for e in item.employee_record.all():
                 if e.status == Status.NEW:
