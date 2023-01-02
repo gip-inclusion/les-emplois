@@ -731,12 +731,4 @@ class Migration(migrations.Migration):
                 DROP FUNCTION IF EXISTS update_approval_end_at_for_prolongation();
             """,
         ),
-        # TODO(alaurent) check if still mandatory or if can be done without custom index
-        # Adds an index on approvals_poleemploiapproval.number for like in order to speed up import
-        # https://stackoverflow.com/a/49682774
-        migrations.RunSQL(
-            sql=r"""CREATE INDEX "approvals_poleemploiapproval_number_like_idx"
-            ON "approvals_poleemploiapproval" ("number" varchar_pattern_ops);""",
-            reverse_sql=r'DROP INDEX "approvals_poleemploiapproval_number_like_idx";',
-        ),
     ]
