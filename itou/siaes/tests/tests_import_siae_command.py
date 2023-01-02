@@ -12,6 +12,7 @@ from django.conf import settings
 from django.core import mail
 from django.test import TransactionTestCase, override_settings
 from django.urls import reverse
+from freezegun import freeze_time
 
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeConventionFactory, SiaeFactory, SiaeWith2MembershipsFactory
@@ -32,6 +33,7 @@ def lazy_import_siae_command():
 @unittest.skipUnless(
     os.getenv("CI", "False"), "Slow and scarcely updated management command, no need for constant testing!"
 )
+@freeze_time("2022-10-10")
 class ImportSiaeManagementCommandsTest(TransactionTestCase):
 
     path_source = "./siaes/fixtures"
