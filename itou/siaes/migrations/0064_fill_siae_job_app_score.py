@@ -18,4 +18,10 @@ class Migration(migrations.Migration):
         ("siaes", "0063_siae_job_app_score"),
     ]
 
-    operations = [migrations.RunPython(_fill_siae_job_app_score, reverse_code=migrations.RunPython.noop)]
+    operations = [
+        migrations.RunPython(
+            _fill_siae_job_app_score,
+            reverse_code=migrations.RunPython.noop,
+            elidable=True,
+        )
+    ]
