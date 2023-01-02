@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("job_applications", "0029_auto_20210223_1528"),
+        ("job_applications", "0001_initial"),
         ("siaes", "0044_auto_20210202_1142"),
     ]
 
