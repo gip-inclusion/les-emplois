@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("prescribers", "0006_auto_20191015_1152"),
+        ("prescribers", "0001_initial"),
         ("siaes", "0010_auto_20191028_1143"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]

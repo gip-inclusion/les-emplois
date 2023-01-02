@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("prescribers", "0006_auto_20191015_1152"),
+        ("prescribers", "0001_initial"),
         ("job_applications", "0003_remove_jobapplication_prescriber_organization"),
     ]
 

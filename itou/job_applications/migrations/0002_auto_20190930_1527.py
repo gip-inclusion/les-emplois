@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         ("job_applications", "0001_initial"),
         ("siaes", "0001_initial"),
         ("jobs", "0002_create_full_text_trigger"),
-        ("prescribers", "0002_auto_20190930_1527"),
+        ("prescribers", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
