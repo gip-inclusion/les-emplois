@@ -7,10 +7,13 @@ from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 from django.utils.html import escape
 
+from itou.cities.factories import create_city_vannes
+from itou.jobs.factories import create_test_romes_and_appellations
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import (
     SiaeConventionFactory,
     SiaeFactory,
+    SiaeJobDescriptionFactory,
     SiaeWith2MembershipsFactory,
     SiaeWithMembershipAndJobsFactory,
 )
@@ -21,8 +24,14 @@ from itou.utils.test import TestCase
 
 
 class CardViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
+        cls.vannes = create_city_vannes()
+
     def test_card(self):
         siae = SiaeFactory(with_membership=True)
+        job_description = SiaeJobDescriptionFactory(siae=siae, custom_name="Plaquiste")
         url = reverse("siaes_views:card", kwargs={"siae_id": siae.pk})
         response = self.client.get(url)
         assert response.status_code == 200
@@ -30,6 +39,35 @@ class CardViewTest(TestCase):
         self.assertContains(response, escape(siae.display_name))
         self.assertContains(response, siae.email)
         self.assertContains(response, siae.phone)
+        self.assertContains(
+            response,
+            f"""
+            <p class="fs-sm text-secondary">
+                <b>1 recrutement en cours</b>
+            </p>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item list-group-item-action px-0 py-2 ">
+                    <a class="d-flex flex-wrap align-items-center text-decoration-none matomo-event"
+                       href="/siae/job_description/{job_description.pk}/card?back_url=/siae/{siae.pk}/card"
+                       data-matomo-category="candidature"
+                       data-matomo-action="clic"
+                       data-matomo-option="clic-metiers">
+                        <div class="d-inline">
+                            <span class="font-weight-bold mr-1 mr-md-2">Plaquiste</span>
+                        </div>
+                        <div class="d-inline ml-lg-auto">
+                            <span class="fs-sm text-nowrap">
+                                <i class="ri-map-pin-2-line ri-sm"></i>
+                                Vannes (56)
+                            </span>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+            """,
+            html=True,
+            count=1,
+        )
 
 
 class JobDescriptionCardViewTest(TestCase):

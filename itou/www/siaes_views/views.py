@@ -397,7 +397,7 @@ def select_financial_annex(request, template_name="siaes/select_financial_annex.
 
 
 def card(request, siae_id, template_name="siaes/card.html"):
-    queryset = Siae.objects.prefetch_job_description_through()
+    queryset = Siae.objects.prefetch_job_description_through().with_count_active_job_descriptions()
 
     siae = get_object_or_404(queryset, pk=siae_id)
     jobs_descriptions = siae.job_description_through.all()
