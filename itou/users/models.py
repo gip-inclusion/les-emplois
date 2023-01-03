@@ -5,11 +5,13 @@ from collections import Counter
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.contrib.postgres.fields import CIEmailField
+from django.contrib.postgres.indexes import OpClass
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MinLengthValidator
 from django.db import models
 from django.db.models import Count
+from django.db.models.functions import Upper
 from django.utils import timezone
 from django.utils.crypto import salted_hmac
 from django.utils.functional import cached_property
@@ -287,6 +289,14 @@ class User(AbstractUser, AddressMixin):
     )
 
     objects = ItouUserManager()
+
+    class Meta(AbstractUser.Meta):
+        indexes = [
+            models.Index(
+                OpClass(Upper("email"), name="text_pattern_ops"),
+                name="users_user_email_upper",
+            )
+        ]
 
     def __str__(self):
         return f"{self.get_full_name()} — {self.email}"
