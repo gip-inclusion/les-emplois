@@ -275,7 +275,9 @@ class Migration(migrations.Migration):
                     "job_app_score",
                     models.FloatField(
                         null=True,
-                        verbose_name="Score de recommandation (ratio de candidatures récentes vs nombre d'offres d'emploi)",
+                        verbose_name=(
+                            "Score de recommandation (ratio de candidatures récentes vs nombre d'offres d'emploi)"
+                        ),
                     ),
                 ),
             ],
@@ -484,7 +486,10 @@ class Migration(migrations.Migration):
                     models.BooleanField(
                         db_index=True,
                         default=True,
-                        help_text="Précise si la convention est active c.a.d. si elle a au moins une annexe financière valide à ce jour.",
+                        help_text=(
+                            "Précise si la convention est active c.a.d. si elle a au moins une annexe financière "
+                            "valide à ce jour."
+                        ),
                         verbose_name="Active",
                     ),
                 ),
