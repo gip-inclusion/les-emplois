@@ -1387,6 +1387,7 @@ class OriginalPoleEmploiApproval(CommonApprovalMixin):
     birthdate = models.DateField(verbose_name="Date de naissance", default=timezone.localdate)
     nir = models.CharField(verbose_name="NIR", max_length=15, null=True, blank=True)
     ntt_nia = models.CharField(verbose_name="NTT ou NIA", max_length=40, null=True, blank=True)
+    merged = models.BooleanField()
 
     class Meta:
         # the table name is misleading but is called "merged" for historical reasons.

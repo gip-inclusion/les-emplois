@@ -620,6 +620,7 @@ class Migration(migrations.Migration):
                 ),
                 ("nir", models.CharField(blank=True, max_length=15, null=True, verbose_name="NIR")),
                 ("ntt_nia", models.CharField(blank=True, max_length=40, null=True, verbose_name="NTT ou NIA")),
+                ("merged", models.BooleanField()),
             ],
             options={
                 "db_table": "merged_approvals_poleemploiapproval",
