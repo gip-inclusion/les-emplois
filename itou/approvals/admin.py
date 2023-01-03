@@ -47,7 +47,7 @@ class JobApplicationInline(admin.StackedInline):
         to_siae_link = reverse("admin:siaes_siae_change", args=[obj.to_siae.pk])
         return format_html(
             f"<a href='{to_siae_link}'>{obj.to_siae.display_name}</a> "
-            f"(SIRET : {obj.to_siae.siren} {obj.to_siae.siret_nic})"
+            f"— SIRET : {obj.to_siae.siren}{obj.to_siae.siret_nic}"
         )
 
     # Custom read-only fields as workaround :
