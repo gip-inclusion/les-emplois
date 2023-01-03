@@ -29,6 +29,7 @@ from django.db.models import Count, Max, Min, Q
 from django.utils import timezone
 from psycopg2 import extras as psycopg2_extras, sql
 
+from itou.analytics.models import Datum
 from itou.approvals.models import Approval, PoleEmploiApproval
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
@@ -54,7 +55,7 @@ from itou.metabase.tables import (
     selected_jobs,
     siaes,
 )
-from itou.metabase.tables.utils import get_active_siae_pks
+from itou.metabase.tables.utils import MetabaseTable, get_active_siae_pks
 from itou.metabase.utils import chunked_queryset, compose, convert_boolean_to_int
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae, SiaeJobDescription
@@ -73,6 +74,7 @@ class Command(BaseCommand):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.MODE_TO_OPERATION = {
+            "analytics": self.populate_analytics,
             "siaes": self.populate_siaes,
             "job_descriptions": self.populate_job_descriptions,
             "organizations": self.populate_organizations,
@@ -197,6 +199,34 @@ class Command(BaseCommand):
             conn.commit()
 
         drop_old_and_new_tables()
+
+    def populate_analytics(self):
+        AnalyticsTable = MetabaseTable(name="c1_analytics_v0")
+        AnalyticsTable.add_columns(
+            [
+                {"name": "id", "type": "varchar", "comment": "ID du point de mesure", "fn": lambda o: o.pk},
+                {
+                    "name": "type",
+                    "type": "varchar",
+                    "comment": "Type de mesure",
+                    "fn": lambda o: o.code,
+                },
+                {
+                    "name": "date",
+                    "type": "date",
+                    "comment": "Date associée à la mesure",
+                    "fn": lambda o: o.bucket,
+                },
+                {
+                    "name": "value",
+                    "type": "integer",
+                    "comment": "Valeur de la mesure",
+                    "fn": lambda o: o.value,
+                },
+            ]
+        )
+
+        self.populate_table(AnalyticsTable, batch_size=10_000, querysets=[Datum.objects.all()])
 
     def populate_siaes(self):
         ONE_MONTH_AGO = timezone.now() - timezone.timedelta(days=30)

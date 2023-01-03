@@ -17,6 +17,7 @@ mkdir -p $OUTPUT_PATH
 (
     if [[ "$1" == "--daily" ]]; then
         django-admin send_slack_message ":rocket: lancement mise à jour de données C1 -> Metabase"
+        django-admin populate_metabase_emplois --mode=analytics
         django-admin populate_metabase_emplois --mode=siaes
         django-admin populate_metabase_emplois --mode=job_descriptions
         django-admin populate_metabase_emplois --mode=organizations
