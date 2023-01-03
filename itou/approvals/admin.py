@@ -45,10 +45,7 @@ class JobApplicationInline(admin.StackedInline):
     @admin.display(description="SIAE destinataire")
     def to_siae_link(self, obj):
         to_siae_link = reverse("admin:siaes_siae_change", args=[obj.to_siae.pk])
-        return format_html(
-            f"<a href='{to_siae_link}'>{obj.to_siae.display_name}</a> "
-            f"— SIRET : {obj.to_siae.siren}{obj.to_siae.siret_nic}"
-        )
+        return format_html(f"<a href='{to_siae_link}'>{obj.to_siae.display_name}</a> — SIRET : {obj.to_siae.siret}")
 
     # Custom read-only fields as workaround :
     # there is no direct relation between approvals and employee records
