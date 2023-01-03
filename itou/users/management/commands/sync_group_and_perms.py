@@ -16,6 +16,7 @@ def get_permissions_dict():
     # and tooling will help us with refactoring, dead code and models, etc.
     import allauth.account.models as account_models
 
+    import itou.analytics.models as analytics_models
     import itou.approvals.models as approvals_models
     import itou.asp.models as asp_models
     import itou.cities.models as cities_models
@@ -33,6 +34,7 @@ def get_permissions_dict():
     return {
         "itou-admin": {
             account_models.EmailAddress: PERMS_ADD,
+            analytics_models.Datum: PERMS_READ,
             approvals_models.Approval: PERMS_ALL,
             approvals_models.PoleEmploiApproval: PERMS_READ,
             approvals_models.Suspension: PERMS_ALL,
