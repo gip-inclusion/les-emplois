@@ -25,7 +25,9 @@
             </span>
         </div>
         <div class="mt-lg-0 ml-auto d-flex flex-column align-items-end justify-content-center">
-            <span class="badge badge-xs badge-pill badge-accent-02-light text-primary">{{ job.display_contract_type }}</span>
+            {% if job.display_contract_type %}
+                <span class="badge badge-xs badge-pill badge-accent-02-light text-primary">{{ job.display_contract_type }}</span>
+            {% endif %}
             {% if job.hours_per_week %}
                 <span class="badge badge-xs badge-pill badge-accent-02-light text-primary mt-1">
                     {{ job.hours_per_week }}h/semaine
