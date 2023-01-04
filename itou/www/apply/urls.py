@@ -103,11 +103,6 @@ urlpatterns = [
     path("<uuid:job_application_id>/siae/transfer", process_views.transfer, name="transfer"),
     # Variant of accept process (employer does not need an approval)
     path(
-        "<uuid:job_application_id>/siae/accept_without_approval",
-        process_views.accept_without_approval,
-        name="accept_without_approval",
-    ),
-    path(
         "<uuid:job_application_id>/siae/edit_contract_start_date",
         edit_views.edit_contract_start_date,
         name="edit_contract_start_date",
