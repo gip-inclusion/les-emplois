@@ -12,6 +12,7 @@ from freezegun import freeze_time
 from itou.approvals.factories import ApprovalFactory
 from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordFactory
+from itou.institutions.enums import InstitutionKind
 from itou.institutions.factories import InstitutionMembershipFactory
 from itou.job_applications.factories import JobApplicationFactory, JobApplicationSentByPrescriberFactory
 from itou.job_applications.notifications import (
@@ -178,6 +179,13 @@ class DashboardViewTest(TestCase):
                     self.assertContains(response, "Créer/rejoindre une autre structure")
                 else:
                     self.assertNotContains(response, "Créer/rejoindre une autre structure")
+
+    def test_dashboard_dihal_institution_access(self):
+        membershipfactory = InstitutionMembershipFactory(institution__kind=InstitutionKind.DIHAL)
+        self.client.force_login(membershipfactory.user)
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertContains(response, "Voir les données des prescriptions")
+        self.assertContains(response, reverse("stats:stats_dihal_state"))
 
     def test_dashboard_siae_evaluations_institution_access(self):
         membershipfactory = InstitutionMembershipFactory()

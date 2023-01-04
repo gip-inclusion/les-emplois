@@ -424,3 +424,14 @@ def stats_dgefp_af(request):
         "page_title": "Annexes financières actives",
     }
     return render_stats(request=request, context=context)
+
+
+@login_required
+def stats_dihal_state(request):
+    current_org = get_current_institution_or_404(request)
+    if not request.user.can_view_stats_dihal(current_org=current_org):
+        raise PermissionDenied
+    context = {
+        "page_title": "Suivi des prescriptions",
+    }
+    return render_stats(request=request, context=context, params={})

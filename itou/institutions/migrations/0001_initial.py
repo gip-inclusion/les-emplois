@@ -180,6 +180,7 @@ class Migration(migrations.Migration):
                                 "Direction régionale de l'économie, de l'emploi, du travail et des solidarités",
                             ),
                             ("DGEFP", "Délégation générale à l'emploi et à la formation professionnelle"),
+                            ("DIHAL", "Délégation interministérielle à l'hébergement et à l'accès au logement"),
                             ("Autre", "Autre"),
                         ],
                         default="Autre",

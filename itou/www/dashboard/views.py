@@ -93,6 +93,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
 
     context = {
         "job_applications_categories": job_applications_categories,
+        # FIXME(vperron): I think there's a rising need for a revamped permission system.
         "can_create_siae_antenna": request.user.can_create_siae_antenna(parent_siae=current_org),
         "can_show_financial_annexes": can_show_financial_annexes,
         "can_show_employee_records": can_show_employee_records,
@@ -104,6 +105,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "can_view_stats_ddets": request.user.can_view_stats_ddets(current_org=current_org),
         "can_view_stats_dreets": request.user.can_view_stats_dreets(current_org=current_org),
         "can_view_stats_dgefp": request.user.can_view_stats_dgefp(current_org=current_org),
+        "can_view_stats_dihal": request.user.can_view_stats_dihal(current_org=current_org),
         "num_rejected_employee_records": num_rejected_employee_records,
         "active_campaigns": active_campaigns,
         "campaign_in_progress": campaign_in_progress,

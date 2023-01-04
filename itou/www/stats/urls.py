@@ -32,4 +32,6 @@ urlpatterns = [
     path("dgefp/iae", views.stats_dgefp_iae, name="stats_dgefp_iae"),
     path("dgefp/diagnosis_control", views.stats_dgefp_diagnosis_control, name="stats_dgefp_diagnosis_control"),
     path("dgefp/af", views.stats_dgefp_af, name="stats_dgefp_af"),
+    # Institution stats - DIHAL - nation level.
+    path("dihal/state", views.stats_dihal_state, name="stats_dihal_state"),
 ]

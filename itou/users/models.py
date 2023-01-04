@@ -612,6 +612,7 @@ class User(AbstractUser, AddressMixin):
             or self.can_view_stats_ddets(current_org=current_org)
             or self.can_view_stats_dreets(current_org=current_org)
             or self.can_view_stats_dgefp(current_org=current_org)
+            or self.can_view_stats_dihal(current_org=current_org)
         )
 
     def _can_view_stats_siae(self, current_org):
@@ -734,6 +735,13 @@ class User(AbstractUser, AddressMixin):
             self.is_labor_inspector
             and isinstance(current_org, Institution)
             and current_org.kind == InstitutionKind.DGEFP
+        )
+
+    def can_view_stats_dihal(self, current_org):
+        return (
+            self.is_labor_inspector
+            and isinstance(current_org, Institution)
+            and current_org.kind == InstitutionKind.DIHAL
         )
 
     def update_external_data_source_history_field(self, provider, field, value) -> bool:

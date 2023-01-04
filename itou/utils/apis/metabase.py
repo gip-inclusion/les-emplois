@@ -88,6 +88,9 @@ METABASE_DASHBOARDS = {
     "stats_dgefp_af": {
         "dashboard_id": 142,
     },
+    "stats_dihal_state": {
+        "dashboard_id": 235,
+    },
 }
 
 
