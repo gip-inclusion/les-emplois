@@ -121,18 +121,16 @@ class JobsAutocompleteTest(TestCase):
 class CitiesAutocompleteTest(TestCase):
     def test_autocomplete(self):
 
-        create_test_cities(["67"], num_per_department=10)
+        create_test_cities(["01"], num_per_department=10)
 
         url = reverse("autocomplete:cities")
 
-        response = self.client.get(url, {"term": "alte"})
+        response = self.client.get(url, {"term": "sai"})
         assert response.status_code == 200
         expected = [
-            {"value": "Altenheim (67)", "slug": "altenheim-67"},
-            {"value": "Altorf (67)", "slug": "altorf-67"},
-            {"value": "Alteckendorf (67)", "slug": "alteckendorf-67"},
-            {"value": "Albé (67)", "slug": "albe-67"},
-            {"value": "Altwiller (67)", "slug": "altwiller-67"},
+            {"slug": "saint-sulpice-01", "value": "Saint-Sulpice (01)"},
+            {"slug": "saint-genis-pouilly-01", "value": "Saint-Genis-Pouilly (01)"},
+            {"slug": "saint-jean-de-gonville-01", "value": "Saint-Jean-de-Gonville (01)"},
         ]
         assert json.loads(response.content) == expected
 
