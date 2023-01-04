@@ -12,11 +12,7 @@ class EditionModeChoices(models.TextChoices):
 
 
 class City(models.Model):
-    """
-    French cities with geocoding data.
-    Raw data is generated via `django-admin generate_cities`
-    and then imported into DB via `django-admin import_cities`.
-    """
+    """French cities with their geocoding data, synchronized via the sync_cities script regularly."""
 
     DEPARTMENT_CHOICES = DEPARTMENTS.items()
 
