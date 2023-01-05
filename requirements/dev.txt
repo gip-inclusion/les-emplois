@@ -398,9 +398,9 @@ djangorestframework==3.14.0 \
     # via
     #   -r requirements/base.txt
     #   drf-spectacular
-djlint==1.19.7 \
-    --hash=sha256:517b1a2dfb943854abaf8b1ad2117d5c2e699d5916cd2621e24f8669eb564af2 \
-    --hash=sha256:7339b0e2b228655000e6bc5e85adb146e1cdad11a1a29c52c3f1e68707d02d86
+djlint==1.19.10 \
+    --hash=sha256:6ab1883bcb5941b9d32180acdbe02d9b445d467efa8567483dc04d874c9dc441 \
+    --hash=sha256:bc9a7d0dd63af5a29f58a4c5fab232e9f30aed12b860a90728ac5828963299f0
     # via -r requirements/dev.in
 drf-spectacular==0.25.1 \
     --hash=sha256:789696f9845ef2397c52f66154aec6d96411baf6aa09a5d40c5f0b0e99f6b3d8 \
