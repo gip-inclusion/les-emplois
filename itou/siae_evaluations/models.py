@@ -186,6 +186,7 @@ class EvaluationCampaign(models.Model):
                 eligibility_diagnosis__author_siae=F("to_siae"),
                 hiring_start_at__gte=self.evaluated_period_start_at,
                 hiring_start_at__lte=self.evaluated_period_end_at,
+                approval__number__startswith=settings.ASP_ITOU_PREFIX,
             )
         )
 

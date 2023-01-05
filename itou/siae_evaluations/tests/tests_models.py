@@ -213,6 +213,13 @@ class TestEvaluationCampaignManagerEligibleJobApplication:
         diag.save()
         assert [] == list(evaluation_campaign.eligible_job_applications())
 
+    def test_approval_does_not_start_with_itou_prefix(self, campaign_eligible_job_app_objects):
+        evaluation_campaign = EvaluationCampaignFactory()
+        approval = campaign_eligible_job_app_objects["approval"]
+        approval.number = "0123456789"
+        approval.save()
+        assert [] == list(evaluation_campaign.eligible_job_applications())
+
 
 class EvaluationCampaignManagerTest(TestCase):
     def test_first_active_campaign(self):
