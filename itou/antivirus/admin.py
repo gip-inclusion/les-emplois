@@ -23,19 +23,19 @@ class SuspiciousFilter(admin.SimpleListFilter):
 
 @admin.register(Scan)
 class ScanAdmin(admin.ModelAdmin):
-    list_display = ["file_id", "suspicious", "clamav_infected", "clamav_signature", "clamav_completed_at"]
+    list_display = ["file_id", "suspicious", "infected", "clamav_signature", "clamav_completed_at"]
     readonly_fields = ["clamav_completed_at", "clamav_signature"]
-    fields = ["clamav_completed_at", "clamav_signature", "clamav_infected", "comment"]
-    list_filter = [SuspiciousFilter, "clamav_infected", "clamav_completed_at"]
+    fields = ["clamav_completed_at", "clamav_signature", "infected", "comment"]
+    list_filter = [SuspiciousFilter, "infected", "clamav_completed_at"]
     search_fields = ["file__key", "clamav_signature"]
 
     @admin.display(boolean=True, description="à vérifier", ordering="suspicious")
     def suspicious(self, obj):
-        return bool(obj.clamav_infected is None and obj.clamav_signature)
+        return bool(obj.infected is None and obj.clamav_signature)
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        is_suspicious = Case(When(Q(clamav_infected=None) & ~Q(clamav_signature=""), then=True))
+        is_suspicious = Case(When(Q(infected=None) & ~Q(clamav_signature=""), then=True))
         return qs.annotate(suspicious=is_suspicious).order_by(F("suspicious").desc(nulls_last=True), "file_id")
 
     def has_add_permission(self, request):

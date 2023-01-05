@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
                 ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 ("clamav_signature", models.TextField()),
                 ("clamav_completed_at", models.DateTimeField(null=True, verbose_name="analyse ClamAV le")),
-                ("clamav_infected", models.BooleanField(null=True, verbose_name="fichier infecté selon ClamAV")),
+                ("clamav_infected", models.BooleanField(null=True, verbose_name="fichier infecté")),
                 ("comment", models.TextField(blank=True, verbose_name="commentaire")),
                 ("file", models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to="files.file")),
             ],

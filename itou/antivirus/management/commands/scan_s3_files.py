@@ -52,7 +52,7 @@ class Command(BaseCommand):
                             file=file,
                             clamav_completed_at=now,
                             # On conflict, the virus field is not updated. Assume legitimate files.
-                            clamav_infected=file.key in viruses_keys,
+                            infected=file.key in viruses_keys,
                         )
                         for file in files
                     ],
