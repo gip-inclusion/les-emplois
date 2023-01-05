@@ -150,7 +150,9 @@ class PoleEmploiAPIClientTest(TestCase):
             json={"resultats": pole_emploi_api_mocks.API_OFFRES},
         )
         assert self.api_client.offres(natureContrat="FT", range="0-1") == pole_emploi_api_mocks.API_OFFRES
-        respx.get("https://pe.fake/offresdemploi/v2/offres/search?range=100-140").respond(204)
+        respx.get("https://pe.fake/offresdemploi/v2/offres/search?typeContrat=&natureContrat=&range=100-140").respond(
+            204
+        )
         assert self.api_client.offres(range="100-140") == []
 
     @respx.mock
