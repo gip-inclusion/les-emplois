@@ -575,7 +575,7 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
                 user.save()
 
             self.apply_session.set("job_seeker_pk", profile.user.pk)
-            self.job_seeker_session.delete()  # Point of no return
+            self.job_seeker_session.delete()
             url = reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk})
         return HttpResponseRedirect(url)
 
@@ -1181,7 +1181,7 @@ class UpdateJobSeekerStepEndView(UpdateJobSeekerBaseView):
             )
         else:
             self.profile.save()
-            self.job_seeker_session.delete()  # Point of no return
+            self.job_seeker_session.delete()
             url = reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk})
         return HttpResponseRedirect(url)
 
