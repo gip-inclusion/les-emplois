@@ -15,3 +15,5 @@ updates:
     # Only allow updates to the lockfile for pip and
     # ignore any version updates that affect the manifest
     versioning-strategy: lockfile-only
+    # Allow up to 10 concurrent open PRs
+    open-pull-requests-limit: 10
