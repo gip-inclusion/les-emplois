@@ -30,3 +30,12 @@ class IdentityProvider(models.TextChoices):
     FRANCE_CONNECT = "FC", "FranceConnect"
     INCLUSION_CONNECT = "IC", "Inclusion Connect"
     PE_CONNECT = "PEC", "Pôle emploi Connect"
+
+
+class LackOfNIRReason(models.TextChoices):
+    TEMPORARY_NUMBER = "TEMPORARY_NUMBER", "Numéro temporaire (NIA/NTT)"
+    NO_NIR = "NO_NIR", "Pas de numéro de sécurité sociale"
+    NIR_ASSOCIATED_TO_OTHER = (
+        "NIR_ASSOCIATED_TO_OTHER",
+        "Le numéro de sécurité sociale est associé à quelqu'un d'autre",
+    )

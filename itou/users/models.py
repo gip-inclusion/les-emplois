@@ -10,7 +10,7 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MinLengthValidator
 from django.db import models
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.db.models.functions import Upper
 from django.utils import timezone
 from django.utils.crypto import salted_hmac
@@ -40,7 +40,7 @@ from itou.utils import constants as global_constants
 from itou.utils.apis.exceptions import AddressLookupError
 from itou.utils.validators import validate_birthdate, validate_nir, validate_pole_emploi_id
 
-from .enums import IdentityProvider, Title, UserKind
+from .enums import IdentityProvider, LackOfNIRReason, Title, UserKind
 
 
 class ApprovalAlreadyExistsError(Exception):
@@ -236,6 +236,13 @@ class User(AbstractUser, AddressMixin):
         unique=True,
         error_messages={"unique": "Ce numéro de sécurité sociale est déjà associé à un autre utilisateur."},
     )
+    lack_of_nir_reason = models.CharField(
+        verbose_name="Pas de NIR ?",
+        help_text=mark_safe("Indiquez la raison de l'absence de NIR."),
+        max_length=30,
+        choices=LackOfNIRReason.choices,
+        blank=True,
+    )
 
     # The two following Pôle emploi fields are reserved for job seekers.
     # They are used in the process of delivering an approval.
@@ -309,7 +316,16 @@ class User(AbstractUser, AddressMixin):
                 violation_error_message="Seul un utilisateur ITOU_STAFF peut avoir is_staff ou is_superuser de vrai.",
                 check=models.Q(~models.Q(kind=UserKind.ITOU_STAFF) & models.Q(is_staff=False, is_superuser=False))
                 | models.Q(kind=UserKind.ITOU_STAFF, is_staff=True),
-            )
+            ),
+            # Make sure that if you have a lack_of_nir_reason value, you cannot have a nir value
+            # (but we'll have a lot of users lacking both nir & lack_of_nir_reason values)
+            models.CheckConstraint(
+                check=Q(lack_of_nir_reason="") | Q(nir__isnull=True),
+                name="user_lack_of_nir_reason_or_nir",
+                violation_error_message=(
+                    "Un utilisateur ayant un NIR ne peut avoir un motif justifiant l'absence de son NIR."
+                ),
+            ),
         ]
 
     def __str__(self):
