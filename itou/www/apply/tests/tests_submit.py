@@ -213,6 +213,7 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
         # ----------------------------------------------------------------------
         response = self.client.get(next_url)
         assert response.status_code == 200
+        self.assertContains(response, "Envoyer la candidature")
 
         # Test fields mandatory to upload to S3
         s3_upload = S3Upload(kind="resume")
@@ -1485,6 +1486,7 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
         # ----------------------------------------------------------------------
         response = self.client.get(next_url)
         assert response.status_code == 200
+        self.assertContains(response, "Enregistrer")
 
         # Test fields mandatory to upload to S3
         s3_upload = S3Upload(kind="resume")

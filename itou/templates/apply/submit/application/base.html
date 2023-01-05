@@ -104,7 +104,7 @@
                             {% buttons %}
                                 <div class="text-right">
                                     {% if back_url %}<a class="btn btn-link" href="{{ back_url }}">Retour</a>{% endif %}
-                                    <button type="submit" class="btn btn-primary">Suivant</button>
+                                    {% block form_submit_button %}<button type="submit" class="btn btn-primary">Suivant</button>{% endblock %}
                                 </div>
                             {% endbuttons %}
                         </form>

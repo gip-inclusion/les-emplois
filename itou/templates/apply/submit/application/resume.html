@@ -174,3 +174,11 @@
         });
     </script>
 {% endblock %}
+
+{% block form_submit_button %}
+    {% if request.user.is_siae_staff %}
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+    {% else %}
+        <button type="submit" class="btn btn-primary">Envoyer la candidature</button>
+    {% endif %}
+{% endblock %}
