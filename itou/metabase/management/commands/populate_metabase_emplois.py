@@ -37,6 +37,7 @@ from itou.jobs.models import Rome
 from itou.metabase.dataframes import get_df_from_rows, store_df
 from itou.metabase.db import build_final_tables, populate_table
 from itou.metabase.tables import (
+    analytics,
     approvals,
     insee_codes,
     job_applications,
@@ -47,7 +48,7 @@ from itou.metabase.tables import (
     selected_jobs,
     siaes,
 )
-from itou.metabase.tables.utils import MetabaseTable, get_active_siae_pks
+from itou.metabase.tables.utils import get_active_siae_pks
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae, SiaeJobDescription
 from itou.users.models import User
@@ -84,32 +85,7 @@ class Command(BaseCommand):
         parser.add_argument("--mode", action="store", dest="mode", type=str, choices=self.MODE_TO_OPERATION.keys())
 
     def populate_analytics(self):
-        AnalyticsTable = MetabaseTable(name="c1_analytics_v0")
-        AnalyticsTable.add_columns(
-            [
-                {"name": "id", "type": "varchar", "comment": "ID du point de mesure", "fn": lambda o: o.pk},
-                {
-                    "name": "type",
-                    "type": "varchar",
-                    "comment": "Type de mesure",
-                    "fn": lambda o: o.code,
-                },
-                {
-                    "name": "date",
-                    "type": "date",
-                    "comment": "Date associée à la mesure",
-                    "fn": lambda o: o.bucket,
-                },
-                {
-                    "name": "value",
-                    "type": "integer",
-                    "comment": "Valeur de la mesure",
-                    "fn": lambda o: o.value,
-                },
-            ]
-        )
-
-        populate_table(AnalyticsTable, batch_size=10_000, querysets=[Datum.objects.all()])
+        populate_table(analytics.AnalyticsTable, batch_size=10_000, querysets=[Datum.objects.all()])
 
     def populate_siaes(self):
         ONE_MONTH_AGO = timezone.now() - timezone.timedelta(days=30)
