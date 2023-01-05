@@ -8,7 +8,7 @@ class Scan(models.Model):
     file = models.OneToOneField(File, on_delete=models.CASCADE)
     clamav_signature = models.TextField()
     clamav_completed_at = models.DateTimeField(null=True, verbose_name="analyse ClamAV le")
-    clamav_infected = models.BooleanField(null=True, verbose_name="fichier infecté selon ClamAV")
+    infected = models.BooleanField(null=True, verbose_name="fichier infecté")
     comment = models.TextField(blank=True, verbose_name="commentaire")
 
     class Meta:
@@ -17,6 +17,6 @@ class Scan(models.Model):
 
     def __str__(self):
         text = f"{capfirst(self._meta.verbose_name)} {self.file_id}"
-        if self.clamav_infected:
+        if self.infected:
             text = f"[VIRUS] {text}"
         return text
