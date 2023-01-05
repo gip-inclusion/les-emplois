@@ -20,14 +20,12 @@ We maintain a google sheet with extensive documentation about all tables and fie
 Its name is "Documentation ITOU METABASE [Master doc]". No direct link here for safety reasons.
 """
 
-import gc
 from collections import OrderedDict
 
 import tenacity
 from django.core.management.base import BaseCommand
 from django.db.models import Count, Max, Min, Q
 from django.utils import timezone
-from psycopg2 import extras as psycopg2_extras, sql
 
 from itou.analytics.models import Datum
 from itou.approvals.models import Approval, PoleEmploiApproval
@@ -37,13 +35,7 @@ from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.jobs.models import Rome
 from itou.metabase.dataframes import get_df_from_rows, store_df
-from itou.metabase.db import (
-    MetabaseDatabaseCursor,
-    build_final_tables,
-    create_table,
-    get_new_table_name,
-    get_old_table_name,
-)
+from itou.metabase.db import build_final_tables, populate_table
 from itou.metabase.tables import (
     approvals,
     insee_codes,
@@ -56,7 +48,6 @@ from itou.metabase.tables import (
     siaes,
 )
 from itou.metabase.tables.utils import MetabaseTable, get_active_siae_pks
-from itou.metabase.utils import chunked_queryset, compose, convert_boolean_to_int
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae, SiaeJobDescription
 from itou.users.models import User
@@ -92,114 +83,6 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--mode", action="store", dest="mode", type=str, choices=self.MODE_TO_OPERATION.keys())
 
-    def populate_table(self, table, batch_size, querysets=None, extra_object=None):
-        """
-        About commits: a single final commit freezes the itou-metabase-db temporarily, making
-        our GUI unable to connect to the db during this commit.
-
-        This is why we instead do small and frequent commits, so that the db stays available
-        throughout the script.
-
-        Note that psycopg2 will always automatically open a new transaction when none is open.
-        Thus it will open a new one after each such commit.
-        """
-
-        table_name = table.name
-        new_table_name = get_new_table_name(table_name)
-        old_table_name = get_old_table_name(table_name)
-
-        def drop_old_and_new_tables():
-            with MetabaseDatabaseCursor() as (cur, conn):
-                cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(new_table_name)))
-                cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(old_table_name)))
-                conn.commit()
-
-        drop_old_and_new_tables()
-
-        total_rows = sum([queryset.count() for queryset in querysets])
-
-        table.add_columns(
-            [
-                {
-                    "name": "date_mise_à_jour_metabase",
-                    "type": "date",
-                    "comment": "Date de dernière mise à jour de Metabase",
-                    # As metabase daily updates run typically every night after midnight, the last day with
-                    # complete data is yesterday, not today.
-                    "fn": lambda o: timezone.now() + timezone.timedelta(days=-1),
-                },
-            ]
-        )
-
-        # Transform boolean fields into 0-1 integer fields as
-        # metabase cannot sum or average boolean columns ¯\_(ツ)_/¯
-        for c in table.columns:
-            if c["type"] == "boolean":
-                c["type"] = "integer"
-                c["fn"] = compose(convert_boolean_to_int, c["fn"])
-
-        self.stdout.write(f"Injecting {total_rows} rows with {len(table.columns)} columns into table {table_name}:")
-
-        create_table(new_table_name, [(c["name"], c["type"]) for c in table.columns])
-
-        with MetabaseDatabaseCursor() as (cur, conn):
-
-            def inject_chunk(table_columns, chunk, new_table_name):
-                insert_query = sql.SQL("insert into {new_table_name} ({fields}) values %s").format(
-                    new_table_name=sql.Identifier(new_table_name),
-                    fields=sql.SQL(",").join(
-                        [sql.Identifier(c["name"]) for c in table_columns],
-                    ),
-                )
-                dataset = [[c["fn"](o) for c in table_columns] for o in chunk]
-                psycopg2_extras.execute_values(cur, insert_query, dataset, template=None)
-                conn.commit()
-
-            # Add comments on table columns.
-            for c in table.columns:
-                assert set(c.keys()) == {"name", "type", "comment", "fn"}
-                column_name = c["name"]
-                column_comment = c["comment"]
-                comment_query = sql.SQL("comment on column {new_table_name}.{column_name} is {column_comment}").format(
-                    new_table_name=sql.Identifier(new_table_name),
-                    column_name=sql.Identifier(column_name),
-                    column_comment=sql.Literal(column_comment),
-                )
-                cur.execute(comment_query)
-
-            conn.commit()
-
-            if extra_object:
-                inject_chunk(table_columns=table.columns, chunk=[extra_object], new_table_name=new_table_name)
-
-            written_rows = 0
-            for queryset in querysets:
-                # Insert rows by batch of batch_size.
-                # A bigger number makes the script faster until a certain point,
-                # but it also increases RAM usage.
-                for chunk_qs in chunked_queryset(queryset, chunk_size=batch_size):
-                    inject_chunk(table_columns=table.columns, chunk=chunk_qs, new_table_name=new_table_name)
-                    written_rows += chunk_qs.count()
-                    self.stdout.write(f"count={written_rows} of total={total_rows} written")
-
-                # Trigger garbage collection to optimize memory use.
-                gc.collect()
-
-            # Swap new and old table nicely to minimize downtime.
-            cur.execute(
-                sql.SQL("ALTER TABLE IF EXISTS {} RENAME TO {}").format(
-                    sql.Identifier(table_name), sql.Identifier(old_table_name)
-                )
-            )
-            cur.execute(
-                sql.SQL("ALTER TABLE {} RENAME TO {}").format(
-                    sql.Identifier(new_table_name), sql.Identifier(table_name)
-                )
-            )
-            conn.commit()
-
-        drop_old_and_new_tables()
-
     def populate_analytics(self):
         AnalyticsTable = MetabaseTable(name="c1_analytics_v0")
         AnalyticsTable.add_columns(
@@ -226,7 +109,7 @@ class Command(BaseCommand):
             ]
         )
 
-        self.populate_table(AnalyticsTable, batch_size=10_000, querysets=[Datum.objects.all()])
+        populate_table(AnalyticsTable, batch_size=10_000, querysets=[Datum.objects.all()])
 
     def populate_siaes(self):
         ONE_MONTH_AGO = timezone.now() - timezone.timedelta(days=30)
@@ -294,7 +177,7 @@ class Command(BaseCommand):
             .all()
         )
 
-        self.populate_table(siaes.TABLE, batch_size=100, querysets=[queryset])
+        populate_table(siaes.TABLE, batch_size=100, querysets=[queryset])
 
     def populate_job_descriptions(self):
         queryset = (
@@ -307,7 +190,7 @@ class Command(BaseCommand):
             .all()
         )
 
-        self.populate_table(job_descriptions.TABLE, batch_size=10_000, querysets=[queryset])
+        populate_table(job_descriptions.TABLE, batch_size=10_000, querysets=[queryset])
 
     def populate_organizations(self):
         """
@@ -353,7 +236,7 @@ class Command(BaseCommand):
             .all()
         )
 
-        self.populate_table(
+        populate_table(
             organizations.TABLE,
             batch_size=100,
             querysets=[queryset],
@@ -389,7 +272,7 @@ class Command(BaseCommand):
             .all()
         )
 
-        self.populate_table(job_applications.TABLE, batch_size=1000, querysets=[queryset])
+        populate_table(job_applications.TABLE, batch_size=1000, querysets=[queryset])
 
     def populate_selected_jobs(self):
         """
@@ -401,7 +284,7 @@ class Command(BaseCommand):
             .values("pk", "selected_jobs__id")
         )
 
-        self.populate_table(selected_jobs.TABLE, batch_size=10_000, querysets=[queryset])
+        populate_table(selected_jobs.TABLE, batch_size=10_000, querysets=[queryset])
 
     def populate_approvals(self):
         """
@@ -418,7 +301,7 @@ class Command(BaseCommand):
             start_at__gte=approvals.POLE_EMPLOI_APPROVAL_MINIMUM_START_DATE
         ).all()
 
-        self.populate_table(approvals.TABLE, batch_size=1000, querysets=[queryset1, queryset2])
+        populate_table(approvals.TABLE, batch_size=1000, querysets=[queryset1, queryset2])
 
     def populate_job_seekers(self):
         """
@@ -440,17 +323,17 @@ class Command(BaseCommand):
             .all()
         )
 
-        self.populate_table(job_seekers.TABLE, batch_size=1000, querysets=[queryset])
+        populate_table(job_seekers.TABLE, batch_size=1000, querysets=[queryset])
 
     def populate_rome_codes(self):
         queryset = Rome.objects.all()
 
-        self.populate_table(rome_codes.TABLE, batch_size=1000, querysets=[queryset])
+        populate_table(rome_codes.TABLE, batch_size=1000, querysets=[queryset])
 
     def populate_insee_codes(self):
         queryset = City.objects.all()
 
-        self.populate_table(insee_codes.TABLE, batch_size=1000, querysets=[queryset])
+        populate_table(insee_codes.TABLE, batch_size=1000, querysets=[queryset])
 
     def populate_departments(self):
         table_name = "departements"
