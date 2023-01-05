@@ -31,7 +31,7 @@ from itou.prescribers.factories import (
 )
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory
-from itou.users.enums import IdentityProvider, Title, UserKind
+from itou.users.enums import IdentityProvider, LackOfNIRReason, Title, UserKind
 from itou.users.factories import (
     ItouStaffFactory,
     JobSeekerFactory,
@@ -798,6 +798,20 @@ class ModelTest(TestCase):
 
         labor_inspector = LaborInspectorFactory()
         assert "inspecteur du travail" == labor_inspector.get_kind_display()
+
+    def test_constraint_user_lack_of_nir_reason_or_nir(self):
+        no_nir_user = JobSeekerFactory(nir=None)
+        # This works
+        assert no_nir_user.nir is None
+        no_nir_user.lack_of_nir_reason = LackOfNIRReason.TEMPORARY_NUMBER
+        no_nir_user.save()
+
+        user = JobSeekerFactory()
+        # This doesn't
+        assert user.nir
+        user.lack_of_nir_reason = LackOfNIRReason.TEMPORARY_NUMBER
+        with pytest.raises(IntegrityError):
+            user.save()
 
 
 def mock_get_geocoding_data(address, post_code=None, limit=1):

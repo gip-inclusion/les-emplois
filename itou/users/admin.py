@@ -191,6 +191,7 @@ class ItouUserAdmin(UserAdmin):
                     "address_in_qpv",
                     "kind",
                     "nir",
+                    "lack_of_nir_reason",
                     "pole_emploi_id",
                     "lack_of_pole_emploi_id_reason",
                     "created_by",
