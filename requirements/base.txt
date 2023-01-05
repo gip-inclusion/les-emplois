@@ -219,9 +219,9 @@ django-filter==22.1 \
     --hash=sha256:ed429e34760127e3520a67f415bec4c905d4649fbe45d0d6da37e6ff5e0287eb \
     --hash=sha256:ed473b76e84f7e83b2511bb2050c3efb36d135207d0128dfe3ae4b36e3594ba5
     # via -r requirements/base.in
-django-hijack==3.2.5 \
-    --hash=sha256:c82b93ab5a4bc895ae6ed636e6f60a44d3a3b029d59334258f8e8b7869b48de8 \
-    --hash=sha256:f011e70b7b8aeb399258a7efb4326e4e300ac1094bef91bf43044f82d3496241
+django-hijack==3.2.6 \
+    --hash=sha256:a6df02875c6a653eeb2c0768391587c3ffe711613b8f6cd9e56b9ba62f0b44d9 \
+    --hash=sha256:c453d9d37208d7cd78f9b679831ec60ff03160c88bb87e9ac1f49e5c4ada3874
     # via -r requirements/base.in
 django-htmx==1.13.0 \
     --hash=sha256:781a59376d769aa28302619e73d37d481a125ab155d9fdd7fb17f10e7d25f352 \
