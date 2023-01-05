@@ -10,6 +10,8 @@ from django.db import IntegrityError
 from django.urls import reverse
 from django.utils import dateformat, timezone
 
+from itou.approvals.factories import ApprovalFactory
+from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.factories import InstitutionFactory, InstitutionWith2MembershipFactory
@@ -127,6 +129,91 @@ class EvaluationCampaignQuerySetTest(TestCase):
         assert 1 == EvaluationCampaign.objects.in_progress().count()
 
 
+@pytest.fixture
+def campaign_eligible_job_app_objects():
+    siae = SiaeWith2MembershipsFactory(department="14")
+    job_seeker = JobSeekerFactory()
+    approval = ApprovalFactory(user=job_seeker)
+    diag = EligibilityDiagnosisFactory(
+        job_seeker=job_seeker,
+        author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
+        author_siae=siae,
+        author=siae.members.first(),
+    )
+    job_app = JobApplicationFactory(
+        job_seeker=job_seeker,
+        approval=approval,
+        to_siae=siae,
+        sender_siae=siae,
+        eligibility_diagnosis=diag,
+        hiring_start_at=timezone.now() - relativedelta(months=2),
+        state=JobApplicationWorkflow.STATE_ACCEPTED,
+    )
+    return {
+        "approval": approval,
+        "diag": diag,
+        "job_app": job_app,
+        "siae": siae,
+    }
+
+
+class TestEvaluationCampaignManagerEligibleJobApplication:
+    def test_eligible_job_application(self, campaign_eligible_job_app_objects):
+        evaluation_campaign = EvaluationCampaignFactory()
+        job_app = campaign_eligible_job_app_objects["job_app"]
+        assert [job_app] == list(evaluation_campaign.eligible_job_applications())
+
+    def test_no_approval(self, campaign_eligible_job_app_objects):
+        evaluation_campaign = EvaluationCampaignFactory()
+        job_app = campaign_eligible_job_app_objects["job_app"]
+        job_app.approval = None
+        job_app.save()
+        assert [] == list(evaluation_campaign.eligible_job_applications())
+
+    def test_outside_institution_department(self, campaign_eligible_job_app_objects):
+        evaluation_campaign = EvaluationCampaignFactory()
+        siae = campaign_eligible_job_app_objects["siae"]
+        siae.department = 12
+        siae.save()
+        assert [] == list(evaluation_campaign.eligible_job_applications())
+
+    @pytest.mark.parametrize("kind", [k for k in SiaeKind if k not in evaluation_enums.EvaluationSiaesKind.Evaluable])
+    def test_siae_not_eligible_kind(self, kind, campaign_eligible_job_app_objects):
+        evaluation_campaign = EvaluationCampaignFactory()
+        siae = campaign_eligible_job_app_objects["siae"]
+        siae.kind = kind
+        siae.save()
+        assert [] == list(evaluation_campaign.eligible_job_applications())
+
+    def test_job_application_not_accepted(self, campaign_eligible_job_app_objects):
+        evaluation_campaign = EvaluationCampaignFactory()
+        job_app = campaign_eligible_job_app_objects["job_app"]
+        job_app.state = JobApplicationWorkflow.STATE_REFUSED
+        job_app.save()
+        assert [] == list(evaluation_campaign.eligible_job_applications())
+
+    def test_job_application_not_in_period(self, campaign_eligible_job_app_objects):
+        evaluation_campaign = EvaluationCampaignFactory()
+        job_app = campaign_eligible_job_app_objects["job_app"]
+        job_app.hiring_start_at = timezone.now() - relativedelta(months=10)
+        job_app.save()
+        assert [] == list(evaluation_campaign.eligible_job_applications())
+
+    def test_eligibility_diag_not_made_by_siae_staff(self, campaign_eligible_job_app_objects):
+        evaluation_campaign = EvaluationCampaignFactory()
+        diag = campaign_eligible_job_app_objects["diag"]
+        diag.author_kind = EligibilityDiagnosis.AUTHOR_KIND_PRESCRIBER
+        diag.save()
+        assert [] == list(evaluation_campaign.eligible_job_applications())
+
+    def test_eligibility_diag_made_by_another_siae(self, campaign_eligible_job_app_objects):
+        evaluation_campaign = EvaluationCampaignFactory()
+        diag = campaign_eligible_job_app_objects["diag"]
+        diag.author_siae = SiaeFactory()
+        diag.save()
+        assert [] == list(evaluation_campaign.eligible_job_applications())
+
+
 class EvaluationCampaignManagerTest(TestCase):
     def test_first_active_campaign(self):
         institution = InstitutionFactory()
@@ -199,113 +286,6 @@ class EvaluationCampaignManagerTest(TestCase):
         assert len(email.to) == 2
         email = mail.outbox[1]
         assert len(email.to) == 2
-
-    def test_eligible_job_applications(self):
-        evaluation_campaign = EvaluationCampaignFactory()
-        siae = SiaeFactory(department="14")
-        siae2 = SiaeFactory(department="14")
-
-        # Job Application without approval
-        JobApplicationFactory(
-            with_approval=True,
-            to_siae=siae,
-            sender_siae=siae,
-            hiring_start_at=timezone.now() - relativedelta(months=2),
-        )
-        assert 0 == len(evaluation_campaign.eligible_job_applications())
-
-        # Job Application outside institution department
-        siae12 = SiaeFactory(department="12")
-        JobApplicationFactory(
-            with_approval=True,
-            to_siae=siae12,
-            sender_siae=siae,
-            eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
-            eligibility_diagnosis__author_siae=siae,
-            hiring_start_at=timezone.now() - relativedelta(months=2),
-        )
-
-        assert 0 == len(evaluation_campaign.eligible_job_applications())
-
-        # Job Application not eligible kind
-        for kind in [k for k in SiaeKind if k not in evaluation_enums.EvaluationSiaesKind.Evaluable]:
-            with self.subTest(kind=kind):
-                siae_wrong_kind = SiaeFactory(department="14", kind=kind)
-                JobApplicationFactory(
-                    with_approval=True,
-                    to_siae=siae_wrong_kind,
-                    sender_siae=siae_wrong_kind,
-                    eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
-                    eligibility_diagnosis__author_siae=siae_wrong_kind,
-                    hiring_start_at=timezone.now() - relativedelta(months=2),
-                )
-                assert 0 == len(evaluation_campaign.eligible_job_applications())
-
-        # Job Application not accepted
-        JobApplicationFactory(
-            with_approval=True,
-            to_siae=siae,
-            sender_siae=siae,
-            eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
-            eligibility_diagnosis__author_siae=siae,
-            hiring_start_at=timezone.now() - relativedelta(months=2),
-            state=JobApplicationWorkflow.STATE_REFUSED,
-        )
-        assert 0 == len(evaluation_campaign.eligible_job_applications())
-
-        # Job Application not in period
-        JobApplicationFactory(
-            with_approval=True,
-            to_siae=siae,
-            sender_siae=siae,
-            eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
-            eligibility_diagnosis__author_siae=siae,
-            hiring_start_at=timezone.now() - relativedelta(months=10),
-        )
-        assert 0 == len(evaluation_campaign.eligible_job_applications())
-
-        # Eligibility Diagnosis not made by Siae_staff
-        JobApplicationFactory(
-            with_approval=True,
-            to_siae=siae,
-            sender_siae=siae,
-            eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_PRESCRIBER,
-            eligibility_diagnosis__author_siae=siae,
-            hiring_start_at=timezone.now() - relativedelta(months=2),
-        )
-        assert 0 == len(evaluation_campaign.eligible_job_applications())
-
-        # Eligibility Diagnosis made by an other siae (not the on of the job application)
-        JobApplicationFactory(
-            with_approval=True,
-            to_siae=siae,
-            sender_siae=siae,
-            eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
-            eligibility_diagnosis__author_siae=siae2,
-            hiring_start_at=timezone.now() - relativedelta(months=2),
-        )
-        assert 0 == len(evaluation_campaign.eligible_job_applications())
-
-        # the eligible job application
-        JobApplicationFactory(
-            with_approval=True,
-            to_siae=siae,
-            sender_siae=siae,
-            eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
-            eligibility_diagnosis__author_siae=siae,
-            hiring_start_at=timezone.now() - relativedelta(months=2),
-        )
-        assert (
-            JobApplication.objects.filter(
-                to_siae=siae,
-                sender_siae=siae,
-                eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
-                eligibility_diagnosis__author_siae=siae,
-                hiring_start_at=timezone.now() - relativedelta(months=2),
-            )[0]
-            == evaluation_campaign.eligible_job_applications()[0]
-        )
-        assert 1 == len(evaluation_campaign.eligible_job_applications())
 
     def test_eligible_siaes(self):
 
