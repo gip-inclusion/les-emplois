@@ -137,12 +137,8 @@ def test_populate_job_seekers():
     num_queries += 1  # Select all elements ids (chunked_queryset)
     num_queries += 1  # Select last pk for current chunck
     num_queries += 1  # Select job seekers chunck (with annotations)
-    num_queries += 1  # Prefetch EligibilityDiagnosis
-    num_queries += 1  # Prefetch AdministrativeCriteria (eligibility_diagnoses__administrative_criteria)
-    num_queries += 1  # Prefetch PrescriberOrganisation (eligibility_diagnoses__author_prescriber_organization)
-    num_queries += 1  # Prefetch Siae (eligibility_diagnoses__author_siae)
-    num_queries += 1  # Prefetch JobApplications
-    num_queries += 1  # Prefetch Siae (job_applications__to_siae)
+    num_queries += 1  # Prefetch EligibilityDiagnosis with anotations, author_prescriber_organization and author_siae
+    num_queries += 1  # Prefetch JobApplications with Siaes
     num_queries += 1  # Prefetch created_by Users
     num_queries += 1  # Get QPV users
     num_queries += 1  # Select AI stock approvals pks

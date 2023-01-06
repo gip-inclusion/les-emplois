@@ -23,14 +23,16 @@ Its name is "Documentation ITOU METABASE [Master doc]". No direct link here for 
 from collections import OrderedDict
 
 import tenacity
+from django.contrib.postgres.aggregates import ArrayAgg
 from django.core.management.base import BaseCommand
-from django.db.models import Count, Max, Min, Q
+from django.db.models import Count, Max, Min, Prefetch, Q
 from django.utils import timezone
 
 from itou.analytics.models import Datum
 from itou.approvals.models import Approval, PoleEmploiApproval
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
+from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.jobs.models import Rome
@@ -288,13 +290,43 @@ class Command(BaseCommand):
         queryset = (
             User.objects.filter(is_job_seeker=True)
             .prefetch_related(
-                "eligibility_diagnoses",
-                "eligibility_diagnoses__administrative_criteria",
-                "eligibility_diagnoses__author_prescriber_organization",
-                "eligibility_diagnoses__author_siae",
-                "job_applications",
-                "job_applications__to_siae",
+                Prefetch(
+                    "eligibility_diagnoses",
+                    queryset=(
+                        EligibilityDiagnosis.objects.select_related(
+                            "author_prescriber_organization",
+                            "author_siae",
+                        ).annotate(
+                            level_1_count=Count(
+                                "administrative_criteria",
+                                filter=Q(administrative_criteria__level=AdministrativeCriteria.Level.LEVEL_1),
+                            ),
+                            level_2_count=Count(
+                                "administrative_criteria",
+                                filter=Q(administrative_criteria__level=AdministrativeCriteria.Level.LEVEL_2),
+                            ),
+                            criteria_ids=ArrayAgg("administrative_criteria__pk"),
+                        )
+                        # TODO Django in 4.2 : Slice here with [:1]
+                        .order_by("-created_at")
+                    ),
+                    # TODO Django in 4.2 : rename to last_eligibility_diagnosis
+                    to_attr="sorted_eligibility_diagnoses",
+                ),
+                Prefetch(
+                    "job_applications",
+                    queryset=JobApplication.objects.select_related("to_siae"),
+                ),
                 "created_by",
+            )
+            .annotate(
+                eligibility_diagnoses_count=Count("eligibility_diagnoses", distinct=True),
+                job_applications_count=Count("job_applications", distinct=True),
+                accepted_job_applications_count=Count(
+                    "job_applications",
+                    filter=Q(job_applications__state=JobApplicationWorkflow.STATE_ACCEPTED),
+                    distinct=True,
+                ),
             )
             .all()
         )
