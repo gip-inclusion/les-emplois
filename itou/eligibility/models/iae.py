@@ -1,4 +1,3 @@
-import datetime
 import logging
 
 from dateutil.relativedelta import relativedelta
@@ -8,32 +7,25 @@ from django.db.models import Exists, OuterRef
 from django.utils import timezone
 
 from itou.approvals.models import Approval
-from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF
+from itou.eligibility.enums import AdministrativeCriteriaLevel, AuthorKind
+
+from .common import (
+    AbstractAdministrativeCriteria,
+    AbstractEligibilityDiagnosisModel,
+    AdministrativeCriteriaQuerySet,
+    CommonEligibilityDiagnosisQuerySet,
+)
 
 
 logger = logging.getLogger(__name__)
 
 
-class EligibilityDiagnosisQuerySet(models.QuerySet):
-    def valid(self):
-        return self.filter(expires_at__gt=timezone.now())
-
-    def expired(self):
-        return self.filter(expires_at__lte=timezone.now())
-
+class EligibilityDiagnosisQuerySet(CommonEligibilityDiagnosisQuerySet):
     def authored_by_siae(self, for_siae):
         return self.filter(author_siae=for_siae)
 
-    def before(self, before):
-        if isinstance(before, datetime.date):
-            return self.filter(created_at__date__lt=before)
-        return self.filter(created_at__lt=before)
-
-    def by_author_kind_prescriber(self):
-        return self.filter(author_kind=self.model.AUTHOR_KIND_PRESCRIBER)
-
     def by_author_kind_prescriber_or_siae(self, for_siae):
-        return self.filter(models.Q(author_kind=self.model.AUTHOR_KIND_PRESCRIBER) | models.Q(author_siae=for_siae))
+        return self.filter(models.Q(author_kind=AuthorKind.PRESCRIBER) | models.Q(author_siae=for_siae))
 
     def for_job_seeker(self, job_seeker):
         return self.filter(job_seeker=job_seeker).select_related(
@@ -126,44 +118,22 @@ class EligibilityDiagnosisManager(models.Manager):
         return last
 
 
-class EligibilityDiagnosis(models.Model):
+class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
     """
-    Store the eligibility diagnosis of a job seeker.
+    Store the eligibility diagnosis (IAE) of a job seeker.
     """
 
-    AUTHOR_KIND_PRESCRIBER = KIND_PRESCRIBER
-    AUTHOR_KIND_SIAE_STAFF = KIND_SIAE_STAFF
-
-    AUTHOR_KIND_CHOICES = (
-        (AUTHOR_KIND_PRESCRIBER, "Prescripteur"),
-        (AUTHOR_KIND_SIAE_STAFF, "Employeur (SIAE)"),
-    )
-
-    EXPIRATION_DELAY_MONTHS = 6
-
+    # Not in abstract model to avoid 'related_name' clashing (and ugly auto-naming)
     job_seeker = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="Demandeur d'emploi",
         on_delete=models.CASCADE,
         related_name="eligibility_diagnoses",
     )
-    author = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        verbose_name="Auteur",
-        on_delete=models.CASCADE,
-        related_name="eligibility_diagnoses_made",
-    )
-    author_kind = models.CharField(
-        verbose_name="Type de l'auteur", max_length=10, choices=AUTHOR_KIND_CHOICES, default=AUTHOR_KIND_PRESCRIBER
-    )
     # When the author is an SIAE staff member, keep a track of his current SIAE.
     author_siae = models.ForeignKey(
-        "siaes.Siae", verbose_name="SIAE de l'auteur", null=True, blank=True, on_delete=models.CASCADE
-    )
-    # When the author is a prescriber, keep a track of his current organization.
-    author_prescriber_organization = models.ForeignKey(
-        "prescribers.PrescriberOrganization",
-        verbose_name="Organisation du prescripteur de l'auteur",
+        "siaes.Siae",
+        verbose_name="SIAE de l'auteur",
         null=True,
         blank=True,
         on_delete=models.CASCADE,
@@ -176,29 +146,12 @@ class EligibilityDiagnosis(models.Model):
         blank=True,
     )
 
-    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now, db_index=True)
-    updated_at = models.DateTimeField(verbose_name="Date de modification", blank=True, null=True, db_index=True)
-    expires_at = models.DateTimeField(verbose_name="Date d'expiration", db_index=True)
-
     objects = EligibilityDiagnosisManager.from_queryset(EligibilityDiagnosisQuerySet)()
 
     class Meta:
-        verbose_name = "Diagnostic d'éligibilité"
-        verbose_name_plural = "Diagnostics d'éligibilité"
+        verbose_name = "Diagnostic d'éligibilité IAE"
+        verbose_name_plural = "Diagnostics d'éligibilité IAE"
         ordering = ["-created_at"]
-
-    def __str__(self):
-        return str(self.id)
-
-    def save(self, *args, **kwargs):
-        self.updated_at = timezone.now()
-        if not self.expires_at:
-            self.expires_at = self.created_at + relativedelta(months=self.EXPIRATION_DELAY_MONTHS)
-        return super().save(*args, **kwargs)
-
-    @property
-    def is_valid(self):
-        return self.expires_at and self.expires_at > timezone.now()
 
     @property
     def author_organization(self):
@@ -266,18 +219,7 @@ class EligibilityDiagnosis(models.Model):
         return new_eligibility_diagnosis
 
 
-class AdministrativeCriteriaQuerySet(models.QuerySet):
-    def level1(self):
-        return self.filter(level=AdministrativeCriteria.Level.LEVEL_1)
-
-    def level2(self):
-        return self.filter(level=AdministrativeCriteria.Level.LEVEL_2)
-
-    def for_job_application(self, job_application):
-        return self.filter(eligibilitydiagnosis__jobapplication=job_application)
-
-
-class AdministrativeCriteria(models.Model):
+class AdministrativeCriteria(AbstractAdministrativeCriteria):
     """
     List of administrative criteria.
     They can be created and updated using the admin.
@@ -290,11 +232,13 @@ class AdministrativeCriteria(models.Model):
 
     MAX_UI_RANK = 32767
 
-    class Level(models.TextChoices):
-        LEVEL_1 = "1", "Niveau 1"
-        LEVEL_2 = "2", "Niveau 2"
+    level = models.CharField(
+        verbose_name="Niveau",
+        max_length=1,
+        choices=AdministrativeCriteriaLevel.choices,
+        default=AdministrativeCriteriaLevel.LEVEL_1,
+    )
 
-    level = models.CharField(verbose_name="Niveau", max_length=1, choices=Level.choices, default=Level.LEVEL_1)
     name = models.CharField(verbose_name="Nom", max_length=255)
     desc = models.CharField(verbose_name="Description", max_length=255, blank=True)
     written_proof = models.CharField(verbose_name="Justificatif", max_length=255, blank=True)
@@ -315,16 +259,9 @@ class AdministrativeCriteria(models.Model):
     objects = models.Manager.from_queryset(AdministrativeCriteriaQuerySet)()
 
     class Meta:
-        verbose_name = "Critère administratif"
-        verbose_name_plural = "Critères administratifs"
+        verbose_name = "Critère administratif IAE"
+        verbose_name_plural = "Critères administratifs IAE"
         ordering = ["level", "ui_rank"]
-
-    def __str__(self):
-        return f"{self.name} - {self.get_level_display()}"
-
-    @property
-    def key(self):
-        return f"level_{self.level}_{self.pk}"
 
 
 class SelectedAdministrativeCriteria(models.Model):
@@ -336,14 +273,16 @@ class SelectedAdministrativeCriteria(models.Model):
 
     eligibility_diagnosis = models.ForeignKey(EligibilityDiagnosis, on_delete=models.CASCADE)
     administrative_criteria = models.ForeignKey(
-        AdministrativeCriteria, on_delete=models.CASCADE, related_name="administrative_criteria_through"
+        AdministrativeCriteria,
+        on_delete=models.CASCADE,
+        related_name="administrative_criteria_through",
     )
     created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
 
     class Meta:
-        verbose_name = "Critère administratif sélectionné"
-        verbose_name_plural = "Critères administratifs sélectionnés"
+        verbose_name = "Critère administratif IAE sélectionné"
+        verbose_name_plural = "Critères administratifs IAE sélectionnés"
         unique_together = ("eligibility_diagnosis", "administrative_criteria")
 
     def __str__(self):
-        return f"{self.id}"
+        return f"{self.pk}"
