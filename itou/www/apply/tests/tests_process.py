@@ -81,7 +81,7 @@ class ProcessViewsTest(TestCase):
     def test_details_for_siae(self, *args, **kwargs):
         """Display the details of a job application."""
 
-        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True, resume_link="")
         siae = job_application.to_siae
         siae_user = siae.members.first()
         self.client.force_login(siae_user)
@@ -91,14 +91,24 @@ class ProcessViewsTest(TestCase):
         assert not job_application.has_editable_job_seeker
         self.assertContains(response, "Ce candidat a pris le contrôle de son compte utilisateur.")
         self.assertContains(response, format_nir(job_application.job_seeker.nir))
+        self.assertContains(response, job_application.job_seeker.pole_emploi_id)
+        self.assertContains(response, job_application.job_seeker.phone)
 
         job_application.job_seeker.created_by = siae_user
+        job_application.job_seeker.phone = ""
+        job_application.job_seeker.nir = ""
+        job_application.job_seeker.pole_emploi_id = ""
         job_application.job_seeker.save()
 
         url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
         assert job_application.has_editable_job_seeker
         self.assertContains(response, "Modifier les informations")
+        self.assertContains(response, "Adresse : <span>Non renseignée</span>", html=True)
+        self.assertContains(response, "Téléphone : <span>Non renseigné</span>", html=True)
+        self.assertContains(response, "CV : <span>Non renseigné</span>", html=True)
+        self.assertContains(response, "Identifiant Pôle emploi : <span>Non renseigné</span>", html=True)
+        self.assertContains(response, "Numéro de sécurité sociale : <span>Non renseigné</span>", html=True)
 
         # Test resume presence:
         # 1/ Job seeker has a personal resume (technical debt).
@@ -108,6 +118,7 @@ class ProcessViewsTest(TestCase):
         )
         url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
+        self.assertNotContains(response, "CV : <span>Non renseigné</span>", html=True)
         self.assertContains(response, resume_link)
 
         # 2/ Job application was sent with an attached resume
@@ -145,7 +156,7 @@ class ProcessViewsTest(TestCase):
     def test_details_for_prescriber(self, *args, **kwargs):
         """As a prescriber, I can access the job_applications details for prescribers."""
 
-        job_application = JobApplicationFactory(with_approval=True)
+        job_application = JobApplicationFactory(with_approval=True, resume_link="")
         prescriber = job_application.sender_prescriber_organization.members.first()
 
         self.client.force_login(prescriber)
@@ -157,6 +168,9 @@ class ProcessViewsTest(TestCase):
         self.assertContains(response, format_nir(job_application.job_seeker.nir))
         # Approval is displayed
         self.assertContains(response, "PASS IAE (agrément) disponible")
+
+        self.assertContains(response, "Adresse : <span>Non renseignée</span>", html=True)
+        self.assertContains(response, "CV : <span>Non renseigné</span>", html=True)
 
     def test_details_for_prescriber_as_siae(self, *args, **kwargs):
         """As a SIAE user, I cannot access the job_applications details for prescribers."""
