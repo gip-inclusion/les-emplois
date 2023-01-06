@@ -23,7 +23,7 @@ from itou.job_applications.factories import (
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory
-from itou.users.enums import UserKind
+from itou.users.enums import LackOfNIRReason, UserKind
 from itou.users.factories import JobSeekerWithAddressFactory, PrescriberFactory
 from itou.users.models import User
 from itou.utils.templatetags.format_filters import format_nir
@@ -97,7 +97,7 @@ class ProcessViewsTest(TestCase):
 
         job_application.job_seeker.created_by = siae_user
         job_application.job_seeker.phone = ""
-        job_application.job_seeker.nir = ""
+        job_application.job_seeker.nir = None
         job_application.job_seeker.pole_emploi_id = ""
         job_application.job_seeker.save()
 
@@ -110,6 +110,13 @@ class ProcessViewsTest(TestCase):
         self.assertContains(response, "CV : <span>Non renseigné</span>", html=True)
         self.assertContains(response, "Identifiant Pôle emploi : <span>Non renseigné</span>", html=True)
         self.assertContains(response, "Numéro de sécurité sociale : <span>Non renseigné</span>", html=True)
+
+        job_application.job_seeker.lack_of_nir_reason = LackOfNIRReason.TEMPORARY_NUMBER
+        job_application.job_seeker.save()
+
+        url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url)
+        self.assertContains(response, LackOfNIRReason.TEMPORARY_NUMBER.label)
 
         # Test resume presence:
         # 1/ Job seeker has a personal resume (technical debt).
@@ -172,6 +179,16 @@ class ProcessViewsTest(TestCase):
 
         self.assertContains(response, "Adresse : <span>Non renseignée</span>", html=True)
         self.assertContains(response, "CV : <span>Non renseigné</span>", html=True)
+
+        job_application.job_seeker.nir = None
+        job_application.job_seeker.save()
+        response = self.client.get(url)
+        self.assertContains(response, "Numéro de sécurité sociale : <span>Non renseigné</span>", html=True)
+
+        job_application.job_seeker.lack_of_nir_reason = LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER
+        job_application.job_seeker.save()
+        response = self.client.get(url)
+        self.assertContains(response, LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER.label, html=True)
 
     def test_details_for_prescriber_as_siae(self, *args, **kwargs):
         """As a SIAE user, I cannot access the job_applications details for prescribers."""
