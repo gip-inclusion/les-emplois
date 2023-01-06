@@ -12,12 +12,12 @@ class PEAMUOAuth2Client(OAuth2Client):
     (╯°□°)╯︵ ┻━┻
     """
 
-    def get_access_token(self, code):
+    def get_access_token(self, code, pkce_code_verifier=None):
         """
         This whole method is unchanged except for the
         `params = {"realm": "/individu"}` hack.
         Original code:
-        https://github.com/pennersr/django-allauth/blob/6a6d3c618ab018234dde8701173093274710ee0a/allauth/socialaccount/providers/oauth2/client.py#L44
+        https://github.com/pennersr/django-allauth/blob/c1b8fe5eef94761ad349048737c5b036e719a501/allauth/socialaccount/providers/oauth2/client.py#L48
         """
         data = {"redirect_uri": self.callback_url, "grant_type": "authorization_code", "code": code}
         if self.basic_auth:
@@ -31,6 +31,8 @@ class PEAMUOAuth2Client(OAuth2Client):
         if self.access_token_method == "GET":
             params = data
             data = None
+        if data and pkce_code_verifier:
+            data["code_verifier"] = pkce_code_verifier
         resp = requests.request(
             self.access_token_method,
             url,
