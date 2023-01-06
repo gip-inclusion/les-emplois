@@ -3,8 +3,37 @@ from django.utils import timezone
 
 from itou.eligibility import models
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from itou.siaes.factories import SiaeFactory
+from itou.siaes.enums import SiaeKind
+from itou.siaes.factories import SiaeFactory, SiaeWith2MembershipsFactory
 from itou.users.factories import JobSeekerFactory
+
+from .enums import AuthorKind
+
+
+class GEIQEligibilityDiagnosisFactory(factory.django.DjangoModelFactory):
+    """Same as factories below, but :
+    - with all possible author types
+    - tailored for GEIQ tests."""
+
+    class Meta:
+        model = models.GEIQEligibilityDiagnosis
+
+    class Params:
+        with_geiq = factory.Trait(
+            author_kind=AuthorKind.GEIQ,
+            author_geiq=factory.SubFactory(SiaeWith2MembershipsFactory, kind=SiaeKind.GEIQ),
+            author=factory.LazyAttribute(lambda obj: obj.author_geiq.members.first()),
+        )
+        with_prescriber = factory.Trait(
+            author_kind=AuthorKind.PRESCRIBER,
+            author_prescriber_organization=factory.SubFactory(
+                PrescriberOrganizationWithMembershipFactory, authorized=True
+            ),
+            author=factory.LazyAttribute(lambda obj: obj.author_prescriber_organization.members.first()),
+        )
+
+    created_at = factory.LazyFunction(timezone.now)
+    job_seeker = factory.SubFactory(JobSeekerFactory)
 
 
 class EligibilityDiagnosisFactory(factory.django.DjangoModelFactory):
@@ -15,7 +44,7 @@ class EligibilityDiagnosisFactory(factory.django.DjangoModelFactory):
 
     created_at = factory.LazyFunction(timezone.now)
     author = factory.LazyAttribute(lambda obj: obj.author_prescriber_organization.members.first())
-    author_kind = models.EligibilityDiagnosis.AUTHOR_KIND_PRESCRIBER
+    author_kind = AuthorKind.PRESCRIBER
     author_prescriber_organization = factory.SubFactory(PrescriberOrganizationWithMembershipFactory, authorized=True)
     job_seeker = factory.SubFactory(JobSeekerFactory)
 
@@ -28,7 +57,7 @@ class EligibilityDiagnosisMadeBySiaeFactory(factory.django.DjangoModelFactory):
 
     created_at = factory.LazyFunction(timezone.now)
     author = factory.LazyAttribute(lambda obj: obj.author_siae.members.first())
-    author_kind = models.EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF
+    author_kind = AuthorKind.SIAE_STAFF
     author_siae = factory.SubFactory(SiaeFactory, with_membership=True)
     job_seeker = factory.SubFactory(JobSeekerFactory)
 
@@ -45,8 +74,9 @@ class ExpiredEligibilityDiagnosisMadeBySiaeFactory(EligibilityDiagnosisMadeBySia
 
 class AdministrativeCriteriaFactory(factory.django.DjangoModelFactory):
     """
-    The AdministrativeCriteria table is automatically populated with a fixture at the end of
-    eligibility's migration #0003.
+    The AdministrativeCriteria table is automatically populated with a fixture
+    after a `post_migrate` signal at the start of the `eligibility` app.
     """
 
-    pass
+    class Meta:
+        model = models.AdministrativeCriteria
