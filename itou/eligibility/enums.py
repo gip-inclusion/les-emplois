@@ -1,6 +1,24 @@
 from django.db import models
 
+from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF
+
+
+class AdministrativeCriteriaAnnex(models.TextChoices):
+    ANNEX_1 = "1", "Annexe 1"
+    ANNEX_2 = "2", "Annexe 2"
+
+
+class AdministrativeCriteriaLevel(models.TextChoices):
+    LEVEL_1 = "1", "Niveau 1"
+    LEVEL_2 = "2", "Niveau 2"
+
 
 class AdministrativeCriteriaLevelPrefix(models.TextChoices):
     LEVEL_1_PREFIX = "level_1_"
     LEVEL_2_PREFIX = "level_2_"
+
+
+class AuthorKind(models.TextChoices):
+    PRESCRIBER = KIND_PRESCRIBER, "Prescripteur"
+    SIAE_STAFF = KIND_SIAE_STAFF, "Employeur (SIAE)"
+    GEIQ = "geiq", "GEIQ"
