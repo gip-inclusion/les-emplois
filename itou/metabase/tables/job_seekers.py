@@ -1,11 +1,9 @@
 from datetime import date, timedelta
 from functools import partial
-from operator import attrgetter
 
 from django.utils import timezone
 
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
-from itou.job_applications.models import JobApplicationWorkflow
 from itou.metabase.tables.utils import (
     MetabaseTable,
     get_ai_stock_job_seeker_pks,
@@ -44,9 +42,9 @@ def get_user_signup_kind(user):
 
 def get_latest_diagnosis(job_seeker):
     assert job_seeker.is_job_seeker
-    if job_seeker.eligibility_diagnoses.count() == 0:
+    if job_seeker.eligibility_diagnoses_count == 0:
         return None
-    return max(job_seeker.eligibility_diagnoses.all(), key=attrgetter("created_at"))
+    return job_seeker.sorted_eligibility_diagnoses[0]
 
 
 def get_latest_diagnosis_author_sub_kind(job_seeker):
@@ -98,8 +96,10 @@ def _get_latest_diagnosis_criteria_by_level(job_seeker, level):
     """
     latest_diagnosis = get_latest_diagnosis(job_seeker)
     if latest_diagnosis:
-        # We have to do all this in python to benefit from prefetch_related.
-        return len([ac for ac in latest_diagnosis.administrative_criteria.all() if ac.level == level])
+        if level == AdministrativeCriteria.Level.LEVEL_1:
+            return latest_diagnosis.level_1_count
+        if level == AdministrativeCriteria.Level.LEVEL_2:
+            return latest_diagnosis.level_2_count
     return None
 
 
@@ -120,8 +120,7 @@ def get_latest_diagnosis_criteria(job_seeker, criteria_id):
     """
     latest_diagnosis = get_latest_diagnosis(job_seeker)
     if latest_diagnosis:
-        # We have to do all this in python to benefit from prefetch_related.
-        return len([ac for ac in latest_diagnosis.administrative_criteria.all() if ac.id == criteria_id])
+        return criteria_id in latest_diagnosis.criteria_ids
     return None
 
 
@@ -248,7 +247,7 @@ TABLE.add_columns(
             "name": "pe_inscrit",
             "type": "boolean",
             "comment": "Le candidat a un identifiant PE",
-            "fn": lambda o: o.pole_emploi_id is not None and o.pole_emploi_id != "",
+            "fn": lambda o: o.pole_emploi_id != "",
         },
         {
             "name": "date_dernière_connexion",
@@ -279,22 +278,20 @@ TABLE.add_columns(
             "name": "total_candidatures",
             "type": "integer",
             "comment": "Nombre de candidatures",
-            "fn": lambda o: o.job_applications.count(),
+            "fn": lambda o: o.job_applications_count,
         },
         {
             "name": "total_embauches",
             "type": "integer",
             "comment": "Nombre de candidatures de type accepté",
             # We have to do all this in python to benefit from prefetch_related.
-            "fn": lambda o: len(
-                [ja for ja in o.job_applications.all() if ja.state == JobApplicationWorkflow.STATE_ACCEPTED]
-            ),
+            "fn": lambda o: o.accepted_job_applications_count,
         },
         {
             "name": "total_diagnostics",
             "type": "integer",
             "comment": "Nombre de diagnostics",
-            "fn": lambda o: o.eligibility_diagnoses.count(),
+            "fn": lambda o: o.eligibility_diagnoses_count,
         },
         {
             "name": "date_diagnostic",
