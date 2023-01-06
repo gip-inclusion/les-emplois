@@ -11,6 +11,8 @@
         Numéro de sécurité sociale : 
         {% if job_application.job_seeker.nir %}
             <b>{{ job_application.job_seeker.nir|format_nir }}</b>
+        {% elif job_application.job_seeker.lack_of_nir_reason %}
+            <b>{{ job_application.job_seeker.get_lack_of_nir_reason_display }}</b>
         {% else %}
             <span>Non renseigné</span>
         {% endif %}
