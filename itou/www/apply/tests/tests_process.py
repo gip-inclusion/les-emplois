@@ -10,6 +10,7 @@ from itou.approvals.factories import PoleEmploiApprovalFactory, SuspensionFactor
 from itou.approvals.models import Approval, Suspension
 from itou.cities.factories import create_test_cities
 from itou.cities.models import City
+from itou.eligibility.enums import AuthorKind
 from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.employee_record.enums import Status
@@ -656,7 +657,7 @@ class ProcessViewsTest(TestCase):
         # Check diagnosis.
         eligibility_diagnosis = job_application.get_eligibility_diagnosis()
         assert eligibility_diagnosis.author == siae_user
-        assert eligibility_diagnosis.author_kind == EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF
+        assert eligibility_diagnosis.author_kind == AuthorKind.SIAE_STAFF
         assert eligibility_diagnosis.author_siae == job_application.to_siae
         # Check administrative criteria.
         administrative_criteria = eligibility_diagnosis.administrative_criteria.all()

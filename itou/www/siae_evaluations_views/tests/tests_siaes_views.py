@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.utils import dateformat, timezone
 from freezegun import freeze_time
 
+from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.institutions.factories import InstitutionMembershipFactory
 from itou.job_applications.factories import JobApplicationFactory
@@ -37,8 +38,8 @@ def create_evaluated_siae_with_consistent_datas(siae, user, level_1=True, level_
         user_info,
         administrative_criteria=list(
             AdministrativeCriteria.objects.filter(
-                level__in=[AdministrativeCriteria.Level.LEVEL_1 if level_1 else None]
-                + [AdministrativeCriteria.Level.LEVEL_2 if level_2 else None]
+                level__in=[AdministrativeCriteriaLevel.LEVEL_1 if level_1 else None]
+                + [AdministrativeCriteriaLevel.LEVEL_2 if level_2 else None]
             )
         ),
     )

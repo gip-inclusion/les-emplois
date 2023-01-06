@@ -81,8 +81,12 @@ class AdministrativeCriteriaForm(forms.Form):
         if self.user.is_prescriber_with_authorized_org or not self.siae:
             return selected_objects
 
-        level_1 = [obj for obj in selected_objects if obj.level == AdministrativeCriteria.Level.LEVEL_1]
-        level_2 = [obj for obj in selected_objects if obj.level == AdministrativeCriteria.Level.LEVEL_2]
+        level_1 = [
+            obj for obj in selected_objects if obj.level == eligibilty_enums.AdministrativeCriteriaLevel.LEVEL_1
+        ]
+        level_2 = [
+            obj for obj in selected_objects if obj.level == eligibilty_enums.AdministrativeCriteriaLevel.LEVEL_2
+        ]
 
         # For ETTI and AI: 1 criterion level 1 OR 2 level 2 criteria.
         if self.siae.kind == SiaeKind.ETTI or self.siae.kind == SiaeKind.AI:
