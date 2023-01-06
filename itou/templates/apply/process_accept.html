@@ -1,5 +1,6 @@
 {% extends "apply/process_base.html" %}
 {% load bootstrap4 %}
+{% load static %}
 
 {% block content %}
 
@@ -14,7 +15,7 @@
               action=""
               hx-post="{{ request.path }}"
               hx-swap="outerHTML show:#acceptForm:top"
-              class="mt-5"
+              class="mt-5 js-format-nir"
               id="acceptForm"
               tabindex="0"
               aria-labelledby="dialogLabel"
@@ -31,7 +32,14 @@
             {% if form_address or form_personal_data %}<h3 class="h2">Candidat</h3>{% endif %}
 
             {% if form_personal_data %}
-                {% bootstrap_form form_personal_data alert_error_type="all" %}
+                {% if form_personal_data.nir_error %}{{ form_personal_data.nir_error|safe }}{% endif %}
+                {% bootstrap_form_errors form_personal_data type='non_fields' %}
+                {% bootstrap_field form_personal_data.nir %}
+                {% bootstrap_field form_personal_data.lack_of_nir %}
+                {% bootstrap_field form_personal_data.lack_of_nir_reason form_group_class=form_personal_data.lack_of_nir_reason.field.form_group_class %}
+                {% bootstrap_field form_personal_data.birthdate %}
+                {% bootstrap_field form_personal_data.pole_emploi_id %}
+                {% bootstrap_field form_personal_data.lack_of_pole_emploi_id_reason %}
             {% endif %}
 
 
@@ -87,6 +95,7 @@
 
 {% block script %}
     {{ block.super }}
+    <script src="{% static 'js/split_nir.js' %}"></script>
     <!-- Needed to use the Datepicker JS widget. -->
     {{ form_accept.media }}
     {% if form_personal_data %}{{ form_personal_data.media }}{% endif %}

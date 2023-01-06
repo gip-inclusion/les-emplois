@@ -2,6 +2,7 @@ from itertools import product
 from unittest.mock import patch
 
 from dateutil.relativedelta import relativedelta
+from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
@@ -29,6 +30,9 @@ from itou.users.models import User
 from itou.utils.templatetags.format_filters import format_nir
 from itou.utils.test import TestCase
 from itou.utils.widgets import DuetDatePickerWidget
+
+
+DISABLED_NIR = 'disabled id="id_nir"'
 
 
 # patch the one used in the `models` module, not the original one in tasks
@@ -489,6 +493,8 @@ class ProcessViewsTest(TestCase):
             # Data for `JobSeekerPersonalDataForm`.
             "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
             "lack_of_pole_emploi_id_reason": job_application.job_seeker.lack_of_pole_emploi_id_reason,
+            "lack_of_nir": True,
+            "lack_of_nir_reason": LackOfNIRReason.TEMPORARY_NUMBER,
             # Data for `UserAddressForm`.
             "address_line_1": "11 rue des Lilas",
             "post_code": "57000",
@@ -642,6 +648,250 @@ class ProcessViewsTest(TestCase):
         response = self.client.get(next_url)
         assert "Un PASS IAE lui a déjà été délivré mais il est associé à un autre compte. " in str(
             list(response.context["messages"])[0]
+        )
+
+    @override_settings(TALLY_URL="https://tally.so")
+    def test_accept_nir_readonly(self, *args, **kwargs):
+        job_application = JobApplicationSentByJobSeekerFactory(
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+        )
+
+        siae_user = job_application.to_siae.members.first()
+        self.client.force_login(siae_user)
+        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url_accept)
+        self.assertContains(response, "Confirmation de l’embauche")
+        # Check that the NIR field is disabled
+        self.assertContains(response, DISABLED_NIR)
+        self.assertContains(
+            response,
+            "Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations.",
+            html=True,
+        )
+
+        job_application.job_seeker.last_login = None
+        job_application.job_seeker.created_by = PrescriberFactory()
+        job_application.job_seeker.save()
+        response = self.client.get(url_accept)
+        self.assertContains(response, "Confirmation de l’embauche")
+        # Check that the NIR field is disabled
+        self.assertContains(response, DISABLED_NIR)
+        self.assertContains(
+            response,
+            (
+                f'<a href="https://tally.so/r/wzxQlg?jobapplication={job_application.pk}" target="_blank" '
+                'rel="noopener">Demander la correction du numéro de sécurité sociale</a>'
+            ),
+            html=True,
+        )
+
+    def test_accept_no_nir_update(self, *args, **kwargs):
+        [city] = create_test_cities(["57"], num_per_department=1)
+
+        job_application = JobApplicationSentByJobSeekerFactory(
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            job_seeker__nir=None,
+        )
+        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+
+        siae_user = job_application.to_siae.members.first()
+        self.client.force_login(siae_user)
+
+        response = self.client.get(url_accept)
+        self.assertContains(response, "Confirmation de l’embauche")
+        # Check that the NIR field is not disabled
+        self.assertNotContains(response, DISABLED_NIR)
+
+        post_data = {
+            # Data for `JobSeekerPersonalDataForm`.
+            "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": job_application.job_seeker.lack_of_pole_emploi_id_reason,
+            # Data for `UserAddressForm`.
+            "address_line_1": "11 rue des Lilas",
+            "post_code": "57000",
+            "city": city.name,
+            "city_slug": city.slug,
+            # Data for `AcceptForm`.
+            "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": (timezone.localdate() + relativedelta(days=360)).strftime(
+                DuetDatePickerWidget.INPUT_DATE_FORMAT
+            ),
+            "answer": "",
+        }
+        response = self.client.post(url_accept, HTTP_HX_REQUEST="true", data=post_data)
+        self.assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
+
+        post_data["nir"] = "1234"
+        response = self.client.post(url_accept, HTTP_HX_REQUEST="true", data=post_data)
+        self.assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
+        self.assertFormError(
+            response.context["form_personal_data"],
+            "nir",
+            "Le numéro de sécurité sociale est trop court (15 caractères autorisés).",
+        )
+
+        NEW_NIR = "197013625838386"
+        post_data["nir"] = NEW_NIR
+
+        self.accept_job_application(job_application=job_application, post_data=post_data)
+        job_application.job_seeker.refresh_from_db()
+        assert job_application.job_seeker.nir == NEW_NIR
+
+    def test_accept_no_nir_other_user(self, *args, **kwargs):
+        [city] = create_test_cities(["57"], num_per_department=1)
+
+        job_application = JobApplicationSentByJobSeekerFactory(
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            job_seeker__nir=None,
+        )
+        other_job_seeker = JobSeekerWithAddressFactory()
+        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+
+        siae_user = job_application.to_siae.members.first()
+        self.client.force_login(siae_user)
+
+        post_data = {
+            # Data for `JobSeekerPersonalDataForm`.
+            "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": job_application.job_seeker.lack_of_pole_emploi_id_reason,
+            "nir": other_job_seeker.nir,
+            # Data for `UserAddressForm`.
+            "address_line_1": "11 rue des Lilas",
+            "post_code": "57000",
+            "city": city.name,
+            "city_slug": city.slug,
+            # Data for `AcceptForm`.
+            "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": (timezone.localdate() + relativedelta(days=360)).strftime(
+                DuetDatePickerWidget.INPUT_DATE_FORMAT
+            ),
+            "answer": "",
+        }
+        response = self.client.post(url_accept, HTTP_HX_REQUEST="true", data=post_data)
+        self.assertContains(
+            response, "Le numéro de sécurité sociale est déjà associé à un autre utilisateur", html=True
+        )
+        self.assertFormError(
+            response.context["form_personal_data"],
+            "nir",
+            "Ce numéro de sécurité sociale est déjà associé à un autre utilisateur.",
+        )
+
+    def test_accept_no_nir_update_with_reason(self, *args, **kwargs):
+        [city] = create_test_cities(["57"], num_per_department=1)
+
+        job_application = JobApplicationSentByJobSeekerFactory(
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            job_seeker__nir="",
+        )
+        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+
+        siae_user = job_application.to_siae.members.first()
+        self.client.force_login(siae_user)
+
+        post_data = {
+            # Data for `JobSeekerPersonalDataForm`.
+            "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": job_application.job_seeker.lack_of_pole_emploi_id_reason,
+            # Data for `UserAddressForm`.
+            "address_line_1": "11 rue des Lilas",
+            "post_code": "57000",
+            "city": city.name,
+            "city_slug": city.slug,
+            # Data for `AcceptForm`.
+            "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": (timezone.localdate() + relativedelta(days=360)).strftime(
+                DuetDatePickerWidget.INPUT_DATE_FORMAT
+            ),
+            "answer": "",
+        }
+        response = self.client.post(url_accept, HTTP_HX_REQUEST="true", data=post_data)
+        self.assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
+
+        # Check the box
+        post_data["lack_of_nir"] = True
+        response = self.client.post(url_accept, HTTP_HX_REQUEST="true", data=post_data)
+        self.assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
+        self.assertContains(response, "Veuillez sélectionner un motif pour continuer", html=True)
+
+        post_data["lack_of_nir_reason"] = LackOfNIRReason.NO_NIR
+        self.accept_job_application(job_application=job_application, post_data=post_data, assert_successful=True)
+        job_application.job_seeker.refresh_from_db()
+        assert job_application.job_seeker.lack_of_nir_reason == LackOfNIRReason.NO_NIR
+
+    def test_accept_lack_of_nir_reason_update(self, *args, **kwargs):
+        [city] = create_test_cities(["57"], num_per_department=1)
+
+        job_application = JobApplicationSentByJobSeekerFactory(
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            job_seeker__nir=None,
+            job_seeker__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
+        )
+        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+
+        siae_user = job_application.to_siae.members.first()
+        self.client.force_login(siae_user)
+
+        response = self.client.get(url_accept)
+        self.assertContains(response, "Confirmation de l’embauche")
+        # Check that the NIR field is initially disabled
+        # since the job seeker has a lack_of_nir_reason
+        assert response.context["form_personal_data"].fields["nir"].disabled
+        NEW_NIR = "197013625838386"
+
+        post_data = {
+            # Data for `JobSeekerPersonalDataForm`.
+            "nir": NEW_NIR,
+            "lack_of_nir_reason": job_application.job_seeker.lack_of_nir_reason,
+            "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": job_application.job_seeker.lack_of_pole_emploi_id_reason,
+            # Data for `UserAddressForm`.
+            "address_line_1": "11 rue des Lilas",
+            "post_code": "57000",
+            "city": city.name,
+            "city_slug": city.slug,
+            # Data for `AcceptForm`.
+            "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": (timezone.localdate() + relativedelta(days=360)).strftime(
+                DuetDatePickerWidget.INPUT_DATE_FORMAT
+            ),
+            "answer": "",
+        }
+
+        self.accept_job_application(job_application=job_application, post_data=post_data, assert_successful=True)
+        job_application.job_seeker.refresh_from_db()
+        # New NIR is set and the lack_of_nir_reason is cleaned
+        assert not job_application.job_seeker.lack_of_nir_reason
+        assert job_application.job_seeker.nir == NEW_NIR
+
+    @override_settings(TALLY_URL="https://tally.so")
+    def test_accept_lack_of_nir_reason_other_user(self, *args, **kwargs):
+        [city] = create_test_cities(["57"], num_per_department=1)
+
+        job_application = JobApplicationSentByJobSeekerFactory(
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            job_seeker__nir=None,
+            job_seeker__lack_of_nir_reason=LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER,
+        )
+        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+
+        siae_user = job_application.to_siae.members.first()
+        self.client.force_login(siae_user)
+
+        response = self.client.get(url_accept)
+        self.assertContains(response, "Confirmation de l’embauche")
+        # Check that the NIR field is initially disabled
+        # since the job seeker has a lack_of_nir_reason
+        assert response.context["form_personal_data"].fields["nir"].disabled
+
+        # Check that the tally link is there
+        self.assertContains(
+            response,
+            (
+                f'<a href="https://tally.so/r/wzxQlg?jobapplication={job_application.pk}" target="_blank" '
+                'rel="noopener">Demander la correction du numéro de sécurité sociale</a>'
+            ),
+            html=True,
         )
 
     def test_eligibility(self, *args, **kwargs):
