@@ -23,7 +23,7 @@ from itou.utils import constants as global_constants
 from itou.utils.perms.prescriber import get_all_available_job_applications_as_prescriber
 from itou.utils.perms.user import get_user_info
 from itou.utils.urls import get_external_link_markup, get_safe_url
-from itou.www.apply.forms import AcceptForm, AnswerForm, JobSeekerPoleEmploiStatusForm, RefusalForm, UserAddressForm
+from itou.www.apply.forms import AcceptForm, AnswerForm, JobSeekerPersonalDataForm, RefusalForm, UserAddressForm
 from itou.www.apply.views import constants as apply_view_constants
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm, ConfirmEligibilityForm
 
@@ -228,14 +228,14 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
 
     # Ask the SIAE to verify the job seeker's Pôle emploi status.
     # This will ensure a smooth Approval delivery.
-    form_pe_status = None
+    form_personal_data = None
     form_user_address = None
 
     if job_application.to_siae.is_subject_to_eligibility_rules:
 
         # Info that will be used to search for an existing Pôle emploi approval.
-        form_pe_status = JobSeekerPoleEmploiStatusForm(instance=job_application.job_seeker, data=request.POST or None)
-        forms.append(form_pe_status)
+        form_personal_data = JobSeekerPersonalDataForm(instance=job_application.job_seeker, data=request.POST or None)
+        forms.append(form_personal_data)
 
         form_user_address = UserAddressForm(instance=job_application.job_seeker, data=request.POST or None)
         forms.append(form_user_address)
@@ -246,7 +246,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
     context = {
         "form_accept": form_accept,
         "form_user_address": form_user_address,
-        "form_pe_status": form_pe_status,
+        "form_personal_data": form_personal_data,
         "job_application": job_application,
         "can_view_personal_information": True,  # SIAE members have access to personal info
     }
@@ -262,8 +262,8 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
 
         try:
             with transaction.atomic():
-                if form_pe_status:
-                    form_pe_status.save()
+                if form_personal_data:
+                    form_personal_data.save()
                 if form_user_address:
                     form_user_address.save()
                 # After each successful transition, a save() is performed by django-xworkflows,

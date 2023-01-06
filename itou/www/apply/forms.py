@@ -541,7 +541,7 @@ class EditHiringDateForm(forms.ModelForm):
         return cleaned_data
 
 
-class JobSeekerPoleEmploiStatusForm(forms.ModelForm):
+class JobSeekerPersonalDataForm(forms.ModelForm):
     """
     Info that will be used to search for an existing Pôle emploi approval.
     """

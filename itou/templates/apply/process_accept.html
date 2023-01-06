@@ -23,10 +23,10 @@
 
             {% csrf_token %}
 
-            {% if form_address or form_pe_status %}<h3 class="h2">Candidat</h3>{% endif %}
+            {% if form_address or form_personal_data %}<h3 class="h2">Candidat</h3>{% endif %}
 
-            {% if form_pe_status %}
-                {% bootstrap_form form_pe_status alert_error_type="all" %}
+            {% if form_personal_data %}
+                {% bootstrap_form form_personal_data alert_error_type="all" %}
             {% endif %}
 
 
@@ -84,5 +84,5 @@
     {{ block.super }}
     <!-- Needed to use the Datepicker JS widget. -->
     {{ form_accept.media }}
-    {% if form_pe_status %}{{ form_pe_status.media }}{% endif %}
+    {% if form_personal_data %}{{ form_personal_data.media }}{% endif %}
 {% endblock %}

@@ -318,7 +318,7 @@ class ProcessViewsTest(TestCase):
                 # Good duration.
                 hiring_start_at = today
                 post_data = {
-                    # Data for `JobSeekerPoleEmploiStatusForm`.
+                    # Data for `JobSeekerPersonalDataForm`.
                     "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
                     # Data for `AcceptForm`.
                     "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
@@ -389,7 +389,7 @@ class ProcessViewsTest(TestCase):
         hiring_start_at = today
         hiring_end_at = Approval.get_default_end_date(hiring_start_at)
         post_data = {
-            # Data for `JobSeekerPoleEmploiStatusForm`.
+            # Data for `JobSeekerPersonalDataForm`.
             "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
             # Data for `AcceptForm`.
             "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
@@ -446,7 +446,7 @@ class ProcessViewsTest(TestCase):
         hiring_end_at = Approval.get_default_end_date(hiring_start_at)
 
         post_data = {
-            # Data for `JobSeekerPoleEmploiStatusForm`.
+            # Data for `JobSeekerPersonalDataForm`.
             "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
             # Data for `AcceptForm`.
             "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
@@ -486,7 +486,7 @@ class ProcessViewsTest(TestCase):
         self.client.force_login(siae_user)
 
         post_data = {
-            # Data for `JobSeekerPoleEmploiStatusForm`.
+            # Data for `JobSeekerPersonalDataForm`.
             "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
             "lack_of_pole_emploi_id_reason": job_application.job_seeker.lack_of_pole_emploi_id_reason,
             # Data for `UserAddressForm`.
