@@ -13,6 +13,7 @@ from django.utils import timezone
 from django_xworkflows import models as xwf_models
 
 from itou.approvals.models import Approval, Prolongation, Suspension
+from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models import EligibilityDiagnosis, SelectedAdministrativeCriteria
 from itou.employee_record import enums as employeerecord_enums
 from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
@@ -791,7 +792,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         # Delete eligibility diagnosis if not provided by an authorized prescriber
         eligibility_diagnosis = self.eligibility_diagnosis
         is_eligibility_diagnosis_made_by_siae = (
-            eligibility_diagnosis and eligibility_diagnosis.author_kind == EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF
+            eligibility_diagnosis and eligibility_diagnosis.author_kind == AuthorKind.SIAE_STAFF
         )
         if is_eligibility_diagnosis_made_by_siae:
             self.eligibility_diagnosis = None

@@ -3,6 +3,7 @@ from functools import partial
 
 from django.utils import timezone
 
+from itou.eligibility.enums import AdministrativeCriteriaLevel, AuthorKind
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.metabase.tables.utils import (
     MetabaseTable,
@@ -18,8 +19,8 @@ from itou.users.enums import IdentityProvider
 
 # Reword the original EligibilityDiagnosis.AUTHOR_KIND_CHOICES
 AUTHOR_KIND_CHOICES = (
-    (EligibilityDiagnosis.AUTHOR_KIND_PRESCRIBER, "Prescripteur"),
-    (EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF, "Employeur"),
+    (AuthorKind.PRESCRIBER, "Prescripteur"),
+    (AuthorKind.SIAE_STAFF, "Employeur"),
 )
 
 
@@ -59,15 +60,9 @@ def get_latest_diagnosis_author_sub_kind(job_seeker):
     if latest_diagnosis:
         author_kind = get_choice(choices=AUTHOR_KIND_CHOICES, key=latest_diagnosis.author_kind)
         author_sub_kind = None
-        if (
-            latest_diagnosis.author_kind == EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF
-            and latest_diagnosis.author_siae
-        ):
+        if latest_diagnosis.author_kind == AuthorKind.SIAE_STAFF and latest_diagnosis.author_siae:
             author_sub_kind = latest_diagnosis.author_siae.kind
-        elif (
-            latest_diagnosis.author_kind == EligibilityDiagnosis.AUTHOR_KIND_PRESCRIBER
-            and latest_diagnosis.author_prescriber_organization
-        ):
+        elif latest_diagnosis.author_kind == AuthorKind.PRESCRIBER and latest_diagnosis.author_prescriber_organization:
             author_sub_kind = latest_diagnosis.author_prescriber_organization.kind
         return f"{author_kind} {author_sub_kind}"
     return None
@@ -76,15 +71,9 @@ def get_latest_diagnosis_author_sub_kind(job_seeker):
 def get_latest_diagnosis_author_display_name(job_seeker):
     latest_diagnosis = get_latest_diagnosis(job_seeker)
     if latest_diagnosis:
-        if (
-            latest_diagnosis.author_kind == EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF
-            and latest_diagnosis.author_siae
-        ):
+        if latest_diagnosis.author_kind == AuthorKind.SIAE_STAFF and latest_diagnosis.author_siae:
             return latest_diagnosis.author_siae.display_name
-        elif (
-            latest_diagnosis.author_kind == EligibilityDiagnosis.AUTHOR_KIND_PRESCRIBER
-            and latest_diagnosis.author_prescriber_organization
-        ):
+        elif latest_diagnosis.author_kind == AuthorKind.PRESCRIBER and latest_diagnosis.author_prescriber_organization:
             return latest_diagnosis.author_prescriber_organization.display_name
     return None
 
@@ -104,11 +93,11 @@ def _get_latest_diagnosis_criteria_by_level(job_seeker, level):
 
 
 def get_latest_diagnosis_level1_criteria(job_seeker):
-    return _get_latest_diagnosis_criteria_by_level(job_seeker=job_seeker, level=AdministrativeCriteria.Level.LEVEL_1)
+    return _get_latest_diagnosis_criteria_by_level(job_seeker=job_seeker, level=AdministrativeCriteriaLevel.LEVEL_1)
 
 
 def get_latest_diagnosis_level2_criteria(job_seeker):
-    return _get_latest_diagnosis_criteria_by_level(job_seeker=job_seeker, level=AdministrativeCriteria.Level.LEVEL_2)
+    return _get_latest_diagnosis_criteria_by_level(job_seeker=job_seeker, level=AdministrativeCriteriaLevel.LEVEL_2)
 
 
 def get_latest_diagnosis_criteria(job_seeker, criteria_id):

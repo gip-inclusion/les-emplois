@@ -1,6 +1,7 @@
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 
+from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.job_applications.factories import JobApplicationFactory
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
@@ -199,9 +200,9 @@ class AdministrativeCriteriaOfJobApplicationFormTest(TestCase):
             job_seeker,
             user_info,
             administrative_criteria=[
-                AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_1).first()
+                AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_1).first()
             ]
-            + [AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_2).first()],
+            + [AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_2).first()],
         )
 
         job_application = JobApplicationFactory(
@@ -213,13 +214,14 @@ class AdministrativeCriteriaOfJobApplicationFormTest(TestCase):
         )
 
         form = AdministrativeCriteriaOfJobApplicationForm(user, siae, job_application=job_application)
+
         assert 2 == len(form.fields)
         assert (
-            AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_1).first().key
+            AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_1).first().key
             in form.fields.keys()
         )
         assert (
-            AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_2).first().key
+            AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_2).first().key
             in form.fields.keys()
         )
 

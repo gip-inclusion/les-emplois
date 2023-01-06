@@ -903,7 +903,7 @@ class User(AbstractUser, AddressMixin):
         if self.is_job_seeker:
             return Kind.JOB_SEEKER
         elif self.is_prescriber:
-            return Kind.PRESCREIBER
+            return Kind.PRESCRIBER
         elif self.is_siae_staff:
             return Kind.SIAE_STAFF
         elif self.is_labor_inspector:

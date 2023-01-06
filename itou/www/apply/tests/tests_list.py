@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.utils.http import urlencode
 
 from itou.approvals.factories import SuspensionFactory
+from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.eligibility.models import AdministrativeCriteria
 from itou.job_applications.factories import (
@@ -387,10 +388,10 @@ class ProcessListSiaeTest(ProcessListTest):
 
         diagnosis = EligibilityDiagnosisFactory(job_seeker=self.maggie)
 
-        level1_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_1).first()
-        level2_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_2).first()
+        level1_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_1).first()
+        level2_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_2).first()
         level1_other_criterion = AdministrativeCriteria.objects.filter(
-            level=AdministrativeCriteria.Level.LEVEL_1
+            level=AdministrativeCriteriaLevel.LEVEL_1
         ).last()
 
         diagnosis.administrative_criteria.add(level1_criterion)

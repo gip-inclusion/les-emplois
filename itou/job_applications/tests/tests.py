@@ -17,6 +17,7 @@ from django.utils import timezone
 from django_xworkflows import models as xwf_models
 
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory, ProlongationFactory, SuspensionFactory
+from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.employee_record.enums import Status
@@ -357,10 +358,10 @@ class JobApplicationQuerySetTest(TestCase):
         job_app = JobApplicationFactory(with_approval=True)
         diagnosis = EligibilityDiagnosisFactory(job_seeker=job_app.job_seeker)
 
-        level1_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_1).first()
-        level2_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_2).first()
+        level1_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_1).first()
+        level2_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_2).first()
         level1_other_criterion = AdministrativeCriteria.objects.filter(
-            level=AdministrativeCriteria.Level.LEVEL_1
+            level=AdministrativeCriteriaLevel.LEVEL_1
         ).last()
 
         diagnosis.administrative_criteria.add(level1_criterion)
@@ -382,10 +383,10 @@ class JobApplicationQuerySetTest(TestCase):
         job_app = JobApplicationFactory(with_approval=True)
         diagnosis = EligibilityDiagnosisFactory(job_seeker=job_app.job_seeker)
 
-        level1_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_1).first()
-        level2_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_2).first()
+        level1_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_1).first()
+        level2_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_2).first()
         level1_other_criterion = AdministrativeCriteria.objects.filter(
-            level=AdministrativeCriteria.Level.LEVEL_1
+            level=AdministrativeCriteriaLevel.LEVEL_1
         ).last()
 
         diagnosis.administrative_criteria.add(level1_criterion)

@@ -13,6 +13,8 @@ logger = logging.getLogger(__name__)
 
 # FIXME(vperron): This namedtuple seems like an intermediate object that is maybe no longer justified.
 # From afar it looks like a code smell or something we could/should get rid of. Beware.
+# (ikarius) : same verdict, this tuple is reused for eligibility diagnosis creation, and will have to be removed
+# or at least limited to permissions domain.
 UserInfo = namedtuple("UserInfo", ["user", "kind", "prescriber_organization", "is_authorized_prescriber", "siae"])
 
 

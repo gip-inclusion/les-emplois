@@ -11,6 +11,7 @@ from django.urls import reverse
 from django.utils import dateformat, timezone
 
 from itou.approvals.factories import ApprovalFactory
+from itou.eligibility.enums import AdministrativeCriteriaLevel, AuthorKind
 from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.institutions.enums import InstitutionKind
@@ -48,7 +49,7 @@ def create_batch_of_job_applications(siae):
         with_approval=True,
         to_siae=siae,
         sender_siae=siae,
-        eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
+        eligibility_diagnosis__author_kind=AuthorKind.SIAE_STAFF,
         eligibility_diagnosis__author_siae=siae,
         hiring_start_at=timezone.now() - relativedelta(months=2),
     )
@@ -136,7 +137,7 @@ def campaign_eligible_job_app_objects():
     approval = ApprovalFactory(user=job_seeker)
     diag = EligibilityDiagnosisFactory(
         job_seeker=job_seeker,
-        author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
+        author_kind=AuthorKind.SIAE_STAFF,
         author_siae=siae,
         author=siae.members.first(),
     )
@@ -202,7 +203,7 @@ class TestEvaluationCampaignManagerEligibleJobApplication:
     def test_eligibility_diag_not_made_by_siae_staff(self, campaign_eligible_job_app_objects):
         evaluation_campaign = EvaluationCampaignFactory()
         diag = campaign_eligible_job_app_objects["diag"]
-        diag.author_kind = EligibilityDiagnosis.AUTHOR_KIND_PRESCRIBER
+        diag.author_kind = AuthorKind.PRESCRIBER
         diag.save()
         assert [] == list(evaluation_campaign.eligible_job_applications())
 
@@ -304,7 +305,7 @@ class EvaluationCampaignManagerTest(TestCase):
             with_approval=True,
             to_siae=siae1,
             sender_siae=siae1,
-            eligibility_diagnosis__author_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
+            eligibility_diagnosis__author_kind=AuthorKind.SIAE_STAFF,
             eligibility_diagnosis__author_siae=siae1,
             hiring_start_at=timezone.now() - relativedelta(months=2),
         )
@@ -397,7 +398,7 @@ class EvaluationCampaignManagerTest(TestCase):
             user=user, kind=KIND_SIAE_STAFF, siae=siae, prescriber_organization=None, is_authorized_prescriber=False
         )
         criteria1 = AdministrativeCriteria.objects.get(
-            level=AdministrativeCriteria.Level.LEVEL_1, name="Bénéficiaire du RSA"
+            level=AdministrativeCriteriaLevel.LEVEL_1, name="Bénéficiaire du RSA"
         )
         eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
             job_seeker, user_info, administrative_criteria=[criteria1]

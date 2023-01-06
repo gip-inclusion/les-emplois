@@ -14,7 +14,7 @@ KIND_LABOR_INSPECTOR = "labor_inspector"
 # TODO(alaurent) Replace all uses of KIND_XXX with this new enum
 class Kind(models.TextChoices):
     JOB_SEEKER = KIND_JOB_SEEKER, "candidat"
-    PRESCREIBER = KIND_PRESCRIBER, "prescripteur"
+    PRESCRIBER = KIND_PRESCRIBER, "prescripteur"
     SIAE_STAFF = KIND_SIAE_STAFF, "employeur"
     LABOR_INSPECTOR = KIND_LABOR_INSPECTOR, "inspecteur du travail"
 
