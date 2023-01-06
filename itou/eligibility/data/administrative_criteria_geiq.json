@@ -1,0 +1,466 @@
+[
+	{
+		"model": "eligibility.geiqadministrativecriteria",
+		"pk": 1,
+		"fields": {
+			"annex": "2",
+			"level": "1",
+			"parent_id": 20,
+			"name": "Bénéficiaire du RSA",
+			"desc": "Revenu de solidarité active",
+			"written_proof": "Attestation RSA",
+			"written_proof_url": "",
+			"written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
+			"ui_rank": 1,
+			"created_at": "2022-12-15T17:16:56.986Z"
+		}
+	},
+	{
+		"model": "eligibility.geiqadministrativecriteria",
+		"pk": 2,
+		"fields": {
+			"annex": "2",
+			"level": "1",
+			"parent_id": 20,
+			"name": "Allocataire ASS",
+			"desc": "Allocation de solidarité spécifique",
+			"written_proof": "Attestation ASS",
+			"written_proof_url": "",
+			"written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
+			"ui_rank": 2,
+			"created_at": "2022-12-15T17:16:56.986Z"
+		}
+	},
+	{
+		"model": "eligibility.geiqadministrativecriteria",
+		"pk": 3,
+		"fields": {
+			"annex": "2",
+			"level": "1",
+			"parent_id": 20,
+			"name": "Allocataire AAH",
+			"desc": "Allocation aux adultes handicapés",
+			"written_proof": "Attestation AAH",
+			"written_proof_url": "",
+			"written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
+			"ui_rank": 3,
+			"created_at": "2022-12-15T17:16:56.986Z"
+		}
+	},
+	{
+		"model": "eligibility.geiqadministrativecriteria",
+		"pk": 4,
+		"fields": {
+			"annex": "2",
+			"level": "1",
+			"parent_id": 22,
+			"name": "DETLD (+ 24 mois)",
+			"desc": "Demandeur d'emploi de très longue durée (inscrit à Pôle emploi)",
+			"written_proof": "Attestation Pôle emploi",
+			"written_proof_url": "",
+			"written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
+			"ui_rank": 4,
+			"created_at": "2022-12-15T17:16:56.986Z"
+		}
+	},
+	{
+		"model": "eligibility.geiqadministrativecriteria",
+		"pk": 5,
+		"fields": {
+			"annex": "2",
+			"level": "2",
+			"parent_id": null,
+			"name": "Niveau d'étude 3 (CAP, BEP) ou infra",
+			"desc": "",
+			"written_proof": "Diplôme et/ou attestation sur l'honneur",
+			"written_proof_url": "https://www.service-public.fr/particuliers/vosdroits/F199",
+			"written_proof_validity": "Attestation sur l'honneur datant de moins de 3 mois avant la date de délivrance du PASS IAE",
+			"ui_rank": 1,
+			"created_at": "2022-12-15T17:16:56.986Z"
+		}
+	},
+	{
+		"model": "eligibility.geiqadministrativecriteria",
+		"pk": 6,
+		"fields": {
+			"annex": "2",
+			"level": "2",
+			"parent_id": null,
+			"name": "Senior (+50 ans)",
+			"desc": "",
+			"written_proof": "Pièce d'identité",
+			"written_proof_url": "",
+			"written_proof_validity": "",
+			"ui_rank": 2,
+			"created_at": "2022-12-15T17:16:56.986Z"
+		}
+	},
+	{
+		"model": "eligibility.geiqadministrativecriteria",
+		"pk": 7,
+		"fields": {
+			"annex": "2",
+			"level": "2",
+			"parent_id": null,
+			"name": "Jeune (-26 ans)",
+			"desc": "",
+			"written_proof": "Pièce d'identité",
+			"written_proof_url": "",
+			"written_proof_validity": "",
+			"ui_rank": 3,
+			"created_at": "2022-12-15T17:16:56.986Z"
+		}
+	},
+	{
+		"model": "eligibility.geiqadministrativecriteria",
+		"pk": 8,
+		"fields": {
+			"annex": "2",
+			"level": "2",
+			"parent_id": null,
+			"name": "Sortant de l'ASE",
+			"desc": "Aide sociale à l'enfance",
+			"written_proof": "Attestation ASE",
+			"written_proof_url": "",
+			"written_proof_validity": "Datant de moins de 12 mois avant la date de délivrance du PASS IAE",
+			"ui_rank": 4,
+			"created_at": "2022-12-15T17:16:56.986Z"
+		}
+	},
+	{
+		"model": "eligibility.geiqadministrativecriteria",
+		"pk": 9,
+		"fields": {
+			"annex": "2",
+			"level": "2",
+			"parent_id": 22,
+			"name": "DELD (12-24 mois)",
+			"desc": "Demandeur d'emploi de longue durée (inscrit à Pôle emploi)",
+			"written_proof": "Attestation Pôle emploi",
+			"written_proof_url": "",
+			"written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
+			"ui_rank": 5,
+			"created_at": "2022-12-15T17:16:56.986Z"
+		}
+	},
+	{
+		"model": "eligibility.geiqadministrativecriteria",
+		"pk": 10,
+		"fields": {
+			"annex": "2",
+			"level": "2",
+			"parent_id": null,
+			"name": "Travailleur handicapé",
+			"desc": "",
+			"written_proof": "Attestation reconnaissance qualité TH",
+			"written_proof_url": "",
+			"written_proof_validity": "Décision valide au moment du recrutement",
+			"ui_rank": 6,
+			"created_at": "2022-12-15T17:16:56.986Z"
+		}
+	},
+	{
+		"model": "eligibility.geiqadministrativecriteria",
+		"pk": 11,
+		"fields": {
+			"annex": "2",
+			"level": "2",
+			"parent_id": null,
+			"name": "Parent isolé",
+			"desc": "",
+			"written_proof": "Attestation CAF",
+			"written_proof_url": "",
+			"written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
+			"ui_rank": 7,
+			"created_at": "2022-12-15T17:16:56.986Z"
+		}
+	},
+	{
+		"model": "eligibility.geiqadministrativecriteria",
+		"pk": 12,
+		"fields": {
+			"annex": "2",
+			"level": "2",
+			"parent_id": null,
+			"name": "Personne sans hébergement ou hébergée ou ayant un parcours de rue",
+			"desc": "",
+			"written_proof": "Certificat de domiciliation. À défaut : déclaration sur l'honneur d'un travailleur social ou d'une association",
+			"written_proof_url": "",
+			"written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
+			"ui_rank": 8,
+			"created_at": "2022-12-15T17:16:56.986Z"
+		}
+	},
+	{
+		"model": "eligibility.geiqadministrativecriteria",
+		"pk": 13,
+		"fields": {
+			"annex": "2",
+			"level": "2",
+			"parent_id": null,
+			"name": "Réfugié statutaire, bénéficiaire d'une protection temporaire, protégé subsidiaire",
+			"desc": "",
+			"written_proof": "Titre de séjour valide ou demande de renouvellement du titre de séjour. Pour les bénéficiaires d'une protection temporaire : autorisation provisoire de séjour.",
+			"written_proof_url": "",
+			"written_proof_validity": "Titre valide au moment de la délivrance du PASS IAE",
+			"ui_rank": 9,
+			"created_at": "2022-12-15T17:16:56.986Z"
+		}
+	},
+	{
+		"model": "eligibility.geiqadministrativecriteria",
+		"pk": 14,
+		"fields": {
+			"annex": "2",
+			"level": "2",
+			"parent_id": 27,
+			"name": "Résident ZRR",
+			"desc": "Zone de revitalisation rurale",
+			"written_proof": "Justificatif de domicile (facture eau, électricité, internet, téléphone)",
+			"written_proof_url": "https://www.data.gouv.fr/fr/datasets/zones-de-revitalisation-rurale-zrr",
+			"written_proof_validity": "Datant de moins de 6 mois avant la date de délivrance du PASS IAE",
+			"ui_rank": 10,
+			"created_at": "2022-12-15T17:16:56.986Z"
+		}
+	},
+	{
+		"model": "eligibility.geiqadministrativecriteria",
+		"pk": 15,
+		"fields": {
+			"annex": "2",
+			"level": "2",
+			"parent_id": 27,
+			"name": "Résident QPV",
+			"desc": "Quartier prioritaire de la politique de la ville",
+			"written_proof": "Justificatif de domicile (facture eau, électricité, internet, téléphone)",
+			"written_proof_url": "https://sig.ville.gouv.fr",
+			"written_proof_validity": "Datant de moins de 6 mois avant la date de délivrance du PASS IAE",
+			"ui_rank": 11,
+			"created_at": "2022-12-15T17:16:56.986Z"
+		}
+	},
+	{
+		"model": "eligibility.geiqadministrativecriteria",
+		"pk": 16,
+		"fields": {
+			"annex": "2",
+			"level": "2",
+			"parent_id": null,
+			"name": "Sortant de détention ou personne placée sous main de justice",
+			"desc": "",
+			"written_proof": "Billet de sortie ou attestation du juge d'application des peines",
+			"written_proof_url": "",
+			"written_proof_validity": "Datant de moins de 6 mois avant la date de délivrance du PASS IAE",
+			"ui_rank": 12,
+			"created_at": "2022-12-15T17:16:56.986Z"
+		}
+	},
+	{
+		"model": "eligibility.geiqadministrativecriteria",
+		"pk": 17,
+		"fields": {
+			"annex": "2",
+			"level": "2",
+			"parent_id": null,
+			"name": "Maîtrise de la langue française",
+			"desc": "",
+			"written_proof": "Evaluation FLE inférieure au niveau A1",
+			"written_proof_url": "",
+			"written_proof_validity": "Datant de moins de 6 mois avant la date de délivrance du PASS IAE",
+			"ui_rank": 13,
+			"created_at": "2022-12-15T17:16:56.986Z"
+		}
+	},
+	{
+		"model": "eligibility.geiqadministrativecriteria",
+		"pk": 18,
+		"fields": {
+			"annex": "2",
+			"level": "2",
+			"parent_id": null,
+			"name": "Mobilité",
+			"desc": "",
+			"written_proof": "Diagnostic mobilité délivré par un prescripteur habilité",
+			"written_proof_url": "",
+			"written_proof_validity": "Datant de moins de 6 mois avant la date de délivrance du PASS IAE",
+			"ui_rank": 14,
+			"created_at": "2022-12-15T17:16:56.986Z"
+		}
+	},
+	{
+		"model": "eligibility.geiqadministrativecriteria",
+		"pk": 19,
+		"fields": {
+			"annex": "1",
+			"level": null,
+			"parent_id": 7,
+			"name": "Jeune de moins de 26 ans sans qualification (niveau 4 maximum)",
+			"desc": "",
+			"written_proof": "",
+			"written_proof_url": "",
+			"written_proof_validity": "",
+			"ui_rank": 32767,
+			"created_at": "2022-12-15T17:40:26.231Z"
+		}
+	},
+	{
+		"model": "eligibility.geiqadministrativecriteria",
+		"pk": 20,
+		"fields": {
+			"annex": "1",
+			"level": null,
+			"parent_id": null,
+			"name": "Bénéficiaire des minimas sociaux",
+			"desc": "",
+			"written_proof": "",
+			"written_proof_url": "",
+			"written_proof_validity": "",
+			"ui_rank": 32767,
+			"created_at": "2022-12-15T17:41:10.380Z"
+		}
+	},
+	{
+		"model": "eligibility.geiqadministrativecriteria",
+		"pk": 21,
+		"fields": {
+			"annex": "1",
+			"level": null,
+			"parent_id": null,
+			"name": "Personne éloignée du marché du travail (> 1 an)",
+			"desc": "",
+			"written_proof": "",
+			"written_proof_url": "",
+			"written_proof_validity": "",
+			"ui_rank": 32767,
+			"created_at": "2022-12-15T17:42:34.280Z"
+		}
+	},
+	{
+		"model": "eligibility.geiqadministrativecriteria",
+		"pk": 22,
+		"fields": {
+			"annex": "1",
+			"level": null,
+			"parent_id": null,
+			"name": "Demandeur d’emploi de 45 ans et plus",
+			"desc": "",
+			"written_proof": "",
+			"written_proof_url": "",
+			"written_proof_validity": "",
+			"ui_rank": 32767,
+			"created_at": "2022-12-15T17:43:12.899Z"
+		}
+	},
+	{
+		"model": "eligibility.geiqadministrativecriteria",
+		"pk": 23,
+		"fields": {
+			"annex": "1",
+			"level": null,
+			"parent_id": null,
+			"name": "Personne en reconversion professionnelle contrainte",
+			"desc": "",
+			"written_proof": "",
+			"written_proof_url": "",
+			"written_proof_validity": "",
+			"ui_rank": 32767,
+			"created_at": "2022-12-15T17:43:41.618Z"
+		}
+	},
+	{
+		"model": "eligibility.geiqadministrativecriteria",
+		"pk": 24,
+		"fields": {
+			"annex": "1",
+			"level": null,
+			"parent_id": null,
+			"name": "Personne bénéficiant ou sortant d’un dispositif d’insertion",
+			"desc": "",
+			"written_proof": "",
+			"written_proof_url": "",
+			"written_proof_validity": "",
+			"ui_rank": 32767,
+			"created_at": "2022-12-15T17:44:15.846Z"
+		}
+	},
+	{
+		"model": "eligibility.geiqadministrativecriteria",
+		"pk": 25,
+		"fields": {
+			"annex": "1",
+			"level": null,
+			"parent_id": null,
+			"name": "Travailleur handicapé",
+			"desc": "",
+			"written_proof": "",
+			"written_proof_url": "",
+			"written_proof_validity": "",
+			"ui_rank": 32767,
+			"created_at": "2022-12-15T17:44:54.981Z"
+		}
+	},
+	{
+		"model": "eligibility.geiqadministrativecriteria",
+		"pk": 26,
+		"fields": {
+			"annex": "1",
+			"level": null,
+			"parent_id": null,
+			"name": "Personne issue d’un quartier ou zone prioritaire (QPV/ZRR)",
+			"desc": "",
+			"written_proof": "",
+			"written_proof_url": "",
+			"written_proof_validity": "",
+			"ui_rank": 32767,
+			"created_at": "2022-12-15T17:46:16.561Z"
+		}
+	},
+	{
+		"model": "eligibility.geiqadministrativecriteria",
+		"pk": 27,
+		"fields": {
+			"annex": "1",
+			"level": null,
+			"parent_id": null,
+			"name": "Sortant de détention ou personne placée sous main de justice",
+			"desc": "",
+			"written_proof": "",
+			"written_proof_url": "",
+			"written_proof_validity": "",
+			"ui_rank": 32767,
+			"created_at": "2022-12-15T17:46:54.278Z"
+		}
+	},
+	{
+		"model": "eligibility.geiqadministrativecriteria",
+		"pk": 28,
+		"fields": {
+			"annex": "1",
+			"level": null,
+			"parent_id": null,
+			"name": "Réfugié statutaire, bénéficiaire d'une protection temporaire, protégé subsidiaire",
+			"desc": "",
+			"written_proof": "Titre de séjour valide ou demande de renouvellement du titre de séjour. Pour les bénéficiaires d'une protection temporaire : autorisation provisoire de séjour.",
+			"written_proof_url": "",
+			"written_proof_validity": "Titre valide au moment de la délivrance du PASS IAE",
+			"ui_rank": 32767,
+			"created_at": "2022-12-15T17:16:56.986Z"
+		}
+	},
+	{
+		"model": "eligibility.geiqadministrativecriteria",
+		"pk": 29,
+		"fields": {
+			"annex": "2",
+			"level": "2",
+			"parent_id": null,
+			"name": "Demandeur d'asile",
+			"desc": "",
+			"written_proof": "Autorisation temporaire de travail.",
+			"written_proof_url": "",
+			"written_proof_validity": "Titre valide au moment de la délivrance du PASS IAE",
+			"ui_rank": 32767,
+			"created_at": "2022-12-15T17:16:56.986Z"
+		}
+	}
+]
