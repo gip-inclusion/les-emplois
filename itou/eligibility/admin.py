@@ -4,11 +4,18 @@ from itou.eligibility import models
 from itou.utils.admin import PkSupportRemarkInline
 
 
-class AdministrativeCriteriaInline(admin.TabularInline):
-    model = models.EligibilityDiagnosis.administrative_criteria.through
+class AbstractAdministrativeCriteriaInline(admin.TabularInline):
     extra = 1
     raw_id_fields = ("administrative_criteria",)
     readonly_fields = ("created_at",)
+
+
+class AdministrativeCriteriaInline(AbstractAdministrativeCriteriaInline):
+    model = models.EligibilityDiagnosis.administrative_criteria.through
+
+
+class GEIQAdministrativeCriteriaInline(AbstractAdministrativeCriteriaInline):
+    model = models.GEIQEligibilityDiagnosis.administrative_criteria.through
 
 
 class IsValidFilter(admin.SimpleListFilter):
@@ -43,8 +50,7 @@ class HasApprovalFilter(admin.SimpleListFilter):
         return queryset
 
 
-@admin.register(models.EligibilityDiagnosis)
-class EligibilityDiagnosisAdmin(admin.ModelAdmin):
+class AbstractEligibilityDiagnosisAdmin(admin.ModelAdmin):
     list_display = (
         "pk",
         "job_seeker",
@@ -52,24 +58,48 @@ class EligibilityDiagnosisAdmin(admin.ModelAdmin):
         "author_kind",
         "created_at",
         "is_valid",
-        "has_approval",
         "expires_at",
     )
     list_display_links = ("pk", "job_seeker")
-    list_filter = (IsValidFilter, HasApprovalFilter, "author_kind")
-    raw_id_fields = ("job_seeker", "author", "author_siae", "author_prescriber_organization")
+    raw_id_fields = (
+        "job_seeker",
+        "author",
+        "author_prescriber_organization",
+    )
     readonly_fields = (
         "created_at",
         "updated_at",
         "expires_at",
-        "is_valid",
-        "is_considered_valid",
     )
     search_fields = ("pk", "job_seeker__email", "author__email")
+    list_filter = (
+        IsValidFilter,
+        "author_kind",
+    )
+
+
+@admin.register(models.EligibilityDiagnosis)
+class EligibilityDiagnosisAdmin(AbstractEligibilityDiagnosisAdmin):
     inlines = (
         AdministrativeCriteriaInline,
         PkSupportRemarkInline,
     )
+
+    def get_list_filter(self, request):
+        return self.list_filter + (HasApprovalFilter,)
+
+    def __init__(self, model, admin_site):
+        super().__init__(model, admin_site)
+        self.raw_id_fields += ("author_siae",)
+
+    def get_list_display(self, request):
+        return self.list_display + ("has_approval",)
+
+    def get_readonly_fields(self, request, obj=None):
+        return self.readonly_fields + (
+            "is_valid",
+            "is_considered_valid",
+        )
 
     def is_valid(self, obj):
         return obj.is_valid
@@ -103,9 +133,37 @@ class EligibilityDiagnosisAdmin(admin.ModelAdmin):
         return qs
 
 
-@admin.register(models.AdministrativeCriteria)
-class AdministrativeCriteriaAdmin(admin.ModelAdmin):
-    list_display = ("pk", "name", "level", "ui_rank", "created_at")
+@admin.register(models.GEIQEligibilityDiagnosis)
+class GEIQEligibilityDiagnosisAdmin(AbstractEligibilityDiagnosisAdmin):
+    inlines = (
+        GEIQAdministrativeCriteriaInline,
+        PkSupportRemarkInline,
+    )
+
+    def __init__(self, model, admin_site):
+        super().__init__(model, admin_site)
+
+        self.raw_id_fields += ("author_geiq",)
+
+    def get_readonly_fields(self, request, obj=None):
+        return self.readonly_fields + (
+            "has_eligibility",
+            "allowance_amount",
+        )
+
+    def has_eligibility(self, obj):
+        return obj.geiq_eligibility_confirmed
+
+    has_eligibility.boolean = True
+    has_eligibility.short_description = "Eligibilité GEIQ confirmée"
+
+    def allowance_amount(self, obj):
+        return f"{obj.geiq_allowance_amount} EUR"
+
+    allowance_amount.short_description = "Montant de l'aide"
+
+
+class AbstractAdministrativeCriteriaAdmin(admin.ModelAdmin):
     list_display_links = ("pk", "name")
     list_filter = ("level",)
     raw_id_fields = ("created_by",)
@@ -116,3 +174,37 @@ class AdministrativeCriteriaAdmin(admin.ModelAdmin):
         if not obj.pk:
             obj.created_by = request.user
         super().save_model(request, obj, form, change)
+
+
+@admin.register(models.AdministrativeCriteria)
+class AdministrativeCriteriaAdmin(AbstractAdministrativeCriteriaAdmin):
+    list_display = (
+        "pk",
+        "name",
+        "level",
+        "ui_rank",
+        "created_at",
+    )
+
+
+@admin.register(models.GEIQAdministrativeCriteria)
+class GEIQAdministrativeCriteriaAdmin(AbstractAdministrativeCriteriaAdmin):
+    list_display = (
+        "pk",
+        "name",
+        "annex",
+        "level",
+        "created_at",
+    )
+    ordering = (
+        "level",
+        "ui_rank",
+        "pk",
+    )
+
+    def __init__(self, model, admin_site):
+        super().__init__(model, admin_site)
+
+        self.raw_id_fields += ("parent",)
+        self.list_filter += ("annex",)
+        self.ordering = ("annex",) + self.ordering
