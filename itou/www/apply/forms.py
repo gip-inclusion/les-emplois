@@ -14,6 +14,7 @@ from itou.asp import models as asp_models
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS, department_from_postcode
 from itou.common_apps.address.forms import MandatoryAddressFormMixin
+from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
 from itou.common_apps.resume.forms import ResumeFormMixin
 from itou.eligibility.models import AdministrativeCriteria
 from itou.job_applications import enums as job_applications_enums
@@ -541,7 +542,7 @@ class EditHiringDateForm(forms.ModelForm):
         return cleaned_data
 
 
-class JobSeekerPersonalDataForm(forms.ModelForm):
+class JobSeekerPersonalDataForm(JobSeekerNIRUpdateMixin, forms.ModelForm):
     """
     Info that will be used to search for an existing Pôle emploi approval.
     """
@@ -557,7 +558,7 @@ class JobSeekerPersonalDataForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ["birthdate", "pole_emploi_id", "lack_of_pole_emploi_id_reason"]
+        fields = ["nir", "lack_of_nir_reason", "birthdate", "pole_emploi_id", "lack_of_pole_emploi_id_reason"]
         help_texts = {"birthdate": "Au format JJ/MM/AAAA, par exemple 20/12/1978."}
 
     def clean(self):

@@ -234,7 +234,11 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
     if job_application.to_siae.is_subject_to_eligibility_rules:
 
         # Info that will be used to search for an existing Pôle emploi approval.
-        form_personal_data = JobSeekerPersonalDataForm(instance=job_application.job_seeker, data=request.POST or None)
+        form_personal_data = JobSeekerPersonalDataForm(
+            instance=job_application.job_seeker,
+            data=request.POST or None,
+            tally_form_query=f"jobapplication={job_application.pk}",
+        )
         forms.append(form_personal_data)
 
         form_user_address = UserAddressForm(instance=job_application.job_seeker, data=request.POST or None)
