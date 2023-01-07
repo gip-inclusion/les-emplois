@@ -25,7 +25,7 @@ def administrative_criteria_annex_2_level_2():
     return GEIQAdministrativeCriteria.objects.get(pk=5)
 
 
-def test_create_eligibility_diagnosis(administrative_criteria_annex_1):
+def test_create_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
     prescriber_org = PrescriberOrganizationWithMembershipFactory()
     geiq = SiaeWithMembershipAndJobsFactory(kind=SiaeKind.GEIQ)
     job_seeker = JobSeekerFactory()
