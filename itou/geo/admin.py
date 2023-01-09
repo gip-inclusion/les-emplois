@@ -36,6 +36,7 @@ class QPVAdmin(GISModelAdmin):
 @admin.register(ZRR)
 class ZRRAdmin(admin.ModelAdmin):
     list_display = ("pk", "insee_code", "status")
+    list_filter = ("status",)
 
     ordering = ("insee_code",)
 
