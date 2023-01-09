@@ -327,3 +327,54 @@ def test_matomo_populate_private(monkeypatch, respx_mock):
             ("2022-06-13", "tb 168 - Délai d'entrée en IAE", "75 - Paris", "75", "Île-de-France"),
             ("2022-06-13", "tb 169 - Taux de transformation PE", "75 - Paris", "75", "Île-de-France"),
         ]
+
+
+@override_settings(MATOMO_BASE_URL="https://mato.mo", MATOMO_AUTH_TOKEN="foobar")
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.respx(base_url="https://mato.mo")
+@pytest.mark.usefixtures("metabase")
+@freeze_time("2022-06-21")
+def test_matomo_empty_output(monkeypatch, respx_mock, capsys):
+    monkeypatch.setattr(time, "sleep", lambda x: None)
+    MATOMO_ONLINE_EMPTY_CONTENT = "0," * 56 + "0"
+    respx_mock.get("/").respond(
+        200,
+        content=f"{MATOMO_HEADERS}\n{MATOMO_ONLINE_EMPTY_CONTENT}".encode("utf-16"),
+    )
+    management.call_command("populate_metabase_matomo", wet_run=True, mode="public")
+    stdout, _ = capsys.readouterr()
+    # sort the output because it's random (ThreadPoolExecutor)
+    assert sorted(stdout.splitlines()) == [
+        "\t! empty matomo values for date=2022-06-13 dashboard=tb 116 - Recrutement",
+        "\t! empty matomo values for date=2022-06-13 dashboard=tb 129 - Analyse des publics",
+        "\t! empty matomo values for date=2022-06-13 dashboard=tb 136 - Prescripteurs habilités",
+        "\t! empty matomo values for date=2022-06-13 dashboard=tb 140 - ETP conventionnés",
+        "\t! empty matomo values for date=2022-06-13 dashboard=tb 150 - Fiches de poste en tension",
+        "\t! empty matomo values for date=2022-06-13 dashboard=tb 32 - Acceptés en auto-prescription",
+        "\t! empty matomo values for date=2022-06-13 dashboard=tb 43 - Statistiques des emplois",
+        "\t! empty matomo values for date=2022-06-13 dashboard=tb 52 - Typologie de prescripteurs",
+        "\t! empty matomo values for date=2022-06-13 dashboard=tb 54 - Typologie des employeurs",
+        "\t! empty matomo values for date=2022-06-13 dashboard=tb 90 - Analyse des métiers",
+        "\t> fetching date=2022-06-13 dashboard='tb 116 - Recrutement' "
+        "segment=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/etat-suivi-candidatures/",
+        "\t> fetching date=2022-06-13 dashboard='tb 129 - Analyse des publics' "
+        "segment=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/analyse-des-publics/",
+        "\t> fetching date=2022-06-13 dashboard='tb 136 - Prescripteurs habilités' "
+        "segment=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/prescripteurs-habilites/",
+        "\t> fetching date=2022-06-13 dashboard='tb 140 - ETP conventionnés' "
+        "segment=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/etp-conventionnes/",
+        "\t> fetching date=2022-06-13 dashboard='tb 150 - Fiches de poste en tension' "
+        "segment=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/postes-en-tension/",
+        "\t> fetching date=2022-06-13 dashboard='tb 32 - Acceptés en "
+        "auto-prescription' "
+        "segment=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/auto-prescription/",
+        "\t> fetching date=2022-06-13 dashboard='tb 43 - Statistiques des emplois' "
+        "segment=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/statistiques-emplois/",
+        "\t> fetching date=2022-06-13 dashboard='tb 52 - Typologie de prescripteurs' "
+        "segment=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/zoom-prescripteurs/",
+        "\t> fetching date=2022-06-13 dashboard='tb 54 - Typologie des employeurs' "
+        "segment=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/zoom-employeurs/",
+        "\t> fetching date=2022-06-13 dashboard='tb 90 - Analyse des métiers' "
+        "segment=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/metiers/",
+        "> about to fetch count=10 public dashboards from Matomo.",
+    ]

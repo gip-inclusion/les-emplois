@@ -141,7 +141,7 @@ def get_matomo_dashboard(at: datetime.datetime, options: MatomoFetchOptions):
     column_names = None
     results = []
     for row in matomo_api_call(base_options | options.api_options):
-        if all(x in ["0", "0s", "0%"] for x in row.values()):
+        if all(x in ["0", "0s", "0%", None] for x in row.values()):
             print(f"\t! empty matomo values for date={at} dashboard={options.dashboard_name}")
             return None, None
         row["Date"] = at
@@ -220,7 +220,7 @@ class Command(BaseCommand):
 
         self.stdout.write(f"> about to fetch count={len(api_call_options)} public dashboards from Matomo.")
         column_names, all_rows = multiget_matomo_dashboards(at, api_call_options)
-        if wet_run:
+        if wet_run and column_names:
             update_table_at_date(
                 METABASE_PUBLIC_DASHBOARDS_TABLE_NAME,
                 column_names,
@@ -285,7 +285,7 @@ class Command(BaseCommand):
 
         self.stdout.write(f"> about to fetch count={len(api_call_options)} private dashboards from Matomo.")
         column_names, all_rows = multiget_matomo_dashboards(at, api_call_options)
-        if wet_run:
+        if wet_run and column_names:
             update_table_at_date(
                 METABASE_PRIVATE_DASHBOARDS_TABLE_NAME,
                 column_names,
