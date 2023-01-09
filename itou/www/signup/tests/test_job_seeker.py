@@ -11,7 +11,7 @@ from itou.cities.factories import create_test_cities
 from itou.cities.models import City
 from itou.openid_connect.france_connect import constants as fc_constants
 from itou.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance
-from itou.users.factories import DEFAULT_PASSWORD
+from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.test import TestCase
@@ -238,6 +238,29 @@ class JobSeekerSignupTest(TestCase):
         assert response.url == reverse("welcoming_tour:index")
         user_email = user.emailaddress_set.first()
         assert user_email.verified
+
+    def test_job_seeker_signup_with_existing_email(self):
+        JobSeekerFactory(email="alice@evil.com")
+        url = reverse("signup:job_seeker")
+        response = self.client.post(
+            url,
+            {
+                "first_name": "Alice",
+                "last_name": "Evil",
+                "email": "alice@evil.com",
+                "password1": "hunter2",
+                "password2": "hunter2",
+                "address_line_1": "Test address_line_1",
+                "address_line_2": "Test address_line_2",
+                "post_code": "87000",
+                "city_name": "Limoges",
+                "city": "limoges",
+            },
+        )
+        assert response.status_code == 200
+        assert response.context["form"].errors == {
+            "email": ["Un autre utilisateur utilise déjà cette adresse e-mail."]
+        }
 
     @respx.mock
     @override_settings(
