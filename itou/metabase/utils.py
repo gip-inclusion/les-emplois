@@ -28,10 +28,10 @@ def chunked_queryset(queryset, chunk_size=10000):
     https://medium.com/@rui.jorge.rei/today-i-learned-django-memory-leak-and-the-sql-query-cache-1c152f62f64
     Code initially adapted from https://djangosnippets.org/snippets/10599/
     """
-    if not queryset.exists():
-        return
     queryset = queryset.order_by("pk")
     pks = queryset.values_list("pk", flat=True)
+    if not pks:
+        return
     start_pk = pks[0]
     while True:
         try:

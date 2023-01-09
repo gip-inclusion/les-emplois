@@ -1,6 +1,7 @@
 """
 Helper methods for manipulating tables used by both populate_metabase_emplois and populate_metabase_fluxiae scripts.
 """
+import copy
 import gc
 import logging
 import os
@@ -164,6 +165,8 @@ def populate_table(table, batch_size, querysets=None, extra_object=None):
 
     total_rows = sum([queryset.count() for queryset in querysets])
 
+    table = copy.deepcopy(table)
+    # because of tenacity, we can't just add the last column to the global variable
     table.add_columns(
         [
             {
