@@ -356,7 +356,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
 
         return HttpResponseClientRedirect(next_url)
 
-    return render(request, template_name, context)
+    return render(request, template_name, {**context, "has_form_error": any(form.errors for form in forms)})
 
 
 @login_required

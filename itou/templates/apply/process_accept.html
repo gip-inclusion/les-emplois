@@ -13,13 +13,18 @@
         <form method="post"
               action=""
               hx-post="{{ request.path }}"
-              hx-swap="outerHTML"
+              hx-swap="outerHTML show:#acceptForm:top"
               class="mt-5"
               id="acceptForm"
               tabindex="0"
               aria-labelledby="dialogLabel"
               aria-hidden="true"
               {% if modal_shown %}data-htmx-open-modal="#js-confirmation-modal"{% endif %}>
+            {% if has_form_error %}
+                <div class="alert alert-danger">
+                    <p class="mb-0">Merci de corriger les erreurs ci-dessous</p>
+                </div>
+            {% endif %}
 
             {% csrf_token %}
 
