@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from time import sleep
 
 import httpx
+import tenacity
 from dateutil.rrule import MO, WEEKLY, rrule
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -21,6 +22,15 @@ from itou.common_apps.address.departments import (
 )
 from itou.metabase.db import MetabaseDatabaseCursor, create_table
 from itou.utils import constants
+
+
+def log_retry_attempt(retry_state):
+    try:
+        outcome = retry_state.outcome.result()
+    except Exception as e:  # pylint: disable=broad-except
+        outcome = str(e)
+
+    print(f"attempt={retry_state.attempt_number} failed with outcome={outcome}")
 
 
 # Matomo might be a little tingly sometimes, let's give it retries.
@@ -80,9 +90,13 @@ METABASE_PRIVATE_DASHBOARDS_TABLE_NAME = "suivi_visiteurs_tb_prives_v0"
 
 
 def matomo_api_call(options):
-    response = client.get(f"{settings.MATOMO_BASE_URL}?{urllib.parse.urlencode(options)}", timeout=MATOMO_TIMEOUT)
-    csv_content = response.content.decode("utf-16")
-    yield from csv.DictReader(io.StringIO(csv_content), dialect="excel")
+    @tenacity.retry(stop=tenacity.stop_after_attempt(3), wait=tenacity.wait_fixed(30), after=log_retry_attempt)
+    def get_csv_raw_data():
+        response = client.get(f"{settings.MATOMO_BASE_URL}?{urllib.parse.urlencode(options)}", timeout=MATOMO_TIMEOUT)
+        response.raise_for_status()
+        return response.content.decode("utf-16")
+
+    yield from csv.DictReader(io.StringIO(get_csv_raw_data()), dialect="excel")
 
 
 def update_table_at_date(table_name, column_names, at, rows):

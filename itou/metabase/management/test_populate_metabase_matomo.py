@@ -1,6 +1,7 @@
 import time
 
 import pytest
+import tenacity
 from django.core import management
 from django.db import connection
 from django.test import override_settings
@@ -42,7 +43,43 @@ MATOMO_ONLINE_CONTENT = (
 )
 
 
-@override_settings(MATOMO_BASE_URL="https://mato.mo")
+@override_settings(MATOMO_BASE_URL="https://mato.mo", MATOMO_AUTH_TOKEN="foobar")
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.respx(base_url="https://mato.mo")
+@pytest.mark.usefixtures("metabase")
+@freeze_time("2022-06-21")
+def test_matomo_retry(monkeypatch, respx_mock, capsys):
+    monkeypatch.setattr(time, "sleep", lambda x: None)
+    respx_mock.get("/").respond(
+        500,
+        content=f"{MATOMO_HEADERS}\n{MATOMO_ONLINE_CONTENT}".encode("utf-16"),
+    )
+    with pytest.raises(tenacity.RetryError):
+        management.call_command("populate_metabase_matomo", wet_run=True, mode="public")
+    stdout, _ = capsys.readouterr()
+    # sort the output because it's random (ThreadPoolExecutor)
+    assert [line[:70] for line in sorted(stdout.splitlines())] == [
+        "\t> fetching date=2022-06-13 dashboard='tb 116 - Recrutement' segment=h",
+        "\t> fetching date=2022-06-13 dashboard='tb 129 - Analyse des publics' s",
+        "\t> fetching date=2022-06-13 dashboard='tb 136 - Prescripteurs habilité",
+        "\t> fetching date=2022-06-13 dashboard='tb 140 - ETP conventionnés' seg",
+        "\t> fetching date=2022-06-13 dashboard='tb 150 - Fiches de poste en ten",
+        "\t> fetching date=2022-06-13 dashboard='tb 32 - Acceptés en auto-prescr",
+        "\t> fetching date=2022-06-13 dashboard='tb 43 - Statistiques des emploi",
+        "\t> fetching date=2022-06-13 dashboard='tb 52 - Typologie de prescripte",
+        "\t> fetching date=2022-06-13 dashboard='tb 54 - Typologie des employeur",
+        "\t> fetching date=2022-06-13 dashboard='tb 90 - Analyse des métiers' se",
+        "> about to fetch count=10 public dashboards from Matomo.",
+    ] + ["For more information check: https://httpstatuses.com/500"] * 30 + [
+        "attempt=1 failed with outcome=Server error '500 Internal Server Error'"
+    ] * 10 + [
+        "attempt=2 failed with outcome=Server error '500 Internal Server Error'"
+    ] * 10 + [
+        "attempt=3 failed with outcome=Server error '500 Internal Server Error'"
+    ] * 10
+
+
+@override_settings(MATOMO_BASE_URL="https://mato.mo", MATOMO_AUTH_TOKEN="foobar")
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.respx(base_url="https://mato.mo")
 @pytest.mark.usefixtures("metabase")
