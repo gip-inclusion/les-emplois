@@ -20,6 +20,7 @@ from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipAndJobsFactory
+from itou.users.enums import LackOfNIRReason
 from itou.users.factories import (
     ItouStaffFactory,
     JobSeekerFactory,
@@ -101,6 +102,48 @@ class ApplyTest(TestCase):
             reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"job_description_id": 42, "back_url": "/"}
         )
         assert self.client.session[f"job_application-{siae.pk}"]["back_url"] == "/"
+
+
+def test_check_nir_job_seeker_with_lack_of_nir_reason(client):
+    """Apply as jobseeker."""
+
+    siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+
+    user = JobSeekerFactory(birthdate=None, nir=None, lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER)
+    client.force_login(user)
+
+    # Entry point.
+    # ----------------------------------------------------------------------
+
+    response = client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"})
+    assert response.status_code == 302
+
+    session_data = client.session[f"job_application-{siae.pk}"]
+    assert session_data == {
+        "back_url": "/",
+        "job_seeker_pk": user.pk,
+        "nir": None,
+        "selected_jobs": [],
+    }
+
+    next_url = reverse("apply:check_nir_for_job_seeker", kwargs={"siae_pk": siae.pk})
+    assert response.url == next_url
+
+    # Step check job seeker NIR.
+    # ----------------------------------------------------------------------
+
+    response = client.get(next_url)
+    assert response.status_code == 200
+
+    nir = "141068078200557"
+    post_data = {"nir": nir, "confirm": 1}
+
+    response = client.post(next_url, data=post_data)
+    assert response.status_code == 302
+
+    user.refresh_from_db()
+    assert user.nir == nir
+    assert user.lack_of_nir_reason == ""
 
 
 class ApplyAsJobSeekerTest(S3AccessingTestCase):
@@ -1272,6 +1315,47 @@ class ApplyAsPrescriberNirExceptionsTest(S3AccessingTestCase):
         # ----------------------------------------------------------------------
         job_seeker.refresh_from_db()
         assert job_seeker.nir == nir
+
+    def test_one_account_lack_of_nir_reason(self):
+        job_seeker = JobSeekerFactory(nir=None, lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER)
+        # Create an approval to bypass the eligibility diagnosis step.
+        PoleEmploiApprovalFactory(birthdate=job_seeker.birthdate, pole_emploi_id=job_seeker.pole_emploi_id)
+        siae, user = self.create_test_data()
+        self.client.force_login(user)
+
+        # Follow all redirections…
+        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"}, follow=True)
+
+        # …until a job seeker has to be determined.
+        assert response.status_code == 200
+        last_url = response.redirect_chain[-1][0]
+        assert last_url == reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk})
+
+        # Enter a non-existing NIR.
+        # ----------------------------------------------------------------------
+        nir = "141068078200557"
+        post_data = {"nir": nir, "confirm": 1}
+        response = self.client.post(last_url, data=post_data)
+        next_url = reverse("apply:check_email_for_sender", kwargs={"siae_pk": siae.pk})
+        self.assertRedirects(response, next_url)
+
+        # Enter an existing email.
+        # ----------------------------------------------------------------------
+        post_data = {"email": job_seeker.email, "confirm": "1"}
+        response = self.client.post(next_url, data=post_data)
+        self.assertRedirects(
+            response, reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk}), target_status_code=302
+        )
+
+        response = self.client.post(next_url, data=post_data, follow=True)
+        assert response.status_code == 200
+        assert 0 == len(list(response.context["messages"]))
+
+        # Make sure the job seeker NIR is now filled in.
+        # ----------------------------------------------------------------------
+        job_seeker.refresh_from_db()
+        assert job_seeker.nir == nir
+        assert job_seeker.lack_of_nir_reason == ""
 
 
 class ApplyAsSiaeTest(S3AccessingTestCase):

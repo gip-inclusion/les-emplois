@@ -245,6 +245,7 @@ class CheckNIRForJobSeekerView(ApplyStepForJobSeekerBaseView):
 
         if self.form.is_valid():
             self.job_seeker.nir = self.form.cleaned_data["nir"]
+            self.job_seeker.lack_of_nir_reason = ""
             self.job_seeker.save()
             return HttpResponseRedirect(reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": self.siae.pk}))
 
@@ -356,8 +357,9 @@ class CheckEmailForSenderView(ApplyStepForSenderBaseView):
                     )
 
                 try:
-                    job_seeker.nir = self.apply_session.get("nir")
-                    job_seeker.save(update_fields=["nir"])
+                    job_seeker.nir = nir
+                    job_seeker.lack_of_nir_reason = ""
+                    job_seeker.save(update_fields=["nir", "lack_of_nir_reason"])
                 except ValidationError:
                     msg = mark_safe(
                         f"Le<b> numéro de sécurité sociale</b> renseigné ({ nir }) est "
