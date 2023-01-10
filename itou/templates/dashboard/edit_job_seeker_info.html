@@ -1,5 +1,6 @@
 {% extends "layout/content_small.html" %}
 {% load bootstrap4 %}
+{% load static %}
 
 {% block title %}
     Informations personnelles de {{ job_application.job_seeker.get_full_name|title }}{{ block.super }}
@@ -20,16 +21,11 @@
     </p>
 </div>
 
-<form method="post" action="" class="js-prevent-multiple-submit">
+{% include "dashboard/includes/edit_job_seeker_info_form.html" with prev_url=prev_url submit_label="Mettre à jour" %}
 
-    {% csrf_token %}
+{% endblock %}
 
-    {% bootstrap_form form alert_error_type="all" %}
-
-    {% buttons %}
-        <a class="btn btn-outline-primary" href="{{ prev_url }}">Annuler</a>
-        <button type="submit" class="btn btn-primary">Mettre à jour</button>
-    {% endbuttons %}
-
-</form>
+{% block script %}
+    {{ block.super }}
+    <script src="{% static 'js/split_nir.js' %}"></script>
 {% endblock %}

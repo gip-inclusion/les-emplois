@@ -12,7 +12,7 @@ class JobSeekerNIRUpdateMixin:
     nir & lack_of_nir_reason must be declared in the form's Meta.fields
     """
 
-    def __init__(self, *args, tally_form_query=None, **kwargs):
+    def __init__(self, *args, editor=None, tally_form_query=None, **kwargs):
         super().__init__(*args, **kwargs)
 
         # A transient checkbox used to collapse optional block
@@ -55,7 +55,7 @@ class JobSeekerNIRUpdateMixin:
             # Disable NIR editing altogether if the job seeker already has one
             self.fields["nir"].disabled = True
             self.fields["lack_of_nir"].widget = forms.HiddenInput()
-            if not self.instance.is_handled_by_proxy:
+            if not self.instance.is_handled_by_proxy and self.instance != editor:
                 nir_help_text = (
                     "Ce candidat a pris le contrôle de son compte utilisateur. "
                     "Vous ne pouvez pas modifier ses informations."

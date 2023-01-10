@@ -182,8 +182,18 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
     """
     dashboard_url = reverse_lazy("dashboard:index")
     prev_url = get_safe_url(request, "prev_url", fallback_url=dashboard_url)
-    form_class = EditJobSeekerInfoForm if request.user.is_job_seeker else EditUserInfoForm
-    form = form_class(instance=request.user, data=request.POST or None)
+    if request.user.is_job_seeker:
+        form = EditJobSeekerInfoForm(
+            instance=request.user,
+            editor=request.user,
+            data=request.POST or None,
+            tally_form_query=f"jobseeker={request.user.pk}",
+        )
+    else:
+        form = EditUserInfoForm(
+            instance=request.user,
+            data=request.POST or None,
+        )
     extra_data = request.user.externaldataimport_set.pe_sources().first()
 
     if request.method == "POST" and form.is_valid():
@@ -225,7 +235,12 @@ def edit_job_seeker_info(request, job_application_id, template_name="dashboard/e
 
     dashboard_url = reverse_lazy("dashboard:index")
     back_url = get_safe_url(request, "back_url", fallback_url=dashboard_url)
-    form = EditJobSeekerInfoForm(instance=job_application.job_seeker, editor=request.user, data=request.POST or None)
+    form = EditJobSeekerInfoForm(
+        instance=job_application.job_seeker,
+        editor=request.user,
+        data=request.POST or None,
+        tally_form_query=f"jobapplication={job_application.pk}",
+    )
 
     if request.method == "POST" and form.is_valid():
         form.save()

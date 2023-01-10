@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 from itou.common_apps.address.forms import MandatoryAddressFormMixin
+from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
 from itou.job_applications.notifications import (
     NewQualifiedJobAppEmployersNotification,
     NewSpontaneousJobAppEmployersNotification,
@@ -26,7 +27,7 @@ class SSOReadonlyMixin:
                     self.fields[name].disabled = True
 
 
-class EditJobSeekerInfoForm(MandatoryAddressFormMixin, SSOReadonlyMixin, forms.ModelForm):
+class EditJobSeekerInfoForm(JobSeekerNIRUpdateMixin, MandatoryAddressFormMixin, SSOReadonlyMixin, forms.ModelForm):
     """
     Edit a job seeker profile.
     """
@@ -38,7 +39,7 @@ class EditJobSeekerInfoForm(MandatoryAddressFormMixin, SSOReadonlyMixin, forms.M
     )
 
     def __init__(self, *args, **kwargs):
-        editor = kwargs.pop("editor", None)
+        editor = kwargs.get("editor", None)
         super().__init__(*args, **kwargs)
         assert self.instance.is_job_seeker, self.instance
 
@@ -71,6 +72,8 @@ class EditJobSeekerInfoForm(MandatoryAddressFormMixin, SSOReadonlyMixin, forms.M
             "email",
             "first_name",
             "last_name",
+            "nir",
+            "lack_of_nir_reason",
             "birthdate",
             "phone",
             "address_line_1",

@@ -32,7 +32,7 @@ from itou.siaes.factories import (
     SiaePendingGracePeriodFactory,
     SiaeWithMembershipAndJobsFactory,
 )
-from itou.users.enums import IdentityProvider
+from itou.users.enums import IdentityProvider, LackOfNIRReason
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
 from itou.users.models import User
 from itou.utils import constants as global_constants
@@ -498,7 +498,12 @@ class DashboardViewTest(TestCase):
 
 
 class EditUserInfoViewTest(TestCase):
-    def test_edit(self):
+    def setUp(self):
+        super().setUp()
+        self.NIR_UPDATE_TALLY_LINK_LABEL = "Demander la correction du numéro de sécurité sociale"
+
+    @override_settings(TALLY_URL="https://tally.so")
+    def test_edit_with_nir(self):
         user = JobSeekerFactory()
         self.client.force_login(user)
         url = reverse("dashboard:edit_user_info")
@@ -506,6 +511,16 @@ class EditUserInfoViewTest(TestCase):
         assert response.status_code == 200
         # There's a specific view to edit the email so we don't show it here
         self.assertNotContains(response, "Adresse électronique")
+        # Check that the NIR field is disabled
+        self.assertContains(response, 'disabled id="id_nir"')
+        self.assertContains(
+            response,
+            (
+                f'<a href="https://tally.so/r/wzxQlg?jobseeker={user.pk}" target="_blank" rel="noopener">'
+                f"{self.NIR_UPDATE_TALLY_LINK_LABEL}</a>"
+            ),
+            html=True,
+        )
 
         post_data = {
             "email": "bob@saintclar.net",
@@ -534,6 +549,69 @@ class EditUserInfoViewTest(TestCase):
 
         # Ensure that the job seeker cannot edit email here.
         assert user.email != post_data["email"]
+
+    def test_edit_with_lack_of_nir_reason(self):
+        user = JobSeekerFactory(nir=None, lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER)
+        self.client.force_login(user)
+        url = reverse("dashboard:edit_user_info")
+        response = self.client.get(url)
+        # Check that the NIR field is disabled (it can be reenabled via lack_of_nir check box)
+        self.assertContains(response, 'disabled id="id_nir"')
+        self.assertContains(response, LackOfNIRReason.TEMPORARY_NUMBER.label, html=True)
+        self.assertNotContains(response, self.NIR_UPDATE_TALLY_LINK_LABEL, html=True)
+
+        NEW_NIR = "1 970 13625838386"
+        post_data = {
+            "email": "bob@saintclar.net",
+            "first_name": "Bob",
+            "last_name": "Saint Clar",
+            "birthdate": "20/12/1978",
+            "phone": "0610203050",
+            "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
+            "address_line_1": "10, rue du Gué",
+            "address_line_2": "Sous l'escalier",
+            "post_code": "35400",
+            "city": "Saint-Malo",
+            "lack_of_nir": False,
+            "nir": NEW_NIR,
+        }
+        response = self.client.post(url, data=post_data)
+        assert response.status_code == 302
+
+        user.refresh_from_db()
+        assert user.lack_of_nir_reason == ""
+        assert user.nir == NEW_NIR.replace(" ", "")
+
+    def test_edit_without_nir_information(self):
+        user = JobSeekerFactory(nir=None, lack_of_nir_reason="")
+        self.client.force_login(user)
+        url = reverse("dashboard:edit_user_info")
+        response = self.client.get(url)
+        # Check that the NIR field is enabled
+        assert not response.context["form"]["nir"].field.disabled
+        self.assertNotContains(response, self.NIR_UPDATE_TALLY_LINK_LABEL, html=True)
+
+        NEW_NIR = "1 970 13625838386"
+        post_data = {
+            "email": "bob@saintclar.net",
+            "first_name": "Bob",
+            "last_name": "Saint Clar",
+            "birthdate": "20/12/1978",
+            "phone": "0610203050",
+            "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
+            "address_line_1": "10, rue du Gué",
+            "address_line_2": "Sous l'escalier",
+            "post_code": "35400",
+            "city": "Saint-Malo",
+            "lack_of_nir": False,
+            "nir": NEW_NIR,
+        }
+        response = self.client.post(url, data=post_data)
+        assert response.status_code == 302
+
+        user.refresh_from_db()
+        assert user.lack_of_nir_reason == ""
+        assert user.nir == NEW_NIR.replace(" ", "")
 
     def test_edit_sso(self):
         user = JobSeekerFactory(identity_provider=IdentityProvider.FRANCE_CONNECT)
@@ -571,9 +649,43 @@ class EditUserInfoViewTest(TestCase):
         assert user.birthdate.strftime("%d/%m/%Y") != post_data["birthdate"]
         assert user.email != post_data["email"]
 
+    def test_edit_as_prescriber(self):
+        user = PrescriberFactory()
+        self.client.force_login(user)
+        url = reverse("dashboard:edit_user_info")
+        response = self.client.get(url)
+        self.assertNotContains(response, "id_nir")
+        self.assertNotContains(response, "id_lack_of_nir")
+        self.assertNotContains(response, "id_lack_of_nir_reason")
+        self.assertNotContains(response, "birthdate")
+
+        post_data = {
+            "first_name": "Bob",
+            "last_name": "Saint Clar",
+            "phone": "0610203050",
+            "address_line_1": "10, rue du Gué",
+            "address_line_2": "Sous l'escalier",
+            "post_code": "35400",
+            "city": "Saint-Malo",
+        }
+        response = self.client.post(url, data=post_data)
+        assert response.status_code == 302
+
+        user = User.objects.get(id=user.id)
+        assert user.phone == post_data["phone"]
+        assert user.address_line_1 == post_data["address_line_1"]
+        assert user.address_line_2 == post_data["address_line_2"]
+        assert user.post_code == post_data["post_code"]
+        assert user.city == post_data["city"]
+
 
 class EditJobSeekerInfo(TestCase):
-    def test_edit_by_siae(self):
+    def setUp(self):
+        super().setUp()
+        self.NIR_UPDATE_TALLY_LINK_LABEL = "Demander la correction du numéro de sécurité sociale"
+
+    @override_settings(TALLY_URL="https://tally.so")
+    def test_edit_by_siae_with_nir(self):
         job_application = JobApplicationSentByPrescriberFactory()
         user = job_application.to_siae.members.first()
 
@@ -589,7 +701,14 @@ class EditJobSeekerInfo(TestCase):
         url = f"{url}?back_url={back_url}"
 
         response = self.client.get(url)
-        assert response.status_code == 200
+        self.assertContains(
+            response,
+            (
+                f'<a href="https://tally.so/r/wzxQlg?jobapplication={job_application.pk}" target="_blank" '
+                f'rel="noopener">{self.NIR_UPDATE_TALLY_LINK_LABEL}</a>'
+            ),
+            html=True,
+        )
 
         post_data = {
             "email": "bob@saintclar.net",
@@ -624,6 +743,132 @@ class EditJobSeekerInfo(TestCase):
 
         assert job_seeker.phone == post_data["phone"]
         assert job_seeker.address_line_2 == post_data["address_line_2"]
+
+        # last_checked_at should have been updated
+        assert job_seeker.last_checked_at > previous_last_checked_at
+
+    def test_edit_by_siae_with_lack_of_nir_reason(self):
+        job_application = JobApplicationSentByPrescriberFactory(
+            job_seeker__nir=None, job_seeker__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER
+        )
+        user = job_application.to_siae.members.first()
+
+        # Ensure that the job seeker is not autonomous (i.e. he did not register by himself).
+        job_application.job_seeker.created_by = user
+        job_application.job_seeker.save()
+        previous_last_checked_at = job_application.job_seeker.last_checked_at
+
+        self.client.force_login(user)
+
+        back_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
+        url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_application_id": job_application.pk})
+        url = f"{url}?back_url={back_url}"
+
+        response = self.client.get(url)
+        self.assertContains(response, LackOfNIRReason.TEMPORARY_NUMBER.label, html=True)
+        self.assertContains(response, 'disabled id="id_nir"')
+        self.assertNotContains(response, self.NIR_UPDATE_TALLY_LINK_LABEL, html=True)
+
+        NEW_NIR = "1 970 13625838386"
+        post_data = {
+            "email": "bob@saintclar.net",
+            "first_name": "Bob",
+            "last_name": "Saint Clar",
+            "birthdate": "20/12/1978",
+            "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
+            "address_line_1": "10, rue du Gué",
+            "post_code": "35400",
+            "city": "Saint-Malo",
+            "lack_of_nir": False,
+            "nir": NEW_NIR,
+        }
+        response = self.client.post(url, data=post_data)
+
+        assert response.status_code == 302
+        assert response.url == back_url
+
+        job_seeker = User.objects.get(id=job_application.job_seeker.id)
+        assert job_seeker.lack_of_nir_reason == ""
+        assert job_seeker.nir == NEW_NIR.replace(" ", "")
+
+        # last_checked_at should have been updated
+        assert job_seeker.last_checked_at > previous_last_checked_at
+
+    def test_edit_by_siae_without_nir_information(self):
+        job_application = JobApplicationSentByPrescriberFactory(
+            job_seeker__nir=None, job_seeker__lack_of_nir_reason=""
+        )
+        user = job_application.to_siae.members.first()
+
+        # Ensure that the job seeker is not autonomous (i.e. he did not register by himself).
+        job_application.job_seeker.created_by = user
+        job_application.job_seeker.save()
+        previous_last_checked_at = job_application.job_seeker.last_checked_at
+
+        self.client.force_login(user)
+
+        back_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
+        url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_application_id": job_application.pk})
+        url = f"{url}?back_url={back_url}"
+
+        response = self.client.get(url)
+        # Check that the NIR field is enabled
+        assert not response.context["form"]["nir"].field.disabled
+        self.assertNotContains(response, self.NIR_UPDATE_TALLY_LINK_LABEL, html=True)
+
+        post_data = {
+            "email": "bob@saintclar.net",
+            "first_name": "Bob",
+            "last_name": "Saint Clar",
+            "birthdate": "20/12/1978",
+            "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
+            "address_line_1": "10, rue du Gué",
+            "post_code": "35400",
+            "city": "Saint-Malo",
+            "lack_of_nir": False,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
+
+        post_data["lack_of_nir"] = True
+        response = self.client.post(url, data=post_data)
+        self.assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
+        self.assertContains(response, "Veuillez sélectionner un motif pour continuer", html=True)
+
+        post_data.update(
+            {
+                "lack_of_nir": True,
+                "lack_of_nir_reason": LackOfNIRReason.TEMPORARY_NUMBER.value,
+            }
+        )
+        response = self.client.post(url, data=post_data)
+        self.assertRedirects(response, expected_url=back_url)
+        job_seeker = User.objects.get(id=job_application.job_seeker.id)
+        assert job_seeker.lack_of_nir_reason == LackOfNIRReason.TEMPORARY_NUMBER
+        assert job_seeker.nir is None
+
+        post_data.update(
+            {
+                "lack_of_nir": False,
+                "nir": "1234",
+            }
+        )
+        response = self.client.post(url, data=post_data)
+        self.assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
+        self.assertFormError(
+            response.context["form"],
+            "nir",
+            "Le numéro de sécurité sociale est trop court (15 caractères autorisés).",
+        )
+
+        NEW_NIR = "1 970 13625838386"
+        post_data["nir"] = NEW_NIR
+        response = self.client.post(url, data=post_data)
+        self.assertRedirects(response, expected_url=back_url)
+
+        job_seeker.refresh_from_db()
+        assert job_seeker.lack_of_nir_reason == ""
+        assert job_seeker.nir == NEW_NIR.replace(" ", "")
 
         # last_checked_at should have been updated
         assert job_seeker.last_checked_at > previous_last_checked_at
