@@ -1,5 +1,6 @@
 import dataclasses
 import logging
+from urllib.error import HTTPError
 
 import httpx
 import jwt
@@ -270,7 +271,12 @@ def inclusion_connect_logout(request):
     complete_url = f"{constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT}?{urlencode(params)}"
     # Logout user from IC with HTTPX to benefit from respx in tests
     # and to handle post logout redirection more easily.
-    response = httpx.get(complete_url)
-    if response.status_code != 200:
-        logger.error("Error during IC logout. Status code: %s", response.status_code)
+    # It's okay if this fails... We don't want to crash on our side.
+    try:
+        response = httpx.get(complete_url)
+    except HTTPError as e:
+        logger.exception("Error during IC logout : '%s'", e)
+    else:
+        if response.status_code != 200:
+            logger.error("Error during IC logout. Status code: %s", response.status_code)
     return HttpResponseRedirect(post_logout_redirect_url)
