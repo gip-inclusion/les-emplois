@@ -918,6 +918,8 @@ class ApplicationEndView(ApplyStepBaseView):
 
 
 class UpdateJobSeekerBaseView(ApplyStepBaseView):
+    required_session_namespaces = ["apply_session"]
+
     def __init__(self):
         super().__init__()
         self.job_seeker_session = None
