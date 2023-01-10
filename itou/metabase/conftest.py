@@ -2,6 +2,7 @@ import pytest
 from django.db import connection
 
 from itou.metabase import db
+from itou.metabase.tables.utils import get_qpv_job_seeker_pks
 
 
 @pytest.fixture(name="metabase")
@@ -31,3 +32,10 @@ def metabase_fixture(monkeypatch):
                 self.cursor.close()
 
     monkeypatch.setattr(db, "MetabaseDatabaseCursor", FakeMetabase)
+
+
+@pytest.fixture(autouse=True)
+def clear_qpv_cache():
+    # Clear cache on get_qpv_job_seeker_pks to ensure we have the correct data
+    # and that the query is always performed
+    get_qpv_job_seeker_pks.cache_clear()
