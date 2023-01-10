@@ -574,10 +574,13 @@ MATOMO_AUTH_TOKEN = os.getenv("MATOMO_AUTH_TOKEN")
 CSP_DEFAULT_SRC = ["'self'"]
 CSP_FRAME_SRC = [
     "https://app.livestorm.co",  # Upcoming events from the homepage
-    "https://stats.inclusion.beta.gouv.fr",
     "*.hotjar.com",
-    "https://pilotage.inclusion.beta.gouv.fr",
+    # For stats/pilotage views
     "https://tally.so",
+    "https://stats.inclusion.beta.gouv.fr",
+    "https://pilotage.inclusion.beta.gouv.fr",
+    "https://communaute.inclusion.beta.gouv.fr",
+    "https://inclusion.beta.gouv.fr",
 ]
 CSP_IMG_SRC = [
     "'self'",
