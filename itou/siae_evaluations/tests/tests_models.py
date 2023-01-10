@@ -452,7 +452,9 @@ class EvaluationCampaignManagerTest(TestCase):
         assert 2 == EvaluatedSiae.objects.filter(reviewed_at__isnull=True).count()
 
         # make the SIAE in another state
-        evaluated_administrative_criterion.review_state = "FOOBAR"
+        evaluated_administrative_criterion.review_state = (
+            evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
+        )
         evaluated_administrative_criterion.save(update_fields=["review_state"])
         del evaluated_siae.state
         assert evaluation_enums.EvaluatedSiaeState.SUBMITTED != evaluated_siae.state

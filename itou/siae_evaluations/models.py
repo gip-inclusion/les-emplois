@@ -721,6 +721,7 @@ class EvaluatedJobApplication(models.Model):
             for eval_admin_crit in self.evaluated_administrative_criteria.all()
         ):
             return evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED
+        raise TypeError(f"Unknown state for “{self}”")
 
     @property
     def should_select_criteria(self):
