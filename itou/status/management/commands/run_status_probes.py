@@ -1,5 +1,8 @@
 import logging
+from contextlib import contextmanager
 
+import httpx
+from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 from tqdm import tqdm
@@ -10,17 +13,43 @@ from itou.status import models, probes
 logger = logging.getLogger(__name__)
 
 
+@contextmanager
+def sentry_monitor(monitor_id):
+    notify_sentry = bool(settings.SENTRY_DSN)
+    headers = {"Authorization": f"DSN {settings.SENTRY_DSN}"}
+
+    if notify_sentry:
+        response = httpx.post(
+            f"https://sentry.io/api/0/monitors/{monitor_id}/checkins/",
+            headers=headers,
+            json={"status": "in_progress"},
+        )
+        response.raise_for_status()
+        checkin_id = response.json()["id"]
+
+    yield
+
+    if notify_sentry:
+        response = httpx.put(
+            f"https://sentry.io/api/0/monitors/{monitor_id}/checkins/{checkin_id}/",
+            headers=headers,
+            json={"status": "ok"},
+        )
+        response.raise_for_status()
+
+
 class Command(BaseCommand):
     help = "Run status probes"
 
     def handle(self, **options):
-        self.stdout.write("Start probing")
+        with sentry_monitor("6bd9f961-825f-4a9f-a94a-671c3e73e98e"):
+            self.stdout.write("Start probing")
 
-        probes_classes = probes.get_probes_classes()
-        self._check_and_remove_dangling_probes(probes_classes)
-        self._run_probes(probes_classes)
+            probes_classes = probes.get_probes_classes()
+            self._check_and_remove_dangling_probes(probes_classes)
+            self._run_probes(probes_classes)
 
-        self.stdout.write("Finished probing")
+            self.stdout.write("Finished probing")
 
     def _run_probes(self, probes_classes):
         self.stdout.write("Running probes")
