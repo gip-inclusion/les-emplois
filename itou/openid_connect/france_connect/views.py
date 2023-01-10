@@ -146,7 +146,8 @@ def france_connect_callback(request):  # pylint: disable=too-many-return-stateme
     nir = request.session.get(ITOU_SESSION_NIR_KEY)
     if nir:
         user.nir = nir
-        user.save(update_fields=["nir"])
+        user.lack_of_nir_reason = ""
+        user.save(update_fields=["nir", "lack_of_nir_reason"])
 
     # Because we have more than one Authentication backend in our settings, we need to specify
     # the one we want to use in login

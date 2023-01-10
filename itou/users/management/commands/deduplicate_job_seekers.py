@@ -107,6 +107,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
         # uniqueness constraint.
         if len(nirs) == 1 and not target.nir:
             target.nir = nirs[0]
+            target.lack_of_nir_reason = ""
             if self.wet_run:
                 target.save()
 

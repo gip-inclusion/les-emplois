@@ -167,6 +167,8 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
 
             if not self.dry_run:
                 job_seeker.nir = row[NIR_COL]
+                if job_seeker.nir:
+                    job_seeker.lack_of_nir_reason = ""
                 nb_updated_job_seekers += 1
 
             if not self.dry_run:
