@@ -1,5 +1,6 @@
 {% extends "layout/content_small.html" %}
 {% load bootstrap4 %}
+{% load static %}
 
 {% block title %}Modifier votre profil{{ block.super }}{% endblock %}
 
@@ -16,17 +17,24 @@
 
     {% endif %}
 
-    <form method="post" action="" class="js-prevent-multiple-submit">
+    {% if request.user.is_job_seeker %}
+        {% include "dashboard/includes/edit_job_seeker_info_form.html" with prev_url=prev_url submit_label="Enregistrer" %}
+    {% else %}
+        <form method="post" action="" class="js-prevent-multiple-submit">
+            {% csrf_token %}
+            {% bootstrap_form form alert_error_type="all" %}
+            {% buttons %}
+                <a class="btn btn-outline-primary" href="{{ prev_url }}">Annuler</a>
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+            {% endbuttons %}
+        </form>
+    {% endif %}
 
-        {% csrf_token %}
+{% endblock %}
 
-        {% bootstrap_form form alert_error_type="all" %}
-
-        {% buttons %}
-            <a class="btn btn-outline-primary" href="{{ prev_url }}">Annuler</a>
-            <button type="submit" class="btn btn-primary">Enregistrer</button>
-        {% endbuttons %}
-
-    </form>
-
+{% block script %}
+    {{ block.super }}
+    {% if request.user.is_job_seeker %}
+        <script src="{% static 'js/split_nir.js' %}"></script>
+    {% endif %}
 {% endblock %}

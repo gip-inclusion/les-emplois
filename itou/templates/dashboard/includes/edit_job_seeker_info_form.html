@@ -1,0 +1,37 @@
+{% comment %}
+
+    Usage:
+        {% include "dashboard/includes/edit_job_seeker_info_form.html" with prev_url="some_url" submit_label="Enregistrer" %}
+
+{% endcomment %}
+
+{% load bootstrap4 %}
+
+<form method="post" action="" class="js-prevent-multiple-submit js-format-nir">
+
+    {% csrf_token %}
+
+    {% if form.nir_error %}{{ form.nir_error|safe }}{% endif %}
+    {% bootstrap_form_errors form type='non_fields' %}
+    {% bootstrap_field form.email %}
+    {% bootstrap_field form.first_name %}
+    {% bootstrap_field form.last_name %}
+    {% bootstrap_field form.nir %}
+    {% bootstrap_field form.lack_of_nir %}
+    {% bootstrap_field form.lack_of_nir_reason form_group_class=form.lack_of_nir_reason.field.form_group_class %}
+    {% bootstrap_field form.birthdate %}
+    {% bootstrap_field form.phone %}
+    {% bootstrap_field form.address_line_1 %}
+    {% bootstrap_field form.address_line_2 %}
+    {% bootstrap_field form.post_code %}
+    {% bootstrap_field form.city %}
+    {% bootstrap_field form.city_slug %}
+    {% bootstrap_field form.pole_emploi_id %}
+    {% bootstrap_field form.lack_of_pole_emploi_id_reason %}
+
+    {% buttons %}
+        <a class="btn btn-outline-primary" href="{{ prev_url }}">Annuler</a>
+        <button type="submit" class="btn btn-primary">{{ submit_label }}</button>
+    {% endbuttons %}
+
+</form>
