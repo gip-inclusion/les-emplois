@@ -2102,6 +2102,17 @@ class UpdateJobSeekerViewTestCase(TestCase):
         self.job_seeker.save(update_fields=["last_login"])
         self._check_only_administrative_allowed(self.siae.members.first())
 
+    def test_without_apply_session(self):
+        self.client.force_login(self.siae.members.first())
+        for url in [
+            self.step_1_url,
+            self.step_2_url,
+            self.step_3_url,
+            self.step_end_url,
+        ]:
+            response = self.client.get(url)
+            assert response.status_code == 403
+
 
 class UpdateJobSeekerStep3ViewTestCase(TestCase):
     def test_job_seeker_with_profile_has_check_boxes_ticked_in_step3(self):
