@@ -359,6 +359,9 @@ class Migration(migrations.Migration):
                     "nir",
                     models.CharField(
                         blank=True,
+                        error_messages={
+                            "unique": "Ce numéro de sécurité sociale est déjà associé à un autre utilisateur."
+                        },
                         max_length=15,
                         null=True,
                         unique=True,
