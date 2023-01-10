@@ -1049,7 +1049,7 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
         response = self.client.post(next_url)
         [message] = list(get_messages(response.wsgi_request))
         assert message.tags == "error"
-        assert message.message == "Un objet Utilisateur avec ce champ NIR existe déjà."
+        assert message.message == "Ce numéro de sécurité sociale est déjà associé à un autre utilisateur."
         self.assertRedirects(response, reverse("dashboard:index"))
 
         # Remove that extra job seeker and proceed with "normal" flow

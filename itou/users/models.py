@@ -237,6 +237,7 @@ class User(AbstractUser, AddressMixin):
         null=True,
         blank=True,
         unique=True,
+        error_messages={"unique": "Ce numéro de sécurité sociale est déjà associé à un autre utilisateur."},
     )
 
     # The two following Pôle emploi fields are reserved for job seekers.
