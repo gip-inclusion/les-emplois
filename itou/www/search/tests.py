@@ -369,7 +369,8 @@ class JobDescriptionSearchViewTest(TestCase):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         city = create_city_saint_andre()
         siae = SiaeFactory(department="44", coords=city.coords, post_code="44117")
-        appellations = Appellation.objects.all()
+        appellations = Appellation.objects.filter(code__in=["10357", "10386", "10479"])
+
         job1 = SiaeJobDescriptionFactory(
             siae=siae, appellation=appellations[0], contract_type=ContractType.APPRENTICESHIP
         )
@@ -380,7 +381,11 @@ class JobDescriptionSearchViewTest(TestCase):
         inactive_siae = SiaeFactory(
             department="45", coords=city.coords, post_code="44117", kind=SiaeKind.EI, convention=None
         )
-        job3 = SiaeJobDescriptionFactory(siae=inactive_siae, contract_type=ContractType.APPRENTICESHIP)
+        job3 = SiaeJobDescriptionFactory(
+            siae=inactive_siae,
+            appellation=appellations[2],
+            contract_type=ContractType.APPRENTICESHIP,
+        )
 
         # no filter: returns everything.
         response = self.client.get(
