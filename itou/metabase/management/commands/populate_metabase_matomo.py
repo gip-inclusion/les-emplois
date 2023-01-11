@@ -142,8 +142,9 @@ def get_matomo_dashboard(at: datetime.datetime, options: MatomoFetchOptions):
     }
     segment = options.api_options.get("segment")
     if segment:
-        segment = segment.split("==")[1]
-    print(f"\t> fetching date={at} dashboard='{options.dashboard_name}' segment={segment}")
+        key, value = segment.split("==")
+        options.api_options["segment"] = f"{key}=={urllib.parse.quote(value, safe='')}"
+    print(f"\t> fetching date={at} dashboard='{options.dashboard_name}' {key}={value}")
     column_names = None
     results = []
     for row in matomo_api_call(base_options | options.api_options):

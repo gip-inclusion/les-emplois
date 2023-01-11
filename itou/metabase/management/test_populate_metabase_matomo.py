@@ -59,16 +59,16 @@ def test_matomo_retry(monkeypatch, respx_mock, capsys):
     stdout, _ = capsys.readouterr()
     # sort the output because it's random (ThreadPoolExecutor)
     assert [line[:70] for line in sorted(stdout.splitlines())] == [
-        "\t> fetching date=2022-06-13 dashboard='tb 116 - Recrutement' segment=h",
-        "\t> fetching date=2022-06-13 dashboard='tb 129 - Analyse des publics' s",
+        "\t> fetching date=2022-06-13 dashboard='tb 116 - Recrutement' pageUrl=h",
+        "\t> fetching date=2022-06-13 dashboard='tb 129 - Analyse des publics' p",
         "\t> fetching date=2022-06-13 dashboard='tb 136 - Prescripteurs habilité",
-        "\t> fetching date=2022-06-13 dashboard='tb 140 - ETP conventionnés' seg",
+        "\t> fetching date=2022-06-13 dashboard='tb 140 - ETP conventionnés' pag",
         "\t> fetching date=2022-06-13 dashboard='tb 150 - Fiches de poste en ten",
         "\t> fetching date=2022-06-13 dashboard='tb 32 - Acceptés en auto-prescr",
         "\t> fetching date=2022-06-13 dashboard='tb 43 - Statistiques des emploi",
         "\t> fetching date=2022-06-13 dashboard='tb 52 - Typologie de prescripte",
         "\t> fetching date=2022-06-13 dashboard='tb 54 - Typologie des employeur",
-        "\t> fetching date=2022-06-13 dashboard='tb 90 - Analyse des métiers' se",
+        "\t> fetching date=2022-06-13 dashboard='tb 90 - Analyse des métiers' pa",
         "> about to fetch count=10 public dashboards from Matomo.",
     ] + ["For more information check: https://httpstatuses.com/500"] * 30 + [
         "attempt=1 failed with outcome=Server error '500 Internal Server Error'"
@@ -356,25 +356,25 @@ def test_matomo_empty_output(monkeypatch, respx_mock, capsys):
         "\t! empty matomo values for date=2022-06-13 dashboard=tb 54 - Typologie des employeurs",
         "\t! empty matomo values for date=2022-06-13 dashboard=tb 90 - Analyse des métiers",
         "\t> fetching date=2022-06-13 dashboard='tb 116 - Recrutement' "
-        "segment=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/etat-suivi-candidatures/",
+        "pageUrl=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/etat-suivi-candidatures/",
         "\t> fetching date=2022-06-13 dashboard='tb 129 - Analyse des publics' "
-        "segment=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/analyse-des-publics/",
+        "pageUrl=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/analyse-des-publics/",
         "\t> fetching date=2022-06-13 dashboard='tb 136 - Prescripteurs habilités' "
-        "segment=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/prescripteurs-habilites/",
+        "pageUrl=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/prescripteurs-habilites/",
         "\t> fetching date=2022-06-13 dashboard='tb 140 - ETP conventionnés' "
-        "segment=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/etp-conventionnes/",
+        "pageUrl=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/etp-conventionnes/",
         "\t> fetching date=2022-06-13 dashboard='tb 150 - Fiches de poste en tension' "
-        "segment=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/postes-en-tension/",
+        "pageUrl=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/postes-en-tension/",
         "\t> fetching date=2022-06-13 dashboard='tb 32 - Acceptés en "
         "auto-prescription' "
-        "segment=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/auto-prescription/",
+        "pageUrl=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/auto-prescription/",
         "\t> fetching date=2022-06-13 dashboard='tb 43 - Statistiques des emplois' "
-        "segment=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/statistiques-emplois/",
+        "pageUrl=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/statistiques-emplois/",
         "\t> fetching date=2022-06-13 dashboard='tb 52 - Typologie de prescripteurs' "
-        "segment=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/zoom-prescripteurs/",
+        "pageUrl=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/zoom-prescripteurs/",
         "\t> fetching date=2022-06-13 dashboard='tb 54 - Typologie des employeurs' "
-        "segment=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/zoom-employeurs/",
+        "pageUrl=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/zoom-employeurs/",
         "\t> fetching date=2022-06-13 dashboard='tb 90 - Analyse des métiers' "
-        "segment=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/metiers/",
+        "pageUrl=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/metiers/",
         "> about to fetch count=10 public dashboards from Matomo.",
     ]
