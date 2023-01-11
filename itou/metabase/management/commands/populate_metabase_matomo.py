@@ -48,6 +48,12 @@ PUBLIC_DASHBOARDS = {
     "statistiques-emplois": "tb 43 - Statistiques des emplois",
     "zoom-employeurs": "tb 54 - Typologie des employeurs",
     "zoom-prescripteurs": "tb 52 - Typologie de prescripteurs",
+    # Note: keep those commented for reference. They're not used anymore but if we ever
+    # need to regenerate values for the Q1 2022 or before, they're going to be required.
+    # "recrutement": "tb 116 - Recrutement",
+    # "criteres": "tb 32 - Acceptés en auto-prescription",
+    # "prescripteurs": "tb 52 - Typologie de prescripteurs",
+    # "employeurs": "tb 54 - Typologie des employeurs",
 }
 
 PRIVATE_DEPARTMENT_DASHBOARDS = {
