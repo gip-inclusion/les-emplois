@@ -603,6 +603,10 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         "Les petits jardins a soumis des justificatifs, mais leur contrôle n’a pas été validé avant la fin de la "
         'campagne “Contrôle Test”, le résultat du contrôle est <b class="text-success">positif</b>.'
     )
+    forced_positive_text_transition_to_adversarial_stage = (
+        "Les petits jardins a soumis des justificatifs, mais leur contrôle n’a pas été validé avant la fin de la "
+        'phase amiable, le résultat du contrôle est <b class="text-success">positif</b>.'
+    )
     forced_negative_text = (
         "Les petits jardins n’a pas soumis de justificatifs avant la fin de la campagne “Contrôle Test”, le résultat "
         'du contrôle est <b class="text-danger">négatif</b>.'
@@ -724,6 +728,87 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         # Was not reviewed by the institution, assume valid (following rules in
         # most administrations).
         self.assertContains(response, self.forced_positive_text, html=True, count=1)
+        self.assertNotContains(response, self.forced_positive_text_transition_to_adversarial_stage, html=True)
+        self.assertNotContains(response, self.forced_negative_text, html=True)
+
+    def test_transition_to_adversarial_phase_before_institution_review_submitted(self):
+        evaluation_campaign = EvaluationCampaignFactory(
+            institution=self.institution,
+            evaluations_asked_at=timezone.now() - relativedelta(weeks=6),
+            name="Contrôle Test",
+        )
+        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign, siae__name="les petits jardins")
+        evaluated_job_app = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_app,
+            uploaded_at=timezone.now() - relativedelta(days=2),
+            submitted_at=timezone.now() - relativedelta(days=1),
+        )
+        evaluation_campaign.transition_to_adversarial_phase()
+
+        self.client.force_login(self.user)
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_detail",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            )
+        )
+        self.assertContains(
+            response,
+            """
+            <p class="badge badge-pill badge-info-light text-primary float-right">
+             Justificatifs non contrôlés
+            </p>
+            """,
+            html=True,
+            count=1,
+        )
+        self.assertNotContains(response, self.control_text)
+        self.assertNotContains(response, self.submit_text)
+        # Was not reviewed by the institution, assume valid (following rules in
+        # most administrations).
+        self.assertNotContains(response, self.forced_positive_text, html=True)
+        self.assertContains(response, self.forced_positive_text_transition_to_adversarial_stage, html=True, count=1)
+        self.assertNotContains(response, self.forced_negative_text, html=True)
+
+    def test_refused_does_not_show_accepted_by_default(self):
+        evaluation_campaign = EvaluationCampaignFactory(
+            institution=self.institution,
+            evaluations_asked_at=timezone.now() - relativedelta(weeks=6),
+            name="Contrôle Test",
+        )
+        now = timezone.now()
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign=evaluation_campaign,
+            siae__name="les petits jardins",
+            reviewed_at=now - relativedelta(days=10),
+            final_reviewed_at=now - relativedelta(days=5),
+        )
+        evaluated_job_app = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_app,
+            uploaded_at=now - relativedelta(days=7),
+            submitted_at=now - relativedelta(days=6),
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2,
+        )
+
+        self.client.force_login(self.user)
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_detail",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            )
+        )
+        self.assertContains(
+            response,
+            '<p class="badge badge-pill badge-danger float-right">Problème constaté</p>',
+            html=True,
+            count=1,
+        )
+        self.assertNotContains(response, self.control_text)
+        self.assertNotContains(response, self.submit_text)
+        self.assertNotContains(response, self.forced_positive_text, html=True)
+        self.assertNotContains(response, self.forced_positive_text_transition_to_adversarial_stage, html=True)
         self.assertNotContains(response, self.forced_negative_text, html=True)
 
     def test_campaign_closed_before_final_evaluation_adversarial_stage_review_not_submitted(self):
@@ -765,6 +850,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         # Was not reviewed by the institution, assume valid (following rules in
         # most administrations).
         self.assertContains(response, self.forced_positive_text, html=True, count=1)
+        self.assertNotContains(response, self.forced_positive_text_transition_to_adversarial_stage, html=True)
         self.assertNotContains(response, self.forced_negative_text, html=True)
 
     def test_campaign_closed_before_final_evaluation_no_docs(self):
@@ -786,7 +872,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         self.assertContains(
             response,
-            '<p class="badge badge-pill badge-emploi float-right">En attente</p>',
+            '<p class="badge badge-pill badge-danger float-right">Non téléversés</p>',
             html=True,
             count=1,
         )
@@ -845,6 +931,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
 
         # EvaluatedAdministrativeCriteria not yet submitted
+        pending_status = "En attente"
         response = self.client.get(url)
         assert response.status_code == 200
         self.assertContains(response, evaluated_siae)
@@ -859,30 +946,53 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(response, back_url)
         self.assertContains(response, validation_url)
         self.assertContains(response, self.control_text)
+        self.assertContains(
+            response,
+            f"""
+            <p class="badge badge-pill badge-emploi float-right">
+             {pending_status}
+            </p>
+            """,
+            html=True,
+            count=1,
+        )
 
         # EvaluatedAdministrativeCriteria uploaded
+        uploaded_status = "Justificatifs téléversés"
         evaluated_administrative_criteria = evaluated_job_application.evaluated_administrative_criteria.first()
         evaluated_administrative_criteria.proof_url = "https://server.com/rocky-balboa.pdf"
         evaluated_administrative_criteria.save(update_fields=["proof_url"])
         response = self.client.get(url)
         assert response.status_code == 200
         self.assertContains(response, back_url)
-        self.assertContains(response, "Justificatifs téléversés")
+        self.assertContains(response, uploaded_status)
         self.assertContains(response, validation_button_disabled, html=True, count=1)
         self.assertContains(response, self.control_text)
 
         # EvaluatedAdministrativeCriteria submitted
+        submitted_status = "À traiter"
+        adversarial_submitted_status = "Nouveaux justificatifs à traiter"
         evaluated_administrative_criteria.submitted_at = timezone.now()
         evaluated_administrative_criteria.save(update_fields=["submitted_at"])
         response = self.client.get(url)
         assert response.status_code == 200
         self.assertContains(response, evaluated_job_application_url)
         self.assertContains(response, back_url)
-        self.assertNotContains(response, "Documents téléversés")
-        self.assertNotContains(response, "En attente")
-        self.assertNotContains(response, "Nouveaux justificatifs à traiter")
+        self.assertNotContains(response, uploaded_status)
+        self.assertNotContains(response, pending_status)
+        self.assertNotContains(response, adversarial_submitted_status)
         self.assertContains(response, validation_button_disabled, html=True, count=1)
         self.assertContains(response, self.control_text)
+        self.assertContains(
+            response,
+            f"""
+            <p class="badge badge-pill badge-pilotage float-right">
+             {submitted_status}
+            </p>
+            """,
+            html=True,
+            count=1,
+        )
 
         # EvaluatedAdministrativeCriteria Accepted
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
@@ -895,12 +1005,21 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(response, back_url)
         self.assertContains(response, validation_button, html=True, count=2)
         self.assertContains(response, self.control_text)
+        self.assertContains(
+            response,
+            """
+            <p class="badge badge-pill badge-success float-right">
+             Validé
+            </p>
+            """,
+            html=True,
+            count=1,
+        )
 
         # EvaluatedAdministrativeCriteria Accepted & Reviewed
         evaluated_siae.reviewed_at = timezone.now()
         evaluated_siae.final_reviewed_at = timezone.now()
         evaluated_siae.save(update_fields=["reviewed_at", "final_reviewed_at"])
-        self.assertContains(response, self.control_text)
 
         response = self.client.get(url)
         assert response.status_code == 200
@@ -908,8 +1027,19 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(response, back_url)
         self.assertNotContains(response, self.submit_text)
         self.assertNotContains(response, self.control_text)
+        self.assertContains(
+            response,
+            """
+            <p class="badge badge-pill badge-success float-right">
+             Validé
+            </p>
+            """,
+            html=True,
+            count=1,
+        )
 
         # EvaluatedAdministrativeCriteria Refused
+        refused_status = "Problème constaté"
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
         evaluated_administrative_criteria.save(update_fields=["review_state"])
         evaluated_siae.reviewed_at = None
@@ -922,6 +1052,16 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(response, back_url)
         self.assertContains(response, validation_button, html=True, count=2)
         self.assertContains(response, self.control_text)
+        self.assertContains(
+            response,
+            f"""
+            <p class="badge badge-pill badge-danger float-right">
+             {refused_status}
+            </p>
+            """,
+            html=True,
+            count=1,
+        )
 
         # EvaluatedAdministrativeCriteria Refused & Reviewed
         evaluated_siae.reviewed_at = timezone.now()
@@ -933,6 +1073,16 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(response, back_url)
         self.assertContains(response, validation_button_disabled, html=True, count=1)
         self.assertContains(response, self.control_text)
+        self.assertContains(
+            response,
+            """
+            <p class="badge badge-pill badge-emploi float-right">
+             Phase contradictoire - En attente
+            </p>
+            """,
+            html=True,
+            count=1,
+        )
 
         # Adversarial phase
 
@@ -951,7 +1101,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(response, validation_button_disabled, html=True, count=1)
         self.assertContains(response, back_url)
         self.assertContains(response, evaluated_job_application_url)
-        self.assertContains(response, "Justificatifs téléversés")
+        self.assertContains(response, uploaded_status)
         self.assertContains(response, self.control_text)
 
         # EvaluatedAdministrativeCriteriaState.SUBMITTED (again)
@@ -961,10 +1111,10 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         assert response.status_code == 200
         self.assertContains(response, evaluated_job_application_url)
         self.assertContains(response, back_url)
-        self.assertNotContains(response, "Documents téléversés")
-        self.assertNotContains(response, "En attente")
-        self.assertNotContains(response, "Problème constaté")
-        self.assertContains(response, "Nouveaux justificatifs à traiter")
+        self.assertNotContains(response, uploaded_status)
+        self.assertNotContains(response, pending_status)
+        self.assertNotContains(response, refused_status)
+        self.assertContains(response, adversarial_submitted_status)
         self.assertContains(response, validation_button_disabled, html=True, count=1)
         self.assertContains(response, self.control_text)
 
@@ -978,6 +1128,16 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(response, back_url)
         self.assertContains(response, validation_button, html=True, count=2)
         self.assertContains(response, self.control_text)
+        self.assertContains(
+            response,
+            """
+            <p class="badge badge-pill badge-success float-right">
+             Validé
+            </p>
+            """,
+            html=True,
+            count=1,
+        )
 
         # EvaluatedAdministrativeCriteria Accepted & Reviewed (again)
         now = timezone.now()
@@ -991,6 +1151,16 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(response, back_url)
         self.assertNotContains(response, self.submit_text)
         self.assertNotContains(response, self.control_text)
+        self.assertContains(
+            response,
+            """
+            <p class="badge badge-pill badge-success float-right">
+             Validé
+            </p>
+            """,
+            html=True,
+            count=1,
+        )
 
         # EvaluatedAdministrativeCriteria Refused (again)
         evaluated_siae.reviewed_at = adversarial_phase_start
@@ -1007,6 +1177,16 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(response, back_url)
         self.assertContains(response, validation_button, html=True, count=2)
         self.assertContains(response, self.control_text)
+        self.assertContains(
+            response,
+            f"""
+            <p class="badge badge-pill badge-danger float-right">
+             {refused_status}
+            </p>
+            """,
+            html=True,
+            count=1,
+        )
 
         # EvaluatedAdministrativeCriteria Refused & Reviewed (again)
         evaluated_siae.final_reviewed_at = timezone.now()
@@ -1019,7 +1199,195 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertNotContains(response, self.submit_text)
         self.assertNotContains(response, self.control_text)
         self.assertContains(
-            response, '<p class="badge badge-pill badge-danger float-right">Problème constaté</p>', count=1
+            response,
+            f"""
+            <p class="badge badge-pill badge-danger float-right">
+             {refused_status}
+            </p>
+            """,
+            html=True,
+            count=1,
+        )
+
+    def test_job_app_status_evaluation_is_final_pending(self):
+        evaluation_campaign = EvaluationCampaignFactory(
+            institution=self.institution,
+            evaluations_asked_at=timezone.now() - relativedelta(weeks=6),
+            ended_at=timezone.now(),
+        )
+        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign)
+        EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        self.client.force_login(self.user)
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_detail",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            )
+        )
+        self.assertContains(
+            response,
+            '<p class="badge badge-pill badge-danger float-right">Non téléversés</p>',
+            count=1,
+        )
+
+    def test_job_app_status_evaluation_is_final_processing(self):
+        evaluation_campaign = EvaluationCampaignFactory(
+            institution=self.institution,
+            evaluations_asked_at=timezone.now() - relativedelta(weeks=6),
+            ended_at=timezone.now(),
+        )
+        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign)
+        evaluated_job_app = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_app)
+        EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_app, proof_url="")
+        self.client.force_login(self.user)
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_detail",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            )
+        )
+        self.assertContains(
+            response,
+            '<p class="badge badge-pill badge-warning float-right">Téléversement incomplet</p>',
+            count=1,
+        )
+
+    def test_job_app_status_evaluation_is_final_uploaded(self):
+        evaluation_campaign = EvaluationCampaignFactory(
+            institution=self.institution,
+            evaluations_asked_at=timezone.now() - relativedelta(weeks=6),
+            ended_at=timezone.now(),
+        )
+        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign)
+        evaluated_job_app = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_app)
+        self.client.force_login(self.user)
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_detail",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            )
+        )
+        self.assertContains(
+            response,
+            '<p class="badge badge-pill badge-warning float-right">Justificatifs téléversés</p>',
+            count=1,
+        )
+
+    def test_job_app_status_evaluation_is_final_submitted(self):
+        evaluation_campaign = EvaluationCampaignFactory(
+            institution=self.institution,
+            evaluations_asked_at=timezone.now() - relativedelta(weeks=6),
+            ended_at=timezone.now(),
+        )
+        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign)
+        evaluated_job_app = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_app,
+            submitted_at=timezone.now() - relativedelta(days=1),
+        )
+        self.client.force_login(self.user)
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_detail",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            )
+        )
+        self.assertContains(
+            response,
+            '<p class="badge badge-pill badge-info-light text-primary float-right">Justificatifs non contrôlés</p>',
+            count=1,
+        )
+
+    def test_job_app_status_evaluation_is_final_accepted(self):
+        evaluation_campaign = EvaluationCampaignFactory(
+            institution=self.institution,
+            evaluations_asked_at=timezone.now() - relativedelta(weeks=6),
+            ended_at=timezone.now(),
+        )
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign=evaluation_campaign,
+            reviewed_at=timezone.now() - relativedelta(hours=1),
+            final_reviewed_at=timezone.now() - relativedelta(hours=1),
+        )
+        evaluated_job_app = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_app,
+            submitted_at=timezone.now() - relativedelta(days=1),
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+        )
+        self.client.force_login(self.user)
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_detail",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            )
+        )
+        self.assertContains(
+            response,
+            '<p class="badge badge-pill badge-success float-right">Validé</p>',
+            count=1,
+        )
+
+    def test_job_app_status_evaluation_is_final_refused(self):
+        evaluation_campaign = EvaluationCampaignFactory(
+            institution=self.institution,
+            evaluations_asked_at=timezone.now() - relativedelta(weeks=6),
+            ended_at=timezone.now(),
+        )
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign=evaluation_campaign,
+            reviewed_at=timezone.now() - relativedelta(hours=6),
+            final_reviewed_at=timezone.now() - relativedelta(hours=1),
+        )
+        evaluated_job_app = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_app,
+            submitted_at=timezone.now() - relativedelta(days=1),
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
+        )
+        self.client.force_login(self.user)
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_detail",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            )
+        )
+        self.assertContains(
+            response,
+            '<p class="badge badge-pill badge-danger float-right">Problème constaté</p>',
+            count=1,
+        )
+
+    def test_job_app_status_evaluation_is_final_refused_2(self):
+        evaluation_campaign = EvaluationCampaignFactory(
+            institution=self.institution,
+            evaluations_asked_at=timezone.now() - relativedelta(weeks=6),
+            ended_at=timezone.now(),
+        )
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign=evaluation_campaign,
+            reviewed_at=timezone.now() - relativedelta(hours=6),
+            final_reviewed_at=timezone.now() - relativedelta(hours=1),
+        )
+        evaluated_job_app = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_app,
+            submitted_at=timezone.now() - relativedelta(days=1),
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2,
+        )
+        self.client.force_login(self.user)
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_detail",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            )
+        )
+        self.assertContains(
+            response,
+            '<p class="badge badge-pill badge-danger float-right">Problème constaté</p>',
+            count=1,
         )
 
     def test_notification_pending_show_view_evaluated_admin_criteria(self):

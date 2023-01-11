@@ -7,6 +7,7 @@ from django.core import mail
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.utils import timezone
+from freezegun import freeze_time
 
 from itou.approvals.factories import ApprovalFactory
 from itou.eligibility.enums import AdministrativeCriteriaLevel, AuthorKind
@@ -398,40 +399,88 @@ class EvaluationCampaignManagerTest(TestCase):
         with pytest.raises(CampaignAlreadyPopulatedException):
             evaluation_campaign.populate(fake_now)
 
+    @freeze_time("2023-01-02 11:11:11")
     def test_transition_to_adversarial_phase(self):
-        fake_now = timezone.now()
-        EvaluatedSiaeFactory()  # will be ignored
+        ignored_siae = EvaluatedSiaeFactory()  # will be ignored
         campaign = EvaluationCampaignFactory(institution__name="DDETS 1")
-        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=campaign, siae__name="Les petits jardins")
-        evaluated_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
-        evaluated_administrative_criterion = EvaluatedAdministrativeCriteriaFactory(
-            submitted_at=fake_now,
-            evaluated_job_application=evaluated_job_application
+        # Did not select eligibility criteria to justify.
+        evaluated_siae_no_response = EvaluatedSiaeFactory(
+            evaluation_campaign=campaign, siae__name="Les grands jardins"
+        )
+        EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_no_response)
+        evaluated_siae_no_docs = EvaluatedSiaeFactory(evaluation_campaign=campaign, siae__name="Les petits jardins")
+        evaluated_jobapp_no_docs = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_no_docs)
+        EvaluatedAdministrativeCriteriaFactory(
+            uploaded_at=timezone.now() - relativedelta(days=7),
+            evaluated_job_application=evaluated_jobapp_no_docs,
             # default review_state is PENDING
         )
-        assert evaluation_enums.EvaluatedSiaeState.SUBMITTED == evaluated_siae.state
-
-        # since we have a SIAE in SUBMITTED state, does not change anything
-        campaign.transition_to_adversarial_phase()
-        assert 2 == EvaluatedSiae.objects.filter(reviewed_at__isnull=True).count()
-
-        # make the SIAE in another state
-        evaluated_administrative_criterion.review_state = (
-            evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
+        evaluated_siae_submitted = EvaluatedSiaeFactory(evaluation_campaign=campaign, siae__name="Prim’vert")
+        evaluated_jobapp_submitted = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_submitted)
+        EvaluatedAdministrativeCriteriaFactory(
+            submitted_at=timezone.now() - relativedelta(days=6),
+            evaluated_job_application=evaluated_jobapp_submitted,
+            # default review_state is PENDING
         )
-        evaluated_administrative_criterion.save(update_fields=["review_state"])
-        del evaluated_siae.state
-        assert evaluation_enums.EvaluatedSiaeState.SUBMITTED != evaluated_siae.state
+        accepted_ts = timezone.now() - relativedelta(days=1)
+        evaluated_siae_accepted = EvaluatedSiaeFactory(
+            evaluation_campaign=campaign,
+            siae__name="Geo",
+            reviewed_at=accepted_ts,
+            final_reviewed_at=accepted_ts,
+        )
+        evaluated_jobapp_accepted = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_accepted)
+        EvaluatedAdministrativeCriteriaFactory(
+            submitted_at=timezone.now() - relativedelta(days=2),
+            evaluated_job_application=evaluated_jobapp_accepted,
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+        )
+        refused_ts = timezone.now() - relativedelta(days=3)
+        evaluated_siae_refused = EvaluatedSiaeFactory(
+            evaluation_campaign=campaign,
+            siae__name="Geo",
+            reviewed_at=refused_ts,
+        )
+        evaluated_jobapp_refused = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_refused)
+        EvaluatedAdministrativeCriteriaFactory(
+            submitted_at=timezone.now() - relativedelta(days=4),
+            evaluated_job_application=evaluated_jobapp_refused,
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
+        )
 
-        # now the transition works
         campaign.transition_to_adversarial_phase()
-        assert 1 == EvaluatedSiae.objects.filter(reviewed_at__isnull=True).count()
-        evaluated_siae.refresh_from_db()
-        assert evaluated_siae.reviewed_at is not None
 
-        [siae_email, institution_email] = mail.outbox
-        assert siae_email.subject == f"Résultat du contrôle - EI Les petits jardins ID-{evaluated_siae.siae_id}"
-        assert siae_email.body == (
+        assert ignored_siae == EvaluatedSiae.objects.get(reviewed_at__isnull=True)
+
+        # Transitioned to ACCEPTED, the DDETS did not review the documents
+        # submitted by SIAE before the transition.
+        evaluated_siae_submitted.refresh_from_db()
+        assert evaluated_siae_submitted.reviewed_at == datetime.datetime(
+            2023, 1, 2, 11, 11, 11, tzinfo=datetime.timezone.utc
+        )
+        assert evaluated_siae_submitted.final_reviewed_at == datetime.datetime(
+            2023, 1, 2, 11, 11, 11, tzinfo=datetime.timezone.utc
+        )
+        assert evaluated_siae_submitted.state == evaluation_enums.EvaluatedSiaeState.ACCEPTED
+
+        evaluated_siae_accepted.refresh_from_db()
+        assert evaluated_siae_accepted.state == evaluation_enums.EvaluatedSiaeState.ACCEPTED
+        assert evaluated_siae_accepted.reviewed_at == accepted_ts
+        assert evaluated_siae_accepted.final_reviewed_at == accepted_ts
+
+        evaluated_siae_refused.refresh_from_db()
+        assert evaluated_siae_refused.state == evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE
+        assert evaluated_siae_refused.reviewed_at == refused_ts
+        assert evaluated_siae_refused.final_reviewed_at is None
+
+        [siae_no_response_email, siae_no_docs_email, institution_email] = sorted(
+            mail.outbox, key=lambda mail: mail.subject
+        )
+        assert (
+            siae_no_response_email.subject
+            == f"Résultat du contrôle - EI Les grands jardins ID-{evaluated_siae_no_response.siae_id}"
+        )
+        assert siae_no_response_email.body == (
             "Bonjour,\n\n"
             "Sauf erreur de notre part, vous n’avez pas transmis les justificatifs dans le cadre du contrôle a "
             "posteriori sur vos embauches réalisées en auto-prescription.\n\n"
@@ -442,8 +491,36 @@ class EvaluationCampaignManagerTest(TestCase):
             "œuvre opérationnelle du contrôle a posteriori des recrutements en auto-prescription prévu par les "
             "articles R. 5132-1-12 à R. 5132-1-17 du code du travail.\n\n"
             "Pour transmettre les justificatifs, rendez-vous sur le tableau de bord de "
-            f"EI Les petits jardins ID-{evaluated_siae.siae_id} à la rubrique “Justifier mes auto-prescriptions”.\n"
-            f"http://127.0.0.1:8000/siae_evaluation/siae_job_applications_list/{evaluated_siae.pk}/\n\n"
+            f"EI Les grands jardins ID-{evaluated_siae_no_response.siae_id} à la rubrique "
+            "“Justifier mes auto-prescriptions”.\n"
+            f"http://127.0.0.1:8000/siae_evaluation/siae_job_applications_list/{evaluated_siae_no_response.pk}/\n\n"
+            "En cas de besoin, vous pouvez consulter ce mode d’emploi.\n\n"
+            "Cordialement,\n\n"
+            "---\n"
+            "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
+            "merci de ne pas en tenir compte [DEV]\n"
+            "Les emplois de l'inclusion\n"
+            "http://127.0.0.1:8000"
+        )
+
+        assert (
+            siae_no_docs_email.subject
+            == f"Résultat du contrôle - EI Les petits jardins ID-{evaluated_siae_no_docs.siae_id}"
+        )
+        assert siae_no_docs_email.body == (
+            "Bonjour,\n\n"
+            "Sauf erreur de notre part, vous n’avez pas transmis les justificatifs dans le cadre du contrôle a "
+            "posteriori sur vos embauches réalisées en auto-prescription.\n\n"
+            "La DDETS 1 ne peut donc pas faire de contrôle, par conséquent vous entrez dans une phase dite "
+            "contradictoire de 6 semaines (durant laquelle il vous faut transmettre les justificatifs demandés) et "
+            "qui se clôturera sur une décision (validation ou sanction pouvant aller jusqu’à un retrait d’aide au "
+            "poste) conformément à l’instruction N° DGEFP/SDPAE/MIP/2022/83 du 5 avril 2022 relative à la mise en "
+            "œuvre opérationnelle du contrôle a posteriori des recrutements en auto-prescription prévu par les "
+            "articles R. 5132-1-12 à R. 5132-1-17 du code du travail.\n\n"
+            "Pour transmettre les justificatifs, rendez-vous sur le tableau de bord de "
+            f"EI Les petits jardins ID-{evaluated_siae_no_docs.siae_id} à la rubrique "
+            "“Justifier mes auto-prescriptions”.\n"
+            f"http://127.0.0.1:8000/siae_evaluation/siae_job_applications_list/{evaluated_siae_no_docs.pk}/\n\n"
             "En cas de besoin, vous pouvez consulter ce mode d’emploi.\n\n"
             "Cordialement,\n\n"
             "---\n"
@@ -461,7 +538,8 @@ class EvaluationCampaignManagerTest(TestCase):
             "Bonjour,\n\n"
             "Vous trouverez ci-dessous la liste des SIAE qui n’ont transmis aucun justificatif dans le cadre du "
             "contrôle a posteriori :\n\n"
-            f"- EI Les petits jardins ID-{evaluated_siae.siae_id}\n\n"
+            f"- EI Les grands jardins ID-{evaluated_siae_no_response.siae_id}\n\n"
+            f"- EI Les petits jardins ID-{evaluated_siae_no_docs.siae_id}\n\n"
             "Ces structures n’ayant pas transmis les justificatifs dans le délai des 6 semaines passent "
             "automatiquement en phase contradictoire et disposent à nouveau de 6 semaines pour se manifester.\n\n"
             "N’hésitez pas à les contacter afin de comprendre les éventuelles difficultés rencontrées pour "
