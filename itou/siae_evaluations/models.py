@@ -235,23 +235,38 @@ class EvaluationCampaign(models.Model):
             send_email_messages(emails)
 
     def transition_to_adversarial_phase(self):
-        force_review_on_siaes = (
+        now = timezone.now()
+        siaes_not_reviewed = (
             EvaluatedSiae.objects.filter(evaluation_campaign=self, reviewed_at__isnull=True)
-            # this is equivalent to removing any EvaluatedSiae in the SUBMITTED state.
-            # it's also not DRY, but efficient.
-            .exclude(
-                # pylint-disable=line-too-long
-                evaluated_job_applications__evaluated_administrative_criteria__review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING  # noqa: E501
-            ).select_related("evaluation_campaign__institution", "siae")
+            .select_related("evaluation_campaign__institution", "siae")
+            .prefetch_related("evaluated_job_applications__evaluated_administrative_criteria")
         )
-        emails = [
-            SIAEEmailFactory(evaluated_siae).forced_to_adversarial_stage() for evaluated_siae in force_review_on_siaes
-        ]
-        if force_review_on_siaes:
-            summary_email = CampaignEmailFactory(self).forced_to_adversarial_stage(force_review_on_siaes)
+        emails = []
+        accept_by_default = []
+        siaes_to_notify = []
+        for evaluated_siae in siaes_not_reviewed:
+            state = evaluated_siae.state
+            if state in [
+                evaluation_enums.EvaluatedSiaeState.PENDING,
+                evaluation_enums.EvaluatedSiaeState.SUBMITTABLE,
+            ]:
+                evaluated_siae.reviewed_at = now
+                siaes_to_notify.append(evaluated_siae)
+                emails.append(SIAEEmailFactory(evaluated_siae).forced_to_adversarial_stage())
+            elif state == evaluation_enums.EvaluatedSiaeState.SUBMITTED:
+                evaluated_siae.reviewed_at = now
+                evaluated_siae.final_reviewed_at = now
+                accept_by_default.append(evaluated_siae)
+                # TODO: Notify SIAE of their accepted evaluation with an email.
+        if siaes_to_notify:
+            siaes_to_notify.sort(key=lambda evaluated_siae: evaluated_siae.siae.name)
+            summary_email = CampaignEmailFactory(self).forced_to_adversarial_stage(siaes_to_notify)
             emails.append(summary_email)
-        send_email_messages(emails)
-        force_review_on_siaes.update(reviewed_at=timezone.now())
+            send_email_messages(emails)
+        EvaluatedSiae.objects.bulk_update(
+            accept_by_default + siaes_to_notify,
+            ["reviewed_at", "final_reviewed_at"],
+        )
 
     def close(self):
         if not self.ended_at:

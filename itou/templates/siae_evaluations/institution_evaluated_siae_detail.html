@@ -35,6 +35,12 @@
                                 <b class="text-danger">négatif</b>.
                             </div>
                         {% endif %}
+                    {% elif accepted_by_default %}
+                        <div class="alert alert-warning">
+                            {{ evaluated_siae|capfirst }} a soumis des justificatifs, mais leur contrôle n’a pas été
+                            validé avant la fin de la phase amiable, le résultat du contrôle est
+                            <b class="text-success">positif</b>.
+                        </div>
                     {% endif %}
 
                     <h3 class="h3">

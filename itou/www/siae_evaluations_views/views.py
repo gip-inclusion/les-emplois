@@ -145,6 +145,14 @@ def institution_evaluated_siae_detail(
         "campaign_closed_before_final_evaluation": (
             evaluation_campaign.ended_at and not evaluated_siae.final_reviewed_at
         ),
+        "accepted_by_default": (
+            evaluated_siae.final_reviewed_at
+            and evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.ACCEPTED
+            and any(
+                evaluated_jobapp.compute_state() != evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED
+                for evaluated_jobapp in evaluated_siae.evaluated_job_applications.all()
+            )
+        ),
     }
     return render(request, template_name, context)
 
