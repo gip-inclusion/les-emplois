@@ -1,11 +1,10 @@
+htmx.onLoad((target) => {
 
-$(document).ready(() => {
-
-  let communeSearchInput = $('.js-commune-autocomplete-input')
-  let hiddenCommuneInput = $('.js-commune-autocomplete-hidden')
-  let searchButton = $('.js-search-button')
-  let loading = $('.js-commune-autocomplete-loading')
-  let noLoading = $('.js-commune-autocomplete-no-loading')
+  let communeSearchInput = $('.js-commune-autocomplete-input', target)
+  let hiddenCommuneInput = $('.js-commune-autocomplete-hidden', target)
+  let searchButton = $('.js-search-button', target)
+  let loading = $('.js-commune-autocomplete-loading', target)
+  let noLoading = $('.js-commune-autocomplete-no-loading', target)
 
   let autoSubmitOnEnterPressed = communeSearchInput.data('autosubmit-on-enter-pressed')
 
