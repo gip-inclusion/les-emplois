@@ -148,7 +148,8 @@ class ApprovalPrintableDisplay(ApprovalBaseViewMixin, TemplateView):
                 # If this occurs too much we may have to change `can_display_approval()`
                 # and investigate a lot more about what's going on.
                 raise Exception(
-                    f"Approval={approval.pk} comes from itou, "
+                    f"Approval={approval.pk} cannot be rendered because "
+                    f"JobApplication={job_application.pk} "
                     "had no eligibility diagnosis and also was not mass-imported."
                 )
 
