@@ -63,7 +63,7 @@ REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] += [  # noqa: F405
 # ITOU settings
 # -------------
 
-ASP_ITOU_PREFIX = os.getenv("ASP_ITOU_PREFIX", "XXXXX")  # same as in our fixtures
+ASP_ITOU_PREFIX = "XXXXX"  # same as in our fixtures
 
 ITOU_PROTOCOL = "http"
 ITOU_FQDN = "127.0.0.1:8000"
