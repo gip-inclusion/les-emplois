@@ -7,7 +7,6 @@ from io import StringIO
 
 import numpy as np
 import pandas as pd
-from psycopg2 import sql
 from tqdm import tqdm
 
 from itou.metabase.db import MetabaseDatabaseCursor, create_table, get_new_table_name, rename_table_atomically
@@ -34,14 +33,6 @@ def infer_colomns_from_df(df):
     ]
 
 
-def init_table(df, table_name):
-    with MetabaseDatabaseCursor() as (cursor, conn):
-        cursor.execute(sql.SQL("DROP TABLE IF EXISTS {table_name}").format(table_name=sql.Identifier(table_name)))
-        conn.commit()
-    # Generate table
-    create_table(table_name, infer_colomns_from_df(df))
-
-
 def store_df(df, table_name, max_attempts=5):
     """
     Store dataframe in database.
@@ -62,7 +53,7 @@ def store_df(df, table_name, max_attempts=5):
     new_table_name = get_new_table_name(table_name)
     while attempts < max_attempts:
         try:
-            init_table(df, new_table_name)
+            create_table(new_table_name, infer_colomns_from_df(df), reset=True)
             for df_chunk in tqdm(df_chunks):
                 buffer = StringIO()
                 df_chunk.to_csv(buffer, header=False, index=False, sep="\t", quoting=csv.QUOTE_NONE, escapechar="\\")
