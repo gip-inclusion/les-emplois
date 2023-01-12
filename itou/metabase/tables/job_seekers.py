@@ -4,7 +4,7 @@ from functools import partial
 from django.utils import timezone
 
 from itou.eligibility.enums import AdministrativeCriteriaLevel, AuthorKind
-from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
+from itou.eligibility.models import AdministrativeCriteria
 from itou.metabase.tables.utils import (
     MetabaseTable,
     get_ai_stock_job_seeker_pks,
@@ -85,9 +85,9 @@ def _get_latest_diagnosis_criteria_by_level(job_seeker, level):
     """
     latest_diagnosis = get_latest_diagnosis(job_seeker)
     if latest_diagnosis:
-        if level == AdministrativeCriteria.Level.LEVEL_1:
+        if level == AdministrativeCriteriaLevel.LEVEL_1:
             return latest_diagnosis.level_1_count
-        if level == AdministrativeCriteria.Level.LEVEL_2:
+        if level == AdministrativeCriteriaLevel.LEVEL_2:
             return latest_diagnosis.level_2_count
     return None
 
@@ -294,7 +294,7 @@ TABLE.add_columns(
             "comment": "ID auteur diagnostic si prescripteur",
             "fn": lambda o: get_latest_diagnosis(o).author_prescriber_organization.id
             if get_latest_diagnosis(o)
-            and get_latest_diagnosis(o).author_kind == EligibilityDiagnosis.AUTHOR_KIND_PRESCRIBER
+            and get_latest_diagnosis(o).author_kind == AuthorKind.PRESCRIBER
             and get_latest_diagnosis(o).author_prescriber_organization
             else None,
         },
@@ -304,7 +304,7 @@ TABLE.add_columns(
             "comment": "ID auteur diagnostic si employeur",
             "fn": lambda o: get_latest_diagnosis(o).author_siae.id
             if get_latest_diagnosis(o)
-            and get_latest_diagnosis(o).author_kind == EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF
+            and get_latest_diagnosis(o).author_kind == AuthorKind.SIAE_STAFF
             and get_latest_diagnosis(o).author_siae
             else None,
         },

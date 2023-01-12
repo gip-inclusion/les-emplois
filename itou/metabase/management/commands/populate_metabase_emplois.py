@@ -32,7 +32,8 @@ from itou.analytics.models import Datum
 from itou.approvals.models import Approval, PoleEmploiApproval
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
-from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
+from itou.eligibility.enums import AdministrativeCriteriaLevel
+from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.jobs.models import Rome
@@ -299,11 +300,11 @@ class Command(BaseCommand):
                         ).annotate(
                             level_1_count=Count(
                                 "administrative_criteria",
-                                filter=Q(administrative_criteria__level=AdministrativeCriteria.Level.LEVEL_1),
+                                filter=Q(administrative_criteria__level=AdministrativeCriteriaLevel.LEVEL_1),
                             ),
                             level_2_count=Count(
                                 "administrative_criteria",
-                                filter=Q(administrative_criteria__level=AdministrativeCriteria.Level.LEVEL_2),
+                                filter=Q(administrative_criteria__level=AdministrativeCriteriaLevel.LEVEL_2),
                             ),
                             criteria_ids=ArrayAgg("administrative_criteria__pk"),
                         )
