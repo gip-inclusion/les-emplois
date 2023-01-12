@@ -543,7 +543,7 @@ class JobApplicationQuerySetTest(TestCase):
         ).aggregate(timestamp=Max("timestamp"))["timestamp"]
         assert JobApplication.objects.with_accepted_at().first().accepted_at == expected_created_at
 
-    def test_with_accepted_at_with_multiple_transition(self):
+    def test_with_accepted_at_with_multiple_transitions(self):
         job_application = JobApplicationSentBySiaeFactory()
         job_application.process()
         job_application.accept(user=job_application.sender)
@@ -555,6 +555,8 @@ class JobApplicationQuerySetTest(TestCase):
             job_application=job_application,
             transition=JobApplicationWorkflow.TRANSITION_ACCEPT,
         ).aggregate(timestamp=Max("timestamp"))["timestamp"]
+        # We should not have more job applications
+        assert JobApplication.objects.with_accepted_at().count() == JobApplication.objects.count()
         assert JobApplication.objects.with_accepted_at().first().accepted_at == expected_created_at
 
     def test_with_accepted_at_default_value(self):
