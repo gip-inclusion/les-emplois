@@ -69,6 +69,9 @@ def rename_table_atomically(from_table_name, to_table_name):
     """
 
     with MetabaseDatabaseCursor() as (cur, conn):
+        # Make sure the old table was deleted previously
+        cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(get_old_table_name(to_table_name))))
+        conn.commit()
         cur.execute(
             sql.SQL("ALTER TABLE IF EXISTS {} RENAME TO {}").format(
                 sql.Identifier(to_table_name),
@@ -86,9 +89,11 @@ def rename_table_atomically(from_table_name, to_table_name):
         conn.commit()
 
 
-def create_table(table_name: str, columns: list[str, str]):
+def create_table(table_name: str, columns: list[str, str], reset=False):
     """Create table from columns names and types"""
     with MetabaseDatabaseCursor() as (cursor, conn):
+        if reset:
+            cursor.execute(sql.SQL("DROP TABLE IF EXISTS {table_name}").format(table_name=sql.Identifier(table_name)))
         create_table_query = sql.SQL("CREATE TABLE IF NOT EXISTS {table_name} ({fields_with_type})").format(
             table_name=sql.Identifier(table_name),
             fields_with_type=sql.SQL(",").join(
@@ -152,16 +157,6 @@ def populate_table(table, batch_size, querysets=None, extra_object=None):
     """
 
     table_name = table.name
-    new_table_name = get_new_table_name(table_name)
-    old_table_name = get_old_table_name(table_name)
-
-    def drop_old_and_new_tables():
-        with MetabaseDatabaseCursor() as (cur, conn):
-            cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(new_table_name)))
-            cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(old_table_name)))
-            conn.commit()
-
-    drop_old_and_new_tables()
 
     total_rows = sum([queryset.count() for queryset in querysets])
 
@@ -189,7 +184,8 @@ def populate_table(table, batch_size, querysets=None, extra_object=None):
 
     print(f"Injecting {total_rows} rows with {len(table.columns)} columns into table {table_name}:")
 
-    create_table(new_table_name, [(c["name"], c["type"]) for c in table.columns])
+    new_table_name = get_new_table_name(table_name)
+    create_table(new_table_name, [(c["name"], c["type"]) for c in table.columns], reset=True)
 
     with MetabaseDatabaseCursor() as (cur, conn):
 
@@ -234,15 +230,4 @@ def populate_table(table, batch_size, querysets=None, extra_object=None):
             # Trigger garbage collection to optimize memory use.
             gc.collect()
 
-        # Swap new and old table nicely to minimize downtime.
-        cur.execute(
-            sql.SQL("ALTER TABLE IF EXISTS {} RENAME TO {}").format(
-                sql.Identifier(table_name), sql.Identifier(old_table_name)
-            )
-        )
-        cur.execute(
-            sql.SQL("ALTER TABLE {} RENAME TO {}").format(sql.Identifier(new_table_name), sql.Identifier(table_name))
-        )
-        conn.commit()
-
-    drop_old_and_new_tables()
+    rename_table_atomically(new_table_name, table_name)
