@@ -42,7 +42,7 @@ class Command(BaseCommand):
     help = "Run status probes"
 
     def handle(self, **options):
-        with sentry_monitor("6bd9f961-825f-4a9f-a94a-671c3e73e98e"):
+        with sentry_monitor("8a1c1061-6fea-4357-9188-54528fc42db2"):
             self.stdout.write("Start probing")
 
             probes_classes = probes.get_probes_classes()
