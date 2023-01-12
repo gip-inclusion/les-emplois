@@ -177,14 +177,17 @@ class JobApplicationQuerySet(models.QuerySet):
                     then=F("hiring_start_at"),
                 ),
                 When(created_from_pe_approval=True, then=F("created_at")),
-                # A job_application created at the accepted status, still accepted
                 When(
                     created_from_pe_approval=False,
                     state=JobApplicationWorkflow.STATE_ACCEPTED,
-                    logs__isnull=True,
-                    then=F("created_at"),
+                    # A job_application created at the accepted status will
+                    # not have transitions logs, fallback on created_at
+                    then=Coalesce(created_at_from_transition, F("created_at")),
                 ),
-                When(created_from_pe_approval=False, then=created_at_from_transition),
+                When(
+                    created_from_pe_approval=False,
+                    then=created_at_from_transition,
+                ),
                 output_field=models.DateTimeField(),
             )
         )
