@@ -271,7 +271,7 @@ def inclusion_connect_logout(request):
     complete_url = f"{constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT}?{urlencode(params)}"
     # Logout user from IC with HTTPX to benefit from respx in tests
     # and to handle post logout redirection more easily.
-    # It's okay if this fails... We don't want to crash on our side.
+    # It's okay if there's an error on Inclusion Connect : we don't want to crash on our side.
     try:
         response = httpx.get(complete_url)
     except HTTPError as e:
