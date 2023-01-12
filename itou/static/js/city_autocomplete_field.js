@@ -1,10 +1,9 @@
-$(document).ready(() => {
-
-  let citySearchInput = $('.js-city-autocomplete-input')
-  let hiddenCityInput = $('.js-city-autocomplete-hidden')
-  let searchButton = $('.js-search-button')
-  let loading = $('.js-city-autocomplete-loading')
-  let noLoading = $('.js-city-autocomplete-no-loading')
+htmx.onLoad((target) => {
+  let citySearchInput = $('.js-city-autocomplete-input', target)
+  let hiddenCityInput = $('.js-city-autocomplete-hidden', target)
+  let searchButton = $('.js-search-button', target)
+  let loading = $('.js-city-autocomplete-loading', target)
+  let noLoading = $('.js-city-autocomplete-no-loading', target)
 
   let autoSubmitOnEnterPressed = citySearchInput.data('autosubmit-on-enter-pressed')
 

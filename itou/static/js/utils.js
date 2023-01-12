@@ -1,9 +1,9 @@
-$(document).ready(() => {
-    $(".js-prevent-default").on("click", (event) => {
+htmx.onLoad((target) => {
+    $(".js-prevent-default", target).on("click", (event) => {
         event.preventDefault();
     });
 
-    $(".js-display-if-javascript-enabled").css("display", "block");
+    $(".js-display-if-javascript-enabled", target).css("display", "block");
 
     /**
      * JS to disable the submit button of the form when it's not valid
@@ -17,7 +17,7 @@ $(document).ready(() => {
         }
     }
 
-    $(".js-enable-submit-when-valid").each(function () {
+    $(".js-enable-submit-when-valid", target).each(function () {
         let form = $(this)
         // Check the validity when something (possibly) change in the form.
         form.on("change reset duetChange", (e) => {
@@ -42,7 +42,7 @@ $(document).ready(() => {
     swap_elements.addClass('d-none').removeClass('d-block')
     swap_element_with.addClass('d-block').removeClass('d-none')
   }
-  $(".js-swap-elements").each(function () {
+  $(".js-swap-elements", target).each(function () {
     $(this).find("[data-swap-element]").each(function () {
       $(this).click(swapElements)
     })
@@ -51,9 +51,9 @@ $(document).ready(() => {
   /**
    * JS to manage shroud
    */
-  $("[data-shroud-input]").prop("disabled", true)
-  $(".js-shroud").find("[data-shroud-input]").prop("disabled", false)
-  $("[data-shroud-clear]").each(function () {
+  $("[data-shroud-input]", target).prop("disabled", true)
+  $(".js-shroud", target).find("[data-shroud-input]").prop("disabled", false)
+  $("[data-shroud-clear]", target).each(function () {
     $(this).click(function() {
       $(".js-shroud").removeClass("js-shroud")
       $("[data-shroud-input]").prop("disabled", true)

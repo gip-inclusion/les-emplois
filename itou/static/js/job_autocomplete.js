@@ -1,9 +1,9 @@
-$(document).ready(() => {
+htmx.onLoad((target) => {
 
-  let jobAppellationSearchInput = $('.js-job-autocomplete-input')
-  let jobAppellationCodeInput = $('.js-job-autocomplete-hidden')
-  let loading = $('.js-job-autocomplete-loading')
-  let noLoading = $('.js-job-autocomplete-no-loading')
+  let jobAppellationSearchInput = $('.js-job-autocomplete-input', target)
+  let jobAppellationCodeInput = $('.js-job-autocomplete-hidden', target)
+  let loading = $('.js-job-autocomplete-loading', target)
+  let noLoading = $('.js-job-autocomplete-no-loading', target)
   let autoSubmitOnEnterPressed = jobAppellationSearchInput.data('autosubmit-on-enter-pressed')
 
   function clearInput() {

@@ -2,8 +2,8 @@
 
 "use strict";
 
-$(document).ready(() => {
-  let form = $(".js-format-nir");
+htmx.onLoad((target) => {
+  let form = $(".js-format-nir", target);
   let input = form.find("input[name='nir']").first();
 
   function formatNir(nir) {
