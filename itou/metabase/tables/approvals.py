@@ -77,7 +77,7 @@ TABLE.add_columns(
         {"name": "date_fin", "type": "date", "comment": "Date de fin", "fn": lambda o: o.end_at},
         {"name": "durée", "type": "interval", "comment": "Durée", "fn": lambda o: o.end_at - o.start_at},
         {
-            "name": "id",
+            "name": "id_candidat",
             "type": "integer",
             "comment": "ID C1 du candidat",
             "fn": lambda o: o.user_id if isinstance(o, Approval) else None,
