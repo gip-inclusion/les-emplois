@@ -27,7 +27,7 @@ with fdp_structures as (
         fdp.date_mise_à_jour_metabase,
         fdp.id as id_fdp,
         fdp.nom_rome as nom_rome_fdp,
-        fdppc.id_anonymisé_candidature, 
+        fdppc.id_candidature, 
         fdp.siret_employeur
     from 
         fiches_de_poste fdp 
@@ -53,8 +53,8 @@ candidatures_recues_par_fiche_de_poste as (
         c.délai_prise_en_compte,
         fdp_s.département_structure,
         fdp_s.région_structure,
-        c.id_anonymisé as id_candidature_anonymisé,
-        c.id_candidat_anonymisé ,
+        c.id as id_candidature,
+        c.id_candidat,
         fdp_s.id_structure,
         c.motif_de_refus,
         fdp_s.nom_département_structure,
@@ -78,7 +78,7 @@ candidatures_recues_par_fiche_de_poste as (
         fdp_structures fdp_s
     left join 
         candidatures c
-        on c.id_anonymisé = fdp_s.id_anonymisé_candidature 
+        on c.id = fdp_s.id_candidature 
 ),
 fiche_de_poste as (
     select 

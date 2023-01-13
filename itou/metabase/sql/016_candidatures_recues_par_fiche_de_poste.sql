@@ -14,8 +14,8 @@ select
     (date_embauche - date_candidature) as delai_embauche, /* nous donne une date en jours */
     c.délai_prise_en_compte,
     c.département_structure,
-    c.id_anonymisé as id_candidature_anonymisé,
-    c.id_candidat_anonymisé ,
+    c.id as id_candidature,
+    c.id_candidat,
     c.id_structure,
     c.motif_de_refus,
     c.nom_département_structure,
@@ -47,7 +47,7 @@ left join
     on o.id = c.id_org_prescripteur
 inner join 
     fiches_de_poste_par_candidature fdppc 
-    on c.id_anonymisé = fdppc.id_anonymisé_candidature 
+    on c.id = fdppc.id_candidature 
 inner join 
     fiches_de_poste fdp 
     on fdp.id = fdppc.id_fiche_de_poste

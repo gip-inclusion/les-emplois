@@ -12,7 +12,7 @@ L'objectif est de calculer le délai entre la 1ère candidature et l'embauche de
 
 with date_1ere_candidature as (
     select 
-        c."id_candidat_anonymisé",
+        c."id_candidat",
         min(date_candidature) as date_1ere_candidature,
         min(
             case 
@@ -27,11 +27,11 @@ with date_1ere_candidature as (
         id_org_prescripteur
     from 
         candidatures c 
-    inner join candidats on c.id_candidat_anonymisé = candidats.id_anonymisé 
+    inner join candidats on c.id_candidat = candidats.id 
         where c.origine = 'Prescripteur habilité' /* Modification du filtre initialement fait par Soumia, qui n'était pas bon */
         and c.origine_détaillée  = 'Prescripteur habilité PE'
     group by 
-        c."id_candidat_anonymisé",
+        c."id_candidat",
         candidats.nom_département,
         date_candidature,
         date_embauche,
@@ -46,7 +46,7 @@ prescripteurs as (
     from organisations o 
 )
 select 
-    "id_candidat_anonymisé",
+    "id_candidat",
     nom_département_candidat,
     date_candidature,
     date_embauche,

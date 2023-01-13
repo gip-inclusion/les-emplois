@@ -14,29 +14,29 @@ with etp_conventionnes as (
     )
 select 
     /* Nombre de candidatures acceptées initiées par l'employeur de type SIAE */
-    count(distinct candidatures_echelle_locale.id_anonymisé) 
+    count(distinct candidatures_echelle_locale.id) 
         filter (
             where 
                 (origine = 'Employeur') 
                 and (état = 'Candidature acceptée')
                 and type_structure in ('EI', 'ETTI', 'AI', 'ACI', 'EITI')) as nombre_candidatures_acceptees_employeurs,
     /* Nombre de candidatures initiées par l'employeur de type SIAE */
-    count(distinct candidatures_echelle_locale.id_anonymisé) 
+    count(distinct candidatures_echelle_locale.id) 
         filter (
             where 
                 (origine = 'Employeur') 
                 and type_structure in ('EI', 'ETTI', 'AI', 'ACI', 'EITI')) as nombre_candidatures_employeurs,
-    count(distinct candidatures_echelle_locale.id_anonymisé) 
+    count(distinct candidatures_echelle_locale.id) 
         filter (
             where 
                 (état = 'Candidature acceptée')
                 and type_structure in ('EI', 'ETTI', 'AI', 'ACI', 'EITI')) as nombre_candidatures_acceptees,
     count(distinct id_fiche_de_poste) AS Nombre_fiches_poste_ouvertes, 
-    count(distinct id_anonymisé) AS nombre_candidatures,
-    count(distinct id_anonymisé) 
+    count(distinct id) AS nombre_candidatures,
+    count(distinct id) 
         filter (
             where (état = 'Candidature déclinée')) as nombre_candidatures_refusees,
-    count(distinct id_anonymisé) 
+    count(distinct id) 
         filter (
             where (état = 'Candidature déclinée')and origine != 'Employeur') as nb_candidatures_refusees_non_emises_par_employeur_siae,
     count(distinct id_structure) as nombre_siae,
@@ -53,7 +53,7 @@ from
     candidatures_echelle_locale
 left join 
     fiches_de_poste_par_candidature fdpc 
-    on candidatures_echelle_locale.id_anonymisé = fdpc.id_anonymisé_candidature 
+    on candidatures_echelle_locale.id = fdpc.id_candidature 
 left join 
     fiches_de_poste fdp on fdpc.id_fiche_de_poste = fdp.id
 left join 

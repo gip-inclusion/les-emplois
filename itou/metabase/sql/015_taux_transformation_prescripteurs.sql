@@ -8,7 +8,7 @@ Nous récupérons aussi différentes informations sur les structures à partir d
 	
 with candidats_p as ( /* Ici on sélectionne les colonnes pertinentes à partir de la table candidats en ne prenant que les auteurs = Prescripteur */
     select  
-	distinct cdd.id_anonymisé as id_candidat_anonymise, 
+	distinct cdd.id as id_candidat, 
 	cdd.actif,   
 	cdd.age,    
 	cdd.date_diagnostic,
@@ -41,9 +41,9 @@ prescripteurs as (
     from organisations o 
 )
 select /* On selectionne les colonnes finales qui nous intéressent */
-    id_candidat_anonymise,
+    id_candidat,
     case /* ajout d'une colonne permettant de calculer le taux de candidats acceptées tout en faisant une jointure avec la table candidatures */
-        when total_embauches > 0 then concat(substring(id_candidat_anonymise from 1 for 1000), '_accepté')
+        when total_embauches > 0 then concat(substring(id_candidat from 1 for 1000), '_accepté')
         else null
     end candidature_acceptée,
     actif,

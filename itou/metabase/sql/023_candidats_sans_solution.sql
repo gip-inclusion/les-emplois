@@ -8,15 +8,15 @@ ou
 */
 with candidature as ( 
     select  
-        distinct (id_candidat_anonymisé) identifiant_candidat, 
+        distinct (id_candidat) identifiant_candidat, 
 	    date_candidature,
-	    count(distinct (candidatures.id_anonymisé)) nombre_candidature,
+	    count(distinct (candidatures.id)) nombre_candidature,
 	    état, 
 	    date_inscription
    from 
        candidatures 
    left join 
-       Candidats on id_candidat_anonymisé =  public.candidats.id_anonymisé 
+       Candidats on id_candidat =  public.candidats.id 
    where 
        date_candidature <= date_trunc('month', date_inscription) + interval '1 month'
        and date_candidature >= date_inscription 
@@ -83,7 +83,7 @@ from (
         date_inscription ) as a 
 left join (
     select 
-        count(distinct(id_anonymisé)) as nombre_candidats,
+        count(distinct(id)) as nombre_candidats,
         date_inscription
     from candidats 
     where candidats.injection_ai = 0
