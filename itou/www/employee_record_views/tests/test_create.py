@@ -7,6 +7,7 @@ from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
+from itou.users.enums import LackOfNIRReason
 from itou.users.factories import JobSeekerWithAddressFactory, JobSeekerWithMockedAddressFactory
 from itou.utils.mocks.address_format import mock_get_geocoding_data
 from itou.utils.test import TestCase
@@ -125,6 +126,17 @@ class AbstractCreateEmployeeRecordTest(TestCase):
         response = self.client.get(self.url)
 
         assert response.status_code == 403
+
+    def test_access_denied_nir_associated_to_other(self):
+        self.job_seeker = self.job_application.job_seeker
+        self.job_seeker.nir = None
+        self.job_seeker.lack_of_nir_reason = LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER
+        self.job_seeker.save(update_fields=("nir", "lack_of_nir_reason"))
+
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertContains(response, "régulariser le numéro de sécurité sociale", status_code=403)
 
 
 class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):

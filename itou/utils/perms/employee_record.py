@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404
 
 from itou.employee_record.enums import Status
 from itou.job_applications.models import JobApplication
+from itou.users.enums import LackOfNIRReason
 from itou.utils.perms.siae import get_current_siae_or_404
 
 
@@ -58,6 +59,12 @@ def can_create_employee_record(request, job_application_id) -> JobApplication:
         pk=job_application_id,
         to_siae=siae,
     )
+
+    if job_application.job_seeker.lack_of_nir_reason == LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER:
+        raise PermissionDenied(
+            "Cette fiche salarié ne peut pas être modifiée. "
+            "Veuillez d'abord régulariser le numéro de sécurité sociale."
+        )
 
     if not tunnel_step_is_allowed(job_application):
         raise PermissionDenied("Cette fiche salarié ne peut pas être modifiée.")
