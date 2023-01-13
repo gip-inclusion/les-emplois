@@ -59,4 +59,12 @@ htmx.onLoad((target) => {
       $("[data-shroud-input]").prop("disabled", true)
     })
   })
+
+  /**
+    * JS to disable/enable targeted field
+    **/
+  $('input[type="checkbox"][data-disable-target]', target).change(function(e) {
+    const target = this.getAttribute("data-disable-target")
+    $(target).attr("disabled", this.checked)
+  })
 });
