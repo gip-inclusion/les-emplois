@@ -128,7 +128,7 @@
                         </p>
                     {% endif %}
                 </div>
-                {% if has_outdated_date %}
+                {% if need_manual_regularization %}
                     <div class="alert alert-warning my-5">
                         <div class="row">
                             <div class="col-auto pr-0">
@@ -139,7 +139,7 @@
                                     <strong>Une action de votre part est nécessaire</strong>
                                 </p>
                                 <p class="mb-0">
-                                    Attention, nous avons détecté une ou plusieurs fiches salariés dont la nouvelle date de fin du PASS IAE doit être transmise manuellement à l’ASP.
+                                    Attention, nous avons détecté une ou plusieurs fiches salariés qui nécessitent une régularisation manuelle de votre part.
                                 </p>
                             </div>
                         </div>

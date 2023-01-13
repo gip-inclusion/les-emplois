@@ -1,4 +1,5 @@
 from dateutil.relativedelta import relativedelta
+from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 
@@ -7,6 +8,7 @@ from itou.employee_record import factories as employee_record_factories
 from itou.employee_record.enums import Status
 from itou.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
+from itou.users.enums import LackOfNIRReason
 from itou.utils.test import TestCase
 
 
@@ -121,6 +123,40 @@ class ListEmployeeRecordsTest(TestCase):
 
         self.assertContains(response, "Désactiver la fiche salarié")
         self.assertContains(response, "Créer la fiche salarié")
+
+    @override_settings(TALLY_URL="https://tally.so")
+    def test_employee_records_with_nir_associated_to_other(self):
+        self.client.force_login(self.user)
+        self.job_seeker.nir = None
+        self.job_seeker.lack_of_nir_reason = LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER
+        self.job_seeker.save(update_fields=("nir", "lack_of_nir_reason"))
+
+        response = self.client.get(self.url + "?status=NEW")
+
+        self.assertContains(response, self.job_seeker.get_full_name().title())
+        self.assertContains(response, "Une action de votre part est nécessaire")
+        self.assertContains(response, "Attention, nous avons détecté une ou plusieurs fiches salariés")
+        self.assertContains(response, "demander la régularisation du numéro de sécurité sociale")
+        self.assertContains(response, f'href="https://tally.so/r/wzxQlg?jobapplication={ self.job_application.pk }"')
+        self.assertNotContains(response, "Mettre à jour")
+
+    @override_settings(TALLY_URL="https://tally.so")
+    def test_employee_record_to_disable_with_nir_associated_to_other(self):
+        self.client.force_login(self.user)
+        self.job_seeker.nir = None
+        self.job_seeker.lack_of_nir_reason = LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER
+        self.job_seeker.save(update_fields=("nir", "lack_of_nir_reason"))
+        new_er = employee_record_factories.EmployeeRecordFactory(job_application=self.job_application)
+
+        response = self.client.get(self.url + "?status=NEW")
+
+        self.assertContains(response, self.job_seeker.get_full_name().title())
+        self.assertContains(response, "Une action de votre part est nécessaire")
+        self.assertContains(response, "Attention, nous avons détecté une ou plusieurs fiches salariés")
+        self.assertContains(response, "demander la régularisation du numéro de sécurité sociale")
+        self.assertContains(response, f'href="https://tally.so/r/wzxQlg?employeerecord={ new_er.pk }"')
+        self.assertNotContains(response, "Désactiver la fiche salarié")
+        self.assertNotContains(response, "Créer la fiche salarié")
 
     def test_rejected_without_custom_message(self):
         self.client.force_login(self.user)

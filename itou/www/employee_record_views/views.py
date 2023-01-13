@@ -12,6 +12,7 @@ from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
+from itou.users.enums import LackOfNIRReason
 from itou.users.models import JobSeekerProfile
 from itou.utils.pagination import pager
 from itou.utils.perms.employee_record import can_create_employee_record, siae_is_allowed
@@ -126,18 +127,21 @@ def list_employee_records(request, template_name="employee_record/list.html"):
 
     # Not needed every time (not pulled-up), and DRY here
     base_query = EmployeeRecord.objects.full_fetch().order_by(*employee_record_order_by)
-    has_outdated_date = False
+    need_manual_regularization = False
 
     if status == Status.NEW:
         # Browse to get only the linked employee record in "new" state
         data = eligible_job_applications
         for item in data:
-            has_outdated_date |= item.has_suspension or item.has_prolongation
-
+            need_manual_regularization |= item.has_suspension or item.has_prolongation
+            need_manual_regularization |= item.job_seeker.lack_of_nir_reason == LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER
+            item.nir_tally_params = f"?jobapplication={item.pk}"
             for e in item.employee_record.all():
                 if e.status == Status.NEW:
                     item.employee_record_new = e
+                    item.nir_tally_params = f"?employeerecord={e.pk}"
                     break
+
         employee_records_list = False
     else:
         data = base_query.filter(status=status).for_siae(siae)
@@ -151,7 +155,7 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         "badges": status_badges,
         "navigation_pages": navigation_pages,
         "feature_availability_date": EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
-        "has_outdated_date": has_outdated_date,
+        "need_manual_regularization": need_manual_regularization,
         "ordered_by_label": order_by.label,
     }
 

@@ -1,4 +1,5 @@
 {% load format_filters %}
+{% load tally %}
 <div class="card my-5">
 
     <div class="card-header">
@@ -101,7 +102,26 @@
 
         {# Actions #}
         {% if form.status.value == "NEW" %}
-            {% if item.has_suspension or item.has_prolongation %}
+            {% if item.job_seeker.lack_of_nir_reason == "NIR_ASSOCIATED_TO_OTHER" %}
+                <div class="alert alert-warning mt-4" role="status">
+                    <div class="row">
+                        <div class="col-auto pr-0">
+                            <i class="ri-error-warning-line ri-xl text-warning"></i>
+                        </div>
+                        <div class="col">
+                            <p class="mb-2">
+                                <strong>Informations manquantes</strong>
+                            </p>
+                            <p class="mb-0">
+                                Pour créer cette fiche salarié, veuillez demander la régularisation du numéro de sécurité sociale.
+                            </p>
+                        </div>
+                        <div class="col-auto align-self-center">
+                            <a class="btn btn-primary" href="{% tally_form_url "wzxQlg" %}{{ item.nir_tally_params }}" target="_blank" rel="noopener">Régulariser le n° de sécurité sociale</a>
+                        </div>
+                    </div>
+                </div>
+            {% elif item.has_suspension or item.has_prolongation %}
                 <div class="alert alert-warning mt-4" role="status">
                     <div class="row">
                         <div class="col-auto pr-0">
