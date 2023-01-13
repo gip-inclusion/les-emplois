@@ -13,9 +13,9 @@ class CityAdmin(ItouGISMixin, admin.ModelAdmin):
 
     search_fields = ("name", "department", "post_codes", "code_insee")
 
-    readonly_fields = ("zrr",)
+    readonly_fields = ("zrr", "edition_mode")
 
-    fields = ("name", "department", "post_codes", "code_insee", "zrr", "coords")
+    fields = ("name", "department", "post_codes", "code_insee", "zrr", "coords", "edition_mode")
 
     @admin.display(description="Commune en ZRR")
     def zrr(self, obj):

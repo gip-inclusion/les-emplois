@@ -6,6 +6,11 @@ from django.db import models
 from itou.common_apps.address.departments import DEPARTMENTS, REGIONS
 
 
+class EditionModeChoices(models.TextChoices):
+    AUTO = "AUTO", "Ville mise à jour automatiquement via script"
+    MANUAL = "MANUAL", "Ville mise à jour manuellement"
+
+
 class City(models.Model):
     """
     French cities with geocoding data.
@@ -24,6 +29,13 @@ class City(models.Model):
     # https://docs.djangoproject.com/en/2.2/ref/contrib/gis/model-api/#pointfield
     coords = gis_models.PointField(geography=True, blank=True, null=True)
 
+    edition_mode = models.CharField(
+        verbose_name="Mode d'édition",
+        choices=EditionModeChoices.choices,
+        max_length=16,
+        default=EditionModeChoices.MANUAL,
+    )
+
     objects = models.Manager()  # The default manager.
 
     class Meta:
@@ -38,6 +50,12 @@ class City(models.Model):
 
     def __str__(self):
         return self.display_name
+
+    def save(self, *args, **kwargs):
+        # Any save() forces the edition_mode to be MANUAL. Only the sync_cities script
+        # can take care of forcing the mode to AUTO.
+        self.edition_mode = EditionModeChoices.MANUAL
+        super().save(*args, **kwargs)
 
     @property
     def display_name(self):
