@@ -1131,17 +1131,22 @@ def test_yield_sync_diff():
             kind=DiffItemKind.SUMMARY,
             label="count=0 label=Rome had the same key in collection and " "queryset",
             raw=None,
-            db_pk=None,
+            db_obj=None,
         ),
         DiffItem(
-            key=None, kind=DiffItemKind.SUMMARY, label="count=0 label=Rome added by collection", raw=None, db_pk=None
+            key=None, kind=DiffItemKind.SUMMARY, label="count=0 label=Rome added by collection", raw=None, db_obj=None
         ),
         DiffItem(
-            key=None, kind=DiffItemKind.SUMMARY, label="count=0 label=Rome removed by collection", raw=None, db_pk=None
+            key=None,
+            kind=DiffItemKind.SUMMARY,
+            label="count=0 label=Rome removed by collection",
+            raw=None,
+            db_obj=None,
         ),
     ]
 
-    Rome(code="FOO", name="Petit papa noel").save()
+    first_rome = Rome(code="FOO", name="Petit papa noel")
+    first_rome.save()
     Rome(code="BAR", name="contenu inchangé").save()
     item_to_remove = Rome(code="BAZ", name="Vas-y francky")
     item_to_remove.save()
@@ -1182,9 +1187,9 @@ def test_yield_sync_diff():
         None,
         {"key": "HELLO", "label": "nouvel objet stylé !"},
         None,
-        item_to_remove,
+        None,
     ]
-    assert [d.db_pk for d in items] == [None, "FOO", None, None, None, None]
+    assert [d.db_obj for d in items] == [None, first_rome, None, None, None, item_to_remove]
 
     # check lambda and detailed keys
     lines = [

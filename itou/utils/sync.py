@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Callable
 
-from django.db.models import QuerySet
+from django.db.models import Model, QuerySet
 
 
 class DiffItemKind(Enum):
@@ -18,8 +18,8 @@ class DiffItem:
     key: str
     kind: DiffItemKind
     label: str
-    raw: dict = None
-    db_pk: str | int | None = None  # database pk in the case of an update
+    raw: dict | None = None
+    db_obj: Model | None = None
 
 
 def yield_sync_diff(
@@ -56,7 +56,7 @@ def yield_sync_diff(
         obj_db = db_map[key]
         obj_coll = data_map[key]
         if not compared_keys:
-            yield DiffItem(key, DiffItemKind.EDITION, f"\tCHANGED item key={key}", obj_coll, obj_db.pk)
+            yield DiffItem(key, DiffItemKind.EDITION, f"\tCHANGED item key={key}", obj_coll, obj_db)
         for coll_key, db_key in compared_keys:
             db_val = getattr(obj_db, db_key)
             col_val = obj_coll[coll_key] if isinstance(coll_key, str) else coll_key(obj_coll)
@@ -66,7 +66,7 @@ def yield_sync_diff(
                     DiffItemKind.EDITION,
                     f"\tCHANGED {db_key}={db_val} changed to value={col_val}",
                     obj_coll,
-                    obj_db.pk,
+                    obj_db,
                 )
 
     yield DiffItem(None, DiffItemKind.SUMMARY, f"count={len(added_by_coll)} label={label} added by collection")
@@ -77,4 +77,4 @@ def yield_sync_diff(
     yield DiffItem(None, DiffItemKind.SUMMARY, f"count={len(removed_in_coll)} label={label} removed by collection")
     for key in sorted(removed_in_coll):
         obj_db = db_map[key]
-        yield DiffItem(key, DiffItemKind.DELETION, f"\tREMOVED {db_map[key]}", obj_db)
+        yield DiffItem(key, DiffItemKind.DELETION, f"\tREMOVED {db_map[key]}", None, obj_db)

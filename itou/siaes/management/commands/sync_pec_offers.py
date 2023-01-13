@@ -135,7 +135,7 @@ class Command(BaseCommand):
             # get the weakest possible lock on these rows, as we don't want to block the entire system
             # but still avoid creating concurrent rows in the same time while we inspect their keys
             pe_offers = SiaeJobDescription.objects.filter(source_kind=JobSource.PE_API).select_for_update(
-                of=["self"], no_key=True
+                of=["self"], skip_locked=True, no_key=True
             )
             for item in yield_sync_diff(raw_offers, "id", pe_offers, "source_id", []):
                 if item.kind in [DiffItemKind.ADDITION, DiffItemKind.EDITION]:
@@ -145,7 +145,7 @@ class Command(BaseCommand):
                         if item.kind == DiffItemKind.ADDITION:
                             added_offers.append(job)
                         else:
-                            job.pk = item.db_pk
+                            job.pk = item.db_obj.pk
                             updated_offers.append(job)
                 elif item.kind == DiffItemKind.DELETION:
                     offers_to_remove.add(item.key)
