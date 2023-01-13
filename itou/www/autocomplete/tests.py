@@ -121,18 +121,17 @@ class JobsAutocompleteTest(TestCase):
 class CitiesAutocompleteTest(TestCase):
     def test_autocomplete(self):
 
-        create_test_cities(["01"], num_per_department=10)
+        create_test_cities(["01", "75"], num_per_department=20)
 
         url = reverse("autocomplete:cities")
 
         response = self.client.get(url, {"term": "sai"})
         assert response.status_code == 200
-        expected = [
+        assert json.loads(response.content) == [
             {"slug": "saint-sulpice-01", "value": "Saint-Sulpice (01)"},
             {"slug": "saint-genis-pouilly-01", "value": "Saint-Genis-Pouilly (01)"},
             {"slug": "saint-jean-de-gonville-01", "value": "Saint-Jean-de-Gonville (01)"},
         ]
-        assert json.loads(response.content) == expected
 
         response = self.client.get(url, {"term": "    "})
         assert response.status_code == 200
@@ -141,5 +140,37 @@ class CitiesAutocompleteTest(TestCase):
 
         response = self.client.get(url, {"term": "paris"})
         assert response.status_code == 200
-        expected = b"[]"
-        assert response.content == expected
+        assert json.loads(response.content) == [
+            {"slug": "paris-75", "value": "Paris (75)"},
+            {"slug": "paris-2e-arrondissement-75", "value": "Paris 2e Arrondissement (75)"},
+            {"slug": "paris-3e-arrondissement-75", "value": "Paris 3e Arrondissement (75)"},
+            {"slug": "paris-4e-arrondissement-75", "value": "Paris 4e Arrondissement (75)"},
+            {"slug": "paris-5e-arrondissement-75", "value": "Paris 5e Arrondissement (75)"},
+            {"slug": "paris-6e-arrondissement-75", "value": "Paris 6e Arrondissement (75)"},
+            {"slug": "paris-7e-arrondissement-75", "value": "Paris 7e Arrondissement (75)"},
+            {"slug": "paris-8e-arrondissement-75", "value": "Paris 8e Arrondissement (75)"},
+            {"slug": "paris-9e-arrondissement-75", "value": "Paris 9e Arrondissement (75)"},
+            {"slug": "paris-10e-arrondissement-75", "value": "Paris 10e Arrondissement (75)"},
+        ]
+
+        response = self.client.get(url, {"term": "paris 8"})
+        assert response.status_code == 200
+        assert json.loads(response.content) == [
+            {"slug": "paris-8e-arrondissement-75", "value": "Paris 8e Arrondissement (75)"},
+            # the trigram similarity allows for those results to show up, I'm not happy with it but
+            # I won't look much more into it now. In my opinion they should be discarded since
+            # they do not include an "8".
+            {"slug": "paris-75", "value": "Paris (75)"},
+            {"slug": "paris-2e-arrondissement-75", "value": "Paris 2e Arrondissement (75)"},
+            {"slug": "paris-3e-arrondissement-75", "value": "Paris 3e Arrondissement (75)"},
+            {"slug": "paris-4e-arrondissement-75", "value": "Paris 4e Arrondissement (75)"},
+            {"slug": "paris-5e-arrondissement-75", "value": "Paris 5e Arrondissement (75)"},
+            {"slug": "paris-6e-arrondissement-75", "value": "Paris 6e Arrondissement (75)"},
+            {"slug": "paris-7e-arrondissement-75", "value": "Paris 7e Arrondissement (75)"},
+            {"slug": "paris-9e-arrondissement-75", "value": "Paris 9e Arrondissement (75)"},
+            {"slug": "paris-10e-arrondissement-75", "value": "Paris 10e Arrondissement (75)"},
+        ]
+
+        response = self.client.get(url, {"term": "toulouse"})
+        assert response.status_code == 200
+        assert json.loads(response.content) == []
