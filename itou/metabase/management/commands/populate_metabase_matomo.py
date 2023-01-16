@@ -2,6 +2,7 @@ import concurrent
 import csv
 import datetime
 import io
+import threading
 import urllib
 from dataclasses import dataclass
 from time import sleep
@@ -24,13 +25,20 @@ from itou.metabase.db import MetabaseDatabaseCursor, create_table
 from itou.utils import constants
 
 
+lock = threading.Lock()
+
+
+def threadsafe_print(s):
+    with lock:
+        print(s, flush=True)
+
+
 def log_retry_attempt(retry_state):
     try:
         outcome = retry_state.outcome.result()
     except Exception as e:  # pylint: disable=broad-except
         outcome = str(e)
-
-    print(f"attempt={retry_state.attempt_number} failed with outcome={outcome}")
+    threadsafe_print(f"attempt={retry_state.attempt_number} failed with outcome={outcome}")
 
 
 # Matomo might be a little tingly sometimes, let's give it retries.
@@ -144,12 +152,12 @@ def get_matomo_dashboard(at: datetime.datetime, options: MatomoFetchOptions):
     if segment:
         key, value = segment.split("==")
         options.api_options["segment"] = f"{key}=={urllib.parse.quote(value, safe='')}"
-    print(f"\t> fetching date={at} dashboard='{options.dashboard_name}' {key}={value}")
+    threadsafe_print(f"\t> fetching date={at} dashboard='{options.dashboard_name}' {key}={value}")
     column_names = None
     results = []
     for row in matomo_api_call(base_options | options.api_options):
         if all(x in ["0", "0s", "0%", None] for x in row.values()):
-            print(f"\t! empty matomo values for date={at} dashboard={options.dashboard_name}")
+            threadsafe_print(f"\t! empty matomo values for date={at} dashboard={options.dashboard_name}")
             return None, None
         row["Date"] = at
         row["Tableau de bord"] = options.dashboard_name
@@ -225,7 +233,7 @@ class Command(BaseCommand):
                 )
             )
 
-        self.stdout.write(f"> about to fetch count={len(api_call_options)} public dashboards from Matomo.")
+        threadsafe_print(f"> about to fetch count={len(api_call_options)} public dashboards from Matomo.")
         column_names, all_rows = multiget_matomo_dashboards(at, api_call_options)
         if wet_run and column_names:
             update_table_at_date(
@@ -290,7 +298,7 @@ class Command(BaseCommand):
                         )
                     )
 
-        self.stdout.write(f"> about to fetch count={len(api_call_options)} private dashboards from Matomo.")
+        threadsafe_print(f"> about to fetch count={len(api_call_options)} private dashboards from Matomo.")
         column_names, all_rows = multiget_matomo_dashboards(at, api_call_options)
         if wet_run and column_names:
             update_table_at_date(
