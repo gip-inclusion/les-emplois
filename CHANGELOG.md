@@ -1,5 +1,22 @@
 # Journal des modifications
 
+## [54] - 2023-01-16
+
+### Ajouté
+- Admin : Ajout d’un filtre des ZRR par statut
+- Candidature : Affichage d’une alerte lorsque les informations personnelles du candidat datent de plusieurs mois, et d’un parcours pour les mettre à jour
+- Recherche de postes : Affichage des offres Parcours Emploi Compétences (PEC)
+
+### Modifié
+- Candidature : Correction de bugs lors de l’affichage du PASS IAE
+- Candidature : Afficher “non renseigné” au lieu de masquer les informations manquantes
+- Candidature : Clarification du texte du bouton de dépôt de candidatures
+- Connexion : Gestion de l’indisponibilité d’Inclusion Connect à la déconnexion
+- Contrôle a posteriori : Exclusion des agréments émis par Pôle Emploi des candidatures à contrôler
+- Fiches salarié : Amélioration de performances
+- Parcours d’embauche : Correction d’un bug lorsqu’une candidature est ouverte dans plusieurs onglets
+- Recherche de postes : Amélioration de la fiche publique entreprise
+
 ## [53] - 2022-12-16
 
 ### Ajouté
