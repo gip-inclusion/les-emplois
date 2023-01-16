@@ -158,7 +158,7 @@ def get_matomo_dashboard(at: datetime.datetime, options: MatomoFetchOptions):
     for row in matomo_api_call(base_options | options.api_options):
         if all(x in ["0", "0s", "0%", None] for x in row.values()):
             threadsafe_print(f"\t! empty matomo values for date={at} dashboard={options.dashboard_name}")
-            return None, None
+            continue
         row["Date"] = at
         row["Tableau de bord"] = options.dashboard_name
         for extra_col, extra_value in options.extra_columns.items():
