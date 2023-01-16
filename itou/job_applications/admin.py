@@ -78,12 +78,6 @@ class JobApplicationAdmin(admin.ModelAdmin):
     inlines = (JobsInline, TransitionLogInline, UUIDSupportRemarkInline)
     search_fields = ("pk", "to_siae__siret", "job_seeker__email", "sender__email")
 
-    list_select_related = (
-        "to_siae",
-        "job_seeker",
-        "sender",
-    )
-
     def get_form(self, request, obj=None, **kwargs):
         """
         Override a field's `help_text` to display a link to the PASS IAE delivery interface.
