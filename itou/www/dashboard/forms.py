@@ -13,30 +13,9 @@ from itou.utils.apis.exceptions import AddressLookupError
 from itou.utils.widgets import DuetDatePickerWidget, MultipleSwitchCheckboxWidget, SwitchCheckboxWidget
 
 
-class EditUserInfoForm(MandatoryAddressFormMixin, forms.ModelForm):
-    """
-    Edit a user profile.
-    """
-
-    email = forms.EmailField(label="Adresse électronique", widget=forms.TextInput(attrs={"autocomplete": "off"}))
-
+class SSOReadonlyMixin:
     def __init__(self, *args, **kwargs):
-        editor = kwargs.pop("editor")
         super().__init__(*args, **kwargs)
-
-        if not self.instance.is_job_seeker:
-            del self.fields["birthdate"]
-            del self.fields["pole_emploi_id"]
-            del self.fields["lack_of_pole_emploi_id_reason"]
-        else:
-            self.fields["birthdate"].required = True
-            self.fields["birthdate"].widget = DuetDatePickerWidget(
-                attrs={
-                    "min": DuetDatePickerWidget.min_birthdate(),
-                    "max": DuetDatePickerWidget.max_birthdate(),
-                }
-            )
-
         if self.instance.has_sso_provider:
             # When a user has logged in with a SSO,
             # it should see the field but most should be disabled
@@ -45,16 +24,46 @@ class EditUserInfoForm(MandatoryAddressFormMixin, forms.ModelForm):
             for name in self.fields.keys():
                 if name in disabled_fields:
                     self.fields[name].disabled = True
+
+
+class EditJobSeekerInfoForm(MandatoryAddressFormMixin, SSOReadonlyMixin, forms.ModelForm):
+    """
+    Edit a job seeker profile.
+    """
+
+    email = forms.EmailField(
+        label="Adresse électronique",
+        disabled=True,
+        widget=forms.TextInput(attrs={"autocomplete": "off"}),
+    )
+
+    def __init__(self, *args, **kwargs):
+        editor = kwargs.pop("editor", None)
+        super().__init__(*args, **kwargs)
+        assert self.instance.is_job_seeker, self.instance
+
+        self.fields["birthdate"].required = True
+        self.fields["birthdate"].widget = DuetDatePickerWidget(
+            attrs={
+                "min": DuetDatePickerWidget.min_birthdate(),
+                "max": DuetDatePickerWidget.max_birthdate(),
+            }
+        )
+
+        # Noboby can edit its own email.
+        if self.instance.has_sso_provider:
+            # If the job seeker uses SSO, point them to the modification process
             self.fields["email"].help_text = (
                 "Si vous souhaitez modifier votre adresse e-mail merci de "
                 f"<a href='{global_constants.ITOU_ASSISTANCE_URL}/#support' target='_blank'>"
                 "contacter notre support technique</a>"
             )
-        else:
-            # Noboby can edit its own email.
+        elif editor and editor.can_edit_email(self.instance):
             # Only prescribers and employers can edit the job seeker's email here under certain conditions
-            if not self.instance.is_job_seeker or not editor.can_edit_email(self.instance):
-                del self.fields["email"]
+            self.fields["email"].disabled = False
+        else:
+            # Otherwise, hide the field
+            self.fields["email"].widget = forms.HiddenInput()
 
     class Meta:
         model = User
@@ -79,15 +88,59 @@ class EditUserInfoForm(MandatoryAddressFormMixin, forms.ModelForm):
 
     def clean(self):
         super().clean()
-        if self.instance.is_job_seeker:
-            self._meta.model.clean_pole_emploi_fields(self.cleaned_data)
+        self._meta.model.clean_pole_emploi_fields(self.cleaned_data)
 
-            # Update job seeker geolocation
-            try:
-                self.instance.set_coords(self.cleaned_data["address_line_1"], self.cleaned_data["post_code"])
-            except AddressLookupError:
-                # Nothing to do: re-raised and already logged as error
-                pass
+        # Update job seeker geolocation
+        try:
+            self.instance.set_coords(self.cleaned_data["address_line_1"], self.cleaned_data["post_code"])
+        except AddressLookupError:
+            # Nothing to do: re-raised and already logged as error
+            pass
+
+    def save(self, commit=True):
+        self.instance.last_checked_at = timezone.now()
+        return super().save(commit=commit)
+
+
+class EditUserInfoForm(MandatoryAddressFormMixin, SSOReadonlyMixin, forms.ModelForm):
+    """
+    Edit a user profile.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        assert not self.instance.is_job_seeker, self.instance
+
+        if self.instance.has_sso_provider:
+            # SSO users do not have access to edit_user_email dedicated view:
+            # this field allows them to discover their dedicated process
+            self.fields["email"] = forms.EmailField(
+                label="Adresse électronique",
+                disabled=True,
+                widget=forms.TextInput(attrs={"autocomplete": "off"}),
+                help_text=(
+                    "Si vous souhaitez modifier votre adresse e-mail merci de "
+                    f"<a href='{global_constants.ITOU_ASSISTANCE_URL}/#support' target='_blank'>"
+                    "contacter notre support technique</a>"
+                ),
+            )
+
+    class Meta:
+        model = User
+        fields = [
+            "first_name",
+            "last_name",
+            "phone",
+            "address_line_1",
+            "address_line_2",
+            "post_code",
+            "city",
+            "city_slug",
+        ]
+        help_texts = {
+            "phone": "Par exemple 0610203040",
+        }
 
     def save(self, commit=True):
         self.instance.last_checked_at = timezone.now()
