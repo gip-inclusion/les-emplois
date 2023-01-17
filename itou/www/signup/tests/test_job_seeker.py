@@ -8,7 +8,6 @@ from django.test import override_settings
 from django.urls import reverse
 
 from itou.cities.factories import create_test_cities
-from itou.cities.models import City
 from itou.openid_connect.france_connect import constants as fc_constants
 from itou.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance
 from itou.users.enums import UserKind
@@ -22,7 +21,7 @@ from itou.www.signup.forms import JobSeekerSituationForm
 
 class JobSeekerSignupTest(TestCase):
     def setUp(self):
-        create_test_cities(["67"], num_per_department=1)
+        [self.city] = create_test_cities(["67"], num_per_department=1)
 
     def test_job_seeker_signup_situation(self):
         """
@@ -94,8 +93,7 @@ class JobSeekerSignupTest(TestCase):
 
         address_line_1 = "Test adresse"
         address_line_2 = "Test adresse complémentaire"
-        city = City.objects.first()
-        post_code = city.post_codes[0]
+        post_code = self.city.post_codes[0]
 
         post_data = {
             "first_name": "John",
@@ -106,8 +104,8 @@ class JobSeekerSignupTest(TestCase):
             "address_line_1": address_line_1,
             "address_line_2": address_line_2,
             "post_code": post_code,
-            "city_name": city.name,
-            "city": city.slug,
+            "city_name": self.city.name,
+            "city": self.city.slug,
         }
 
         response = self.client.post(url, data=post_data)
@@ -145,8 +143,7 @@ class JobSeekerSignupTest(TestCase):
 
         address_line_1 = "Test adresse"
         address_line_2 = "Test adresse complémentaire"
-        city = City.objects.first()
-        post_code = city.post_codes[0]
+        post_code = self.city.post_codes[0]
 
         post_data = {
             "first_name": "John",
@@ -157,8 +154,8 @@ class JobSeekerSignupTest(TestCase):
             "address_line_1": address_line_1,
             "address_line_2": address_line_2,
             "post_code": post_code,
-            "city_name": city.name,
-            "city": city.slug,
+            "city_name": self.city.name,
+            "city": self.city.slug,
         }
 
         response = self.client.post(url, data=post_data)
@@ -182,8 +179,7 @@ class JobSeekerSignupTest(TestCase):
 
         address_line_1 = "Test adresse"
         address_line_2 = "Test adresse complémentaire"
-        city = City.objects.first()
-        post_code = city.post_codes[0]
+        post_code = self.city.post_codes[0]
 
         post_data = {
             "first_name": "John",
@@ -194,8 +190,8 @@ class JobSeekerSignupTest(TestCase):
             "address_line_1": address_line_1,
             "address_line_2": address_line_2,
             "post_code": post_code,
-            "city_name": city.name,
-            "city": city.slug,
+            "city_name": self.city.name,
+            "city": self.city.slug,
         }
 
         response = self.client.post(url, data=post_data)
