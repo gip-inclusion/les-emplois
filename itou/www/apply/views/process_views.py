@@ -74,6 +74,7 @@ def details_for_siae(request, job_application_id, template_name="apply/process_d
     back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("apply:list_for_siae"))
 
     context = {
+        "can_view_personal_information": True,  # SIAE members have access to personal info
         "eligibility_diagnosis": job_application.get_eligibility_diagnosis(),
         "expired_eligibility_diagnosis": expired_eligibility_diagnosis,
         "job_application": job_application,
@@ -117,6 +118,7 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
     back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("apply:list_for_prescriber"))
 
     context = {
+        "can_view_personal_information": request.user.can_view_personal_information(job_application.job_seeker),
         "eligibility_diagnosis": job_application.get_eligibility_diagnosis(),
         "job_application": job_application,
         "transition_logs": transition_logs,

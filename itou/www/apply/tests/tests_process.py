@@ -24,7 +24,7 @@ from itou.job_applications.factories import (
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory
-from itou.users.factories import JobSeekerWithAddressFactory
+from itou.users.factories import JobSeekerWithAddressFactory, PrescriberFactory
 from itou.users.models import User
 from itou.utils.templatetags.format_filters import format_nir
 from itou.utils.test import TestCase
@@ -183,6 +183,26 @@ class ProcessViewsTest(TestCase):
         url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
         assert response.status_code == 302
+
+    def test_details_for_unauthorized_prescriber(self, *args, **kwargs):
+        """As an unauthorized prescriber I cannot access personnal information of arbitrary job seekers"""
+        prescriber = PrescriberFactory()
+        job_application = JobApplicationFactory(
+            job_seeker_with_address=True,
+            job_seeker__first_name="Supersecretname",
+            job_seeker__last_name="Unknown",
+            sender=prescriber,
+            sender_kind=job_applications_enums.SenderKind.PRESCRIBER,
+        )
+        self.client.force_login(prescriber)
+        url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url)
+        self.assertContains(response, format_nir(job_application.job_seeker.nir))
+        self.assertContains(response, "Prénom : <b>S…</b>", html=True)
+        self.assertContains(response, "Nom : <b>U…</b>", html=True)
+        self.assertNotContains(response, job_application.job_seeker.email)
+        self.assertNotContains(response, job_application.job_seeker.phone)
+        self.assertNotContains(response, job_application.job_seeker.post_code)
 
     def test_process(self, *args, **kwargs):
         """Ensure that the `process` transition is triggered."""
