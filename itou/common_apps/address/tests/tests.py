@@ -5,7 +5,6 @@ from django import forms
 from django.contrib.gis.geos import Point
 
 from itou.cities.factories import create_test_cities
-from itou.cities.models import City
 from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.address.forms import MandatoryAddressFormMixin, OptionalAddressFormMixin
 from itou.common_apps.address.models import lat_lon_to_coords
@@ -143,8 +142,7 @@ class UtilsOptionalAddressFormMixinTest(TestCase):
         The city name should be fetched from the slug.
         """
 
-        create_test_cities(["67"], num_per_department=1)
-        city = City.objects.first()
+        [city] = create_test_cities(["67"], num_per_department=1)
 
         form_data = {
             "city_slug": city.slug,
@@ -172,9 +170,7 @@ class UtilsOptionalAddressFormMixinTest(TestCase):
         If an instance is passed, `city` and `city_slug` should be prepopulated.
         """
 
-        create_test_cities(["57"], num_per_department=1)
-
-        city = City.objects.first()
+        [city] = create_test_cities(["57"], num_per_department=1)
 
         user = JobSeekerFactory()
         user.address_line_1 = "11 rue des pixels cassés"

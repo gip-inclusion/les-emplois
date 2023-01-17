@@ -12,7 +12,6 @@ from pytest_django.asserts import assertRedirects
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.asp.models import AllocationDuration, EducationLevel, RSAAllocation
 from itou.cities.factories import create_city_in_zrr, create_test_cities
-from itou.cities.models import City
 from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.geo.factories import ZRRFactory
@@ -344,8 +343,7 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
 
 class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
     def setUp(self):
-        create_test_cities(["67"], num_per_department=1)
-        self.city = City.objects.first()
+        [self.city] = create_test_cities(["67"], num_per_department=1)
 
     @property
     def default_session_data(self):
@@ -885,8 +883,8 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
 
 class ApplyAsPrescriberTest(S3AccessingTestCase):
     def setUp(self):
-        create_test_cities(["67"], num_per_department=10)
-        self.city = City.objects.first()
+        cities = create_test_cities(["67"], num_per_department=10)
+        self.city = cities[0]
 
     @property
     def default_session_data(self):
@@ -1278,8 +1276,7 @@ class ApplyAsPrescriberNirExceptionsTest(S3AccessingTestCase):
 
 class ApplyAsSiaeTest(S3AccessingTestCase):
     def setUp(self):
-        create_test_cities(["67"], num_per_department=1)
-        self.city = City.objects.first()
+        [self.city] = create_test_cities(["67"], num_per_department=1)
 
     @property
     def default_session_data(self):
@@ -1795,8 +1792,7 @@ class UpdateJobSeekerViewTestCase(TestCase):
         cls.step_end_url = reverse(
             "apply:update_job_seeker_step_end", kwargs={"siae_pk": cls.siae.pk, "job_seeker_pk": cls.job_seeker.pk}
         )
-        create_test_cities(["67"], num_per_department=1)
-        cls.city = City.objects.first()
+        [cls.city] = create_test_cities(["67"], num_per_department=1)
 
         cls.INFO_MODIFIABLE_PAR_CANDIDAT_UNIQUEMENT = "Informations modifiables par le candidat uniquement"
         cls.job_seeker_session_key = f"job_seeker-{cls.job_seeker.pk}"

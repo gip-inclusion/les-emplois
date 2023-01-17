@@ -9,7 +9,6 @@ from django.utils.http import urlencode
 from itou.approvals.factories import PoleEmploiApprovalFactory, SuspensionFactory
 from itou.approvals.models import Approval, Suspension
 from itou.cities.factories import create_test_cities
-from itou.cities.models import City
 from itou.eligibility.enums import AuthorKind
 from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
@@ -271,8 +270,8 @@ class ProcessViewsTest(TestCase):
         assert job_application.state.is_postponed
 
     def test_accept(self, *args, **kwargs):
-        create_test_cities(["54", "57"], num_per_department=2)
-        city = City.objects.first()
+        cities = create_test_cities(["54", "57"], num_per_department=2)
+        city = cities[0]
         today = timezone.localdate()
 
         job_seeker = JobSeekerWithAddressFactory(city=city.name)
@@ -389,8 +388,8 @@ class ProcessViewsTest(TestCase):
 
     def test_accept_with_active_suspension(self, *args, **kwargs):
         """Test the `accept` transition with active suspension for active user"""
-        create_test_cities(["54", "57"], num_per_department=2)
-        city = City.objects.first()
+        cities = create_test_cities(["54", "57"], num_per_department=2)
+        city = cities[0]
         today = timezone.localdate()
         # the old job of job seeker
         job_seeker_user = JobSeekerWithAddressFactory()
@@ -456,8 +455,7 @@ class ProcessViewsTest(TestCase):
         """
         Test the "manual approval delivery mode" path of the view.
         """
-        create_test_cities(["57"], num_per_department=1)
-        city = City.objects.first()
+        [city] = create_test_cities(["57"], num_per_department=1)
 
         job_application = JobApplicationSentByJobSeekerFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
@@ -492,8 +490,8 @@ class ProcessViewsTest(TestCase):
         assert job_application.approval_delivery_mode == job_application.APPROVAL_DELIVERY_MODE_MANUAL
 
     def test_accept_and_update_hiring_start_date_of_two_job_applications(self, *args, **kwargs):
-        create_test_cities(["54", "57"], num_per_department=2)
-        city = City.objects.first()
+        cities = create_test_cities(["54", "57"], num_per_department=2)
+        city = cities[0]
         job_seeker = JobSeekerWithAddressFactory()
         base_for_post_data = {
             "address_line_1": job_seeker.address_line_1,
@@ -588,9 +586,8 @@ class ProcessViewsTest(TestCase):
         assert job_app_starting_later.approval.start_at == job_app_starting_earlier.hiring_start_at
 
     def test_accept_with_double_user(self, *args, **kwargs):
-
-        create_test_cities(["54"], num_per_department=1)
-        city = City.objects.first()
+        cities = create_test_cities(["54"], num_per_department=1)
+        city = cities[0]
 
         siae = SiaeFactory(with_membership=True)
         job_seeker = JobSeekerWithAddressFactory(city=city.name)
@@ -775,8 +772,8 @@ class ProcessViewsTest(TestCase):
     def test_accept_after_cancel(self, *args, **kwargs):
         # A canceled job application is not linked to an approval
         # unless the job seeker has an accepted job application.
-        create_test_cities(["54", "57"], num_per_department=2)
-        city = City.objects.first()
+        cities = create_test_cities(["54", "57"], num_per_department=2)
+        city = cities[0]
         job_seeker = JobSeekerWithAddressFactory(city=city.name)
         job_application = JobApplicationSentByJobSeekerFactory(
             state=JobApplicationWorkflow.STATE_CANCELLED, job_seeker=job_seeker

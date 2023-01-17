@@ -21,7 +21,7 @@ def create_test_cities(selected_departments, num_per_department=None):
             line["coords"] = GEOSGeometry(f"{line['coords']}")
             department_map[current_dpt].append(City(**line))
     cities = sum(department_map.values(), [])
-    City.objects.bulk_create(cities)
+    return City.objects.bulk_create(cities)
 
 
 def create_city_saint_andre():
