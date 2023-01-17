@@ -26,7 +26,16 @@ class SearchSiaeTest(TestCase):
     def test_district(self):
         city_slug = "paris-75"
         paris_city = City.objects.create(
-            name="Paris", slug=city_slug, department="75", post_codes=["75001"], coords=Point(5, 23)
+            name="Paris",
+            slug=city_slug,
+            department="75",
+            post_codes=["75001"],
+            coords=Point(5, 23),
+            code_insee="75056",
+        )
+
+        City.objects.create(
+            name="Paris 10eme", slug="paris-10eme-75", department="75", post_codes=["75010"], coords=Point(5, 23)
         )
 
         siae_1 = SiaeFactory(department="75", coords=paris_city.coords, post_code="75001")
@@ -51,6 +60,10 @@ class SearchSiaeTest(TestCase):
         response = self.client.get(self.url, {"city": city_slug, "districts_75": ["75001"]})
         self.assertContains(response, "(1 résultat)")
         self.assertContains(response, siae_1.display_name)
+
+        # Do not get arrondissements when searching the arrondissement directly
+        response = self.client.get(self.url, {"city": "paris-10eme-75"})
+        self.assertNotContains(response, "Arrondissements de Paris")
 
     def test_kind(self):
         city = create_city_saint_andre()

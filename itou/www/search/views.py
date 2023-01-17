@@ -14,6 +14,10 @@ from itou.utils.pagination import pager
 from itou.www.search.forms import JobDescriptionSearchForm, PrescriberSearchForm, SiaeSearchForm
 
 
+# INSEE codes for the french cities that do have districts.
+INSEE_CODES_WITH_DISTRICTS = {"13055", "75056", "69123"}
+
+
 class EmployerSearchBaseView(FormView):
 
     template_name = "search/siaes_search_results.html"
@@ -141,7 +145,8 @@ class EmployerSearchView(EmployerSearchBaseView):
             departments = sorted(departments)
             form.add_field_departements(departments)
 
-        if departments_districts:
+        city = form.cleaned_data["city"]
+        if departments_districts and city.code_insee in INSEE_CODES_WITH_DISTRICTS:
             for department, districts in departments_districts.items():
                 districts = sorted(districts)
                 form.add_field_districts(department, districts)
