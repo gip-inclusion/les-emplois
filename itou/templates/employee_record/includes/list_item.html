@@ -101,7 +101,7 @@
 
         {# Actions #}
         {% if form.status.value == "NEW" %}
-            {% if item.has_outdated_date %}
+            {% if item.has_suspension or item.has_prolongation %}
                 <div class="alert alert-warning mt-4" role="status">
                     <div class="row">
                         <div class="col-auto pr-0">

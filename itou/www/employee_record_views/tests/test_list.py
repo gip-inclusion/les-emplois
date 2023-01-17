@@ -2,6 +2,7 @@ from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from django.utils import timezone
 
+from itou.approvals import factories as approvals_factories
 from itou.employee_record import factories as employee_record_factories
 from itou.employee_record.enums import Status
 from itou.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
@@ -84,6 +85,35 @@ class ListEmployeeRecordsTest(TestCase):
 
         assert response.status_code == 200
         self.assertContains(response, "Fin de contrat :&nbsp;<b>Non renseigné")
+
+    def test_employee_records_with_a_suspension_need_to_be_updated(self):
+        self.client.force_login(self.user)
+        approvals_factories.SuspensionFactory(
+            approval=self.job_application.approval, siae=self.job_application.to_siae
+        )
+
+        response = self.client.get(self.url + "?status=NEW")
+
+        assert response.status_code == 200
+        self.assertContains(response, "Une action de votre part est nécessaire")
+        self.assertContains(response, "Attention, nous avons détecté une ou plusieurs fiches salariés")
+        self.assertContains(response, "Une mise à jour manuelle est nécessaire.")
+        self.assertContains(response, "Mettre à jour")
+
+    def test_employee_records_with_a_prolongation_need_to_be_updated(self):
+        self.client.force_login(self.user)
+        approvals_factories.ProlongationFactory(
+            approval=self.job_application.approval,
+            declared_by_siae=self.job_application.to_siae,
+        )
+
+        response = self.client.get(self.url + "?status=NEW")
+
+        assert response.status_code == 200
+        self.assertContains(response, "Une action de votre part est nécessaire")
+        self.assertContains(response, "Attention, nous avons détecté une ou plusieurs fiches salariés")
+        self.assertContains(response, "Une mise à jour manuelle est nécessaire.")
+        self.assertContains(response, "Mettre à jour")
 
     def test_rejected_without_custom_message(self):
         self.client.force_login(self.user)
