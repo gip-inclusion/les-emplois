@@ -5,6 +5,7 @@ from django.conf import settings
 from django.contrib.gis.geos import Point
 from django.core import management
 from django.db import connection
+from django.utils import timezone
 from pytest_django.asserts import assertNumQueries
 
 from itou.analytics.factories import DatumFactory
@@ -82,7 +83,7 @@ def test_populate_job_seekers():
         created_by=PrescriberFactory(),
         identity_provider=IdentityProvider.PE_CONNECT,
         pole_emploi_id="",
-        last_login=datetime.datetime.now(),
+        last_login=timezone.now(),
         nir="179038704133768",
         post_code="33360",
         geocoding_score=1,
@@ -118,7 +119,7 @@ def test_populate_job_seekers():
     )
     job_application_3 = JobApplicationFactory(
         job_seeker=user_3,
-        created_at=datetime.date(2023, 1, 1),
+        created_at=datetime.datetime(2023, 1, 1, tzinfo=datetime.timezone.utc),
         with_approval=True,
         approval=ApprovalFactory(user=user_3),
         eligibility_diagnosis__author_kind="siae_staff",
@@ -133,10 +134,13 @@ def test_populate_job_seekers():
         with_approval=True,
         approval=job_application_3.approval,
         eligibility_diagnosis=None,
-        created_at=datetime.date(2022, 1, 1),
+        created_at=datetime.datetime(2022, 1, 1, tzinfo=datetime.timezone.utc),
     )
 
-    EligibilityDiagnosisFactory(job_seeker=user_3, created_at=datetime.date(2020, 1, 1))
+    EligibilityDiagnosisFactory(
+        job_seeker=user_3,
+        created_at=datetime.datetime(2020, 1, 1, tzinfo=datetime.timezone.utc),
+    )
 
     num_queries = 1  # Count rows
     num_queries += 1  # Select all elements ids (chunked_queryset)
