@@ -1,3 +1,4 @@
+import pytest
 from django.core import management
 from django.test import override_settings
 
@@ -16,6 +17,7 @@ from itou.utils.mocks.pole_emploi import API_OFFRES
         "SECRET": "pe-secret",
     }
 )
+@pytest.mark.django_db(transaction=True)
 def test_sync_pec_offers(capsys, respx_mock, monkeypatch):
     city = City.objects.create(
         slug="slug",

@@ -131,26 +131,26 @@ class Command(BaseCommand):
         updated_offers = []
         offers_to_remove = set()
 
-        # get the weakest possible lock on these rows, as we don't want to block the entire system
-        # but still avoid creating concurrent rows in the same time while we inspect their keys
-        pe_offers = SiaeJobDescription.objects.filter(source_kind=JobSource.PE_API).select_for_update(
-            of=["self"], skip_locked=True, no_key=True
-        )
-        for item in yield_sync_diff(raw_offers, "id", pe_offers, "source_id", []):
-            if item.kind in [DiffItemKind.ADDITION, DiffItemKind.EDITION]:
-                job = pe_offer_to_job_description(item.raw)
-                if job:
-                    job.siae = pe_siae
-                    if item.kind == DiffItemKind.ADDITION:
-                        added_offers.append(job)
-                    else:
-                        job.pk = item.db_pk
-                        updated_offers.append(job)
-            elif item.kind == DiffItemKind.DELETION:
-                offers_to_remove.add(item.key)
+        with transaction.atomic():
+            # get the weakest possible lock on these rows, as we don't want to block the entire system
+            # but still avoid creating concurrent rows in the same time while we inspect their keys
+            pe_offers = SiaeJobDescription.objects.filter(source_kind=JobSource.PE_API).select_for_update(
+                of=["self"], no_key=True
+            )
+            for item in yield_sync_diff(raw_offers, "id", pe_offers, "source_id", []):
+                if item.kind in [DiffItemKind.ADDITION, DiffItemKind.EDITION]:
+                    job = pe_offer_to_job_description(item.raw)
+                    if job:
+                        job.siae = pe_siae
+                        if item.kind == DiffItemKind.ADDITION:
+                            added_offers.append(job)
+                        else:
+                            job.pk = item.db_pk
+                            updated_offers.append(job)
+                elif item.kind == DiffItemKind.DELETION:
+                    offers_to_remove.add(item.key)
 
-        if wet_run:
-            with transaction.atomic():
+            if wet_run:
                 objs = SiaeJobDescription.objects.bulk_create(added_offers)
                 self.stdout.write(f"> successfully created count={len(objs)} PE job offers")
                 n_objs = SiaeJobDescription.objects.bulk_update(
