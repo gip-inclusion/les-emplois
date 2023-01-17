@@ -59,31 +59,48 @@ class CardViewTest(TestCase):
         self.assertContains(
             response,
             """
-            <ul class="nav nav-tabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <a id="recrutements-en-cours-tab"
-                       class="nav-link active"
-                       role="tab"
-                       href="#recrutements-en-cours"
-                       data-toggle="tab"
-                       aria-selected="true"
-                       aria-controls="#recrutements-en-cours"
-                    >
-                       Recrutements en cours <span class="badge badge-pill badge-primary text-white ml-2">0</span>
-                    </a>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <a id="autres-metiers-tab"
-                       class="nav-link"
-                       role="tab"
-                       href="#autres-metiers"
-                       data-toggle="tab"
-                       aria-selected="false"
-                       aria-controls="#autres-metiers"
-                    >
-                       Autre métier exercé <span class="badge badge-pill badge-info-light text-dark ml-2">1</span>
-                    </a>
-                </li>
+            <ul aria-labelledby="metiers-title" class="s-tabs-01__nav nav nav-tabs" role="tablist">
+             <li class="nav-item" role="presentation">
+              <a aria-controls="recrutements-en-cours"
+                 aria-selected="true"
+                 class="nav-link active"
+                 data-toggle="tab"
+                 href="#recrutements-en-cours"
+                 id="recrutements-en-cours-tab"
+                 role="tab">
+               Recrutements en cours
+               <span class="badge badge-sm badge-primary badge-pill text-white ml-2">
+                0
+               </span>
+              </a>
+             </li>
+             <li class="nav-item" role="presentation">
+              <a aria-controls="autres-metiers"
+                 aria-selected="false"
+                 class="nav-link"
+                 data-toggle="tab"
+                 href="#autres-metiers"
+                 id="autres-metiers-tab"
+                 role="tab">
+               Autre m&eacute;tier exerc&eacute;
+               <span class="badge badge-sm badge-pill badge-info-light text-dark ml-2">
+                1
+               </span>
+              </a>
+             </li>
+             <li class="nav-item-dropdown dropdown" role="presentation">
+              <a aria-expanded="false"
+                 class="nav-link dropdown-toggle"
+                 data-toggle="dropdown"
+                 href="#"
+                 id="sTabs01DropdownMoreLink"
+                 role="button">
+               <i class="ri-more-line">
+               </i>
+              </a>
+              <div aria-labelledby="sTabs01DropdownMoreLink" class="dropdown-menu dropdown-menu-right">
+              </div>
+             </li>
             </ul>
             """,
             html=True,
@@ -93,49 +110,54 @@ class CardViewTest(TestCase):
             response,
             f"""
             <div class="tab-content">
-                <div id="recrutements-en-cours"
-                     class="tab-pane fade active show"
-                     aria-labelled-by="recrutements-en-cours-tab"
-                     role="tab-panel">
-                    <p>Pour le moment, il n’y a aucun recrutement en cours dans cette structure.</p>
+             <div aria-labelledby="recrutements-en-cours-tab"
+                  class="tab-pane fade active show"
+                  id="recrutements-en-cours"
+                  role="tabpanel">
+              <p>
+               Pour le moment, il n&rsquo;y a aucun recrutement en cours dans cette structure.
+              </p>
+             </div>
+             <div aria-labelledby="autres-metiers-tab" class="tab-pane fade" id="autres-metiers" role="tabpanel">
+              <ul class="list-group list-group-flush list-group-link">
+               <li class="list-group-item list-group-item-action">
+                <div class="d-flex align-items-center">
+                 <div>
+                  <div class="d-flex flex-column flex-lg-row align-items-lg-center">
+                   <a class="font-weight-bold stretched-link order-2 order-md-1 matomo-event"
+                      data-matomo-action="clic"
+                      data-matomo-category="candidature"
+                      data-matomo-option="clic-metiers"
+                      href="/siae/job_description/{job_description.pk}/card?back_url=/siae/{siae.pk}/card">
+                    Plaquiste
+                   </a>
+                  </div>
+                  <span class="fs-sm mt-1 d-flex align-items-center">
+                   <i class="ri-map-pin-2-line ri-sm mr-1">
+                   </i>
+                   Vannes (56)
+                  </span>
+                 </div>
+                 <div class="mt-lg-0 ml-auto d-flex flex-column align-items-end justify-content-center">
+                  <span class="badge badge-xs badge-pill badge-accent-02-light text-primary">
+                   CDI
+                  </span>
+                 </div>
                 </div>
-                <div id="{self.OTHER_TAB_ID}"
-                     class="tab-pane fade"
-                     aria-labelled-by="autres-metiers-tab"
-                     role="tab-panel">
-                    <ul class="list-group list-group-flush list-group-link">
-                        <li class="list-group-item list-group-item-action">
-                        <div class="d-flex align-items-center">
-                        <div>
-                        <div class="d-flex flex-column flex-lg-row align-items-lg-center">
-                            <a href="/siae/job_description/{job_description.pk}/card?back_url=/siae/{siae.pk}/card"
-                               class="font-weight-bold stretched-link order-2 order-md-1 matomo-event"
-                               data-matomo-category="candidature"
-                               data-matomo-action="clic"
-                               data-matomo-option="clic-metiers">
-                                Plaquiste
-                            </a>
-                        </div>
-                        <span class="fs-sm mt-1 d-flex align-items-center">
-                            <i class="ri-map-pin-2-line ri-sm mr-1"></i>
-                                Vannes (56)
-                        </span>
-                    </div>
-                    <div class="mt-lg-0 ml-auto d-flex flex-column align-items-end justify-content-center">
-                        <span class="badge badge-xs badge-pill badge-accent-02-light text-primary">CDI</span>
-                    </div>
-                    </div>
-                    </li>
-                    </ul>
-                </div>
-                <div class="clearfix">
-                    <a class="btn btn-primary float-right mt-3"
-                       href="/apply/{siae.pk}/start"
-                       title="Proposer une candidature auprès de l'employeur solidaire Les petits jardins">
-                        <i class="ri-draft-line"></i>
-                        Proposer une candidature
-                    </a>
-                </div>
+               </li>
+              </ul>
+             </div>
+             <div class="d-flex justify-content-end mt-3">
+              <a class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0"
+                 href="/apply/{siae.pk}/start"
+                 title="Proposer une candidature aupr&egrave;s de l'employeur solidaire Les petits jardins">
+               <i class="ri-draft-line">
+               </i>
+               <span>
+                Proposer une candidature
+               </span>
+              </a>
+             </div>
             </div>
             """,
             html=True,
@@ -156,18 +178,34 @@ class CardViewTest(TestCase):
         self.assertContains(
             response,
             """
-            <ul class="nav nav-tabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <a id="recrutements-en-cours-tab"
-                       class="nav-link active"
-                       role="tab"
-                       href="#recrutements-en-cours"
-                       data-toggle="tab"
-                       aria-selected="true"
-                       aria-controls="#recrutements-en-cours">
-                        Recrutement en cours <span class="badge badge-primary badge-pill text-white ml-2">1</span>
-                    </a>
-                </li>
+            <ul aria-labelledby="metiers-title" class="s-tabs-01__nav nav nav-tabs" role="tablist">
+             <li class="nav-item" role="presentation">
+              <a aria-controls="recrutements-en-cours"
+                 aria-selected="true"
+                 class="nav-link active"
+                 data-toggle="tab"
+                 href="#recrutements-en-cours"
+                 id="recrutements-en-cours-tab"
+                 role="tab">
+               Recrutement en cours
+               <span class="badge badge-sm badge-primary badge-pill text-white ml-2">
+                1
+               </span>
+              </a>
+             </li>
+             <li class="nav-item-dropdown dropdown" role="presentation">
+              <a aria-expanded="false"
+                 class="nav-link dropdown-toggle"
+                 data-toggle="dropdown"
+                 href="#"
+                 id="sTabs01DropdownMoreLink"
+                 role="button">
+               <i class="ri-more-line">
+               </i>
+              </a>
+              <div aria-labelledby="sTabs01DropdownMoreLink" class="dropdown-menu dropdown-menu-right">
+              </div>
+             </li>
             </ul>
             """,
             html=True,
@@ -177,43 +215,49 @@ class CardViewTest(TestCase):
             response,
             f"""
             <div class="tab-content">
-                <div id="recrutements-en-cours"
-                     class="tab-pane fade active show"
-                     aria-labelled-by="recrutements-en-cours-tab"
-                     role="tab-panel">
-                    <ul class="list-group list-group-flush list-group-link">
-                    <li class="list-group-item list-group-item-action">
-                    <div class="d-flex align-items-center">
-                    <div>
-                        <div class="d-flex flex-column flex-lg-row align-items-lg-center">
-                            <a href="/siae/job_description/{job_description.pk}/card?back_url=/siae/{siae.pk}/card"
-                               class="font-weight-bold stretched-link order-2 order-md-1 matomo-event"
-                               data-matomo-category="candidature"
-                               data-matomo-action="clic"
-                               data-matomo-option="clic-metiers">
-                                Plaquiste
-                            </a>
-                        </div>
-                        <span class="fs-sm mt-1 d-flex align-items-center">
-                            <i class="ri-map-pin-2-line ri-sm mr-1"></i>
-                                Vannes (56)
-                        </span>
-                    </div>
-                    <div class="mt-lg-0 ml-auto d-flex flex-column align-items-end justify-content-center">
-                        <span class="badge badge-xs badge-pill badge-accent-02-light text-primary">CDI</span>
-                    </div>
-                    </div>
-                    </li>
-                    </ul>
+             <div aria-labelledby="recrutements-en-cours-tab"
+                  class="tab-pane fade active show"
+                  id="recrutements-en-cours"
+                  role="tabpanel">
+              <ul class="list-group list-group-flush list-group-link">
+               <li class="list-group-item list-group-item-action">
+                <div class="d-flex align-items-center">
+                 <div>
+                  <div class="d-flex flex-column flex-lg-row align-items-lg-center">
+                   <a class="font-weight-bold stretched-link order-2 order-md-1 matomo-event"
+                      data-matomo-action="clic"
+                      data-matomo-category="candidature"
+                      data-matomo-option="clic-metiers"
+                      href="/siae/job_description/{job_description.pk}/card?back_url=/siae/{siae.pk}/card">
+                    Plaquiste
+                   </a>
+                  </div>
+                  <span class="fs-sm mt-1 d-flex align-items-center">
+                   <i class="ri-map-pin-2-line ri-sm mr-1">
+                   </i>
+                   Vannes (56)
+                  </span>
+                 </div>
+                 <div class="mt-lg-0 ml-auto d-flex flex-column align-items-end justify-content-center">
+                  <span class="badge badge-xs badge-pill badge-accent-02-light text-primary">
+                   CDI
+                  </span>
+                 </div>
                 </div>
-                <div class="clearfix">
-                    <a class="btn btn-primary float-right mt-3"
-                       href="/apply/{siae.pk}/start"
-                       title="Proposer une candidature auprès de l'employeur solidaire Les petits jardins">
-                        <i class="ri-draft-line"></i>
-                        Proposer une candidature
-                    </a>
-                </div>
+               </li>
+              </ul>
+             </div>
+             <div class="d-flex justify-content-end mt-3">
+              <a class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0"
+                 href="/apply/{siae.pk}/start"
+                 title="Proposer une candidature aupr&egrave;s de l'employeur solidaire Les petits jardins">
+               <i class="ri-draft-line">
+               </i>
+               <span>
+                Proposer une candidature
+               </span>
+              </a>
+             </div>
             </div>
             """,
             html=True,
@@ -245,30 +289,48 @@ class CardViewTest(TestCase):
         self.assertContains(
             response,
             """
-            <ul class="nav nav-tabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <a id="recrutements-en-cours-tab"
-                       class="nav-link active"
-                       role="tab"
-                       href="#recrutements-en-cours"
-                       data-toggle="tab"
-                       aria-selected="true"
-                       aria-controls="#recrutements-en-cours">
-                        Recrutement en cours <span class="badge badge-primary badge-pill text-white ml-2">1</span>
-                    </a>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <a id="autres-metiers-tab"
-                       class="nav-link"
-                       role="tab"
-                       href="#autres-metiers"
-                       data-toggle="tab"
-                       aria-selected="false"
-                       aria-controls="#autres-metiers"
-                    >
-                       Autre métier exercé <span class="badge badge-pill badge-info-light text-dark ml-2">1</span>
-                    </a>
-                </li>
+            <ul aria-labelledby="metiers-title" class="s-tabs-01__nav nav nav-tabs" role="tablist">
+             <li class="nav-item" role="presentation">
+              <a aria-controls="recrutements-en-cours"
+                 aria-selected="true"
+                 class="nav-link active"
+                 data-toggle="tab"
+                 href="#recrutements-en-cours"
+                 id="recrutements-en-cours-tab"
+                 role="tab">
+               Recrutement en cours
+               <span class="badge badge-sm badge-primary badge-pill text-white ml-2">
+                1
+               </span>
+              </a>
+             </li>
+             <li class="nav-item" role="presentation">
+              <a aria-controls="autres-metiers"
+                 aria-selected="false"
+                 class="nav-link"
+                 data-toggle="tab"
+                 href="#autres-metiers"
+                 id="autres-metiers-tab"
+                 role="tab">
+               Autre m&eacute;tier exerc&eacute;
+               <span class="badge badge-sm badge-pill badge-info-light text-dark ml-2">
+                1
+               </span>
+              </a>
+             </li>
+             <li class="nav-item-dropdown dropdown" role="presentation">
+              <a aria-expanded="false"
+                 class="nav-link dropdown-toggle"
+                 data-toggle="dropdown"
+                 href="#"
+                 id="sTabs01DropdownMoreLink"
+                 role="button">
+               <i class="ri-more-line">
+               </i>
+              </a>
+              <div aria-labelledby="sTabs01DropdownMoreLink" class="dropdown-menu dropdown-menu-right">
+              </div>
+             </li>
             </ul>
             """,
             html=True,
@@ -278,72 +340,78 @@ class CardViewTest(TestCase):
             response,
             f"""
             <div class="tab-content">
-                <div id="recrutements-en-cours"
-                     class="tab-pane fade active show"
-                     aria-labelled-by="recrutements-en-cours-tab"
-                     role="tab-panel">
-                    <ul class="list-group list-group-flush list-group-link">
-                    <li class="list-group-item list-group-item-action">
-                    <div class="d-flex align-items-center">
-                    <div>
-                        <div class="d-flex flex-column flex-lg-row align-items-lg-center">
-                            <a class="font-weight-bold stretched-link order-2 order-md-1 matomo-event"
-                               href="/siae/job_description/{active_job_description.pk}/card?back_url=/siae/{siae.pk}/card"
-                               data-matomo-category="candidature"
-                               data-matomo-action="clic"
-                               data-matomo-option="clic-metiers">
-                                Plaquiste
-                            </a>
-                        </div>
-                        <span class="fs-sm mt-1 d-flex align-items-center">
-                            <i class="ri-map-pin-2-line ri-sm mr-1"></i>
-                                Vannes (56)
-                        </span>
-                    </div>
-                    <div class="mt-lg-0 ml-auto d-flex flex-column align-items-end justify-content-center">
-                        <span class="badge badge-xs badge-pill badge-accent-02-light text-primary">CDI</span>
-                    </div>
-                    </div>
-                    </li>
-                    </ul>
+             <div aria-labelledby="recrutements-en-cours-tab"
+                  class="tab-pane fade active show"
+                  id="recrutements-en-cours"
+                  role="tabpanel">
+              <ul class="list-group list-group-flush list-group-link">
+               <li class="list-group-item list-group-item-action">
+                <div class="d-flex align-items-center">
+                 <div>
+                  <div class="d-flex flex-column flex-lg-row align-items-lg-center">
+                   <a class="font-weight-bold stretched-link order-2 order-md-1 matomo-event"
+                      data-matomo-action="clic"
+                      data-matomo-category="candidature"
+                      data-matomo-option="clic-metiers"
+                      href="/siae/job_description/{active_job_description.pk}/card?back_url=/siae/{siae.pk}/card">
+                    Plaquiste
+                   </a>
+                  </div>
+                  <span class="fs-sm mt-1 d-flex align-items-center">
+                   <i class="ri-map-pin-2-line ri-sm mr-1">
+                   </i>
+                   Vannes (56)
+                  </span>
+                 </div>
+                 <div class="mt-lg-0 ml-auto d-flex flex-column align-items-end justify-content-center">
+                  <span class="badge badge-xs badge-pill badge-accent-02-light text-primary">
+                   CDI
+                  </span>
+                 </div>
                 </div>
-                <div id="{self.OTHER_TAB_ID}"
-                     class="tab-pane fade"
-                     aria-labelled-by="autres-metiers-tab"
-                     role="tab-panel">
-                    <ul class="list-group list-group-flush list-group-link">
-                        <li class="list-group-item list-group-item-action">
-                        <div class="d-flex align-items-center">
-                        <div>
-                        <div class="d-flex flex-column flex-lg-row align-items-lg-center">
-                            <a class="font-weight-bold stretched-link order-2 order-md-1 matomo-event"
-                               href="/siae/job_description/{other_job_description.pk}/card?back_url=/siae/{siae.pk}/card"
-                               data-matomo-category="candidature"
-                               data-matomo-action="clic"
-                               data-matomo-option="clic-metiers">
-                                Peintre
-                            </a>
-                        </div>
-                        <span class="fs-sm mt-1 d-flex align-items-center">
-                            <i class="ri-map-pin-2-line ri-sm mr-1"></i>
-                                Vannes (56)
-                        </span>
-                    </div>
-                    <div class="mt-lg-0 ml-auto d-flex flex-column align-items-end justify-content-center">
-                        <span class="badge badge-xs badge-pill badge-accent-02-light text-primary">CDI</span>
-                    </div>
-                    </div>
-                    </li>
-                    </ul>
+               </li>
+              </ul>
+             </div>
+             <div aria-labelledby="autres-metiers-tab" class="tab-pane fade" id="autres-metiers" role="tabpanel">
+              <ul class="list-group list-group-flush list-group-link">
+               <li class="list-group-item list-group-item-action">
+                <div class="d-flex align-items-center">
+                 <div>
+                  <div class="d-flex flex-column flex-lg-row align-items-lg-center">
+                   <a class="font-weight-bold stretched-link order-2 order-md-1 matomo-event"
+                      data-matomo-action="clic"
+                      data-matomo-category="candidature"
+                      data-matomo-option="clic-metiers"
+                      href="/siae/job_description/{other_job_description.pk}/card?back_url=/siae/{siae.pk}/card">
+                    Peintre
+                   </a>
+                  </div>
+                  <span class="fs-sm mt-1 d-flex align-items-center">
+                   <i class="ri-map-pin-2-line ri-sm mr-1">
+                   </i>
+                   Vannes (56)
+                  </span>
+                 </div>
+                 <div class="mt-lg-0 ml-auto d-flex flex-column align-items-end justify-content-center">
+                  <span class="badge badge-xs badge-pill badge-accent-02-light text-primary">
+                   CDI
+                  </span>
+                 </div>
                 </div>
-                <div class="clearfix">
-                    <a class="btn btn-primary float-right mt-3"
-                       href="/apply/{siae.pk}/start"
-                       title="Proposer une candidature auprès de l'employeur solidaire Les petits jardins">
-                        <i class="ri-draft-line"></i>
-                        Proposer une candidature
-                    </a>
-                </div>
+               </li>
+              </ul>
+             </div>
+             <div class="d-flex justify-content-end mt-3">
+              <a class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0"
+                 href="/apply/{siae.pk}/start"
+                 title="Proposer une candidature aupr&egrave;s de l'employeur solidaire Les petits jardins">
+               <i class="ri-draft-line">
+               </i>
+               <span>
+                Proposer une candidature
+               </span>
+              </a>
+             </div>
             </div>
             """,
             html=True,
@@ -364,31 +432,48 @@ class CardViewTest(TestCase):
         self.assertContains(
             response,
             """
-            <ul class="nav nav-tabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <a id="recrutements-en-cours-tab"
-                       class="nav-link active"
-                       role="tab"
-                       href="#recrutements-en-cours"
-                       data-toggle="tab"
-                       aria-selected="true"
-                       aria-controls="#recrutements-en-cours"
-                    >
-                       Recrutements en cours <span class="badge badge-pill badge-primary text-white ml-2">0</span>
-                    </a>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <a id="autres-metiers-tab"
-                       class="nav-link"
-                       role="tab"
-                       href="#autres-metiers"
-                       data-toggle="tab"
-                       aria-selected="false"
-                       aria-controls="#autres-metiers"
-                    >
-                       Autre métier exercé <span class="badge badge-pill badge-info-light text-dark ml-2">1</span>
-                    </a>
-                </li>
+            <ul aria-labelledby="metiers-title" class="s-tabs-01__nav nav nav-tabs" role="tablist">
+             <li class="nav-item" role="presentation">
+              <a aria-controls="recrutements-en-cours"
+                 aria-selected="true"
+                 class="nav-link active"
+                 data-toggle="tab"
+                 href="#recrutements-en-cours"
+                 id="recrutements-en-cours-tab"
+                 role="tab">
+               Recrutements en cours
+               <span class="badge badge-sm badge-primary badge-pill text-white ml-2">
+                0
+               </span>
+              </a>
+             </li>
+             <li class="nav-item" role="presentation">
+              <a aria-controls="autres-metiers"
+                 aria-selected="false"
+                 class="nav-link"
+                 data-toggle="tab"
+                 href="#autres-metiers"
+                 id="autres-metiers-tab"
+                 role="tab">
+               Autre m&eacute;tier exerc&eacute;
+               <span class="badge badge-sm badge-pill badge-info-light text-dark ml-2">
+                1
+               </span>
+              </a>
+             </li>
+             <li class="nav-item-dropdown dropdown" role="presentation">
+              <a aria-expanded="false"
+                 class="nav-link dropdown-toggle"
+                 data-toggle="dropdown"
+                 href="#"
+                 id="sTabs01DropdownMoreLink"
+                 role="button">
+               <i class="ri-more-line">
+               </i>
+              </a>
+              <div aria-labelledby="sTabs01DropdownMoreLink" class="dropdown-menu dropdown-menu-right">
+              </div>
+             </li>
             </ul>
             """,
             html=True,
@@ -398,41 +483,43 @@ class CardViewTest(TestCase):
             response,
             f"""
             <div class="tab-content">
-                <div id="recrutements-en-cours"
-                     class="tab-pane fade active show"
-                     aria-labelled-by="recrutements-en-cours-tab"
-                     role="tab-panel">
-                    <p>Pour le moment, il n’y a aucun recrutement en cours dans cette structure.</p>
+             <div aria-labelledby="recrutements-en-cours-tab"
+                  class="tab-pane fade active show"
+                  id="recrutements-en-cours"
+                  role="tabpanel">
+              <p>
+               Pour le moment, il n&rsquo;y a aucun recrutement en cours dans cette structure.
+              </p>
+             </div>
+             <div aria-labelledby="autres-metiers-tab" class="tab-pane fade" id="autres-metiers" role="tabpanel">
+              <ul class="list-group list-group-flush list-group-link">
+               <li class="list-group-item list-group-item-action">
+                <div class="d-flex align-items-center">
+                 <div>
+                  <div class="d-flex flex-column flex-lg-row align-items-lg-center">
+                   <a class="font-weight-bold stretched-link order-2 order-md-1 matomo-event"
+                      data-matomo-action="clic"
+                      data-matomo-category="candidature"
+                      data-matomo-option="clic-metiers"
+                      href="/siae/job_description/{job_description.pk}/card?back_url=/siae/{siae.pk}/card">
+                    Plaquiste
+                   </a>
+                  </div>
+                  <span class="fs-sm mt-1 d-flex align-items-center">
+                   <i class="ri-map-pin-2-line ri-sm mr-1">
+                   </i>
+                   Vannes (56)
+                  </span>
+                 </div>
+                 <div class="mt-lg-0 ml-auto d-flex flex-column align-items-end justify-content-center">
+                  <span class="badge badge-xs badge-pill badge-accent-02-light text-primary">
+                   CDI
+                  </span>
+                 </div>
                 </div>
-                <div id="{self.OTHER_TAB_ID}"
-                     class="tab-pane fade"
-                     aria-labelled-by="autres-metiers-tab"
-                     role="tab-panel">
-                    <ul class="list-group list-group-flush list-group-link">
-                        <li class="list-group-item list-group-item-action">
-                        <div class="d-flex align-items-center">
-                        <div>
-                        <div class="d-flex flex-column flex-lg-row align-items-lg-center">
-                            <a href="/siae/job_description/{job_description.pk}/card?back_url=/siae/{siae.pk}/card"
-                               class="font-weight-bold stretched-link order-2 order-md-1 matomo-event"
-                               data-matomo-category="candidature"
-                               data-matomo-action="clic"
-                               data-matomo-option="clic-metiers">
-                                Plaquiste
-                            </a>
-                        </div>
-                        <span class="fs-sm mt-1 d-flex align-items-center">
-                            <i class="ri-map-pin-2-line ri-sm mr-1"></i>
-                                Vannes (56)
-                        </span>
-                    </div>
-                    <div class="mt-lg-0 ml-auto d-flex flex-column align-items-end justify-content-center">
-                        <span class="badge badge-xs badge-pill badge-accent-02-light text-primary">CDI</span>
-                    </div>
-                    </div>
-                    </li>
-                    </ul>
-                </div>
+               </li>
+              </ul>
+             </div>
             </div>
             """,
             html=True,
