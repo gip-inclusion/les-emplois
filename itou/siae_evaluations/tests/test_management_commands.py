@@ -199,7 +199,7 @@ class TestManagementCommand:
             evaluated_job_application=evaluated_job_app_accepted,
             uploaded_at=timezone.now() - relativedelta(days=3),
             submitted_at=timezone.now() - relativedelta(days=2),
-            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
         )
 
         evaluated_job_app_refused = EvaluatedJobApplicationFactory(
