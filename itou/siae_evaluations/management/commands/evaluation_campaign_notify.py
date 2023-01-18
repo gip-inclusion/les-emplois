@@ -38,7 +38,8 @@ class Command(BaseCommand):
         for campaign in campaigns.filter(evaluations_asked_at__date__lte=evaluations_asked_before):
             emails = []
             evaluated_siaes = (
-                campaign.evaluated_siaes.exclude(
+                campaign.evaluated_siaes.filter(final_reviewed_at=None)
+                .exclude(
                     Exists(
                         EvaluatedAdministrativeCriteria.objects.filter(
                             evaluated_job_application__evaluated_siae=OuterRef("pk"),

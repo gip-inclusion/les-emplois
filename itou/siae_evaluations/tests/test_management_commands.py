@@ -439,3 +439,42 @@ class TestManagementCommand:
         assert stdout == ""
         assert stderr == ""
         assert mailoutbox == []
+
+    @freeze_time("2023-01-18 11:11:11")
+    def test_second_notification_not_fired_for_siae_with_final_state(self, capsys, mailoutbox):
+        campaign = EvaluationCampaignFactory(
+            evaluations_asked_at=timezone.now() - relativedelta(weeks=6, days=30),
+            evaluated_period_start_at=datetime.date(2022, 1, 1),
+            evaluated_period_end_at=datetime.date(2022, 9, 30),
+            institution__name="DDETS 01",
+            name="Campagne de test",
+        )
+
+        evaluated_job_app_accepted = EvaluatedJobApplicationFactory(
+            evaluated_siae__evaluation_campaign=campaign,
+            evaluated_siae__reviewed_at=timezone.now() - relativedelta(days=1),
+            evaluated_siae__final_reviewed_at=timezone.now() - relativedelta(days=1),
+        )
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_app_accepted,
+            uploaded_at=timezone.now() - relativedelta(days=3),
+            submitted_at=timezone.now() - relativedelta(days=2),
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+        )
+        evaluated_job_app_refused = EvaluatedJobApplicationFactory(
+            evaluated_siae__evaluation_campaign=campaign,
+            evaluated_siae__reviewed_at=timezone.now() - relativedelta(days=10),
+            evaluated_siae__final_reviewed_at=timezone.now() - relativedelta(days=1),
+        )
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_app_refused,
+            uploaded_at=timezone.now() - relativedelta(days=3),
+            submitted_at=timezone.now() - relativedelta(days=2),
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2,
+        )
+
+        call_command("evaluation_campaign_notify")
+        stdout, stderr = capsys.readouterr()
+        assert stdout == ""
+        assert stderr == ""
+        assert mailoutbox == []
