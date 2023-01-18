@@ -175,6 +175,7 @@ def refuse(request, job_application_id, template_name="apply/process_refuse.html
     context = {
         "form": form,
         "job_application": job_application,
+        "can_view_personal_information": True,  # SIAE members have access to personal info
     }
     return render(request, template_name, context)
 
@@ -207,6 +208,7 @@ def postpone(request, job_application_id, template_name="apply/process_postpone.
     context = {
         "form": form,
         "job_application": job_application,
+        "can_view_personal_information": True,  # SIAE members have access to personal info
     }
     return render(request, template_name, context)
 
@@ -246,6 +248,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
         "form_user_address": form_user_address,
         "form_pe_status": form_pe_status,
         "job_application": job_application,
+        "can_view_personal_information": True,  # SIAE members have access to personal info
     }
 
     if request.method == "POST" and all([form.is_valid() for form in forms]):
@@ -380,6 +383,7 @@ def cancel(request, job_application_id, template_name="apply/process_cancel.html
         return HttpResponseRedirect(next_url)
 
     context = {
+        "can_view_personal_information": True,  # SIAE members have access to personal info
         "job_application": job_application,
     }
     return render(request, template_name, context)
@@ -486,6 +490,7 @@ def eligibility(request, job_application_id, template_name="apply/process_eligib
 
     context = {
         "job_application": job_application,
+        "can_view_personal_information": True,  # SIAE members have access to personal info
         "form_administrative_criteria": form_administrative_criteria,
         "form_confirm_eligibility": form_confirm_eligibility,
         "job_seeker": job_application.job_seeker,

@@ -200,9 +200,12 @@ class ProcessViewsTest(TestCase):
         self.assertContains(response, format_nir(job_application.job_seeker.nir))
         self.assertContains(response, "Prénom : <b>S…</b>", html=True)
         self.assertContains(response, "Nom : <b>U…</b>", html=True)
+        self.assertContains(response, '<span class="text-muted">S… U…</span>', html=True)
         self.assertNotContains(response, job_application.job_seeker.email)
         self.assertNotContains(response, job_application.job_seeker.phone)
         self.assertNotContains(response, job_application.job_seeker.post_code)
+        self.assertNotContains(response, "Supersecretname")
+        self.assertNotContains(response, "Unknown")
 
     def test_process(self, *args, **kwargs):
         """Ensure that the `process` transition is triggered."""

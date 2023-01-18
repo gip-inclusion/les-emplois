@@ -1,9 +1,10 @@
 {% extends "layout/content_small.html" %}
+{% load str_filters %}
 
 {% block title %}
     Candidature
     -
-    {{ job_application.job_seeker.get_full_name }}
+    {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}
     {{ block.super }}
 {% endblock %}
 
@@ -11,7 +12,7 @@
 
     <h1 class="h1-hero-c1">
         Candidature de
-        <span class="text-muted">{{ job_application.job_seeker.get_full_name|title }}</span>
+        <span class="text-muted">{{ job_application.job_seeker.get_full_name|title|mask_unless:can_view_personal_information }}</span>
     </h1>
     <p>{% include "apply/includes/state_badge.html" with job_application=job_application %}</p>
 
