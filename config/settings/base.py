@@ -107,7 +107,6 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 
 DJANGO_MIDDLEWARES = [
-    "csp.contrib.rate_limiting.RateLimitedCSPMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -118,6 +117,7 @@ DJANGO_MIDDLEWARES = [
 ]
 
 THIRD_PARTY_MIDDLEWARES = [
+    "csp.middleware.CSPMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
     "hijack.middleware.HijackUserMiddleware",
 ]
@@ -634,4 +634,3 @@ if S3_STORAGE_ENDPOINT_DOMAIN:
     ]
 CSP_INCLUDE_NONCE_IN = ["script-src", "script-src-elem"]
 CSP_REPORT_URI = os.getenv("CSP_REPORT_URI", None)
-CSP_REPORT_PERCENTAGE = float(os.getenv("CSP_REPORT_PERCENTAGE", 1))
