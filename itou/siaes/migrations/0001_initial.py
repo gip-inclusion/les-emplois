@@ -12,20 +12,6 @@ from django.db import migrations, models
 import itou.utils.validators
 
 
-def create_pole_emploi_siae(apps, _schema_editor):
-    from itou.siaes import enums
-
-    Siae = apps.get_model("siaes", "Siae")
-    Siae.objects.get_or_create(
-        siret=enums.POLE_EMPLOI_SIRET,
-        defaults={
-            "name": "POLE EMPLOI",
-            "kind": enums.SIAE_KIND_RESERVED,
-            "source": enums.SIAE_SOURCE_ADMIN_CREATED,
-        },
-    )
-
-
 class Migration(migrations.Migration):
 
     initial = True
@@ -605,5 +591,4 @@ class Migration(migrations.Migration):
                 name="source_id_kind_unique_without_null_values",
             ),
         ),
-        migrations.RunPython(create_pole_emploi_siae, migrations.RunPython.noop, elidable=True),
     ]
