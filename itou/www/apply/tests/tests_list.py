@@ -1,11 +1,13 @@
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
+from pytest_django.asserts import assertContains
 
 from itou.approvals.factories import SuspensionFactory
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.eligibility.models import AdministrativeCriteria
+from itou.job_applications.enums import SenderKind
 from itou.job_applications.factories import (
     JobApplicationFactory,
     JobApplicationSentByJobSeekerFactory,
@@ -16,6 +18,7 @@ from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
 from itou.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory
+from itou.users.factories import PrescriberFactory
 from itou.utils.test import TestCase
 from itou.utils.widgets import DuetDatePickerWidget
 
@@ -567,6 +570,24 @@ class ProcessListPrescriberTest(ProcessListTest):
         applications = response.context["job_applications_page"].object_list
         assert len(applications) == 8
         assert applications[0].to_siae.pk in to_siaes_ids
+
+
+def test_list_for_unauthorized_prescriber_view(client):
+    prescriber = PrescriberFactory()
+    JobApplicationFactory(
+        job_seeker_with_address=True,
+        job_seeker__first_name="Supersecretname",
+        job_seeker__last_name="Unknown",
+        sender=prescriber,
+        sender_kind=SenderKind.PRESCRIBER,
+    )
+    client.force_login(prescriber)
+    url = reverse("apply:list_for_prescriber")
+    response = client.get(url)
+
+    assertContains(response, "<b>S… U…</b>", html=True)
+    # Unfortunately, the job seeker's name is available in the filters
+    # assertNotContains(response, "Supersecretname")
 
 
 ####################################################

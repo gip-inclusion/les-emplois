@@ -1,6 +1,8 @@
+{% load str_filters %}
+
 <div class="card-header">
     <p>
-        <b>{{ job_application.job_seeker.get_full_name }}</b>
+        <b>{{ job_application.job_seeker.get_full_name|mask_unless:job_application.user_can_view_personal_information }}</b>
 
         <small>chez</small>
 

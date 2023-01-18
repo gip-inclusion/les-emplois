@@ -14,6 +14,11 @@ from itou.www.apply.forms import (
 )
 
 
+def _add_user_can_view_personal_information(job_applications, can_view):
+    for job_application in job_applications:
+        job_application.user_can_view_personal_information = can_view(job_application.job_seeker)
+
+
 @login_required
 @user_passes_test(lambda u: u.is_job_seeker, login_url="/", redirect_field_name=None)
 def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html"):
@@ -31,6 +36,9 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
         filters_counter = filters_form.get_qs_filters_counter(qs_filters)
 
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=10)
+
+    # The candidate has obviously access to its personal info
+    _add_user_can_view_personal_information(job_applications_page, lambda ja: True)
 
     context = {
         "job_applications_page": job_applications_page,
@@ -60,6 +68,7 @@ def list_for_prescriber(request, template_name="apply/list_for_prescriber.html")
         filters_counter = filters_form.get_qs_filters_counter(qs_filters)
 
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=10)
+    _add_user_can_view_personal_information(job_applications_page, request.user.can_view_personal_information)
 
     context = {
         "job_applications_page": job_applications_page,
@@ -128,6 +137,9 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         filters_counter = filters_form.get_qs_filters_counter(qs_filters)
 
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=10)
+
+    # SIAE members have access to personal info
+    _add_user_can_view_personal_information(job_applications_page, lambda ja: True)
 
     context = {
         "siae": siae,
