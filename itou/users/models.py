@@ -223,6 +223,17 @@ class User(AbstractUser, AddressMixin):
         verbose_name="Inspecteur du travail (DDETS, DREETS, DGEFP)", default=False
     )
 
+    # TODO(rsebille): Replace the use of a signal by using an uuid4() as default value.
+    #  I am not do it _right now_ because we need to make sure the format will work on ASP side,
+    #  and even if it works we will need the field to store the ID already sent.
+    asp_uid = models.TextField(
+        verbose_name="ID unique envoyé à l'ASP",
+        max_length=30,
+        null=True,
+        blank=True,
+        unique=True,
+    )
+
     # Don’t need to specify db_index because unique implies the creation of an index.
     nir = models.CharField(
         verbose_name="NIR",
@@ -333,6 +344,10 @@ class User(AbstractUser, AddressMixin):
             raise ValidationError("A User can not have more than one kind")
 
         super().save(*args, **kwargs)
+
+        if self.is_job_seeker and not self.asp_uid:
+            self.asp_uid = self.jobseeker_hash_id
+            super().save(update_fields=["asp_uid"])
 
     def can_edit_email(self, user):
         return user.is_handled_by_proxy and user.is_created_by(self) and not user.has_verified_email
@@ -804,8 +819,7 @@ class User(AbstractUser, AddressMixin):
         if not self.is_job_seeker:
             return None
 
-        salt = salted_hmac(key_salt="job_seeker.id", value=self.id, secret=settings.SECRET_KEY)
-        return salt.hexdigest()[:30]
+        return salted_hmac(key_salt="job_seeker.id", value=self.id).hexdigest()[:30]
 
     def last_hire_was_made_by_siae(self, siae):
         if not self.is_job_seeker:

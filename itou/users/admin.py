@@ -186,9 +186,11 @@ class ItouUserAdmin(UserAdmin):
     search_fields = UserAdmin.search_fields + (
         "pk",
         "nir",
+        "asp_uid",
     )
     readonly_fields = (
         "pk",
+        "asp_uid",
         "jobseeker_hash_id",
         "identity_provider",
         "address_in_qpv",
@@ -200,6 +202,7 @@ class ItouUserAdmin(UserAdmin):
             {
                 "fields": (
                     "pk",
+                    "asp_uid",
                     "jobseeker_hash_id",
                     "title",
                     "birthdate",

@@ -9,6 +9,7 @@ import pytest
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
+from django.test import override_settings
 from django.utils import timezone
 
 import itou.asp.factories as asp
@@ -1188,3 +1189,39 @@ class LatestApprovalTestCase(TestCase):
         ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
         PoleEmploiApprovalFactory(nir=user.nir, start_at=start_at, end_at=end_at)
         assert user.latest_common_approval is None
+
+
+@pytest.mark.parametrize(
+    "factory,expected",
+    [
+        (JobSeekerFactory, "08b4e9f755a688b554a6487d96d2a0"),
+        (PrescriberFactory, None),
+        (SiaeStaffFactory, None),
+        (LaborInspectorFactory, None),
+    ],
+)
+@override_settings(SECRET_KEY="test")
+def test_user_jobseeker_hash_id(factory, expected):
+    user = factory(pk=42)
+
+    if expected is None:
+        assert user.jobseeker_hash_id is expected
+    else:
+        assert user.jobseeker_hash_id == expected
+
+
+@pytest.mark.parametrize(
+    "factory",
+    [
+        JobSeekerFactory,
+        PrescriberFactory,
+        SiaeStaffFactory,
+        LaborInspectorFactory,
+    ],
+)
+def test_user_asp_uid(factory):
+    user = factory.build(pk=42)
+
+    assert user.asp_uid is None
+    user.save()
+    assert user.asp_uid == user.jobseeker_hash_id
