@@ -32,11 +32,11 @@ select
                 (état = 'Candidature acceptée')
                 and type_structure in ('EI', 'ETTI', 'AI', 'ACI', 'EITI')) as nombre_candidatures_acceptees,
     count(distinct id_fiche_de_poste) AS Nombre_fiches_poste_ouvertes, 
-    count(distinct id) AS nombre_candidatures,
-    count(distinct id) 
+    count(distinct candidatures_echelle_locale.id) AS nombre_candidatures,
+    count(distinct candidatures_echelle_locale.id) 
         filter (
             where (état = 'Candidature déclinée')) as nombre_candidatures_refusees,
-    count(distinct id) 
+    count(distinct candidatures_echelle_locale.id) 
         filter (
             where (état = 'Candidature déclinée')and origine != 'Employeur') as nb_candidatures_refusees_non_emises_par_employeur_siae,
     count(distinct id_structure) as nombre_siae,
