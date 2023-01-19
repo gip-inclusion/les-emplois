@@ -6,7 +6,6 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models, transaction
 from django.db.models import Count, Exists, F, OuterRef, Q
-from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
 
@@ -15,10 +14,10 @@ from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siae_evaluations import enums as evaluation_enums
+from itou.siae_evaluations.emails import CampaignEmailFactory, SIAEEmailFactory
 from itou.siaes.models import Siae
 from itou.users.enums import KIND_SIAE_STAFF
-from itou.utils import constants as global_constants
-from itou.utils.emails import get_email_message, send_email_messages
+from itou.utils.emails import send_email_messages
 
 from .constants import CAMPAIGN_VIEWABLE_DURATION
 
@@ -77,7 +76,7 @@ def create_campaigns(evaluated_period_start_at, evaluated_period_end_at, ratio_s
     # Send notification.
     if evaluation_campaign_list:
         send_email_messages(
-            evaluation_campaign.get_email_to_institution_ratio_to_select(ratio_selection_end_at)
+            CampaignEmailFactory(evaluation_campaign).ratio_to_select(ratio_selection_end_at)
             for evaluation_campaign in evaluation_campaign_list
         )
 
@@ -245,8 +244,8 @@ class EvaluationCampaign(models.Model):
                 ]
             )
 
-            emails = [evaluated_siae.get_email_to_siae_selected() for evaluated_siae in evaluated_siaes]
-            emails += [self.get_email_to_institution_selected_siae()]
+            emails = [SIAEEmailFactory(evaluated_siae).selected() for evaluated_siae in evaluated_siaes]
+            emails += [CampaignEmailFactory(self).selected_siae()]
             send_email_messages(emails)
 
     def transition_to_adversarial_phase(self):
@@ -260,10 +259,11 @@ class EvaluationCampaign(models.Model):
             ).select_related("evaluation_campaign__institution", "siae")
         )
         emails = [
-            evaluated_siae.get_email_to_siae_forced_to_adversarial_stage() for evaluated_siae in force_review_on_siaes
+            SIAEEmailFactory(evaluated_siae).forced_to_adversarial_stage() for evaluated_siae in force_review_on_siaes
         ]
         if force_review_on_siaes:
-            emails.append(self.get_email_to_institution_forced_to_adversarial_stage(force_review_on_siaes))
+            summary_email = CampaignEmailFactory(self).forced_to_adversarial_stage(force_review_on_siaes)
+            emails.append(summary_email)
         send_email_messages(emails)
         force_review_on_siaes.update(reviewed_at=timezone.now())
 
@@ -272,39 +272,9 @@ class EvaluationCampaign(models.Model):
             self.ended_at = timezone.now()
             self.save(update_fields=["ended_at"])
             send_email_messages(
-                evaluated_siae.get_email_to_siae_refused_no_proofs()
+                SIAEEmailFactory(evaluated_siae).refused_no_proofs()
                 for evaluated_siae in self.evaluated_siaes.did_not_send_proof()
             )
-
-    # fixme vincentporte : to refactor. move all get_email_to_institution_xxx() method
-    # to emails.py in institution model
-    def get_email_to_institution_ratio_to_select(self, ratio_selection_end_at):
-        to = self.institution.active_members.values_list("email", flat=True)
-        context = {
-            "ratio_selection_end_at": ratio_selection_end_at,
-            "dashboard_url": f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}{reverse('dashboard:index')}",
-        }
-        subject = "siae_evaluations/email/to_institution_ratio_to_select_subject.txt"
-        body = "siae_evaluations/email/to_institution_ratio_to_select_body.txt"
-        return get_email_message(to, context, subject, body)
-
-    def get_email_to_institution_selected_siae(self):
-        to = self.institution.active_members.values_list("email", flat=True)
-        context = {
-            "end_date": self.adversarial_stage_start_date,
-            "evaluated_period_start_at": self.evaluated_period_start_at,
-            "evaluated_period_end_at": self.evaluated_period_end_at,
-        }
-        subject = "siae_evaluations/email/to_institution_selected_siae_subject.txt"
-        body = "siae_evaluations/email/to_institution_selected_siae_body.txt"
-        return get_email_message(to, context, subject, body)
-
-    def get_email_to_institution_forced_to_adversarial_stage(self, evaluated_siaes):
-        to = self.institution.active_members.values_list("email", flat=True)
-        context = {"evaluated_siaes": evaluated_siaes}
-        subject = "siae_evaluations/email/to_institution_siaes_forced_to_adversarial_stage_subject.txt"
-        body = "siae_evaluations/email/to_institution_siaes_forced_to_adversarial_stage_body.txt"
-        return get_email_message(to, context, subject, body)
 
 
 class EvaluatedSiaeQuerySet(models.QuerySet):
@@ -419,142 +389,16 @@ class EvaluatedSiae(models.Model):
             # Invalidate the cache, a review changes the state of the evaluation.
             del self.state
             email = {
-                (ACCEPTED, True): functools.partial(self.get_email_to_siae_reviewed, adversarial=True),
-                (ACCEPTED, False): functools.partial(self.get_email_to_siae_reviewed, adversarial=False),
-                (ADVERSARIAL_STAGE, False): self.get_email_to_siae_adversarial_stage,
-                (NOTIFICATION_PENDING, True): self.get_email_to_siae_refused,
+                (ACCEPTED, True): functools.partial(SIAEEmailFactory(self).reviewed, adversarial=True),
+                (ACCEPTED, False): functools.partial(SIAEEmailFactory(self).reviewed, adversarial=False),
+                (ADVERSARIAL_STAGE, False): SIAEEmailFactory(self).adversarial_stage,
+                (NOTIFICATION_PENDING, True): SIAEEmailFactory(self).refused,
             }[(self.state, from_adversarial_stage)]()
             send_email_messages([email])
 
     @property
     def evaluation_is_final(self):
         return bool(self.final_reviewed_at or self.evaluation_campaign.ended_at)
-
-    # fixme vincentporte : to refactor. move all get_email_to_siae_xxx() method to emails.py in siae model
-    def get_email_to_siae_selected(self):
-        to = self.siae.active_admin_members.values_list("email", flat=True)
-        evaluated_siae_url = reverse(
-            "siae_evaluations_views:siae_job_applications_list",
-            kwargs={"evaluated_siae_pk": self.pk},
-        )
-        context = {
-            "campaign": self.evaluation_campaign,
-            "siae": self.siae,
-            "end_date": self.evaluation_campaign.adversarial_stage_start_date,
-            "url": (f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}" + evaluated_siae_url),
-        }
-        subject = "siae_evaluations/email/to_siae_selected_subject.txt"
-        body = "siae_evaluations/email/to_siae_selected_body.txt"
-        return get_email_message(to, context, subject, body)
-
-    def get_email_to_siae_notify_before_adversarial_stage(self):
-        to = self.siae.active_admin_members.values_list("email", flat=True)
-        job_app_list_url = reverse(
-            "siae_evaluations_views:siae_job_applications_list",
-            kwargs={"evaluated_siae_pk": self.pk},
-        )
-        context = {
-            "evaluation_campaign": self.evaluation_campaign,
-            "siae": self.siae,
-            "evaluated_job_app_list_url": f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}{job_app_list_url}",
-            "itou_community_url": global_constants.ITOU_COMMUNITY_URL,
-        }
-        subject = "siae_evaluations/email/to_siae_notify_before_adversarial_stage_subject.txt"
-        body = "siae_evaluations/email/to_siae_notify_before_adversarial_stage_body.txt"
-        return get_email_message(to, context, subject, body)
-
-    def get_email_to_siae_reviewed(self, adversarial=False):
-        to = self.siae.active_admin_members.values_list("email", flat=True)
-        context = {"evaluation_campaign": self.evaluation_campaign, "siae": self.siae, "adversarial": adversarial}
-        subject = "siae_evaluations/email/to_siae_reviewed_subject.txt"
-        body = "siae_evaluations/email/to_siae_reviewed_body.txt"
-        return get_email_message(to, context, subject, body)
-
-    def get_email_to_siae_adversarial_stage(self):
-        to = self.siae.active_admin_members.values_list("email", flat=True)
-        context = {
-            "evaluation_campaign": self.evaluation_campaign,
-            "siae": self.siae,
-        }
-        subject = "siae_evaluations/email/to_siae_adversarial_stage_subject.txt"
-        body = "siae_evaluations/email/to_siae_adversarial_stage_body.txt"
-        return get_email_message(to, context, subject, body)
-
-    def get_email_to_siae_forced_to_adversarial_stage(self):
-        to = self.siae.active_admin_members.values_list("email", flat=True)
-        auto_prescription_url = reverse(
-            "siae_evaluations_views:siae_job_applications_list",
-            kwargs={"evaluated_siae_pk": self.pk},
-        )
-        context = {
-            "evaluation_campaign": self.evaluation_campaign,
-            "siae": self.siae,
-            "auto_prescription_url": f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}{auto_prescription_url}",
-        }
-        subject = "siae_evaluations/email/to_siae_forced_to_adversarial_stage_subject.txt"
-        body = "siae_evaluations/email/to_siae_forced_to_adversarial_stage_body.txt"
-        return get_email_message(to, context, subject, body)
-
-    def get_email_to_siae_refused(self):
-        to = self.siae.active_admin_members.values_list("email", flat=True)
-        context = {
-            "evaluation_campaign": self.evaluation_campaign,
-            "siae": self.siae,
-        }
-        subject = "siae_evaluations/email/to_siae_refused_subject.txt"
-        body = "siae_evaluations/email/to_siae_refused_body.txt"
-        return get_email_message(to, context, subject, body)
-
-    def get_email_to_siae_notify_before_campaign_close(self):
-        to = self.siae.active_admin_members.values_list("email", flat=True)
-        job_app_list_url = reverse(
-            "siae_evaluations_views:siae_job_applications_list",
-            kwargs={"evaluated_siae_pk": self.pk},
-        )
-        context = {
-            "adversarial_stage_start": self.evaluation_campaign.adversarial_stage_start_date,
-            "evaluation_campaign": self.evaluation_campaign,
-            "siae": self.siae,
-            "evaluated_job_app_list_url": f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}{job_app_list_url}",
-            "itou_community_url": global_constants.ITOU_COMMUNITY_URL,
-        }
-        subject = "siae_evaluations/email/to_siae_notify_before_campaign_close_subject.txt"
-        body = "siae_evaluations/email/to_siae_notify_before_campaign_close_body.txt"
-        return get_email_message(to, context, subject, body)
-
-    def get_email_to_siae_refused_no_proofs(self):
-        to = self.siae.active_admin_members.values_list("email", flat=True)
-        context = {
-            "evaluation_campaign": self.evaluation_campaign,
-            "siae": self.siae,
-        }
-        subject = "siae_evaluations/email/to_siae_refused_no_proofs_subject.txt"
-        body = "siae_evaluations/email/to_siae_refused_no_proofs_body.txt"
-        return get_email_message(to, context, subject, body)
-
-    def get_email_to_siae_sanctioned(self):
-        to = self.siae.active_admin_members.values_list("email", flat=True)
-        dashboard_url = reverse("dashboard:index")
-        context = {
-            "evaluation_campaign": self.evaluation_campaign,
-            "siae": self.siae,
-            "dashboard_url": (f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}" + dashboard_url),
-        }
-        subject = "siae_evaluations/email/to_siae_sanctioned_subject.txt"
-        body = "siae_evaluations/email/to_siae_sanctioned_body.txt"
-        return get_email_message(to, context, subject, body)
-
-    # fixme vincentporte : to refactor. move all get_email_to_institution_xxx() method
-    # to emails.py in institution model
-    def get_email_to_institution_submitted_by_siae(self):
-        to = self.evaluation_campaign.institution.active_members.values_list("email", flat=True)
-        context = {
-            "siae": self.siae,
-            "dashboard_url": f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}{reverse('dashboard:index')}",
-        }
-        subject = "siae_evaluations/email/to_institution_submitted_by_siae_subject.txt"
-        body = "siae_evaluations/email/to_institution_submitted_by_siae_body.txt"
-        return get_email_message(to, context, subject, body)
 
     # fixme vincentporte : rsebille suggests to replace cached_property with prefetch_related
     @cached_property
