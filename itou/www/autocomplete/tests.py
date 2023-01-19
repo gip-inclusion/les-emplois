@@ -1,5 +1,3 @@
-import json
-
 from django.urls import reverse
 
 from itou.cities.factories import create_test_cities
@@ -37,7 +35,7 @@ class JobsAutocompleteTest(TestCase):
                 "name": "Agent / Agente cariste de livraison ferroviaire",
             }
         ]
-        assert json.loads(response.content) == expected
+        assert response.json() == expected
 
     def test_search_case_insensitive_and_explicit_rome_code(self):
         response = self.client.get(
@@ -56,7 +54,7 @@ class JobsAutocompleteTest(TestCase):
                 "name": "Chauffeur-livreur / Chauffeuse-livreuse",
             }
         ]
-        assert json.loads(response.content) == expected
+        assert response.json() == expected
 
     def test_search_empty_chars(self):
         response = self.client.get(
@@ -87,7 +85,7 @@ class JobsAutocompleteTest(TestCase):
                 "name": "Conducteur / Conductrice de chariot élévateur de l'armée",
             }
         ]
-        assert json.loads(response.content) == expected
+        assert response.json() == expected
 
     def test_search_special_chars(self):
         response = self.client.get(
@@ -106,7 +104,7 @@ class JobsAutocompleteTest(TestCase):
                 "name": "Conducteur / Conductrice de chariot élévateur de l'armée",
             }
         ]
-        assert json.loads(response.content) == expected
+        assert response.json() == expected
 
     def test_search_filter_with_rome_code(self):
         appellation = Appellation.objects.autocomplete("conducteur", limit=1, rome_code="N1101")[0]
@@ -127,7 +125,7 @@ class CitiesAutocompleteTest(TestCase):
 
         response = self.client.get(url, {"term": "sai"})
         assert response.status_code == 200
-        assert json.loads(response.content) == [
+        assert response.json() == [
             {"slug": "saint-sulpice-01", "value": "Saint-Sulpice (01)"},
             {"slug": "saint-genis-pouilly-01", "value": "Saint-Genis-Pouilly (01)"},
             {"slug": "saint-jean-de-gonville-01", "value": "Saint-Jean-de-Gonville (01)"},
@@ -140,7 +138,7 @@ class CitiesAutocompleteTest(TestCase):
 
         response = self.client.get(url, {"term": "paris"})
         assert response.status_code == 200
-        assert json.loads(response.content) == [
+        assert response.json() == [
             {"slug": "paris-75", "value": "Paris (75)"},
             {"slug": "paris-2e-arrondissement-75", "value": "Paris 2e Arrondissement (75)"},
             {"slug": "paris-3e-arrondissement-75", "value": "Paris 3e Arrondissement (75)"},
@@ -155,7 +153,7 @@ class CitiesAutocompleteTest(TestCase):
 
         response = self.client.get(url, {"term": "paris 8"})
         assert response.status_code == 200
-        assert json.loads(response.content) == [
+        assert response.json() == [
             {"slug": "paris-8e-arrondissement-75", "value": "Paris 8e Arrondissement (75)"},
             # the trigram similarity allows for those results to show up, I'm not happy with it but
             # I won't look much more into it now. In my opinion they should be discarded since
@@ -173,4 +171,4 @@ class CitiesAutocompleteTest(TestCase):
 
         response = self.client.get(url, {"term": "toulouse"})
         assert response.status_code == 200
-        assert json.loads(response.content) == []
+        assert response.json() == []
