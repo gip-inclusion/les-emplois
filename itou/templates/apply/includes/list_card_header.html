@@ -23,7 +23,7 @@
     <p>
         <small class="text-muted">{{ job_application.created_at|date:"d F Y à H:i" }}</small>
 
-        {% if job_application.is_pending_for_too_long and not request.user_is_job_seeker %}
+        {% if job_application.is_pending_for_too_long and not request.user.is_job_seeker %}
             <br>
             <small class="text-danger font-weight-bold">
                 En attente de réponse depuis plus de {{ job_application.WEEKS_BEFORE_CONSIDERED_OLD }} semaines.
