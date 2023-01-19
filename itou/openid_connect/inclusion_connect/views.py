@@ -63,7 +63,7 @@ def _redirect_to_login_page_on_error(error_msg, request=None):
     return HttpResponseRedirect(reverse("home:hp"))
 
 
-def generate_inclusion_params_from_session(ic_session):
+def _generate_inclusion_params_from_session(ic_session):
     redirect_uri = get_absolute_url(reverse("inclusion_connect:callback"))
     signed_csrf = InclusionConnectState.create_signed_csrf_token()
     data = {
@@ -79,6 +79,16 @@ def generate_inclusion_params_from_session(ic_session):
     if login_hint is not None:
         data["login_hint"] = login_hint
     return data
+
+
+def _add_user_kind_error_message(request, existing_user, new_user_kind):
+    error = (
+        f"Un compte {existing_user.get_kind_display()} existe déjà avec cette adresse e-mail. "
+        "Vous devez créer un compte Inclusion Connect avec une autre adresse e-mail pour "
+        f"devenir {UserKind(new_user_kind).label} sur la plateforme. Besoin d'aide ? "
+        f"<a href='{ITOU_ASSISTANCE_URL}/#support' target='_blank'>Contactez-nous</a>."
+    )
+    messages.error(request, mark_safe(error))
 
 
 def inclusion_connect_authorize(request):
@@ -102,7 +112,7 @@ def inclusion_connect_authorize(request):
         ic_session["channel"] = channel
         request.session.modified = True
 
-    data = generate_inclusion_params_from_session(ic_session)
+    data = _generate_inclusion_params_from_session(ic_session)
 
     if request.GET.get("register"):
         base_url = constants.INCLUSION_CONNECT_ENDPOINT_REGISTER
@@ -123,11 +133,11 @@ def inclusion_connect_resume_registration(request):
     if not ic_session or ic_session["token"]:
         messages.error(request, "Impossible de reprendre la création de compte.")
         return HttpResponseRedirect(reverse("home:hp"))
-    data = generate_inclusion_params_from_session(ic_session)
+    data = _generate_inclusion_params_from_session(ic_session)
     return HttpResponseRedirect(f"{constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE}?{urlencode(data)}")
 
 
-def get_token(request, code):
+def _get_token(request, code):
     # Retrieve token from Inclusion Connect
     token_redirect_uri = get_absolute_url(reverse("inclusion_connect:callback"))
     data = {
@@ -148,7 +158,7 @@ def get_token(request, code):
     return response.json(), None
 
 
-def get_user_info(request, access_token):
+def _get_user_info(request, access_token):
     response = httpx.get(
         constants.INCLUSION_CONNECT_ENDPOINT_USERINFO,
         params={"schema": "openid"},
@@ -167,7 +177,7 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
         return _redirect_to_login_page_on_error(error_msg="Missing code or state.", request=request)
 
     # Get access token now to have more data in sentry
-    token_data, error_rediction = get_token(request, code)
+    token_data, error_rediction = _get_token(request, code)
     if error_rediction:
         return error_rediction
     access_token = token_data.get("access_token")
@@ -193,7 +203,7 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
     # because the token is only valid for 5 seconds.
     # We don't really need to access user_info since all we need is already in the access_token.
     # Should we remove this ?
-    user_data, error_rediction = get_user_info(request, access_token)
+    user_data, error_rediction = _get_user_info(request, access_token)
     if error_rediction:
         return error_rediction
 
@@ -227,14 +237,7 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
         user, _ = ic_user_data.create_or_update_user()
     except InvalidKindException:
         existing_user = User.objects.get(email=user_data["email"])
-        error = (
-            f"Un compte {existing_user.get_kind_display()} existe déjà avec cette adresse e-mail. "
-            "Vous devez créer un compte Inclusion Connect avec une autre adresse e-mail pour "
-            f"devenir {UserKind(user_kind).label} sur la plateforme. Besoin d'aide ? "
-            f"<a href='{ITOU_ASSISTANCE_URL}/#support' target='_blank'>Contactez-nous</a>."
-        )
-        messages.error(request, mark_safe(error))
-
+        _add_user_kind_error_message(request, existing_user, user_kind)
         is_successful = False
 
     if not is_successful:
