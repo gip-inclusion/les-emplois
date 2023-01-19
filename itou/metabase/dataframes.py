@@ -20,8 +20,8 @@ PANDA_DATAFRAME_TO_PSQL_TYPES_MAPPING = {
 }
 
 
-def infer_colomns_from_df(df):
-    # Generate a dataframe with the same headers a the first non null value for each colomn
+def infer_columns_from_df(df):
+    # Generate a dataframe with the same headers a the first non null value for each column
     df_columns = [df[column_name] for column_name in df.columns]
     non_null_values = [df_column.get(df_column.first_valid_index()) for df_column in df_columns]
     initial_line = pd.DataFrame([non_null_values], columns=df.columns)
@@ -53,7 +53,7 @@ def store_df(df, table_name, max_attempts=5):
     new_table_name = get_new_table_name(table_name)
     while attempts < max_attempts:
         try:
-            create_table(new_table_name, infer_colomns_from_df(df), reset=True)
+            create_table(new_table_name, infer_columns_from_df(df), reset=True)
             for df_chunk in tqdm(df_chunks):
                 buffer = StringIO()
                 df_chunk.to_csv(buffer, header=False, index=False, sep="\t", quoting=csv.QUOTE_NONE, escapechar="\\")
