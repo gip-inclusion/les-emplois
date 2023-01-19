@@ -46,7 +46,9 @@ prescripteurs as (
     from organisations o 
 )
 select 
-    "id_candidat",
+    id_candidat,
+    /* TODO dejafait drop as soon as analistos have migrated to the new deanonymized column */
+    id_candidat as id_candidat_anonymisé,
     nom_département_candidat,
     date_candidature,
     date_embauche,
