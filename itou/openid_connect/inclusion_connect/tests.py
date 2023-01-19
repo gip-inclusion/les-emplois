@@ -68,7 +68,7 @@ def mock_oauth_dance(
     next_url=None,
     assert_redirects=True,
     expected_route="welcoming_tour:index",
-    login_hint=None,
+    user_email=None,
     user_info_email=None,
     channel=None,
     register=True,
@@ -79,7 +79,7 @@ def mock_oauth_dance(
         "user_kind": user_kind,
         "previous_url": previous_url,
         "next_url": next_url,
-        "login_hint": login_hint,
+        "user_email": user_email,
         "channel": channel,
         "register": register,
     }
@@ -335,10 +335,10 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
 
     def test_authorize_endpoint_with_params(self):
         email = "porthos@touspourun.com"
-        params = {"login_hint": email, "user_kind": UserKind.PRESCRIBER, "channel": "invitation"}
+        params = {"user_email": email, "user_kind": UserKind.PRESCRIBER, "channel": "invitation"}
         url = f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
         response = self.client.get(url, follow=False)
-        assert quote(email) in response.url
+        assert f"login_hint={quote(email)}" in response.url
         assert self.client.session[constants.INCLUSION_CONNECT_SESSION_KEY]["user_email"] == email
 
     def test_resume_endpoint_no_session(self):
@@ -362,7 +362,7 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
     def test_resume_endpoint(self):
         # Fill up session with authorize view
         email = "porthos@touspourun.com"
-        params = {"login_hint": email, "user_kind": UserKind.PRESCRIBER, "channel": "invitation"}
+        params = {"user_email": email, "user_kind": UserKind.PRESCRIBER, "channel": "invitation"}
         url = f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
         response = self.client.get(url, follow=False)
         assert InclusionConnectState.objects.count() == 1

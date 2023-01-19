@@ -605,7 +605,7 @@ def prescriber_pole_emploi_user(request, template_name="signup/prescriber_pole_e
         PrescriberOrganization, pk=pole_emploi_org_pk, kind=PrescriberOrganizationKind.PE.value
     )
     params = {
-        "login_hint": session_data["email"],
+        "user_email": session_data["email"],
         "channel": InclusionConnectChannel.POLE_EMPLOI.value,
         "user_kind": KIND_PRESCRIBER,
         "previous_url": request.get_full_path(),

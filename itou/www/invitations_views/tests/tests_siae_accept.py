@@ -52,7 +52,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         next_url = reverse("invitations_views:join_siae", args=(invitation.pk,))
         params = {
             "user_kind": KIND_SIAE_STAFF,
-            "login_hint": invitation.email,
+            "user_email": invitation.email,
             "channel": "invitation",
             "previous_url": previous_url,
             "next_url": next_url,
@@ -66,7 +66,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
             self,
             KIND_SIAE_STAFF,
             assert_redirects=False,
-            login_hint=invitation.email,
+            user_email=invitation.email,
             channel="invitation",
             previous_url=previous_url,
             next_url=next_url,
@@ -102,7 +102,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         next_url = reverse("invitations_views:join_siae", args=(invitation.pk,))
         params = {
             "user_kind": KIND_SIAE_STAFF,
-            "login_hint": invitation.email,
+            "user_email": invitation.email,
             "channel": "invitation",
             "previous_url": previous_url,
             "next_url": next_url,
@@ -116,7 +116,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
             KIND_SIAE_STAFF,
             assert_redirects=False,
             # the login hint is different from OIDC_USERINFO["email"] which is used to create the IC account
-            login_hint=invitation.email,
+            user_email=invitation.email,
             channel="invitation",
             previous_url=previous_url,
             next_url=next_url,
@@ -210,7 +210,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
             self,
             KIND_SIAE_STAFF,
             assert_redirects=False,
-            login_hint=invitation.email,
+            user_email=invitation.email,
             channel="invitation",
             previous_url=previous_url,
             next_url=next_url,

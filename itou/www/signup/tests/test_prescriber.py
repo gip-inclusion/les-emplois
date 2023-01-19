@@ -89,7 +89,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         previous_url = reverse("signup:prescriber_pole_emploi_user")
         next_url = reverse("signup:prescriber_join_org")
         params = {
-            "login_hint": email,
+            "user_email": email,
             "channel": "pole_emploi",
             "user_kind": KIND_PRESCRIBER,
             "previous_url": previous_url,
@@ -103,7 +103,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
             self,
             KIND_PRESCRIBER,
             assert_redirects=False,
-            login_hint=email,
+            user_email=email,
             channel="pole_emploi",
             user_info_email=email,
             previous_url=previous_url,
@@ -955,7 +955,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
         response = mock_oauth_dance(
             self,
             KIND_PRESCRIBER,
-            login_hint=pe_email,
+            user_email=pe_email,
             channel="pole_emploi",
             assert_redirects=False,
             previous_url=previous_url,
