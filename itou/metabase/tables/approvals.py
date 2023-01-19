@@ -12,6 +12,7 @@ from itou.metabase.tables.utils import (
     hash_content,
 )
 from itou.prescribers.models import PrescriberOrganization
+from itou.users.enums import UserKind
 
 
 POLE_EMPLOI_APPROVAL_MINIMUM_START_DATE = datetime(2018, 1, 1)
@@ -31,7 +32,7 @@ def get_siae_from_approval(approval):
     if isinstance(approval, PoleEmploiApproval):
         return None
     assert isinstance(approval, Approval)
-    if not approval.user.is_job_seeker:
+    if approval.user.kind != UserKind.JOB_SEEKER:
         # Sometimes we have incorrect data where a user has an approval, thus should be a job seeker,
         # but actually is a prescriber or an employer.
         # We ignore this error here and instead report it in the final `report_data_inconsistencies` method.

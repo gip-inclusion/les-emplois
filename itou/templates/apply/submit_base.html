@@ -6,17 +6,19 @@
 {% block content %}
 
     <h1 class="h1-hero-c1">
-        {% if request.user.is_siae_staff %}
+        {% if request.user.kind == UserKind.SIAE_STAFF %}
             Déclarer une embauche
         {% else %}
             Postuler
-            {% if request.user.is_prescriber and job_seeker %}
+            {% if request.user.kind == UserKind.PRESCRIBER and job_seeker %}
                 pour <span class="text-muted">{{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</span>
             {% endif %}
             chez <span class="text-muted">{{ siae.display_name }}</span>
         {% endif %}
     </h1>
-    {% if request.user.is_siae_staff and job_seeker %}<h2 class="h1">{{ job_seeker.get_full_name|title }}</h2>{% endif %}
+    {% if request.user.kind == UserKind.SIAE_STAFF and job_seeker %}
+        <h2 class="h1">{{ job_seeker.get_full_name|title }}</h2>
+    {% endif %}
 
     {% include "approvals/includes/card.html" with common_approval=job_seeker.latest_common_approval %}
 

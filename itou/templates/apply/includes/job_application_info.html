@@ -1,5 +1,5 @@
 <ul>
-    {% if request.user.is_prescriber %}
+    {% if request.user.kind == UserKind.PRESCRIBER %}
         <li>
             Employeur : <b>{{ job_application.to_siae.display_name }}</b>
         </li>

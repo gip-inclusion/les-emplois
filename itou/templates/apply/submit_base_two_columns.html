@@ -12,13 +12,15 @@
             <div class="row">
                 <div class="col-12 col-lg-6 order-md-1 pr-lg-5 mt-4">
                     <h1 class="h1-hero-c1">
-                        {% if request.user.is_siae_staff %}
+                        {% if request.user.kind == UserKind.SIAE_STAFF %}
                             Déclarer une embauche
                         {% else %}
                             Postuler
                         {% endif %}
                     </h1>
-                    {% if request.user.is_siae_staff and job_seeker %}<h2 class="h1">{{ job_seeker.get_full_name|title }}</h2>{% endif %}
+                    {% if request.user.kind == UserKind.SIAE_STAFF and job_seeker %}
+                        <h2 class="h1">{{ job_seeker.get_full_name|title }}</h2>
+                    {% endif %}
 
                     {% include "approvals/includes/card.html" with common_approval=job_seeker.latest_common_approval %}
 
@@ -43,7 +45,7 @@
                 <div class="col-12 col-lg-6 order-md-2 pl-lg-5 d-none d-lg-block">
                     <h2 class="h1 ff-extra-01">
                         Où trouver
-                        {% if request.user.is_job_seeker %}
+                        {% if request.user.kind == UserKind.JOB_SEEKER %}
                             mon
                         {% else %}
                             le
@@ -53,7 +55,7 @@
                     <img class="mt-5 img-fluid" src="{% static 'img/carte_vitale.png' %}" alt="Spécimen de carte vitale">
                     <p class="ff-extra-01 mt-0">
                         Il est présent à cet endroit sur
-                        {% if request.user.is_job_seeker %}
+                        {% if request.user.kind == UserKind.JOB_SEEKER %}
                             votre
                         {% else %}
                             la

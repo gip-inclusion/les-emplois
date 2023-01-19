@@ -27,7 +27,7 @@ from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.siaes.enums import SiaeKind
 from itou.siaes.models import Siae, SiaeMembership
 from itou.users.adapter import UserAdapter
-from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF
+from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF, UserKind
 from itou.utils import constants as global_constants
 from itou.utils.nav_history import get_prev_url_from_history, push_url_in_history
 from itou.utils.tokens import siae_signup_token_generator
@@ -268,7 +268,7 @@ class SiaeUserView(SiaeBaseView, TemplateView):
 
 class SiaeJoinView(LoginRequiredMixin, SiaeBaseView):
     def get(self, request, *args, **kwargs):
-        if not request.user.is_siae_staff:
+        if not request.user.kind == UserKind.SIAE_STAFF:
             logger.error("A non staff user tried to join a SIAE")
             messages.error(request, "Vous ne pouvez pas rejoindre une SIAE avec ce compte.")
             return HttpResponseRedirect(reverse("home:hp"))

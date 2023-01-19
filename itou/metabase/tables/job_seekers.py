@@ -14,7 +14,7 @@ from itou.metabase.tables.utils import (
     get_qpv_job_seeker_pks,
     hash_content,
 )
-from itou.users.enums import IdentityProvider
+from itou.users.enums import IdentityProvider, UserKind
 
 
 # Reword the original EligibilityDiagnosis.AUTHOR_KIND_CHOICES
@@ -34,9 +34,9 @@ def get_user_signup_kind(user):
     creator = user.created_by
     if creator is None:
         return "autonome"
-    if creator.is_prescriber:
+    if creator.kind == UserKind.PRESCRIBER:
         return "par prescripteur"
-    if creator.is_siae_staff:
+    if creator.kind == UserKind.SIAE_STAFF:
         return "par employeur"
     if creator.is_staff:
         return "par administrateur"
@@ -44,7 +44,7 @@ def get_user_signup_kind(user):
 
 
 def get_latest_diagnosis(job_seeker):
-    assert job_seeker.is_job_seeker
+    assert job_seeker.kind == UserKind.JOB_SEEKER
     if job_seeker.eligibility_diagnoses_count == 0:
         return None
     return job_seeker.sorted_eligibility_diagnoses[0]

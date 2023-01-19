@@ -3,6 +3,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import safestring
 
+from itou.users.enums import UserKind
 from itou.utils import constants as global_constants
 from itou.www.login import urls as login_urls
 
@@ -37,7 +38,7 @@ class ItouCurrentOrganizationMiddleware:
             return self.get_response(request)
 
         if user.is_authenticated:
-            if user.is_siae_staff:
+            if user.kind == UserKind.SIAE_STAFF:
                 current_siae_pk = request.session.get(global_constants.ITOU_SESSION_CURRENT_SIAE_KEY)
                 siae_set = user.siae_set.filter(siaemembership__is_active=True).active_or_in_grace_period()
 
@@ -76,7 +77,7 @@ class ItouCurrentOrganizationMiddleware:
                         messages.warning(request, message)
                         return redirect("account_logout")
 
-            elif user.is_prescriber:
+            elif user.kind == UserKind.PRESCRIBER:
                 # Prescriber users can now select an organization
                 # (if they are member of several prescriber organizations)
                 current_prescriber_org_key = request.session.get(
@@ -95,7 +96,7 @@ class ItouCurrentOrganizationMiddleware:
                     # => Remove any old session entry if needed
                     del request.session[global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY]
 
-            elif user.is_labor_inspector:
+            elif user.kind == UserKind.LABOR_INSPECTOR:
                 current_institution_key = request.session.get(global_constants.ITOU_SESSION_CURRENT_INSTITUTION_KEY)
                 if not current_institution_key:
                     first_active_membership = user.institutionmembership_set.filter(is_active=True).first()

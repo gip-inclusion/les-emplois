@@ -14,13 +14,13 @@
 
     {% csrf_token %}
 
-    {% if form_confirm_eligibility and request.user.is_siae_staff %}
+    {% if form_confirm_eligibility and request.user.kind == UserKind.SIAE_STAFF %}
         {% bootstrap_form_errors form_confirm_eligibility type="all" %}
     {% endif %}
 
     {% bootstrap_form_errors form_administrative_criteria type="all" %}
 
-    {% if request.user.is_siae_staff %}<h3 class="h2">Critères administratifs de niveau 1</h3>{% endif %}
+    {% if request.user.kind == UserKind.SIAE_STAFF %}<h3 class="h2">Critères administratifs de niveau 1</h3>{% endif %}
 
     {% for field in form_administrative_criteria %}
         {% if form_administrative_criteria.LEVEL_1_PREFIX in field.name %}
@@ -28,14 +28,14 @@
         {% endif %}
     {% endfor %}
 
-    {% if request.user.is_siae_staff %}<h3 class="h2">Critères administratifs de niveau 2</h3>{% endif %}
+    {% if request.user.kind == UserKind.SIAE_STAFF %}<h3 class="h2">Critères administratifs de niveau 2</h3>{% endif %}
 
     {% for field in form_administrative_criteria %}
         {% if form_administrative_criteria.LEVEL_2_PREFIX in field.name %}
             {% include "eligibility/includes/criteria_input.html" with field=field objects_dict=form_administrative_criteria.OBJECTS %}
         {% endif %}
     {% endfor %}
-    {% if form_confirm_eligibility and request.user.is_siae_staff %}
+    {% if form_confirm_eligibility and request.user.kind == UserKind.SIAE_STAFF %}
         <hr>
         {% bootstrap_form form_confirm_eligibility %}
     {% endif %}

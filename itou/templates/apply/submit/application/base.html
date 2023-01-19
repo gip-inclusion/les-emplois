@@ -10,9 +10,9 @@
                 <div class="col-12 col-lg-7">
                     <div class="d-flex flex-column flex-md-row align-items-center">
                         <h1 class="my-5 flex-grow-1">
-                            {% if request.user.is_job_seeker %}
+                            {% if request.user.kind == UserKind.JOB_SEEKER %}
                                 Postuler
-                            {% elif request.user.is_siae_staff %}
+                            {% elif request.user.kind == UserKind.SIAE_STAFF %}
                                 Auto-prescription pour {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}
                             {% else %}
                                 Postuler pour {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}
@@ -30,7 +30,7 @@
                     </div>
                     <div class="d-flex flex-column flex-md-row align-items-center mb-4">
                         Dernière actualisation du profil : {{ job_seeker.last_checked_at|date }} à {{ job_seeker.last_checked_at|time }}
-                        {% if can_view_personal_information and not request.user.is_job_seeker %}
+                        {% if can_view_personal_information and not request.user.kind == UserKind.JOB_SEEKER %}
                             <a class="btn btn-link" href="{% url "apply:update_job_seeker_step_1" siae_pk=siae.pk job_seeker_pk=job_seeker.pk %}">Vérifier le profil</a>
                         {% endif %}
                         {% if new_check_needed %}<i class="ri-information-line ri-xl text-warning"></i>{% endif %}
@@ -62,7 +62,7 @@
                         </div>
                         <span>
                             {% block progress_title %}
-                                {% if request.user.is_siae_staff %}
+                                {% if request.user.kind == UserKind.SIAE_STAFF %}
                                     Auto-prescription
                                 {% else %}
                                     Postuler

@@ -350,26 +350,9 @@ class User(AbstractUser, AddressMixin):
 
         super().save(*args, **kwargs)
 
-        if self.is_job_seeker and not self.asp_uid:
+        if self.kind == UserKind.JOB_SEEKER and not self.asp_uid:
             self.asp_uid = salted_hmac(key_salt="job_seeker.id", value=self.id).hexdigest()[:30]
             super().save(update_fields=["asp_uid"])
-
-    @property
-    def is_job_seeker(self):
-        return self.kind == UserKind.JOB_SEEKER
-
-    @property
-    def is_prescriber(self):
-        return self.kind == UserKind.PRESCRIBER
-
-    @property
-    def is_siae_staff(self):
-        return self.kind == UserKind.SIAE_STAFF
-
-    @property
-    def is_labor_inspector(self):
-        # Members of DDETS, DREETS or DGEFP institution have their own dashboard.
-        return self.kind == UserKind.LABOR_INSPECTOR
 
     def can_edit_email(self, user):
         return user.is_handled_by_proxy and user.is_created_by(self) and not user.has_verified_email
@@ -378,12 +361,12 @@ class User(AbstractUser, AddressMixin):
         if self.pk == user.pk:  # I am me
             return True
 
-        if self.is_prescriber:
+        if self.kind == UserKind.PRESCRIBER:
             if self.is_prescriber_with_authorized_org:
                 return user.is_handled_by_proxy
             else:
                 return user.is_handled_by_proxy and user.is_created_by(self)
-        elif self.is_siae_staff:
+        elif self.kind == UserKind.SIAE_STAFF:
             return user.is_handled_by_proxy
 
         return False
@@ -392,19 +375,21 @@ class User(AbstractUser, AddressMixin):
         if self.can_edit_personal_information(user):  # If we can edit them then we can view them
             return True
 
-        if user.is_job_seeker:  # Restrict display of personal information to job seeker
-            if self.is_prescriber:
+        if user.kind == UserKind.JOB_SEEKER:  # Restrict display of personal information to job seeker
+            if self.kind == UserKind.PRESCRIBER:
                 if self.is_prescriber_with_authorized_org:
                     return True
                 else:
                     return user.is_handled_by_proxy and user.is_created_by(self)
-            elif self.is_siae_staff:
+            elif self.kind == UserKind.SIAE_STAFF:
                 return True
 
         return False
 
     def can_add_nir(self, job_seeker):
-        return (self.is_prescriber_with_authorized_org or self.is_siae_staff) and (job_seeker and not job_seeker.nir)
+        return (self.is_prescriber_with_authorized_org or self.kind == UserKind.SIAE_STAFF) and (
+            job_seeker and not job_seeker.nir
+        )
 
     def is_created_by(self, user):
         return bool(self.created_by_id and self.created_by_id == user.pk)
@@ -419,7 +404,7 @@ class User(AbstractUser, AddressMixin):
 
     @cached_property
     def latest_approval(self):
-        if not self.is_job_seeker:
+        if self.kind != UserKind.JOB_SEEKER:
             return None
         approvals = Approval.objects.filter(user=self).order_by("-start_at")
         if not approvals:
@@ -439,7 +424,7 @@ class User(AbstractUser, AddressMixin):
 
     @cached_property
     def latest_pe_approval(self):
-        if not self.is_job_seeker:
+        if self.kind != UserKind.JOB_SEEKER:
             return None
         approval_numbers = Approval.objects.filter(user=self).values_list("number", flat=True)
         pe_approvals = PoleEmploiApproval.objects.find_for(self).exclude(number__in=approval_numbers)
@@ -536,7 +521,7 @@ class User(AbstractUser, AddressMixin):
 
     @property
     def is_handled_by_proxy(self):
-        if self.is_job_seeker and self.created_by and not self.last_login:
+        if self.kind == UserKind.JOB_SEEKER and self.created_by and not self.last_login:
             return True
         return False
 
@@ -554,12 +539,12 @@ class User(AbstractUser, AddressMixin):
 
     @cached_property
     def is_prescriber_with_org(self):
-        return self.is_prescriber and self.prescribermembership_set.filter(is_active=True).exists()
+        return self.kind == UserKind.PRESCRIBER and self.prescribermembership_set.filter(is_active=True).exists()
 
     @cached_property
     def is_prescriber_with_authorized_org(self):
         return (
-            self.is_prescriber
+            self.kind == UserKind.PRESCRIBER
             and self.prescriberorganization_set.filter(is_authorized=True, members__is_active=True).exists()
         )
 
@@ -572,11 +557,11 @@ class User(AbstractUser, AddressMixin):
 
     @property
     def has_external_data(self):
-        return self.is_job_seeker and hasattr(self, "jobseekerexternaldata")
+        return self.kind == UserKind.JOB_SEEKER and hasattr(self, "jobseekerexternaldata")
 
     @property
     def has_jobseeker_profile(self):
-        return self.is_job_seeker and hasattr(self, "jobseeker_profile")
+        return self.kind == UserKind.JOB_SEEKER and hasattr(self, "jobseeker_profile")
 
     def has_valid_diagnosis(self, for_siae=None):
         return self.eligibility_diagnoses.has_considered_valid(job_seeker=self, for_siae=for_siae)
@@ -597,7 +582,7 @@ class User(AbstractUser, AddressMixin):
         They are in a "dangling" status: still active (membership-wise) but unable to login
         because not member of any SIAE.
         """
-        return self.is_siae_staff and self.siaemembership_set.filter(is_active=True).exists()
+        return self.kind == UserKind.SIAE_STAFF and self.siaemembership_set.filter(is_active=True).exists()
 
     def active_or_in_grace_period_siae_memberships(self):
         """
@@ -628,7 +613,7 @@ class User(AbstractUser, AddressMixin):
         a given territory and thus would not need to join others.
         """
         return (
-            self.is_siae_staff
+            self.kind == UserKind.SIAE_STAFF
             and parent_siae.is_active
             and parent_siae.has_admin(self)
             and parent_siae.should_have_convention
@@ -659,7 +644,7 @@ class User(AbstractUser, AddressMixin):
         actual callable methods `can_view_stats_siae_*`.
         """
         return (
-            self.is_siae_staff
+            self.kind == UserKind.SIAE_STAFF
             and isinstance(current_org, Siae)
             and current_org.has_member(self)
             # Metabase expects a filter on the SIAE ASP id (technically `siae.convention.asp_id`) which is why
@@ -689,7 +674,7 @@ class User(AbstractUser, AddressMixin):
         a non-CD organization of the `DEPT` kind.
         """
         return (
-            self.is_prescriber
+            self.kind == UserKind.PRESCRIBER
             and isinstance(current_org, PrescriberOrganization)
             and current_org.kind == PrescriberOrganizationKind.DEPT
             and current_org.is_authorized
@@ -708,7 +693,7 @@ class User(AbstractUser, AddressMixin):
 
     def can_view_stats_pe(self, current_org):
         return (
-            self.is_prescriber
+            self.kind == UserKind.PRESCRIBER
             and isinstance(current_org, PrescriberOrganization)
             and current_org.kind == PrescriberOrganizationKind.PE
             and current_org.is_authorized
@@ -730,7 +715,7 @@ class User(AbstractUser, AddressMixin):
         DDETS as in "Directions départementales de l’emploi, du travail et des solidarités".
         """
         return (
-            self.is_labor_inspector
+            self.kind == UserKind.LABOR_INSPECTOR
             and isinstance(current_org, Institution)
             and current_org.kind == InstitutionKind.DDETS
         )
@@ -750,7 +735,7 @@ class User(AbstractUser, AddressMixin):
         DREETS as in "Directions régionales de l’économie, de l’emploi, du travail et des solidarités".
         """
         return (
-            self.is_labor_inspector
+            self.kind == UserKind.LABOR_INSPECTOR
             and isinstance(current_org, Institution)
             and current_org.kind == InstitutionKind.DREETS
         )
@@ -769,14 +754,14 @@ class User(AbstractUser, AddressMixin):
         Users of the DGEFP institution can view the confidential DGEFP stats for all regions and departments.
         """
         return (
-            self.is_labor_inspector
+            self.kind == UserKind.LABOR_INSPECTOR
             and isinstance(current_org, Institution)
             and current_org.kind == InstitutionKind.DGEFP
         )
 
     def can_view_stats_dihal(self, current_org):
         return (
-            self.is_labor_inspector
+            self.kind == UserKind.LABOR_INSPECTOR
             and isinstance(current_org, Institution)
             and current_org.kind == InstitutionKind.DIHAL
         )
@@ -826,7 +811,7 @@ class User(AbstractUser, AddressMixin):
 
     @cached_property
     def last_accepted_job_application(self):
-        if not self.is_job_seeker:
+        if self.kind != UserKind.JOB_SEEKER:
             return None
 
         # Some candidates may not have accepted job applications
@@ -834,7 +819,7 @@ class User(AbstractUser, AddressMixin):
         return self.job_applications.accepted().with_accepted_at().order_by("-accepted_at", "-hiring_start_at").first()
 
     def last_hire_was_made_by_siae(self, siae):
-        if not self.is_job_seeker:
+        if self.kind != UserKind.JOB_SEEKER:
             return False
         return self.last_accepted_job_application and self.last_accepted_job_application.to_siae == siae
 

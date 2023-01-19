@@ -374,7 +374,7 @@ class Command(BaseCommand):
         self.stdout.write("Checking data for inconsistencies.")
         for approval in Approval.objects.prefetch_related("user").all():
             user = approval.user
-            if not user.is_job_seeker:
+            if user.kind != UserKind.JOB_SEEKER:
                 self.stdout.write(f"FATAL ERROR: user {user.id} has an approval but is not a job seeker")
                 fatal_errors += 1
 

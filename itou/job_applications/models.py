@@ -21,6 +21,7 @@ from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.enums import RefusalReason, SenderKind
 from itou.job_applications.tasks import huey_notify_pole_emploi
 from itou.siaes.models import Siae
+from itou.users.enums import UserKind
 from itou.utils.emails import get_email_message, send_email_messages
 from itou.utils.urls import get_absolute_url
 
@@ -757,7 +758,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         if target_siae == self.to_siae:
             return False
         # User must be SIAE user / employee
-        if not user.is_siae_staff:
+        if user.kind != UserKind.SIAE_STAFF:
             return False
         return self.is_in_transferable_state
 

@@ -19,6 +19,7 @@ from itou.eligibility.models import AdministrativeCriteria
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS
+from itou.users.enums import UserKind
 from itou.users.models import JobSeekerProfile, User
 from itou.utils import constants as global_constants
 from itou.utils.validators import validate_nir, validate_pole_emploi_id
@@ -42,7 +43,7 @@ class UserExistsForm(forms.Form):
             if not self.user.is_active:
                 error = "Vous ne pouvez pas postuler pour cet utilisateur car son compte a été désactivé."
                 raise forms.ValidationError(error)
-            if not self.user.is_job_seeker:
+            if self.user.kind != UserKind.JOB_SEEKER:
                 error = "Vous ne pouvez pas postuler pour cet utilisateur car il n'est pas demandeur d'emploi."
                 raise forms.ValidationError(error)
         return email
@@ -341,12 +342,12 @@ class SubmitJobApplicationForm(forms.ModelForm, ResumeFormMixin):
         super().__init__(*args, **kwargs)
         self.fields["selected_jobs"].queryset = siae.job_description_through.filter(is_active=True)
 
-        self.fields["message"].required = not user.is_siae_staff
+        self.fields["message"].required = user.kind != UserKind.SIAE_STAFF
         self.fields["message"].widget.attrs["placeholder"] = ""
-        if user.is_job_seeker:
+        if user.kind == UserKind.JOB_SEEKER:
             self.fields["message"].label = "Message à l’employeur"
             help_text = "Message obligatoire à destination de l’employeur et non modifiable après l’envoi."
-        elif user.is_siae_staff:
+        elif user.kind == UserKind.SIAE_STAFF:
             self.fields["message"].label = "Message d’information"
             help_text = "Ce message ne sera plus modifiable après l’envoi et une copie sera transmise au candidat."
         else:

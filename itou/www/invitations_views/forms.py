@@ -6,6 +6,7 @@ from django.forms.models import modelformset_factory
 
 from itou.invitations.models import LaborInspectorInvitation, PrescriberWithOrgInvitation, SiaeStaffInvitation
 from itou.prescribers.enums import PrescriberOrganizationKind
+from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
 
@@ -32,7 +33,7 @@ class PrescriberWithOrgInvitationForm(forms.ModelForm):
         """
         user = User.objects.filter(email__iexact=email).first()
         if user:
-            if not user.is_prescriber:
+            if user.kind != UserKind.PRESCRIBER:
                 error = forms.ValidationError("Cet utilisateur n'est pas un prescripteur.")
                 self.add_error("email", error)
             else:
@@ -121,7 +122,7 @@ class SiaeStaffInvitationForm(forms.ModelForm):
         """
         user = User.objects.filter(email__iexact=email).first()
         if user:
-            if not user.is_siae_staff:
+            if user.kind != UserKind.SIAE_STAFF:
                 error = forms.ValidationError("Cet utilisateur n'est pas un employeur.")
                 self.add_error("email", error)
             else:
@@ -185,7 +186,7 @@ class LaborInspectorInvitationForm(forms.ModelForm):
         """
         user = User.objects.filter(email__iexact=email).first()
         if user:
-            if not user.is_labor_inspector:
+            if user.kind != UserKind.LABOR_INSPECTOR:
                 error = forms.ValidationError("Cet utilisateur n'est pas un inspecteur du travail.")
                 self.add_error("email", error)
             else:

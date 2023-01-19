@@ -18,7 +18,7 @@
 
     {% if job_application.to_siae.is_subject_to_eligibility_rules %}
 
-        {% if request.user.is_siae_staff %}
+        {% if request.user.kind == UserKind.SIAE_STAFF %}
             {% if job_application.state.is_accepted and job_application.approval %}
 
                 <div class="alert alert-info">
@@ -49,7 +49,7 @@
                 {# to decide whether they may accept a job application or not. #}
                 {% include "approvals/includes/card.html" with common_approval=job_application.job_seeker.latest_common_approval job_application=job_application %}
             {% endif %}
-        {% elif request.user.is_prescriber %}
+        {% elif request.user.kind == UserKind.PRESCRIBER %}
             <div class="card my-4">
                 <div class="card-body">
                     {# Approval status. #}

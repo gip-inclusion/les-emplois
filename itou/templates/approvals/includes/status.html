@@ -31,7 +31,7 @@ Arguments:
     {% endif %}
 </p>
 
-{% if user.is_siae_staff and job_application.is_pending %}
+{% if user.kind == UserKind.SIAE_STAFF and job_application.is_pending %}
     {% comment %}
     If the PASS IAE number is displayed at this time, some employers think that there is
     no need to validate the application because a number is already assigned.
@@ -127,7 +127,7 @@ Arguments:
             <b>Expiré</b> le {{ common_approval.end_at|date:"d/m/Y" }} (depuis {{ common_approval.end_at|timesince }})
         </p>
 
-        {% if user.is_siae_staff %}
+        {% if user.kind == UserKind.SIAE_STAFF %}
             {% if job_application.is_pending and job_application.get_eligibility_diagnosis.is_valid %}
                 {% comment %}
             When an authorized prescriber bypasses the waiting period and sends a candidate

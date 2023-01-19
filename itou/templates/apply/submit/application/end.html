@@ -9,9 +9,15 @@
         <div class="container">
             <div class="row">
                 <div class="col-12 col-lg-7 js-swap-elements">
-                    <h1 class="my-5">{{ request.user.is_siae_staff|yesno:"Auto-prescription enregistrée !,Candidature envoyée !" }}</h1>
+                    <h1 class="my-5">
+                        {% if request.user.kind == UserKind.SIAE_STAFF %}
+                            Auto-prescription enregistrée !
+                        {% else %}
+                            Candidature envoyée !
+                        {% endif %}
+                    </h1>
                     <p>
-                        {% if request.user.is_job_seeker %}
+                        {% if request.user.kind == UserKind.JOB_SEEKER %}
                             Votre candidature
                         {% else %}
                             La candidature de {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}
@@ -22,7 +28,11 @@
                         <p>
                             <b>
                                 {% if can_edit_personal_information %}
-                                    Veuillez vous assurer que {{ request.user.is_job_seeker|yesno:"vos coordonnées,les coordonnées de votre candidat" }} sont bien à jour :
+                                    {% if request.user.kind == UserKind.JOB_SEEKER %}
+                                        Veuillez vous assurer que vos coordonnées sont bien à jour :
+                                    {% else %}
+                                        Veuillez vous assurer que les coordonnées de votre candidat sont bien à jour :
+                                    {% endif %}
                                 {% else %}
                                     Le candidat a la possibilité de mettre à jour ses coordonnées en se connectant sur son espace.
                                 {% endif %}
@@ -32,7 +42,7 @@
                             <div class="card c-card c-card--noshadow border-bottom p-3">
                                 <div class="card-header d-flex flex-row align-items-center">
                                     <h2 class="mb-0 flex-grow-1">{{ job_application.job_seeker.get_full_name }}</h2>
-                                    {% if request.user.is_job_seeker %}
+                                    {% if request.user.kind == UserKind.JOB_SEEKER %}
                                         <a class="btn btn-outline-primary btn-ico btn-sm" href="{% url 'dashboard:edit_user_info' %}">
                                             <i class="ri-pencil-line mr-2"></i>Modifier
                                         </a>
@@ -63,7 +73,7 @@
                                 <a class="btn btn-primary" href="{% url "dashboard:index" %}">Tableau de bord</a>
                             </div>
                         </div>
-                        {% if not request.user.is_job_seeker %}
+                        {% if not request.user.kind == UserKind.JOB_SEEKER %}
                             <div class="c-form c-card--noshadow border-bottom {% if not form.is_bound %}d-none{% endif %}" data-swap-element-with="#informations">
                                 <h2 class="mb-5">{{ job_application.job_seeker.get_full_name }}</h2>
 

@@ -7,6 +7,7 @@ from itou.job_applications.notifications import (
     NewQualifiedJobAppEmployersNotification,
     NewSpontaneousJobAppEmployersNotification,
 )
+from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.apis.exceptions import AddressLookupError
@@ -40,7 +41,7 @@ class EditJobSeekerInfoForm(MandatoryAddressFormMixin, SSOReadonlyMixin, forms.M
     def __init__(self, *args, **kwargs):
         editor = kwargs.pop("editor", None)
         super().__init__(*args, **kwargs)
-        assert self.instance.is_job_seeker, self.instance
+        assert self.instance.kind == UserKind.JOB_SEEKER, self.instance
 
         self.fields["birthdate"].required = True
         self.fields["birthdate"].widget = DuetDatePickerWidget(
@@ -110,7 +111,7 @@ class EditUserInfoForm(MandatoryAddressFormMixin, SSOReadonlyMixin, forms.ModelF
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        assert not self.instance.is_job_seeker, self.instance
+        assert not self.instance.kind == UserKind.JOB_SEEKER, self.instance
 
         if self.instance.has_sso_provider:
             # SSO users do not have access to edit_user_email dedicated view:

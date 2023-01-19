@@ -135,7 +135,7 @@ class ApplicationBaseView(ApplyStepBaseView):
             "can_view_personal_information": self.request.user.can_view_personal_information(self.job_seeker),
             # Do not show the warning for job seekers
             "new_check_needed": (
-                not self.request.user.is_job_seeker
+                self.request.user.kind != UserKind.JOB_SEEKER
                 and self.job_seeker.last_checked_at < timezone.now() - JOB_SEEKER_INFOS_CHECK_PERIOD
             ),
         }
@@ -153,7 +153,7 @@ class ApplyStepForJobSeekerBaseView(ApplyStepBaseView):
         self.job_seeker = request.user
 
     def dispatch(self, request, *args, **kwargs):
-        if not self.job_seeker.is_job_seeker:
+        if self.job_seeker.kind != UserKind.JOB_SEEKER:
             return HttpResponseRedirect(reverse("apply:start", kwargs={"siae_pk": self.siae.pk}))
         return super().dispatch(request, *args, **kwargs)
 
@@ -190,7 +190,7 @@ class StartView(ApplyStepBaseView):
 
     def get(self, request, *args, **kwargs):
         # SIAE members can only submit a job application to their SIAE
-        if request.user.is_siae_staff and not self.siae.has_member(request.user):
+        if request.user.kind == UserKind.SIAE_STAFF and not self.siae.has_member(request.user):
             raise PermissionDenied("Vous ne pouvez postuler pour un candidat que dans votre structure.")
 
         # Refuse all applications except those made by an SIAE member
@@ -202,7 +202,7 @@ class StartView(ApplyStepBaseView):
         self.apply_session.init(
             {
                 "back_url": self._coalesce_back_url(),
-                "job_seeker_pk": user_info.user.pk if user_info.user.is_job_seeker else None,
+                "job_seeker_pk": user_info.user.pk if user_info.user.kind == UserKind.JOB_SEEKER else None,
                 "nir": None,
                 "selected_jobs": [request.GET["job_description_id"]] if "job_description_id" in request.GET else [],
             }
@@ -213,7 +213,7 @@ class StartView(ApplyStepBaseView):
                 reverse("apply:pending_authorization_for_sender", kwargs={"siae_pk": self.siae.pk})
             )
 
-        tunnel = "job_seeker" if user_info.user.is_job_seeker else "sender"
+        tunnel = "job_seeker" if user_info.user.kind == UserKind.JOB_SEEKER else "sender"
         return HttpResponseRedirect(reverse(f"apply:check_nir_for_{tunnel}", kwargs={"siae_pk": self.siae.pk}))
 
 
@@ -341,7 +341,7 @@ class CheckEmailForSenderView(ApplyStepForSenderBaseView):
             if self.form.data.get("preview"):
                 preview_mode = True
                 # Don't display personal information to unauthorized members.
-                if self.sender.is_prescriber and not self.sender.is_prescriber_with_authorized_org:
+                if self.sender.kind == UserKind.PRESCRIBER and not self.sender.is_prescriber_with_authorized_org:
                     job_seeker_name = f"{job_seeker.first_name[0]}… {job_seeker.last_name[0]}…"
                 else:
                     job_seeker_name = job_seeker.get_full_name()
@@ -660,7 +660,10 @@ class CheckPreviousApplications(ApplicationBaseView):
             return HttpResponseRedirect(reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk}))
 
         # Limit the possibility of applying to the same SIAE for 24 hours.
-        if not request.user.is_siae_staff and self.previous_applications.created_in_past(hours=24).exists():
+        if (
+            not request.user.kind == UserKind.SIAE_STAFF
+            and self.previous_applications.created_in_past(hours=24).exists()
+        ):
             if request.user == self.job_seeker:
                 msg = "Vous avez déjà postulé chez cet employeur durant les dernières 24 heures."
             else:
@@ -930,7 +933,7 @@ class UpdateJobSeekerBaseView(ApplyStepBaseView):
     def setup(self, request, *args, **kwargs):
         self.job_seeker = get_object_or_404(User, pk=kwargs["job_seeker_pk"])
         self.job_seeker_session = SessionNamespace(request.session, f"job_seeker-{self.job_seeker.pk}")
-        if request.user.is_job_seeker or not request.user.can_view_personal_information(self.job_seeker):
+        if request.user.kind == UserKind.JOB_SEEKER or not request.user.can_view_personal_information(self.job_seeker):
             # Since the link leading to this process isn't visible to those users, this should never happen
             raise PermissionDenied("Votre utilisateur n'est pas autorisé à vérifier les informations de ce candidat")
         super().setup(request, *args, **kwargs)

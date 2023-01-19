@@ -44,7 +44,7 @@ class UserAdminForm(UserChangeForm):
         if nir and self.instance.nir_already_exists(nir=nir, exclude_pk=self.instance.pk):
             raise ValidationError("Le NIR de ce candidat est déjà associé à un autre utilisateur.")
 
-        if self.instance.is_job_seeker:
+        if self.instance.kind == UserKind.JOB_SEEKER:
             # Update job seeker geolocation
             try:
                 self.instance.set_coords(self.cleaned_data["address_line_1"], self.cleaned_data["post_code"])

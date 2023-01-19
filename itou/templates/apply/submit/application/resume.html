@@ -12,14 +12,14 @@
 {% block step_title %}Finaliser la candidature{% endblock %}
 {% block pre_step_title %}
     {% if is_subject_to_eligibility_rules %}
-        {% if not request.user.is_job_seeker and eligibility_diagnosis.author_organization %}
+        {% if not request.user.kind == UserKind.JOB_SEEKER and eligibility_diagnosis.author_organization %}
             <div class="mb-5">
                 <p>L’éligibilité à l'IAE du candidat a été validée par :</p>
                 <p class="text-tertiary font-weight-bold">{{ eligibility_diagnosis.author_organization.display_name }}</p>
             </div>
         {% endif %}
         {# Nothing is displayed to SIAE members when the job seeker is not eligible to the IAE #}
-        {% if not request.user.is_siae_staff or job_seeker.has_valid_common_approval or eligibility_diagnosis %}
+        {% if request.user.kind != UserKind.SIAE_STAFF or job_seeker.has_valid_common_approval or eligibility_diagnosis %}
             <div class="alert alert-info mb-5" role="status">
                 <div class="row">
                     <div class="col-auto pr-0">
@@ -31,11 +31,11 @@
                                 <strong>Date de fin de validité du pass IAE : {{ job_seeker.latest_common_approval.end_at|date:"d/m/Y" }}</strong>
                             </p>
                             <p class="mb-0">
-                                {% if request.user.is_prescriber_with_authorized_org or request.user.is_siae_staff %}
+                                {% if request.user.is_prescriber_with_authorized_org or request.user.kind == UserKind.SIAE_STAFF %}
                                     Tant que le Pass IAE est valide, vous n’avez pas à valider la situation administrative du candidat.
-                                {% elif request.user.is_prescriber %}
+                                {% elif request.user.kind == UserKind.PRESCRIBER %}
                                     Tant que le pass IAE est valide, l’employeur n’aura pas à vérifier l’éligibilité IAE du candidat.
-                                {% elif request.user.is_job_seeker %}
+                                {% elif request.user.kind == UserKind.JOB_SEEKER %}
                                     Tant que le pass IAE est valide, l’employeur n’aura pas à vérifier votre éligibilité à l’IAE.
                                 {% endif %}
                             </p>
@@ -44,21 +44,21 @@
                                 <strong>Date de fin de validité du diagnostic : {{ eligibility_diagnosis.expires_at|date:"d/m/Y" }}</strong>
                             </p>
                             <p class="mb-0">
-                                {% if request.user.is_prescriber %}
+                                {% if request.user.kind == UserKind.PRESCRIBER %}
                                     Tant que l’éligibilité IAE est valide, l’employeur n’aura pas à vérifier les critères administratifs du candidat.
-                                {% elif request.user.is_siae_staff %}
+                                {% elif request.user.kind == UserKind.SIAE_STAFF %}
                                     Tant que l’éligibilité IAE est valide, vous n’aurez pas à vérifier les critères administratifs du candidat.
-                                {% elif request.user.is_job_seeker %}
+                                {% elif request.user.kind == UserKind.JOB_SEEKER %}
                                     Tant que votre éligibilité IAE est valide, l’employeur n’aura pas à vérifier vos critères administratifs.
                                 {% endif %}
                             </p>
                         {% else %}
-                            {% if request.user.is_prescriber %}
+                            {% if request.user.kind == UserKind.PRESCRIBER %}
                                 <p class="mb-2">
                                     <strong>Information</strong>
                                 </p>
                                 <p class="mb-0">En cas d’embauche, l’employeur se chargera de vérifier et valider l’éligibilité IAE du candidat.</p>
-                            {% elif request.user.is_job_seeker %}
+                            {% elif request.user.kind == UserKind.JOB_SEEKER %}
                                 <p class="mb-2">
                                     <strong>Information</strong>
                                 </p>
@@ -86,7 +86,7 @@
                         <p class="mb-2">
                             <strong>Bon à savoir</strong>
                         </p>
-                        {% if request.user.is_siae_staff %}
+                        {% if request.user.kind == UserKind.SIAE_STAFF %}
                             <p class="mb-0">Précisez dans le message :</p>
                             <ul class="mb-0">
                                 <li>les motivations du candidat,</li>
@@ -95,7 +95,7 @@
                             </ul>
                         {% else %}
                             <p class="mb-0">
-                                {% if request.user.is_job_seeker %}
+                                {% if request.user.kind == UserKind.JOB_SEEKER %}
                                     Pour retenir l’attention du recruteur, décrivez votre situation,
                                     votre parcours, vos compétences et expliquez les freins socio-professionnels rencontrés.
                                     <br />
@@ -176,7 +176,7 @@
 {% endblock %}
 
 {% block form_submit_button %}
-    {% if request.user.is_siae_staff %}
+    {% if request.user.kind == UserKind.SIAE_STAFF %}
         <button type="submit" class="btn btn-primary">Enregistrer</button>
     {% else %}
         <button type="submit" class="btn btn-primary">Envoyer la candidature</button>

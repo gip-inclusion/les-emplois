@@ -10,6 +10,7 @@ from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.models import Siae
+from itou.users.enums import UserKind
 from itou.users.models import User
 
 
@@ -59,7 +60,7 @@ def get_hiring_siae(job_seeker):
     around the fact that we do not have a proper approval=>siae
     link yet.
     """
-    assert job_seeker.is_job_seeker
+    assert job_seeker.kind == UserKind.JOB_SEEKER
     hirings = [ja for ja in job_seeker.job_applications.all() if ja.state == JobApplicationWorkflow.STATE_ACCEPTED]
     if hirings:
         latest_hiring = max(hirings, key=attrgetter("created_at"))

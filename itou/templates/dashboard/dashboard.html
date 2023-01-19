@@ -111,7 +111,7 @@
 
     {# welcoming_tour desactivé spécifiquement pour les institutions partenaires #}
     {# en attendant une carte plus globale sur le sujet #}
-    {% if user.joined_recently and not user.is_labor_inspector %}
+    {% if user.joined_recently and not user.kind == UserKind.LABOR_INSPECTOR %}
         {% include "welcoming_tour/includes/message.html" %}
     {% endif %}
 {% endblock %}
@@ -125,7 +125,7 @@
                     <div class="s-banner-01__col col-12">
                         <div class="d-flex flex-column flex-md-row">
                             <div class="w-100 mt-3 pl-0 pl-md-3">
-                                {% if user.is_prescriber %}
+                                {% if user.kind == UserKind.PRESCRIBER %}
                                     <p class="h3 mb-2">Consultez l’offre de service de vos partenaires</p>
                                     <p>
                                         DORA vous aide dans la levée des freins périphériques bloquant le retour à l'emploi des bénéficiaires en facilitant l’identification des services d’insertion adaptés.
@@ -148,7 +148,7 @@
                                             <i class="ri-external-link-line ri-lg"></i>
                                         </a>
                                     </p>
-                                {% elif user.is_siae_staff %}
+                                {% elif user.kind == UserKind.SIAE_STAFF %}
                                     <p class="h3 mb-2">Donnez de la visibilité à votre offre d’insertion</p>
                                     <p>
                                         DORA est une cartographie numérique de l'offre d'insertion nationale. Rendez vos services visibles sur votre territoire et sur tous les sites partenaires, grâce à notre démarche collective d'ouverture des données.
@@ -185,7 +185,9 @@
 
     <h1 class="h1">
         Tableau de bord
-        {% if user.is_job_seeker and user.get_full_name %}- <span class="text-muted">{{ user.get_full_name }}</span>{% endif %}
+        {% if user.kind == UserKind.JOB_SEEKER and user.get_full_name %}
+            - <span class="text-muted">{{ user.get_full_name }}</span>
+        {% endif %}
         {% if current_siae %}- <span class="text-muted">{{ current_siae.display_name }}</span>{% endif %}
         {% if current_prescriber_organization %}
             -
@@ -206,19 +208,19 @@
 
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 mt-3">
 
-        {% if user.is_staff %}
+        {% if user.kind == UserKind.DJANGO_STAFF %}
             {% include "dashboard/includes/admin_card.html" %}
         {% endif %}
 
-        {% if user.is_job_seeker %}
+        {% if user.kind == UserKind.JOB_SEEKER %}
             {% include "dashboard/includes/job_seeker_job_applications_card.html" %}
             {% if user.latest_common_approval %}
                 {% include "dashboard/includes/job_seeker_approval_card.html" %}
             {% endif %}
         {% endif %}
-        {# end of if user.is_job_seeker #}
+        {# end of if user.kind == UserKind.JOB_SEEKER #}
 
-        {% if user.is_prescriber %}
+        {% if user.kind == UserKind.PRESCRIBER %}
 
             {% if current_prescriber_organization %}
                 {% include "dashboard/includes/prescriber_organisation_card.html" %}
@@ -227,9 +229,9 @@
             {% include "dashboard/includes/prescriber_job_applications_card.html" %}
 
         {% endif %}
-        {# end of if user.is_prescriber #}
+        {# end of if user.kind == UserKind.PRESCRIBER #}
 
-        {% if user.is_siae_staff %}
+        {% if user.kind == UserKind.SIAE_STAFF %}
             {% include "dashboard/includes/siae_card.html" %}
             {% include "dashboard/includes/siae_job_applications_card.html" %}
             {% if current_siae.is_subject_to_eligibility_rules %}
@@ -241,12 +243,12 @@
             {% endif %}
 
         {% endif %}
-        {# end of if user.is_siae_staff #}
+        {# end of if user.kind == UserKind.SIAE_STAFF #}
 
-        {% if user.is_labor_inspector %}
+        {% if user.kind == UserKind.LABOR_INSPECTOR %}
             {% include "dashboard/includes/labor_inspector_organization_card.html" %}
         {% endif %}
-        {# end of if user.is_labor_inspector #}
+        {# end of if user.kind == UserKind.LABOR_INSPECTOR #}
 
         {% if can_view_stats_dashboard_widget %}
             {% include "dashboard/includes/stats.html" %}
@@ -256,7 +258,7 @@
             {% include "dashboard/includes/labor_inspector_evaluation_campains_card.html" %}
         {% endif %}
 
-        {% if user.is_siae_staff or user.is_prescriber %}
+        {% if user.kind == UserKind.SIAE_STAFF or user.kind == UserKind.PRESCRIBER %}
             {% include "dashboard/includes/dora_card.html" with siret=current_org.siret tracker="utm_source=LesEmplois&utm_medium=blocLesEmplois&utm_campaign=dashboard" %}
         {% endif %}
     </div>

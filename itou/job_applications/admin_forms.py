@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 
 from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication
+from itou.users.enums import UserKind
 
 
 class JobApplicationAdminForm(forms.ModelForm):
@@ -19,7 +20,7 @@ class JobApplicationAdminForm(forms.ModelForm):
         if sender_kind == SenderKind.JOB_SEEKER:
             if sender is None:
                 raise ValidationError("Emetteur candidat manquant.")
-            if not sender.is_job_seeker:
+            if sender.kind != UserKind.JOB_SEEKER:
                 raise ValidationError("Emetteur du mauvais type.")
 
         if sender_kind == SenderKind.SIAE_STAFF:
@@ -29,7 +30,7 @@ class JobApplicationAdminForm(forms.ModelForm):
                 raise ValidationError("Emetteur SIAE manquant.")
             else:
                 # Sender is optional, but if it exists, check its role.
-                if not sender.is_siae_staff:
+                if sender.kind != UserKind.SIAE_STAFF:
                     raise ValidationError("Emetteur du mauvais type.")
 
         elif sender_siae is not None:
@@ -38,7 +39,7 @@ class JobApplicationAdminForm(forms.ModelForm):
         if sender_kind == SenderKind.PRESCRIBER:
             if sender:
                 # Sender is optional, but if it exists, check its role.
-                if not sender.is_prescriber:
+                if sender.kind != UserKind.PRESCRIBER:
                     raise ValidationError("Emetteur du mauvais type.")
                 # Request organization only if prescriber is linked to organization
                 if sender.is_prescriber_with_org and sender_prescriber_organization is None:

@@ -1,7 +1,7 @@
 {% load redirection_fields %}
 
 {% if user.is_authenticated %}
-    {% if user.is_siae_staff and user_siaes|length > 1 %}
+    {% if user.kind == UserKind.SIAE_STAFF and user_siaes|length > 1 %}
         <li class="dropdown">
             <button type="button" class="btn {{ button_size }} btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown" aria-expanded="false">
                 ({{ current_siae.kind }}) {{ current_siae.display_name|truncatechars:50 }}
@@ -25,7 +25,7 @@
             </div>
         </li>
     {% endif %}
-    {% if user.is_prescriber and user_prescriberorganizations|length > 1 %}
+    {% if user.kind == UserKind.PRESCRIBER and user_prescriberorganizations|length > 1 %}
         <li class="dropdown">
             <button type="button" class="btn {{ button_size }} btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown" aria-expanded="false">
                 ({{ current_prescriber_organization.kind }}) {{ current_prescriber_organization.display_name|truncatechars:50 }}
@@ -50,7 +50,7 @@
         </li>
     {% endif %}
 
-    {% if user.is_labor_inspector and user_institutions|length > 1 %}
+    {% if user.kind == UserKind.LABOR_INSPECTOR and user_institutions|length > 1 %}
         <li class="dropdown">
             <button type="button" class="btn {{ button_size }} btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown" aria-expanded="false">
                 ({{ current_institution.kind }}) {{ current_institution.display_name|truncatechars:50 }}
@@ -101,7 +101,7 @@
                 <li>
                     <a class="dropdown-item text-primary" href="{% url 'dashboard:index' %}">Tableau de bord</a>
                 </li>
-                {% if user.is_siae_staff %}
+                {% if user.kind == UserKind.SIAE_STAFF %}
                     <li>
                         <a class="dropdown-item text-primary" href="{% url 'dashboard:edit_user_notifications' %}">Mes notifications</a>
                     </li>

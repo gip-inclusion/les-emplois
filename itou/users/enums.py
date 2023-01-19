@@ -8,6 +8,7 @@ from django.db import models
 KIND_JOB_SEEKER = "job_seeker"
 KIND_PRESCRIBER = "prescriber"
 KIND_SIAE_STAFF = "siae_staff"
+# Members of DDETS, DREETS or DGEFP institution have their own dashboard.
 KIND_LABOR_INSPECTOR = "labor_inspector"
 KIND_ITOU_STAFF = "itou_staff"
 

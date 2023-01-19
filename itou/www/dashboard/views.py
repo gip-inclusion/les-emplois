@@ -19,6 +19,7 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.siae_evaluations.constants import CAMPAIGN_VIEWABLE_DURATION
 from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
 from itou.siaes.models import Siae, SiaeFinancialAnnex
+from itou.users.enums import UserKind
 from itou.utils import constants as global_constants
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
@@ -46,7 +47,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
     # `current_org` can be a Siae, a PrescriberOrganization or an Institution.
     current_org = None
 
-    if request.user.is_siae_staff:
+    if request.user.kind == UserKind.SIAE_STAFF:
         current_org = get_current_siae_or_404(request)
         can_show_financial_annexes = current_org.convention_can_be_accessed_by(request.user)
         can_show_employee_records = current_org.can_use_employee_record
@@ -100,13 +101,13 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
             # to avoid support tickets.
             show_previous_year_financial_annex_info = True
 
-    if request.user.is_prescriber:
+    if request.user.kind == UserKind.PRESCRIBER:
         try:
             current_org = get_current_org_or_404(request)
         except Http404:
             pass
 
-    if request.user.is_labor_inspector:
+    if request.user.kind == UserKind.LABOR_INSPECTOR:
         current_org = get_current_institution_or_404(request)
         active_campaigns = EvaluationCampaign.objects.for_institution(current_org).viewable()
         campaign_in_progress = any(campaign.ended_at is None for campaign in active_campaigns)
@@ -135,7 +136,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "precriber_kind_dept": PrescriberOrganizationKind.DEPT,
         "show_previous_year_financial_annex_info": show_previous_year_financial_annex_info,
         "show_dora_banner": (
-            any([request.user.is_siae_staff, request.user.is_prescriber])
+            request.user.kind in [UserKind.SIAE_STAFF, UserKind.PRESCRIBER]
             and current_org
             and current_org.department in ["08", "60", "91", "974"]
         ),
@@ -182,7 +183,7 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
     """
     dashboard_url = reverse_lazy("dashboard:index")
     prev_url = get_safe_url(request, "prev_url", fallback_url=dashboard_url)
-    form_class = EditJobSeekerInfoForm if request.user.is_job_seeker else EditUserInfoForm
+    form_class = EditJobSeekerInfoForm if request.user.kind == UserKind.JOB_SEEKER else EditUserInfoForm
     form = form_class(instance=request.user, data=request.POST or None)
     extra_data = request.user.externaldataimport_set.pe_sources().first()
 
@@ -291,7 +292,7 @@ def switch_institution(request):
 
 @login_required
 def edit_user_notifications(request, template_name="dashboard/edit_user_notifications.html"):
-    if not request.user.is_siae_staff:
+    if request.user.kind != UserKind.SIAE_STAFF:
         raise PermissionDenied
 
     current_siae_pk = request.session.get(global_constants.ITOU_SESSION_CURRENT_SIAE_KEY)

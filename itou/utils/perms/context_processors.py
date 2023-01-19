@@ -1,6 +1,7 @@
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 
+from itou.users.enums import UserKind
 from itou.utils import constants as global_constants
 
 
@@ -141,22 +142,22 @@ def get_context_institution(user, institution_pk):
 
 
 def user_to_account_type(user):
-    if user.is_job_seeker:
+    if user.kind == UserKind.JOB_SEEKER:
         return {
             "account_type": "job_seeker",
             "account_sub_type": "job_seeker_with_peconnect" if user.is_peamu else "job_seeker_without_peconnect",
         }
-    elif user.is_siae_staff:
+    elif user.kind == UserKind.SIAE_STAFF:
         return {
             "account_type": "employer",
             "account_sub_type": "employer_not_admin",
         }
-    elif user.is_prescriber:
+    elif user.kind == UserKind.PRESCRIBER:
         return {
             "account_type": "prescriber",
             "account_sub_type": "prescriber_without_org",
         }
-    elif user.is_labor_inspector:
+    elif user.kind == UserKind.LABOR_INSPECTOR:
         return {
             "account_type": "labor_inspector",
             "account_sub_type": "inspector_not_admin",

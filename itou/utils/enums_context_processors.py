@@ -1,4 +1,5 @@
 import itou.job_applications.enums as job_aplication_enums
+import itou.users.enums as users_enums
 
 
 def expose_enums(*args):
@@ -8,5 +9,6 @@ def expose_enums(*args):
     """
 
     return {
+        "UserKind": users_enums.UserKind,
         "SenderKind": job_aplication_enums.SenderKind,
     }

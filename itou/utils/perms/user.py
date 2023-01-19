@@ -4,6 +4,7 @@ from collections import namedtuple
 from django.conf import settings
 from hijack import signals
 
+from itou.users.enums import UserKind
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
 
@@ -26,14 +27,14 @@ def get_user_info(request):
     siae = None
     prescriber_organization = None
 
-    if request.user.is_job_seeker:
+    if request.user.kind == UserKind.JOB_SEEKER:
         kind = request.user.kind
 
-    if request.user.is_siae_staff:
+    if request.user.kind == UserKind.SIAE_STAFF:
         kind = request.user.kind
         siae = get_current_siae_or_404(request)
 
-    if request.user.is_prescriber:
+    if request.user.kind == UserKind.PRESCRIBER:
         kind = request.user.kind
         if request.user.is_prescriber_with_org:
             prescriber_organization = get_current_org_or_404(request)

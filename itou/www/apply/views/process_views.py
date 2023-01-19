@@ -18,6 +18,7 @@ from django_xworkflows import models as xwf_models
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.models import Siae
+from itou.users.enums import UserKind
 from itou.users.models import ApprovalAlreadyExistsError
 from itou.utils import constants as global_constants
 from itou.utils.perms.prescriber import get_all_available_job_applications_as_prescriber
@@ -85,7 +86,7 @@ def details_for_siae(request, job_application_id, template_name="apply/process_d
 
 
 @login_required
-@user_passes_test(lambda u: u.is_prescriber, login_url="/", redirect_field_name=None)
+@user_passes_test(lambda u: u.kind == UserKind.PRESCRIBER, login_url="/", redirect_field_name=None)
 def details_for_prescriber(request, job_application_id, template_name="apply/process_details_prescriber.html"):
     """
     Detail of an application for an SIAE with the ability:

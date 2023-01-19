@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.urls import reverse_lazy
 
 from itou.common_apps.organizations.views import deactivate_org_member, update_org_admin_role
+from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.perms.institution import get_current_institution_or_404
 
@@ -25,7 +26,7 @@ def member_list(request, template_name="institutions/members.html"):
     pending_invitations = None
     # Institution members can only be labor inspectors for the moment,
     # but this is likely to change in the future.
-    if request.user.is_labor_inspector:
+    if request.user.kind == UserKind.LABOR_INSPECTOR:
         pending_invitations = institution.labor_inspectors_invitations.pending()
 
     context = {

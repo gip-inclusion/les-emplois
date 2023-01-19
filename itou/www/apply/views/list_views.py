@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.utils.text import slugify
 
 from itou.job_applications.csv_export import generate_csv_export
+from itou.users.enums import UserKind
 from itou.utils.pagination import pager
 from itou.utils.perms.prescriber import get_all_available_job_applications_as_prescriber
 from itou.utils.perms.siae import get_current_siae_or_404
@@ -20,7 +21,7 @@ def _add_user_can_view_personal_information(job_applications, can_view):
 
 
 @login_required
-@user_passes_test(lambda u: u.is_job_seeker, login_url="/", redirect_field_name=None)
+@user_passes_test(lambda u: u.kind == UserKind.JOB_SEEKER, login_url="/", redirect_field_name=None)
 def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html"):
     """
     List of applications for a job seeker.
@@ -49,7 +50,7 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
 
 
 @login_required
-@user_passes_test(lambda u: u.is_prescriber, login_url="/", redirect_field_name=None)
+@user_passes_test(lambda u: u.kind == UserKind.PRESCRIBER, login_url="/", redirect_field_name=None)
 def list_for_prescriber(request, template_name="apply/list_for_prescriber.html"):
     """
     List of applications for a prescriber.
@@ -79,7 +80,7 @@ def list_for_prescriber(request, template_name="apply/list_for_prescriber.html")
 
 
 @login_required
-@user_passes_test(lambda u: u.is_prescriber, login_url="/", redirect_field_name=None)
+@user_passes_test(lambda u: u.kind == UserKind.PRESCRIBER, login_url="/", redirect_field_name=None)
 def list_for_prescriber_exports(request, template_name="apply/list_of_available_exports.html"):
     """
     List of applications for a prescriber, sorted by month, displaying the count of applications per month
@@ -94,7 +95,7 @@ def list_for_prescriber_exports(request, template_name="apply/list_of_available_
 
 
 @login_required
-@user_passes_test(lambda u: u.is_prescriber, login_url="/", redirect_field_name=None)
+@user_passes_test(lambda u: u.kind == UserKind.PRESCRIBER, login_url="/", redirect_field_name=None)
 def list_for_prescriber_exports_download(request, month_identifier):
     """
     List of applications for a prescriber for a given month identifier (YYYY-mm),

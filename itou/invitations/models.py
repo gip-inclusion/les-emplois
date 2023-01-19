@@ -170,7 +170,7 @@ class PrescriberWithOrgInvitation(InvitationAbstract):
 
     def guest_can_join_organization(self, request):
         user = get_object_or_404(User, email=self.email)
-        return user == request.user and user.is_prescriber
+        return user == request.user and user.kind == UserKind.PRESCRIBER
 
     def set_guest_type(self, user):
         user.kind = UserKind.PRESCRIBER
@@ -244,7 +244,7 @@ class SiaeStaffInvitation(InvitationAbstract):
 
     def guest_can_join_siae(self, request):
         user = get_object_or_404(User, email=self.email)
-        return user == request.user and user.is_siae_staff
+        return user == request.user and user.kind == UserKind.SIAE_STAFF
 
     def set_guest_type(self, user):
         user.kind = UserKind.SIAE_STAFF
@@ -320,7 +320,7 @@ class LaborInspectorInvitation(InvitationAbstract):
 
     def guest_can_join_institution(self, request):
         user = get_object_or_404(User, email=self.email)
-        return user == request.user and user.is_labor_inspector
+        return user == request.user and user.kind == UserKind.LABOR_INSPECTOR
 
     def set_guest_type(self, user):
         user.kind = UserKind.LABOR_INSPECTOR

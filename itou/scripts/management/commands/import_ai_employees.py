@@ -22,6 +22,7 @@ from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.enums import SiaeKind
 from itou.siaes.models import Siae
+from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.management_commands import DeprecatedLoggerMixin
 from itou.utils.validators import validate_nir
@@ -300,7 +301,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
             not_same_nir = job_seeker.nir and job_seeker.nir != row[NIR_COL]
             if not_same_nir:
                 self.logger.info(f"User found but with a different NIR: {job_seeker.email}. Creating a new one.")
-            if not job_seeker.is_job_seeker or not_same_nir:
+            if job_seeker.kind != UserKind.JOB_SEEKER or not_same_nir:
                 # If job seeker is not a job seeker, create a new one.
                 user_data["email"] = self.fake_email()
                 job_seeker = None
