@@ -154,6 +154,7 @@ TEMPLATES = [
                 # Itou.
                 "itou.utils.perms.context_processors.get_current_organization_and_perms",
                 "itou.utils.settings_context_processors.expose_settings",
+                "itou.utils.enums_context_processors.expose_enums",
             ]
         },
     }

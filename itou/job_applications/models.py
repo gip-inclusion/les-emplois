@@ -416,20 +416,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         - https://github.com/rbarrois/xworkflows
     """
 
-    # Copy those values here, as they are used in templates ( `if self.kind == self.SENDER_KIND_XXX` )
-    # It's either this, or:
-    # - we create special properties such as `is_job_seeker()`, but this is ugly and tedious.
-    # - we inject the SenderKind constants through the context, but it needs to be passed down to includes
-    #   which makes them extra complex (template arguments) for no good reason.
-    # - we create a global context that includes those constants but it's hiding the logic somewhere and
-    #   thus creating "magic" templates.
-    # - we split the views for every kind, but it's not trivial since we would have to refactor the included
-    #   templates logic for every view.
-    # This is not very DRY, but clearly is the clearest solution. Disclaimer: I tried the others.
-    SENDER_KIND_JOB_SEEKER = SenderKind.JOB_SEEKER
-    SENDER_KIND_PRESCRIBER = SenderKind.PRESCRIBER
-    SENDER_KIND_SIAE_STAFF = SenderKind.SIAE_STAFF
-
     # SIAE have the possibility to update the hiring date if:
     # - it is before the end date of an approval created for this job application
     # - it is in the future, max. MAX_CONTRACT_POSTPONE_IN_DAYS days from today.
@@ -822,7 +808,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         ]
 
         # Send email to prescriber or orienter if any
-        if self.sender_kind == self.SENDER_KIND_PRESCRIBER:
+        if self.sender_kind == SenderKind.PRESCRIBER:
             emails.append(self.get_email_transfer_prescriber(transferred_by, self.transferred_from, target_siae))
 
         send_email_messages(emails)

@@ -16,13 +16,13 @@
 
             {% if request.user == job_application.sender %}
                 Vous
-            {% elif job_application.sender_kind == job_application.SENDER_KIND_JOB_SEEKER %}
+            {% elif job_application.sender_kind == SenderKind.JOB_SEEKER %}
                 Le candidat lui même
             {% else %}
                 {{ job_application.sender.get_full_name }}
             {% endif %}
 
-            {% if job_application.sender_kind == job_application.SENDER_KIND_PRESCRIBER %}
+            {% if job_application.sender_kind == SenderKind.PRESCRIBER %}
                 {% if job_application.sender_prescriber_organization %}
                     <br>
                     <b>{{ job_application.sender_prescriber_organization.display_name }}</b>
@@ -33,7 +33,7 @@
                 {% endif %}
             {% endif %}
 
-            {% if job_application.sender_kind == job_application.SENDER_KIND_SIAE_STAFF %}
+            {% if job_application.sender_kind == SenderKind.SIAE_STAFF %}
                 <br>
                 <b>{{ job_application.sender_siae.display_name }}</b>
                 {% if request.user.is_siae_staff %}
