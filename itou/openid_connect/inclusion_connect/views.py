@@ -13,7 +13,7 @@ from django.utils import crypto
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 
-from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF, UserKind
+from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF, IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils.constants import ITOU_ASSISTANCE_URL
 from itou.utils.urls import get_absolute_url
@@ -41,6 +41,8 @@ class InclusionConnectSession:
     next_url: str = None
     user_email: str = None
     user_kind: str = None
+    user_firstname: str = None
+    user_lastname: str = None
     request: str = None
     key: str = constants.INCLUSION_CONNECT_SESSION_KEY
     channel: str = None
@@ -75,9 +77,12 @@ def _generate_inclusion_params_from_session(ic_session):
         "nonce": crypto.get_random_string(length=12),
         "from": "emplois",  # Display a "Les emplois" logo on the connection page.
     }
-    user_email = ic_session.get("user_email")
-    if user_email is not None:
+    if (user_email := ic_session.get("user_email")) is not None:
         data["login_hint"] = user_email
+    if (lastname := ic_session.get("user_lastname")) is not None:
+        data["lastname"] = lastname
+    if (firstname := ic_session.get("user_firstname")) is not None:
+        data["firstname"] = firstname
     return data
 
 
@@ -106,10 +111,10 @@ def inclusion_connect_authorize(request):
     user_email = request.GET.get("user_email")
     channel = request.GET.get("channel")
     if user_email:
-        if not channel:
-            return _redirect_to_login_page_on_error(error_msg="channel is missing when user_email is present.")
         ic_session["user_email"] = user_email
         ic_session["channel"] = channel
+        ic_session["user_firstname"] = request.GET.get("user_firstname")
+        ic_session["user_lastname"] = request.GET.get("user_lastname")
         request.session.modified = True
 
     data = _generate_inclusion_params_from_session(ic_session)
@@ -135,6 +140,37 @@ def inclusion_connect_resume_registration(request):
         return HttpResponseRedirect(reverse("home:hp"))
     data = _generate_inclusion_params_from_session(ic_session)
     return HttpResponseRedirect(f"{constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE}?{urlencode(data)}")
+
+
+def inclusion_connect_activate_account(request):
+    params = request.GET.copy()
+    email = params.get("user_email")
+    if not email:
+        return HttpResponseRedirect(params.get("previous_url", reverse("home:hp")))
+
+    user_kind = params.get("user_kind")
+    user = User.objects.filter(email=email).first()
+
+    if not user:
+        params["register"] = True
+        request.GET = params
+        return inclusion_connect_authorize(request)
+
+    if user.kind != user_kind:
+        _add_user_kind_error_message(request, user, request.GET.get("user_kind"))
+        return HttpResponseRedirect(params.get("previous_url", reverse("home:hp")))
+
+    if user.identity_provider == IdentityProvider.INCLUSION_CONNECT:
+        params["channel"] = InclusionConnectChannel.ACTIVATION
+        request.GET = params
+        return inclusion_connect_authorize(request)
+
+    params["channel"] = InclusionConnectChannel.ACTIVATION
+    params["user_firstname"] = user.first_name
+    params["user_lastname"] = user.last_name
+    params["register"] = True
+    request.GET = params
+    return inclusion_connect_authorize(request)
 
 
 def _get_token(request, code):
@@ -217,19 +253,18 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
     ic_session_email = ic_session.get("user_email")
 
     if ic_session_email and ic_session_email != ic_user_data.email:
-        errors = {
-            InclusionConnectChannel.POLE_EMPLOI: (
-                "L’adresse e-mail que vous avez utilisée pour vous connecter avec Inclusion Connect "
-                f"({ic_user_data.email}) "
-                f"est différente de celle que vous avez indiquée précédemment ({ic_session_email})."
-            ),
-            InclusionConnectChannel.INVITATION: (
+        if ic_session["channel"] == InclusionConnectChannel.INVITATION:
+            error = (
                 "L’adresse e-mail que vous avez utilisée pour vous connecter avec Inclusion Connect "
                 f"({ic_user_data.email}) "
                 f"ne correspond pas à l’adresse e-mail de l’invitation ({ic_session_email})."
-            ),
-        }
-        error = errors[ic_session["channel"]]
+            )
+        else:
+            error = (
+                "L’adresse e-mail que vous avez utilisée pour vous connecter avec Inclusion Connect "
+                f"({ic_user_data.email}) "
+                f"est différente de celle que vous avez indiquée précédemment ({ic_session_email})."
+            )
         messages.error(request, error)
         is_successful = False
 

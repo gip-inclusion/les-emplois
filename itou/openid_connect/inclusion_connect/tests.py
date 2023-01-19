@@ -23,8 +23,15 @@ from freezegun import freeze_time
 
 from itou.openid_connect.inclusion_connect.views import InclusionConnectSession
 from itou.users import enums as users_enums
-from itou.users.enums import UserKind
-from itou.users.factories import DEFAULT_PASSWORD, PrescriberFactory, UserFactory
+from itou.users.enums import IdentityProvider, UserKind
+from itou.users.factories import (
+    DEFAULT_PASSWORD,
+    JobSeekerFactory,
+    LaborInspectorFactory,
+    PrescriberFactory,
+    SiaeStaffFactory,
+    UserFactory,
+)
 from itou.users.models import User
 
 from ..constants import OIDC_STATE_CLEANUP
@@ -446,6 +453,55 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
             self.assertContains(response, "existe déjà avec cette adresse e-mail")
             self.assertContains(response, "pour devenir employeur sur la plateforme")
             user.delete()
+
+
+class InclusionConnectAccountActivationTest(InclusionConnectBaseTestCase):
+    def test_new_user(self):
+        params = {"user_email": OIDC_USERINFO["email"], "user_kind": UserKind.PRESCRIBER}
+        url = f"{reverse('inclusion_connect:activate_account')}?{urlencode(params)}"
+        response = self.client.get(url, follow=False)
+        assert response.url.startswith(constants.INCLUSION_CONNECT_ENDPOINT_REGISTER)
+        assert constants.INCLUSION_CONNECT_SESSION_KEY in self.client.session
+        assert f"login_hint={quote(OIDC_USERINFO['email'])}" in response.url
+
+    def test_existing_django_user(self):
+        user = PrescriberFactory(identity_provider=IdentityProvider.DJANGO)
+        params = {"user_email": user.email, "user_kind": UserKind.PRESCRIBER}
+        url = f"{reverse('inclusion_connect:activate_account')}?{urlencode(params)}"
+        response = self.client.get(url, follow=False)
+        assert response.url.startswith(constants.INCLUSION_CONNECT_ENDPOINT_REGISTER)
+        assert constants.INCLUSION_CONNECT_SESSION_KEY in self.client.session
+        assert f"login_hint={quote(user.email)}" in response.url
+        assert f"firstname={user.first_name}" in response.url
+        assert f"lastname={user.last_name}" in response.url
+
+    def test_existing_ic_user(self):
+        user = PrescriberFactory(identity_provider=IdentityProvider.INCLUSION_CONNECT)
+        params = {"user_email": user.email, "user_kind": UserKind.PRESCRIBER}
+        url = f"{reverse('inclusion_connect:activate_account')}?{urlencode(params)}"
+        response = self.client.get(url, follow=False)
+        assert response.url.startswith(constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE)
+        assert constants.INCLUSION_CONNECT_SESSION_KEY in self.client.session
+        assert f"login_hint={quote(user.email)}" in response.url
+
+    def test_bad_user_kind(self):
+        for user in [JobSeekerFactory(), PrescriberFactory(), SiaeStaffFactory(), LaborInspectorFactory()]:
+            user_kind = UserKind.PRESCRIBER if user.kind != UserKind.PRESCRIBER else UserKind.SIAE_STAFF
+            with self.subTest(user_kind=user_kind):
+                params = {"user_email": user.email, "user_kind": user_kind}
+                url = f"{reverse('inclusion_connect:activate_account')}?{urlencode(params)}"
+                response = self.client.get(url, follow=True)
+                self.assertRedirects(response, reverse("home:hp"))
+                self.assertContains(response, "existe déjà avec cette adresse e-mail")
+                self.assertContains(
+                    response, "Vous devez créer un compte Inclusion Connect avec une autre adresse e-mail"
+                )
+
+    def test_no_email(self):
+        params = {"user_kind": UserKind.PRESCRIBER}
+        url = f"{reverse('inclusion_connect:activate_account')}?{urlencode(params)}"
+        response = self.client.get(url, follow=True)
+        self.assertRedirects(response, reverse("home:hp"))
 
 
 class InclusionConnectSessionTest(InclusionConnectBaseTestCase):
