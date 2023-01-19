@@ -47,7 +47,7 @@ def handle_invited_user_registration_with_django(request, invitation, invitation
 def handle_invited_user_registration_with_inclusion_connect(request, invitation, invitation_type):
     params = {
         "user_kind": invitation_type,
-        "login_hint": invitation.email,
+        "user_email": invitation.email,
         "channel": InclusionConnectChannel.INVITATION.value,
         "previous_url": request.get_full_path(),
         "next_url": get_safe_url(request, "redirect_to"),

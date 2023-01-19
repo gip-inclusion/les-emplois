@@ -75,9 +75,9 @@ def _generate_inclusion_params_from_session(ic_session):
         "nonce": crypto.get_random_string(length=12),
         "from": "emplois",  # Display a "Les emplois" logo on the connection page.
     }
-    login_hint = ic_session.get("user_email")
-    if login_hint is not None:
-        data["login_hint"] = login_hint
+    user_email = ic_session.get("user_email")
+    if user_email is not None:
+        data["login_hint"] = user_email
     return data
 
 
@@ -103,12 +103,12 @@ def inclusion_connect_authorize(request):
     request = ic_session.bind_to_request(request)
     ic_session = request.session[constants.INCLUSION_CONNECT_SESSION_KEY]
 
-    login_hint = request.GET.get("login_hint")
+    user_email = request.GET.get("user_email")
     channel = request.GET.get("channel")
-    if login_hint:
+    if user_email:
         if not channel:
-            return _redirect_to_login_page_on_error(error_msg="channel is missing when login_hint is present.")
-        ic_session["user_email"] = login_hint
+            return _redirect_to_login_page_on_error(error_msg="channel is missing when user_email is present.")
+        ic_session["user_email"] = user_email
         ic_session["channel"] = channel
         request.session.modified = True
 
