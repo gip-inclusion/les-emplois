@@ -33,7 +33,7 @@ class Command(BaseCommand):
                 [id_itou, number, _, _, _, name, first_name, birthday] = line.split(CSV_SEPARATOR)[:8]
                 approval = Approval.objects.select_related("user").get(number=number)
                 user = approval.user
-                if id_itou == user.jobseeker_hash_id:
+                if id_itou == user.asp_uid:
                     debug_log(f"> HASH ID MATCH for pass={number} user={user}")
                     self.stdout.write(line)
                 else:

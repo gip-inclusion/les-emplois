@@ -822,7 +822,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
             assert row[PASS_IAE_NUMBER_COL] == approval.number
             assert row[PASS_IAE_START_DATE_COL] == approval.start_at.strftime(DATE_FORMAT)
             assert row[PASS_IAE_END_DATE_COL] == approval.end_at.strftime(DATE_FORMAT)
-            assert row[USER_PK_COL] == job_seeker.jobseeker_hash_id
+            assert row[USER_PK_COL] == job_seeker.asp_uid
             assert row[USER_ITOU_EMAIL_COL] == job_seeker.email
 
         # Clean

@@ -192,7 +192,6 @@ class ItouUserAdmin(UserAdmin):
     readonly_fields = (
         "pk",
         "asp_uid",
-        "jobseeker_hash_id",
         "identity_provider",
         "address_in_qpv",
         "is_staff",
@@ -205,7 +204,6 @@ class ItouUserAdmin(UserAdmin):
                 "fields": (
                     "pk",
                     "asp_uid",
-                    "jobseeker_hash_id",
                     "title",
                     "birthdate",
                     "birth_place",
@@ -253,10 +251,6 @@ class ItouUserAdmin(UserAdmin):
 
     is_created_by_a_proxy.boolean = True
     is_created_by_a_proxy.short_description = "créé par un tiers"
-
-    @admin.display(description="id ITOU obfusqué")
-    def jobseeker_hash_id(self, obj):
-        return obj.jobseeker_hash_id
 
     @admin.display(description="Adresse en QPV")
     def address_in_qpv(self, obj):

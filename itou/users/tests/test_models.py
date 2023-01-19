@@ -1201,27 +1201,13 @@ class LatestApprovalTestCase(TestCase):
     ],
 )
 @override_settings(SECRET_KEY="test")
-def test_user_jobseeker_hash_id(factory, expected):
-    user = factory(pk=42)
-
-    if expected is None:
-        assert user.jobseeker_hash_id is expected
-    else:
-        assert user.jobseeker_hash_id == expected
-
-
-@pytest.mark.parametrize(
-    "factory",
-    [
-        JobSeekerFactory,
-        PrescriberFactory,
-        SiaeStaffFactory,
-        LaborInspectorFactory,
-    ],
-)
-def test_user_asp_uid(factory):
+def test_user_asp_uid(factory, expected):
     user = factory.build(pk=42)
 
     assert user.asp_uid is None
     user.save()
-    assert user.asp_uid == user.jobseeker_hash_id
+
+    if expected is None:
+        assert user.asp_uid is None
+    else:
+        assert user.asp_uid == expected

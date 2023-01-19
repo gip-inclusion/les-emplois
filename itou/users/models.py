@@ -351,7 +351,7 @@ class User(AbstractUser, AddressMixin):
         super().save(*args, **kwargs)
 
         if self.is_job_seeker and not self.asp_uid:
-            self.asp_uid = self.jobseeker_hash_id
+            self.asp_uid = salted_hmac(key_salt="job_seeker.id", value=self.id).hexdigest()[:30]
             super().save(update_fields=["asp_uid"])
 
     def can_edit_email(self, user):
@@ -815,16 +815,6 @@ class User(AbstractUser, AddressMixin):
         # Some candidates may not have accepted job applications
         # Assuming its the case can lead to issues downstream
         return self.job_applications.accepted().with_accepted_at().order_by("-accepted_at", "-hiring_start_at").first()
-
-    @cached_property
-    def jobseeker_hash_id(self):
-        """
-        Obfuscation of internal user id provided to ASP
-        """
-        if not self.is_job_seeker:
-            return None
-
-        return salted_hmac(key_salt="job_seeker.id", value=self.id).hexdigest()[:30]
 
     def last_hire_was_made_by_siae(self, siae):
         if not self.is_job_seeker:

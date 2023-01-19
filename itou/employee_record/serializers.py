@@ -34,7 +34,7 @@ class _PersonSerializer(serializers.Serializer):
 
     passIae = serializers.CharField(source="approval_number")
     sufPassIae = NullField()
-    idItou = serializers.CharField(source="job_seeker.jobseeker_hash_id")
+    idItou = serializers.CharField(source="job_seeker.asp_uid")
 
     civilite = serializers.ChoiceField(choices=Title.choices, source="job_seeker.title")
     nomUsage = serializers.SerializerMethodField()

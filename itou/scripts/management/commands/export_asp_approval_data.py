@@ -38,7 +38,7 @@ class Command(BaseCommand):
         self.stdout.write(f"params: {file_path=}, {wet_run=}")
 
         def check_id_itou(approval: Approval, id_itou: str):
-            actual_hash_id = approval.user.jobseeker_hash_id
+            actual_hash_id = approval.user.asp_uid
             if actual_hash_id != id_itou:
                 raise ItouHashError(f"User hash ids don't match {id_itou=} {actual_hash_id=}")
 

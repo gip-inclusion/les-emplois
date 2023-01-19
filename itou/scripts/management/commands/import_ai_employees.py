@@ -487,7 +487,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
             df.loc[i, PASS_IAE_NUMBER_COL] = approval.number
             df.loc[i, PASS_IAE_START_DATE_COL] = approval.start_at.strftime(DATE_FORMAT)
             df.loc[i, PASS_IAE_END_DATE_COL] = approval.end_at.strftime(DATE_FORMAT)
-            df.loc[i, USER_PK_COL] = job_seeker.jobseeker_hash_id
+            df.loc[i, USER_PK_COL] = job_seeker.asp_uid
             df.loc[i, USER_ITOU_EMAIL_COL] = job_seeker.email
 
         self.logger.info("Import is over!")
