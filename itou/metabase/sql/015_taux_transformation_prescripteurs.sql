@@ -45,7 +45,7 @@ select /* On selectionne les colonnes finales qui nous intéressent */
     /* TODO dejafait drop as soon as analistos have migrated to the new deanonymized column */
     id_candidat as id_candidat_anonymise,
     case /* ajout d'une colonne permettant de calculer le taux de candidats acceptées tout en faisant une jointure avec la table candidatures */
-        when total_embauches > 0 then concat(substring(id_candidat from 1 for 1000), '_accepté')
+        when total_embauches > 0 then concat(cast(id_candidat as varchar), '_accepté')
         else null
     end candidature_acceptée,
     actif,
