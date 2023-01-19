@@ -35,11 +35,11 @@ Nous vous confirmons que l'embauche de {{ job_application.job_seeker.get_full_na
 
 *Candidature envoyée par :*
 
-{% if job_application.sender_kind == job_application.SENDER_KIND_JOB_SEEKER %}
+{% if job_application.sender_kind == SenderKind.JOB_SEEKER %}
 Le candidat lui même.
 {% endif %}
 
-{% if job_application.sender_kind == job_application.SENDER_KIND_PRESCRIBER %}
+{% if job_application.sender_kind == SenderKind.PRESCRIBER %}
 
 - {{ job_application.sender.get_full_name }}{% if job_application.sender_prescriber_organization %}
 - {{ job_application.sender_prescriber_organization.display_name }}{% endif %}

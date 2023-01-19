@@ -6,6 +6,7 @@ from django.core import mail
 from django.template.loader import get_template
 
 from itou.utils import constants as global_constants
+from itou.utils.enums_context_processors import expose_enums
 
 
 def remove_extra_line_breaks(text):
@@ -39,6 +40,8 @@ def get_email_message(to, context, subject, body, from_email=settings.DEFAULT_FR
     subject = textwrap.shorten(
         subject_prefix + get_email_text_template(subject, context), width=250, placeholder="..."
     )
+    # Add enums in emails
+    context.update(expose_enums())
     return mail.EmailMessage(
         from_email=from_email,
         to=to,

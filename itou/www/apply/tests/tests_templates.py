@@ -5,6 +5,7 @@ from django.utils.html import escape
 
 from itou.job_applications.factories import JobApplicationSentBySiaeFactory
 from itou.users.factories import JobSeekerWithAddressFactory, UserFactory
+from itou.utils.enums_context_processors import expose_enums
 
 
 def load_template(path):
@@ -27,6 +28,7 @@ def test_job_application_auto_prescription_badge_in_list():
             {
                 "job_application": JobApplicationSentBySiaeFactory(),
                 "request": get_request(),
+                **expose_enums(),
             }
         )
     )
@@ -41,6 +43,7 @@ def test_job_application_imported_from_pe_in_list():
             {
                 "job_application": JobApplicationSentBySiaeFactory(created_from_pe_approval=True),
                 "request": get_request(),
+                **expose_enums(),
             }
         )
     )

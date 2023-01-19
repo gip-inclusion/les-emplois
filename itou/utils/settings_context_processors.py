@@ -6,7 +6,7 @@ from itou.utils import constants as global_constants
 def expose_settings(request):
     """
     Put things into the context to make them available in templates.
-    https://docs.djangoproject.com/en/2.1/ref/templates/api/#using-requestcontext
+    https://docs.djangoproject.com/en/4.1/ref/templates/api/#using-requestcontext
     """
 
     assistance_url = global_constants.ITOU_ASSISTANCE_URL
