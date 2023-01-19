@@ -12,6 +12,7 @@ from django.views import generic
 from django.views.decorators.http import require_POST
 
 from itou.siae_evaluations import enums as evaluation_enums
+from itou.siae_evaluations.emails import InstitutionEmailFactory, SIAEEmailFactory
 from itou.siae_evaluations.models import (
     EvaluatedAdministrativeCriteria,
     EvaluatedJobApplication,
@@ -191,7 +192,7 @@ class InstitutionEvaluatedSiaeNotifyView(LoginRequiredMixin, generic.UpdateView)
 
     def form_valid(self, form):
         messages.success(self.request, f"{self.object} a bien été notifiée de la sanction.")
-        email = self.object.get_email_to_siae_sanctioned()
+        email = SIAEEmailFactory(self.object).sanctioned()
         send_email_messages([email])
         return super().form_valid(form)
 
@@ -531,7 +532,7 @@ def siae_submit_proofs(request, evaluated_siae_pk):
 
         # note vincentporte : misconception. This view should be called with one evaluated_siae
         # check this impact when calling this view with evaluated_siae.pk in params
-        send_email_messages([evaluated_siae.get_email_to_institution_submitted_by_siae()])
+        send_email_messages([InstitutionEmailFactory(evaluated_siae).submitted_by_siae()])
 
         messages.success(
             request,

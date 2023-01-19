@@ -3,6 +3,7 @@ from django.core.management import BaseCommand
 from django.db.models import Exists, F, OuterRef, Q
 from django.utils import timezone
 
+from itou.siae_evaluations.emails import SIAEEmailFactory
 from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria, EvaluationCampaign
 from itou.utils.emails import send_email_messages
 
@@ -26,7 +27,7 @@ class Command(BaseCommand):
                 .select_related("evaluation_campaign__institution", "siae__convention")
             )
             for evaluated_siae in evaluated_siaes:
-                emails.append(evaluated_siae.get_email_to_siae_notify_before_adversarial_stage())
+                emails.append(SIAEEmailFactory(evaluated_siae).notify_before_adversarial_stage())
             if emails:
                 send_email_messages(emails)
                 evaluated_siaes.update(reminder_sent_at=timezone.now())
@@ -51,7 +52,7 @@ class Command(BaseCommand):
                 .select_related("evaluation_campaign__institution", "siae__convention")
             )
             for evaluated_siae in evaluated_siaes:
-                emails.append(evaluated_siae.get_email_to_siae_notify_before_campaign_close())
+                emails.append(SIAEEmailFactory(evaluated_siae).notify_before_campaign_close())
             if emails:
                 send_email_messages(emails)
                 evaluated_siaes.update(reminder_sent_at=timezone.now())
