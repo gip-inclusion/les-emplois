@@ -1,3 +1,4 @@
+from django.contrib.admin import widgets
 from django.contrib.auth.forms import UserChangeForm
 from django.core.exceptions import ValidationError
 
@@ -10,6 +11,9 @@ class UserAdminForm(UserChangeForm):
     class Meta:
         model = User
         fields = "__all__"
+        widgets = {
+            "asp_uid": widgets.AdminTextInputWidget,
+        }
 
     def clean(self):
         roles_count = (

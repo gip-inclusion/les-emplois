@@ -12,7 +12,12 @@ class Migration(migrations.Migration):
             model_name="user",
             name="asp_uid",
             field=models.TextField(
-                blank=True, max_length=30, null=True, unique=True, verbose_name="ID unique envoyé à l'ASP"
+                blank=True,
+                help_text="Si vide, une valeur sera assignée automatiquement.",
+                max_length=30,
+                null=True,
+                unique=True,
+                verbose_name="ID unique envoyé à l'ASP",
             ),
         ),
     ]

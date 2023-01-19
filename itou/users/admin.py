@@ -191,7 +191,6 @@ class ItouUserAdmin(UserAdmin):
     )
     readonly_fields = (
         "pk",
-        "asp_uid",
         "identity_provider",
         "address_in_qpv",
         "is_staff",

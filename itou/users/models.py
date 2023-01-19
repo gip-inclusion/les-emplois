@@ -231,6 +231,7 @@ class User(AbstractUser, AddressMixin):
     #  and even if it works we will need the field to store the ID already sent.
     asp_uid = models.TextField(
         verbose_name="ID unique envoyé à l'ASP",
+        help_text="Si vide, une valeur sera assignée automatiquement.",
         max_length=30,
         null=True,
         blank=True,
