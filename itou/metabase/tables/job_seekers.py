@@ -38,8 +38,8 @@ def get_user_signup_kind(user):
         return "par prescripteur"
     if creator.is_siae_staff:
         return "par employeur"
-    if creator.is_superuser:
-        return "par superuser"
+    if creator.is_staff:
+        return "par administrateur"
     raise ValueError("Unexpected job seeker creator kind")
 
 
