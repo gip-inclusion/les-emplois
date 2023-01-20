@@ -541,8 +541,8 @@ class InclusionConnectLoginTest(InclusionConnectBaseTestCase):
         # Then log in again.
         login_url = reverse("login:prescriber")
         response = self.client.get(login_url)
-        self.assertContains(response, "inclusion_connect_ico.svg")
-        self.assertContains(response, reverse("inclusion_connect:authorize"))
+        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
+        self.assertContains(response, reverse("login:activate_prescriber_account"))
 
         response = mock_oauth_dance(self, UserKind.PRESCRIBER, assert_redirects=False)
         expected_redirection = reverse("dashboard:index")

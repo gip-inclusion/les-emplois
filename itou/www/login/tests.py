@@ -65,8 +65,8 @@ class PrescriberLoginTest(InclusionConnectBaseTestCase):
         url = reverse("login:prescriber")
         response = self.client.get(url)
         assert response.status_code == 200
-        self.assertContains(response, "S'identifier avec Inclusion Connect")
-        self.assertContains(response, reverse("inclusion_connect:authorize"))
+        self.assertContains(response, "Se connecter avec Inclusion Connect")
+        self.assertContains(response, reverse("login:activate_prescriber_account"))
         self.assertContains(response, "Adresse e-mail")
         self.assertContains(response, "Mot de passe")
 
@@ -105,8 +105,8 @@ class SiaeStaffLoginTest(InclusionConnectBaseTestCase):
         url = reverse("login:siae_staff")
         response = self.client.get(url)
         assert response.status_code == 200
-        self.assertContains(response, "S'identifier avec Inclusion Connect")
-        self.assertContains(response, reverse("inclusion_connect:authorize"))
+        self.assertContains(response, "Se connecter avec Inclusion Connect")
+        self.assertContains(response, reverse("login:activate_siae_staff_account"))
         self.assertContains(response, "Adresse e-mail")
         self.assertContains(response, "Mot de passe")
 
