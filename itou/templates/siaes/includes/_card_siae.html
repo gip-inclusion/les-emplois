@@ -1,6 +1,6 @@
 {% comment %} takes argument siae <Siae>{% endcomment %}
-<div class="card c-card has-links-inside my-4">
-    <div class="bg-light p-3 p-md-4">
+<div class="card c-card has-links-inside mb-3 mb-md-4">
+    <div class="card-header bg-light pb-3">
         <p class="d-flex flex-wrap fs-sm mb-2">
             <span class="flex-grow-1 text-primary">
                 {% if siae.is_opcs %}
@@ -13,14 +13,14 @@
                 <span class="badge badge-base badge-pill badge-xs badge-accent-01-lighter text-accent-01"><b>Priorité aux bénéficiaires de la RQTH</b></span>
             {% endif %}
         </p>
-        <h3 class="h2 mb-2">
+        <h3 class="mb-2">
             <a class="matomo-event" href="{{ siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}" data-matomo-category="candidature" data-matomo-action="clic" data-matomo-option="clic-structure">{{ siae.display_name }}</a>
             {# Display non-user-edited name too, but only if it's not the same text #}
             {% if siae.brand and siae.brand|lower != siae.name|lower %}
                 <small class="text-muted">({{ siae.name|title }})</small>
             {% endif %}
         </h3>
-        <h4 class="h5 mb-2 text-muted">{{ siae.address_on_one_line }}</h4>
+        <p class="font-weight-bold mb-2 text-muted">{{ siae.address_on_one_line }}</p>
         <p class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center mb-0">
             <span class="align-self-start">
                 <span class="badge badge-sm badge-pill badge-primary">à {{ siae.distance|floatformat:"-1"|default:"12" }} km</span>
@@ -44,7 +44,7 @@
             {% endif %}
         </p>
     </div>
-    <div class="card-body p-3 p-md-4">
+    <div class="card-body">
         {% if siae.block_job_applications %}
             <p class="mb-0">
                 <i>Cet employeur ne traite plus de nouvelles candidatures pour le moment</i>

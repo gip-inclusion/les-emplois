@@ -1,51 +1,63 @@
 {% load bootstrap4 %}
-<div class="card mt-4">
-    <a id="js-search-filter-button"
-       class="btn btn-primary-outline btn-sm btn-ico d-block d-md-none"
-       href="#search-filter-form"
-       data-toggle="collapse"
-       role="button"
-       aria-expanded="false"
-       aria-controls="search-filter-form">
-        <span>Filtrer les résultats</span>
+
+<aside class="c-aside-filters">
+    <a class="c-aside-filters__btn__collapse" data-toggle="collapse" href="#search-filter-form" aria-expanded="false" aria-controls="search-filter-form">
         <i class="ri-filter-line"></i>
+        <span>Filtres des résultats</span>
     </a>
-    <div id="search-filter-form" class="card-body collapse show">
-        {% bootstrap_field form.distance form_group_class="form-group" label_class="h3 font-weight-bold text-muted" %}
+    <div class="c-aside-filters__card collapse" id="search-filter-form">
+        <div class="c-aside-filters__card__body">
+            <fieldset>
+                {% bootstrap_field form.distance form_group_class="form-group mb-0" label_class="d-block font-weight-bold mb-3" %}
+            </fieldset>
 
-        {% if form.departments %}
+            {% if form.departments %}
+                <hr>
+                <fieldset>
+                    {% bootstrap_field form.departments form_group_class="form-group mb-0" label_class="d-block font-weight-bold mb-3" %}
+                </fieldset>
+            {% endif %}
+
+            {# getattr and list still painful in Django template #}
+            {% if form.districts_13 %}
+                <hr>
+                <fieldset>
+                    {% bootstrap_field form.districts_13 form_group_class="form-group mb-0" label_class="d-block font-weight-bold mb-3" %}
+                </fieldset>
+            {% endif %}
+
+            {% if form.districts_69 %}
+                <hr>
+                <fieldset>
+                    {% bootstrap_field form.districts_69 form_group_class="form-group mb-0" label_class="d-block font-weight-bold mb-3" %}
+                </fieldset>
+            {% endif %}
+
+            {% if form.districts_75 %}
+                <hr>
+                <fieldset>
+                    {% bootstrap_field form.districts_75 form_group_class="form-group mb-0" label_class="d-block font-weight-bold mb-3" %}
+                </fieldset>
+            {% endif %}
+
             <hr>
-            {% bootstrap_field form.departments form_group_class="form-group mt-2" label_class="h3 font-weight-bold text-muted" %}
-        {% endif %}
+            <fieldset>
+                {% bootstrap_field form.kinds form_group_class="form-group mb-0" label_class="d-block font-weight-bold mb-3" %}
+            </fieldset>
 
-        {# getattr and list still painful in Django template #}
-        {% if form.districts_13 %}
-            <hr>
-            {% bootstrap_field form.districts_13 form_group_class="form-group mt-2" label_class="h3 font-weight-bold text-muted" %}
-        {% endif %}
+            {% if form.contract_types %}
+                <hr>
+                <fieldset>
+                    {% bootstrap_field form.contract_types form_group_class="form-group mb-0" label_class="d-block font-weight-bold mb-3" %}
+                </fieldset>
+            {% endif %}
 
-        {% if form.districts_69 %}
-            <hr>
-            {% bootstrap_field form.districts_69 form_group_class="form-group mt-2" label_class="h3 font-weight-bold text-muted" %}
-        {% endif %}
-
-        {% if form.districts_75 %}
-            <hr>
-            {% bootstrap_field form.districts_75 form_group_class="form-group mt-2" label_class="h3 font-weight-bold text-muted" %}
-        {% endif %}
-
-        <hr>
-        {% bootstrap_field form.kinds form_group_class="form-group mt-2" label_class="h3 font-weight-bold text-muted" %}
-
-        {% if form.contract_types %}
-            <hr>
-            {% bootstrap_field form.contract_types form_group_class="form-group mt-2" label_class="h3 font-weight-bold text-muted" %}
-        {% endif %}
-
-        {% if form.domains %}
-            <hr>
-            {% bootstrap_field form.domains form_group_class="form-group mt-2" label_class="h3 font-weight-bold text-muted" %}
-        {% endif %}
-
+            {% if form.domains %}
+                <hr>
+                <fieldset>
+                    {% bootstrap_field form.domains form_group_class="form-group mb-0" label_class="d-block font-weight-bold mb-3" %}
+                </fieldset>
+            {% endif %}
+        </div>
     </div>
-</div>
+</aside>
