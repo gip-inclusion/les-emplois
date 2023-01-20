@@ -1,0 +1,60 @@
+{# django-allauth template override. #}
+{% extends "layout/content_full_viewport.html" %}
+{% load bootstrap4 %}
+{% load redirection_fields %}
+{% load static %}
+
+{% block title %}Connexion {{ block.super }}{% endblock %}
+
+{% block content %}
+    <section class="s-section pt-0">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-lg-6">
+                    <div class="c-form mb-5">
+                        <picture class="d-lg-block mb-5">
+                            <img class="img-fluid" src="{% static 'img/inclusion_connect/logo-inclusion-connect.svg' %}"/>
+                        </picture>
+                        <h2>Activer Inclusion Connect</h2>
+                        <ol>
+                            <li>Saisissez la même adresse e-mail que celle actuellement utilisée sur les emplois de l’inclusion</li>
+                            <li>Cliquez sur “Valider”</li>
+                            <li>Laissez-vous guider</li>
+                        </ol>
+
+                        <form method="post" action="{{ activate_account_url }}">
+                            {% csrf_token %}
+                            <fieldset>
+                                {% bootstrap_form_errors form type="all" %}
+                                {% redirection_input_field name=redirect_field_name value=redirect_field_value %}
+                                {% bootstrap_field form.email form_group_class="form-group" %}
+                            </fieldset>
+                            <button type="submit"
+                                    class="btn btn-block btn-primary matomo-event"
+                                    data-matomo-category="inscription-{{ authentication_type }}"
+                                    data-matomo-action="clic"
+                                    data-matomo-option="activer-son-compte-inclusion-connect">
+                                Valider
+                            </button>
+                        </form>
+
+                        <hr class="my-5">
+
+                        <div class="text-center">
+                            <h5>Vous avez déjà un compte Inclusion Connect ?</h5>
+                            <a href="{{ inclusion_connect_url }}" class="matomo-event" data-matomo-category="inscription-account_type_display_name" data-matomo-action="clic" data-matomo-option="se-connecter-avec-inclusion-connect">
+                                <span>Se connecter</span>
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="s-section__col col-12 col-lg-6">
+                    <picture class="d-none d-lg-block text-center">
+                        <img class="img-fluid" src="{% static 'img/illustration-login.svg' %}" alt="" loading="lazy">
+                    </picture>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

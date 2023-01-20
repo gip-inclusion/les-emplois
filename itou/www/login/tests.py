@@ -1,3 +1,5 @@
+from urllib.parse import quote
+
 import respx
 from django.contrib.messages import get_messages
 from django.test import override_settings
@@ -204,3 +206,19 @@ class JopbSeekerLoginTest(TestCase):
             "et wossewodda-3728@yopmail.com.Veuillez vous rapprocher du support pour débloquer la situation "
             "en suivant <a href='https://communaute.inclusion.beta.gouv.fr/aide/emplois/#support'>ce lien</a>."
         )
+
+
+def test_prescriber_account_activation_view(client):
+    url = reverse("login:activate_prescriber_account")
+    response = client.post(url, data={"email": "toto@email.com"}, follow=False)
+    assert response.url.startswith(reverse("inclusion_connect:activate_account"))
+    assert f"user_email={quote('toto@email.com')}" in response.url
+    assert "user_kind=prescriber" in response.url
+
+
+def test_siae_staff_account_activation_view(client):
+    url = reverse("login:activate_siae_staff_account")
+    response = client.post(url, data={"email": "toto@email.com"}, follow=False)
+    assert response.url.startswith(reverse("inclusion_connect:activate_account"))
+    assert f"user_email={quote('toto@email.com')}" in response.url
+    assert "user_kind=siae_staff" in response.url

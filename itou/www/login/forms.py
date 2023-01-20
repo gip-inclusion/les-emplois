@@ -19,3 +19,7 @@ class ItouLoginForm(LoginForm):
             error_message = f"Votre compte est relié à {identity_provider}. Merci de vous connecter avec ce service."
             raise forms.ValidationError(error_message)
         return super().clean()
+
+
+class AccountMigrationForm(forms.Form):
+    email = forms.CharField(label="Votre adresse e-mail")

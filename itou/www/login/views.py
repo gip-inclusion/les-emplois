@@ -3,10 +3,11 @@ from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.urls import reverse
 from django.utils.http import urlencode
+from django.views.generic import FormView
 
-from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF
+from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF, UserKind
 from itou.utils.urls import get_safe_url
-from itou.www.login.forms import ItouLoginForm
+from itou.www.login.forms import AccountMigrationForm, ItouLoginForm
 
 
 class ItouLoginView(LoginView):
@@ -115,3 +116,43 @@ class JobSeekerLoginView(ItouLoginView):
             "show_peamu": bool(settings.PEAMU_AUTH_BASE_URL),
         }
         return context | extra_context
+
+
+class AccountMigrationBaseView(FormView):
+    template_name = "account/activate_inclusion_connect_account.html"
+    form_class = AccountMigrationForm
+
+    def _get_inclusion_connect_base_params(self):
+        return {
+            "user_kind": self.user_kind,
+            "previous_url": self.request.get_full_path(),
+        }
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        params = self._get_inclusion_connect_base_params()
+        inclusion_connect_url = f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
+        extra_context = {
+            "activate_account_url": reverse(self.url_name),
+            "inclusion_connect_url": inclusion_connect_url,
+        }
+        return context | extra_context
+
+    def form_valid(self, form):
+        self.form = form
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        params = self._get_inclusion_connect_base_params()
+        params["user_email"] = self.form.cleaned_data["email"]
+        return f"{reverse('inclusion_connect:activate_account')}?{urlencode(params)}"
+
+
+class PrescriberAccountMigrationView(AccountMigrationBaseView):
+    url_name = "login:activate_prescriber_account"
+    user_kind = UserKind.PRESCRIBER
+
+
+class SiaeStaffAccountMigrationView(AccountMigrationBaseView):
+    url_name = "login:activate_siae_staff_account"
+    user_kind = UserKind.SIAE_STAFF
