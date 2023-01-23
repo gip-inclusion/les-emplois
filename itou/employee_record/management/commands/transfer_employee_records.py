@@ -12,6 +12,7 @@ from itou.employee_record.exceptions import SerializationError
 from itou.employee_record.mocks.fake_serializers import TestEmployeeRecordBatchSerializer
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, EmployeeRecordUpdateNotification
 from itou.employee_record.serializers import EmployeeRecordBatchSerializer, EmployeeRecordSerializer
+from itou.utils import sentry
 from itou.utils.iterators import chunks
 
 from ...common_management import EmployeeRecordTransferCommand
@@ -195,6 +196,7 @@ class Command(EmployeeRecordTransferCommand):
 
         return record_errors
 
+    @sentry.Monitor("a4e3c7c8-4d5b-437d-a979-2b8aa7a84634")
     def download(self, conn, dry_run):
         """
         Fetch remote ASP file containing the results of the processing
@@ -255,6 +257,7 @@ class Command(EmployeeRecordTransferCommand):
 
                 conn.remove(file)
 
+    @sentry.Monitor("8654bf02-7d10-463a-8cef-c377a3e01c5c")
     def upload(self, sftp, dry_run):
         """
         Upload a file composed of all ready employee records
