@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.urls import reverse
 
 from itou.utils import constants as global_constants
@@ -14,7 +13,7 @@ class CampaignEmailFactory:
     def ratio_to_select(self, ratio_selection_end_at):
         context = {
             "ratio_selection_end_at": ratio_selection_end_at,
-            "dashboard_url": f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}{reverse('dashboard:index')}",
+            "dashboard_url": get_absolute_url(reverse("dashboard:index")),
         }
         subject = "siae_evaluations/email/to_institution_ratio_to_select_subject.txt"
         body = "siae_evaluations/email/to_institution_ratio_to_select_body.txt"
@@ -58,7 +57,7 @@ class InstitutionEmailFactory:
     def submitted_by_siae(self):
         context = {
             "siae": self.evaluated_siae.siae,
-            "dashboard_url": f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}{reverse('dashboard:index')}",
+            "dashboard_url": get_absolute_url(reverse("dashboard:index")),
         }
         subject = "siae_evaluations/email/to_institution_submitted_by_siae_subject.txt"
         body = "siae_evaluations/email/to_institution_submitted_by_siae_body.txt"
@@ -79,7 +78,7 @@ class SIAEEmailFactory:
             "campaign": self.evaluated_siae.evaluation_campaign,
             "siae": self.evaluated_siae.siae,
             "end_date": self.evaluated_siae.evaluation_campaign.adversarial_stage_start_date,
-            "url": (f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}" + evaluated_siae_url),
+            "url": get_absolute_url(evaluated_siae_url),
         }
         subject = "siae_evaluations/email/to_siae_selected_subject.txt"
         body = "siae_evaluations/email/to_siae_selected_body.txt"
@@ -103,7 +102,7 @@ class SIAEEmailFactory:
         context = {
             "evaluation_campaign": self.evaluated_siae.evaluation_campaign,
             "siae": self.evaluated_siae.siae,
-            "evaluated_job_app_list_url": f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}{job_app_list_url}",
+            "evaluated_job_app_list_url": get_absolute_url(job_app_list_url),
             "itou_community_url": global_constants.ITOU_COMMUNITY_URL,
         }
         subject = "siae_evaluations/email/to_siae_notify_before_adversarial_stage_subject.txt"
@@ -127,7 +126,7 @@ class SIAEEmailFactory:
         context = {
             "evaluation_campaign": self.evaluated_siae.evaluation_campaign,
             "siae": self.evaluated_siae.siae,
-            "auto_prescription_url": f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}{auto_prescription_url}",
+            "auto_prescription_url": get_absolute_url(auto_prescription_url),
         }
         subject = "siae_evaluations/email/to_siae_forced_to_adversarial_stage_subject.txt"
         body = "siae_evaluations/email/to_siae_forced_to_adversarial_stage_body.txt"
@@ -142,7 +141,7 @@ class SIAEEmailFactory:
             "adversarial_stage_start": self.evaluated_siae.evaluation_campaign.adversarial_stage_start_date,
             "evaluation_campaign": self.evaluated_siae.evaluation_campaign,
             "siae": self.evaluated_siae.siae,
-            "evaluated_job_app_list_url": f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}{job_app_list_url}",
+            "evaluated_job_app_list_url": get_absolute_url(job_app_list_url),
             "itou_community_url": global_constants.ITOU_COMMUNITY_URL,
         }
         subject = "siae_evaluations/email/to_siae_notify_before_campaign_close_subject.txt"
@@ -172,7 +171,7 @@ class SIAEEmailFactory:
         context = {
             "evaluation_campaign": self.evaluated_siae.evaluation_campaign,
             "siae": self.evaluated_siae.siae,
-            "dashboard_url": (f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}" + dashboard_url),
+            "dashboard_url": get_absolute_url(dashboard_url),
         }
         subject = "siae_evaluations/email/to_siae_sanctioned_subject.txt"
         body = "siae_evaluations/email/to_siae_sanctioned_body.txt"
