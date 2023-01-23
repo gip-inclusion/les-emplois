@@ -305,6 +305,14 @@ class User(AbstractUser, AddressMixin):
                 name="users_user_email_upper",
             )
         ]
+        constraints = [
+            models.CheckConstraint(
+                name="staff_and_superusers",
+                violation_error_message="Seul un utilisateur ITOU_STAFF peut avoir is_staff ou is_superuser de vrai.",
+                check=models.Q(~models.Q(kind=UserKind.ITOU_STAFF) & models.Q(is_staff=False, is_superuser=False))
+                | models.Q(kind=UserKind.ITOU_STAFF, is_staff=True),
+            )
+        ]
 
     def __str__(self):
         return f"{self.get_full_name()} — {self.email}"
