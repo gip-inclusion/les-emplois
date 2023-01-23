@@ -629,6 +629,9 @@ CSP_CONNECT_SRC = [
     "wss://*.hotjar.com",
     "https://translate.googleapis.com",  # Allow google translate
 ]
+CSP_WORKER_SRC = [
+    "'self' blob:",  # Redoc seems to use blob:https://emplois.inclusion.beta.gouv.fr/some-ran-dom-uu-id
+]
 if S3_STORAGE_ENDPOINT_DOMAIN:
     CSP_CONNECT_SRC += [
         f"https://{S3_STORAGE_ENDPOINT_DOMAIN}",
