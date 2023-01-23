@@ -2,10 +2,17 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.urls import reverse
 from django.utils import dateformat, timezone
+from freezegun import freeze_time
 
 from itou.institutions.factories import InstitutionWith2MembershipFactory
 from itou.siae_evaluations.emails import CampaignEmailFactory, InstitutionEmailFactory, SIAEEmailFactory
-from itou.siae_evaluations.factories import EvaluatedSiaeFactory, EvaluationCampaignFactory
+from itou.siae_evaluations.enums import EvaluatedAdministrativeCriteriaState
+from itou.siae_evaluations.factories import (
+    EvaluatedAdministrativeCriteriaFactory,
+    EvaluatedJobApplicationFactory,
+    EvaluatedSiaeFactory,
+    EvaluationCampaignFactory,
+)
 from itou.siaes.factories import SiaeFactory, SiaeWith2MembershipsFactory
 
 
@@ -51,6 +58,95 @@ class TestInstitutionEmailFactory:
         assert dateformat.format(fake_now + relativedelta(weeks=6), "d E Y") in email.body
         assert dateformat.format(evaluation_campaign.evaluated_period_start_at, "d E Y") in email.body
         assert dateformat.format(evaluation_campaign.evaluated_period_end_at, "d E Y") in email.body
+
+    # See EvaluationCampaignManagerTest.test_close for notifications when siae
+    # did not send proofs.
+
+    @freeze_time("2023-01-23")
+    def test_close_notifies_when_siae_has_negative_result(self, mailoutbox):
+        institution = InstitutionWith2MembershipFactory(name="DDETS 01")
+        campaign = EvaluationCampaignFactory(institution=institution)
+        siae = SiaeWith2MembershipsFactory(name="les petits jardins")
+        evaluated_siae = EvaluatedSiaeFactory(
+            siae=siae,
+            evaluation_campaign=campaign,
+            reviewed_at=timezone.now() - relativedelta(days=60),
+            final_reviewed_at=timezone.now() - relativedelta(days=20),
+        )
+        evaluated_jobapp = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_jobapp,
+            uploaded_at=timezone.now() - relativedelta(days=21, minutes=1),
+            submitted_at=timezone.now() - relativedelta(days=21),
+            review_state=EvaluatedAdministrativeCriteriaState.REFUSED_2,
+        )
+
+        campaign.close()
+
+        [institution_email] = mailoutbox
+
+        assert sorted(institution_email.to) == sorted(institution.active_members.values_list("email", flat=True))
+        assert institution_email.subject == "[Contrôle a posteriori] Notification des sanctions"
+        assert institution_email.body == (
+            "Bonjour,\n\n"
+            "Suite au dernier contrôle a posteriori, une ou plusieurs SIAE de votre département ont obtenu un "
+            "résultat négatif.\n"
+            "Conformément au  Décret n° 2021-1128 du 30 août 2021 relatif à l'insertion par l'activité économique, "
+            "les manquements constatés ainsi que les sanctions envisagées doivent être notifiés aux SIAE.\n\n"
+            "Veuillez vous connecter sur votre espace des emplois de l’inclusion afin d’effectuer cette démarche.\n"
+            f"http://127.0.0.1:8000/siae_evaluation/institution_evaluated_siae_list/{campaign.pk}/\n\n"
+            "Cordialement,\n\n"
+            "---\n"
+            "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
+            "merci de ne pas en tenir compte [DEV]\n"
+            "Les emplois de l'inclusion\n"
+            "http://127.0.0.1:8000"
+        )
+
+    def test_close_does_not_notify_when_siae_has_been_notified(self, mailoutbox):
+        institution = InstitutionWith2MembershipFactory(name="DDETS 01")
+        campaign = EvaluationCampaignFactory(institution=institution)
+        siae = SiaeWith2MembershipsFactory(name="les petits jardins")
+        evaluated_siae = EvaluatedSiaeFactory(
+            siae=siae,
+            evaluation_campaign=campaign,
+            reviewed_at=timezone.now() - relativedelta(days=60),
+            final_reviewed_at=timezone.now() - relativedelta(days=20),
+            notified_at=timezone.now() - relativedelta(days=10),
+        )
+        evaluated_jobapp = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_jobapp,
+            uploaded_at=timezone.now() - relativedelta(days=21, minutes=1),
+            submitted_at=timezone.now() - relativedelta(days=21),
+            review_state=EvaluatedAdministrativeCriteriaState.REFUSED_2,
+        )
+
+        campaign.close()
+
+        assert [] == mailoutbox
+
+    def test_close_does_not_notify_when_siae_has_positive_result(self, mailoutbox):
+        institution = InstitutionWith2MembershipFactory(name="DDETS 01")
+        campaign = EvaluationCampaignFactory(institution=institution)
+        siae = SiaeWith2MembershipsFactory(name="les petits jardins")
+        evaluated_siae = EvaluatedSiaeFactory(
+            siae=siae,
+            evaluation_campaign=campaign,
+            reviewed_at=timezone.now() - relativedelta(days=50),
+            final_reviewed_at=timezone.now() - relativedelta(days=50),
+        )
+        evaluated_jobapp = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_jobapp,
+            uploaded_at=timezone.now() - relativedelta(days=51, minutes=1),
+            submitted_at=timezone.now() - relativedelta(days=51),
+            review_state=EvaluatedAdministrativeCriteriaState.ACCEPTED,
+        )
+
+        campaign.close()
+
+        assert [] == mailoutbox
 
     def test_submitted_by_siae(self):
         institution = InstitutionWith2MembershipFactory()

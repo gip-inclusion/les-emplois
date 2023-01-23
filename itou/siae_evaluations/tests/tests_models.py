@@ -525,12 +525,13 @@ class EvaluationCampaignManagerTest(TestCase):
         assert evaluation_campaign.ended_at is not None
         ended_at = evaluation_campaign.ended_at
 
-        [email] = mail.outbox
-        assert email.subject == (
+        [siae_email, institution_email] = mail.outbox
+        assert siae_email.to == list(evaluated_siae.siae.active_admin_members.values_list("email", flat=True))
+        assert siae_email.subject == (
             "[Contrôle a posteriori] "
             f"Absence de réponse de la structure EI Les petits jardins ID-{evaluated_siae.siae_id}"
         )
-        assert email.body == (
+        assert siae_email.body == (
             "Bonjour,\n\n"
             "Sauf erreur de notre part, vous n’avez pas transmis les justificatifs demandés dans le cadre du contrôle "
             "a posteriori sur vos embauches réalisées en auto-prescription entre le 01 Janvier 2022 et le 30 "
@@ -549,11 +550,30 @@ class EvaluationCampaignManagerTest(TestCase):
             "Les emplois de l'inclusion\n"
             "http://127.0.0.1:8000"
         )
+        assert sorted(institution_email.to) == sorted(
+            evaluation_campaign.institution.active_members.values_list("email", flat=True)
+        )
+        assert institution_email.subject == "[Contrôle a posteriori] Notification des sanctions"
+        assert institution_email.body == (
+            "Bonjour,\n\n"
+            "Suite au dernier contrôle a posteriori, une ou plusieurs SIAE de votre département ont obtenu un "
+            "résultat négatif.\n"
+            "Conformément au  Décret n° 2021-1128 du 30 août 2021 relatif à l'insertion par l'activité économique, "
+            "les manquements constatés ainsi que les sanctions envisagées doivent être notifiés aux SIAE.\n\n"
+            "Veuillez vous connecter sur votre espace des emplois de l’inclusion afin d’effectuer cette démarche.\n"
+            f"http://127.0.0.1:8000/siae_evaluation/institution_evaluated_siae_list/{evaluation_campaign.pk}/\n\n"
+            "Cordialement,\n\n"
+            "---\n"
+            "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
+            "merci de ne pas en tenir compte [DEV]\n"
+            "Les emplois de l'inclusion\n"
+            "http://127.0.0.1:8000"
+        )
 
         evaluation_campaign.close()
         assert ended_at == evaluation_campaign.ended_at
         # No new mail.
-        assert len(mail.outbox) == 1
+        assert len(mail.outbox) == 2
 
 
 class EvaluatedSiaeQuerySetTest(TestCase):
