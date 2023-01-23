@@ -13,9 +13,7 @@ from itou.utils.test import TestCase
 class ListEmployeeRecordsTest(TestCase):
     def setUp(self):
         # User must be super user for UI first part (tmp)
-        self.siae = SiaeWithMembershipAndJobsFactory(
-            name="Evil Corp.", membership__user__first_name="Elliot", membership__user__is_superuser=True
-        )
+        self.siae = SiaeWithMembershipAndJobsFactory(name="Evil Corp.", membership__user__first_name="Elliot")
         self.siae_without_perms = SiaeWithMembershipAndJobsFactory(
             kind="EITI", name="A-Team", membership__user__first_name="Hannibal"
         )
