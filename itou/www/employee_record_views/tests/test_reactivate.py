@@ -10,9 +10,7 @@ from itou.utils.test import TestCase
 class ReactivateEmployeeRecordsTest(TestCase):
     def setUp(self):
         # User must be super user for UI first part (tmp)
-        self.siae = SiaeWithMembershipAndJobsFactory(
-            name="Wanna Corp.", membership__user__first_name="Billy", membership__user__is_superuser=True
-        )
+        self.siae = SiaeWithMembershipAndJobsFactory(name="Wanna Corp.", membership__user__first_name="Billy")
         self.user = self.siae.members.get(first_name="Billy")
         self.job_application = JobApplicationWithCompleteJobSeekerProfileFactory(to_siae=self.siae)
         self.employee_record = EmployeeRecordWithProfileFactory(job_application=self.job_application)
