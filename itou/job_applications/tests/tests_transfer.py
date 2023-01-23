@@ -12,7 +12,8 @@ from itou.job_applications.factories import (
 )
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.factories import SiaeFactory, SiaeWith2MembershipsFactory
-from itou.users.factories import UserFactory
+from itou.users.enums import UserKind
+from itou.users.factories import JobSeekerFactory
 from itou.utils.test import TestCase
 
 
@@ -48,13 +49,13 @@ class JobApplicationTransferModelTest(TestCase):
 
         origin_user = origin_siae.members.first()
         target_user = target_siae.members.first()
-        lambda_user = UserFactory(is_siae_staff=False)
+        lambda_user = JobSeekerFactory()
         target_siae.members.add(origin_user)
 
         job_application = JobApplicationFactory(to_siae=origin_siae)
 
-        assert origin_user.is_siae_staff
-        assert target_user.is_siae_staff
+        assert origin_user.kind == UserKind.SIAE_STAFF
+        assert target_user.kind == UserKind.SIAE_STAFF
         assert not job_application.can_be_transferred(target_user, job_application.to_siae)
         assert not job_application.can_be_transferred(lambda_user, target_siae)
         assert not job_application.can_be_transferred(target_user, target_siae)
@@ -75,7 +76,7 @@ class JobApplicationTransferModelTest(TestCase):
 
         origin_user = origin_siae.members.first()
         target_user = target_siae.members.first()
-        lambda_user = UserFactory(is_siae_staff=False)
+        lambda_user = JobSeekerFactory()
         target_siae.members.add(origin_user)
 
         job_application = JobApplicationFactory(with_eligibility_diagnosis=True, to_siae=origin_siae)

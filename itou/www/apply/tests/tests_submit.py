@@ -21,7 +21,13 @@ from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipAndJobsFactory
-from itou.users.factories import JobSeekerFactory, JobSeekerProfileFactory, PrescriberFactory, UserFactory
+from itou.users.factories import (
+    ItouStaffFactory,
+    JobSeekerFactory,
+    JobSeekerProfileFactory,
+    PrescriberFactory,
+    SiaeStaffFactory,
+)
 from itou.users.models import User
 from itou.utils.session import SessionNamespace
 from itou.utils.storage.s3 import S3Upload
@@ -1585,10 +1591,9 @@ class ApplyAsOtherTest(TestCase):
                 response = self.client.get(reverse(route, kwargs={"siae_pk": siae.pk}), follow=True)
                 assert response.status_code == 403
 
-    def test_an_account_without_rights_is_not_allowed_to_submit_application(self):
+    def test_itou_staff_are_not_allowed_to_submit_application(self):
         siae = SiaeFactory()
-        user = UserFactory(is_job_seeker=False, is_prescriber=False, is_siae_staff=False, is_labor_inspector=False)
-
+        user = ItouStaffFactory()
         self.client.force_login(user)
 
         for route in self.ROUTES:
@@ -2076,7 +2081,7 @@ class UpdateJobSeekerViewTestCase(TestCase):
 
     def test_as_authorized_prescriber_with_proxied_job_seeker(self):
         # Make sure the job seeker does not manage its own account
-        self.job_seeker.created_by = UserFactory()
+        self.job_seeker.created_by = PrescriberFactory()
         self.job_seeker.last_login = None
         self.job_seeker.save(update_fields=["created_by", "last_login"])
         authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
@@ -2091,7 +2096,7 @@ class UpdateJobSeekerViewTestCase(TestCase):
 
     def test_as_siae_with_proxied_job_seeker(self):
         # Make sure the job seeker does not manage its own account
-        self.job_seeker.created_by = UserFactory()
+        self.job_seeker.created_by = SiaeStaffFactory()
         self.job_seeker.last_login = None
         self.job_seeker.save(update_fields=["created_by", "last_login"])
         self._check_everything_allowed(self.siae.members.first())

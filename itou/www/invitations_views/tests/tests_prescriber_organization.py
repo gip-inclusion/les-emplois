@@ -16,8 +16,8 @@ from itou.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oaut
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory, PrescriberPoleEmploiFactory
 from itou.siaes.factories import SiaeFactory
-from itou.users.enums import KIND_PRESCRIBER
-from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory, UserFactory
+from itou.users.enums import UserKind
+from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.perms.prescriber import get_current_org_or_404
@@ -152,7 +152,7 @@ class TestPEOrganizationInvitation(TestCase):
         self.sender = self.organization.members.first()
 
     def test_pe_organization_invitation_successful(self):
-        guest = UserFactory.build(email=f"sabine.lagrange{global_constants.POLE_EMPLOI_EMAIL_SUFFIX}")
+        guest = PrescriberFactory.build(email=f"sabine.lagrange{global_constants.POLE_EMPLOI_EMAIL_SUFFIX}")
         post_data = POST_DATA | {
             "form-0-first_name": guest.first_name,
             "form-0-last_name": guest.last_name,
@@ -196,7 +196,7 @@ class TestAcceptPrescriberWithOrgInvitation(InclusionConnectBaseTestCase):
 
         user.refresh_from_db()
         invitation.refresh_from_db()
-        assert user.is_prescriber
+        assert user.kind == UserKind.PRESCRIBER
 
         assert invitation.accepted
         assert invitation.accepted_at
@@ -227,7 +227,7 @@ class TestAcceptPrescriberWithOrgInvitation(InclusionConnectBaseTestCase):
         previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
         next_url = reverse("invitations_views:join_prescriber_organization", args=(invitation.pk,))
         params = {
-            "user_kind": KIND_PRESCRIBER,
+            "user_kind": UserKind.PRESCRIBER,
             "login_hint": invitation.email,
             "channel": "invitation",
             "previous_url": previous_url,
@@ -239,7 +239,7 @@ class TestAcceptPrescriberWithOrgInvitation(InclusionConnectBaseTestCase):
         # Singup fails on Inclusion Connect with email different than the one from the invitation
         response = mock_oauth_dance(
             self,
-            KIND_PRESCRIBER,
+            UserKind.PRESCRIBER,
             assert_redirects=False,
             login_hint=invitation.email,
             channel="invitation",
@@ -260,7 +260,7 @@ class TestAcceptPrescriberWithOrgInvitation(InclusionConnectBaseTestCase):
         invitation.save()
         response = mock_oauth_dance(
             self,
-            KIND_PRESCRIBER,
+            UserKind.PRESCRIBER,
             assert_redirects=False,
             login_hint=invitation.email,
             channel="invitation",
@@ -322,7 +322,7 @@ class TestAcceptPrescriberWithOrgInvitation(InclusionConnectBaseTestCase):
         next_url = reverse("invitations_views:join_prescriber_organization", args=(invitation.pk,))
         previous_url = f"{reverse('login:prescriber')}?{urlencode({'next': next_url})}"
         params = {
-            "user_kind": KIND_PRESCRIBER,
+            "user_kind": UserKind.PRESCRIBER,
             "previous_url": previous_url,
             "next_url": next_url,
         }
@@ -331,7 +331,7 @@ class TestAcceptPrescriberWithOrgInvitation(InclusionConnectBaseTestCase):
 
         response = mock_oauth_dance(
             self,
-            KIND_PRESCRIBER,
+            UserKind.PRESCRIBER,
             assert_redirects=False,
             login_hint=user.email,
             channel="invitation",

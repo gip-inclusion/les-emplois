@@ -2,7 +2,7 @@ from django.forms.models import model_to_dict
 
 from itou.approvals.factories import ApprovalFactory
 from itou.users.admin_forms import UserAdminForm
-from itou.users.enums import IdentityProvider
+from itou.users.enums import IdentityProvider, UserKind
 from itou.users.factories import JobSeekerFactory
 from itou.utils.test import TestCase
 
@@ -25,6 +25,7 @@ class UserAdminFormTest(TestCase):
         data_user["is_prescriber"] = True
         data_user["is_siae_staff"] = False
         data_user["is_labor_inspector"] = False
+        data_user["kind"] = UserKind.PRESCRIBER
         form = UserAdminForm(data=data_user, instance=user)
         assert not form.is_valid()
         assert "Cet utilisateur possède déjà un PASS IAE" in form.errors["__all__"][0]
@@ -44,6 +45,7 @@ class UserAdminFormTest(TestCase):
             "password": "foo",
             "email": "john@wayne.com",
             "is_job_seeker": True,
+            "kind": UserKind.JOB_SEEKER,
             "date_joined": "2022-02-02",
             "last_checked_at": "2022-02-02",
             "identity_provider": IdentityProvider.DJANGO,
@@ -91,6 +93,7 @@ class UserAdminFormTest(TestCase):
             "password": "foo",
             "email": "john@wayne.com",
             "is_job_seeker": True,
+            "kind": UserKind.JOB_SEEKER,
             "date_joined": "2022-02-02",
             "last_checked_at": "2022-02-02",
             "identity_provider": IdentityProvider.DJANGO,

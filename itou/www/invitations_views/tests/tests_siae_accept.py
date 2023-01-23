@@ -12,8 +12,8 @@ from itou.openid_connect.inclusion_connect.testing import InclusionConnectBaseTe
 from itou.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory
-from itou.users.enums import KIND_SIAE_STAFF
-from itou.users.factories import SiaeStaffFactory, UserFactory
+from itou.users.enums import KIND_SIAE_STAFF, UserKind
+from itou.users.factories import SiaeStaffFactory
 from itou.users.models import User
 from itou.utils.perms.siae import get_current_siae_or_404
 
@@ -22,7 +22,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
     def assert_accepted_invitation(self, response, invitation, user):
         user.refresh_from_db()
         invitation.refresh_from_db()
-        assert user.is_siae_staff
+        assert user.kind == UserKind.SIAE_STAFF
         assert invitation.accepted
         assert invitation.accepted_at
 
@@ -84,7 +84,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
 
     def test_accept_invitation_logged_in_user(self):
         # A logged in user should log out before accepting an invitation.
-        logged_in_user = UserFactory()
+        logged_in_user = SiaeStaffFactory()
         self.client.force_login(logged_in_user)
         # Invitation for another user
         invitation = SentSiaeStaffInvitationFactory(email="loutre@example.com")

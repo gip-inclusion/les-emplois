@@ -9,14 +9,15 @@ KIND_JOB_SEEKER = "job_seeker"
 KIND_PRESCRIBER = "prescriber"
 KIND_SIAE_STAFF = "siae_staff"
 KIND_LABOR_INSPECTOR = "labor_inspector"
+KIND_ITOU_STAFF = "itou_staff"
 
 
-# TODO(alaurent) Replace all uses of KIND_XXX with this new enum
-class Kind(models.TextChoices):
+class UserKind(models.TextChoices):
     JOB_SEEKER = KIND_JOB_SEEKER, "candidat"
     PRESCRIBER = KIND_PRESCRIBER, "prescripteur"
     SIAE_STAFF = KIND_SIAE_STAFF, "employeur"
     LABOR_INSPECTOR = KIND_LABOR_INSPECTOR, "inspecteur du travail"
+    ITOU_STAFF = KIND_ITOU_STAFF, "administrateur"
 
 
 class Title(models.TextChoices):

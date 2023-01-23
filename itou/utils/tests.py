@@ -34,7 +34,7 @@ from itou.prescribers.factories import PrescriberOrganizationWithMembershipFacto
 from itou.siaes.factories import SiaeFactory
 from itou.siaes.models import Siae, SiaeMembership
 from itou.users.enums import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
-from itou.users.factories import JobSeekerFactory, PrescriberFactory, UserFactory
+from itou.users.factories import ItouStaffFactory, JobSeekerFactory, PrescriberFactory
 from itou.users.models import User
 from itou.utils import constants as global_constants, pagination
 from itou.utils.models import PkSupportRemark
@@ -783,7 +783,7 @@ class SiaeSignupTokenGeneratorTest(TestCase):
         p0 = SiaeSignupTokenGenerator()
         tk1 = p0.make_token(siae)
         assert p0.check_token(siae, tk1) is True
-        user = User()
+        user = User(is_siae_staff=True)
         user.save()
         membership = SiaeMembership()
         membership.user = user
@@ -891,9 +891,6 @@ class ResumeFormMixinTest(TestCase):
 
 class SupportRemarkAdminViewsTest(TestCase):
     def test_add_support_remark_to_suspension(self):
-        user = UserFactory()
-        self.client.force_login(user)
-
         today = timezone.localdate()
         job_app = JobApplicationFactory(with_approval=True)
         approval = job_app.approval
@@ -908,13 +905,14 @@ class SupportRemarkAdminViewsTest(TestCase):
         url = reverse("admin:approvals_suspension_change", args=[suspension.pk])
 
         # Not enough perms.
+        user = PrescriberFactory()
+        self.client.force_login(user)
         response = self.client.get(url)
         assert response.status_code == 302
 
-        user.is_staff = True
-        user.save()
-
         # Add needed perms
+        user = ItouStaffFactory()
+        self.client.force_login(user)
         suspension_content_type = ContentType.objects.get_for_model(Suspension)
         permission = Permission.objects.get(content_type=suspension_content_type, codename="change_suspension")
         user.user_permissions.add(permission)
@@ -1070,7 +1068,7 @@ class JSONTest(TestCase):
         for obj, expected, *_ in self.ASYMMETRIC_CONVERSION:
             assert dumps(obj) == expected
 
-        model_object = UserFactory()
+        model_object = JobSeekerFactory()
         assert dumps(model_object) == str(model_object.pk)
 
     def test_decode(self):

@@ -4,7 +4,7 @@ from django.test.client import RequestFactory
 from django.utils.html import escape
 
 from itou.job_applications.factories import JobApplicationSentBySiaeFactory
-from itou.users.factories import JobSeekerWithAddressFactory, UserFactory
+from itou.users.factories import JobSeekerWithAddressFactory, SiaeStaffFactory
 from itou.utils.enums_context_processors import expose_enums
 
 
@@ -14,7 +14,7 @@ def load_template(path):
 
 def get_request():
     request = RequestFactory()
-    request.user = UserFactory(is_siae_staff=True)
+    request.user = SiaeStaffFactory()
     return request
 
 

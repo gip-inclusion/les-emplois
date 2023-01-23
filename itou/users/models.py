@@ -40,7 +40,7 @@ from itou.utils import constants as global_constants
 from itou.utils.apis.exceptions import AddressLookupError
 from itou.utils.validators import validate_birthdate, validate_nir, validate_pole_emploi_id
 
-from .enums import IdentityProvider, Kind, Title
+from .enums import IdentityProvider, Title, UserKind
 
 
 class ApprovalAlreadyExistsError(Exception):
@@ -222,6 +222,9 @@ class User(AbstractUser, AddressMixin):
     is_labor_inspector = models.BooleanField(
         verbose_name="Inspecteur du travail (DDETS, DREETS, DGEFP)", default=False
     )
+    kind = models.CharField(
+        max_length=20, verbose_name="Type d'utilisateur", choices=UserKind.choices, null=True, blank=False
+    )
 
     # TODO(rsebille): Replace the use of a signal by using an uuid4() as default value.
     #  I am not do it _right now_ because we need to make sure the format will work on ASP side,
@@ -342,6 +345,8 @@ class User(AbstractUser, AddressMixin):
         ]
         if user_kinds.count(True) > 1:
             raise ValidationError("A User can not have more than one kind")
+
+        self.kind = self.kind_from_flags
 
         super().save(*args, **kwargs)
 
@@ -840,6 +845,7 @@ class User(AbstractUser, AddressMixin):
         """
         username = cls.generate_unique_username()
         fields["is_job_seeker"] = True
+        fields["kind"] = UserKind.JOB_SEEKER
         fields["created_by"] = proxy_user
         user = cls.objects.create_user(
             username,
@@ -913,20 +919,22 @@ class User(AbstractUser, AddressMixin):
 
     # TODO(alaurent) Maybe replace with a field in db
     @property
-    def kind(self):
+    def kind_from_flags(self):
         if self.is_job_seeker:
-            return Kind.JOB_SEEKER
+            return UserKind.JOB_SEEKER
         elif self.is_prescriber:
-            return Kind.PRESCRIBER
+            return UserKind.PRESCRIBER
         elif self.is_siae_staff:
-            return Kind.SIAE_STAFF
+            return UserKind.SIAE_STAFF
         elif self.is_labor_inspector:
-            return Kind.LABOR_INSPECTOR
-        else:
-            raise ValueError("User has no valid kind")
+            return UserKind.LABOR_INSPECTOR
+        elif self.is_staff:
+            return UserKind.ITOU_STAFF
+        # Allow null kind as we create jobseekers without is_job_seeker=True
+        # because of allauth
 
     def get_kind_display(self):
-        return self.kind.label
+        return self.kind_from_flags.label
 
 
 def get_allauth_account_user_display(user):

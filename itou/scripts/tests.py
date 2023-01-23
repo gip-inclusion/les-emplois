@@ -41,7 +41,8 @@ from itou.scripts.management.commands.import_ai_employees import (
 )
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory
-from itou.users.factories import JobSeekerFactory, PrescriberFactory, UserFactory
+from itou.users.enums import UserKind
+from itou.users.factories import ItouStaffFactory, JobSeekerFactory, PrescriberFactory
 from itou.users.models import User
 from itou.utils.test import TestCase
 
@@ -362,7 +363,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         assert total_df.iloc[1][COMMENTS_COL] == expected_comment
 
     def test_find_or_create_job_seeker__find(self):
-        developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
+        developer = ItouStaffFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
         CommuneFactory(code=getattr(CleanedAiCsvFileMock, CITY_INSEE_COL))
         command = self.command
 
@@ -414,7 +415,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         job_seeker.delete()
 
     def test_find_or_create_job_seeker__create(self):
-        developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
+        developer = ItouStaffFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
         commune = CommuneFactory(code=getattr(CleanedAiCsvFileMock, CITY_INSEE_COL))
         command = self.command
 
@@ -493,7 +494,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         job_seeker.delete()
 
     def test_find_or_create_approval__find(self):
-        developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
+        developer = ItouStaffFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
         command = self.command
 
         # Existing valid PASS IAE delivered after a job application has been accepted.
@@ -530,7 +531,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         existing_approval.user.delete()
 
     def test_find_or_create_approval__create(self):
-        developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
+        developer = ItouStaffFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
         command = self.command
 
         # No PASS IAE.
@@ -639,7 +640,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
 
     def test_find_or_create_job_application__find(self):
         # Find job applications created previously by this script.
-        developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
+        developer = ItouStaffFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
         command = self.command
 
         # An approval is mandatory to test employee records creation (FS).
@@ -670,7 +671,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         )
 
     def test_find_or_create_job_application__create(self):
-        developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
+        developer = ItouStaffFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
         command = self.command
 
         # Employers canceled the job application we created, hence removing the PASS IAE we delivered.
@@ -737,7 +738,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         job_application.job_seeker.delete()
 
     def test_import_data_into_itou(self):
-        developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
+        developer = ItouStaffFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
         CommuneFactory(code=getattr(CleanedAiCsvFileMock, CITY_INSEE_COL))
         command = self.command
         base_data = CleanedAiCsvFileMock()
@@ -749,7 +750,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         assert User.objects.count() == 2
         assert Approval.objects.count() == 1
         assert JobApplication.objects.count() == 1
-        job_seeker = User.objects.filter(is_job_seeker=True).get()
+        job_seeker = User.objects.filter(kind=UserKind.JOB_SEEKER).get()
         assert job_seeker.job_applications.count() == 1
         assert job_seeker.approvals.count() == 1
         job_seeker.delete()
@@ -769,7 +770,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         )
         input_df = pandas.DataFrame([CleanedAiCsvFileMock()])
         output_df = command.import_data_into_itou(df=input_df, to_be_imported_df=input_df)
-        assert User.objects.filter(is_job_seeker=True).count() == 1
+        assert User.objects.filter(kind=UserKind.JOB_SEEKER).count() == 1
         assert Approval.objects.count() == 1
         assert JobApplication.objects.count() == 1
         job_seeker.delete()

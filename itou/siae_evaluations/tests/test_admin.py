@@ -12,7 +12,7 @@ from itou.siae_evaluations.factories import (
     EvaluationCampaignFactory,
 )
 from itou.siaes.factories import SiaeMembershipFactory
-from itou.users.factories import JobSeekerFactory
+from itou.users.factories import ItouStaffFactory
 
 
 class TestEvaluationCampaignAdmin:
@@ -71,7 +71,7 @@ class TestEvaluationCampaignAdmin:
         SiaeMembershipFactory(siae=campaign4_siae.siae, user__email="campaign4@beta.gouv.fr")
         # Not selected.
         EvaluatedSiaeFactory(evaluation_campaign__name="Contrôle 02/02/2020")
-        admin_user = JobSeekerFactory(is_staff=True, is_superuser=True)
+        admin_user = ItouStaffFactory(is_superuser=True)
         client.force_login(admin_user)
         with assertNumQueries(
             1  # Load Django session

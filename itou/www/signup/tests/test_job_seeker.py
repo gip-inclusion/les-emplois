@@ -11,6 +11,7 @@ from itou.cities.factories import create_test_cities
 from itou.cities.models import City
 from itou.openid_connect.france_connect import constants as fc_constants
 from itou.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance
+from itou.users.enums import UserKind
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from itou.users.models import User
 from itou.utils import constants as global_constants
@@ -205,9 +206,7 @@ class JobSeekerSignupTest(TestCase):
         user = User.objects.get(email=post_data["email"])
         # `username` should be a valid UUID, see `User.generate_unique_username()`.
         assert user.username == uuid.UUID(user.username, version=4).hex
-        assert user.is_job_seeker
-        assert not user.is_prescriber
-        assert not user.is_siae_staff
+        assert user.kind == UserKind.JOB_SEEKER
 
         # Check `EmailAddress` state.
         assert user.emailaddress_set.count() == 1

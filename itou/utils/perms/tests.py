@@ -1,20 +1,20 @@
 from django.test import override_settings
 from django.urls import reverse
 
-from itou.users.factories import UserFactory
+from itou.users.factories import ItouStaffFactory, JobSeekerFactory, PrescriberFactory
 from itou.utils.test import TestCase
 
 
 class UserHijackPermTestCase(TestCase):
     def test_user_does_not_exist(self):
-        hijacker = UserFactory(is_active=True, is_superuser=True)
+        hijacker = ItouStaffFactory(is_superuser=True)
         self.client.force_login(hijacker)
         response = self.client.post(reverse("hijack:acquire"), {"user_pk": 0, "next": "/foo/"})
         assert response.status_code == 404
 
     def test_superuser(self):
-        hijacked = UserFactory()
-        hijacker = UserFactory(is_superuser=True)
+        hijacked = JobSeekerFactory()
+        hijacker = ItouStaffFactory(is_superuser=True)
         self.client.force_login(hijacker)
 
         with self.assertLogs() as cm:
@@ -30,34 +30,30 @@ class UserHijackPermTestCase(TestCase):
         assert cm.records[0].message == f"admin={hijacker} has ended impersonation of user={hijacked}"
 
     def test_disallowed_hijackers(self):
-        hijacked = UserFactory(is_active=True)
+        hijacked = PrescriberFactory()
 
-        hijacker = UserFactory(is_active=False)
+        hijacker = PrescriberFactory(is_active=False)  # Not staff nor active
         self.client.force_login(hijacker)
         response = self.client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
         assert response.status_code == 302
         assert response["Location"] == "/accounts/login/?next=/hijack/acquire/"
 
-        hijacker = UserFactory(is_active=True, is_staff=False, is_superuser=False)
-        self.client.force_login(hijacker)
-        response = self.client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
-        assert response.status_code == 403
-
-        hijacker = UserFactory(is_active=True, is_staff=True, is_superuser=False)
+        hijacker = PrescriberFactory()  # active but not staff or superuser
         self.client.force_login(hijacker)
         response = self.client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
         assert response.status_code == 403
 
         with override_settings(HIJACK_ALLOWED_USER_EMAILS=["foo@test.com", "bar@baz.org"]):
-            hijacker = UserFactory(is_active=True, is_staff=True, is_superuser=False, email="not@inthelist.com")
+            # active staff but not superuser and email not in the whitelist
+            hijacker = ItouStaffFactory(email="not@inthelist.com")
             self.client.force_login(hijacker)
             response = self.client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
             assert response.status_code == 403
 
     @override_settings(HIJACK_ALLOWED_USER_EMAILS=["foo@test.com", "bar@baz.org"])
     def test_allowed_staff_hijacker(self):
-        hijacked = UserFactory(is_active=True)
-        hijacker = UserFactory(is_active=True, is_staff=True, email="bar@baz.org")
+        hijacked = PrescriberFactory()
+        hijacker = ItouStaffFactory(email="bar@baz.org")
         self.client.force_login(hijacker)
 
         with self.assertLogs() as cm:

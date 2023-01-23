@@ -2,7 +2,8 @@ from django.urls import reverse
 from django.utils import timezone
 from pytest_django.asserts import assertRedirects
 
-from itou.users.factories import JobSeekerFactory
+from itou.users.enums import UserKind
+from itou.users.factories import ItouStaffFactory, JobSeekerFactory
 from itou.users.models import IdentityProvider, User
 
 
@@ -10,7 +11,7 @@ def test_no_email_sent(client):
     user = JobSeekerFactory(identity_provider=IdentityProvider.INCLUSION_CONNECT)
 
     # Typical admin user.
-    admin_user = JobSeekerFactory(is_staff=True, is_superuser=True)
+    admin_user = ItouStaffFactory(is_superuser=True)
     client.force_login(admin_user)
     now = timezone.now()
     naive_now = timezone.make_naive(now)
@@ -23,7 +24,7 @@ def test_no_email_sent(client):
             "last_checked_at_1": naive_now.time(),
             # email was set by SSO.
             "is_job_seeker": True,
-            "is_staff": True,
+            "kind": "job_seeker",
             "siaemembership_set-INITIAL_FORMS": "0",
             "siaemembership_set-TOTAL_FORMS": "0",
             "prescribermembership_set-INITIAL_FORMS": "0",
@@ -37,8 +38,7 @@ def test_no_email_sent(client):
     )
     assertRedirects(response, reverse("admin:users_user_changelist"))
     user_refreshed = User.objects.get(pk=user.pk)
-    assert user_refreshed.is_staff is True
-    assert user_refreshed.is_job_seeker is True
+    assert user_refreshed.kind == UserKind.JOB_SEEKER
     assert user_refreshed.first_name == user.first_name
     assert user_refreshed.last_name == user.last_name
     assert user_refreshed.date_joined == now

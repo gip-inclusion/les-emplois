@@ -10,8 +10,8 @@ from django.utils import timezone
 from freezegun import freeze_time
 
 from itou.openid_connect.constants import OIDC_STATE_CLEANUP
-from itou.users.enums import IdentityProvider
-from itou.users.factories import UserFactory
+from itou.users.enums import IdentityProvider, UserKind
+from itou.users.factories import JobSeekerFactory, UserFactory
 from itou.users.models import User
 from itou.utils.test import TestCase
 from itou.utils.testing import reload_module
@@ -124,7 +124,7 @@ class FranceConnectTest(TestCase):
 
         assert user.external_data_source_history[0]["source"] == "FC"
         assert user.identity_provider == IdentityProvider.FRANCE_CONNECT
-        assert user.is_job_seeker
+        assert user.kind == UserKind.JOB_SEEKER
 
         # Update user
         fc_user_data.last_name = "DUPUIS"
@@ -187,7 +187,7 @@ class FranceConnectTest(TestCase):
         we use it and we update it
         """
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
-        UserFactory(
+        JobSeekerFactory(
             username=fc_user_data.username,
             last_name="will_be_forgotten",
             identity_provider=IdentityProvider.FRANCE_CONNECT,
@@ -205,7 +205,7 @@ class FranceConnectTest(TestCase):
         The email is also different, so it will crash while trying to create a new user.
         """
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
-        UserFactory(
+        JobSeekerFactory(
             username=fc_user_data.username,
             last_name="will_be_forgotten",
             identity_provider=IdentityProvider.DJANGO,
@@ -220,7 +220,7 @@ class FranceConnectTest(TestCase):
         we use it and we update it
         """
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
-        UserFactory(email=fc_user_data.email, identity_provider=IdentityProvider.DJANGO)
+        JobSeekerFactory(email=fc_user_data.email, identity_provider=IdentityProvider.DJANGO)
         user, created = fc_user_data.create_or_update_user()
         assert not created
         assert user.last_name == FC_USERINFO["family_name"]
@@ -235,7 +235,7 @@ class FranceConnectTest(TestCase):
         we use it but we do not update it
         """
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
-        UserFactory(email=fc_user_data.email, identity_provider=IdentityProvider.INCLUSION_CONNECT)
+        JobSeekerFactory(email=fc_user_data.email, identity_provider=IdentityProvider.INCLUSION_CONNECT)
         user, created = fc_user_data.create_or_update_user()
         assert not created
         assert user.last_name != FC_USERINFO["family_name"]

@@ -28,7 +28,7 @@ from itou.job_applications.factories import JobApplicationFactory, JobApplicatio
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory
-from itou.users.factories import JobSeekerFactory, UserFactory
+from itou.users.factories import ItouStaffFactory, JobSeekerFactory
 from itou.utils import constants as global_constants
 from itou.utils.test import TestCase
 
@@ -341,7 +341,7 @@ class ApprovalModelTest(TestCase):
 
     def test_is_from_ai_stock(self):
         approval_created_at = settings.AI_EMPLOYEES_STOCK_IMPORT_DATE
-        developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
+        developer = ItouStaffFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
 
         approval = ApprovalFactory()
         assert not approval.is_from_ai_stock
@@ -709,9 +709,7 @@ class AutomaticApprovalAdminViewsTest(TestCase):
         Given an existing approval, when setting a different number,
         then the save is rejected.
         """
-        user = UserFactory()
-        user.is_staff = True
-        user.save()
+        user = ItouStaffFactory()
         content_type = ContentType.objects.get_for_model(Approval)
         permission = Permission.objects.get(content_type=content_type, codename="change_approval")
         user.user_permissions.add(permission)
@@ -743,9 +741,6 @@ class AutomaticApprovalAdminViewsTest(TestCase):
 
 class CustomApprovalAdminViewsTest(TestCase):
     def test_manually_add_approval(self):
-        user = UserFactory()
-        self.client.force_login(user)
-
         # When a Pôle emploi ID has been forgotten and the user has no NIR, an approval must be delivered
         # with a manual verification.
         job_seeker = JobSeekerFactory(
@@ -765,16 +760,17 @@ class CustomApprovalAdminViewsTest(TestCase):
         url = reverse("admin:approvals_approval_manually_add_approval", args=[job_application.pk])
 
         # Not enough perms.
+        user = JobSeekerFactory()
+        self.client.force_login(user)
         response = self.client.get(url)
         assert response.status_code == 302
 
-        user.is_staff = True
-        user.save()
+        # With good perms.
+        user = ItouStaffFactory()
+        self.client.force_login(user)
         content_type = ContentType.objects.get_for_model(Approval)
         permission = Permission.objects.get(content_type=content_type, codename="add_approval")
         user.user_permissions.add(permission)
-
-        # With good perms.
         response = self.client.get(url)
         assert response.status_code == 200
 
@@ -1486,14 +1482,14 @@ class ApprovalConcurrentModelTest(TransactionTestCase):
     def test_nominal_process(self):
         with transaction.atomic():
             # create a first approval out of the blue, ensure the number is correct.
-            approval_1 = ApprovalFactory.build(user=UserFactory(), number=None)
+            approval_1 = ApprovalFactory.build(user=JobSeekerFactory(), number=None)
             assert Approval.objects.count() == 0
             approval_1.save()
             assert approval_1.number == "XXXXX0000001"
             assert Approval.objects.count() == 1
 
             # if a second one is created after the save, no worries man.
-            approval_2 = ApprovalFactory.build(user=UserFactory(), number=None)
+            approval_2 = ApprovalFactory.build(user=JobSeekerFactory(), number=None)
             approval_2.save()
             assert approval_2.number == "XXXXX0000002"
 
@@ -1508,10 +1504,10 @@ class ApprovalConcurrentModelTest(TransactionTestCase):
         # create a first Approval so that the last() in get_next_number actually has something
         # to select_for_update() and will effectively lock the last row.
         with transaction.atomic():
-            ApprovalFactory(user=UserFactory(), number=None)
+            ApprovalFactory(user=JobSeekerFactory(), number=None)
 
-        user1 = UserFactory()
-        user2 = UserFactory()
+        user1 = JobSeekerFactory()
+        user2 = JobSeekerFactory()
 
         approval = None
         approval2 = None

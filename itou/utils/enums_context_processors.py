@@ -1,5 +1,4 @@
 import itou.job_applications.enums as job_aplication_enums
-import itou.users.enums as users_enums
 
 
 def expose_enums(*args):

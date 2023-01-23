@@ -41,7 +41,7 @@ from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
 from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS, SiaeKind
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipAndJobsFactory
-from itou.users.factories import JobSeekerFactory, SiaeStaffFactory, UserFactory
+from itou.users.factories import ItouStaffFactory, JobSeekerFactory, SiaeStaffFactory
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.templatetags import format_filters
@@ -171,7 +171,7 @@ class JobApplicationModelTest(TestCase):
 
         # Comes from AI stock.
         # See users.management.commands.import_ai_employees
-        developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
+        developer = ItouStaffFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
         job_application = JobApplicationFactory.build(
             approval_manually_delivered_by=developer, created_at=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE
         )
@@ -203,7 +203,7 @@ class JobApplicationModelTest(TestCase):
 
     def test_is_from_ai_stock(self):
         job_application_created_at = settings.AI_EMPLOYEES_STOCK_IMPORT_DATE
-        developer = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
+        developer = ItouStaffFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
 
         job_application = JobApplicationFactory.build()
         assert not job_application.is_from_ai_stock
@@ -866,7 +866,7 @@ class JobApplicationNotificationsTest(TestCase):
 
     @patch("itou.job_applications.models.huey_notify_pole_emploi")
     def test_manually_deliver_approval(self, *args, **kwargs):
-        staff_member = UserFactory(is_staff=True)
+        staff_member = ItouStaffFactory()
         job_seeker = JobSeekerFactory(
             nir="", pole_emploi_id="", lack_of_pole_emploi_id_reason=JobSeekerFactory._meta.model.REASON_FORGOTTEN
         )
@@ -889,7 +889,7 @@ class JobApplicationNotificationsTest(TestCase):
         assert len(mail.outbox) == 1
 
     def test_manually_refuse_approval(self):
-        staff_member = UserFactory(is_staff=True)
+        staff_member = ItouStaffFactory()
         job_seeker = JobSeekerFactory(
             nir="", pole_emploi_id="", lack_of_pole_emploi_id_reason=JobSeekerFactory._meta.model.REASON_FORGOTTEN
         )
@@ -1756,7 +1756,7 @@ class DisplayMissingEligibilityDiagnosesCommandTest(TestCase):
     @override_settings(AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL="foo@bar.com")
     def test_nominal(self):
         stdout = io.StringIO()
-        user = UserFactory(email="batman@batcave.org")
+        user = ItouStaffFactory(email="batman@batcave.org")
         ja = JobApplicationFactory(
             with_approval=True,
             eligibility_diagnosis=None,
