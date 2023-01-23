@@ -33,7 +33,7 @@ from itou.job_applications.factories import JobApplicationFactory
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory
 from itou.siaes.models import Siae, SiaeMembership
-from itou.users.enums import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
+from itou.users.enums import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF, UserKind
 from itou.users.factories import ItouStaffFactory, JobSeekerFactory, PrescriberFactory
 from itou.users.models import User
 from itou.utils import constants as global_constants, pagination
@@ -783,7 +783,7 @@ class SiaeSignupTokenGeneratorTest(TestCase):
         p0 = SiaeSignupTokenGenerator()
         tk1 = p0.make_token(siae)
         assert p0.check_token(siae, tk1) is True
-        user = User(is_siae_staff=True)
+        user = User(kind=UserKind.SIAE_STAFF)
         user.save()
         membership = SiaeMembership()
         membership.user = user

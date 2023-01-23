@@ -79,7 +79,7 @@ class PEAMUTests(OAuth2TestsMixin, TestCase):
     @mock.patch("itou.external_data.signals.import_user_pe_data_on_peamu_login")
     def test_peamu_connection_for_existing_non_peamu_user(self, mock_login_signal):
         email = "user@example.com"
-        user = User.objects.create(username="user", is_active=True, email=email, is_job_seeker=True)
+        user = User.objects.create(username="user", is_active=True, email=email, kind=users_enums.UserKind.JOB_SEEKER)
         user.set_password("test")
         user.save()
         EmailAddress.objects.create(user=user, email=email, primary=True)

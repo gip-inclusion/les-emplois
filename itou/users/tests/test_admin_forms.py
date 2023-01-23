@@ -8,23 +8,20 @@ from itou.utils.test import TestCase
 
 
 class UserAdminFormTest(TestCase):
-    def test_role_counts(self):
+    def test_kind(self):
         user = JobSeekerFactory()
         data_user = model_to_dict(user)
-        data_user["is_job_seeker"] = True
-        data_user["is_prescriber"] = True
+        data_user["kind"] = UserKind.ITOU_STAFF
         form = UserAdminForm(data=data_user, instance=user)
-        assert not form.is_valid()
-        assert "Un utilisateur ne peut avoir qu'un rôle à la fois" in form.errors["__all__"][0]
+        assert form.is_valid()
+        form.save()
+        user.refresh_from_db()
+        assert user.is_staff
 
     def test_pass_iae_and_job_seeker(self):
         user = JobSeekerFactory()
         ApprovalFactory(user=user)
         data_user = model_to_dict(user)
-        data_user["is_job_seeker"] = False
-        data_user["is_prescriber"] = True
-        data_user["is_siae_staff"] = False
-        data_user["is_labor_inspector"] = False
         data_user["kind"] = UserKind.PRESCRIBER
         form = UserAdminForm(data=data_user, instance=user)
         assert not form.is_valid()
@@ -44,7 +41,6 @@ class UserAdminFormTest(TestCase):
             "username": "johnwayne",
             "password": "foo",
             "email": "john@wayne.com",
-            "is_job_seeker": True,
             "kind": UserKind.JOB_SEEKER,
             "date_joined": "2022-02-02",
             "last_checked_at": "2022-02-02",
@@ -92,7 +88,6 @@ class UserAdminFormTest(TestCase):
             "username": "johnwayne",
             "password": "foo",
             "email": "john@wayne.com",
-            "is_job_seeker": True,
             "kind": UserKind.JOB_SEEKER,
             "date_joined": "2022-02-02",
             "last_checked_at": "2022-02-02",

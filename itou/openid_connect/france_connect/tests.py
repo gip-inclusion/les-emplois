@@ -16,7 +16,7 @@ from itou.users.models import User
 from itou.utils.test import TestCase
 from itou.utils.testing import reload_module
 
-from ..models import TooManyKindsException
+from ..models import InvalidKindException
 from . import constants
 from .models import FranceConnectState, FranceConnectUserData
 
@@ -248,10 +248,10 @@ class FranceConnectTest(TestCase):
     def test_create_or_update_user_raise_too_many_kind_exception(self):
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
 
-        for field in ["is_prescriber", "is_siae_staff", "is_labor_inspector"]:
-            user = UserFactory(username=fc_user_data.username, email=fc_user_data.email, **{field: True})
+        for kind in [UserKind.PRESCRIBER, UserKind.SIAE_STAFF, UserKind.LABOR_INSPECTOR]:
+            user = UserFactory(username=fc_user_data.username, email=fc_user_data.email, kind=kind)
 
-            with pytest.raises(TooManyKindsException):
+            with pytest.raises(InvalidKindException):
                 fc_user_data.create_or_update_user()
 
             user.delete()
@@ -286,9 +286,9 @@ class FranceConnectTest(TestCase):
     def test_callback_redirect_on_too_many_kind_exception(self):
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
 
-        for field in ["is_prescriber", "is_siae_staff", "is_labor_inspector"]:
-            user = UserFactory(username=fc_user_data.username, email=fc_user_data.email, **{field: True})
-            mock_oauth_dance(self, expected_route=f"login:{field[3:]}")
+        for kind in [UserKind.PRESCRIBER, UserKind.SIAE_STAFF, UserKind.LABOR_INSPECTOR]:
+            user = UserFactory(username=fc_user_data.username, email=fc_user_data.email, kind=kind)
+            mock_oauth_dance(self, expected_route=f"login:{kind}")
             user.delete()
 
     def test_logout_no_id_token(self):

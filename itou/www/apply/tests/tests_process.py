@@ -24,6 +24,7 @@ from itou.job_applications.factories import (
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory
+from itou.users.enums import UserKind
 from itou.users.factories import JobSeekerWithAddressFactory, PrescriberFactory
 from itou.users.models import User
 from itou.utils.templatetags.format_filters import format_nir
@@ -133,7 +134,7 @@ class ProcessViewsTest(TestCase):
         """A hidden job_application is not displayed."""
 
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True, job_seeker__is_job_seeker=True, hidden_for_siae=True
+            sent_by_authorized_prescriber_organisation=True, job_seeker__kind=UserKind.JOB_SEEKER, hidden_for_siae=True
         )
         siae_user = job_application.to_siae.members.first()
         self.client.force_login(siae_user)

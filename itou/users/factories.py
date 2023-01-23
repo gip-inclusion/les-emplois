@@ -14,7 +14,7 @@ from itou.cities.factories import create_city_in_zrr, create_city_partially_in_z
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.geo.factories import QPVFactory, ZRRFactory
 from itou.users import models
-from itou.users.enums import Title
+from itou.users.enums import Title, UserKind
 from itou.utils.mocks.address_format import get_random_geocoding_api_result
 from itou.utils.validators import validate_nir
 
@@ -62,19 +62,19 @@ class UserFactory(factory.django.DjangoModelFactory):
 
 
 class ItouStaffFactory(UserFactory):
-    is_staff = True
+    kind = UserKind.ITOU_STAFF
 
 
 class PrescriberFactory(UserFactory):
-    is_prescriber = True
+    kind = UserKind.PRESCRIBER
 
 
 class SiaeStaffFactory(UserFactory):
-    is_siae_staff = True
+    kind = UserKind.SIAE_STAFF
 
 
 class LaborInspectorFactory(UserFactory):
-    is_labor_inspector = True
+    kind = UserKind.LABOR_INSPECTOR
 
 
 # `JobSeeker` and `JobSeekerProfile` factories are mainly used for employee record testing
@@ -87,7 +87,7 @@ class LaborInspectorFactory(UserFactory):
 
 class JobSeekerFactory(UserFactory):
     title = random.choice(Title.values)
-    is_job_seeker = True
+    kind = UserKind.JOB_SEEKER
     pole_emploi_id = factory.fuzzy.FuzzyText(length=8, chars=string.digits)
 
     class Params:

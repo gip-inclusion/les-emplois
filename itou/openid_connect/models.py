@@ -11,7 +11,7 @@ from itou.users.models import User
 from .constants import OIDC_STATE_CLEANUP, OIDC_STATE_EXPIRATION
 
 
-class TooManyKindsException(Exception):
+class InvalidKindException(Exception):
     def __init__(self, user, *args):
         self.user = user
         super().__init__(*args)
@@ -98,6 +98,7 @@ class OIDConnectUserData:
     last_name: str
     username: str
     identity_provider: IdentityProvider
+    kind: str
 
     def create_or_update_user(self):
         """
@@ -138,13 +139,12 @@ class OIDConnectUserData:
             if other_user:
                 raise MultipleUsersFoundException([user, other_user])
 
+        if user.kind != user_data_dict["kind"]:
+            raise InvalidKindException(user)
+
         if not created:
             for key, value in user_data_dict.items():
                 setattr(user, key, value)
-
-        user_kinds = [user.is_job_seeker, user.is_prescriber, user.is_siae_staff, user.is_labor_inspector]
-        if user_kinds.count(True) > 1:
-            raise TooManyKindsException(user)
 
         for key, value in user_data_dict.items():
             user.update_external_data_source_history_field(provider=self.identity_provider, field=key, value=value)

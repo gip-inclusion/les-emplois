@@ -54,6 +54,7 @@ from itou.metabase.tables import (
 from itou.metabase.tables.utils import get_active_siae_pks
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae, SiaeJobDescription
+from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.python import timeit
 
@@ -289,7 +290,7 @@ class Command(BaseCommand):
         for each of the 15 possible criteria.
         """
         queryset = (
-            User.objects.filter(is_job_seeker=True)
+            User.objects.filter(kind=UserKind.JOB_SEEKER)
             .prefetch_related(
                 Prefetch(
                     "eligibility_diagnoses",

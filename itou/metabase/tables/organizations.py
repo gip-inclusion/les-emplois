@@ -11,6 +11,7 @@ from itou.metabase.tables.utils import (
 )
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
+from itou.users.enums import UserKind
 from itou.users.models import User
 
 
@@ -33,7 +34,7 @@ def get_org_first_join_date(org):
 def get_org_members_count(org):
     if org == ORG_OF_PRESCRIBERS_WITHOUT_ORG:
         # Number of prescriber users without org.
-        return User.objects.filter(is_prescriber=True, prescribermembership=None).count()
+        return User.objects.filter(kind=UserKind.PRESCRIBER, prescribermembership=None).count()
     return org.members.count()
 
 

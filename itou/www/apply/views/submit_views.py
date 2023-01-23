@@ -21,6 +21,7 @@ from itou.job_applications.notifications import (
     NewSpontaneousJobAppEmployersNotification,
 )
 from itou.siaes.models import Siae, SiaeJobDescription
+from itou.users.enums import UserKind
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.apis.exceptions import AddressLookupError
 from itou.utils.perms.user import get_user_info
@@ -84,9 +85,11 @@ class ApplyStepBaseView(LoginRequiredMixin, SessionNamespaceRequiredMixin, Templ
         super().setup(request, *args, **kwargs)
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated and not any(
-            [request.user.is_job_seeker, request.user.is_prescriber, request.user.is_siae_staff]
-        ):
+        if request.user.is_authenticated and request.user.kind not in [
+            UserKind.JOB_SEEKER,
+            UserKind.PRESCRIBER,
+            UserKind.SIAE_STAFF,
+        ]:
             raise PermissionDenied("Vous n'êtes pas autorisé à déposer de candidature.")
         return super().dispatch(request, *args, **kwargs)
 
@@ -172,7 +175,7 @@ class ApplyStepForSenderBaseView(ApplyStepBaseView):
         self.sender = request.user
 
     def dispatch(self, request, *args, **kwargs):
-        if not any([self.sender.is_prescriber, self.sender.is_siae_staff]):
+        if self.sender.kind not in [UserKind.PRESCRIBER, UserKind.SIAE_STAFF]:
             return HttpResponseRedirect(reverse("apply:start", kwargs={"siae_pk": self.siae.pk}))
         return super().dispatch(request, *args, **kwargs)
 

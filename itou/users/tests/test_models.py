@@ -1,5 +1,4 @@
 import datetime
-import itertools
 import json
 import uuid
 from unittest import mock
@@ -30,7 +29,7 @@ from itou.prescribers.factories import (
 )
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory
-from itou.users.enums import IdentityProvider, Title
+from itou.users.enums import IdentityProvider, Title, UserKind
 from itou.users.factories import (
     JobSeekerFactory,
     JobSeekerProfileFactory,
@@ -120,7 +119,7 @@ class ModelTest(TestCase):
         }
         user = User.create_job_seeker_by_proxy(proxy_user, **user_data)
 
-        assert user.is_job_seeker
+        assert user.kind == UserKind.JOB_SEEKER
         assert user.password is not None
         assert user.username is not None
 
@@ -775,29 +774,14 @@ class ModelTest(TestCase):
         assert not user.can_view_stats_dgefp(current_org=institution)
         assert not user.can_view_stats_dashboard_widget(current_org=institution)
 
-    def test_a_user_can_only_have_one_kind(self):
-        unique_fields = ["is_job_seeker", "is_prescriber", "is_siae_staff", "is_labor_inspector"]
+    def test_user_kind(self):
+        non_staff_kinds = [UserKind.JOB_SEEKER, UserKind.PRESCRIBER, UserKind.SIAE_STAFF, UserKind.LABOR_INSPECTOR]
 
-        for field in unique_fields:
-            UserFactory(**{field: True})
-
-        for n in range(2, 5):
-            for fields in itertools.combinations(unique_fields, n):
-                with pytest.raises(ValidationError):
-                    UserFactory(**dict(zip(fields, itertools.repeat(True))))
-
-    def test_kind(self):
-        job_seeker = JobSeekerFactory()
-        assert "job_seeker" == job_seeker.kind_from_flags
-
-        prescriber = PrescriberFactory()
-        assert "prescriber" == prescriber.kind_from_flags
-
-        siae_staff = SiaeStaffFactory()
-        assert "siae_staff" == siae_staff.kind_from_flags
-
-        labor_inspector = LaborInspectorFactory()
-        assert "labor_inspector" == labor_inspector.kind_from_flags
+        for kind in non_staff_kinds:
+            user = UserFactory(kind=kind, is_staff=True)
+            assert not user.is_staff
+        user = UserFactory(kind=UserKind.ITOU_STAFF, is_staff=False)
+        assert user.is_staff
 
     def test_get_kind_display(self):
         job_seeker = JobSeekerFactory()

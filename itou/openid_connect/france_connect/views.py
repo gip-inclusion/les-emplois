@@ -10,10 +10,11 @@ from django.urls import reverse
 from django.utils import crypto
 from django.utils.http import urlencode
 
+from itou.users.enums import UserKind
 from itou.utils.constants import ITOU_SESSION_NIR_KEY
 from itou.utils.urls import get_absolute_url
 
-from ..models import MultipleUsersFoundException, TooManyKindsException
+from ..models import InvalidKindException, MultipleUsersFoundException
 from . import constants
 from .models import FranceConnectState, FranceConnectUserData
 
@@ -125,14 +126,14 @@ def france_connect_callback(request):  # pylint: disable=too-many-return-stateme
     try:
         # At this step, we can update the user's fields in DB and create a session if required
         user, _ = fc_user_data.create_or_update_user()
-    except TooManyKindsException as e:
+    except InvalidKindException as e:
         messages.info(request, "Ce compte existe déjà, veuillez vous connecter.")
-        if e.user.is_prescriber:
-            return HttpResponseRedirect(reverse("login:prescriber"))
-        if e.user.is_siae_staff:
-            return HttpResponseRedirect(reverse("login:siae_staff"))
-        if e.user.is_labor_inspector:
-            return HttpResponseRedirect(reverse("login:labor_inspector"))
+        url = {
+            UserKind.PRESCRIBER: reverse("login:prescriber"),
+            UserKind.SIAE_STAFF: reverse("login:siae_staff"),
+            UserKind.LABOR_INSPECTOR: reverse("login:labor_inspector"),
+        }[e.user.kind]
+        return HttpResponseRedirect(url)
     except MultipleUsersFoundException as e:
         return _redirect_to_job_seeker_login_on_error(
             "Vous avez deux comptes sur la plateforme et nous detectons un conflit d'email : "

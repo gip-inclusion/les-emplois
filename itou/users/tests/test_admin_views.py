@@ -23,8 +23,7 @@ def test_no_email_sent(client):
             "last_checked_at_0": naive_now.date(),
             "last_checked_at_1": naive_now.time(),
             # email was set by SSO.
-            "is_job_seeker": True,
-            "kind": "job_seeker",
+            "kind": UserKind.JOB_SEEKER,
             "siaemembership_set-INITIAL_FORMS": "0",
             "siaemembership_set-TOTAL_FORMS": "0",
             "prescribermembership_set-INITIAL_FORMS": "0",

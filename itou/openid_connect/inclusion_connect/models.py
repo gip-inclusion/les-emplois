@@ -1,6 +1,6 @@
 import dataclasses
 
-from itou.users.enums import IdentityProvider
+from itou.users.enums import IdentityProvider, UserKind
 
 from ..models import OIDConnectState, OIDConnectUserData
 
@@ -12,11 +12,11 @@ class InclusionConnectState(OIDConnectState):
 
 @dataclasses.dataclass
 class InclusionConnectPrescriberData(OIDConnectUserData):
-    is_prescriber: bool = True
+    kind: str = UserKind.PRESCRIBER
     identity_provider: IdentityProvider = IdentityProvider.INCLUSION_CONNECT
 
 
 @dataclasses.dataclass
 class InclusionConnectSiaeStaffData(OIDConnectUserData):
-    is_siae_staff: bool = True
+    kind: str = UserKind.SIAE_STAFF
     identity_provider: IdentityProvider = IdentityProvider.INCLUSION_CONNECT

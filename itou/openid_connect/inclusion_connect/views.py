@@ -18,7 +18,7 @@ from itou.users.models import User
 from itou.utils.constants import ITOU_ASSISTANCE_URL
 from itou.utils.urls import get_absolute_url
 
-from ..models import TooManyKindsException
+from ..models import InvalidKindException
 from . import constants
 from .enums import InclusionConnectChannel
 from .models import InclusionConnectPrescriberData, InclusionConnectSiaeStaffData, InclusionConnectState
@@ -225,7 +225,7 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
 
     try:
         user, _ = ic_user_data.create_or_update_user()
-    except TooManyKindsException:
+    except InvalidKindException:
         existing_user = User.objects.get(email=user_data["email"])
         error = (
             f"Un compte {existing_user.get_kind_display()} existe déjà avec cette adresse e-mail. "

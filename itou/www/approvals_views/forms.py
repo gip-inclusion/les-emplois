@@ -8,6 +8,7 @@ from django_select2.forms import Select2MultipleWidget
 from itou.approvals.models import Approval, Prolongation, Suspension
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.enums import SiaeKind
+from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.widgets import DuetDatePickerWidget
 
@@ -34,7 +35,7 @@ class ApprovalForm(forms.Form):
     def _get_choices_for_job_seekers(self):
         # TODO(alaurent) : An Employee model linked to the siae, Approval and JobSeeker would make things easier here
         approvals_qs = Approval.objects.filter(self._get_approvals_qs_filter())
-        users_qs = User.objects.filter(is_job_seeker=True, approvals__in=approvals_qs)
+        users_qs = User.objects.filter(kind=UserKind.JOB_SEEKER, approvals__in=approvals_qs)
         return [
             (user.pk, user.get_full_name().title())
             for user in users_qs.order_by("first_name", "last_name")

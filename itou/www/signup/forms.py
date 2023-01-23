@@ -7,6 +7,7 @@ from django.utils.safestring import mark_safe
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
+from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.apis import api_entreprise, geocoding as api_geocoding
@@ -145,12 +146,11 @@ class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
         # Avoid django-allauth to call its own often failing `generate_unique_username`
         # function by forcing a username.
         self.cleaned_data["username"] = User.generate_unique_username()
-
         # Create the user.
         user = super().save(request)
         user.first_name = self.cleaned_data["first_name"]
         user.last_name = self.cleaned_data["last_name"]
-        user.is_job_seeker = True
+        user.kind = UserKind.JOB_SEEKER
         if self.nir:
             user.nir = self.nir
 

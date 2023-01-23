@@ -66,7 +66,7 @@ class ItouUserManager(UserManager):
         """
         return (
             self.values("pole_emploi_id")
-            .filter(is_job_seeker=True)
+            .filter(kind=UserKind.JOB_SEEKER)
             # Skip empty `pole_emploi_id`.
             .exclude(pole_emploi_id="")
             # Skip 31 cases where `00000000` was used as the `pole_emploi_id`.
@@ -215,13 +215,6 @@ class User(AbstractUser, AddressMixin):
     )
     phone = models.CharField(verbose_name="Téléphone", max_length=20, blank=True)
 
-    is_job_seeker = models.BooleanField(verbose_name="Demandeur d'emploi", default=False)
-    is_prescriber = models.BooleanField(verbose_name="Prescripteur", default=False)
-    is_siae_staff = models.BooleanField(verbose_name="Employeur (SIAE)", default=False)
-    # Members of DDETS, DREETS or DGEFP institution have their own dashboard.
-    is_labor_inspector = models.BooleanField(
-        verbose_name="Inspecteur du travail (DDETS, DREETS, DGEFP)", default=False
-    )
     kind = models.CharField(max_length=20, verbose_name="Type d'utilisateur", choices=UserKind.choices, blank=False)
 
     # TODO(rsebille): Replace the use of a signal by using an uuid4() as default value.
@@ -335,24 +328,40 @@ class User(AbstractUser, AddressMixin):
         self.department = department_from_postcode(self.post_code)
         self.validate_unique()
 
-        # TODO(rsebille): Replace by a UniqueConstraint once the data have been cleaned
-        user_kinds = [
-            self.is_job_seeker,
-            self.is_prescriber,
-            self.is_siae_staff,
-            self.is_labor_inspector,
-        ]
-        if user_kinds.count(True) > 1:
-            raise ValidationError("A User can not have more than one kind")
-
-        # Fallback because of allauth user creation (will be removed as soon as the data migration is done)
-        self.kind = self.kind_from_flags or UserKind.JOB_SEEKER
+        # Update is_staff with kind
+        if self.kind == UserKind.ITOU_STAFF:
+            self.is_staff = True
+        elif self.kind in UserKind:
+            # Any other user kind isn't staff
+            self.is_staff = False
+        else:  # self.kind == "" : handle django admin_client pytest fixture
+            if self.is_staff:
+                self.kind = UserKind.ITOU_STAFF
+            else:
+                ValidationError("User is missing kind")
 
         super().save(*args, **kwargs)
 
         if self.is_job_seeker and not self.asp_uid:
             self.asp_uid = salted_hmac(key_salt="job_seeker.id", value=self.id).hexdigest()[:30]
             super().save(update_fields=["asp_uid"])
+
+    @property
+    def is_job_seeker(self):
+        return self.kind == UserKind.JOB_SEEKER
+
+    @property
+    def is_prescriber(self):
+        return self.kind == UserKind.PRESCRIBER
+
+    @property
+    def is_siae_staff(self):
+        return self.kind == UserKind.SIAE_STAFF
+
+    @property
+    def is_labor_inspector(self):
+        # Members of DDETS, DREETS or DGEFP institution have their own dashboard.
+        return self.kind == UserKind.LABOR_INSPECTOR
 
     def can_edit_email(self, user):
         return user.is_handled_by_proxy and user.is_created_by(self) and not user.has_verified_email
@@ -834,7 +843,6 @@ class User(AbstractUser, AddressMixin):
             }
         """
         username = cls.generate_unique_username()
-        fields["is_job_seeker"] = True
         fields["kind"] = UserKind.JOB_SEEKER
         fields["created_by"] = proxy_user
         user = cls.objects.create_user(
@@ -893,7 +901,7 @@ class User(AbstractUser, AddressMixin):
     def clean_pole_emploi_fields(cleaned_data):
         """
         Validate Pôle emploi fields that depend on each other.
-        Only for users with the `is_job_seeker` flag set to True.
+        Only for users with kind == job_seeker.
         It must be used in forms and modelforms that manipulate job seekers.
         """
         pole_emploi_id = cleaned_data["pole_emploi_id"]
@@ -907,24 +915,8 @@ class User(AbstractUser, AddressMixin):
             # the object is shared between the caller and the called routine.
             cleaned_data["lack_of_pole_emploi_id_reason"] = ""
 
-    # TODO(alaurent) Maybe replace with a field in db
-    @property
-    def kind_from_flags(self):
-        if self.is_job_seeker:
-            return UserKind.JOB_SEEKER
-        elif self.is_prescriber:
-            return UserKind.PRESCRIBER
-        elif self.is_siae_staff:
-            return UserKind.SIAE_STAFF
-        elif self.is_labor_inspector:
-            return UserKind.LABOR_INSPECTOR
-        elif self.is_staff:
-            return UserKind.ITOU_STAFF
-        # Allow null kind as we create jobseekers without is_job_seeker=True
-        # because of allauth
-
     def get_kind_display(self):
-        return self.kind_from_flags.label
+        return UserKind(self.kind).label
 
 
 def get_allauth_account_user_display(user):
