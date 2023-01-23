@@ -847,7 +847,7 @@ class CustomApprovalAdminViewsTest(TestCase):
                 if not job_application.to_siae.can_use_employee_record:
                     assert msg == "La SIAE n'utilise pas les fiches salariés"
                 else:
-                    assert msg == "-"
+                    assert msg == "En attente de création"
 
 
 class SuspensionQuerySetTest(TestCase):

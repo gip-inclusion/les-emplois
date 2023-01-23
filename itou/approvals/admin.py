@@ -69,6 +69,9 @@ class JobApplicationInline(admin.StackedInline):
         if not obj.create_employee_record:
             return "Création désactivée"
 
+        if JobApplication.objects.eligible_as_employee_record(siae=obj.to_siae).filter(pk=obj.pk).exists():
+            return "En attente de création"
+
         return "-"
 
 
