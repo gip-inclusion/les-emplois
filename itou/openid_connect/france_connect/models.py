@@ -1,7 +1,7 @@
 import dataclasses
 import datetime
 
-from itou.users.enums import IdentityProvider
+from itou.users.enums import IdentityProvider, UserKind
 
 from ..models import OIDConnectState, OIDConnectUserData
 
@@ -19,7 +19,7 @@ class FranceConnectUserData(OIDConnectUserData):  # pylint: disable=too-many-ins
     address_line_1: str | None = None
     post_code: str | None = None
     city: str | None = None
-    is_job_seeker: bool = True
+    kind: str = UserKind.JOB_SEEKER
     identity_provider: IdentityProvider = IdentityProvider.FRANCE_CONNECT
 
     @staticmethod

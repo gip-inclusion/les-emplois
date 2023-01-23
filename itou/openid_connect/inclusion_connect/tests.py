@@ -28,7 +28,7 @@ from itou.users.factories import DEFAULT_PASSWORD, PrescriberFactory, UserFactor
 from itou.users.models import User
 
 from ..constants import OIDC_STATE_CLEANUP
-from ..models import TooManyKindsException
+from ..models import InvalidKindException
 from . import constants
 from .models import InclusionConnectPrescriberData, InclusionConnectSiaeStaffData, InclusionConnectState
 from .testing import InclusionConnectBaseTestCase
@@ -272,10 +272,10 @@ class InclusionConnectModelTest(InclusionConnectBaseTestCase):
     def test_create_or_update_prescriber_raise_too_many_kind_exception(self):
         ic_user_data = InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)
 
-        for field in ["is_job_seeker", "is_siae_staff", "is_labor_inspector"]:
-            user = UserFactory(username=ic_user_data.username, email=ic_user_data.email, **{field: True})
+        for kind in [UserKind.JOB_SEEKER, UserKind.SIAE_STAFF, UserKind.LABOR_INSPECTOR]:
+            user = UserFactory(username=ic_user_data.username, email=ic_user_data.email, kind=kind)
 
-            with pytest.raises(TooManyKindsException):
+            with pytest.raises(InvalidKindException):
                 ic_user_data.create_or_update_user()
 
             user.delete()
@@ -283,10 +283,10 @@ class InclusionConnectModelTest(InclusionConnectBaseTestCase):
     def test_create_or_update_siae_staff_raise_too_many_kind_exception(self):
         ic_user_data = InclusionConnectSiaeStaffData.from_user_info(OIDC_USERINFO)
 
-        for field in ["is_job_seeker", "is_prescriber", "is_labor_inspector"]:
-            user = UserFactory(username=ic_user_data.username, email=ic_user_data.email, **{field: True})
+        for kind in [UserKind.JOB_SEEKER, UserKind.PRESCRIBER, UserKind.LABOR_INSPECTOR]:
+            user = UserFactory(username=ic_user_data.username, email=ic_user_data.email, kind=kind)
 
-            with pytest.raises(TooManyKindsException):
+            with pytest.raises(InvalidKindException):
                 ic_user_data.create_or_update_user()
 
             user.delete()
@@ -426,8 +426,8 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
     def test_callback_redirect_prescriber_on_too_many_kind_exception(self):
         ic_user_data = InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)
 
-        for field in ["is_job_seeker", "is_siae_staff", "is_labor_inspector"]:
-            user = UserFactory(username=ic_user_data.username, email=ic_user_data.email, **{field: True})
+        for kind in [UserKind.JOB_SEEKER, UserKind.SIAE_STAFF, UserKind.LABOR_INSPECTOR]:
+            user = UserFactory(username=ic_user_data.username, email=ic_user_data.email, kind=kind)
             response = mock_oauth_dance(self, UserKind.PRESCRIBER, assert_redirects=False)
             response = self.client.get(response.url, follow=True)
             self.assertContains(response, "existe déjà avec cette adresse e-mail")
@@ -438,8 +438,8 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
     def test_callback_redirect_siae_staff_on_too_many_kind_exception(self):
         ic_user_data = InclusionConnectSiaeStaffData.from_user_info(OIDC_USERINFO)
 
-        for field in ["is_job_seeker", "is_prescriber", "is_labor_inspector"]:
-            user = UserFactory(username=ic_user_data.username, email=ic_user_data.email, **{field: True})
+        for kind in [UserKind.JOB_SEEKER, UserKind.PRESCRIBER, UserKind.LABOR_INSPECTOR]:
+            user = UserFactory(username=ic_user_data.username, email=ic_user_data.email, kind=kind)
             # Don't check redirection as the user isn't an siae member yet, so it won't work.
             response = mock_oauth_dance(self, UserKind.SIAE_STAFF, assert_redirects=False)
             response = self.client.get(response.url, follow=True)

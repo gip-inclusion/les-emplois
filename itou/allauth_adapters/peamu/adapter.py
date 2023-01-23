@@ -12,11 +12,11 @@ from itou.utils import constants as global_constants
 class PEAMUSocialAccountAdapter(DefaultSocialAccountAdapter):
     def populate_user(self, request, sociallogin, data):
         user = super().populate_user(request, sociallogin, data)
-        setattr(user, "is_job_seeker", True)
-        setattr(user, "identity_provider", users_enums.IdentityProvider.PE_CONNECT)
+        user.kind = users_enums.UserKind.JOB_SEEKER
+        user.identity_provider = users_enums.IdentityProvider.PE_CONNECT
         nir = request.session.get(global_constants.ITOU_SESSION_NIR_KEY)
         if nir:
-            setattr(user, "nir", nir)
+            user.nir = nir
         return user
 
 

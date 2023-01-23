@@ -1,5 +1,6 @@
 from rest_framework import authentication, generics
 
+from itou.users.enums import UserKind
 from itou.users.models import User
 
 from .perms import ApplicantsAPIPermission
@@ -46,7 +47,7 @@ class ApplicantsView(generics.ListAPIView):
         siae_id = self.request.user.siaemembership_set.get().siae_id
 
         return (
-            User.objects.filter(job_applications__to_siae_id=siae_id, is_job_seeker=True)
+            User.objects.filter(job_applications__to_siae_id=siae_id, kind=UserKind.JOB_SEEKER)
             .select_related("birth_place", "birth_country")
             .prefetch_related("job_applications")
             .order_by("-pk")

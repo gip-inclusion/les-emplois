@@ -11,6 +11,7 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.db.models import Q
 
+from itou.users.enums import UserKind
 from itou.users.models import User
 
 
@@ -171,7 +172,7 @@ class Command(BaseCommand):
         addresses = (
             User.objects.exclude(Q(address_line_1="") | Q(post_code="") | Q(city=""))
             .filter(
-                is_job_seeker=True,
+                kind=UserKind.JOB_SEEKER,
                 is_active=True,
                 coords__isnull=True,
                 geocoding_score__isnull=True,
@@ -224,7 +225,7 @@ class Command(BaseCommand):
             User.objects.exclude(coords__isnull=True, geocoding_score__isnull=True)
             .filter(
                 is_active=True,
-                is_job_seeker=True,
+                kind=UserKind.JOB_SEEKER,
                 coords__isnull=False,
                 geocoding_score__gt=MIN_SCORE,
             )

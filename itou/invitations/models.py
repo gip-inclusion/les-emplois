@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404, reverse
 from django.utils import timezone
 from django.utils.http import urlencode
 
-from itou.users.enums import KIND_LABOR_INSPECTOR, KIND_PRESCRIBER, KIND_SIAE_STAFF
+from itou.users.enums import KIND_LABOR_INSPECTOR, KIND_PRESCRIBER, KIND_SIAE_STAFF, UserKind
 from itou.users.models import User
 from itou.utils.emails import get_email_message
 from itou.utils.urls import get_absolute_url
@@ -107,8 +107,7 @@ class InvitationAbstract(models.Model):
         self.send_invitation()
 
     def set_guest_type(self, user):
-        user.is_job_seeker = True
-        return user
+        raise NotImplementedError
 
     def accepted_notif_sender(self):
         self.email_accepted_notif_sender.send()
@@ -174,7 +173,7 @@ class PrescriberWithOrgInvitation(InvitationAbstract):
         return user == request.user and user.is_prescriber
 
     def set_guest_type(self, user):
-        user.is_prescriber = True
+        user.kind = UserKind.PRESCRIBER
         return user
 
     # Emails
@@ -248,7 +247,7 @@ class SiaeStaffInvitation(InvitationAbstract):
         return user == request.user and user.is_siae_staff
 
     def set_guest_type(self, user):
-        user.is_siae_staff = True
+        user.kind = UserKind.SIAE_STAFF
         return user
 
     # Emails
@@ -324,7 +323,7 @@ class LaborInspectorInvitation(InvitationAbstract):
         return user == request.user and user.is_labor_inspector
 
     def set_guest_type(self, user):
-        user.is_labor_inspector = True
+        user.kind = UserKind.LABOR_INSPECTOR
         return user
 
     # Emails

@@ -6,6 +6,7 @@ from django.utils.html import escape
 from itou.invitations.models import SiaeStaffInvitation
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory, SiaeMembershipFactory
+from itou.users.enums import UserKind
 from itou.users.factories import JobSeekerFactory, SiaeStaffFactory
 from itou.utils.test import TestCase
 from itou.www.invitations_views.forms import SiaeStaffInvitationForm
@@ -81,18 +82,18 @@ class TestSendSingleSiaeInvitation(TestCase):
         assert invitation.SIGNIN_ACCOUNT_TYPE == "siae_staff"
 
     def test_send_invitation_to_not_employer(self):
-        JobSeekerFactory(
-            first_name=self.guest_data["first_name"],
-            last_name=self.guest_data["last_name"],
-            email=self.guest_data["email"],
-        )
+        user = JobSeekerFactory(**self.guest_data)
         self.client.force_login(self.sender)
-        response = self.client.post(INVITATION_URL, data=self.post_data)
 
-        for error_dict in response.context["formset"].errors:
-            for key, _errors in error_dict.items():
-                assert key == "email"
-                assert error_dict["email"][0] == "Cet utilisateur n'est pas un employeur."
+        for kind in [UserKind.JOB_SEEKER, UserKind.PRESCRIBER, UserKind.LABOR_INSPECTOR]:
+            user.kind = kind
+            user.save()
+            response = self.client.post(INVITATION_URL, data=self.post_data)
+
+            for error_dict in response.context["formset"].errors:
+                for key, _errors in error_dict.items():
+                    assert key == "email"
+                    assert error_dict["email"][0] == "Cet utilisateur n'est pas un employeur."
 
     def test_two_employers_invite_the_same_guest(self):
         # SIAE 1 invites guest.

@@ -24,8 +24,7 @@ class ItouCurrentOrganizationMiddleware:
         # Accepting an invitation to join a group is a two-step process.
         # - View one: account creation or login.
         # - View two: user is added to the group.
-        # In view two, the user is authenticated and has a flag (is_siae_staff, is_prescriber, ...)
-        # but he does not belong to any group.
+        # In view two, the user is authenticated but he does not belong to any group.
         # This raises an error so we skip the middleware only in this case.
         login_routes = [reverse(f"login:{url.name}") for url in login_urls.urlpatterns] + [reverse("account_login")]
         skip_middleware_conditions = [

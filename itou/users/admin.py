@@ -108,31 +108,6 @@ class InstitutionMembershipInline(admin.TabularInline):
         return mark_safe(f'<a href="{url}">{obj.institution_id}</a>')
 
 
-class KindFilter(admin.SimpleListFilter):
-    title = "Type"
-    parameter_name = "kind"
-
-    def lookups(self, request, model_admin):
-        return (
-            ("is_job_seeker", "Demandeur d'emploi"),
-            ("is_prescriber", "Prescripteur"),
-            ("is_siae_staff", "SIAE"),
-            ("is_labor_inspector", "Inspecteur du travail"),
-        )
-
-    def queryset(self, request, queryset):
-        value = self.value()
-        if value == "is_job_seeker":
-            queryset = queryset.filter(is_job_seeker=True)
-        elif value == "is_prescriber":
-            queryset = queryset.filter(is_prescriber=True)
-        elif value == "is_siae_staff":
-            queryset = queryset.filter(is_siae_staff=True)
-        elif value == "is_labor_inspector":
-            queryset = queryset.filter(is_labor_inspector=True)
-        return queryset
-
-
 class CreatedByProxyFilter(admin.SimpleListFilter):
     title = "Créé par un tiers"
     parameter_name = "created_by"
@@ -173,7 +148,6 @@ class ItouUserAdmin(UserAdmin):
     )
     list_display_links = ("pk", "email")
     list_filter = UserAdmin.list_filter + (
-        KindFilter,
         "kind",
         CreatedByProxyFilter,
         "identity_provider",
@@ -215,10 +189,6 @@ class ItouUserAdmin(UserAdmin):
                     "department",
                     "city",
                     "address_in_qpv",
-                    "is_job_seeker",
-                    "is_prescriber",
-                    "is_siae_staff",
-                    "is_labor_inspector",
                     "kind",
                     "nir",
                     "pole_emploi_id",
