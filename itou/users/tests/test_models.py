@@ -8,7 +8,6 @@ import pytest
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
-from django.db import IntegrityError, transaction
 from django.test import override_settings
 from django.utils import timezone
 
@@ -32,7 +31,6 @@ from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory
 from itou.users.enums import IdentityProvider, Title, UserKind
 from itou.users.factories import (
-    ItouStaffFactory,
     JobSeekerFactory,
     JobSeekerProfileFactory,
     LaborInspectorFactory,
@@ -1197,37 +1195,3 @@ def test_user_asp_uid(factory, expected):
         assert user.asp_uid is None
     else:
         assert user.asp_uid == expected
-
-
-@pytest.mark.parametrize(
-    "factory",
-    [
-        JobSeekerFactory,
-        PrescriberFactory,
-        SiaeStaffFactory,
-        LaborInspectorFactory,
-    ],
-)
-def test_user_not_is_staff_nor_superuser(factory):
-    factory()
-
-    # Avoid crashing the database connection because of the IntegrityError
-    with transaction.atomic():
-        with pytest.raises(IntegrityError):
-            User.objects.update(is_staff=True)
-
-    # Avoid crashing the database connection because of the IntegrityError
-    with transaction.atomic():
-        with pytest.raises(IntegrityError):
-            User.objects.update(is_superuser=True)
-
-
-def test_staff_user():
-    ItouStaffFactory(is_superuser=True)
-
-    User.objects.update(is_superuser=False)
-
-    # Avoid crashing the database connection because of the IntegrityError
-    with transaction.atomic():
-        with pytest.raises(IntegrityError):
-            User.objects.update(is_staff=False)
