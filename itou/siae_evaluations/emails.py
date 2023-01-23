@@ -3,6 +3,7 @@ from django.urls import reverse
 
 from itou.utils import constants as global_constants
 from itou.utils.emails import get_email_message
+from itou.utils.urls import get_absolute_url
 
 
 class CampaignEmailFactory:
@@ -33,6 +34,19 @@ class CampaignEmailFactory:
         context = {"evaluated_siaes": evaluated_siaes}
         subject = "siae_evaluations/email/to_institution_siaes_forced_to_adversarial_stage_subject.txt"
         body = "siae_evaluations/email/to_institution_siaes_forced_to_adversarial_stage_body.txt"
+        return get_email_message(self.recipients, context, subject, body)
+
+    def close(self):
+        context = {
+            "evaluated_siaes_list_url": get_absolute_url(
+                reverse(
+                    "siae_evaluations_views:institution_evaluated_siae_list",
+                    kwargs={"evaluation_campaign_pk": self.evaluation_campaign.pk},
+                )
+            )
+        }
+        subject = "siae_evaluations/email/to_institution_campaign_close_subject.txt"
+        body = "siae_evaluations/email/to_institution_campaign_close_body.txt"
         return get_email_message(self.recipients, context, subject, body)
 
 

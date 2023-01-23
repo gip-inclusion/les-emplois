@@ -271,10 +271,32 @@ class EvaluationCampaign(models.Model):
         if not self.ended_at:
             self.ended_at = timezone.now()
             self.save(update_fields=["ended_at"])
-            send_email_messages(
-                SIAEEmailFactory(evaluated_siae).refused_no_proofs()
-                for evaluated_siae in self.evaluated_siaes.did_not_send_proof()
+            evaluated_siaes = (
+                EvaluatedSiae.objects.filter(evaluation_campaign=self)
+                .filter(notified_at=None)
+                .prefetch_related("evaluated_job_applications__evaluated_administrative_criteria")
             )
+            has_siae_to_notify = False
+            siae_without_proofs = []
+            for evaluated_siae in evaluated_siaes:
+                # Computing the state is costly, avoid it when possible.
+                if not has_siae_to_notify:
+                    has_siae_to_notify |= (
+                        evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.NOTIFICATION_PENDING
+                    )
+                if evaluated_siae.final_reviewed_at is None:
+                    criterias = [
+                        crit
+                        for jobapp in evaluated_siae.evaluated_job_applications.all()
+                        for crit in jobapp.evaluated_administrative_criteria.all()
+                    ]
+                    if len(criterias) == 0 or any(crit.submitted_at is None for crit in criterias):
+                        siae_without_proofs.append(evaluated_siae)
+                        has_siae_to_notify = True
+            emails = [SIAEEmailFactory(evaluated_siae).refused_no_proofs() for evaluated_siae in siae_without_proofs]
+            if has_siae_to_notify:
+                emails.append(CampaignEmailFactory(self).close())
+            send_email_messages(emails)
 
 
 class EvaluatedSiaeQuerySet(models.QuerySet):
