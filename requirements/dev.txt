@@ -1127,9 +1127,9 @@ s3transfer==0.6.0 \
     # via
     #   -r requirements/base.txt
     #   boto3
-sentry-sdk==1.13.0 \
-    --hash=sha256:72da0766c3069a3941eadbdfa0996f83f5a33e55902a19ba399557cfee1dddcc \
-    --hash=sha256:b7ff6318183e551145b5c4766eb65b59ad5b63ff234dffddc5fb50340cad6729
+sentry-sdk==1.14.0 \
+    --hash=sha256:273fe05adf052b40fd19f6d4b9a5556316807246bd817e5e3482930730726bb0 \
+    --hash=sha256:72c00322217d813cf493fe76590b23a757e063ff62fec59299f4af7201dd4448
     # via -r requirements/base.txt
 setuptools==65.5.1 \
     --hash=sha256:d0b9a8433464d5800cbe05094acf5c6d52a91bfac9b52bcfc4d41382be5d5d31 \
