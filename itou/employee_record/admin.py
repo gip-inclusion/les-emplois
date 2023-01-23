@@ -158,11 +158,11 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
         return mark_safe(f'<a href="{url}">Profil salarié ID:{job_seeker.pk}</a>')
 
     def asp_processing_type(self, obj):
-        return (
-            "Intégrée automatiquement par script (doublon ASP)"
-            if obj.processed_as_duplicate
-            else "Intégration ASP normale"
-        )
+        if obj.processed_as_duplicate:
+            return "Intégrée automatiquement par script (doublon ASP)"
+        if obj.asp_processing_code:
+            return "Intégration ASP normale"
+        return "-"
 
     asp_processing_type.short_description = "Type d'intégration"
     job_seeker_link.short_description = "Salarié"
