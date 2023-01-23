@@ -16,10 +16,10 @@ select
     c.département_structure,
     c.id as id_candidature,
     /* TODO dejafait drop as soon as analistos have migrated to the new deanonymized column */
-    c.id as id_candidature_anonymisé,
+    c.id_anonymisé as id_candidature_anonymisé,
     c.id_candidat,
     /* TODO dejafait drop as soon as analistos have migrated to the new deanonymized column */
-    c.id_candidat as id_candidat_anonymisé,
+    c.id_candidat_anonymisé as id_candidat_anonymisé,
     c.id_structure,
     c.motif_de_refus,
     c.nom_département_structure,

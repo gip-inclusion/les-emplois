@@ -8,7 +8,9 @@ Nous récupérons aussi différentes informations sur les structures à partir d
 	
 with candidats_p as ( /* Ici on sélectionne les colonnes pertinentes à partir de la table candidats en ne prenant que les auteurs = Prescripteur */
     select  
-	distinct cdd.id as id_candidat, 
+	distinct cdd.id as id_candidat,
+	/* TODO dejafait drop as soon as analistos have migrated to the new deanonymized column */
+	cdd.id_anonymisé as id_candidat_anonymise, 
 	cdd.actif,   
 	cdd.age,    
 	cdd.date_diagnostic,
@@ -43,7 +45,7 @@ prescripteurs as (
 select /* On selectionne les colonnes finales qui nous intéressent */
     id_candidat,
     /* TODO dejafait drop as soon as analistos have migrated to the new deanonymized column */
-    id_candidat as id_candidat_anonymise,
+    id_candidat_anonymise as id_candidat_anonymise,
     case /* ajout d'une colonne permettant de calculer le taux de candidats acceptées tout en faisant une jointure avec la table candidatures */
         when total_embauches > 0 then concat(cast(id_candidat as varchar), '_accepté')
         else null

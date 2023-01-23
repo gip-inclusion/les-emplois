@@ -12,7 +12,9 @@ L'objectif est de calculer le délai entre la 1ère candidature et l'embauche de
 
 with date_1ere_candidature as (
     select 
-        c."id_candidat",
+        c.id_candidat,
+        /* TODO dejafait drop as soon as analistos have migrated to the new deanonymized column */
+        c.id_candidat_anonymisé,
         min(date_candidature) as date_1ere_candidature,
         min(
             case 
@@ -31,7 +33,9 @@ with date_1ere_candidature as (
         where c.origine = 'Prescripteur habilité' /* Modification du filtre initialement fait par Soumia, qui n'était pas bon */
         and c.origine_détaillée  = 'Prescripteur habilité PE'
     group by 
-        c."id_candidat",
+        c.id_candidat,
+        /* TODO dejafait drop as soon as analistos have migrated to the new deanonymized column */
+        c.id_candidat_anonymisé,
         candidats.nom_département,
         date_candidature,
         date_embauche,
@@ -48,7 +52,7 @@ prescripteurs as (
 select 
     id_candidat,
     /* TODO dejafait drop as soon as analistos have migrated to the new deanonymized column */
-    id_candidat as id_candidat_anonymisé,
+    id_candidat_anonymisé,
     nom_département_candidat,
     date_candidature,
     date_embauche,

@@ -85,10 +85,10 @@ select
     état,
     id,
     /* TODO dejafait drop as soon as analistos have migrated to the new deanonymized column */
-    id as id_anonymisé,
+    id_anonymisé,
     id_candidat,
     /* TODO dejafait drop as soon as analistos have migrated to the new deanonymized column */
-    id_candidat as id_candidat_anonymisé,
+    id_candidat_anonymisé,
     candidatures_p.id_structure,
     motif_de_refus,
     candidatures_p.nom_département_structure,
