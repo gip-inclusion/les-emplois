@@ -191,14 +191,14 @@ class ModelTest(TestCase):
         """
 
         email = "juste@leblanc.com"
-        UserFactory(email=email)
+        JobSeekerFactory(email=email)
 
         # Creating a user with an existing email should raise an error.
         with pytest.raises(ValidationError):
-            UserFactory(email=email)
+            JobSeekerFactory(email=email)
 
         # Updating a user with an existing email should raise an error.
-        user = UserFactory(email="francois@pignon.com")
+        user = JobSeekerFactory(email="francois@pignon.com")
         user.email = email
         with pytest.raises(ValidationError):
             user.save()
@@ -206,7 +206,7 @@ class ModelTest(TestCase):
         # Make sure it's case insensitive.
         email = email.title()
         with pytest.raises(ValidationError):
-            UserFactory(email=email)
+            JobSeekerFactory(email=email)
 
     def test_is_handled_by_proxy(self):
         job_seeker = JobSeekerFactory()
@@ -243,7 +243,7 @@ class ModelTest(TestCase):
         # Field name don't reflect actual behaviour.
         # Also, keeping a trace of old data is interesting in a debug purpose.
         # Maybe split this test in smaller tests at the same time.
-        user = UserFactory()
+        user = PrescriberFactory()
         assert not user.external_data_source_history
 
         provider = IdentityProvider.FRANCE_CONNECT
@@ -422,7 +422,7 @@ class ModelTest(TestCase):
             job_seeker.clean()
 
     def test_can_edit_email(self):
-        user = UserFactory()
+        user = PrescriberFactory()
         job_seeker = JobSeekerFactory()
 
         # Same user.
@@ -437,7 +437,7 @@ class ModelTest(TestCase):
         assert not user.can_edit_email(job_seeker)
 
         # User did not create the job seeker's account.
-        job_seeker = JobSeekerFactory(created_by=UserFactory())
+        job_seeker = JobSeekerFactory(created_by=PrescriberFactory())
         assert not user.can_edit_email(job_seeker)
 
         # Job seeker has verified his email.
@@ -568,7 +568,7 @@ class ModelTest(TestCase):
         assert not authorized_prescriber.can_add_nir(job_seeker_with_nir)
 
     def test_is_account_creator(self):
-        user = UserFactory()
+        user = PrescriberFactory()
 
         job_seeker = JobSeekerFactory(created_by=user)
         assert job_seeker.is_created_by(user)
@@ -576,11 +576,11 @@ class ModelTest(TestCase):
         job_seeker = JobSeekerFactory()
         assert not job_seeker.is_created_by(user)
 
-        job_seeker = JobSeekerFactory(created_by=UserFactory())
+        job_seeker = JobSeekerFactory(created_by=PrescriberFactory())
         assert not job_seeker.is_created_by(user)
 
     def test_has_verified_email(self):
-        user = UserFactory()
+        user = JobSeekerFactory()
 
         assert not user.has_verified_email
         address = user.emailaddress_set.create(email=user.email, verified=False)

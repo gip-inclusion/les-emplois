@@ -222,9 +222,7 @@ class User(AbstractUser, AddressMixin):
     is_labor_inspector = models.BooleanField(
         verbose_name="Inspecteur du travail (DDETS, DREETS, DGEFP)", default=False
     )
-    kind = models.CharField(
-        max_length=20, verbose_name="Type d'utilisateur", choices=UserKind.choices, null=True, blank=False
-    )
+    kind = models.CharField(max_length=20, verbose_name="Type d'utilisateur", choices=UserKind.choices, blank=False)
 
     # TODO(rsebille): Replace the use of a signal by using an uuid4() as default value.
     #  I am not do it _right now_ because we need to make sure the format will work on ASP side,
@@ -347,7 +345,8 @@ class User(AbstractUser, AddressMixin):
         if user_kinds.count(True) > 1:
             raise ValidationError("A User can not have more than one kind")
 
-        self.kind = self.kind_from_flags
+        # Fallback because of allauth user creation (will be removed as soon as the data migration is done)
+        self.kind = self.kind_from_flags or UserKind.JOB_SEEKER
 
         super().save(*args, **kwargs)
 
