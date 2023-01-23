@@ -15,6 +15,7 @@ from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication
 from itou.users.models import User
 from itou.utils.management_commands import DeprecatedLoggerMixin
+from itou.utils.urls import get_absolute_url
 
 
 class Command(DeprecatedLoggerMixin, BaseCommand):
@@ -72,7 +73,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
         users_to_delete = [u for u in duplicates if u != target]
 
         target_admin_path = reverse("admin:users_user_change", args=[target.pk])
-        target_admin_url = f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}{target_admin_path}"
+        target_admin_url = get_absolute_url(target_admin_path)
         self.EASY_DUPLICATES_LOGS.append(
             {
                 "Compte de destination": target.email,
@@ -122,9 +123,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
         freshness_threshold = timezone.now() - relativedelta(months=3)
         for duplicate in duplicates:
             args = {"job_seeker_id": duplicate.id, "created_at__gte": freshness_threshold}
-            recent_job_applications_url = (
-                f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}{job_applications_path}?{urlencode(args)}"
-            )
+            recent_job_applications_url = f"{get_absolute_url(job_applications_path)}?{urlencode(args)}"
             log_info = {
                 "Numéro": self.HARD_DUPLICATES_COUNT,
                 "Nombre de doublons": len(duplicates),
@@ -141,7 +140,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
             approval = duplicate.approvals.last()
             if approval:
                 approval_admin_path = reverse("admin:approvals_approval_change", args=[approval.pk])
-                approval_admin_url = f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}{approval_admin_path}"
+                approval_admin_url = get_absolute_url(approval_admin_path)
                 log_info["Numéro PASS IAE"] = approval.number
                 log_info["Début PASS IAE"] = approval.start_at.strftime("%d/%m/%Y")
                 log_info["Fin PASS IAE"] = approval.end_at.strftime("%d/%m/%Y")
