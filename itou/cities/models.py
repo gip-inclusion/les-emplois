@@ -19,8 +19,12 @@ class City(models.Model):
     name = models.CharField(verbose_name="Ville", max_length=255, db_index=True)
     slug = models.SlugField(verbose_name="Slug", max_length=255, unique=True)
     department = models.CharField(verbose_name="Département", choices=DEPARTMENT_CHOICES, max_length=3, db_index=True)
+
+    # Note that post codes and insee codes have a n-to-n relationship.
+    # One insee code can have several post codes but the inverse is also true e.g. zip code 33360 has six insee codes.
     post_codes = ArrayField(models.CharField(max_length=5), verbose_name="Codes postaux", blank=True)
     code_insee = models.CharField(verbose_name="Code INSEE", max_length=5, unique=True)
+
     # Latitude and longitude coordinates.
     # https://docs.djangoproject.com/en/2.2/ref/contrib/gis/model-api/#pointfield
     coords = gis_models.PointField(geography=True, blank=True, null=True)
