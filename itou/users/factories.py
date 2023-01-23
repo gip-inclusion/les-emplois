@@ -61,6 +61,10 @@ class UserFactory(factory.django.DjangoModelFactory):
     phone = factory.Faker("phone_number", locale="fr_FR")
 
 
+class ItouStaffFactory(UserFactory):
+    is_staff = True
+
+
 class PrescriberFactory(UserFactory):
     is_prescriber = True
 

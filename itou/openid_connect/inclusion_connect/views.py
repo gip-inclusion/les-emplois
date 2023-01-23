@@ -13,7 +13,7 @@ from django.utils import crypto
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 
-from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF, Kind
+from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF, UserKind
 from itou.users.models import User
 from itou.utils.constants import ITOU_ASSISTANCE_URL
 from itou.utils.urls import get_absolute_url
@@ -230,7 +230,7 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
         error = (
             f"Un compte {existing_user.get_kind_display()} existe déjà avec cette adresse e-mail. "
             "Vous devez créer un compte Inclusion Connect avec une autre adresse e-mail pour "
-            f"devenir {Kind(user_kind).label} sur la plateforme. Besoin d'aide ? "
+            f"devenir {UserKind(user_kind).label} sur la plateforme. Besoin d'aide ? "
             f"<a href='{ITOU_ASSISTANCE_URL}/#support' target='_blank'>Contactez-nous</a>."
         )
         messages.error(request, mark_safe(error))

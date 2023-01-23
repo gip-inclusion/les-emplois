@@ -9,7 +9,7 @@ from itou.approvals.factories import ApprovalFactory
 from itou.job_applications.factories import JobApplicationFactory
 from itou.job_applications.models import JobApplication
 from itou.siaes.factories import SiaeMembershipFactory
-from itou.users.factories import UserFactory
+from itou.users.factories import ItouStaffFactory
 from itou.utils import constants as global_constants
 from itou.utils.test import TestCase
 
@@ -95,7 +95,7 @@ class TestDisplayApproval(TestCase):
         job_application = JobApplicationFactory(
             with_approval=True,
             eligibility_diagnosis=None,
-            approval_manually_delivered_by=UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL),
+            approval_manually_delivered_by=ItouStaffFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL),
             created_at=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE,
         )
 
@@ -117,7 +117,7 @@ class TestDisplayApproval(TestCase):
         # On November 30th, 2021, AI were delivered approvals without a diagnosis.
         # See itou.users.management.commands.import_ai_employees.
         approval_created_at = settings.AI_EMPLOYEES_STOCK_IMPORT_DATE
-        approval_created_by = UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
+        approval_created_by = ItouStaffFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
         job_application = JobApplicationFactory(
             with_approval=True,
             eligibility_diagnosis=None,

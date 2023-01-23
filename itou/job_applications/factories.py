@@ -17,12 +17,12 @@ from itou.prescribers.factories import (
 from itou.siaes.factories import SiaeFactory
 from itou.siaes.models import SiaeJobDescription
 from itou.users.factories import (
+    ItouStaffFactory,
     JobSeekerFactory,
     JobSeekerProfileFactory,
     JobSeekerProfileWithHexaAddressFactory,
     JobSeekerWithMockedAddressFactory,
     PrescriberFactory,
-    UserFactory,
 )
 
 
@@ -54,7 +54,7 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
         )
         is_from_ai_stock = factory.Trait(
             approval_manually_delivered_by=factory.SubFactory(
-                UserFactory, email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL
+                ItouStaffFactory, email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL
             ),
             created_at=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE,
         )

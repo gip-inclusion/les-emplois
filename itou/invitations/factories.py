@@ -6,7 +6,7 @@ from django.utils import timezone
 from itou.invitations import models
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory
-from itou.users.factories import UserFactory
+from itou.users.factories import PrescriberFactory, SiaeStaffFactory
 
 
 class SiaeStaffInvitationFactory(factory.django.DjangoModelFactory):
@@ -16,7 +16,7 @@ class SiaeStaffInvitationFactory(factory.django.DjangoModelFactory):
     email = factory.Sequence("email{}@siaestaff.com".format)
     first_name = factory.Sequence("first_name{}".format)
     last_name = factory.Sequence("last_name{}".format)
-    sender = factory.SubFactory(UserFactory)
+    sender = factory.SubFactory(SiaeStaffFactory)
     siae = factory.SubFactory(SiaeFactory, with_membership=True)
 
 
@@ -37,7 +37,7 @@ class PrescriberWithOrgSentInvitationFactory(factory.django.DjangoModelFactory):
     email = factory.Faker("email", locale="fr_FR")
     first_name = factory.Faker("first_name", locale="fr_FR")
     last_name = factory.Faker("last_name", locale="fr_FR")
-    sender = factory.SubFactory(UserFactory)
+    sender = factory.SubFactory(PrescriberFactory)
     sent = True
     sent_at = factory.LazyFunction(timezone.now)
     organization = factory.SubFactory(PrescriberOrganizationWithMembershipFactory)

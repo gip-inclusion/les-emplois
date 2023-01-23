@@ -1,7 +1,7 @@
 import datetime
 
 from itou.asp.models import Commune
-from itou.users.factories import UserFactory
+from itou.users.factories import ItouStaffFactory
 from itou.utils.test import TestCase
 
 
@@ -72,7 +72,7 @@ class CommuneModelTest(TestCase):
         assert new_commune == result
 
     def test_by_insee_code_ignore_manually_created(self):
-        user = UserFactory()
+        user = ItouStaffFactory()
         commune = Commune.objects.current().first()
         # Manually add a Commune as we did to duplicate an existing Commune
         # SAINT-DENIS/STE-CLOTILDE code=97411
@@ -102,7 +102,7 @@ class CommuneModelTest(TestCase):
         assert new_commune == result
 
     def test_by_insee_code_and_period_ignore_manually_created(self):
-        user = UserFactory()
+        user = ItouStaffFactory()
         commune = Commune.objects.first()
 
         # Manually add a Commune as we did to duplicate an existing Commune

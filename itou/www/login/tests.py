@@ -15,7 +15,6 @@ from itou.users.factories import (
     LaborInspectorFactory,
     PrescriberFactory,
     SiaeStaffFactory,
-    UserFactory,
 )
 from itou.utils.test import TestCase
 from itou.utils.testing import reload_module
@@ -188,8 +187,8 @@ class JopbSeekerLoginTest(TestCase):
         The job seeker has 2 accounts : a django one, and a FC one, with 2 different email adresses.
         Then he changes the email adresse on FC to use the django account email.
         """
-        UserFactory(email=FC_USERINFO["email"], identity_provider=IdentityProvider.DJANGO)
-        UserFactory(
+        JobSeekerFactory(email=FC_USERINFO["email"], identity_provider=IdentityProvider.DJANGO)
+        JobSeekerFactory(
             username=FC_USERINFO["sub"],
             email="seconde@email.com",
             identity_provider=IdentityProvider.FRANCE_CONNECT,

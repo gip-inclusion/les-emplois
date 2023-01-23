@@ -17,7 +17,7 @@ from itou.geo.utils import coords_to_geometry
 from itou.job_applications.factories import JobApplicationFactory
 from itou.siaes.factories import SiaeFactory
 from itou.users.enums import IdentityProvider
-from itou.users.factories import JobSeekerFactory, PrescriberFactory, SiaeStaffFactory, UserFactory
+from itou.users.factories import ItouStaffFactory, JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
 
 
 @pytest.mark.django_db(transaction=True)
@@ -103,7 +103,7 @@ def test_populate_job_seekers():
     job_application_2 = JobApplicationFactory(
         with_approval=True,
         job_seeker=user_2,
-        approval__created_by=UserFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL),
+        approval__created_by=ItouStaffFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL),
         approval__created_at=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE,
     )
 

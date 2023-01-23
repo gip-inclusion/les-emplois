@@ -22,7 +22,7 @@ from itou.prescribers.factories import (
 )
 from itou.prescribers.management.commands.merge_organizations import organization_merge_into
 from itou.prescribers.models import PrescriberOrganization
-from itou.users.factories import UserFactory
+from itou.users.factories import ItouStaffFactory, PrescriberFactory
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
 from itou.utils.test import TestCase
 
@@ -174,12 +174,12 @@ class PrescriberOrganizationModelTest(TestCase):
     def test_add_member(self):
         org = PrescriberOrganizationFactory()
         assert 0 == org.members.count()
-        admin_user = UserFactory()
+        admin_user = PrescriberFactory()
         org.add_member(admin_user)
         assert 1 == org.memberships.count()
         assert org.memberships.get(user=admin_user).is_admin
 
-        other_user = UserFactory()
+        other_user = PrescriberFactory()
         org.add_member(other_user)
         assert 2 == org.memberships.count()
         assert not org.memberships.get(user=other_user).is_admin
@@ -242,15 +242,10 @@ class PrescriberOrganizationModelTest(TestCase):
 class PrescriberOrganizationAdminTest(TestCase):
     def setUp(self):
         # super user
-        self.superuser = UserFactory()
-        self.superuser.is_staff = True
-        self.superuser.is_superuser = True
-        self.superuser.save()
+        self.superuser = ItouStaffFactory(is_superuser=True)
 
         # staff user with permissions
-        self.user = UserFactory()
-        self.user.is_staff = True
-        self.user.save()
+        self.user = ItouStaffFactory()
         content_type = ContentType.objects.get_for_model(PrescriberOrganization)
         permission = Permission.objects.get(content_type=content_type, codename="change_prescriberorganization")
         self.user.user_permissions.add(permission)

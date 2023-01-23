@@ -788,16 +788,16 @@ class ModelTest(TestCase):
 
     def test_kind(self):
         job_seeker = JobSeekerFactory()
-        assert "job_seeker" == job_seeker.kind
+        assert "job_seeker" == job_seeker.kind_from_flags
 
         prescriber = PrescriberFactory()
-        assert "prescriber" == prescriber.kind
+        assert "prescriber" == prescriber.kind_from_flags
 
         siae_staff = SiaeStaffFactory()
-        assert "siae_staff" == siae_staff.kind
+        assert "siae_staff" == siae_staff.kind_from_flags
 
         labor_inspector = LaborInspectorFactory()
-        assert "labor_inspector" == labor_inspector.kind
+        assert "labor_inspector" == labor_inspector.kind_from_flags
 
     def test_get_kind_display(self):
         job_seeker = JobSeekerFactory()

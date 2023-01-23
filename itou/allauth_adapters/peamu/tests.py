@@ -73,9 +73,7 @@ class PEAMUTests(OAuth2TestsMixin, TestCase):
         assert email_address.user.is_active is True
         assert email_address.user.identity_provider == users_enums.IdentityProvider.PE_CONNECT
         # Note that a PEAMU user is automatically set as a job seeker.
-        assert email_address.user.is_job_seeker is True
-        assert email_address.user.is_prescriber is False
-        assert email_address.user.is_siae_staff is False
+        assert email_address.user.kind == users_enums.UserKind.JOB_SEEKER
         assert email_address.user.is_staff is False
 
     @mock.patch("itou.external_data.signals.import_user_pe_data_on_peamu_login")

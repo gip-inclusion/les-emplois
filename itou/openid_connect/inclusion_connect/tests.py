@@ -23,7 +23,7 @@ from freezegun import freeze_time
 
 from itou.openid_connect.inclusion_connect.views import InclusionConnectSession
 from itou.users import enums as users_enums
-from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF
+from itou.users.enums import UserKind
 from itou.users.factories import DEFAULT_PASSWORD, PrescriberFactory, UserFactory
 from itou.users.models import User
 
@@ -112,7 +112,6 @@ def mock_oauth_dance(
     response = test_class.client.get(url, data={"code": "123", "state": csrf_signed})
     if assert_redirects:
         test_class.assertRedirects(response, reverse(expected_route))
-
     return response
 
 
@@ -187,7 +186,7 @@ class InclusionConnectModelTest(InclusionConnectBaseTestCase):
         we use it and we update it.
         """
         ic_user_data = InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)
-        UserFactory(
+        PrescriberFactory(
             username=ic_user_data.username,
             last_name="will_be_forgotten",
             identity_provider=users_enums.IdentityProvider.INCLUSION_CONNECT,
@@ -204,7 +203,7 @@ class InclusionConnectModelTest(InclusionConnectBaseTestCase):
         The email is also different, so it will crash while trying to create a new user.
         """
         ic_user_data = InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)
-        UserFactory(
+        PrescriberFactory(
             username=ic_user_data.username,
             last_name="will_be_forgotten",
             identity_provider=users_enums.IdentityProvider.DJANGO,
@@ -219,7 +218,7 @@ class InclusionConnectModelTest(InclusionConnectBaseTestCase):
         We user it and we update it with the data form the identity_provider.
         """
         ic_user_data = InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)
-        UserFactory(email=ic_user_data.email, identity_provider=users_enums.IdentityProvider.DJANGO)
+        PrescriberFactory(email=ic_user_data.email, identity_provider=users_enums.IdentityProvider.DJANGO)
         user, created = ic_user_data.create_or_update_user()
         assert not created
         assert user.last_name == OIDC_USERINFO["family_name"]
@@ -233,7 +232,7 @@ class InclusionConnectModelTest(InclusionConnectBaseTestCase):
         we use it but we do not update it.
         """
         ic_user_data = InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)
-        UserFactory(email=ic_user_data.email, identity_provider=users_enums.IdentityProvider.FRANCE_CONNECT)
+        PrescriberFactory(email=ic_user_data.email, identity_provider=users_enums.IdentityProvider.FRANCE_CONNECT)
         user, created = ic_user_data.create_or_update_user()
         assert not created
         assert user.last_name != OIDC_USERINFO["family_name"]
@@ -242,7 +241,7 @@ class InclusionConnectModelTest(InclusionConnectBaseTestCase):
         assert user.identity_provider != users_enums.IdentityProvider.INCLUSION_CONNECT
 
     def test_update_user_from_user_info(self):
-        user = UserFactory(**dataclasses.asdict(InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)))
+        user = PrescriberFactory(**dataclasses.asdict(InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)))
         ic_user = InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)
 
         new_ic_user = InclusionConnectPrescriberData(
@@ -319,7 +318,7 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
         response = self.client.get(url, follow=False)
         self.assertRedirects(response, reverse("home:hp"))
 
-        url = f"{reverse('inclusion_connect:authorize')}?user_kind={KIND_PRESCRIBER}"
+        url = f"{reverse('inclusion_connect:authorize')}?user_kind={UserKind.PRESCRIBER}"
         response = self.client.get(url, follow=False)
         assert response.url.startswith(constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE)
         assert constants.INCLUSION_CONNECT_SESSION_KEY in self.client.session
@@ -329,14 +328,14 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
         response = self.client.get(url, follow=False)
         self.assertRedirects(response, reverse("home:hp"))
 
-        url = f"{reverse('inclusion_connect:authorize')}?user_kind={KIND_PRESCRIBER}&register=true"
+        url = f"{reverse('inclusion_connect:authorize')}?user_kind={UserKind.PRESCRIBER}&register=true"
         response = self.client.get(url, follow=False)
         assert response.url.startswith(constants.INCLUSION_CONNECT_ENDPOINT_REGISTER)
         assert constants.INCLUSION_CONNECT_SESSION_KEY in self.client.session
 
     def test_authorize_endpoint_with_params(self):
         email = "porthos@touspourun.com"
-        params = {"login_hint": email, "user_kind": KIND_PRESCRIBER, "channel": "invitation"}
+        params = {"login_hint": email, "user_kind": UserKind.PRESCRIBER, "channel": "invitation"}
         url = f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
         response = self.client.get(url, follow=False)
         assert quote(email) in response.url
@@ -352,7 +351,7 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
 
     @respx.mock
     def test_resume_endpoint_with_already_finished_registration(self):
-        mock_oauth_dance(self, KIND_PRESCRIBER)
+        mock_oauth_dance(self, UserKind.PRESCRIBER)
         url = f"{reverse('inclusion_connect:resume_registration')}"
         response = self.client.get(url)
         self.assertRedirects(response, reverse("home:hp"))
@@ -363,7 +362,7 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
     def test_resume_endpoint(self):
         # Fill up session with authorize view
         email = "porthos@touspourun.com"
-        params = {"login_hint": email, "user_kind": KIND_PRESCRIBER, "channel": "invitation"}
+        params = {"login_hint": email, "user_kind": UserKind.PRESCRIBER, "channel": "invitation"}
         url = f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
         response = self.client.get(url, follow=False)
         assert InclusionConnectState.objects.count() == 1
@@ -379,44 +378,42 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
     @respx.mock
     def test_callback_prescriber_created(self):
         ### User does not exist.
-        mock_oauth_dance(self, KIND_PRESCRIBER)
+        mock_oauth_dance(self, UserKind.PRESCRIBER)
         assert User.objects.count() == 1
         user = User.objects.get(email=OIDC_USERINFO["email"])
         assert user.first_name == OIDC_USERINFO["given_name"]
         assert user.last_name == OIDC_USERINFO["family_name"]
         assert user.username == OIDC_USERINFO["sub"]
         assert user.has_sso_provider
-        assert user.is_prescriber
-        assert not user.is_siae_staff
+        assert user.kind == "prescriber"
         assert user.identity_provider == users_enums.IdentityProvider.INCLUSION_CONNECT
 
     @respx.mock
     def test_callback_siae_staff_created(self):
         ### User does not exist.
         # Don't check redirection as the user isn't an siae member yet, so it won't work.
-        mock_oauth_dance(self, KIND_SIAE_STAFF, assert_redirects=False)
+        mock_oauth_dance(self, UserKind.SIAE_STAFF, assert_redirects=False)
         assert User.objects.count() == 1
         user = User.objects.get(email=OIDC_USERINFO["email"])
         assert user.first_name == OIDC_USERINFO["given_name"]
         assert user.last_name == OIDC_USERINFO["family_name"]
         assert user.username == OIDC_USERINFO["sub"]
         assert user.has_sso_provider
-        assert not user.is_prescriber
-        assert user.is_siae_staff
+        assert user.kind == "siae_staff"
         assert user.identity_provider == users_enums.IdentityProvider.INCLUSION_CONNECT
 
     @respx.mock
     def test_callback_existing_django_user(self):
         # User created with django already exists on Itou but some attributes differs.
         # Update all fields
-        UserFactory(
+        PrescriberFactory(
             first_name="Bernard",
             last_name="Blier",
             username="bernard_blier",
             email=OIDC_USERINFO["email"],
             identity_provider=users_enums.IdentityProvider.DJANGO,
         )
-        mock_oauth_dance(self, KIND_PRESCRIBER)
+        mock_oauth_dance(self, UserKind.PRESCRIBER)
         assert User.objects.count() == 1
         user = User.objects.get(email=OIDC_USERINFO["email"])
         assert user.first_name == OIDC_USERINFO["given_name"]
@@ -431,7 +428,7 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
 
         for field in ["is_job_seeker", "is_siae_staff", "is_labor_inspector"]:
             user = UserFactory(username=ic_user_data.username, email=ic_user_data.email, **{field: True})
-            response = mock_oauth_dance(self, KIND_PRESCRIBER, assert_redirects=False)
+            response = mock_oauth_dance(self, UserKind.PRESCRIBER, assert_redirects=False)
             response = self.client.get(response.url, follow=True)
             self.assertContains(response, "existe déjà avec cette adresse e-mail")
             self.assertContains(response, "pour devenir prescripteur sur la plateforme")
@@ -444,7 +441,7 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
         for field in ["is_job_seeker", "is_prescriber", "is_labor_inspector"]:
             user = UserFactory(username=ic_user_data.username, email=ic_user_data.email, **{field: True})
             # Don't check redirection as the user isn't an siae member yet, so it won't work.
-            response = mock_oauth_dance(self, KIND_SIAE_STAFF, assert_redirects=False)
+            response = mock_oauth_dance(self, UserKind.SIAE_STAFF, assert_redirects=False)
             response = self.client.get(response.url, follow=True)
             self.assertContains(response, "existe déjà avec cette adresse e-mail")
             self.assertContains(response, "pour devenir employeur sur la plateforme")
@@ -480,7 +477,7 @@ class InclusionConnectLoginTest(InclusionConnectBaseTestCase):
         He can log in again later.
         """
         # Create an account with IC.
-        mock_oauth_dance(self, KIND_PRESCRIBER)
+        mock_oauth_dance(self, UserKind.PRESCRIBER)
 
         # Then log out.
         response = self.client.post(reverse("account_logout"))
@@ -491,7 +488,7 @@ class InclusionConnectLoginTest(InclusionConnectBaseTestCase):
         self.assertContains(response, "inclusion_connect_ico.svg")
         self.assertContains(response, reverse("inclusion_connect:authorize"))
 
-        response = mock_oauth_dance(self, KIND_PRESCRIBER, assert_redirects=False)
+        response = mock_oauth_dance(self, UserKind.PRESCRIBER, assert_redirects=False)
         expected_redirection = reverse("dashboard:index")
         self.assertRedirects(response, expected_redirection)
 
@@ -516,7 +513,7 @@ class InclusionConnectLoginTest(InclusionConnectBaseTestCase):
         # - IC side: account creation
         # - Django side: account update.
         # This logic is already tested here: InclusionConnectModelTest
-        response = mock_oauth_dance(self, KIND_PRESCRIBER, assert_redirects=False)
+        response = mock_oauth_dance(self, UserKind.PRESCRIBER, assert_redirects=False)
         # This existing user should not see the welcoming tour.
         expected_redirection = reverse("dashboard:index")
         self.assertRedirects(response, expected_redirection)
@@ -539,14 +536,14 @@ class InclusionConnectLoginTest(InclusionConnectBaseTestCase):
         assert not auth.get_user(self.client).is_authenticated
 
         # Then login with Inclusion Connect.
-        mock_oauth_dance(self, KIND_PRESCRIBER, assert_redirects=False)
+        mock_oauth_dance(self, UserKind.PRESCRIBER, assert_redirects=False)
         assert auth.get_user(self.client).is_authenticated
 
 
 class InclusionConnectLogoutTest(InclusionConnectBaseTestCase):
     @respx.mock
     def test_simple_logout(self):
-        mock_oauth_dance(self, KIND_PRESCRIBER)
+        mock_oauth_dance(self, UserKind.PRESCRIBER)
         respx.get(constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(200)
         logout_url = reverse("inclusion_connect:logout")
         response = self.client.get(logout_url)
@@ -554,7 +551,7 @@ class InclusionConnectLogoutTest(InclusionConnectBaseTestCase):
 
     @respx.mock
     def test_logout_with_redirection(self):
-        mock_oauth_dance(self, KIND_PRESCRIBER)
+        mock_oauth_dance(self, UserKind.PRESCRIBER)
         expected_redirection = reverse("dashboard:index")
         respx.get(constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(200)
 
@@ -569,7 +566,7 @@ class InclusionConnectLogoutTest(InclusionConnectBaseTestCase):
         When ac IC user wants to log out from his local account,
         he should be logged out too from IC.
         """
-        response = mock_oauth_dance(self, KIND_PRESCRIBER)
+        response = mock_oauth_dance(self, UserKind.PRESCRIBER)
         assert auth.get_user(self.client).is_authenticated
         # Follow the redirection.
         response = self.client.get(response.url)
@@ -592,7 +589,7 @@ class InclusionConnectLogoutTest(InclusionConnectBaseTestCase):
         When a local user wants to log out from his local account,
         he should be logged out without inclusion connect.
         """
-        user = UserFactory()
+        user = PrescriberFactory()
         self.client.force_login(user)
         response = self.client.post(reverse("account_logout"))
         expected_redirection = reverse("home:hp")
@@ -603,7 +600,7 @@ class InclusionConnectLogoutTest(InclusionConnectBaseTestCase):
     def test_logout_with_incomplete_state(self):
         # This happens while testing. It should never happen for real users, but it's still painful for us.
 
-        mock_oauth_dance(self, KIND_PRESCRIBER)
+        mock_oauth_dance(self, UserKind.PRESCRIBER)
         respx.get(constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(200)
 
         session = self.client.session

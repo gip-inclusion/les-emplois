@@ -6,7 +6,7 @@ from django.utils.html import escape
 from itou.invitations.models import SiaeStaffInvitation
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory, SiaeMembershipFactory
-from itou.users.factories import JobSeekerFactory, UserFactory
+from itou.users.factories import JobSeekerFactory, SiaeStaffFactory
 from itou.utils.test import TestCase
 from itou.www.invitations_views.forms import SiaeStaffInvitationForm
 
@@ -55,11 +55,10 @@ class TestSendSingleSiaeInvitation(TestCase):
         assert self.post_data["form-0-email"] in outbox_emails
 
     def test_send_invitation_user_already_exists(self):
-        guest = UserFactory(
+        guest = SiaeStaffFactory(
             first_name=self.guest_data["first_name"],
             last_name=self.guest_data["last_name"],
             email=self.guest_data["email"],
-            is_siae_staff=True,
         )
         self.client.force_login(self.sender)
         response = self.client.post(INVITATION_URL, data=self.post_data, follow=True)
@@ -82,7 +81,7 @@ class TestSendSingleSiaeInvitation(TestCase):
         assert invitation.SIGNIN_ACCOUNT_TYPE == "siae_staff"
 
     def test_send_invitation_to_not_employer(self):
-        UserFactory(
+        JobSeekerFactory(
             first_name=self.guest_data["first_name"],
             last_name=self.guest_data["last_name"],
             email=self.guest_data["email"],
@@ -119,8 +118,8 @@ class TestSendMultipleSiaeInvitation(TestCase):
         # The sender is a member of the SIAE
         self.sender = self.siae.members.first()
         # Define instances not created in DB
-        self.invited_user = UserFactory.build()
-        self.second_invited_user = UserFactory.build()
+        self.invited_user = SiaeStaffFactory.build()
+        self.second_invited_user = SiaeStaffFactory.build()
         self.post_data = {
             "form-TOTAL_FORMS": "2",
             "form-INITIAL_FORMS": "0",

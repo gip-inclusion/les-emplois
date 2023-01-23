@@ -22,7 +22,7 @@ from itou.prescribers.factories import (
     PrescriberPoleEmploiFactory,
 )
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
-from itou.users.enums import KIND_PRESCRIBER
+from itou.users.enums import KIND_PRESCRIBER, UserKind
 from itou.users.factories import PrescriberFactory, SiaeStaffFactory
 from itou.users.models import User
 from itou.utils import constants as global_constants
@@ -119,9 +119,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         self.assertContains(response, f"Code SAFIR {organization.code_safir_pole_emploi}")
 
         user = User.objects.get(email=email)
-        assert not user.is_job_seeker
-        assert user.is_prescriber
-        assert not user.is_siae_staff
+        assert user.kind == UserKind.PRESCRIBER
 
         user_emails = user.emailaddress_set.all()
         # Emails are not checked in Django anymore.
@@ -193,9 +191,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
 
         # Check `User` state.
         user = User.objects.get(email=OIDC_USERINFO["email"])
-        assert not user.is_job_seeker
-        assert user.is_prescriber
-        assert not user.is_siae_staff
+        assert user.kind == UserKind.PRESCRIBER
 
         # Check `EmailAddress` state.
         user_emails = user.emailaddress_set.all()
@@ -286,9 +282,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
 
         # Check `User` state.
         user = User.objects.get(email=OIDC_USERINFO["email"])
-        assert not user.is_job_seeker
-        assert user.is_prescriber
-        assert not user.is_siae_staff
+        assert user.kind == UserKind.PRESCRIBER
 
         # Check `EmailAddress` state.
         user_emails = user.emailaddress_set.all()
@@ -375,9 +369,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
 
         # Check `User` state.
         user = User.objects.get(email=OIDC_USERINFO["email"])
-        assert not user.is_job_seeker
-        assert user.is_prescriber
-        assert not user.is_siae_staff
+        assert user.kind == UserKind.PRESCRIBER
 
         # Check `EmailAddress` state.
         user_emails = user.emailaddress_set.all()
@@ -518,9 +510,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
 
         # Check `User` state.
         user = User.objects.get(email=OIDC_USERINFO["email"])
-        assert not user.is_job_seeker
-        assert user.is_prescriber
-        assert not user.is_siae_staff
+        assert user.kind == UserKind.PRESCRIBER
 
         # Check `EmailAddress` state.
         user_emails = user.emailaddress_set.all()

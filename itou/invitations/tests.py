@@ -10,7 +10,7 @@ from itou.invitations.factories import (
     SiaeStaffInvitationFactory,
 )
 from itou.invitations.models import InvitationAbstract, SiaeStaffInvitation
-from itou.users.factories import UserFactory
+from itou.users.factories import PrescriberFactory, SiaeStaffFactory
 from itou.utils.test import TestCase
 
 
@@ -101,7 +101,7 @@ class InvitationEmailsTest(SimpleTestCase):
 class TestPrescriberWithOrgInvitation(TestCase):
     def test_add_member_to_organization(self):
         invitation = PrescriberWithOrgSentInvitationFactory(email="hey@you.com")
-        UserFactory(email=invitation.email)
+        PrescriberFactory(email=invitation.email)
         org_members = invitation.organization.members.count()
         invitation.add_invited_user_to_organization()
         org_members_after = invitation.organization.members.count()
@@ -146,7 +146,7 @@ class TestPrescriberWithOrgInvitationEmails(SimpleTestCase):
 class TestSiaeInvitation(TestCase):
     def test_add_member_to_siae(self):
         invitation = SentSiaeStaffInvitationFactory(email="hey@you.com")
-        UserFactory(email=invitation.email)
+        SiaeStaffFactory(email=invitation.email)
         siae_members = invitation.siae.members.count()
         invitation.add_invited_user_to_siae()
         siae_members_after = invitation.siae.members.count()

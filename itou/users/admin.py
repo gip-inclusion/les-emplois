@@ -174,6 +174,7 @@ class ItouUserAdmin(UserAdmin):
     list_display_links = ("pk", "email")
     list_filter = UserAdmin.list_filter + (
         KindFilter,
+        "kind",
         CreatedByProxyFilter,
         "identity_provider",
     )
@@ -194,6 +195,7 @@ class ItouUserAdmin(UserAdmin):
         "jobseeker_hash_id",
         "identity_provider",
         "address_in_qpv",
+        "is_staff",
     )
 
     fieldsets = UserAdmin.fieldsets + (
@@ -220,6 +222,7 @@ class ItouUserAdmin(UserAdmin):
                     "is_prescriber",
                     "is_siae_staff",
                     "is_labor_inspector",
+                    "kind",
                     "nir",
                     "pole_emploi_id",
                     "lack_of_pole_emploi_id_reason",

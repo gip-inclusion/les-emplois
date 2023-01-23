@@ -16,7 +16,7 @@ from itou.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oaut
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory, SiaeMembershipFactory, SiaeWithMembershipAndJobsFactory
 from itou.siaes.models import Siae
-from itou.users.enums import KIND_SIAE_STAFF
+from itou.users.enums import KIND_SIAE_STAFF, UserKind
 from itou.users.factories import DEFAULT_PASSWORD, PrescriberFactory, SiaeStaffFactory
 from itou.users.models import User
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
@@ -94,9 +94,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         user = User.objects.get(email=OIDC_USERINFO["email"])
 
         # Check `User` state.
-        assert not user.is_job_seeker
-        assert not user.is_prescriber
-        assert user.is_siae_staff
+        assert user.kind == UserKind.SIAE_STAFF
         assert user.is_active
         assert siae.has_admin(user)
         assert 1 == siae.members.count()
@@ -231,9 +229,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         user = User.objects.get(email=OIDC_USERINFO["email"])
 
         # Check `User` state.
-        assert not user.is_job_seeker
-        assert not user.is_prescriber
-        assert user.is_siae_staff
+        assert user.kind == UserKind.SIAE_STAFF
         assert user.is_active
         siae = Siae.objects.get(siret=FAKE_SIRET)
         assert siae.has_admin(user)
