@@ -533,6 +533,7 @@ class JobDescriptionCardViewTest(TestCase):
         siae = SiaeWithMembershipAndJobsFactory()
         job_description = siae.job_description_through.first()
         job_description.description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+        job_description.open_positions = 1234
         job_description.save()
         url = reverse("siaes_views:job_description_card", kwargs={"job_description_id": job_description.pk})
         response = self.client.get(url)
@@ -542,6 +543,16 @@ class JobDescriptionCardViewTest(TestCase):
         self.assertContains(response, job_description.description)
         self.assertContains(response, escape(job_description.display_name))
         self.assertContains(response, escape(siae.display_name))
+        OPEN_POSITION_TEXT = "1234 postes ouverts au recrutement"
+        self.assertContains(response, OPEN_POSITION_TEXT)
+
+        job_description.is_active = False
+        job_description.save()
+        response = self.client.get(url)
+        self.assertContains(response, job_description.description)
+        self.assertContains(response, escape(job_description.display_name))
+        self.assertContains(response, escape(siae.display_name))
+        self.assertNotContains(response, OPEN_POSITION_TEXT)
 
 
 class ShowAndSelectFinancialAnnexTest(TestCase):
