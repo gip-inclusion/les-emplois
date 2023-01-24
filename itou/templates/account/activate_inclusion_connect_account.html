@@ -6,22 +6,23 @@
 
 {% block title %}Connexion {{ block.super }}{% endblock %}
 
+{% block body_class %}p-inclusion-connect{% endblock %}
+
 {% block content %}
-    <section class="s-section pt-0">
+    <section class="s-section pt-lg-3">
         <div class="s-section__container container">
-            <div class="s-section__row row">
-                <div class="s-section__col col-12 col-lg-6">
-                    <div class="c-form mb-5">
-                        <picture class="d-lg-block mb-5">
-                            <img class="img-fluid" src="{% static 'img/inclusion_connect/logo-inclusion-connect.svg' %}" alt="Inclusion Connect"/>
+            <div class="s-section__row row no-gutters">
+                <div class="s-section__col col-12 col-lg-6 bg-lg-white">
+                    <div class="bg-white p-3 py-lg-7 px-lg-8">
+                        <picture class="d-block mb-5">
+                            <img class="img-fluid" src="{% static 'img/inclusion_connect/logo-inclusion-connect.svg' %}" width="240" alt="Inclusion Connect"/>
                         </picture>
-                        <h2>Activer Inclusion Connect</h2>
-                        <ol>
+                        <h1 class="h2 mb-lg-4">Activer Inclusion Connect</h1>
+                        <ol class="mb-lg-4">
                             <li>Saisissez la même adresse e-mail que celle actuellement utilisée sur les emplois de l’inclusion</li>
                             <li>Cliquez sur “Valider”</li>
                             <li>Laissez-vous guider</li>
                         </ol>
-
                         <form method="post" action="{{ activate_account_url }}">
                             {% csrf_token %}
                             <fieldset>
@@ -37,22 +38,19 @@
                                 Valider
                             </button>
                         </form>
-
-                        <hr class="my-5">
-
+                        <hr class="my-3 my-lg-4">
                         <div class="text-center">
-                            <h5>Vous avez déjà un compte Inclusion Connect ?</h5>
-                            <a href="{{ inclusion_connect_url }}" class="matomo-event" data-matomo-category="inscription-account_type_display_name" data-matomo-action="clic" data-matomo-option="se-connecter-avec-inclusion-connect">
-                                <span>Se connecter</span>
-                            </a>
+                            <h2 class="h5">Vous avez déjà un compte Inclusion Connect ?</h2>
+                            <a href="{{ inclusion_connect_url }}"
+                               class="btn btn-link matomo-event"
+                               data-matomo-category="inscription-account_type_display_name"
+                               data-matomo-action="clic"
+                               data-matomo-option="se-connecter-avec-inclusion-connect">Se connecter</a>
                         </div>
-
                     </div>
                 </div>
-                <div class="s-section__col col-12 col-lg-6">
-                    <picture class="d-none d-lg-block text-center">
-                        <img class="img-fluid" src="{% static 'img/illustration-login.svg' %}" alt="" loading="lazy">
-                    </picture>
+                <div class="s-section__col d-none d-lg-flex col-lg-6 p-lg-6 justify-content-center align-items-center bg-light">
+                    <img class="img-fluid" src="{% static 'img/illustration-ic.svg' %}" alt="" loading="lazy">
                 </div>
             </div>
         </div>
