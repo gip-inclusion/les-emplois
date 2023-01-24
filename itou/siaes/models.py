@@ -468,7 +468,7 @@ class SiaeMembership(MembershipAbstract):
         on_delete=models.CASCADE,
         verbose_name="Mis à jour par",
     )
-    notifications = models.JSONField(verbose_name=("Notifications"), default=dict, blank=True)
+    notifications = models.JSONField(verbose_name="Notifications", default=dict, blank=True)
 
     class Meta:
         unique_together = ("user_id", "siae_id")

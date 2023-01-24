@@ -115,28 +115,28 @@ class EvaluationCampaign(models.Model):
     name = models.CharField(verbose_name="Nom de la campagne d'évaluation", max_length=100, blank=False, null=False)
 
     # dates of execution of the campaign
-    created_at = models.DateTimeField(verbose_name=("Date de création"), default=timezone.now)
-    percent_set_at = models.DateTimeField(verbose_name=("Date de paramétrage de la sélection"), blank=True, null=True)
+    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
+    percent_set_at = models.DateTimeField(verbose_name="Date de paramétrage de la sélection", blank=True, null=True)
     evaluations_asked_at = models.DateTimeField(
-        verbose_name=("Date de notification du contrôle aux Siaes"), blank=True, null=True
+        verbose_name="Date de notification du contrôle aux Siaes", blank=True, null=True
     )
-    ended_at = models.DateTimeField(verbose_name=("Date de clôture de la campagne"), blank=True, null=True)
+    ended_at = models.DateTimeField(verbose_name="Date de clôture de la campagne", blank=True, null=True)
 
     # dates of the evaluated period
     # to do later : add coherence controls between campaign.
     # Campaign B for one institution cannot start before the end of campaign A of the same institution
     evaluated_period_start_at = models.DateField(
-        verbose_name=("Date de début de la période contrôlée"), blank=False, null=False
+        verbose_name="Date de début de la période contrôlée", blank=False, null=False
     )
     evaluated_period_end_at = models.DateField(
-        verbose_name=("Date de fin de la période contrôlée"), blank=False, null=False
+        verbose_name="Date de fin de la période contrôlée", blank=False, null=False
     )
 
     institution = models.ForeignKey(
         "institutions.Institution",
         on_delete=models.CASCADE,
         related_name="evaluation_campaigns",
-        verbose_name=("DDETS responsable du contrôle"),
+        verbose_name="DDETS responsable du contrôle",
         validators=[validate_institution],
     )
 
@@ -323,7 +323,7 @@ class EvaluatedSiae(models.Model):
         related_name="evaluated_siaes",
     )
     # In “phase amiable” until documents have been reviewed.
-    reviewed_at = models.DateTimeField(verbose_name=("Contrôlée le"), blank=True, null=True)
+    reviewed_at = models.DateTimeField(verbose_name="Contrôlée le", blank=True, null=True)
     # Refused documents from the phase amiable can be uploaded again, a second
     # refusal is final (phase contradictoire).
     final_reviewed_at = models.DateTimeField(verbose_name="Contrôle définitif le", blank=True, null=True)
@@ -636,8 +636,8 @@ class EvaluatedAdministrativeCriteria(models.Model):
     )
 
     proof_url = models.URLField(max_length=500, verbose_name="Lien vers le justificatif", blank=True)
-    uploaded_at = models.DateTimeField(verbose_name=("Téléversé le"), blank=True, null=True)
-    submitted_at = models.DateTimeField(verbose_name=("Transmis le"), blank=True, null=True)
+    uploaded_at = models.DateTimeField(verbose_name="Téléversé le", blank=True, null=True)
+    submitted_at = models.DateTimeField(verbose_name="Transmis le", blank=True, null=True)
     review_state = models.CharField(
         verbose_name="Vérification",
         max_length=10,

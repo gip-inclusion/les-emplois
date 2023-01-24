@@ -126,9 +126,9 @@ class EmployeeRecord(models.Model):
     ASP_PROCESSING_SUCCESS_CODE = "0000"
     ASP_CLONE_MESSAGE = "Fiche salarié clonée"
 
-    created_at = models.DateTimeField(verbose_name=("Date de création"), default=timezone.now)
-    updated_at = models.DateTimeField(verbose_name=("Date de modification"), default=timezone.now)
-    processed_at = models.DateTimeField(verbose_name=("Date d'intégration"), null=True)
+    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
+    updated_at = models.DateTimeField(verbose_name="Date de modification", default=timezone.now)
+    processed_at = models.DateTimeField(verbose_name="Date d'intégration", null=True)
     status = models.CharField(max_length=10, verbose_name="Statut", choices=Status.choices, default=Status.NEW)
 
     # Job application has references on many mandatory parts of the E.R.:
@@ -746,7 +746,7 @@ class EmployeeRecordUpdateNotification(models.Model):
         default=timezone.now,
     )
     updated_at = models.DateTimeField(
-        verbose_name=("Date de modification"),
+        verbose_name="Date de modification",
         default=timezone.now,
     )
     status = models.CharField(
