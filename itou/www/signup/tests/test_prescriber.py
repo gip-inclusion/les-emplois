@@ -84,7 +84,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         assert email == session_data.get("email")
 
         response = self.client.get(response.url)
-        self.assertContains(response, "inclusion_connect_button.svg")
+        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
         # Check IC will redirect to the correct url
         previous_url = reverse("signup:prescriber_pole_emploi_user")
         next_url = reverse("signup:prescriber_join_org")
@@ -166,7 +166,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         url = reverse("signup:prescriber_user")
         self.assertRedirects(response, url)
         response = self.client.get(url)
-        self.assertContains(response, "inclusion_connect_button.svg")
+        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
         # Check IC will redirect to the correct url
         previous_url = reverse("signup:prescriber_user")
         next_url = reverse("signup:prescriber_join_org")
@@ -256,7 +256,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         url = reverse("signup:prescriber_user")
         self.assertRedirects(response, url)
         response = self.client.get(url)
-        self.assertContains(response, "inclusion_connect_button.svg")
+        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
         # Check IC will redirect to the correct url
         previous_url = reverse("signup:prescriber_user")
         next_url = reverse("signup:prescriber_join_org")
@@ -344,7 +344,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         url = reverse("signup:prescriber_user")
         self.assertRedirects(response, url)
         response = self.client.get(url)
-        self.assertContains(response, "inclusion_connect_button.svg")
+        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
         # Check IC will redirect to the correct url
         previous_url = reverse("signup:prescriber_user")
         next_url = reverse("signup:prescriber_join_org")
@@ -488,7 +488,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         url = reverse("signup:prescriber_user")
         self.assertContains(response, url)
         response = self.client.get(url)
-        self.assertContains(response, "inclusion_connect_button.svg")
+        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
         # Check IC will redirect to the correct url
         previous_url = reverse("signup:prescriber_user")
         params = {
@@ -564,7 +564,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         url = reverse("signup:prescriber_user")
         self.assertRedirects(response, url)
         response = self.client.get(url)
-        self.assertContains(response, "inclusion_connect_button.svg")
+        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
         # Check IC will redirect to the correct url
         previous_url = reverse("signup:prescriber_user")
         next_url = reverse("signup:prescriber_join_org")
@@ -673,7 +673,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
 
         # Step 2: register as a simple prescriber (orienteur).
         response = self.client.get(reverse("signup:prescriber_user"))
-        self.assertContains(response, "inclusion_connect_button.svg")
+        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
         # Check IC will redirect to the correct url
         previous_url = reverse("signup:prescriber_user")
         params = {
@@ -740,7 +740,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         signup_url = reverse("signup:prescriber_user")
 
         response = self.client.get(signup_url)
-        self.assertContains(response, "inclusion_connect_button.svg")
+        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
         # Check IC will redirect to the correct url
         previous_url = reverse("signup:prescriber_user")
         next_url = reverse("signup:prescriber_join_org")
@@ -825,7 +825,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
         signup_url = reverse("signup:prescriber_user")
 
         response = self.client.get(signup_url)
-        self.assertContains(response, "inclusion_connect_button.svg")
+        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
 
         # Connect with Inclusion Connect.
         previous_url = reverse("signup:prescriber_user")
@@ -892,7 +892,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
         signup_url = reverse("signup:prescriber_user")
 
         response = self.client.get(signup_url)
-        self.assertContains(response, "inclusion_connect_button.svg")
+        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
 
         # Connect with Inclusion Connect.
         previous_url = reverse("signup:prescriber_user")
@@ -910,7 +910,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
         # Show an error and don't create an organization.
         assert response.wsgi_request.path == signup_url
         self.assertTemplateNotUsed(response, "welcoming_tour/prescriber.html")
-        self.assertContains(response, "inclusion_connect_button.svg")
+        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
         messages = list(get_messages(response.wsgi_request))
         assert len(messages) == 1
         error_message = "Un compte employeur existe déjà avec cette adresse e-mail"
@@ -946,7 +946,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
         check_email_url = reverse("signup:prescriber_check_pe_email")
         post_data = {"email": pe_email}
         response = self.client.post(check_email_url, data=post_data, follow=True)
-        self.assertContains(response, "inclusion_connect_button.svg")
+        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
 
         # Connect with Inclusion Connect but, this time, don't use a PE email.
         previous_url = reverse("signup:prescriber_pole_emploi_user")
@@ -967,7 +967,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
 
         # Response should contain elements available only to prescribers on the welcoming tour.
         self.assertTemplateNotUsed(response, "welcoming_tour/prescriber.html")
-        self.assertContains(response, "inclusion_connect_button.svg")
+        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
         messages = list(get_messages(response.wsgi_request))
         assert len(messages) == 1
         assert "est différente de celle que vous avez indiquée précédemment" in messages[0].message

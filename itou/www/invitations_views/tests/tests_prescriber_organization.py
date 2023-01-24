@@ -221,7 +221,7 @@ class TestAcceptPrescriberWithOrgInvitation(InclusionConnectBaseTestCase):
     def test_accept_prescriber_org_invitation(self):
         invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
         response = self.client.get(invitation.acceptance_link)
-        self.assertContains(response, "inclusion_connect_button.svg")
+        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
 
         # We don't put the full path with the FQDN in the parameters
         previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]

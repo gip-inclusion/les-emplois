@@ -63,7 +63,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         # No error when opening magic link a second time.
         response = self.client.get(magic_link)
         assert response.status_code == 200
-        self.assertContains(response, "inclusion_connect_button.svg")
+        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
 
         # Check IC will redirect to the correct url
         token = siae.get_token()
@@ -125,7 +125,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
 
         magic_link = siae.signup_magic_link
         response = self.client.get(magic_link)
-        self.assertContains(response, "inclusion_connect_button.svg")
+        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
 
         # Check IC will redirect to the correct url
         token = siae.get_token()
@@ -199,7 +199,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
 
         # Now, we're on the second page.
         url = reverse("signup:facilitator_user")
-        self.assertContains(response, "inclusion_connect_button.svg")
+        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
 
         # Check IC will redirect to the correct url
         previous_url = reverse("signup:facilitator_user")
