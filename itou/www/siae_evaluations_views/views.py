@@ -1,3 +1,5 @@
+import datetime
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -188,7 +190,56 @@ class InstitutionEvaluatedSiaeNotifyView(LoginRequiredMixin, generic.UpdateView)
                 notified_at=None,
             )
             .select_related("evaluation_campaign", "siae")
+            .prefetch_related(
+                "evaluated_job_applications__evaluated_administrative_criteria",
+                "evaluated_job_applications__job_application__eligibility_diagnosis__administrative_criteria",
+            )
         )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        job_apps = self.object.evaluated_job_applications.all()
+        job_apps_count = len(job_apps)
+        crits_count = 0
+        crits_not_submitted = 0
+        expected_crits_count = 0
+        crits_refused = 0
+        for evaluated_jobapp in job_apps:
+            evaluated_administrative_criteria = evaluated_jobapp.evaluated_administrative_criteria.all()
+            if evaluated_administrative_criteria:
+                # User selected administrative criteria they will prove.
+                for crit in evaluated_administrative_criteria:
+                    crits_count += 1
+                    if crit.submitted_at is None:
+                        crits_not_submitted += 1
+                        expected_crits_count += 1
+                    elif crit.review_state in [
+                        evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
+                        evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2,
+                    ]:
+                        crits_refused += 1
+            else:
+                guessed_crits_count = len(
+                    evaluated_jobapp.job_application.eligibility_diagnosis.administrative_criteria.all()
+                )
+                expected_crits_count += guessed_crits_count
+                crits_count += guessed_crits_count
+        context["uploaded_count"] = crits_not_submitted
+        context["not_submitted_percent"] = expected_crits_count / crits_count * 100.0 if crits_count else 0.0
+        context["expected_crits_count"] = expected_crits_count
+        context["refused_percent"] = crits_refused / crits_count * 100.0 if crits_count else 0.0
+        context["job_apps_count"] = job_apps_count
+        context["evaluation_history"] = (
+            EvaluatedSiae.objects.viewable()
+            .filter(siae=self.object.siae_id)
+            .exclude(pk=self.object.pk)
+            # Ignore first evaluation campaigns, they were a test.
+            .exclude(evaluation_campaign__evaluated_period_end_at__lt=datetime.date(2022, 1, 1))
+            .order_by("-evaluation_campaign__evaluated_period_start_at")
+            .select_related("evaluation_campaign")
+            .prefetch_related("evaluated_job_applications__evaluated_administrative_criteria")
+        )
+        return context
 
     def form_valid(self, form):
         messages.success(self.request, f"{self.object} a bien été notifiée de la sanction.")
