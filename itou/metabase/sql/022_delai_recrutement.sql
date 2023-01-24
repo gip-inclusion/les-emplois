@@ -15,7 +15,8 @@ select
     distinct (c.id_candidat) as identifiant_candidat, 
     pc.min_date_candidature,
     min(date_embauche) as min_date_embauche,
-    min(date_embauche) - pc.min_date_candidature as delai_recrutement_jours
+    min(date_embauche) - pc.min_date_candidature as delai_recrutement_jours,
+    injection_ai
 from 
     candidatures c
 left join 
@@ -27,4 +28,5 @@ where
     and origine != 'Employeur'
 group by 
     c.id_candidat, 
-    pc.min_date_candidature
+    pc.min_date_candidature,
+    injection_ai 

@@ -33,7 +33,7 @@ with candidats_p as ( /* Ici on sélectionne les colonnes pertinentes à partir 
 	cdd.pe_inscrit
     from
 	public.candidats as cdd /* cdd pour CanDiDats */
-    where type_auteur_diagnostic = ('Prescripteur') and injection_ai = 0
+    where type_auteur_diagnostic = ('Prescripteur')
 ),
 prescripteurs as (
     select 

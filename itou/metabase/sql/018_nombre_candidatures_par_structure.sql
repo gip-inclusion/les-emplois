@@ -22,7 +22,7 @@ with z_candidatures as (
 	c.nom_org_prescripteur	
     from 
 	public.candidatures c 
-    where injection_ai = 0 and type_structure IN ('AI', 'ACI', 'EI', 'EITI', 'ETTI') 
+    where type_structure IN ('AI', 'ACI', 'EI', 'EITI', 'ETTI') 
     group by 
 	état,
 	c.date_candidature,
