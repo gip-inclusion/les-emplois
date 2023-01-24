@@ -1,3 +1,5 @@
+import datetime
+
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.contrib.messages.storage.base import Message
@@ -18,7 +20,7 @@ from itou.siae_evaluations.factories import (
     EvaluationCampaignFactory,
 )
 from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria, EvaluatedJobApplication, EvaluationCampaign
-from itou.siaes.factories import SiaeMembershipFactory
+from itou.siaes.factories import SiaeFactory, SiaeMembershipFactory
 from itou.users.enums import KIND_SIAE_STAFF
 from itou.users.factories import JobSeekerFactory
 from itou.utils.perms.user import UserInfo
@@ -1147,6 +1149,8 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
 
 
 class InstitutionEvaluatedSiaeNotifyViewTest(TestCase):
+    not_submitted = "justificatifs non soumis"
+
     def test_access_other_institution(self):
         membership = InstitutionMembershipFactory(institution__name="DDETS 14")
         user = membership.user
@@ -1214,7 +1218,31 @@ class InstitutionEvaluatedSiaeNotifyViewTest(TestCase):
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
-        self.assertContains(response, f"Notifier la sanction du contrôle pour {evaluated_siae.siae.name}")
+        self.assertContains(response, f"Notifier la sanction du contrôle pour {evaluated_siae.siae.name}", count=1)
+        self.assertContains(
+            response,
+            f"""
+            <a target="_blank" href="/siae_evaluation/institution_evaluated_siae_detail/{evaluated_siae.pk}/">
+             Revoir l’auto-prescription
+             <i class="ri-external-link-line">
+             </i>
+            </a>""",
+            html=True,
+            count=1,
+        )
+        self.assertContains(response, "<li>100 % justificatifs refusés lors de votre contrôle</li>", count=1)
+        self.assertContains(
+            response,
+            """
+            <h3 class="mt-5">
+             Historique des campagnes de contrôle
+            </h3>
+            <ul class="list-unstyled">
+            </ul>""",
+            html=True,
+            count=1,
+        )
+        self.assertNotContains(response, self.not_submitted)
 
     def test_access_incomplete_evaluation_closed_campaign(self):
         membership = InstitutionMembershipFactory(institution__name="DDETS 14")
@@ -1250,6 +1278,128 @@ class InstitutionEvaluatedSiaeNotifyViewTest(TestCase):
             )
         )
         assert response.status_code == 404
+
+    @freeze_time("2023-01-24 11:11:00")
+    def test_data_card_statistics(self):
+        membership = InstitutionMembershipFactory(institution__name="DDETS 14")
+        user = membership.user
+        institution = membership.institution
+        siae = SiaeFactory()
+        previous_campaign = EvaluationCampaignFactory(
+            institution=institution,
+            ended_at=timezone.now() - relativedelta(years=1),
+            evaluated_period_start_at=datetime.date(2022, 1, 1),
+            evaluated_period_end_at=datetime.date(2022, 12, 31),
+        )
+        previous_evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign=previous_campaign,
+            siae=siae,
+            reviewed_at=timezone.now() - relativedelta(years=1, months=3),
+        )
+        # SIAE didn’t answer for that evaluation campaign.
+        EvaluatedJobApplicationFactory.create_batch(2, evaluated_siae=previous_evaluated_siae)
+
+        campaign = EvaluationCampaignFactory(institution=institution, ended_at=timezone.now() - relativedelta(hours=1))
+        other_evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=campaign)
+        EvaluatedJobApplicationFactory(evaluated_siae=other_evaluated_siae)
+
+        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=campaign, siae=siae)
+        # SIAE didn’t bother justifying this application.
+        EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae, job_application__with_eligibility_diagnosis=True)
+        inprogress_evaluated_job_app = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=inprogress_evaluated_job_app, uploaded_at=timezone.now() - relativedelta(weeks=1)
+        )
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=inprogress_evaluated_job_app,
+            uploaded_at=timezone.now() - relativedelta(weeks=1),
+            submitted_at=timezone.now() - relativedelta(days=5),
+        )
+        refused_adversarial_evaluated_job_app = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=refused_adversarial_evaluated_job_app,
+            uploaded_at=timezone.now() - relativedelta(weeks=1),
+            submitted_at=timezone.now() - relativedelta(days=5),
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+        )
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=refused_adversarial_evaluated_job_app,
+            uploaded_at=timezone.now() - relativedelta(weeks=1),
+            submitted_at=timezone.now() - relativedelta(days=5),
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
+        )
+        refused_evaluated_job_app = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=refused_evaluated_job_app,
+            uploaded_at=timezone.now() - relativedelta(weeks=1),
+            submitted_at=timezone.now() - relativedelta(days=5),
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+        )
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=refused_evaluated_job_app,
+            uploaded_at=timezone.now() - relativedelta(weeks=1),
+            submitted_at=timezone.now() - relativedelta(days=5),
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2,
+        )
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=refused_evaluated_job_app,
+            uploaded_at=timezone.now() - relativedelta(weeks=1),
+            submitted_at=timezone.now() - relativedelta(days=5),
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2,
+        )
+        accepted_evaluated_job_app = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=accepted_evaluated_job_app,
+            uploaded_at=timezone.now() - relativedelta(weeks=1),
+            submitted_at=timezone.now() - relativedelta(days=5),
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+        )
+        self.client.force_login(user)
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_notify",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            )
+        )
+        self.assertContains(response, f"Notifier la sanction du contrôle pour {evaluated_siae.siae.name}")
+        self.assertContains(
+            response,
+            f"""
+            <a target="_blank" href="/siae_evaluation/institution_evaluated_siae_detail/{evaluated_siae.pk}/">
+             Revoir les 5 auto-prescriptions
+             <i class="ri-external-link-line">
+             </i>
+            </a>""",
+            html=True,
+            count=1,
+        )
+        # 8 criteria, 3 refused. 3/7 * 100 = 37.5 %, rounded to the closest
+        # integer by floatformat.
+        self.assertContains(response, "<li>38 % justificatifs refusés lors de votre contrôle</li>", count=1)
+        # 1 criteria uploaded. 1/8 * 100 = 12.5 %, rounded to the closest
+        # integer by floatformat.
+        self.assertContains(
+            response,
+            f"<li>13 % {self.not_submitted} par la SIAE (dont 1 téléversé sur 1 attendu)</li>",
+            html=True,
+            count=1,
+        )
+        self.assertContains(
+            response,
+            """
+            <h3 class="mt-5">
+             Historique des campagnes de contrôle
+            </h3>
+            <ul class="list-unstyled">
+             <li>
+              Période du 01/01/2022 au 31/12/2022 :
+              <b class="text-danger">Négatif</b>
+             </li>
+            </ul>""",
+            html=True,
+            count=1,
+        )
+        self.assertContains(response, self.not_submitted, count=1)
 
     @freeze_time("2022-10-24 11:11:00")
     def test_post(self):
