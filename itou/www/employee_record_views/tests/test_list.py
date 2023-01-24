@@ -113,6 +113,15 @@ class ListEmployeeRecordsTest(TestCase):
         self.assertContains(response, "Une mise à jour manuelle est nécessaire.")
         self.assertContains(response, "Mettre à jour")
 
+    def test_employee_record_to_disable(self):
+        self.client.force_login(self.user)
+        employee_record_factories.EmployeeRecordFactory(job_application=self.job_application)
+
+        response = self.client.get(self.url + "?status=NEW")
+
+        self.assertContains(response, "Désactiver la fiche salarié")
+        self.assertContains(response, "Créer la fiche salarié")
+
     def test_rejected_without_custom_message(self):
         self.client.force_login(self.user)
 
