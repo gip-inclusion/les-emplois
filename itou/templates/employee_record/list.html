@@ -94,14 +94,13 @@
                             nouvelles fiches salarié.
                         </p>
                     {% elif form.status.value == "READY" %}
-                        <p class="mb-0">
-                            Vous trouverez ici les fiches salarié complétées et en attente d'envoi à
-                            l'ASP.
-                        </p>
+                        <p class="mb-0">Vous trouverez ici les fiches salarié complétées en attente de l’envoi à l’ASP,</p>
+                        <p class="mb-0">qui a lieu automatiquement à intervalles réguliers.</p>
                         <p class="mb-0">
                             À ce stade, seule la visualisation des informations de la fiche est
                             possible.
                         </p>
+                        <p class="mb-0">Merci de votre patience.</p>
                     {% elif form.status.value == "SENT" %}
                         <p class="mb-0">Vous trouverez ici les fiches salarié complétées et envoyées à l'ASP.</p>
                         <p class="mb-0">
