@@ -123,7 +123,7 @@ class EmployeeRecord(models.Model):
     ASP_CLONE_MESSAGE = "Fiche salarié clonée"
 
     created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
-    updated_at = models.DateTimeField(verbose_name="Date de modification", default=timezone.now)
+    updated_at = models.DateTimeField(verbose_name="Date de modification", auto_now=True)
     processed_at = models.DateTimeField(verbose_name="Date d'intégration", null=True)
     status = models.CharField(max_length=10, verbose_name="Statut", choices=Status.choices, default=Status.NEW)
 
@@ -217,12 +217,6 @@ class EmployeeRecord(models.Model):
             f"PK:{self.pk} PASS:{self.approval_number} SIRET:{self.siret} JA:{self.job_application} "
             f"JOBSEEKER:{self.job_seeker} STATUS:{self.status} ASP_ID:{self.asp_id}"
         )
-
-    def save(self, *args, **kwargs):
-        if self.pk:
-            self.updated_at = timezone.now()
-
-        super().save(*args, **kwargs)
 
     def _clean_job_application(self):
         """
@@ -743,7 +737,7 @@ class EmployeeRecordUpdateNotification(models.Model):
     )
     updated_at = models.DateTimeField(
         verbose_name="Date de modification",
-        default=timezone.now,
+        auto_now=True,
     )
     status = models.CharField(
         verbose_name="Statut",
