@@ -135,7 +135,7 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
         )
 
         assert 1 == EmployeeRecordUpdateNotification.objects.new().count()
-        assert employee_record.pk == EmployeeRecordUpdateNotification.objects.first().employee_record.pk
+        assert employee_record.pk == EmployeeRecordUpdateNotification.objects.earliest("created_at").employee_record.pk
 
     def test_update_with_prolongation(self):
         # Creation of a prolongation on an approval linked to an employee record
@@ -149,4 +149,4 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
         )
 
         assert 1 == EmployeeRecordUpdateNotification.objects.new().count()
-        assert employee_record.pk == EmployeeRecordUpdateNotification.objects.first().employee_record.pk
+        assert employee_record.pk == EmployeeRecordUpdateNotification.objects.earliest("created_at").employee_record.pk

@@ -17,7 +17,7 @@ def test_schedule_approval_update_notification_when_notification_do_not_exists(a
             helpers.ACTION_CHECKBOX_NAME: [employee_record.pk],
         },
     )
-    notification = models.EmployeeRecordUpdateNotification.objects.last()
+    notification = models.EmployeeRecordUpdateNotification.objects.latest("created_at")
     assert notification.employee_record == employee_record
     assert notification.notification_type == models.NotificationType.APPROVAL
     assert notification.status == models.Status.NEW
@@ -58,7 +58,7 @@ def test_schedule_approval_update_notification_when_other_than_new_notification_
     )
     notification.refresh_from_db()
     assert notification.updated_at == save_updated_at
-    created_notification = models.EmployeeRecordUpdateNotification.objects.last()
+    created_notification = models.EmployeeRecordUpdateNotification.objects.latest("created_at")
     assert created_notification != notification
     assert created_notification.employee_record == notification.employee_record
     assert created_notification.notification_type == notification.notification_type

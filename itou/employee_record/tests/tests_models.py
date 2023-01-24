@@ -204,7 +204,7 @@ class EmployeeRecordModelTest(TestCase):
         assert clone.asp_batch_file is None
         assert clone.asp_batch_line_number is None
         assert clone.asp_processing_code is None
-        assert EmployeeRecord.ASP_CLONE_MESSAGE in clone.asp_processing_label
+        assert "Fiche salarié clonée" in clone.asp_processing_label
         assert Status.DISABLED == good_employee_record.status
         assert clone.archived_json is None
 

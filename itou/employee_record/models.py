@@ -38,6 +38,52 @@ def validate_asp_batch_filename(value):
 ARCHIVING_DELTA = timezone.timedelta(days=constants.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS)
 
 
+class ASPExchangeInformation(models.Model):
+    ASP_PROCESSING_SUCCESS_CODE = "0000"
+    ASP_DUPLICATE_ERROR_CODE = "3436"
+
+    ASP_MOVEMENT_TYPE = None  # Must be specified in descendant classes
+
+    # ASP processing part
+    asp_processing_code = models.CharField(max_length=4, verbose_name="Code de traitement ASP", null=True)
+    asp_processing_label = models.CharField(max_length=200, verbose_name="Libellé de traitement ASP", null=True)
+
+    # Employee records are sent to ASP in a JSON file,
+    # We keep track of the name for processing feedback
+    # The format of the file name is EXACTLY: RIAE_FS_AAAAMMJJHHMMSS.json (27 chars)
+    asp_batch_file = models.CharField(
+        max_length=27,
+        verbose_name="Fichier de batch ASP",
+        null=True,
+        validators=[validate_asp_batch_filename],
+    )
+    # Line number of the employee record in the batch file
+    # Unique pair with `asp_batch_file`
+    asp_batch_line_number = models.IntegerField(
+        verbose_name="Ligne correspondante dans le fichier batch ASP",
+        null=True,
+    )
+
+    # Once correctly processed by ASP, the employee record is archived:
+    # - it can't be changed anymore
+    # - a serialized version of the employee record is stored (as proof, and for API concerns)
+    # The API will not use JSON serializers on a regular basis,
+    # except for the archive serialization, which occurs once.
+    # It will only return a list of this JSON field for archived employee records.
+    archived_json = models.JSONField(verbose_name="Archive JSON de la fiche salarié", null=True, blank=True)
+
+    class Meta:
+        abstract = True
+        constraints = [
+            models.UniqueConstraint(
+                fields=["asp_batch_file", "asp_batch_line_number"],
+                name="unique_%(class)s_asp_batch_file_and_line",
+                condition=Q(asp_batch_file__isnull=False),
+            )
+        ]
+        ordering = ["-created_at"]
+
+
 class EmployeeRecordQuerySet(models.QuerySet):
     """
     Queryset functions for EmployeeRecord model
@@ -97,7 +143,7 @@ class EmployeeRecordQuerySet(models.QuerySet):
         return self.exclude(job_application__to_siae__convention__asp_id=F("asp_id"))
 
 
-class EmployeeRecord(models.Model):
+class EmployeeRecord(ASPExchangeInformation):
     """
     EmployeeRecord - Fiche salarié (FS for short)
 
@@ -116,11 +162,7 @@ class EmployeeRecord(models.Model):
 
     CAN_BE_DISABLED_STATES = [Status.NEW, Status.REJECTED, Status.PROCESSED]
 
-    # 'C' stands for Creation
-    ASP_MOVEMENT_TYPE = "C"
-    ASP_DUPLICATE_ERROR_CODE = "3436"
-    ASP_PROCESSING_SUCCESS_CODE = "0000"
-    ASP_CLONE_MESSAGE = "Fiche salarié clonée"
+    ASP_MOVEMENT_TYPE = MovementType.CREATION
 
     created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="Date de modification", auto_now=True)
@@ -157,34 +199,6 @@ class EmployeeRecord(models.Model):
         verbose_name="Siret structure mère", max_length=14, validators=[validate_siret], db_index=True
     )
 
-    # ASP processing part
-    asp_processing_code = models.CharField(max_length=4, verbose_name="Code de traitement ASP", null=True)
-    asp_processing_label = models.CharField(max_length=200, verbose_name="Libellé de traitement ASP", null=True)
-
-    # Employee records are sent to ASP in a JSON file,
-    # We keep track of the name for processing feedback
-    # The format of the file name is EXACTLY: RIAE_FS_ AAAAMMJJHHMMSS (27 chars)
-    asp_batch_file = models.CharField(
-        max_length=27,
-        verbose_name="Fichier de batch ASP",
-        null=True,
-        db_index=True,
-        validators=[validate_asp_batch_filename],
-    )
-    # Line number of the employee record in the batch file
-    # Unique pair with `asp_batch_file`
-    asp_batch_line_number = models.IntegerField(
-        verbose_name="Ligne correspondante dans le fichier batch ASP", null=True, db_index=True
-    )
-
-    # Once correctly processed by ASP, the employee record is archived:
-    # - it can't be changed anymore
-    # - a serialized version of the employee record is stored (as proof, and for API concerns)
-    # The API will not use JSON serializers on a regular basis,
-    # except for the archive serialization, which occurs once.
-    # It will only return a list of this JSON field for archived employee records.
-    archived_json = models.JSONField(verbose_name="Archive JSON de la fiche salarié", null=True)
-
     # When an employee record is rejected with a '3436' error code by ASP, it means that:
     # - all the information transmitted via this employee record is already available on ASP side,
     # - the employee record is not needed by ASP and considered as a duplicate
@@ -199,18 +213,16 @@ class EmployeeRecord(models.Model):
     # Added typing helper: improved type checking for `objects` methods
     objects: EmployeeRecordQuerySet | Manager = EmployeeRecordQuerySet.as_manager()
 
-    class Meta:
+    class Meta(ASPExchangeInformation.Meta):
         verbose_name = "Fiche salarié"
         verbose_name_plural = "Fiches salarié"
-        constraints = [
+        constraints = ASPExchangeInformation.Meta.constraints + [
             models.UniqueConstraint(
                 fields=["asp_id", "approval_number"],
                 name="unique_asp_id_approval_number",
                 condition=~Q(status=Status.DISABLED),
             )
         ]
-        unique_together = ["asp_batch_file", "asp_batch_line_number"]
-        ordering = ["-created_at"]
 
     def __str__(self):
         return (
@@ -430,7 +442,7 @@ class EmployeeRecord(models.Model):
             approval_number=self.approval_number,
             asp_id=asp_id,
             siret=EmployeeRecord.siret_from_asp_source(self.job_application.to_siae),
-            asp_processing_label=f"{self.ASP_CLONE_MESSAGE} (pk origine: {self.pk})",
+            asp_processing_label=f"Fiche salarié clonée (pk origine: {self.pk})",
         )
 
         try:
@@ -719,7 +731,7 @@ class EmployeeRecordUpdateNotificationQuerySet(QuerySet):
         return self.filter(asp_batch_file=filename, asp_batch_line_number=line_number)
 
 
-class EmployeeRecordUpdateNotification(models.Model):
+class EmployeeRecordUpdateNotification(ASPExchangeInformation):
     """
     Notification of PROCESSED employee record updates.
 
@@ -759,30 +771,9 @@ class EmployeeRecordUpdateNotification(models.Model):
         on_delete=models.CASCADE,
     )
 
-    # ASP processing part
-    asp_processing_code = models.CharField(max_length=4, verbose_name="Code de traitement ASP", null=True)
-    asp_processing_label = models.CharField(max_length=200, verbose_name="Libellé de traitement ASP", null=True)
-
-    # Employee records are sent to ASP in a JSON file,
-    # We keep track of the name for processing feedback
-    # The format of the file name is EXACTLY: RIAE_FS_ AAAAMMJJHHMMSS (27 chars)
-    asp_batch_file = models.CharField(
-        max_length=27,
-        verbose_name="Fichier de batch ASP",
-        null=True,
-        validators=[validate_asp_batch_filename],
-    )
-
-    # Line number of the employee record in the batch file
-    # Unique pair with `asp_batch_file`
-    asp_batch_line_number = models.IntegerField(
-        verbose_name="Ligne correspondante dans le fichier batch ASP",
-        null=True,
-    )
-
     objects = EmployeeRecordUpdateNotificationQuerySet.as_manager()
 
-    class Meta:
+    class Meta(ASPExchangeInformation.Meta):
         verbose_name = "Notification de changement de la fiche salarié"
         verbose_name_plural = "Notifications de changement de la fiche salarié"
 
