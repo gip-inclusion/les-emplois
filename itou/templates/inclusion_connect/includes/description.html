@@ -1,33 +1,28 @@
 {% load static %}
 
+<h2>Créez un compte les emplois de l’inclusion avec Inclusion Connect</h2>
 <p class="mt-5">
-    Créez un compte sur les emplois de l’inclusion avec <span class="font-weight-bold">Inclusion Connect</span>.
-    <br>
     Inclusion Connect est une solution de connexion unique à plusieurs services publics réservée aux professionnels de l’inclusion.
 </p>
 
 
 {% if inclusion_connect_url %}
-    {% include "inclusion_connect/includes/button.html" with authentication_type=account_type_display_name %}
+    <div class="text-center">
+        <a href="{{ inclusion_connect_url }}"
+           class="btn-inclusion-connect matomo-event"
+           data-matomo-category="inscription-{{ authentication_type }}"
+           data-matomo-action="clic"
+           data-matomo-option="se-connecter-avec-inclusion-connect">
+            <img src="{% static 'img/inclusion_connect/logo-inclusion-connect-one-line.svg' %}" alt="Se connecter avec Inclusion Connect" height="14">
+        </a>
+        <br>
+        <!-- To edit the following page, use this link : https://www.notion.so/Simplifions-l-utilisation-des-services-destination-des-professionnels-de-l-inclusion-ded9135197654da590f5dde41d8bb68b -->
+        <a href="https://plateforme-inclusion.notion.site/Simplifions-l-utilisation-des-services-destination-des-professionnels-de-l-inclusion-ded9135197654da590f5dde41d8bb68b"
+           class="btn btn-link"
+           target="_blank">
+            En savoir plus
+        </a>
+    </div>
 {% else %}
     <p class="font-italic text-center mt-3">Inclusion Connect est momentanément désactivé.</p>
 {% endif %}
-
-<p class="text-center font-weight-bold mt-5">La plateforme de l’inclusion met en place</p>
-
-<div class="bg-emploi-lighter p-3 text-center rounded mt-3">
-    <img class="img-fluid" alt="" src="{% static 'img/inclusion_connect/inclusion_connect_logo.svg' %}">
-    <p class="my-3">Vous pouvez utiliser le même identifiant et le même mot de passe pour les services suivants :</p>
-    <div class="d-flex justify-content-center align-items-center">
-        <span class="w-33">
-            <img src="{% static 'img/logos_chantiers/emplois.svg' %}" class="img-fluid img-fitcover" alt="logo des emplois de l'inclusion" loading="lazy">
-        </span>
-        <span class="w-33 px-lg-2">
-            <img src="{% static 'img/logos_chantiers/rdv_solidarite.svg' %}" class="img-fluid img-fitcover" alt="logo de rendez-vous solidarité" loading="lazy">
-        </span>
-        <span class="w-33 px-lg-6">
-            <img src="{% static 'img/logos_chantiers/dora.svg' %}" class="img-fluid img-fitcover" alt="logo du projet Dora" loading="lazy">
-        </span>
-        {% comment %} <img src="{% static 'img/logos_chantiers/communaute.svg' %}" class="w-100 px-2" alt="logo de la communauté de l'inclusion"> {% endcomment %}
-    </div>
-</div>

@@ -45,7 +45,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
     def test_accept_invitation_signup_(self):
         invitation = SentSiaeStaffInvitationFactory(email=OIDC_USERINFO["email"])
         response = self.client.get(invitation.acceptance_link, follow=True)
-        self.assertContains(response, "inclusion_connect_button.svg")
+        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
 
         # We don't put the full path with the FQDN in the parameters
         previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
@@ -95,7 +95,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
     def test_accept_invitation_signup_wrong_email(self):
         invitation = SentSiaeStaffInvitationFactory()
         response = self.client.get(invitation.acceptance_link, follow=True)
-        self.assertContains(response, "inclusion_connect_button.svg")
+        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
 
         # We don't put the full path with the FQDN in the parameters
         previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
@@ -201,7 +201,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         )
         response = self.client.get(invitation.acceptance_link, follow=True)
         self.assertContains(response, escape("La structure que vous souhaitez rejoindre n'est plus active."))
-        self.assertNotContains(response, "inclusion_connect_button.svg")
+        self.assertNotContains(response, "logo-inclusion-connect-one-line.svg")
 
         # If the user still manages to signup with IC
         previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
