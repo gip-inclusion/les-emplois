@@ -19,10 +19,12 @@
                     <form method="post">
                         {% csrf_token %}
                         {% bootstrap_form form %}
-                        <a class="btn btn-link" href="{% url "siae_evaluations_views:institution_evaluated_siae_list" evaluated_siae.evaluation_campaign_id %}">
-                            Revenir à la liste
-                        </a>
-                        <button class="btn btn-primary float-right">Envoyer ce résultat</button>
+                        <div class="float-right">
+                            <a class="btn btn-link" href="{% url "siae_evaluations_views:institution_evaluated_siae_list" evaluated_siae.evaluation_campaign_id %}">
+                                Revenir à la liste
+                            </a>
+                            <button class="btn btn-primary">Envoyer ce résultat</button>
+                        </div>
                     </form>
                 </div>
             </div>
