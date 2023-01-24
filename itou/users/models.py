@@ -330,6 +330,11 @@ class User(AbstractUser, AddressMixin):
             raise ValidationError(self.ERROR_BIRTH_COMMUNE_WITH_FOREIGN_COUNTRY)
 
     def save(self, *args, **kwargs):
+        if not self.is_job_seeker:
+            self.asp_uid = None  # Needs to be done before the call to .validate_unique()
+        if self.is_job_seeker and not self.asp_uid and self.id:  # When .kind changes
+            self.asp_uid = salted_hmac(key_salt="job_seeker.id", value=self.id).hexdigest()[:30]
+
         # Update department from postal code (if possible).
         self.department = department_from_postcode(self.post_code)
         self.validate_unique()
