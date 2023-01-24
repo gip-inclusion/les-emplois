@@ -134,6 +134,8 @@ def build_final_tables():
     The name of the table being created with the query is derived from the filename,
     # e.g. '002_missions_ai_ehpad.sql' => 'missions_ai_ehpad'
     """
+    create_unversioned_tables_if_needed()
+
     path = f"{get_current_dir()}/sql"
     for filename in sorted([f for f in os.listdir(path) if f.endswith(".sql")]):
         print(f"Running {filename} ...")
@@ -141,6 +143,132 @@ def build_final_tables():
         with open(os.path.join(path, filename), encoding="utf-8") as file:
             sql_request = file.read()
         build_custom_table(table_name=table_name, sql_request=sql_request)
+        print("Done.")
+
+
+def create_unversioned_tables_if_needed():
+    """
+    Unfortunately some tables are not versioned yet as they are still managed manually by our data analysts.
+    This becomes a problem when trying to run all requests on a local empty database.
+    The present function creates these unversioned tables without any content, at least now all the requests
+    can complete locally and we have a good visibility of how many tables are left to be automated.
+    """
+    with MetabaseDatabaseCursor() as (cur, conn):
+        create_table_sql_requests = """
+            CREATE TABLE IF NOT EXISTS "commune_gps" (
+                "code_insee" varchar(255),
+                "nom_commune" varchar(255),
+                "code_postal" varchar(255),
+                "latitude" numeric(9,6),
+                "longitude" numeric(9,6)
+            );
+
+            CREATE TABLE IF NOT EXISTS "constantes" (
+                "annee_en_cours" float8
+            );
+
+            CREATE TABLE IF NOT EXISTS "sa_ept" (
+                "etablissement_public_territorial" varchar(255),
+                "commune" varchar(255),
+                "departement" varchar(255),
+                "code_comm" varchar(25)
+            );
+
+            CREATE TABLE IF NOT EXISTS "sa_zones_infradepartementales" (
+                "code_insee" varchar(255),
+                "libelle_commune" varchar(255),
+                "nom_departement" text,
+                "nom_region" varchar(255),
+                "nom_arrondissement" varchar(255),
+                "nom_zone_emploi_2020" varchar(255),
+                "code_commune" varchar,
+                "nom_epci" varchar(255),
+                "type_epci" varchar
+            );
+
+            CREATE TABLE IF NOT EXISTS "code_rome_domaine_professionnel" (
+                "grand_domaine" varchar(255),
+                "domaine_professionnel" varchar(255),
+                "code_rome" varchar,
+                "description_code_rome" varchar,
+                "date_mise_à_jour_metabase" date
+            );
+
+            CREATE TABLE IF NOT EXISTS "reseau_iae_adherents" (
+                "SIRET" text,
+                "Réseau IAE" text
+            );
+
+            CREATE TABLE IF NOT EXISTS "suivi_visiteurs_tb_prives" (
+                "Date" timestamp,
+                "Département" text,
+                "Nom Département" text,
+                "Tableau de bord" text,
+                "Visiteurs uniques" float8,
+                "Visites" float8,
+                "Actions" float8,
+                "Nombre maximum d'actions en une visite" float8,
+                "Rebonds" float8,
+                "Temps total passé par les visiteurs (en secondes)" float8,
+                "Visites retour" float8,
+                "Actions des visites retour" float8,
+                "Visiteurs uniques de retour" float8,
+                "Visiteurs connus" float8,
+                "Actions maximum dans une visite de retour" float8,
+                "Pourcentage de rebond pour les visites retour" text,
+                "Nombre moyen d'actions par visiteur connu" float8,
+                "Durée moyenne des visites pour les visiteurs connus (en second" text,
+                "Temps moyen de connexion" text,
+                "Moy. heure du serveur" text,
+                "Conversions" float8,
+                "Visites avec conversions" float8,
+                "Revenu" float8,
+                "Taux de conversion" text,
+                "nb_conversions_returning_visit" float8,
+                "nb_visits_converted_returning_visit" float8,
+                "revenue_returning_visit" float8,
+                "conversion_rate_returning_visit" text,
+                "Vues de page" float8,
+                "Vues de page uniques" float8,
+                "Téléchargements" float8,
+                "Téléchargements uniques" float8,
+                "Liens sortants" float8,
+                "Liens sortants uniques" float8,
+                "Recherches" float8,
+                "Taux de rebond" text,
+                "Actions par visite" float8,
+                "Durée moy. des visites (en secondes)" text,
+                "Moy. Durée d'une nouvelle visite (en sec)" text,
+                "Moy. Actions par nouvelle visite" float8,
+                "Taux de rebond pour une nouvelle visite" text,
+                "Nouvelle Visite" float8,
+                "Actions de Nouvelles Visites" float8,
+                "Nouveaux visiteurs uniques" float8,
+                "Nouveaux Utilisateurs" float8,
+                "max_actions_new" float8,
+                "nb_conversions_new_visit" float8,
+                "nb_visits_converted_new_visit" float8,
+                "revenue_new_visit" float8,
+                "conversion_rate_new_visit" text
+            );
+
+            CREATE TABLE IF NOT EXISTS "suivi_utilisateurs_tb_prives" (
+                "id" varchar(300),
+                "numero_departement" varchar(5),
+                "nom_département" varchar(300),
+                "région" varchar(200),
+                "structure" varchar(150),
+                "type_siae" varchar(50),
+                "nom_siae" varchar(350),
+                "nom_cd" varchar(350),
+                "nom_agence_pe" varchar(350),
+                "utilisateur" varchar(100)
+            );
+
+        """
+        print("Creating unversioned tables if needed...")
+        cur.execute(sql.SQL(create_table_sql_requests))
+        conn.commit()
         print("Done.")
 
 
