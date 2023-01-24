@@ -1,4 +1,30 @@
+from bs4 import BeautifulSoup
 from django.test import Client, TestCase as BaseTestCase
+
+
+def format_html(response, **selectors):
+    """
+    Formats an HTML document, ideal for inclusion in the expected outcome of a
+    test.
+
+    Heed the warning from
+    https://www.crummy.com/software/BeautifulSoup/bs4/doc/#pretty-printing :
+
+    > Since it adds whitespace (in the form of newlines), prettify() changes
+      the meaning of an HTML document and should not be used to reformat one.
+      The goal of prettify() is to help you visually understand the structure
+      of the documents you work with.
+
+    Prefer `assertHTMLEqual` and `assertContains(…, html=True)`.
+
+    Nonetheless, this tool cuts boilerplate in capturing response output.
+    """
+    parser = BeautifulSoup(response.content, "html5lib")
+    return [elt.prettify() for elt in parser.find_all(**selectors)]
+
+
+def pprint_html(response, **selectors):
+    print("\n\n".join(format_html(response, **selectors)))
 
 
 class NoInlineClient(Client):
