@@ -105,12 +105,8 @@ class EmployeeRecord(models.Model):
     """
 
     ERROR_JOB_APPLICATION_MUST_BE_ACCEPTED = "La candidature doit être acceptée"
-    ERROR_JOB_SEEKER_TITLE = "La civilité du salarié est obligatoire"
-    ERROR_JOB_SEEKER_BIRTH_COUNTRY = "Le pays de naissance est obligatoire"
     ERROR_JOB_APPLICATION_WITHOUT_APPROVAL = "L'embauche n'est pas reliée à un PASS IAE"
 
-    ERROR_JOB_SEEKER_TITLE = "La civilité du salarié est obligatoire"
-    ERROR_JOB_SEEKER_BIRTH_COUNTRY = "Le pays de naissance est obligatoire"
     ERROR_JOB_SEEKER_HAS_NO_PROFILE = "Cet utilisateur n'a pas de profil de demandeur d'emploi enregistré"
 
     ERROR_EMPLOYEE_RECORD_IS_DUPLICATE = "Une fiche salarié pour ce PASS IAE et cette SIAE existe déjà"
