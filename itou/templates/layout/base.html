@@ -40,8 +40,8 @@
         <link rel="stylesheet" href="{% static "vendor/duetds-date-picker-1.4.0/themes/default.css" %}" type="text/css">
         {% block extra_head %}{% endblock %}
     </head>
-    <body>
-        <nav role="navigation" aria-label="Accès rapide" tabindex="1" class="sr-only">
+    <body class="{% block body_class %}{% endblock %}">
+        <nav role="navigation" aria-label="Accès rapide" tabindex="0" class="sr-only">
             <ul>
                 <li>
                     <a href="#nav-primary">Aller au menu principal</a>

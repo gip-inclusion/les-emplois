@@ -543,3 +543,12 @@ Usage:
 .htmx-request .htmx-indicator {
     display: inline-block;
 }
+
+/* Inclusion connect
+--------------------------------------------------------------------------- */
+.p-inclusion-connect .s-main {
+    background-color: #fff !important;
+    background-image: url('../img/illustration-bg-ic.svg');
+    background-repeat: no-repeat;
+    background-position: top -120px left;
+}
