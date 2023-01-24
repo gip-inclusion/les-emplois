@@ -1,7 +1,7 @@
 from itou.metabase.tables.utils import MetabaseTable, hash_content
 
 
-TABLE = MetabaseTable(name="fiches_de_poste_par_candidature_v2")
+TABLE = MetabaseTable(name="fiches_de_poste_par_candidature")
 TABLE.add_columns(
     [
         {
