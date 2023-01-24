@@ -1,8 +1,10 @@
 {% include "siaes/includes/_siae_info.html" %}
 
-<p class="badge badge-pill badge-success mb-4">
-    {{ job.open_positions }} poste{{ job.open_positions|pluralize }} ouvert{{ job.open_positions|pluralize }} au recrutement
-</p>
+{% if job.is_active %}
+    <p class="badge badge-pill badge-success mb-4">
+        {{ job.open_positions }} poste{{ job.open_positions|pluralize }} ouvert{{ job.open_positions|pluralize }} au recrutement
+    </p>
+{% endif %}
 
 <h2 class="mb-4">{{ job.display_name }}</h2>
 
