@@ -38,7 +38,7 @@
                                             </p>
                                             <a href="{{ inclusion_connect_url }}"
                                                class="btn btn-link matomo-event"
-                                               data-matomo-category="inscription-account_type_display_name"
+                                               data-matomo-category="inscription {{ account_type_display_name }}"
                                                data-matomo-action="clic"
                                                data-matomo-option="se-connecter-avec-inclusion-connect">Se connecter</a>
                                         </strong>
@@ -55,7 +55,7 @@
                             </fieldset>
                             <button type="submit"
                                     class="btn btn-block btn-primary matomo-event"
-                                    data-matomo-category="inscription-{{ authentication_type }}"
+                                    data-matomo-category="inscription {{ account_type_display_name }}"
                                     data-matomo-action="clic"
                                     data-matomo-option="activer-son-compte-inclusion-connect">
                                 Valider
@@ -66,7 +66,7 @@
                             <h2 class="h5">Vous avez déjà un compte Inclusion Connect ?</h2>
                             <a href="{{ inclusion_connect_url }}"
                                class="btn btn-link matomo-event"
-                               data-matomo-category="inscription-account_type_display_name"
+                               data-matomo-category="inscription {{ account_type_display_name }}"
                                data-matomo-action="clic"
                                data-matomo-option="se-connecter-avec-inclusion-connect">Se connecter</a>
                         </div>
