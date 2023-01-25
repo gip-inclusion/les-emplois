@@ -3,6 +3,7 @@ from io import BytesIO
 import pysftp
 from django.conf import settings
 from rest_framework.parsers import JSONParser
+from rest_framework.renderers import JSONRenderer
 
 from itou.employee_record import constants
 from itou.employee_record.enums import MovementType, Status
@@ -49,16 +50,16 @@ class Command(EmployeeRecordTransferCommand):
         - render the list of employee record notifications in JSON
         - send it to ASP remote folder.
         """
-        # Ability to use ASP test serializers (using fake SIRET numbers)
         raw_batch = EmployeeRecordBatch(notifications)
+        # Ability to use ASP test serializers (using fake SIRET numbers)
         if self.asp_test:
-            batch = TestEmployeeRecordUpdateNotificationBatchSerializer(raw_batch)
+            batch_data = TestEmployeeRecordUpdateNotificationBatchSerializer(raw_batch).data
         else:
-            batch = EmployeeRecordUpdateNotificationBatchSerializer(raw_batch)
+            batch_data = EmployeeRecordUpdateNotificationBatchSerializer(raw_batch).data
 
         try:
             # accessing .data triggers serialization
-            remote_path = self.upload_json_file(batch.data, conn, dry_run)
+            remote_path = self.upload_json_file(batch_data, conn, dry_run)
         except SerializationError as ex:
             self.stdout.write(
                 f"Employee records serialization error during upload, can't process.\n"
@@ -80,8 +81,11 @@ class Command(EmployeeRecordTransferCommand):
                 self.stdout.write("DRY-RUN: Not *really* updating notification statuses")
                 return
 
+            renderer = JSONRenderer()
             for idx, notification in enumerate(notifications, 1):
-                notification.update_as_sent(remote_path, idx)
+                notification.update_as_sent(
+                    remote_path, idx, renderer.render(batch_data["lignesTelechargement"][idx - 1])
+                )
 
     def _parse_feedback_file(self, feedback_file: str, batch: dict, dry_run: bool) -> int:
         """
@@ -134,7 +138,7 @@ class Command(EmployeeRecordTransferCommand):
                     # Not an important issue if notification was previously processed
                     if notification.status != Status.PROCESSED:
                         try:
-                            notification.update_as_processed(processing_code, processing_label)
+                            notification.update_as_processed(processing_code, processing_label, employee_record)
                         except Exception as ex:
                             record_errors += 1
                             self.stdout.write(f"Can't perform update: {notification=}, {ex=}")
@@ -145,7 +149,7 @@ class Command(EmployeeRecordTransferCommand):
                 if not dry_run:
                     # Fix unexpected stop on multiple pass on the same file
                     if notification.status != Status.REJECTED:
-                        notification.update_as_rejected(processing_code, processing_label)
+                        notification.update_as_rejected(processing_code, processing_label, employee_record)
                     else:
                         self.stdout.write(f"Already rejected: {notification=}")
                 else:

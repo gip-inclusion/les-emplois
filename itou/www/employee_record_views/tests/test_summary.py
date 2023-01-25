@@ -42,7 +42,7 @@ class SummaryEmployeeRecordsTest(TestCase):
         self.assertNotContains(response, "Horodatage ASP")
 
         self.employee_record.update_as_ready()
-        self.employee_record.update_as_sent("RIAE_FS_20210410130000.json", 1)
+        self.employee_record.update_as_sent("RIAE_FS_20210410130000.json", 1, None)
 
         response = self.client.get(self.url)
         self.assertContains(response, "Horodatage ASP")

@@ -11,7 +11,7 @@ from itou.employee_record.enums import MovementType, NotificationType, Status
 from itou.employee_record.exceptions import SerializationError
 from itou.employee_record.mocks.fake_serializers import TestEmployeeRecordBatchSerializer
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, EmployeeRecordUpdateNotification
-from itou.employee_record.serializers import EmployeeRecordBatchSerializer, EmployeeRecordSerializer
+from itou.employee_record.serializers import EmployeeRecordBatchSerializer
 from itou.utils import sentry
 from itou.utils.iterators import chunks
 
@@ -45,14 +45,15 @@ class Command(EmployeeRecordTransferCommand):
         """
         Render a list of employee records in JSON format then send it to SFTP upload folder
         """
-        # Temporary ability to use test serializers
         raw_batch = EmployeeRecordBatch(employee_records)
-        batch = (
-            TestEmployeeRecordBatchSerializer(raw_batch) if self.asp_test else EmployeeRecordBatchSerializer(raw_batch)
-        )
+        # Ability to use ASP test serializers (using fake SIRET numbers)
+        if self.asp_test:
+            batch_data = TestEmployeeRecordBatchSerializer(raw_batch).data
+        else:
+            batch_data = EmployeeRecordBatchSerializer(raw_batch).data
 
         try:
-            remote_path = self.upload_json_file(batch.data, conn, dry_run)
+            remote_path = self.upload_json_file(batch_data, conn, dry_run)
         except SerializationError as ex:
             self.stdout.write(
                 f"Employee records serialization error during upload, can't process.\n"
@@ -74,10 +75,13 @@ class Command(EmployeeRecordTransferCommand):
                 self.stdout.write("DRY-RUN: Not *really* updating employee records statuses")
                 return
 
-            # Now that file is transfered, update employee records status (SENT)
+            # Now that file is transferred, update employee records status (SENT)
             # and store in which file they have been sent
+            renderer = JSONRenderer()
             for idx, employee_record in enumerate(employee_records, 1):
-                employee_record.update_as_sent(remote_path, idx)
+                employee_record.update_as_sent(
+                    remote_path, idx, renderer.render(batch_data["lignesTelechargement"][idx - 1])
+                )
 
     def _parse_feedback_file(self, feedback_file, batch, dry_run) -> int:
         """
@@ -88,7 +92,6 @@ class Command(EmployeeRecordTransferCommand):
         Returns the number of errors encountered
         """
         batch_filename = EmployeeRecordBatch.batch_filename_from_feedback(feedback_file)
-        renderer = JSONRenderer()
         record_errors = 0
         records = batch.get("lignesTelechargement")
 
@@ -110,10 +113,10 @@ class Command(EmployeeRecordTransferCommand):
             )
             return 1
 
-        for idx, employee_record in enumerate(records, 1):
-            line_number = employee_record.get("numLigne")
-            processing_code = employee_record.get("codeTraitement")
-            processing_label = employee_record.get("libelleTraitement")
+        for idx, raw_employee_record in enumerate(records, 1):
+            line_number = raw_employee_record.get("numLigne")
+            processing_code = raw_employee_record.get("codeTraitement")
+            processing_label = raw_employee_record.get("libelleTraitement")
 
             self.stdout.write(f"Record: {line_number=}, {processing_code=}, {processing_label=}")
 
@@ -129,20 +132,17 @@ class Command(EmployeeRecordTransferCommand):
                 # Do not count as an error
                 continue
 
-            # Employee record succesfully processed by ASP :
+            archived_json = JSONRenderer().render(raw_employee_record)
+            # Employee record successfully processed by ASP :
             if processing_code == EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE:
                 # Archive a JSON copy of employee record (with processing code and label)
                 employee_record.asp_processing_code = processing_code
                 employee_record.asp_processing_label = processing_label
 
-                serializer = EmployeeRecordSerializer(employee_record)
-
                 if not dry_run:
                     try:
                         if employee_record.status != Status.PROCESSED:
-                            employee_record.update_as_processed(
-                                processing_code, processing_label, renderer.render(serializer.data).decode()
-                            )
+                            employee_record.update_as_processed(processing_code, processing_label, archived_json)
                         else:
                             self.stdout.write(f"Already accepted: {employee_record=}")
                     except Exception as ex:
@@ -165,7 +165,7 @@ class Command(EmployeeRecordTransferCommand):
                     if processing_code == EmployeeRecord.ASP_DUPLICATE_ERROR_CODE:
                         employee_record.status = Status.REJECTED
                         employee_record.asp_processing_code = EmployeeRecord.ASP_DUPLICATE_ERROR_CODE
-                        employee_record.update_as_processed_as_duplicate()
+                        employee_record.update_as_processed_as_duplicate(archived_json)
 
                         # If the ASP mark the employee record as duplicate,
                         # and there is a suspension or a prolongation for the associated approval,
@@ -188,7 +188,7 @@ class Command(EmployeeRecordTransferCommand):
                     # Fixes unexpected stop on multiple pass on the same file
                     if employee_record.status != Status.REJECTED:
                         # Standard error / rejection processing
-                        employee_record.update_as_rejected(processing_code, processing_label)
+                        employee_record.update_as_rejected(processing_code, processing_label, archived_json)
                     else:
                         self.stdout.write(f"Already rejected: {employee_record=}")
                 else:

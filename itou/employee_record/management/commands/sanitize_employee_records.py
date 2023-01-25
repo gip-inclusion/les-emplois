@@ -39,7 +39,7 @@ class Command(BaseCommand):
 
             with transaction.atomic():
                 for to_fix in err_3436:
-                    to_fix.update_as_processed_as_duplicate()
+                    to_fix.update_as_processed_as_duplicate(to_fix.archived_json)
 
             self.stdout.write(" - done!")
 

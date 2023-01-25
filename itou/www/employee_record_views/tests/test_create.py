@@ -674,10 +674,10 @@ class UpdateRejectedEmployeeRecordTest(AbstractCreateEmployeeRecordTest):
         employee_record = EmployeeRecord.objects.get(job_application=self.job_application)
 
         # Must change status twice (contrained lifecycle)
-        employee_record.update_as_sent("fooFileName.json", 1)
+        employee_record.update_as_sent("fooFileName.json", 1, None)
         assert employee_record.status == Status.SENT
 
-        employee_record.update_as_rejected("0001", "Error message")
+        employee_record.update_as_rejected("0001", "Error message", None)
 
         assert employee_record.status == Status.REJECTED
 

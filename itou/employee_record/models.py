@@ -83,6 +83,22 @@ class ASPExchangeInformation(models.Model):
         ]
         ordering = ["-created_at"]
 
+    def _set_archived_json(self, archive):
+        if archive is not None:
+            with contextlib.suppress(json.JSONDecodeError):
+                archive = json.loads(archive)
+        self.archived_json = archive
+
+    def set_asp_batch_information(self, file, line_number, archive):
+        self.asp_batch_file = file
+        self.asp_batch_line_number = line_number
+        self._set_archived_json(archive)
+
+    def set_asp_processing_information(self, code, label, archive):
+        self.asp_processing_code = code
+        self.asp_processing_label = label
+        self._set_archived_json(archive)
+
 
 class EmployeeRecordQuerySet(models.QuerySet):
     """
@@ -292,7 +308,7 @@ class EmployeeRecord(ASPExchangeInformation):
         self.status = Status.READY
         self.save()
 
-    def update_as_sent(self, asp_filename, line_number):
+    def update_as_sent(self, asp_filename, line_number, archive):
         """
         An employee record is sent to ASP via a JSON file,
         The file name is stored for further feedback processing (also done via a file)
@@ -315,12 +331,12 @@ class EmployeeRecord(ASPExchangeInformation):
         self.siret = EmployeeRecord.siret_from_asp_source(self.job_application.to_siae)
         self.asp_id = self.job_application.to_siae.convention.asp_id
 
-        self.asp_batch_file = asp_filename
-        self.asp_batch_line_number = line_number
         self.status = Status.SENT
+        self.set_asp_batch_information(asp_filename, line_number, archive)
+
         self.save()
 
-    def update_as_rejected(self, code, label):
+    def update_as_rejected(self, code, label, archive):
         """
         Update status after an ASP rejection of the employee record
 
@@ -331,8 +347,8 @@ class EmployeeRecord(ASPExchangeInformation):
 
         self.clean()
         self.status = Status.REJECTED
-        self.asp_processing_code = code
-        self.asp_processing_label = label
+        self.set_asp_processing_information(code, label, archive)
+
         self.save()
 
     def update_as_processed(self, code, label, archive):
@@ -342,12 +358,8 @@ class EmployeeRecord(ASPExchangeInformation):
         self.clean()
         self.status = Status.PROCESSED
         self.processed_at = timezone.now()
-        self.asp_processing_code = code
-        self.asp_processing_label = label
-        if archive is not None:
-            with contextlib.suppress(json.JSONDecodeError):
-                archive = json.loads(archive)
-        self.archived_json = archive
+        self.set_asp_processing_information(code, label, archive)
+
         self.save()
 
     def update_as_disabled(self):
@@ -394,7 +406,7 @@ class EmployeeRecord(ASPExchangeInformation):
             # Override .save() update of `updated_at` when using bulk updates
             self.updated_at = timezone.now()
 
-    def update_as_processed_as_duplicate(self):
+    def update_as_processed_as_duplicate(self, archive):
         """
         Force status to `PROCESSED` if the employee record has been marked
         as duplicate by ASP (error code 3436).
@@ -412,8 +424,8 @@ class EmployeeRecord(ASPExchangeInformation):
         self.status = Status.PROCESSED
         self.processed_at = timezone.now()
         self.processed_as_duplicate = True
-        self.asp_processing_label = "Statut forcé suite à doublon ASP"
-        self.archived_json = None
+        self.set_asp_processing_information(self.ASP_DUPLICATE_ERROR_CODE, "Statut forcé suite à doublon ASP", archive)
+
         self.save()
 
     def clone_orphan(self, asp_id):
@@ -780,27 +792,29 @@ class EmployeeRecordUpdateNotification(ASPExchangeInformation):
     def __repr__(self):
         return f"<{type(self).__name__} pk={self.pk}>"
 
-    def update_as_sent(self, filename, line_number):
+    def update_as_sent(self, filename, line_number, archive):
         if self.status not in [NotificationStatus.NEW, NotificationStatus.REJECTED]:
             raise ValidationError(f"Invalid status to update as SENT (currently: {self.status})")
 
         self.status = NotificationStatus.SENT
-        self.asp_batch_file = filename
-        self.asp_batch_line_number = line_number
-        self.save(update_fields=["status", "asp_batch_file", "asp_batch_line_number", "updated_at"])
+        self.set_asp_batch_information(filename, line_number, archive)
 
-    def update_as_rejected(self, code, label):
-        if not self.status == Status.SENT:
-            raise ValidationError(f"Invalid status to update as REJECTED (currently: {self.status})")
-        self.status = Status.REJECTED
-        self.asp_processing_code = code
-        self.asp_processing_label = label
         self.save()
 
-    def update_as_processed(self, code, label):
+    def update_as_rejected(self, code, label, archive):
+        if not self.status == Status.SENT:
+            raise ValidationError(f"Invalid status to update as REJECTED (currently: {self.status})")
+
+        self.status = Status.REJECTED
+        self.set_asp_processing_information(code, label, archive)
+
+        self.save()
+
+    def update_as_processed(self, code, label, archive):
         if not self.status == Status.SENT:
             raise ValidationError(f"Invalid status to update as PROCESSED (currently: {self.status})")
+
         self.status = Status.PROCESSED
-        self.asp_processing_code = code
-        self.asp_processing_label = label
+        self.set_asp_processing_information(code, label, archive)
+
         self.save()

@@ -149,7 +149,7 @@ class EmployeeRecordAPIFetchListTest(APITestCase):
         # Get list without filtering by status (PROCESSED)
         # note: there is no way to create a processed employee record
         # (and this is perfectly normal)
-        self.employee_record.update_as_sent(self.faker.asp_batch_filename(), 1)
+        self.employee_record.update_as_sent(self.faker.asp_batch_filename(), 1, None)
         process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
 
         # There should be no result at this point
@@ -185,7 +185,7 @@ class EmployeeRecordAPIFetchListTest(APITestCase):
 
         assert len(result.get("results")) == 0
 
-        employee_record_sent.update_as_sent(self.faker.asp_batch_filename(), 1)
+        employee_record_sent.update_as_sent(self.faker.asp_batch_filename(), 1, None)
         response = self.client.get(ENDPOINT_URL + "?status=SENT", format="json")
 
         assert response.status_code == 200
@@ -199,7 +199,7 @@ class EmployeeRecordAPIFetchListTest(APITestCase):
         job_application = JobApplicationWithCompleteJobSeekerProfileFactory(to_siae=self.siae)
         employee_record_rejected = EmployeeRecord.from_job_application(job_application=job_application)
         employee_record_rejected.update_as_ready()
-        employee_record_rejected.update_as_sent(self.faker.asp_batch_filename(), 1)
+        employee_record_rejected.update_as_sent(self.faker.asp_batch_filename(), 1, None)
 
         # There should be no result at this point
         response = self.client.get(ENDPOINT_URL + "?status=REJECTED", format="json")
@@ -210,7 +210,7 @@ class EmployeeRecordAPIFetchListTest(APITestCase):
         assert len(result.get("results")) == 0
 
         err_code, err_message = "12", "JSON Invalide"
-        employee_record_rejected.update_as_rejected(err_code, err_message)
+        employee_record_rejected.update_as_rejected(err_code, err_message, None)
 
         # Status case is not important
         response = self.client.get(ENDPOINT_URL + "?status=rEjEcTeD", format="json")
@@ -288,7 +288,7 @@ class EmployeeRecordAPIParametersTest(APITestCase):
         )
         employee_record = EmployeeRecord.from_job_application(job_application_2)
         employee_record.update_as_ready()
-        employee_record.update_as_sent(self.faker.asp_batch_filename(), 1)
+        employee_record.update_as_sent(self.faker.asp_batch_filename(), 1, None)
 
         member = employee_record.job_application.to_siae.members.first()
         self.client.force_login(member)
