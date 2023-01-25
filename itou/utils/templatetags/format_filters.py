@@ -75,3 +75,9 @@ def format_approval_number(number, autoescape=True):
     return mark_safe(
         f'<span>{parts[0]}</span><span class="ml-1">{parts[1]}</span><span class="ml-1">{parts[2]}</span>'
     )
+
+
+@register.filter
+@stringfilter
+def remove_json_extension(filename):
+    return filename.removesuffix(".json")

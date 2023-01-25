@@ -29,6 +29,17 @@
                         <div>
                             <b>{{ employee_record.get_status_display }}</b> le {{ employee_record.updated_at }}
                         </div>
+                        {% if employee_record.asp_batch_file %}
+                            <div class="mt-3">
+                                <b>Horodatage ASP:</b>
+                            </div>
+                            <div>Création : {{ employee_record.asp_batch_file|remove_json_extension }}</div>
+                            {% for update_notification in employee_record.update_notifications.all %}
+                                {% if update_notification.asp_batch_file %}
+                                    <div>Modification : {{ update_notification.asp_batch_file|remove_json_extension }}</div>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
                     </div>
                     <div class="col-sm-3 text-right">
                         <img src="{% static 'img/employee_record/asp_upload.svg' %}" alt="Transfert ASP">

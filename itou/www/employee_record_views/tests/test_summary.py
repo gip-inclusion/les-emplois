@@ -1,6 +1,6 @@
 from django.urls import reverse
 
-from itou.employee_record.factories import EmployeeRecordWithProfileFactory
+from itou.employee_record.factories import EmployeeRecordUpdateNotificationFactory, EmployeeRecordWithProfileFactory
 from itou.job_applications.factories import JobApplicationWithCompleteJobSeekerProfileFactory
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
 from itou.utils.test import TestCase
@@ -35,3 +35,23 @@ class SummaryEmployeeRecordsTest(TestCase):
         response = self.client.get(self.url)
         assert response.status_code == 200
         self.assertContains(response, "Fin du contrat : <b>Non renseigné")
+
+    def test_asp_batch_file_infos(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertNotContains(response, "Horodatage ASP")
+
+        self.employee_record.update_as_ready()
+        filename = "RIAE_FS_20210410130000.json"
+        self.employee_record.update_as_sent(filename, 1)
+
+        response = self.client.get(self.url)
+        self.assertContains(response, "Horodatage ASP")
+        self.assertContains(response, "Création : RIAE_FS_20210410130000")
+
+        filename2 = "RIAE_FS_20210510130000.json"
+        EmployeeRecordUpdateNotificationFactory(employee_record=self.employee_record, asp_batch_file=filename2)
+        response = self.client.get(self.url)
+        self.assertContains(response, "Horodatage ASP")
+        self.assertContains(response, "Création : RIAE_FS_20210410130000")
+        self.assertContains(response, "Modification : RIAE_FS_20210510130000")
