@@ -54,7 +54,7 @@
                                         {% endif %}
                                     </a>
                                     {% if evaluated_siae.state == "NOTIFICATION_PENDING" %}
-                                        <a class="btn btn-primary btn-sm ml-1" href="{% url "siae_evaluations_views:institution_evaluated_siae_notify" evaluated_siae.pk %}">
+                                        <a class="btn btn-primary btn-sm ml-1" href="{% url "siae_evaluations_views:institution_evaluated_siae_notify_step1" evaluated_siae.pk %}">
                                             <i class="ri-notification-4-line"></i> Notifier le résultat
                                         </a>
                                     {% endif %}

@@ -93,7 +93,7 @@ class LaborExplanationForm(forms.ModelForm):
             self.initial["labor_inspector_explanation"] = instance.labor_inspector_explanation
 
 
-class InstitutionEvaluatedSiaeNotifyForm(forms.ModelForm):
+class InstitutionEvaluatedSiaeNotifyStep1Form(forms.ModelForm):
     notification_reason = forms.ChoiceField(
         choices=evaluation_enums.EvaluatedSiaeNotificationReason.choices,
         widget=forms.RadioSelect(),

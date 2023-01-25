@@ -20,8 +20,8 @@ urlpatterns = [
     ),
     path(
         "institution_evaluated_siae_notify/<int:evaluated_siae_pk>/",
-        views.InstitutionEvaluatedSiaeNotifyView.as_view(),
-        name="institution_evaluated_siae_notify",
+        views.InstitutionEvaluatedSiaeNotifyStep1View.as_view(),
+        name="institution_evaluated_siae_notify_step1",
     ),
     path(
         "institution_evaluated_siae_sanction/<int:evaluated_siae_pk>/",

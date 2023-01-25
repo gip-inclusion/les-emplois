@@ -28,7 +28,7 @@ from itou.utils.storage.s3 import S3Upload
 from itou.utils.urls import get_safe_url
 from itou.www.eligibility_views.forms import AdministrativeCriteriaOfJobApplicationForm
 from itou.www.siae_evaluations_views.forms import (
-    InstitutionEvaluatedSiaeNotifyForm,
+    InstitutionEvaluatedSiaeNotifyStep1Form,
     LaborExplanationForm,
     SetChosenPercentForm,
     SubmitEvaluatedAdministrativeCriteriaProofForm,
@@ -167,10 +167,10 @@ def institution_evaluated_siae_detail(
     return render(request, template_name, context)
 
 
-class InstitutionEvaluatedSiaeNotifyView(LoginRequiredMixin, generic.UpdateView):
+class InstitutionEvaluatedSiaeNotifyStep1View(LoginRequiredMixin, generic.UpdateView):
     model = EvaluatedSiae
-    form_class = InstitutionEvaluatedSiaeNotifyForm
-    template_name = "siae_evaluations/institution_evaluated_siae_notify.html"
+    form_class = InstitutionEvaluatedSiaeNotifyStep1Form
+    template_name = "siae_evaluations/institution_evaluated_siae_notify_step1.html"
     context_object_name = "evaluated_siae"
     pk_url_kwarg = "evaluated_siae_pk"
 
