@@ -1,5 +1,3 @@
-import copy
-
 from django.contrib.gis.geos import Point
 from django.core import management
 from pytest_django.asserts import assertQuerysetEqual
@@ -158,52 +156,53 @@ def test_sync_cities(settings, capsys, respx_mock):
         "> successfully updated count=0 cities",  # no update to post codes
     ]
 
-    def to_dict(obj):
-        dct = copy.deepcopy(obj.__dict__)
-        del dct["id"]
-        del dct["_state"]
-        dct["coords"] = str(dct["coords"])
-        return dct
-
     assertQuerysetEqual(
         City.objects.all().order_by("code_insee"),
         [
-            {
-                "name": "L'Abergement-Clémenciat",
-                "slug": "labergement-clemenciat-01",
-                "department": "01",
-                "post_codes": ["01234", "01400"],
-                "code_insee": "01001",
-                "coords": "SRID=4326;POINT (4.9306 46.1517)",
-                "edition_mode": "AUTO",
-            },
-            {
-                "name": "L'Abergement-de-Varey",
-                "slug": "labergement-de-varey-01",
-                "department": "01",
-                "post_codes": ["01400"],
-                "code_insee": "01003",
-                "coords": "SRID=4326;POINT (4.9306 46.1517)",
-                "edition_mode": "AUTO",
-            },
-            {
-                "name": "Marssssssssseillle bébé",
-                "slug": "marseille-1er-13",
-                "department": "13",
-                "post_codes": ["13001"],
-                "code_insee": "13201",
-                "coords": "SRID=4326;POINT (5.3828 43.3002)",
-                "edition_mode": "MANUAL",
-            },
-            {
-                "name": "Marseille 2e",
-                "slug": "marseille-2e-13",
-                "department": "13",
-                "post_codes": ["13002"],
-                "code_insee": "13202",
-                "coords": "SRID=4326;POINT (5.3496 43.3225)",
-                "edition_mode": "AUTO",
-            },
+            (
+                "L'Abergement-Clémenciat",
+                "labergement-clemenciat-01",
+                "01",
+                ["01234", "01400"],
+                "01001",
+                "SRID=4326;POINT (4.9306 46.1517)",
+                "AUTO",
+            ),
+            (
+                "L'Abergement-de-Varey",
+                "labergement-de-varey-01",
+                "01",
+                ["01400"],
+                "01003",
+                "SRID=4326;POINT (4.9306 46.1517)",
+                "AUTO",
+            ),
+            (
+                "Marssssssssseillle bébé",
+                "marseille-1er-13",
+                "13",
+                ["13001"],
+                "13201",
+                "SRID=4326;POINT (5.3828 43.3002)",
+                "MANUAL",
+            ),
+            (
+                "Marseille 2e",
+                "marseille-2e-13",
+                "13",
+                ["13002"],
+                "13202",
+                "SRID=4326;POINT (5.3496 43.3225)",
+                "AUTO",
+            ),
         ],
-        to_dict,
+        transform=lambda city: (
+            city.name,
+            city.slug,
+            city.department,
+            city.post_codes,
+            city.code_insee,
+            city.coords,
+            city.edition_mode,
+        ),
     )
