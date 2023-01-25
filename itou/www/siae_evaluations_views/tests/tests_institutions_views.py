@@ -284,7 +284,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             count=1,
         )
         notify_url = reverse(
-            "siae_evaluations_views:institution_evaluated_siae_notify",
+            "siae_evaluations_views:institution_evaluated_siae_notify_step1",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
         self.assertContains(
@@ -333,7 +333,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             count=1,
         )
         notify_url = reverse(
-            "siae_evaluations_views:institution_evaluated_siae_notify",
+            "siae_evaluations_views:institution_evaluated_siae_notify_step1",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
         self.assertContains(
@@ -383,7 +383,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             count=1,
         )
         notify_url = reverse(
-            "siae_evaluations_views:institution_evaluated_siae_notify",
+            "siae_evaluations_views:institution_evaluated_siae_notify_step1",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
         self.assertContains(
@@ -1149,7 +1149,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         assert response.status_code == 200
 
 
-class InstitutionEvaluatedSiaeNotifyViewTest(TestCase):
+class InstitutionEvaluatedSiaeNotifyViewStep1Test(TestCase):
     not_submitted = "justificatifs non soumis"
 
     def test_access_other_institution(self):
@@ -1163,7 +1163,7 @@ class InstitutionEvaluatedSiaeNotifyViewTest(TestCase):
         self.client.force_login(user)
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_notify",
+                "siae_evaluations_views:institution_evaluated_siae_notify_step1",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
@@ -1176,7 +1176,7 @@ class InstitutionEvaluatedSiaeNotifyViewTest(TestCase):
         self.client.force_login(user)
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_notify",
+                "siae_evaluations_views:institution_evaluated_siae_notify_step1",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
@@ -1197,7 +1197,7 @@ class InstitutionEvaluatedSiaeNotifyViewTest(TestCase):
         self.client.force_login(user)
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_notify",
+                "siae_evaluations_views:institution_evaluated_siae_notify_step1",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
@@ -1215,7 +1215,7 @@ class InstitutionEvaluatedSiaeNotifyViewTest(TestCase):
         self.client.force_login(user)
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_notify",
+                "siae_evaluations_views:institution_evaluated_siae_notify_step1",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
@@ -1257,7 +1257,7 @@ class InstitutionEvaluatedSiaeNotifyViewTest(TestCase):
         self.client.force_login(user)
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_notify",
+                "siae_evaluations_views:institution_evaluated_siae_notify_step1",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
@@ -1274,7 +1274,7 @@ class InstitutionEvaluatedSiaeNotifyViewTest(TestCase):
         self.client.force_login(user)
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_notify",
+                "siae_evaluations_views:institution_evaluated_siae_notify_step1",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
@@ -1358,7 +1358,7 @@ class InstitutionEvaluatedSiaeNotifyViewTest(TestCase):
         self.client.force_login(user)
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_notify",
+                "siae_evaluations_views:institution_evaluated_siae_notify_step1",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
@@ -1422,7 +1422,7 @@ class InstitutionEvaluatedSiaeNotifyViewTest(TestCase):
         )
         response = self.client.post(
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_notify",
+                "siae_evaluations_views:institution_evaluated_siae_notify_step1",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             ),
             data={
@@ -1464,7 +1464,7 @@ class InstitutionEvaluatedSiaeNotifyViewTest(TestCase):
         self.client.force_login(user)
         response = self.client.post(
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_notify",
+                "siae_evaluations_views:institution_evaluated_siae_notify_step1",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             ),
             data={
