@@ -1,10 +1,11 @@
-from urllib.parse import quote
+from urllib.parse import quote, urlencode
 
 import respx
 from django.contrib.messages import get_messages
 from django.test import override_settings
 from django.test.client import RequestFactory
 from django.urls import reverse
+from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.openid_connect.france_connect import constants as fc_constants
 from itou.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance
@@ -216,9 +217,25 @@ def test_prescriber_account_activation_view(client):
     assert "user_kind=prescriber" in response.url
 
 
+def test_prescriber_account_activation_view_already_exists(client):
+    user = PrescriberFactory(identity_provider=IdentityProvider.INCLUSION_CONNECT)
+    url = reverse("login:activate_prescriber_account")
+    response = client.post(url, data={"email": user.email}, follow=True)
+    assertRedirects(response, f"{url}?{urlencode({'existing_ic_account': user.email})}")
+    assertContains(response, "Vous avez déjà un compte Inclusion Connect associé à l'adresse")
+
+
 def test_siae_staff_account_activation_view(client):
     url = reverse("login:activate_siae_staff_account")
     response = client.post(url, data={"email": "toto@email.com"}, follow=False)
     assert response.url.startswith(reverse("inclusion_connect:activate_account"))
     assert f"user_email={quote('toto@email.com')}" in response.url
     assert "user_kind=siae_staff" in response.url
+
+
+def test_siae_staff_account_activation_view_already_exists(client):
+    user = SiaeStaffFactory(identity_provider=IdentityProvider.INCLUSION_CONNECT)
+    url = reverse("login:activate_siae_staff_account")
+    response = client.post(url, data={"email": user.email}, follow=True)
+    assertRedirects(response, f"{url}?{urlencode({'existing_ic_account': user.email})}")
+    assertContains(response, "Vous avez déjà un compte Inclusion Connect associé à l'adresse")

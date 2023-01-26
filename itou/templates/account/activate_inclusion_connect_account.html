@@ -23,6 +23,29 @@
                             <li>Cliquez sur “Valider”</li>
                             <li>Laissez-vous guider</li>
                         </ol>
+                        {% if existing_ic_account %}
+                            <div class="alert alert-info" role="status">
+                                <div class="row">
+                                    <div class="col-auto pr-0">
+                                        <i class="ri-information-line ri-xl text-info"></i>
+                                    </div>
+                                    <div class="col">
+                                        <strong>
+                                            <p class="mb-0">
+                                                Vous avez déjà un compte Inclusion Connect associé à l'adresse
+                                                <br>
+                                                {{ existing_ic_account }}
+                                            </p>
+                                            <a href="{{ inclusion_connect_url }}"
+                                               class="btn btn-link matomo-event"
+                                               data-matomo-category="inscription-account_type_display_name"
+                                               data-matomo-action="clic"
+                                               data-matomo-option="se-connecter-avec-inclusion-connect">Se connecter</a>
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
                         <form method="post" action="{{ activate_account_url }}">
                             {% csrf_token %}
                             <fieldset>

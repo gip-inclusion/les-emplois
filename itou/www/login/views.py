@@ -1,11 +1,13 @@
 from allauth.account.views import LoginView
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.http import urlencode
 from django.views.generic import FormView
 
-from itou.users.enums import UserKind
+from itou.users.enums import IdentityProvider, UserKind
+from itou.users.models import User
 from itou.utils.urls import get_safe_url
 from itou.www.login.forms import AccountMigrationForm, ItouLoginForm
 
@@ -107,15 +109,23 @@ class AccountMigrationBaseView(FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         params = self._get_inclusion_connect_base_params()
+        existing_ic_account = self.request.GET.get("existing_ic_account")
         inclusion_connect_url = f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
         extra_context = {
             "activate_account_url": reverse(self.url_name),
             "inclusion_connect_url": inclusion_connect_url,
+            "existing_ic_account": existing_ic_account,
         }
         return context | extra_context
 
     def form_valid(self, form):
         self.form = form
+        email = self.form.cleaned_data["email"]
+        if User.objects.filter(
+            email=email, kind=self.user_kind, identity_provider=IdentityProvider.INCLUSION_CONNECT
+        ).exists():
+            params = {"existing_ic_account": email}
+            return HttpResponseRedirect(f"{self.request.get_full_path()}?{urlencode(params)}")
         return super().form_valid(form)
 
     def get_success_url(self):
