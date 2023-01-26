@@ -39,8 +39,9 @@ class ApprovalAdminForm(ApprovalFormMixin, forms.ModelForm):
         # The admin interface must give the possibility to create PASS IAE
         # ex nihilo with arbitrary numbers because we have noticed holes in
         # the approvals transmitted by PE and we have complaints from users.
-        self.fields["number"].required = False
-        self.fields["number"].help_text += self.ADDITIONAL_HELP_TEXT_NUMBER
+        if "number" in self.fields:
+            self.fields["number"].required = False
+            self.fields["number"].help_text += self.ADDITIONAL_HELP_TEXT_NUMBER
 
 
 class ManuallyAddApprovalForm(ApprovalFormMixin, forms.ModelForm):

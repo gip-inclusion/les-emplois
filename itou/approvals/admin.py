@@ -141,6 +141,7 @@ class StartDateFilter(admin.SimpleListFilter):
 
 @admin.register(models.Approval)
 class ApprovalAdmin(admin.ModelAdmin):
+    form = ApprovalAdminForm
     list_display = ("pk", "number", "user", "birthdate", "start_at", "end_at", "is_valid", "created_at")
     list_select_related = ("user",)
     search_fields = ("pk", "number", "user__first_name", "user__last_name", "user__email")
@@ -166,13 +167,6 @@ class ApprovalAdmin(admin.ModelAdmin):
         PkSupportRemarkInline,
     )
 
-    def get_form(self, request, obj=None, **kwargs):
-        if self.has_change_permission(request, obj) or self.has_add_permission(request):
-            # When a user has only the "view" permission it seems that ModelForm.fields is empty,
-            # ApprovalAdminForm wants to modify that attribute which result in a KeyError,
-            # so we return the custom form only for user with the "change" permission.
-            kwargs["form"] = ApprovalAdminForm
-        return super().get_form(request, obj, **kwargs)
 
     def save_model(self, request, obj, form, change):
         if not change:
