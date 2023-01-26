@@ -18,7 +18,7 @@ from itou.eligibility.models import EligibilityDiagnosis, SelectedAdministrative
 from itou.employee_record import enums as employeerecord_enums
 from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
 from itou.employee_record.models import EmployeeRecord
-from itou.job_applications.enums import RefusalReason, SenderKind
+from itou.job_applications.enums import Origin, RefusalReason, SenderKind
 from itou.job_applications.tasks import huey_notify_pole_emploi
 from itou.siaes.models import Siae
 from itou.utils.emails import get_email_message, send_email_messages
@@ -529,8 +529,12 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     # This flag is used in the `PoleEmploiApproval`'s conversion process.
     # This process is required following the end of the software allowing Pôle emploi to manage their approvals.
     # The process allows to convert a `PoleEmploiApproval` into an `Approval`.
+    # TODO(alaurent) remove when origin is set every where
     created_from_pe_approval = models.BooleanField(
         default=False, verbose_name="Candidature créée lors de l'import d'un agrément Pole Emploi"
+    )
+    origin = models.CharField(
+        verbose_name="Origine de la candidature", max_length=30, choices=Origin.choices, default=Origin.DEFAULT
     )
 
     # Job applications sent to SIAEs subject to eligibility rules can obtain an

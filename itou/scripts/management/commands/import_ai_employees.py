@@ -19,7 +19,7 @@ from itou.approvals import enums as approvals_enums
 from itou.approvals.models import Approval
 from itou.asp.models import Commune
 from itou.common_apps.address.departments import department_from_postcode
-from itou.job_applications.enums import SenderKind
+from itou.job_applications.enums import Origin, SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.enums import SiaeKind
 from itou.siaes.models import Siae
@@ -422,6 +422,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
                 "created_at": settings.AI_EMPLOYEES_STOCK_IMPORT_DATE,
                 "create_employee_record": False,
                 "approval_number_sent_by_email": True,
+                "origin": Origin.AI_STOCK,
             }
             job_application = JobApplication(**job_app_dict)
             if not self.dry_run:

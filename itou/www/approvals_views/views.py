@@ -10,7 +10,7 @@ from django.views.generic import DetailView, ListView, TemplateView
 
 from itou.approvals import enums as approvals_enums
 from itou.approvals.models import Approval, PoleEmploiApproval, Suspension
-from itou.job_applications.enums import SenderKind
+from itou.job_applications.enums import Origin, SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.users.models import User
 from itou.utils import constants as global_constants
@@ -436,6 +436,7 @@ def pe_approval_create(request, pe_approval_id):
             state=JobApplicationWorkflow.STATE_ACCEPTED,
             approval=approval_from_pe,
             created_from_pe_approval=True,  # This flag is specific to this process.
+            origin=Origin.PE_APPROVAL,  # This origin is specific to this process.
             sender=request.user,
             sender_kind=SenderKind.SIAE_STAFF,
             sender_siae=siae,
