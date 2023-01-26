@@ -1,3 +1,4 @@
+import pytest
 from dateutil.relativedelta import relativedelta
 from django.test import override_settings
 from django.urls import reverse
@@ -12,6 +13,7 @@ from itou.users.enums import LackOfNIRReason
 from itou.utils.test import TestCase
 
 
+@pytest.mark.usefixtures("unittest_compatibility")
 class ListEmployeeRecordsTest(TestCase):
     def setUp(self):
         # User must be super user for UI first part (tmp)
@@ -163,7 +165,7 @@ class ListEmployeeRecordsTest(TestCase):
 
         record = employee_record_factories.EmployeeRecordWithProfileFactory(job_application__to_siae=self.siae)
         record.update_as_ready()
-        record.update_as_sent("RIAE_FS_20210410130002.json", 1)
+        record.update_as_sent(self.faker.asp_batch_filename(), 1)
         record.update_as_rejected("0012", "JSON Invalide")
 
         response = self.client.get(self.url + "?status=REJECTED")

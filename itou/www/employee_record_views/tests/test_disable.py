@@ -1,3 +1,4 @@
+import pytest
 from django.urls import reverse
 from django.utils.html import escape
 
@@ -9,6 +10,7 @@ from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
 from itou.utils.test import TestCase
 
 
+@pytest.mark.usefixtures("unittest_compatibility")
 class DisableEmployeeRecordsTest(TestCase):
     def setUp(self):
         # User must be super user for UI first part (tmp)
@@ -52,8 +54,7 @@ class DisableEmployeeRecordsTest(TestCase):
 
     def test_disable_employee_record_sent(self):
         self.employee_record.update_as_ready()
-        filename = "RIAE_FS_20210410130001.json"
-        self.employee_record.update_as_sent(filename, 1)
+        self.employee_record.update_as_sent(self.faker.asp_batch_filename(), 1)
 
         self.employee_record.refresh_from_db()
         assert self.employee_record.status == Status.SENT
@@ -68,8 +69,7 @@ class DisableEmployeeRecordsTest(TestCase):
 
     def test_disable_employee_record_rejected(self):
         self.employee_record.update_as_ready()
-        filename = "RIAE_FS_20210410130001.json"
-        self.employee_record.update_as_sent(filename, 1)
+        self.employee_record.update_as_sent(self.faker.asp_batch_filename(), 1)
         err_code, err_message = "12", "JSON Invalide"
         self.employee_record.update_as_rejected(err_code, err_message)
 
@@ -88,8 +88,7 @@ class DisableEmployeeRecordsTest(TestCase):
 
     def test_disable_employee_record_completed(self):
         self.employee_record.update_as_ready()
-        filename = "RIAE_FS_20210410130001.json"
-        self.employee_record.update_as_sent(filename, 1)
+        self.employee_record.update_as_sent(self.faker.asp_batch_filename(), 1)
         process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
         self.employee_record.update_as_processed(process_code, process_message, "{}")
 

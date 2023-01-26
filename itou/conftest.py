@@ -4,7 +4,9 @@ from django.contrib.gis.db.models.fields import get_srid_info
 from django.core import management
 from django.core.cache import cache
 from django.db import connection
+from factory import Faker
 
+from itou.utils import faker_providers
 from itou.utils.htmx.testing import HtmxClient
 from itou.utils.test import NoInlineClient
 
@@ -75,3 +77,14 @@ def django_test_environment_email_fixup(django_test_environment) -> None:
     # django.test.utils.setup_test_environment.
     settings.EMAIL_BACKEND = "itou.utils.tasks.AsyncEmailBackend"
     settings.ASYNC_EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+
+
+@pytest.fixture(autouse=True, scope="session")
+def itou_faker_provider(_session_faker):
+    _session_faker.add_provider(faker_providers.ItouProvider)  # For faker
+    Faker.add_provider(faker_providers.ItouProvider)  # For factory_boy
+
+
+@pytest.fixture(scope="function")
+def unittest_compatibility(request, faker):
+    request.instance.faker = faker

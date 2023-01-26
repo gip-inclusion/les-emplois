@@ -42,15 +42,15 @@ class SummaryEmployeeRecordsTest(TestCase):
         self.assertNotContains(response, "Horodatage ASP")
 
         self.employee_record.update_as_ready()
-        filename = "RIAE_FS_20210410130000.json"
-        self.employee_record.update_as_sent(filename, 1)
+        self.employee_record.update_as_sent("RIAE_FS_20210410130000.json", 1)
 
         response = self.client.get(self.url)
         self.assertContains(response, "Horodatage ASP")
         self.assertContains(response, "Création : RIAE_FS_20210410130000")
 
-        filename2 = "RIAE_FS_20210510130000.json"
-        EmployeeRecordUpdateNotificationFactory(employee_record=self.employee_record, asp_batch_file=filename2)
+        EmployeeRecordUpdateNotificationFactory(
+            employee_record=self.employee_record, asp_batch_file="RIAE_FS_20210510130000.json"
+        )
         response = self.client.get(self.url)
         self.assertContains(response, "Horodatage ASP")
         self.assertContains(response, "Création : RIAE_FS_20210410130000")

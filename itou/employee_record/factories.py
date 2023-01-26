@@ -30,6 +30,9 @@ class EmployeeRecordFactory(BareEmployeeRecordFactory):
 
     class Params:
         orphan = factory.Trait(asp_id=0)
+        with_batch_information = factory.Trait(
+            asp_batch_file=factory.Faker("asp_batch_filename"), asp_batch_line_number=factory.Sequence(int)
+        )
 
 
 class EmployeeRecordWithProfileFactory(EmployeeRecordFactory):
