@@ -66,3 +66,10 @@ class RefusalReason(models.TextChoices):
         """
         empty = [(None, cls.__empty__)] if hasattr(cls, "__empty__") else []
         return empty + [(enum.value, enum.label) for enum in cls if enum not in cls.hidden()]
+
+
+class Origin(models.TextChoices):
+    DEFAULT = "default", "Créée normalement via les emplois"
+    PE_APPROVAL = "pe_approval", "Créée lors d'un import d'Agrément Pole Emploi"
+    AI_STOCK = "ai_stock", "Créée lors de l'import du stock AI"
+    ADMIN = "admin", "Créée depuis l'admin"

@@ -4,6 +4,7 @@ from django.urls import reverse
 from itou.approvals import enums as approvals_enums
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.approvals.models import Approval
+from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.factories import JobApplicationFactory
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.factories import SiaeFactory, SiaeMembershipFactory
@@ -230,6 +231,7 @@ class PoleEmploiApprovalCreateTest(TestCase):
         converted_approval = new_user.approvals.get()
         assert converted_approval.number == self.pe_approval.number
         assert converted_approval.origin == approvals_enums.Origin.PE_APPROVAL
+        assert new_user.last_accepted_job_application.origin == job_applications_enums.Origin.PE_APPROVAL
 
     def test_from_existing_user_without_approval(self):
         """
@@ -254,6 +256,7 @@ class PoleEmploiApprovalCreateTest(TestCase):
         converted_approval = job_seeker.approvals.get()
         assert converted_approval.number == self.pe_approval.number
         assert converted_approval.origin == approvals_enums.Origin.PE_APPROVAL
+        assert job_seeker.last_accepted_job_application.origin == job_applications_enums.Origin.PE_APPROVAL
 
     def test_when_pole_emploi_approval_has_already_been_imported(self):
         """
