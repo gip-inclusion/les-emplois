@@ -1591,6 +1591,7 @@ class JobApplicationAdminFormTest(TestCase):
             "hiring_end_at",
             "hiring_without_approval",
             "created_from_pe_approval",
+            "origin",
             "approval",
             "approval_delivery_mode",
             "approval_number_sent_by_email",
@@ -1613,6 +1614,7 @@ class JobApplicationAdminFormTest(TestCase):
             "job_seeker": [{"message": "Ce champ est obligatoire.", "code": "required"}],
             "to_siae": [{"message": "Ce champ est obligatoire.", "code": "required"}],
             "state": [{"message": "Ce champ est obligatoire.", "code": "required"}],
+            "origin": [{"message": "Ce champ est obligatoire.", "code": "required"}],
             "created_at": [{"message": "Ce champ est obligatoire.", "code": "required"}],
             "__all__": [{"message": "Emetteur prescripteur manquant.", "code": ""}],
         }

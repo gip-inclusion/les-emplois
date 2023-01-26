@@ -4,6 +4,7 @@ from django.utils.safestring import mark_safe
 
 from itou.job_applications import models
 from itou.job_applications.admin_forms import JobApplicationAdminForm
+from itou.job_applications.enums import Origin
 from itou.utils.admin import UUIDSupportRemarkInline
 
 
@@ -74,9 +75,16 @@ class JobApplicationAdmin(admin.ModelAdmin):
         "transferred_by",
         "transferred_at",
         "transferred_from",
+        "origin",
     )
     inlines = (JobsInline, TransitionLogInline, UUIDSupportRemarkInline)
     search_fields = ("pk", "to_siae__siret", "job_seeker__email", "sender__email")
+
+    def save_model(self, request, obj, form, change):
+        if not change:
+            obj.origin = Origin.ADMIN
+
+        super().save_model(request, obj, form, change)
 
     def get_form(self, request, obj=None, **kwargs):
         """
