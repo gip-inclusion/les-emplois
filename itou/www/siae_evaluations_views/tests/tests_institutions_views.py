@@ -1,5 +1,7 @@
 import datetime
 
+import html5lib
+import pytest
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.contrib.messages.storage.base import Message
@@ -19,13 +21,19 @@ from itou.siae_evaluations.factories import (
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
 )
-from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria, EvaluatedJobApplication, EvaluationCampaign
+from itou.siae_evaluations.models import (
+    EvaluatedAdministrativeCriteria,
+    EvaluatedJobApplication,
+    EvaluationCampaign,
+    Sanctions,
+)
 from itou.siaes.factories import SiaeFactory, SiaeMembershipFactory
 from itou.users.enums import KIND_SIAE_STAFF
 from itou.users.factories import JobSeekerFactory
 from itou.utils.perms.user import UserInfo
 from itou.utils.templatetags.format_filters import format_approval_number
 from itou.utils.test import TestCase
+from itou.utils.types import InclusiveDateRange
 from itou.www.siae_evaluations_views.forms import LaborExplanationForm, SetChosenPercentForm
 
 
@@ -291,7 +299,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             response,
             f"""
             <a class="btn btn-primary btn-sm ml-1" href="{notify_url}">
-                <i class="ri-notification-4-line"></i> Notifier le résultat
+                <i class="ri-notification-4-line"></i> Notifier la sanction
             </a>
             """,
             html=True,
@@ -340,7 +348,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             response,
             f"""
             <a class="btn btn-primary btn-sm ml-1" href="{notify_url}">
-                <i class="ri-notification-4-line"></i> Notifier le résultat
+                <i class="ri-notification-4-line"></i> Notifier la sanction
             </a>
             """,
             html=True,
@@ -390,7 +398,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             response,
             f"""
             <a class="btn btn-primary btn-sm ml-1" href="{notify_url}">
-                <i class="ri-notification-4-line"></i> Notifier le résultat
+                <i class="ri-notification-4-line"></i> Notifier la sanction
             </a>
             """,
             html=True,
@@ -1149,132 +1157,71 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         assert response.status_code == 200
 
 
-class InstitutionEvaluatedSiaeNotifyViewStep1Test(TestCase):
+class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
     not_submitted = "justificatifs non soumis"
 
-    def test_access_other_institution(self):
+    @classmethod
+    def setUpTestData(cls):
         membership = InstitutionMembershipFactory(institution__name="DDETS 14")
-        user = membership.user
-        evaluated_siae = EvaluatedSiaeFactory.create(
+        cls.user = membership.user
+        cls.institution = membership.institution
+
+    def login(self, evaluated_siae):
+        self.client.force_login(self.user)
+
+    def test_access_other_institution(self):
+        evaluated_siae = EvaluatedSiaeFactory(
             # Evaluation of another institution.
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
         )
-        self.client.force_login(user)
+        self.login(evaluated_siae)
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_notify_step1",
+                self.urlname,
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
         assert response.status_code == 404
 
     def test_access_incomplete_on_active_campaign(self):
-        membership = InstitutionMembershipFactory(institution__name="DDETS 14")
-        user = membership.user
-        evaluated_siae = EvaluatedSiaeFactory.create()
-        self.client.force_login(user)
+        evaluated_siae = EvaluatedSiaeFactory()
+        self.login(evaluated_siae)
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_notify_step1",
+                self.urlname,
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
         assert response.status_code == 404
 
     def test_access_notified_institution(self):
-        membership = InstitutionMembershipFactory(institution__name="DDETS 14")
-        user = membership.user
-        institution = membership.institution
-        evaluated_siae = EvaluatedSiaeFactory.create(
-            evaluation_campaign__institution=institution,
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign__institution=self.institution,
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
             notified_at=timezone.now(),
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat.",
         )
-        self.client.force_login(user)
+        self.login(evaluated_siae)
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_notify_step1",
+                self.urlname,
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
         assert response.status_code == 404
 
-    def test_access_final_refused_control_active_campaign(self):
-        membership = InstitutionMembershipFactory(institution__name="DDETS 14")
-        user = membership.user
-        institution = membership.institution
-        evaluated_siae = EvaluatedSiaeFactory.create(
-            evaluation_campaign__institution=institution,
-            complete=True,
-            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
-        )
-        self.client.force_login(user)
-        response = self.client.get(
-            reverse(
-                "siae_evaluations_views:institution_evaluated_siae_notify_step1",
-                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
-            )
-        )
-        self.assertContains(response, f"Notifier la sanction du contrôle pour {evaluated_siae.siae.name}", count=1)
-        self.assertContains(
-            response,
-            f"""
-            <a target="_blank" href="/siae_evaluation/institution_evaluated_siae_detail/{evaluated_siae.pk}/">
-             Revoir l’auto-prescription
-             <i class="ri-external-link-line">
-             </i>
-            </a>""",
-            html=True,
-            count=1,
-        )
-        self.assertContains(response, "<li>100 % justificatifs refusés lors de votre contrôle</li>", count=1)
-        self.assertContains(
-            response,
-            """
-            <h3>
-             Historique des campagnes de contrôle
-            </h3>
-            <ul class="list-unstyled">
-            </ul>""",
-            html=True,
-            count=1,
-        )
-        self.assertNotContains(response, self.not_submitted)
-
-    def test_access_incomplete_evaluation_closed_campaign(self):
-        membership = InstitutionMembershipFactory(institution__name="DDETS 14")
-        user = membership.user
-        institution = membership.institution
-        evaluated_siae = EvaluatedSiaeFactory.create(
-            evaluation_campaign__institution=institution,
-            evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(weeks=4),
-            evaluation_campaign__ended_at=timezone.now(),
-        )
-        self.client.force_login(user)
-        response = self.client.get(
-            reverse(
-                "siae_evaluations_views:institution_evaluated_siae_notify_step1",
-                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
-            )
-        )
-        self.assertContains(response, f"Notifier la sanction du contrôle pour {evaluated_siae.siae.name}")
-
     def test_access_long_closed_campaign(self):
-        membership = InstitutionMembershipFactory(institution__name="DDETS 14")
-        user = membership.user
-        institution = membership.institution
-        evaluated_siae = EvaluatedSiaeFactory.create(
-            evaluation_campaign__institution=institution,
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign__institution=self.institution,
             evaluation_campaign__ended_at=timezone.now() - CAMPAIGN_VIEWABLE_DURATION,
         )
-        self.client.force_login(user)
+        self.login(evaluated_siae)
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_notify_step1",
+                self.urlname,
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
@@ -1282,12 +1229,9 @@ class InstitutionEvaluatedSiaeNotifyViewStep1Test(TestCase):
 
     @freeze_time("2023-01-24 11:11:00")
     def test_data_card_statistics(self):
-        membership = InstitutionMembershipFactory(institution__name="DDETS 14")
-        user = membership.user
-        institution = membership.institution
         siae = SiaeFactory()
         previous_campaign = EvaluationCampaignFactory(
-            institution=institution,
+            institution=self.institution,
             ended_at=timezone.now() - relativedelta(years=1),
             evaluated_period_start_at=datetime.date(2022, 1, 1),
             evaluated_period_end_at=datetime.date(2022, 12, 31),
@@ -1300,7 +1244,9 @@ class InstitutionEvaluatedSiaeNotifyViewStep1Test(TestCase):
         # SIAE didn’t answer for that evaluation campaign.
         EvaluatedJobApplicationFactory.create_batch(2, evaluated_siae=previous_evaluated_siae)
 
-        campaign = EvaluationCampaignFactory(institution=institution, ended_at=timezone.now() - relativedelta(hours=1))
+        campaign = EvaluationCampaignFactory(
+            institution=self.institution, ended_at=timezone.now() - relativedelta(hours=1)
+        )
         other_evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=campaign)
         EvaluatedJobApplicationFactory(evaluated_siae=other_evaluated_siae)
 
@@ -1355,7 +1301,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep1Test(TestCase):
             submitted_at=timezone.now() - relativedelta(days=5),
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
         )
-        self.client.force_login(user)
+        self.login(evaluated_siae)
         response = self.client.get(
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_notify_step1",
@@ -1402,71 +1348,108 @@ class InstitutionEvaluatedSiaeNotifyViewStep1Test(TestCase):
         )
         self.assertContains(response, self.not_submitted, count=1)
 
+
+class InstitutionEvaluatedSiaeNotifyViewStep1Test(InstitutionEvaluatedSiaeNotifyViewAccessTestMixin, TestCase):
+    urlname = "siae_evaluations_views:institution_evaluated_siae_notify_step1"
+
+    def test_access_final_refused_control_active_campaign(self):
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign__institution=self.institution,
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+        )
+        self.client.force_login(self.user)
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_notify_step1",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            )
+        )
+        self.assertContains(response, f"Notifier la sanction du contrôle pour {evaluated_siae.siae.name}", count=1)
+        self.assertContains(
+            response,
+            f"""
+            <a target="_blank" href="/siae_evaluation/institution_evaluated_siae_detail/{evaluated_siae.pk}/">
+             Revoir l’auto-prescription
+             <i class="ri-external-link-line">
+             </i>
+            </a>""",
+            html=True,
+            count=1,
+        )
+        self.assertContains(response, "<li>100 % justificatifs refusés lors de votre contrôle</li>", count=1)
+        self.assertContains(
+            response,
+            """
+            <h3>
+             Historique des campagnes de contrôle
+            </h3>
+            <ul class="list-unstyled">
+            </ul>""",
+            html=True,
+            count=1,
+        )
+        self.assertNotContains(response, self.not_submitted)
+
+    def test_access_incomplete_evaluation_closed_campaign(self):
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign__institution=self.institution,
+            evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(weeks=4),
+            evaluation_campaign__ended_at=timezone.now(),
+        )
+        self.client.force_login(self.user)
+        response = self.client.get(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_notify_step1",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            )
+        )
+        self.assertContains(response, f"Notifier la sanction du contrôle pour {evaluated_siae.siae.name}")
+
     @freeze_time("2022-10-24 11:11:00")
     def test_post(self):
-        membership = InstitutionMembershipFactory(institution__name="DDETS 14")
-        user = membership.user
-        institution = membership.institution
         siae_membership = SiaeMembershipFactory(siae__name="Les petits jardins", user__email="siae@mailinator.com")
-        evaluated_siae = EvaluatedSiaeFactory.create(
+        evaluated_siae = EvaluatedSiaeFactory(
             siae=siae_membership.siae,
-            evaluation_campaign__institution=institution,
+            evaluation_campaign__institution=self.institution,
             evaluation_campaign__name="Campagne 2022",
             evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(weeks=4),
             evaluation_campaign__ended_at=timezone.now() - relativedelta(hours=1),
         )
-        self.client.force_login(user)
+        self.client.force_login(self.user)
         text = (
             "Votre chat a mangé le justificatif, vous devrez suivre une formation protection contre les risques "
             "félins."
         )
         response = self.client.post(
-            reverse(
-                "siae_evaluations_views:institution_evaluated_siae_notify_step1",
-                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
-            ),
+            reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
             data={
                 "notification_reason": "MISSING_PROOF",
                 "notification_text": text,
             },
         )
-        assert list(messages.get_messages(response.wsgi_request)) == [
-            Message(messages.SUCCESS, "Les petits jardins a bien été notifiée de la sanction."),
-        ]
         self.assertRedirects(
             response,
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_list",
-                kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
+                "siae_evaluations_views:institution_evaluated_siae_notify_step2",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             ),
         )
         evaluated_siae.refresh_from_db()
-        assert evaluated_siae.notified_at == timezone.now()
+        assert evaluated_siae.notified_at is None
         assert evaluated_siae.notification_reason == "MISSING_PROOF"
         assert evaluated_siae.notification_text == text
-        [email] = mail.outbox
-        assert email.to == ["siae@mailinator.com"]
-        assert email.subject == f"Résultat du contrôle - EI Les petits jardins ID-{evaluated_siae.siae_id}"
-        assert "Le résultat de la campagne de contrôle a posteriori “Campagne 2022” est disponible." in email.body
-        assert "Voir le résultat du contrôle “Campagne 2022”" in email.body
-        assert "http://127.0.0.1:8000/dashboard/\n" in email.body
 
     def test_post_missing_data(self):
-        membership = InstitutionMembershipFactory(institution__name="DDETS 14")
-        user = membership.user
-        institution = membership.institution
-        evaluated_siae = EvaluatedSiaeFactory.create(
+        evaluated_siae = EvaluatedSiaeFactory(
             siae__name="Les petits jardins",
-            evaluation_campaign__institution=institution,
+            evaluation_campaign__institution=self.institution,
             evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(weeks=4),
             evaluation_campaign__ended_at=timezone.now() - relativedelta(hours=1),
         )
-        self.client.force_login(user)
+        self.client.force_login(self.user)
         response = self.client.post(
-            reverse(
-                "siae_evaluations_views:institution_evaluated_siae_notify_step1",
-                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
-            ),
+            reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
             data={
                 "notification_reason": "invalid data",
                 "notification_text": "",
@@ -1504,6 +1487,1040 @@ class InstitutionEvaluatedSiaeNotifyViewStep1Test(TestCase):
             '<div class="invalid-feedback">Sélectionnez un choix valide. invalid data n’en fait pas partie.</div>',
             count=1,
         )
+
+
+class InstitutionEvaluatedSiaeNotifyViewStep2Test(InstitutionEvaluatedSiaeNotifyViewAccessTestMixin, TestCase):
+    urlname = "siae_evaluations_views:institution_evaluated_siae_notify_step2"
+
+    def assertChecked(self, response, checked_values):
+        parser = html5lib.HTMLParser(namespaceHTMLElements=False)
+        html = parser.parse(response.content)
+        checkboxes = html.findall(".//input[@type='checkbox'][@name='sanctions']")
+        assert len(checkboxes) == 7
+        assert sorted(c.get("value") for c in checkboxes if "checked" in c.attrib) == sorted(checked_values)
+
+    def test_get_empty_session(self):
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign__institution=self.institution,
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
+            notification_text="A envoyé une photo de son chat.",
+        )
+        self.client.force_login(self.user)
+        response = self.client.get(
+            reverse(
+                self.urlname,
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            )
+        )
+        self.assertChecked(response, [])
+
+    def test_get_with_session_data(self):
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign__institution=self.institution,
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
+            notification_text="A envoyé une photo de son chat.",
+        )
+        self.client.force_login(self.user)
+        key = f"siae_evaluations_views:institution_evaluated_siae_notify-{evaluated_siae.pk}"
+        checked = ["SUBSIDY_CUT_PERCENT", "TRAINING"]
+        session = self.client.session
+        session[key] = {"sanctions": checked}
+        session.save()
+        response = self.client.get(
+            reverse(
+                self.urlname,
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            )
+        )
+        self.assertChecked(response, checked)
+
+    def test_post_fills_session(self):
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign__institution=self.institution,
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
+            notification_text="A envoyé une photo de son chat.",
+        )
+        self.client.force_login(self.user)
+        checked = ["SUBSIDY_CUT_PERCENT", "TRAINING"]
+        response = self.client.post(
+            reverse(
+                self.urlname,
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            ),
+            data={"sanctions": checked},
+        )
+        self.assertRedirects(
+            response,
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_notify_step3",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            ),
+        )
+        key = f"siae_evaluations_views:institution_evaluated_siae_notify-{evaluated_siae.pk}"
+        assert self.client.session[key] == {"sanctions": checked}
+
+    def test_post_without_data(self):
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign__institution=self.institution,
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
+            notification_text="A envoyé une photo de son chat.",
+        )
+        self.client.force_login(self.user)
+        response = self.client.post(reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}))
+        self.assertContains(
+            response,
+            '<div class="invalid-feedback">Ce champ est obligatoire.</div>',
+            html=True,
+            count=1,
+        )
+        assert response.context["form"].errors == {"sanctions": ["Ce champ est obligatoire."]}
+
+    def test_post_all_sanctions_errors(self):
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign__institution=self.institution,
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
+            notification_text="A envoyé une photo de son chat.",
+        )
+        self.client.force_login(self.user)
+        data_error = [
+            (
+                ["TEMPORARY_SUSPENSION", "PERMANENT_SUSPENSION"],
+                "“Retrait temporaire de la capacité d’auto-prescription” est incompatible avec "
+                "“Retrait définitif de la capacité d’auto-prescription”, "
+                "choisissez l’une ou l’autre de ces sanctions.",
+            ),
+            (
+                ["SUBSIDY_CUT_FULL", "SUBSIDY_CUT_PERCENT"],
+                "“Suppression d’une partie de l’aide au poste” est incompatible avec "
+                "“Suppression de toute l’aide au poste”, choisissez l’une ou l’autre de ces sanctions.",
+            ),
+            (
+                ["NO_SANCTIONS", "SUBSIDY_CUT_FULL"],
+                "“Ne pas sanctionner” est incompatible avec les autres sanctions.",
+            ),
+        ]
+        for data, error in data_error:
+            with self.subTest(data):
+                response = self.client.post(
+                    reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
+                    data={"sanctions": data},
+                )
+                self.assertContains(
+                    response,
+                    f'<div class="alert alert-danger" role="alert">{error}</div>',
+                    html=True,
+                    count=1,
+                )
+
+
+class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotifyViewAccessTestMixin, TestCase):
+    urlname = "siae_evaluations_views:institution_evaluated_siae_notify_step3"
+
+    def login(self, evaluated_siae, sanctions=("TRAINING",)):
+        self.client.force_login(self.user)
+        key = f"siae_evaluations_views:institution_evaluated_siae_notify-{evaluated_siae.pk}"
+        session = self.client.session
+        session[key] = {"sanctions": sanctions}
+        session.save()
+
+    def test_get(self):
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign__institution=self.institution,
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
+            notification_text="A envoyé une photo de son chat.",
+        )
+        self.login(evaluated_siae, sanctions=["TRAINING"])
+        response = self.client.get(reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}))
+        assert response.status_code == 200
+
+    @freeze_time("2022-10-24 11:11:00")
+    def test_post_training(self):
+        siae_membership = SiaeMembershipFactory(siae__name="Les petits jardins", user__email="siae@mailinator.com")
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign__name="Campagne 2022",
+            evaluation_campaign__institution=self.institution,
+            siae=siae_membership.siae,
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
+            notification_text="A envoyé une photo de son chat.",
+        )
+        self.login(evaluated_siae, sanctions=["TRAINING"])
+        response = self.client.post(
+            reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
+            {"training_session": "RDV le lundi 8 à 15h à la DDETS"},
+        )
+        self.assertRedirects(
+            response,
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_list",
+                kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
+            ),
+        )
+        evaluated_siae.refresh_from_db()
+        assert evaluated_siae.notified_at == timezone.now()
+        assert evaluated_siae.notification_reason == "INVALID_PROOF"
+        assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
+        [email] = mail.outbox
+        assert email.to == ["siae@mailinator.com"]
+        assert email.subject == "Notification de sanction"
+        assert email.body == (
+            "Bonjour,\n\n"
+            "Suite aux manquements constatés lors du dernier contrôle a posteriori des auto-prescriptions réalisées "
+            "dans votre SIAE, vous trouverez ci-dessous la mesure prise :\n\n"
+            "- Participation à une session de présentation de l’auto-prescription\n\n"
+            "    RDV le lundi 8 à 15h à la DDETS\n\n"
+            "Cordialement,\n\n"
+            "---\n"
+            "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
+            "merci de ne pas en tenir compte [DEV]\n"
+            "Les emplois de l'inclusion\n"
+            "http://127.0.0.1:8000"
+        )
+        assert evaluated_siae.sanctions.training_session == "RDV le lundi 8 à 15h à la DDETS"
+        assert evaluated_siae.sanctions.suspension_dates is None
+        assert evaluated_siae.sanctions.subsidy_cut_percent is None
+        assert evaluated_siae.sanctions.subsidy_cut_dates is None
+        assert evaluated_siae.sanctions.deactivation_reason == ""
+        assert evaluated_siae.sanctions.no_sanction_reason == ""
+
+    @freeze_time("2022-10-24 11:11:00")
+    def test_post_temporary_suspension(self):
+        siae_membership = SiaeMembershipFactory(siae__name="Les petits jardins", user__email="siae@mailinator.com")
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign__name="Campagne 2022",
+            evaluation_campaign__institution=self.institution,
+            siae=siae_membership.siae,
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
+            notification_text="A envoyé une photo de son chat.",
+        )
+        self.login(evaluated_siae, sanctions=["TEMPORARY_SUSPENSION"])
+        response = self.client.post(
+            reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
+            {
+                "temporary_suspension_from": datetime.date(2023, 1, 1),
+                "temporary_suspension_to": datetime.date(2023, 2, 1),
+            },
+        )
+        self.assertRedirects(
+            response,
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_list",
+                kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
+            ),
+        )
+        evaluated_siae.refresh_from_db()
+        assert evaluated_siae.notified_at == timezone.now()
+        assert evaluated_siae.notification_reason == "INVALID_PROOF"
+        assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
+        [email] = mail.outbox
+        assert email.to == ["siae@mailinator.com"]
+        assert email.subject == "Notification de sanction"
+        assert email.body == (
+            "Bonjour,\n\n"
+            "Suite aux manquements constatés lors du dernier contrôle a posteriori des auto-prescriptions réalisées "
+            "dans votre SIAE, vous trouverez ci-dessous la mesure prise :\n\n"
+            "- Retrait temporaire de la capacité d’auto-prescription\n\n"
+            "    La capacité d’auto-prescrire un parcours d’insertion par l’activité économique est suspendue pour "
+            "une durée déterminée par l’autorité administrative.\n\n"
+            "    Dans votre cas, le retrait temporaire de la capacité d’auto-prescription sera effectif à partir du "
+            "1 janvier 2023 et jusqu’au 1 février 2023.\n\n"
+            "Cordialement,\n\n"
+            "---\n"
+            "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
+            "merci de ne pas en tenir compte [DEV]\n"
+            "Les emplois de l'inclusion\n"
+            "http://127.0.0.1:8000"
+        )
+        assert evaluated_siae.sanctions.training_session == ""
+        assert evaluated_siae.sanctions.suspension_dates == InclusiveDateRange(
+            datetime.date(2023, 1, 1), datetime.date(2023, 2, 1)
+        )
+        assert evaluated_siae.sanctions.subsidy_cut_percent is None
+        assert evaluated_siae.sanctions.subsidy_cut_dates is None
+        assert evaluated_siae.sanctions.deactivation_reason == ""
+        assert evaluated_siae.sanctions.no_sanction_reason == ""
+
+    @freeze_time("2022-10-24 11:11:00")
+    def test_post_temporary_suspension_incorrect_date_order(self):
+        siae_membership = SiaeMembershipFactory(siae__name="Les petits jardins", user__email="siae@mailinator.com")
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign__name="Campagne 2022",
+            evaluation_campaign__institution=self.institution,
+            siae=siae_membership.siae,
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
+            notification_text="A envoyé une photo de son chat.",
+        )
+        self.login(evaluated_siae, sanctions=["TEMPORARY_SUSPENSION"])
+        response = self.client.post(
+            reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
+            {
+                "temporary_suspension_from": datetime.date(2023, 2, 1),
+                "temporary_suspension_to": datetime.date(2023, 1, 1),
+            },
+        )
+        assert response.status_code == 200
+        self.assertContains(
+            response,
+            """
+            <div class="alert alert-danger" role="alert">
+             La date de fin de suspension ne peut pas être avant la date de début de suspension.
+            </div>
+            """,
+            html=True,
+            count=1,
+        )
+        evaluated_siae.refresh_from_db()
+        assert [] == mail.outbox
+        with pytest.raises(Sanctions.DoesNotExist):
+            evaluated_siae.sanctions
+
+    @freeze_time("2022-10-24 11:11:00")
+    def test_post_temporary_suspension_missing_lower_date(self):
+        siae_membership = SiaeMembershipFactory(siae__name="Les petits jardins", user__email="siae@mailinator.com")
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign__name="Campagne 2022",
+            evaluation_campaign__institution=self.institution,
+            siae=siae_membership.siae,
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
+            notification_text="A envoyé une photo de son chat.",
+        )
+        self.login(evaluated_siae, sanctions=["TEMPORARY_SUSPENSION"])
+        response = self.client.post(
+            reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
+            {"temporary_suspension_to": datetime.date(2023, 1, 1)},
+        )
+        self.assertContains(
+            response,
+            """
+            <div class="form-group is-invalid form-group-required">
+             <label for="id_temporary_suspension_from">
+              À partir du
+             </label>
+             <duet-date-picker aria-label="Retrait temporaire de la capacité d’auto-prescription à partir du"
+                               class="is-invalid"
+                               identifier="id_temporary_suspension_from"
+                               min="2022-11-24"
+                               name="temporary_suspension_from"
+                               required
+                               title=""/>
+              <div class="invalid-feedback">
+               Ce champ est obligatoire.
+              </div>
+            </div>
+            """,
+            html=True,
+            count=1,
+        )
+        evaluated_siae.refresh_from_db()
+        assert [] == mail.outbox
+        with pytest.raises(Sanctions.DoesNotExist):
+            evaluated_siae.sanctions
+
+    @freeze_time("2022-10-24 11:11:00")
+    def test_post_temporary_suspension_missing_upper_date(self):
+        siae_membership = SiaeMembershipFactory(siae__name="Les petits jardins", user__email="siae@mailinator.com")
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign__name="Campagne 2022",
+            evaluation_campaign__institution=self.institution,
+            siae=siae_membership.siae,
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
+            notification_text="A envoyé une photo de son chat.",
+        )
+        self.login(evaluated_siae, sanctions=["TEMPORARY_SUSPENSION"])
+        response = self.client.post(
+            reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
+            {"temporary_suspension_from": datetime.date(2023, 1, 1)},
+        )
+        self.assertContains(
+            response,
+            """
+            <div class="form-group is-invalid form-group-required">
+             <label for="id_temporary_suspension_to">
+              Jusqu’au
+             </label>
+             <duet-date-picker aria-label="Retrait temporaire de la capacité d’auto-prescription jusqu’au"
+                               class="is-invalid"
+                               identifier="id_temporary_suspension_to"
+                               min="2022-11-24"
+                               name="temporary_suspension_to"
+                               required
+                               title="" />
+              <div class="invalid-feedback">
+               Ce champ est obligatoire.
+              </div>
+            </div>
+            """,
+            html=True,
+            count=1,
+        )
+        evaluated_siae.refresh_from_db()
+        assert [] == mail.outbox
+        with pytest.raises(Sanctions.DoesNotExist):
+            evaluated_siae.sanctions
+
+    @freeze_time("2022-10-24 11:11:00")
+    def test_post_temporary_suspension_bad_input(self):
+        siae_membership = SiaeMembershipFactory(siae__name="Les petits jardins", user__email="siae@mailinator.com")
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign__name="Campagne 2022",
+            evaluation_campaign__institution=self.institution,
+            siae=siae_membership.siae,
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
+            notification_text="A envoyé une photo de son chat.",
+        )
+        self.login(evaluated_siae, sanctions=["TEMPORARY_SUSPENSION"])
+        response = self.client.post(
+            reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
+            {
+                # Field is ignored.
+                "permanent_suspension": datetime.date(2023, 1, 1),
+                "temporary_suspension_from": "invalid",
+                "temporary_suspension_to": "invalid",
+            },
+        )
+        from itou.utils.test import pprint_html
+
+        pprint_html(response, name="form")
+        self.assertContains(
+            response,
+            """
+            <div class="form-group is-invalid form-group-required">
+             <label for="id_temporary_suspension_from">
+              À partir du
+             </label>
+             <duet-date-picker aria-label="Retrait temporaire de la capacité d’auto-prescription à partir du"
+                               class="is-invalid"
+                               identifier="id_temporary_suspension_from"
+                               min="2022-11-24"
+                               name="temporary_suspension_from"
+                               required
+                               title=""
+                               value="invalid" />
+              <div class="invalid-feedback">
+               Saisissez une date valide.
+              </div>
+            </div>
+                """,
+            html=True,
+            count=1,
+        )
+        self.assertContains(
+            response,
+            """
+            <div class="form-group is-invalid form-group-required">
+             <label for="id_temporary_suspension_to">
+              Jusqu’au
+             </label>
+             <duet-date-picker aria-label="Retrait temporaire de la capacité d’auto-prescription jusqu’au"
+                               class="is-invalid"
+                               identifier="id_temporary_suspension_to"
+                               min="2022-11-24"
+                               name="temporary_suspension_to"
+                               required
+                               title=""
+                               value="invalid" />
+              <div class="invalid-feedback">
+               Saisissez une date valide.
+              </div>
+            </div>
+            """,
+            html=True,
+            count=1,
+        )
+        evaluated_siae.refresh_from_db()
+        assert [] == mail.outbox
+        with pytest.raises(Sanctions.DoesNotExist):
+            evaluated_siae.sanctions
+
+    @freeze_time("2022-10-24 11:11:00")
+    def test_post_temporary_suspension_starts_in_less_than_a_month(self):
+        siae_membership = SiaeMembershipFactory(siae__name="Les petits jardins", user__email="siae@mailinator.com")
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign__name="Campagne 2022",
+            evaluation_campaign__institution=self.institution,
+            siae=siae_membership.siae,
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
+            notification_text="A envoyé une photo de son chat.",
+        )
+        self.login(evaluated_siae, sanctions=["TEMPORARY_SUSPENSION"])
+        response = self.client.post(
+            reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
+            {
+                "temporary_suspension_from": datetime.date(2022, 11, 20),
+                "temporary_suspension_to": datetime.date(2022, 11, 20),
+            },
+        )
+        self.assertContains(
+            response,
+            """
+            <div class="form-group is-invalid form-group-required">
+             <label for="id_temporary_suspension_from">
+              À partir du
+             </label>
+             <duet-date-picker aria-label="Retrait temporaire de la capacité d’auto-prescription à partir du"
+                               class="is-invalid"
+                               identifier="id_temporary_suspension_from"
+                               min="2022-11-24"
+                               name="temporary_suspension_from"
+                               required
+                               title=""
+                               value="2022-11-20" />
+              <div class="invalid-feedback">
+               Assurez-vous que cette valeur est supérieure ou égale à 2022-11-24.
+              </div>
+            </div>
+            """,
+            html=True,
+            count=1,
+        )
+        self.assertContains(
+            response,
+            """
+            <div class="form-group is-invalid form-group-required">
+             <label for="id_temporary_suspension_to">
+              Jusqu’au
+             </label>
+             <duet-date-picker aria-label="Retrait temporaire de la capacité d’auto-prescription jusqu’au"
+                               class="is-invalid"
+                               identifier="id_temporary_suspension_to"
+                               min="2022-11-24"
+                               name="temporary_suspension_to"
+                               required
+                               title=""
+                               value="2022-11-20" />
+              <div class="invalid-feedback">
+               Assurez-vous que cette valeur est supérieure ou égale à 2022-11-24.
+              </div>
+            </div>
+            """,
+            html=True,
+            count=1,
+        )
+        evaluated_siae.refresh_from_db()
+        assert [] == mail.outbox
+        with pytest.raises(Sanctions.DoesNotExist):
+            evaluated_siae.sanctions
+
+    @freeze_time("2022-10-24 11:11:00")
+    def test_post_permanent_suspension(self):
+        siae_membership = SiaeMembershipFactory(siae__name="Les petits jardins", user__email="siae@mailinator.com")
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign__name="Campagne 2022",
+            evaluation_campaign__institution=self.institution,
+            siae=siae_membership.siae,
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
+            notification_text="A envoyé une photo de son chat.",
+        )
+        self.login(evaluated_siae, sanctions=["PERMANENT_SUSPENSION"])
+        response = self.client.post(
+            reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
+            {"permanent_suspension": datetime.date(2023, 1, 1)},
+        )
+        self.assertRedirects(
+            response,
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_list",
+                kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
+            ),
+        )
+        evaluated_siae.refresh_from_db()
+        assert evaluated_siae.notified_at == timezone.now()
+        assert evaluated_siae.notification_reason == "INVALID_PROOF"
+        assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
+        [email] = mail.outbox
+        assert email.to == ["siae@mailinator.com"]
+        assert email.subject == "Notification de sanction"
+        assert email.body == (
+            "Bonjour,\n\n"
+            "Suite aux manquements constatés lors du dernier contrôle a posteriori des auto-prescriptions réalisées "
+            "dans votre SIAE, vous trouverez ci-dessous la mesure prise :\n\n"
+            "- Retrait définitif de la capacité d’auto-prescription\n\n"
+            "    La capacité à prescrire un parcours est rompue, elle peut être rétablie par le préfet, à la demande "
+            "de la structure, sous réserve de la participation de ses dirigeants ou salariés à des actions de "
+            "formation définies par l’autorité administrative.\n\n"
+            "    Dans votre cas, le retrait définitif de la capacité d’auto-prescription sera effectif à partir du "
+            "1 janvier 2023.\n\n"
+            "Cordialement,\n\n"
+            "---\n"
+            "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
+            "merci de ne pas en tenir compte [DEV]\n"
+            "Les emplois de l'inclusion\n"
+            "http://127.0.0.1:8000"
+        )
+        assert evaluated_siae.sanctions.training_session == ""
+        assert evaluated_siae.sanctions.suspension_dates == InclusiveDateRange(datetime.date(2023, 1, 1))
+        assert evaluated_siae.sanctions.subsidy_cut_percent is None
+        assert evaluated_siae.sanctions.subsidy_cut_dates is None
+        assert evaluated_siae.sanctions.deactivation_reason == ""
+        assert evaluated_siae.sanctions.no_sanction_reason == ""
+
+    @freeze_time("2022-10-24 11:11:00")
+    def test_post_permanent_suspension_bad_input(self):
+        siae_membership = SiaeMembershipFactory(siae__name="Les petits jardins", user__email="siae@mailinator.com")
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign__name="Campagne 2022",
+            evaluation_campaign__institution=self.institution,
+            siae=siae_membership.siae,
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
+            notification_text="A envoyé une photo de son chat.",
+        )
+        self.login(evaluated_siae, sanctions=["PERMANENT_SUSPENSION"])
+        response = self.client.post(
+            reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
+            {
+                "permanent_suspension": "invalid",
+                # Field is ignored.
+                "temporary_suspension_from": datetime.date(2023, 1, 1),
+            },
+        )
+        self.assertContains(
+            response,
+            """
+            <div class="form-group is-invalid form-group-required">
+             <label for="id_permanent_suspension">
+              À partir du
+             </label>
+             <duet-date-picker aria-label="Retrait définitif de la capacité d’auto-prescription à partir du"
+                               class="is-invalid"
+                               identifier="id_permanent_suspension"
+                               min="2022-11-24"
+                               name="permanent_suspension"
+                               required
+                               title=""
+                               value="invalid" />
+              <div class="invalid-feedback">
+               Saisissez une date valide.
+              </div>
+            </div>
+            """,
+            html=True,
+            count=1,
+        )
+        evaluated_siae.refresh_from_db()
+        assert [] == mail.outbox
+        with pytest.raises(Sanctions.DoesNotExist):
+            evaluated_siae.sanctions
+
+    @freeze_time("2022-10-24 11:11:00")
+    def test_post_subsidy_cut_percent(self):
+        siae_membership = SiaeMembershipFactory(siae__name="Les petits jardins", user__email="siae@mailinator.com")
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign__name="Campagne 2022",
+            evaluation_campaign__institution=self.institution,
+            siae=siae_membership.siae,
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
+            notification_text="A envoyé une photo de son chat.",
+        )
+        self.login(evaluated_siae, sanctions=["SUBSIDY_CUT_PERCENT"])
+        response = self.client.post(
+            reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
+            {
+                "subsidy_cut_percent": 20,
+                "subsidy_cut_from": datetime.date(2023, 1, 1),
+                "subsidy_cut_to": datetime.date(2023, 6, 1),
+            },
+        )
+        self.assertRedirects(
+            response,
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_list",
+                kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
+            ),
+        )
+        evaluated_siae.refresh_from_db()
+        assert evaluated_siae.notified_at == timezone.now()
+        assert evaluated_siae.notification_reason == "INVALID_PROOF"
+        assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
+        [email] = mail.outbox
+        assert email.to == ["siae@mailinator.com"]
+        assert email.subject == "Notification de sanction"
+        assert email.body == (
+            "Bonjour,\n\n"
+            "Suite aux manquements constatés lors du dernier contrôle a posteriori des auto-prescriptions réalisées "
+            "dans votre SIAE, vous trouverez ci-dessous la mesure prise :\n\n"
+            "- Suppression d’une partie de l’aide au poste\n\n"
+            "    La suppression de l’aide attribuée aux salariés s’apprécie par l’autorité administrative, par "
+            "imputation de l’année N+1. Cette notification s’accompagne d’une demande conforme auprès de l’ASP de la "
+            "part du préfet. Lorsque le département a participé aux aides financières concernées en application de "
+            "l’article L. 5132-2, le préfet informe le président du conseil départemental de sa décision en vue de "
+            "la récupération, le cas échéant, des montants correspondants.\n\n"
+            "    Dans votre cas, la suppression de 20 % de l’aide au poste sera effective à partir du 1 janvier 2023 "
+            "et jusqu’au 1 juin 2023.\n\n"
+            "Cordialement,\n\n"
+            "---\n"
+            "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
+            "merci de ne pas en tenir compte [DEV]\n"
+            "Les emplois de l'inclusion\n"
+            "http://127.0.0.1:8000"
+        )
+        assert evaluated_siae.sanctions.training_session == ""
+        assert evaluated_siae.sanctions.suspension_dates is None
+        assert evaluated_siae.sanctions.subsidy_cut_percent == 20
+        assert evaluated_siae.sanctions.subsidy_cut_dates == InclusiveDateRange(
+            datetime.date(2023, 1, 1), datetime.date(2023, 6, 1)
+        )
+        assert evaluated_siae.sanctions.deactivation_reason == ""
+        assert evaluated_siae.sanctions.no_sanction_reason == ""
+
+    @freeze_time("2022-10-24 11:11:00")
+    def test_post_subsidy_percent_invalid_date_and_percent(self):
+        siae_membership = SiaeMembershipFactory(siae__name="Les petits jardins", user__email="siae@mailinator.com")
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign__name="Campagne 2022",
+            evaluation_campaign__institution=self.institution,
+            siae=siae_membership.siae,
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
+            notification_text="A envoyé une photo de son chat.",
+        )
+        self.login(evaluated_siae, sanctions=["SUBSIDY_CUT_PERCENT"])
+        response = self.client.post(
+            reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
+            {
+                "subsidy_cut_percent": "110",
+                "subsidy_cut_from": "invalid",
+                "subsidy_cut_to": "invalid",
+            },
+        )
+        self.assertContains(
+            response,
+            """
+            <div class="form-group is-invalid form-group-required">
+             <label for="id_subsidy_cut_percent">
+              Pourcentage d’aide retiré à la SIAE
+             </label>
+             <input aria-label="Suppression d’une partie de l’aide au poste à partir du"
+                    class="form-control is-invalid"
+                    id="id_subsidy_cut_percent"
+                    max="100"
+                    min="1"
+                    name="subsidy_cut_percent"
+                    placeholder="Pourcentage d’aide retiré à la SIAE"
+                    required
+                    step="1"
+                    title=""
+                    type="number"
+                    value="110" />
+             <div class="invalid-feedback">
+              Assurez-vous que cette valeur est inférieure ou égale à 100.
+             </div>
+            </div>
+            <div class="form-group is-invalid form-group-required">
+             <label for="id_subsidy_cut_from">
+              À partir du
+             </label>
+             <duet-date-picker aria-label="Suppression d’une partie de l’aide au poste à partir du"
+                               class="is-invalid"
+                               identifier="id_subsidy_cut_from"
+                               name="subsidy_cut_from"
+                               required
+                               title=""
+                               value="invalid" />
+              <div class="invalid-feedback">
+               Saisissez une date valide.
+              </div>
+            </div>
+            <div class="form-group is-invalid form-group-required">
+             <label for="id_subsidy_cut_to">
+              Jusqu’au
+             </label>
+             <duet-date-picker aria-label="Suppression d’une partie de l’aide au poste jusqu’au"
+                               class="is-invalid"
+                               identifier="id_subsidy_cut_to"
+                               name="subsidy_cut_to"
+                               required
+                               title=""
+                               value="invalid" />
+              <div class="invalid-feedback">
+               Saisissez une date valide.
+              </div>
+            </div>
+            """,
+            html=True,
+            count=1,
+        )
+        evaluated_siae.refresh_from_db()
+        assert [] == mail.outbox
+        with pytest.raises(Sanctions.DoesNotExist):
+            evaluated_siae.sanctions
+
+    @freeze_time("2022-10-24 11:11:00")
+    def test_post_subsidy_cut_full(self):
+        siae_membership = SiaeMembershipFactory(siae__name="Les petits jardins", user__email="siae@mailinator.com")
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign__name="Campagne 2022",
+            evaluation_campaign__institution=self.institution,
+            siae=siae_membership.siae,
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
+            notification_text="A envoyé une photo de son chat.",
+        )
+        self.login(evaluated_siae, sanctions=["SUBSIDY_CUT_FULL"])
+        response = self.client.post(
+            reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
+            {
+                "subsidy_cut_percent": 20,  # Ignored.
+                "subsidy_cut_from": datetime.date(2023, 1, 1),
+                "subsidy_cut_to": datetime.date(2023, 6, 1),
+            },
+        )
+        self.assertRedirects(
+            response,
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_list",
+                kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
+            ),
+        )
+        evaluated_siae.refresh_from_db()
+        assert evaluated_siae.notified_at == timezone.now()
+        assert evaluated_siae.notification_reason == "INVALID_PROOF"
+        assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
+        [email] = mail.outbox
+        assert email.to == ["siae@mailinator.com"]
+        assert email.subject == "Notification de sanction"
+        assert email.body == (
+            "Bonjour,\n\n"
+            "Suite aux manquements constatés lors du dernier contrôle a posteriori des auto-prescriptions réalisées "
+            "dans votre SIAE, vous trouverez ci-dessous la mesure prise :\n\n"
+            "- Suppression de l’aide au poste\n\n"
+            "    La suppression de l’aide attribuée aux salariés s’apprécie par l’autorité administrative, par "
+            "imputation de l’année N+1. Cette notification s’accompagne d’une demande conforme auprès de l’ASP de la "
+            "part du préfet. Lorsque le département a participé aux aides financières concernées en application de "
+            "l’article L. 5132-2, le préfet informe le président du conseil départemental de sa décision en vue de "
+            "la récupération, le cas échéant, des montants correspondants.\n\n"
+            "    Dans votre cas, la suppression de l’aide au poste sera effective à partir du 1 janvier 2023 "
+            "et jusqu’au 1 juin 2023.\n\n"
+            "Cordialement,\n\n"
+            "---\n"
+            "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
+            "merci de ne pas en tenir compte [DEV]\n"
+            "Les emplois de l'inclusion\n"
+            "http://127.0.0.1:8000"
+        )
+        assert evaluated_siae.sanctions.training_session == ""
+        assert evaluated_siae.sanctions.suspension_dates is None
+        assert evaluated_siae.sanctions.subsidy_cut_percent == 100
+        assert evaluated_siae.sanctions.subsidy_cut_dates == InclusiveDateRange(
+            datetime.date(2023, 1, 1), datetime.date(2023, 6, 1)
+        )
+        assert evaluated_siae.sanctions.deactivation_reason == ""
+        assert evaluated_siae.sanctions.no_sanction_reason == ""
+
+    @freeze_time("2022-10-24 11:11:00")
+    def test_post_deactivation(self):
+        siae_membership = SiaeMembershipFactory(siae__name="Les petits jardins", user__email="siae@mailinator.com")
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign__name="Campagne 2022",
+            evaluation_campaign__institution=self.institution,
+            siae=siae_membership.siae,
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
+            notification_text="A envoyé une photo de son chat.",
+        )
+        self.login(evaluated_siae, sanctions=["DEACTIVATION"])
+        response = self.client.post(
+            reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
+            {"deactivation_reason": "Chat trop vorace."},
+        )
+        self.assertRedirects(
+            response,
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_list",
+                kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
+            ),
+        )
+        evaluated_siae.refresh_from_db()
+        assert evaluated_siae.notified_at == timezone.now()
+        assert evaluated_siae.notification_reason == "INVALID_PROOF"
+        assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
+        [email] = mail.outbox
+        assert email.to == ["siae@mailinator.com"]
+        assert email.subject == "Notification de sanction"
+        assert email.body == (
+            "Bonjour,\n\n"
+            "Suite aux manquements constatés lors du dernier contrôle a posteriori des auto-prescriptions réalisées "
+            "dans votre SIAE, vous trouverez ci-dessous la mesure prise :\n\n"
+            "- Déconventionnement de la structure\n\n"
+            "    La suppression du conventionnement s’apprécie par l’autorité administrative. Cette notification "
+            "s’accompagne d’une demande conforme auprès de l’ASP de la part du préfet. Lorsque le département a "
+            "participé aux aides financières concernées en application de l’article L. 5132-2, le préfet informe le "
+            "président du conseil départemental de sa décision.\n\n"
+            "    Chat trop vorace.\n\n"
+            "Cordialement,\n\n"
+            "---\n"
+            "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
+            "merci de ne pas en tenir compte [DEV]\n"
+            "Les emplois de l'inclusion\n"
+            "http://127.0.0.1:8000"
+        )
+        assert evaluated_siae.sanctions.training_session == ""
+        assert evaluated_siae.sanctions.suspension_dates is None
+        assert evaluated_siae.sanctions.subsidy_cut_percent is None
+        assert evaluated_siae.sanctions.subsidy_cut_dates is None
+        assert evaluated_siae.sanctions.deactivation_reason == "Chat trop vorace."
+        assert evaluated_siae.sanctions.no_sanction_reason == ""
+
+    @freeze_time("2022-10-24 11:11:00")
+    def test_post_no_sanction(self):
+        siae_membership = SiaeMembershipFactory(siae__name="Les petits jardins", user__email="siae@mailinator.com")
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign__name="Campagne 2022",
+            evaluation_campaign__institution=self.institution,
+            siae=siae_membership.siae,
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
+            notification_text="A envoyé une photo de son chat.",
+        )
+        self.login(evaluated_siae, sanctions=["NO_SANCTIONS"])
+        response = self.client.post(
+            reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
+            {"no_sanction_reason": "Chat trop mignon."},
+        )
+        self.assertRedirects(
+            response,
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_list",
+                kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
+            ),
+        )
+        evaluated_siae.refresh_from_db()
+        assert evaluated_siae.notified_at == timezone.now()
+        assert evaluated_siae.notification_reason == "INVALID_PROOF"
+        assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
+        [email] = mail.outbox
+        assert email.to == ["siae@mailinator.com"]
+        assert email.subject == "Notification de sanction"
+        assert email.body == (
+            "Bonjour,\n\n"
+            "Suite aux manquements constatés lors du dernier contrôle a posteriori des auto-prescriptions réalisées "
+            "dans votre SIAE, nous avons décidé de ne pas appliquer de sanction. Vous trouverez ci-dessous le détail "
+            "de cette décision :\n\n"
+            "Chat trop mignon.\n\n"
+            "Cordialement,\n\n"
+            "---\n"
+            "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
+            "merci de ne pas en tenir compte [DEV]\n"
+            "Les emplois de l'inclusion\n"
+            "http://127.0.0.1:8000"
+        )
+        assert evaluated_siae.sanctions.training_session == ""
+        assert evaluated_siae.sanctions.suspension_dates is None
+        assert evaluated_siae.sanctions.subsidy_cut_percent is None
+        assert evaluated_siae.sanctions.subsidy_cut_dates is None
+        assert evaluated_siae.sanctions.deactivation_reason == ""
+        assert evaluated_siae.sanctions.no_sanction_reason == "Chat trop mignon."
+
+    @freeze_time("2022-10-24 11:11:00")
+    def test_post_combined_sanctions(self):
+        siae_membership = SiaeMembershipFactory(siae__name="Les petits jardins", user__email="siae@mailinator.com")
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign__name="Campagne 2022",
+            evaluation_campaign__institution=self.institution,
+            siae=siae_membership.siae,
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
+            notification_text="A envoyé une photo de son chat.",
+        )
+        self.login(evaluated_siae, sanctions=["PERMANENT_SUSPENSION", "SUBSIDY_CUT_PERCENT", "DEACTIVATION"])
+        response = self.client.post(
+            reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
+            {
+                "permanent_suspension": datetime.date(2023, 1, 1),
+                "subsidy_cut_percent": 20,
+                "subsidy_cut_from": datetime.date(2023, 1, 1),
+                "subsidy_cut_to": datetime.date(2023, 6, 1),
+                "deactivation_reason": "Chat trop vorace.",
+            },
+        )
+        self.assertRedirects(
+            response,
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_list",
+                kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
+            ),
+        )
+        evaluated_siae.refresh_from_db()
+        assert evaluated_siae.notified_at == timezone.now()
+        assert evaluated_siae.notification_reason == "INVALID_PROOF"
+        assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
+        [email] = mail.outbox
+        assert email.to == ["siae@mailinator.com"]
+        assert email.subject == "Notification de sanctions"
+        assert email.body == (
+            "Bonjour,\n\n"
+            "Suite aux manquements constatés lors du dernier contrôle a posteriori des auto-prescriptions réalisées "
+            "dans votre SIAE, vous trouverez ci-dessous les mesures prises :\n\n"
+            "- Retrait définitif de la capacité d’auto-prescription\n\n"
+            "    La capacité à prescrire un parcours est rompue, elle peut être rétablie par le préfet, à la demande "
+            "de la structure, sous réserve de la participation de ses dirigeants ou salariés à des actions de "
+            "formation définies par l’autorité administrative.\n\n"
+            "    Dans votre cas, le retrait définitif de la capacité d’auto-prescription sera effectif à partir du "
+            "1 janvier 2023.\n\n"
+            "- Suppression d’une partie de l’aide au poste\n\n"
+            "    La suppression de l’aide attribuée aux salariés s’apprécie par l’autorité administrative, par "
+            "imputation de l’année N+1. Cette notification s’accompagne d’une demande conforme auprès de l’ASP de la "
+            "part du préfet. Lorsque le département a participé aux aides financières concernées en application de "
+            "l’article L. 5132-2, le préfet informe le président du conseil départemental de sa décision en vue de "
+            "la récupération, le cas échéant, des montants correspondants.\n\n"
+            "    Dans votre cas, la suppression de 20 % de l’aide au poste sera effective à partir du 1 janvier 2023 "
+            "et jusqu’au 1 juin 2023.\n\n"
+            "- Déconventionnement de la structure\n\n"
+            "    La suppression du conventionnement s’apprécie par l’autorité administrative. Cette notification "
+            "s’accompagne d’une demande conforme auprès de l’ASP de la part du préfet. Lorsque le département a "
+            "participé aux aides financières concernées en application de l’article L. 5132-2, le préfet informe le "
+            "président du conseil départemental de sa décision.\n\n"
+            "    Chat trop vorace.\n\n"
+            "Cordialement,\n\n"
+            "---\n"
+            "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
+            "merci de ne pas en tenir compte [DEV]\n"
+            "Les emplois de l'inclusion\n"
+            "http://127.0.0.1:8000"
+        )
+        assert evaluated_siae.sanctions.training_session == ""
+        assert evaluated_siae.sanctions.suspension_dates == InclusiveDateRange(datetime.date(2023, 1, 1))
+        assert evaluated_siae.sanctions.subsidy_cut_percent == 20
+        assert evaluated_siae.sanctions.subsidy_cut_dates == InclusiveDateRange(
+            datetime.date(2023, 1, 1), datetime.date(2023, 6, 1)
+        )
+        assert evaluated_siae.sanctions.deactivation_reason == "Chat trop vorace."
+        assert evaluated_siae.sanctions.no_sanction_reason == ""
 
 
 class InstitutionEvaluatedJobApplicationViewTest(TestCase):

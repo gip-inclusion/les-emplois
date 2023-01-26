@@ -67,6 +67,7 @@ def get_permissions_dict():
             siae_evaluations_models.EvaluatedSiae: PERMS_READ,
             siae_evaluations_models.EvaluatedJobApplication: PERMS_READ,
             siae_evaluations_models.EvaluatedAdministrativeCriteria: PERMS_READ,
+            siae_evaluations_models.Sanctions: PERMS_READ,
             users_models.User: PERMS_ADD,
             users_models.JobSeekerProfile: PERMS_EDIT,
         },

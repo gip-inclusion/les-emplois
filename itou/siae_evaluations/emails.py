@@ -166,13 +166,14 @@ class SIAEEmailFactory:
         body = "siae_evaluations/email/to_siae_refused_no_proofs_body.txt"
         return get_email_message(self.recipients, context, subject, body)
 
+    def not_sanctioned(self):
+        context = {"sanctions": self.evaluated_siae.sanctions}
+        subject = "siae_evaluations/email/to_siae_not_sanctioned_subject.txt"
+        body = "siae_evaluations/email/to_siae_not_sanctioned_body.txt"
+        return get_email_message(self.recipients, context, subject, body)
+
     def sanctioned(self):
-        dashboard_url = reverse("dashboard:index")
-        context = {
-            "evaluation_campaign": self.evaluated_siae.evaluation_campaign,
-            "siae": self.evaluated_siae.siae,
-            "dashboard_url": get_absolute_url(dashboard_url),
-        }
+        context = {"sanctions": self.evaluated_siae.sanctions}
         subject = "siae_evaluations/email/to_siae_sanctioned_subject.txt"
         body = "siae_evaluations/email/to_siae_sanctioned_body.txt"
         return get_email_message(self.recipients, context, subject, body)

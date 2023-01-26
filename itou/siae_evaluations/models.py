@@ -18,6 +18,7 @@ from itou.siae_evaluations.emails import CampaignEmailFactory, SIAEEmailFactory
 from itou.siaes.models import Siae
 from itou.users.enums import KIND_SIAE_STAFF
 from itou.utils.emails import send_email_messages
+from itou.utils.models import InclusiveDateRangeField
 
 from .constants import CAMPAIGN_VIEWABLE_DURATION
 
@@ -663,4 +664,61 @@ class EvaluatedAdministrativeCriteria(models.Model):
         return (
             self.review_state == evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
             and self.evaluated_job_application.evaluated_siae.reviewed_at
+        )
+
+
+class Sanctions(models.Model):
+    evaluated_siae = models.OneToOneField(
+        EvaluatedSiae,
+        on_delete=models.CASCADE,
+        verbose_name="SIAE évaluée",
+    )
+    training_session = models.TextField(
+        blank=True,
+        verbose_name="Détails de la participation à une session de présentation de l’auto-prescription",
+    )
+    suspension_dates = InclusiveDateRangeField(
+        blank=True,
+        null=True,
+        verbose_name="Retrait de la capacité d’auto-prescription",
+    )
+    subsidy_cut_percent = models.PositiveSmallIntegerField(
+        blank=True,
+        null=True,
+        validators=[MinValueValidator(1), MaxValueValidator(100)],
+        verbose_name="Pourcentage de retrait de l’aide au poste",
+    )
+    subsidy_cut_dates = InclusiveDateRangeField(
+        blank=True,
+        null=True,
+        verbose_name="Dates de retrait de l’aide au poste",
+    )
+    deactivation_reason = models.TextField(
+        blank=True,
+        verbose_name="Explication du déconventionnement de la structure",
+    )
+    no_sanction_reason = models.TextField(blank=True, verbose_name="Explication de l’absence de sanction")
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                name="subsidy_cut_consistency",
+                violation_error_message=(
+                    "Le pourcentage et la date de début de retrait de l’aide au poste doivent être renseignés."
+                ),
+                check=models.Q(subsidy_cut_percent__isnull=True, subsidy_cut_dates__isnull=True)
+                | models.Q(subsidy_cut_percent__isnull=False, subsidy_cut_dates__isnull=False),
+            ),
+        ]
+        verbose_name_plural = "sanctions"
+
+    def __str__(self):
+        return f"{self.__class__.__name__} pour {self.evaluated_siae}"
+
+    def count_active(self):
+        return (
+            bool(self.training_session)
+            + bool(self.suspension_dates)
+            + bool(self.subsidy_cut_dates)
+            + bool(self.deactivation_reason)
         )
