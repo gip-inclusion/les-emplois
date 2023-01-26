@@ -163,10 +163,6 @@ def create_unversioned_tables_if_needed():
                 "longitude" numeric(9,6)
             );
 
-            CREATE TABLE IF NOT EXISTS "constantes" (
-                "annee_en_cours" float8
-            );
-
             CREATE TABLE IF NOT EXISTS "sa_ept" (
                 "etablissement_public_territorial" varchar(255),
                 "commune" varchar(255),
