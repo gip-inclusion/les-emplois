@@ -33,9 +33,13 @@ class ApprovalFormMixin:
 
 
 class ApprovalAdminForm(ApprovalFormMixin, forms.ModelForm):
+    class Meta:
+        model = Approval
+        fields = ["start_at", "end_at", "user", "number", "created_by", "origin"]
+        widgets = {"created_by": forms.HiddenInput(), "origin": forms.HiddenInput()}
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
         # The admin interface must give the possibility to create PASS IAE
         # ex nihilo with arbitrary numbers because we have noticed holes in
         # the approvals transmitted by PE and we have complaints from users.
@@ -62,5 +66,5 @@ class ManuallyAddApprovalFromJobApplicationForm(ApprovalFormMixin, forms.ModelFo
 
     class Meta:
         model = Approval
-        fields = ["user", "start_at", "end_at", "number", "created_by"]
-        widgets = {"user": forms.HiddenInput(), "created_by": forms.HiddenInput()}
+        fields = ["user", "start_at", "end_at", "number", "created_by", "origin"]
+        widgets = {"user": forms.HiddenInput(), "created_by": forms.HiddenInput(), "origin": forms.HiddenInput()}

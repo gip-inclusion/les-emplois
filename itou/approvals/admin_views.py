@@ -16,6 +16,7 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
 from itou.approvals.admin_forms import ManuallyAddApprovalFromJobApplicationForm
+from itou.approvals.enums import Origin
 from itou.approvals.models import Approval
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.utils.emails import get_email_text_template
@@ -55,8 +56,9 @@ def manually_add_approval(
         "end_at": Approval.get_default_end_date(job_application.hiring_start_at),
         "user": job_application.job_seeker.pk,
         "created_by": request.user.pk,
+        "origin": Origin.ADMIN,
     }
-    form = ManuallyAddApprovalForm(initial=initial, data=request.POST or None)
+    form = ManuallyAddApprovalFromJobApplicationForm(initial=initial, data=request.POST or None)
     fieldsets = [(None, {"fields": list(form.base_fields)})]
     adminForm = admin.helpers.AdminForm(form, fieldsets, {})
 

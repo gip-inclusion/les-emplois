@@ -19,7 +19,7 @@ from freezegun import freeze_time
 
 from itou.approvals.admin import JobApplicationInline
 from itou.approvals.admin_forms import ApprovalAdminForm
-from itou.approvals.enums import ApprovalStatus
+from itou.approvals.enums import ApprovalStatus, Origin
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory, ProlongationFactory, SuspensionFactory
 from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, Suspension
 from itou.approvals.notifications import NewProlongationToAuthorizedPrescriberNotification
@@ -774,6 +774,13 @@ class CustomApprovalAdminViewsTest(TestCase):
         user.user_permissions.add(permission)
         response = self.client.get(url)
         assert response.status_code == 200
+        assert response.context["form"].initial == {
+            "start_at": job_application.hiring_start_at,
+            "end_at": Approval.get_default_end_date(job_application.hiring_start_at),
+            "user": job_application.job_seeker.pk,
+            "created_by": user.pk,
+            "origin": Origin.ADMIN,
+        }
 
         # Les numéros avec le préfixe `ASP_ITOU_PREFIX` ne doivent pas pouvoir
         # être délivrés à la main dans l'admin.
@@ -782,6 +789,7 @@ class CustomApprovalAdminViewsTest(TestCase):
             "end_at": job_application.hiring_end_at.strftime("%d/%m/%Y"),
             "user": job_application.job_seeker.pk,
             "created_by": user.pk,
+            "origin": Origin.ADMIN,
             "number": f"{Approval.ASP_ITOU_PREFIX}1234567",
         }
         response = self.client.post(url, data=post_data)
@@ -794,6 +802,7 @@ class CustomApprovalAdminViewsTest(TestCase):
             "end_at": job_application.hiring_end_at.strftime("%d/%m/%Y"),
             "user": job_application.job_seeker.pk,
             "created_by": user.pk,
+            "origin": Origin.ADMIN,
         }
         response = self.client.post(url, data=post_data)
         assert response.status_code == 302
