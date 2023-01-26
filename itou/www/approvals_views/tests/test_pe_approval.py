@@ -1,6 +1,7 @@
 from django.contrib.messages import get_messages
 from django.urls import reverse
 
+from itou.approvals import enums as approvals_enums
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.approvals.models import Approval
 from itou.job_applications.factories import JobApplicationFactory
@@ -226,6 +227,10 @@ class PoleEmploiApprovalCreateTest(TestCase):
         assert Approval.objects.count() == initial_approval_count + 1
         assert User.objects.count() == initial_user_count + 1
 
+        converted_approval = new_user.approvals.get()
+        assert converted_approval.number == self.pe_approval.number
+        assert converted_approval.origin == approvals_enums.Origin.PE_APPROVAL
+
     def test_from_existing_user_without_approval(self):
         """
         When an existing user has no valid approval, it is possible to import a Pôle emploi Approval
@@ -245,6 +250,10 @@ class PoleEmploiApprovalCreateTest(TestCase):
             messages[-1].message
             == "L'agrément a bien été importé, vous pouvez désormais le prolonger ou le suspendre."
         )
+
+        converted_approval = job_seeker.approvals.get()
+        assert converted_approval.number == self.pe_approval.number
+        assert converted_approval.origin == approvals_enums.Origin.PE_APPROVAL
 
     def test_when_pole_emploi_approval_has_already_been_imported(self):
         """

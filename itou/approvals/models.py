@@ -14,6 +14,7 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 from unidecode import unidecode
 
+from itou.approvals.enums import Origin
 from itou.approvals.notifications import NewProlongationToAuthorizedPrescriberNotification
 from itou.job_applications import enums as job_application_enums
 from itou.siaes import enums as siae_enums
@@ -241,6 +242,9 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, verbose_name="Créé par", null=True, blank=True, on_delete=models.SET_NULL
     )
+    origin = models.CharField(
+        verbose_name="Origine du pass", max_length=30, choices=Origin.choices, default=Origin.DEFAULT
+    )
 
     objects = models.Manager.from_queryset(CommonApprovalQuerySet)()
 
@@ -257,6 +261,9 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         if not self.number:
             # `get_next_number` will lock rows until the end of the transaction.
             self.number = self.get_next_number()
+        if not self.number.startswith(Approval.ASP_ITOU_PREFIX):
+            # Override any existing origin as a PE Approval converted from the admin is still a PE Approval
+            self.origin = Origin.PE_APPROVAL
         super().save(*args, **kwargs)
 
     def clean(self):

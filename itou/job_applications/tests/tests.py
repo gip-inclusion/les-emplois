@@ -16,6 +16,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
 
+from itou.approvals.enums import Origin
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory, ProlongationFactory, SuspensionFactory
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
@@ -1130,6 +1131,7 @@ class JobApplicationWorkflowTest(TestCase):
         assert job_application.approval.number == pe_approval.number
         assert job_application.approval_number_sent_by_email
         assert job_application.approval_delivery_mode == job_application.APPROVAL_DELIVERY_MODE_AUTOMATIC
+        assert job_application.approval.origin == Origin.PE_APPROVAL
         # Check sent emails.
         assert len(mail.outbox) == 2
         # Email sent to the job seeker.
@@ -1152,6 +1154,7 @@ class JobApplicationWorkflowTest(TestCase):
         assert job_application.approval.number == pe_approval.number
         assert job_application.approval_number_sent_by_email
         assert job_application.approval_delivery_mode == job_application.APPROVAL_DELIVERY_MODE_AUTOMATIC
+        assert job_application.approval.origin == Origin.PE_APPROVAL
         # Check sent emails.
         assert len(mail.outbox) == 2
         # Email sent to the job seeker.
