@@ -1,0 +1,38 @@
+{% load str_filters %}
+<article class="col-12 col-lg-5 order-1 mb-sm-4 card c-card has-links-inside">
+    <div class="card-header">
+        <h2>Données</h2>
+    </div>
+    <div class="card-body">
+        <h3>Campagne en cours</h3>
+        <ul>
+            <li>{{ refused_percent|floatformat:"0" }} % justificatifs refusés lors de votre contrôle</li>
+            {% if expected_crits_count %}
+                <li>
+                    {{ not_submitted_percent|floatformat:"0" }} % justificatifs non soumis par la SIAE (dont {{ uploaded_count }} téléversé{{ uploaded_count|pluralizefr }} sur {{ expected_crits_count }} attendu{{ expected_crits_count|pluralizefr }})
+                </li>
+            {% endif %}
+        </ul>
+        <a target="_blank" href="{% url 'siae_evaluations_views:institution_evaluated_siae_detail' evaluated_siae_pk=evaluated_siae.pk %}">Revoir
+            {% if job_apps_count == 1 %}
+                l’auto-prescription
+            {% else %}
+                les {{ job_apps_count }} auto-prescriptions
+            {% endif %}
+            <i class="ri-external-link-line"></i></a>
+        <h3 class="mt-5">Historique des campagnes de contrôle</h3>
+        <ul class="list-unstyled">
+            {% for old_evaluated_siae in evaluation_history %}
+                <li>
+                    Période du {{ old_evaluated_siae.evaluation_campaign.evaluated_period_start_at|date:"d/m/Y" }} au {{ old_evaluated_siae.evaluation_campaign.evaluated_period_end_at|date:"d/m/Y" }} :
+                    {% if old_evaluated_siae.state == "ACCEPTED" %}
+                        <b class="text-success">Positif</b>
+                    {% else %}
+                        <b class="text-danger">Négatif</b>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+        <p>2021 : Campagne non concernée par les sanctions</p>
+    </div>
+</article>
