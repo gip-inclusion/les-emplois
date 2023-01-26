@@ -50,7 +50,7 @@ MATOMO_ONLINE_CONTENT = (
 @freeze_time("2022-06-21")
 def test_matomo_retry(monkeypatch, respx_mock, capsys):
     monkeypatch.setattr(time, "sleep", lambda x: None)
-    respx_mock.get("/").respond(
+    respx_mock.get("/index.php").respond(
         500,
         content=f"{MATOMO_HEADERS}\n{MATOMO_ONLINE_CONTENT}".encode("utf-16"),
     )
@@ -86,7 +86,7 @@ def test_matomo_retry(monkeypatch, respx_mock, capsys):
 @freeze_time("2022-06-21")
 def test_matomo_populate_public(monkeypatch, respx_mock):
     monkeypatch.setattr(time, "sleep", lambda x: None)
-    respx_mock.get("/").respond(
+    respx_mock.get("/index.php").respond(
         200,
         content=f"{MATOMO_HEADERS}\n{MATOMO_ONLINE_CONTENT}".encode("utf-16"),
     )
@@ -197,7 +197,7 @@ def test_matomo_populate_private(monkeypatch, respx_mock):
     # rewrite the REGIONS import or the test, even with mocked HTTP calls, is several minutes
     monkeypatch.setattr(populate_metabase_matomo, "REGIONS", {"Bretagne": ["75", "31"]})
     monkeypatch.setattr(time, "sleep", lambda x: None)
-    respx_mock.get("/").respond(
+    respx_mock.get("/index.php").respond(
         200,
         content=f"{MATOMO_HEADERS}\n{MATOMO_ONLINE_CONTENT}".encode("utf-16"),
     )
@@ -337,7 +337,7 @@ def test_matomo_populate_private(monkeypatch, respx_mock):
 def test_matomo_empty_output(monkeypatch, respx_mock, capsys):
     monkeypatch.setattr(time, "sleep", lambda x: None)
     MATOMO_ONLINE_EMPTY_CONTENT = "0," * 56 + "0"
-    respx_mock.get("/").respond(
+    respx_mock.get("/index.php").respond(
         200,
         content=f"{MATOMO_HEADERS}\n{MATOMO_ONLINE_EMPTY_CONTENT}".encode("utf-16"),
     )

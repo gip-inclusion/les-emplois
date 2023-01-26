@@ -107,7 +107,6 @@
                 "cookieslist": false, /* Show the cookie list */
                 "closePopup": false, /* Show a close X on the banner */
                 "showIcon": true, /* Show cookie icon to manage cookies */
-                //"iconSrc": "", /* Optionnal: URL or base64 encoded image */
                 "iconPosition": "BottomLeft", /* BottomRight, BottomLeft, TopRight and TopLeft */
                 "adblocker": false, /* Show a Warning if an adblocker is detected */
                 "DenyAllCta" : true, /* Show the deny all button */
@@ -118,7 +117,6 @@
                 "moreInfoLink": true, /* Show more info link */
                 "useExternalCss": true, /* If false, the tarteaucitron.css file will be loaded */
                 "useExternalJs": false, /* If false, the tarteaucitron.js file will be loaded */
-                //"cookieDomain": ".my-multisite-domaine.fr", /* Shared cookie for multisite */
                 "readmoreLink": "{{ ITOU_DOC_URL }}/mentions/protection-des-donnees", /* Change the default readmore link */
                 "mandatory": true, /* Show a message about mandatory cookies */
             });
@@ -131,7 +129,7 @@
 
             // Matomo :
             tarteaucitron.user.matomoId = {{ MATOMO_SITE_ID }};
-            tarteaucitron.user.matomoHost = "https://stats.data.gouv.fr/";
+            tarteaucitron.user.matomoHost = '{{ MATOMO_BASE_URL }}';
             (tarteaucitron.job = tarteaucitron.job || []).push('matomo');
 
             // livestorm
@@ -196,33 +194,20 @@
         {% if ITOU_FQDN in ALLOWED_HOSTS %}
             {# Matomo/Piwik open source web analytics #}
             <script nonce="{{ CSP_NONCE }}">
-                var _paq = window._paq || [];
+                window._paq = window._paq || [];
                 /* Custom variables: https://matomo.org/docs/custom-variables/ */
                 /* Fields are, in order: index, name, value, scope. */
                 {% for key, value in  matomo_custom_variables.items %}
-                    _paq.push(['setCustomVariable', {{ forloop.counter }}, '{{ key }}', '{{ value }}', 'page']);
+                    window._paq.push(['setCustomVariable', {{ forloop.counter }}, '{{ key }}', '{{ value }}', 'page']);
                 {% endfor %}
                 /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
                 {% if matomo_custom_url %}
-                    _paq.push(['setCustomUrl', location.origin + '{{ matomo_custom_url }}']);
+                    window._paq.push(['setCustomUrl', location.origin + '{{ matomo_custom_url }}']);
                 {% endif %}
-                _paq.push(['trackPageView']);
-                _paq.push(['enableLinkTracking']);
-                (function() {
-                    var u = "//stats.data.gouv.fr/";
-                    _paq.push(['setTrackerUrl', u + 'piwik.php']);
-                    _paq.push(['setSiteId', '117']);
-                    var d = document,
-                    g = d.createElement('script'),
-                    s = d.getElementsByTagName('script')[0];
-                    g.async = true;
-                    g.defer = true;
-                    g.src = u + 'piwik.js';
-                    s.parentNode.insertBefore(g, s);
-                })();
             </script>
             <script src="{% static "js/matomo.js" %}"></script>
         {% endif %}
+
 
         {# Display "Je donne mon avis" only on HP. #}
         {# The rationale behind it: "Je donne mon avis" is imposed by DINUM but is redundant with Hotjar. #}
