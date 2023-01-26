@@ -330,6 +330,7 @@ class ApprovalModelTest(TestCase):
         assert approval.number == valid_pe_approval.number[:12]
         assert approval.user == user
         assert approval.created_by is None
+        assert approval.origin == Origin.PE_APPROVAL
 
         # With an existing valid `Approval`.
 

@@ -17,6 +17,7 @@ from django.utils.crypto import salted_hmac
 from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
 
+from itou.approvals.enums import Origin
 from itou.approvals.models import Approval, PoleEmploiApproval
 from itou.asp.models import (
     AllocationDuration,
@@ -552,6 +553,7 @@ class User(AbstractUser, AddressMixin):
             end_at=pe_approval.end_at,
             user=self,
             number=pe_approval.number,
+            origin=Origin.PE_APPROVAL,
         )
         approval_from_pe.save()
         return approval_from_pe

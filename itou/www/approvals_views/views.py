@@ -8,6 +8,7 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.generic import DetailView, ListView, TemplateView
 
+from itou.approvals import enums as approvals_enums
 from itou.approvals.models import Approval, PoleEmploiApproval, Suspension
 from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
@@ -424,6 +425,7 @@ def pe_approval_create(request, pe_approval_id):
             user=job_seeker,
             # Only store 12 chars numbers.
             number=pe_approval.number,
+            origin=approvals_enums.Origin.PE_APPROVAL,
         )
         approval_from_pe.save()
 

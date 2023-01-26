@@ -15,6 +15,7 @@ from django.db import IntegrityError, transaction
 from django.db.models import F, Q
 from tqdm import tqdm
 
+from itou.approvals import enums as approvals_enums
 from itou.approvals.models import Approval
 from itou.asp.models import Commune
 from itou.common_apps.address.departments import department_from_postcode
@@ -348,6 +349,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
                 user_id=job_seeker.pk,
                 created_by=created_by,
                 created_at=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE,
+                origin=approvals_enums.Origin.AI_STOCK,
             )
             if not self.dry_run:
                 # In production, it can raise an IntegrityError if another PASS has just been delivered a few seconds ago.
