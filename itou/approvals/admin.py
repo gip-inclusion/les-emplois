@@ -6,6 +6,7 @@ from django.utils.html import format_html
 from itou.approvals import models
 from itou.approvals.admin_forms import ApprovalAdminForm
 from itou.approvals.admin_views import manually_add_approval, manually_refuse_approval
+from itou.approvals.enums import Origin
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
 from itou.utils.admin import PkSupportRemarkInline
@@ -154,6 +155,7 @@ class ApprovalAdmin(admin.ModelAdmin):
     readonly_fields = (
         "created_at",
         "created_by",
+        "origin",
         "pe_notification_status",
         "pe_notification_time",
         "pe_notification_endpoint",
@@ -167,10 +169,10 @@ class ApprovalAdmin(admin.ModelAdmin):
         PkSupportRemarkInline,
     )
 
-
     def save_model(self, request, obj, form, change):
         if not change:
             obj.created_by = request.user
+            obj.origin = Origin.ADMIN
 
         # Is there an employee record linked ?
         employee_record = EmployeeRecord.objects.filter(approval_number=obj.number).first()
