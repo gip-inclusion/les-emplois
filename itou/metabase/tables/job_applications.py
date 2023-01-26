@@ -140,6 +140,12 @@ TABLE.add_columns(
             "fn": lambda o: o.created_at,
         },
         {
+            "name": "date_début_contrat",
+            "type": "date",
+            "comment": "Date de début du contrat",
+            "fn": lambda o: o.hiring_start_at,
+        },
+        {
             "name": "état",
             "type": "varchar",
             "comment": "Etat de la candidature",
