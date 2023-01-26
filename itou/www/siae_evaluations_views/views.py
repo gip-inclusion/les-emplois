@@ -12,6 +12,7 @@ from django.utils import text, timezone
 from django.utils.safestring import mark_safe
 from django.views import generic
 from django.views.decorators.http import require_POST
+from django.views.generic.detail import SingleObjectMixin
 
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.emails import InstitutionEmailFactory, SIAEEmailFactory
@@ -20,6 +21,7 @@ from itou.siae_evaluations.models import (
     EvaluatedJobApplication,
     EvaluatedSiae,
     EvaluationCampaign,
+    Sanctions,
 )
 from itou.utils.emails import send_email_messages
 from itou.utils.perms.institution import get_current_institution_or_404
@@ -29,6 +31,8 @@ from itou.utils.urls import get_safe_url
 from itou.www.eligibility_views.forms import AdministrativeCriteriaOfJobApplicationForm
 from itou.www.siae_evaluations_views.forms import (
     InstitutionEvaluatedSiaeNotifyStep1Form,
+    InstitutionEvaluatedSiaeNotifyStep2Form,
+    InstitutionEvaluatedSiaeNotifyStep3Form,
     LaborExplanationForm,
     SetChosenPercentForm,
     SubmitEvaluatedAdministrativeCriteriaProofForm,
@@ -167,10 +171,54 @@ def institution_evaluated_siae_detail(
     return render(request, template_name, context)
 
 
-class InstitutionEvaluatedSiaeNotifyStep1View(LoginRequiredMixin, generic.UpdateView):
+def evaluation_campaign_data_context(evaluated_siae):
+    context = {}
+    job_apps = evaluated_siae.evaluated_job_applications.all()
+    job_apps_count = len(job_apps)
+    crits_count = 0
+    crits_not_submitted = 0
+    expected_crits_count = 0
+    crits_refused = 0
+    for evaluated_jobapp in job_apps:
+        evaluated_administrative_criteria = evaluated_jobapp.evaluated_administrative_criteria.all()
+        if evaluated_administrative_criteria:
+            # User selected administrative criteria they will prove.
+            for crit in evaluated_administrative_criteria:
+                crits_count += 1
+                if crit.submitted_at is None:
+                    crits_not_submitted += 1
+                    expected_crits_count += 1
+                elif crit.review_state in [
+                    evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
+                    evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2,
+                ]:
+                    crits_refused += 1
+        else:
+            guessed_crits_count = len(
+                evaluated_jobapp.job_application.eligibility_diagnosis.administrative_criteria.all()
+            )
+            expected_crits_count += guessed_crits_count
+            crits_count += guessed_crits_count
+    context["uploaded_count"] = crits_not_submitted
+    context["not_submitted_percent"] = expected_crits_count / crits_count * 100.0 if crits_count else 0.0
+    context["expected_crits_count"] = expected_crits_count
+    context["refused_percent"] = crits_refused / crits_count * 100.0 if crits_count else 0.0
+    context["job_apps_count"] = job_apps_count
+    context["evaluation_history"] = (
+        EvaluatedSiae.objects.viewable()
+        .filter(siae=evaluated_siae.siae_id)
+        .exclude(pk=evaluated_siae.pk)
+        # Ignore first evaluation campaigns, they were a test.
+        .exclude(evaluation_campaign__evaluated_period_end_at__lt=datetime.date(2022, 1, 1))
+        .order_by("-evaluation_campaign__evaluated_period_start_at")
+        .select_related("evaluation_campaign")
+        .prefetch_related("evaluated_job_applications__evaluated_administrative_criteria")
+    )
+    return context
+
+
+class InstitutionEvaluatedSiaeNotifyMixin(LoginRequiredMixin, SingleObjectMixin):
     model = EvaluatedSiae
-    form_class = InstitutionEvaluatedSiaeNotifyStep1Form
-    template_name = "siae_evaluations/institution_evaluated_siae_notify_step1.html"
     context_object_name = "evaluated_siae"
     pk_url_kwarg = "evaluated_siae_pk"
 
@@ -198,52 +246,105 @@ class InstitutionEvaluatedSiaeNotifyStep1View(LoginRequiredMixin, generic.Update
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        job_apps = self.object.evaluated_job_applications.all()
-        job_apps_count = len(job_apps)
-        crits_count = 0
-        crits_not_submitted = 0
-        expected_crits_count = 0
-        crits_refused = 0
-        for evaluated_jobapp in job_apps:
-            evaluated_administrative_criteria = evaluated_jobapp.evaluated_administrative_criteria.all()
-            if evaluated_administrative_criteria:
-                # User selected administrative criteria they will prove.
-                for crit in evaluated_administrative_criteria:
-                    crits_count += 1
-                    if crit.submitted_at is None:
-                        crits_not_submitted += 1
-                        expected_crits_count += 1
-                    elif crit.review_state in [
-                        evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
-                        evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2,
-                    ]:
-                        crits_refused += 1
-            else:
-                guessed_crits_count = len(
-                    evaluated_jobapp.job_application.eligibility_diagnosis.administrative_criteria.all()
-                )
-                expected_crits_count += guessed_crits_count
-                crits_count += guessed_crits_count
-        context["uploaded_count"] = crits_not_submitted
-        context["not_submitted_percent"] = expected_crits_count / crits_count * 100.0 if crits_count else 0.0
-        context["expected_crits_count"] = expected_crits_count
-        context["refused_percent"] = crits_refused / crits_count * 100.0 if crits_count else 0.0
-        context["job_apps_count"] = job_apps_count
-        context["evaluation_history"] = (
-            EvaluatedSiae.objects.viewable()
-            .filter(siae=self.object.siae_id)
-            .exclude(pk=self.object.pk)
-            # Ignore first evaluation campaigns, they were a test.
-            .exclude(evaluation_campaign__evaluated_period_end_at__lt=datetime.date(2022, 1, 1))
-            .order_by("-evaluation_campaign__evaluated_period_start_at")
-            .select_related("evaluation_campaign")
-            .prefetch_related("evaluated_job_applications__evaluated_administrative_criteria")
-        )
+        context.update(evaluation_campaign_data_context(self.object))
         return context
 
+    @property
+    def sessionkey(self):
+        return f"siae_evaluations_views:institution_evaluated_siae_notify-{self.kwargs['evaluated_siae_pk']}"
+
+
+class InstitutionEvaluatedSiaeNotifyStep1View(InstitutionEvaluatedSiaeNotifyMixin, generic.UpdateView):
+    form_class = InstitutionEvaluatedSiaeNotifyStep1Form
+    template_name = "siae_evaluations/institution_evaluated_siae_notify_step1.html"
+
+    def get_success_url(self):
+        return reverse(
+            "siae_evaluations_views:institution_evaluated_siae_notify_step2",
+            kwargs={"evaluated_siae_pk": self.object.pk},
+        )
+
+
+class InstitutionEvaluatedSiaeNotifyStep2View(InstitutionEvaluatedSiaeNotifyMixin, generic.FormView):
+    form_class = InstitutionEvaluatedSiaeNotifyStep2Form
+    template_name = "siae_evaluations/institution_evaluated_siae_notify_step2.html"
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super().post(request, *args, **kwargs)
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial["sanctions"] = self.request.session.get(self.sessionkey, {}).get("sanctions")
+        return initial
+
     def form_valid(self, form):
-        messages.success(self.request, f"{self.object} a bien été notifiée de la sanction.")
-        email = SIAEEmailFactory(self.object).sanctioned()
+        self.request.session[self.sessionkey] = {"sanctions": form.cleaned_data["sanctions"]}
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse(
+            "siae_evaluations_views:institution_evaluated_siae_notify_step3",
+            kwargs={"evaluated_siae_pk": self.object.pk},
+        )
+
+
+class InstitutionEvaluatedSiaeNotifyStep3View(InstitutionEvaluatedSiaeNotifyMixin, generic.FormView):
+    form_class = InstitutionEvaluatedSiaeNotifyStep3Form
+    template_name = "siae_evaluations/institution_evaluated_siae_notify_step3.html"
+
+    def get(self, request, *args, **kwargs):
+        if self.sessionkey not in request.session:
+            return HttpResponseRedirect(
+                reverse(
+                    "siae_evaluations_views:institution_evaluated_siae_notify_step2",
+                    kwargs={"evaluated_siae_pk": self.kwargs["evaluated_siae_pk"]},
+                )
+            )
+        self.object = self.get_object()
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        if self.sessionkey not in request.session:
+            return HttpResponseRedirect(
+                reverse(
+                    "siae_evaluations_views:institution_evaluated_siae_notify_step2",
+                    kwargs={"evaluated_siae_pk": self.kwargs["evaluated_siae_pk"]},
+                )
+            )
+        self.object = self.get_object()
+        return super().post(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["sanctions"] = self.request.session[self.sessionkey]["sanctions"]
+        return kwargs
+
+    def form_valid(self, form):
+        evaluated_siae = self.object
+        sanctions = Sanctions(
+            evaluated_siae=evaluated_siae,
+            training_session=form.cleaned_data.get("training_session", ""),
+            suspension_dates=form.cleaned_data.get("suspension_dates"),
+            subsidy_cut_percent=form.cleaned_data.get("subsidy_cut_percent"),
+            subsidy_cut_dates=form.cleaned_data.get("subsidy_cut_dates"),
+            deactivation_reason=form.cleaned_data.get("deactivation_reason", ""),
+            no_sanction_reason=form.cleaned_data.get("no_sanction_reason", ""),
+        )
+        evaluated_siae.notified_at = timezone.now()
+        with transaction.atomic():
+            sanctions.save()
+            evaluated_siae.save(update_fields=["notified_at"])
+        del self.request.session[self.sessionkey]
+        messages.success(self.request, f"{evaluated_siae} a bien été notifiée de la sanction.")
+        if sanctions.no_sanction_reason:
+            email = SIAEEmailFactory(evaluated_siae).not_sanctioned()
+        else:
+            email = SIAEEmailFactory(evaluated_siae).sanctioned()
         send_email_messages([email])
         return super().form_valid(form)
 
@@ -268,9 +369,11 @@ def evaluated_siae_sanction(request, evaluated_siae_pk, viewer_type):
             **{filter_lookup: viewer},
         )
         .exclude(notified_at=None)
-        .select_related("evaluation_campaign")
+        .select_related("evaluation_campaign", "sanctions")
     )
-    context = {"evaluated_siae": evaluated_siae}
+    context = evaluation_campaign_data_context(evaluated_siae)
+    context["evaluated_siae"] = evaluated_siae
+    context["sanctions"] = evaluated_siae.sanctions
     return render(request, "siae_evaluations/evaluated_siae_sanction.html", context)
 
 
@@ -602,3 +705,7 @@ def siae_submit_proofs(request, evaluated_siae_pk):
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
     )
+
+
+def sanctions_helper_view(request):
+    return render(request, "siae_evaluations/sanctions_helper.html")

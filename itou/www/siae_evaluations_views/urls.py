@@ -24,6 +24,17 @@ urlpatterns = [
         name="institution_evaluated_siae_notify_step1",
     ),
     path(
+        "institution_evaluated_siae_sanctions/<int:evaluated_siae_pk>/",
+        views.InstitutionEvaluatedSiaeNotifyStep2View.as_view(),
+        name="institution_evaluated_siae_notify_step2",
+    ),
+    path(
+        "institution_evaluated_siae_sanctions_details/<int:evaluated_siae_pk>/",
+        views.InstitutionEvaluatedSiaeNotifyStep3View.as_view(),
+        name="institution_evaluated_siae_notify_step3",
+    ),
+    path("institution_evaluated_siae_sanction_instruction/", views.sanctions_helper_view, name="sanctions_helper"),
+    path(
         "institution_evaluated_siae_sanction/<int:evaluated_siae_pk>/",
         views.evaluated_siae_sanction,
         {"viewer_type": "institution"},

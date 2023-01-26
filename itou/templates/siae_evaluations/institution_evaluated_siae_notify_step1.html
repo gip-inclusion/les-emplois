@@ -8,8 +8,19 @@
     <h1 class="mb-5">
         Notifier la sanction du contrôle pour <span class="text-muted">{{ evaluated_siae }}</span>
     </h1>
+    <section class="row">
+        <div class="c-stepper my-3 my-lg-6 col-lg-6">
+            <div class="progress progress--emploi">
+                <div class="progress-bar progress-bar-33" role="progressbar" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100">
+                </div>
+            </div>
+            <p>
+                <strong>Étape 1</strong>/3 : Résultat de cette campagne de contrôle
+            </p>
+        </div>
+    </section>
     <div class="row">
-        <div class="col-lg-6 order-2 order-md-1">
+        <div class="col-lg-6 order-2 order-lg-1">
             <div class="card c-card">
                 <div class="card-body">
                     <h2 class="mt-2">Quelle raison justifie ce résultat ?</h2>
@@ -27,7 +38,7 @@
                             <a class="btn btn-link" href="{% url "siae_evaluations_views:institution_evaluated_siae_list" evaluated_siae.evaluation_campaign_id %}">
                                 Revenir à la liste
                             </a>
-                            <button class="btn btn-primary">Envoyer ce résultat</button>
+                            <button class="btn btn-primary">Passer au choix de sanction</button>
                         </div>
                     </form>
                 </div>

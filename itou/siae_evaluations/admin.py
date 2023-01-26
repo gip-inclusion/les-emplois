@@ -275,3 +275,34 @@ class EvaluatedAdministrativeCriteriaAdmin(admin.ModelAdmin):
         "submitted_at",
         "review_state",
     )
+
+
+@admin.register(models.Sanctions)
+class SanctionsAdmin(admin.ModelAdmin):
+    list_display = [
+        "evaluated_siae",
+        "evaluation_campaign",
+        "institution",
+    ]
+    list_select_related = ["evaluated_siae__evaluation_campaign__institution"]
+    search_fields = ["evaluated_siae__siae__name"]
+    readonly_fields = [
+        "evaluated_siae",
+        "training_session",
+        "suspension_dates",
+        "subsidy_cut_percent",
+        "subsidy_cut_dates",
+        "deactivation_reason",
+        "no_sanction_reason",
+    ]
+
+    @admin.display(description="Campagne", ordering="evaluated_siae__evaluation_campaign")
+    def evaluation_campaign(self, obj):
+        return obj.evaluated_siae.evaluation_campaign.name
+
+    @admin.display(description="Institution", ordering="evaluated_siae__evaluation_campaign__institution")
+    def institution(self, obj):
+        return obj.evaluated_siae.evaluation_campaign.institution
+
+    def has_delete_permission(self, request, obj=None):
+        return False

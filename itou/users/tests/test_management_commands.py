@@ -224,6 +224,7 @@ class TestSyncPermsTestCase(TestCase):
             "view_evaluatedjobapplication",
             "view_evaluatedsiae",
             "view_evaluationcampaign",
+            "view_sanctions",
             "add_siae",
             "change_siae",
             "view_siae",

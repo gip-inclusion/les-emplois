@@ -1,38 +1,100 @@
 {% extends "layout/content.html" %}
 
-{% block title %}
-    Résultat de la campagne de contrôle a posteriori {{ evaluated_siae.evaluation_campaign }} {{ block.super }}
-{% endblock %}
+{% block title %}Notification de sanction pour {{ evaluated_siae.siae }} {{ block.super }}{% endblock %}
 
 {% block content %}
-    <div class="row justify-content-center">
-        <div class="col-lg-8 col-md-10 col-12">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h1>Résultat de la campagne de contrôle a posteriori {{ evaluated_siae.evaluation_campaign.name }}</h1>
+    <h1 class="mb-4">
+        Notification de sanction pour <span class="text-info">{{ evaluated_siae.siae }}</span>
+    </h1>
+    <div class="row">
+        <div class="col-lg-6 order-2 order-lg-1">
+            <div class="card c-card">
+                <div class="card-body">
+                    <h2 class="mt-2">
+                        Campagne de contrôle a posteriori du {{ evaluated_siae.evaluation_campaign.evaluated_period_start_at|date:"d/m/Y" }} au {{ evaluated_siae.evaluation_campaign.evaluated_period_end_at|date:"d/m/Y" }}
+                    </h2>
+                    <hr class="my-4">
+                    <p>
+                        <b>Résultat :</b> <b class="text-danger">Négatif</b>
+                    </p>
+                    <p>
+                        <b>Raison principale :</b> <b class="text-info">{{ evaluated_siae.get_notification_reason_display }}</b>
+                    </p>
+                    <p>
+                        <b>Commentaire de votre DDETS</b>
+                        <div class="card">
+                            <div class="card-body">{{ evaluated_siae.notification_text }}</div>
                         </div>
-                        <div class="card-body">
-                            <p>
-                                <b>Résultat :</b> <b class="text-danger">Négatif</b>
-                            </p>
-                            <p>
-                                <b>Raison principale :</b> <b class="text-info">{{ evaluated_siae.get_notification_reason_display }}</b>
-                            </p>
-                            <p>
-                                <b>Commentaire de votre DDETS</b>
-                                <div class="card">
-                                    <div class="card-body">{{ evaluated_siae.notification_text }}</div>
-                                </div>
-                            </p>
+                    </p>
+                </div>
+                <div class="card-body">
+                    <h2>Sanction{{ sanctions.count_active|pluralize }}</h2>
+
+                    {% if sanctions.training_session %}
+                        <h3 class="mt-5">Participation à une session de présentation de l’auto-prescription</h3>
+                        <div class="card">
+                            <div class="card-body">{{ sanctions.training_session }}</div>
                         </div>
-                        <div class="card-body">
-                            <a class="btn btn-primary float-right" href="{% url "dashboard:index" %}">Revenir au tableau de bord</a>
+                    {% endif %}
+
+                    {% if sanctions.suspension_dates and sanctions.suspension_dates.upper %}
+                        <h3 class="mt-5">Retrait temporaire de la capacité d’auto-prescription</h3>
+                        <p>
+                            La capacité d’auto-prescrire un parcours d'insertion par l'activité économique est suspendue pour une durée déterminée par l'autorité administrative.
+                        </p>
+                        <p>
+                            Dans votre cas, le retrait temporaire de la capacité d’auto-prescription sera effectif à partir du {{ sanctions.suspension_dates.lower|date }} et jusqu’au {{ sanctions.suspension_dates.upper|date }}.
+                        </p>
+                    {% elif sanctions.suspension_dates %}
+                        <h3 class="mt-5">Retrait définitif de la capacité d’auto-prescription</h3>
+                        <p>
+                            La capacité à prescrire un parcours est rompue, elle peut être rétablie par le préfet, à la demande de la structure, sous réserve de la participation de ses dirigeants ou salariés à des actions de formation définies par l'autorité administrative.
+                        </p>
+                        <p>
+                            Dans votre cas, le retrait définitif de la capacité d’auto-prescription sera effectif à partir du {{ sanctions.suspension_dates.lower|date }}.
+                        </p>
+                    {% endif %}
+
+                    {% if sanctions.subsidy_cut_dates %}
+                        <h3 class="mt-5">
+                            Suppression
+                            {% if sanctions.subsidy_cut_percent < 100 %}d’une partie{% endif %}
+                            de l’aide au poste
+                        </h3>
+                        <p>
+                            La suppression de l’aide attribuée aux salariés s’apprécie par l'autorité administrative, par imputation de l’année N+1. Cette notification s’accompagne d’une demande conforme auprès de l’ASP de la part du préfet. Lorsque le département a participé aux aides financières concernées en application de l'article L. 5132-2, le préfet informe le président du conseil départemental de sa décision en vue de la récupération, le cas échéant, des montants correspondants.
+                        </p>
+                        <p>
+                            Dans votre cas, la suppression
+                            {% if sanctions.subsidy_cut_percent < 100 %}
+                                de {{ sanctions.subsidy_cut_percent }} %
+                            {% endif %}
+                            de l’aide au poste sera effective à partir du {{ sanctions.subsidy_cut_dates.lower|date }} et jusqu’au {{ sanctions.subsidy_cut_dates.upper|date }}.
+                        </p>
+                    {% endif %}
+
+                    {% if sanctions.deactivation_reason %}
+                        <h3 class="mt-5">Déconventionnement de la structure</h3>
+                        <p>
+                            La suppression du conventionnement s’apprécie par l'autorité administrative. Cette notification s’accompagne d’une demande conforme auprès de l’ASP de la part du préfet. Lorsque le département a participé aux aides financières concernées en application de l'article L. 5132-2, le préfet informe le président du conseil départemental de sa décision.
+                        </p>
+                        <div class="card">
+                            <div class="card-body">{{ sanctions.deactivation_reason }}</div>
                         </div>
-                    </div>
+                    {% endif %}
+
+                    {% if sanctions.no_sanction_reason %}
+                        <h3 class="mt-5">Ne pas sanctionner</h3>
+                        <div class="card">
+                            <div class="card-body">{{ sanctions.no_sanction_reason }}</div>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <a class="btn btn-primary float-right" href="{% url "dashboard:index" %}">Revenir au tableau de bord</a>
                 </div>
             </div>
         </div>
+        {% include "siae_evaluations/includes/evaluation_data.html" %}
     </div>
 {% endblock %}

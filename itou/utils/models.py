@@ -1,8 +1,12 @@
+from datetime import timedelta
+
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.postgres.fields import DateRangeField
+from django.contrib.postgres.fields import DateRangeField, ranges
 from django.db import models
 from django.db.models import Func
+
+from itou.utils.types import InclusiveDateRange
 
 
 class DateRange(Func):
@@ -16,6 +20,27 @@ class DateRange(Func):
 
     function = "daterange"
     output_field = DateRangeField()
+
+
+class InclusiveDateRangeField(DateRangeField):
+    range_type = InclusiveDateRange
+
+    def from_db_value(self, value, expression, connection):
+        if value:
+            # Default bounds are [] but database returns [),
+            # convert upper bound accordingly.
+            lower, upper = value.lower, value.upper
+            if upper:
+                upper -= timedelta(days=1)
+            value = InclusiveDateRange(lower, upper)
+        return value
+
+
+@InclusiveDateRangeField.register_lookup
+class InclusiveRangeEndsWith(ranges.RangeEndsWith):
+    def as_sql(self, compiler, connection):
+        sql, params = super().as_sql(compiler, connection)
+        return f"({sql} - interval '1 day')::date", params
 
 
 class AbstractSupportRemark(models.Model):
