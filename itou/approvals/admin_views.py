@@ -15,7 +15,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
-from itou.approvals.admin_forms import ManuallyAddApprovalForm
+from itou.approvals.admin_forms import ManuallyAddApprovalFromJobApplicationForm
 from itou.approvals.models import Approval
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.utils.emails import get_email_text_template

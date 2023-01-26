@@ -44,7 +44,7 @@ class ApprovalAdminForm(ApprovalFormMixin, forms.ModelForm):
             self.fields["number"].help_text += self.ADDITIONAL_HELP_TEXT_NUMBER
 
 
-class ManuallyAddApprovalForm(ApprovalFormMixin, forms.ModelForm):
+class ManuallyAddApprovalFromJobApplicationForm(ApprovalFormMixin, forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
