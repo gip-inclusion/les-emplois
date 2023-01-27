@@ -48,6 +48,10 @@ class DuetDatePickerWidget(forms.DateInput):
         # Remove the `form-control` class inserted by `django-bootstrap4` to avoid
         # breaking the layout.
         attrs["class"] = attrs.get("class", "").replace("form-control", "").strip()
+        try:
+            attrs["identifier"] = attrs.pop("id")
+        except KeyError:
+            pass
         return attrs
 
     @classmethod
