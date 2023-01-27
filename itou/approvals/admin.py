@@ -175,7 +175,7 @@ class ApprovalAdmin(admin.ModelAdmin):
         return super().get_form(request, obj, **kwargs)
 
     def save_model(self, request, obj, form, change):
-        if not obj.pk:
+        if not change:
             obj.created_by = request.user
 
         # Is there an employee record linked ?

@@ -57,7 +57,7 @@ class CommuneAdmin(ASPModelAdmin):
     inlines = (PkSupportRemarkInline,)
 
     def save_model(self, request, obj, form, change):
-        if not obj.pk:
+        if not change:
             obj.created_by = request.user
 
         if not models.Commune.objects.filter(code=form.cleaned_data["code"]).exists():
