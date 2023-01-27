@@ -1,7 +1,7 @@
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
-from pytest_django.asserts import assertContains
+from pytest_django.asserts import assertContains, assertNumQueries
 
 from itou.approvals.factories import SuspensionFactory
 from itou.eligibility.enums import AdministrativeCriteriaLevel
@@ -578,12 +578,28 @@ def test_list_for_unauthorized_prescriber_view(client):
         job_seeker_with_address=True,
         job_seeker__first_name="Supersecretname",
         job_seeker__last_name="Unknown",
+        job_seeker__created_by=PrescriberFactory(),  # to check for useless queries
         sender=prescriber,
         sender_kind=SenderKind.PRESCRIBER,
     )
     client.force_login(prescriber)
     url = reverse("apply:list_for_prescriber")
-    response = client.get(url)
+    with assertNumQueries(
+        1  # fetch django session
+        + 1  # fetch user
+        + 1  # check for membeship
+        + 1  # get list of senders (distinct sender_id)
+        + 1  # get list of job seekers (distinct job_seeker_id)
+        + 1  # get list of administrative criteria
+        + 1  # get list of job seekers (distinct job_seeker_id) (again)
+        + 2  # get list of job application + prefetch of job descriptions
+        + 1  # get list of siaes (distinct)
+        + 3  # count, list & prefetch of job application
+        + 1  # check user membership again
+        + 1  # weird fetch social account
+        + 3  # update session
+    ):
+        response = client.get(url)
 
     assertContains(response, "<b>S… U…</b>", html=True)
     # Unfortunately, the job seeker's name is available in the filters
