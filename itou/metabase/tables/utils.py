@@ -121,47 +121,52 @@ def get_post_code_column(name_suffix="", comment_suffix="", custom_fn=lambda o: 
 
 
 def get_address_columns(name_suffix="", comment_suffix="", custom_fn=lambda o: o):
-    return [
-        {
-            "name": f"adresse_ligne_1{name_suffix}",
-            "type": "varchar",
-            "comment": f"Première ligne adresse{comment_suffix}",
-            "fn": lambda o: custom_fn(o).address_line_1,
-        },
-        {
-            "name": f"adresse_ligne_2{name_suffix}",
-            "type": "varchar",
-            "comment": f"Seconde ligne adresse{comment_suffix}",
-            "fn": lambda o: custom_fn(o).address_line_2,
-        },
-    ] + [get_post_code_column(name_suffix, comment_suffix, custom_fn)] + [
-        {
-            # FIXME @dejafait drop this as soon as data analysts no longer use it
-            # because one post_code can actually have *several* insee_codes (╯°□°)╯︵ ┻━┻
-            "name": f"code_commune{name_suffix}",
-            "type": "varchar",
-            "comment": f"Code commune{comment_suffix}",
-            "fn": lambda o: convert_post_code_to_insee_code(custom_fn(o).post_code),
-        },
-        {
-            "name": f"ville{name_suffix}",
-            "type": "varchar",
-            "comment": f"Ville{comment_suffix}",
-            "fn": lambda o: custom_fn(o).city,
-        },
-        {
-            "name": f"longitude{name_suffix}",
-            "type": "float",
-            "comment": f"Longitude{comment_suffix}",
-            "fn": lambda o: custom_fn(o).longitude,
-        },
-        {
-            "name": f"latitude{name_suffix}",
-            "type": "float",
-            "comment": f"Latitude{comment_suffix}",
-            "fn": lambda o: custom_fn(o).latitude,
-        },
-    ] + get_department_and_region_columns(name_suffix, comment_suffix, custom_fn)
+    return (
+        [
+            {
+                "name": f"adresse_ligne_1{name_suffix}",
+                "type": "varchar",
+                "comment": f"Première ligne adresse{comment_suffix}",
+                "fn": lambda o: custom_fn(o).address_line_1,
+            },
+            {
+                "name": f"adresse_ligne_2{name_suffix}",
+                "type": "varchar",
+                "comment": f"Seconde ligne adresse{comment_suffix}",
+                "fn": lambda o: custom_fn(o).address_line_2,
+            },
+        ]
+        + [get_post_code_column(name_suffix, comment_suffix, custom_fn)]
+        + [
+            {
+                # FIXME @dejafait drop this as soon as data analysts no longer use it
+                # because one post_code can actually have *several* insee_codes (╯°□°)╯︵ ┻━┻
+                "name": f"code_commune{name_suffix}",
+                "type": "varchar",
+                "comment": f"Code commune{comment_suffix}",
+                "fn": lambda o: convert_post_code_to_insee_code(custom_fn(o).post_code),
+            },
+            {
+                "name": f"ville{name_suffix}",
+                "type": "varchar",
+                "comment": f"Ville{comment_suffix}",
+                "fn": lambda o: custom_fn(o).city,
+            },
+            {
+                "name": f"longitude{name_suffix}",
+                "type": "float",
+                "comment": f"Longitude{comment_suffix}",
+                "fn": lambda o: custom_fn(o).longitude,
+            },
+            {
+                "name": f"latitude{name_suffix}",
+                "type": "float",
+                "comment": f"Latitude{comment_suffix}",
+                "fn": lambda o: custom_fn(o).latitude,
+            },
+        ]
+        + get_department_and_region_columns(name_suffix, comment_suffix, custom_fn)
+    )
 
 
 def get_establishment_last_login_date_column():
