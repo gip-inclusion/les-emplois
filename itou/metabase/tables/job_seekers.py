@@ -11,6 +11,7 @@ from itou.metabase.tables.utils import (
     get_choice,
     get_department_and_region_columns,
     get_hiring_siae,
+    get_post_code_column,
     get_qpv_job_seeker_pks,
     hash_content,
 )
@@ -256,6 +257,8 @@ def get_table():
             },
         ]
     )
+
+    job_seekers_table.add_columns([get_post_code_column(comment_suffix=" du candidat")])
 
     job_seekers_table.add_columns(get_department_and_region_columns(comment_suffix=" du candidat"))
 
