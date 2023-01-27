@@ -119,16 +119,36 @@ class JobsAutocompleteTest(TestCase):
 class CitiesAutocompleteTest(TestCase):
     def test_autocomplete(self):
 
-        create_test_cities(["01", "75"], num_per_department=20)
+        create_test_cities(["01", "75", "93"], num_per_department=20)
 
         url = reverse("autocomplete:cities")
 
         response = self.client.get(url, {"term": "sai"})
         assert response.status_code == 200
         assert response.json() == [
-            {"slug": "saint-sulpice-01", "value": "Saint-Sulpice (01)"},
             {"slug": "saint-genis-pouilly-01", "value": "Saint-Genis-Pouilly (01)"},
             {"slug": "saint-jean-de-gonville-01", "value": "Saint-Jean-de-Gonville (01)"},
+            {"slug": "saint-sulpice-01", "value": "Saint-Sulpice (01)"},
+            {"slug": "le-pre-saint-gervais-93", "value": "Le Pré-Saint-Gervais (93)"},
+        ]
+
+        # the request still finds results when dashes were forgotten
+        response = self.client.get(url, {"term": "saint g"})
+        assert response.status_code == 200
+        assert response.json() == [
+            {"slug": "saint-genis-pouilly-01", "value": "Saint-Genis-Pouilly (01)"},
+            {"slug": "le-pre-saint-gervais-93", "value": "Le Pré-Saint-Gervais (93)"},
+        ]
+
+        # and is also able to remove the dashes if entered
+        response = self.client.get(url, {"term": "la cour"})
+        assert response.status_code == 200
+        assert response.json() == [{"slug": "la-courneuve-93", "value": "La Courneuve (93)"}]
+
+        response = self.client.get(url, {"term": "chat"})
+        assert response.status_code == 200
+        assert response.json() == [
+            {"slug": "bage-le-chatel-01", "value": "Bâgé-le-Châtel (01)"},
         ]
 
         response = self.client.get(url, {"term": "    "})
@@ -140,6 +160,17 @@ class CitiesAutocompleteTest(TestCase):
         assert response.status_code == 200
         assert response.json() == [
             {"slug": "paris-75", "value": "Paris (75)"},
+            {"slug": "paris-10e-arrondissement-75", "value": "Paris 10e Arrondissement (75)"},
+            {"slug": "paris-11e-arrondissement-75", "value": "Paris 11e Arrondissement (75)"},
+            {"slug": "paris-12e-arrondissement-75", "value": "Paris 12e Arrondissement (75)"},
+            {"slug": "paris-13e-arrondissement-75", "value": "Paris 13e Arrondissement (75)"},
+            {"slug": "paris-14e-arrondissement-75", "value": "Paris 14e Arrondissement (75)"},
+            {"slug": "paris-15e-arrondissement-75", "value": "Paris 15e Arrondissement (75)"},
+            {"slug": "paris-17e-arrondissement-75", "value": "Paris 17e Arrondissement (75)"},
+            {"slug": "paris-18e-arrondissement-75", "value": "Paris 18e Arrondissement (75)"},
+            {"slug": "paris-19e-arrondissement-75", "value": "Paris 19e Arrondissement (75)"},
+            {"slug": "paris-1er-arrondissement-75", "value": "Paris 1er Arrondissement (75)"},
+            {"slug": "paris-20e-arrondissement-75", "value": "Paris 20e Arrondissement (75)"},
             {"slug": "paris-2e-arrondissement-75", "value": "Paris 2e Arrondissement (75)"},
             {"slug": "paris-3e-arrondissement-75", "value": "Paris 3e Arrondissement (75)"},
             {"slug": "paris-4e-arrondissement-75", "value": "Paris 4e Arrondissement (75)"},
@@ -148,25 +179,12 @@ class CitiesAutocompleteTest(TestCase):
             {"slug": "paris-7e-arrondissement-75", "value": "Paris 7e Arrondissement (75)"},
             {"slug": "paris-8e-arrondissement-75", "value": "Paris 8e Arrondissement (75)"},
             {"slug": "paris-9e-arrondissement-75", "value": "Paris 9e Arrondissement (75)"},
-            {"slug": "paris-10e-arrondissement-75", "value": "Paris 10e Arrondissement (75)"},
         ]
 
         response = self.client.get(url, {"term": "paris 8"})
         assert response.status_code == 200
         assert response.json() == [
             {"slug": "paris-8e-arrondissement-75", "value": "Paris 8e Arrondissement (75)"},
-            # the trigram similarity allows for those results to show up, I'm not happy with it but
-            # I won't look much more into it now. In my opinion they should be discarded since
-            # they do not include an "8".
-            {"slug": "paris-75", "value": "Paris (75)"},
-            {"slug": "paris-2e-arrondissement-75", "value": "Paris 2e Arrondissement (75)"},
-            {"slug": "paris-3e-arrondissement-75", "value": "Paris 3e Arrondissement (75)"},
-            {"slug": "paris-4e-arrondissement-75", "value": "Paris 4e Arrondissement (75)"},
-            {"slug": "paris-5e-arrondissement-75", "value": "Paris 5e Arrondissement (75)"},
-            {"slug": "paris-6e-arrondissement-75", "value": "Paris 6e Arrondissement (75)"},
-            {"slug": "paris-7e-arrondissement-75", "value": "Paris 7e Arrondissement (75)"},
-            {"slug": "paris-9e-arrondissement-75", "value": "Paris 9e Arrondissement (75)"},
-            {"slug": "paris-10e-arrondissement-75", "value": "Paris 10e Arrondissement (75)"},
         ]
 
         response = self.client.get(url, {"term": "toulouse"})

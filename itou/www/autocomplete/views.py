@@ -1,6 +1,6 @@
 from datetime import datetime
+from os.path import commonprefix
 
-from django.contrib.postgres.search import TrigramSimilarity, TrigramWordSimilarity
 from django.db.models import Q
 from django.http import JsonResponse
 from unidecode import unidecode
@@ -9,6 +9,10 @@ from itou.asp.models import Commune
 from itou.cities.models import City
 from itou.jobs.models import Appellation
 from itou.siaes.models import SiaeJobDescription
+
+
+# Consider that after 50 matches the user should refine its search.
+MAX_CITIES_TO_RETURN = 50
 
 
 def sanitize(string):
@@ -25,14 +29,37 @@ def cities_autocomplete(request):
     cities = []
 
     if term:
-        cities = (
-            # similarity score is 0.5 since we want at least 50% of the entire sentence trigrams to match.
-            City.objects.annotate(
-                similarity=TrigramSimilarity("name", term), word_similarity=TrigramWordSimilarity(term, "name")
+        if term.isdigit():
+            cities = City.objects.filter(post_codes__contains=[term]).order_by("name", "department")[
+                :MAX_CITIES_TO_RETURN
+            ]
+
+        else:
+            term = unidecode(term.lower())
+            term_spaced = term.replace("-", " ")
+            term_hyphenated = term.replace(" ", "-")
+            index_term = commonprefix([term_spaced, term_hyphenated])
+            cities = sorted(
+                # The double search does not seem ideal, but we *did* start with a trigram similarity
+                # and word similarity approach. It is disappointing since it does return results that
+                # are not expected, for instance results containing letters not present in the search.
+                # It has been decided with the UX to use the simplest approach. Secondly, it seems
+                # that most people look for a city by "the start of the name", not by "any word within
+                # the name" so the icontains lookup, ordered by index of the matching string, feels more
+                # natural.
+                # The hyphenated/unhyphenated thing has been added considering the mess that hyphens
+                # represent in french city names. It is ugly, but simpler than the other approach which
+                # could have been to look for the slugs, but requires a perfect sync of th slug and name
+                # at all times, just for the search.
+                City.objects.filter(
+                    Q(name__unaccent__icontains=term_spaced) | Q(name__unaccent__icontains=term_hyphenated)
+                )[:MAX_CITIES_TO_RETURN],
+                # - the results __starting__ by the searched term are favoured (Paris over Cormeil-en-Parisis)
+                # - then if the length is the same, by alphabetic order
+                # - then if everything is the same (Sainte-Colombe...) by department.
+                key=lambda c: (unidecode(c.name.lower()).index(index_term), c.name, c.department),
             )
-            .filter(word_similarity__gte=0.5)
-            .order_by("-word_similarity", "-similarity", "name")
-        )[:10]
+
         cities = [{"value": city.display_name, "slug": city.slug} for city in cities]
 
     return JsonResponse(cities, safe=False)

@@ -19,7 +19,6 @@ htmx.onLoad((target) => {
       delay: 300,
       minLength: 1,
       source: citySearchInput.data('autocomplete-source-url'),
-      autoFocus: true,
       // Make a selection on focus.
       focus: (event, ui) => {
         searchButton.prop("disabled", true)
@@ -35,7 +34,8 @@ htmx.onLoad((target) => {
           searchButton.prop("disabled", false)
           citySearchInput.val(value)
         } else {
-          clearInput()
+          hiddenCityInput.val('')
+          searchButton.prop("disabled", true)
         }
       },
       // Allow to submit the parent form when the enter key is pressed.
@@ -62,6 +62,5 @@ htmx.onLoad((target) => {
         citySearchInput.val('')
       }
     })
-    .focus(clearInput)
 
 });
