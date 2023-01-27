@@ -2,7 +2,6 @@
 Base settings to build other settings files upon.
 https://docs.djangoproject.com/en/dev/ref/settings
 """
-import datetime
 import json
 import os
 
@@ -361,11 +360,6 @@ if SENTRY_DSN:
     sentry_init(dsn=SENTRY_DSN, traces_sample_rate=_sentry_traces_sample_rate)
 
 SHOW_TEST_ACCOUNTS_BANNER = ITOU_ENVIRONMENT in ("DEMO", "REVIEW-APP")
-
-# On November 30th, 2021, we delivered approvals for AI structures.
-# See itou.scripts.management.commands.import_ai_employees
-AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL = os.getenv("AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL")
-AI_EMPLOYEES_STOCK_IMPORT_DATE = datetime.datetime(2021, 11, 30, tzinfo=datetime.timezone.utc)
 
 # https://adresse.data.gouv.fr/faq
 API_BAN_BASE_URL = os.getenv("API_BAN_BASE_URL")
