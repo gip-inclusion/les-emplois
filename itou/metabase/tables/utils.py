@@ -111,6 +111,15 @@ def convert_post_code_to_insee_code(post_code):
     return get_post_code_to_insee_code_map().get(post_code)
 
 
+def get_post_code_column(name_suffix="", comment_suffix="", custom_fn=lambda o: o):
+    return {
+        "name": f"code_postal{name_suffix}",
+        "type": "varchar",
+        "comment": f"Code postal{comment_suffix}",
+        "fn": lambda o: custom_fn(o).post_code,
+    }
+
+
 def get_address_columns(name_suffix="", comment_suffix="", custom_fn=lambda o: o):
     return [
         {
@@ -125,12 +134,7 @@ def get_address_columns(name_suffix="", comment_suffix="", custom_fn=lambda o: o
             "comment": f"Seconde ligne adresse{comment_suffix}",
             "fn": lambda o: custom_fn(o).address_line_2,
         },
-        {
-            "name": f"code_postal{name_suffix}",
-            "type": "varchar",
-            "comment": f"Code postal{comment_suffix}",
-            "fn": lambda o: custom_fn(o).post_code,
-        },
+    ] + [get_post_code_column(name_suffix, comment_suffix, custom_fn)] + [
         {
             # FIXME @dejafait drop this as soon as data analysts no longer use it
             # because one post_code can actually have *several* insee_codes (╯°□°)╯︵ ┻━┻
