@@ -694,14 +694,15 @@ class SiaePrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
     def __init__(self, job_applications_qs, *args, **kwargs):
         self.job_applications_qs = job_applications_qs
         super().__init__(*args, **kwargs)
-        self.fields["senders"].choices += self._get_choices_for("sender")
-        self.fields["job_seekers"].choices = self._get_choices_for("job_seeker")
+        senders = self.job_applications_qs.get_unique_fk_objects("sender")
+        self.fields["senders"].choices += self._get_choices_for(senders)
+        job_seekers = self.job_applications_qs.get_unique_fk_objects("job_seeker")
+        self.fields["job_seekers"].choices = self._get_choices_for(job_seekers)
         self.fields["criteria"].choices = self._get_choices_for_administrativecriteria()
-        self.fields["departments"].choices = self._get_choices_for_departments()
+        self.fields["departments"].choices = self._get_choices_for_departments(job_seekers)
         self.fields["selected_jobs"].choices = self._get_choices_for_jobs()
 
-    def _get_choices_for(self, user_type):
-        users = self.job_applications_qs.get_unique_fk_objects(user_type)
+    def _get_choices_for(self, users):
         users = [user for user in users if user.get_full_name()]
         users = [(user.id, user.get_full_name().title()) for user in users]
         return sorted(users, key=lambda l: l[1])
@@ -709,8 +710,7 @@ class SiaePrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
     def _get_choices_for_administrativecriteria(self):
         return [(c.pk, c.name) for c in AdministrativeCriteria.objects.all()]
 
-    def _get_choices_for_departments(self):
-        job_seekers = self.job_applications_qs.get_unique_fk_objects("job_seeker")
+    def _get_choices_for_departments(self, job_seekers):
         departments = {
             (user.department, DEPARTMENTS.get(user.department))
             for user in job_seekers

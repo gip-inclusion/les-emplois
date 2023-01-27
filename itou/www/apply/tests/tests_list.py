@@ -176,7 +176,21 @@ class ProcessListSiaeTest(ProcessListTest):
         Eddie wants to see a list of job applications sent to his SIAE.
         """
         self.client.force_login(self.eddie_hit_pit)
-        response = self.client.get(self.siae_base_url)
+        with self.assertNumQueries(
+            1  # fetch django session
+            + 1  # fetch user
+            + 3  # check for membership & infos
+            + 1  # get list of senders (distinct sender_id)
+            + 1  # get list of job seekers (distinct job_seeker_id)
+            + 1  # get list of administrative criteria
+            + 2  # get list of job application + prefetch of job descriptions
+            + 1  # get list of sender org (distinct sender_prescriber_organization_id)
+            + 3  # count, list & prefetch of job application
+            + 1  # check user membership again
+            + 1  # weird fetch social account
+            + 3  # update session
+        ):
+            response = self.client.get(self.siae_base_url)
 
         total_applications = len(response.context["job_applications_page"].object_list)
 
@@ -591,7 +605,6 @@ def test_list_for_unauthorized_prescriber_view(client):
         + 1  # get list of senders (distinct sender_id)
         + 1  # get list of job seekers (distinct job_seeker_id)
         + 1  # get list of administrative criteria
-        + 1  # get list of job seekers (distinct job_seeker_id) (again)
         + 2  # get list of job application + prefetch of job descriptions
         + 1  # get list of siaes (distinct)
         + 3  # count, list & prefetch of job application
