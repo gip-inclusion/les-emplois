@@ -1,13 +1,9 @@
-import csv
-import io
-
 from django.contrib import admin, messages
-from django.http import HttpResponse
 from django.urls import reverse
-from django.utils import timezone
 from django.utils.safestring import mark_safe
 
 from itou.siae_evaluations import models
+from itou.utils.export import to_streaming_response
 
 
 class EvaluatedSiaesInline(admin.TabularInline):
@@ -83,61 +79,70 @@ class EvaluatedAdministrativeCriteriaInline(admin.TabularInline):
     id_link.short_description = "Lien vers les critères administratifs évalués"
 
 
+def _evaluated_siae_serializer(queryset):
+    def _get_active_admin(siae):
+        return [p.user.email for p in siae.memberships.all() if p.is_admin and p.user.is_active]
+
+    def _get_stage(evaluated_siae):
+        if evaluated_siae.evaluation_campaign.ended_at:
+            return "Campagne terminée"
+        elif evaluated_siae.reviewed_at is None:
+            return "Phase amiable"
+        elif evaluated_siae.final_reviewed_at is None:
+            return "Phase contradictoire"
+        return "Contrôle terminé"
+
+    return [
+        (
+            evaluated_siae.evaluation_campaign.name,
+            evaluated_siae.siae.convention.siret_signature,
+            evaluated_siae.siae.kind,
+            evaluated_siae.siae.name,
+            evaluated_siae.siae.department,
+            ", ".join(_get_active_admin(evaluated_siae.siae)),
+            evaluated_siae.siae.phone,
+            evaluated_siae.state,
+            _get_stage(evaluated_siae),
+        )
+        for evaluated_siae in queryset
+    ]
+
+
 @admin.register(models.EvaluationCampaign)
 class EvaluationCampaignAdmin(admin.ModelAdmin):
     @admin.action(description="Exporter les SIAE des campagnes sélectionnées")
     def export_siaes(self, request, queryset):
-        queryset = queryset.select_related("institution").prefetch_related(
-            "evaluated_siaes__evaluated_job_applications__evaluated_administrative_criteria",
-            "evaluated_siaes__siae__memberships__user",
-            "evaluated_siaes__siae__convention",
-        )
-        with io.StringIO() as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerow(
-                [
-                    "Campagne",
-                    "SIRET signature",
-                    "Type",
-                    "Nom",
-                    "Département",
-                    "Emails administrateurs",
-                    "Numéro de téléphone",
-                    "État du contrôle",
-                    "Phase du contrôle",
-                ]
+        export_qs = (
+            models.EvaluatedSiae.objects.filter(evaluation_campaign__in=queryset)
+            .select_related(
+                "evaluation_campaign",
+                "siae__convention",
             )
-            for campaign in queryset:
-                for evaluated_siae in campaign.evaluated_siaes.all():
-                    siae = evaluated_siae.siae
-                    # Keep in sync with MembershipQuerySet.active_admin_members.
-                    to = [p.user.email for p in siae.memberships.all() if p.is_admin and p.user.is_active]
-                    if campaign.ended_at:
-                        stage = "Campagne terminée"
-                    elif evaluated_siae.reviewed_at is None:
-                        stage = "Phase amiable"
-                    elif evaluated_siae.final_reviewed_at is None:
-                        stage = "Phase contradictoire"
-                    else:
-                        stage = "Contrôle terminé"
-                    writer.writerow(
-                        [
-                            campaign.name,
-                            siae.convention.siret_signature,
-                            siae.kind,
-                            siae.name,
-                            siae.department,
-                            ", ".join(to),
-                            siae.phone,
-                            evaluated_siae.state,
-                            stage,
-                        ]
-                    )
-            response = HttpResponse(csvfile.getvalue())
-            response.headers["Content-Type"] = "text/csv"
-            now = timezone.now().isoformat(timespec="seconds").replace(":", "-")
-            response.headers["Content-Disposition"] = f'attachment; filename="export-siaes-campagnes-{now}.csv"'
-            return response
+            .prefetch_related(
+                "evaluated_job_applications__evaluated_administrative_criteria",
+                "siae__memberships__user",
+            )
+            .order_by("evaluation_campaign_id", "id")
+        )
+        headers = [
+            "Campagne",
+            "SIRET signature",
+            "Type",
+            "Nom",
+            "Département",
+            "Emails administrateurs",
+            "Numéro de téléphone",
+            "État du contrôle",
+            "Phase du contrôle",
+        ]
+
+        return to_streaming_response(
+            export_qs,
+            "export-siaes-campagnes",
+            headers,
+            _evaluated_siae_serializer,
+            with_time=True,
+        )
 
     @admin.action(description="Passer les campagnes en phase contradictoire")
     def transition_to_adversarial_phase(self, request, queryset):
