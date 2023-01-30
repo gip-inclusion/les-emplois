@@ -521,13 +521,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         default=False, verbose_name="L'entreprise choisit de ne pas obtenir un PASS IAE à l'embauche"
     )
 
-    # This flag is used in the `PoleEmploiApproval`'s conversion process.
-    # This process is required following the end of the software allowing Pôle emploi to manage their approvals.
-    # The process allows to convert a `PoleEmploiApproval` into an `Approval`.
-    # TODO(alaurent) remove when origin is set every where
-    created_from_pe_approval = models.BooleanField(
-        default=False, verbose_name="Candidature créée lors de l'import d'un agrément Pole Emploi", null=True
-    )
     origin = models.CharField(
         verbose_name="Origine de la candidature", max_length=30, choices=Origin.choices, default=Origin.DEFAULT
     )
