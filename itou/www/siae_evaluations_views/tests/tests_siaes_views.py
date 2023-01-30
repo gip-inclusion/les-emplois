@@ -91,7 +91,7 @@ class SiaeJobApplicationListViewTest(S3AccessingTestCase):
             + 1  # fetch evaluated siae
             + 2  # fetch evaluatedjobapplication and its prefetched evaluatedadministrativecriteria
             + 1  # aggregate min evaluation_campaign notification date
-            + 2  # weird fetch siae membership and social account
+            + 1  # weird fetch siae membership
             # NOTE(vperron): the prefecth is necessary to check the SUBMITTABLE state of the evaluated siae
             # We do those requests "two times" but at least it's now accurate information, and we get
             # the EvaluatedJobApplication list another way so that we can select_related on them.

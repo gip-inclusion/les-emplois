@@ -236,8 +236,7 @@ class ModelTest(TestCase):
         job_seeker = JobSeekerFactory(identity_provider=IdentityProvider.INCLUSION_CONNECT)
         assert job_seeker.has_sso_provider
 
-        job_seeker = JobSeekerFactory()
-        job_seeker.socialaccount_set.create(provider="peamu")
+        job_seeker = JobSeekerFactory(identity_provider=IdentityProvider.PE_CONNECT)
         assert job_seeker.has_sso_provider
 
     def test_update_external_data_source_history_field(self):

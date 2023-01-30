@@ -187,7 +187,6 @@ class ProcessListSiaeTest(ProcessListTest):
             + 1  # get list of sender org (distinct sender_prescriber_organization_id)
             + 3  # count, list & prefetch of job application
             + 1  # check user membership again
-            + 1  # weird fetch social account
             + 3  # update session
         ):
             response = self.client.get(self.siae_base_url)
@@ -609,7 +608,6 @@ def test_list_for_unauthorized_prescriber_view(client):
         + 1  # get list of siaes (distinct)
         + 3  # count, list & prefetch of job application
         + 1  # check user membership again
-        + 1  # weird fetch social account
         + 3  # update session
     ):
         response = client.get(url)
