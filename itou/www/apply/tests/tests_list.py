@@ -524,7 +524,7 @@ class ProcessListPrescriberTest(ProcessListTest):
         response = self.client.get(download_url)
 
         assert 200 == response.status_code
-        assert "text/csv" in response.get("Content-Type")
+        assert "spreadsheetml" in response.get("Content-Type")
 
     def test_view__filtered_by_state(self):
         """
@@ -675,7 +675,7 @@ class ProcessListExportsSiaeTest(ProcessListTest):
 class ProcessListExportsDownloadPrescriberTest(ProcessListTest):
     def test_list_for_prescriber_exports_download_view(self):
         """
-        Connect as Thibault to download a CSV export of available job applications
+        Connect as Thibault to download a XLSX export of available job applications
         """
         self.client.force_login(self.thibault_pe)
 
@@ -689,11 +689,11 @@ class ProcessListExportsDownloadPrescriberTest(ProcessListTest):
         response = self.client.get(download_url)
 
         assert 200 == response.status_code
-        assert "text/csv" in response.get("Content-Type")
+        assert "spreadsheetml" in response.get("Content-Type")
 
     def test_list_for_siae_exports_download_view(self):
         """
-        Connect as Thibault and attempt to download a CSV export of available job applications from SIAE
+        Connect as Thibault and attempt to download a XLSX export of available job applications from SIAE
         """
         self.client.force_login(self.thibault_pe)
 
@@ -715,7 +715,7 @@ class ProcessListExportsDownloadPrescriberTest(ProcessListTest):
 class ProcessListExportsDownloadSiaeTest(ProcessListTest):
     def test_list_for_siae_exports_download_view(self):
         """
-        Connect as Thibault to download a CSV export of available job applications
+        Connect as Thibault to download a XLSX export of available job applications
         """
         self.client.force_login(self.eddie_hit_pit)
 
@@ -727,11 +727,11 @@ class ProcessListExportsDownloadSiaeTest(ProcessListTest):
         response = self.client.get(download_url)
 
         assert 200 == response.status_code
-        assert "text/csv" in response.get("Content-Type")
+        assert "spreadsheetml" in response.get("Content-Type")
 
     def test_list_for_prescriber_exports_download_view(self):
         """
-        Connect as SIAE and attempt to download a CSV export of available job applications from prescribers
+        Connect as SIAE and attempt to download a XLSX export of available job applications from prescribers
         """
         self.client.force_login(self.eddie_hit_pit)
 

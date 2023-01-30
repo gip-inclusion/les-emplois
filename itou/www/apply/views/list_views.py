@@ -1,9 +1,8 @@
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.http import HttpResponse
 from django.shortcuts import render
 from django.utils.text import slugify
 
-from itou.job_applications.csv_export import generate_csv_export
+from itou.job_applications.export import stream_xlsx_export
 from itou.utils.pagination import pager
 from itou.utils.perms.prescriber import get_all_available_job_applications_as_prescriber
 from itou.utils.perms.siae import get_current_siae_or_404
@@ -105,14 +104,7 @@ def list_for_prescriber_exports_download(request, month_identifier):
     year, month = month_identifier.split("-")
     job_applications = job_applications.created_on_given_year_and_month(year, month).with_list_related_data()
 
-    filename = f"candidatures-{month_identifier}.csv"
-
-    response = HttpResponse(content_type="text/csv", charset="utf-8")
-    response["Content-Disposition"] = f'attachment; filename="{filename}"'
-
-    generate_csv_export(job_applications, response)
-
-    return response
+    return stream_xlsx_export(job_applications, f"candidatures-{month_identifier}")
 
 
 @login_required
@@ -175,11 +167,5 @@ def list_for_siae_exports_download(request, month_identifier):
     siae = get_current_siae_or_404(request)
     job_applications = siae.job_applications_received.not_archived()
     job_applications = job_applications.created_on_given_year_and_month(year, month).with_list_related_data()
-    filename = f"candidatures-{slugify(siae.display_name)}-{month_identifier}.csv"
 
-    response = HttpResponse(content_type="text/csv", charset="utf-8")
-    response["Content-Disposition"] = f'attachment; filename="{filename}"'
-
-    generate_csv_export(job_applications, response)
-
-    return response
+    return stream_xlsx_export(job_applications, f"candidatures-{slugify(siae.display_name)}-{month_identifier}")

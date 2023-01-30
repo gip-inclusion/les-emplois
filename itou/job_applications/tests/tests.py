@@ -23,8 +23,8 @@ from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordFactory
 from itou.job_applications.admin_forms import JobApplicationAdminForm
-from itou.job_applications.csv_export import generate_csv_export
 from itou.job_applications.enums import Origin, RefusalReason, SenderKind
+from itou.job_applications.export import JOB_APPLICATION_CSV_HEADERS, stream_xlsx_export
 from itou.job_applications.factories import (
     JobApplicationFactory,
     JobApplicationSentByJobSeekerFactory,
@@ -46,6 +46,7 @@ from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.templatetags import format_filters
 from itou.utils.test import TestCase
+from itou.utils.testing import get_rows_from_streaming_response
 
 
 @override_settings(
@@ -1489,7 +1490,7 @@ class JobApplicationWorkflowTest(TestCase):
 
 class JobApplicationCsvExportTest(TestCase):
     @patch("itou.job_applications.models.huey_notify_pole_emploi")
-    def test_csv_export_contains_the_necessary_info(self, *args, **kwargs):
+    def test_xlsx_export_contains_the_necessary_info(self, *args, **kwargs):
         create_test_romes_and_appellations(["M1805"], appellations_per_rome=2)
         job_seeker = JobSeekerFactory()
         job_application = JobApplicationSentByJobSeekerFactory(
@@ -1502,35 +1503,40 @@ class JobApplicationCsvExportTest(TestCase):
         # The accept transition above will create a valid PASS IAE for the job seeker.
         assert job_seeker.approvals.last().is_valid
 
-        csv_output = io.StringIO()
-        generate_csv_export(JobApplication.objects, csv_output)
-        self.maxDiff = None
-        assert job_seeker.first_name in csv_output.getvalue()
-        assert job_seeker.last_name in csv_output.getvalue()
-        assert job_seeker.first_name in csv_output.getvalue()
-        assert job_seeker.last_name in csv_output.getvalue()
-        assert job_seeker.email in csv_output.getvalue()
-        assert job_seeker.phone in csv_output.getvalue()
-        assert job_seeker.birthdate.strftime("%d/%m/%Y") in csv_output.getvalue()
-        assert job_seeker.city in csv_output.getvalue()
-        assert job_seeker.post_code in csv_output.getvalue()
-        assert job_application.to_siae.display_name in csv_output.getvalue()
-        assert job_application.to_siae.kind in csv_output.getvalue()
-        assert job_application.selected_jobs.first().display_name in csv_output.getvalue()
-        assert "Candidature spontanée" in csv_output.getvalue()
-        assert job_application.created_at.strftime("%d/%m/%Y") in csv_output.getvalue()
-        assert job_application.hiring_start_at.strftime("%d/%m/%Y") in csv_output.getvalue()
-        assert job_application.hiring_end_at.strftime("%d/%m/%Y") in csv_output.getvalue()
-        assert "oui" in csv_output.getvalue()  # Eligibility status.
-        assert job_application.approval.number in csv_output.getvalue()
-        assert job_application.approval.start_at.strftime("%d/%m/%Y") in csv_output.getvalue()
-        assert job_application.approval.end_at.strftime("%d/%m/%Y") in csv_output.getvalue()
+        response = stream_xlsx_export(JobApplication.objects.all(), "filename")
+        assert get_rows_from_streaming_response(response) == [
+            JOB_APPLICATION_CSV_HEADERS,
+            [
+                job_seeker.last_name,
+                job_seeker.first_name,
+                job_seeker.email,
+                job_seeker.phone,
+                job_seeker.birthdate.strftime("%d/%m/%Y"),
+                job_seeker.city,
+                job_seeker.post_code,
+                job_application.to_siae.display_name,
+                str(job_application.to_siae.kind),
+                " ".join(a.display_name for a in job_application.selected_jobs.all()),
+                "Candidature spontanée",
+                "",
+                job_application.sender.get_full_name(),
+                job_application.created_at.strftime("%d/%m/%Y"),
+                "Candidature acceptée",
+                job_application.hiring_start_at.strftime("%d/%m/%Y"),
+                job_application.hiring_end_at.strftime("%d/%m/%Y"),
+                "",  # no reafusal reason
+                "oui",  # Eligibility status.
+                job_application.approval.number,
+                job_application.approval.start_at.strftime("%d/%m/%Y"),
+                job_application.approval.end_at.strftime("%d/%m/%Y"),
+            ],
+        ]
 
-    def test_refused_job_application_has_reason_in_csv_export(self):
-        user = JobSeekerFactory()
+    def test_refused_job_application_has_reason_in_xlsx_export(self):
+        job_seeker = JobSeekerFactory()
         kwargs = {
-            "job_seeker": user,
-            "sender": user,
+            "job_seeker": job_seeker,
+            "sender": job_seeker,
             "sender_kind": SenderKind.JOB_SEEKER,
             "refusal_reason": RefusalReason.DID_NOT_COME,
         }
@@ -1538,11 +1544,34 @@ class JobApplicationCsvExportTest(TestCase):
         job_application = JobApplicationFactory(state=JobApplicationWorkflow.STATE_PROCESSING, **kwargs)
         job_application.refuse()
 
-        csv_output = io.StringIO()
-        generate_csv_export(JobApplication.objects, csv_output)
-
-        assert "Candidature déclinée" in csv_output.getvalue()
-        assert "Candidat non joignable" in csv_output.getvalue()
+        response = stream_xlsx_export(JobApplication.objects.all(), "filename")
+        assert get_rows_from_streaming_response(response) == [
+            JOB_APPLICATION_CSV_HEADERS,
+            [
+                job_seeker.last_name,
+                job_seeker.first_name,
+                job_seeker.email,
+                job_seeker.phone,
+                job_seeker.birthdate.strftime("%d/%m/%Y"),
+                job_seeker.city,
+                job_seeker.post_code,
+                job_application.to_siae.display_name,
+                str(job_application.to_siae.kind),
+                " ".join(a.display_name for a in job_application.selected_jobs.all()),
+                "Candidature spontanée",
+                "",
+                job_application.sender.get_full_name(),
+                job_application.created_at.strftime("%d/%m/%Y"),
+                "Candidature déclinée",
+                job_application.hiring_start_at.strftime("%d/%m/%Y"),
+                job_application.hiring_end_at.strftime("%d/%m/%Y"),
+                "Candidat non joignable",
+                "non",
+                "",
+                "",
+                "",
+            ],
+        ]
 
 
 class JobApplicationAdminFormTest(TestCase):

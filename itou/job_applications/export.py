@@ -1,6 +1,5 @@
-import csv
-
 from itou.job_applications.enums import SenderKind
+from itou.utils.export import to_streaming_response
 
 
 JOB_APPLICATION_CSV_HEADERS = [
@@ -79,10 +78,7 @@ def _get_readable_sender_kind(job_application):
     return kind
 
 
-def _job_application_as_dict(job_application):
-    """
-    The main CSV export mthod: it converts a JobApplication into a CSV array data
-    """
+def _serialize_job_application(job_application):
     job_seeker = job_application.job_seeker
     siae = job_application.to_siae
 
@@ -95,41 +91,44 @@ def _job_application_as_dict(job_application):
         approval_start_date = approval.start_at
         approval_end_date = approval.end_at
 
-    return {
-        "Nom candidat": job_seeker.last_name,
-        "Prénom candidat": job_seeker.first_name,
-        "Email candidat": job_seeker.email,
-        "Téléphone candidat": job_seeker.phone,
-        "Date de naissance candidat": _format_date(job_seeker.birthdate),
-        "Ville candidat": job_seeker.city,
-        "Département candidat": job_seeker.post_code,
-        "Nom structure employeur": siae.display_name,
-        "Type employeur": siae.kind,
-        "Métiers": _get_selected_jobs(job_application),
-        "Source de la candidature": _get_readable_sender_kind(job_application),
-        "Nom organisation prescripteur": _get_prescriber_orgname(job_application),
-        "Nom utilisateur prescripteur": _get_prescriber_username(job_application),
-        "Date de la candidature": _format_date(job_application.created_at),
-        "Statut de la candidature": job_application.get_state_display(),
-        "Dates de début d’embauche": _format_date(job_application.hiring_start_at),
-        "Dates de fin d’embauche": _format_date(job_application.hiring_end_at),
-        "Motifs de refus": job_application.get_refusal_reason_display(),
-        "Éligibilité IAE validée": _get_eligibility_status(job_application),
-        "Numéro PASS IAE": numero_pass_iae,
-        "Début PASS IAE": _format_date(approval_start_date),
-        "Fin PASS IAE": _format_date(approval_end_date),
-    }
+    return [
+        job_seeker.last_name,
+        job_seeker.first_name,
+        job_seeker.email,
+        job_seeker.phone,
+        _format_date(job_seeker.birthdate),
+        job_seeker.city,
+        job_seeker.post_code,
+        siae.display_name,
+        siae.kind,
+        _get_selected_jobs(job_application),
+        _get_readable_sender_kind(job_application),
+        _get_prescriber_orgname(job_application),
+        _get_prescriber_username(job_application),
+        _format_date(job_application.created_at),
+        job_application.get_state_display(),
+        _format_date(job_application.hiring_start_at),
+        _format_date(job_application.hiring_end_at),
+        job_application.get_refusal_reason_display(),
+        _get_eligibility_status(job_application),
+        numero_pass_iae,
+        _format_date(approval_start_date),
+        _format_date(approval_end_date),
+    ]
 
 
-def generate_csv_export(job_applications, stream):
+def _job_applications_serializer(queryset):
+    return [_serialize_job_application(job_application) for job_application in queryset]
+
+
+def stream_xlsx_export(job_applications, filename):
     """
-    Takes a list of job application, converts them to CSV and writes them in the provided stream
+    Takes a list of job application, converts them to XLSX and writes them in the provided stream
     The stream can be for instance an http response, a string (io.StringIO()) or a file
     """
-
-    rows = [_job_application_as_dict(job_application) for job_application in job_applications.iterator()]
-
-    writer = csv.DictWriter(stream, quoting=csv.QUOTE_ALL, fieldnames=JOB_APPLICATION_CSV_HEADERS)
-
-    writer.writeheader()
-    writer.writerows(rows)
+    return to_streaming_response(
+        job_applications,
+        filename,
+        JOB_APPLICATION_CSV_HEADERS,
+        _job_applications_serializer,
+    )
