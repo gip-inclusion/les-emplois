@@ -66,10 +66,6 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
     the platform has to create missing users and deliver brand new PASS IAE.
     AI employees list was provided by the ASP in a CSV file.
 
-    A fixed creation date (settings.AI_EMPLOYEES_STOCK_IMPORT_DATE) allows us to retrieve objects
-    created by this script.
-    See Approval.is_from_ai_stock for example.
-
     This is what this script does:
     1/ Parse a file provided by the ASP.
     2/ Clean data.

@@ -5,6 +5,7 @@ from operator import attrgetter
 from django.conf import settings
 from django.utils import timezone
 
+from itou.approvals.enums import Origin
 from itou.approvals.models import Approval
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
@@ -181,26 +182,9 @@ def get_establishment_is_active_column():
     ]
 
 
-def _get_ai_stock_approvals():
-    return Approval.objects.select_related("created_by").filter(
-        created_by__email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL,
-        created_at__date=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE.date(),
-    )
-
-
-@functools.cache
-def get_ai_stock_approval_pks():
-    """
-    As of June 2022 we have exactly 71205 approvals from the AI stock and exactly the same number of job seekers.
-    This number is supposed to stay constant over time, there is no reason for it to grow.
-    We load all 71k pks once and for all in memory for performance reasons.
-    """
-    return _get_ai_stock_approvals().values_list("pk", flat=True).distinct()
-
-
 @functools.cache
 def get_ai_stock_job_seeker_pks():
-    return _get_ai_stock_approvals().values_list("user_id", flat=True).distinct()
+    return Approval.objects.filter(origin=Origin.AI_STOCK).values_list("user_id", flat=True).distinct()
 
 
 @functools.cache

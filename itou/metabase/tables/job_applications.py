@@ -1,12 +1,6 @@
-from itou.job_applications.enums import SenderKind
+from itou.job_applications.enums import Origin, SenderKind
 from itou.job_applications.models import JobApplicationWorkflow
-from itou.metabase.tables.utils import (
-    MetabaseTable,
-    get_ai_stock_approval_pks,
-    get_choice,
-    get_department_and_region_columns,
-    hash_content,
-)
+from itou.metabase.tables.utils import MetabaseTable, get_choice, get_department_and_region_columns, hash_content
 from itou.prescribers.enums import PrescriberOrganizationKind
 
 
@@ -273,7 +267,7 @@ TABLE.add_columns(
             "name": "injection_ai",
             "type": "boolean",
             "comment": "Provient des injections AI",
-            "fn": lambda o: o.approval_id in get_ai_stock_approval_pks(),
+            "fn": lambda o: o.origin == Origin.AI_STOCK,
         },
         {
             "name": "mode_attribution_pass_iae",

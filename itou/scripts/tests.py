@@ -11,10 +11,11 @@ from django.conf import settings
 from django.core import management
 from django.test import TransactionTestCase
 
+from itou.approvals import enums as approvals_enums
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.approvals.models import Approval, PoleEmploiApproval
 from itou.asp.factories import CommuneFactory
-from itou.job_applications.enums import SenderKind
+from itou.job_applications.enums import Origin, SenderKind
 from itou.job_applications.factories import JobApplicationFactory, JobApplicationSentBySiaeFactory
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.scripts.management.commands.import_ai_employees import (
@@ -545,7 +546,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         assert approval.end_at == datetime.date(2023, 11, 30)
         assert approval.created_by.pk == developer.pk
         assert approval.created_at == settings.AI_EMPLOYEES_STOCK_IMPORT_DATE
-        assert approval.is_from_ai_stock
+        assert approval.origin == approvals_enums.Origin.AI_STOCK
 
         # Clean
         job_seeker.delete()
@@ -706,7 +707,7 @@ class ImportAiEmployeesManagementCommandTest(TestCase):
         assert new_job_application.approval.pk == approval.pk
         assert not JobApplication.objects.filter(pk=job_application.pk).exists()
         assert not new_job_application.can_be_cancelled
-        assert new_job_application.is_from_ai_stock
+        assert new_job_application.origin == Origin.AI_STOCK
         assert JobApplication.objects.count() == 1
         job_application.job_seeker.delete()
 

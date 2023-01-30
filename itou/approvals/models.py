@@ -73,10 +73,6 @@ class CommonApprovalMixin(models.Model):
         return now > self.waiting_period_end
 
     @property
-    def originates_from_itou(self):
-        return self.number.startswith(Approval.ASP_ITOU_PREFIX)
-
-    @property
     def is_pass_iae(self):
         """
         Returns True if the approval has been issued by Itou, False otherwise.
@@ -334,21 +330,6 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
     @cached_property
     def can_be_suspended(self):
         return self.is_in_progress and not self.is_suspended
-
-    @property
-    def is_from_ai_stock(self):
-        """On November 30th, 2021, AI were delivered approvals without a diagnosis.
-        See itou.users.management.commands.import_ai_employees.
-        """
-        # Avoid a circular import.
-        user_manager = self.user._meta.model.objects
-        developer_qs = user_manager.filter(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
-        if not developer_qs:
-            return False
-        developer = developer_qs.first()
-        return (
-            self.created_by == developer and self.created_at.date() == settings.AI_EMPLOYEES_STOCK_IMPORT_DATE.date()
-        )
 
     def can_be_suspended_by_siae(self, siae):
         # Only the SIAE currently hiring the job seeker can suspend a PASS IAE.

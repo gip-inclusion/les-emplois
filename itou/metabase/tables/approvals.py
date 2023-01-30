@@ -3,14 +3,9 @@ from datetime import datetime
 
 from django.conf import settings
 
+from itou.approvals.enums import Origin
 from itou.approvals.models import Approval, PoleEmploiApproval
-from itou.metabase.tables.utils import (
-    MetabaseTable,
-    get_ai_stock_approval_pks,
-    get_department_and_region_columns,
-    get_hiring_siae,
-    hash_content,
-)
+from itou.metabase.tables.utils import MetabaseTable, get_department_and_region_columns, get_hiring_siae, hash_content
 from itou.prescribers.models import PrescriberOrganization
 
 
@@ -132,7 +127,7 @@ TABLE.add_columns(
             "name": "injection_ai",
             "type": "boolean",
             "comment": "Provient des injections AI",
-            "fn": lambda o: o.pk in get_ai_stock_approval_pks() if isinstance(o, Approval) else False,
+            "fn": lambda o: o.origin == Origin.AI_STOCK,
         },
         {
             "name": "hash_numéro_pass_iae",

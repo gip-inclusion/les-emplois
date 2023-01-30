@@ -45,7 +45,7 @@ Arguments:
     </p>
 {% endif %}
 
-{% if job_application.created_from_pe_approval %}
+{% if job_application.origin == JobApplicationOrigin.PE_APPROVAL %}
     <p>Ce PASS IAE a été importé depuis un agrément Pôle emploi.</p>
 {% endif %}
 

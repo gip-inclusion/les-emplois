@@ -138,22 +138,25 @@ class ApprovalPrintableDisplay(ApprovalBaseViewMixin, TemplateView):
             if diagnosis_author_org:
                 diagnosis_author_org_name = diagnosis_author_org.display_name
 
-        if not diagnosis and approval.originates_from_itou:
+        if (
+            not diagnosis
+            and approval.origin in [approvals_enums.Origin.ADMIN, approvals_enums.Origin.DEFAULT]
+            and job_application.origin != Origin.AI_STOCK
+        ):
             # On November 30th, 2021, AI were delivered a PASS IAE
             # without a diagnosis for all of their employees.
             # We want to raise an error if the approval of the pass originates from our side, but
             # is not from the AI stock, as it should not happen.
             # We may have to add conditions there in case of new mass imports.
-            if not approval.is_from_ai_stock and not job_application.is_from_ai_stock:
-                # Keep track of job applications without a proper eligibility diagnosis because
-                # it shouldn't happen.
-                # If this occurs too much we may have to change `can_display_approval()`
-                # and investigate a lot more about what's going on.
-                raise Exception(
-                    f"Approval={approval.pk} cannot be rendered because "
-                    f"JobApplication={job_application.pk} "
-                    "had no eligibility diagnosis and also was not mass-imported."
-                )
+            # Keep track of job applications without a proper eligibility diagnosis because
+            # it shouldn't happen.
+            # If this occurs too much we may have to change `can_display_approval()`
+            # and investigate a lot more about what's going on.
+            raise Exception(
+                f"Approval={approval.pk} cannot be rendered because "
+                f"JobApplication={job_application.pk} "
+                "had no eligibility diagnosis and also was not mass-imported."
+            )
 
         context.update(
             {
@@ -435,7 +438,6 @@ def pe_approval_create(request, pe_approval_id):
             to_siae=siae,
             state=JobApplicationWorkflow.STATE_ACCEPTED,
             approval=approval_from_pe,
-            created_from_pe_approval=True,  # This flag is specific to this process.
             origin=Origin.PE_APPROVAL,  # This origin is specific to this process.
             sender=request.user,
             sender_kind=SenderKind.SIAE_STAFF,

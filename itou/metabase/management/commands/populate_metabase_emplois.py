@@ -34,7 +34,7 @@ from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import EligibilityDiagnosis
-from itou.job_applications.enums import SenderKind
+from itou.job_applications.enums import Origin, SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.jobs.models import Rome
 from itou.metabase.dataframes import get_df_from_rows, store_df
@@ -179,8 +179,7 @@ class Command(BaseCommand):
         of prescriber users *without* any organization.
         """
         active_user_created_job_applications_filter = Q(
-            jobapplication__created_from_pe_approval=False,
-            jobapplication__to_siae_id__in=get_active_siae_pks(),
+            ~Q(jobapplication__origin=Origin.PE_APPROVAL) & Q(jobapplication__to_siae_id__in=get_active_siae_pks())
         )
         job_applications_count = Count(
             "jobapplication",
@@ -248,7 +247,8 @@ class Command(BaseCommand):
                 "approval_id",
                 "approval_delivery_mode",
             )
-            .filter(created_from_pe_approval=False, to_siae_id__in=get_active_siae_pks())
+            .exclude(origin=Origin.PE_APPROVAL)
+            .filter(to_siae_id__in=get_active_siae_pks())
             .all()
         )
 
@@ -259,7 +259,8 @@ class Command(BaseCommand):
         Populate associations between job applications and job descriptions.
         """
         queryset = (
-            JobApplication.objects.filter(created_from_pe_approval=False, to_siae_id__in=get_active_siae_pks())
+            JobApplication.objects.exclude(origin=Origin.PE_APPROVAL)
+            .filter(to_siae_id__in=get_active_siae_pks())
             .exclude(selected_jobs=None)
             .values("pk", "selected_jobs__id")
         )

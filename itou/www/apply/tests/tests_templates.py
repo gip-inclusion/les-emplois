@@ -3,6 +3,7 @@ from django.template import Context, Template
 from django.test.client import RequestFactory
 from django.utils.html import escape
 
+from itou.job_applications.enums import Origin
 from itou.job_applications.factories import JobApplicationSentBySiaeFactory
 from itou.users.factories import JobSeekerWithAddressFactory, SiaeStaffFactory
 from itou.utils.enums_context_processors import expose_enums
@@ -41,7 +42,7 @@ def test_job_application_imported_from_pe_in_list():
     rendered = tmpl.render(
         Context(
             {
-                "job_application": JobApplicationSentBySiaeFactory(created_from_pe_approval=True),
+                "job_application": JobApplicationSentBySiaeFactory(origin=Origin.PE_APPROVAL),
                 "request": get_request(),
                 **expose_enums(),
             }

@@ -42,7 +42,7 @@ class ManualApprovalDeliveryRequiredFilter(admin.SimpleListFilter):
 @admin.register(models.JobApplication)
 class JobApplicationAdmin(admin.ModelAdmin):
     form = JobApplicationAdminForm
-    list_display = ("pk", "state", "sender_kind", "created_at")
+    list_display = ("pk", "job_seeker", "state", "sender_kind", "created_at")
     raw_id_fields = (
         "job_seeker",
         "eligibility_diagnosis",
@@ -63,7 +63,7 @@ class JobApplicationAdmin(admin.ModelAdmin):
         "approval_delivery_mode",
         "sender_prescriber_organization__is_authorized",
         "to_siae__department",
-        "created_from_pe_approval",
+        "origin",
     )
     readonly_fields = (
         "created_at",

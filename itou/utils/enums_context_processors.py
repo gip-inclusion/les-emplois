@@ -1,3 +1,4 @@
+import itou.approvals.enums as approvals_enums
 import itou.job_applications.enums as job_aplication_enums
 
 
@@ -8,5 +9,7 @@ def expose_enums(*args):
     """
 
     return {
+        "ApprovalOrigin": approvals_enums.Origin,
+        "JobApplicationOrigin": job_aplication_enums.Origin,
         "SenderKind": job_aplication_enums.SenderKind,
     }

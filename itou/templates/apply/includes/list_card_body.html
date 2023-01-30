@@ -40,7 +40,7 @@
                     <br>
                     <small>
                         <span class="badge badge-info">
-                            {% if job_application.created_from_pe_approval %}
+                            {% if job_application.origin == JobApplicationOrigin.PE_APPROVAL %}
                                 Import agrément Pôle emploi
                             {% else %}
                                 Auto-prescription

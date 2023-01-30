@@ -10,7 +10,7 @@
 
         {% if approval.is_pass_iae %}
             <div class="alert alert-danger" role="status">
-                {% if approval.originates_from_itou %}
+                {% if approval.origin != ApprovalOrigin.PE_APPROVAL %}
                     <p class="mb-0">
                         Le numéro <strong>{{ approval.number }}</strong> correspond à un PASS IAE.
                     </p>
