@@ -1567,7 +1567,6 @@ class JobApplicationAdminFormTest(TestCase):
             "hiring_start_at",
             "hiring_end_at",
             "hiring_without_approval",
-            "created_from_pe_approval",
             "origin",
             "approval",
             "approval_delivery_mode",
