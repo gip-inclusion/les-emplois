@@ -80,6 +80,9 @@ httpx  # https://github.com/encode/httpx/
 paramiko==2.8.1  # https://github.com/paramiko/paramiko
 pysftp==0.2.9  # https://bitbucket.org/dundeemt/pysftp/src/master/
 
+# Stream XLSX files
+xlsx_streaming  # https://github.com/Polyconseil/xlsx_streaming
+
 # Add Content Security Policy headers
 django-csp
 

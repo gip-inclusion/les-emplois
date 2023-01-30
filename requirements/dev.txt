@@ -1318,6 +1318,10 @@ xlrd==2.0.1 \
     # via
     #   -r requirements/base.txt
     #   tablib
+xlsx-streaming==1.1.0 \
+    --hash=sha256:6c1a040ccbebbe7ea1d5d54180ae9b2972112f74303c13fc266812cd98c8b826 \
+    --hash=sha256:c12d21653d2d77ead622b49deb30c8a5921ff3be6c1e4ac2540a8ead8c64f7b7
+    # via -r requirements/base.txt
 xlwt==1.3.0 \
     --hash=sha256:a082260524678ba48a297d922cc385f58278b8aa68741596a87de01a9c628b2e \
     --hash=sha256:c59912717a9b28f1a3c2a98fd60741014b06b043936dcecbc113eaaada156c88
@@ -1330,3 +1334,8 @@ xworkflows==1.1.0 \
     # via
     #   -r requirements/base.txt
     #   django-xworkflows
+zipstream==1.1.4 \
+    --hash=sha256:2ef24b9150c93429b172750c4890b5ab28c1317892e11727afeff986ad2a3506
+    # via
+    #   -r requirements/base.txt
+    #   xlsx-streaming
