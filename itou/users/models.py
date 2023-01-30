@@ -434,7 +434,7 @@ class User(AbstractUser, AddressMixin):
 
     @property
     def has_sso_provider(self):
-        return self.identity_provider != IdentityProvider.DJANGO or self.is_peamu
+        return self.identity_provider != IdentityProvider.DJANGO
 
     @cached_property
     def has_verified_email(self):
@@ -565,14 +565,8 @@ class User(AbstractUser, AddressMixin):
         return False
 
     @cached_property
-    def is_peamu(self):
-        social_accounts = self.socialaccount_set.all()
-        # We have to do all this in python to benefit from prefetch_related.
-        return len([sa for sa in social_accounts if sa.provider == "peamu"]) >= 1
-
-    @cached_property
     def peamu_id_token(self):
-        if not self.is_peamu:
+        if self.identity_provider != IdentityProvider.PE_CONNECT:
             return None
         return self.socialaccount_set.filter(provider="peamu").get().extra_data["id_token"]
 

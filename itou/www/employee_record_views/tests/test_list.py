@@ -258,7 +258,6 @@ class ListEmployeeRecordsTest(TestCase):
         num_queries += 1  # Select ordered job applications
         num_queries += 1  # Select EmployeeRecords
         num_queries += 1  # Select siae members
-        num_queries += 1  # Get user social_account
         with self.assertNumQueries(num_queries):
             self.client.get(self.url)
 

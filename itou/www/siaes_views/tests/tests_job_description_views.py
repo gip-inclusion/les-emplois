@@ -426,7 +426,6 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
             + 1  # fetch siaes infos
             + 1  # fetch prescribers_prescribermembership/organization
             + 1  # fetch jobappelation
-            + 1  # weird fetch social account
             + 1  # fetch other job infos
         ):
             response = self.client.get(self.url)

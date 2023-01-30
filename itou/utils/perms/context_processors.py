@@ -1,6 +1,7 @@
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 
+from itou.users.enums import IdentityProvider
 from itou.utils import constants as global_constants
 
 
@@ -144,7 +145,11 @@ def user_to_account_type(user):
     if user.is_job_seeker:
         return {
             "account_type": "job_seeker",
-            "account_sub_type": "job_seeker_with_peconnect" if user.is_peamu else "job_seeker_without_peconnect",
+            "account_sub_type": (
+                "job_seeker_with_peconnect"
+                if user.identity_provider == IdentityProvider.PE_CONNECT
+                else "job_seeker_without_peconnect"
+            ),
         }
     elif user.is_siae_staff:
         return {
