@@ -8,7 +8,7 @@ class Command(BaseCommand):
     Export all valid approvals (PASS IAE, not Pole emploi) to an Excel file.
 
     This file is:
-    * named 'export_pass_iae_MMDDYYY_HHMINSEC.xslx' (datetime of export)
+    * named 'export_pass_iae_MMDDYYY_HHMINSEC.xlsx' (datetime of export)
     * put in the 'exports' folder
 
     There is no optional argument at the moment.
