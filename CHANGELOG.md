@@ -1,5 +1,32 @@
 # Journal des modifications
 
+## [55] - 2023-01-23
+
+### Ajouté
+
+- Automatisation : Mise à jour des villes
+- Fiches salariés : ajout d'un bandeau d'information pour les SIAEs ayant une convention active sans annexe financière
+- Fiches salariés : ajout des informations d'horodatage ASP
+- Parcours d'embauche : Possibilité de renseigner le numéro de sécurité sociale ou la raison de son absence
+- UI : Ajout d'un bandeau de promotion de DORA dans le tableau de bord
+
+### Modifié
+
+- Admin : cacher les boutons de validation/refus des habilitations au support externe
+- Admin : plus de granularité sur certains messages des PASS IAE et des fiches salariés
+- Contrôle a posteriori : Exclusion des SIAE dont le controle est terminé du rappel en phase contradictoire
+- Contrôle a posteriori : Notifier les DDETS quand les SIAE attendent les sanctions
+- Fiches salariés : Correction pour le message d'information d'actualisation
+- Matomo : améliorations de stabilisation
+- Metabase : améliorations et corrections diverses
+- Parcours d'embauche : les orienteurs n'ont plus accès aux informations personnelles des candidats
+- RGPD : Prendre en compte les choix de tracking & cookies de l'utilisateur
+- Recherche de postes : suppression du badge du nombre de postes ouverts si le recrutement est fermé
+- Thème : mise à jour vers la version 0.5.7
+- UI : Mise à jour de l'URL de la communauté
+- UI : amélioration des cartes SIAE
+- UI : amélioration des onglets avec résultats des recherches
+
 ## [54] - 2023-01-16
 
 ### Ajouté
