@@ -13,6 +13,7 @@ from itou.siae_evaluations.factories import (
 )
 from itou.siaes.factories import SiaeMembershipFactory
 from itou.users.factories import ItouStaffFactory
+from itou.utils.testing import get_rows_from_streaming_response
 
 
 class TestEvaluationCampaignAdmin:
@@ -61,6 +62,12 @@ class TestEvaluationCampaignAdmin:
             reviewed_at=timezone.now() - relativedelta(days=2),
             final_reviewed_at=timezone.now() - relativedelta(days=1),
         )
+        EvaluatedSiaeFactory(
+            evaluation_campaign=campaign4,
+            siae__name="les machins le retour",
+            siae__convention__siret_signature="22222222200033",
+            siae__phone="0633333333",
+        )
         campaign4_jobapp = EvaluatedJobApplicationFactory.create(evaluated_siae=campaign4_siae)
         EvaluatedAdministrativeCriteriaFactory(
             evaluated_job_application=campaign4_jobapp,
@@ -78,14 +85,11 @@ class TestEvaluationCampaignAdmin:
             + 1  # Load user
             + 1  # Count the filtered results (paginator)
             + 1  # Count the full results
-            + 1  # Fetch evaluation campaigns
-            + 1  # Prefetch evaluated siaes
-            + 1  # Prefetch job applications
-            + 1  # Prefetch administrative criteria
-            + 1  # Prefetch siaes
+            + 1  # Fetch evaluated siae and related evaludation_campaign, siae, convention
+            + 1  # Prefetch evaludated job applications
+            + 1  # Prefetch corresponding administrative criteria
             + 1  # Prefetch siae memberships
             + 1  # Prefetch users of siae memberships
-            + 1  # Prefetch siae conventions
         ):
             response = client.post(
                 reverse("admin:siae_evaluations_evaluationcampaign_changelist"),
@@ -101,25 +105,82 @@ class TestEvaluationCampaignAdmin:
                     ],
                 },
             )
+            excel_export = get_rows_from_streaming_response(response)
         assert response.status_code == 200
-        assert response["Content-Type"] == "text/csv"
+        assert response["Content-Type"] == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         assert (
             response["Content-Disposition"]
-            == 'attachment; filename="export-siaes-campagnes-2022-12-07T11-11-00+00-00.csv"'
+            == 'attachment; filename="export-siaes-campagnes-2022-12-07T11-11-00+00-00.xlsx"'
         )
-        assert response.content.decode(response.charset) == (
-            "Campagne,SIRET signature,Type,Nom,Département,Emails administrateurs,Numéro de téléphone,"
-            "État du contrôle,Phase du contrôle\r\n"
+        assert excel_export == [
+            [
+                "Campagne",
+                "SIRET signature",
+                "Type",
+                "Nom",
+                "Département",
+                "Emails administrateurs",
+                "Numéro de téléphone",
+                "État du contrôle",
+                "Phase du contrôle",
+            ],
             # campaign1
-            "Contrôle 01/01/2022,00000000000032,EI,les jardins,14,"
-            '"campaign1+1@beta.gouv.fr, campaign1+2@beta.gouv.fr",,PENDING,Phase amiable\r\n'
+            [
+                "Contrôle 01/01/2022",
+                "00000000000032",
+                "EI",
+                "les jardins",
+                "14",
+                "campaign1+1@beta.gouv.fr, campaign1+2@beta.gouv.fr",
+                "",
+                "PENDING",
+                "Phase amiable",
+            ],
             # campaign2
-            "Contrôle 01/01/2021,12345678900032,EI,les trucs du bazar,14,"
-            "campaign2@beta.gouv.fr,0612345678,PENDING,Phase contradictoire\r\n"
+            [
+                "Contrôle 01/01/2021",
+                "12345678900032",
+                "EI",
+                "les trucs du bazar",
+                "14",
+                "campaign2@beta.gouv.fr",
+                "0612345678",
+                "PENDING",
+                "Phase contradictoire",
+            ],
             # campaign3
-            "Contrôle 01/01/2019,11111111100032,EI,les bidules,14,"
-            "campaign3@beta.gouv.fr,0611111111,REFUSED,Campagne terminée\r\n"
+            [
+                "Contrôle 01/01/2019",
+                "11111111100032",
+                "EI",
+                "les bidules",
+                "14",
+                "campaign3@beta.gouv.fr",
+                "0611111111",
+                "REFUSED",
+                "Campagne terminée",
+            ],
             # campaign4
-            "Contrôle 01/01/2018,22222222200032,EI,les machins,14,"
-            "campaign4@beta.gouv.fr,0622222222,ACCEPTED,Contrôle terminé\r\n"
-        )
+            [
+                "Contrôle 01/01/2018",
+                "22222222200032",
+                "EI",
+                "les machins",
+                "14",
+                "campaign4@beta.gouv.fr",
+                "0622222222",
+                "ACCEPTED",
+                "Contrôle terminé",
+            ],
+            [
+                "Contrôle 01/01/2018",
+                "22222222200033",
+                "EI",
+                "les machins le retour",
+                "14",
+                "",
+                "0633333333",
+                "PENDING",
+                "Phase amiable",
+            ],
+        ]
