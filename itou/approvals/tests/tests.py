@@ -5,7 +5,6 @@ from unittest import mock
 
 import pytest
 from dateutil.relativedelta import relativedelta
-from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
@@ -167,12 +166,6 @@ class CommonApprovalMixinTest(TestCase):
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         assert not approval.is_valid()
         assert not approval.is_in_waiting_period
-
-    def test_originates_from_itou(self):
-        approval = ApprovalFactory(number="XXXXX0000001")
-        assert approval.originates_from_itou
-        approval = PoleEmploiApprovalFactory(number="625741810182")
-        assert not approval.originates_from_itou
 
     def test_is_pass_iae(self):
         # PoleEmploiApproval.
@@ -339,19 +332,6 @@ class ApprovalModelTest(TestCase):
         approval = user.get_or_create_approval()
         assert isinstance(approval, Approval)
         assert approval == valid_approval
-
-    def test_is_from_ai_stock(self):
-        approval_created_at = settings.AI_EMPLOYEES_STOCK_IMPORT_DATE
-        developer = ItouStaffFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
-
-        approval = ApprovalFactory()
-        assert not approval.is_from_ai_stock
-
-        approval = ApprovalFactory(created_at=approval_created_at)
-        assert not approval.is_from_ai_stock
-
-        approval = ApprovalFactory(created_at=approval_created_at, created_by=developer)
-        assert approval.is_from_ai_stock
 
     def test_is_open_to_application_process_with_suspension(self):
         today = timezone.localdate()
@@ -1005,11 +985,9 @@ class SuspensionModelTest(TestCase):
         job_application_1 = JobApplicationFactory(with_approval=True, hiring_start_at=today)
         job_application_2 = JobApplicationFactory(with_approval=True, hiring_start_at=start_at)
         job_application_3 = JobApplicationFactory(
-            with_approval=True, hiring_start_at=start_at, created_from_pe_approval=True
+            with_approval=True, hiring_start_at=start_at, origin=Origin.PE_APPROVAL
         )
-        job_application_4 = JobApplicationFactory(
-            with_approval=True, hiring_start_at=None, created_from_pe_approval=True
-        )
+        job_application_4 = JobApplicationFactory(with_approval=True, hiring_start_at=None, origin=Origin.PE_APPROVAL)
 
         # TODO: must be checked with PO
         # - empty hiring start date

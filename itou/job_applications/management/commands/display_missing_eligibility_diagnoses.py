@@ -1,8 +1,7 @@
-from django.conf import settings
 from django.core.management.base import BaseCommand
-from django.db.models import Q
 
-from itou.approvals.models import Approval
+from itou.approvals import enums as approvals_enums
+from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS
 
@@ -26,13 +25,11 @@ class Command(BaseCommand):
             JobApplication.objects.filter(
                 state=JobApplicationWorkflow.STATE_ACCEPTED,
                 eligibility_diagnosis=None,
-                approval__number__startswith=Approval.ASP_ITOU_PREFIX,
                 to_siae__kind__in=SIAE_WITH_CONVENTION_KINDS,
+                approval__isnull=False,
             )
-            .exclude(
-                Q(approval__created_by__isnull=True)
-                | Q(approval__created_by__email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
-            )
+            .exclude(origin=job_applications_enums.Origin.AI_STOCK)
+            .exclude(approval__origin__in=[approvals_enums.Origin.AI_STOCK, approvals_enums.Origin.PE_APPROVAL])
             .order_by("approval__created_at")
         )
         if queryset.count() == 0:

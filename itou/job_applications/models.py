@@ -173,22 +173,17 @@ class JobApplicationQuerySet(models.QuerySet):
             accepted_at=Case(
                 # Mega Super duper special case to handle job applications created to generate AI's PASS IAE
                 When(
-                    approval_manually_delivered_by__email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL,
-                    created_at=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE,
+                    origin=Origin.AI_STOCK,
                     then=F("hiring_start_at"),
                 ),
-                When(created_from_pe_approval=True, then=F("created_at")),
+                When(origin=Origin.PE_APPROVAL, then=F("created_at")),
                 When(
-                    created_from_pe_approval=False,
                     state=JobApplicationWorkflow.STATE_ACCEPTED,
                     # A job_application created at the accepted status will
                     # not have transitions logs, fallback on created_at
                     then=Coalesce(created_at_from_transition, F("created_at")),
                 ),
-                When(
-                    created_from_pe_approval=False,
-                    then=created_at_from_transition,
-                ),
+                default=created_at_from_transition,
                 output_field=models.DateTimeField(),
             )
         )
@@ -531,7 +526,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     # The process allows to convert a `PoleEmploiApproval` into an `Approval`.
     # TODO(alaurent) remove when origin is set every where
     created_from_pe_approval = models.BooleanField(
-        default=False, verbose_name="Candidature créée lors de l'import d'un agrément Pole Emploi"
+        default=False, verbose_name="Candidature créée lors de l'import d'un agrément Pole Emploi", null=True
     )
     origin = models.CharField(
         verbose_name="Origine de la candidature", max_length=30, choices=Origin.choices, default=Origin.DEFAULT
@@ -662,7 +657,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     @property
     def can_be_cancelled(self):
-        if self.is_from_ai_stock:
+        if self.origin == Origin.AI_STOCK:
             return False
         if self.hiring_start_at:
             # A job application can be canceled provided that
@@ -688,22 +683,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         return (
             self.state == JobApplicationWorkflow.STATE_REFUSED
             and self.refusal_reason == RefusalReason.DEACTIVATION.value
-        )
-
-    @property
-    def is_from_ai_stock(self):
-        """On November 30th, 2021, we created job applications to deliver approvals.
-        See itou.users.management.commands.import_ai_employees.
-        """
-        # Avoid a circular import.
-        user_manager = self.job_seeker._meta.model.objects
-        developer_qs = user_manager.filter(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
-        if not developer_qs:
-            return False
-        developer = developer_qs.first()
-        return (
-            self.approval_manually_delivered_by == developer
-            and self.created_at.date() == settings.AI_EMPLOYEES_STOCK_IMPORT_DATE.date()
         )
 
     @property

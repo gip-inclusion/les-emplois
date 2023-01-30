@@ -71,5 +71,6 @@ class RefusalReason(models.TextChoices):
 class Origin(models.TextChoices):
     DEFAULT = "default", "Créée normalement via les emplois"
     PE_APPROVAL = "pe_approval", "Créée lors d'un import d'Agrément Pole Emploi"
+    # On November 30th, 2021, AI were delivered approvals without a diagnosis.
     AI_STOCK = "ai_stock", "Créée lors de l'import du stock AI"
     ADMIN = "admin", "Créée depuis l'admin"

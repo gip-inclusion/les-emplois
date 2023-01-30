@@ -1,7 +1,6 @@
 import datetime
 
 import pytest
-from django.conf import settings
 from django.contrib.gis.geos import Point
 from django.core import management
 from django.db import connection
@@ -9,6 +8,7 @@ from django.utils import timezone
 from pytest_django.asserts import assertNumQueries
 
 from itou.analytics.factories import DatumFactory
+from itou.approvals.enums import Origin
 from itou.approvals.factories import ApprovalFactory
 from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.eligibility.models import AdministrativeCriteria
@@ -17,7 +17,7 @@ from itou.geo.utils import coords_to_geometry
 from itou.job_applications.factories import JobApplicationFactory
 from itou.siaes.factories import SiaeFactory
 from itou.users.enums import IdentityProvider
-from itou.users.factories import ItouStaffFactory, JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
+from itou.users.factories import JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
 
 
 @pytest.mark.django_db(transaction=True)
@@ -103,8 +103,7 @@ def test_populate_job_seekers():
     job_application_2 = JobApplicationFactory(
         with_approval=True,
         job_seeker=user_2,
-        approval__created_by=ItouStaffFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL),
-        approval__created_at=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE,
+        approval__origin=Origin.AI_STOCK,
     )
 
     job_application_2.eligibility_diagnosis.administrative_criteria.add(*list(AdministrativeCriteria.objects.all()))

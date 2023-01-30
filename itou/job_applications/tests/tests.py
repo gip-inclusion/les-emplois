@@ -16,7 +16,6 @@ from django.urls import reverse
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
 
-from itou.approvals.enums import Origin
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory, ProlongationFactory, SuspensionFactory
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
@@ -25,7 +24,7 @@ from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordFactory
 from itou.job_applications.admin_forms import JobApplicationAdminForm
 from itou.job_applications.csv_export import generate_csv_export
-from itou.job_applications.enums import RefusalReason, SenderKind
+from itou.job_applications.enums import Origin, RefusalReason, SenderKind
 from itou.job_applications.factories import (
     JobApplicationFactory,
     JobApplicationSentByJobSeekerFactory,
@@ -171,11 +170,7 @@ class JobApplicationModelTest(TestCase):
         assert not job_application_not_ok.can_be_cancelled
 
         # Comes from AI stock.
-        # See users.management.commands.import_ai_employees
-        developer = ItouStaffFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
-        job_application = JobApplicationFactory.build(
-            approval_manually_delivered_by=developer, created_at=settings.AI_EMPLOYEES_STOCK_IMPORT_DATE
-        )
+        job_application = JobApplicationFactory.build(origin=Origin.AI_STOCK)
         assert not job_application.can_be_cancelled
 
     def test_can_be_archived(self):
@@ -201,24 +196,6 @@ class JobApplicationModelTest(TestCase):
         for state in states_transition_possible:
             job_application = JobApplicationFactory(state=state)
             assert job_application.can_be_archived
-
-    def test_is_from_ai_stock(self):
-        job_application_created_at = settings.AI_EMPLOYEES_STOCK_IMPORT_DATE
-        developer = ItouStaffFactory(email=settings.AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL)
-
-        job_application = JobApplicationFactory.build()
-        assert not job_application.is_from_ai_stock
-
-        job_application = JobApplicationFactory.build(created_at=job_application_created_at)
-        assert not job_application.is_from_ai_stock
-
-        job_application = JobApplicationFactory.build(approval_manually_delivered_by=developer)
-        assert not job_application.is_from_ai_stock
-
-        job_application = JobApplicationFactory.build(
-            created_at=job_application_created_at, approval_manually_delivered_by=developer
-        )
-        assert job_application.is_from_ai_stock
 
     def test_candidate_has_employee_record(self):
 
@@ -528,7 +505,7 @@ class JobApplicationQuerySetTest(TestCase):
     def test_with_accepted_at_for_created_from_pe_approval(self):
         JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_ACCEPTED,
-            created_from_pe_approval=True,
+            origin=Origin.PE_APPROVAL,
         )
 
         job_application = JobApplication.objects.with_accepted_at().first()
@@ -562,7 +539,7 @@ class JobApplicationQuerySetTest(TestCase):
         assert JobApplication.objects.with_accepted_at().first().accepted_at == expected_created_at
 
     def test_with_accepted_at_default_value(self):
-        job_application = JobApplicationSentBySiaeFactory(created_from_pe_approval=False)
+        job_application = JobApplicationSentBySiaeFactory()
 
         assert JobApplication.objects.with_accepted_at().first().accepted_at is None
 
@@ -578,11 +555,11 @@ class JobApplicationQuerySetTest(TestCase):
         assert job_application.accepted_at == job_application.created_at
 
     def test_with_accepted_at_for_ai_stock(self):
-        JobApplicationFactory(is_from_ai_stock=True)
+        JobApplicationFactory(origin=Origin.AI_STOCK)
 
         job_application = JobApplication.objects.with_accepted_at().first()
         assert job_application.accepted_at.date() == job_application.hiring_start_at
-        assert job_application.accepted_at != settings.AI_EMPLOYEES_STOCK_IMPORT_DATE
+        assert job_application.accepted_at != job_application.created_at
 
 
 class JobApplicationNotificationsTest(TestCase):
@@ -1758,7 +1735,6 @@ class JobApplicationsEnumsTest(TestCase):
 
 
 class DisplayMissingEligibilityDiagnosesCommandTest(TestCase):
-    @override_settings(AI_EMPLOYEES_STOCK_DEVELOPER_EMAIL="foo@bar.com")
     def test_nominal(self):
         stdout = io.StringIO()
         user = ItouStaffFactory(email="batman@batcave.org")
