@@ -565,12 +565,6 @@ class User(AbstractUser, AddressMixin):
         return False
 
     @cached_property
-    def peamu_id_token(self):
-        if self.identity_provider != IdentityProvider.PE_CONNECT:
-            return None
-        return self.socialaccount_set.filter(provider="peamu").get().extra_data["id_token"]
-
-    @cached_property
     def is_prescriber_with_org(self):
         return self.is_prescriber and self.prescribermembership_set.filter(is_active=True).exists()
 

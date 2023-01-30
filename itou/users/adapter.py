@@ -5,6 +5,7 @@ from django.utils.http import urlencode
 
 from itou.openid_connect.france_connect.constants import FRANCE_CONNECT_SESSION_STATE, FRANCE_CONNECT_SESSION_TOKEN
 from itou.openid_connect.inclusion_connect.constants import INCLUSION_CONNECT_SESSION_KEY
+from itou.users.enums import IdentityProvider
 from itou.utils.urls import get_absolute_url, get_safe_url
 
 
@@ -52,8 +53,8 @@ class UserAdapter(DefaultAccountAdapter):
             fc_base_logout_url = reverse("france_connect:logout")
             redirect_url = f"{fc_base_logout_url}?{urlencode(params)}"
         # PE Connect
-        peamu_id_token = getattr(request.user, "peamu_id_token", None)
-        if peamu_id_token:
+        if getattr(request.user, "kind", None) == IdentityProvider.PE_CONNECT:
+            peamu_id_token = self.socialaccount_set.filter(provider="peamu").get().extra_data["id_token"]
             hp_url = get_absolute_url(reverse("home:hp"))
             params = {"id_token_hint": peamu_id_token, "redirect_uri": hp_url}
             redirect_url = f"{settings.PEAMU_AUTH_BASE_URL}/compte/deconnexion?{urlencode(params)}"
