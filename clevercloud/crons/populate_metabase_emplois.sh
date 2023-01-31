@@ -32,6 +32,7 @@ mkdir -p $OUTPUT_PATH
         django-admin send_slack_message ":rocket: lancement mise à jour de données peu fréquentes C1 -> Metabase"
         django-admin populate_metabase_emplois --mode=rome_codes
         django-admin populate_metabase_emplois --mode=insee_codes
+        django-admin populate_metabase_emplois --mode=insee_codes_vs_post_codes
         django-admin populate_metabase_emplois --mode=departments
         django-admin populate_metabase_emplois --mode=final_tables
         django-admin send_slack_message ":white_check_mark: succès mise à jour de données peu fréquentes C1 -> Metabase"
