@@ -99,7 +99,9 @@ class ListEmployeeRecordsTest(TestCase):
         assert response.status_code == 200
         self.assertContains(response, "Une action de votre part est nécessaire")
         self.assertContains(response, "Attention, nous avons détecté une ou plusieurs fiches salariés")
-        self.assertContains(response, "Une mise à jour manuelle est nécessaire.")
+        self.assertContains(
+            response, "Une mise à jour manuelle est nécessaire même si ce salarié a déjà quitté la structure."
+        )
         self.assertContains(response, "Mettre à jour")
 
     def test_employee_records_with_a_prolongation_need_to_be_updated(self):
@@ -114,7 +116,9 @@ class ListEmployeeRecordsTest(TestCase):
         assert response.status_code == 200
         self.assertContains(response, "Une action de votre part est nécessaire")
         self.assertContains(response, "Attention, nous avons détecté une ou plusieurs fiches salariés")
-        self.assertContains(response, "Une mise à jour manuelle est nécessaire.")
+        self.assertContains(
+            response, "Une mise à jour manuelle est nécessaire même si ce salarié a déjà quitté la structure."
+        )
         self.assertContains(response, "Mettre à jour")
 
     def test_employee_record_to_disable(self):
