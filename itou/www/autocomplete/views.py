@@ -3,11 +3,16 @@ from datetime import datetime
 from django.contrib.postgres.search import TrigramSimilarity, TrigramWordSimilarity
 from django.db.models import Q
 from django.http import JsonResponse
+from unidecode import unidecode
 
 from itou.asp.models import Commune
 from itou.cities.models import City
 from itou.jobs.models import Appellation
 from itou.siaes.models import SiaeJobDescription
+
+
+def sanitize(string):
+    return unidecode(string.lower())
 
 
 def cities_autocomplete(request):
@@ -85,14 +90,20 @@ def communes_autocomplete(request):
         # Can't extract date in ISO format: use today as fallback
         dt = datetime.now()
 
+    active_communes_qs = Commune.objects.filter(start_date__lte=dt).filter(Q(end_date=None) | Q(end_date__gt=dt))
     if term:
-        communes = (
-            Commune.objects.filter(start_date__lte=dt)
-            .filter(Q(end_date=None) | Q(end_date__gt=dt))
-            .annotate(similarity=TrigramWordSimilarity(term, "name"))
-            .filter(similarity__gt=0.1)
-            .order_by("-similarity")
-        )
+        if term.isdigit():
+            communes = active_communes_qs.filter(code__startswith=term).order_by("name", "code")[:10]
+        else:
+            communes = sorted(
+                active_communes_qs.filter(name__unaccent__icontains=term),
+                # - the results starting by the searched term are favoured (Paris over Cormeil-en-Parisis)
+                # - the shorter city names are then favoured (it seems more natural to our brains)
+                # - then if the length is the same, by alphabetic order
+                # - then if everything is the same (Sainte-Colombe...) by department.
+                key=lambda c: (sanitize(c.name).index(sanitize(term)), len(c.name), c.name, c.department_code),
+            )
+
         communes = [
             {
                 "value": f"{commune.name} ({commune.department_code})",

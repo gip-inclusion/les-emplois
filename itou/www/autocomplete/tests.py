@@ -172,3 +172,26 @@ class CitiesAutocompleteTest(TestCase):
         response = self.client.get(url, {"term": "toulouse"})
         assert response.status_code == 200
         assert response.json() == []
+
+
+class CommunesAutocompleteTest(TestCase):
+    def test_autocomplete(self):
+
+        url = reverse("autocomplete:communes")
+
+        response = self.client.get(url, {"term": "sai"})
+        assert response.status_code == 200
+        assert response.json() == [
+            {"code": "64483", "department": "064", "value": "SAINT-JEAN-DE-LUZ (064)"},
+            {"code": "62758", "department": "062", "value": "SAINT-MARTIN-BOULOGNE (062)"},
+        ]
+
+        response = self.client.get(url, {"term": "    "})
+        assert response.status_code == 200
+        assert response.json() == []
+
+        response = self.client.get(url, {"term": "64"})
+        assert response.status_code == 200
+        assert response.json() == [
+            {"code": "64483", "department": "064", "value": "SAINT-JEAN-DE-LUZ (064)"},
+        ]
