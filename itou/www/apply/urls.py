@@ -96,12 +96,22 @@ urlpatterns = [
     path("prescriber/list", list_views.list_for_prescriber, name="list_for_prescriber"),
     path("prescriber/list/exports", list_views.list_for_prescriber_exports, name="list_for_prescriber_exports"),
     path(
+        "prescriber/list/exports/download",
+        list_views.list_for_prescriber_exports_download,
+        name="list_for_prescriber_exports_download",
+    ),
+    path(
         "prescriber/list/exports/download/<str:month_identifier>",
         list_views.list_for_prescriber_exports_download,
         name="list_for_prescriber_exports_download",
     ),
     path("siae/list", list_views.list_for_siae, name="list_for_siae"),
     path("siae/list/exports", list_views.list_for_siae_exports, name="list_for_siae_exports"),
+    path(
+        "siae/list/exports/download",
+        list_views.list_for_siae_exports_download,
+        name="list_for_siae_exports_download",
+    ),
     path(
         "siae/list/exports/download/<str:month_identifier>",
         list_views.list_for_siae_exports_download,

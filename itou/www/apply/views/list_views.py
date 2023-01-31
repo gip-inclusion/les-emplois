@@ -86,25 +86,32 @@ def list_for_prescriber_exports(request, template_name="apply/list_of_available_
     """
     job_applications = get_all_available_job_applications_as_prescriber(request)
 
+    total_job_applications = job_applications.count()
     job_applications_by_month = job_applications.with_monthly_counts()
 
-    context = {"job_applications_by_month": job_applications_by_month, "export_for": "prescriber"}
+    context = {
+        "job_applications_by_month": job_applications_by_month,
+        "total_job_applications": total_job_applications,
+        "export_for": "prescriber",
+    }
     return render(request, template_name, context)
 
 
 @login_required
 @user_passes_test(lambda u: u.is_prescriber, login_url="/", redirect_field_name=None)
-def list_for_prescriber_exports_download(request, month_identifier):
+def list_for_prescriber_exports_download(request, month_identifier=None):
     """
     List of applications for a prescriber for a given month identifier (YYYY-mm),
     exported as a CSV file with immediate download
     """
-    job_applications = get_all_available_job_applications_as_prescriber(request)
+    job_applications = get_all_available_job_applications_as_prescriber(request).with_list_related_data()
+    filename = "candidatures"
+    if month_identifier:
+        year, month = month_identifier.split("-")
+        filename = f"{filename}-{month_identifier}"
+        job_applications = job_applications.created_on_given_year_and_month(year, month)
 
-    year, month = month_identifier.split("-")
-    job_applications = job_applications.created_on_given_year_and_month(year, month).with_list_related_data()
-
-    return stream_xlsx_export(job_applications, f"candidatures-{month_identifier}")
+    return stream_xlsx_export(job_applications, filename)
 
 
 @login_required
@@ -151,21 +158,30 @@ def list_for_siae_exports(request, template_name="apply/list_of_available_export
 
     siae = get_current_siae_or_404(request)
     job_applications = siae.job_applications_received.not_archived()
+    total_job_applications = job_applications.count()
     job_applications_by_month = job_applications.with_monthly_counts()
 
-    context = {"job_applications_by_month": job_applications_by_month, "siae": siae, "export_for": "siae"}
+    context = {
+        "job_applications_by_month": job_applications_by_month,
+        "total_job_applications": total_job_applications,
+        "siae": siae,
+        "export_for": "siae",
+    }
     return render(request, template_name, context)
 
 
 @login_required
-def list_for_siae_exports_download(request, month_identifier):
+def list_for_siae_exports_download(request, month_identifier=None):
     """
     List of applications for a SIAE for a given month identifier (YYYY-mm),
     exported as a CSV file with immediate download
     """
-    year, month = month_identifier.split("-")
     siae = get_current_siae_or_404(request)
-    job_applications = siae.job_applications_received.not_archived()
-    job_applications = job_applications.created_on_given_year_and_month(year, month).with_list_related_data()
+    job_applications = siae.job_applications_received.not_archived().with_list_related_data()
+    filename = f"candidatures-{slugify(siae.display_name)}"
+    if month_identifier:
+        year, month = month_identifier.split("-")
+        filename = f"{filename}-{month_identifier}"
+        job_applications = job_applications.created_on_given_year_and_month(year, month)
 
-    return stream_xlsx_export(job_applications, f"candidatures-{slugify(siae.display_name)}-{month_identifier}")
+    return stream_xlsx_export(job_applications, filename)
