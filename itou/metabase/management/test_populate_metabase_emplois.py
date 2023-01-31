@@ -141,7 +141,8 @@ def test_populate_job_seekers():
         created_at=datetime.datetime(2020, 1, 1, tzinfo=datetime.timezone.utc),
     )
 
-    num_queries = 1  # Count rows
+    num_queries = 1  # Get administrative criteria
+    num_queries += 1  # Count rows
     num_queries += 1  # Select all elements ids (chunked_queryset)
     num_queries += 1  # Select last pk for current chunck
     num_queries += 1  # Select job seekers chunck (with annotations)

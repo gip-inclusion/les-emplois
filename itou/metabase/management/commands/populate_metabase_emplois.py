@@ -333,8 +333,9 @@ class Command(BaseCommand):
             )
             .all()
         )
+        job_seekers_table = job_seekers.get_table()
 
-        populate_table(job_seekers.TABLE, batch_size=1000, querysets=[queryset])
+        populate_table(job_seekers_table, batch_size=1000, querysets=[queryset])
 
     def populate_rome_codes(self):
         queryset = Rome.objects.all()

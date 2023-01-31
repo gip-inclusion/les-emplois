@@ -175,213 +175,216 @@ def get_job_seeker_qpv_info(job_seeker):
     return "Adresse hors QPV"
 
 
-TABLE = MetabaseTable(name="candidats")
-TABLE.add_columns(
-    [
-        {
-            "name": "id",
-            "type": "integer",
-            "comment": "ID C1 du candidat",
-            "fn": lambda o: o.pk,
-        },
-        {
-            # TODO @dejafait : eventually drop this obsolete field
-            "name": "id_anonymisé",
-            "type": "varchar",
-            "comment": "ID anonymisé du candidat",
-            "fn": lambda o: hash_content(o.pk),
-        },
-        {
-            "name": "hash_nir",
-            "type": "varchar",
-            "comment": "Version obfusquée du NIR",
-            "fn": lambda o: hash_content(o.nir) if o.nir else None,
-        },
-        {
-            "name": "sexe_selon_nir",
-            "type": "varchar",
-            "comment": "Sexe du candidat selon le NIR",
-            "fn": get_gender_from_nir,
-        },
-        {
-            "name": "annee_naissance_selon_nir",
-            "type": "integer",
-            "comment": "Année de naissance du candidat selon le NIR",
-            "fn": get_birth_year_from_nir,
-        },
-        {
-            "name": "mois_naissance_selon_nir",
-            "type": "integer",
-            "comment": "Mois de naissance du candidat selon le NIR",
-            "fn": get_birth_month_from_nir,
-        },
-        {"name": "age", "type": "integer", "comment": "Age du candidat en années", "fn": get_user_age_in_years},
-        {
-            "name": "date_inscription",
-            "type": "date",
-            "comment": "Date inscription du candidat",
-            "fn": lambda o: o.date_joined,
-        },
-        {
-            "name": "type_inscription",
-            "type": "varchar",
-            "comment": "Type inscription du candidat",
-            "fn": get_user_signup_kind,
-        },
-        {
-            "name": "pe_connect",
-            "type": "boolean",
-            "comment": "Le candidat utilise PE Connect",
-            "fn": lambda o: o.identity_provider == IdentityProvider.PE_CONNECT,
-        },
-        {
-            "name": "pe_inscrit",
-            "type": "boolean",
-            "comment": "Le candidat a un identifiant PE",
-            "fn": lambda o: o.pole_emploi_id != "",
-        },
-        {
-            "name": "date_dernière_connexion",
-            "type": "date",
-            "comment": "Date de dernière connexion au service du candidat",
-            "fn": lambda o: o.last_login,
-        },
-        {
-            "name": "actif",
-            "type": "boolean",
-            "comment": "Dernière connexion dans les 7 jours",
-            "fn": lambda o: o.last_login > timezone.now() + timedelta(days=-7) if o.last_login else False,
-        },
-    ]
-)
+def get_table():
+    job_seekers_table = MetabaseTable(name="candidats")
 
-TABLE.add_columns(get_department_and_region_columns(comment_suffix=" du candidat"))
-
-TABLE.add_columns(
-    [
-        {
-            "name": "adresse_en_qpv",
-            "type": "varchar",
-            "comment": "Analyse QPV sur adresse du candidat",
-            "fn": get_job_seeker_qpv_info,
-        },
-        {
-            "name": "total_candidatures",
-            "type": "integer",
-            "comment": "Nombre de candidatures",
-            "fn": lambda o: o.job_applications_count,
-        },
-        {
-            "name": "total_embauches",
-            "type": "integer",
-            "comment": "Nombre de candidatures de type accepté",
-            # We have to do all this in python to benefit from prefetch_related.
-            "fn": lambda o: o.accepted_job_applications_count,
-        },
-        {
-            "name": "total_diagnostics",
-            "type": "integer",
-            "comment": "Nombre de diagnostics",
-            "fn": lambda o: o.eligibility_diagnoses_count,
-        },
-        {
-            "name": "date_diagnostic",
-            "type": "date",
-            "comment": "Date du dernier diagnostic",
-            "fn": lambda o: getattr(get_latest_diagnosis(o), "created_at", None),
-        },
-        {
-            "name": "id_auteur_diagnostic_prescripteur",
-            "type": "integer",
-            "comment": "ID auteur diagnostic si prescripteur",
-            "fn": lambda o: get_latest_diagnosis(o).author_prescriber_organization.id
-            if get_latest_diagnosis(o)
-            and get_latest_diagnosis(o).author_kind == AuthorKind.PRESCRIBER
-            and get_latest_diagnosis(o).author_prescriber_organization
-            else None,
-        },
-        {
-            "name": "id_auteur_diagnostic_employeur",
-            "type": "integer",
-            "comment": "ID auteur diagnostic si employeur",
-            "fn": lambda o: get_latest_diagnosis(o).author_siae.id
-            if get_latest_diagnosis(o)
-            and get_latest_diagnosis(o).author_kind == AuthorKind.SIAE_STAFF
-            and get_latest_diagnosis(o).author_siae
-            else None,
-        },
-        {
-            "name": "type_auteur_diagnostic",
-            "type": "varchar",
-            "comment": "Type auteur du dernier diagnostic",
-            "fn": lambda o: get_choice(choices=AUTHOR_KIND_CHOICES, key=get_latest_diagnosis(o).author_kind)
-            if get_latest_diagnosis(o)
-            else None,
-        },
-        {
-            "name": "sous_type_auteur_diagnostic",
-            "type": "varchar",
-            "comment": "Sous type auteur du dernier diagnostic",
-            "fn": get_latest_diagnosis_author_sub_kind,
-        },
-        {
-            "name": "nom_auteur_diagnostic",
-            "type": "varchar",
-            "comment": "Nom auteur du dernier diagnostic",
-            "fn": get_latest_diagnosis_author_display_name,
-        },
-        {
-            "name": "type_structure_dernière_embauche",
-            "type": "varchar",
-            "comment": "Type de la structure destinataire de la dernière embauche du candidat",
-            "fn": lambda o: get_hiring_siae(o).kind if get_hiring_siae(o) else None,
-        },
-        {
-            "name": "total_critères_niveau_1",
-            "type": "integer",
-            "comment": "Total critères de niveau 1 du dernier diagnostic",
-            "fn": get_latest_diagnosis_level1_criteria,
-        },
-        {
-            "name": "total_critères_niveau_2",
-            "type": "integer",
-            "comment": "Total critères de niveau 2 du dernier diagnostic",
-            "fn": get_latest_diagnosis_level2_criteria,
-        },
-    ]
-)
-
-
-# Add one column for each of the 15 criteria.
-for criteria in AdministrativeCriteria.objects.order_by("id").all():
-    column_comment = _format_criteria_name_as_column_comment(criteria)
-    column_name = format_criteria_name_as_column_name(criteria)
-
-    TABLE.add_columns(
+    job_seekers_table.add_columns(
         [
             {
-                "name": column_name,
+                "name": "id",
+                "type": "integer",
+                "comment": "ID C1 du candidat",
+                "fn": lambda o: o.pk,
+            },
+            {
+                # TODO @dejafait : eventually drop this obsolete field
+                "name": "id_anonymisé",
+                "type": "varchar",
+                "comment": "ID anonymisé du candidat",
+                "fn": lambda o: hash_content(o.pk),
+            },
+            {
+                "name": "hash_nir",
+                "type": "varchar",
+                "comment": "Version obfusquée du NIR",
+                "fn": lambda o: hash_content(o.nir) if o.nir else None,
+            },
+            {
+                "name": "sexe_selon_nir",
+                "type": "varchar",
+                "comment": "Sexe du candidat selon le NIR",
+                "fn": get_gender_from_nir,
+            },
+            {
+                "name": "annee_naissance_selon_nir",
+                "type": "integer",
+                "comment": "Année de naissance du candidat selon le NIR",
+                "fn": get_birth_year_from_nir,
+            },
+            {
+                "name": "mois_naissance_selon_nir",
+                "type": "integer",
+                "comment": "Mois de naissance du candidat selon le NIR",
+                "fn": get_birth_month_from_nir,
+            },
+            {"name": "age", "type": "integer", "comment": "Age du candidat en années", "fn": get_user_age_in_years},
+            {
+                "name": "date_inscription",
+                "type": "date",
+                "comment": "Date inscription du candidat",
+                "fn": lambda o: o.date_joined,
+            },
+            {
+                "name": "type_inscription",
+                "type": "varchar",
+                "comment": "Type inscription du candidat",
+                "fn": get_user_signup_kind,
+            },
+            {
+                "name": "pe_connect",
                 "type": "boolean",
-                "comment": f"Critère {column_comment} (niveau {criteria.level})",
-                "fn": partial(get_latest_diagnosis_criteria, criteria_id=criteria.id),
-            }
+                "comment": "Le candidat utilise PE Connect",
+                "fn": lambda o: o.identity_provider == IdentityProvider.PE_CONNECT,
+            },
+            {
+                "name": "pe_inscrit",
+                "type": "boolean",
+                "comment": "Le candidat a un identifiant PE",
+                "fn": lambda o: o.pole_emploi_id != "",
+            },
+            {
+                "name": "date_dernière_connexion",
+                "type": "date",
+                "comment": "Date de dernière connexion au service du candidat",
+                "fn": lambda o: o.last_login,
+            },
+            {
+                "name": "actif",
+                "type": "boolean",
+                "comment": "Dernière connexion dans les 7 jours",
+                "fn": lambda o: o.last_login > timezone.now() + timedelta(days=-7) if o.last_login else False,
+            },
         ]
     )
 
-TABLE.add_columns(
-    [
-        {
-            "name": "injection_ai",
-            "type": "boolean",
-            "comment": "Provient des injections AI",
-            # Here we flag job seekers as soon as any of their approvals is from the AI stock.
-            # In theory we should only flag them when their latest approval `o.approvals_wrapper.latest_approval`
-            # matches, but the performance becomes terrible (e.g. 120 minutes vs 30 minutes), is not easy to fix due
-            # to how `approvals_wrapper.latest_approval` is implemented and gives the exact same end result
-            # anyway (71205 users), most likely since most if not all of these users only have a single approval
-            # anyway.
-            # FIXME(vperron): It would be interesting to test again now though.
-            "fn": lambda o: o.pk in get_ai_stock_job_seeker_pks(),
-        },
-    ]
-)
+    job_seekers_table.add_columns(get_department_and_region_columns(comment_suffix=" du candidat"))
+
+    job_seekers_table.add_columns(
+        [
+            {
+                "name": "adresse_en_qpv",
+                "type": "varchar",
+                "comment": "Analyse QPV sur adresse du candidat",
+                "fn": get_job_seeker_qpv_info,
+            },
+            {
+                "name": "total_candidatures",
+                "type": "integer",
+                "comment": "Nombre de candidatures",
+                "fn": lambda o: o.job_applications_count,
+            },
+            {
+                "name": "total_embauches",
+                "type": "integer",
+                "comment": "Nombre de candidatures de type accepté",
+                # We have to do all this in python to benefit from prefetch_related.
+                "fn": lambda o: o.accepted_job_applications_count,
+            },
+            {
+                "name": "total_diagnostics",
+                "type": "integer",
+                "comment": "Nombre de diagnostics",
+                "fn": lambda o: o.eligibility_diagnoses_count,
+            },
+            {
+                "name": "date_diagnostic",
+                "type": "date",
+                "comment": "Date du dernier diagnostic",
+                "fn": lambda o: getattr(get_latest_diagnosis(o), "created_at", None),
+            },
+            {
+                "name": "id_auteur_diagnostic_prescripteur",
+                "type": "integer",
+                "comment": "ID auteur diagnostic si prescripteur",
+                "fn": lambda o: get_latest_diagnosis(o).author_prescriber_organization.id
+                if get_latest_diagnosis(o)
+                and get_latest_diagnosis(o).author_kind == AuthorKind.PRESCRIBER
+                and get_latest_diagnosis(o).author_prescriber_organization
+                else None,
+            },
+            {
+                "name": "id_auteur_diagnostic_employeur",
+                "type": "integer",
+                "comment": "ID auteur diagnostic si employeur",
+                "fn": lambda o: get_latest_diagnosis(o).author_siae.id
+                if get_latest_diagnosis(o)
+                and get_latest_diagnosis(o).author_kind == AuthorKind.SIAE_STAFF
+                and get_latest_diagnosis(o).author_siae
+                else None,
+            },
+            {
+                "name": "type_auteur_diagnostic",
+                "type": "varchar",
+                "comment": "Type auteur du dernier diagnostic",
+                "fn": lambda o: get_choice(choices=AUTHOR_KIND_CHOICES, key=get_latest_diagnosis(o).author_kind)
+                if get_latest_diagnosis(o)
+                else None,
+            },
+            {
+                "name": "sous_type_auteur_diagnostic",
+                "type": "varchar",
+                "comment": "Sous type auteur du dernier diagnostic",
+                "fn": get_latest_diagnosis_author_sub_kind,
+            },
+            {
+                "name": "nom_auteur_diagnostic",
+                "type": "varchar",
+                "comment": "Nom auteur du dernier diagnostic",
+                "fn": get_latest_diagnosis_author_display_name,
+            },
+            {
+                "name": "type_structure_dernière_embauche",
+                "type": "varchar",
+                "comment": "Type de la structure destinataire de la dernière embauche du candidat",
+                "fn": lambda o: get_hiring_siae(o).kind if get_hiring_siae(o) else None,
+            },
+            {
+                "name": "total_critères_niveau_1",
+                "type": "integer",
+                "comment": "Total critères de niveau 1 du dernier diagnostic",
+                "fn": get_latest_diagnosis_level1_criteria,
+            },
+            {
+                "name": "total_critères_niveau_2",
+                "type": "integer",
+                "comment": "Total critères de niveau 2 du dernier diagnostic",
+                "fn": get_latest_diagnosis_level2_criteria,
+            },
+        ]
+    )
+
+    # Add one column for each of the 15 criteria.
+    for criteria in AdministrativeCriteria.objects.order_by("id").all():
+        column_comment = _format_criteria_name_as_column_comment(criteria)
+        column_name = format_criteria_name_as_column_name(criteria)
+
+        job_seekers_table.add_columns(
+            [
+                {
+                    "name": column_name,
+                    "type": "boolean",
+                    "comment": f"Critère {column_comment} (niveau {criteria.level})",
+                    "fn": partial(get_latest_diagnosis_criteria, criteria_id=criteria.id),
+                }
+            ]
+        )
+
+    job_seekers_table.add_columns(
+        [
+            {
+                "name": "injection_ai",
+                "type": "boolean",
+                "comment": "Provient des injections AI",
+                # Here we flag job seekers as soon as any of their approvals is from the AI stock.
+                # In theory we should only flag them when their latest approval `o.approvals_wrapper.latest_approval`
+                # matches, but the performance becomes terrible (e.g. 120 minutes vs 30 minutes), is not easy to fix
+                # due to how `approvals_wrapper.latest_approval` is implemented and gives the exact same end result
+                # anyway (71205 users), most likely since most if not all of these users only have a single approval
+                # anyway.
+                # FIXME(vperron): It would be interesting to test again now though.
+                "fn": lambda o: o.pk in get_ai_stock_job_seeker_pks(),
+            },
+        ]
+    )
+
+    return job_seekers_table
