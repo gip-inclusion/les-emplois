@@ -1,11 +1,10 @@
-import csv
-
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db.models import Count, Q
 
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
+from itou.utils.export import generate_excel_sheet
 
 
 class Command(BaseCommand):
@@ -24,18 +23,19 @@ class Command(BaseCommand):
             f"authorization_status=REFUSED prescriber_kind=TOTAL count={prescriber_orgs_refused.count()}"
         )
 
-    def export_queryset_to_csv(self, to_csv, filename):
-        path = f"{settings.EXPORT_DIR}/{filename}"
+    def export_to_xlsx(self, data):
+        path = f"{settings.EXPORT_DIR}/duplicated_refused_prescriber_organizations_contacts.xlsx"
 
-        self.stdout.write(f"Number of admin contacts to export: {to_csv.count()}")
+        if data:
+            self.stdout.write(f"Number of admin contacts to export: {len(data)}")
+            headers = list(data[0].keys())
+            workbook = generate_excel_sheet(headers, [[str(value) for value in row.values()] for row in data])
 
-        if to_csv:
-            keys = to_csv[0].keys()
-
-            with open(path, "w", newline="") as output_file:
-                dict_writer = csv.DictWriter(output_file, keys)
-                dict_writer.writeheader()
-                dict_writer.writerows(to_csv)
+            with open(path, "wb") as xlsxfile:
+                workbook.save(xlsxfile)
+            self.stdout.write(f"XLSX file created `{path}`")
+        else:
+            self.stdout.write("No admin contacts to export")
 
     def handle(self, **options):
 
@@ -67,7 +67,7 @@ class Command(BaseCommand):
             f"Number of Prescriber Organizations which CANNOT be updated: {prescriber_orgs_refused_to_exclude.count()}"
         )
 
-        prescriber_orgs_refused_to_exclude_list_of_contacts = (
+        prescriber_orgs_refused_to_exclude_list_of_contacts = list(
             PrescriberMembership.objects.filter(
                 organization__siret__in=prescriber_orgs_refused_to_exclude.values("siret"), is_admin=True
             )
@@ -87,10 +87,7 @@ class Command(BaseCommand):
             )
             .order_by("organization__siret", "organization__kind")
         )
-        self.export_queryset_to_csv(
-            prescriber_orgs_refused_to_exclude_list_of_contacts,
-            "duplicated_refused_prescriber_organizations_contacts.csv",
-        )
+        self.export_to_xlsx(prescriber_orgs_refused_to_exclude_list_of_contacts)
 
         # Exclude occurences of duplicated siret and mass update.
         prescriber_orgs_refused_to_update = prescriber_orgs_refused.exclude(

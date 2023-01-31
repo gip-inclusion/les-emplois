@@ -1,7 +1,5 @@
 import datetime
 import io
-import os
-import unittest
 
 from django.contrib.auth.models import Group
 from django.core.management import call_command
@@ -14,7 +12,6 @@ from itou.users.models import User
 from itou.utils.test import TestCase
 
 
-@unittest.skipUnless(os.getenv("CI", False), "It is a long management command and normally not subject to change!")
 class DeduplicateJobSeekersManagementCommandsTest(TestCase):
     """
     Test the deduplication of several users.
@@ -64,7 +61,7 @@ class DeduplicateJobSeekersManagementCommandsTest(TestCase):
         assert 1 == user3.eligibility_diagnoses.count()
 
         # Merge all users into `user1`.
-        call_command("deduplicate_job_seekers", verbosity=0, no_csv=True, wet_run=True)
+        call_command("deduplicate_job_seekers", verbosity=0, no_xlsx=True, wet_run=True)
 
         # If only one NIR exists for all the duplicates, it should
         # be reassigned to the target account.
@@ -125,7 +122,7 @@ class DeduplicateJobSeekersManagementCommandsTest(TestCase):
         ApprovalFactory(user=user1)
 
         # Merge all users into `user1`.
-        call_command("deduplicate_job_seekers", verbosity=0, no_csv=True, wet_run=True)
+        call_command("deduplicate_job_seekers", verbosity=0, no_xlsx=True, wet_run=True)
 
         assert 3 == user1.job_applications.count()
 

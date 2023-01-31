@@ -1,4 +1,3 @@
-import csv
 import datetime
 import os
 
@@ -8,6 +7,7 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from itou.approvals.models import Approval
+from itou.utils.export import generate_excel_sheet
 
 
 class Command(BaseCommand):
@@ -31,12 +31,28 @@ class Command(BaseCommand):
             return
 
         log_datetime = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-        path = f"{settings.EXPORT_DIR}/{log_datetime}-export_pe_api_rejections.csv"
+        path = f"{settings.EXPORT_DIR}/{log_datetime}-export_pe_api_rejections.xlsx"
         os.makedirs(settings.EXPORT_DIR, exist_ok=True)
+        data = []
+        for approval in rejected_approvals:
+            # Use the same logic that Approval.notify_pole_emploi() to get the SIAE using the PASS.
+            siae = approval.jobapplication_set.accepted().order_by("-created_at").first().to_siae
+            data.append(
+                [
+                    approval.number,
+                    approval.pe_notification_time.isoformat(sep=" "),
+                    approval.pe_notification_exit_code,
+                    approval.user.nir,
+                    approval.user.pole_emploi_id,
+                    approval.user.last_name,
+                    approval.user.first_name,
+                    approval.user.birthdate.isoformat(),
+                    siae.department,
+                ]
+            )
 
-        with open(path, "w") as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerow(
+        with open(path, "wb") as xlsxfile:
+            workbook = generate_excel_sheet()(
                 [
                     "numero",
                     "date_notification",
@@ -47,24 +63,8 @@ class Command(BaseCommand):
                     "prenom",
                     "date_naissance",
                     "siae_departement",
-                ]
+                ],
+                data,
             )
-
-            for approval in rejected_approvals:
-                # Use the same logic that Approval.notify_pole_emploi() to get the SIAE using the PASS.
-                siae = approval.jobapplication_set.accepted().order_by("-created_at").first().to_siae
-                writer.writerow(
-                    [
-                        approval.number,
-                        approval.pe_notification_time,
-                        approval.pe_notification_exit_code,
-                        approval.user.nir,
-                        approval.user.pole_emploi_id,
-                        approval.user.last_name,
-                        approval.user.first_name,
-                        approval.user.birthdate,
-                        siae.department,
-                    ]
-                )
-
-        self.stdout.write(f"CSV file created `{path}`")
+            workbook.save(xlsxfile)
+        self.stdout.write(f"XLSX file created `{path}`")
