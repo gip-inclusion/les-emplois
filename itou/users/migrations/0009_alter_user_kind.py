@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
                     ("itou_staff", "administrateur"),
                 ],
                 max_length=20,
-                verbose_name="Type d'utilisateur",
+                verbose_name="Type",
             ),
         ),
     ]

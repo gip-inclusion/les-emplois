@@ -140,7 +140,7 @@ class ItouUserAdmin(UserAdmin):
         "first_name",
         "last_name",
         "birthdate",
-        "is_staff",
+        "kind",
         "identity_provider",
         "is_created_by_a_proxy",
         "has_verified_email",
