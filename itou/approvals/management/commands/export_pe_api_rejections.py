@@ -1,16 +1,14 @@
 import datetime
-import os
 
 from dateutil.relativedelta import relativedelta
-from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from itou.approvals.models import Approval
-from itou.utils.export import generate_excel_sheet
+from itou.utils.management_commands import XlsxExportMixin
 
 
-class Command(BaseCommand):
+class Command(XlsxExportMixin, BaseCommand):
     def handle(self, **options):
 
         first_day_of_month = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
@@ -31,8 +29,8 @@ class Command(BaseCommand):
             return
 
         log_datetime = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-        path = f"{settings.EXPORT_DIR}/{log_datetime}-export_pe_api_rejections.xlsx"
-        os.makedirs(settings.EXPORT_DIR, exist_ok=True)
+        filename = f"{log_datetime}-export_pe_api_rejections.xlsx"
+
         data = []
         for approval in rejected_approvals:
             # Use the same logic that Approval.notify_pole_emploi() to get the SIAE using the PASS.
@@ -51,20 +49,16 @@ class Command(BaseCommand):
                 ]
             )
 
-        with open(path, "wb") as xlsxfile:
-            workbook = generate_excel_sheet()(
-                [
-                    "numero",
-                    "date_notification",
-                    "code_echec",
-                    "nir",
-                    "pole_emploi_id",
-                    "nom_naissance",
-                    "prenom",
-                    "date_naissance",
-                    "siae_departement",
-                ],
-                data,
-            )
-            workbook.save(xlsxfile)
-        self.stdout.write(f"XLSX file created `{path}`")
+        headers = [
+            "numero",
+            "date_notification",
+            "code_echec",
+            "nir",
+            "pole_emploi_id",
+            "nom_naissance",
+            "prenom",
+            "date_naissance",
+            "siae_departement",
+        ]
+
+        self.export_to_xlsx(filename, headers, data)

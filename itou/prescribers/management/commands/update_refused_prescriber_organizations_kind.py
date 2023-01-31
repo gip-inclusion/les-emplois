@@ -1,13 +1,12 @@
-from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db.models import Count, Q
 
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
-from itou.utils.export import generate_excel_sheet
+from itou.utils.management_commands import XlsxExportMixin
 
 
-class Command(BaseCommand):
+class Command(XlsxExportMixin, BaseCommand):
     help = "Update kind of prescriber_organization with REFUSED authorization status"
 
     def show_counts(self, prescriber_orgs_refused, info):
@@ -22,20 +21,6 @@ class Command(BaseCommand):
         self.stdout.write(
             f"authorization_status=REFUSED prescriber_kind=TOTAL count={prescriber_orgs_refused.count()}"
         )
-
-    def export_to_xlsx(self, data):
-        path = f"{settings.EXPORT_DIR}/duplicated_refused_prescriber_organizations_contacts.xlsx"
-
-        if data:
-            self.stdout.write(f"Number of admin contacts to export: {len(data)}")
-            headers = list(data[0].keys())
-            workbook = generate_excel_sheet(headers, [[str(value) for value in row.values()] for row in data])
-
-            with open(path, "wb") as xlsxfile:
-                workbook.save(xlsxfile)
-            self.stdout.write(f"XLSX file created `{path}`")
-        else:
-            self.stdout.write("No admin contacts to export")
 
     def handle(self, **options):
 
@@ -87,7 +72,16 @@ class Command(BaseCommand):
             )
             .order_by("organization__siret", "organization__kind")
         )
-        self.export_to_xlsx(prescriber_orgs_refused_to_exclude_list_of_contacts)
+        if prescriber_orgs_refused_to_exclude_list_of_contacts:
+            data = [
+                [str(value) for value in row.values()] for row in prescriber_orgs_refused_to_exclude_list_of_contacts
+            ]
+            self.stdout.write(f"Number of admin contacts to export: {len(data)}")
+            filename = "duplicated_refused_prescriber_organizations_contacts.xlsx"
+            headers = list(prescriber_orgs_refused_to_exclude_list_of_contacts[0].keys())
+            self.export_to_xlsx(filename, headers, data)
+        else:
+            self.stdout.write("No admin contacts to export")
 
         # Exclude occurences of duplicated siret and mass update.
         prescriber_orgs_refused_to_update = prescriber_orgs_refused.exclude(
