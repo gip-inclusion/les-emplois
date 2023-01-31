@@ -219,10 +219,6 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
 
 @login_required
 def suspend(request, approval_id, template_name="approvals/suspend.html"):
-    """
-    Suspend the given approval.
-    """
-
     siae = get_current_siae_or_404(request)
     approval = get_object_or_404(Approval, pk=approval_id)
 

@@ -860,7 +860,7 @@ class SuspensionQuerySetTest(TestCase):
         SuspensionFactory.create_batch(2, start_at=start_at)
         assert 0 == Suspension.objects.old().count()
         # Old.
-        start_at = timezone.localdate() - relativedelta(years=1)
+        start_at = timezone.localdate() - relativedelta(years=3)
         end_at = Suspension.get_max_end_at(start_at)
         expected_num = 3
         SuspensionFactory.create_batch(expected_num, start_at=start_at, end_at=end_at)
@@ -959,8 +959,10 @@ class SuspensionModelTest(TestCase):
         suspension2.end_at = suspension1.end_at + relativedelta(days=1)
         assert suspension2.get_overlapping_suspensions().exists()
 
-        # End before suspension1.
-        suspension2.start_at = suspension1.start_at - relativedelta(years=2)
+        # End exactly before suspension1
+        # - 3 years is the maximum
+        # - add an extra day for non-flakyness/clarity of intent
+        suspension2.start_at = suspension1.start_at - relativedelta(years=3, days=1)
         suspension2.end_at = Suspension.get_max_end_at(suspension2.start_at)
         assert not suspension2.get_overlapping_suspensions().exists()
 

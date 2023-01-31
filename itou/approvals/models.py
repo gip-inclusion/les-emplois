@@ -575,9 +575,9 @@ class Suspension(models.Model):
     """
 
     # Min duration: none.
-    # Max duration: 12 months (could be adjusted according to user feedback).
-    # 12-months suspensions can be consecutive and there can be any number of them.
-    MAX_DURATION_MONTHS = 12
+    # Max duration: 36 months (could be adjusted according to user feedback).
+    # 36-months suspensions can be consecutive and there can be any number of them.
+    MAX_DURATION_MONTHS = 36
     # Temporary update for support team needs. operated on march. Target value should be 30.
     # More information on https://github.com/betagouv/itou/pull/1163
     MAX_RETROACTIVITY_DURATION_DAYS = 365

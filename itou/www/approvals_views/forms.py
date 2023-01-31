@@ -232,7 +232,8 @@ class SuspensionForm(forms.ModelForm):
             "end_at": mark_safe(
                 "Au format JJ/MM/AAAA, par exemple 20/12/1978."
                 "<br>"
-                "Renseignez une date de fin à 12 mois si le contrat de travail est terminé ou rompu."
+                f"Renseignez une date de fin à {Suspension.MAX_DURATION_MONTHS} mois "
+                "si le contrat de travail est terminé ou rompu."
             ),
             "reason_explanation": "Obligatoire seulement en cas de force majeure.",
         }
@@ -263,7 +264,7 @@ class SuspensionForm(forms.ModelForm):
         start_at = self.cleaned_data.get("start_at")
 
         # If the end date of the suspension is not known,
-        # it is set to `start_date` + 12 months.
+        # it is set to `start_date` + 36 months.
         # If `set_default_end_date` is not checked, `end_at` field is required.
         # See Suspension model clean/validation.
         if set_default_end_date and start_at:
