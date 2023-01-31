@@ -44,7 +44,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
         django-admin update_nir_from_pass --file-path=path/to/file.xlsx
     """
 
-    help = "Deduplicate job seekers."
+    help = "Update NIR from PASS"
 
     def add_arguments(self, parser):
         parser.add_argument(

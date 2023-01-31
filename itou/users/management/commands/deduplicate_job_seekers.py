@@ -1,4 +1,3 @@
-import csv
 import datetime
 import os
 
@@ -14,6 +13,7 @@ from tqdm import tqdm
 from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication
 from itou.users.models import User
+from itou.utils.export import generate_excel_sheet
 from itou.utils.management_commands import DeprecatedLoggerMixin
 from itou.utils.urls import get_absolute_url
 
@@ -40,7 +40,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
 
     To run the command without any change in DB and have a preview of which
     accounts will be merged:
-        django-admin deduplicate_job_seekers --wet-run --no-csv
+        django-admin deduplicate_job_seekers --wet-run --no-xlsx
 
     To merge duplicates job seekers in the database:
         django-admin deduplicate_job_seekers
@@ -60,7 +60,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
         parser.add_argument(
             "--wet-run", dest="wet_run", action="store_true", help="Actually write information in the database"
         )
-        parser.add_argument("--no-csv", dest="no_csv", action="store_true", help="Do not export results in CSV")
+        parser.add_argument("--no-xlsx", dest="no_xlsx", action="store_true", help="Do not export results in XLSX")
 
     def handle_easy_duplicates(self, duplicates, target, nirs):
         """
@@ -74,17 +74,16 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
 
         target_admin_path = reverse("admin:users_user_change", args=[target.pk])
         target_admin_url = get_absolute_url(target_admin_path)
-        self.EASY_DUPLICATES_LOGS.append(
-            {
-                "Compte de destination": target.email,
-                "URL admin du compte de destination": target_admin_url,
-                "Nombre de doublons": len(users_to_delete),
-                "Doublons fusionnés": " ; ".join([u.email for u in users_to_delete]),
-            }
-        )
+        log_info = [
+            target.email,
+            target_admin_url,
+            len(users_to_delete),
+            " ; ".join([u.email for u in users_to_delete]),
+        ]
+        self.EASY_DUPLICATES_LOGS.append(log_info)
 
         # Debug info (when verbosity >= 1).
-        self.logger.debug(f"[easy] {self.EASY_DUPLICATES_LOGS[-1].values()}")
+        self.logger.debug(f"[easy] {log_info}")
 
         for user in users_to_delete:
 
@@ -125,30 +124,25 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
         for duplicate in duplicates:
             args = {"job_seeker_id": duplicate.id, "created_at__gte": freshness_threshold}
             recent_job_applications_url = f"{get_absolute_url(job_applications_path)}?{urlencode(args)}"
-            log_info = {
-                "Numéro": self.HARD_DUPLICATES_COUNT,
-                "Nombre de doublons": len(duplicates),
-                "Email": duplicate.email,
-                "NIR": duplicate.nir,
-                "Date de naissance": duplicate.birthdate,
-                "Numéro PASS IAE": "",
-                "Début PASS IAE": "",
-                "Fin PASS IAE": "",
-                "Lien admin PASS IAE": "",
-                "Candidatures récentes (< 3 mois)": recent_job_applications_url,
-            }
-
             approval = duplicate.approvals.last()
             if approval:
                 approval_admin_path = reverse("admin:approvals_approval_change", args=[approval.pk])
                 approval_admin_url = get_absolute_url(approval_admin_path)
-                log_info["Numéro PASS IAE"] = approval.number
-                log_info["Début PASS IAE"] = approval.start_at.strftime("%d/%m/%Y")
-                log_info["Fin PASS IAE"] = approval.end_at.strftime("%d/%m/%Y")
-                log_info["Lien admin PASS IAE"] = approval_admin_url
+            log_info = [
+                self.HARD_DUPLICATES_COUNT,
+                len(duplicates),
+                duplicate.email,
+                duplicate.nir,
+                duplicate.birthdate,
+                approval.number if approval else "",
+                approval.start_at.strftime("%d/%m/%Y") if approval else "",
+                approval.end_at.strftime("%d/%m/%Y") if approval else "",
+                approval_admin_url if approval else "",
+                recent_job_applications_url,
+            ]
 
             # Debug info (when verbosity >= 1).
-            self.logger.debug(f"[hard] {log_info.values()}")
+            self.logger.debug(f"[hard] {log_info}")
 
             # We are only logging for now.
             self.HARD_DUPLICATES_LOGS.append(log_info)
@@ -164,25 +158,25 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
         We can transfer this information to the support for manual correction.
         """
         for duplicate in duplicates:
-            log_info = {
-                "Numéro": self.NIR_DUPLICATES_COUNT,
-                "Nombre de doublons": len(duplicates),
-                "Email": duplicate.email,
-                "NIR": duplicate.nir,
-            }
+            log_info = [
+                self.NIR_DUPLICATES_COUNT,
+                len(duplicates),
+                duplicate.email,
+                duplicate.nir,
+            ]
 
             # Debug info (when verbosity >= 1).
-            self.logger.debug(f"[NIR] {log_info.values()}")
+            self.logger.debug(f"[NIR] {log_info}")
 
             # We are only logging for now.
             self.NIR_DUPLICATES_LOGS.append(log_info)
 
-    def handle(self, wet_run=False, no_csv=False, **options):
+    def handle(self, wet_run=False, no_xlsx=False, **options):
 
         self.set_logger(options.get("verbosity"))
 
         self.wet_run = wet_run
-        self.no_csv = no_csv
+        self.no_xlsx = no_xlsx
 
         self.stdout.write("Starting. Good luck…")
 
@@ -237,8 +231,8 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
                 self.HARD_DUPLICATES_COUNT += 1
                 self.handle_hard_duplicates(duplicates)
 
-        if not self.no_csv:
-            self.to_csv(
+        if not self.no_xlsx:
+            self.to_xlsx(
                 "easy-duplicates",
                 [
                     "Compte de destination",
@@ -248,7 +242,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
                 ],
                 self.EASY_DUPLICATES_LOGS,
             )
-            self.to_csv(
+            self.to_xlsx(
                 "hard-duplicates",
                 [
                     "Numéro",  # Lines with the same number are duplicates.
@@ -264,7 +258,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
                 ],
                 self.HARD_DUPLICATES_LOGS,
             )
-            self.to_csv(
+            self.to_xlsx(
                 "nir-duplicates",
                 [
                     "Numéro",  # Lines with the same number are duplicates.
@@ -283,12 +277,11 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
         self.stdout.write("-" * 80)
         self.stdout.write("Done!")
 
-    def to_csv(self, filename, fieldnames, data):
+    def to_xlsx(self, filename, fieldnames, data):
         log_datetime = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-        path = f"{settings.EXPORT_DIR}/{log_datetime}-{filename}-{settings.ITOU_ENVIRONMENT.lower()}.csv"
+        path = f"{settings.EXPORT_DIR}/{log_datetime}-{filename}-{settings.ITOU_ENVIRONMENT.lower()}.xlsx"
         os.makedirs(settings.EXPORT_DIR, exist_ok=True)
-        with open(path, "w") as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=fieldnames, quoting=csv.QUOTE_ALL)
-            writer.writeheader()
-            writer.writerows(data)
-        self.stdout.write(f"CSV file created `{path}`")
+        with open(path, "wb") as xlsxfile:
+            workbook = generate_excel_sheet(fieldnames, data)
+            workbook.save(xlsxfile)
+        self.stdout.write(f"XLSX file created `{path}`")
