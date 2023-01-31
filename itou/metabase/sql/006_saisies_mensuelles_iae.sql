@@ -63,6 +63,7 @@ coordonnees_gps as (
         latitude,
         longitude 
     from 
+        /* TODO @defajait DROP ASAP - use codes_insee_vs_codes_postaux instead */
         commune_GPS
 )
 select 

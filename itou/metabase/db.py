@@ -155,6 +155,7 @@ def create_unversioned_tables_if_needed():
     """
     with MetabaseDatabaseCursor() as (cur, conn):
         create_table_sql_requests = """
+            /* TODO @defajait DROP ASAP - use codes_insee_vs_codes_postaux instead */
             CREATE TABLE IF NOT EXISTS "commune_gps" (
                 "code_insee" varchar(255),
                 "nom_commune" varchar(255),

@@ -94,7 +94,8 @@ from
              code_insee,
              latitude,
              longitude 
-        from 
+        from
+            /* TODO @defajait DROP ASAP - use codes_insee_vs_codes_postaux instead */
             commune_GPS
     ) as commune_structure 
         on trim(cast(s.structure_adresse_admin_code_insee as varchar)) 
