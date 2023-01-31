@@ -1,5 +1,4 @@
 import datetime
-import os
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
@@ -13,12 +12,11 @@ from tqdm import tqdm
 from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication
 from itou.users.models import User
-from itou.utils.export import generate_excel_sheet
-from itou.utils.management_commands import DeprecatedLoggerMixin
+from itou.utils.management_commands import DeprecatedLoggerMixin, XlsxExportMixin
 from itou.utils.urls import get_absolute_url
 
 
-class Command(DeprecatedLoggerMixin, BaseCommand):
+class Command(XlsxExportMixin, DeprecatedLoggerMixin, BaseCommand):
     """
     Deduplicate job seekers.
 
@@ -279,9 +277,5 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
 
     def to_xlsx(self, filename, fieldnames, data):
         log_datetime = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-        path = f"{settings.EXPORT_DIR}/{log_datetime}-{filename}-{settings.ITOU_ENVIRONMENT.lower()}.xlsx"
-        os.makedirs(settings.EXPORT_DIR, exist_ok=True)
-        with open(path, "wb") as xlsxfile:
-            workbook = generate_excel_sheet(fieldnames, data)
-            workbook.save(xlsxfile)
-        self.stdout.write(f"XLSX file created `{path}`")
+        filename = f"{log_datetime}-{filename}-{settings.ITOU_ENVIRONMENT.lower()}.xlsx"
+        self.export_to_xlsx(filename, fieldnames, data)
