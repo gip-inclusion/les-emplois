@@ -507,6 +507,7 @@ class ProcessListPrescriberTest(ProcessListTest):
         response = self.client.get(self.prescriber_exports_url)
 
         assert 200 == response.status_code
+        assertContains(response, "Toutes les candidatures")
 
     def test_list_for_prescriber_exports_download_view(self):
         """
@@ -631,6 +632,7 @@ class ProcessListExportsPrescriberTest(ProcessListTest):
         response = self.client.get(self.prescriber_exports_url)
 
         assert 200 == response.status_code
+        assertContains(response, "Toutes les candidatures")
 
     def test_list_for_prescriber_exports_as_siae_view(self):
         """
@@ -656,6 +658,7 @@ class ProcessListExportsSiaeTest(ProcessListTest):
         response = self.client.get(self.siae_exports_url)
 
         assert 200 == response.status_code
+        assertContains(response, "Toutes les candidatures")
 
     def test_list_for_siae_exports_as_prescriber_view(self):
         """
@@ -676,6 +679,18 @@ class ProcessListExportsDownloadPrescriberTest(ProcessListTest):
     def test_list_for_prescriber_exports_download_view(self):
         """
         Connect as Thibault to download a XLSX export of available job applications
+        """
+        self.client.force_login(self.thibault_pe)
+        download_url = reverse("apply:list_for_prescriber_exports_download")
+
+        response = self.client.get(download_url)
+
+        assert 200 == response.status_code
+        assert "spreadsheetml" in response.get("Content-Type")
+
+    def test_list_for_prescriber_exports_download_view_by_month(self):
+        """
+        Connect as Thibault to download a CSV export of available job applications
         """
         self.client.force_login(self.thibault_pe)
 
@@ -716,6 +731,18 @@ class ProcessListExportsDownloadSiaeTest(ProcessListTest):
     def test_list_for_siae_exports_download_view(self):
         """
         Connect as Thibault to download a XLSX export of available job applications
+        """
+        self.client.force_login(self.eddie_hit_pit)
+        download_url = reverse("apply:list_for_siae_exports_download")
+
+        response = self.client.get(download_url)
+
+        assert 200 == response.status_code
+        assert "spreadsheetml" in response.get("Content-Type")
+
+    def test_list_for_siae_exports_download_view_by_month(self):
+        """
+        Connect as Thibault to download a CSV export of available job applications
         """
         self.client.force_login(self.eddie_hit_pit)
 

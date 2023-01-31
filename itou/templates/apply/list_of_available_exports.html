@@ -18,15 +18,42 @@
 
         <div class="table-responsive">
             <table class="table table-striped table-bordered">
-                <caption>Liste des candidatures reçues par mois</caption>
+                <caption>Liste des candidatures reçues</caption>
                 <thead>
                     <tr>
-                        <th scope="col">Mois</th>
+                        <th scope="col">Contenu du fichier</th>
                         <th scope="col">Nombre de candidatures</th>
-                        <th scope="col">Télécharger (.csv)</th>
+                        <th scope="col">Télécharger (.xlsx)</th>
                     </tr>
                 </thead>
                 <tbody>
+                    <tr>
+                        <td>Toutes les candidatures</td>
+                        <td>{{ total_job_applications }}</td>
+                        <td>
+                            {% if export_for == "siae" %}
+                                <i class="ri-download-line mr-1"></i>
+                                <a class="matomo-event text-decoration-none"
+                                   data-matomo-category="candidatures"
+                                   data-matomo-action="exports"
+                                   data-matomo-option="export-siae"
+                                   title="Télécharger cet export SIAE"
+                                   href="{% url 'apply:list_for_siae_exports_download' %}">
+                                    Télécharger
+                                </a>
+                            {% else %}
+                                <i class="ri-download-line mr-1"></i>
+                                <a class="matomo-event text-decoration-none"
+                                   data-matomo-category="candidatures"
+                                   data-matomo-action="exports"
+                                   data-matomo-option="export-prescripteur"
+                                   title="Télécharger cet export prescripteur"
+                                   href="{% url 'apply:list_for_prescriber_exports_download' %}">
+                                    Télécharger
+                                </a>
+                            {% endif %}
+                        </td>
+                    </tr>
                     {% for month in job_applications_by_month %}
                         <tr>
                             <td>{{ month.month|date:"F Y"|capfirst }}</td>
@@ -48,7 +75,7 @@
                                        data-matomo-category="candidatures"
                                        data-matomo-action="exports"
                                        data-matomo-option="export-prescripteur"
-                                       title="Télécharger cet export prescriteur"
+                                       title="Télécharger cet export prescripteur"
                                        href="{% url 'apply:list_for_prescriber_exports_download' month_identifier=month.month|date:"Y-m" %}">
                                         Télécharger
                                     </a>
