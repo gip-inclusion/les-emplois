@@ -9,6 +9,8 @@ from itou.approvals.enums import Origin
 from itou.approvals.models import Approval
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
+from itou.geo.enums import ZRRStatus
+from itou.geo.models import ZRR
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.models import Siae
 from itou.users.models import User
@@ -111,6 +113,24 @@ def get_post_code_to_insee_code_map():
 # because one post_code can actually have *several* insee_codes (╯°□°)╯︵ ┻━┻
 def convert_post_code_to_insee_code(post_code):
     return get_post_code_to_insee_code_map().get(post_code)
+
+
+@functools.cache
+def get_insee_code_to_zrr_status_map():
+    """
+    Load once and for all this ~35k items dataset in memory.
+    """
+    insee_code_to_zrr_status_map = {}
+    for zrr in ZRR.objects.all():
+        insee_code_to_zrr_status_map[zrr.insee_code] = zrr.status
+    return insee_code_to_zrr_status_map
+
+
+def get_zrr_status_for_insee_code(insee_code):
+    raw_zrr_status = get_insee_code_to_zrr_status_map().get(insee_code)
+    if raw_zrr_status:
+        return ZRRStatus(raw_zrr_status).label
+    return "Statut ZRR inconnu"
 
 
 def get_post_code_column(name_suffix="", comment_suffix="", custom_fn=lambda o: o):
