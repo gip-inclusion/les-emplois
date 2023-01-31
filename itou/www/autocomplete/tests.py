@@ -190,8 +190,12 @@ class CommunesAutocompleteTest(TestCase):
         assert response.status_code == 200
         assert response.json() == []
 
-        response = self.client.get(url, {"term": "64"})
+        response = self.client.get(url, {"term": "ILL"})
         assert response.status_code == 200
         assert response.json() == [
-            {"code": "64483", "department": "064", "value": "SAINT-JEAN-DE-LUZ (064)"},
+            {"code": "59350", "department": "059", "value": "LILLE (059)"},
+            {"code": "37273", "department": "037", "value": "VILLE-AUX-DAMES (037)"},
+            {"code": "07141", "department": "007", "value": "LENTILLERES (007)"},
+            {"code": "13200", "department": "013", "value": "MARSEILLE (013)"},
+            {"code": "83100", "department": "083", "value": "PUGET-VILLE (083)"},
         ]
