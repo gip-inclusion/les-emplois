@@ -98,10 +98,9 @@ def communes_autocomplete(request):
             communes = sorted(
                 active_communes_qs.filter(name__unaccent__icontains=term),
                 # - the results starting by the searched term are favoured (Paris over Cormeil-en-Parisis)
-                # - the shorter city names are then favoured (it seems more natural to our brains)
                 # - then if the length is the same, by alphabetic order
                 # - then if everything is the same (Sainte-Colombe...) by department.
-                key=lambda c: (sanitize(c.name).index(sanitize(term)), len(c.name), c.name, c.department_code),
+                key=lambda c: (sanitize(c.name).index(sanitize(term)), c.name, c.department_code),
             )
 
         communes = [
