@@ -216,7 +216,7 @@ class User(AbstractUser, AddressMixin):
     )
     phone = models.CharField(verbose_name="Téléphone", max_length=20, blank=True)
 
-    kind = models.CharField(max_length=20, verbose_name="Type d'utilisateur", choices=UserKind.choices, blank=False)
+    kind = models.CharField(max_length=20, verbose_name="Type", choices=UserKind.choices, blank=False)
 
     asp_uid = models.TextField(
         verbose_name="ID unique envoyé à l'ASP",
