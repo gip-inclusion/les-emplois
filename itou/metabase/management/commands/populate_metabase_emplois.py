@@ -374,11 +374,9 @@ class Command(BaseCommand):
         """
         fatal_errors = 0
         self.stdout.write("Checking data for inconsistencies.")
-        for approval in Approval.objects.prefetch_related("user").all():
-            user = approval.user
-            if not user.is_job_seeker:
-                self.stdout.write(f"FATAL ERROR: user {user.id} has an approval but is not a job seeker")
-                fatal_errors += 1
+        if Approval.objects.exclude(user__kind=UserKind.JOB_SEEKER).exists():
+            self.stdout.write("FATAL ERROR: At least one user has an approval but is not a job seeker")
+            fatal_errors += 1
 
         if fatal_errors >= 1:
             raise RuntimeError(
@@ -391,6 +389,11 @@ class Command(BaseCommand):
         build_final_tables()
 
     @timeit
-    @tenacity.retry(stop=tenacity.stop_after_attempt(3), wait=tenacity.wait_fixed(5), after=log_retry_attempt)
+    @tenacity.retry(
+        retry=tenacity.retry_if_not_exception_type(RuntimeError),
+        stop=tenacity.stop_after_attempt(3),
+        wait=tenacity.wait_fixed(5),
+        after=log_retry_attempt,
+    )
     def handle(self, mode, **options):
         self.MODE_TO_OPERATION[mode]()

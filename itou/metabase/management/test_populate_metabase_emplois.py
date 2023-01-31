@@ -313,3 +313,28 @@ def test_populate_job_seekers():
             datetime.date.today() - datetime.timedelta(days=1),
         ),
     ]
+
+
+def test_check_inconsistencies(capsys):
+    approval = ApprovalFactory()
+
+    with assertNumQueries(1):  # Select the job seekers
+        management.call_command("populate_metabase_emplois", mode="data_inconsistencies")
+
+    stdout, _ = capsys.readouterr()
+    assert stdout.splitlines() == [
+        "Checking data for inconsistencies.",
+        "timeit: method=report_data_inconsistencies completed in seconds=0.00",
+        "timeit: method=handle completed in seconds=0.00",
+    ]
+
+    approval.user.kind = "siae_staff"
+    approval.user.save()
+
+    with pytest.raises(RuntimeError):
+        management.call_command("populate_metabase_emplois", mode="data_inconsistencies")
+    stdout, _ = capsys.readouterr()
+    assert stdout.splitlines() == [
+        "Checking data for inconsistencies.",
+        "FATAL ERROR: At least one user has an approval but is not a job seeker",
+    ]
