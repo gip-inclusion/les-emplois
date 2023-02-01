@@ -203,8 +203,9 @@ class EvaluationCampaign(models.Model):
         return qs
 
     def number_of_siaes_to_select(self, upperbound=0):
-        if self.eligible_siaes(upperbound=upperbound).count() > 0:
-            return max(round(self.eligible_siaes(upperbound=upperbound).count() * self.chosen_percent / 100), 1)
+        eligible_count = self.eligible_siaes().count()
+        if eligible_count:
+            return max(round(eligible_count * self.chosen_percent / 100), 1)
         return 0
 
     def eligible_siaes_under_ratio(self, upperbound=0):

@@ -414,8 +414,22 @@ class EvaluationCampaignManagerTest(TestCase):
         assert 0 == EvaluatedSiae.objects.all().count()
         assert 0 == EvaluatedJobApplication.objects.all().count()
 
-        # first regular method exec
-        evaluation_campaign.populate(fake_now)
+        with self.assertNumQueries(
+            1  # SAVEPOINT from transaction.atomic()
+            + 1  # UPDATE SET percent_set_at
+            + 1  # COUNT eligible job applications
+            + 1  # SELECT to_siae_id and job application count for SIAE with at least 2 auto-prescriptions.
+            + 1  # SELECT SIAE details
+            + 1  # INSERT EvaluatedSiae
+            + 1  # COUNT eligible job applications
+            + 1  # SELECT job applications to evaluate
+            + 1  # INSERT EvaluatedJobApplication
+            + 1  # SELECT SIAE convention
+            + 1  # SELECT SIAE admin users
+            + 1  # SELECT institution users
+            + 1  # RELEASE SAVEPOINT (end of transaction.atomic())
+        ):
+            evaluation_campaign.populate(fake_now)
         evaluation_campaign.refresh_from_db()
 
         assert fake_now == evaluation_campaign.percent_set_at
