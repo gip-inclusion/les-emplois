@@ -189,37 +189,26 @@ class EvaluationCampaign(models.Model):
             )
         )
 
-    def eligible_siaes(self, upperbound=0):
-        qs = (
+    def eligible_siaes(self):
+        return (
             self.eligible_job_applications()
             .values("to_siae")
             .annotate(to_siae_count=Count("to_siae"))
             .filter(to_siae_count__gte=evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN)
         )
 
-        if upperbound != 0:
-            qs = qs.filter(to_siae_count__lt=upperbound)
-
-        return qs
-
-    def number_of_siaes_to_select(self, upperbound=0):
+    def number_of_siaes_to_select(self):
         eligible_count = self.eligible_siaes().count()
         if eligible_count:
             return max(round(eligible_count * self.chosen_percent / 100), 1)
         return 0
 
-    def eligible_siaes_under_ratio(self, upperbound=0):
+    def eligible_siaes_under_ratio(self):
         return (
-            self.eligible_siaes(upperbound=upperbound)
-            .values_list("to_siae", flat=True)
-            .order_by("?")[: self.number_of_siaes_to_select(upperbound=upperbound)]
+            self.eligible_siaes().values_list("to_siae", flat=True).order_by("?")[: self.number_of_siaes_to_select()]
         )
 
-    def populate(
-        self,
-        set_at,
-        upperbound=0,
-    ):
+    def populate(self, set_at):
         if self.evaluations_asked_at:
             raise CampaignAlreadyPopulatedException()
 
@@ -232,7 +221,7 @@ class EvaluationCampaign(models.Model):
 
             evaluated_siaes = EvaluatedSiae.objects.bulk_create(
                 EvaluatedSiae(evaluation_campaign=self, siae=Siae.objects.get(pk=pk))
-                for pk in self.eligible_siaes_under_ratio(upperbound=upperbound)
+                for pk in self.eligible_siaes_under_ratio()
             )
 
             EvaluatedJobApplication.objects.bulk_create(

@@ -312,25 +312,7 @@ class EvaluationCampaignManagerTest(TestCase):
         siae2 = SiaeFactory(department="14")
         create_batch_of_job_applications(siae2)
 
-        # test eligible_siaes without upperbound
         eligible_siaes_res = evaluation_campaign.eligible_siaes()
-        assert 1 == eligible_siaes_res.count()
-        assert {
-            "to_siae": siae2.id,
-            "to_siae_count": evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN,
-        } in eligible_siaes_res
-
-        eligible_siaes_res = evaluation_campaign.eligible_siaes(upperbound=0)
-        assert 1 == eligible_siaes_res.count()
-        assert {
-            "to_siae": siae2.id,
-            "to_siae_count": evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN,
-        } in eligible_siaes_res
-
-        # test eligible_siaes with upperbound = 3
-        eligible_siaes_res = evaluation_campaign.eligible_siaes(
-            upperbound=evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN + 1
-        )
         assert 1 == eligible_siaes_res.count()
         assert {
             "to_siae": siae2.id,
@@ -340,26 +322,12 @@ class EvaluationCampaignManagerTest(TestCase):
         # adding 2 more job applications to siae2
         create_batch_of_job_applications(siae2)
 
-        # test eligible_siaes without upperbound
         eligible_siaes_res = evaluation_campaign.eligible_siaes()
         assert 1 == eligible_siaes_res.count()
         assert {
             "to_siae": siae2.id,
             "to_siae_count": evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN * 2,
         } in eligible_siaes_res
-
-        eligible_siaes_res = evaluation_campaign.eligible_siaes(upperbound=0)
-        assert 1 == eligible_siaes_res.count()
-        assert {
-            "to_siae": siae2.id,
-            "to_siae_count": evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN * 2,
-        } in eligible_siaes_res
-
-        # test eligible_siaes with upperbound = 3
-        eligible_siaes_res = evaluation_campaign.eligible_siaes(
-            upperbound=evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN + 1
-        )
-        assert 0 == eligible_siaes_res.count()
 
     def test_number_of_siaes_to_select(self):
         evaluation_campaign = EvaluationCampaignFactory()
