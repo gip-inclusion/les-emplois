@@ -1234,7 +1234,7 @@ class InstitutionEvaluatedSiaeNotifyViewTest(TestCase):
         self.assertContains(
             response,
             """
-            <h3 class="mt-5">
+            <h3>
              Historique des campagnes de contrôle
             </h3>
             <ul class="list-unstyled">
@@ -1387,7 +1387,7 @@ class InstitutionEvaluatedSiaeNotifyViewTest(TestCase):
         self.assertContains(
             response,
             """
-            <h3 class="mt-5">
+            <h3>
              Historique des campagnes de contrôle
             </h3>
             <ul class="list-unstyled">

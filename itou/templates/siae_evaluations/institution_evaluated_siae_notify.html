@@ -37,6 +37,7 @@
         <article class="col-12 col-lg-5 order-1 mb-sm-4 card c-card has-links-inside">
             <div class="card-header">
                 <h2>Données</h2>
+                <hr class="mt-5">
             </div>
             <div class="card-body">
                 <h3>Campagne en cours</h3>
@@ -55,7 +56,8 @@
                         les {{ job_apps_count }} auto-prescriptions
                     {% endif %}
                     <i class="ri-external-link-line"></i></a>
-                <h3 class="mt-5">Historique des campagnes de contrôle</h3>
+                <hr class="my-5">
+                <h3>Historique des campagnes de contrôle</h3>
                 <ul class="list-unstyled">
                     {% for old_evaluated_siae in evaluation_history %}
                         <li>
