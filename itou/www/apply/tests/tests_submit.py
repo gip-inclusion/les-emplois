@@ -7,7 +7,7 @@ from dateutil.relativedelta import relativedelta
 from django.contrib.messages import get_messages
 from django.urls import resolve, reverse
 from django.utils import timezone
-from pytest_django.asserts import assertRedirects
+from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.asp.models import AllocationDuration, EducationLevel, RSAAllocation
@@ -2232,3 +2232,117 @@ class UpdateJobSeekerStep3ViewTestCase(TestCase):
             '<input type="checkbox" name="ass_allocation" class="form-check-input" id="id_ass_allocation" checked="">',
             html=True,
         )
+
+
+def test_detect_existing_job_seeker(client):
+    siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+
+    prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
+    user = prescriber_organization.members.first()
+    client.force_login(user)
+
+    job_seeker_profile = JobSeekerProfileFactory(
+        user__nir=None, user__first_name="Jérémy", user__email="jeremy@example.com"
+    )
+
+    default_session_data = {
+        "back_url": "/",
+        "job_seeker_pk": None,
+        "nir": None,
+        "selected_jobs": [],
+    }
+
+    # Entry point.
+    # ----------------------------------------------------------------------
+
+    response = client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"})
+    assert response.status_code == 302
+
+    session_data = client.session[f"job_application-{siae.pk}"]
+    assert session_data == default_session_data
+
+    next_url = reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk})
+    assert response.url == next_url
+
+    # Step determine the job seeker with a NIR.
+    # ----------------------------------------------------------------------
+
+    response = client.get(next_url)
+    assert response.status_code == 200
+
+    NEW_NIR = "197013625838386"
+    response = client.post(next_url, data={"nir": NEW_NIR, "confirm": 1})
+    assert response.status_code == 302
+    expected_session_data = default_session_data | {"nir": NEW_NIR}
+    assert client.session[f"job_application-{siae.pk}"] == expected_session_data
+
+    next_url = reverse("apply:check_email_for_sender", kwargs={"siae_pk": siae.pk})
+    assert response.url == next_url
+
+    # Step get job seeker e-mail.
+    # ----------------------------------------------------------------------
+
+    response = client.get(next_url)
+    assert response.status_code == 200
+
+    response = client.post(next_url, data={"email": "wrong-email@example.com", "confirm": "1"})
+    assert response.status_code == 302
+    job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
+
+    expected_job_seeker_session = {
+        "user": {
+            "email": "wrong-email@example.com",
+            "nir": NEW_NIR,
+        }
+    }
+    assert client.session[job_seeker_session_name] == expected_job_seeker_session
+
+    next_url = reverse(
+        "apply:create_job_seeker_step_1_for_sender",
+        kwargs={"siae_pk": siae.pk, "session_uuid": job_seeker_session_name},
+    )
+    assert response.url == next_url
+
+    # Step to create a job seeker.
+    # ----------------------------------------------------------------------
+
+    response = client.get(next_url)
+    assert response.status_code == 200
+
+    post_data = {
+        "title": job_seeker_profile.user.title,
+        "first_name": "JEREMY",  # Try without the accent and in uppercase
+        "last_name": job_seeker_profile.user.last_name,
+        "birthdate": job_seeker_profile.user.birthdate,
+    }
+    response = client.post(next_url, data=post_data)
+    assert response.status_code == 200
+
+    assertContains(
+        response,
+        (
+            "D'après les informations renseignées, il semblerait que ce candidat soit "
+            "déjà rattaché à un autre email : j*****@e******.c**."
+        ),
+        html=True,
+    )
+    assertContains(
+        response,
+        (
+            '<button type="submit" name="confirm" value="1" class="btn btn-sm btn-primary">'
+            "Poursuivre la création du compte</button>"
+        ),
+        html=True,
+    )
+    # Use the modal button to send confirmation
+    response = client.post(next_url, data=post_data | {"confirm": 1})
+
+    # session data is updated and we are correctly redirected to step 2
+    expected_job_seeker_session["user"] |= post_data
+    assert client.session[job_seeker_session_name] == expected_job_seeker_session
+
+    next_url = reverse(
+        "apply:create_job_seeker_step_2_for_sender",
+        kwargs={"siae_pk": siae.pk, "session_uuid": job_seeker_session_name},
+    )
+    assert response.url == next_url

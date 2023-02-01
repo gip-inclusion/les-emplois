@@ -24,6 +24,7 @@ from itou.siaes.models import Siae, SiaeJobDescription
 from itou.users.enums import UserKind
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.apis.exceptions import AddressLookupError
+from itou.utils.emails import redact_email_address
 from itou.utils.perms.user import get_user_info
 from itou.utils.session import SessionNamespace, SessionNamespaceRequiredMixin
 from itou.utils.storage.s3 import S3Upload
@@ -417,16 +418,30 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
         )
 
     def post(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        context["confirmation_needed"] = False
         if self.form.is_valid():
-            self.job_seeker_session.set("user", self.job_seeker_session.get("user", {}) | self.form.cleaned_data)
-            return HttpResponseRedirect(
-                reverse(
-                    "apply:create_job_seeker_step_2_for_sender",
-                    kwargs={"siae_pk": self.siae.pk, "session_uuid": self.job_seeker_session.name},
-                )
-            )
+            existing_job_seeker = User.objects.filter(
+                kind=UserKind.JOB_SEEKER,
+                birthdate=self.form.cleaned_data["birthdate"],
+                first_name__unaccent__iexact=self.form.cleaned_data["first_name"],
+                last_name__unaccent__iexact=self.form.cleaned_data["last_name"],
+            ).first()
+            if existing_job_seeker and not self.form.data.get("confirm"):
+                # If an existing job seeker matches the info, a confirmation is required
+                context["confirmation_needed"] = True
+                context["redacted_existing_email"] = redact_email_address(existing_job_seeker.email)
 
-        return self.render_to_response(self.get_context_data(**kwargs))
+            if not context["confirmation_needed"]:
+                self.job_seeker_session.set("user", self.job_seeker_session.get("user", {}) | self.form.cleaned_data)
+                return HttpResponseRedirect(
+                    reverse(
+                        "apply:create_job_seeker_step_2_for_sender",
+                        kwargs={"siae_pk": self.siae.pk, "session_uuid": self.job_seeker_session.name},
+                    )
+                )
+
+        return self.render_to_response(context)
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {

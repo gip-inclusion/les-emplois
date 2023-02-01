@@ -37,6 +37,7 @@ from itou.users.enums import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF, 
 from itou.users.factories import ItouStaffFactory, JobSeekerFactory, PrescriberFactory
 from itou.users.models import User
 from itou.utils import constants as global_constants, pagination
+from itou.utils.emails import redact_email_address
 from itou.utils.models import PkSupportRemark
 from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.perms.context_processors import get_current_organization_and_perms
@@ -1216,3 +1217,18 @@ def test_yield_sync_diff():
         "count=1 label=Rome removed by collection",
         "\tREMOVED Vas-y francky (BAZ)",
     ]
+
+
+@pytest.mark.parametrize(
+    "email,expected",
+    [
+        ("", ""),
+        ("test", "t***"),
+        ("test@localhost", "t***@l********"),
+        ("test@example.com", "t***@e******.c**"),
+        ("test.foo@example.com", "t*******@e******.c**"),
+        ("test@beta.gouv.fr", "t***@b********.f*"),
+    ],
+)
+def test_redact_email_adresse(email, expected):
+    assert redact_email_address(email) == expected

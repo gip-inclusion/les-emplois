@@ -54,3 +54,20 @@ def get_email_message(to, context, subject, body, from_email=settings.DEFAULT_FR
 def send_email_messages(email_messages):
     with mail.get_connection() as connection:
         connection.send_messages(email_messages)
+
+
+def redact_email_address(email):
+    def redact_part(part):
+        return part[0] + "*" * (len(part) - 1) if part else ""
+
+    if not email:
+        return ""
+    if "@" not in email:
+        return redact_part(email)
+    user_part, domain_part = email.rsplit("@", 1)
+    redacted_user = redact_part(user_part)
+    if "." in domain_part:
+        redacted_domain = ".".join([redact_part(part) for part in domain_part.rsplit(".", 1)])
+    else:
+        redacted_domain = redact_part(domain_part)
+    return f"{redacted_user}@{redacted_domain}"
