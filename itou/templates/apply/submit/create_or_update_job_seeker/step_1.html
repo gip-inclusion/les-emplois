@@ -9,4 +9,50 @@
     {% bootstrap_field form.first_name %}
     {% bootstrap_field form.last_name %}
     {% bootstrap_field form.birthdate %} {# TODO: Duet border-color button is not of the correct color #}
+
+    {% if confirmation_needed %}
+        <!-- Modal -->
+        <div class="modal" id="email-confirmation-modal" tabindex="-1" role="dialog" aria-labelledby="email-confirmation-label" aria-modal="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="email-confirmation-label">Attention</h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+                            <i class="ri-close-line"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            <strong>
+                                D'après les informations renseignées, il semblerait que ce
+                                candidat soit déjà rattaché à un autre email : {{ redacted_existing_email }}.
+                            </strong>
+                        </p>
+                        <p>
+                            Nous vous invitons à vérifier l'email renseigné précédemment
+                            afin d'éviter la création d'un compte en doublon.
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        {# Go to the next step. #}
+                        <button type="submit" name="confirm" value="1" class="btn btn-sm btn-primary">Poursuivre la création du compte</button>
+                        {# Reload this page with a new form. #}
+                        <a href="{% url 'apply:check_email_for_sender' siae_pk=siae.pk %}" name="cancel" value="1" class="btn btn-sm btn-secondary">Modifier l'email du candidat</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block script %}
+    {{ super }}
+    {% if confirmation_needed %}
+        {# Show the confirmation modal after submitting the form. #}
+        <script nonce="{{ CSP_NONCE }}">
+            // Adding the "show" CSS class is not enough and not documented.
+            // A JS initialization is recommended.
+            $("#email-confirmation-modal").modal("show");
+        </script>
+    {% endif %}
 {% endblock %}
