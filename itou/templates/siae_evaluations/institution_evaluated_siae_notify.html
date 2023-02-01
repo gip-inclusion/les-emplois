@@ -6,15 +6,15 @@
 {% block title %}Notifier la sanction du contrôle pour {{ evaluated_siae }}{{ block.super }}{% endblock %}
 
 {% block content %}
-    <h1>
+    <h1 class="mb-5">
         Notifier la sanction du contrôle pour <span class="text-muted">{{ evaluated_siae }}</span>
     </h1>
-    <div class="row justify-content-between">
-        <section class="col-lg-6 col-12 order-2 order-md-1 card c-card">
-            <div class="row mt-3">
+    <div class="row">
+        <div class="col-lg-6 order-2 order-md-1">
+            <div class="card c-card">
                 <div class="card-body">
-                    <h2>Quelle raison justifie ce résultat ?</h2>
-                    <hr>
+                    <h2 class="mt-2">Quelle raison justifie ce résultat ?</h2>
+                    <hr class="my-4">
                     <p>
                         <b>
                             Résultat de cette campagne de contrôle : <span class="text-danger">Négatif</span>
@@ -33,45 +33,45 @@
                     </form>
                 </div>
             </div>
-        </section>
-        <article class="col-12 col-lg-5 order-1 mb-sm-4 card c-card has-links-inside">
-            <div class="card-header">
-                <h2>Données</h2>
-                <hr class="mt-5">
+        </div>
+        <div class="order-1 col-lg-6 mb-4 mb-lg-0">
+            <div class="card c-card has-links-inside">
+                <div class="card-body">
+                    <h2 class="mt-2">Données</h2>
+                    <hr class="my-4">
+                    <h3>Campagne en cours</h3>
+                    <ul>
+                        <li>{{ refused_percent|floatformat:"0" }} % justificatifs refusés lors de votre contrôle</li>
+                        {% if expected_crits_count %}
+                            <li>
+                                {{ not_submitted_percent|floatformat:"0" }} % justificatifs non soumis par la SIAE (dont {{ uploaded_count }} téléversé{{ uploaded_count|pluralizefr }} sur {{ expected_crits_count }} attendu{{ expected_crits_count|pluralizefr }})
+                            </li>
+                        {% endif %}
+                    </ul>
+                    <a target="_blank" href="{% url 'siae_evaluations_views:institution_evaluated_siae_detail' evaluated_siae_pk=evaluated_siae.pk %}">Revoir
+                        {% if job_apps_count == 1 %}
+                            l’auto-prescription
+                        {% else %}
+                            les {{ job_apps_count }} auto-prescriptions
+                        {% endif %}
+                        <i class="ri-external-link-line"></i></a>
+                    <hr class="my-4">
+                    <h3>Historique des campagnes de contrôle</h3>
+                    <ul class="list-unstyled">
+                        {% for old_evaluated_siae in evaluation_history %}
+                            <li>
+                                Période du {{ old_evaluated_siae.evaluation_campaign.evaluated_period_start_at|date:"d/m/Y" }} au {{ old_evaluated_siae.evaluation_campaign.evaluated_period_end_at|date:"d/m/Y" }} :
+                                {% if old_evaluated_siae.state == "ACCEPTED" %}
+                                    <b class="text-success">Positif</b>
+                                {% else %}
+                                    <b class="text-danger">Négatif</b>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <p>2021 : Campagne non concernée par les sanctions</p>
+                </div>
             </div>
-            <div class="card-body">
-                <h3>Campagne en cours</h3>
-                <ul>
-                    <li>{{ refused_percent|floatformat:"0" }} % justificatifs refusés lors de votre contrôle</li>
-                    {% if expected_crits_count %}
-                        <li>
-                            {{ not_submitted_percent|floatformat:"0" }} % justificatifs non soumis par la SIAE (dont {{ uploaded_count }} téléversé{{ uploaded_count|pluralizefr }} sur {{ expected_crits_count }} attendu{{ expected_crits_count|pluralizefr }})
-                        </li>
-                    {% endif %}
-                </ul>
-                <a target="_blank" href="{% url 'siae_evaluations_views:institution_evaluated_siae_detail' evaluated_siae_pk=evaluated_siae.pk %}">Revoir
-                    {% if job_apps_count == 1 %}
-                        l’auto-prescription
-                    {% else %}
-                        les {{ job_apps_count }} auto-prescriptions
-                    {% endif %}
-                    <i class="ri-external-link-line"></i></a>
-                <hr class="my-5">
-                <h3>Historique des campagnes de contrôle</h3>
-                <ul class="list-unstyled">
-                    {% for old_evaluated_siae in evaluation_history %}
-                        <li>
-                            Période du {{ old_evaluated_siae.evaluation_campaign.evaluated_period_start_at|date:"d/m/Y" }} au {{ old_evaluated_siae.evaluation_campaign.evaluated_period_end_at|date:"d/m/Y" }} :
-                            {% if old_evaluated_siae.state == "ACCEPTED" %}
-                                <b class="text-success">Positif</b>
-                            {% else %}
-                                <b class="text-danger">Négatif</b>
-                            {% endif %}
-                        </li>
-                    {% endfor %}
-                </ul>
-                <p>2021 : Campagne non concernée par les sanctions</p>
-            </div>
-        </article>
+        </div>
     </div>
 {% endblock %}
