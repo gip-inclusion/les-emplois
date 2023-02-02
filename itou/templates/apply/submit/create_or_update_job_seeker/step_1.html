@@ -34,10 +34,12 @@
                         </p>
                     </div>
                     <div class="modal-footer">
-                        {# Go to the next step. #}
-                        <button type="submit" name="confirm" value="1" class="btn btn-sm btn-primary">Poursuivre la création du compte</button>
-                        {# Reload this page with a new form. #}
-                        <a href="{% url 'apply:check_email_for_sender' siae_pk=siae.pk %}" name="cancel" value="1" class="btn btn-sm btn-secondary">Modifier l'email du candidat</a>
+                        <div class="row">
+                            {# Go to the next step. #}
+                            <button type="submit" name="confirm" value="1" class="btn btn-sm btn-link">Poursuivre la création du compte</button>
+                            {# Reload this page with a new form. #}
+                            <a href="{% url 'apply:check_email_for_sender' siae_pk=siae.pk %}?email={{ email_to_create|urlencode }}" name="cancel" value="1" class="btn btn-sm btn-primary">Modifier l'email du candidat</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -46,7 +48,7 @@
 {% endblock %}
 
 {% block script %}
-    {{ super }}
+    {{ block.super }}
     {% if confirmation_needed %}
         {# Show the confirmation modal after submitting the form. #}
         <script nonce="{{ CSP_NONCE }}">
