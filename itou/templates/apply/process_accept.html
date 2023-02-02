@@ -1,6 +1,7 @@
 {% extends "apply/process_base.html" %}
 {% load bootstrap4 %}
 {% load static %}
+{% load str_filters %}
 
 {% block content %}
 
@@ -17,9 +18,7 @@
               hx-swap="outerHTML show:#acceptForm:top"
               class="mt-5 js-format-nir"
               id="acceptForm"
-              tabindex="0"
               aria-labelledby="dialogLabel"
-              aria-hidden="true"
               {% if modal_shown %}data-htmx-open-modal="#js-confirmation-modal"{% endif %}>
             {% if has_form_error %}
                 <div class="alert alert-danger">
@@ -29,7 +28,7 @@
 
             {% csrf_token %}
 
-            {% if form_address or form_personal_data %}<h3 class="h2">Candidat</h3>{% endif %}
+            {% if form_address or form_personal_data %}<h2 class="h2">Candidat</h2>{% endif %}
 
             {% if form_personal_data %}
                 {% if form_personal_data.nir_error %}{{ form_personal_data.nir_error|safe }}{% endif %}
@@ -49,7 +48,7 @@
 
             <div class="mt-5">
 
-                <h3 class="h2">Embauche</h3>
+                <h2 class="h2">Embauche</h2>
                 {% bootstrap_form form_accept alert_error_type="all" %}
 
             </div>
@@ -58,8 +57,9 @@
             {% buttons %}
                 <div class="text-right mb-4">
                     <a class="btn btn-outline-primary bg-white" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">Retour</a>
-                    <button type="submit" class="btn btn-primary btn-ico">
-                        <i class="ri-check-line ri-xl"></i><span class=".btn .btn-ico"></span>Valider l’embauche
+                    <button type="submit" class="btn btn-primary btn-ico" aria-label="Valider l’embauche de {{ job_application.job_seeker.get_full_name|title|mask_unless:can_view_personal_information }}">
+                        <i class="ri-check-line ri-xl"></i>
+                        <span>Valider l’embauche</span>
                     </button>
                 </div>
             {% endbuttons %}

@@ -3,7 +3,7 @@
 {% load static %}
 {% load str_filters %}
 
-{% block title %}Candidatures reçues{{ block.super }}{% endblock %}
+{% block title %}Candidatures reçues {{ block.super }}{% endblock %}
 
 {% block extra_head %}{{ filters_form.media.css }}{% endblock %}
 
@@ -50,7 +50,9 @@
                         {% include "apply/includes/job_applications_filters/sender.html" %}
                     </div>
                     <div class="card-footer text-right">
-                        <button id="js-job-applications-filters-apply-button" type="submit" class="btn btn-primary">Appliquer</button>
+                        <button id="js-job-applications-filters-apply-button" type="submit" class="btn btn-primary" aria-label="Appliquer les filtres">
+                            Appliquer
+                        </button>
                     </div>
                 </div>
             </form>
@@ -86,13 +88,11 @@
                         {% include "apply/includes/list_card_body.html" with job_application=job_application %}
 
                         <div class="card-footer bg-white">
-                            <div class="row">
-                                <div class="col-sm-3">
-                                    <a class="btn btn-emploi" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}?back_url={{ request.get_full_path|urlencode }}">
-                                        Gérer la candidature
-                                    </a>
-                                </div>
-                            </div>
+                            <a class="btn btn-emploi"
+                               href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}?back_url={{ request.get_full_path|urlencode }}"
+                               aria-label="Gérer la candidature de {{ job_application.job_seeker.get_full_name|mask_unless:job_application.user_can_view_personal_information }}">
+                                Gérer la candidature
+                            </a>
                         </div>
 
                     </div>

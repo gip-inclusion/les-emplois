@@ -1,5 +1,6 @@
 {% extends "apply/process_base.html" %}
 {% load bootstrap4 %}
+{% load str_filters %}
 
 {% block content %}
 
@@ -13,7 +14,9 @@
 
         {% buttons %}
             <a class="btn btn-outline-primary" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">Annuler</a>
-            <button type="submit" class="btn btn-success">Mettre en liste d'attente</button>
+            <button type="submit" class="btn btn-success" aria-label="Mettre la candidature de {{ job_application.job_seeker.get_full_name|title|mask_unless:can_view_personal_information }} en liste d'attente">
+                Mettre en liste d'attente
+            </button>
         {% endbuttons %}
 
     </form>
