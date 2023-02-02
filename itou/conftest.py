@@ -1,3 +1,6 @@
+# Workaround being able to use freezegun with pandas.
+# https://github.com/spulec/freezegun/issues/98
+import pandas  # noqa F401
 import pytest
 from django.conf import settings
 from django.contrib.gis.db.models.fields import get_srid_info
