@@ -23,7 +23,9 @@ class EmployeeRecordFactory(BareEmployeeRecordFactory):
     (no job seeker profile linked => not updatable)
     """
 
-    job_application = factory.SubFactory(JobApplicationWithApprovalNotCancellableFactory)
+    job_application = factory.SubFactory(
+        JobApplicationWithApprovalNotCancellableFactory, to_siae__use_employee_record=True
+    )
     asp_id = factory.SelfAttribute(".job_application.to_siae.convention.asp_id")
     approval_number = factory.SelfAttribute(".job_application.approval.number")
     siret = factory.SelfAttribute(".job_application.to_siae.siret")

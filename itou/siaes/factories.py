@@ -101,7 +101,7 @@ class SiaeFactory(factory.django.DjangoModelFactory):
     post_code = factory.Faker("postalcode")
     city = factory.Faker("city", locale="fr_FR")
     source = models.Siae.SOURCE_ASP
-    convention = factory.SubFactory(SiaeConventionFactory)
+    convention = factory.SubFactory(SiaeConventionFactory, kind=factory.SelfAttribute("..kind"))
     department = factory.LazyAttribute(lambda o: department_from_postcode(o.post_code))
 
 

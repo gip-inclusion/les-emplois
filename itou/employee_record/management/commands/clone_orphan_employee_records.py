@@ -28,9 +28,7 @@ class Command(BaseCommand):
 
     @transaction.atomic()
     def handle(self, old_asp_id, new_asp_id, wet_run=False, **options):
-        try:
-            siaes_models.SiaeConvention.objects.get(asp_id=new_asp_id)
-        except siaes_models.SiaeConvention.DoesNotExist:
+        if not siaes_models.SiaeConvention.objects.filter(asp_id=new_asp_id).exists():
             self.stderr.write(f"No convention exists with {new_asp_id=}!")
             return
 

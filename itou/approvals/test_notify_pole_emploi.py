@@ -172,7 +172,7 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         )
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_ERROR)
         job_seeker = JobSeekerFactory()
-        siae = SiaeFactory(kind="FOOBAR")  # unknown kind
+        siae = SiaeFactory(kind="FOO")  # unknown kind
         approval = ApprovalFactory(user=job_seeker)
         JobApplicationFactory(to_siae=siae, approval=approval, state=JobApplicationWorkflow.STATE_ACCEPTED)
         approval.notify_pole_emploi(at=now)
@@ -190,7 +190,7 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         )
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_ERROR)
         job_seeker = JobSeekerFactory()
-        siae = SiaeFactory(kind="FOOBAR")  # unknown kind
+        siae = SiaeFactory(kind="FOO")  # unknown kind
         approval = ApprovalFactory(user=job_seeker)
         JobApplicationFactory(to_siae=siae, approval=approval, state=JobApplicationWorkflow.STATE_POSTPONED)
         approval.notify_pole_emploi(at=now)

@@ -430,9 +430,7 @@ class EmployeeRecord(models.Model):
         if not self.is_orphan:
             raise CloningError(f"This employee record is not an orphan, {self.asp_id=}")
 
-        try:
-            convention = SiaeConvention.objects.get(asp_id=asp_id)
-        except SiaeConvention.DoesNotExist:
+        if not SiaeConvention.objects.filter(asp_id=asp_id).exists():
             raise CloningError(f"Unable to find SIAE convention for asp_id: {asp_id}")
 
         # Cleanup clone fields
@@ -440,7 +438,7 @@ class EmployeeRecord(models.Model):
             status=Status.NEW,
             job_application=self.job_application,
             approval_number=self.approval_number,
-            asp_id=convention.asp_id,
+            asp_id=asp_id,
             siret=EmployeeRecord.siret_from_asp_source(self.job_application.to_siae),
             asp_processing_label=f"{self.ASP_CLONE_MESSAGE} (pk origine: {self.pk})",
         )
