@@ -5,24 +5,6 @@ from itou.eligibility.models import AdministrativeCriteria
 from itou.siaes.enums import SiaeKind
 
 
-class ConfirmEligibilityForm(forms.Form):
-    """
-    Confirmation is currently required only for SIAEs.
-    """
-
-    confirm = forms.BooleanField(
-        label=(
-            "Le candidat étant éligible à l'IAE, je m'engage à conserver les justificatifs "
-            "correspondants aux critères d'éligibilité sélectionnés pour 24 mois, en cas de contrôle."
-        )
-    )
-
-    def clean_confirm(self):
-        if not self.cleaned_data["confirm"]:
-            error = "Vous devez confirmer l'éligibilité du candidat."
-            raise forms.ValidationError(error)
-
-
 class AdministrativeCriteriaForm(forms.Form):
 
     LEVEL_1_PREFIX = eligibilty_enums.AdministrativeCriteriaLevelPrefix.LEVEL_1_PREFIX

@@ -14,10 +14,6 @@
 
     {% csrf_token %}
 
-    {% if form_confirm_eligibility and request.user.is_siae_staff %}
-        {% bootstrap_form_errors form_confirm_eligibility type="all" %}
-    {% endif %}
-
     {% bootstrap_form_errors form_administrative_criteria type="all" %}
 
     {% if request.user.is_siae_staff %}<h3 class="h2">Critères administratifs de niveau 1</h3>{% endif %}
@@ -35,12 +31,11 @@
             {% include "eligibility/includes/criteria_input.html" with field=field objects_dict=form_administrative_criteria.OBJECTS %}
         {% endif %}
     {% endfor %}
-    {% if form_confirm_eligibility and request.user.is_siae_staff %}
-        <hr>
-        {% bootstrap_form form_confirm_eligibility %}
-    {% endif %}
 
-    <p>En cliquant sur "Valider" vous confirmez que le candidat est éligible à l'insertion par l'activité économique.</p>
+    <p>
+        En cliquant sur "Valider" vous confirmez que le candidat est éligible à l'insertion par l'activité économique et vous vous engagez
+        à conserver les justificatifs correspondants aux critères d'éligibilité sélectionnés pendant 24 mois, en cas de contrôle.
+    </p>
     {% buttons %}
         <p class="text-right">
             {% if cancel_url %}<a class="btn btn-outline-primary" href="{{ cancel_url }}">Annuler</a>{% endif %}
