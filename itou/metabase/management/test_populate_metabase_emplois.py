@@ -24,7 +24,7 @@ from itou.users.factories import JobSeekerFactory, PrescriberFactory, SiaeStaffF
 
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
-def test_populate_metabase_analytics():
+def test_populate_analytics():
     date_maj = datetime.date.today() + datetime.timedelta(days=-1)
     data0 = DatumFactory(code="ER-101", bucket="2021-12-31")
     data1 = DatumFactory(code="ER-102", bucket="2020-10-17")
@@ -347,7 +347,7 @@ def test_check_inconsistencies(capsys):
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
-def test_populate_metabase_approvals():
+def test_populate_approvals():
     approval = ApprovalFactory()
     pe_approval = PoleEmploiApprovalFactory()
 
