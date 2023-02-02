@@ -5,16 +5,18 @@ from django.contrib.gis.geos import Point
 from django.core import management
 from django.db import connection
 from django.utils import timezone
+from freezegun import freeze_time
 from pytest_django.asserts import assertNumQueries
 
 from itou.analytics.factories import DatumFactory
 from itou.approvals.enums import Origin
-from itou.approvals.factories import ApprovalFactory
+from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.eligibility.models import AdministrativeCriteria
 from itou.geo.factories import QPVFactory
 from itou.geo.utils import coords_to_geometry
 from itou.job_applications.factories import JobApplicationFactory
+from itou.metabase.tables.utils import hash_content
 from itou.siaes.factories import SiaeFactory
 from itou.users.enums import IdentityProvider
 from itou.users.factories import JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
@@ -338,3 +340,68 @@ def test_check_inconsistencies(capsys):
         "Checking data for inconsistencies.",
         "FATAL ERROR: At least one user has an approval but is not a job seeker",
     ]
+
+
+@freeze_time("2023-02-02")
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.usefixtures("metabase")
+def test_populate_metabase_approvals():
+    approval = ApprovalFactory()
+    pe_approval = PoleEmploiApprovalFactory()
+
+    num_queries = 1  # Count approvals
+    num_queries += 1  # Count PE approvals
+    num_queries += 1  # Select approval IDs
+    num_queries += 1  # Select approvals IDs, chunk by 1000
+    num_queries += 1  # Select approvals with columns
+    num_queries += 1  # Prefetch users
+    num_queries += 1  # Prefetch JobApplications
+
+    num_queries += 1  # Select PE approval IDs
+    num_queries += 1  # Select PE approvals IDs, chunk by 1000
+    num_queries += 1  # Select PE approvals with columns
+    num_queries += 1  # Select prescriber organizations
+    with assertNumQueries(num_queries):
+        management.call_command("populate_metabase_emplois", mode="approvals")
+
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM pass_agréments ORDER BY date_début")
+        rows = cursor.fetchall()
+        assert rows == [
+            (
+                "PASS IAE (XXXXX)",
+                datetime.date(2023, 2, 2),
+                datetime.date(2025, 2, 1),
+                datetime.timedelta(days=730),
+                approval.user.id,
+                hash_content(approval.user_id),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                0,
+                hash_content(approval.number),
+                datetime.date(2023, 2, 1),
+            ),
+            (
+                "Agrément PE",
+                datetime.date(2023, 2, 2),
+                datetime.date(2025, 2, 1),
+                datetime.timedelta(days=730),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                0,
+                hash_content(pe_approval.number),
+                datetime.date(2023, 2, 1),
+            ),
+        ]

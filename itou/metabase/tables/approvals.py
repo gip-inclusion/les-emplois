@@ -127,7 +127,7 @@ TABLE.add_columns(
             "name": "injection_ai",
             "type": "boolean",
             "comment": "Provient des injections AI",
-            "fn": lambda o: o.origin == Origin.AI_STOCK,
+            "fn": lambda o: o.origin == Origin.AI_STOCK if isinstance(o, Approval) else False,
         },
         {
             "name": "hash_numéro_pass_iae",
