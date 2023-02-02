@@ -316,7 +316,7 @@ class CheckEmailForSenderView(ApplyStepForSenderBaseView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.form = UserExistsForm(data=request.POST or None)
+        self.form = UserExistsForm(initial=request.GET, data=request.POST or None)
 
     def post(self, request, *args, **kwargs):
         can_add_nir = False
@@ -431,6 +431,7 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
                 # If an existing job seeker matches the info, a confirmation is required
                 context["confirmation_needed"] = True
                 context["redacted_existing_email"] = redact_email_address(existing_job_seeker.email)
+                context["email_to_create"] = self.job_seeker_session.get("user", {}).get("email", "")
 
             if not context["confirmation_needed"]:
                 self.job_seeker_session.set("user", self.job_seeker_session.get("user", {}) | self.form.cleaned_data)

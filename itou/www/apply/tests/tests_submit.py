@@ -2329,11 +2329,15 @@ def test_detect_existing_job_seeker(client):
     assertContains(
         response,
         (
-            '<button type="submit" name="confirm" value="1" class="btn btn-sm btn-primary">'
+            '<button type="submit" name="confirm" value="1" class="btn btn-sm btn-link">'
             "Poursuivre la création du compte</button>"
         ),
         html=True,
     )
+    check_email_url = (
+        reverse("apply:check_email_for_sender", kwargs={"siae_pk": siae.pk}) + "?email=wrong-email%40example.com"
+    )
+    assertContains(response, check_email_url)
     # Use the modal button to send confirmation
     response = client.post(next_url, data=post_data | {"confirm": 1})
 
@@ -2346,3 +2350,7 @@ def test_detect_existing_job_seeker(client):
         kwargs={"siae_pk": siae.pk, "session_uuid": job_seeker_session_name},
     )
     assert response.url == next_url
+
+    # If we chose to cancel & go back, we should find our old wrong email in the page
+    response = client.get(check_email_url)
+    assertContains(response, "wrong-email@example.com")
