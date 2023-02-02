@@ -25,7 +25,7 @@ from itou.utils.perms.user import get_user_info
 from itou.utils.urls import get_external_link_markup, get_safe_url
 from itou.www.apply.forms import AcceptForm, AnswerForm, JobSeekerPersonalDataForm, RefusalForm, UserAddressForm
 from itou.www.apply.views import constants as apply_view_constants
-from itou.www.eligibility_views.forms import AdministrativeCriteriaForm, ConfirmEligibilityForm
+from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 
 
 def check_waiting_period(job_application):
@@ -481,9 +481,7 @@ def eligibility(request, job_application_id, template_name="apply/process_eligib
     form_administrative_criteria = AdministrativeCriteriaForm(
         request.user, siae=job_application.to_siae, data=request.POST or None
     )
-    form_confirm_eligibility = ConfirmEligibilityForm(data=request.POST or None)
-
-    if request.method == "POST" and form_confirm_eligibility.is_valid() and form_administrative_criteria.is_valid():
+    if request.method == "POST" and form_administrative_criteria.is_valid():
         user_info = get_user_info(request)
         EligibilityDiagnosis.create_diagnosis(
             job_application.job_seeker, user_info, administrative_criteria=form_administrative_criteria.cleaned_data
@@ -496,7 +494,6 @@ def eligibility(request, job_application_id, template_name="apply/process_eligib
         "job_application": job_application,
         "can_view_personal_information": True,  # SIAE members have access to personal info
         "form_administrative_criteria": form_administrative_criteria,
-        "form_confirm_eligibility": form_confirm_eligibility,
         "job_seeker": job_application.job_seeker,
     }
     return render(request, template_name, context)

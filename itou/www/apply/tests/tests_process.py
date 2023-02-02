@@ -919,10 +919,13 @@ class ProcessViewsTest(TestCase):
         assert response.status_code == 200
         self.assertTemplateUsed(response, "apply/includes/known_criteria.html", count=1)
 
-        # Ensure that a manual confirmation is mandatory.
-        post_data = {"confirm": "false"}
+        # Ensure that some criteria are mandatory.
+        post_data = {
+            f"{criterion1.key}": "false",
+        }
         response = self.client.post(url, data=post_data)
         assert response.status_code == 200
+        assert response.context["form_administrative_criteria"].errors
 
         post_data = {
             # Administrative criteria level 1.
@@ -930,8 +933,6 @@ class ProcessViewsTest(TestCase):
             # Administrative criteria level 2.
             f"{criterion2.key}": "true",
             f"{criterion3.key}": "true",
-            # Confirm.
-            "confirm": "true",
         }
         response = self.client.post(url, data=post_data)
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
