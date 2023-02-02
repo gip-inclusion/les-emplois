@@ -7,19 +7,21 @@
 
     {% if job_application.refusal_reason %}
         <p>
-            <b>Motif de refus :</b> {{ job_application.get_refusal_reason_display }}
+            <b>Motif de refus :</b> {{ job_application.get_refusal_reason_display }}
         </p>
     {% endif %}
 
     {% if job_application.answer_to_prescriber %}
         <h4 class="h6 mt-4">Commentaire privé de l'employeur</h4>
-        <div class="bg-gray-100 border rounded font-italic px-3 pt-3 pb-0 mb-3">
+        <blockquote class="bg-info-lightest rounded font-italic px-3 pt-3 pb-1 mb-3">
             {{ job_application.answer_to_prescriber|linebreaks }}
-        </div>
+        </blockquote>
     {% endif %}
 
     {% if job_application.answer %}
         <h4 class="h6 mt-4">Copie du message envoyé au candidat</h4>
-        <div class="bg-gray-100 border rounded font-italic px-3 pt-3 pb-0">{{ job_application.answer|linebreaks }}</div>
+        <blockquote class="bg-info-lightest rounded font-italic px-3 pt-3 pb-1">
+            {{ job_application.answer|linebreaks }}
+        </blockquote>
     {% endif %}
 {% endif %}
