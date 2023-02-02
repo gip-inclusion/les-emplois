@@ -8,7 +8,7 @@ select
     sum(nombre_etp_consommes_reels_annuels) as total_etp_annuels_realises,
     etp.effectif_mensuel_conventionné,
     case 
-        when etp.nombre_etp_conventionnés <> 0 then sum(nombre_etp_consommes_reels_annuels)/etp.effectif_mensuel_conventionné*100      
+        when etp.nombre_etp_conventionnés <> 0 then sum(nombre_etp_consommes_reels_mensuels)/etp.effectif_mensuel_conventionné*100      
         else 0
     end taux_de_realisation,
     max(date_part('month',etp_c.date_saisie)) as mois_max,
