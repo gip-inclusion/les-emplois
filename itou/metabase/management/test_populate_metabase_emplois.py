@@ -320,30 +320,6 @@ def test_populate_job_seekers():
     ]
 
 
-def test_check_inconsistencies(capsys):
-    approval = ApprovalFactory()
-
-    with assertNumQueries(1):  # Select the job seekers
-        management.call_command("populate_metabase_emplois", mode="data_inconsistencies")
-
-    stdout, _ = capsys.readouterr()
-    out_lines = stdout.splitlines()
-    assert out_lines[0] == "Checking data for inconsistencies."
-    assert "timeit: method=report_data_inconsistencies completed in seconds=" in out_lines[1]
-    assert "timeit: method=handle completed in seconds=" in out_lines[2]
-
-    approval.user.kind = "siae_staff"
-    approval.user.save()
-
-    with pytest.raises(RuntimeError):
-        management.call_command("populate_metabase_emplois", mode="data_inconsistencies")
-    stdout, _ = capsys.readouterr()
-    assert stdout.splitlines() == [
-        "Checking data for inconsistencies.",
-        "FATAL ERROR: At least one user has an approval but is not a job seeker",
-    ]
-
-
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
@@ -407,3 +383,27 @@ def test_populate_approvals():
                 datetime.date(2023, 2, 1),
             ),
         ]
+
+
+def test_data_inconsistencies(capsys):
+    approval = ApprovalFactory()
+
+    with assertNumQueries(1):  # Select the job seekers
+        management.call_command("populate_metabase_emplois", mode="data_inconsistencies")
+
+    stdout, _ = capsys.readouterr()
+    out_lines = stdout.splitlines()
+    assert out_lines[0] == "Checking data for inconsistencies."
+    assert "timeit: method=report_data_inconsistencies completed in seconds=" in out_lines[1]
+    assert "timeit: method=handle completed in seconds=" in out_lines[2]
+
+    approval.user.kind = "siae_staff"
+    approval.user.save()
+
+    with pytest.raises(RuntimeError):
+        management.call_command("populate_metabase_emplois", mode="data_inconsistencies")
+    stdout, _ = capsys.readouterr()
+    assert stdout.splitlines() == [
+        "Checking data for inconsistencies.",
+        "FATAL ERROR: At least one user has an approval but is not a job seeker",
+    ]
