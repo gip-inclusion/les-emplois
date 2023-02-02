@@ -2,7 +2,7 @@ import pytest
 from django.db import connection
 
 from itou.metabase import db
-from itou.metabase.tables.utils import get_qpv_job_seeker_pks
+from itou.metabase.tables.utils import get_insee_code_to_zrr_status_map, get_qpv_job_seeker_pks
 
 
 @pytest.fixture(name="metabase")
@@ -39,3 +39,10 @@ def clear_qpv_cache():
     # Clear cache on get_qpv_job_seeker_pks to ensure we have the correct data
     # and that the query is always performed
     get_qpv_job_seeker_pks.cache_clear()
+
+
+@pytest.fixture(autouse=True)
+def clear_zrr_cache():
+    # Clear cache on get_insee_code_to_zrr_status_map to ensure we have the correct data
+    # and that the query is always performed
+    get_insee_code_to_zrr_status_map.cache_clear()

@@ -1,6 +1,6 @@
-from itou.geo.factories import QPVFactory
+from itou.geo.factories import QPVFactory, ZRRFactory
 from itou.geo.utils import coords_to_geometry
-from itou.metabase.tables.utils import get_qpv_job_seeker_pks
+from itou.metabase.tables.utils import get_qpv_job_seeker_pks, get_zrr_status_for_insee_code
 from itou.users.factories import JobSeekerFactory
 
 
@@ -15,3 +15,22 @@ def test_get_qpv_job_seeker_pks():
 
     assert job_seeker_in_qpv.pk in get_qpv_job_seeker_pks()
     assert job_seeker_not_in_qpv.pk not in get_qpv_job_seeker_pks()
+
+
+def test_get_zrr_status_for_unknown_insee_code():
+    assert get_zrr_status_for_insee_code("12345") == "Statut ZRR inconnu"
+
+
+def test_get_zrr_status_for_insee_code_in_zrr():
+    in_zrr = ZRRFactory(in_zrr=True)
+    assert get_zrr_status_for_insee_code(in_zrr.insee_code) == "Classée en ZRR"
+
+
+def test_get_zrr_status_for_insee_code_not_in_zrr():
+    not_in_zrr = ZRRFactory(not_in_zrr=True)
+    assert get_zrr_status_for_insee_code(not_in_zrr.insee_code) == "Non-classée en ZRR"
+
+
+def test_get_zrr_status_for_insee_code_partially_in_zrr():
+    partially_in_zrr = ZRRFactory(partially_in_zrr=True)
+    assert get_zrr_status_for_insee_code(partially_in_zrr.insee_code) == "Partiellement classée en ZRR"
