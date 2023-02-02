@@ -74,7 +74,7 @@ with siae_data as (
             on (siae_membership.user_id=u.id)
         inner join siaes_siae as siae
             on (siae.id=siae_membership.siae_id)
-    where u.is_siae_staff is true
+    where u.kind='siae_staff'
 ),
 
 org_data as (
@@ -106,7 +106,7 @@ org_data as (
             on (prescriber_membership.user_id=u.id)
         inner join prescribers_prescriberorganization as org
             on (org.id=prescriber_membership.organization_id)
-    where u.is_prescriber is true
+    where u.kind='prescriber'
 )
 
 select * from siae_data as siae
