@@ -4,11 +4,11 @@ select
     etp.af_numero_convention,
     date_saisie,
     annee_af,
-    sum(nombre_etp_consommes_reels_mensuels) as total_etp_annuels_realises,
-    sum(nombre_etp_consommes_reels_annuels) as total_etp_mensuels_realises,
-    (etp.nombre_etp_conventionnés) as etp_conventionnés,
+    sum(nombre_etp_consommes_reels_mensuels) as total_etp_mensuels_realises,
+    sum(nombre_etp_consommes_reels_annuels) as total_etp_annuels_realises,
+    etp.effectif_mensuel_conventionné,
     case 
-        when etp.nombre_etp_conventionnés <> 0 then sum(nombre_etp_consommes_reels_annuels)/etp.nombre_etp_conventionnés*100      
+        when etp.nombre_etp_conventionnés <> 0 then sum(nombre_etp_consommes_reels_annuels)/etp.effectif_mensuel_conventionné*100      
         else 0
     end taux_de_realisation,
     max(date_part('month',etp_c.date_saisie)) as mois_max,
@@ -32,7 +32,7 @@ group by
     etp.id_annexe_financiere,
     etp.af_numero_convention,
     etp.af_numero_annexe_financiere,
-    etp_conventionnés,
+    effectif_mensuel_conventionné,
     date_saisie,
     annee_af,
     etp.type_structure,
