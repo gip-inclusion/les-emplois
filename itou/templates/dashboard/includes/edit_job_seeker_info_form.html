@@ -1,7 +1,7 @@
 {% comment %}
 
     Usage:
-        {% include "dashboard/includes/edit_job_seeker_info_form.html" with prev_url="some_url" submit_label="Enregistrer" %}
+        {% include "dashboard/includes/edit_job_seeker_info_form.html" with prev_url="some_url" submit_label="Enregistrer et quitter" %}
 
 {% endcomment %}
 
@@ -27,9 +27,12 @@
     {% bootstrap_field form.pole_emploi_id %}
     {% bootstrap_field form.lack_of_pole_emploi_id_reason %}
 
+    <hr class="my-4">
     {% buttons %}
-        <a class="btn btn-outline-primary" href="{{ prev_url }}">Annuler</a>
-        <button type="submit" class="btn btn-primary">{{ submit_label }}</button>
+        <div class="text-right mb-4">
+            <a class="btn btn-link" href="{{ prev_url }}">Annuler</a>
+            <button type="submit" class="btn btn-primary">{{ submit_label }}</button>
+        </div>
     {% endbuttons %}
 
 </form>

@@ -2,7 +2,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
-from itou.common_apps.address.forms import MandatoryAddressFormMixin
+from itou.common_apps.address.forms import MandatoryAddressFormMixin, OptionalAddressFormMixin
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
 from itou.job_applications.notifications import (
     NewQualifiedJobAppEmployersNotification,
@@ -105,7 +105,7 @@ class EditJobSeekerInfoForm(JobSeekerNIRUpdateMixin, MandatoryAddressFormMixin, 
         return super().save(commit=commit)
 
 
-class EditUserInfoForm(MandatoryAddressFormMixin, SSOReadonlyMixin, forms.ModelForm):
+class EditUserInfoForm(OptionalAddressFormMixin, SSOReadonlyMixin, forms.ModelForm):
     """
     Edit a user profile.
     """
@@ -114,20 +114,6 @@ class EditUserInfoForm(MandatoryAddressFormMixin, SSOReadonlyMixin, forms.ModelF
         super().__init__(*args, **kwargs)
 
         assert not self.instance.is_job_seeker, self.instance
-
-        if self.instance.has_sso_provider:
-            # SSO users do not have access to edit_user_email dedicated view:
-            # this field allows them to discover their dedicated process
-            self.fields["email"] = forms.EmailField(
-                label="Adresse électronique",
-                disabled=True,
-                widget=forms.TextInput(attrs={"autocomplete": "off"}),
-                help_text=(
-                    "Si vous souhaitez modifier votre adresse e-mail merci de "
-                    f"<a href='{global_constants.ITOU_ASSISTANCE_URL}/#support' target='_blank'>"
-                    "contacter notre support technique</a>"
-                ),
-            )
 
     class Meta:
         model = User

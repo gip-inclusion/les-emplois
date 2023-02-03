@@ -21,6 +21,7 @@ from itou.job_applications.notifications import (
     NewQualifiedJobAppEmployersNotification,
     NewSpontaneousJobAppEmployersNotification,
 )
+from itou.openid_connect.inclusion_connect.testing import InclusionConnectBaseTestCase
 from itou.prescribers import factories as prescribers_factories
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.siae_evaluations import enums as evaluation_enums
@@ -607,7 +608,7 @@ class DashboardViewTest(TestCase):
         )
 
 
-class EditUserInfoViewTest(TestCase):
+class EditUserInfoViewTest(InclusionConnectBaseTestCase):
     def setUp(self):
         super().setUp()
         self.NIR_UPDATE_TALLY_LINK_LABEL = "Demander la correction du numéro de sécurité sociale"
@@ -782,6 +783,42 @@ class EditUserInfoViewTest(TestCase):
         assert response.status_code == 302
 
         user = User.objects.get(id=user.id)
+        assert user.phone == post_data["phone"]
+        assert user.address_line_1 == post_data["address_line_1"]
+        assert user.address_line_2 == post_data["address_line_2"]
+        assert user.post_code == post_data["post_code"]
+        assert user.city == post_data["city"]
+
+    def test_edit_as_prescriber_with_ic(self):
+        user = PrescriberFactory(identity_provider=IdentityProvider.INCLUSION_CONNECT)
+        self.client.force_login(user)
+        url = reverse("dashboard:edit_user_info")
+        response = self.client.get(url)
+        self.assertNotContains(response, "id_nir")
+        self.assertNotContains(response, "id_lack_of_nir")
+        self.assertNotContains(response, "id_lack_of_nir_reason")
+        self.assertNotContains(response, "birthdate")
+        self.assertContains(response, f"Prénom : <strong>{user.first_name}</strong>")
+        self.assertContains(response, f"Nom : <strong>{user.last_name}</strong>")
+        self.assertContains(response, f"Adresse e-mail : <strong>{user.email}</strong>")
+        self.assertContains(response, "Modifier ces informations")
+
+        post_data = {
+            "email": "aaa",
+            "first_name": "Bob",
+            "last_name": "Saint Clar",
+            "phone": "0610203050",
+            "address_line_1": "10, rue du Gué",
+            "address_line_2": "Sous l'escalier",
+            "post_code": "35400",
+            "city": "Saint-Malo",
+        }
+        response = self.client.post(url, data=post_data)
+        assert response.status_code == 302
+
+        user = User.objects.get(id=user.id)
+        assert user.first_name != "Bob"
+        assert user.first_name != "Saint Clair"
         assert user.phone == post_data["phone"]
         assert user.address_line_1 == post_data["address_line_1"]
         assert user.address_line_2 == post_data["address_line_2"]
