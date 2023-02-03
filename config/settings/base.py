@@ -582,7 +582,6 @@ CSP_IMG_SRC = [
     "data:",  # Because of tarteaucitron.js
     "*.tile.openstreetmap.org",
     "*.hotjar.com",
-    "https://stats.data.gouv.fr",
     "https://www.gstatic.com",  # Used by google translate
     "https://translate.google.com",  # Used by google translate
     "https://cdn.redoc.ly",
@@ -603,7 +602,6 @@ CSP_FONT_SRC = [
 ]
 CSP_SCRIPT_SRC = [
     "'self'",
-    "https://stats.data.gouv.fr",
     "https://stats.inclusion.beta.gouv.fr",
     "*.hotjar.com",
     "https://translate.googleapis.com",  # Allow google translate
@@ -617,12 +615,17 @@ CSP_SCRIPT_SRC_ELEM = CSP_SCRIPT_SRC
 CSP_CONNECT_SRC = [
     "'self'",
     "*.sentry.io",  # Allow to send reports to sentry without CORS errors.
-    "https://stats.data.gouv.fr",
     "*.hotjar.com",
     "*.hotjar.io",
     "wss://*.hotjar.com",
     "https://translate.googleapis.com",  # Allow google translate
 ]
+
+if MATOMO_BASE_URL:
+    CSP_IMG_SRC.append(MATOMO_BASE_URL)
+    CSP_SCRIPT_SRC.append(MATOMO_BASE_URL)
+    CSP_CONNECT_SRC.append(MATOMO_BASE_URL)
+
 CSP_WORKER_SRC = [
     "'self' blob:",  # Redoc seems to use blob:https://emplois.inclusion.beta.gouv.fr/some-ran-dom-uu-id
 ]
