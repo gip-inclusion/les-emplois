@@ -1456,7 +1456,7 @@ class ProlongationNotificationsTest(TestCase):
         assert title(prolongation.declared_by.get_full_name()) in email.body
 
         assert prolongation.declared_by_siae.display_name in email.body
-        assert prolongation.approval.number_with_spaces in email.body
+        assert prolongation.approval.number in email.body
         assert title(prolongation.approval.user.first_name) in email.body
         assert title(prolongation.approval.user.last_name) in email.body
         assert global_constants.ITOU_EMAIL_PROLONGATION in email.body
