@@ -75,7 +75,6 @@ def _generate_inclusion_params_from_session(ic_session):
         "scope": constants.INCLUSION_CONNECT_SCOPES,
         "state": signed_csrf,
         "nonce": crypto.get_random_string(length=12),
-        "from": "emplois",  # Display a "Les emplois" logo on the connection page.
     }
     if (user_email := ic_session.get("user_email")) is not None:
         data["login_hint"] = user_email
