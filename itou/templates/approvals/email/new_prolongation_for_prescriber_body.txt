@@ -5,7 +5,7 @@ Bonjour,
 
 {{ prolongation.declared_by.get_full_name|title }} de la structure {{ prolongation.declared_by_siae.display_name }} a déclaré avoir obtenu votre accord pour prolonger un PASS IAE :
 
-- Numéro de PASS : {{ prolongation.approval.number_with_spaces }}
+- Numéro de PASS : {{ prolongation.approval.number }}
 - Prénom : {{ prolongation.approval.user.first_name|title }}
 - Nom : {{ prolongation.approval.user.last_name|title }}
 - Début de la prolongation : {{ prolongation.start_at|date:"d/m/Y" }}
