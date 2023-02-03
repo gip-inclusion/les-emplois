@@ -12,16 +12,16 @@ select
     date_part('year', af.af_date_debut_effet_v2) as annee_af,
     af_date_debut_effet_v2,
     af_date_fin_effet_v2,
+    /* we compute year_diff to anticipate an eventual consideration of the FDI structure, which can have an af that goes over two years */
     (
         date_part('year', af_date_fin_effet_v2) - date_part('year', af_date_debut_effet_v2)
     ) as year_diff,
-    /* we compute year_diff to anticipate an eventual consideration of the FDI structure, which can have an af that goes over two years */
+    /* I need to add 1 to the operation because postgre considers that between january 1st and december 31st of the same year, 11 months have passed not 11,xx nor 12. Thus, the artificial addition of an extra month to round the operation is needed */
     (
         date_part('year', af_date_fin_effet_v2) - date_part('year', af_date_debut_effet_v2)
     ) * 12 + (
         date_part('month', af_date_fin_effet_v2) - date_part('month', af_date_debut_effet_v2)
     ) + 1 as duree_annexe,
-    /* I need to add 1 to the operation because postgre considers that between january 1st and december 31st of the same year, 11 months have passed not 11,xx nor 12. Thus, the artificial addition of an extra month to round the operation is needed */
     af.af_etat_annexe_financiere_code,
     af.af_mesure_dispositif_id,
     af.af_mesure_dispositif_code,

@@ -7,9 +7,9 @@ with calcul_etp as (
         etp.af_numero_convention,
         annee_af,
         dernier_mois_saisi_asp,
+        /* les deux conditions si dessus sont identiques, sauf que pour l'une on considère les ETPs mensuels et l'autre les annuels */
         sum(nombre_etp_consommes_reels_mensuels) as total_etp_mensuels_realises,
         sum(nombre_etp_consommes_reels_annuels) as total_etp_annuels_realises,
-        /* les deux conditions si dessus sont identiques, sauf que pour l'une on considère les ETPs mensuels et l'autre les annuels */
         case
             /* Sur les deux lignes du dessous on sélectionne le dernier mois saisi pour avoir une moyenne mensuelle des ETPs consommés sur les années précédentes */
             when (
