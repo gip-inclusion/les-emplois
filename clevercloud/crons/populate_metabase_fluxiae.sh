@@ -1,0 +1,52 @@
+#!/bin/bash -l
+
+if [[ "$CRON_ENABLED" != "1" ]]; then
+    exit 0
+fi
+
+echo "Running the ASP import script"
+
+cd "$APP_HOME" || exit 1
+
+# Activate trace of all the executed commands so that the output can be read more easily
+# Every command in this script will be written before being executed
+set +x
+
+FLUX_IAE_FILE=$(find asp_shared_bucket/ -name 'fluxIAE_*.zip' -type f -mtime -5)
+if [[ ! -f "$FLUX_IAE_FILE" ]]; then
+    django-admin send_slack_message ":x: Fichier FluxIAE non disponible sur le FTP de l'ASP !"
+    exit 0
+fi
+
+CONTACT_EA_FILE=$(find asp_shared_bucket/ -name 'Liste_Contact_EA_*.zip' -type f -mtime -5)
+if [[ ! -f "$CONTACT_EA_FILE" ]]; then
+    django-admin send_slack_message ":x: Fichier de contacts EA non disponible sur le FTP de l'ASP !"
+    exit 0
+fi
+
+# Create the "data" directory inside of the app and clear it of any previously existing data
+mkdir -p itou/siaes/management/commands/data/
+rm -rf itou/siaes/management/commands/data/*
+
+# Unzip ASP files in those data directories
+unzip -P $ASP_UNZIP_PASSWORD "$FLUX_IAE_FILE" -d itou/siaes/management/commands/data/
+unzip -P $ASP_UNZIP_PASSWORD "$CONTACT_EA_FILE" -d itou/siaes/management/commands/data/
+
+# Ensure the creation of the output log folders
+OUTPUT_PATH=shared_bucket/imports-asp
+mkdir -p $OUTPUT_PATH/populate_metabase_fluxiae
+mkdir -p $OUTPUT_PATH/import_siae
+mkdir -p $OUTPUT_PATH/import_ea_eatt
+
+# Perform the imports
+django-admin send_slack_message ":rocket: Début de la mise à jour hebdomadaire de Metabase & Emplois avec les dernières données ASP"
+time ./manage.py populate_metabase_fluxiae --verbosity 2 |& tee -a "$OUTPUT_PATH/populate_metabase_fluxiae/output_$(date '+%Y-%m-%d_%H-%M-%S').log"
+time ./manage.py import_siae --verbosity=2 |& tee -a "$OUTPUT_PATH/import_siae/output_$(date '+%Y-%m-%d_%H-%M-%S').log"
+time ./manage.py import_ea_eatt --verbosity=2 |& tee -a "$OUTPUT_PATH/import_ea_eatt/output_$(date '+%Y-%m-%d_%H-%M-%S').log"
+django-admin send_slack_message ":white_check_mark: Fin de la mise à jour hebdomadaire de Metabase & Emplois avec les dernières données ASP"
+
+# Destroy the cleartext ASP data
+rm -rf itou/siaes/management/commands/data/
+
+# Remove ASP files from 2 weeks ago
+find asp_shared_bucket/ -name '*.zip' -type f -mtime +13 -delete

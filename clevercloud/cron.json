@@ -12,6 +12,7 @@
   "30 0 * * * $ROOT/clevercloud/run_management_command.sh collect_analytics_data --save",
   "0 0 15 * * $ROOT/clevercloud/run_management_command.sh sync_romes_and_appellations --wet-run",
   "0 6 * * 1 $ROOT/clevercloud/crons/populate_metabase_matomo.sh",
+  "0 6 * * 2 $ROOT/clevercloud/crons/populate_metabase_fluxiae.sh",
   "30 20 * * * $ROOT/clevercloud/crons/populate_metabase_emplois.sh --daily",
   "0 0 2 * * $ROOT/clevercloud/crons/populate_metabase_emplois.sh --monthly",
   "5 * * * * $ROOT/clevercloud/run_management_command.sh sync_pec_offers --wet-run",
