@@ -3,6 +3,8 @@ import hashlib
 from operator import attrgetter
 
 from django.conf import settings
+from django.db.models.fields import AutoField, CharField, DateField, PositiveIntegerField
+from django.db.models.fields.related import ForeignKey
 from django.utils import timezone
 
 from itou.approvals.enums import Origin
@@ -29,6 +31,35 @@ class MetabaseTable:
         assert len(matching_columns) == 1
         fn = matching_columns[0]["fn"]
         return fn(input)
+
+
+def get_field_type_from_field(field):
+    if isinstance(field, CharField):
+        return "varchar"
+    if isinstance(field, PositiveIntegerField):
+        return "integer"
+    if isinstance(field, AutoField) and field.name == "id":
+        return "integer"
+    if isinstance(field, ForeignKey):
+        return "integer"
+    if isinstance(field, DateField):
+        return "date"
+    raise ValueError("Unexpected field type")
+
+
+def get_column_from_field(field, name):
+    """
+    Guess column configuration for simple fields with no subtlety.
+    """
+    field_name = field.name
+    if isinstance(field, ForeignKey):
+        field_name += "_id"
+    return {
+        "name": name,
+        "type": get_field_type_from_field(field),
+        "comment": field.verbose_name,
+        "fn": lambda o: getattr(o, field_name),
+    }
 
 
 def get_choice(choices, key):

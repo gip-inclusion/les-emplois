@@ -17,6 +17,7 @@ from itou.geo.factories import QPVFactory
 from itou.geo.utils import coords_to_geometry
 from itou.job_applications.factories import JobApplicationFactory
 from itou.metabase.tables.utils import hash_content
+from itou.siae_evaluations.factories import EvaluationCampaignFactory
 from itou.siaes.factories import SiaeFactory
 from itou.users.enums import IdentityProvider
 from itou.users.factories import JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
@@ -380,6 +381,35 @@ def test_populate_approvals():
                 None,
                 0,
                 hash_content(pe_approval.number),
+                datetime.date(2023, 2, 1),
+            ),
+        ]
+
+
+@freeze_time("2023-02-02")
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.usefixtures("metabase")
+def test_populate_evaluation_campaigns():
+    evaluation_campaign = EvaluationCampaignFactory()
+
+    num_queries = 1  # Count campaigns
+    num_queries += 1  # Select campaign IDs
+    num_queries += 1  # Select one chunk of campaign IDs
+    num_queries += 1  # Select campaigns with columns
+    with assertNumQueries(num_queries):
+        management.call_command("populate_metabase_emplois", mode="evaluation_campaigns")
+
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM cap_campagnes ORDER BY id")
+        rows = cursor.fetchall()
+        assert rows == [
+            (
+                evaluation_campaign.id,
+                evaluation_campaign.name,
+                evaluation_campaign.institution_id,
+                evaluation_campaign.evaluated_period_start_at,
+                evaluation_campaign.evaluated_period_end_at,
+                evaluation_campaign.chosen_percent,
                 datetime.date(2023, 2, 1),
             ),
         ]

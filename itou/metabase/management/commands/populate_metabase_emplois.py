@@ -42,6 +42,7 @@ from itou.metabase.db import build_final_tables, populate_table
 from itou.metabase.tables import (
     analytics,
     approvals,
+    evaluation_campaigns,
     insee_codes,
     job_applications,
     job_descriptions,
@@ -53,6 +54,7 @@ from itou.metabase.tables import (
 )
 from itou.metabase.tables.utils import get_active_siae_pks
 from itou.prescribers.models import PrescriberOrganization
+from itou.siae_evaluations.models import EvaluationCampaign
 from itou.siaes.models import Siae, SiaeJobDescription
 from itou.users.enums import UserKind
 from itou.users.models import User
@@ -78,6 +80,7 @@ class Command(BaseCommand):
             "job_applications": self.populate_job_applications,
             "selected_jobs": self.populate_selected_jobs,
             "approvals": self.populate_approvals,
+            "evaluation_campaigns": self.populate_evaluation_campaigns,
             "rome_codes": self.populate_rome_codes,
             "insee_codes": self.populate_insee_codes,
             "insee_codes_vs_post_codes": self.populate_insee_codes_vs_post_codes,
@@ -284,6 +287,10 @@ class Command(BaseCommand):
         ).all()
 
         populate_table(approvals.TABLE, batch_size=1000, querysets=[queryset1, queryset2])
+
+    def populate_evaluation_campaigns(self):
+        queryset = EvaluationCampaign.objects.all()
+        populate_table(evaluation_campaigns.TABLE, batch_size=1000, querysets=[queryset])
 
     def populate_job_seekers(self):
         """
