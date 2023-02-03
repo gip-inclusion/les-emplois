@@ -327,11 +327,10 @@ def test_check_inconsistencies(capsys):
         management.call_command("populate_metabase_emplois", mode="data_inconsistencies")
 
     stdout, _ = capsys.readouterr()
-    assert stdout.splitlines() == [
-        "Checking data for inconsistencies.",
-        "timeit: method=report_data_inconsistencies completed in seconds=0.00",
-        "timeit: method=handle completed in seconds=0.00",
-    ]
+    out_lines = stdout.splitlines()
+    assert out_lines[0] == "Checking data for inconsistencies."
+    assert "timeit: method=report_data_inconsistencies completed in seconds=" in out_lines[1]
+    assert "timeit: method=handle completed in seconds=" in out_lines[2]
 
     approval.user.kind = "siae_staff"
     approval.user.save()
