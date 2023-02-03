@@ -44,7 +44,10 @@ class UserExistsForm(forms.Form):
                 error = "Vous ne pouvez pas postuler pour cet utilisateur car son compte a été désactivé."
                 raise forms.ValidationError(error)
             if not self.user.is_job_seeker:
-                error = "Vous ne pouvez pas postuler pour cet utilisateur car il n'est pas demandeur d'emploi."
+                error = (
+                    "Vous ne pouvez pas postuler pour cet utilisateur car"
+                    "cet e-mail est déjà rattaché à un prescripteur ou à un employeur."
+                )
                 raise forms.ValidationError(error)
         return email
 
