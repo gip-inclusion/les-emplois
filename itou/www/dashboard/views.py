@@ -1,4 +1,5 @@
 from allauth.account.views import PasswordChangeView
+from django.conf import settings
 from django.contrib import auth, messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -15,6 +16,7 @@ from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.institutions.models import Institution
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.openid_connect.inclusion_connect import constants as ic_constants
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.siae_evaluations.constants import CAMPAIGN_VIEWABLE_DURATION
@@ -25,7 +27,7 @@ from itou.utils import constants as global_constants
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
-from itou.utils.urls import get_safe_url
+from itou.utils.urls import get_absolute_url, get_safe_url
 from itou.www.dashboard.forms import (
     EditJobSeekerInfoForm,
     EditNewJobAppEmployersNotificationForm,
@@ -217,10 +219,28 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
         success_url = get_safe_url(request, "success_url", fallback_url=dashboard_url)
         return HttpResponseRedirect(success_url)
 
+    ic_account_url = None
+    if request.user.identity_provider == IdentityProvider.INCLUSION_CONNECT and settings.INCLUSION_CONNECT_BASE_URL:
+        # SSO users do not have access to edit_user_email dedicated view:
+        # this field allows them to discover their dedicated process
+        ic_login_params = {
+            "next_url": request.build_absolute_uri(),
+            "user_kind": request.user.kind,
+        }
+        inclusion_connect_url = (
+            f"{get_absolute_url(reverse('inclusion_connect:authorize'))}?{urlencode(ic_login_params)}"
+        )
+        params = {
+            "referrer": ic_constants.INCLUSION_CONNECT_CLIENT_ID,
+            "referrer_uri": inclusion_connect_url,
+        }
+        ic_account_url = f"{ic_constants.INCLUSION_CONNECT_ACCOUNT_URL}?{urlencode(params)}"
+
     context = {
         "extra_data": extra_data,
         "form": form,
         "prev_url": prev_url,
+        "ic_account_url": ic_account_url,
     }
 
     return render(request, template_name, context)
