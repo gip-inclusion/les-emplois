@@ -1,7 +1,6 @@
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView
 from rest_framework import routers
-from rest_framework.authtoken import views as auth_views
 
 from itou.api.data_inclusion_api.views import DataInclusionStructureView
 
@@ -12,6 +11,7 @@ from .employee_record_api.viewsets import (
     EmployeeRecordViewSet,
 )
 from .siae_api.viewsets import SiaeViewSet
+from .token_auth.views import ObtainAuthToken
 
 
 # High level app for API
@@ -31,7 +31,7 @@ router.register(r"siaes", SiaeViewSet, basename="siaes")
 
 urlpatterns = [
     # TokenAuthentication endpoint to get token from login/password.
-    path("token-auth/", auth_views.obtain_auth_token, name="token-auth"),
+    path("token-auth/", ObtainAuthToken.as_view(), name="token-auth"),
     # Needed for Browseable API (dev)
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     # OpenAPI

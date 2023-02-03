@@ -8,6 +8,7 @@ app_name = "dashboard"
 
 urlpatterns = [
     path("", views.dashboard, name="index"),
+    path("token_api", views.api_token, name="api_token"),
     path("edit_user_email", views.edit_user_email, name="edit_user_email"),
     path("edit_user_info", views.edit_user_info, name="edit_user_info"),
     path("edit_user_notifications", views.edit_user_notifications, name="edit_user_notifications"),

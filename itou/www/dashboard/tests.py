@@ -10,6 +10,8 @@ from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
+from pytest_django.asserts import assertContains, assertNotContains
+from rest_framework.authtoken.models import Token
 
 from itou.approvals.factories import ApprovalFactory
 from itou.employee_record.enums import Status
@@ -1509,3 +1511,50 @@ class EditUserPreferencesExceptionsTest(TestCase):
         url = reverse("dashboard:edit_user_notifications")
         response = self.client.get(url)
         assert response.status_code == 403
+
+
+TOKEN_MENU_STR = "Accès aux APIs"
+
+
+def test_api_token_view_for_siae_admin(client):
+    siae_staff = SiaeMembershipFactory().user
+    client.force_login(siae_staff)
+
+    assert not Token.objects.exists()
+
+    url = reverse("home:hp")
+    response = client.get(url)
+
+    url = reverse("dashboard:api_token")
+    assertContains(response, TOKEN_MENU_STR)
+    assertContains(response, url)
+
+    response = client.get(url)
+    assertContains(response, "Vous n'avez pas encore de token d'API")
+    assertContains(response, "Créer un token d'API")
+
+    response = client.post(url)
+    token = Token.objects.filter(user=siae_staff).get()
+    assertContains(response, token.key)
+    assertContains(response, "Copier le token")
+
+    # Check multi-posts
+    response = client.post(url)
+    assert Token.objects.filter(user=siae_staff).count() == 1
+
+
+def test_api_token_view_for_non_siae_admin(client):
+    siae_staff = SiaeMembershipFactory(is_admin=False).user
+    client.force_login(siae_staff)
+
+    assert not Token.objects.exists()
+
+    url = reverse("home:hp")
+    response = client.get(url)
+
+    url = reverse("dashboard:api_token")
+    assertNotContains(response, TOKEN_MENU_STR)
+    assertNotContains(response, url)
+
+    response = client.get(url)
+    assert response.status_code == 403
