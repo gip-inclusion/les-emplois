@@ -15,9 +15,14 @@ from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.eligibility.models import AdministrativeCriteria
 from itou.geo.factories import QPVFactory
 from itou.geo.utils import coords_to_geometry
+from itou.institutions.factories import InstitutionFactory
 from itou.job_applications.factories import JobApplicationFactory
 from itou.metabase.tables.utils import hash_content
-from itou.siae_evaluations.factories import EvaluationCampaignFactory
+from itou.siae_evaluations.factories import (
+    EvaluatedJobApplicationFactory,
+    EvaluatedSiaeFactory,
+    EvaluationCampaignFactory,
+)
 from itou.siaes.factories import SiaeFactory
 from itou.users.enums import IdentityProvider
 from itou.users.factories import JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
@@ -389,6 +394,35 @@ def test_populate_approvals():
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
+def test_populate_institutions():
+    institution = InstitutionFactory(department="14")
+
+    num_queries = 1  # Count institutions
+    num_queries += 1  # Select institution IDs
+    num_queries += 1  # Select one chunk of institution IDs
+    num_queries += 1  # Select institutions with columns
+    with assertNumQueries(num_queries):
+        management.call_command("populate_metabase_emplois", mode="institutions")
+
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM institutions ORDER BY id")
+        rows = cursor.fetchall()
+        assert rows == [
+            (
+                institution.id,
+                institution.kind,
+                "14",
+                "14 - Calvados",
+                "Normandie",
+                institution.name,
+                datetime.date(2023, 2, 1),
+            ),
+        ]
+
+
+@freeze_time("2023-02-02")
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.usefixtures("metabase")
 def test_populate_evaluation_campaigns():
     evaluation_campaign = EvaluationCampaignFactory()
 
@@ -410,6 +444,63 @@ def test_populate_evaluation_campaigns():
                 evaluation_campaign.evaluated_period_start_at,
                 evaluation_campaign.evaluated_period_end_at,
                 evaluation_campaign.chosen_percent,
+                datetime.date(2023, 2, 1),
+            ),
+        ]
+
+
+@freeze_time("2023-02-02")
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.usefixtures("metabase")
+def test_populate_evaluated_siaes():
+    evaluated_siae = EvaluatedSiaeFactory()
+
+    num_queries = 1  # Count evaluated siaes
+    num_queries += 1  # Select evaluated siae IDs
+    num_queries += 1  # Select one chunk of evaluated siae IDs
+    num_queries += 1  # Select evaluated siaes with columns
+    num_queries += 1  # Select related evaluated job applications
+    num_queries += 1  # Select related campaigns
+    with assertNumQueries(num_queries):
+        management.call_command("populate_metabase_emplois", mode="evaluated_siaes")
+
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM cap_structures ORDER BY id")
+        rows = cursor.fetchall()
+        assert rows == [
+            (
+                evaluated_siae.id,
+                evaluated_siae.siae_id,
+                evaluated_siae.state,
+                evaluated_siae.reviewed_at,
+                evaluated_siae.final_reviewed_at,
+                datetime.date(2023, 2, 1),
+            ),
+        ]
+
+
+@freeze_time("2023-02-02")
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.usefixtures("metabase")
+def test_populate_evaluated_job_applications():
+    evaluated_job_application = EvaluatedJobApplicationFactory()
+
+    num_queries = 1  # Count evaluated job applications
+    num_queries += 1  # Select evaluated job application IDs
+    num_queries += 1  # Select one chunk of evaluated job application IDs
+    num_queries += 1  # Select evaluated job applications with columns
+    num_queries += 1  # Select related evaluated siaes
+    with assertNumQueries(num_queries):
+        management.call_command("populate_metabase_emplois", mode="evaluated_job_applications")
+
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM cap_candidatures ORDER BY id")
+        rows = cursor.fetchall()
+        assert rows == [
+            (
+                evaluated_job_application.id,
+                evaluated_job_application.evaluated_siae_id,
+                evaluated_job_application.state,
                 datetime.date(2023, 2, 1),
             ),
         ]

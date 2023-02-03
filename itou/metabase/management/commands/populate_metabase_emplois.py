@@ -34,6 +34,7 @@ from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import EligibilityDiagnosis
+from itou.institutions.models import Institution
 from itou.job_applications.enums import Origin, SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.jobs.models import Rome
@@ -42,8 +43,11 @@ from itou.metabase.db import build_final_tables, populate_table
 from itou.metabase.tables import (
     analytics,
     approvals,
+    evaluated_job_applications,
+    evaluated_siaes,
     evaluation_campaigns,
     insee_codes,
+    institutions,
     job_applications,
     job_descriptions,
     job_seekers,
@@ -54,7 +58,7 @@ from itou.metabase.tables import (
 )
 from itou.metabase.tables.utils import get_active_siae_pks
 from itou.prescribers.models import PrescriberOrganization
-from itou.siae_evaluations.models import EvaluationCampaign
+from itou.siae_evaluations.models import EvaluatedJobApplication, EvaluatedSiae, EvaluationCampaign
 from itou.siaes.models import Siae, SiaeJobDescription
 from itou.users.enums import UserKind
 from itou.users.models import User
@@ -80,7 +84,10 @@ class Command(BaseCommand):
             "job_applications": self.populate_job_applications,
             "selected_jobs": self.populate_selected_jobs,
             "approvals": self.populate_approvals,
+            "institutions": self.populate_institutions,
             "evaluation_campaigns": self.populate_evaluation_campaigns,
+            "evaluated_siaes": self.populate_evaluated_siaes,
+            "evaluated_job_applications": self.populate_evaluated_job_applications,
             "rome_codes": self.populate_rome_codes,
             "insee_codes": self.populate_insee_codes,
             "insee_codes_vs_post_codes": self.populate_insee_codes_vs_post_codes,
@@ -288,9 +295,23 @@ class Command(BaseCommand):
 
         populate_table(approvals.TABLE, batch_size=1000, querysets=[queryset1, queryset2])
 
+    def populate_institutions(self):
+        queryset = Institution.objects.all()
+        populate_table(institutions.TABLE, batch_size=1000, querysets=[queryset])
+
     def populate_evaluation_campaigns(self):
         queryset = EvaluationCampaign.objects.all()
         populate_table(evaluation_campaigns.TABLE, batch_size=1000, querysets=[queryset])
+
+    def populate_evaluated_siaes(self):
+        queryset = EvaluatedSiae.objects.prefetch_related(
+            "evaluated_job_applications__evaluated_administrative_criteria"
+        ).all()
+        populate_table(evaluated_siaes.TABLE, batch_size=1000, querysets=[queryset])
+
+    def populate_evaluated_job_applications(self):
+        queryset = EvaluatedJobApplication.objects.prefetch_related("evaluated_administrative_criteria").all()
+        populate_table(evaluated_job_applications.TABLE, batch_size=1000, querysets=[queryset])
 
     def populate_job_seekers(self):
         """
