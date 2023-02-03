@@ -11,7 +11,9 @@ from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.http import urlencode
 from django.views.decorators.http import require_POST
+from rest_framework.authtoken.models import Token
 
+from itou.api.token_auth.views import TOKEN_ID_STR
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.institutions.models import Institution
@@ -360,6 +362,30 @@ def edit_user_notifications(request, template_name="dashboard/edit_user_notifica
     context = {
         "new_job_app_notification_form": new_job_app_notification_form,
         "back_url": back_url,
+    }
+
+    return render(request, template_name, context)
+
+
+@login_required
+def api_token(request, template_name="dashboard/api_token.html"):
+    if request.user.is_siae_staff:
+        siae = get_current_siae_or_404(request)
+        if not siae.has_admin(request.user):
+            raise PermissionDenied
+
+    else:
+        raise PermissionDenied
+
+    if request.method == "POST":
+        token, _created = Token.objects.get_or_create(user=request.user)
+    else:
+        token = Token.objects.filter(user=request.user).first()  # May be None if no token
+
+    context = {
+        "login_string": TOKEN_ID_STR,
+        "token": token,
+        "siaes_names": request.user.siaemembership_set.active_admin().values_list("siae__name", flat=True),
     }
 
     return render(request, template_name, context)

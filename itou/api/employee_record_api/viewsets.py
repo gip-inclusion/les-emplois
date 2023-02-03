@@ -88,7 +88,9 @@ class EmployeeRecordViewSet(AbstractEmployeeRecordViewSet):
     # Permissions
 
     L'utilisation externe de cette API nécessite l'utilisation d'un token d'autorisation
-    (voir le endpoint `auth-token`).
+
+    Ce token peut être généré, et récupéré depuis votre tableau de bord sur le site des emplois.
+    Cliquez sur "Mon espace" puis "Token d'API"
 
     L'API peut également être utilisée dans un navigateur :
 
