@@ -2,7 +2,7 @@
 import datetime
 import io
 import json
-from unittest.mock import PropertyMock, patch
+from unittest.mock import patch
 
 import pytest
 from dateutil.relativedelta import relativedelta
@@ -39,8 +39,8 @@ from itou.job_applications.models import JobApplication, JobApplicationTransitio
 from itou.job_applications.notifications import NewQualifiedJobAppEmployersNotification
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
-from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS, SiaeKind
-from itou.siaes.factories import SiaeFactory, SiaeWithMembershipAndJobsFactory
+from itou.siaes.enums import SiaeKind
+from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
 from itou.users.factories import ItouStaffFactory, JobSeekerFactory, SiaeStaffFactory
 from itou.users.models import User
 from itou.utils import constants as global_constants
@@ -102,42 +102,6 @@ class JobApplicationModelTest(TestCase):
 
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
         assert job_application.is_sent_by_authorized_prescriber
-
-    @patch.object(JobApplication, "can_be_cancelled", new_callable=PropertyMock, return_value=False)
-    def test_can_display_approval(self, *args, **kwargs):
-        """
-        A user can download an approval only when certain conditions
-        are met:
-        - the job_application.to_siae is subject to eligibility rules,
-        - an approval exists (ie is not in the process of being delivered),
-        - the job_application has been accepted.
-        """
-        job_application = JobApplicationFactory(with_approval=True)
-        assert job_application.can_display_approval
-
-        # SIAE not subject to eligibility rules.
-        not_eligible_kinds = [kind for kind in SiaeKind if kind not in SIAE_WITH_CONVENTION_KINDS]
-        not_eligible_siae = SiaeFactory(kind=not_eligible_kinds[0])
-        job_application = JobApplicationFactory(with_approval=True, to_siae=not_eligible_siae)
-        assert not job_application.can_display_approval
-
-        # Application is not accepted.
-        job_application = JobApplicationFactory(with_approval=True, state=JobApplicationWorkflow.STATE_OBSOLETE)
-        assert not job_application.can_display_approval
-
-        # Application accepted but without approval.
-        job_application = JobApplicationFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
-        assert not job_application.can_display_approval
-
-    def test_can_download_expired_approval(self):
-        # Approval has ended
-        start = datetime.date.today() - relativedelta(years=2)
-        ended_approval = ApprovalFactory(start_at=start)
-
-        # `hiring_start_at` must be set in order to pass the `can_be_cancelled` condition
-        # called by `can_display_approval`.
-        job_application = JobApplicationFactory(with_approval=True, approval=ended_approval, hiring_start_at=start)
-        assert job_application.can_display_approval
 
     def test_can_be_cancelled(self):
         """

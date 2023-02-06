@@ -121,9 +121,7 @@ class ApprovalPrintableDisplay(ApprovalBaseViewMixin, TemplateView):
 
         job_application = self.get_job_application(approval)
 
-        # TODO(alaurent) We could probably just use "if not siae.is_subject_to_eligibility_rules"
-        # Fix this when refactoring the database
-        if not job_application or not job_application.can_display_approval:
+        if not job_application or not self.siae.is_subject_to_eligibility_rules:
             # Message only visible in DEBUG
             raise Http404("Nous sommes au regret de vous informer que vous ne pouvez pas afficher cet agrément.")
 
