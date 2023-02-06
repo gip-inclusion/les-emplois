@@ -69,7 +69,7 @@ with calcul_etp as (
         and etp.af_numero_annexe_financiere = etp_c.af_numero_annexe_financiere
         and date_part('year', etp_c.date_saisie) = annee_af
         /* bien penser à joindre sur l'année pour éviter que l'on se retrouve avec années de conventionnement qui correspondent pas */
-        right join suivi_saisies_dans_asp sasp on etp.id_annexe_financiere = sasp.af_id_annexe_financiere
+        left join suivi_saisies_dans_asp sasp on sasp.af_id_annexe_financiere = etp.id_annexe_financiere 
     group by
         dernier_mois_saisi_asp,
         etp.id_annexe_financiere,
