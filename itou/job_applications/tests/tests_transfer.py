@@ -139,7 +139,14 @@ class JobApplicationTransferModelTest(TestCase):
         assert job_application.transferred_from is None
         assert job_application.transferred_at is None
 
-        with self.assertNumQueries(7):
+        with self.assertNumQueries(
+            2  # Check user is in both origin and dest siae
+            + 1  # Update job application
+            + 1  # Check if approvals are linked to diagnosis because of on_delete=set_null
+            + 1  # Check if job applications are linked because of on_delete=set_null
+            + 2  # Delete diagnosis and criteria made by the SIAE
+            + 1  # Select user for email
+        ):
             job_application.transfer_to(origin_user, target_siae)
 
         job_application.refresh_from_db()

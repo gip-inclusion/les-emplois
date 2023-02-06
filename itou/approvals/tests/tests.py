@@ -7,6 +7,7 @@ import pytest
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.messages import get_messages
 from django.core import mail
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import IntegrityError, transaction
@@ -22,6 +23,7 @@ from itou.approvals.enums import ApprovalStatus, Origin
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory, ProlongationFactory, SuspensionFactory
 from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, Suspension
 from itou.approvals.notifications import NewProlongationToAuthorizedPrescriberNotification
+from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordFactory
 from itou.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
@@ -720,6 +722,43 @@ class AutomaticApprovalAdminViewsTest(TestCase):
             [ApprovalAdminForm.ERROR_NUMBER_CANNOT_BE_CHANGED % approval.number],
         )
 
+    def test_create_approval(self):
+        user = ItouStaffFactory()
+        content_type = ContentType.objects.get_for_model(Approval)
+        permission = Permission.objects.get(content_type=content_type, codename="add_approval")
+        user.user_permissions.add(permission)
+        self.client.force_login(user)
+
+        diagnosis = EligibilityDiagnosisFactory()
+        other_job_seeker = JobSeekerFactory()
+        url = reverse("admin:approvals_approval_add")
+
+        post_data = {
+            "start_at": "01/01/2100",
+            "end_at": "31/12/2102",
+            "user": other_job_seeker.pk,
+            "eligibility_diagnosis": diagnosis.pk,
+        }
+        response = self.client.post(url, data=post_data)
+        assert response.status_code == 200
+        self.assertFormError(
+            response.context["adminform"],
+            "eligibility_diagnosis",
+            ["Le diagnostique doit appartenir au même utilisateur que le PASS"],
+        )
+        assert not Approval.objects.exists()
+
+        post_data = {
+            "start_at": "01/01/2100",
+            "end_at": "31/12/2102",
+            "user": diagnosis.job_seeker_id,
+            "eligibility_diagnosis": diagnosis.pk,
+        }
+        response = self.client.post(url, data=post_data)
+        assert Approval.objects.count() == 1
+        approval = Approval.objects.get()
+        assert approval.eligibility_diagnosis == diagnosis
+
 
 class CustomApprovalAdminViewsTest(TestCase):
     def test_manually_add_approval(self):
@@ -733,6 +772,7 @@ class CustomApprovalAdminViewsTest(TestCase):
             state=JobApplicationWorkflow.STATE_PROCESSING,
             approval=None,
             approval_number_sent_by_email=False,
+            with_eligibility_diagnosis=True,
         )
         job_application.accept(user=job_application.to_siae.members.first())
 
@@ -763,6 +803,21 @@ class CustomApprovalAdminViewsTest(TestCase):
             "origin": Origin.ADMIN,
             "eligibility_diagnosis": job_application.eligibility_diagnosis,
         }
+
+        # Without an eligibility diangosis on the job application.
+        eligibility_diagnosis = job_application.eligibility_diagnosis
+        job_application.eligibility_diagnosis = None
+        job_application.save()
+        response = self.client.get(url, follow=True)
+        messages = list(get_messages(response.wsgi_request))
+        assert (
+            messages[0].message
+            == "Impossible de créer un PASS IAE car la candidature n'a pas de diagnostique d'éligibilité."
+        )
+
+        # Put back the eligibility diangosis
+        job_application.eligibility_diagnosis = eligibility_diagnosis
+        job_application.save()
 
         # Les numéros avec le préfixe `ASP_ITOU_PREFIX` ne doivent pas pouvoir
         # être délivrés à la main dans l'admin.

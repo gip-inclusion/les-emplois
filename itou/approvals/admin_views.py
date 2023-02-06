@@ -51,6 +51,12 @@ def manually_add_approval(
         approval_number_sent_by_email=False,
     )
 
+    if job_application.eligibility_diagnosis is None:
+        messages.error(
+            request, "Impossible de créer un PASS IAE car la candidature n'a pas de diagnostique d'éligibilité."
+        )
+        return HttpResponseRedirect(reverse("admin:approvals_approval_changelist"))
+
     initial = {
         "start_at": job_application.hiring_start_at,
         "end_at": Approval.get_default_end_date(job_application.hiring_start_at),

@@ -851,6 +851,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 self.job_seeker.pole_emploi_id
                 or self.job_seeker.lack_of_pole_emploi_id_reason == self.job_seeker.REASON_NOT_REGISTERED
             ):
+                # Security check: it's supposed to be blocked upstream.
+                if self.eligibility_diagnosis is None:
+                    raise xwf_models.AbortTransition("Cannot create an approval without eligibility diagnosis here")
                 # Automatically create a new approval.
                 new_approval = Approval(
                     start_at=self.hiring_start_at,
