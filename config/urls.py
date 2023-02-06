@@ -75,6 +75,9 @@ urlpatterns = [
     path("welcoming_tour/", include("itou.www.welcoming_tour.urls")),
     # Static pages.
     path("accessibility/", TemplateView.as_view(template_name="static/accessibility.html"), name="accessibility"),
+    path("legal/notice/", TemplateView.as_view(template_name="static/legal/notice.html"), name="legal-notice"),
+    path("legal/privacy/", TemplateView.as_view(template_name="static/legal/privacy.html"), name="legal-privacy"),
+    path("legal/terms/", TemplateView.as_view(template_name="static/legal/terms.html"), name="legal-terms"),
 ]
 
 if settings.DEBUG and "debug_toolbar" in settings.INSTALLED_APPS:

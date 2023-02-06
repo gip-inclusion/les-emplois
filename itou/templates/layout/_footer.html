@@ -146,17 +146,23 @@
     <section class="s-footer-legal">
         <div class="s-footer-legal__container container">
             <div class="s-footer-legal__row row">
-                <div class="s-footer-legal__col col-12 col-lg">
+                <div class="s-footer-legal__col col-xs-12 col-lg-8">
                     <ul>
                         <li>
-                            <a href="{{ ITOU_DOC_URL }}/mentions/" rel="noopener" target="_blank">Mentions légales</a>
+                            <a href="{% url 'legal-notice' %}">Mentions légales</a>
                         </li>
                         <li>
-                            <a href="{% url 'accessibility' %}" rel="noopener">Accessibilité : partiellement conforme</a>
+                            <a href="{% url 'legal-terms' %}">Conditions générales</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'legal-privacy' %}">Confidentialité</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'accessibility' %}">Accessibilité : partiellement conforme</a>
                         </li>
                     </ul>
                 </div>
-                <div class="s-footer-legal__col col-12 col-lg text-lg-right">
+                <div class="s-footer-legal__col col-xs-12 col-lg-4 text-lg-right">
                     <span>© République Française 2021</span>
                 </div>
             </div>
