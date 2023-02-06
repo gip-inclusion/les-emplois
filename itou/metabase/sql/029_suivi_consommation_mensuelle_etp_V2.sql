@@ -4,9 +4,11 @@ select
     etp.af_numero_convention,
     date_saisie,
     annee_af,
+    etp.af_etat_annexe_financiere_code,
     sum(nombre_etp_consommes_reels_mensuels) as total_etp_mensuels_realises,
     sum(nombre_etp_consommes_reels_annuels) as total_etp_annuels_realises,
     etp.effectif_mensuel_conventionné,
+    etp.effectif_annuel_conventionné,
     case 
         when etp.effectif_mensuel_conventionné <> 0 then sum(nombre_etp_consommes_reels_mensuels)/etp.effectif_mensuel_conventionné*100      
         else 0
@@ -33,6 +35,8 @@ group by
     etp.af_numero_convention,
     etp.af_numero_annexe_financiere,
     effectif_mensuel_conventionné,
+    effectif_annuel_conventionné,
+    etp.af_etat_annexe_financiere_code,
     date_saisie,
     annee_af,
     etp.type_structure,

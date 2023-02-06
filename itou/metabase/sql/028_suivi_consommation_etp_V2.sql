@@ -5,6 +5,7 @@ with calcul_etp as (
         /* Utilisation de l'ID de l'annexe financière -> ID unique contrairement à la convention et l'af */
         etp.af_numero_annexe_financiere,
         etp.af_numero_convention,
+        etp.af_etat_annexe_financiere_code,
         annee_af,
         dernier_mois_saisi_asp,
         /* les deux conditions si dessus sont identiques, sauf que pour l'une on considère les ETPs mensuels et l'autre les annuels */
@@ -75,6 +76,7 @@ with calcul_etp as (
         etp.id_annexe_financiere,
         etp.af_numero_convention,
         etp.af_numero_annexe_financiere,
+        etp.af_etat_annexe_financiere_code,
         effectif_mensuel_conventionné,
         effectif_annuel_conventionné,
         annee_af,
