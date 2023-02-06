@@ -42,7 +42,9 @@ DISABLED_NIR = 'disabled id="id_nir"'
 # patch the one used in the `models` module, not the original one in tasks
 @patch("itou.job_applications.models.huey_notify_pole_emploi", return_value=False)
 class ProcessViewsTest(TestCase):
-    def accept_job_application(self, job_application, post_data=None, city=None, assert_successful=True):
+    def accept_job_application(
+        self, job_application, post_data=None, city=None, assert_successful=True, no_confirm_button=False
+    ):
         """
         This is not a test. It's a shortcut to process "apply:accept" view steps:
         - GET
@@ -52,7 +54,10 @@ class ProcessViewsTest(TestCase):
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url_accept)
         assert response.status_code == 200
-        self.assertContains(response, "Confirmation de l’embauche")
+        if no_confirm_button:
+            self.assertNotContains(response, "Confirmation de l’embauche")
+        else:
+            self.assertContains(response, "Confirmation de l’embauche")
         # Make sure modal is hidden.
         self.assertNotContains(response, "data-htmx-open-modal")
 
@@ -308,6 +313,7 @@ class ProcessViewsTest(TestCase):
         }
         siae = SiaeFactory(with_membership=True)
         siae_user = siae.members.first()
+        self.client.force_login(siae_user)
 
         hiring_end_dates = [
             Approval.get_default_end_date(today),
@@ -317,10 +323,12 @@ class ProcessViewsTest(TestCase):
 
         for hiring_end_at, state in cases:
             with self.subTest(hiring_end_at=hiring_end_at, state=state):
-                job_application = JobApplicationSentByJobSeekerFactory(
-                    state=state, job_seeker=job_seeker, to_siae=siae
+                job_application = JobApplicationFactory(
+                    state=state,
+                    job_seeker=job_seeker,
+                    to_siae=siae,
+                    with_eligibility_diagnosis=True,
                 )
-                self.client.force_login(siae_user)
                 previous_last_checked_at = job_seeker.last_checked_at
 
                 # Good duration.
@@ -357,7 +365,12 @@ class ProcessViewsTest(TestCase):
         ##############
         # Exceptions #
         ##############
-        job_application = JobApplicationSentByJobSeekerFactory(state=state, job_seeker=job_seeker, to_siae=siae)
+        job_application = JobApplicationFactory(
+            state=state,
+            job_seeker=job_seeker,
+            to_siae=siae,
+            with_eligibility_diagnosis=True,
+        )
 
         # Wrong dates.
         hiring_start_at = today
@@ -390,8 +403,10 @@ class ProcessViewsTest(TestCase):
         self.assertFormError(response.context["form_accept"], None, JobApplication.ERROR_END_IS_BEFORE_START)
 
         # No address provided.
-        job_application = JobApplicationSentByJobSeekerFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING, to_siae=siae
+        job_application = JobApplicationFactory(
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            to_siae=siae,
+            with_eligibility_diagnosis=True,
         )
 
         hiring_start_at = today
@@ -410,6 +425,24 @@ class ProcessViewsTest(TestCase):
         self.assertFormError(response.context["form_user_address"], "address_line_1", "Ce champ est obligatoire.")
         self.assertFormError(response.context["form_user_address"], "city", "Ce champ est obligatoire.")
         self.assertFormError(response.context["form_user_address"], "post_code", "Ce champ est obligatoire.")
+
+        # No eligibility diagnosis -> should not see the confirm button, nor accept posted data
+        job_application = JobApplicationSentByJobSeekerFactory(
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            job_seeker=job_seeker,
+            to_siae=siae,
+        )
+        post_data = {
+            # Data for `JobSeekerPersonalDataForm`.
+            "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
+            # Data for `AcceptForm`.
+            "hiring_start_at": today.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "answer": "",
+            **address,
+        }
+        response, _ = self.accept_job_application(
+            job_application=job_application, post_data=post_data, assert_successful=False, no_confirm_button=True
+        )
 
     def test_accept_with_active_suspension(self, *args, **kwargs):
         """Test the `accept` transition with active suspension for active user"""
@@ -440,11 +473,12 @@ class ProcessViewsTest(TestCase):
 
         # Now, another Siae wants to hire the job seeker
         other_siae = SiaeFactory(with_membership=True)
-        job_application = JobApplicationSentByJobSeekerFactory(
+        job_application = JobApplicationFactory(
             approval=approval_job_seeker,
             state=JobApplicationWorkflow.STATE_PROCESSING,
             job_seeker=job_seeker_user,
             to_siae=other_siae,
+            with_eligibility_diagnosis=True,
         )
         other_siae_user = job_application.to_siae.members.first()
 
@@ -482,12 +516,13 @@ class ProcessViewsTest(TestCase):
         """
         [city] = create_test_cities(["57"], num_per_department=1)
 
-        job_application = JobApplicationSentByJobSeekerFactory(
+        job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
             # The state of the 3 `pole_emploi_*` fields will trigger a manual delivery.
             job_seeker__nir="",
             job_seeker__pole_emploi_id="",
             job_seeker__lack_of_pole_emploi_id_reason=User.REASON_FORGOTTEN,
+            with_eligibility_diagnosis=True,
         )
 
         siae_user = job_application.to_siae.members.first()
@@ -533,14 +568,20 @@ class ProcessViewsTest(TestCase):
         approval_default_ending = Approval.get_default_end_date(start_at=hiring_start_at)
 
         # Send 3 job applications to 3 different structures
-        job_application = JobApplicationSentByJobSeekerFactory(
-            job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_PROCESSING
+        job_application = JobApplicationFactory(
+            job_seeker=job_seeker,
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            with_eligibility_diagnosis=True,
         )
-        job_app_starting_earlier = JobApplicationSentByJobSeekerFactory(
-            job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_PROCESSING
+        job_app_starting_earlier = JobApplicationFactory(
+            job_seeker=job_seeker,
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            with_eligibility_diagnosis=True,
         )
-        job_app_starting_later = JobApplicationSentByJobSeekerFactory(
-            job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_PROCESSING
+        job_app_starting_later = JobApplicationFactory(
+            job_seeker=job_seeker,
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            with_eligibility_diagnosis=True,
         )
 
         # SIAE 1 logs in and accepts the first job application.
@@ -618,8 +659,11 @@ class ProcessViewsTest(TestCase):
 
         siae = SiaeFactory(with_membership=True)
         job_seeker = JobSeekerWithAddressFactory(city=city.name)
-        job_application = JobApplicationSentByJobSeekerFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING, job_seeker=job_seeker, to_siae=siae
+        job_application = JobApplicationFactory(
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            job_seeker=job_seeker,
+            to_siae=siae,
+            with_eligibility_diagnosis=True,
         )
 
         # Create a "PE Approval" that will be converted to a PASS IAE when accepting the process
@@ -643,8 +687,11 @@ class ProcessViewsTest(TestCase):
         almost_same_job_seeker = JobSeekerWithAddressFactory(
             city=city.name, pole_emploi_id=job_seeker.pole_emploi_id, birthdate=job_seeker.birthdate
         )
-        another_job_application = JobApplicationSentByJobSeekerFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING, job_seeker=almost_same_job_seeker, to_siae=siae
+        another_job_application = JobApplicationFactory(
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            job_seeker=almost_same_job_seeker,
+            to_siae=siae,
+            with_eligibility_diagnosis=True,
         )
 
         # Gracefully display a message instead of just plain crashing
@@ -656,8 +703,9 @@ class ProcessViewsTest(TestCase):
 
     @override_settings(TALLY_URL="https://tally.so")
     def test_accept_nir_readonly(self, *args, **kwargs):
-        job_application = JobApplicationSentByJobSeekerFactory(
+        job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
+            with_eligibility_diagnosis=True,
         )
 
         siae_user = job_application.to_siae.members.first()
@@ -695,6 +743,7 @@ class ProcessViewsTest(TestCase):
         job_application = JobApplicationSentByJobSeekerFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
             job_seeker__nir="",
+            with_eligibility_diagnosis=True,
         )
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
@@ -744,9 +793,10 @@ class ProcessViewsTest(TestCase):
     def test_accept_no_nir_other_user(self, *args, **kwargs):
         [city] = create_test_cities(["57"], num_per_department=1)
 
-        job_application = JobApplicationSentByJobSeekerFactory(
+        job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
             job_seeker__nir="",
+            with_eligibility_diagnosis=True,
         )
         other_job_seeker = JobSeekerWithAddressFactory()
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
@@ -787,6 +837,7 @@ class ProcessViewsTest(TestCase):
         job_application = JobApplicationSentByJobSeekerFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
             job_seeker__nir="",
+            with_eligibility_diagnosis=True,
         )
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
@@ -826,10 +877,11 @@ class ProcessViewsTest(TestCase):
     def test_accept_lack_of_nir_reason_update(self, *args, **kwargs):
         [city] = create_test_cities(["57"], num_per_department=1)
 
-        job_application = JobApplicationSentByJobSeekerFactory(
+        job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
             job_seeker__nir="",
             job_seeker__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
+            with_eligibility_diagnosis=True,
         )
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
@@ -872,10 +924,11 @@ class ProcessViewsTest(TestCase):
     def test_accept_lack_of_nir_reason_other_user(self, *args, **kwargs):
         [city] = create_test_cities(["57"], num_per_department=1)
 
-        job_application = JobApplicationSentByJobSeekerFactory(
+        job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
             job_seeker__nir="",
             job_seeker__lack_of_nir_reason=LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER,
+            with_eligibility_diagnosis=True,
         )
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
@@ -1068,8 +1121,10 @@ class ProcessViewsTest(TestCase):
         cities = create_test_cities(["54", "57"], num_per_department=2)
         city = cities[0]
         job_seeker = JobSeekerWithAddressFactory(city=city.name)
-        job_application = JobApplicationSentByJobSeekerFactory(
-            state=JobApplicationWorkflow.STATE_CANCELLED, job_seeker=job_seeker
+        job_application = JobApplicationFactory(
+            state=JobApplicationWorkflow.STATE_CANCELLED,
+            job_seeker=job_seeker,
+            with_eligibility_diagnosis=True,
         )
         siae_user = job_application.to_siae.members.first()
         self.client.force_login(siae_user)

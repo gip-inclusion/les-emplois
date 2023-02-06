@@ -153,7 +153,7 @@ class ApprovalAdmin(admin.ModelAdmin):
         StartDateFilter,
     )
     list_display_links = ("pk", "number")
-    raw_id_fields = ("user", "created_by")
+    raw_id_fields = ("user", "created_by", "eligibility_diagnosis")
     readonly_fields = (
         "created_at",
         "created_by",
@@ -170,6 +170,12 @@ class ApprovalAdmin(admin.ModelAdmin):
         JobApplicationInline,
         PkSupportRemarkInline,
     )
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj and (obj.origin not in [Origin.ADMIN, Origin.DEFAULT]):
+            # Only allow to edit eligibility diagnosis on approvals that should have one
+            return ("eligibility_diagnosis",) + self.readonly_fields
+        return self.readonly_fields
 
     def save_model(self, request, obj, form, change):
         if not change:

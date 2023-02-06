@@ -35,17 +35,27 @@ class ApprovalFormMixin:
 class ApprovalAdminForm(ApprovalFormMixin, forms.ModelForm):
     class Meta:
         model = Approval
-        fields = ["start_at", "end_at", "user", "number", "created_by", "origin"]
+        fields = ["start_at", "end_at", "user", "number", "created_by", "origin", "eligibility_diagnosis"]
         widgets = {"created_by": forms.HiddenInput(), "origin": forms.HiddenInput()}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # The admin interface must give the possibility to create PASS IAE
+        # TODO(alaurent) Update when all old approvals have a diagnosis
+        if not self.instance.pk:
+            self.fields["eligibility_diagnosis"].required = True
+
         # ex nihilo with arbitrary numbers because we have noticed holes in
         # the approvals transmitted by PE and we have complaints from users.
         if "number" in self.fields:
             self.fields["number"].required = False
             self.fields["number"].help_text += self.ADDITIONAL_HELP_TEXT_NUMBER
+
+    def clean_eligibility_diagnosis(self):
+        eligibility_diagnosis = self.cleaned_data["eligibility_diagnosis"]
+        if eligibility_diagnosis and eligibility_diagnosis.job_seeker != self.cleaned_data["user"]:
+            # Could we filter available eligibility diagnosis ?
+            raise forms.ValidationError("Le diagnostique doit appartenir au même utilisateur que le PASS")
+        return eligibility_diagnosis
 
 
 class ManuallyAddApprovalFromJobApplicationForm(ApprovalFormMixin, forms.ModelForm):

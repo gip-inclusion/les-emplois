@@ -80,7 +80,9 @@ class JobApplicationModelTest(TestCase):
     @patch("itou.job_applications.models.huey_notify_pole_emploi")
     def test_accepted_by(self, notification_mock):
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True, state=JobApplicationWorkflow.STATE_PROCESSING
+            sent_by_authorized_prescriber_organisation=True,
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            with_eligibility_diagnosis=True,
         )
         user = job_application.to_siae.members.first()
         job_application.accept(user=user)
@@ -477,7 +479,7 @@ class JobApplicationQuerySetTest(TestCase):
         assert job_application.accepted_at == job_application.created_at
 
     def test_with_accepted_at_for_accept_transition(self):
-        job_application = JobApplicationSentBySiaeFactory()
+        job_application = JobApplicationSentBySiaeFactory(with_eligibility_diagnosis=True)
         job_application.process()
         job_application.accept(user=job_application.sender)
 
@@ -488,7 +490,7 @@ class JobApplicationQuerySetTest(TestCase):
         assert JobApplication.objects.with_accepted_at().first().accepted_at == expected_created_at
 
     def test_with_accepted_at_with_multiple_transitions(self):
-        job_application = JobApplicationSentBySiaeFactory()
+        job_application = JobApplicationSentBySiaeFactory(with_eligibility_diagnosis=True)
         job_application.process()
         job_application.accept(user=job_application.sender)
         job_application.cancel(user=job_application.sender)
@@ -999,7 +1001,12 @@ class JobApplicationWorkflowTest(TestCase):
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         assert job_seeker.pole_emploi_id != ""
 
-        kwargs = {"job_seeker": job_seeker, "sender": job_seeker, "sender_kind": SenderKind.JOB_SEEKER}
+        kwargs = {
+            "job_seeker": job_seeker,
+            "sender": job_seeker,
+            "sender_kind": SenderKind.JOB_SEEKER,
+            "with_eligibility_diagnosis": True,
+        }
         JobApplicationFactory(state=JobApplicationWorkflow.STATE_NEW, **kwargs)
         JobApplicationFactory(state=JobApplicationWorkflow.STATE_PROCESSING, **kwargs)
         JobApplicationFactory(state=JobApplicationWorkflow.STATE_POSTPONED, **kwargs)
@@ -1029,7 +1036,12 @@ class JobApplicationWorkflowTest(TestCase):
         """
         job_seeker = JobSeekerFactory()
 
-        kwargs = {"job_seeker": job_seeker, "sender": job_seeker, "sender_kind": SenderKind.JOB_SEEKER}
+        kwargs = {
+            "job_seeker": job_seeker,
+            "sender": job_seeker,
+            "sender_kind": SenderKind.JOB_SEEKER,
+            "with_eligibility_diagnosis": True,
+        }
         for state in [
             JobApplicationWorkflow.STATE_NEW,
             JobApplicationWorkflow.STATE_PROCESSING,
@@ -1133,7 +1145,9 @@ class JobApplicationWorkflowTest(TestCase):
             pole_emploi_id="",
         )
         job_application = JobApplicationSentByJobSeekerFactory(
-            job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_PROCESSING
+            job_seeker=job_seeker,
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            eligibility_diagnosis=EligibilityDiagnosisFactory(job_seeker=job_seeker),
         )
         job_application.accept(user=job_application.to_siae.members.first())
         assert job_application.approval is not None
@@ -1148,7 +1162,9 @@ class JobApplicationWorkflowTest(TestCase):
             nir="",
         )
         job_application = JobApplicationSentByJobSeekerFactory(
-            job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_PROCESSING
+            job_seeker=job_seeker,
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            eligibility_diagnosis=EligibilityDiagnosisFactory(job_seeker=job_seeker),
         )
         job_application.accept(user=job_application.to_siae.members.first())
         assert job_application.approval is not None
@@ -1163,7 +1179,9 @@ class JobApplicationWorkflowTest(TestCase):
             nir="", pole_emploi_id="", lack_of_pole_emploi_id_reason=JobSeekerFactory._meta.model.REASON_NOT_REGISTERED
         )
         job_application = JobApplicationSentByJobSeekerFactory(
-            job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_PROCESSING
+            job_seeker=job_seeker,
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            eligibility_diagnosis=EligibilityDiagnosisFactory(job_seeker=job_seeker),
         )
         job_application.accept(user=job_application.to_siae.members.first())
         assert job_application.approval is not None
@@ -1178,7 +1196,8 @@ class JobApplicationWorkflowTest(TestCase):
         Accept a job application sent by an "orienteur".
         """
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            with_eligibility_diagnosis=True,
         )
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         assert job_application.job_seeker.pole_emploi_id != ""
@@ -1202,7 +1221,9 @@ class JobApplicationWorkflowTest(TestCase):
         Accept a job application sent by an authorized prescriber.
         """
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True, state=JobApplicationWorkflow.STATE_PROCESSING
+            sent_by_authorized_prescriber_organisation=True,
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            with_eligibility_diagnosis=True,
         )
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         assert job_application.job_seeker.pole_emploi_id != ""
@@ -1238,6 +1259,7 @@ class JobApplicationWorkflowTest(TestCase):
             sent_by_authorized_prescriber_organisation=True,
             job_seeker=user,
             state=JobApplicationWorkflow.STATE_PROCESSING,
+            with_eligibility_diagnosis=True,
         )
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         assert job_application.job_seeker.pole_emploi_id != ""
@@ -1461,6 +1483,7 @@ class JobApplicationCsvExportTest(TestCase):
             job_seeker=job_seeker,
             state=JobApplicationWorkflow.STATE_PROCESSING,
             selected_jobs=Appellation.objects.all(),
+            eligibility_diagnosis=EligibilityDiagnosisFactory(job_seeker=job_seeker),
         )
         job_application.accept(user=job_application.to_siae.members.first())
 
