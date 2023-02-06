@@ -241,6 +241,15 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
     origin = models.CharField(
         verbose_name="Origine du pass", max_length=30, choices=Origin.choices, default=Origin.DEFAULT
     )
+    # The job seeker's eligibility diagnosis used for the job application
+    # that created this Approval
+    eligibility_diagnosis = models.ForeignKey(
+        "eligibility.EligibilityDiagnosis",
+        verbose_name="Diagnostic d'éligibilité",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
 
     objects = CommonApprovalQuerySet.as_manager()
 

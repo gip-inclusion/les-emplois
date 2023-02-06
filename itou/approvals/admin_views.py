@@ -57,6 +57,7 @@ def manually_add_approval(
         "user": job_application.job_seeker.pk,
         "created_by": request.user.pk,
         "origin": Origin.ADMIN,
+        "eligibility_diagnosis": job_application.eligibility_diagnosis,
     }
     form = ManuallyAddApprovalFromJobApplicationForm(initial=initial, data=request.POST or None)
     fieldsets = [(None, {"fields": list(form.base_fields)})]

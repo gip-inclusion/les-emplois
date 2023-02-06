@@ -119,13 +119,19 @@ class ApprovalPrintableDisplay(ApprovalBaseViewMixin, TemplateView):
         queryset = Approval.objects.select_related("user")
         approval = get_object_or_404(queryset, pk=self.kwargs["approval_id"])
 
-        job_application = self.get_job_application(approval)
-
-        if not job_application or not self.siae.is_subject_to_eligibility_rules:
+        if not self.siae.is_subject_to_eligibility_rules:
             # Message only visible in DEBUG
             raise Http404("Nous sommes au regret de vous informer que vous ne pouvez pas afficher cet agrément.")
 
-        diagnosis = job_application.get_eligibility_diagnosis()
+        diagnosis = approval.eligibility_diagnosis
+
+        # TODO(alaurent) remove once last approvals were manually fixed
+        if not diagnosis:
+            job_application = self.get_job_application(approval)
+            if not job_application:
+                raise Http404("Nous sommes au regret de vous informer que vous ne pouvez pas afficher cet agrément.")
+            diagnosis = job_application.get_eligibility_diagnosis()
+
         diagnosis_author = None
         diagnosis_author_org = None
         diagnosis_author_org_name = None
@@ -136,6 +142,7 @@ class ApprovalPrintableDisplay(ApprovalBaseViewMixin, TemplateView):
             if diagnosis_author_org:
                 diagnosis_author_org_name = diagnosis_author_org.display_name
 
+        # TODO(alaurent): remove once all approvals were fixed
         if (
             not diagnosis
             and approval.origin in [approvals_enums.Origin.ADMIN, approvals_enums.Origin.DEFAULT]
@@ -146,10 +153,6 @@ class ApprovalPrintableDisplay(ApprovalBaseViewMixin, TemplateView):
             # We want to raise an error if the approval of the pass originates from our side, but
             # is not from the AI stock, as it should not happen.
             # We may have to add conditions there in case of new mass imports.
-            # Keep track of job applications without a proper eligibility diagnosis because
-            # it shouldn't happen.
-            # If this occurs too much we may have to change `can_display_approval()`
-            # and investigate a lot more about what's going on.
             raise Exception(
                 f"Approval={approval.pk} cannot be rendered because "
                 f"JobApplication={job_application.pk} "
