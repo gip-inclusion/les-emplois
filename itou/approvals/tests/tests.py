@@ -761,6 +761,7 @@ class CustomApprovalAdminViewsTest(TestCase):
             "user": job_application.job_seeker.pk,
             "created_by": user.pk,
             "origin": Origin.ADMIN,
+            "eligibility_diagnosis": job_application.eligibility_diagnosis,
         }
 
         # Les numéros avec le préfixe `ASP_ITOU_PREFIX` ne doivent pas pouvoir
