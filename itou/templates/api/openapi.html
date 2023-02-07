@@ -1,7 +1,7 @@
 {% load static %}
 {% extends "layout/content.html" %}
 
-{% block title %}API ReDoc{{ block.super }}{% endblock %}
+{% block title %}API ReDoc {{ block.super }}{% endblock %}
 
 {% block content %}
     <redoc spec-url='{% url schema_url %}' disable-search="true" hide-download-button="true"></redoc>
