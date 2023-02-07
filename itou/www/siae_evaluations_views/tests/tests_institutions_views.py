@@ -945,6 +945,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         assert response.status_code == 200
         self.assertContains(response, validation_button_disabled, html=True, count=1)
         self.assertContains(response, back_url)
+        self.assertContains(response, evaluated_job_application_url)
         self.assertContains(response, "Justificatifs téléversés")
         self.assertContains(response, self.control_text)
 

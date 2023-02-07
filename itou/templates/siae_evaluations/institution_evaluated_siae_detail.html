@@ -104,17 +104,11 @@
                             </div>
 
                             <div class="card-body">
-                                {% if evaluated_siae.evaluation_is_final %}
-                                    {% if evaluated_job_application.state == "UPLOADED" or evaluated_job_application.state == "SUBMITTED" or evaluated_job_application.state == "ACCEPTED" or evaluated_job_application.state == "REFUSED" or evaluated_job_application.state == "REFUSED_2" %}
-                                        <a href="{% url 'siae_evaluations_views:institution_evaluated_job_application' evaluated_job_application.pk %}" class="btn btn-outline-primary btn-sm float-right">
-                                            Revoir ses justificatifs
-                                        </a>
-                                    {% endif %}
-                                {% elif evaluated_job_application.state == "SUBMITTED" %}
+                                {% if not evaluated_siae.evaluation_is_final and evaluated_job_application.state == "SUBMITTED" %}
                                     <a href="{% url 'siae_evaluations_views:institution_evaluated_job_application' evaluated_job_application.pk %}" class="btn btn-outline-primary btn-sm float-right">
                                         Contrôler cette auto-prescription
                                     </a>
-                                {% elif evaluated_siae.state == "ACCEPTED" or evaluated_siae.state == "REFUSED" or evaluated_siae.state == "ADVERSARIAL_STAGE" or evaluated_siae.state == "NOTIFICATION_PENDING" %}
+                                {% elif evaluated_job_application.state != "PENDING" and evaluated_job_application.state != "PROCESSING" %}
                                     <a href="{% url 'siae_evaluations_views:institution_evaluated_job_application' evaluated_job_application.pk %}" class="btn btn-outline-primary btn-sm float-right">
                                         Revoir ses justificatifs
                                     </a>
