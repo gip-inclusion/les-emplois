@@ -3,7 +3,7 @@ import hashlib
 from operator import attrgetter
 
 from django.conf import settings
-from django.db.models.fields import AutoField, CharField, DateField, PositiveIntegerField
+from django.db.models.fields import AutoField, CharField, DateField, PositiveIntegerField, UUIDField
 from django.db.models.fields.related import ForeignKey
 from django.utils import timezone
 
@@ -40,10 +40,13 @@ def get_field_type_from_field(field):
         return "integer"
     if isinstance(field, AutoField) and field.name == "id":
         return "integer"
-    if isinstance(field, ForeignKey):
-        return "integer"
+    if isinstance(field, UUIDField):
+        return "varchar"
     if isinstance(field, DateField):
         return "date"
+    if isinstance(field, ForeignKey):
+        related_pk_field = field.related_model._meta.pk
+        return get_field_type_from_field(related_pk_field)
     raise ValueError("Unexpected field type")
 
 

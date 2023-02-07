@@ -10,6 +10,7 @@ TABLE = MetabaseTable(name="cap_candidatures")
 TABLE.add_columns(
     [
         get_column_from_field(get_field("id"), name="id"),
+        get_column_from_field(get_field("job_application_id"), name="id_candidature"),
         get_column_from_field(get_field("evaluated_siae_id"), name="id_cap_structure"),
         {
             "name": "état",

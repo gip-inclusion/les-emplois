@@ -470,6 +470,7 @@ def test_populate_evaluated_siaes():
         assert rows == [
             (
                 evaluated_siae.id,
+                evaluated_siae.evaluation_campaign_id,
                 evaluated_siae.siae_id,
                 evaluated_siae.state,
                 evaluated_siae.reviewed_at,
@@ -499,6 +500,7 @@ def test_populate_evaluated_job_applications():
         assert rows == [
             (
                 evaluated_job_application.id,
+                str(evaluated_job_application.job_application_id),
                 evaluated_job_application.evaluated_siae_id,
                 evaluated_job_application.state,
                 datetime.date(2023, 2, 1),
