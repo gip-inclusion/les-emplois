@@ -191,6 +191,63 @@ class CitiesAutocompleteTest(TestCase):
         assert response.status_code == 200
         assert response.json() == []
 
+    def test_queryset_is_ordered_before_truncation(self):
+        create_test_cities(["01", "02", "54", "57", "62", "75", "93"], num_per_department=20)
+        response = self.client.get(reverse("autocomplete:cities"), {"term": "e"})
+        assert response.status_code == 200
+        assert response.json() == [
+            {"slug": "eclimeux-62", "value": "Éclimeux (62)"},
+            {"slug": "epiez-sur-chiers-54", "value": "Épiez-sur-Chiers (54)"},
+            {"slug": "erbeviller-sur-amezule-54", "value": "Erbéviller-sur-Amezule (54)"},
+            {"slug": "beny-01", "value": "Bény (01)"},
+            {"slug": "celles-sur-aisne-02", "value": "Celles-sur-Aisne (02)"},
+            {"slug": "helstroff-57", "value": "Helstroff (57)"},
+            {"slug": "le-pre-saint-gervais-93", "value": "Le Pré-Saint-Gervais (93)"},
+            {"slug": "remies-02", "value": "Remies (02)"},
+            {"slug": "remilly-57", "value": "Rémilly (57)"},
+            {"slug": "sevran-93", "value": "Sevran (93)"},
+            {"slug": "verneuil-sur-serre-02", "value": "Verneuil-sur-Serre (02)"},
+            {"slug": "chenicourt-54", "value": "Chenicourt (54)"},
+            {"slug": "hoeville-54", "value": "Hoéville (54)"},
+            {"slug": "tremblay-en-france-93", "value": "Tremblay-en-France (93)"},
+            {"slug": "viels-maisons-02", "value": "Viels-Maisons (02)"},
+            {"slug": "bage-le-chatel-01", "value": "Bâgé-le-Châtel (01)"},
+            {"slug": "joyeux-01", "value": "Joyeux (01)"},
+            {"slug": "moyen-54", "value": "Moyen (54)"},
+            {"slug": "noyelles-les-vermelles-62", "value": "Noyelles-lès-Vermelles (62)"},
+            {"slug": "wimereux-62", "value": "Wimereux (62)"},
+            {"slug": "agnieres-62", "value": "Agnières (62)"},
+            {"slug": "cattenom-57", "value": "Cattenom (57)"},
+            {"slug": "schneckenbusch-57", "value": "Schneckenbusch (57)"},
+            {"slug": "baslieux-54", "value": "Baslieux (54)"},
+            {"slug": "boissey-01", "value": "Boissey (01)"},
+            {"slug": "burthecourt-aux-chenes-54", "value": "Burthecourt-aux-Chênes (54)"},
+            {"slug": "dhuizel-02", "value": "Dhuizel (02)"},
+            {"slug": "dompierre-sur-chalaronne-01", "value": "Dompierre-sur-Chalaronne (01)"},
+            {"slug": "longuenesse-62", "value": "Longuenesse (62)"},
+            {"slug": "montreuil-93", "value": "Montreuil (93)"},
+            {"slug": "sainte-austreberthe-62", "value": "Sainte-Austreberthe (62)"},
+            {"slug": "foncquevillers-62", "value": "Foncquevillers (62)"},
+            {"slug": "oigny-en-valois-02", "value": "Oigny-en-Valois (02)"},
+            {"slug": "ottange-57", "value": "Ottange (57)"},
+            {"slug": "noisy-le-grand-93", "value": "Noisy-le-Grand (93)"},
+            {"slug": "paris-1er-arrondissement-75", "value": "Paris 1er Arrondissement (75)"},
+            {"slug": "paris-2e-arrondissement-75", "value": "Paris 2e Arrondissement (75)"},
+            {"slug": "paris-3e-arrondissement-75", "value": "Paris 3e Arrondissement (75)"},
+            {"slug": "paris-4e-arrondissement-75", "value": "Paris 4e Arrondissement (75)"},
+            {"slug": "paris-5e-arrondissement-75", "value": "Paris 5e Arrondissement (75)"},
+            {"slug": "paris-6e-arrondissement-75", "value": "Paris 6e Arrondissement (75)"},
+            {"slug": "paris-7e-arrondissement-75", "value": "Paris 7e Arrondissement (75)"},
+            {"slug": "paris-8e-arrondissement-75", "value": "Paris 8e Arrondissement (75)"},
+            {"slug": "paris-9e-arrondissement-75", "value": "Paris 9e Arrondissement (75)"},
+            {"slug": "saint-genis-pouilly-01", "value": "Saint-Genis-Pouilly (01)"},
+            {"slug": "saint-jean-de-gonville-01", "value": "Saint-Jean-de-Gonville (01)"},
+            {"slug": "acquin-westbecourt-62", "value": "Acquin-Westbécourt (62)"},
+            {"slug": "bainville-sur-madon-54", "value": "Bainville-sur-Madon (54)"},
+            {"slug": "la-courneuve-93", "value": "La Courneuve (93)"},
+            {"slug": "paris-10e-arrondissement-75", "value": "Paris 10e Arrondissement (75)"},
+        ]
+
 
 class CommunesAutocompleteTest(TestCase):
     def test_autocomplete(self):
