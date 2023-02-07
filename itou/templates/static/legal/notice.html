@@ -1,67 +1,96 @@
-{% extends "layout/base.html" %}
+{% extends "layout/content.html" %}
 
-{% block title %}Mentions légales{{ block.super }}{% endblock %}
+{% block title %}Mentions légales {{ block.super }}{% endblock %}
 
-{% block content_full_viewport %}
-
-    <section>
-        <div class="container">
-            <h1 id="mentions-légales">Mentions légales</h1>
-            <hr>
-            <h2 id="éditeur">Éditeur</h2>
-            <p>Le site « Les emplois de l’inclusion » est édité par :</p>
-            <p>Le Groupement d’Intérêt Public « Plateforme de l’inclusion » :</p>
-            <p>
-                127 Rue de Grenelle
-                75007 Paris
-            </p>
-            <h2 id="directeur-de-la-publication">Directeur de la publication</h2>
-            <p>Le Directeur de la publication est Monsieur Arnaud Denoix.</p>
-            <h2 id="hébergement-des-emplois-de-linclusion">Hébergement des emplois de l&#39;inclusion</h2>
-            <p>Ce site est hébergé par :</p>
-            <p>
-                Clever Cloud SAS
-                5, passage de l’industrie
-                92130 Issy-Les-Moulineaux
-                France
-            </p>
-            <h2 id="accessibilité">Accessibilité</h2>
-            <p>
-                La conformité aux normes d’accessibilité numérique est un objectif ultérieur mais nous tâchons de rendre ce site accessible à toutes et à tous.
-            </p>
-            <h4 id="en-savoir-plus">En savoir plus</h4>
-            <p>
-                Pour en savoir plus sur la politique d’accessibilité numérique de l’Etat, voir le lien suivant : <a href="https://www.numerique.gouv.fr/publications/rgaa-accessibilite/">https://www.numerique.gouv.fr/publications/rgaa-accessibilite/</a>
-            </p>
-            <h2 id="signaler-un-dysfonctionnement">Signaler un dysfonctionnement</h2>
-            <p>
-                Si vous rencontrez un défaut d’accessibilité vous empêchant d’accéder à un contenu ou à une fonctionnalité du site, merci de nous en faire part ici : <a href="https://communaute.inclusion.beta.gouv.fr/aide/">https://communaute.inclusion.beta.gouv.fr/aide/</a>
-                Si vous n’obtenez pas de réponse rapide de notre part, vous êtes en droit de faire parvenir vos doléances ou une demande de saisine au Défenseur des droits.
-            </p>
-            <p>Pour le joindre, vous pouvez :</p>
-            <ul>
-                <li>
-                    Utiliser le formulaire de contact en ligne ici : <a href="https://formulaire.defenseurdesdroits.fr/code/afficher.php?ETAPE=accueil_2016">https://formulaire.defenseurdesdroits.fr/code/afficher.php?ETAPE=accueil_2016</a> ;
-                </li>
-                <li>Composer le 09 69 39 00 00 (du lundi au vendredi de 8h à 20h) ;</li>
-                <li>
-                    Envoyer un courrier (sans timbre) à l’adresse suivante : Défenseur des droits, Libre réponse 71120, 75342 Paris CEDEX 07.
-                </li>
-            </ul>
-            <p>
-                Pour en savoir plus sur la politique d’accessibilité numérique de l’État : <a href="https://accessibilite.numerique.gouv.fr/">https://accessibilite.numerique.gouv.fr/</a>
-            </p>
-            <h2 id="sécurité">Sécurité</h2>
-            <p>
-                Le site est protégé par un certificat électronique, matérialisé pour la grande majorité des navigateurs par un cadenas. Cette protection participe à la confidentialité des échanges.
-                En aucun cas les services associés à la plateforme ne seront à l’origine d’envoi de courriels pour demander la saisie d’informations personnelles.
-            </p>
-            <p>
-                En aucun cas les services associés à la plateforme de l’inclusion ne seront à l’origine d’envoi de courriels pour demander la saisie de vos informations personnelles.
-            </p>
-
-
+{% block content_container_css_classes %}pt-0{% endblock %}
+{% block pre_content %}
+    <section class="s-title-01 p-0">
+        <div class="s-title-01__container container">
+            <div class="s-title-01__row row">
+                <div class="s-title-01__col col-12">
+                    <h1 class="s-title-01__title h1">
+                        <strong>Mentions légales</strong>
+                    </h1>
+                </div>
+            </div>
         </div>
     </section>
+{% endblock %}
 
+{% block content %}
+    <h2 id="éditeur" class="mt-3 mt-lg-5">Éditeur</h2>
+    <p>Le site « Les emplois de l’inclusion » est édité par :</p>
+    <address>
+        Le Groupement d’Intérêt Public « Plateforme de l’inclusion » 
+        <br>
+        127 Rue de Grenelle
+        <br>
+        75007 Paris
+    </address>
+
+    <h2 id="directeur-de-la-publication" class="mt-3 mt-lg-5">Directeur de la publication</h2>
+    <p>Le Directeur de la publication est Monsieur Arnaud Denoix.</p>
+
+    <h2 id="hébergement-des-emplois-de-linclusion">Hébergement des emplois de l&#39;inclusion</h2>
+    <p>Ce site est hébergé par :</p>
+    <address>
+        Clever Cloud SAS
+        <br>
+        5, passage de l’industrie
+        <br>
+        92130 Issy-Les-Moulineaux
+        <br>
+        France
+    </address>
+
+    <h2 id="accessibilité" class="mt-3 mt-lg-5">Accessibilité</h2>
+    <p>
+        La conformité aux normes d’accessibilité numérique est un objectif ultérieur mais nous tâchons de rendre ce site accessible à toutes et à tous.
+    </p>
+    <h3 id="en-savoir-plus">En savoir plus</h3>
+    <p>
+        Pour en savoir plus sur la politique d’accessibilité numérique de l’Etat, voir le lien suivant : <a href="https://www.numerique.gouv.fr/publications/rgaa-accessibilite/">https://www.numerique.gouv.fr/publications/rgaa-accessibilite/</a>
+    </p>
+
+
+    <h2 id="signaler-un-dysfonctionnement" class="mt-3 mt-lg-5">Signaler un dysfonctionnement</h2>
+    <p>
+        Si vous rencontrez un défaut d’accessibilité vous empêchant d’accéder à un contenu ou à une fonctionnalité du site, merci de nous en faire part ici : <a href="https://communaute.inclusion.beta.gouv.fr/aide/">https://communaute.inclusion.beta.gouv.fr/aide/</a>
+    </p>
+    <p>
+        Si vous n’obtenez pas de réponse rapide de notre part, vous êtes en droit de faire parvenir vos doléances ou une demande de saisine au Défenseur des droits.
+    </p>
+    <p>Pour le joindre, vous pouvez :</p>
+    <ul>
+        <li>
+            Utiliser le formulaire de contact en ligne ici : <a href="https://formulaire.defenseurdesdroits.fr/code/afficher.php?ETAPE=accueil_2016">https://formulaire.defenseurdesdroits.fr/code/afficher.php?ETAPE=accueil_2016</a> ;
+        </li>
+        <li>
+            Composer le <a href="tel:+33969390000">09 69 39 00 00</a> (du lundi au vendredi de 8h à 20h) ;
+        </li>
+        <li>
+            Envoyer un courrier (sans timbre) à l’adresse suivante :
+            <br>
+            <address>
+                Défenseur des droits,
+                <br>
+                Libre réponse 71120,
+                <br>
+                75342 Paris CEDEX 07.
+            </address>
+        </li>
+    </ul>
+    <p>
+        Pour en savoir plus sur la politique d’accessibilité numérique de l’État : <a href="https://accessibilite.numerique.gouv.fr/">https://accessibilite.numerique.gouv.fr/</a>
+    </p>
+
+    <h2 id="sécurité" class="mt-3 mt-lg-5">Sécurité</h2>
+    <p>
+        Le site est protégé par un certificat électronique, matérialisé pour la grande majorité des navigateurs par un cadenas. Cette protection participe à la confidentialité des échanges.
+        <br>
+        En aucun cas les services associés à la plateforme ne seront à l’origine d’envoi de courriels pour demander la saisie d’informations personnelles.
+    </p>
+    <p>
+        En aucun cas les services associés à la plateforme de l’inclusion ne seront à l’origine d’envoi de courriels pour demander la saisie de vos informations personnelles.
+    </p>
 {% endblock %}

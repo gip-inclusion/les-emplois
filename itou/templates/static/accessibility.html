@@ -2,16 +2,29 @@
 
 {% block title %}Déclaration d'accessibilité {{ block.super }}{% endblock %}
 
+{% block content_container_css_classes %}pt-0{% endblock %}
+
+{% block pre_content %}
+    <section class="s-title-01 p-0">
+        <div class="s-title-01__container container">
+            <div class="s-title-01__row row">
+                <div class="s-title-01__col col-12">
+                    <h1 class="s-title-01__title h1">
+                        <strong>Déclaration d'accessibilité</strong>
+                    </h1>
+                    <h2 class="h3">
+                        <b>La Délégation générale à l'Emploi et à la Formation professionnelle</b> s'engage à rendre son service accessible, conformément à l'article 47 de la loi n° 2005-102 du 11 février 2005.
+                    </h2>
+                    <p>
+                        Cette déclaration d'accessibilité s'applique au site web <b>Les emplois de l'inclusion</b>.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
 {% block content %}
-
-    <h1 class="h1">Déclaration d'accessibilité</h1>
-    <p>
-        <b>La Délégation générale à l'Emploi et à la Formation professionnelle</b> s'engage à rendre son service accessible, conformément à l'article 47 de la loi n° 2005-102 du 11 février 2005.
-    </p>
-    <p>
-        Cette déclaration d'accessibilité s'applique au site web <b>Les emplois de l'inclusion</b>.
-    </p>
-
     <h2 class="h2 mt-3 mt-lg-5">État de conformité</h2>
     <p>Le site a été audité par la société alter way en novembre 2021.</p>
     <p>
@@ -132,7 +145,13 @@
             E-mail : <a href="mailto:{{ ITOU_EMAIL_CONTACT }}">{{ ITOU_EMAIL_CONTACT }}</a>
         </li>
         <li>
-            Adresse : 20 avenue de Ségur 75007 Paris
+            Adresse :
+            <br>
+            <address>
+                20 avenue de Ségur
+                <br>
+                75007 Paris
+            </address>
         </li>
     </ul>
     <p>
@@ -158,11 +177,13 @@
         <li>
             Envoyer un courrier par la poste (gratuit, ne pas mettre de timbre) :
             <br>
-            Défenseur des droits
-            <br>
-            Libre réponse 71120
-            <br>
-            75342 Paris CEDEX 07
+            <address>
+                Défenseur des droits
+                <br>
+                Libre réponse 71120
+                <br>
+                75342 Paris CEDEX 07
+            </address>
         </li>
     </ul>
 
