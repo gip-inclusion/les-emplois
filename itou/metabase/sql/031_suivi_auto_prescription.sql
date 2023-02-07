@@ -1,5 +1,6 @@
 select
     c.id,
+    cd.id as id_candidature,
     c.hash_nir,
     c.age,
     c.département,
@@ -16,9 +17,12 @@ select
     cd.état,
     cd.origine,
     cd.origine_détaillée,
-    cd.type_structure,
     cd.id_structure,
-    cd.nom_structure
+    cd.type_structure,
+    cd.nom_structure,
+    cd.département_structure,
+    cd.nom_département_structure,
+    cd.région_structure    
 from candidats c
     left join candidatures cd
         on c.id = cd.id_candidat 
