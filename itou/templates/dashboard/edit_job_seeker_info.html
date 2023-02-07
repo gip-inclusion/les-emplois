@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block title %}
-    Informations personnelles de {{ job_application.job_seeker.get_full_name|title }}{{ block.super }}
+    Informations personnelles de {{ job_application.job_seeker.get_full_name|title }} {{ block.super }}
 {% endblock %}
 
 {% block content %}
