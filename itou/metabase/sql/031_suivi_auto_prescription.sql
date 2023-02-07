@@ -22,7 +22,9 @@ select
     cd.nom_structure,
     cd.département_structure,
     cd.nom_département_structure,
-    cd.région_structure    
+    cd.région_structure,
+    cd.injection_ai as injection_ai_candidatures,
+    c.injection_ai as injection_ai_candidats
 from candidats c
     left join candidatures cd
         on c.id = cd.id_candidat 
