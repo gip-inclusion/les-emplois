@@ -46,7 +46,7 @@
                         <div class="card-deck">
                             {% employers_accounts_tag as employers_accounts %}
                             {% for account in employers_accounts %}
-                                <div class="card">
+                                <div class="card has-links-inside">
                                     <div class="card-body mb-auto py-0">
                                         <img src="{% static '/img/test_accounts/' %}{{ account.image }}" class="card-img-top p-2 test-accounts-image-menu" alt="">
                                         <h5 class="h5 card-title font-weight-bold text-center">{{ account.title }}</h5>
@@ -73,7 +73,7 @@
                         <div class="card-deck">
                             {% prescribers_accounts_tag as prescribers_accounts %}
                             {% for account in prescribers_accounts %}
-                                <div class="card">
+                                <div class="card has-links-inside">
                                     <img src="{% static '/img/test_accounts/' %}{{ account.image }}" class="card-img-top p-2 test-accounts-image-menu" alt="">
                                     <div class="card-body">
                                         <h5 class="h5 card-title h6 font-weight-bold text-center">{{ account.title|safe }}</h5>
@@ -94,7 +94,7 @@
                         <div class="card-deck w-sm-33 m-auto">
                             {% job_seekers_accounts_tag as job_seekers_accounts %}
                             {% for account in job_seekers_accounts %}
-                                <div class="card">
+                                <div class="card has-links-inside">
                                     <img src="{% static '/img/test_accounts/' %}{{ account.image }}" class="card-img-top p-2 test-accounts-image-menu" alt="">
                                     <div class="card-body">
                                         <h5 class="h5 card-title font-weight-bold text-center mb-0">{{ account.title }}</h5>
