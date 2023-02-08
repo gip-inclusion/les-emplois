@@ -36,7 +36,6 @@ class SiaeSearchForm(forms.Form):
             attrs={
                 "class": "js-city-autocomplete-input form-control",
                 "data-autocomplete-source-url": CITY_AUTOCOMPLETE_SOURCE_URL,
-                "data-autosubmit-on-enter-pressed": 1,
                 "placeholder": "Autour de (Arras, Bobigny, Strasbourg…)",
                 "autocomplete": "off",
             }
@@ -147,7 +146,6 @@ class PrescriberSearchForm(forms.Form):
             attrs={
                 "class": "js-city-autocomplete-input form-control",
                 "data-autocomplete-source-url": CITY_AUTOCOMPLETE_SOURCE_URL,
-                "data-autosubmit-on-enter-pressed": 1,
                 "placeholder": "Autour de (Arras, Bobigny, Strasbourg…)",
                 "autocomplete": "off",
             }
