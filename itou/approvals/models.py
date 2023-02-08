@@ -1175,9 +1175,6 @@ class PoleEmploiApprovalManager(models.Manager):
             filter_expression |= Q(pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate)
         return self.filter(filter_expression).order_by("-start_at")
 
-    def without_nir_ntt_or_nia(self):
-        return self.filter(Q(nir=None) & Q(ntt_nia=None))
-
 
 class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
     """
