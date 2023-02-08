@@ -273,7 +273,7 @@ class Siae(AddressMixin, OrganizationAbstract):
     )
 
     objects = SiaeManager()
-    unfiltered_objects = models.Manager.from_queryset(SiaeQuerySet)()
+    unfiltered_objects = SiaeQuerySet.as_manager()
 
     class Meta:
         verbose_name = "Entreprise"
@@ -585,7 +585,7 @@ class SiaeJobDescription(models.Model):
     )
     source_url = models.URLField(verbose_name="URL source de l'offre", max_length=512, null=True, blank=True)
 
-    objects = models.Manager.from_queryset(SiaeJobDescriptionQuerySet)()
+    objects = SiaeJobDescriptionQuerySet.as_manager()
 
     class Meta:
         verbose_name = "Fiche de poste"

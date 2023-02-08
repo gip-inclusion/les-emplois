@@ -208,7 +208,7 @@ class AbstractPeriod(models.Model):
     start_date = models.DateField(verbose_name="Début de validité")
     end_date = models.DateField(verbose_name="Fin de validité", null=True, blank=True)
 
-    objects = models.Manager.from_queryset(PeriodQuerySet)()
+    objects = PeriodQuerySet.as_manager()
 
     class Meta:
         abstract = True
@@ -470,7 +470,7 @@ class Country(PrettyPrintMixin, models.Model):
         CEE = "2", "CEE"
         OUTSIDE_CEE = "3", "Hors CEE"
 
-    objects = models.Manager.from_queryset(CountryQuerySet)()
+    objects = CountryQuerySet.as_manager()
 
     code = models.CharField(max_length=3, verbose_name="Code pays INSEE")
     name = models.CharField(max_length=50, verbose_name="Nom du pays")

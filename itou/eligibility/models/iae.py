@@ -256,7 +256,7 @@ class AdministrativeCriteria(AbstractAdministrativeCriteria):
         settings.AUTH_USER_MODEL, verbose_name="Créé par", null=True, blank=True, on_delete=models.SET_NULL
     )
 
-    objects = models.Manager.from_queryset(AdministrativeCriteriaQuerySet)()
+    objects = AdministrativeCriteriaQuerySet.as_manager()
 
     class Meta:
         verbose_name = "Critère administratif IAE"

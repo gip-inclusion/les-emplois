@@ -242,7 +242,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         verbose_name="Origine du pass", max_length=30, choices=Origin.choices, default=Origin.DEFAULT
     )
 
-    objects = models.Manager.from_queryset(CommonApprovalQuerySet)()
+    objects = CommonApprovalQuerySet.as_manager()
 
     class Meta:
         verbose_name = "PASS IAE"
@@ -670,7 +670,7 @@ class Suspension(models.Model):
         on_delete=models.SET_NULL,
     )
 
-    objects = models.Manager.from_queryset(SuspensionQuerySet)()
+    objects = SuspensionQuerySet.as_manager()
 
     class Meta:
         verbose_name = "Suspension"

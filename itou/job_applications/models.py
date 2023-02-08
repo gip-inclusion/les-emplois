@@ -580,7 +580,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now, db_index=True)
     updated_at = models.DateTimeField(verbose_name="Date de modification", blank=True, null=True, db_index=True)
 
-    objects = models.Manager.from_queryset(JobApplicationQuerySet)()
+    objects = JobApplicationQuerySet.as_manager()
 
     class Meta:
         verbose_name = "Candidature"

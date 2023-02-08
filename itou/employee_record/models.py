@@ -790,7 +790,7 @@ class EmployeeRecordUpdateNotification(models.Model):
         null=True,
     )
 
-    objects = models.Manager.from_queryset(EmployeeRecordUpdateNotificationQuerySet)()
+    objects = EmployeeRecordUpdateNotificationQuerySet.as_manager()
 
     class Meta:
         verbose_name = "Notification de changement de la fiche salarié"

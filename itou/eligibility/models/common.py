@@ -113,7 +113,7 @@ class AbstractAdministrativeCriteria(models.Model):
     class Meta:
         abstract = True
 
-    objects = models.Manager.from_queryset(AdministrativeCriteriaQuerySet)
+    objects = AdministrativeCriteriaQuerySet.as_manager()
 
     def __str__(self):
         name = f"{self.name}"
