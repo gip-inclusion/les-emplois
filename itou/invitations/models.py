@@ -50,7 +50,7 @@ class InvitationAbstract(models.Model):
     created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now, db_index=True)
     sent_at = models.DateTimeField(verbose_name="Date d'envoi", blank=True, null=True, db_index=True)
 
-    objects = models.Manager.from_queryset(InvitationQuerySet)()
+    objects = InvitationQuerySet.as_manager()
 
     class Meta:
         ordering = ["-created_at"]

@@ -86,7 +86,7 @@ class Appellation(models.Model):
     # A PostgreSQL trigger (defined in migrations) updates this field automatically.
     full_text = SearchVectorField(null=True)
 
-    objects = models.Manager.from_queryset(AppellationQuerySet)()
+    objects = AppellationQuerySet.as_manager()
 
     class Meta:
         verbose_name = "Appellation"

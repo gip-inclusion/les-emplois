@@ -33,7 +33,7 @@ class Institution(AddressMixin, OrganizationAbstract):
         through_fields=("institution", "user"),
     )
 
-    objects = models.Manager.from_queryset(OrganizationQuerySet)()
+    objects = OrganizationQuerySet.as_manager()
 
 
 class InstitutionMembership(MembershipAbstract):

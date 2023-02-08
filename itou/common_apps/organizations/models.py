@@ -48,7 +48,7 @@ class OrganizationAbstract(models.Model):
     #     blank=True,
     #     through_fields=("organization", "user"),
     # )
-    objects = models.Manager.from_queryset(OrganizationQuerySet)()
+    objects = OrganizationQuerySet.as_manager()
 
     class Meta:
         abstract = True
@@ -215,7 +215,7 @@ class MembershipAbstract(models.Model):
     created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="Date de modification", null=True)
 
-    objects = models.Manager.from_queryset(MembershipQuerySet)()
+    objects = MembershipQuerySet.as_manager()
 
     class Meta:
         abstract = True
