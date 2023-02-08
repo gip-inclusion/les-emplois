@@ -523,45 +523,35 @@ class EvaluatedJobApplication(models.Model):
     # fixme vincentporte : rsebille suggests to replace cached_property with prefetch_related
     @cached_property
     def state(self):
+        STATES_PRIORITY = [
+            # Low priority: all criteria must have this state for the evaluated job application to have it
+            evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED,
+            evaluation_enums.EvaluatedJobApplicationsState.REFUSED,
+            evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            evaluation_enums.EvaluatedJobApplicationsState.SUBMITTED,
+            evaluation_enums.EvaluatedJobApplicationsState.UPLOADED,
+            evaluation_enums.EvaluatedJobApplicationsState.PROCESSING,
+            # High priority: if at least one criteria has this state, the evaluated job application will also
+        ]
 
-        # assuming the EvaluatedJobApplication instance is fully hydrated
-        # with its evaluated_administrative_criteria before being called,
-        # to prevent tons of additional queries in db.
-        if len(self.evaluated_administrative_criteria.all()) == 0:
-            return evaluation_enums.EvaluatedJobApplicationsState.PENDING
+        def state_from(criteria):
+            if criteria.proof_url == "":
+                return evaluation_enums.EvaluatedJobApplicationsState.PROCESSING
+            if criteria.submitted_at is None:
+                return evaluation_enums.EvaluatedJobApplicationsState.UPLOADED
+            return {
+                # pylint-disable=line-too-long
+                evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING: evaluation_enums.EvaluatedJobApplicationsState.SUBMITTED,  # noqa: E501
+                evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED: evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED,  # noqa: E501
+                evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED: evaluation_enums.EvaluatedJobApplicationsState.REFUSED,  # noqa: E501
+                evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2: evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,  # noqa: E501
+            }[criteria.review_state]
 
-        if any(eval_admin_crit.proof_url == "" for eval_admin_crit in self.evaluated_administrative_criteria.all()):
-            return evaluation_enums.EvaluatedJobApplicationsState.PROCESSING
-
-        if any(
-            eval_admin_crit.submitted_at is None for eval_admin_crit in self.evaluated_administrative_criteria.all()
-        ):
-            return evaluation_enums.EvaluatedJobApplicationsState.UPLOADED
-
-        if any(
-            eval_admin_crit.review_state == evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
-            for eval_admin_crit in self.evaluated_administrative_criteria.all()
-        ):
-            return evaluation_enums.EvaluatedJobApplicationsState.SUBMITTED
-
-        if any(
-            eval_admin_crit.review_state == evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2
-            for eval_admin_crit in self.evaluated_administrative_criteria.all()
-        ):
-            return evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2
-
-        if any(
-            eval_admin_crit.review_state == evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
-            for eval_admin_crit in self.evaluated_administrative_criteria.all()
-        ):
-            return evaluation_enums.EvaluatedJobApplicationsState.REFUSED
-
-        if all(
-            eval_admin_crit.review_state == evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
-            for eval_admin_crit in self.evaluated_administrative_criteria.all()
-        ):
-            return evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED
-        raise TypeError(f"Unknown state for “{self}”")
+        return max(
+            (state_from(criteria) for criteria in self.evaluated_administrative_criteria.all()),
+            key=STATES_PRIORITY.index,
+            default=evaluation_enums.EvaluatedJobApplicationsState.PENDING,
+        )
 
     @property
     def should_select_criteria(self):
