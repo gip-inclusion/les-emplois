@@ -24,7 +24,10 @@ def _generate_excel_template(headers):
         headers,
         [["Default" for _header in headers]],  # Force the type of each column to text
     )
-    return io.BytesIO(openpyxl.writer.excel.save_virtual_workbook(template))
+    buffer = io.BytesIO()
+    openpyxl.writer.excel.save_workbook(template, buffer)
+    buffer.seek(0)
+    return buffer
 
 
 def to_streaming_response(queryset, filename, headers, serializer, with_time=False):
