@@ -1,4 +1,5 @@
 {% extends "layout/content.html" %}
+{% load format_filters %}
 {% load static tally %}
 {% block title %}Tableau de bord {{ block.super }}{% endblock %}
 
@@ -184,15 +185,17 @@
 {% block content %}
 
     <h1 class="h1">
-        Tableau de bord
-        {% if user.is_job_seeker and user.get_full_name %}- <span class="text-muted">{{ user.get_full_name }}</span>{% endif %}
-        {% if current_siae %}- <span class="text-muted">{{ current_siae.display_name }}</span>{% endif %}
+        {% if user.is_job_seeker and user.get_full_name %}
+            Tableau de bord - <span class="text-muted">{{ user.get_full_name }}</span>
+        {% endif %}
+        {% if current_siae %}<span class="text-muted">{{ current_siae.display_name }}</span>{% endif %}
         {% if current_prescriber_organization %}
-            -
             <span class="text-muted">{{ current_prescriber_organization.display_name }}</span>
             {% if current_prescriber_organization.is_authorized %}<i class="ri-award-line ri-2x"></i>{% endif %}
         {% endif %}
-        {% if current_institution %}- <span class="text-muted">{{ current_institution.display_name }}</span>{% endif %}
+        {% if current_institution %}
+            Tableau de bord - <span class="text-muted">{{ current_institution.display_name }}</span>
+        {% endif %}
     </h1>
 
     {% if current_prescriber_organization and current_prescriber_organization.is_authorized %}
@@ -202,6 +205,12 @@
                 <span class="badge badge-pill badge-sm badge-light">Code SAFIR {{ current_prescriber_organization.code_safir_pole_emploi }}</span>
             {% endif %}
         </p>
+    {% endif %}
+
+    {% if current_siae %}<p class="text-muted">SIRET {{ current_siae.siret|format_siret }}</p>{% endif %}
+
+    {% if current_prescriber_organization and current_prescriber_organization.siret %}
+        <p class="text-muted">SIRET {{ current_prescriber_organization.siret|format_siret }}</p>
     {% endif %}
 
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 mt-3">
