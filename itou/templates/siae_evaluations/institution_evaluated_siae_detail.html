@@ -74,19 +74,21 @@
                             {# navigation : anchor to scroll to a specific card when returning to this page #}
                             <a class="scrolldown-anchor" id="{{ evaluated_job_application.pk }}"></a>
                             <div class="card-header">
-                                {% include "siae_evaluations/includes/job_seeker_infos_for_institution.html" with job_seeker=evaluated_job_application.job_application.job_seeker approval=evaluated_job_application.job_application.approval state=evaluated_job_application.state reviewed_at=evaluated_job_application.evaluated_siae.reviewed_at %}
+                                {% include "siae_evaluations/includes/job_seeker_infos_for_institution.html" with job_seeker=evaluated_job_application.job_application.job_seeker approval=evaluated_job_application.job_application.approval state=evaluated_job_application.compute_state reviewed_at=evaluated_job_application.evaluated_siae.reviewed_at %}
                             </div>
 
                             <div class="card-body">
-                                {% if not evaluated_siae.evaluation_is_final and evaluated_job_application.state == "SUBMITTED" %}
-                                    <a href="{% url 'siae_evaluations_views:institution_evaluated_job_application' evaluated_job_application.pk %}" class="btn btn-outline-primary btn-sm float-right">
-                                        Contrôler cette auto-prescription
-                                    </a>
-                                {% elif evaluated_job_application.state != "PENDING" and evaluated_job_application.state != "PROCESSING" %}
-                                    <a href="{% url 'siae_evaluations_views:institution_evaluated_job_application' evaluated_job_application.pk %}" class="btn btn-outline-primary btn-sm float-right">
-                                        Revoir ses justificatifs
-                                    </a>
-                                {% endif %}
+                                {% with evaluated_job_application_state=evaluated_job_application.compute_state %}
+                                    {% if not evaluated_siae.evaluation_is_final and evaluated_job_application_state == "SUBMITTED" %}
+                                        <a href="{% url 'siae_evaluations_views:institution_evaluated_job_application' evaluated_job_application.pk %}" class="btn btn-outline-primary btn-sm float-right">
+                                            Contrôler cette auto-prescription
+                                        </a>
+                                    {% elif evaluated_job_application_state != "PENDING" and evaluated_job_application_state != "PROCESSING" %}
+                                        <a href="{% url 'siae_evaluations_views:institution_evaluated_job_application' evaluated_job_application.pk %}" class="btn btn-outline-primary btn-sm float-right">
+                                            Revoir ses justificatifs
+                                        </a>
+                                    {% endif %}
+                                {% endwith %}
                             </div>
                         </div>
                     {% endfor %}

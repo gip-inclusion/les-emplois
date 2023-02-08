@@ -454,7 +454,7 @@ class EvaluatedSiae(models.Model):
         # it has been decided that if we were in the unlikely case that any criteria was still PENDING,
         # the DDETS should still be able to verify it.
         if any(
-            eval_job_app.state == evaluation_enums.EvaluatedJobApplicationsState.SUBMITTED
+            eval_job_app.compute_state() == evaluation_enums.EvaluatedJobApplicationsState.SUBMITTED
             for eval_job_app in self.evaluated_job_applications.all()
         ):
             return (
@@ -520,9 +520,7 @@ class EvaluatedJobApplication(models.Model):
     def __str__(self):
         return f"{self.job_application}"
 
-    # fixme vincentporte : rsebille suggests to replace cached_property with prefetch_related
-    @cached_property
-    def state(self):
+    def compute_state(self):
         STATES_PRIORITY = [
             # Low priority: all criteria must have this state for the evaluated job application to have it
             evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED,
@@ -555,13 +553,14 @@ class EvaluatedJobApplication(models.Model):
 
     @property
     def should_select_criteria(self):
-        if self.state == evaluation_enums.EvaluatedJobApplicationsState.PENDING:
+        state = self.compute_state()
+        if state == evaluation_enums.EvaluatedJobApplicationsState.PENDING:
             return evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.PENDING
 
         if self.evaluated_siae.reviewed_at:
             return evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.NOTEDITABLE
 
-        if self.state in [
+        if state in [
             evaluation_enums.EvaluatedJobApplicationsState.PROCESSING,
             evaluation_enums.EvaluatedJobApplicationsState.UPLOADED,
         ]:

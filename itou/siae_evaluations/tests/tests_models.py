@@ -962,45 +962,38 @@ class EvaluatedJobApplicationModelTest(TestCase):
 
     def test_state(self):
         evaluated_job_application = EvaluatedJobApplicationFactory()
-        assert evaluation_enums.EvaluatedJobApplicationsState.PENDING == evaluated_job_application.state
-        del evaluated_job_application.state  # clear cached_property stored value
+        assert evaluation_enums.EvaluatedJobApplicationsState.PENDING == evaluated_job_application.compute_state()
 
         evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
             evaluated_job_application=evaluated_job_application, proof_url=""
         )
-        assert evaluation_enums.EvaluatedJobApplicationsState.PROCESSING == evaluated_job_application.state
-        del evaluated_job_application.state
+        assert evaluation_enums.EvaluatedJobApplicationsState.PROCESSING == evaluated_job_application.compute_state()
 
         evaluated_administrative_criteria.proof_url = "https://www.test.com"
         evaluated_administrative_criteria.save(update_fields=["proof_url"])
-        assert evaluation_enums.EvaluatedJobApplicationsState.UPLOADED == evaluated_job_application.state
-        del evaluated_job_application.state
+        assert evaluation_enums.EvaluatedJobApplicationsState.UPLOADED == evaluated_job_application.compute_state()
 
         evaluated_administrative_criteria.submitted_at = timezone.now()
         evaluated_administrative_criteria.save(update_fields=["submitted_at"])
-        assert evaluation_enums.EvaluatedJobApplicationsState.SUBMITTED == evaluated_job_application.state
-        del evaluated_job_application.state
+        assert evaluation_enums.EvaluatedJobApplicationsState.SUBMITTED == evaluated_job_application.compute_state()
 
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
         evaluated_administrative_criteria.save(update_fields=["review_state"])
-        assert evaluation_enums.EvaluatedJobApplicationsState.SUBMITTED == evaluated_job_application.state
-        del evaluated_job_application.state
+        assert evaluation_enums.EvaluatedJobApplicationsState.SUBMITTED == evaluated_job_application.compute_state()
 
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
         evaluated_administrative_criteria.save(update_fields=["review_state"])
-        assert evaluation_enums.EvaluatedJobApplicationsState.REFUSED == evaluated_job_application.state
-        del evaluated_job_application.state
+        assert evaluation_enums.EvaluatedJobApplicationsState.REFUSED == evaluated_job_application.compute_state()
 
         evaluated_administrative_criteria.review_state = (
             evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2
         )
         evaluated_administrative_criteria.save(update_fields=["review_state"])
-        assert evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2 == evaluated_job_application.state
-        del evaluated_job_application.state
+        assert evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2 == evaluated_job_application.compute_state()
 
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria.save(update_fields=["review_state"])
-        assert evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED == evaluated_job_application.state
+        assert evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED == evaluated_job_application.compute_state()
 
     def test_state_refused2_has_precedence(self):
         evaluated_job_application = EvaluatedJobApplicationFactory(
@@ -1017,7 +1010,7 @@ class EvaluatedJobApplicationModelTest(TestCase):
             submitted_at=timezone.now() - relativedelta(weeks=4),
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2,
         )
-        assert evaluated_job_application.state == evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2
+        assert evaluated_job_application.compute_state() == evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2
 
     def test_should_select_criteria_with_mock(self):
         evaluated_job_application = EvaluatedJobApplicationFactory()
@@ -1025,7 +1018,6 @@ class EvaluatedJobApplicationModelTest(TestCase):
             evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.PENDING
             == evaluated_job_application.should_select_criteria
         )
-        del evaluated_job_application.state
 
         editable_status = [
             evaluation_enums.EvaluatedJobApplicationsState.PROCESSING,
@@ -1034,7 +1026,7 @@ class EvaluatedJobApplicationModelTest(TestCase):
 
         for state in editable_status:
             with self.subTest(state=state):
-                with mock.patch.object(EvaluatedJobApplication, "state", state):
+                with mock.patch.object(EvaluatedJobApplication, "compute_state", return_value=state):
                     assert (
                         evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.EDITABLE
                         == evaluated_job_application.should_select_criteria
@@ -1048,7 +1040,7 @@ class EvaluatedJobApplicationModelTest(TestCase):
 
         for state in not_editable_status:
             with self.subTest(state=state):
-                with mock.patch.object(EvaluatedJobApplication, "state", state):
+                with mock.patch.object(EvaluatedJobApplication, "compute_state", return_value=state):
                     assert (
                         evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.NOTEDITABLE
                         == evaluated_job_application.should_select_criteria
@@ -1063,7 +1055,6 @@ class EvaluatedJobApplicationModelTest(TestCase):
             evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.PENDING
             == evaluated_job_application.should_select_criteria
         )
-        del evaluated_job_application.state
 
         for state in [
             state
@@ -1071,7 +1062,7 @@ class EvaluatedJobApplicationModelTest(TestCase):
             if state != evaluation_enums.EvaluatedJobApplicationsState.PENDING
         ]:
             with self.subTest(state=state):
-                with mock.patch.object(EvaluatedJobApplication, "state", state):
+                with mock.patch.object(EvaluatedJobApplication, "compute_state", return_value=state):
                     assert (
                         evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.NOTEDITABLE
                         == evaluated_job_application.should_select_criteria

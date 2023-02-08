@@ -594,7 +594,7 @@ def siae_select_criteria(
     context = {
         "job_seeker": evaluated_job_application.job_application.job_seeker,
         "approval": evaluated_job_application.job_application.approval,
-        "state": evaluated_job_application.state,
+        "state": evaluated_job_application.compute_state(),
         "form_administrative_criteria": form_administrative_criteria,
         "level_1_fields": level_1_fields,
         "level_2_fields": level_2_fields,
@@ -663,8 +663,11 @@ def siae_submit_proofs(request, evaluated_siae_pk):
     # if at least one of those job applications is uploaded but not yet transmitted, or accepted, let's submit.
     if evaluated_job_applications and any(
         (
-            evaluated_job_application.state == evaluation_enums.EvaluatedJobApplicationsState.UPLOADED
-            or evaluated_job_application.state == evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED
+            evaluated_job_application.compute_state()
+            in (
+                evaluation_enums.EvaluatedJobApplicationsState.UPLOADED,
+                evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED,
+            )
         )
         for evaluated_job_application in evaluated_job_applications
     ):
