@@ -284,7 +284,7 @@ class SiaeSelectCriteriaViewTest(TestCase):
             + f"#{evaluated_job_application.pk}"
             == response.context["back_url"]
         )
-        assert evaluated_job_application.state == response.context["state"]
+        assert evaluated_job_application.compute_state() == response.context["state"]
         assert evaluated_siae.siae.kind == response.context["kind"]
 
     def test_context_fields_list(self):

@@ -21,7 +21,7 @@
             <div class="card">
 
                 <div class="card-header">
-                    {% include "siae_evaluations/includes/job_seeker_infos_for_siae.html" with job_seeker=evaluated_administrative_criteria.evaluated_job_application.job_application.job_seeker approval=evaluated_administrative_criteria.evaluated_job_application.job_application.approval state=evaluated_administrative_criteria.evaluated_job_application.state reviewed_at=evaluated_administrative_criteria.evaluated_job_application.evaluated_siae.reviewed_at %}
+                    {% include "siae_evaluations/includes/job_seeker_infos_for_siae.html" with job_seeker=evaluated_administrative_criteria.evaluated_job_application.job_application.job_seeker approval=evaluated_administrative_criteria.evaluated_job_application.job_application.approval state=evaluated_administrative_criteria.evaluated_job_application.compute_state reviewed_at=evaluated_administrative_criteria.evaluated_job_application.evaluated_siae.reviewed_at %}
                 </div>
 
                 <div class="card-body">

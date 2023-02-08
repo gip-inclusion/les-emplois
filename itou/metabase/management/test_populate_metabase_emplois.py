@@ -521,7 +521,7 @@ def test_populate_evaluated_job_applications():
                 evaluated_job_application.id,
                 str(evaluated_job_application.job_application_id),
                 evaluated_job_application.evaluated_siae_id,
-                evaluated_job_application.state,
+                evaluated_job_application.compute_state(),
                 datetime.date(2023, 2, 1),
             ),
         ]

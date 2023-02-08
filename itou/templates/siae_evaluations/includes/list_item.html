@@ -3,7 +3,7 @@
     {# navigation : anchor to scroll to a specific card when returning to this page #}
     <a class="scrolldown-anchor" id="{{ item.pk }}"></a>
     <div class="card-header">
-        {% include "siae_evaluations/includes/job_seeker_infos_for_siae.html" with job_seeker=item.job_application.job_seeker approval=item.job_application.approval state=item.state reviewed_at=item.evaluated_siae.reviewed_at %}
+        {% include "siae_evaluations/includes/job_seeker_infos_for_siae.html" with job_seeker=item.job_application.job_seeker approval=item.job_application.approval state=item.compute_state reviewed_at=item.evaluated_siae.reviewed_at %}
     </div>
 
     <div class="card-body">

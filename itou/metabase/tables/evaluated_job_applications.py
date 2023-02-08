@@ -16,7 +16,7 @@ TABLE.add_columns(
             "name": "état",
             "type": "varchar",
             "comment": "Etat du contrôle de la candidature",
-            "fn": lambda o: o.state,
+            "fn": lambda o: o.compute_state(),
         },
     ]
 )
