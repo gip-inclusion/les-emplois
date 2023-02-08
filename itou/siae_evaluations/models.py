@@ -101,11 +101,6 @@ class EvaluationCampaignQuerySet(models.QuerySet):
         return self.filter(self.in_progress_q | recent_q)
 
 
-class EvaluationCampaignManager(models.Manager):
-    def first_active_campaign(self, institution):
-        return self.for_institution(institution).in_progress().first()
-
-
 class EvaluationCampaign(models.Model):
     """
     A campaign of evaluation
@@ -154,7 +149,7 @@ class EvaluationCampaign(models.Model):
         ],
     )
 
-    objects = EvaluationCampaignManager.from_queryset(EvaluationCampaignQuerySet)()
+    objects = EvaluationCampaignQuerySet.as_manager()
 
     class Meta:
         verbose_name = "Campagne"
@@ -313,10 +308,6 @@ class EvaluatedSiaeQuerySet(models.QuerySet):
         )
 
 
-class EvaluatedSiaeManager(models.Manager):
-    pass
-
-
 class EvaluatedSiae(models.Model):
 
     evaluation_campaign = models.ForeignKey(
@@ -350,7 +341,7 @@ class EvaluatedSiae(models.Model):
 
     reminder_sent_at = models.DateTimeField(verbose_name="rappel envoyé le", null=True, blank=True)
 
-    objects = EvaluatedSiaeManager.from_queryset(EvaluatedSiaeQuerySet)()
+    objects = EvaluatedSiaeQuerySet.as_manager()
 
     class Meta:
         verbose_name = "Entreprise"

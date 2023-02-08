@@ -221,25 +221,6 @@ class TestEvaluationCampaignManagerEligibleJobApplication:
 
 
 class EvaluationCampaignManagerTest(TestCase):
-    def test_first_active_campaign(self):
-        institution = InstitutionFactory()
-        now = timezone.now()
-        EvaluationCampaignFactory(institution=institution, ended_at=timezone.now())
-        EvaluationCampaignFactory(
-            institution=institution,
-            evaluated_period_start_at=now.date() - relativedelta(months=11),
-            evaluated_period_end_at=now.date() - relativedelta(months=10),
-        )
-        EvaluationCampaignFactory(
-            institution=institution,
-            evaluated_period_start_at=now.date() - relativedelta(months=6),
-            evaluated_period_end_at=now.date() - relativedelta(months=5),
-        )
-        assert (
-            now.date() - relativedelta(months=5)
-            == EvaluationCampaign.objects.first_active_campaign(institution).evaluated_period_end_at
-        )
-
     def test_validate_institution(self):
 
         with pytest.raises(ValidationError):
