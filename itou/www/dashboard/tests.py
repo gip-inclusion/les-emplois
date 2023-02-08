@@ -36,7 +36,7 @@ from itou.users.enums import IdentityProvider, LackOfNIRReason
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
 from itou.users.models import User
 from itou.utils import constants as global_constants
-from itou.utils.templatetags.format_filters import format_approval_number
+from itou.utils.templatetags.format_filters import format_approval_number, format_siret
 from itou.utils.test import TestCase
 from itou.www.dashboard.forms import EditUserEmailForm
 
@@ -83,7 +83,14 @@ class DashboardViewTest(TestCase):
 
         url = reverse("dashboard:index")
         response = self.client.get(url)
-        assert response.status_code == 200
+        self.assertContains(response, format_siret(siae.siret))
+
+    def test_dashboard_for_prescriber(self):
+        prescriber_organization = prescribers_factories.PrescriberOrganizationWithMembershipFactory()
+        self.client.force_login(prescriber_organization.members.first())
+
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertContains(response, format_siret(prescriber_organization.siret))
 
     def test_dashboard_displays_asp_badge(self):
         siae = SiaeFactory(kind=SiaeKind.EI, with_membership=True)
