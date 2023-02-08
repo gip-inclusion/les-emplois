@@ -64,7 +64,15 @@ class TransferUpdatesManagementCommandTest(ManagementCommandTestCase):
 
     @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
     def test_download(self):
-        out, _ = self.call_command(upload=False, download=True, wet_run=True)
+        self.call_command(upload=True, wet_run=True)
+        self.notification.refresh_from_db()
+        assert self.notification.status == er_enums.Status.SENT
+        assert self.notification.asp_batch_line_number == 1
+        assert self.notification.asp_batch_file is not None
+        assert self.notification.archived_json
+        assert self.notification.archived_json["codeTraitement"] is None
+
+        out, _ = self.call_command(download=True, wet_run=True)
 
         assert "DRY-RUN mode" not in out
         assert "Connected to:" in out
@@ -72,7 +80,11 @@ class TransferUpdatesManagementCommandTest(ManagementCommandTestCase):
         assert "Starting DOWNLOAD" in out
         assert "Employee record notifications processing done" in out
 
-        # TODO: implement SFTP mock with fake result file
+        self.notification.refresh_from_db()
+        assert self.notification.status == er_enums.Status.PROCESSED
+        assert self.notification.asp_processing_code == EmployeeRecordUpdateNotification.ASP_PROCESSING_SUCCESS_CODE
+        assert self.notification.archived_json
+        assert self.notification.archived_json["codeTraitement"] == self.notification.asp_processing_code
 
     @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
     def test_asp_test(self):

@@ -94,7 +94,6 @@ class Command(EmployeeRecordTransferCommand):
         - return the number of errors encountered.
         """
         batch_filename = EmployeeRecordBatch.batch_filename_from_feedback(feedback_file)
-        success_code = "0000"
         record_errors = 0
         records = batch.get("lignesTelechargement")
 
@@ -129,8 +128,9 @@ class Command(EmployeeRecordTransferCommand):
                 record_errors += 1
                 continue
 
-            # Employee record notification succesfully processed by ASP:
-            if processing_code == success_code:
+            archived_json = JSONRenderer().render(employee_record)
+            # Employee record notification successfully processed by ASP:
+            if processing_code == EmployeeRecordUpdateNotification.ASP_PROCESSING_SUCCESS_CODE:
                 notification.asp_processing_code = processing_code
                 notification.asp_processing_label = processing_label
 
@@ -138,7 +138,7 @@ class Command(EmployeeRecordTransferCommand):
                     # Not an important issue if notification was previously processed
                     if notification.status != Status.PROCESSED:
                         try:
-                            notification.update_as_processed(processing_code, processing_label, employee_record)
+                            notification.update_as_processed(processing_code, processing_label, archived_json)
                         except Exception as ex:
                             record_errors += 1
                             self.stdout.write(f"Can't perform update: {notification=}, {ex=}")
@@ -149,7 +149,7 @@ class Command(EmployeeRecordTransferCommand):
                 if not dry_run:
                     # Fix unexpected stop on multiple pass on the same file
                     if notification.status != Status.REJECTED:
-                        notification.update_as_rejected(processing_code, processing_label, employee_record)
+                        notification.update_as_rejected(processing_code, processing_label, archived_json)
                     else:
                         self.stdout.write(f"Already rejected: {notification=}")
                 else:
