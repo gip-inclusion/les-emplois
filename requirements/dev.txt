@@ -707,9 +707,9 @@ odfpy==1.4.1 \
     # via
     #   -r requirements/base.txt
     #   tablib
-openpyxl==3.0.10 \
-    --hash=sha256:0ab6d25d01799f97a9464630abacbb34aafecdcaa0ef3cba6d6b3499867d0355 \
-    --hash=sha256:e47805627aebcf860edb4edf7987b1309c1b3632f3750538ed962bbcc3bd7449
+openpyxl==3.1.0 \
+    --hash=sha256:24d7d361025d186ba91eff58135d50855cf035a84371b891e58fb6eb5125660f \
+    --hash=sha256:eccedbe1cdd8b2494057e73959b496821141038dbb7eb9266ea59e3f34208231
     # via
     #   -r requirements/base.txt
     #   tablib
