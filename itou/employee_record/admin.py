@@ -64,6 +64,7 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
     list_display = (
         "pk",
         "created_at",
+        "updated_at",
         "approval_number",
         "siret",
         "asp_processing_code",
@@ -76,11 +77,8 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
     )
 
     search_fields = (
-        "pk",
         "siret",
         "approval_number",
-        "asp_processing_code",
-        "asp_processing_label",
         "asp_batch_file",
     )
 
@@ -176,6 +174,7 @@ class EmployeeRecordUpdateNotificationAdmin(admin.ModelAdmin):
         "created_at",
         "updated_at",
         "notification_type",
+        "asp_processing_code",
         "status",
     )
 
@@ -187,16 +186,46 @@ class EmployeeRecordUpdateNotificationAdmin(admin.ModelAdmin):
     raw_id_fields = ("employee_record",)
 
     readonly_fields = (
+        "pk",
+        "employee_record",
+        "created_at",
+        "updated_at",
         "asp_batch_file",
         "asp_batch_line_number",
         "asp_processing_code",
         "asp_processing_label",
+        "archived_json",
     )
 
     search_fields = [
-        "employee_record__id",
+        "employee_record__siret",
         "employee_record__approval_number",
-        "employee_record__asp_id",
-        "employee_record__job_application__job_seeker__email",
-        "employee_record__job_application__to_siae__siret",
+        "asp_batch_file",
     ]
+
+    fieldsets = (
+        (
+            "Informations",
+            {
+                "fields": (
+                    "pk",
+                    "status",
+                    "employee_record",
+                    "created_at",
+                    "updated_at",
+                )
+            },
+        ),
+        (
+            "Traitement ASP",
+            {
+                "fields": (
+                    "asp_batch_file",
+                    "asp_batch_line_number",
+                    "asp_processing_code",
+                    "asp_processing_label",
+                    "archived_json",
+                )
+            },
+        ),
+    )
