@@ -43,19 +43,19 @@ bcrypt==4.0.1 \
     --hash=sha256:e9a51bbfe7e9802b5f3508687758b564069ba937748ad7b9e890086290d2f79e \
     --hash=sha256:fbdaec13c5105f0c4e5c52614d04f0bca5f5af007910daa8b6b12095edaa67b3
     # via paramiko
-beautifulsoup4==4.11.1 \
-    --hash=sha256:58d5c3d29f5a36ffeb94f02f0d786cd53014cf9b3b3951d42e0080d8a9498d30 \
-    --hash=sha256:ad9aa55b65ef2808eb405f46cf74df7fcb7044d5cbc26487f96eb2ef2e436693
+beautifulsoup4==4.11.2 \
+    --hash=sha256:0e79446b10b3ecb499c1556f7e228a53e64a2bfcebd455f370d8927cb5b59e39 \
+    --hash=sha256:bc4bdda6717de5a2987436fb8d72f45dc90dd856bdfd512a1314ce90349a0106
     # via django-bootstrap4
 boto3==1.24.96 \
     --hash=sha256:6b8899542cff82becceb3498a2240bf77c96def0515b0a31f7f6a9d5b92e7a3d \
     --hash=sha256:748c055214c629744c34c7f94bfa888733dfac0b92e1daef9c243e1391ea4f53
-    # via -r base.in
+    # via -r requirements/base.in
 botocore==1.27.96 \
     --hash=sha256:e41a81a18511f2f9181b2a9ab302a55c0effecccbef846c55aad0c47bfdbefb9 \
     --hash=sha256:fc0a13ef6042e890e361cf408759230f8574409bb51f81740d2e5d8ad5d1fbea
     # via
-    #   -r base.in
+    #   -r requirements/base.in
     #   boto3
     #   s3transfer
 certifi==2022.12.7 \
@@ -177,7 +177,7 @@ django==4.1.6 \
     --hash=sha256:bceb0fe1a386781af0788cae4108622756cd05e7775448deec04a71ddf87685d \
     --hash=sha256:c6fe7ebe7c017fe59f1029821dae0acb5a2ddcd6c9a0138fd20a8bfefac914bc
     # via
-    #   -r base.in
+    #   -r requirements/base.in
     #   django-allauth
     #   django-anymail
     #   django-appconf
@@ -193,11 +193,11 @@ django==4.1.6 \
     #   drf-spectacular
 django-allauth==0.51.0 \
     --hash=sha256:ca1622733b6faa591580ccd3984042f12d8c79ade93438212de249b7ffb6f91f
-    # via -r base.in
+    # via -r requirements/base.in
 django-anymail==9.0 \
     --hash=sha256:4239f7c61fb77b6eb8c8591a317a84a2a78f6bce1f8f42847921de74194b5d8a \
     --hash=sha256:c21d94ffdbada613a85c22a7bf32e37447d2811e1688cd001d3cad3c7f1ff289
-    # via -r base.in
+    # via -r requirements/base.in
 django-appconf==1.0.5 \
     --hash=sha256:ae9f864ee1958c815a965ed63b3fba4874eec13de10236ba063a788f9a17389d \
     --hash=sha256:be3db0be6c81fa84742000b89a81c016d70ae66a7ccb620cdef592b1f1a6aaa4
@@ -205,45 +205,45 @@ django-appconf==1.0.5 \
 django-bootstrap4==22.1 \
     --hash=sha256:b6da4cb54682012ff8baa1a1e672ba30cbfae82fb3d74f4b341109074e8e239f \
     --hash=sha256:fc9984f7238fbcd330ec5111bf0435083caa7192b022eedd53bfa4128bee318f
-    # via -r base.in
+    # via -r requirements/base.in
 django-csp==3.7 \
     --hash=sha256:01443a07723f9a479d498bd7bb63571aaa771e690f64bde515db6cdb76e8041a \
     --hash=sha256:01eda02ad3f10261c74131cdc0b5a6a62b7c7ad4fd017fbefb7a14776e0a9727
-    # via -r base.in
+    # via -r requirements/base.in
 django-filter==22.1 \
     --hash=sha256:ed429e34760127e3520a67f415bec4c905d4649fbe45d0d6da37e6ff5e0287eb \
     --hash=sha256:ed473b76e84f7e83b2511bb2050c3efb36d135207d0128dfe3ae4b36e3594ba5
-    # via -r base.in
+    # via -r requirements/base.in
 django-hijack==3.2.6 \
     --hash=sha256:a6df02875c6a653eeb2c0768391587c3ffe711613b8f6cd9e56b9ba62f0b44d9 \
     --hash=sha256:c453d9d37208d7cd78f9b679831ec60ff03160c88bb87e9ac1f49e5c4ada3874
-    # via -r base.in
+    # via -r requirements/base.in
 django-htmx==1.13.0 \
     --hash=sha256:781a59376d769aa28302619e73d37d481a125ab155d9fdd7fb17f10e7d25f352 \
     --hash=sha256:848c3e195b8757656626c8a099f9be59c6d30f468f1d54e69f0f2a48f0a14928
-    # via -r base.in
+    # via -r requirements/base.in
 django-import-export==3.0.2 \
     --hash=sha256:ae77a44c08d94b98e50dec11ea53fd5f65702b7d8c3c929c88c310a4e4444507 \
     --hash=sha256:f0f08f119b1f3a39e67dab8f945609ee13e264a798be532bdd7210e1c851efe2
-    # via -r base.in
+    # via -r requirements/base.in
 django-select2==8.0.0 \
     --hash=sha256:0145c9cb34a8c0813f68d7165ed6b034ac03fbdbf145aea203d15ae1653cf7d9 \
     --hash=sha256:38e2c91c99f0da07bb43addfa1ac3a2cd6a209154a93edbf4564b9203fa32a4d
-    # via -r base.in
+    # via -r requirements/base.in
 django-xworkflows==1.0.0 \
     --hash=sha256:b233b5244fb864f95ba935bd3f2214c55600db6294dbca544a6f9eb14918fb06 \
     --hash=sha256:dc7c68e786b5392abf556f6dcd7182e947f77d1a964043868d4d8615fdd760e4
-    # via -r base.in
+    # via -r requirements/base.in
 djangorestframework==3.14.0 \
     --hash=sha256:579a333e6256b09489cbe0a067e66abe55c6595d8926be6b99423786334350c8 \
     --hash=sha256:eb63f58c9f218e1a7d064d17a70751f528ed4e1d35547fdade9aaf4cd103fd08
     # via
-    #   -r base.in
+    #   -r requirements/base.in
     #   drf-spectacular
 drf-spectacular==0.25.1 \
     --hash=sha256:789696f9845ef2397c52f66154aec6d96411baf6aa09a5d40c5f0b0e99f6b3d8 \
     --hash=sha256:d58684e702f5ad436c5bd1735d46df0e123e64de883092d38f1debb9fa4a03c9
-    # via -r base.in
+    # via -r requirements/base.in
 et-xmlfile==1.1.0 \
     --hash=sha256:8eb9e2bc2f8c97e37a2dc85a09ecdcdec9d8a396530a6d5a33b30b9a92da0c5c \
     --hash=sha256:a2ba85d1d6a74ef63837eed693bcb89c3f752169b0e3e7ae5b16ca5e1b3deada
@@ -259,10 +259,10 @@ httpcore==0.15.0 \
 httpx==0.23.3 \
     --hash=sha256:9818458eb565bb54898ccb9b8b251a28785dd4a55afbc23d0eb410754fe7d0f9 \
     --hash=sha256:a211fcce9b1254ea24f0cd6af9869b3d29aba40154e947d2a07bb499b3e310d6
-    # via -r base.in
+    # via -r requirements/base.in
 huey==2.4.4 \
     --hash=sha256:6a27a7862a7a982c0508ad4e548d95765e3b0d97093a51106f07540837a09c86
-    # via -r base.in
+    # via -r requirements/base.in
 idna==3.4 \
     --hash=sha256:814f528e8dead7d329833b91c5faa87d60bf71824cd12a7530b5526063d02cb4 \
     --hash=sha256:90b77e79eaa3eba6de819a0c442c0b4ceefc341a7a2ab77d7562bf49f425c5c2
@@ -362,11 +362,11 @@ lxml==4.9.2 \
     --hash=sha256:efa29c2fe6b4fdd32e8ef81c1528506895eca86e1d8c4657fda04c9b3786ddf9 \
     --hash=sha256:f1496ea22ca2c830cbcbd473de8f114a320da308438ae65abad6bab7867fe38f \
     --hash=sha256:f49e52d174375a7def9915c9f06ec4e569d235ad428f70751765f48d5926678c
-    # via -r base.in
+    # via -r requirements/base.in
 markdown==3.4.1 \
     --hash=sha256:08fb8465cffd03d10b9dd34a5c3fea908e20391a2a90b88d66362cb05beed186 \
     --hash=sha256:3b809086bb6efad416156e00a0da66fe47618a5d6918dd688f53f40c8e4cfeff
-    # via -r base.in
+    # via -r requirements/base.in
 markuppy==1.14 \
     --hash=sha256:1adee2c0a542af378fe84548ff6f6b0168f3cb7f426b46961038a2bcfaad0d5f
     # via tablib
@@ -411,7 +411,7 @@ openpyxl==3.0.10 \
     --hash=sha256:0ab6d25d01799f97a9464630abacbb34aafecdcaa0ef3cba6d6b3499867d0355 \
     --hash=sha256:e47805627aebcf860edb4edf7987b1309c1b3632f3750538ed962bbcc3bd7449
     # via
-    #   -r base.in
+    #   -r requirements/base.in
     #   tablib
 pandas==1.4.4 \
     --hash=sha256:050aada67a5ec6699a7879e769825b510018a95fb9ac462bb1867483d0974a97 \
@@ -435,12 +435,12 @@ pandas==1.4.4 \
     --hash=sha256:d0022fe6a313df1c4869b5edc012d734c6519a6fffa3cf70930f32e6a1078e49 \
     --hash=sha256:e7cc960959be28d064faefc0cb2aef854d46b827c004ebea7e79b5497ed83e7d \
     --hash=sha256:ee6f1848148ed3204235967613b0a32be2d77f214e9623f554511047705c1e04
-    # via -r base.in
+    # via -r requirements/base.in
 paramiko==2.8.1 \
     --hash=sha256:7b5910f5815a00405af55da7abcc8a9e0d9657f57fcdd9a89894fdbba1c6b8a8 \
     --hash=sha256:85b1245054e5d7592b9088cc6d08da22445417912d3a3e48138675c7a8616438
     # via
-    #   -r base.in
+    #   -r requirements/base.in
     #   pysftp
 psycopg2==2.9.5 \
     --hash=sha256:093e3894d2d3c592ab0945d9eba9d139c139664dcf83a1c440b8a7aa9bb21955 \
@@ -456,7 +456,7 @@ psycopg2==2.9.5 \
     --hash=sha256:d3ef67e630b0de0779c42912fe2cbae3805ebaba30cda27fea2a3de650a9414f \
     --hash=sha256:f5b6320dbc3cf6cfb9f25308286f9f7ab464e65cfb105b64cc9c52831748ced2 \
     --hash=sha256:fc04dd5189b90d825509caa510f20d1d504761e78b8dfb95a0ede180f71d50e5
-    # via -r base.in
+    # via -r requirements/base.in
 pycparser==2.21 \
     --hash=sha256:8ee45429555515e1f6b185e78100aea234072576aa43ab53aefcae078162fca9 \
     --hash=sha256:e644fdec12f7872f86c58ff790da456218b10f863970249516d60a5eaca77206
@@ -465,7 +465,7 @@ pyjwt[crypto]==2.4.0 \
     --hash=sha256:72d1d253f32dbd4f5c88eaf1fdc62f3a19f676ccbadb9dbc5d07e951b2b26daf \
     --hash=sha256:d42908208c699b3b973cbeb01a969ba6a96c821eefb1c5bfe4c390c01d67abba
     # via
-    #   -r base.in
+    #   -r requirements/base.in
     #   django-allauth
 pynacl==1.5.0 \
     --hash=sha256:06b8f6fa7f5de8d5d2f7573fe8c863c051225a27b61e6860fd047b1775807858 \
@@ -505,18 +505,18 @@ pyrsistent==0.19.2 \
     # via jsonschema
 pysftp==0.2.9 \
     --hash=sha256:fbf55a802e74d663673400acd92d5373c1c7ee94d765b428d9f977567ac4854a
-    # via -r base.in
+    # via -r requirements/base.in
 python-dateutil==2.8.2 \
     --hash=sha256:0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86 \
     --hash=sha256:961d03dc3453ebbc59dbdea9e4e11c5651520a876d0f4db161e8674aae935da9
     # via
-    #   -r base.in
+    #   -r requirements/base.in
     #   botocore
     #   pandas
 python-dotenv==0.21.1 \
     --hash=sha256:1c93de8f636cde3ce377292818d0e440b6e45a82f215c3744979151fa8151c49 \
     --hash=sha256:41e12e0318bebc859fcc4d97d4db8d20ad21721a6aa5047dd59f090391cb549a
-    # via -r base.in
+    # via -r requirements/base.in
 python3-openid==3.2.0 \
     --hash=sha256:33fbf6928f401e0b790151ed2b5290b02545e8775f982485205a066f874aaeaf \
     --hash=sha256:6626f771e0417486701e0b4daff762e7212e820ca5b29fcc0d05f6f8736dfa6b
@@ -569,18 +569,18 @@ pyyaml==6.0 \
     --hash=sha256:e61ceaab6f49fb8bdfaa0f92c4b57bcfbea54c09277b1b4f7ac376bfb7a7c174 \
     --hash=sha256:f84fbc98b019fef2ee9a1cb3ce93e3187a6df0b2538a651bfb890254ba9f90b5
     # via
-    #   -r base.in
+    #   -r requirements/base.in
     #   drf-spectacular
     #   tablib
 redis==4.4.2 \
     --hash=sha256:a010f6cb7378065040a02839c3f75c7e0fb37a87116fb4a95be82a95552776c7 \
     --hash=sha256:e6206448e2f8a432871d07d432c13ed6c2abcf6b74edb436c99752b1371be387
-    # via -r base.in
+    # via -r requirements/base.in
 requests==2.28.2 \
     --hash=sha256:64299f4909223da747622c030b781c0d7811e359c37124b4bd368fb8c6518baa \
     --hash=sha256:98b1b2782e3c6c4904938b84c0eb932721069dfdb9134313beff7c83c2df24bf
     # via
-    #   -r base.in
+    #   -r requirements/base.in
     #   django-allauth
     #   django-anymail
     #   requests-oauthlib
@@ -599,7 +599,7 @@ s3transfer==0.6.0 \
 sentry-sdk==1.14.0 \
     --hash=sha256:273fe05adf052b40fd19f6d4b9a5556316807246bd817e5e3482930730726bb0 \
     --hash=sha256:72c00322217d813cf493fe76590b23a757e063ff62fec59299f4af7201dd4448
-    # via -r base.in
+    # via -r requirements/base.in
 six==1.16.0 \
     --hash=sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926 \
     --hash=sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254
@@ -626,20 +626,20 @@ tablib[html,ods,xls,xlsx,yaml]==3.2.1 \
 tenacity==8.1.0 \
     --hash=sha256:35525cd47f82830069f0d6b73f7eb83bc5b73ee2fff0437952cedf98b27653ac \
     --hash=sha256:e48c437fdf9340f5666b92cd7990e96bc5fc955e1298baf4a907e3972067a445
-    # via -r base.in
+    # via -r requirements/base.in
 tqdm==4.64.1 \
     --hash=sha256:5f4f682a004951c1b450bc753c710e9280c5746ce6ffedee253ddbcbf54cf1e4 \
     --hash=sha256:6fee160d6ffcd1b1c68c65f14c829c22832bc401726335ce92c52d395944a6a1
-    # via -r base.in
+    # via -r requirements/base.in
 unidecode==1.3.6 \
     --hash=sha256:547d7c479e4f377b430dd91ac1275d593308dce0fc464fb2ab7d41f82ec653be \
     --hash=sha256:fed09cf0be8cf415b391642c2a5addfc72194407caee4f98719e40ec2a72b830
-    # via -r base.in
+    # via -r requirements/base.in
 uritemplate==4.1.1 \
     --hash=sha256:4346edfc5c3b79f694bccd6d6099a322bbeb628dbf2cd86eea55a456ce5124f0 \
     --hash=sha256:830c08b8d99bdd312ea4ead05994a38e8936266f84b9a7878232db50b044e02e
     # via
-    #   -r base.in
+    #   -r requirements/base.in
     #   drf-spectacular
 urllib3==1.26.12 \
     --hash=sha256:3fa96cf423e6987997fc326ae8df396db2a8b7c667747d47ddd8ecba91f4a74e \
@@ -650,17 +650,17 @@ urllib3==1.26.12 \
     #   sentry-sdk
 uwsgi==2.0.21 \
     --hash=sha256:35a30d83791329429bc04fe44183ce4ab512fcf6968070a7bfba42fc5a0552a9
-    # via -r base.in
+    # via -r requirements/base.in
 xlrd==2.0.1 \
     --hash=sha256:6a33ee89877bd9abc1158129f6e94be74e2679636b8a205b43b85206c3f0bbdd \
     --hash=sha256:f72f148f54442c6b056bf931dbc34f986fd0c3b0b6b5a58d013c9aef274d0c88
     # via
-    #   -r base.in
+    #   -r requirements/base.in
     #   tablib
 xlsx-streaming==1.1.0 \
     --hash=sha256:6c1a040ccbebbe7ea1d5d54180ae9b2972112f74303c13fc266812cd98c8b826 \
     --hash=sha256:c12d21653d2d77ead622b49deb30c8a5921ff3be6c1e4ac2540a8ead8c64f7b7
-    # via -r base.in
+    # via -r requirements/base.in
 xlwt==1.3.0 \
     --hash=sha256:a082260524678ba48a297d922cc385f58278b8aa68741596a87de01a9c628b2e \
     --hash=sha256:c59912717a9b28f1a3c2a98fd60741014b06b043936dcecbc113eaaada156c88
