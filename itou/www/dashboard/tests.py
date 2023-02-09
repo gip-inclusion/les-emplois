@@ -558,7 +558,7 @@ class EditUserInfoViewTest(TestCase):
         assert user.email != post_data["email"]
 
     def test_edit_with_lack_of_nir_reason(self):
-        user = JobSeekerFactory(nir=None, lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER)
+        user = JobSeekerFactory(nir="", lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER)
         self.client.force_login(user)
         url = reverse("dashboard:edit_user_info")
         response = self.client.get(url)
@@ -590,7 +590,7 @@ class EditUserInfoViewTest(TestCase):
         assert user.nir == NEW_NIR.replace(" ", "")
 
     def test_edit_without_nir_information(self):
-        user = JobSeekerFactory(nir=None, lack_of_nir_reason="")
+        user = JobSeekerFactory(nir="", lack_of_nir_reason="")
         self.client.force_login(user)
         url = reverse("dashboard:edit_user_info")
         response = self.client.get(url)
@@ -756,7 +756,7 @@ class EditJobSeekerInfo(TestCase):
 
     def test_edit_by_siae_with_lack_of_nir_reason(self):
         job_application = JobApplicationSentByPrescriberFactory(
-            job_seeker__nir=None, job_seeker__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER
+            job_seeker__nir="", job_seeker__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER
         )
         user = job_application.to_siae.members.first()
 
@@ -802,9 +802,7 @@ class EditJobSeekerInfo(TestCase):
         assert job_seeker.last_checked_at > previous_last_checked_at
 
     def test_edit_by_siae_without_nir_information(self):
-        job_application = JobApplicationSentByPrescriberFactory(
-            job_seeker__nir=None, job_seeker__lack_of_nir_reason=""
-        )
+        job_application = JobApplicationSentByPrescriberFactory(job_seeker__nir="", job_seeker__lack_of_nir_reason="")
         user = job_application.to_siae.members.first()
 
         # Ensure that the job seeker is not autonomous (i.e. he did not register by himself).
@@ -852,7 +850,7 @@ class EditJobSeekerInfo(TestCase):
         self.assertRedirects(response, expected_url=back_url)
         job_seeker = User.objects.get(id=job_application.job_seeker.id)
         assert job_seeker.lack_of_nir_reason == LackOfNIRReason.TEMPORARY_NUMBER
-        assert job_seeker.nir is None
+        assert job_seeker.nir == ""
 
         post_data.update(
             {

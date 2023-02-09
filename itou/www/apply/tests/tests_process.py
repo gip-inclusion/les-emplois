@@ -102,7 +102,7 @@ class ProcessViewsTest(TestCase):
 
         job_application.job_seeker.created_by = siae_user
         job_application.job_seeker.phone = ""
-        job_application.job_seeker.nir = None
+        job_application.job_seeker.nir = ""
         job_application.job_seeker.pole_emploi_id = ""
         job_application.job_seeker.save()
 
@@ -185,7 +185,7 @@ class ProcessViewsTest(TestCase):
         self.assertContains(response, "Adresse : <span>Non renseignée</span>", html=True)
         self.assertContains(response, "CV : <span>Non renseigné</span>", html=True)
 
-        job_application.job_seeker.nir = None
+        job_application.job_seeker.nir = ""
         job_application.job_seeker.save()
         response = self.client.get(url)
         self.assertContains(response, "Numéro de sécurité sociale : <span>Non renseigné</span>", html=True)
@@ -691,7 +691,7 @@ class ProcessViewsTest(TestCase):
 
         job_application = JobApplicationSentByJobSeekerFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
-            job_seeker__nir=None,
+            job_seeker__nir="",
         )
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
@@ -743,7 +743,7 @@ class ProcessViewsTest(TestCase):
 
         job_application = JobApplicationSentByJobSeekerFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
-            job_seeker__nir=None,
+            job_seeker__nir="",
         )
         other_job_seeker = JobSeekerWithAddressFactory()
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
@@ -774,7 +774,7 @@ class ProcessViewsTest(TestCase):
         )
         self.assertFormError(
             response.context["form_personal_data"],
-            "nir",
+            None,
             "Ce numéro de sécurité sociale est déjà associé à un autre utilisateur.",
         )
 
@@ -825,7 +825,7 @@ class ProcessViewsTest(TestCase):
 
         job_application = JobApplicationSentByJobSeekerFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
-            job_seeker__nir=None,
+            job_seeker__nir="",
             job_seeker__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
         )
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
@@ -871,7 +871,7 @@ class ProcessViewsTest(TestCase):
 
         job_application = JobApplicationSentByJobSeekerFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
-            job_seeker__nir=None,
+            job_seeker__nir="",
             job_seeker__lack_of_nir_reason=LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER,
         )
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})

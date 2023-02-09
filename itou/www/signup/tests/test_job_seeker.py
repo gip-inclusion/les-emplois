@@ -163,7 +163,7 @@ class JobSeekerSignupTest(TestCase):
         self.assertRedirects(response, reverse("account_email_verification_sent"))
 
         job_seeker = User.objects.get(email=post_data["email"])
-        assert not job_seeker.nir
+        assert job_seeker.nir == ""
 
     def test_job_seeker_signup(self):
         """Job-seeker signup."""
@@ -305,4 +305,4 @@ class JobSeekerSignupTest(TestCase):
 
         mock_oauth_dance(self)
         job_seeker = User.objects.get(email=FC_USERINFO["email"])
-        assert job_seeker.nir is None
+        assert not job_seeker.nir

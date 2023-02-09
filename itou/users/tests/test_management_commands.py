@@ -33,19 +33,19 @@ class DeduplicateJobSeekersManagementCommandsTest(TestCase):
         }
 
         # Create `user1`.
-        job_app1 = JobApplicationFactory(with_approval=True, job_seeker__nir=None, **kwargs)
+        job_app1 = JobApplicationFactory(with_approval=True, job_seeker__nir="", **kwargs)
         user1 = job_app1.job_seeker
 
-        assert user1.nir is None
+        assert user1.nir == ""
         assert 1 == user1.approvals.count()
         assert 1 == user1.job_applications.count()
         assert 1 == user1.eligibility_diagnoses.count()
 
         # Create `user2`.
-        job_app2 = JobApplicationFactory(with_eligibility_diagnosis=True, job_seeker__nir=None, **kwargs)
+        job_app2 = JobApplicationFactory(with_eligibility_diagnosis=True, job_seeker__nir="", **kwargs)
         user2 = job_app2.job_seeker
 
-        assert user2.nir is None
+        assert user2.nir == ""
         assert 0 == user2.approvals.count()
         assert 1 == user2.job_applications.count()
         assert 1 == user2.eligibility_diagnoses.count()
@@ -55,7 +55,7 @@ class DeduplicateJobSeekersManagementCommandsTest(TestCase):
         user3 = job_app3.job_seeker
         expected_nir = user3.nir
 
-        assert user3.nir is not None
+        assert user3.nir
         assert 0 == user3.approvals.count()
         assert 1 == user3.job_applications.count()
         assert 1 == user3.eligibility_diagnoses.count()
@@ -95,21 +95,21 @@ class DeduplicateJobSeekersManagementCommandsTest(TestCase):
         }
 
         # Create `user1` through a job application sent by him.
-        job_app1 = JobApplicationSentByJobSeekerFactory(job_seeker__nir=None, **kwargs)
+        job_app1 = JobApplicationSentByJobSeekerFactory(job_seeker__nir="", **kwargs)
         user1 = job_app1.job_seeker
 
         assert 1 == user1.job_applications.count()
         assert job_app1.sender == user1
 
         # Create `user2` through a job application sent by him.
-        job_app2 = JobApplicationSentByJobSeekerFactory(job_seeker__nir=None, **kwargs)
+        job_app2 = JobApplicationSentByJobSeekerFactory(job_seeker__nir="", **kwargs)
         user2 = job_app2.job_seeker
 
         assert 1 == user2.job_applications.count()
         assert job_app2.sender == user2
 
         # Create `user3` through a job application sent by a prescriber.
-        job_app3 = JobApplicationFactory(with_eligibility_diagnosis=True, job_seeker__nir=None, **kwargs)
+        job_app3 = JobApplicationFactory(with_eligibility_diagnosis=True, job_seeker__nir="", **kwargs)
         user3 = job_app3.job_seeker
         assert job_app3.sender != user3
         job_app3_sender = job_app3.sender  # The sender is a prescriber.

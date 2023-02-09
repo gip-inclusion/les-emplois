@@ -210,7 +210,6 @@ class ApprovalsSendToPeManagementTestCase(TestCase):
         # the database to have the necessary job application, nir, or start date to fetch them.
         ApprovalFactory(with_jobapplication=False)
         ApprovalFactory(user__nir="")
-        ApprovalFactory(user__nir=None)
         ApprovalFactory(user__birthdate=None)
         ApprovalFactory(start_at=datetime.datetime.today().date() + datetime.timedelta(days=1))
 

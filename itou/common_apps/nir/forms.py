@@ -1,4 +1,5 @@
 from django import forms
+from django.core.exceptions import NON_FIELD_ERRORS
 from django.forms import widgets
 
 from itou.users.enums import LackOfNIRReason
@@ -79,14 +80,13 @@ class JobSeekerNIRUpdateMixin:
             self.fields["lack_of_nir_reason"].form_group_class += " show"
 
     def clean_nir(self):
-        nir = self.cleaned_data["nir"]
-        return nir.upper().replace(" ", "") if nir is not None else None
+        return self.cleaned_data["nir"].upper().replace(" ", "")
 
     def clean(self):
         super().clean()
         if self.cleaned_data["lack_of_nir"]:
             if self.cleaned_data.get("lack_of_nir_reason"):
-                self.cleaned_data["nir"] = None
+                self.cleaned_data["nir"] = ""
             else:
                 self.add_error(
                     "lack_of_nir_reason", forms.ValidationError("Veuillez sélectionner un motif pour continuer")
@@ -105,7 +105,7 @@ class JobSeekerNIRUpdateMixin:
             "Pour continuer, veuillez entrer un numéro de sécurité sociale valide ou cocher la "
             f'mention "{self.fields["lack_of_nir"].label}" et sélectionner un motif.'
         )
-        if self.has_error("nir", code="unique"):
+        if self.has_error(NON_FIELD_ERRORS, code="unique_nir_if_not_empty"):
             title = "Le numéro de sécurité sociale est déjà associé à un autre utilisateur"
         elif self.has_error("nir") or self.has_error("lack_of_nir_reason"):
             title = "Le numéro de sécurité sociale n'est pas valide"
