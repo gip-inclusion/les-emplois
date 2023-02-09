@@ -115,7 +115,7 @@ def test_check_nir_job_seeker_with_lack_of_nir_reason(client):
 
     siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
 
-    user = JobSeekerFactory(birthdate=None, nir=None, lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER)
+    user = JobSeekerFactory(birthdate=None, nir="", lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER)
     client.force_login(user)
 
     # Entry point.
@@ -1323,7 +1323,7 @@ class ApplyAsPrescriberNirExceptionsTest(S3AccessingTestCase):
         assert job_seeker.nir == nir
 
     def test_one_account_lack_of_nir_reason(self):
-        job_seeker = JobSeekerFactory(nir=None, lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER)
+        job_seeker = JobSeekerFactory(nir="", lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER)
         # Create an approval to bypass the eligibility diagnosis step.
         PoleEmploiApprovalFactory(birthdate=job_seeker.birthdate, pole_emploi_id=job_seeker.pole_emploi_id)
         siae, user = self.create_test_data()
@@ -2264,7 +2264,7 @@ def test_detect_existing_job_seeker(client):
     client.force_login(user)
 
     job_seeker_profile = JobSeekerProfileFactory(
-        user__nir=None, user__first_name="Jérémy", user__email="jeremy@example.com"
+        user__nir="", user__first_name="Jérémy", user__email="jeremy@example.com"
     )
 
     default_session_data = {

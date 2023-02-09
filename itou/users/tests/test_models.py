@@ -800,9 +800,9 @@ class ModelTest(TestCase):
         assert "inspecteur du travail" == labor_inspector.get_kind_display()
 
     def test_constraint_user_lack_of_nir_reason_or_nir(self):
-        no_nir_user = JobSeekerFactory(nir=None)
+        no_nir_user = JobSeekerFactory(nir="")
         # This works
-        assert no_nir_user.nir is None
+        assert no_nir_user.nir == ""
         no_nir_user.lack_of_nir_reason = LackOfNIRReason.TEMPORARY_NUMBER
         no_nir_user.save()
 
@@ -810,7 +810,10 @@ class ModelTest(TestCase):
         # This doesn't
         assert user.nir
         user.lack_of_nir_reason = LackOfNIRReason.TEMPORARY_NUMBER
-        with pytest.raises(IntegrityError):
+        with pytest.raises(
+            ValidationError,
+            match="Un utilisateur ayant un NIR ne peut avoir un motif justifiant l'absence de son NIR.",
+        ):
             user.save()
 
 
@@ -1271,10 +1274,8 @@ def test_staff_user():
 
 
 def test_user_invalid_kind():
-    # Avoid crashing the database connection because of the IntegrityError
-    with transaction.atomic():
-        with pytest.raises(
-            IntegrityError,
-            match='new row for relation "users_user" violates check constraint "has_kind"',
-        ):
-            UserFactory(kind="")
+    with pytest.raises(
+        ValidationError,
+        match="Le type d’utilisateur est incorrect.",
+    ):
+        UserFactory(kind="")

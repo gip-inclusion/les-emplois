@@ -39,6 +39,7 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.utils import constants as global_constants
 from itou.utils.apis.exceptions import AddressLookupError
+from itou.utils.models import UniqueConstraintWithErrorCode
 from itou.utils.validators import validate_birthdate, validate_nir, validate_pole_emploi_id
 
 from .enums import IdentityProvider, LackOfNIRReason, Title, UserKind
@@ -232,10 +233,7 @@ class User(AbstractUser, AddressMixin):
         verbose_name="NIR",
         max_length=15,
         validators=[validate_nir],
-        null=True,
         blank=True,
-        unique=True,
-        error_messages={"unique": "Ce numéro de sécurité sociale est déjà associé à un autre utilisateur."},
     )
     lack_of_nir_reason = models.CharField(
         verbose_name="Pas de NIR ?",
@@ -321,7 +319,7 @@ class User(AbstractUser, AddressMixin):
             # Make sure that if you have a lack_of_nir_reason value, you cannot have a nir value
             # (but we'll have a lot of users lacking both nir & lack_of_nir_reason values)
             models.CheckConstraint(
-                check=Q(lack_of_nir_reason="") | Q(nir__isnull=True),
+                check=Q(lack_of_nir_reason="") | Q(nir=""),
                 name="user_lack_of_nir_reason_or_nir",
                 violation_error_message=(
                     "Un utilisateur ayant un NIR ne peut avoir un motif justifiant l'absence de son NIR."
@@ -337,6 +335,13 @@ class User(AbstractUser, AddressMixin):
                     | models.Q(kind=UserKind.SIAE_STAFF)
                     | models.Q(kind=UserKind.LABOR_INSPECTOR)
                 ),
+            ),
+            UniqueConstraintWithErrorCode(
+                "nir",
+                name="unique_nir_if_not_empty",
+                condition=~Q(nir=""),
+                validation_error_code="unique_nir_if_not_empty",
+                violation_error_message="Ce numéro de sécurité sociale est déjà associé à un autre utilisateur.",
             ),
         ]
 
@@ -376,6 +381,8 @@ class User(AbstractUser, AddressMixin):
         elif self.is_staff:
             # self.kind == "" : handle django admin_client pytest fixture
             self.kind = UserKind.ITOU_STAFF
+
+        self.validate_constraints()
 
         super().save(*args, **kwargs)
 

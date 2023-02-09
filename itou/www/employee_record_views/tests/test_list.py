@@ -133,7 +133,7 @@ class ListEmployeeRecordsTest(TestCase):
     @override_settings(TALLY_URL="https://tally.so")
     def test_employee_records_with_nir_associated_to_other(self):
         self.client.force_login(self.user)
-        self.job_seeker.nir = None
+        self.job_seeker.nir = ""
         self.job_seeker.lack_of_nir_reason = LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER
         self.job_seeker.save(update_fields=("nir", "lack_of_nir_reason"))
 
@@ -149,7 +149,7 @@ class ListEmployeeRecordsTest(TestCase):
     @override_settings(TALLY_URL="https://tally.so")
     def test_employee_record_to_disable_with_nir_associated_to_other(self):
         self.client.force_login(self.user)
-        self.job_seeker.nir = None
+        self.job_seeker.nir = ""
         self.job_seeker.lack_of_nir_reason = LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER
         self.job_seeker.save(update_fields=("nir", "lack_of_nir_reason"))
         new_er = employee_record_factories.EmployeeRecordFactory(job_application=self.job_application)

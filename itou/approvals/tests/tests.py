@@ -678,7 +678,7 @@ class PoleEmploiApprovalManagerTest(TestCase):
         assert search_results[3] == nir_approval
 
     def test_find_for_no_nir(self):
-        user = JobSeekerFactory(nir=None)
+        user = JobSeekerFactory(nir="")
         PoleEmploiApprovalFactory(nir=None)  # entirely unrelated
         with self.assertNumQueries(0):
             search_results = PoleEmploiApproval.objects.find_for(user)

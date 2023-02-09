@@ -325,7 +325,7 @@ class CheckEmailForSenderView(ApplyStepForSenderBaseView):
 
         if self.form.is_valid():
             job_seeker = self.form.get_user()
-            nir = self.apply_session.get("nir")
+            nir = self.apply_session.get("nir") or ""
             can_add_nir = nir and self.sender.can_add_nir(job_seeker)
 
             # No user found with that email, redirect to create a new account.

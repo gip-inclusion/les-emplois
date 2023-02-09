@@ -199,7 +199,7 @@ class PEAMUTests(OAuth2TestsMixin, TestCase):
 
         self.login(self.get_mocked_response())
         job_seeker = User.objects.get(email="john.doe@example.com")
-        assert job_seeker.nir is None
+        assert job_seeker.nir == ""
 
     def test_anonymous_user_logout(self):
         # An AnonymousUser does not have the peamu_id_token attribute

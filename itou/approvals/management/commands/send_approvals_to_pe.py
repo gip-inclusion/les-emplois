@@ -41,7 +41,7 @@ class Command(BaseCommand):
             # those with a no-nir, no-birthdate or no-name user are also removed from the queryset
             # in order not to block the cron. They will be picked up as soon as they are set.
             .exclude(
-                Q(user__nir=None)
+                Q(user__nir="")
                 | Q(user__birthdate=None)
                 # there are no such cases in the database at the time of writing, but it *might* happen.
                 | Q(user__nir="")
