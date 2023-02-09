@@ -290,7 +290,6 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
 
 def inclusion_connect_logout(request):
     token = request.GET.get("token")
-    state = request.GET.get("state")
     post_logout_redirect_url = request.GET.get("redirect_url", reverse("home:hp"))
 
     # Fallback on session data.
@@ -299,12 +298,8 @@ def inclusion_connect_logout(request):
         if not ic_session:
             raise KeyError("Missing session key.")
         token = ic_session["token"]
-        state = ic_session["state"]
 
-    params = {
-        "id_token_hint": token,
-        "state": state,
-    }
+    params = {"id_token_hint": token}
     complete_url = f"{constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT}?{urlencode(params)}"
     # Logout user from IC with HTTPX to benefit from respx in tests
     # and to handle post logout redirection more easily.

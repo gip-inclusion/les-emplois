@@ -45,9 +45,8 @@ class UserAdapter(DefaultAccountAdapter):
         ic_session = request.session.get(INCLUSION_CONNECT_SESSION_KEY)
         if ic_session:
             token = ic_session["token"]
-            state = ic_session["state"]
-            if token and state:
-                params = {"token": token, "state": state}
+            if token:
+                params = {"token": token}
                 ic_base_logout_url = reverse("inclusion_connect:logout")
                 redirect_url = f"{ic_base_logout_url}?{urlencode(params)}"
         # France Connect
