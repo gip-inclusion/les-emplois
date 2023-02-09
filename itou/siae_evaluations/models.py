@@ -465,14 +465,16 @@ class EvaluatedSiae(models.Model):
                 else evaluation_enums.EvaluatedSiaeState.SUBMITTED
             )
 
-        if self.reviewed_at and self.final_reviewed_at is None:
-            if self.evaluation_is_final:
-                # Campaign closed, otherwise self.final_reviewed_at would be set.
-                if any_evaluated_admin_crit_matches(lambda crit: crit.submitted_at > self.reviewed_at):
-                    return evaluation_enums.EvaluatedSiaeState.ACCEPTED
-                # Adversarial phase, new proofs not submitted.
-                return NOTIFICATION_PENDING_OR_REFUSED
+        if self.reviewed_at and not self.evaluation_is_final:
             return evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE
+
+        if (
+            self.final_reviewed_at is None
+            and self.evaluation_campaign.ended_at
+            # reviewed_at is always set during the campaign.
+            and any_evaluated_admin_crit_matches(lambda crit: crit.submitted_at > self.reviewed_at)
+        ):
+            return evaluation_enums.EvaluatedSiaeState.ACCEPTED
 
         if any_evaluated_admin_crit_matches(
             lambda crit: crit.review_state
@@ -482,15 +484,6 @@ class EvaluatedSiae(models.Model):
             ]
         ):
             if self.evaluation_is_final:
-                if (
-                    not self.reviewed_at
-                    or not self.final_reviewed_at
-                    and any_evaluated_admin_crit_matches(
-                        lambda crit: crit.submitted_at and crit.submitted_at > self.reviewed_at
-                    )
-                ):
-                    # User submitted proofs that were not reviewed, accept them.
-                    return evaluation_enums.EvaluatedSiaeState.ACCEPTED
                 return NOTIFICATION_PENDING_OR_REFUSED
             return evaluation_enums.EvaluatedSiaeState.REFUSED
         return evaluation_enums.EvaluatedSiaeState.ACCEPTED
