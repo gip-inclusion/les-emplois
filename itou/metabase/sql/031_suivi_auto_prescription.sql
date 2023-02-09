@@ -1,4 +1,4 @@
-with auto_p as (
+with autopr_all as ( 
     select
         c.id,
         cd.id as id_candidature,
@@ -48,13 +48,13 @@ with auto_p as (
         cd.id_candidat = c.id
 )
 select 
-    auto_p.id,
+    autopr_all.id,
     id_candidature,
     type_de_candidature,
     hash_nir,
-    auto_p.département,
-    auto_p.nom_département,
-    auto_p.région,
+    autopr_all.département,
+    autopr_all.nom_département,
+    autopr_all.région,
     adresse_en_qpv,
     date_diagnostic,
     date_candidature,
@@ -65,6 +65,7 @@ select
     état,
     origine,
     origine_détaillée,
+    autopr_all.id_structure,
     s.siret,
     type_structure,
     nom_structure,
@@ -75,6 +76,6 @@ select
     reprise_de_stock_ai_candidats,
     reprise_de_stock_ai_candidatures
 from
-    auto_p
+    autopr_all 
 left join structures s
-    on auto_p.id_structure = s.id
+    on autopr_all.id_structure = s.id

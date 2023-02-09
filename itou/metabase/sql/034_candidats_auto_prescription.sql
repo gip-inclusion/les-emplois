@@ -1,4 +1,4 @@
-with auto_p as (
+with autopr_candidates as (
     select
         distinct(c.id),
         cd.état,
@@ -75,7 +75,7 @@ all_candidates as (
 select
     *
 from
-    auto_p
+    autopr_candidates as autopr_c
 left join all_candidates ac
     on 
-        auto_p.id = ac.id
+        autopr_c.id = ac.id
