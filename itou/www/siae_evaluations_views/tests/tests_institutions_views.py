@@ -3060,10 +3060,10 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
             1  # django session
             + 1  # fetch user
             + 3  # fetch institution membership & institution x 2 !should be fixed!
-            + 6  # fetch evaluated_siae and its prefetch_related
-            + 1  # one again institution membership
+            + 5  # fetch evaluated_siae and its prefetch_related (evalcriteria, admincriteria, jobapp, approval)
+            + 2  # user & institution membership (again)
+            + 3  # issue with evaluated_job_application.evaluated_siae.state (evaljobapp, evalcriteria, evaljobapp)
             + 3  # savepoint, update session, release savepoint
-            + 5  # issue with evaluated_job_application.evaluated_siae.state
         ):
             response = self.client.get(url)
         assert response.status_code == 200
