@@ -141,7 +141,7 @@ class CitiesAutocompleteTest(TestCase):
         ]
 
         # and is also able to remove the dashes if entered
-        response = self.client.get(url, {"term": "la cour"})
+        response = self.client.get(url, {"term": "la-cour"})
         assert response.status_code == 200
         assert response.json() == [{"slug": "la-courneuve-93", "value": "La Courneuve (93)"}]
 
@@ -259,6 +259,13 @@ class CommunesAutocompleteTest(TestCase):
         assert response.json() == [
             {"code": "64483", "department": "064", "value": "SAINT-JEAN-DE-LUZ (064)"},
             {"code": "62758", "department": "062", "value": "SAINT-MARTIN-BOULOGNE (062)"},
+        ]
+
+        # the request still finds results when dashes were forgotten
+        response = self.client.get(url, {"term": "saint j"})
+        assert response.status_code == 200
+        assert response.json() == [
+            {"code": "64483", "department": "064", "value": "SAINT-JEAN-DE-LUZ (064)"},
         ]
 
         response = self.client.get(url, {"term": "    "})

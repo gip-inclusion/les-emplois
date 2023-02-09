@@ -15,8 +15,29 @@ from itou.siaes.models import SiaeJobDescription
 MAX_CITIES_TO_RETURN = 50
 
 
-def sanitize(string):
-    return unidecode(string.lower())
+def autocomplete_name(qs, term, extra_ordering_by):
+    term = unidecode(term.lower())
+    term_spaced = term.replace("-", " ")
+    term_hyphenated = term.replace(" ", "-")
+    # We started with a trigram similarity and word similarity approach. It is disappointing
+    # since it does return results that are not expected, for instance results containing
+    # letters not present in the search.
+    # It has been decided with the UX to use the simplest approach. It seems that most
+    # people look for a city by "the start of the name", not by "any word within the name"
+    # so the icontains lookup, ordered by index of the matching string, feels more natural.
+    # The hyphenated/unhyphenated thing has been added considering the mess that hyphens
+    # represent in french city names. It should be improved in the future to handle cases
+    # such as search terms “La Chapelle du” not finding La Chapelle-du-Châtelard.
+
+    return (
+        qs.filter(Q(name__unaccent__icontains=term_spaced) | Q(name__unaccent__icontains=term_hyphenated))
+        .annotate(
+            spaced_index=NullIf(StrIndex(Lower("name__unaccent"), Value(term_spaced)), 0),
+            hyphenated_index=NullIf(StrIndex(Lower("name__unaccent"), Value(term_hyphenated)), 0),
+            best_index=Least(F("spaced_index"), F("hyphenated_index")),
+        )
+        .order_by(F("best_index").asc(nulls_last=True), "name", extra_ordering_by)
+    )
 
 
 def cities_autocomplete(request):
@@ -31,31 +52,8 @@ def cities_autocomplete(request):
     if term:
         if term.isdigit():
             cities = City.objects.filter(post_codes__contains=[term]).order_by("name", "department")
-
         else:
-            term = unidecode(term.lower())
-            term_spaced = term.replace("-", " ")
-            term_hyphenated = term.replace(" ", "-")
-            # We started with a trigram similarity and word similarity approach. It is disappointing
-            # since it does return results that are not expected, for instance results containing
-            # letters not present in the search.
-            # It has been decided with the UX to use the simplest approach. It seems that most
-            # people look for a city by "the start of the name", not by "any word within the name"
-            # so the icontains lookup, ordered by index of the matching string, feels more natural.
-            # The hyphenated/unhyphenated thing has been added considering the mess that hyphens
-            # represent in french city names. It should be improved in the future to handle cases
-            # such as search terms “La Chapelle du” not finding La Chapelle-du-Châtelard.
-            cities = (
-                City.objects.filter(
-                    Q(name__unaccent__icontains=term_spaced) | Q(name__unaccent__icontains=term_hyphenated)
-                )
-                .annotate(
-                    spaced_index=NullIf(StrIndex(Lower("name__unaccent"), Value(term_spaced)), 0),
-                    hyphenated_index=NullIf(StrIndex(Lower("name__unaccent"), Value(term_hyphenated)), 0),
-                    best_index=Least(F("spaced_index"), F("hyphenated_index")),
-                )
-                .order_by(F("best_index").asc(nulls_last=True), "name", "department")
-            )
+            cities = autocomplete_name(City.objects.all(), term, extra_ordering_by="department")
 
         cities = [{"value": city.display_name, "slug": city.slug} for city in cities[:MAX_CITIES_TO_RETURN]]
 
@@ -117,15 +115,9 @@ def communes_autocomplete(request):
     active_communes_qs = Commune.objects.filter(start_date__lte=dt).filter(Q(end_date=None) | Q(end_date__gt=dt))
     if term:
         if term.isdigit():
-            communes = active_communes_qs.filter(code__startswith=term).order_by("name", "code")[:10]
+            communes = active_communes_qs.filter(code__startswith=term).order_by("name", "code")[:MAX_CITIES_TO_RETURN]
         else:
-            communes = sorted(
-                active_communes_qs.filter(name__unaccent__icontains=term),
-                # - the results starting by the searched term are favoured (Paris over Cormeil-en-Parisis)
-                # - then if the length is the same, by alphabetic order
-                # - then if everything is the same (Sainte-Colombe...) by department.
-                key=lambda c: (sanitize(c.name).index(sanitize(term)), c.name, c.department_code),
-            )
+            communes = autocomplete_name(active_communes_qs, term, extra_ordering_by="code")
 
         communes = [
             {
