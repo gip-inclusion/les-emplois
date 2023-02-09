@@ -281,6 +281,12 @@ class EmployeeRecord(ASPExchangeInformation):
         self._clean_job_application()
         self._clean_job_seeker()
 
+    def _fill_denormalized_fields(self):
+        # If the SIAE is an antenna, the SIRET will be rejected by the ASP so we have to use the mother's one
+        self.siret = self.siret_from_asp_source(self.job_application.to_siae)
+        self.asp_id = self.job_application.to_siae.convention.asp_id
+        self.approval_number = self.job_application.approval.number
+
     # Business methods
 
     def update_as_ready(self):
@@ -302,6 +308,11 @@ class EmployeeRecord(ASPExchangeInformation):
         self.job_seeker.save(update_fields=["last_checked_at"])
 
         self.clean()
+        # There could be a delay between the moment the object is created
+        # and the moment it is completed to be sent to the ASP.
+        # In the meantime the ASP ID or the SIRET *can change* (mainly because of weekly ASP import scripts).
+        # To prevent some ASP processing errors, we do a refresh on some mutable fields.
+        self._fill_denormalized_fields()
 
         # If we reach this point, the employee record is ready to be serialized
         # and can be sent to ASP
@@ -319,18 +330,6 @@ class EmployeeRecord(ASPExchangeInformation):
             raise InvalidStatusError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
 
         self.clean()
-
-        # There could be a delay between the moment the object
-        # is created and the moment it is sent to ASP.
-        # In the meantime asp_id / SIRET *can change*
-        # (mainly because of weekly ASP import scripts).
-        # To prevent some ASP processing errors, we do a refresh
-        # on some mutable fields before sending:
-        # - ASP ID
-        # - SIRET number
-        self.siret = EmployeeRecord.siret_from_asp_source(self.job_application.to_siae)
-        self.asp_id = self.job_application.to_siae.convention.asp_id
-
         self.status = Status.SENT
         self.set_asp_batch_information(asp_filename, line_number, archive)
 
@@ -373,6 +372,7 @@ class EmployeeRecord(ASPExchangeInformation):
         if self.status != Status.DISABLED:
             raise InvalidStatusError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
 
+        self._fill_denormalized_fields()
         # check if FS exists before reactivate
         if (
             EmployeeRecord.objects.exclude(status=Status.DISABLED)

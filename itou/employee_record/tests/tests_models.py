@@ -6,6 +6,7 @@ import pytest
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
+from itou.approvals.factories import ApprovalFactory
 from itou.employee_record import constants
 from itou.employee_record.enums import Status
 from itou.employee_record.exceptions import CloningError, InvalidStatusError
@@ -24,6 +25,7 @@ from itou.job_applications.factories import (
     JobApplicationWithoutApprovalFactory,
 )
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.siaes.factories import SiaeFactory
 from itou.utils.mocks.address_format import mock_get_geocoding_data
 from itou.utils.test import TestCase
 
@@ -127,6 +129,28 @@ class EmployeeRecordModelTest(TestCase):
         with pytest.raises(ValidationError):
             employee_record = EmployeeRecord.from_job_application(job_application)
             employee_record.update_as_ready()
+
+    def test_update_as_ready_fill_denormalized_fields(self):
+        job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
+        employee_record = EmployeeRecord.from_job_application(job_application)
+
+        old_siae, old_approval = job_application.to_siae, job_application.approval
+        new_siae, new_approval = SiaeFactory(), ApprovalFactory()
+
+        employee_record.job_application.to_siae = new_siae
+        employee_record.job_application.approval = new_approval
+        employee_record.job_application.save()
+
+        assert employee_record.siret == old_siae.siret
+        assert employee_record.asp_id == old_siae.convention.asp_id
+        assert employee_record.approval_number == old_approval.number
+
+        employee_record.update_as_ready()
+
+        employee_record.refresh_from_db()
+        assert employee_record.siret == new_siae.siret
+        assert employee_record.asp_id == new_siae.convention.asp_id
+        assert employee_record.approval_number == new_approval.number
 
     def test_batch_filename_validator(self):
         """
@@ -492,6 +516,31 @@ class EmployeeRecordLifeCycleTest(TestCase):
         self.employee_record.update_as_processed(process_code, process_message, archive_third)
         assert self.employee_record.asp_batch_file == filename_second
         assert self.employee_record.archived_json == json.loads(archive_third)
+
+    @mock.patch(
+        "itou.common_apps.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def test_reactivate_when_the_siae_has_changed(self, _mock):
+        new_siae = SiaeFactory(use_employee_record=True)
+        old_siae = self.employee_record.job_application.to_siae
+
+        assert self.employee_record.siret == old_siae.siret
+        assert self.employee_record.asp_id == old_siae.asp_id
+
+        self.employee_record.update_as_sent(self.faker.unique.asp_batch_filename(), 1, None)
+        self.employee_record.update_as_processed("", "", None)
+        self.employee_record.update_as_disabled()
+
+        # Change SIAE
+        self.employee_record.job_application.to_siae = new_siae
+        self.employee_record.job_application.save()
+        self.employee_record.refresh_from_db()
+        # Reactivate the employee record
+        self.employee_record.update_as_new()
+
+        assert self.employee_record.siret == new_siae.siret
+        assert self.employee_record.asp_id == new_siae.asp_id
 
     @mock.patch(
         "itou.common_apps.address.format.get_geocoding_data",
