@@ -22,6 +22,7 @@ from itou.approvals.enums import ApprovalStatus, Origin
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory, ProlongationFactory, SuspensionFactory
 from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, Suspension
 from itou.approvals.notifications import NewProlongationToAuthorizedPrescriberNotification
+from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordFactory
 from itou.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
@@ -810,13 +811,14 @@ class CustomApprovalAdminViewsTest(TestCase):
         msg = JobApplicationInline.employee_record_status(employee_record.job_application)
         assert msg == f"<a href='{url}'><b>Nouvelle (ID: {employee_record.pk})</b></a>"
 
-        # When an employee record already exists for the candidate
+        # When the job application will lead to a duplicate employee record but is still proposed
         job_application = JobApplicationFactory(
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
             to_siae=employee_record.job_application.to_siae,
             approval=employee_record.job_application.approval,
         )
         msg = JobApplicationInline.employee_record_status(job_application)
-        assert msg == "Une fiche salarié existe déjà pour ce candidat"
+        assert msg == "En attente de création (doublon)"
 
         # When the employee record is an orphan
         employee_record = EmployeeRecordFactory(orphan=True)
@@ -838,6 +840,15 @@ class CustomApprovalAdminViewsTest(TestCase):
                     assert msg == "La SIAE n'utilise pas les fiches salariés"
                 else:
                     assert msg == "En attente de création"
+
+        # When an employee record already exists for the candidate
+        employee_record = EmployeeRecordFactory(status=Status.READY)
+        job_application = JobApplicationFactory(
+            to_siae=employee_record.job_application.to_siae,
+            approval=employee_record.job_application.approval,
+        )
+        msg = JobApplicationInline.employee_record_status(job_application)
+        assert msg == "Une fiche salarié existe déjà pour ce candidat"
 
 
 class SuspensionQuerySetTest(TestCase):

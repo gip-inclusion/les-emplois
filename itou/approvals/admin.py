@@ -61,17 +61,19 @@ class JobApplicationInline(admin.StackedInline):
                 debug += ", ORPHAN"
             return format_html(f"<a href='{url}'><b>{employee_record.get_status_display()} ({debug})</b></a>")
 
-        if obj.candidate_has_employee_record:
-            return "Une fiche salarié existe déjà pour ce candidat"
-
         if not obj.to_siae.can_use_employee_record:
             return "La SIAE n'utilise pas les fiches salariés"
 
         if not obj.create_employee_record:
             return "Création désactivée"
 
+        already_exists = obj.candidate_has_employee_record
+
         if JobApplication.objects.eligible_as_employee_record(siae=obj.to_siae).filter(pk=obj.pk).exists():
-            return "En attente de création"
+            return "En attente de création" + (" (doublon)" if already_exists else "")
+
+        if already_exists:  # Put this check after the eligibility to show that one is proposed but is also a duplicate
+            return "Une fiche salarié existe déjà pour ce candidat"
 
         return "-"
 
