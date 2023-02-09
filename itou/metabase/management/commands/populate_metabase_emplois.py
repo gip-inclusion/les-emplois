@@ -233,6 +233,59 @@ class Command(BaseCommand):
             extra_object=organizations.ORG_OF_PRESCRIBERS_WITHOUT_ORG,
         )
 
+    def populate_job_seekers(self):
+        """
+        Populate job seekers table and add detailed stats about
+        diagnoses and administrative criteria, including one column
+        for each of the 15 possible criteria.
+        """
+        queryset = (
+            User.objects.filter(kind=UserKind.JOB_SEEKER)
+            .prefetch_related(
+                Prefetch(
+                    "eligibility_diagnoses",
+                    queryset=(
+                        EligibilityDiagnosis.objects.select_related(
+                            "author_prescriber_organization",
+                            "author_siae",
+                        ).annotate(
+                            level_1_count=Count(
+                                "administrative_criteria",
+                                filter=Q(administrative_criteria__level=AdministrativeCriteriaLevel.LEVEL_1),
+                            ),
+                            level_2_count=Count(
+                                "administrative_criteria",
+                                filter=Q(administrative_criteria__level=AdministrativeCriteriaLevel.LEVEL_2),
+                            ),
+                            criteria_ids=ArrayAgg("administrative_criteria__pk"),
+                        )
+                        # TODO Django in 4.2 : Slice here with [:1]
+                        .order_by("-created_at")
+                    ),
+                    # TODO Django in 4.2 : rename to last_eligibility_diagnosis
+                    to_attr="sorted_eligibility_diagnoses",
+                ),
+                Prefetch(
+                    "job_applications",
+                    queryset=JobApplication.objects.select_related("to_siae"),
+                ),
+                "created_by",
+            )
+            .annotate(
+                eligibility_diagnoses_count=Count("eligibility_diagnoses", distinct=True),
+                job_applications_count=Count("job_applications", distinct=True),
+                accepted_job_applications_count=Count(
+                    "job_applications",
+                    filter=Q(job_applications__state=JobApplicationWorkflow.STATE_ACCEPTED),
+                    distinct=True,
+                ),
+            )
+            .all()
+        )
+        job_seekers_table = job_seekers.get_table()
+
+        populate_table(job_seekers_table, batch_size=1000, querysets=[queryset])
+
     def populate_job_applications(self):
         queryset = (
             JobApplication.objects.select_related("to_siae", "sender", "sender_siae", "sender_prescriber_organization")
@@ -313,58 +366,9 @@ class Command(BaseCommand):
         queryset = EvaluatedJobApplication.objects.prefetch_related("evaluated_administrative_criteria").all()
         populate_table(evaluated_job_applications.TABLE, batch_size=1000, querysets=[queryset])
 
-    def populate_job_seekers(self):
-        """
-        Populate job seekers table and add detailed stats about
-        diagnoses and administrative criteria, including one column
-        for each of the 15 possible criteria.
-        """
-        queryset = (
-            User.objects.filter(kind=UserKind.JOB_SEEKER)
-            .prefetch_related(
-                Prefetch(
-                    "eligibility_diagnoses",
-                    queryset=(
-                        EligibilityDiagnosis.objects.select_related(
-                            "author_prescriber_organization",
-                            "author_siae",
-                        ).annotate(
-                            level_1_count=Count(
-                                "administrative_criteria",
-                                filter=Q(administrative_criteria__level=AdministrativeCriteriaLevel.LEVEL_1),
-                            ),
-                            level_2_count=Count(
-                                "administrative_criteria",
-                                filter=Q(administrative_criteria__level=AdministrativeCriteriaLevel.LEVEL_2),
-                            ),
-                            criteria_ids=ArrayAgg("administrative_criteria__pk"),
-                        )
-                        # TODO Django in 4.2 : Slice here with [:1]
-                        .order_by("-created_at")
-                    ),
-                    # TODO Django in 4.2 : rename to last_eligibility_diagnosis
-                    to_attr="sorted_eligibility_diagnoses",
-                ),
-                Prefetch(
-                    "job_applications",
-                    queryset=JobApplication.objects.select_related("to_siae"),
-                ),
-                "created_by",
-            )
-            .annotate(
-                eligibility_diagnoses_count=Count("eligibility_diagnoses", distinct=True),
-                job_applications_count=Count("job_applications", distinct=True),
-                accepted_job_applications_count=Count(
-                    "job_applications",
-                    filter=Q(job_applications__state=JobApplicationWorkflow.STATE_ACCEPTED),
-                    distinct=True,
-                ),
-            )
-            .all()
-        )
-        job_seekers_table = job_seekers.get_table()
-
-        populate_table(job_seekers_table, batch_size=1000, querysets=[queryset])
+    def populate_evaluated_criteria(self):
+        queryset = EvaluatedAdministrativeCriteria.objects.all()
+        populate_table(evaluated_criteria.TABLE, batch_size=1000, querysets=[queryset])
 
     def populate_rome_codes(self):
         queryset = Rome.objects.all()
