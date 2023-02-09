@@ -948,7 +948,9 @@ class UpdateJobSeekerBaseView(ApplyStepBaseView):
     def setup(self, request, *args, **kwargs):
         self.job_seeker = get_object_or_404(User, pk=kwargs["job_seeker_pk"])
         self.job_seeker_session = SessionNamespace(request.session, f"job_seeker-{self.job_seeker.pk}")
-        if request.user.is_job_seeker or not request.user.can_view_personal_information(self.job_seeker):
+        if request.user.is_authenticated and (
+            request.user.is_job_seeker or not request.user.can_view_personal_information(self.job_seeker)
+        ):
             # Since the link leading to this process isn't visible to those users, this should never happen
             raise PermissionDenied("Votre utilisateur n'est pas autorisé à vérifier les informations de ce candidat")
         super().setup(request, *args, **kwargs)
