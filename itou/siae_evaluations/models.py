@@ -411,49 +411,58 @@ class EvaluatedSiae(models.Model):
         # and evaluated_administrative_criteria before being called,
         # to prevent tons of additional queries in db.
 
-        evaluated_job_applications_states = [
-            eval_job_app.compute_state() for eval_job_app in self.evaluated_job_applications.all()
-        ]
-
         NOTIFICATION_PENDING_OR_REFUSED = (
             evaluation_enums.EvaluatedSiaeState.REFUSED
             if self.notified_at
             else evaluation_enums.EvaluatedSiaeState.NOTIFICATION_PENDING
         )
 
-        if (
-            # edge case, evaluated_siae has no evaluated_job_application
-            len(self.evaluated_job_applications.all()) == 0
-            # at least one evaluated_job_application has no evaluated_administrative_criteria
-            or evaluation_enums.EvaluatedJobApplicationsState.PENDING in evaluated_job_applications_states
-            # at least one evaluated_administrative_criteria proof is not uploaded
-            or evaluation_enums.EvaluatedJobApplicationsState.PROCESSING in evaluated_job_applications_states
-        ):
+        STATES_PRIORITY = [
+            # Low priority: all applications must have this state for the siae to have it
+            evaluation_enums.EvaluatedSiaeState.ACCEPTED,
+            evaluation_enums.EvaluatedSiaeState.REFUSED,
+            evaluation_enums.EvaluatedSiaeState.SUBMITTED,
+            evaluation_enums.EvaluatedSiaeState.SUBMITTABLE,
+            evaluation_enums.EvaluatedSiaeState.PENDING,
+            # High priority: if at least one application has this state, the siae will also
+        ]
+
+        def state_from(application):
+            return {
+                # pylint-disable=line-too-long
+                evaluation_enums.EvaluatedJobApplicationsState.PENDING: evaluation_enums.EvaluatedSiaeState.PENDING,
+                evaluation_enums.EvaluatedJobApplicationsState.PROCESSING: evaluation_enums.EvaluatedSiaeState.PENDING,
+                evaluation_enums.EvaluatedJobApplicationsState.UPLOADED: evaluation_enums.EvaluatedSiaeState.SUBMITTABLE,  # noqa: E501
+                evaluation_enums.EvaluatedJobApplicationsState.SUBMITTED: evaluation_enums.EvaluatedSiaeState.SUBMITTED,  # noqa: E501
+                evaluation_enums.EvaluatedJobApplicationsState.REFUSED: evaluation_enums.EvaluatedSiaeState.REFUSED,
+                evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2: evaluation_enums.EvaluatedSiaeState.REFUSED,
+                evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED: evaluation_enums.EvaluatedSiaeState.ACCEPTED,
+            }[application.compute_state()]
+
+        state_from_applications = max(
+            (state_from(eval_job_app) for eval_job_app in self.evaluated_job_applications.all()),
+            key=STATES_PRIORITY.index,
+            default=evaluation_enums.EvaluatedSiaeState.PENDING,
+        )
+
+        if state_from_applications in {
+            evaluation_enums.EvaluatedSiaeState.PENDING,
+            evaluation_enums.EvaluatedSiaeState.SUBMITTABLE,
+        }:
+            # SIAE did not submit proof
+            return NOTIFICATION_PENDING_OR_REFUSED if self.evaluation_is_final else state_from_applications
+
+        if state_from_applications == evaluation_enums.EvaluatedSiaeState.SUBMITTED:
+            # if DDETS did not review proof, accept them
             return (
-                # SIAE did not submit proof.
-                NOTIFICATION_PENDING_OR_REFUSED
-                if self.evaluation_is_final
-                else evaluation_enums.EvaluatedSiaeState.PENDING
+                evaluation_enums.EvaluatedSiaeState.ACCEPTED if self.evaluation_is_final else state_from_applications
             )
 
-        if evaluation_enums.EvaluatedJobApplicationsState.UPLOADED in evaluated_job_applications_states:
-            return (
-                # SIAE did not submit proof.
-                NOTIFICATION_PENDING_OR_REFUSED
-                if self.evaluation_is_final
-                else evaluation_enums.EvaluatedSiaeState.SUBMITTABLE
-            )
-
-        # After a "bug" in production where the DDETS could not verify job applications,
-        # it has been decided that if we were in the unlikely case that any criteria was still PENDING,
-        # the DDETS should still be able to verify it.
-        if evaluation_enums.EvaluatedJobApplicationsState.SUBMITTED in evaluated_job_applications_states:
-            return (
-                # DDETS did not review proof.
-                evaluation_enums.EvaluatedSiaeState.ACCEPTED
-                if self.evaluation_is_final
-                else evaluation_enums.EvaluatedSiaeState.SUBMITTED
-            )
+        # state_from_applications is either REFUSED or ACCEPTED here
+        assert state_from_applications in {
+            evaluation_enums.EvaluatedSiaeState.ACCEPTED,
+            evaluation_enums.EvaluatedSiaeState.REFUSED,
+        }, state_from_applications
 
         if self.reviewed_at and not self.evaluation_is_final:
             return evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE
@@ -470,10 +479,7 @@ class EvaluatedSiae(models.Model):
         ):
             return evaluation_enums.EvaluatedSiaeState.ACCEPTED
 
-        if {
-            evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
-            evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2,
-        }.intersection(evaluated_job_applications_states):
+        if state_from_applications == evaluation_enums.EvaluatedSiaeState.REFUSED:
             if self.evaluation_is_final:
                 return NOTIFICATION_PENDING_OR_REFUSED
             return evaluation_enums.EvaluatedSiaeState.REFUSED
