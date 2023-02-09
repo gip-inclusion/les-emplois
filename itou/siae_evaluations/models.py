@@ -411,12 +411,9 @@ class EvaluatedSiae(models.Model):
         # and evaluated_administrative_criteria before being called,
         # to prevent tons of additional queries in db.
 
-        def any_evaluated_admin_crit_matches(filter_func):
-            return any(
-                filter_func(eval_admin_crit)
-                for eval_job_app in self.evaluated_job_applications.all()
-                for eval_admin_crit in eval_job_app.evaluated_administrative_criteria.all()
-            )
+        evaluated_job_applications_states = [
+            eval_job_app.compute_state() for eval_job_app in self.evaluated_job_applications.all()
+        ]
 
         NOTIFICATION_PENDING_OR_REFUSED = (
             evaluation_enums.EvaluatedSiaeState.REFUSED
@@ -428,12 +425,9 @@ class EvaluatedSiae(models.Model):
             # edge case, evaluated_siae has no evaluated_job_application
             len(self.evaluated_job_applications.all()) == 0
             # at least one evaluated_job_application has no evaluated_administrative_criteria
-            or any(
-                len(evaluated_job_application.evaluated_administrative_criteria.all()) == 0
-                for evaluated_job_application in self.evaluated_job_applications.all()
-            )
+            or evaluation_enums.EvaluatedJobApplicationsState.PENDING in evaluated_job_applications_states
             # at least one evaluated_administrative_criteria proof is not uploaded
-            or any_evaluated_admin_crit_matches(lambda crit: crit.proof_url == "")
+            or evaluation_enums.EvaluatedJobApplicationsState.PROCESSING in evaluated_job_applications_states
         ):
             return (
                 # SIAE did not submit proof.
@@ -442,7 +436,7 @@ class EvaluatedSiae(models.Model):
                 else evaluation_enums.EvaluatedSiaeState.PENDING
             )
 
-        if any_evaluated_admin_crit_matches(lambda crit: crit.submitted_at is None):
+        if evaluation_enums.EvaluatedJobApplicationsState.UPLOADED in evaluated_job_applications_states:
             return (
                 # SIAE did not submit proof.
                 NOTIFICATION_PENDING_OR_REFUSED
@@ -453,10 +447,7 @@ class EvaluatedSiae(models.Model):
         # After a "bug" in production where the DDETS could not verify job applications,
         # it has been decided that if we were in the unlikely case that any criteria was still PENDING,
         # the DDETS should still be able to verify it.
-        if any(
-            eval_job_app.compute_state() == evaluation_enums.EvaluatedJobApplicationsState.SUBMITTED
-            for eval_job_app in self.evaluated_job_applications.all()
-        ):
+        if evaluation_enums.EvaluatedJobApplicationsState.SUBMITTED in evaluated_job_applications_states:
             return (
                 # DDETS did not review proof.
                 evaluation_enums.EvaluatedSiaeState.ACCEPTED
@@ -471,17 +462,18 @@ class EvaluatedSiae(models.Model):
             self.final_reviewed_at is None
             and self.evaluation_campaign.ended_at
             # reviewed_at is always set during the campaign.
-            and any_evaluated_admin_crit_matches(lambda crit: crit.submitted_at > self.reviewed_at)
+            and any(
+                eval_admin_crit.submitted_at > self.reviewed_at
+                for eval_job_app in self.evaluated_job_applications.all()
+                for eval_admin_crit in eval_job_app.evaluated_administrative_criteria.all()
+            )
         ):
             return evaluation_enums.EvaluatedSiaeState.ACCEPTED
 
-        if any_evaluated_admin_crit_matches(
-            lambda crit: crit.review_state
-            in [
-                evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
-                evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2,
-            ]
-        ):
+        if {
+            evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
+            evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2,
+        }.intersection(evaluated_job_applications_states):
             if self.evaluation_is_final:
                 return NOTIFICATION_PENDING_OR_REFUSED
             return evaluation_enums.EvaluatedSiaeState.REFUSED
