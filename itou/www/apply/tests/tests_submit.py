@@ -39,6 +39,12 @@ fake = faker.Faker(locale="fr_FR")
 
 
 class ApplyTest(TestCase):
+    def test_anonymous_access(self):
+        siae = SiaeFactory(with_jobs=True)
+        url = reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk})
+        response = self.client.get(url)
+        assert response.status_code == 403
+
     def test_we_raise_a_permission_denied_on_missing_session(self):
         routes = {
             "apply:check_nir_for_sender",
@@ -2136,6 +2142,22 @@ class UpdateJobSeekerViewTestCase(TestCase):
         assert self.job_seeker.has_jobseeker_profile is True
         assert self.job_seeker.jobseeker_profile.education_level == EducationLevel.BAC_LEVEL
         assert self.job_seeker.last_checked_at != previous_last_checked_at
+
+    def test_anonymous_step_1(self):
+        response = self.client.get(self.step_1_url)
+        assert response.status_code == 403
+
+    def test_anonymous_step_2(self):
+        response = self.client.get(self.step_2_url)
+        assert response.status_code == 403
+
+    def test_anonymous_step_3(self):
+        response = self.client.get(self.step_3_url)
+        assert response.status_code == 403
+
+    def test_anonymous_step_end(self):
+        response = self.client.get(self.step_end_url)
+        assert response.status_code == 403
 
     def test_as_job_seeker(self):
         self._check_nothing_permitted(self.job_seeker)

@@ -1169,6 +1169,15 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
     def login(self, evaluated_siae):
         self.client.force_login(self.user)
 
+    def test_anonymous_access(self):
+        evaluated_siae = EvaluatedSiaeFactory(
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+        )
+        url = reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk})
+        response = self.client.get(url)
+        self.assertRedirects(response, reverse("account_login") + f"?next={url}")
+
     def test_access_other_institution(self):
         evaluated_siae = EvaluatedSiaeFactory(
             # Evaluation of another institution.

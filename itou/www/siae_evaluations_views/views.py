@@ -222,9 +222,10 @@ class InstitutionEvaluatedSiaeNotifyMixin(LoginRequiredMixin, SingleObjectMixin)
     context_object_name = "evaluated_siae"
     pk_url_kwarg = "evaluated_siae_pk"
 
-    def setup(self, *args, **kwargs):
-        super().setup(*args, **kwargs)
-        self.institution = get_current_institution_or_404(self.request)
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        if request.user.is_authenticated:
+            self.institution = get_current_institution_or_404(self.request)
 
     def get_queryset(self):
         return (
