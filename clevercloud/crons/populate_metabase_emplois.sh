@@ -22,6 +22,7 @@ mkdir -p $OUTPUT_PATH
         django-admin populate_metabase_emplois --mode=job_descriptions
         django-admin populate_metabase_emplois --mode=organizations
         django-admin populate_metabase_emplois --mode=job_seekers
+        django-admin populate_metabase_emplois --mode=criteria
         django-admin populate_metabase_emplois --mode=job_applications
         django-admin populate_metabase_emplois --mode=selected_jobs
         django-admin populate_metabase_emplois --mode=approvals
@@ -29,6 +30,7 @@ mkdir -p $OUTPUT_PATH
         django-admin populate_metabase_emplois --mode=evaluation_campaigns
         django-admin populate_metabase_emplois --mode=evaluated_siaes
         django-admin populate_metabase_emplois --mode=evaluated_job_applications
+        django-admin populate_metabase_emplois --mode=evaluated_criteria
         django-admin populate_metabase_emplois --mode=final_tables
         django-admin populate_metabase_emplois --mode=data_inconsistencies
         django-admin send_slack_message ":white_check_mark: succès mise à jour de données C1 -> Metabase"

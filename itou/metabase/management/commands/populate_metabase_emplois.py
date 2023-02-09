@@ -33,7 +33,7 @@ from itou.approvals.models import Approval, PoleEmploiApproval
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 from itou.eligibility.enums import AdministrativeCriteriaLevel
-from itou.eligibility.models import EligibilityDiagnosis
+from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.institutions.models import Institution
 from itou.job_applications.enums import Origin, SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
@@ -43,6 +43,8 @@ from itou.metabase.db import build_final_tables, populate_table
 from itou.metabase.tables import (
     analytics,
     approvals,
+    criteria,
+    evaluated_criteria,
     evaluated_job_applications,
     evaluated_siaes,
     evaluation_campaigns,
@@ -58,7 +60,12 @@ from itou.metabase.tables import (
 )
 from itou.metabase.tables.utils import get_active_siae_pks
 from itou.prescribers.models import PrescriberOrganization
-from itou.siae_evaluations.models import EvaluatedJobApplication, EvaluatedSiae, EvaluationCampaign
+from itou.siae_evaluations.models import (
+    EvaluatedAdministrativeCriteria,
+    EvaluatedJobApplication,
+    EvaluatedSiae,
+    EvaluationCampaign,
+)
 from itou.siaes.models import Siae, SiaeJobDescription
 from itou.users.enums import UserKind
 from itou.users.models import User
@@ -81,6 +88,7 @@ class Command(BaseCommand):
             "job_descriptions": self.populate_job_descriptions,
             "organizations": self.populate_organizations,
             "job_seekers": self.populate_job_seekers,
+            "criteria": self.populate_criteria,
             "job_applications": self.populate_job_applications,
             "selected_jobs": self.populate_selected_jobs,
             "approvals": self.populate_approvals,
@@ -88,6 +96,7 @@ class Command(BaseCommand):
             "evaluation_campaigns": self.populate_evaluation_campaigns,
             "evaluated_siaes": self.populate_evaluated_siaes,
             "evaluated_job_applications": self.populate_evaluated_job_applications,
+            "evaluated_criteria": self.populate_evaluated_criteria,
             "rome_codes": self.populate_rome_codes,
             "insee_codes": self.populate_insee_codes,
             "insee_codes_vs_post_codes": self.populate_insee_codes_vs_post_codes,
@@ -285,6 +294,10 @@ class Command(BaseCommand):
         job_seekers_table = job_seekers.get_table()
 
         populate_table(job_seekers_table, batch_size=1000, querysets=[queryset])
+
+    def populate_criteria(self):
+        queryset = AdministrativeCriteria.objects.all()
+        populate_table(criteria.TABLE, batch_size=1000, querysets=[queryset])
 
     def populate_job_applications(self):
         queryset = (

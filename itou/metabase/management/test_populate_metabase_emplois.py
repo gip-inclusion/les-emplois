@@ -19,6 +19,7 @@ from itou.institutions.factories import InstitutionFactory
 from itou.job_applications.factories import JobApplicationFactory
 from itou.metabase.tables.utils import hash_content
 from itou.siae_evaluations.factories import (
+    EvaluatedAdministrativeCriteriaFactory,
     EvaluatedJobApplicationFactory,
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
@@ -329,6 +330,24 @@ def test_populate_job_seekers():
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
+def test_populate_criteria():
+    num_queries = 1  # Count criteria
+    num_queries += 1  # Select criteria IDs
+    num_queries += 1  # Select one chunk of criteria IDs
+    num_queries += 1  # Select criteria with columns
+    with assertNumQueries(num_queries):
+        management.call_command("populate_metabase_emplois", mode="criteria")
+
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM critères_iae ORDER BY id")
+        rows = cursor.fetchall()
+        assert len(rows) == 18
+        assert rows[0] == (1, "Bénéficiaire du RSA", "1", "Revenu de solidarité active", datetime.date(2023, 2, 1))
+
+
+@freeze_time("2023-02-02")
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.usefixtures("metabase")
 def test_populate_approvals():
     approval = ApprovalFactory()
     pe_approval = PoleEmploiApprovalFactory()
@@ -503,6 +522,36 @@ def test_populate_evaluated_job_applications():
                 str(evaluated_job_application.job_application_id),
                 evaluated_job_application.evaluated_siae_id,
                 evaluated_job_application.state,
+                datetime.date(2023, 2, 1),
+            ),
+        ]
+
+
+@freeze_time("2023-02-02")
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.usefixtures("metabase")
+def test_populate_evaluated_criteria():
+    evaluated_job_application = EvaluatedJobApplicationFactory()
+    evaluated_criteria = EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_application)
+
+    num_queries = 1  # Count evaluated criteria
+    num_queries += 1  # Select evaluated criteria IDs
+    num_queries += 1  # Select one chunk of evaluated criteria IDs
+    num_queries += 1  # Select evaluated criteria with columns
+    with assertNumQueries(num_queries):
+        management.call_command("populate_metabase_emplois", mode="evaluated_criteria")
+
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM cap_critères_iae ORDER BY id")
+        rows = cursor.fetchall()
+        assert rows == [
+            (
+                evaluated_criteria.id,
+                evaluated_criteria.administrative_criteria_id,
+                evaluated_criteria.evaluated_job_application_id,
+                evaluated_criteria.uploaded_at,
+                evaluated_criteria.submitted_at,
+                evaluated_criteria.review_state,
                 datetime.date(2023, 2, 1),
             ),
         ]
