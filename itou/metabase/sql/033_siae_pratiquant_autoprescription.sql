@@ -1,7 +1,7 @@
 with siae_autopr as (
     select 
         count (
-            distinct (nom_structure)
+            distinct (id_structure)
         ) as total_siae_autopr,
         1 as id
     from
@@ -12,7 +12,7 @@ with siae_autopr as (
 siae_all as (
     select 
         count (
-            distinct (nom_structure)
+            distinct (id_structure)
         ) as total_siae_all,
         1 as id
     from
