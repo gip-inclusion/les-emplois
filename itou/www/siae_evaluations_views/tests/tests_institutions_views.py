@@ -1361,6 +1361,114 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
         )
         self.assertContains(response, self.not_submitted, count=1)
 
+    @freeze_time("2023-06-24 11:11:00")
+    def test_data_card_statistics_multiple_previous_campaigns_check_sanctions(self):
+        siae = SiaeFactory()
+        previous_campaign_1 = EvaluationCampaignFactory(
+            institution=self.institution,
+            ended_at=timezone.make_aware(datetime.datetime(2022, 3, 24)),
+            evaluated_period_start_at=datetime.date(2022, 1, 1),
+            evaluated_period_end_at=datetime.date(2022, 2, 28),
+        )
+        # This SIAE didn’t answer for that evaluation campaign.
+        previous_evaluated_siae_1 = EvaluatedSiaeFactory(
+            evaluation_campaign=previous_campaign_1,
+            siae=siae,
+            reviewed_at=timezone.make_aware(datetime.datetime(2022, 2, 24)),
+        )
+        EvaluatedJobApplicationFactory.create_batch(2, evaluated_siae=previous_evaluated_siae_1)
+        sanctions_1 = Sanctions.objects.create(
+            evaluated_siae=previous_evaluated_siae_1, no_sanction_reason="Pas envie"
+        )
+
+        previous_campaign_2 = EvaluationCampaignFactory(
+            institution=self.institution,
+            ended_at=timezone.make_aware(datetime.datetime(2022, 8, 24)),
+            evaluated_period_start_at=datetime.date(2022, 6, 1),
+            evaluated_period_end_at=datetime.date(2022, 7, 31),
+        )
+        # It didn’t answer for that evaluation campaign either.
+        previous_evaluated_siae_2 = EvaluatedSiaeFactory(
+            evaluation_campaign=previous_campaign_2,
+            siae=siae,
+            reviewed_at=timezone.make_aware(datetime.datetime(2022, 7, 24)),
+        )
+        EvaluatedJobApplicationFactory.create_batch(2, evaluated_siae=previous_evaluated_siae_2)
+        Sanctions.objects.create(
+            evaluated_siae=previous_evaluated_siae_2, deactivation_reason="Ça commence à bien faire"
+        )
+
+        campaign = EvaluationCampaignFactory(
+            institution=self.institution, ended_at=timezone.now() - relativedelta(hours=1)
+        )
+        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=campaign, siae=siae)
+        self.login(evaluated_siae)
+        with self.assertNumQueries(
+            1  # Load session
+            + 4  # Check user, membership, institution & institution membership (!)
+            + 1  # Load evaluated siae infos
+            + 1  # Load evaluated job applications
+            + 1  # Check institution membership again
+            + 3  # Load evaluated siae infos + job application + criteria for previous campaigns
+            + 3  # Update session
+        ):
+            response = self.client.get(
+                reverse(
+                    self.urlname,
+                    kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+                )
+            )
+        NO_SANCTION = "<li>Ne pas sanctionner</li>"
+        TEMP_SUSPENSION = "<li>Retrait temporaire de la capacité d’auto-prescription</li>"
+        FINAL_SUSPENSION = "<li>Retrait définitif de la capacité d’auto-prescription</li>"
+        PARTIAL_CUT = "<li>Suppression d’une partie de l’aide au poste</li>"
+        TOTAL_CUT = "<li>Suppression de l’aide au poste</li>"
+        DEACTIVATION = "<li>Déconventionnement de la structure</li>"
+
+        self.assertContains(response, NO_SANCTION)
+        self.assertContains(response, DEACTIVATION)
+        self.assertNotContains(response, TEMP_SUSPENSION)
+        self.assertNotContains(response, FINAL_SUSPENSION)
+        self.assertNotContains(response, PARTIAL_CUT, html=True)
+        self.assertNotContains(response, TOTAL_CUT, html=True)
+
+        sanctions_1.no_sanction_reason = ""
+        sanctions_1.suspension_dates = InclusiveDateRange(datetime.date(2022, 3, 1), datetime.date(2022, 3, 2))
+        sanctions_1.subsidy_cut_dates = InclusiveDateRange(datetime.date(2022, 3, 1), datetime.date(2022, 3, 2))
+        sanctions_1.subsidy_cut_percent = 50
+        sanctions_1.save()
+
+        response = self.client.get(
+            reverse(
+                self.urlname,
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            )
+        )
+        self.assertNotContains(response, NO_SANCTION)
+        self.assertContains(response, TEMP_SUSPENSION)
+        self.assertNotContains(response, FINAL_SUSPENSION)
+        self.assertContains(response, PARTIAL_CUT, html=True)
+        self.assertNotContains(response, TOTAL_CUT, html=True)
+        self.assertContains(response, DEACTIVATION)
+
+        sanctions_1.suspension_dates = InclusiveDateRange(datetime.date(2022, 3, 1))
+        sanctions_1.subsidy_cut_dates = InclusiveDateRange(datetime.date(2022, 3, 1), datetime.date(2022, 3, 2))
+        sanctions_1.subsidy_cut_percent = 100
+        sanctions_1.save()
+
+        response = self.client.get(
+            reverse(
+                self.urlname,
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            )
+        )
+        self.assertNotContains(response, NO_SANCTION)
+        self.assertNotContains(response, TEMP_SUSPENSION)
+        self.assertContains(response, FINAL_SUSPENSION)
+        self.assertNotContains(response, PARTIAL_CUT, html=True)
+        self.assertContains(response, TOTAL_CUT, html=True)
+        self.assertContains(response, DEACTIVATION)
+
 
 class InstitutionEvaluatedSiaeNotifyViewStep1Test(InstitutionEvaluatedSiaeNotifyViewAccessTestMixin, TestCase):
     urlname = "siae_evaluations_views:institution_evaluated_siae_notify_step1"

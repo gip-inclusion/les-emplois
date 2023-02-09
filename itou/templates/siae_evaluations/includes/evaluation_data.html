@@ -32,6 +32,27 @@
                             <b class="text-success">Positif</b>
                         {% else %}
                             <b class="text-danger">Négatif</b>
+                            {% if old_evaluated_siae.sanctions %}
+                                <ul class="ml-3">
+                                    {% if old_evaluated_siae.sanctions.training_session %}
+                                        <li>Participation à une session de présentation de l’auto-prescription</li>
+                                    {% endif %}
+                                    {% if old_evaluated_siae.sanctions.suspension_dates and old_evaluated_siae.sanctions.suspension_dates.upper %}
+                                        <li>Retrait temporaire de la capacité d’auto-prescription</li>
+                                    {% elif old_evaluated_siae.sanctions.suspension_dates %}
+                                        <li>Retrait définitif de la capacité d’auto-prescription</li>
+                                    {% endif %}
+                                    {% if old_evaluated_siae.sanctions.subsidy_cut_dates %}
+                                        <li>
+                                            Suppression
+                                            {% if old_evaluated_siae.sanctions.subsidy_cut_percent < 100 %}d’une partie{% endif %}
+                                            de l’aide au poste
+                                        </li>
+                                    {% endif %}
+                                    {% if old_evaluated_siae.sanctions.deactivation_reason %}<li>Déconventionnement de la structure</li>{% endif %}
+                                    {% if old_evaluated_siae.sanctions.no_sanction_reason %}<li>Ne pas sanctionner</li>{% endif %}
+                                </ul>
+                            {% endif %}
                         {% endif %}
                     </li>
                 {% endfor %}
