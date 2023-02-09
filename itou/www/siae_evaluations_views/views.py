@@ -211,7 +211,7 @@ def evaluation_campaign_data_context(evaluated_siae):
         # Ignore first evaluation campaigns, they were a test.
         .exclude(evaluation_campaign__evaluated_period_end_at__lt=datetime.date(2022, 1, 1))
         .order_by("-evaluation_campaign__evaluated_period_start_at")
-        .select_related("evaluation_campaign")
+        .select_related("evaluation_campaign", "sanctions")
         .prefetch_related("evaluated_job_applications__evaluated_administrative_criteria")
     )
     return context
