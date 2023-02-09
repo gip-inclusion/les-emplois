@@ -3062,7 +3062,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
             + 3  # fetch institution membership & institution x 2 !should be fixed!
             + 5  # fetch evaluated_siae and its prefetch_related (evalcriteria, admincriteria, jobapp, approval)
             + 2  # user & institution membership (again)
-            + 3  # issue with evaluated_job_application.evaluated_siae.state (evaljobapp, evalcriteria, evaljobapp)
+            + 2  # evaljobapp & its evalcriteria
             + 3  # savepoint, update session, release savepoint
         ):
             response = self.client.get(url)
