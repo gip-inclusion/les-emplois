@@ -693,13 +693,17 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             ended_at=timezone.now(),
             name="Contrôle Test",
         )
-        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign, siae__name="les petits jardins")
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign=evaluation_campaign,
+            siae__name="les petits jardins",
+            reviewed_at=timezone.now() - relativedelta(days=5),
+        )
         evaluated_job_app = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
         EvaluatedAdministrativeCriteriaFactory(
             evaluated_job_application=evaluated_job_app,
             uploaded_at=timezone.now() - relativedelta(days=2),
             submitted_at=timezone.now() - relativedelta(days=1),
-            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2,
         )
 
         self.client.force_login(self.user)

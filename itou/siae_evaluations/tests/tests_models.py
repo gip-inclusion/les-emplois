@@ -890,6 +890,7 @@ class EvaluatedSiaeModelTest(TestCase):
     def test_state_on_closed_campaign_criteria_refused_review_not_validated(self):
         evaluated_job_app = EvaluatedJobApplicationFactory(
             evaluated_siae__evaluation_campaign__ended_at=timezone.now(),
+            evaluated_siae__reviewed_at=timezone.now() - relativedelta(days=5),
         )
         EvaluatedAdministrativeCriteriaFactory(
             evaluated_job_application=evaluated_job_app,
@@ -933,6 +934,7 @@ class EvaluatedSiaeModelTest(TestCase):
     def test_state_on_closed_campaign_criteria_accepted(self):
         evaluated_job_app = EvaluatedJobApplicationFactory(
             evaluated_siae__evaluation_campaign__ended_at=timezone.now(),
+            evaluated_siae__reviewed_at=timezone.now() - relativedelta(days=5),
         )
         EvaluatedAdministrativeCriteriaFactory(
             evaluated_job_application=evaluated_job_app,
@@ -941,27 +943,6 @@ class EvaluatedSiaeModelTest(TestCase):
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
         )
         assert evaluated_job_app.evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.ACCEPTED
-
-    def test_review(self):
-        fake_now = timezone.now()
-        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__ended_at=fake_now)
-        evaluated_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
-        EvaluatedAdministrativeCriteriaFactory(
-            evaluated_job_application=evaluated_job_application,
-            submitted_at=fake_now,
-            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
-        )
-
-        evaluated_siae.review()
-        evaluated_siae.refresh_from_db()
-        assert evaluated_siae.reviewed_at is not None
-
-        evaluated_siae.reviewed_at = None
-        evaluated_siae.save(update_fields=["reviewed_at"])
-
-        evaluated_siae.review()
-        evaluated_siae.refresh_from_db()
-        assert evaluated_siae.reviewed_at is not None
 
 
 class EvaluatedJobApplicationModelTest(TestCase):
