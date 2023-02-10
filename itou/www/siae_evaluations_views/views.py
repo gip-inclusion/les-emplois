@@ -373,7 +373,10 @@ def evaluated_siae_sanction(request, evaluated_siae_pk, viewer_type):
     )
     context = evaluation_campaign_data_context(evaluated_siae)
     context["evaluated_siae"] = evaluated_siae
-    context["sanctions"] = evaluated_siae.sanctions
+    try:
+        context["sanctions"] = evaluated_siae.sanctions
+    except EvaluatedSiae.sanctions.RelatedObjectDoesNotExist:
+        context["sanctions"] = None
     return render(request, "siae_evaluations/evaluated_siae_sanction.html", context)
 
 
