@@ -1,11 +1,11 @@
 import datetime
 import io
-import tempfile
 from unittest.mock import patch
 
 from dateutil.relativedelta import relativedelta
 from django.core import management
 from django.test import TransactionTestCase
+from django.utils import timezone
 from freezegun import freeze_time
 
 from itou.approvals.factories import PoleEmploiApprovalFactory, SuspensionFactory
@@ -158,91 +158,93 @@ class ImportPEApprovalSiretKindTestCase(TransactionTestCase):
         assert pe_approval_2.siae_siret == "123456789"
 
 
-class UpdateSuspensionsEndAtTestCase(TransactionTestCase):
-    @freeze_time("2023-02-08")
-    def test_command_output(self):
-        months_of_prolongation = update_suspensions_end_at_mngt_comd.MONTHS_OF_PROLONGATION
-        # One approval per suspension.
-        suspension1 = SuspensionFactory(
-            approval__number="XXXXX0000001",
-            end_at=datetime.datetime.today() + relativedelta(months=Suspension.MAX_DURATION_MONTHS, days=1),
-        )
-        # One approval, 2 suspensions.
-        # The second one should begin when the first one ends.
-        # Only the second one has been updated (but twice).
-        suspension2 = SuspensionFactory(
-            approval__number="XXXXX0000002",
-            start_at=datetime.datetime.today() - relativedelta(months=3),
-            end_at=datetime.datetime.today() - relativedelta(days=1),
-        )
-        suspension3_end_at = datetime.datetime.today() + relativedelta(months=months_of_prolongation * 2)
-        suspension3 = SuspensionFactory(
-            approval=suspension2.approval, start_at=datetime.datetime.today(), end_at=suspension3_end_at
-        )
+@freeze_time("2023-02-08")
+def test_update_suspension_end_at(tmp_path):
+    prolongation = relativedelta(months=update_suspensions_end_at_mngt_comd.MONTHS_OF_PROLONGATION)
+    # One approval, 1 suspension
+    # A suspension of 36 months and one day (it's an anomaly)
+    suspension1 = SuspensionFactory(
+        approval__number="XXXXX0000001",
+        end_at=timezone.localdate() + relativedelta(months=Suspension.MAX_DURATION_MONTHS),
+    )
+    # One approval, 2 suspensions.
+    # The second one should begin when the first one ends.
+    # Only the second one has been updated (but twice).
+    suspension2 = SuspensionFactory(
+        approval__number="XXXXX0000002",
+        start_at=timezone.localdate() - relativedelta(months=3),
+        end_at=timezone.localdate() - relativedelta(days=1),
+    )
+    suspension3 = SuspensionFactory(approval=suspension2.approval, start_at=timezone.localdate())
+    suspension3.end_at += prolongation
+    suspension3.save()
 
-        # Suspension updated after the first script ran should not be updated.
-        suspension4 = SuspensionFactory(
-            approval__number="XXXXX0000003",
-            start_at=datetime.datetime.today() - relativedelta(days=30),
-            end_at=datetime.datetime.today() - relativedelta(days=1),
-        )
-        suspension5_updated_at = update_suspensions_end_at_mngt_comd.FIRST_SCRIPT_RUNNING_DATE + relativedelta(days=1)
-        suspension5 = SuspensionFactory(
-            approval=suspension4.approval, start_at=datetime.datetime.today(), updated_at=suspension5_updated_at
-        )
+    # One approval, 1 suspension
+    # Suspension updated after the first script ran should not be updated.
+    suspension4_updated_at = update_suspensions_end_at_mngt_comd.FIRST_SCRIPT_RUNNING_DATE + relativedelta(days=1)
+    suspension4 = SuspensionFactory(
+        approval__number="XXXXX0000003", start_at=timezone.localdate(), updated_at=suspension4_updated_at
+    )
 
-        with tempfile.NamedTemporaryFile() as file:
-            suspensions = Suspension.objects.prefetch_related("approval").all()
-            for suspension in suspensions.iterator():
-                log_row = f"{suspension.approval.number} {suspension.start_at} {suspension.end_at}\n"
-                file.write(bytes(log_row, encoding="utf-8"))
+    with open(tmp_path / "extended-suspensions.txt", "w") as file:
+        log_rows = [
+            "XXXXX0000001 2023-02-08 2026-02-08",
+            "XXXXX0000002 2023-02-08 2026-02-07",
+            "XXXXX0000002 2023-02-08 2028-02-07",
+            "XXXXX0000003 2023-02-08 2026-02-07",
+            "XXXXX0000003 2023-02-08 2028-02-07",
+            # Approval was deleted after the first script ran.
+            "XXXXX5432764 2022-12-12 2025-12-11",
+            "XXXXX5432764 2022-12-12 2027-12-11",
+        ]
+        file.write("\n".join(log_rows))
+        file.seek(0)
 
-                # Approval who was deleted after the first script ran.
-                file.write(b"XXXXX5432764 2022-12-12 2024-12-11\n")
-            file.seek(0)
+        stdout = io.StringIO()
+        management.call_command("update_suspensions_end_at", file.name, wet_run=True, stdout=stdout)
+        output = stdout.getvalue().split("\n")
 
-            stdout = io.StringIO()
-            management.call_command("update_suspensions_end_at", file_path=file.name, wet_run=True, stdout=stdout)
-            output = stdout.getvalue()
-            # Ending after Suspension.MAX_DURATION_MONTHS
-            # suspension1 and suspension3
-            assert "Problematic suspensions found in database: 2." in output
+    assert output == [
+        # Ending after Suspension.MAX_DURATION_MONTHS
+        # suspension1 and suspension3
+        "Problematic suspensions found in database: 2",
+        # XXXXX0000001, XXXXX0000002, XXXXX0000003 and XXXXX5432764 (deleted approval).
+        "Total of unique approvals in input file: 4",
+        # suspension1 and suspension3
+        "Problematic suspensions found in input file: 2",
+        # XXXXX0000002, XXXXX0000003 and XXXXX5432764 (deleted approval)
+        "Anomalies found in input file: 3",
+        "",
+        "Start processing",
+        "========================================",
+        f"Updating suspension pk={suspension3.pk} approval=XXXXX0000002 start_at=2023-02-08 "
+        "old_end_at=2028-02-07 new_end_at=2026-02-07",
+        f"Skipping suspension updated after script ran: pk={suspension4.pk} "
+        f"start_at={suspension4.start_at} end_at={suspension4.end_at} "
+        f"updated_at={suspension4.updated_at.date()}",
+        "Skipping approval not found: approval=XXXXX5432764",
+        "",
+        "Results",
+        "========================================",
+        "Updated suspensions: 1",
+        "Skipped suspensions (see reasons above): 2",
+        "Everything is good",
+        "",
+    ]
 
-            # XXXXX0000001, XXXXX0000002, XXXXX0000003 and XXXXX5432764 (deleted approval).
-            assert "Total of unique approvals in input file: 4" in output
+    suspension1.refresh_from_db()
+    # One suspension linked to one approval. Don't touch it.
+    assert not suspension1.updated_at
 
-            # suspension1 and suspension3
-            assert "Problematic suspensions found in input file: 2" in output
+    # Many suspensions linked to one approval: the end_at was updated many times.
+    # This is the first suspension. Only the last one should be updated.
+    suspension2.refresh_from_db()
+    assert not suspension2.updated_at
+    # The last one was updated
+    suspension3.refresh_from_db()
+    assert suspension3.updated_at
+    assert suspension3.end_at == Suspension.get_max_end_at(suspension3.start_at)
 
-            assert "Updated suspensions: 1" in output
-
-            # Edge cases
-            assert (
-                f"Skipping suspension updated after script ran: {suspension5.pk}, "
-                f"start_at: {suspension5.start_at.date()}, end_at: {suspension5.end_at.date()}"
-            ) in output
-            assert "Skipping approval not found: XXXXX5432764" in output
-            assert "Skipped suspensions (one suspension per approval): 1" in output
-            assert (
-                "Skipped suspensions (other reasons): 2" in output
-            )  # Approval not found, suspension updated after script ran.
-
-        suspension1.refresh_from_db()
-        # One suspension linked to one approval. Don't touch it.
-        assert not suspension1.updated_at
-
-        # Many suspensions linked to one approval: the end_at was updated many times.
-        # This is the first suspension. Only the last one should be updated.
-        suspension2.refresh_from_db()
-        assert not suspension2.updated_at
-        suspension3.refresh_from_db()
-        assert suspension3.updated_at
-        assert suspension3.end_at == (suspension3_end_at - relativedelta(months=months_of_prolongation)).date()
-
-        # Many suspensions linked to one approval: the end_at was updated many times.
-        # This is the first suspension. Only the last one should be updated.
-        suspension4.refresh_from_db()
-        assert not suspension4.updated_at
-        # This suspension was updated after the first script ran so we should keep it as it is.
-        suspension5.refresh_from_db()
-        assert suspension5.updated_at == suspension5_updated_at
+    # This suspension was updated after the first script ran so we should keep it as it is.
+    suspension4.refresh_from_db()
+    assert suspension4.updated_at == suspension4_updated_at
