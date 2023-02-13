@@ -26,7 +26,6 @@ select
     total_siae_autopr as "Nombre de structures utilisant l'autoprescription",
     total_siae_all as "Nombre total de structures",
     sau.type_structure
-    /*cast (total_siae_autopr as numeric)/cast (total_siae_all as numeric) as "% structures utilisant l'autoprescription"*/
 from
     siae_autopr sau
 left join siae_all sall 
