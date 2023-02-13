@@ -1,6 +1,22 @@
 # Journal des modifications
+## [56] - 2023-02-13
 
-## [55] - 2023-01-23
+### Ajouté
+- Contrôle a posteriori : Affichage de liens vers les justificatifs
+- Contrôle a posteriori : Ajout de l'affichage et choix des sanctions
+- Parcours d'inscription : Ajout d'une vue d'activation de compte Inclusion Connect
+- UI : Export en XLSX au lieu de CSV
+
+### Modifié
+- Autocomplétion : modification des règles de gestion de l'autocomplétion de villes
+- PASS IAE : Les suspensions à 12 mois sont passées à 36 mois
+- Parcours d'inscription : détection de préexistence de candidats à l'inscription
+- RGPD : Mise à jour des mentions légales, confidentialité et conditions générales
+- RGPD : Prise en compte des préférences de cookies
+- UI : Affichage des SIRET des structures sur le tableau de bord
+- UI : Modifications d'accessibilité et de précision de certains messages
+
+## [55] - 2023-01-30
 
 ### Ajouté
 
