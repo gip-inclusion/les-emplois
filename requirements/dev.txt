@@ -476,8 +476,8 @@ httpx==0.23.3 \
     # via
     #   -r requirements/base.txt
     #   respx
-huey==2.4.4 \
-    --hash=sha256:6a27a7862a7a982c0508ad4e548d95765e3b0d97093a51106f07540837a09c86
+huey==2.4.5 \
+    --hash=sha256:760cf150deff1fa34b852da37701a5a750d1148f03ea07aa2b3764dc6060b4c3
     # via -r requirements/base.txt
 identify==2.5.8 \
     --hash=sha256:48b7925fe122720088aeb7a6c34f17b27e706b72c61070f27fe3789094233440 \
