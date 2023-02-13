@@ -1163,9 +1163,9 @@ tablib[html,ods,xls,xlsx,yaml]==3.2.1 \
     # via
     #   -r requirements/base.txt
     #   django-import-export
-tenacity==8.1.0 \
-    --hash=sha256:35525cd47f82830069f0d6b73f7eb83bc5b73ee2fff0437952cedf98b27653ac \
-    --hash=sha256:e48c437fdf9340f5666b92cd7990e96bc5fc955e1298baf4a907e3972067a445
+tenacity==8.2.1 \
+    --hash=sha256:c7bb4b86425b977726a7b49971542d4f67baf72096597d283f3ffd01f33b92df \
+    --hash=sha256:dd1b769ca7002fda992322939feca5bee4fa11f39146b0af14e0b8d9f27ea854
     # via -r requirements/base.txt
 tomli==2.0.1 \
     --hash=sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc \
