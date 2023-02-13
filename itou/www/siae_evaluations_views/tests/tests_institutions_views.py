@@ -1317,7 +1317,7 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
         self.login(evaluated_siae)
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_notify_step1",
+                self.urlname,
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
