@@ -724,7 +724,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         # Was not reviewed by the institution, assume valid (following rules in
         # most administrations).
         self.assertContains(response, self.forced_positive_text, html=True, count=1)
-        self.assertNotContains(response, self.forced_negative_text)
+        self.assertNotContains(response, self.forced_negative_text, html=True)
 
     def test_campaign_closed_before_final_evaluation_adversarial_stage_review_not_submitted(self):
         evaluation_campaign = EvaluationCampaignFactory(
@@ -765,7 +765,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         # Was not reviewed by the institution, assume valid (following rules in
         # most administrations).
         self.assertContains(response, self.forced_positive_text, html=True, count=1)
-        self.assertNotContains(response, self.forced_negative_text)
+        self.assertNotContains(response, self.forced_negative_text, html=True)
 
     def test_campaign_closed_before_final_evaluation_no_docs(self):
         evaluation_campaign = EvaluationCampaignFactory(
@@ -792,7 +792,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         self.assertNotContains(response, self.control_text)
         self.assertNotContains(response, self.submit_text)
-        self.assertNotContains(response, self.forced_positive_text)
+        self.assertNotContains(response, self.forced_positive_text, html=True)
         self.assertContains(response, self.forced_negative_text, html=True, count=1)
 
     def test_closed_campaign(self):
@@ -1134,7 +1134,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             )
         )
         self.assertContains(response, "Phase contradictoire - En attente", html=True)
-        self.assertNotContains(response, self.forced_negative_text)
+        self.assertNotContains(response, self.forced_negative_text, html=True)
 
     def test_num_queries_in_view(self):
         self.client.force_login(self.user)
