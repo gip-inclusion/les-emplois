@@ -69,6 +69,7 @@ from itou.metabase.db import build_final_tables
 # Another way to do it would be to rationalize our import (to Itou) & export (to Metabase) logic.
 from itou.siaes.management.commands._import_siae.utils import get_fluxiae_df, get_fluxiae_referential_filenames
 from itou.utils.python import timeit
+from itou.utils.slack import send_slack_message
 
 
 class Command(BaseCommand):
@@ -86,6 +87,10 @@ class Command(BaseCommand):
 
     @timeit
     def populate_metabase_fluxiae(self):
+        send_slack_message(
+            ":rocket: Début de la mise à jour hebdomadaire de Metabase avec les dernières données FluxIAE :rocket:"
+        )
+
         self.populate_fluxiae_referentials()
 
         self.populate_fluxiae_view(vue_name="fluxIAE_AnnexeFinanciere")
@@ -103,6 +108,11 @@ class Command(BaseCommand):
         self.populate_fluxiae_view(vue_name="fluxIAE_Structure")
 
         build_final_tables()
+
+        send_slack_message(
+            ":white_check_mark: Fin de la mise à jour hebdomadaire de Metabase avec les"
+            " dernières données FluxIAE :white_check_mark:"
+        )
 
     def handle(self, **options):
         self.populate_metabase_fluxiae()
