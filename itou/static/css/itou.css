@@ -552,3 +552,10 @@ Usage:
     background-repeat: no-repeat;
     background-position: top -120px left;
 }
+
+/* Workaround while waiting for next version
+--------------------------------------------------------------------------- */
+.disabled {
+    color: #B3B4C3 !important;
+    pointer-events: none;
+}

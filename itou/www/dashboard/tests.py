@@ -24,6 +24,7 @@ from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.constants import CAMPAIGN_VIEWABLE_DURATION
 from itou.siae_evaluations.factories import EvaluatedSiaeFactory, EvaluationCampaignFactory
+from itou.siae_evaluations.models import Sanctions
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import (
     SiaeAfterGracePeriodFactory,
@@ -36,6 +37,7 @@ from itou.users.enums import IdentityProvider, LackOfNIRReason
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
 from itou.users.models import User
 from itou.utils import constants as global_constants
+from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.format_filters import format_approval_number, format_siret
 from itou.utils.test import TestCase
 from itou.www.dashboard.forms import EditUserEmailForm
@@ -162,6 +164,7 @@ class DashboardViewTest(TestCase):
                 response = self.client.get(reverse("dashboard:index"))
                 self.assertContains(response, "Prolonger/suspendre un agrément émis par Pôle emploi")
                 self.assertContains(response, "Déclarer une embauche")
+                self.assertContains(response, reverse("apply:start", kwargs={"siae_pk": siae.pk}))
 
         for kind in [SiaeKind.EA, SiaeKind.EATT, SiaeKind.GEIQ, SiaeKind.OPCS]:
             with self.subTest(f"should not display when siae_kind={kind}"):
@@ -172,6 +175,28 @@ class DashboardViewTest(TestCase):
                 response = self.client.get(reverse("dashboard:index"))
                 self.assertNotContains(response, "Prolonger/suspendre un agrément émis par Pôle emploi")
                 self.assertNotContains(response, "Déclarer une embauche")
+                self.assertNotContains(response, reverse("apply:start", kwargs={"siae_pk": siae.pk}))
+
+    def test_dashboard_agreements_with_suspension_sanction(self):
+        siae = SiaeFactory(subject_to_eligibility=True, with_membership=True)
+        Sanctions.objects.create(
+            evaluated_siae=EvaluatedSiaeFactory(siae=siae),
+            suspension_dates=InclusiveDateRange(timezone.localdate() - relativedelta(days=1)),
+        )
+
+        user = siae.members.first()
+        self.client.force_login(user)
+
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertContains(response, "Prolonger/suspendre un agrément émis par Pôle emploi")
+        # Check that "Déclarer une embauche" is here, but not its matching link
+        self.assertContains(response, "Déclarer une embauche")
+        self.assertNotContains(response, reverse("apply:start", kwargs={"siae_pk": siae.pk}))
+        # Check that the button tooltip is there
+        self.assertContains(
+            response,
+            "Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle a posteriori",
+        )
 
     def test_dashboard_can_create_siae_antenna(self):
         for kind in SiaeKind:

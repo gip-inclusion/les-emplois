@@ -23,11 +23,14 @@ from itou.job_applications.factories import (
     JobApplicationSentByPrescriberOrganizationFactory,
 )
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.siae_evaluations.factories import EvaluatedSiaeFactory
+from itou.siae_evaluations.models import Sanctions
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory
 from itou.users.enums import LackOfNIRReason, UserKind
 from itou.users.factories import JobSeekerWithAddressFactory, PrescriberFactory
 from itou.users.models import User
+from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.format_filters import format_nir
 from itou.utils.test import TestCase
 from itou.utils.widgets import DuetDatePickerWidget
@@ -971,6 +974,27 @@ class ProcessViewsTest(TestCase):
         response = self.client.get(url)
         assert response.status_code == 404
 
+    def test_eligibility_for_siae_with_suspension_sanction(self, *args, **kwargs):
+        """Test eligibility for an Siae that has been suspended."""
+
+        job_application = JobApplicationSentByPrescriberOrganizationFactory(
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            job_seeker=JobSeekerWithAddressFactory(),
+        )
+        Sanctions.objects.create(
+            evaluated_siae=EvaluatedSiaeFactory(siae=job_application.to_siae),
+            suspension_dates=InclusiveDateRange(timezone.localdate()),
+        )
+
+        siae_user = job_application.to_siae.members.first()
+        self.client.force_login(siae_user)
+
+        url = reverse("apply:eligibility", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url)
+        self.assertContains(
+            response, "suite aux mesures prises dans le cadre du contrôle a posteriori", status_code=403
+        )
+
     def test_eligibility_state_for_job_application(self, *args, **kwargs):
         """The eligibility diagnosis page must only be accessible
         in JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES states."""
@@ -1128,6 +1152,30 @@ class ProcessTemplatesTest(TestCase):
         # Test template content.
         self.assertNotContains(response, self.url_process)
         self.assertContains(response, self.url_eligibility)
+        self.assertContains(response, self.url_refuse)
+        self.assertNotContains(response, self.url_postpone)
+        self.assertNotContains(response, self.url_accept)
+
+    def test_details_template_for_state_processing_but_suspended_siae(self):
+        """Test actions available when the state is processing but SIAE is suspended"""
+        Sanctions.objects.create(
+            evaluated_siae=EvaluatedSiaeFactory(siae=self.job_application.to_siae),
+            suspension_dates=InclusiveDateRange(timezone.localdate() - relativedelta(days=1)),
+        )
+        self.client.force_login(self.siae_user)
+        self.job_application.state = JobApplicationWorkflow.STATE_PROCESSING
+        self.job_application.save()
+        response = self.client.get(self.url_details)
+        # Test template content.
+        self.assertNotContains(response, self.url_process)
+        self.assertNotContains(response, self.url_eligibility)
+        self.assertContains(
+            response,
+            (
+                "Vous ne pouvez pas valider les critères d'éligibilité suite aux "
+                "mesures prises dans le cadre du contrôle a posteriori"
+            ),
+        )
         self.assertContains(response, self.url_refuse)
         self.assertNotContains(response, self.url_postpone)
         self.assertNotContains(response, self.url_accept)

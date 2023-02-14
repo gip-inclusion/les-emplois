@@ -29,6 +29,7 @@ from itou.siae_evaluations.models import (
     EvaluatedJobApplication,
     EvaluatedSiae,
     EvaluationCampaign,
+    Sanctions,
     create_campaigns,
     select_min_max_job_applications,
     validate_institution,
@@ -37,6 +38,7 @@ from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory, SiaeWith2MembershipsFactory
 from itou.users.enums import KIND_SIAE_STAFF
 from itou.users.factories import JobSeekerFactory
+from itou.utils.models import InclusiveDateRange
 from itou.utils.perms.user import UserInfo
 from itou.utils.test import TestCase
 
@@ -1149,3 +1151,54 @@ class EvaluatedAdministrativeCriteriaModelTest(TestCase):
                 evaluated_administrative_criteria.review_state = state
                 evaluated_administrative_criteria.save(update_fields=["review_state"])
                 assert not evaluated_administrative_criteria.can_upload()
+
+
+def test_siae_get_active_suspension_functions():
+    siae = SiaeFactory()
+    assert siae.get_active_suspension_dates() is None
+
+    # Suspension in the past is inactive and not returned
+    Sanctions.objects.create(
+        evaluated_siae=EvaluatedSiaeFactory(siae=siae),
+        suspension_dates=InclusiveDateRange(
+            timezone.localdate() - relativedelta(years=2), timezone.localdate() - relativedelta(years=1)
+        ),
+    )
+    assert siae.get_active_suspension_dates() is None
+    assert siae.get_active_suspension_text_with_dates() == ""
+
+    # Active suspension
+    active_suspension = InclusiveDateRange(
+        timezone.localdate() - relativedelta(years=1), timezone.localdate() + relativedelta(years=2)
+    )
+    active_suspension2 = InclusiveDateRange(
+        timezone.localdate() - relativedelta(years=1), timezone.localdate() + relativedelta(years=1)
+    )
+    Sanctions.objects.create(
+        evaluated_siae=EvaluatedSiaeFactory(siae=siae),
+        suspension_dates=active_suspension,
+    )
+    assert siae.get_active_suspension_dates() == active_suspension
+    Sanctions.objects.create(
+        evaluated_siae=EvaluatedSiaeFactory(siae=siae),
+        suspension_dates=active_suspension2,
+    )
+    # We still get active_suspension that ends after active_suspension2
+    assert siae.get_active_suspension_dates() == active_suspension
+    explanation = siae.get_active_suspension_text_with_dates()
+    assert "retrait temporaire" in explanation
+    assert (
+        f"est effectif depuis le {active_suspension.lower:%d/%m/%Y} "
+        f"et le sera jusqu'au {active_suspension.upper:%d/%m/%Y}"
+    ) in explanation
+
+    # Suspension without end is prefered
+    final_suspension = InclusiveDateRange(timezone.localdate() - relativedelta(years=2))
+    Sanctions.objects.create(
+        evaluated_siae=EvaluatedSiaeFactory(siae=siae),
+        suspension_dates=final_suspension,
+    )
+    assert siae.get_active_suspension_dates() == final_suspension
+    explanation = siae.get_active_suspension_text_with_dates()
+    assert "retrait définitif" in explanation
+    assert f"est effectif depuis le {final_suspension.lower:%d/%m/%Y}." in explanation

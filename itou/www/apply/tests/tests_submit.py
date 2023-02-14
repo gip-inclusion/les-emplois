@@ -19,6 +19,8 @@ from itou.institutions.factories import InstitutionWithMembershipFactory
 from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from itou.siae_evaluations.factories import EvaluatedSiaeFactory
+from itou.siae_evaluations.models import Sanctions
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipAndJobsFactory
 from itou.users.enums import LackOfNIRReason
 from itou.users.factories import (
@@ -29,6 +31,7 @@ from itou.users.factories import (
     SiaeStaffFactory,
 )
 from itou.users.models import User
+from itou.utils.models import InclusiveDateRange
 from itou.utils.session import SessionNamespace
 from itou.utils.storage.s3 import S3Upload
 from itou.utils.storage.testing import S3AccessingTestCase
@@ -161,6 +164,22 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
             "nir": None,
             "selected_jobs": [],
         }
+
+    def test_apply_as_job_seeker_with_suspension_sanction(self):
+        siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+        Sanctions.objects.create(
+            evaluated_siae=EvaluatedSiaeFactory(siae=siae),
+            suspension_dates=InclusiveDateRange(timezone.localdate() - relativedelta(days=1)),
+        )
+
+        user = JobSeekerFactory(birthdate=None, nir="")
+        self.client.force_login(user)
+
+        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"})
+        # The suspension does not prevent access to the process
+        self.assertRedirects(
+            response, expected_url=reverse("apply:check_nir_for_job_seeker", kwargs={"siae_pk": siae.pk})
+        )
 
     def test_apply_as_jobseeker(self):
         """Apply as jobseeker."""
@@ -944,6 +963,20 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
             "selected_jobs": [],
         }
 
+    def test_apply_as_prescriber_with_suspension_sanction(self):
+        siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+        Sanctions.objects.create(
+            evaluated_siae=EvaluatedSiaeFactory(siae=siae),
+            suspension_dates=InclusiveDateRange(timezone.localdate() - relativedelta(days=1)),
+        )
+
+        user = PrescriberFactory()
+        self.client.force_login(user)
+
+        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"})
+        # The suspension does not prevent the access to the process
+        self.assertRedirects(response, expected_url=reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk}))
+
     def test_apply_as_prescriber(self):
         siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
 
@@ -1387,6 +1420,23 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
 
         response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae2.pk}), {"back_url": "/"})
         assert response.status_code == 403
+
+    def test_apply_as_siae_with_suspension_sanction(self):
+        siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+        Sanctions.objects.create(
+            evaluated_siae=EvaluatedSiaeFactory(siae=siae),
+            suspension_dates=InclusiveDateRange(timezone.localdate() - relativedelta(days=1)),
+        )
+
+        user = siae.members.first()
+        self.client.force_login(user)
+
+        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"})
+        self.assertContains(
+            response,
+            "suite aux mesures prises dans le cadre du contrôle a posteriori",
+            status_code=403,
+        )
 
     def test_apply_as_siae(self):
         """Apply as SIAE."""
