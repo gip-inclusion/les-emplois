@@ -327,6 +327,17 @@ class User(AbstractUser, AddressMixin):
                     "Un utilisateur ayant un NIR ne peut avoir un motif justifiant l'absence de son NIR."
                 ),
             ),
+            models.CheckConstraint(
+                name="has_kind",
+                violation_error_message="Le type d’utilisateur est incorrect.",
+                check=(
+                    models.Q(kind=UserKind.ITOU_STAFF)
+                    | models.Q(kind=UserKind.JOB_SEEKER)
+                    | models.Q(kind=UserKind.PRESCRIBER)
+                    | models.Q(kind=UserKind.SIAE_STAFF)
+                    | models.Q(kind=UserKind.LABOR_INSPECTOR)
+                ),
+            ),
         ]
 
     def __str__(self):
@@ -362,11 +373,9 @@ class User(AbstractUser, AddressMixin):
         elif self.kind in UserKind:
             # Any other user kind isn't staff
             self.is_staff = False
-        else:  # self.kind == "" : handle django admin_client pytest fixture
-            if self.is_staff:
-                self.kind = UserKind.ITOU_STAFF
-            else:
-                ValidationError("User is missing kind")
+        elif self.is_staff:
+            # self.kind == "" : handle django admin_client pytest fixture
+            self.kind = UserKind.ITOU_STAFF
 
         super().save(*args, **kwargs)
 

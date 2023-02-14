@@ -1268,3 +1268,13 @@ def test_staff_user():
     with transaction.atomic():
         with pytest.raises(IntegrityError):
             User.objects.update(is_staff=False)
+
+
+def test_user_invalid_kind():
+    # Avoid crashing the database connection because of the IntegrityError
+    with transaction.atomic():
+        with pytest.raises(
+            IntegrityError,
+            match='new row for relation "users_user" violates check constraint "has_kind"',
+        ):
+            UserFactory(kind="")
