@@ -3,7 +3,7 @@ from django.contrib.gis.measure import D
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator
 from django.db import models
-from django.db.models import BooleanField, Case, Count, Exists, OuterRef, Prefetch, Q, Subquery, When
+from django.db.models import BooleanField, Case, Count, Exists, F, OuterRef, Prefetch, Q, Subquery, When
 from django.db.models.constraints import UniqueConstraint
 from django.db.models.functions import Cast, Coalesce
 from django.urls import reverse
@@ -455,6 +455,28 @@ class Siae(AddressMixin, OrganizationAbstract):
         # is immutable. Only user created siaes can have their
         # convention changed by the user.
         return self.source == self.SOURCE_USER_CREATED
+
+    def get_active_suspension_dates(self):
+        active_suspension_dates = (
+            self.evaluated_siaes.filter(sanctions__suspension_dates__contains=timezone.localdate())
+            .order_by(F("sanctions__suspension_dates__upper").desc(nulls_first=True))
+            .values_list("sanctions__suspension_dates", flat=True)[:1]
+        )
+        return active_suspension_dates[0] if active_suspension_dates else None
+
+    def get_active_suspension_text_with_dates(self):
+        active_suspension_dates = self.get_active_suspension_dates()
+        if active_suspension_dates is None:
+            return ""
+        if active_suspension_dates.upper is None:
+            return (
+                "Dans votre cas, le retrait définitif de la capacité d'auto-prescription est effectif "
+                f"depuis le {active_suspension_dates.lower:%d/%m/%Y}."
+            )
+        return (
+            "Dans votre cas, le retrait temporaire de la capacité d'auto-prescription est effectif depuis le "
+            f"{active_suspension_dates.lower:%d/%m/%Y} et le sera jusqu'au {active_suspension_dates.upper:%d/%m/%Y}."
+        )
 
 
 class SiaeMembership(MembershipAbstract):

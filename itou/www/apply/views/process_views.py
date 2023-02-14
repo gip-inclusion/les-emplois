@@ -474,6 +474,12 @@ def eligibility(request, job_application_id, template_name="apply/process_eligib
     if not job_application.to_siae.is_subject_to_eligibility_rules:
         raise Http404()
 
+    if suspension_explanation := job_application.to_siae.get_active_suspension_text_with_dates():
+        raise PermissionDenied(
+            "Vous ne pouvez pas valider les critères d'éligibilité suite aux mesures prises dans le cadre "
+            "du contrôle a posteriori. " + suspension_explanation
+        )
+
     form_administrative_criteria = AdministrativeCriteriaForm(
         request.user, siae=job_application.to_siae, data=request.POST or None
     )

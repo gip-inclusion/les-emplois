@@ -5,7 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import DateRangeField, ranges
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Func
+from django.db.models import Func, Transform
 
 from itou.utils.types import InclusiveDateRange
 
@@ -42,6 +42,12 @@ class InclusiveRangeEndsWith(ranges.RangeEndsWith):
     def as_sql(self, compiler, connection):
         sql, params = super().as_sql(compiler, connection)
         return f"({sql} - interval '1 day')::date", params
+
+
+@InclusiveDateRangeField.register_lookup
+class Upper(Transform):
+    lookup_name = "upper"
+    function = "UPPER"
 
 
 class AbstractSupportRemark(models.Model):

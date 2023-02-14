@@ -11,10 +11,19 @@
                 We will have to discuss this matter further with AVE, but it has been
                 decided that it probably did not make much sense initially.
                 {% endcomment %}
-                <li class="card-text mb-3">
-                    <i class="ri-login-box-line ri-lg mr-1"></i>
-                    <a href="{% url 'apply:start' siae_pk=current_siae.pk %}">Déclarer une embauche</a>
-                </li>
+                {% with suspension=current_siae.get_active_suspension_text_with_dates %}
+                    <li class="card-text mb-3">
+                        {% if suspension %}
+                            <span data-toggle="tooltip" data-placement="top" title="Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle a posteriori. {{ suspension }}">
+                                <i class="ri-login-box-line disabled"></i>
+                                <a href="" class="disabled">Déclarer une embauche</a>
+                            </span>
+                        {% else %}
+                            <i class="ri-login-box-line ri-lg mr-1"></i>
+                            <a href="{% url 'apply:start' siae_pk=current_siae.pk %} ">Déclarer une embauche</a>
+                        {% endif %}
+                    </li>
+                {% endwith %}
 
                 <li class="card-text mb-3">
                     <i class="ri-contacts-book-line ri-lg mr-1"></i>

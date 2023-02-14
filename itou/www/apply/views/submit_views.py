@@ -191,8 +191,14 @@ class StartView(ApplyStepBaseView):
 
     def get(self, request, *args, **kwargs):
         # SIAE members can only submit a job application to their SIAE
-        if request.user.is_siae_staff and not self.siae.has_member(request.user):
-            raise PermissionDenied("Vous ne pouvez postuler pour un candidat que dans votre structure.")
+        if request.user.is_siae_staff:
+            if not self.siae.has_member(request.user):
+                raise PermissionDenied("Vous ne pouvez postuler pour un candidat que dans votre structure.")
+            if suspension_explanation := self.siae.get_active_suspension_text_with_dates():
+                raise PermissionDenied(
+                    "Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle "
+                    "a posteriori. " + suspension_explanation
+                )
 
         # Refuse all applications except those made by an SIAE member
         if self.siae.block_job_applications and not self.siae.has_member(request.user):
