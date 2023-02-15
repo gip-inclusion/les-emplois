@@ -111,4 +111,21 @@
     <!-- Needed to use Select2MultipleWidget. -->
     {{ filters_form.media.js }}
     <script src='{% static "js/job_applications_filters.js" %}'></script>
+
+    <!-- FIXME(vperron): this Tally Form should be removed 2023-04-01 at the very latest -->
+    <script async src="https://tally.so/widgets/embed.js"></script>
+    <script nonce="{{ CSP_NONCE }}">
+        window.TallyConfig = {
+            "formId": "mBEr1K",
+            "popup": {
+                "emoji": {
+                    "text": "👋",
+                    "animation": "wave"
+                },
+                "autoClose": 3000,
+                "showOnce": true,
+                "doNotShowAfterSubmit": true
+            }
+        };
+    </script>
 {% endblock %}
