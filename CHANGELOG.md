@@ -12,7 +12,6 @@
 - PASS IAE : Les suspensions à 12 mois sont passées à 36 mois
 - Parcours d'inscription : détection de préexistence de candidats à l'inscription
 - RGPD : Mise à jour des mentions légales, confidentialité et conditions générales
-- RGPD : Prise en compte des préférences de cookies
 - UI : Affichage des SIRET des structures sur le tableau de bord
 - UI : Modifications d'accessibilité et de précision de certains messages
 
@@ -35,8 +34,6 @@
 - Fiches salariés : Correction pour le message d'information d'actualisation
 - Matomo : améliorations de stabilisation
 - Metabase : améliorations et corrections diverses
-- Parcours d'embauche : les orienteurs n'ont plus accès aux informations personnelles des candidats
-- RGPD : Prendre en compte les choix de tracking & cookies de l'utilisateur
 - Recherche de postes : suppression du badge du nombre de postes ouverts si le recrutement est fermé
 - Thème : mise à jour vers la version 0.5.7
 - UI : Mise à jour de l'URL de la communauté
