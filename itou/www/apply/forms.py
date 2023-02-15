@@ -19,7 +19,7 @@ from itou.common_apps.resume.forms import ResumeFormMixin
 from itou.eligibility.models import AdministrativeCriteria
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
-from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS
+from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS, SiaeKind
 from itou.users.models import JobSeekerProfile, User
 from itou.utils import constants as global_constants
 from itou.utils.validators import validate_nir, validate_pole_emploi_id
@@ -369,10 +369,6 @@ class SubmitJobApplicationForm(forms.ModelForm, ResumeFormMixin):
 
 
 class RefusalForm(forms.Form):
-    """
-    Allow an SIAE to specify a reason for refusal.
-    """
-
     ANSWER_INITIAL = (
         "Nous avons étudié votre candidature avec la plus grande attention mais "
         "nous sommes au regret de vous informer que celle-ci n'a pas été retenue.\n\n"
@@ -403,6 +399,14 @@ class RefusalForm(forms.Form):
 
     def __init__(self, job_application, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        if job_application.to_siae.kind == SiaeKind.GEIQ:
+            self.fields["refusal_reason"].choices = job_applications_enums.RefusalReason.displayed_choices(
+                extra_exclude_enums=[
+                    job_applications_enums.RefusalReason.PREVENT_OBJECTIVES,
+                    job_applications_enums.RefusalReason.NON_ELIGIBLE,
+                ]
+            )
+
         if job_application.sender_kind != job_applications_enums.SenderKind.PRESCRIBER:
             self.fields.pop("answer_to_prescriber")
             self.fields["answer"].label = "Message à envoyer au candidat"

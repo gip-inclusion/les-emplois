@@ -1,6 +1,7 @@
 from itertools import product
 from unittest.mock import patch
 
+import pytest
 from dateutil.relativedelta import relativedelta
 from django.test import override_settings
 from django.urls import reverse
@@ -1355,3 +1356,28 @@ class ProcessTransferJobApplicationTest(TestCase):
         assert messages
         assert len(messages) == 1
         assert f"transférée à la SIAE <b>{other_siae.display_name}</b>" in str(messages[0])
+
+
+@pytest.mark.parametrize("reason", ["prevent_objectives", "non_eligible"])
+def test_refuse_jobapplication_geiq_reasons(client, reason):
+    job_application = JobApplicationFactory(
+        sent_by_authorized_prescriber_organisation=True,
+        state=JobApplicationWorkflow.STATE_PROCESSING,
+        to_siae__kind=SiaeKind.GEIQ,
+    )
+    assert job_application.state.is_processing
+    siae_user = job_application.to_siae.members.first()
+    client.force_login(siae_user)
+
+    url = reverse("apply:refuse", kwargs={"job_application_id": job_application.pk})
+    response = client.get(url)
+    assert response.status_code == 200
+
+    post_data = {
+        "refusal_reason": reason,
+        "answer": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    }
+    response = client.post(url, data=post_data)
+    assert response.context["form"].errors == {
+        "refusal_reason": [f"Sélectionnez un choix valide. {reason} n’en fait pas partie."]
+    }

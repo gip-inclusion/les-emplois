@@ -149,10 +149,6 @@ def process(request, job_application_id):
 
 @login_required
 def refuse(request, job_application_id, template_name="apply/process_refuse.html"):
-    """
-    Trigger the `refuse` transition.
-    """
-
     queryset = JobApplication.objects.siae_member_required(request.user)
     job_application = get_object_or_404(queryset, id=job_application_id)
 
