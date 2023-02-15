@@ -14,7 +14,31 @@
         <h2 class="h1 font-weight-normal text-muted">Aucune candidature pour le moment.</h2>
     {% else %}
 
-        {% include "apply/includes/info_csv.html" %}
+        {% if export_for == "siae" or can_view_stats_pe %}
+            <div id="besoin-dun-chiffre" class="card my-4">
+                <div class="card-body">
+                    <p class="card-title">
+                        <i class="ri-information-line mr-1"></i>
+                        <b>Besoin d'un chiffre ?</b>
+                    </p>
+                    <p class="card-text">
+                        {% if export_for == "siae" %}
+                            <span class="text-primary">Accédez aux <a href="{% url 'stats:stats_siae_hiring' %}"  target="_blank" rel="noopener">données de recrutement de votre structure</a> (non nominatives) compilées, calculées et mises à jour quotidiennement.</span>
+                        {% elif export_for == "prescriber" and can_view_stats_pe %}
+                            <span class="text-primary">Accédez aux données de votre agence (non nominatives) compilées, calculées et mises à jour quotidiennement :</span>
+                            <ul>
+                                <li>
+                                    <a href="{% url 'stats:stats_pe_state_main' %}"  target="_blank" rel="noopener">Voir les données de l'ensemble de l'état des candidatures orientées</a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'stats:stats_pe_conversion_main' %}"  target="_blank" rel="noopener">Voir les données du taux de transformation des candidatures</a>
+                                </li>
+                            </ul>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        {% endif %}
 
         <div class="table-responsive">
             <table class="table table-striped table-bordered">

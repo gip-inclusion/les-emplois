@@ -4,7 +4,7 @@ from django.utils.text import slugify
 
 from itou.job_applications.export import stream_xlsx_export
 from itou.utils.pagination import pager
-from itou.utils.perms.prescriber import get_all_available_job_applications_as_prescriber
+from itou.utils.perms.prescriber import get_all_available_job_applications_as_prescriber, get_current_org_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.www.apply.forms import (
     FilterJobApplicationsForm,
@@ -84,6 +84,7 @@ def list_for_prescriber_exports(request, template_name="apply/list_of_available_
     List of applications for a prescriber, sorted by month, displaying the count of applications per month
     with the possibiliy to download those applications as a CSV file.
     """
+    current_org = get_current_org_or_404(request)
     job_applications = get_all_available_job_applications_as_prescriber(request)
 
     total_job_applications = job_applications.count()
@@ -93,6 +94,7 @@ def list_for_prescriber_exports(request, template_name="apply/list_of_available_
         "job_applications_by_month": job_applications_by_month,
         "total_job_applications": total_job_applications,
         "export_for": "prescriber",
+        "can_view_stats_pe": request.user.can_view_stats_pe(current_org=current_org),
     }
     return render(request, template_name, context)
 

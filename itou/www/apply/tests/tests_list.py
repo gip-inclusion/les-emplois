@@ -19,7 +19,7 @@ from itou.jobs.models import Appellation
 from itou.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory
 from itou.users.factories import PrescriberFactory
-from itou.utils.test import TestCase
+from itou.utils.test import TestCase, format_html
 from itou.utils.widgets import DuetDatePickerWidget
 
 
@@ -499,15 +499,51 @@ class ProcessListPrescriberTest(ProcessListTest):
 
         assert total_applications == self.pole_emploi.jobapplication_set.count()
 
-    def test_list_for_prescriber_exports_view(self):
-        """
-        Connect as Thibault to see a list of available job applications exports
-        """
+    def test_list_for_prescriber_pe_exports_view(self):
         self.client.force_login(self.thibault_pe)
         response = self.client.get(self.prescriber_exports_url)
 
         assert 200 == response.status_code
         assertContains(response, "Toutes les candidatures")
+        assert format_html(response, id="besoin-dun-chiffre") == [
+            '<div class="card my-4" id="besoin-dun-chiffre">\n'
+            ' <div class="card-body">\n'
+            '  <p class="card-title">\n'
+            '   <i class="ri-information-line mr-1">\n'
+            "   </i>\n"
+            "   <b>\n"
+            "    Besoin d'un chiffre ?\n"
+            "   </b>\n"
+            "  </p>\n"
+            '  <p class="card-text">\n'
+            '   <span class="text-primary">\n'
+            "    Accédez aux données de votre agence (non nominatives) compilées, "
+            "calculées et mises à jour quotidiennement :\n"
+            "   </span>\n"
+            "  </p>\n"
+            "  <ul>\n"
+            "   <li>\n"
+            '    <a href="/stats/pe/state/main" rel="noopener" target="_blank">\n'
+            "     Voir les données de l'ensemble de l'état des candidatures orientées\n"
+            "    </a>\n"
+            "   </li>\n"
+            "   <li>\n"
+            '    <a href="/stats/pe/conversion/main" rel="noopener" target="_blank">\n'
+            "     Voir les données du taux de transformation des candidatures\n"
+            "    </a>\n"
+            "   </li>\n"
+            "  </ul>\n"
+            "  <p>\n"
+            "  </p>\n"
+            " </div>\n"
+            "</div>\n",
+        ]
+
+    def test_list_for_prescriber_exports_view(self):
+        self.client.force_login(self.audrey_envol)
+        response = self.client.get(self.prescriber_exports_url)
+        assert 200 == response.status_code
+        assert format_html(response, id="besoin-dun-chiffre") == []  # no link to pilotage
 
     def test_list_for_prescriber_exports_download_view(self):
         """
@@ -659,6 +695,28 @@ class ProcessListExportsSiaeTest(ProcessListTest):
 
         assert 200 == response.status_code
         assertContains(response, "Toutes les candidatures")
+        assert format_html(response, id="besoin-dun-chiffre") == [
+            '<div class="card my-4" id="besoin-dun-chiffre">\n'
+            ' <div class="card-body">\n'
+            '  <p class="card-title">\n'
+            '   <i class="ri-information-line mr-1">\n'
+            "   </i>\n"
+            "   <b>\n"
+            "    Besoin d'un chiffre ?\n"
+            "   </b>\n"
+            "  </p>\n"
+            '  <p class="card-text">\n'
+            '   <span class="text-primary">\n'
+            "    Accédez aux\n"
+            '    <a href="/stats/siae/hiring" rel="noopener" target="_blank">\n'
+            "     données de recrutement de votre structure\n"
+            "    </a>\n"
+            "    (non nominatives) compilées, calculées et mises à jour quotidiennement.\n"
+            "   </span>\n"
+            "  </p>\n"
+            " </div>\n"
+            "</div>\n",
+        ]
 
     def test_list_for_siae_exports_as_prescriber_view(self):
         """
