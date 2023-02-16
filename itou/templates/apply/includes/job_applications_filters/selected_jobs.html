@@ -1,21 +1,21 @@
 {% if filters_form.selected_jobs %}
-    <div class="pt-3 w-100 border-bottom">
-        <button class="p-0 btn collapse-caret" data-toggle="collapse" data-target="#collapse_filter_jobs" type="button" aria-expanded="true" aria-controls="collapse_filter_jobs">
-            <span class="h5 mb-1">Fiches de poste</span>
-        </button>
-    </div>
-    <div class="form_group collapse show p-1" id="collapse_filter_jobs">
+    <fieldset>
+        <legend>
+            Fiches de poste
+        </legend>
         {% if filters_form.selected_jobs|length > 0 %}
-            <ul class="list-unstyled">
+            <ul>
                 {% for choice in filters_form.selected_jobs %}
-                    <li class="form-check">
-                        <input id="{{ choice.id_for_label }}" class="form-check-input" name="{{ choice.data.name }}" type="checkbox" value="{{ choice.data.value }}" {% if choice.data.selected %}checked=""{% endif %}>
-                        <label for="{{ choice.id_for_label }}" class="form-check-label">{{ choice.choice_label }}</label>
+                    <li>
+                        <div class="form-check">
+                            <input id="{{ choice.id_for_label }}" class="form-check-input" name="{{ choice.data.name }}" type="checkbox" value="{{ choice.data.value }}" {% if choice.data.selected %}checked=""{% endif %}>
+                            <label for="{{ choice.id_for_label }}" class="form-check-label">{{ choice.choice_label }}</label>
+                        </div>
                     </li>
                 {% endfor %}
             </ul>
         {% else %}
-            <p>Aucune candidature n'est rattachée à une fiche de poste.</p>
+            <p class="mb-2">Aucune candidature n'est rattachée à une fiche de poste.</p>
         {% endif %}
-    </div>
+    </fieldset>
 {% endif %}

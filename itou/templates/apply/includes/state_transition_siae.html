@@ -2,9 +2,6 @@
 {% load format_filters %}
 
 {% if job_application.state.is_new %}
-
-    <hr>
-
     <form method="post" action="{% url 'apply:process' job_application_id=job_application.id %}" class="js-prevent-multiple-submit">
         {% csrf_token %}
         {% buttons %}
@@ -13,15 +10,11 @@
             </p>
         {% endbuttons %}
     </form>
-
 {% endif %}
 
 {# Possible next steps when the state is processing ------------------------------------------------------ #}
 
 {% if job_application.state.is_processing %}
-
-    <hr>
-
     {% if job_application.eligibility_diagnosis_by_siae_required %}
         {% include "apply/includes/buttons/new_diagnosis.html" %}
     {% else %}
@@ -29,52 +22,38 @@
         {% include "apply/includes/buttons/postpone.html" %}
     {% endif %}
     {% include "apply/includes/buttons/refuse.html" %}
-
 {% endif %}
 
 {# Possible next steps when the state is postponed ------------------------------------------------------ #}
 
 {% if job_application.state.is_postponed %}
-
-    <hr>
-
     {% if job_application.eligibility_diagnosis_by_siae_required %}
         {% include "apply/includes/buttons/new_diagnosis.html" %}
     {% else %}
         {% include "apply/includes/buttons/accept.html" %}
     {% endif %}
     {% include "apply/includes/buttons/refuse.html" %}
-
-
 {% endif %}
 
 
 {# Possible next steps when the state is obsolete, refused or cancelled --------------------------------- #}
 
 {% if job_application.state.is_obsolete or job_application.state.is_refused or job_application.state.is_cancelled %}
-
-    <hr>
-
     {% if job_application.eligibility_diagnosis_by_siae_required %}
         {% include "apply/includes/buttons/new_diagnosis.html" %}
     {% else %}
         {% include "apply/includes/buttons/accept.html" %}
     {% endif %}
-
 {% endif %}
 
 {# Job application accepted: details -------------------------------------------------------------------- #}
 
 {% if job_application.state.is_accepted %}
-    <hr>
-
-    <h3 class="h2 font-weight-normal text-muted">Détails du contrat de travail</h3>
-    <p>
-        <ul>
-            <li>Début : {{ job_application.hiring_start_at|date:"d F Y" }}</li>
-            <li>Fin : {{ job_application.hiring_end_at|date:"d F Y"|default:"Non renseigné" }}</li>
-        </ul>
-    </p>
+    <h3>Détails du contrat de travail</h3>
+    <ul>
+        <li>Début : {{ job_application.hiring_start_at|date:"d F Y" }}</li>
+        <li>Fin : {{ job_application.hiring_end_at|date:"d F Y"|default:"Non renseigné" }}</li>
+    </ul>
 
     {% if job_application.can_update_hiring_start %}
         <p>
@@ -86,10 +65,7 @@
 
     {# Job application cancellation -------------------------------------------------------------------------- #}
     {% if job_application.can_be_cancelled %}
-        <hr>
-
-        <h3 class="h2 font-weight-normal text-muted">Rétractation</h3>
-
+        <h3>Rétractation</h3>
         {% if job_application.to_siae.is_subject_to_eligibility_rules %}
             <p>
                 Si vous annulez cette embauche, vous ne pourrez pas prétendre à l'aide au poste pour les jours éventuellement travaillés.

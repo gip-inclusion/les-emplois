@@ -107,6 +107,10 @@
     z-index: 4051 !important;
 }
 
+.c-aside-filters .select2.select2-container.select2-container--default {
+    width: 100% !important;
+}
+
 /*
 Force the display of `.invalid-feedback` for Duet Date Picker with Bootstrap 4.
 See also `duet_date_picker.html`.

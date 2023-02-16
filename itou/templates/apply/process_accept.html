@@ -12,59 +12,62 @@
     </div>
 
     {% block htmx %}
-        <form method="post"
-              action=""
-              hx-post="{{ request.path }}"
-              hx-swap="outerHTML show:#acceptForm:top"
-              class="mt-5 js-format-nir"
-              id="acceptForm"
-              aria-labelledby="dialogLabel"
-              {% if modal_shown %}data-htmx-open-modal="#js-confirmation-modal"{% endif %}>
-            {% if has_form_error %}
-                <div class="alert alert-danger">
-                    <p class="mb-0">Merci de corriger les erreurs ci-dessous</p>
-                </div>
-            {% endif %}
+        <div class="c-form">
+            <form method="post"
+                  action=""
+                  hx-post="{{ request.path }}"
+                  hx-swap="outerHTML show:#acceptForm:top"
+                  class="js-format-nir"
+                  id="acceptForm"
+                  aria-labelledby="dialogLabel"
+                  {% if modal_shown %}data-htmx-open-modal="#js-confirmation-modal"{% endif %}>
+                {% if has_form_error %}
+                    <div class="alert alert-danger">
+                        <p class="mb-0">Merci de corriger les erreurs ci-dessous</p>
+                    </div>
+                {% endif %}
 
-            {% csrf_token %}
+                {% csrf_token %}
 
-            {% if form_address or form_personal_data %}<h2 class="h2">Candidat</h2>{% endif %}
+                {% if form_address or form_personal_data %}<h2>Candidat</h2>{% endif %}
 
-            {% if form_personal_data %}
-                {% if form_personal_data.nir_error %}{{ form_personal_data.nir_error|safe }}{% endif %}
-                {% bootstrap_form_errors form_personal_data type='non_fields' %}
-                {% bootstrap_field form_personal_data.nir %}
-                {% bootstrap_field form_personal_data.lack_of_nir %}
-                {% bootstrap_field form_personal_data.lack_of_nir_reason form_group_class=form_personal_data.lack_of_nir_reason.field.form_group_class %}
-                {% bootstrap_field form_personal_data.birthdate %}
-                {% bootstrap_field form_personal_data.pole_emploi_id %}
-                {% bootstrap_field form_personal_data.lack_of_pole_emploi_id_reason %}
-            {% endif %}
+                {% if form_personal_data %}
+                    {% if form_personal_data.nir_error %}{{ form_personal_data.nir_error|safe }}{% endif %}
+                    {% bootstrap_form_errors form_personal_data type='non_fields' %}
+                    {% bootstrap_field form_personal_data.nir %}
+                    {% bootstrap_field form_personal_data.lack_of_nir %}
+                    {% bootstrap_field form_personal_data.lack_of_nir_reason form_group_class=form_personal_data.lack_of_nir_reason.field.form_group_class %}
+                    {% bootstrap_field form_personal_data.birthdate %}
+                    {% bootstrap_field form_personal_data.pole_emploi_id %}
+                    {% bootstrap_field form_personal_data.lack_of_pole_emploi_id_reason %}
+                {% endif %}
 
 
-            {% if form_user_address %}
-                {% bootstrap_form form_user_address alert_error_type="all" %}
-            {% endif %}
+                {% if form_user_address %}
+                    {% bootstrap_form form_user_address alert_error_type="all" %}
+                {% endif %}
 
-            <div class="mt-5">
-
-                <h2 class="h2">Embauche</h2>
+                <hr>
+                <h2>Embauche</h2>
                 {% bootstrap_form form_accept alert_error_type="all" %}
 
-            </div>
+                {% buttons %}
+                    <hr>
+                    <div class="form-row align-items-center justify-content-end">
+                        <div class="form-group mb-0 col-6 col-lg-auto">
+                            <a class="btn btn-block btn-outline-primary" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">Retour</a>
+                        </div>
+                        <div class="form-group mb-0 col-6 col-lg-auto">
+                            <button type="submit" class="btn btn-ico btn-block btn-primary" aria-label="Valider l’embauche de {{ job_application.job_seeker.get_full_name|title|mask_unless:can_view_personal_information }}">
+                                <i class="ri-check-line ri-xl"></i>
+                                <span>Valider l’embauche</span>
+                            </button>
+                        </div>
+                    </div>
+                {% endbuttons %}
 
-            <hr class="my-5">
-            {% buttons %}
-                <div class="text-right mb-4">
-                    <a class="btn btn-outline-primary bg-white" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">Retour</a>
-                    <button type="submit" class="btn btn-primary btn-ico" aria-label="Valider l’embauche de {{ job_application.job_seeker.get_full_name|title|mask_unless:can_view_personal_information }}">
-                        <i class="ri-check-line ri-xl"></i>
-                        <span>Valider l’embauche</span>
-                    </button>
-                </div>
-            {% endbuttons %}
-
-        </form>
+            </form>
+        </div>
     {% endblock %}
 
     <div class="modal" id="js-confirmation-modal" tabindex="-1" aria-labelledby="confirmation-modal-label" aria-hidden="true">

@@ -7,48 +7,37 @@
     {{ block.super }}
 
     {# Job seeker info ------------------------------------------------------------------------- #}
-    <div class="card my-4">
-        <div class="card-body">
-            <div class="card-text">
-                <h2>Candidat</h2>
-                <hr class="my-4">
-                <h3 >Informations personnelles</h3>
-                {% include "apply/includes/job_seeker_info.html" with job_application=job_application %}
-                {# Eligibility ------------------------------------------------------------------------- #}
-                {% include "apply/includes/eligibility_diagnosis.html" with eligibility_diagnosis=eligibility_diagnosis job_application=job_application %}
-            </div>
-        </div>
+    <div class="c-box my-4">
+        <h2>Candidat</h2>
+        <hr>
+        <h3 >Informations personnelles</h3>
+        {% include "apply/includes/job_seeker_info.html" with job_application=job_application %}
+        {# Eligibility ------------------------------------------------------------------------- #}
+        {% include "apply/includes/eligibility_diagnosis.html" with eligibility_diagnosis=eligibility_diagnosis job_application=job_application %}
     </div>
 
     {# Job application info ------------------------------------------------------------------------- #}
-    <div class="card my-4">
-        <div class="card-body">
-            <div class="card-text">
-                <h2>Candidature</h2>
+    <div class="c-box my-4">
+        <h2>Candidature</h2>
+        <hr>
+        <h3>Détails de la candidature</h3>
+        {% include "apply/includes/job_application_info.html" with job_application=job_application %}
 
-                <hr class="my-4">
-                <h3>Détails de la candidature</h3>
-                {% include "apply/includes/job_application_info.html" with job_application=job_application %}
+        <hr>
+        {# Sender info ------------------------------------------------------------------------- #}
+        <h3>Candidature envoyée par</h3>
+        {% include "apply/includes/job_application_sender_info.html" with job_application=job_application %}
 
-                <hr class="my-4">
-                {# Sender info ------------------------------------------------------------------------- #}
-                <h3>Candidature envoyée par</h3>
-                {% include "apply/includes/job_application_sender_info.html" with job_application=job_application %}
+        {# Negative answers ------------------------------------------------------------------------- #}
+        {% include "apply/includes/job_application_answers.html" with job_application=job_application %}
 
-                {# Negative answers ------------------------------------------------------------------------- #}
-                {% include "apply/includes/job_application_answers.html" with job_application=job_application %}
+        {# History ------------------------------------------------------ #}
 
-                {# History ------------------------------------------------------ #}
-
-                {% if transition_logs %}
-
-                    <hr class="my-4">
-                    <h3>Historique des modifications</h3>
-                    {% include "apply/includes/transition_logs.html" with job_application=job_application transition_logs=transition_logs %}
-
-                {% endif %}
-            </div>
-        </div>
+        {% if transition_logs %}
+            <hr>
+            <h3>Historique des modifications</h3>
+            {% include "apply/includes/transition_logs.html" with job_application=job_application transition_logs=transition_logs %}
+        {% endif %}
     </div>
 
 {% endblock %}

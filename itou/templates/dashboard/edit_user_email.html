@@ -14,12 +14,13 @@
         </p>
     </div>
 
-    <form method="post" action="" class="js-prevent-multiple-submit">
-        {% csrf_token %}
+    <div class="c-form">
+        <form method="post" action="" class="js-prevent-multiple-submit">
+            {% csrf_token %}
 
-        {% bootstrap_form form alert_error_type="all" %}
+            {% bootstrap_form form alert_error_type="all" %}
 
-        <button type="submit" class="btn btn-primary">Enregistrer</button>
-    </form>
-
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
+        </form>
+    </div>
 {% endblock %}

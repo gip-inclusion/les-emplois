@@ -1,66 +1,62 @@
-<div class="card-body row no-gutters">
-    <div class="col-md-5">
-        <p class="h4 card-subtitle text-muted">Métier(s) recherché(s) :</p>
-        {% if not job_application.selected_jobs.exists %}
-            <p class="card-text">Candidature spontanée</p>
-        {% else %}
-            <ul class="card-text">
-                {% for job in job_application.selected_jobs.all %}<li>{{ job.display_name }}</li>{% endfor %}
-            </ul>
-        {% endif %}
-    </div>
-
-    <div class="col-md-4">
-        <p class="h5 card-subtitle text-muted">Envoyée par :</p>
-        <p class="card-text">
-
-            {% if request.user == job_application.sender %}
-                Vous
-            {% elif job_application.sender_kind == SenderKind.JOB_SEEKER %}
-                Le candidat lui même
+<div class="card-body">
+    <div class="row">
+        <div class="col-12 col-md-6 col-lg-5 mb-3 mb-lg-0">
+            <p class="font-weight-bold mb-1">Métier(s) recherché(s) :</p>
+            {% if not job_application.selected_jobs.exists %}
+                <p class="fs-sm card-text">Candidature spontanée</p>
             {% else %}
-                {{ job_application.sender.get_full_name }}
+                <ul class="fs-sm card-text">
+                    {% for job in job_application.selected_jobs.all %}<li>{{ job.display_name }}</li>{% endfor %}
+                </ul>
             {% endif %}
+        </div>
+        <div class="col-12 col-md-6 col-lg-4 mb-3 mb-lg-0">
+            <p class="font-weight-bold mb-1">Envoyée par :</p>
+            <p class="fs-sm card-text">
+                {% if request.user == job_application.sender %}
+                    Vous
+                {% elif job_application.sender_kind == SenderKind.JOB_SEEKER %}
+                    Le candidat lui même
+                {% else %}
+                    {{ job_application.sender.get_full_name }}
+                {% endif %}
 
-            {% if job_application.sender_kind == SenderKind.PRESCRIBER %}
-                {% if job_application.sender_prescriber_organization %}
-                    <br>
-                    <b>{{ job_application.sender_prescriber_organization.display_name }}</b>
-                    {% if job_application.is_sent_by_authorized_prescriber %}
+                {% if job_application.sender_kind == SenderKind.PRESCRIBER %}
+                    {% if job_application.sender_prescriber_organization %}
                         <br>
-                        <small><span class="badge badge-pill badge-warning">Prescripteur habilité</span></small>
+                        <b>{{ job_application.sender_prescriber_organization.display_name }}</b>
+                        {% if job_application.is_sent_by_authorized_prescriber %}
+                            <br>
+                            <span class="badge badge-pill badge-sm badge-warning">Prescripteur habilité</span>
+                        {% endif %}
                     {% endif %}
                 {% endif %}
-            {% endif %}
 
-            {% if job_application.sender_kind == SenderKind.SIAE_STAFF %}
-                <br>
-                <b>{{ job_application.sender_siae.display_name }}</b>
-                {% if request.user.is_siae_staff %}
+                {% if job_application.sender_kind == SenderKind.SIAE_STAFF %}
                     <br>
-                    <small>
-                        <span class="badge badge-info">
+                    <b>{{ job_application.sender_siae.display_name }}</b>
+                    {% if request.user.is_siae_staff %}
+                        <br>
+                        <span class="badge badge-pill badge-sm badge-info">
                             {% if job_application.origin == JobApplicationOrigin.PE_APPROVAL %}
                                 Import agrément Pôle emploi
                             {% else %}
                                 Auto-prescription
                             {% endif %}
                         </span>
-                    </small>
+                    {% endif %}
                 {% endif %}
-            {% endif %}
-
-        </p>
-    </div>
-
-    <div class="col-md-3">
-        <p class="h5 card-subtitle text-muted">Statut :</p>
-        <p class="card-text">
-            <small>{% include "apply/includes/state_badge.html" with job_application=job_application %}</small>
-            {% if job_application.has_suspended_approval %}
-                <br>
-                <small><span class="badge badge-pill badge-warning">PASS IAE suspendu</span></small>
-            {% endif %}
-        </p>
+            </p>
+        </div>
+        <div class="col-12 col-md-12 col-lg-3 pl-lg-0">
+            <p class="font-weight-bold mb-1">Statut :</p>
+            <p class="fs-sm card-text">
+                {% include "apply/includes/state_badge.html" with job_application=job_application %}
+                {% if job_application.has_suspended_approval %}
+                    <br>
+                    <span class="badge badge-sm badge-pill badge-warning">PASS IAE suspendu</span>
+                {% endif %}
+            </p>
+        </div>
     </div>
 </div>

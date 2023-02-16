@@ -1,34 +1,29 @@
 {% load str_filters %}
 
 <div class="card-header">
-    <p>
+    <p class="mb-0">
         <b>{{ job_application.job_seeker.get_full_name|mask_unless:job_application.user_can_view_personal_information }}</b>
-
-        <small>chez</small>
-
+        chez
         <b>
             <a href="{{ job_application.to_siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">
                 {{ job_application.to_siae.display_name }}
             </a>
         </b>
-
         {% if job_application.to_siae.grace_period_has_expired %}
-            <span class="badge badge-pill badge-danger">
+            <span class="badge badge-sm badge-pill badge-danger">
                 Structure déconventionnée depuis le
                 {{ job_application.to_siae.grace_period_end_date|date:"d F Y" }}
             </span>
         {% endif %}
     </p>
-
-    <p>
-        <small class="text-muted">{{ job_application.created_at|date:"d F Y à H:i" }}</small>
-
+    <p class="mb-0">
+        <span class="text-secondary fs-sm">{{ job_application.created_at|date:"d F Y à H:i" }}</span>
         {% if job_application.is_pending_for_too_long and not request.user.is_job_seeker %}
             <br>
-            <small class="text-danger font-weight-bold">
+            <span class="text-danger fs-sm font-weight-bold">
                 En attente de réponse depuis plus de {{ job_application.WEEKS_BEFORE_CONSIDERED_OLD }} semaines.
-            </small>
+            </span>
         {% endif %}
     </p>
-
+    <hr class="mb-0">
 </div>
