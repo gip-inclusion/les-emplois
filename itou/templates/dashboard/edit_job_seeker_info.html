@@ -21,7 +21,9 @@
     </p>
 </div>
 
-{% include "dashboard/includes/edit_job_seeker_info_form.html" with prev_url=prev_url submit_label="Mettre à jour" %}
+<div class="c-form">
+    {% include "dashboard/includes/edit_job_seeker_info_form.html" with prev_url=prev_url submit_label="Mettre à jour" %}
+</div>
 
 {% endblock %}
 

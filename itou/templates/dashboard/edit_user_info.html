@@ -18,16 +18,20 @@
     {% endif %}
 
     {% if request.user.is_job_seeker %}
-        {% include "dashboard/includes/edit_job_seeker_info_form.html" with prev_url=prev_url submit_label="Enregistrer" %}
+        <div class="c-form">
+            {% include "dashboard/includes/edit_job_seeker_info_form.html" with prev_url=prev_url submit_label="Enregistrer" %}
+        </div>
     {% else %}
-        <form method="post" action="" class="js-prevent-multiple-submit">
-            {% csrf_token %}
-            {% bootstrap_form form alert_error_type="all" %}
-            {% buttons %}
-                <a class="btn btn-outline-primary" href="{{ prev_url }}">Annuler</a>
-                <button type="submit" class="btn btn-primary">Enregistrer</button>
-            {% endbuttons %}
-        </form>
+        <div class="c-form">
+            <form method="post" action="" class="js-prevent-multiple-submit">
+                {% csrf_token %}
+                {% bootstrap_form form alert_error_type="all" %}
+                {% buttons %}
+                    <a class="btn btn-outline-primary" href="{{ prev_url }}">Annuler</a>
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                {% endbuttons %}
+            </form>
+        </div>
     {% endif %}
 
 {% endblock %}

@@ -5,50 +5,50 @@
 
     {{ block.super }}
 
-    <div class="card">
-        <div class="card-body">
-            <h2 class="h3">Renseigner le motif de refus de candidature.</h2>
+    <div class="c-form">
+        <h2>Renseigner le motif de refus de candidature.</h2>
+        <form method="post" action="" class="js-prevent-multiple-submit">
 
-            <form method="post" action="" class="js-prevent-multiple-submit">
+            {% csrf_token %}
 
-                {% csrf_token %}
+            {% bootstrap_form_errors form type="all" %}
 
-                {% bootstrap_form_errors form type="all" %}
+            {# TODO: Fix incorrect rendering of form with radio buttons #}
+            {# https://github.com/zostera/django-bootstrap4/issues/126 #}
+            <div class="form-group{% if form.refusal_reason.field.required %} form-group-required{% endif %} js-refusal-reasons">
+                {{ form.refusal_reason.label_tag }}
+                <ul class="list-unstyled">
+                    {% for radio in form.refusal_reason %}
+                        <li>
+                            <label for="{{ radio.id_for_label }}">{{ radio.tag }} {{ radio.choice_label }}</label>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
 
-                {# TODO: Fix incorrect rendering of form with radio buttons #}
-                {# https://github.com/zostera/django-bootstrap4/issues/126 #}
-                <div class="form-group{% if form.refusal_reason.field.required %} form-group-required{% endif %} js-refusal-reasons">
-                    {{ form.refusal_reason.label_tag }}
-                    <ul class="list-unstyled">
-                        {% for radio in form.refusal_reason %}
-                            <li>
-                                <label for="{{ radio.id_for_label }}">{{ radio.tag }} {{ radio.choice_label }}</label>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </div>
+            {% if form.answer_to_prescriber %}
+                {% bootstrap_field form.answer_to_prescriber %}
+            {% endif %}
 
-                {% if form.answer_to_prescriber %}
-                    {% bootstrap_field form.answer_to_prescriber %}
-                {% endif %}
+            <hr>
+            <h2>Répondre au candidat</h2>
 
-                <hr class="my-5">
+            {% bootstrap_field form.answer %}
 
-                <h2 class="h3">Répondre au candidat</h2>
 
-                {% bootstrap_field form.answer %}
-
-                <hr class="my-5">
-
-                {% buttons %}
-                    <div class="text-right">
-                        <a class="btn btn-link" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">Annuler</a>
-                        <button type="submit" class="btn btn-danger">Confirmer le refus</button>
+            {% buttons %}
+                <hr>
+                <div class="form-row align-items-center justify-content-end">
+                    <div class="form-group mb-0 col-6 col-lg-auto">
+                        <a class="btn btn-outline-primary" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">Annuler</a>
                     </div>
-                {% endbuttons %}
+                    <div class="form-group mb-0 col-6 col-lg-auto">
+                        <button type="submit" class="btn btn-block btn-danger">Confirmer le refus</button>
+                    </div>
+                </div>
+            {% endbuttons %}
 
-            </form>
-        </div>
+        </form>
     </div>
 
 {% endblock %}

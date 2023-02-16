@@ -1,21 +1,21 @@
 {% if filters_form.departments %}
-    <div class="pt-3 w-100 border-bottom">
-        <button class="p-0 btn collapse-caret" data-toggle="collapse" data-target="#collapse_filter_departments" type="button" aria-expanded="true" aria-controls="collapse_filter_departments">
-            <span class="h5 mb-1">Département du candidat</span>
-        </button>
-    </div>
-    <div class="collapse show p-1" id="collapse_filter_departments">
+    <fieldset>
+        <legend>
+            Département du candidat
+        </legend>
         {% if filters_form.departments|length > 0 %}
-            <ul class="list-unstyled">
+            <ul>
                 {% for choice in filters_form.departments %}
-                    <li class="form-check">
-                        <input id="{{ choice.id_for_label }}" class="form-check-input" name="{{ choice.data.name }}" type="checkbox" value="{{ choice.data.value }}" {% if choice.data.selected %}checked=""{% endif %}>
-                        <label for="{{ choice.id_for_label }}" class="form-check-label">{{ choice.choice_label }}</label>
+                    <li>
+                        <div class="form-check">
+                            <input id="{{ choice.id_for_label }}" class="form-check-input" name="{{ choice.data.name }}" type="checkbox" value="{{ choice.data.value }}" {% if choice.data.selected %}checked=""{% endif %}>
+                            <label for="{{ choice.id_for_label }}" class="form-check-label">{{ choice.choice_label }}</label>
+                        </div>
                     </li>
                 {% endfor %}
             </ul>
         {% else %}
-            <p>Aucun département renseigné.</p>
+            <p class="mb-2">Aucun département renseigné.</p>
         {% endif %}
-    </div>
+    </fieldset>
 {% endif %}

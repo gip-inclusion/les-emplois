@@ -7,18 +7,29 @@
     <h1 class="h1-hero-c1">
         Candidature de <span class="text-muted">{{ job_application.job_seeker.get_full_name|title }}</span>
     </h1>
-    <h2 class="h1">Modification de la date de contrat</h2>
 
-    <form method="post" action="" class="js-prevent-multiple-submit">
+    <div class="c-form">
+        <h2>Modification de la date de contrat</h2>
+        <form method="post" action="" class="js-prevent-multiple-submit">
 
-        {% csrf_token %}
+            {% csrf_token %}
 
-        {% bootstrap_form form alert_error_type="all" %}
+            {% bootstrap_form form alert_error_type="all" %}
 
-        {% buttons %}
-            <a class="btn btn-outline-primary" href="{{ prev_url }}">Annuler</a>
-            <button type="submit" class="btn btn-primary">Enregistrer</button>
-        {% endbuttons %}
+            {% buttons %}
+                <hr>
+                <div class="form-row align-items-center justify-content-end">
+                    <div class="form-group mb-0 col-6 col-lg-auto">
+                        <a class="btn btn-outline-primary" href="{{ prev_url }}" aria-label="Annuler la modification de la date de contrat">Annuler</a>
+                    </div>
+                    <div class="form-group mb-0 col-6 col-lg-auto">
+                        <button type="submit" class="btn btn-block btn-primary" aria-label="Enregistrer la modification de la date de contrat">
+                            Enregistrer
+                        </button>
+                    </div>
+                </div>
+            {% endbuttons %}
 
-    </form>
+        </form>
+    </div>
 {% endblock %}

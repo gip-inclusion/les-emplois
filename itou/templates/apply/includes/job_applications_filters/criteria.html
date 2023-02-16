@@ -2,12 +2,10 @@
 
 
 {% if filters_form.criteria %}
-    <div class="pt-3 w-100 border-bottom">
-        <button class="p-0 btn collapse-caret" data-toggle="collapse" data-target="#collapse_filter_criteria" type="button" aria-expanded="true" aria-controls="collapse_filter_criteria">
-            <span class="h5 mb-1">Critères administratifs déclarés</span>
-        </button>
-    </div>
-    <div id="collapse_filter_criteria" class="collapse show">
-        {% bootstrap_field filters_form.criteria form_group_class="py-1" %}
-    </div>
+    <fieldset>
+        <legend>
+            Critères administratifs déclarés
+        </legend>
+        {% bootstrap_field filters_form.criteria form_group_class="" %}
+    </fieldset>
 {% endif %}

@@ -1,11 +1,11 @@
 {% load static %}
 
-<div id="rdvi-promo" class="card mb-3 mt-4 px-4 alert-dismissible-once d-none container rounded-lg border-important bg-important-lightest">
+<div id="rdvi-promo" class="card my-4 px-4 alert-dismissible-once d-none container rounded-lg border-important bg-important-lightest">
     <div class="row">
-        <div class="col-auto align-self-center">
+        <div class="d-none d-md-block col-md-auto align-self-center">
             <img src="{% static 'img/logo_rdv_insertion.svg' %}" height="90" alt="" loading="lazy" class="m-auto">
         </div>
-        <div class="col p-0">
+        <div class="col-12 col-md p-0">
             <div class="card-header pt-4">
                 <span class="badge badge-pill badge-important badge-xs">Nouveau service</span>
                 <button data-dismiss="alert" data-target="#rdvi-promo" type="button" class="close" aria-label="Fermer">
@@ -19,16 +19,14 @@
                     augmenter le taux de présence de vos candidats aux entretiens individuels et
                     aux informations collectives ?
                 </p>
-                <p>
-                    <a class="btn btn-ico btn-link p-0"
-                       href="https://rdv-insertion.gitbook.io/guide-dutilisation-rdv-insertion/4-cas-dusage-type/faciliter-la-prise-de-rendez-vous-pour-les-employeurs-des-emplois-de-linclusion"
-                       rel="noopener"
-                       target="_blank"
-                       aria-label="Découvrir le service RDV-Insertion dans un nouvel onglet">
-                        <span>Je découvre</span>
-                        <i class="ri-external-link-line ri-lg"></i>
-                    </a>
-                </p>
+                <a class="btn btn-ico btn-link p-0"
+                   href="https://rdv-insertion.gitbook.io/guide-dutilisation-rdv-insertion/4-cas-dusage-type/faciliter-la-prise-de-rendez-vous-pour-les-employeurs-des-emplois-de-linclusion"
+                   rel="noopener"
+                   target="_blank"
+                   aria-label="Découvrir le service RDV-Insertion dans un nouvel onglet">
+                    <span>Je découvre</span>
+                    <i class="ri-external-link-line ri-lg"></i>
+                </a>
             </div>
         </div>
     </div>

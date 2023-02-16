@@ -1,12 +1,10 @@
 {% load bootstrap4 %}
 
 {% if filters_form.senders or filters_form.sender_organizations %}
-    <div class="pt-3 w-100 border-bottom">
-        <button class="p-0 btn collapse-caret" data-toggle="collapse" data-target="#collapse_filter_sender" type="button" aria-expanded="true" aria-controls="collapse_filter_sender">
-            <span class="h5 mb-1">Émetteur</span>
-        </button>
-    </div>
-    <div class="collapse show p-1" id="collapse_filter_sender">
+    <fieldset>
+        <legend>
+            Émetteur
+        </legend>
     {% endif %}
 
     {% if filters_form.senders %}
@@ -14,7 +12,7 @@
     {% endif %}
 
     {% if filters_form.sender_organizations %}
-        {% bootstrap_field filters_form.sender_organizations label_class="mt-3" %}
+        {% bootstrap_field filters_form.sender_organizations %}
     {% endif %}
 
-    {% if filters_form.senders or filters_form.sender_organizations %}</div>{% endif %}
+    {% if filters_form.senders or filters_form.sender_organizations %}</fieldset>{% endif %}
