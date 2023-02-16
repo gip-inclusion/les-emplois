@@ -115,7 +115,7 @@ def communes_autocomplete(request):
     active_communes_qs = Commune.objects.filter(start_date__lte=dt).filter(Q(end_date=None) | Q(end_date__gt=dt))
     if term:
         if term.isdigit():
-            communes = active_communes_qs.filter(code__startswith=term).order_by("name", "code")[:MAX_CITIES_TO_RETURN]
+            communes = active_communes_qs.filter(code__startswith=term).order_by("name", "code")
         else:
             communes = autocomplete_name(active_communes_qs, term, extra_ordering_by="code")
 
@@ -125,7 +125,7 @@ def communes_autocomplete(request):
                 "code": commune.code,
                 "department": commune.department_code,
             }
-            for commune in communes[:10]
+            for commune in communes[:MAX_CITIES_TO_RETURN]
         ]
 
     return JsonResponse(communes, safe=False)
