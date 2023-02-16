@@ -2,6 +2,7 @@ from django import forms
 from django.core.validators import MinLengthValidator, RegexValidator
 from django.urls import reverse_lazy
 from django.utils import timezone
+from django_select2.forms import Select2MultipleWidget
 
 from itou.asp.exceptions import CommuneUnknownInPeriodError, UnknownCommuneError
 from itou.asp.models import Commune, RSAAllocation
@@ -46,6 +47,23 @@ class SelectEmployeeRecordStatusForm(forms.Form):
         initial=EmployeeRecordOrder.HIRING_START_AT_DESC,
         required=False,
     )
+
+
+class EmployeeRecordFilterForm(forms.Form):
+
+    job_seekers = forms.MultipleChoiceField(
+        required=False,
+        label="Nom du candidat",
+        widget=Select2MultipleWidget,
+    )
+
+    def __init__(self, job_seekers, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["job_seekers"].choices = sorted(
+            [(user.id, user.get_full_name().title()) for user in job_seekers if user.get_full_name()],
+            key=lambda u: u[1],
+        )
 
 
 class NewEmployeeRecordStep1Form(forms.ModelForm):

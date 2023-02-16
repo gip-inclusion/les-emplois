@@ -5,6 +5,7 @@ from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordWithProfileFactory
 from itou.job_applications.factories import JobApplicationWithCompleteJobSeekerProfileFactory
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
+from itou.utils.templatetags import format_filters
 from itou.utils.test import TestCase
 
 
@@ -36,10 +37,10 @@ class ReactivateEmployeeRecordsTest(TestCase):
         self.employee_record.refresh_from_db()
         assert self.employee_record.status == Status.NEW
 
-        job_seeker_name = self.employee_record.job_seeker.get_full_name().title()
+        approval_number_formatted = format_filters.format_approval_number(self.employee_record.approval_number)
 
         response = self.client.get(f"{self.next_url}?status=NEW")
-        self.assertContains(response, job_seeker_name)
+        self.assertContains(response, approval_number_formatted)
 
         response = self.client.get(f"{self.next_url}?status=DISABLED")
-        self.assertNotContains(response, job_seeker_name)
+        self.assertNotContains(response, approval_number_formatted)

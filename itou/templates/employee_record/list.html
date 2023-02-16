@@ -6,16 +6,20 @@
 
 {% block title %}Fiches salarié ASP - {{ current_siae.display_name }} {{ block.super }}{% endblock %}
 
+{% block extra_head %}{{ filters_form.media.css }}{% endblock %}
+
 {% block script %}
     {{ block.super }}
+    <!-- Needed to use Select2MultipleWidget. -->
+    {{ filters_form.media.js }}
     <script nonce="{{ CSP_NONCE }}">
-        $("#status-filter-form-group :input").change(function() {
+        $("#status-filter-form :input").change(function () {
             $("#status-filter-form").submit();
         });
         $("#order-form-group :input").click(function(event) {
-            // Fill the hidden order input of the form
-            $("#id_order").val(event.target.value);
-            $("#status-filter-form").submit();
+            let input = $("#id_order")
+            input.val(event.target.value); // Fill the hidden order input of the form
+            input.change(); // Fire a change event to notify handlers
         });
     </script>
 {% endblock %}
@@ -29,18 +33,19 @@
     <div class="mt-3">
         <div class="row">
 
-            <div class="col-sm-3">
-                <div class="card-deck">
-                    <div class="card">
+            <div class="col-12 col-md-4 mt-2">
+                <form method="get" class="form" id="status-filter-form">
+                    <div class="card c-card h-100 w-100 c-card--emploi">
                         <div class="card-header">
-                            <b>Filtrer les fiches</b>
+                            <h3>Filtrer les fiches</h3>
                         </div>
                         <div class="card-body">
-                            <form method="get" class="form" id="status-filter-form">
-                                <p class="text-muted">
-                                    <b>Par statut</b>
-                                </p>
-                                <div class="container form-group m-0" id="status-filter-form-group">
+                            {# Status filter #}
+                            <div class="pt-3 w-100 border-bottom">
+                                <span class="h5 mb-1">Par statut</span>
+                            </div>
+                            <div class="p-1">
+                                <div class="container form-group m-0">
                                     {% for status, badge in form.status|zip:badges %}
                                         <div class="row">
                                             <div class="col-10 p-0">{{ status }}</div>
@@ -52,15 +57,19 @@
                                         </div>
                                     {% endfor %}
                                 </div>
-                                {# Filled via jQuery #}
-                                {{ form.order.as_hidden }}
-                            </form>
+                            </div>
+                            {# Job seeker filter #}
+                            <div class="pt-3 w-100 border-bottom">
+                                <span class="h5 mb-1">Par candidat</span>
+                            </div>
+                            <div class="p-1">{% bootstrap_field filters_form.job_seekers %}</div>
+                            {# Filled via jQuery #}
+                            {{ form.order.as_hidden }}
                         </div>
                     </div>
-                </div>
+                </form>
             </div>
-
-            <div class="col-sm-9">
+            <div class="col-12 col-md-8 mt-2">
                 <div class="container rounded bg-gray-400 p-3 mb-3">
                     <div class="row">
                         <div class="col-sm-10">
@@ -179,9 +188,9 @@
                 </div>
 
                 {% if not navigation_pages %}
-                    <div class="text-muted text-center">
+                    <div class="text-muted text-center mt-5">
                         <i class="ri-forbid-line mr-1"></i>
-                        <span>Aucune fiche salarié avec le statut selectionné ...</span>
+                        <span>Aucune fiche salarié avec le statut sélectionné ...</span>
                     </div>
                 {% endif %}
 

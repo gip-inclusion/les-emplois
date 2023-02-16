@@ -18,6 +18,7 @@ from itou.utils.pagination import pager
 from itou.utils.perms.employee_record import can_create_employee_record, siae_is_allowed
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.www.employee_record_views.forms import (
+    EmployeeRecordFilterForm,
     NewEmployeeRecordStep1Form,
     NewEmployeeRecordStep2Form,
     NewEmployeeRecordStep3Form,
@@ -63,6 +64,12 @@ def list_employee_records(request, template_name="employee_record/list.html"):
 
     if not siae.can_use_employee_record:
         raise PermissionDenied
+
+    filters_form = EmployeeRecordFilterForm(
+        JobApplication.objects.accepted().filter(to_siae=siae).get_unique_fk_objects("job_seeker"),
+        data=request.GET,
+    )
+    filters_form.full_clean()
 
     form = SelectEmployeeRecordStatusForm(data=request.GET)
     form.full_clean()  # We do not use is_valid to validate each field independently
@@ -123,6 +130,10 @@ def list_employee_records(request, template_name="employee_record/list.html"):
     if status == Status.NEW:
         # Browse to get only the linked employee record in "new" state
         data = eligible_job_applications
+        if job_seekers := filters_form.cleaned_data.get("job_seekers"):
+            # The queryset was already evaluated for badges, so it's faster to iterate because of the non-trivial query
+            data = [ja for ja in data if str(ja.job_seeker_id) in job_seekers]
+
         for item in data:
             need_manual_regularization |= item.has_suspension or item.has_prolongation
             need_manual_regularization |= item.job_seeker.lack_of_nir_reason == LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER
@@ -141,9 +152,12 @@ def list_employee_records(request, template_name="employee_record/list.html"):
             .filter(status=status)
             .order_by(*employee_record_order_by)
         )
+        if job_seekers := filters_form.cleaned_data.get("job_seekers"):
+            data = data.filter(job_application__job_seeker__in=job_seekers)
 
     context = {
         "form": form,
+        "filters_form": filters_form,
         "employee_records_list": employee_records_list,
         "badges": status_badges,
         "navigation_pages": pager(data, request.GET.get("page", 1), items_per_page=10) if data else None,

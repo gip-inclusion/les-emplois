@@ -10,6 +10,7 @@ from itou.employee_record.enums import Status
 from itou.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
 from itou.users.enums import LackOfNIRReason
+from itou.utils.templatetags import format_filters
 from itou.utils.test import TestCase
 
 
@@ -46,7 +47,7 @@ class ListEmployeeRecordsTest(TestCase):
         response = self.client.get(self.url)
 
         assert response.status_code == 200
-        self.assertContains(response, self.job_seeker.get_full_name().title())
+        self.assertContains(response, format_filters.format_approval_number(self.job_application.approval.number))
 
     def test_status_filter(self):
         """
@@ -54,20 +55,19 @@ class ListEmployeeRecordsTest(TestCase):
         """
         # No status defined
         self.client.force_login(self.user)
+        approval_number_formatted = format_filters.format_approval_number(self.job_application.approval.number)
+
         response = self.client.get(self.url)
-
-        job_seeker_name = self.job_seeker.get_full_name().title()
-
-        self.assertContains(response, job_seeker_name)
+        self.assertContains(response, approval_number_formatted)
 
         # Or NEW
         response = self.client.get(self.url + "?status=NEW")
-        self.assertContains(response, job_seeker_name)
+        self.assertContains(response, approval_number_formatted)
 
         # More complete tests to come with fixtures files
         for status in [Status.SENT, Status.REJECTED, Status.PROCESSED]:
             response = self.client.get(self.url + f"?status={status.value}")
-            self.assertNotContains(response, job_seeker_name)
+            self.assertNotContains(response, approval_number_formatted)
 
     def test_employee_records_with_hiring_end_at(self):
         self.client.force_login(self.user)
@@ -139,7 +139,7 @@ class ListEmployeeRecordsTest(TestCase):
 
         response = self.client.get(self.url + "?status=NEW")
 
-        self.assertContains(response, self.job_seeker.get_full_name().title())
+        self.assertContains(response, format_filters.format_approval_number(self.job_application.approval.number))
         self.assertContains(response, "Une action de votre part est nécessaire")
         self.assertContains(response, "Attention, nous avons détecté une ou plusieurs fiches salariés")
         self.assertContains(response, "demander la régularisation du numéro de sécurité sociale")
@@ -156,7 +156,7 @@ class ListEmployeeRecordsTest(TestCase):
 
         response = self.client.get(self.url + "?status=NEW")
 
-        self.assertContains(response, self.job_seeker.get_full_name().title())
+        self.assertContains(response, format_filters.format_approval_number(self.job_application.approval.number))
         self.assertContains(response, "Une action de votre part est nécessaire")
         self.assertContains(response, "Attention, nous avons détecté une ou plusieurs fiches salariés")
         self.assertContains(response, "demander la régularisation du numéro de sécurité sociale")
@@ -215,13 +215,17 @@ class ListEmployeeRecordsTest(TestCase):
                 self.assertNotContains(response, err_message)
                 self.assertContains(response, custom_err_message)
 
-    def _check_employee_record_order(self, url, first_job_seeker, second_job_seeker):
+    def _check_employee_record_order(self, url, first_job_application, second_job_application):
         response = self.client.get(url)
         assert response.status_code == 200
         response_text = response.content.decode(response.charset)
         # The index method raises ValueError if the value isn't found
-        first_job_seeker_position = response_text.index(first_job_seeker.get_full_name().title())
-        second_job_seeker_position = response_text.index(second_job_seeker.get_full_name().title())
+        first_job_seeker_position = response_text.index(
+            format_filters.format_approval_number(first_job_application.approval.number)
+        )
+        second_job_seeker_position = response_text.index(
+            format_filters.format_approval_number(second_job_application.approval.number)
+        )
         assert first_job_seeker_position < second_job_seeker_position
 
     def test_new_employee_records_sorted(self):
@@ -238,27 +242,20 @@ class ListEmployeeRecordsTest(TestCase):
         )
 
         # Zzzzz's hiring start is more recent
-        self._check_employee_record_order(self.url, job_applicationZ.job_seeker, job_applicationA.job_seeker)
+        self._check_employee_record_order(self.url, job_applicationZ, job_applicationA)
 
         # order with -hiring_start_at is the default
-        self._check_employee_record_order(
-            self.url + "?order=-hiring_start_at", job_applicationZ.job_seeker, job_applicationA.job_seeker
-        )
-        self._check_employee_record_order(
-            self.url + "?order=hiring_start_at", job_applicationA.job_seeker, job_applicationZ.job_seeker
-        )
+        self._check_employee_record_order(self.url + "?order=-hiring_start_at", job_applicationZ, job_applicationA)
+        self._check_employee_record_order(self.url + "?order=hiring_start_at", job_applicationA, job_applicationZ)
 
         # Zzzzz after Aaaaa
-        self._check_employee_record_order(
-            self.url + "?order=name", job_applicationA.job_seeker, job_applicationZ.job_seeker
-        )
-        self._check_employee_record_order(
-            self.url + "?order=-name", job_applicationZ.job_seeker, job_applicationA.job_seeker
-        )
+        self._check_employee_record_order(self.url + "?order=name", job_applicationA, job_applicationZ)
+        self._check_employee_record_order(self.url + "?order=-name", job_applicationZ, job_applicationA)
 
         # Count queries
         num_queries = 1  # Get django session
         num_queries += 3  # Get current user and siae
+        num_queries += 1  # Select job seeker for filters
         num_queries += 1  # Select employee_records status count
         num_queries += 1  # Get Siae Convention
         num_queries += 1  # Select ordered job applications
@@ -287,31 +284,31 @@ class ListEmployeeRecordsTest(TestCase):
 
         # Zzzzz's hiring start is more recent
         self._check_employee_record_order(
-            self.url + "?status=REJECTED", recordZ.job_application.job_seeker, recordA.job_application.job_seeker
+            self.url + "?status=REJECTED", recordZ.job_application, recordA.job_application
         )
 
         # order with -hiring_start_at is the default
         self._check_employee_record_order(
             self.url + "?status=REJECTED&order=-hiring_start_at",
-            recordZ.job_application.job_seeker,
-            recordA.job_application.job_seeker,
+            recordZ.job_application,
+            recordA.job_application,
         )
         self._check_employee_record_order(
             self.url + "?status=REJECTED&order=hiring_start_at",
-            recordA.job_application.job_seeker,
-            recordZ.job_application.job_seeker,
+            recordA.job_application,
+            recordZ.job_application,
         )
 
         # Zzzzz after Aaaaa
         self._check_employee_record_order(
             self.url + "?status=REJECTED&order=name",
-            recordA.job_application.job_seeker,
-            recordZ.job_application.job_seeker,
+            recordA.job_application,
+            recordZ.job_application,
         )
         self._check_employee_record_order(
             self.url + "?status=REJECTED&order=-name",
-            recordZ.job_application.job_seeker,
-            recordA.job_application.job_seeker,
+            recordZ.job_application,
+            recordA.job_application,
         )
 
     def test_ready_employee_records_sorted(self):
@@ -331,30 +328,28 @@ class ListEmployeeRecordsTest(TestCase):
             record.update_as_ready()
 
         # Zzzzz's hiring start is more recent
-        self._check_employee_record_order(
-            self.url + "?status=READY", recordZ.job_application.job_seeker, recordA.job_application.job_seeker
-        )
+        self._check_employee_record_order(self.url + "?status=READY", recordZ.job_application, recordA.job_application)
 
         # order with -hiring_start_at is the default
         self._check_employee_record_order(
             self.url + "?status=READY&order=-hiring_start_at",
-            recordZ.job_application.job_seeker,
-            recordA.job_application.job_seeker,
+            recordZ.job_application,
+            recordA.job_application,
         )
         self._check_employee_record_order(
             self.url + "?status=READY&order=hiring_start_at",
-            recordA.job_application.job_seeker,
-            recordZ.job_application.job_seeker,
+            recordA.job_application,
+            recordZ.job_application,
         )
 
         # Zzzzz after Aaaaa
         self._check_employee_record_order(
             self.url + "?status=READY&order=name",
-            recordA.job_application.job_seeker,
-            recordZ.job_application.job_seeker,
+            recordA.job_application,
+            recordZ.job_application,
         )
         self._check_employee_record_order(
             self.url + "?status=READY&order=-name",
-            recordZ.job_application.job_seeker,
-            recordA.job_application.job_seeker,
+            recordZ.job_application,
+            recordA.job_application,
         )
