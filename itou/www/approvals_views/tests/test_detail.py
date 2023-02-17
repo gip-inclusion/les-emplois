@@ -115,18 +115,20 @@ class TestApprovalDetailView:
         siae_member = job_application.to_siae.members.first()
         client.force_login(siae_member)
 
-        user_info_allowed = "Modifier les informations personnelles"
+        user_info_edit_url = reverse(
+            "dashboard:edit_job_seeker_info", kwargs={"job_application_id": job_application.pk}
+        )
         user_info_not_allowed = "Vous ne pouvez pas modifier ses informations"
 
         url = reverse("approvals:detail", kwargs={"pk": approval.pk})
         assert not job_application.has_editable_job_seeker
         response = client.get(url)
-        assertNotContains(response, user_info_allowed)
+        assertNotContains(response, user_info_edit_url)
         assertContains(response, user_info_not_allowed)
 
         job_application.job_seeker.created_by = PrescriberFactory()
         job_application.job_seeker.save()
         assert job_application.has_editable_job_seeker
         response = client.get(url)
-        assertContains(response, user_info_allowed)
+        assertContains(response, user_info_edit_url)
         assertNotContains(response, user_info_not_allowed)
