@@ -10,33 +10,40 @@ DEPARTMENT_FILTER_KEY = "d%C3%A9partement"
 REGION_FILTER_KEY = "r%C3%A9gion"
 
 METABASE_DASHBOARDS = {
+    #
     # Public stats.
+    #
     "stats_public": {
         "dashboard_id": 119,
     },
+    #
     # Temporary items to easily test and debug ongoing tally popup issues.
+    #
     "stats_test1": {
         "dashboard_id": 119,
     },
     "stats_test2": {
         "dashboard_id": 119,
     },
+    #
     # Employer stats.
+    #
     "stats_siae_etp": {
         "dashboard_id": 128,
-        # Tally form suspended on 2022/09/30, should be restored soon.
-        # "tally_form_id": "nrjbRv",
     },
     "stats_siae_hiring": {
         "dashboard_id": 185,
         "tally_form_id": "waQPkB",
     },
-    # Prescriber stats.
+    #
+    # Prescriber stats - CD.
+    #
     "stats_cd": {
         "dashboard_id": 118,
-        # Tally form suspended on 2022/09/30, should be restored soon.
-        # "tally_form_id": "wb5Nro",
     },
+    #
+    # Prescriber stats - PE.
+    #
     "stats_pe_delay_main": {
         "dashboard_id": 168,
         "tally_form_id": "3lb9XW",
@@ -62,11 +69,17 @@ METABASE_DASHBOARDS = {
         "dashboard_id": 162,
         "tally_form_id": "wobaYV",
     },
+    #
     # Institution stats - DDETS - department level.
+    #
+    "stats_ddets_auto_prescription": {
+        "dashboard_id": 267,
+    },
+    "stats_ddets_follow_diagnosis_control": {
+        "dashboard_id": 265,
+    },
     "stats_ddets_iae": {
         "dashboard_id": 117,
-        # Tally form suspended on 2022/09/30, should be restored soon.
-        # "tally_form_id": "nPdWLb",
     },
     "stats_ddets_diagnosis_control": {
         "dashboard_id": 144,
@@ -75,17 +88,31 @@ METABASE_DASHBOARDS = {
         "dashboard_id": 160,
         "tally_form_id": "mVLBXv",
     },
+    #
     # Institution stats - DREETS - region level.
+    #
+    "stats_dreets_auto_prescription": {
+        "dashboard_id": 267,
+    },
+    "stats_dreets_follow_diagnosis_control": {
+        "dashboard_id": 265,
+    },
     "stats_dreets_iae": {
         "dashboard_id": 117,
-        # Tally form suspended on 2022/09/30, should be restored soon.
-        # "tally_form_id": "nPdWLb",
     },
     "stats_dreets_hiring": {
         "dashboard_id": 160,
         "tally_form_id": "mVLBXv",
     },
+    #
     # Institution stats - DGEFP - nation level.
+    #
+    "stats_dgefp_auto_prescription": {
+        "dashboard_id": 267,
+    },
+    "stats_dgefp_follow_diagnosis_control": {
+        "dashboard_id": 265,
+    },
     "stats_dgefp_iae": {
         "dashboard_id": 117,
     },
@@ -95,6 +122,9 @@ METABASE_DASHBOARDS = {
     "stats_dgefp_af": {
         "dashboard_id": 142,
     },
+    #
+    # Institution stats - DIHAL - nation level.
+    #
     "stats_dihal_state": {
         "dashboard_id": 235,
     },

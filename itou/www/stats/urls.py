@@ -25,13 +25,31 @@ urlpatterns = [
     path("pe/state/raw", views.stats_pe_state_raw, name="stats_pe_state_raw"),
     path("pe/tension", views.stats_pe_tension, name="stats_pe_tension"),
     # Institution stats - DDETS - department level.
+    path("ddets/auto_prescription", views.stats_ddets_auto_prescription, name="stats_ddets_auto_prescription"),
+    path(
+        "ddets/follow_diagnosis_control",
+        views.stats_ddets_follow_diagnosis_control,
+        name="stats_ddets_follow_diagnosis_control",
+    ),
     path("ddets/iae", views.stats_ddets_iae, name="stats_ddets_iae"),
     path("ddets/diagnosis_control", views.stats_ddets_diagnosis_control, name="stats_ddets_diagnosis_control"),
     path("ddets/hiring", views.stats_ddets_hiring, name="stats_ddets_hiring"),
     # Institution stats - DREETS - region level.
+    path("dreets/auto_prescription", views.stats_dreets_auto_prescription, name="stats_dreets_auto_prescription"),
+    path(
+        "dreets/follow_diagnosis_control",
+        views.stats_dreets_follow_diagnosis_control,
+        name="stats_dreets_follow_diagnosis_control",
+    ),
     path("dreets/iae", views.stats_dreets_iae, name="stats_dreets_iae"),
     path("dreets/hiring", views.stats_dreets_hiring, name="stats_dreets_hiring"),
     # Institution stats - DGEFP - nation level.
+    path("dgefp/auto_prescription", views.stats_dgefp_auto_prescription, name="stats_dgefp_auto_prescription"),
+    path(
+        "dgefp/follow_diagnosis_control",
+        views.stats_dgefp_follow_diagnosis_control,
+        name="stats_dgefp_follow_diagnosis_control",
+    ),
     path("dgefp/iae", views.stats_dgefp_iae, name="stats_dgefp_iae"),
     path("dgefp/diagnosis_control", views.stats_dgefp_diagnosis_control, name="stats_dgefp_diagnosis_control"),
     path("dgefp/af", views.stats_dgefp_af, name="stats_dgefp_af"),

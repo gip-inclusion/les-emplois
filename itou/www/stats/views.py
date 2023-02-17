@@ -331,6 +331,19 @@ def render_stats_ddets(request, page_title, extra_context={}):
 
 
 @login_required
+def stats_ddets_auto_prescription(request):
+    return render_stats_ddets(request=request, page_title="Focus auto-prescription")
+
+
+@login_required
+def stats_ddets_follow_diagnosis_control(request):
+    """
+    This dashboard shows data about the diagnosis control ("Contrôle a posteriori") overall progress.
+    """
+    return render_stats_ddets(request=request, page_title="Suivre le contrôle à posteriori")
+
+
+@login_required
 def stats_ddets_iae(request):
     department = get_stats_ddets_department(request)
     return render_stats_ddets(request=request, page_title=f"Données de mon département : {DEPARTMENTS[department]}")
@@ -377,6 +390,19 @@ def render_stats_dreets(request, page_title):
 
 
 @login_required
+def stats_dreets_auto_prescription(request):
+    return render_stats_dreets(request=request, page_title="Focus auto-prescription")
+
+
+@login_required
+def stats_dreets_follow_diagnosis_control(request):
+    """
+    This dashboard shows data about the diagnosis control ("Contrôle a posteriori") overall progress.
+    """
+    return render_stats_dreets(request=request, page_title="Suivre le contrôle à posteriori")
+
+
+@login_required
 def stats_dreets_iae(request):
     region = get_stats_dreets_region(request)
     return render_stats_dreets(
@@ -411,6 +437,19 @@ def render_stats_dgefp(request, page_title, add_params=True, extra_context={}):
         params = get_params_for_whole_country()
         return render_stats(request=request, context=context, params=params)
     return render_stats(request=request, context=context)
+
+
+@login_required
+def stats_dgefp_auto_prescription(request):
+    return render_stats_dgefp(request=request, page_title="Focus auto-prescription")
+
+
+@login_required
+def stats_dgefp_follow_diagnosis_control(request):
+    """
+    This dashboard shows data about the diagnosis control ("Contrôle a posteriori") overall progress.
+    """
+    return render_stats_dgefp(request=request, page_title="Suivre le contrôle à posteriori")
 
 
 @login_required
