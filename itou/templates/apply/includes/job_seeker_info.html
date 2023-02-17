@@ -62,14 +62,16 @@
         </li>
     {% endif %}
 </ul>
-{% if job_application.has_editable_job_seeker %}
-    <p>
-        <a href="{% url 'dashboard:edit_job_seeker_info' job_application_id=job_application.pk %}?back_url={{ request.get_full_path|urlencode }}"
-           class="btn btn-outline-primary{% if with_matomo_event %} matomo-event{% endif %}"
-           {% if with_matomo_event %}data-matomo-category="salaries" data-matomo-action="clic" data-matomo-option="modfifier-les-informations-personnelles"{% endif %}>
-            Modifier les informations personnelles
-        </a>
-    </p>
-{% else %}
-    <p>Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations.</p>
-{% endif %}
+<p>
+    <a href="{% if job_application.has_editable_job_seeker %}{% url 'dashboard:edit_job_seeker_info' job_application_id=job_application.pk %}?back_url={{ request.get_full_path|urlencode }}{% endif %}"
+       class="btn btn-outline-primary{% if with_matomo_event %} matomo-event{% endif %}{% if not job_application.has_editable_job_seeker %} disabled{% endif %}"
+       {% if with_matomo_event %}data-matomo-category="salaries" data-matomo-action="clic" data-matomo-option="modfifier-les-informations-personnelles"{% endif %}>
+        Modifier les informations personnelles
+    </a>
+    {% if not job_application.has_editable_job_seeker %}
+        <i class="ri-information-line ri-xl text-info ml-1"
+           data-toggle="tooltip"
+           data-placement="top"
+           title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations."></i>
+    {% endif %}
+</p>
