@@ -78,6 +78,7 @@
 
             {% if not job_applications_page %}
                 <h2 class="font-weight-normal text-muted mt-4">Aucune candidature pour le moment.</h2>
+                {% include "apply/includes/rdv_insertion_promo_card.html" %}
             {% else %}
                 {% for job_application in job_applications_page %}
 
@@ -96,6 +97,10 @@
                         </div>
 
                     </div>
+
+                    {% if forloop.counter == 1 %}
+                        {% include "apply/includes/rdv_insertion_promo_card.html" %}
+                    {% endif %}
 
                 {% endfor %}
 

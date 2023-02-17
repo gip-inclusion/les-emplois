@@ -196,6 +196,19 @@ class ProcessListSiaeTest(ProcessListTest):
         # Result page should contain all SIAE's job applications.
         assert total_applications == self.hit_pit.job_applications_received.not_archived().count()
 
+    def test_list_rdv_insertion_promo(self):
+        self.client.force_login(self.eddie_hit_pit)
+        response = self.client.get(self.siae_base_url)
+        promo_text = "Besoin d'un outil de prise de RDV par mail et/ou SMS"
+        self.assertContains(response, promo_text)
+
+        # Check with an other SIAE without applications - the promo is there too
+        other_siae = SiaeFactory(with_membership=True)
+        self.client.force_login(other_siae.members.first())
+        response = self.client.get(self.siae_base_url)
+        self.assertContains(response, "Aucune candidature pour le moment.")
+        self.assertContains(response, promo_text)
+
     def test_list_for_siae_view__filtered_by_one_state(self):
         """
         Eddie wants to see only accepted job applications.
