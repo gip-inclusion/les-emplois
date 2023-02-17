@@ -315,135 +315,131 @@ def stats_pe_tension(request):
     )
 
 
-@login_required
-def stats_ddets_iae(request):
+def render_stats_ddets(request, page_title, extra_context={}):
     """
     DDETS ("Directions départementales de l’emploi, du travail et des solidarités") stats shown to relevant members.
     They can only view data for their own departement.
-    This dashboard shows data about IAE in general.
     """
     department = get_stats_ddets_department(request)
     params = get_params_for_departement(department)
     context = {
-        "page_title": f"Données de mon département : {DEPARTMENTS[department]}",
+        "page_title": page_title,
         "matomo_custom_url_suffix": format_region_and_department_for_matomo(department),
     }
+    context.update(extra_context)
     return render_stats(request=request, context=context, params=params)
+
+
+@login_required
+def stats_ddets_iae(request):
+    department = get_stats_ddets_department(request)
+    return render_stats_ddets(request=request, page_title=f"Données de mon département : {DEPARTMENTS[department]}")
 
 
 @login_required
 def stats_ddets_diagnosis_control(request):
     """
-    DDETS ("Directions départementales de l’emploi, du travail et des solidarités") stats shown to relevant members.
-    They can only view data for their own departement.
-    This dashboard shows data about diagnosis control ("Contrôle a posteriori").
+    This dashboard shows the diagnosis control ("Contrôle a posteriori") raw data.
     """
-    department = get_stats_ddets_department(request)
-    params = get_params_for_departement(department)
-    context = {
-        "page_title": "Données du contrôle a posteriori",
+    extra_context = {
         "back_url": reverse("siae_evaluations_views:samples_selection"),
         "show_diagnosis_control_message": True,
-        "matomo_custom_url_suffix": format_region_and_department_for_matomo(department),
     }
-    return render_stats(request=request, context=context, params=params)
+    return render_stats_ddets(
+        request=request, page_title="Données du contrôle a posteriori", extra_context=extra_context
+    )
 
 
 @login_required
 def stats_ddets_hiring(request):
     """
-    DDETS ("Directions départementales de l’emploi, du travail et des solidarités") stats shown to relevant members.
-    They can only view data for their own departement.
     This dashboard shows data about hiring ("Facilitation de l'embauche").
     """
     department = get_stats_ddets_department(request)
-    params = get_params_for_departement(department)
+    return render_stats_ddets(
+        request=request,
+        page_title=f"Données facilitation de l'embauche de mon département : {DEPARTMENTS[department]}",
+    )
+
+
+def render_stats_dreets(request, page_title):
+    """
+    DREETS ("Directions régionales de l’économie, de l’emploi, du travail et des solidarités") stats shown to
+    relevant members. They can only view data for their own region and can filter by department.
+    """
+    region = get_stats_dreets_region(request)
+    params = get_params_for_region(region)
     context = {
-        "page_title": f"Données facilitation de l'embauche de mon département : {DEPARTMENTS[department]}",
-        "matomo_custom_url_suffix": format_region_and_department_for_matomo(department),
+        "page_title": page_title,
+        "matomo_custom_url_suffix": format_region_for_matomo(region),
     }
     return render_stats(request=request, context=context, params=params)
 
 
 @login_required
 def stats_dreets_iae(request):
-    """
-    DREETS ("Directions régionales de l’économie, de l’emploi, du travail et des solidarités") stats shown to
-    relevant members. They can only view data for their own region and can filter by department.
-    This dashboard shows data about IAE in general.
-    """
     region = get_stats_dreets_region(request)
-    params = get_params_for_region(region)
-    context = {
-        "page_title": f"Données de ma région : {region}",
-        "matomo_custom_url_suffix": format_region_for_matomo(region),
-    }
-    return render_stats(request=request, context=context, params=params)
+    return render_stats_dreets(
+        request=request,
+        page_title=f"Données de ma région : {region}",
+    )
 
 
 @login_required
 def stats_dreets_hiring(request):
     """
-    DREETS ("Directions régionales de l’économie, de l’emploi, du travail et des solidarités") stats shown to
-    relevant members. They can only view data for their own region and can filter by department.
     This dashboard shows data about hiring ("Facilitation de l'embauche").
     """
     region = get_stats_dreets_region(request)
-    params = get_params_for_region(region)
+    return render_stats_dreets(
+        request=request,
+        page_title=f"Données facilitation de l'embauche de ma région : {region}",
+    )
+
+
+def render_stats_dgefp(request, page_title, add_params=True, extra_context={}):
+    """
+    DGEFP ("délégation générale à l'Emploi et à la Formation professionnelle") stats shown to relevant members.
+    They can view nation wide data and filter by region and/or department.
+    """
+    ensure_stats_dgefp_permission(request)
     context = {
-        "page_title": f"Données facilitation de l'embauche de ma région : {region}",
-        "matomo_custom_url_suffix": format_region_for_matomo(region),
+        "page_title": page_title,
     }
-    return render_stats(request=request, context=context, params=params)
+    context.update(extra_context)
+    if add_params:
+        params = get_params_for_whole_country()
+        return render_stats(request=request, context=context, params=params)
+    return render_stats(request=request, context=context)
 
 
 @login_required
 def stats_dgefp_iae(request):
-    """
-    DGEFP ("délégation générale à l'Emploi et à la Formation professionnelle") stats shown to relevant members.
-    They can view all data and filter by region and/or department.
-    This dashboard shows data about IAE in general.
-    """
-    ensure_stats_dgefp_permission(request)
-    params = get_params_for_whole_country()
-    context = {
-        "page_title": "Données des régions",
-    }
-    return render_stats(request=request, context=context, params=params)
+    return render_stats_dgefp(request=request, page_title="Données des régions")
 
 
 @login_required
 def stats_dgefp_diagnosis_control(request):
     """
-    DGEFP ("délégation générale à l'Emploi et à la Formation professionnelle") stats shown to relevant members.
-    They can view all data and filter by region and/or department.
-    This dashboard shows data about diagnosis control ("Contrôle a posteriori").
+    This dashboard shows diagnosis control ("Contrôle a posteriori") raw data.
     """
-    ensure_stats_dgefp_permission(request)
-    params = get_params_for_whole_country()
-    context = {
-        "page_title": "Données (version bêta) du contrôle a posteriori",
-        "show_diagnosis_control_message": True,
-    }
-    return render_stats(request=request, context=context, params=params)
+    return render_stats_dgefp(
+        request=request,
+        page_title="Données (version bêta) du contrôle a posteriori",
+        extra_context={"show_diagnosis_control_message": True},
+    )
 
 
 @login_required
 def stats_dgefp_af(request):
-    """
-    DGEFP ("délégation générale à l'Emploi et à la Formation professionnelle") stats shown to relevant members.
-    They can view all data and filter by region and/or department.
-    This dashboard shows data about financial annexes ("af").
-    """
-    ensure_stats_dgefp_permission(request)
-    context = {
-        "page_title": "Annexes financières actives",
-    }
-    return render_stats(request=request, context=context)
+    return render_stats_dgefp(request=request, page_title="Annexes financières actives", add_params=False)
 
 
 @login_required
 def stats_dihal_state(request):
+    """
+    DIHAL ("Délégation interministérielle à l'hébergement et à l'accès au logement") stats shown to relevant members.
+    """
     current_org = get_current_institution_or_404(request)
     if not request.user.can_view_stats_dihal(current_org=current_org):
         raise PermissionDenied
