@@ -152,13 +152,13 @@ class GEIQEligibilityDiagnosisAdmin(AbstractEligibilityDiagnosisAdmin):
         )
 
     def has_eligibility(self, obj):
-        return obj.geiq_eligibility_confirmed
+        return obj.eligibility_confirmed
 
     has_eligibility.boolean = True
     has_eligibility.short_description = "Eligibilité GEIQ confirmée"
 
     def allowance_amount(self, obj):
-        return f"{obj.geiq_allowance_amount} EUR"
+        return f"{obj.allowance_amount} EUR"
 
     allowance_amount.short_description = "Montant de l'aide"
 
