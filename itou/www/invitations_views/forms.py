@@ -275,10 +275,5 @@ class NewUserInvitationForm(SignupForm):
         # function by forcing a username.
         self.cleaned_data["username"] = User.generate_unique_username()
         get_adapter().stash_verified_email(request, self.email)
-        # Possible problem: this causes the user to be saved twice.
-        # If we want to save it once, we should override the Allauth method.
-        # See https://github.com/pennersr/django-allauth/blob/master/allauth/account/forms.py#L401
-        user = super().save(request)
-        user = self.invitation.set_guest_type(user)
-        user.save()
-        return user
+        self.user_kind = self.invitation.USER_KIND
+        return super().save(request)

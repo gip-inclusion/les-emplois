@@ -12,12 +12,17 @@ from itou.utils.urls import get_absolute_url, get_safe_url
 class UserAdapter(DefaultAccountAdapter):
     """
     Overrides standard allauth adapter:
+        * sets user kind on save
         * provides additional context to some emails sent via allauth
         * handles redirections after allauth actions
 
     Activation of this adapter is done in project settings with:
         ACCOUNT_ADAPTER = "name_of_class"
     """
+
+    def save_user(self, request, user, form):
+        user.kind = form.user_kind
+        return super().save_user(request, user, form)
 
     def get_login_redirect_url(self, request):
         url = reverse("dashboard:index")

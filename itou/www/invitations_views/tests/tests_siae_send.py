@@ -79,7 +79,7 @@ class TestSendSingleSiaeInvitation(TestCase):
         assert invitation.email == guest.email
         assert invitation.sender == self.sender
         assert invitation.siae == self.siae
-        assert invitation.SIGNIN_ACCOUNT_TYPE == "siae_staff"
+        assert invitation.USER_KIND == "siae_staff"
 
     def test_send_invitation_to_not_employer(self):
         user = JobSeekerFactory(**self.guest_data)
