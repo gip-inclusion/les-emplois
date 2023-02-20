@@ -14,8 +14,10 @@ select
     emi.emi_nb_heures_travail as nombre_heures_travaillees,
     /*Nous calculons directement les ETPs réalisés pour éviter des problèmes de filtres/colonnes/etc sur metabase*/
     /* ETPs réalisés = Nbr heures travaillées / montant d'heures necessaires pour avoir 1 ETP */
-    (emi.emi_nb_heures_travail / firmi.rmi_valeur) as nombre_etp_consommes_reels_mensuels, 
-    (emi.emi_nb_heures_travail / firmi.rmi_valeur) * 12 as nombre_etp_consommes_reels_annuels,
+    -- Ici le calcul nb heures * valeur nous donne de base des ETPs ANNUELS. 
+    (emi.emi_nb_heures_travail / firmi.rmi_valeur) as nombre_etp_consommes_reels_annuels, 
+    -- multiplication par 12 pour tomber sur le mensuel 
+    (emi.emi_nb_heures_travail / firmi.rmi_valeur) * 12 as nombre_etp_consommes_reels_mensuels,
     emi.emi_afi_id as identifiant_annexe_fin,
     af.af_numero_convention,
     af.af_numero_annexe_financiere,
