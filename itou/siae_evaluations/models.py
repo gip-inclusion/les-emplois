@@ -375,30 +375,29 @@ class EvaluatedSiae(models.Model):
         REFUSED = evaluation_enums.EvaluatedSiaeState.REFUSED
         ADVERSARIAL_STAGE = evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE
         NOTIFICATION_PENDING = evaluation_enums.EvaluatedSiaeState.NOTIFICATION_PENDING
-        if self.state in {ACCEPTED, REFUSED, ADVERSARIAL_STAGE}:
-            from_adversarial_stage = bool(self.reviewed_at)
-            previous_state = self.state
+        from_adversarial_stage = bool(self.reviewed_at)
+        previous_state = self.state
 
-            now = timezone.now()
-            if previous_state == ACCEPTED:
-                self.reviewed_at = now
-                self.final_reviewed_at = now
-            elif previous_state == REFUSED:
-                self.reviewed_at = now
-            elif previous_state == ADVERSARIAL_STAGE:
-                self.final_reviewed_at = now
-            else:
-                raise TypeError(f"Cannot review an “{self.__class__.__name__}” with status “{self.state}”.")
-            self.save()
-            # Invalidate the cache, a review changes the state of the evaluation.
-            del self.state
-            email = {
-                (ACCEPTED, True): functools.partial(SIAEEmailFactory(self).reviewed, adversarial=True),
-                (ACCEPTED, False): functools.partial(SIAEEmailFactory(self).reviewed, adversarial=False),
-                (ADVERSARIAL_STAGE, False): SIAEEmailFactory(self).adversarial_stage,
-                (NOTIFICATION_PENDING, True): SIAEEmailFactory(self).refused,
-            }[(self.state, from_adversarial_stage)]()
-            send_email_messages([email])
+        now = timezone.now()
+        if previous_state == ACCEPTED:
+            self.reviewed_at = now
+            self.final_reviewed_at = now
+        elif previous_state == REFUSED:
+            self.reviewed_at = now
+        elif previous_state == ADVERSARIAL_STAGE:
+            self.final_reviewed_at = now
+        else:
+            raise TypeError(f"Cannot review an “{self.__class__.__name__}” with status “{self.state}”.")
+        self.save()
+        # Invalidate the cache, a review changes the state of the evaluation.
+        del self.state
+        email = {
+            (ACCEPTED, True): functools.partial(SIAEEmailFactory(self).reviewed, adversarial=True),
+            (ACCEPTED, False): functools.partial(SIAEEmailFactory(self).reviewed, adversarial=False),
+            (ADVERSARIAL_STAGE, False): SIAEEmailFactory(self).adversarial_stage,
+            (NOTIFICATION_PENDING, True): SIAEEmailFactory(self).refused,
+        }[(self.state, from_adversarial_stage)]()
+        send_email_messages([email])
 
     @property
     def evaluation_is_final(self):
