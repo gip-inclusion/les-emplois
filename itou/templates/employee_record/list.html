@@ -87,15 +87,18 @@
                 </div>
 
                 {# Messages #}
-                <div class="h5">
+                <article>
                     {% if form.status.value == "NEW" %}
                         <p class="mb-0">
-                            Vous trouverez ici les candidatures validées à partir desquelles vous devez créer de
-                            nouvelles fiches salarié.
+                            Vous trouverez ici les candidatures validées <b>à partir desquelles vous devez créer de
+                            nouvelles fiches salarié</b>.
                         </p>
                     {% elif form.status.value == "READY" %}
-                        <p class="mb-0">Vous trouverez ici les fiches salarié complétées en attente de l’envoi à l’ASP,</p>
-                        <p class="mb-0">qui a lieu automatiquement à intervalles réguliers.</p>
+                        <p class="mb-0">
+                            Vous trouverez ici les fiches salarié complétées
+                            <b>en attente d’envoi à l’ASP, qui a lieu
+                            automatiquement à intervalles réguliers</b>.
+                        </p>
                         <p class="mb-0">
                             À ce stade, seule la visualisation des informations de la fiche est
                             possible.
@@ -126,7 +129,7 @@
                             "Nouvelle".
                         </p>
                     {% endif %}
-                </div>
+                </article>
                 {% if need_manual_regularization %}
                     <div class="alert alert-warning my-5">
                         <div class="row">
