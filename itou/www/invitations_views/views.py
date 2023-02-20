@@ -93,7 +93,7 @@ def new_user(request, invitation_type, invitation_id):
 
     if User.objects.filter(email__iexact=invitation.email).exists():
         # The user exists but he should log in first.
-        login_url = reverse(f"login:{invitation.SIGNIN_ACCOUNT_TYPE}")
+        login_url = reverse(f"login:{invitation.USER_KIND}")
         next_step_url = "{url}?next={redirect_to}".format(
             url=login_url,
             redirect_to=get_safe_url(request, "redirect_to"),

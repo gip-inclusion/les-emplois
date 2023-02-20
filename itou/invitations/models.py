@@ -34,9 +34,6 @@ class InvitationQuerySet(models.QuerySet):
 
 
 class InvitationAbstract(models.Model):
-    # String representing the account type to use when logging in.
-    # reverse(f"login:{account_type}")
-    SIGNIN_ACCOUNT_TYPE = ""
     EXPIRATION_DAYS = 14
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -106,9 +103,6 @@ class InvitationAbstract(models.Model):
         self.save()
         self.send_invitation()
 
-    def set_guest_type(self, user):
-        raise NotImplementedError
-
     def accepted_notif_sender(self):
         self.email_accepted_notif_sender.send()
 
@@ -132,7 +126,7 @@ class InvitationAbstract(models.Model):
 
 
 class PrescriberWithOrgInvitation(InvitationAbstract):
-    SIGNIN_ACCOUNT_TYPE = "prescriber"
+    USER_KIND = UserKind.PRESCRIBER
     sender = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="Parrain ou marraine",
@@ -172,10 +166,6 @@ class PrescriberWithOrgInvitation(InvitationAbstract):
         user = get_object_or_404(User, email=self.email)
         return user == request.user and user.is_prescriber
 
-    def set_guest_type(self, user):
-        user.kind = UserKind.PRESCRIBER
-        return user
-
     # Emails
     @property
     def email_accepted_notif_sender(self):
@@ -208,7 +198,7 @@ class PrescriberWithOrgInvitation(InvitationAbstract):
 
 
 class SiaeStaffInvitation(InvitationAbstract):
-    SIGNIN_ACCOUNT_TYPE = "siae_staff"
+    USER_KIND = UserKind.SIAE_STAFF
     sender = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="Parrain ou marraine",
@@ -246,10 +236,6 @@ class SiaeStaffInvitation(InvitationAbstract):
         user = get_object_or_404(User, email=self.email)
         return user == request.user and user.is_siae_staff
 
-    def set_guest_type(self, user):
-        user.kind = UserKind.SIAE_STAFF
-        return user
-
     # Emails
     @property
     def email_accepted_notif_sender(self):
@@ -282,7 +268,7 @@ class SiaeStaffInvitation(InvitationAbstract):
 
 
 class LaborInspectorInvitation(InvitationAbstract):
-    SIGNIN_ACCOUNT_TYPE = "labor_inspector"
+    USER_KIND = UserKind.LABOR_INSPECTOR
     sender = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="Parrain ou marraine",
@@ -321,10 +307,6 @@ class LaborInspectorInvitation(InvitationAbstract):
     def guest_can_join_institution(self, request):
         user = get_object_or_404(User, email=self.email)
         return user == request.user and user.is_labor_inspector
-
-    def set_guest_type(self, user):
-        user.kind = UserKind.LABOR_INSPECTOR
-        return user
 
     # Emails
     @property

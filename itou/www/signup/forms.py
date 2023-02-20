@@ -147,10 +147,10 @@ class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
         # function by forcing a username.
         self.cleaned_data["username"] = User.generate_unique_username()
         # Create the user.
+        self.user_kind = UserKind.JOB_SEEKER
         user = super().save(request)
         user.first_name = self.cleaned_data["first_name"]
         user.last_name = self.cleaned_data["last_name"]
-        user.kind = UserKind.JOB_SEEKER
         if self.nir:
             user.nir = self.nir
 
