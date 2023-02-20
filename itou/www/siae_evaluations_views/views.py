@@ -145,28 +145,6 @@ def institution_evaluated_siae_detail(
         "campaign_closed_before_final_evaluation": (
             evaluation_campaign.ended_at and not evaluated_siae.final_reviewed_at
         ),
-        "show_notified": (
-            not evaluation_campaign.ended_at
-            and evaluated_siae.reviewed_at
-            and (
-                evaluated_siae.final_reviewed_at
-                and evaluated_siae.state
-                in {
-                    evaluation_enums.EvaluatedSiaeState.ACCEPTED,
-                    evaluation_enums.EvaluatedSiaeState.REFUSED,
-                }
-                or evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE
-                # Hide the “Résultats transmis !” banner when SIAE starts
-                # uploading new documents. Otherwise, the banner is shown while
-                # the SIAE remains in ADVERSARIAL_STAGE (until the institution
-                # submits their second review), and the page would not look
-                # much different after the second review is submitted.
-                and not EvaluatedAdministrativeCriteria.objects.filter(
-                    evaluated_job_application__evaluated_siae_id=evaluated_siae.pk,
-                    submitted_at__gt=evaluated_siae.reviewed_at,
-                ).exists()
-            )
-        ),
     }
     return render(request, template_name, context)
 
@@ -502,6 +480,14 @@ def institution_evaluated_siae_validation(request, evaluated_siae_pk):
     if evaluated_siae.can_review:
         with transaction.atomic():
             evaluated_siae.review()
+        messages.success(
+            request,
+            mark_safe(
+                "<b>Résultats transmis !</b><br>"
+                "Merci d'avoir pris le temps de contrôler les pièces justificatives. "
+                "Nous notifions par mail l'administrateur de la SIAE."
+            ),
+        )
 
     return HttpResponseRedirect(
         reverse(

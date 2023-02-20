@@ -843,7 +843,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             "siae_evaluations_views:institution_evaluated_siae_list",
             kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
         )
-        message = '<div class="alert alert-communaute alert-dismissible fade show" role="status">'
 
         # EvaluatedAdministrativeCriteria not yet submitted
         response = self.client.get(url)
@@ -859,7 +858,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertNotContains(response, evaluated_job_application_url)
         self.assertContains(response, back_url)
         self.assertContains(response, validation_url)
-        self.assertNotContains(response, message)
         self.assertContains(response, self.control_text)
 
         # EvaluatedAdministrativeCriteria uploaded
@@ -884,7 +882,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertNotContains(response, "En attente")
         self.assertNotContains(response, "Nouveaux justificatifs à traiter")
         self.assertContains(response, validation_button_disabled, html=True, count=1)
-        self.assertNotContains(response, message)
         self.assertContains(response, self.control_text)
 
         # EvaluatedAdministrativeCriteria Accepted
@@ -897,7 +894,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(response, evaluated_job_application_url)
         self.assertContains(response, back_url)
         self.assertContains(response, validation_button, html=True, count=2)
-        self.assertNotContains(response, message)
         self.assertContains(response, self.control_text)
 
         # EvaluatedAdministrativeCriteria Accepted & Reviewed
@@ -911,7 +907,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(response, evaluated_job_application_url)
         self.assertContains(response, back_url)
         self.assertNotContains(response, self.submit_text)
-        self.assertContains(response, message)
         self.assertNotContains(response, self.control_text)
 
         # EvaluatedAdministrativeCriteria Refused
@@ -926,7 +921,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(response, evaluated_job_application_url)
         self.assertContains(response, back_url)
         self.assertContains(response, validation_button, html=True, count=2)
-        self.assertNotContains(response, message)
         self.assertContains(response, self.control_text)
 
         # EvaluatedAdministrativeCriteria Refused & Reviewed
@@ -938,7 +932,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(response, evaluated_job_application_url)
         self.assertContains(response, back_url)
         self.assertContains(response, validation_button_disabled, html=True, count=1)
-        self.assertContains(response, message)
         self.assertContains(response, self.control_text)
 
         # Adversarial phase
@@ -973,7 +966,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertNotContains(response, "Problème constaté")
         self.assertContains(response, "Nouveaux justificatifs à traiter")
         self.assertContains(response, validation_button_disabled, html=True, count=1)
-        self.assertNotContains(response, message)
         self.assertContains(response, self.control_text)
 
         # EvaluatedAdministrativeCriteriaState.ACCEPTED (again)
@@ -985,7 +977,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(response, evaluated_job_application_url)
         self.assertContains(response, back_url)
         self.assertContains(response, validation_button, html=True, count=2)
-        self.assertNotContains(response, message)
         self.assertContains(response, self.control_text)
 
         # EvaluatedAdministrativeCriteria Accepted & Reviewed (again)
@@ -999,7 +990,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(response, evaluated_job_application_url)
         self.assertContains(response, back_url)
         self.assertNotContains(response, self.submit_text)
-        self.assertContains(response, message)
         self.assertNotContains(response, self.control_text)
 
         # EvaluatedAdministrativeCriteria Refused (again)
@@ -1016,7 +1006,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(response, evaluated_job_application_url)
         self.assertContains(response, back_url)
         self.assertContains(response, validation_button, html=True, count=2)
-        self.assertNotContains(response, message)
         self.assertContains(response, self.control_text)
 
         # EvaluatedAdministrativeCriteria Refused & Reviewed (again)
@@ -1028,7 +1017,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(response, evaluated_job_application_url)
         self.assertContains(response, back_url)
         self.assertNotContains(response, self.submit_text)
-        self.assertNotContains(response, message)
         self.assertNotContains(response, self.control_text)
         self.assertContains(
             response, '<p class="badge badge-pill badge-danger float-right">Problème constaté</p>', count=1
@@ -3333,16 +3321,24 @@ class InstitutionEvaluatedSiaeValidationViewTest(TestCase):
         assert response.url == redirect_url
         self.evaluated_siae.refresh_from_db()
         assert self.evaluated_siae.reviewed_at is None
+        assert list(messages.get_messages(response.wsgi_request)) == []
 
         # accepted
         EvaluatedAdministrativeCriteria.objects.filter(
             evaluated_job_application__evaluated_siae=self.evaluated_siae
         ).update(review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED)
         response = self.client.post(url)
-        assert response.status_code == 302
-        assert response.url == redirect_url
         self.evaluated_siae.refresh_from_db()
         assert self.evaluated_siae.reviewed_at is not None
+        assert list(messages.get_messages(response.wsgi_request)) == [
+            Message(
+                messages.SUCCESS,
+                "<b>Résultats transmis !</b><br>"
+                "Merci d'avoir pris le temps de contrôler les pièces justificatives. "
+                "Nous notifions par mail l'administrateur de la SIAE.",
+            )
+        ]
+        self.assertRedirects(response, redirect_url)
 
         # refused
         self.evaluated_siae.reviewed_at = None
@@ -3353,10 +3349,17 @@ class InstitutionEvaluatedSiaeValidationViewTest(TestCase):
         ).update(review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED)
 
         response = self.client.post(url)
-        assert response.status_code == 302
-        assert response.url == redirect_url
         self.evaluated_siae.refresh_from_db()
         assert self.evaluated_siae.reviewed_at is not None
+        assert list(messages.get_messages(response.wsgi_request)) == [
+            Message(
+                messages.SUCCESS,
+                "<b>Résultats transmis !</b><br>"
+                "Merci d'avoir pris le temps de contrôler les pièces justificatives. "
+                "Nous notifions par mail l'administrateur de la SIAE.",
+            )
+        ]
+        self.assertRedirects(response, redirect_url)
 
         # cannot validate twice
         timestamp = self.evaluated_siae.reviewed_at
@@ -3364,6 +3367,7 @@ class InstitutionEvaluatedSiaeValidationViewTest(TestCase):
         assert response.status_code == 302
         self.evaluated_siae.refresh_from_db()
         assert timestamp == self.evaluated_siae.reviewed_at
+        assert list(messages.get_messages(response.wsgi_request)) == []
 
     def test_accepted(self):
         evaluated_siae = EvaluatedSiaeFactory.create(
