@@ -374,6 +374,7 @@ def evaluated_siae_sanction(request, evaluated_siae_pk, viewer_type):
     )
     context = evaluation_campaign_data_context(evaluated_siae)
     context["evaluated_siae"] = evaluated_siae
+    context["is_siae"] = viewer_type == "siae"
     try:
         context["sanctions"] = evaluated_siae.sanctions
     except EvaluatedSiae.sanctions.RelatedObjectDoesNotExist:

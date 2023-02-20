@@ -33,6 +33,12 @@ class EvaluatedSiaeSanctionViewTest(TestCase):
             evaluated_siae=cls.evaluated_siae,
             training_session="RDV le 18 avril à 14h dans les locaux de Pôle Emploi.",
         )
+        cls.return_evaluated_siae_list_link_html = (
+            '<a class="btn btn-primary float-right" '
+            f'href="/siae_evaluation/institution_evaluated_siae_list/{cls.evaluated_siae.evaluation_campaign_id}/">'
+            "Retour</a>"
+        )
+        cls.return_dashboard_link_html = '<a class="btn btn-primary float-right" href="/dashboard/">Retour</a>'
 
     def assertSanctionContent(self, response):
         self.assertContains(
@@ -88,6 +94,17 @@ class EvaluatedSiaeSanctionViewTest(TestCase):
             )
         )
         self.assertSanctionContent(response)
+        self.assertContains(
+            response,
+            self.return_evaluated_siae_list_link_html,
+            html=True,
+            count=1,
+        )
+        self.assertNotContains(
+            response,
+            self.return_dashboard_link_html,
+            html=True,
+        )
 
     def test_view_as_other_institution(self):
         other = InstitutionMembershipFactory()
@@ -109,6 +126,17 @@ class EvaluatedSiaeSanctionViewTest(TestCase):
             )
         )
         self.assertSanctionContent(response)
+        self.assertContains(
+            response,
+            self.return_dashboard_link_html,
+            html=True,
+            count=1,
+        )
+        self.assertNotContains(
+            response,
+            self.return_evaluated_siae_list_link_html,
+            html=True,
+        )
 
     def test_view_as_other_siae(self):
         siae_membership = SiaeMembershipFactory()

@@ -91,7 +91,8 @@
                     {% endif %}
                 </div>
                 <div class="card-body">
-                    <a class="btn btn-primary float-right" href="{% url "dashboard:index" %}">Revenir au tableau de bord</a>
+                    <a class="btn btn-primary float-right"
+                       href="{% if not is_siae %}{% url 'siae_evaluations_views:institution_evaluated_siae_list' evaluated_siae.evaluation_campaign_id %}{% else %}{% url "dashboard:index" %}{% endif %}">Retour</a>
                 </div>
             </div>
         </div>
