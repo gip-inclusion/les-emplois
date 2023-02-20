@@ -407,9 +407,9 @@ oauthlib==3.2.2 \
 odfpy==1.4.1 \
     --hash=sha256:db766a6e59c5103212f3cc92ec8dd50a0f3a02790233ed0b52148b70d3c438ec
     # via tablib
-openpyxl==3.1.0 \
-    --hash=sha256:24d7d361025d186ba91eff58135d50855cf035a84371b891e58fb6eb5125660f \
-    --hash=sha256:eccedbe1cdd8b2494057e73959b496821141038dbb7eb9266ea59e3f34208231
+openpyxl==3.1.1 \
+    --hash=sha256:a0266e033e65f33ee697254b66116a5793c15fc92daf64711080000df4cfe0a8 \
+    --hash=sha256:f06d44e2c973781068bce5ecf860a09bcdb1c7f5ce1facd5e9aa82c92c93ae72
     # via
     #   -r requirements/base.in
     #   tablib
