@@ -1,4 +1,8 @@
+from django.urls import reverse
+from pytest_django.asserts import assertContains, assertRedirects
+
 from itou.institutions.factories import InstitutionWith2MembershipFactory, InstitutionWithMembershipFactory
+from itou.users.factories import ItouStaffFactory
 from itou.utils.test import TestCase
 
 
@@ -29,3 +33,47 @@ class InstitutionModelTest(TestCase):
         user_with_active_membership.save()
 
         assert user_with_active_membership not in institution.active_members
+
+
+def test_deactivate_last_admin(client):
+    institution = InstitutionWithMembershipFactory()
+    membership = institution.memberships.first()
+    assert membership.is_admin
+
+    staff_user = ItouStaffFactory(is_superuser=True)
+    client.force_login(staff_user)
+    change_url = reverse("admin:institutions_institution_change", args=[institution.pk])
+    response = client.get(change_url)
+    assert response.status_code == 200
+
+    response = client.post(
+        change_url,
+        data={
+            "kind": institution.kind.value,
+            "name": institution.name,
+            "address_line_1": institution.address_line_1,
+            "address_line_2": institution.address_line_2,
+            "post_code": institution.post_code,
+            "city": institution.city,
+            "department": institution.department,
+            "coords": "",
+            "institutionmembership_set-TOTAL_FORMS": "2",
+            "institutionmembership_set-INITIAL_FORMS": "1",
+            "institutionmembership_set-MIN_NUM_FORMS": "0",
+            "institutionmembership_set-MAX_NUM_FORMS": "1000",
+            "institutionmembership_set-0-id": membership.pk,
+            "institutionmembership_set-0-institution": institution.pk,
+            "institutionmembership_set-0-user": membership.user.pk,
+            # institutionmembership_set-0-is_admin is absent
+            "_continue": "Enregistrer+et+continuer+les+modifications",
+        },
+    )
+    assertRedirects(response, change_url, fetch_redirect_response=False)
+    response = client.get(change_url)
+    assertContains(
+        response,
+        (
+            "Vous venez de supprimer le dernier administrateur de la structure. "
+            "Les membres restants risquent de solliciter le support."
+        ),
+    )

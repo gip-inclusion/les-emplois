@@ -1,4 +1,4 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.db.models import Count
 
 
@@ -36,3 +36,17 @@ class OrganizationAdmin(admin.ModelAdmin):
         queryset = super().get_queryset(request)
         queryset = queryset.annotate(_member_count=Count("members", distinct=True))
         return queryset
+
+    def save_related(self, request, form, formsets, change):
+        had_admin = change and form.instance.active_admin_members.exists()
+        super().save_related(request, form, formsets, change)
+        if had_admin:
+            active_memberships = form.instance.memberships.all()
+            if active_memberships and not any(membership.is_admin for membership in active_memberships):
+                messages.warning(
+                    request,
+                    (
+                        "Vous venez de supprimer le dernier administrateur de la structure. "
+                        "Les membres restants risquent de solliciter le support."
+                    ),
+                )
