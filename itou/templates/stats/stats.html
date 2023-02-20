@@ -125,6 +125,17 @@
         </div>
     </section>
 
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+
+    <script nonce="{{ CSP_NONCE }}">
+        document.getElementById("stats-iframe").addEventListener("load", function(){
+            iFrameResize({}, this)
+        });
+    </script>
+
     {% if tally_form_id %}
         <script async src="https://tally.so/widgets/embed.js"></script>
 
@@ -147,13 +158,5 @@
             };
         </script>
     {% endif %}
-{% endblock %}
-
-{% block script %}
-    {{ block.super }}
-    <script nonce="{{ CSP_NONCE }}">
-        document.getElementById("stats-iframe").addEventListener("load", function(){
-            iFrameResize({}, this)
-        });
-    </script>
+ 
 {% endblock %}
