@@ -16,15 +16,12 @@ def command_fixture():
 
 def test_management_command_default_run(command):
     employee_record = factories.EmployeeRecordFactory(orphan=True)
-    old_asp_id, new_asp_id = employee_record.asp_id, employee_record.job_application.to_siae.convention.asp_id
+    siae = employee_record.job_application.to_siae
 
-    command.handle(
-        old_asp_id=old_asp_id,
-        new_asp_id=new_asp_id,
-    )
+    command.handle(for_siae=siae.pk)
 
     assert command.stderr.getvalue().split("\n") == [
-        f"Clone orphans employee records from old_asp_id={old_asp_id} to new_asp_id={new_asp_id}",
+        f"Clone orphans employee records of {siae=} {siae.siret=} {siae.convention.asp_id=}",
         "1 employee records will be cloned",
         "Option --wet-run was not used so nothing will be cloned.",
         "Done!",
@@ -38,19 +35,15 @@ def test_management_command_default_run(command):
 
 def test_management_command_wet_run(command):
     employee_record = factories.EmployeeRecordFactory(orphan=True)
-    old_asp_id, new_asp_id = employee_record.asp_id, employee_record.job_application.to_siae.convention.asp_id
+    siae = employee_record.job_application.to_siae
     # Create non-orphan employee records with the old and new ASP ID to check filtering
-    factories.EmployeeRecordFactory(job_application__to_siae__convention__asp_id=old_asp_id)
-    factories.EmployeeRecordFactory(job_application__to_siae__convention__asp_id=new_asp_id)
+    factories.EmployeeRecordFactory(job_application__to_siae__convention__asp_id=employee_record.asp_id)
+    factories.EmployeeRecordFactory(job_application__to_siae__convention__asp_id=siae.convention.asp_id)
 
-    command.handle(
-        old_asp_id=old_asp_id,
-        new_asp_id=new_asp_id,
-        wet_run=True,
-    )
+    command.handle(for_siae=siae.pk, wet_run=True)
 
     assert command.stderr.getvalue().split("\n") == [
-        f"Clone orphans employee records from old_asp_id={old_asp_id} to new_asp_id={new_asp_id}",
+        f"Clone orphans employee records of {siae=} {siae.siret=} {siae.convention.asp_id=}",
         "1 employee records will be cloned",
         "Done!",
         "",
@@ -67,23 +60,21 @@ def test_management_command_when_the_new_asp_id_is_used_by_multiple_convention(c
         orphan=True,
         job_application__to_siae__kind=siaes_enums.SiaeKind.EI,
     )
-    old_asp_id, new_asp_id = employee_record.asp_id, employee_record.job_application.to_siae.convention.asp_id
+    siae = employee_record.job_application.to_siae
+
+    # Create a non-orphan employee record that use the same convention
     factories.EmployeeRecordFactory(
         job_application__to_siae__kind=siaes_enums.SiaeKind.ACI,
-        job_application__to_siae__convention__asp_id=new_asp_id,
+        job_application__to_siae__convention__asp_id=siae.convention.asp_id,
     )
-
     # SiaeConventionFactory() use the `django_get_or_create` option to match the ("asp_id", "kind")` unique
     # constraint, and in this test case we need to be sure that more than one convention share the same asp_id.
-    assert siaes_models.SiaeConvention.objects.filter(asp_id=new_asp_id).count() == 2
+    assert siaes_models.SiaeConvention.objects.filter(asp_id=siae.convention.asp_id).count() == 2
 
-    command.handle(
-        old_asp_id=old_asp_id,
-        new_asp_id=new_asp_id,
-    )
+    command.handle(for_siae=siae.pk)
 
     assert command.stderr.getvalue().split("\n") == [
-        f"Clone orphans employee records from old_asp_id={old_asp_id} to new_asp_id={new_asp_id}",
+        f"Clone orphans employee records of {siae=} {siae.siret=} {siae.convention.asp_id=}",
         "1 employee records will be cloned",
         "Option --wet-run was not used so nothing will be cloned.",
         "Done!",
@@ -96,4 +87,4 @@ def test_management_command_when_the_new_asp_id_is_used_by_multiple_convention(c
 
 
 def test_management_command_name(faker):
-    call_command("clone_orphan_employee_records", "--old-asp-id", faker.pyint(), "--new-asp-id", faker.pyint())
+    call_command("clone_orphan_employee_records", "--for-siae", faker.pyint())

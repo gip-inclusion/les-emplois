@@ -10,12 +10,7 @@ class Command(BaseCommand):
         super().add_arguments(parser)
 
         parser.add_argument(
-            "--old-asp-id",
-            type=int,
-            required=True,
-        )
-        parser.add_argument(
-            "--new-asp-id",
+            "--for-siae",
             type=int,
             required=True,
         )
@@ -27,14 +22,20 @@ class Command(BaseCommand):
         )
 
     @transaction.atomic()
-    def handle(self, old_asp_id, new_asp_id, wet_run=False, **options):
-        if not siaes_models.SiaeConvention.objects.filter(asp_id=new_asp_id).exists():
-            self.stderr.write(f"No convention exists with {new_asp_id=}!")
+    def handle(self, for_siae, wet_run=False, **options):
+        siae = siaes_models.Siae.objects.filter(pk=for_siae).select_related("convention").first()
+        if not siae:
+            self.stderr.write(f"No SIAE found for pk={for_siae!r}.")
+            return
+        if not siae.convention:
+            self.stderr.write(f"No convention exists for {siae=}!")
             return
 
-        self.stderr.write(f"Clone orphans employee records from {old_asp_id=} to {new_asp_id=}")
+        self.stderr.write(f"Clone orphans employee records of {siae=} {siae.siret=} {siae.convention.asp_id=}")
 
-        employee_records_to_clone = EmployeeRecord.objects.orphans().filter(asp_id=old_asp_id).order_by("pk")
+        employee_records_to_clone = (
+            EmployeeRecord.objects.filter(job_application__to_siae=siae).orphans().order_by("pk")
+        )
         self.stderr.write(f"{len(employee_records_to_clone)} employee records will be cloned")
 
         if not wet_run:
@@ -46,7 +47,7 @@ class Command(BaseCommand):
 
             try:
                 with transaction.atomic():
-                    employee_record_clone = employee_record.clone(new_asp_id)
+                    employee_record_clone = employee_record.clone()
             except Exception as e:
                 self.stdout.write(f"  Error when cloning {employee_record.pk=}: {e}")
             else:
