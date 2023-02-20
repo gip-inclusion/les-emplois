@@ -223,6 +223,7 @@ def test_prescriber_account_activation_view_already_exists(client):
     response = client.post(url, data={"email": user.email}, follow=True)
     assertRedirects(response, f"{url}?{urlencode({'existing_ic_account': user.email})}")
     assertContains(response, "Vous avez déjà un compte Inclusion Connect associé à l'adresse")
+    assertContains(response, f"user_email={quote(user.email)}")
 
 
 def test_siae_staff_account_activation_view(client):
@@ -239,3 +240,4 @@ def test_siae_staff_account_activation_view_already_exists(client):
     response = client.post(url, data={"email": user.email}, follow=True)
     assertRedirects(response, f"{url}?{urlencode({'existing_ic_account': user.email})}")
     assertContains(response, "Vous avez déjà un compte Inclusion Connect associé à l'adresse")
+    assertContains(response, f"user_email={quote(user.email)}")

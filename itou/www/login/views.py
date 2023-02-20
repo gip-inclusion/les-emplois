@@ -111,10 +111,15 @@ class AccountMigrationBaseView(FormView):
         params = self._get_inclusion_connect_base_params()
         existing_ic_account = self.request.GET.get("existing_ic_account")
         inclusion_connect_url = f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
+        existing_ic_account_url = None
+        if existing_ic_account:
+            params["user_email"] = existing_ic_account
+            existing_ic_account_url = f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
         extra_context = {
             "activate_account_url": reverse(self.url_name),
             "inclusion_connect_url": inclusion_connect_url,
             "existing_ic_account": existing_ic_account,
+            "existing_ic_account_url": existing_ic_account_url,
         }
         return context | extra_context
 
