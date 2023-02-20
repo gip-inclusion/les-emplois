@@ -20,32 +20,6 @@
                         {% endif %}
                     </h1>
 
-                    {# messages #}
-                    {% if show_notified %}
-                        <div class="alert alert-communaute alert-dismissible fade show" role="status">
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
-                                <i class="ri-close-line"></i>
-                            </button>
-                            <div class="row">
-                                <div class="col-auto pr-0">
-                                    <i class="ri-information-line ri-xl text-communaute"></i>
-                                </div>
-                                <div class="col">
-                                    <p class="mb-2">
-                                        <strong>Résultats transmis !</strong>
-                                    </p>
-                                    <p class="mb-0">
-                                        Merci d'avoir pris le temps de contrôler les pièces justificatives.
-                                        Nous notifions par mail l'administrateur de la Siae.
-                                    </p>
-                                </div>
-                                <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
-                                    <a href="{{ back_url }}" class="btn btn-sm btn-primary">Retour à la liste des Siae</a>
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
-
                     {% if campaign_closed_before_final_evaluation %}
                         {% if evaluated_siae.state == "ACCEPTED" %}
                             <div class="alert alert-warning">
