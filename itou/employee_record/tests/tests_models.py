@@ -2,6 +2,7 @@ import json
 from datetime import date, timedelta
 from unittest import mock
 
+import freezegun
 import pytest
 from django.core.exceptions import ValidationError
 from django.utils import timezone
@@ -204,75 +205,71 @@ class EmployeeRecordModelTest(TestCase):
 
         assert EmployeeRecord.objects.archivable().count() == 1
 
-    def test_clone_orphan(self):
-        # Check employee record clone features and properties
-        good_employee_record = EmployeeRecordWithProfileFactory(status=Status.PROCESSED)
-        disabled_employee_record = EmployeeRecordWithProfileFactory(status=Status.DISABLED)
-        bad_employee_record = EmployeeRecordWithProfileFactory(status=Status.PROCESSED)
 
-        previous_asp_id = good_employee_record.asp_id
-        good_employee_record.asp_id += 1
-        good_employee_record.siret = "99999999999999"
-        good_employee_record.save()
+@pytest.mark.parametrize("status", list(Status))
+def test_clone_for_orphan_employee_record(status):
+    # Check employee record clone features and properties
+    employee_record = EmployeeRecordFactory(orphan=True, status=status)
 
-        previous_disabled_asp_id = disabled_employee_record.asp_id
-        disabled_employee_record.asp_id += 1
-        disabled_employee_record.siret = "99999999999999"
-        disabled_employee_record.save()
+    assert employee_record.is_orphan
+    with freezegun.freeze_time():
+        clone = employee_record.clone()
+    assert not clone.is_orphan
 
-        assert good_employee_record.is_orphan
+    # Check fields that changes during cloning
+    assert clone.pk != employee_record.pk
+    assert clone.status == Status.NEW
+    assert clone.asp_processing_label == f"Fiche salarié clonée (pk origine: {employee_record.pk})"
+    assert clone.created_at != employee_record.created_at
+    assert clone.updated_at == clone.created_at
 
-        clone = good_employee_record.clone_orphan(previous_asp_id)
-        assert clone.pk != good_employee_record.pk
-        assert good_employee_record.created_at != clone.created_at
-        assert Status.NEW == clone.status
-        assert previous_asp_id == clone.asp_id
-        assert good_employee_record.approval_number == clone.approval_number
-        assert good_employee_record.job_application == clone.job_application
-        assert clone.job_application.to_siae.siret == clone.siret
-        assert clone.asp_batch_file is None
-        assert clone.asp_batch_line_number is None
-        assert clone.asp_processing_code is None
-        assert "Fiche salarié clonée" in clone.asp_processing_label
-        assert Status.DISABLED == good_employee_record.status
-        assert clone.archived_json is None
+    # Check fields that are copied or possibly overwritten
+    assert clone.job_application == employee_record.job_application
+    assert clone.approval_number == employee_record.approval_number
+    assert clone.asp_id == employee_record.job_application.to_siae.convention.asp_id
+    assert clone.siret == employee_record.job_application.to_siae.siret
 
-        bad_asp_id = disabled_employee_record.asp_id + 1
-        with self.assertRaisesMessage(
-            CloningError,
-            f"Unable to find SIAE convention for asp_id: {bad_asp_id}",
-        ):
-            # No such convention ID
-            disabled_employee_record.clone_orphan(bad_asp_id)
+    # Check fields that should be empty
+    assert clone.asp_processing_code is None
+    assert clone.asp_batch_file is None
+    assert clone.asp_batch_line_number is None
+    assert clone.archived_json is None
+    assert clone.processed_at is None
+    assert clone.financial_annex is None
+    assert clone.processed_as_duplicate is False
 
-        # Cloning in DISABLED state must work
-        disabled_employee_record.clone_orphan(previous_disabled_asp_id)
+    # Check cloned employee record
+    assert employee_record.is_orphan
+    if employee_record.can_be_disabled:
+        assert employee_record.status == Status.DISABLED
 
-        assert disabled_employee_record.is_orphan is True
 
-        # Check conditions are required
+def test_clone_for_disabled_employee_record():
+    employee_record = EmployeeRecordFactory(status=Status.DISABLED)
 
-        with pytest.raises(CloningError):
-            # Clone with previous asp_id
-            bad_employee_record.clone_orphan(previous_asp_id)
+    clone = employee_record.clone()
+    assert clone.pk != employee_record.pk
+    # Cloned employee record should be DISABLED
+    assert employee_record.status == Status.DISABLED
 
-        with pytest.raises(CloningError):
-            # Not an orphan
-            bad_employee_record.clone_orphan(bad_employee_record.asp_id)
 
-        with pytest.raises(CloningError):
-            # Not saved (no PK)
-            bad_employee_record.pk = None
-            bad_employee_record.clone_orphan(-1)
+def test_clone_when_a_duplicate_exists():
+    employee_record = EmployeeRecordFactory()
+    with pytest.raises(CloningError, match=r"Duplicate asp_id / approval_number pair"):
+        employee_record.clone()
 
-        bad_employee_record = EmployeeRecordWithProfileFactory(status=Status.PROCESSED)
-        bad_employee_record.approval_number = good_employee_record.approval_number
-        bad_employee_record.save()
-        bad_employee_record.asp_id = -2
 
-        with pytest.raises(CloningError):
-            # Other case: duplicate in db (pair approval_number,asp_id)
-            bad_employee_record.clone_orphan(-1)
+def test_clone_without_primary_key():
+    employee_record = BareEmployeeRecordFactory.build()
+    with pytest.raises(CloningError) as exc_info:
+        employee_record.clone()
+    assert str(exc_info.value) == "This employee record has not been saved yet (no PK)."
+
+
+def test_clone_without_convention():
+    employee_record = EmployeeRecordFactory(orphan=True, job_application__to_siae__convention=None)
+    with pytest.raises(CloningError, match=r"SIAE \d{14} has no convention"):
+        employee_record.clone()
 
 
 class EmployeeRecordBatchTest(TestCase):

@@ -11,7 +11,7 @@ from rest_framework.authtoken.admin import User
 from itou.approvals.models import Approval
 from itou.asp.models import EmployerType, PrescriberType, SiaeKind
 from itou.job_applications.enums import SenderKind
-from itou.siaes.models import Siae, SiaeConvention, SiaeFinancialAnnex
+from itou.siaes.models import Siae, SiaeFinancialAnnex
 from itou.users.models import JobSeekerProfile
 from itou.utils.validators import validate_siret
 
@@ -428,9 +428,9 @@ class EmployeeRecord(ASPExchangeInformation):
 
         self.save()
 
-    def clone_orphan(self, asp_id):
+    def clone(self):
         """
-        Create and return a NEW copy of an orphan employee record, this is useful when orphans are detected.
+        Create and return a NEW copy of an employee record, this is useful when orphans are detected.
         If cloning is successful, current employee record is DISABLED (if possible) to avoid conflicts.
 
         Raises `CloningError` if cloning conditions are not met.
@@ -438,21 +438,15 @@ class EmployeeRecord(ASPExchangeInformation):
         if not self.pk:
             raise CloningError("This employee record has not been saved yet (no PK).")
 
-        if self.asp_id == asp_id:
-            raise CloningError(f"Can't clone an employee record with the same asp_id: {asp_id}")
-
-        if not self.is_orphan:
-            raise CloningError(f"This employee record is not an orphan, {self.asp_id=}")
-
-        if not SiaeConvention.objects.filter(asp_id=asp_id).exists():
-            raise CloningError(f"Unable to find SIAE convention for asp_id: {asp_id}")
+        if not self.job_application.to_siae.convention:
+            raise CloningError(f"SIAE {self.job_application.to_siae.siret} has no convention")
 
         # Cleanup clone fields
         er_copy = EmployeeRecord(
             status=Status.NEW,
             job_application=self.job_application,
             approval_number=self.approval_number,
-            asp_id=asp_id,
+            asp_id=self.job_application.to_siae.convention.asp_id,
             siret=EmployeeRecord.siret_from_asp_source(self.job_application.to_siae),
             asp_processing_label=f"Fiche salarié clonée (pk origine: {self.pk})",
         )

@@ -46,7 +46,7 @@ class Command(BaseCommand):
 
             try:
                 with transaction.atomic():
-                    employee_record_clone = employee_record.clone_orphan(new_asp_id)
+                    employee_record_clone = employee_record.clone(new_asp_id)
             except Exception as e:
                 self.stdout.write(f"  Error when cloning {employee_record.pk=}: {e}")
             else:
