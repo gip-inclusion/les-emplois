@@ -179,6 +179,36 @@
                 </div>
             </div>
         </section>
+    {% elif ic_activate_url %}
+        {# Une p-inclusion-connect class somewhere #}
+        <div class="container mt-2 bg-white">
+            <div class="row">
+                <div class="col-8">
+                    <div class="d-flex flex-column flex-md-row">
+                        <div class="w-100">
+                            <span class="badge badge-pill badge-sm badge-important-lightest text-important mb-2">A découvrir</span>
+                            <p class="h2 mb-2">Inclusion Connect : un accès unique à tous vos services !</p>
+                            <p class="mb-2">
+                                Simplifiez la connexion : accédez aux différents services partenaires avec <b>le même identifiant et le même mot de passe.</b>
+                            </p>
+
+                            <a class="btn btn-primary btn-ico" href="{{ ic_activate_url }}" title="Activer Inclusion Connect">
+                                <span>Activer Inclusion Connect</span>
+                            </a>
+
+                            <a class="ml-4 text-decoration-none"
+                               href="https://plateforme-inclusion.notion.site/Un-compte-unique-pour-mes-services-num-riques-ded9135197654da590f5dde41d8bb68b"
+                               title="Plus d'infos concernant Inclusion Connect"
+                               rel="noopener"
+                               target="_blank">
+                                <span>Plus d'infos</span>
+                                <i class="ri-external-link-line ri-lg"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     {% endif %}
 {% endblock %}
 
@@ -207,10 +237,16 @@
         </p>
     {% endif %}
 
-    {% if current_siae %}<p class="text-muted">SIRET {{ current_siae.siret|format_siret }}</p>{% endif %}
+    {% if current_siae %}
+        <p class="text-muted">
+            SIRET {{ current_siae.siret|format_siret }}
+        </p>
+    {% endif %}
 
     {% if current_prescriber_organization and current_prescriber_organization.siret %}
-        <p class="text-muted">SIRET {{ current_prescriber_organization.siret|format_siret }}</p>
+        <p class="text-muted">
+            SIRET {{ current_prescriber_organization.siret|format_siret }}
+        </p>
     {% endif %}
 
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 mt-3">
