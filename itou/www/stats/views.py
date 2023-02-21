@@ -138,6 +138,22 @@ def stats_public(request):
     return render_stats(request=request, context=context)
 
 
+def stats_test1(request):
+    context = {
+        "page_title": "Test 1 : stats_public clone + tally popup + with the usual iframeResizer",
+        "tally_form_id": "waQPkB",
+    }
+    return render_stats(request=request, context=context, template_name="stats/stats_test1.html")
+
+
+def stats_test2(request):
+    context = {
+        "page_title": "Test 2 : stats_public clone + tally popup + *without* the usual iframeResizer",
+        "tally_form_id": "waQPkB",
+    }
+    return render_stats(request=request, context=context, template_name="stats/stats_test2.html")
+
+
 @xframe_options_exempt
 def stats_pilotage(request, dashboard_id):
     """
