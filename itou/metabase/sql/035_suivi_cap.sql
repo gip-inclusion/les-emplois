@@ -13,6 +13,7 @@ with nb_structures_par_dept as (
 select
     cap_camp.nom,
     struct.nom_département as nom_département,
+    struct.région,
     -- récupération du pct de séléction attendu
     max(cap_camp.pourcentage_sélection) as pct_selection,
     --nb controlees : ie celles qui ont une date de contrôle non null
@@ -56,5 +57,6 @@ from
     left join nb_structures_par_dept nb_tot_dep on nb_tot_dep.nom_département = struct.nom_département
 group by
     cap_camp.nom,
+    struct.région,
     struct.nom_département
 order by struct.nom_département;
