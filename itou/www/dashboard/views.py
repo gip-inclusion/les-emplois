@@ -8,6 +8,7 @@ from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
+from django.utils.http import urlencode
 from django.views.decorators.http import require_POST
 
 from itou.employee_record.enums import Status
@@ -19,6 +20,7 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.siae_evaluations.constants import CAMPAIGN_VIEWABLE_DURATION
 from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
 from itou.siaes.models import Siae, SiaeFinancialAnnex
+from itou.users.enums import IdentityProvider
 from itou.utils import constants as global_constants
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
@@ -111,6 +113,15 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         active_campaigns = EvaluationCampaign.objects.for_institution(current_org).viewable()
         campaign_in_progress = any(campaign.ended_at is None for campaign in active_campaigns)
 
+    ic_activate_url = None
+    if request.user.identity_provider != IdentityProvider.INCLUSION_CONNECT:
+        params = {
+            "user_kind": request.user.kind,
+            "previous_url": request.get_full_path(),
+            "user_email": request.user.email,
+        }
+        ic_activate_url = f"{reverse('inclusion_connect:activate_account')}?{urlencode(params)}"
+
     context = {
         "current_org": current_org,
         "job_applications_categories": job_applications_categories,
@@ -139,6 +150,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
             and current_org
             and current_org.department in ["08", "60", "91", "974"]
         ),
+        "ic_activate_url": ic_activate_url,
     }
 
     return render(request, template_name, context)
