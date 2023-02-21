@@ -61,7 +61,7 @@
                                    data-matomo-category="candidatures"
                                    data-matomo-action="exports"
                                    data-matomo-option="export-siae"
-                                   title="Télécharger cet export SIAE"
+                                   aria-label="Télécharger cet export SIAE"
                                    href="{% url 'apply:list_for_siae_exports_download' %}">
                                     Télécharger
                                 </a>
@@ -71,7 +71,7 @@
                                    data-matomo-category="candidatures"
                                    data-matomo-action="exports"
                                    data-matomo-option="export-prescripteur"
-                                   title="Télécharger cet export prescripteur"
+                                   aria-label="Télécharger cet export prescripteur"
                                    href="{% url 'apply:list_for_prescriber_exports_download' %}">
                                     Télécharger
                                 </a>
@@ -89,7 +89,7 @@
                                        data-matomo-category="candidatures"
                                        data-matomo-action="exports"
                                        data-matomo-option="export-siae"
-                                       title="Télécharger cet export SIAE"
+                                       aria-label="Télécharger cet export SIAE"
                                        href="{% url 'apply:list_for_siae_exports_download' month_identifier=month.month|date:"Y-m" %}">
                                         Télécharger
                                     </a>
@@ -99,7 +99,7 @@
                                        data-matomo-category="candidatures"
                                        data-matomo-action="exports"
                                        data-matomo-option="export-prescripteur"
-                                       title="Télécharger cet export prescripteur"
+                                       aria-label="Télécharger cet export prescripteur"
                                        href="{% url 'apply:list_for_prescriber_exports_download' month_identifier=month.month|date:"Y-m" %}">
                                         Télécharger
                                     </a>

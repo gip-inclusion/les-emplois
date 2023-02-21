@@ -68,7 +68,7 @@
                         {% include "apply/includes/list_card_body.html" with job_application=job_application %}
 
                         <div class="card-footer">
-                            <a href="#" data-toggle="collapse" data-target="#answer{{ forloop.counter0 }}" aria-expanded="false" aria-controls="answer{{ forloop.counter0 }}" title="Plus d'informations sur cette candidature">Plus d'informations</a>
+                            <a href="#" data-toggle="collapse" data-target="#answer{{ forloop.counter0 }}" aria-expanded="false" aria-controls="answer{{ forloop.counter0 }}" aria-label="Plus d'informations sur cette candidature">Plus d'informations</a>
                             <div id="answer{{ forloop.counter0 }}" class="collapse mt-3">
                                 <p>
                                     <b>Message de candidature :</b>

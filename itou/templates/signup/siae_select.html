@@ -44,17 +44,17 @@
                 <i>Si ce n’est pas le cas</i>, demandez à votre DDETS d’enregistrer au plus vite l’annexe financière dans l’ASP.
             </p>
             <p>
-                En cas de nécessité d’inscription rapide, demandez à votre DDETS de nous contacter via <a href="https://communaute.inclusion.beta.gouv.fr/aide/emplois/#support" target="_blank" rel="noopener" title="lien de contact pour votre DDETS (ouverture dans un nouvel onglet)">ce formulaire</a>.
+                En cas de nécessité d’inscription rapide, demandez à votre DDETS de nous contacter via <a href="https://communaute.inclusion.beta.gouv.fr/aide/emplois/#support" target="_blank" rel="noopener" aria-label="lien de contact pour votre DDETS (ouverture dans un nouvel onglet)">ce formulaire</a>.
             </p>
 
             <p>
                 <strong>Si vous tentez d'inscrire une Entreprise Adaptée ou un GEIQ</strong> :
-                Utilisez <a href="{% tally_form_url "wA799W" %}" target="_blank" rel="noopener" title="lien pour une Entreprise Adaptée ou un GEIQ (ouverture dans un nouvel onglet)">ce formulaire</a>.
+                Utilisez <a href="{% tally_form_url "wA799W" %}" target="_blank" rel="noopener" aria-label="lien pour une Entreprise Adaptée ou un GEIQ (ouverture dans un nouvel onglet)">ce formulaire</a>.
             </p>
 
             <p class="mb-0">
                 <strong>Si votre organisation est porteuse de la clause sociale</strong> :
-                Utilisez <a href="{% url "signup:facilitator_search" %}" rel="noopener" title="lien pour une organisation porteuse de la clause sociale">ce formulaire</a>.
+                Utilisez <a href="{% url "signup:facilitator_search" %}" rel="noopener" aria-label="lien pour une organisation porteuse de la clause sociale">ce formulaire</a>.
             </p>
         </div>
     {% endif %}
@@ -158,7 +158,7 @@
     {% if siaes_without_members or siaes_with_members %}
         <div class="mt-5">
             <p>
-                En cas de problème contactez-nous : <a href="{{ ITOU_ASSISTANCE_URL }}" target="_blank" rel="noopener" title="{{ ITOU_ASSISTANCE_URL }} (ouverture dans un nouvel onglet)">{{ ITOU_ASSISTANCE_URL }}</a>
+                En cas de problème contactez-nous : <a href="{{ ITOU_ASSISTANCE_URL }}" target="_blank" rel="noopener" aria-label="{{ ITOU_ASSISTANCE_URL }} (ouverture dans un nouvel onglet)">{{ ITOU_ASSISTANCE_URL }}</a>
             </p>
         </div>
     {% endif %}

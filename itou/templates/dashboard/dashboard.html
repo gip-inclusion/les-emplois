@@ -29,7 +29,7 @@
                         Veuillez contacter un de vos administrateurs (par exemple {{ admin.first_name|title }} {{ admin.last_name|title }}) pour qu'il ou elle indique une autre adresse
                     {% endwith %}
                 {% endif %}
-                ou <a href="{{ ITOU_ASSISTANCE_URL }}" target="_blank" rel="noopener" title="Contactez-nous en cas de problème (ouverture dans un nouvel onglet)">contactez-nous</a> en cas de problème.
+                ou <a href="{{ ITOU_ASSISTANCE_URL }}" target="_blank" rel="noopener" aria-label="Contactez-nous en cas de problème (ouverture dans un nouvel onglet)">contactez-nous</a> en cas de problème.
             </p>
         </div>
     {% endif %}
@@ -60,7 +60,7 @@
                         Veuillez contacter un de vos administrateurs (par exemple {{ admin.first_name|title }} {{ admin.last_name|title }}) pour qu'il ou elle indique une autre adresse
                     {% endwith %}
                 {% endif %}
-                ou <a href="{{ ITOU_ASSISTANCE_URL }}" target="_blank" rel="noopener" title="Contactez-nous en cas de problème (ouverture dans un nouvel onglet)">contactez-nous</a> en cas de problème.
+                ou <a href="{{ ITOU_ASSISTANCE_URL }}" target="_blank" rel="noopener" aria-label="Contactez-nous en cas de problème (ouverture dans un nouvel onglet)">contactez-nous</a> en cas de problème.
             </p>
         </div>
     {% endif %}
@@ -101,7 +101,7 @@
                     <a href="{% tally_form_url "wgDzz1" idprescriber=current_prescriber_organization.pk iduser=user.pk source=ITOU_ENVIRONMENT %}"
                        rel="noopener"
                        target="_blank"
-                       title="Cliquez ici pour l'envoyer (ouverture dans un nouvel onglet)">
+                       aria-label="Cliquez ici pour l'envoyer (ouverture dans un nouvel onglet)">
                         cliquez ici pour l'envoyer
                         <i class="ri-external-link-line ri-lg"></i>
                     </a>
@@ -134,7 +134,7 @@
                                     <p class="mb-0">
                                         <a class="btn btn-primary btn-ico"
                                            href="https://dora.fabrique.social.gouv.fr/?utm_source=LesEmplois&utm_medium=banniereLesEmplois&utm_campaign=dashboard"
-                                           title="Consulter les services (ouverture dans un nouvel onglet)"
+                                           aria-label="Consulter les services (ouverture dans un nouvel onglet)"
                                            rel="noopener"
                                            target="_blank">
                                             <span>Consulter les services</span>
@@ -142,7 +142,7 @@
                                         </a>
                                         <a class="btn btn-link btn-ico"
                                            href="https://dora.fabrique.social.gouv.fr/contribuer?utm_source=LesEmplois&utm_medium=banniereLesEmplois&utm_campaign=dashboard"
-                                           title="Suggérer les services de vos partenaires (ouverture dans un nouvel onglet)"
+                                           aria-label="Suggérer les services de vos partenaires (ouverture dans un nouvel onglet)"
                                            rel="noopener"
                                            target="_blank">
                                             <span>Suggérer les services de vos partenaires</span>
@@ -157,7 +157,7 @@
                                     <p class="mb-0">
                                         <a class="btn btn-primary btn-ico"
                                            href="https://dora.fabrique.social.gouv.fr/auth/rattachement?siret={{ current_org.siret }}&utm_source=LesEmplois&utm_medium=banniereLesEmplois&utm_campaign=dashboard"
-                                           title="Référencer un service (ouverture dans un nouvel onglet)"
+                                           aria-label="Référencer un service (ouverture dans un nouvel onglet)"
                                            rel="noopener"
                                            target="_blank">
                                             <span>Référencer un service</span>
@@ -165,7 +165,7 @@
                                         </a>
                                         <a class="btn btn-link btn-ico"
                                            href="https://dora.fabrique.social.gouv.fr/?utm_source=LesEmplois&utm_medium=banniereLesEmplois&utm_campaign=dashboard"
-                                           title="Découvrir DORA (ouverture dans un nouvel onglet)"
+                                           aria-label="Découvrir DORA (ouverture dans un nouvel onglet)"
                                            rel="noopener"
                                            target="_blank">
                                             <span>Découvrir DORA</span>

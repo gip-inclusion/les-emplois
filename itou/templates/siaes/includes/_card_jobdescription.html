@@ -20,7 +20,7 @@
                            data-matomo-action="clic"
                            data-matomo-option="clic-structure-fichedeposte"
                            target="_blank"
-                           title="Ouvrir la page de la structure dans un nouvel onglet">
+                           aria-label="Ouvrir la page de la structure dans un nouvel onglet">
                             <b>{{ job_description.siae.kind }}</b>&nbsp;- {{ job_description.siae.display_name }}
                             <i class="ri-external-link-line ri-lg"></i>
                         </a>
@@ -50,7 +50,7 @@
                        href="{{ job_description.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}"
                        data-matomo-category="candidature"
                        data-matomo-action="clic"
-                       {% if job_description.is_external %} rel="noopener" target="_blank" data-matomo-option="clic-card-fichedeposte-externe" title="Visiter l'offre sur le site d'origine" {% else %} data-matomo-option="clic-card-fichedeposte" title="Aller vers la description de ce poste"  {% endif %}>
+                       {% if job_description.is_external %} rel="noopener" target="_blank" data-matomo-option="clic-card-fichedeposte-externe" aria-label="Visiter l'offre sur le site d'origine" {% else %} data-matomo-option="clic-card-fichedeposte" aria-label="Aller vers la description de ce poste"  {% endif %}>
                         <span class="h3">{{ job_description.display_name | capfirst }}</span>
                         {% if job_description.is_external %}&nbsp;<i class="ri-external-link-line ri-lg text-secondary"></i>{% endif %}
                     </a>

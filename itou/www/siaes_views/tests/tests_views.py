@@ -150,7 +150,7 @@ class CardViewTest(TestCase):
              <div class="d-flex justify-content-end mt-3">
               <a class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0"
                  href="/apply/{siae.pk}/start"
-                 title="Proposer une candidature aupr&egrave;s de l'employeur solidaire Les petits jardins">
+                 aria-label="Proposer une candidature aupr&egrave;s de l'employeur solidaire Les petits jardins">
                <i class="ri-draft-line">
                </i>
                <span>
@@ -250,7 +250,7 @@ class CardViewTest(TestCase):
              <div class="d-flex justify-content-end mt-3">
               <a class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0"
                  href="/apply/{siae.pk}/start"
-                 title="Proposer une candidature aupr&egrave;s de l'employeur solidaire Les petits jardins">
+                 aria-label="Proposer une candidature aupr&egrave;s de l'employeur solidaire Les petits jardins">
                <i class="ri-draft-line">
                </i>
                <span>
@@ -404,7 +404,7 @@ class CardViewTest(TestCase):
              <div class="d-flex justify-content-end mt-3">
               <a class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0"
                  href="/apply/{siae.pk}/start"
-                 title="Proposer une candidature aupr&egrave;s de l'employeur solidaire Les petits jardins">
+                 aria-label="Proposer une candidature aupr&egrave;s de l'employeur solidaire Les petits jardins">
                <i class="ri-draft-line">
                </i>
                <span>

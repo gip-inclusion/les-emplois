@@ -30,7 +30,7 @@
         {% endif %}
         {% if criteria.written_proof_url %}
             <p class="small mb-0 form-text text-muted">
-                <a href="{{ criteria.written_proof_url }}" rel="noopener" target="_blank" title="{{ criteria.written_proof_url }} (ouverture dans un nouvel onglet)">
+                <a href="{{ criteria.written_proof_url }}" rel="noopener" target="_blank" aria-label="{{ criteria.written_proof_url }} (ouverture dans un nouvel onglet)">
                     {{ criteria.written_proof_url }}
                 </a>
             </p>
