@@ -1,5 +1,16 @@
 /* Cette table nous permet de suivre la consommation d'etp par structures, par rapport à leur conventionnement */
-with calcul_etp as (
+with mois_saisis as (
+    select
+        id_annexe_financiere,
+        af_numero_annexe_financiere,
+        (max(date_part('month', date_saisie))+ 1) - min(date_part('month', date_saisie)) as nombre_mois_saisis
+    from
+        suivi_etp_realises_v2
+    group by
+        id_annexe_financiere,
+        af_numero_annexe_financiere
+),
+calcul_etp as (
     select
         distinct(etp.id_annexe_financiere),
         /* Utilisation de l'ID de l'annexe financière -> ID unique contrairement à la convention et l'af */
@@ -8,82 +19,74 @@ with calcul_etp as (
         etp.af_etat_annexe_financiere_code,
         annee_af,
         dernier_mois_saisi_asp,
+        nombre_mois_saisis,
         /* les deux conditions si dessus sont identiques, sauf que pour l'une on considère les ETPs mensuels et l'autre les annuels */
         sum(nombre_etp_consommes_reels_mensuels) as total_etp_mensuels_realises,
         sum(nombre_etp_consommes_reels_annuels) as total_etp_annuels_realises,
-        -- Ici on utilise
+        -- Ici on utilise le nombre de mois saisis éviter d
         case
             /* Sur les deux lignes du dessous on sélectionne le dernier mois saisi pour avoir une moyenne mensuelle des ETPs consommés sur les années précédentes */
-            when (
+            when 
+                (
                 max(annee_af) = date_part (
                     'year',
                     current_date
                 ) - 1
-            ) then (
-                sum(nombre_etp_consommes_reels_mensuels) / (
-                -- Ici on utilise le nombre de mois saisis pour avoir une donnée pertinente    
+            ) 
+            then 
                 (
-                        max(date_part('month', etp_c.date_saisie))+ 1
-                    ) - min(date_part('month', etp_c.date_saisie))
-                )
+                sum(nombre_etp_consommes_reels_mensuels) / nombre_mois_saisis
             )
-            when (
+            when 
+                (
                 max(annee_af) = date_part('year', current_date) - 2
-            ) then (
-                sum(nombre_etp_consommes_reels_mensuels) / (
-                    (
-                        max(date_part('month', etp_c.date_saisie))+ 1
-                    ) - min(date_part('month', etp_c.date_saisie))
-                )
+            ) 
+            then 
+                (
+                sum(nombre_etp_consommes_reels_mensuels) / nombre_mois_saisis
             )
             /* Ici on lui demande de seulement prendre en compte les mois écoulés pour l'année en cours (donc en mars il divisera le total par 3) */
-            else sum(nombre_etp_consommes_reels_mensuels) filter (
+            else 
+                sum(nombre_etp_consommes_reels_mensuels) 
+            filter 
+                (
             where
                 annee_af = (
                     date_part('year', current_date)
                 )
-            ) / (
-                (
-                    max(date_part('month', etp_c.date_saisie))+ 1
-                ) - min(date_part('month', etp_c.date_saisie))
-            )
+            ) / nombre_mois_saisis
         end moyenne_nb_etp_mensuels_depuis_debut_annee,
         case
-            when (
+            when 
+                (
                 max(annee_af) = date_part (
                     'year',
                     current_date
                 ) - 1
-            ) then (
-                sum(nombre_etp_consommes_reels_annuels) / (
-                    (
-                        max(date_part('month', etp_c.date_saisie))+ 1
-                    ) - min(date_part('month', etp_c.date_saisie))
-                )
+            ) 
+            then 
+                (
+                sum(nombre_etp_consommes_reels_annuels) / nombre_mois_saisis
             )
-            when (
+            when 
+                (
                 max(annee_af) = date_part('year', current_date) - 2
-            ) then (
-                sum(nombre_etp_consommes_reels_annuels) / (
-                    (
-                        max(date_part('month', etp_c.date_saisie))+ 1
-                    ) - min(date_part('month', etp_c.date_saisie))
-                )
+            ) 
+            then 
+                (
+                sum(nombre_etp_consommes_reels_annuels) / nombre_mois_saisis
             )
-            else sum(nombre_etp_consommes_reels_annuels) filter (
+            else 
+                sum(nombre_etp_consommes_reels_annuels) 
+                    filter (
             where
                 annee_af = (
                     date_part('year', current_date)
                 )
-            ) / (
-                (
-                    max(date_part('month', etp_c.date_saisie))+ 1
-                ) - min(date_part('month', etp_c.date_saisie))
-            )
+            ) / nombre_mois_saisis
         end moyenne_nb_etp_annuels_depuis_debut_annee,
         effectif_mensuel_conventionné,
         effectif_annuel_conventionné,
-        (max(date_part('month', etp_c.date_saisie))+ 1) - min(date_part('month', etp_c.date_saisie)) as nombre_mois_saisis,
         etp.duree_annexe,
         etp.type_structure,
         etp.structure_denomination,
@@ -100,9 +103,12 @@ with calcul_etp as (
         /* bien penser à joindre sur l'année pour éviter que l'on se retrouve avec années de conventionnement qui correspondent pas */
     left join suivi_saisies_dans_asp sasp on
         sasp.af_id_annexe_financiere = etp.id_annexe_financiere
+    left join mois_saisis ms on
+        ms.id_annexe_financiere = etp.id_annexe_financiere
     group by
         dernier_mois_saisi_asp,
         duree_annexe,
+        nombre_mois_saisis,
         etp.id_annexe_financiere,
         etp.af_numero_convention,
         etp.af_numero_annexe_financiere,
