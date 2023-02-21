@@ -91,8 +91,11 @@
                     {% endif %}
                 </div>
                 <div class="card-body">
-                    <a class="btn btn-primary float-right"
-                       href="{% if not is_siae %}{% url 'siae_evaluations_views:institution_evaluated_siae_list' evaluated_siae.evaluation_campaign_id %}{% else %}{% url "dashboard:index" %}{% endif %}">Retour</a>
+                    {% if is_siae %}
+                        <a class="btn btn-primary float-right" href="{% url "dashboard:index" %}">Retour au Tableau de bord</a>
+                    {% else %}
+                        <a class="btn btn-primary float-right" href="{% url 'siae_evaluations_views:institution_evaluated_siae_list' evaluated_siae.evaluation_campaign_id %}">Revenir à la liste des SIAE</a>
+                    {% endif %}
                 </div>
             </div>
         </div>

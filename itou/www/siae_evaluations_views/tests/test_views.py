@@ -36,9 +36,11 @@ class EvaluatedSiaeSanctionViewTest(TestCase):
         cls.return_evaluated_siae_list_link_html = (
             '<a class="btn btn-primary float-right" '
             f'href="/siae_evaluation/institution_evaluated_siae_list/{cls.evaluated_siae.evaluation_campaign_id}/">'
-            "Retour</a>"
+            "Revenir à la liste des SIAE</a>"
         )
-        cls.return_dashboard_link_html = '<a class="btn btn-primary float-right" href="/dashboard/">Retour</a>'
+        cls.return_dashboard_link_html = (
+            '<a class="btn btn-primary float-right" href="/dashboard/">Retour au Tableau de bord</a>'
+        )
 
     def assertSanctionContent(self, response):
         self.assertContains(
