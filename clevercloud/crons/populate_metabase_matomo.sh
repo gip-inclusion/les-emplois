@@ -11,10 +11,10 @@ set -o errexit
 OUTPUT_PATH=shared_bucket/populate_metabase_matomo
 mkdir -p $OUTPUT_PATH
 
+OUTPUT_LOG="$OUTPUT_PATH/output_$(date '+%Y-%m-%d_%H-%M-%S').log"
+
 django-admin send_slack_message ":rocket: Démarrage de la mise à jour des données Matomo"
-(
-django-admin populate_metabase_matomo --mode=public --wet-run
-django-admin populate_metabase_matomo --mode=private --wet-run
-django-admin populate_metabase_emplois --mode final_tables
-) |& tee -a "$OUTPUT_PATH/output_$(date '+%Y-%m-%d_%H-%M-%S').log"
+django-admin populate_metabase_matomo --mode=public --wet-run |& tee -a $OUTPUT_LOG
+django-admin populate_metabase_matomo --mode=private --wet-run |& tee -a $OUTPUT_LOG
+django-admin populate_metabase_emplois --mode final_tables |& tee -a $OUTPUT_LOG
 django-admin send_slack_message  ":white_check_mark: Mise à jour des données Matomo terminée"

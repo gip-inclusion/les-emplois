@@ -11,38 +11,39 @@ set -o errexit
 OUTPUT_PATH=shared_bucket/populate_metabase_emplois
 mkdir -p $OUTPUT_PATH
 
+OUTPUT_LOG="$OUTPUT_PATH/output_$(date '+%Y-%m-%d_%H-%M-%S').log"
+
 # NOTE(vperron): this is not a proper getopt parsing but getopt is SO verbose for
 # just that simple use that I have rather use a very simple version. This script
 # is intended to be automated by a proper tool like Airflow anyway.
-(
-    if [[ "$1" == "--daily" ]]; then
-        django-admin send_slack_message ":rocket: lancement mise à jour de données C1 -> Metabase"
-        django-admin populate_metabase_emplois --mode=analytics
-        django-admin populate_metabase_emplois --mode=siaes
-        django-admin populate_metabase_emplois --mode=job_descriptions
-        django-admin populate_metabase_emplois --mode=organizations
-        django-admin populate_metabase_emplois --mode=job_seekers
-        django-admin populate_metabase_emplois --mode=criteria
-        django-admin populate_metabase_emplois --mode=job_applications
-        django-admin populate_metabase_emplois --mode=selected_jobs
-        django-admin populate_metabase_emplois --mode=approvals
-        django-admin populate_metabase_emplois --mode=institutions
-        django-admin populate_metabase_emplois --mode=evaluation_campaigns
-        django-admin populate_metabase_emplois --mode=evaluated_siaes
-        django-admin populate_metabase_emplois --mode=evaluated_job_applications
-        django-admin populate_metabase_emplois --mode=evaluated_criteria
-        django-admin populate_metabase_emplois --mode=final_tables
-        django-admin populate_metabase_emplois --mode=data_inconsistencies
-        django-admin send_slack_message ":white_check_mark: succès mise à jour de données C1 -> Metabase"
-    elif [[ "$1" == "--monthly" ]]; then
-        django-admin send_slack_message ":rocket: lancement mise à jour de données peu fréquentes C1 -> Metabase"
-        django-admin populate_metabase_emplois --mode=rome_codes
-        django-admin populate_metabase_emplois --mode=insee_codes
-        django-admin populate_metabase_emplois --mode=insee_codes_vs_post_codes
-        django-admin populate_metabase_emplois --mode=departments
-        django-admin populate_metabase_emplois --mode=final_tables
-        django-admin send_slack_message ":white_check_mark: succès mise à jour de données peu fréquentes C1 -> Metabase"
-    else
-        echo "populate_metabase_emplois shell script: unknown mode='$1' selected"
-    fi
-) |& tee -a "$OUTPUT_PATH/output_$(date '+%Y-%m-%d_%H-%M-%S').log"
+if [[ "$1" == "--daily" ]]; then
+    django-admin send_slack_message ":rocket: lancement mise à jour de données C1 -> Metabase"
+    django-admin populate_metabase_emplois --mode=analytic |& tee -a $OUTPUT_LOG
+    django-admin populate_metabase_emplois --mode=siaes |& tee -a $OUTPUT_LOG
+    django-admin populate_metabase_emplois --mode=job_descriptions |& tee -a $OUTPUT_LOG
+    django-admin populate_metabase_emplois --mode=organizations |& tee -a $OUTPUT_LOG
+    django-admin populate_metabase_emplois --mode=job_seekers |& tee -a $OUTPUT_LOG
+    django-admin populate_metabase_emplois --mode=criteria |& tee -a $OUTPUT_LOG
+    django-admin populate_metabase_emplois --mode=job_applications |& tee -a $OUTPUT_LOG
+    django-admin populate_metabase_emplois --mode=selected_jobs |& tee -a $OUTPUT_LOG
+    django-admin populate_metabase_emplois --mode=approvals |& tee -a $OUTPUT_LOG
+    django-admin populate_metabase_emplois --mode=institutions |& tee -a $OUTPUT_LOG
+    django-admin populate_metabase_emplois --mode=evaluation_campaigns |& tee -a $OUTPUT_LOG
+    django-admin populate_metabase_emplois --mode=evaluated_siaes |& tee -a $OUTPUT_LOG
+    django-admin populate_metabase_emplois --mode=evaluated_job_applications |& tee -a $OUTPUT_LOG
+    django-admin populate_metabase_emplois --mode=evaluated_criteria |& tee -a $OUTPUT_LOG
+    django-admin populate_metabase_emplois --mode=final_tables |& tee -a $OUTPUT_LOG
+    django-admin populate_metabase_emplois --mode=data_inconsistencies |& tee -a $OUTPUT_LOG
+    django-admin send_slack_message ":white_check_mark: succès mise à jour de données C1 -> Metabase"
+elif [[ "$1" == "--monthly" ]]; then
+    django-admin send_slack_message ":rocket: lancement mise à jour de données peu fréquentes C1 -> Metabase"
+    django-admin populate_metabase_emplois --mode=rome_codes |& tee -a $OUTPUT_LOG
+    django-admin populate_metabase_emplois --mode=insee_codes |& tee -a $OUTPUT_LOG
+    django-admin populate_metabase_emplois --mode=insee_codes_vs_post_codes |& tee -a $OUTPUT_LOG
+    django-admin populate_metabase_emplois --mode=departments |& tee -a $OUTPUT_LOG
+    django-admin populate_metabase_emplois --mode=final_tables |& tee -a $OUTPUT_LOG
+    django-admin send_slack_message ":white_check_mark: succès mise à jour de données peu fréquentes C1 -> Metabase"
+else
+    echo "populate_metabase_emplois shell script: unknown mode='$1' selected"
+fi
+
