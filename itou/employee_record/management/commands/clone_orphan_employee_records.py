@@ -33,14 +33,17 @@ class Command(BaseCommand):
 
         self.stderr.write(f"Clone orphans employee records of {siae=} {siae.siret=} {siae.convention.asp_id=}")
 
-        employee_records_to_clone = (
-            EmployeeRecord.objects.filter(job_application__to_siae=siae).orphans().order_by("pk")
+        orphans = EmployeeRecord.objects.filter(job_application__to_siae=siae).orphans()
+        to_clone = (
+            orphans.exclude(approval_number__in=EmployeeRecord.objects.for_siae(siae).values("approval_number"))
+            .distinct("approval_number")
+            .order_by("approval_number", "-job_application__hiring_start_at", "-pk")
         )
-        self.stderr.write(f"{len(employee_records_to_clone)} employee records will be cloned")
+        self.stderr.write(f"{len(to_clone)}/{orphans.count()} orphans employee records will be cloned")
 
         if not wet_run:
             self.stderr.write("Option --wet-run was not used so nothing will be cloned.")
-        for employee_record in employee_records_to_clone:
+        for employee_record in to_clone:
             self.stdout.write(f"Cloning {employee_record.pk=}...")
             if not wet_run:
                 continue

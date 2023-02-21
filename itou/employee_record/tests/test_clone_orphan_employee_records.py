@@ -22,7 +22,7 @@ def test_management_command_default_run(command):
 
     assert command.stderr.getvalue().split("\n") == [
         f"Clone orphans employee records of {siae=} {siae.siret=} {siae.convention.asp_id=}",
-        "1 employee records will be cloned",
+        "1/1 orphans employee records will be cloned",
         "Option --wet-run was not used so nothing will be cloned.",
         "Done!",
         "",
@@ -44,7 +44,7 @@ def test_management_command_wet_run(command):
 
     assert command.stderr.getvalue().split("\n") == [
         f"Clone orphans employee records of {siae=} {siae.siret=} {siae.convention.asp_id=}",
-        "1 employee records will be cloned",
+        "1/1 orphans employee records will be cloned",
         "Done!",
         "",
     ]
@@ -75,7 +75,7 @@ def test_management_command_when_the_new_asp_id_is_used_by_multiple_convention(c
 
     assert command.stderr.getvalue().split("\n") == [
         f"Clone orphans employee records of {siae=} {siae.siret=} {siae.convention.asp_id=}",
-        "1 employee records will be cloned",
+        "1/1 orphans employee records will be cloned",
         "Option --wet-run was not used so nothing will be cloned.",
         "Done!",
         "",
@@ -84,6 +84,26 @@ def test_management_command_when_the_new_asp_id_is_used_by_multiple_convention(c
         f"Cloning employee_record.pk={employee_record.pk}...",
         "",
     ]
+
+
+def test_management_command_do_not_try_to_create_multiple_records_for_the_same_approval(command):
+    first_employee_record = factories.EmployeeRecordFactory(
+        orphan=True,
+        job_application__to_siae__kind=siaes_enums.SiaeKind.EI,
+    )
+    second_employee_record = first_employee_record.clone()  # Use clone to create the most perfect duplicate
+    siae = second_employee_record.job_application.to_siae
+
+    command.handle(for_siae=siae.pk)
+
+    assert command.stderr.getvalue().split("\n") == [
+        f"Clone orphans employee records of {siae=} {siae.siret=} {siae.convention.asp_id=}",
+        "0/1 orphans employee records will be cloned",
+        "Option --wet-run was not used so nothing will be cloned.",
+        "Done!",
+        "",
+    ]
+    assert command.stdout.getvalue().split("\n") == [""]
 
 
 def test_management_command_name(faker):
