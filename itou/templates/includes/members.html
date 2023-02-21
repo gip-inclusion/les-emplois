@@ -18,9 +18,7 @@
                     <td>
                         {{ member.user.get_full_name }}
                         {% if member.user in active_admin_members %}
-                            <small>
-                                <span class="badge badge-pill badge-info" data-toggle="tooltip" title="Administrateur de la structure">admin</span>
-                            </small>
+                            <span class="badge badge-xs badge-pill badge-info" data-toggle="tooltip" title="Administrateur de la structure">admin</span>
                         {% endif %}
                     </td>
                     <td>
