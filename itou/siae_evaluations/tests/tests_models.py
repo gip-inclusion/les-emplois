@@ -1000,6 +1000,23 @@ class EvaluatedJobApplicationModelTest(TestCase):
         evaluated_administrative_criteria.save(update_fields=["review_state"])
         assert evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED == evaluated_job_application.state
 
+    def test_state_refused2_has_precedence(self):
+        evaluated_job_application = EvaluatedJobApplicationFactory(
+            evaluated_siae__reviewed_at=timezone.now() - relativedelta(weeks=3),
+            evaluated_siae__final_reviewed_at=timezone.now(),
+        )
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_application,
+            submitted_at=timezone.now(),
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
+        )
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_application,
+            submitted_at=timezone.now() - relativedelta(weeks=4),
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2,
+        )
+        assert evaluated_job_application.state == evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2
+
     def test_should_select_criteria_with_mock(self):
         evaluated_job_application = EvaluatedJobApplicationFactory()
         assert (
