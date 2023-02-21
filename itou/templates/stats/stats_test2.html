@@ -22,6 +22,7 @@
         </div>
     {% endif %}
 
+    <script src="{{ stats_base_url }}/app/iframeResizer.js"></script>
     <iframe id="stats-iframe" src="{{ iframeurl }}" width="100%" frameborder="0">
     </iframe>
 
@@ -129,6 +130,12 @@
 {% block script %}
     {{ block.super }}
 
+    <script nonce="{{ CSP_NONCE }}">
+        document.getElementById("stats-iframe").addEventListener("load", function(){
+            iFrameResize({}, this)
+        });
+    </script>
+
     {% if tally_form_id %}
         <script async src="https://tally.so/widgets/embed.js"></script>
 
@@ -140,9 +147,10 @@
                         "text": "👋",
                         "animation": "wave"
                     },
-                    "autoClose": 3000,
-                    "showOnce": true,
-                    "doNotShowAfterSubmit": true
+                    "open": {
+                        "trigger": "time",
+                        "ms": 1000
+                    },
                 }
             };
         </script>
