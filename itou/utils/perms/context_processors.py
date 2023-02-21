@@ -20,9 +20,7 @@ def get_current_organization_and_perms(request):
 
     if request.user.is_authenticated:
         context, extra_context, extra_matomo_context = {}, {}, {}
-        matomo_context = {"account_id": request.user.pk, "is_authenticated": "yes"} | user_to_account_type(
-            request.user
-        )
+        matomo_context = {"is_authenticated": "yes"} | user_to_account_type(request.user)
 
         if siae_pk:
             extra_context, extra_matomo_context = get_context_siae(request.user, siae_pk)
@@ -68,7 +66,6 @@ def get_context_siae(user, siae_pk):
                 }
             )
     context["user_siaes"] = sort_organizations(siaes)
-    matomo_context["account_siae_ids"] = join_keys_str(context["user_siaes"])
     return context, matomo_context
 
 
@@ -103,7 +100,6 @@ def get_context_prescriber(user, prescriber_org_pk):
                 }
             )
     context["user_prescriberorganizations"] = sort_organizations(prescriber_orgs)
-    matomo_context["account_organization_ids"] = join_keys_str(context["user_prescriberorganizations"])
     return context, matomo_context
 
 
@@ -137,7 +133,6 @@ def get_context_institution(user, institution_pk):
             )
 
     context["user_institutions"] = sort_organizations(institutions)
-    matomo_context["account_institution_ids"] = join_keys_str(context["user_institutions"])
     return context, matomo_context
 
 
