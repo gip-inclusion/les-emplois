@@ -3,6 +3,9 @@ import uuid
 from django.db import models
 from django.utils import timezone
 
+from itou.common_apps.address.departments import DEPARTMENTS
+from itou.users.enums import UserKind
+
 
 class DatumCode(models.TextChoices):
     # Employee record - Base
@@ -30,3 +33,22 @@ class Datum(models.Model):
         verbose_name_plural = "Data"
         unique_together = ["code", "bucket"]
         indexes = [models.Index(fields=["measured_at", "code"])]
+
+
+class StatsDashboardVisit(models.Model):
+    dashboard_id = models.IntegerField(verbose_name="ID tableau de bord Metabase")
+    dashboard_name = models.TextField(verbose_name="Nom de la vue du tableau de bord")
+    department = models.CharField(verbose_name="Département", choices=DEPARTMENTS.items(), max_length=3, null=True)
+    region = models.TextField(verbose_name="Région", null=True)
+    current_siae_id = models.IntegerField(verbose_name="ID SIAE courante", null=True)
+    current_prescriber_organization_id = models.IntegerField(
+        verbose_name="ID organisation prescriptrice courante", null=True
+    )
+    current_institution_id = models.IntegerField(verbose_name="ID institution courante", null=True)
+    user_kind = models.TextField(verbose_name="Type d'utilisateur", choices=UserKind.choices)
+    user_id = models.IntegerField(verbose_name="ID utilisateur")
+
+    measured_at = models.DateTimeField(default=timezone.now)  # Not using auto_now_add=True to allow overrides
+
+    class Meta:
+        verbose_name_plural = "Visite de tableau de bord"
