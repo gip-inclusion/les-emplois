@@ -57,7 +57,7 @@
                     <span>Cette structure vous intéresse ?</span>
                     <a class="btn btn-sm btn-primary"
                        href="{% url 'apply:start' siae_pk=siae.pk %}{% if back_url %}?back_url={{ back_url }}{% endif %}"
-                       title="Proposer votre candidature auprès de l'employeur solidaire {{ siae.display_name }}">
+                       aria-label="Proposer votre candidature auprès de l'employeur solidaire {{ siae.display_name }}">
                         Proposer votre candidature
                     </a>
                 </div>

@@ -22,7 +22,7 @@
                         </a>
                     </div>
                     <div class="col-auto">
-                        <a href="{% url "siaes_views:job_description_list" %}" class="btn btn-sm btn-primary" title="Retour vers la liste des postes">
+                        <a href="{% url "siaes_views:job_description_list" %}" class="btn btn-sm btn-primary" aria-label="Retour vers la liste des postes">
                             Fermer
                         </a>
                     </div>
@@ -30,7 +30,7 @@
             {% else %}
                 <div class="row mb-4">
                     <div class="col">
-                        <a href="#job_description_link" class="btn btn-sm btn-outline-primary" data-toggle="collapse" title="Partager cette fiche métier">Partager cette fiche métier</a>
+                        <a href="#job_description_link" class="btn btn-sm btn-outline-primary" data-toggle="collapse" aria-label="Partager cette fiche métier">Partager cette fiche métier</a>
                         <div class="collapse pt-2" id="job_description_link">
                             <p class="small mb-1">Cliquez sur le lien ci-dessous pour le copier:</p>
                             <input type="text" class="form-control form-control-sm" value="{{ request.scheme }}://{{ request.get_host }}{{ job.get_absolute_url }}">
@@ -43,7 +43,7 @@
                                data-matomo-category="candidature"
                                data-matomo-action="clic"
                                data-matomo-option="clic-metiers"
-                               title="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
+                               aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
                                 Postuler
                             </a>
                         </div>

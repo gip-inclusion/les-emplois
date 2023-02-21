@@ -22,7 +22,7 @@
                 </h6>
             </div>
             <div class="col text-right">
-                <a class="btn btn-primary btn-sm" href="{% url "siaes_views:edit_job_description" %}?page={{ page|default:1 }}" title="Créer une nouvelle fiche de poste">Créer une nouvelle fiche de poste</a>
+                <a class="btn btn-primary btn-sm" href="{% url "siaes_views:edit_job_description" %}?page={{ page|default:1 }}" aria-label="Créer une nouvelle fiche de poste">Créer une nouvelle fiche de poste</a>
             </div>
         </div>
 
@@ -72,7 +72,7 @@
                         <tr>
                             <th>{{ job_description.appellation.rome.code }}</th>
                             <th>
-                                <a href="{% url "siaes_views:job_description_card" job_description_id=job_description.id %}" title="Lien vers fiche de poste : '{{ job_description.display_name }}'">
+                                <a href="{% url "siaes_views:job_description_card" job_description_id=job_description.id %}" aria-label="Lien vers fiche de poste : '{{ job_description.display_name }}'">
                                     {{ job_description.display_name }}
                                 </a>
                             </th>
@@ -144,7 +144,7 @@
                                 </div>
                             </td>
                             <td>
-                                <a href="{% url "siaes_views:job_description_card" job_description_id=job_description.id %}" class="text-decoration-none" title="Lien vers fiche de poste : '{{ job_description.display_name }}'">
+                                <a href="{% url "siaes_views:job_description_card" job_description_id=job_description.id %}" class="text-decoration-none" aria-label="Lien vers fiche de poste : '{{ job_description.display_name }}'">
                                     <i class="ri-arrow-right-s-line ri-xl"></i>
 
                                 </a>
@@ -193,7 +193,7 @@
                 <div id="js-modal-preview-body" class="modal-body">
                 </div>
                 <div class="modal-footer">
-                    <a class="btn btn-sm btn-primary" href="#" data-dismiss="modal" title="Fermer la fenêtre">Fermer la fenêtre</a>
+                    <a class="btn btn-sm btn-primary" href="#" data-dismiss="modal" aria-label="Fermer la fenêtre">Fermer la fenêtre</a>
                 </div>
             </div>
         </div>

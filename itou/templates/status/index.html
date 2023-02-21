@@ -32,19 +32,19 @@
                             {% endif %}
                         </td>
                         <td>
-                            <span title="{{ status.last_success_at|date:"c"|default:"" }}">
+                            <span aria-label="{{ status.last_success_at|date:"c"|default:"" }}">
                                 {{ status.last_success_at|timesince|default:"N/A" }}
                             </span>
                             {% if status.last_success_info %}
-                                <i class="ri-information-line fs-lg" title="{{ status.last_success_info }}"></i>
+                                <i class="ri-information-line fs-lg" aria-label="{{ status.last_success_info }}"></i>
                             {% endif %}
                         </td>
                         <td>
-                            <span title="{{ status.last_failure_at|date:"c"|default:"" }}">
+                            <span aria-label="{{ status.last_failure_at|date:"c"|default:"" }}">
                                 {{ status.last_failure_at|timesince|default:"N/A" }}
                             </span>
                             {% if status.last_failure_info %}
-                                <i class="ri-error-warning-line fs-lg" title="{{ status.last_failure_info }}"></i>
+                                <i class="ri-error-warning-line fs-lg" aria-label="{{ status.last_failure_info }}"></i>
                             {% endif %}
                         </td>
                     </tr>

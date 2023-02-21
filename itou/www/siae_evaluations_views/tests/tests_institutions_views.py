@@ -2646,7 +2646,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
 
 class InstitutionEvaluatedJobApplicationViewTest(TestCase):
     btn_modifier_html = """
-        <button class="btn btn-outline-primary btn-sm float-right" title="Modifier l'état de ce justificatif">
+        <button class="btn btn-outline-primary btn-sm float-right" aria-label="Modifier l'état de ce justificatif">
             Modifier
         </button>
     """
@@ -2743,7 +2743,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
             <a href="https://server.com/rocky-balboa.pdf"
                rel="noopener"
                target="_blank"
-               title="Revoir ce justificatif (ouverture dans un nouvel onglet)"
+               aria-label="Revoir ce justificatif (ouverture dans un nouvel onglet)"
             >
                 Revoir ce justificatif
             </a>
@@ -2880,7 +2880,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
             <a href="https://server.com/rocky-balboa.pdf"
                rel="noopener"
                target="_blank"
-               title="Revoir ce justificatif (ouverture dans un nouvel onglet)"
+               aria-label="Revoir ce justificatif (ouverture dans un nouvel onglet)"
             >
                 Revoir ce justificatif
             </a>
