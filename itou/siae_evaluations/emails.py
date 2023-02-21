@@ -94,6 +94,15 @@ class SIAEEmailFactory:
         body = "siae_evaluations/email/to_siae_reviewed_body.txt"
         return get_email_message(self.recipients, context, subject, body)
 
+    def force_accepted(self):
+        context = {
+            "evaluation_campaign": self.evaluated_siae.evaluation_campaign,
+            "siae": self.evaluated_siae.siae,
+        }
+        subject = "siae_evaluations/email/to_siae_force_accepted_subject.txt"
+        body = "siae_evaluations/email/to_siae_force_accepted_body.txt"
+        return get_email_message(self.recipients, context, subject, body)
+
     def notify_before_adversarial_stage(self):
         job_app_list_url = reverse(
             "siae_evaluations_views:siae_job_applications_list",

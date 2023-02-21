@@ -1,0 +1,12 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% block body %}
+Bonjour,
+
+La campagne de contrôle a posteriori sur les embauches réalisées en auto-prescription entre le {{ evaluation_campaign.evaluated_period_start_at|date:"d E Y" }} et le {{ evaluation_campaign.evaluated_period_end_at|date:"d E Y" }} entre en phase contradictoire.
+
+La {{ evaluation_campaign.institution.name }} n’a pas étudié la conformité des justificatifs que vous avez transmis dans le délai imparti. Par conséquent, vos auto-prescriptions sont considérées comme conformes.
+
+Cette campagne de contrôle est terminée pour votre SIAE {{ siae.kind }} {{ siae.name }} ID-{{siae.id}}.
+
+Cordialement,
+{% endblock %}

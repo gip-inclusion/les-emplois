@@ -257,7 +257,7 @@ class EvaluationCampaign(models.Model):
                 evaluated_siae.reviewed_at = now
                 evaluated_siae.final_reviewed_at = now
                 accept_by_default.append(evaluated_siae)
-                # TODO: Notify SIAE of their accepted evaluation with an email.
+                emails.append(SIAEEmailFactory(evaluated_siae).force_accepted())
         if siaes_to_notify:
             siaes_to_notify.sort(key=lambda evaluated_siae: evaluated_siae.siae.name)
             summary_email = CampaignEmailFactory(self).forced_to_adversarial_stage(siaes_to_notify)

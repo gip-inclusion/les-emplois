@@ -473,7 +473,7 @@ class EvaluationCampaignManagerTest(TestCase):
         assert evaluated_siae_refused.reviewed_at == refused_ts
         assert evaluated_siae_refused.final_reviewed_at is None
 
-        [siae_no_response_email, siae_no_docs_email, institution_email] = sorted(
+        [siae_no_response_email, siae_no_docs_email, siae_force_accepted, institution_email] = sorted(
             mail.outbox, key=lambda mail: mail.subject
         )
         assert (
@@ -522,6 +522,25 @@ class EvaluationCampaignManagerTest(TestCase):
             "“Justifier mes auto-prescriptions”.\n"
             f"http://127.0.0.1:8000/siae_evaluation/siae_job_applications_list/{evaluated_siae_no_docs.pk}/\n\n"
             "En cas de besoin, vous pouvez consulter ce mode d’emploi.\n\n"
+            "Cordialement,\n\n"
+            "---\n"
+            "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
+            "merci de ne pas en tenir compte [DEV]\n"
+            "Les emplois de l'inclusion\n"
+            "http://127.0.0.1:8000"
+        )
+
+        assert (
+            siae_force_accepted.subject == f"Résultat du contrôle - EI Prim’vert ID-{evaluated_siae_submitted.siae_id}"
+        )
+        assert siae_force_accepted.body == (
+            "Bonjour,\n\n"
+            "La campagne de contrôle a posteriori sur les embauches réalisées en auto-prescription entre "
+            "le 02 Octobre 2022 et le 02 Décembre 2022 entre en phase contradictoire.\n\n"
+            "La DDETS 1 n’a pas étudié la conformité des justificatifs que vous avez transmis dans le délai "
+            "imparti. Par conséquent, vos auto-prescriptions sont considérées comme conformes.\n\n"
+            "Cette campagne de contrôle est terminée pour votre SIAE EI Prim’vert "
+            f"ID-{evaluated_siae_submitted.siae_id}.\n\n"
             "Cordialement,\n\n"
             "---\n"
             "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
