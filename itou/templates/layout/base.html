@@ -195,11 +195,6 @@
             {# Matomo/Piwik open source web analytics #}
             <script nonce="{{ CSP_NONCE }}">
                 window._paq = window._paq || [];
-                /* Custom variables: https://matomo.org/docs/custom-variables/ */
-                /* Fields are, in order: index, name, value, scope. */
-                {% for key, value in  matomo_custom_variables.items %}
-                    window._paq.push(['setCustomVariable', {{ forloop.counter }}, '{{ key }}', '{{ value }}', 'page']);
-                {% endfor %}
                 /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
                 {% if matomo_custom_url %}
                     window._paq.push(['setCustomUrl', location.origin + '{{ matomo_custom_url }}']);
