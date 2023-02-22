@@ -52,14 +52,15 @@ select
     struct. "nom_département" as "nom_département",
     struct. "région",
     -- récupération du pct de sélection attendu
-    max(cap_camp. "pourcentage_sélection") as "pct_sélection",
+    -- que l'on divise par 100 pour permettre l'affichage correct sur metabase
+    max(cap_camp. "pourcentage_sélection")/100 as "part_structures_à_contrôler",
     sum(cap_struct_cnt. "nb_contrôlées") as "nb_contrôlées",
     sum(cap_struct_cnt. "nb_acceptées") as "nb_acceptées",
     sum(cap_struct_cnt. "nb_refusées") as "nb_refusées",
     sum(cap_struct_cnt. "nb_attente") as "nb_attente",
     -- pourcentage de SIAE contrôlées :
     -- les contrôlées / ttes les siae
-    sum(cap_struct_cnt. "nb_contrôlées") / max(nb_tot_dep.nb_struct) * 100 as "pct_contrôlées"
+    sum(cap_struct_cnt. "nb_contrôlées") / max(nb_tot_dep.nb_struct) as "part_structures_contrôlées"
 from
     cap_struct_counts cap_struct_cnt
     left join structures struct on cap_struct_cnt.id_structure = struct.id
