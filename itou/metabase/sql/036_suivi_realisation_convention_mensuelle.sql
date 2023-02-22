@@ -22,6 +22,7 @@ select
         else 0
     end nombre_etp_consommes_reels_mensuels,
     af_date_fin_effet_v2,
+    annee_af,
     duree_annexe,
     effectif_mensuel_conventionné,
     effectif_annuel_conventionné,
