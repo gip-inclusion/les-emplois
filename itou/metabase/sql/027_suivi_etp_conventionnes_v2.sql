@@ -36,7 +36,7 @@ select
             )+ 1
         )/ 12
     ) as effectif_annuel_conventionné,
-    replace(af.af_mesure_dispositif_code, '_', ' ') as type_structure,
+    type_structure,
     structure.structure_denomination,
     structure.structure_adresse_admin_commune as commune_structure,
     structure.structure_adresse_admin_code_insee as code_insee_structure,
@@ -54,9 +54,12 @@ left join
     "fluxIAE_Structure_v2" as structure
         on
     af.af_id_structure = structure.structure_id_siae
+left join ref_mesure_dispositif_asp as ref_asp 
+        on
+    af.af_mesure_dispositif_code = ref_asp.af_mesure_dispositif_code
 where
     date_part('year', af.af_date_debut_effet_v2) >= annee_en_cours - 2
     and af.af_etat_annexe_financiere_code in (
         'VALIDE', 'PROVISOIRE', 'CLOTURE'
     )
-    and af_mesure_dispositif_code not like '%FDI%'
+    and af.af_mesure_dispositif_code not like '%FDI%'
