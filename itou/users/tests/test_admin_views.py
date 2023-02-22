@@ -7,6 +7,31 @@ from itou.users.factories import ItouStaffFactory, JobSeekerFactory
 from itou.users.models import IdentityProvider, User
 
 
+def test_add_user(client):
+    admin_user = ItouStaffFactory(is_superuser=True)
+    client.force_login(admin_user)
+    response = client.post(
+        reverse("admin:users_user_add"),
+        {
+            "username": "foo",
+            "password1": "hunter2",
+            "password2": "hunter2",
+            "kind": UserKind.JOB_SEEKER,
+            "siaemembership_set-INITIAL_FORMS": "0",
+            "siaemembership_set-TOTAL_FORMS": "0",
+            "prescribermembership_set-INITIAL_FORMS": "0",
+            "prescribermembership_set-TOTAL_FORMS": "0",
+            "institutionmembership_set-INITIAL_FORMS": "0",
+            "institutionmembership_set-TOTAL_FORMS": "0",
+            "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": "0",
+            "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": "0",
+        },
+    )
+    user = User.objects.get(username="foo")
+    assertRedirects(response, reverse("admin:users_user_change", kwargs={"object_id": user.pk}))
+    assert user.kind == UserKind.JOB_SEEKER
+
+
 def test_no_email_sent(client):
     user = JobSeekerFactory(identity_provider=IdentityProvider.INCLUSION_CONNECT)
 

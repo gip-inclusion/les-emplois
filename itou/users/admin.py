@@ -11,7 +11,7 @@ from itou.institutions.models import InstitutionMembership
 from itou.prescribers.models import PrescriberMembership
 from itou.siaes.models import SiaeMembership
 from itou.users import models
-from itou.users.admin_forms import UserAdminForm
+from itou.users.admin_forms import ItouUserCreationForm, UserAdminForm
 from itou.utils.admin import PkSupportRemarkInline
 
 
@@ -127,6 +127,7 @@ class CreatedByProxyFilter(admin.SimpleListFilter):
 @admin.register(models.User)
 class ItouUserAdmin(UserAdmin):
 
+    add_form = ItouUserCreationForm
     form = UserAdminForm
     inlines = [
         SiaeMembershipInline,
@@ -203,6 +204,16 @@ class ItouUserAdmin(UserAdmin):
     # Add last_checked_at in "Important dates" section, alongside last_login & date_joined
     assert "last_login" in fieldsets[-2][1]["fields"]
     fieldsets[-2][1]["fields"] += ("last_checked_at",)
+
+    add_fieldsets = UserAdmin.add_fieldsets + (
+        (
+            "Type d’utilisateur",
+            {
+                "classes": ["wide"],
+                "fields": ["kind"],
+            },
+        ),
+    )
 
     def has_verified_email(self, obj):
         """
