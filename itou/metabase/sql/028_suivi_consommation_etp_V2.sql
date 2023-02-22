@@ -3,6 +3,7 @@ with mois_saisis as (
     select
         id_annexe_financiere,
         af_numero_annexe_financiere,
+        -- On prend le mois maximal saisi +1 - le mois minimal saisi pour avoir le nombre de mois saisis
         (max(date_part('month', date_saisie))+ 1) - min(date_part('month', date_saisie)) as nombre_mois_saisis
     from
         suivi_etp_realises_v2
@@ -13,19 +14,20 @@ with mois_saisis as (
 calcul_etp as (
     select
         distinct(etp.id_annexe_financiere),
-        /* Utilisation de l'ID de l'annexe financière -> ID unique contrairement à la convention et l'af */
+        /* Utilisation de l'ID de l'annexe financière -> ID unique contrairement à la convention */
         etp.af_numero_annexe_financiere,
         etp.af_numero_convention,
         etp.af_etat_annexe_financiere_code,
         annee_af,
         dernier_mois_saisi_asp,
         nombre_mois_saisis,
-        /* les deux conditions si dessus sont identiques, sauf que pour l'une on considère les ETPs mensuels et l'autre les annuels */
+        /* les deux conditions si dessous sont identiques, sauf que pour l'une on considère les ETPs mensuels et l'autre les annuels */
         sum(nombre_etp_consommes_reels_mensuels) as total_etp_mensuels_realises,
         sum(nombre_etp_consommes_reels_annuels) as total_etp_annuels_realises,
-        -- Ici on utilise le nombre de mois saisis éviter d
+        -- Ici on utilise le nombre de mois saisis éviter d'écrire une formule à rallonge 
         case
-            /* Sur les deux lignes du dessous on sélectionne le dernier mois saisi pour avoir une moyenne mensuelle des ETPs consommés sur les années précédentes */
+            /* Sur les deux formules du dessous on sélectionne le dernier mois saisi pour avoir une moyenne mensuelle des ETPs consommés sur les années précédentes */
+           -- Moyenne sur l'année N - 1
             when 
                 (
                 max(annee_af) = date_part (
@@ -37,6 +39,7 @@ calcul_etp as (
                 (
                 sum(nombre_etp_consommes_reels_mensuels) / nombre_mois_saisis
             )
+            -- Moyenne sur l'année N - 2
             when 
                 (
                 max(annee_af) = date_part('year', current_date) - 2
@@ -45,6 +48,7 @@ calcul_etp as (
                 (
                 sum(nombre_etp_consommes_reels_mensuels) / nombre_mois_saisis
             )
+            -- Moyenne sur l'année actuelle
             /* Ici on lui demande de seulement prendre en compte les mois écoulés pour l'année en cours (donc en mars il divisera le total par 3) */
             else 
                 sum(nombre_etp_consommes_reels_mensuels) 
@@ -57,6 +61,7 @@ calcul_etp as (
             ) / nombre_mois_saisis
         end moyenne_nb_etp_mensuels_depuis_debut_annee,
         case
+        -- Moyenne sur l'année N-1
             when 
                 (
                 max(annee_af) = date_part (
@@ -68,6 +73,7 @@ calcul_etp as (
                 (
                 sum(nombre_etp_consommes_reels_annuels) / nombre_mois_saisis
             )
+        -- Moyenne sur l'année N-2
             when 
                 (
                 max(annee_af) = date_part('year', current_date) - 2
@@ -76,6 +82,7 @@ calcul_etp as (
                 (
                 sum(nombre_etp_consommes_reels_annuels) / nombre_mois_saisis
             )
+        -- Moyenne sur l'année actuelle
             else 
                 sum(nombre_etp_consommes_reels_annuels) 
                     filter (

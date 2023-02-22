@@ -48,7 +48,7 @@ with saisies as (
         and date_part('year', af.af_date_debut_effet_v2) >= (
             date_part('year', current_date) - 1
         )
-        -- Petite correction pour considérer les dates de saisie antérieures à 36 mois (parfois les annexes s'arrêtent en milieu d'année)
+        -- Petite correction pour considérer les dates de saisie antérieures à 36 moiset non 3 mois (parfois les annexes s'arrêtent en milieu d'année)
                 and af.af_date_fin_effet_v2 >= CURRENT_DATE - INTERVAL '36 months'
                 /* On prend les déclarations mensuelles de l'année en cours */
                 and  emi.emi_sme_annee >= (date_part('year', current_date) - 1)

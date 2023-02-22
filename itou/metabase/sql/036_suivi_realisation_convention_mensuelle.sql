@@ -41,6 +41,6 @@ from
     suivi_complet_etps_conventionnes scec
 left join suivi_etp_realises_par_structure serps
     on
-        serps.id_annexe_financiere = scec.id_annexe_financiere
+    serps.id_annexe_financiere = scec.id_annexe_financiere
     and serps.annee = scec.année
     and serps.mois = scec.month
