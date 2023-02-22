@@ -243,7 +243,7 @@ class EvaluationCampaign(models.Model):
         )
         emails = []
         accept_by_default = []
-        siaes_to_notify = []
+        transition_to_adversarial_stage = []
         for evaluated_siae in siaes_not_reviewed:
             state = evaluated_siae.state
             if state in [
@@ -251,20 +251,24 @@ class EvaluationCampaign(models.Model):
                 evaluation_enums.EvaluatedSiaeState.SUBMITTABLE,
             ]:
                 evaluated_siae.reviewed_at = now
-                siaes_to_notify.append(evaluated_siae)
+                transition_to_adversarial_stage.append(evaluated_siae)
                 emails.append(SIAEEmailFactory(evaluated_siae).forced_to_adversarial_stage())
             elif state == evaluation_enums.EvaluatedSiaeState.SUBMITTED:
                 evaluated_siae.reviewed_at = now
                 evaluated_siae.final_reviewed_at = now
                 accept_by_default.append(evaluated_siae)
                 emails.append(SIAEEmailFactory(evaluated_siae).force_accepted())
-        if siaes_to_notify:
-            siaes_to_notify.sort(key=lambda evaluated_siae: evaluated_siae.siae.name)
-            summary_email = CampaignEmailFactory(self).forced_to_adversarial_stage(siaes_to_notify)
+        if transition_to_adversarial_stage or accept_by_default:
+            transition_to_adversarial_stage.sort(key=lambda evaluated_siae: evaluated_siae.siae.name)
+            accept_by_default.sort(key=lambda evaluated_siae: evaluated_siae.siae.name)
+            summary_email = CampaignEmailFactory(self).transition_to_adversarial_stage(
+                transition_to_adversarial_stage,
+                accept_by_default,
+            )
             emails.append(summary_email)
             send_email_messages(emails)
         EvaluatedSiae.objects.bulk_update(
-            accept_by_default + siaes_to_notify,
+            accept_by_default + transition_to_adversarial_stage,
             ["reviewed_at", "final_reviewed_at"],
         )
 

@@ -2,15 +2,29 @@
 {% block body %}
 Bonjour,
 
+{% if siaes_forced_to_adversarial_stage %}
 Vous trouverez ci-dessous la liste des SIAE qui n’ont transmis aucun justificatif dans le cadre du contrôle a posteriori :
 
-{% for evaluated_siae in evaluated_siaes %}
+{% for evaluated_siae in siaes_forced_to_adversarial_stage %}
 - {{ evaluated_siae.siae.kind }} {{ evaluated_siae.siae.name }} ID-{{ evaluated_siae.siae_id }}
 {% endfor %}
 
 Ces structures n’ayant pas transmis les justificatifs dans le délai des 6 semaines passent automatiquement en phase contradictoire et disposent à nouveau de 6 semaines pour se manifester.
 
 N’hésitez pas à les contacter afin de comprendre les éventuelles difficultés rencontrées pour transmettre les justificatifs.
+{% endif %}
+{% if siaes_accepted_by_default and siaes_forced_to_adversarial_stage %}
 
+---
+
+{% endif %}
+{% if siaes_accepted_by_default %}
+Les structures suivantes avaient transmis leurs justificatifs mais n’ont pas eu de retour de la DDETS, leur contrôle est considéré positif :
+
+{% for evaluated_siae in siaes_accepted_by_default %}
+- {{ evaluated_siae.siae.kind }} {{ evaluated_siae.siae.name }} ID-{{ evaluated_siae.siae_id }}
+{% endfor %}
+
+{% endif %}
 Cordialement,
 {% endblock %}

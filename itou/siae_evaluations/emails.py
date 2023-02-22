@@ -29,10 +29,13 @@ class CampaignEmailFactory:
         body = "siae_evaluations/email/to_institution_selected_siae_body.txt"
         return get_email_message(self.recipients, context, subject, body)
 
-    def forced_to_adversarial_stage(self, evaluated_siaes):
-        context = {"evaluated_siaes": evaluated_siaes}
-        subject = "siae_evaluations/email/to_institution_siaes_forced_to_adversarial_stage_subject.txt"
-        body = "siae_evaluations/email/to_institution_siaes_forced_to_adversarial_stage_body.txt"
+    def transition_to_adversarial_stage(self, siaes_forced_to_adversarial_stage, siaes_accepted_by_default):
+        context = {
+            "siaes_forced_to_adversarial_stage": siaes_forced_to_adversarial_stage,
+            "siaes_accepted_by_default": siaes_accepted_by_default,
+        }
+        subject = "siae_evaluations/email/to_institution_siaes_transition_to_adversarial_stage_subject.txt"
+        body = "siae_evaluations/email/to_institution_siaes_transition_to_adversarial_stage_body.txt"
         return get_email_message(self.recipients, context, subject, body)
 
     def close(self):
