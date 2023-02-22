@@ -549,10 +549,7 @@ class EvaluationCampaignManagerTest(TestCase):
             "http://127.0.0.1:8000"
         )
 
-        assert institution_email.subject == (
-            "[Contrôle a posteriori] "
-            "Liste des SIAE n’ayant pas transmis les justificatifs de leurs auto-prescriptions"
-        )
+        assert institution_email.subject == "[Contrôle a posteriori] Passage en phase contradictoire"
         assert institution_email.body == (
             "Bonjour,\n\n"
             "Vous trouverez ci-dessous la liste des SIAE qui n’ont transmis aucun justificatif dans le cadre du "
@@ -563,6 +560,124 @@ class EvaluationCampaignManagerTest(TestCase):
             "automatiquement en phase contradictoire et disposent à nouveau de 6 semaines pour se manifester.\n\n"
             "N’hésitez pas à les contacter afin de comprendre les éventuelles difficultés rencontrées pour "
             "transmettre les justificatifs.\n\n"
+            "---\n\n"
+            "Les structures suivantes avaient transmis leurs justificatifs mais n’ont pas eu de retour de la DDETS, "
+            "leur contrôle est considéré positif :\n\n"
+            f"- EI Prim’vert ID-{evaluated_siae_submitted.siae_id}\n\n"
+            "Cordialement,\n\n"
+            "---\n"
+            "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
+            "merci de ne pas en tenir compte [DEV]\n"
+            "Les emplois de l'inclusion\n"
+            "http://127.0.0.1:8000"
+        )
+
+    @freeze_time("2023-01-02 11:11:11")
+    def test_transition_to_adversarial_phase_forced_to_adversarial_stage(self):
+        campaign = EvaluationCampaignFactory(institution__name="DDETS 1")
+        evaluated_siae_no_response = EvaluatedSiaeFactory(
+            evaluation_campaign=campaign, siae__name="Les grands jardins"
+        )
+        EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_no_response)
+
+        campaign.transition_to_adversarial_phase()
+
+        evaluated_siae_no_response.refresh_from_db()
+        assert evaluated_siae_no_response.reviewed_at == timezone.now()
+
+        [siae_no_response_email, institution_email] = sorted(mail.outbox, key=lambda mail: mail.subject)
+        assert (
+            siae_no_response_email.subject
+            == f"Résultat du contrôle - EI Les grands jardins ID-{evaluated_siae_no_response.siae_id}"
+        )
+        assert siae_no_response_email.body == (
+            "Bonjour,\n\n"
+            "Sauf erreur de notre part, vous n’avez pas transmis les justificatifs dans le cadre du contrôle a "
+            "posteriori sur vos embauches réalisées en auto-prescription.\n\n"
+            "La DDETS 1 ne peut donc pas faire de contrôle, par conséquent vous entrez dans une phase dite "
+            "contradictoire de 6 semaines (durant laquelle il vous faut transmettre les justificatifs demandés) et "
+            "qui se clôturera sur une décision (validation ou sanction pouvant aller jusqu’à un retrait d’aide au "
+            "poste) conformément à l’instruction N° DGEFP/SDPAE/MIP/2022/83 du 5 avril 2022 relative à la mise en "
+            "œuvre opérationnelle du contrôle a posteriori des recrutements en auto-prescription prévu par les "
+            "articles R. 5132-1-12 à R. 5132-1-17 du code du travail.\n\n"
+            "Pour transmettre les justificatifs, rendez-vous sur le tableau de bord de "
+            f"EI Les grands jardins ID-{evaluated_siae_no_response.siae_id} à la rubrique "
+            "“Justifier mes auto-prescriptions”.\n"
+            f"http://127.0.0.1:8000/siae_evaluation/siae_job_applications_list/{evaluated_siae_no_response.pk}/\n\n"
+            "En cas de besoin, vous pouvez consulter ce mode d’emploi.\n\n"
+            "Cordialement,\n\n"
+            "---\n"
+            "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
+            "merci de ne pas en tenir compte [DEV]\n"
+            "Les emplois de l'inclusion\n"
+            "http://127.0.0.1:8000"
+        )
+
+        assert institution_email.subject == "[Contrôle a posteriori] Passage en phase contradictoire"
+        assert institution_email.body == (
+            "Bonjour,\n\n"
+            "Vous trouverez ci-dessous la liste des SIAE qui n’ont transmis aucun justificatif dans le cadre du "
+            "contrôle a posteriori :\n\n"
+            f"- EI Les grands jardins ID-{evaluated_siae_no_response.siae_id}\n\n"
+            "Ces structures n’ayant pas transmis les justificatifs dans le délai des 6 semaines passent "
+            "automatiquement en phase contradictoire et disposent à nouveau de 6 semaines pour se manifester.\n\n"
+            "N’hésitez pas à les contacter afin de comprendre les éventuelles difficultés rencontrées pour "
+            "transmettre les justificatifs.\n\n"
+            "Cordialement,\n\n"
+            "---\n"
+            "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
+            "merci de ne pas en tenir compte [DEV]\n"
+            "Les emplois de l'inclusion\n"
+            "http://127.0.0.1:8000"
+        )
+
+    @freeze_time("2023-01-02 11:11:11")
+    def test_transition_to_adversarial_phase_force_accepted(self):
+        campaign = EvaluationCampaignFactory(institution__name="DDETS 1")
+        evaluated_siae_submitted = EvaluatedSiaeFactory(evaluation_campaign=campaign, siae__name="Prim’vert")
+        evaluated_jobapp_submitted = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_submitted)
+        EvaluatedAdministrativeCriteriaFactory(
+            submitted_at=timezone.now() - relativedelta(days=6),
+            evaluated_job_application=evaluated_jobapp_submitted,
+            # default review_state is PENDING
+        )
+
+        campaign.transition_to_adversarial_phase()
+
+        # Transitioned to ACCEPTED, the DDETS did not review the documents
+        # submitted by SIAE before the transition.
+        evaluated_siae_submitted.refresh_from_db()
+        assert evaluated_siae_submitted.reviewed_at == datetime.datetime(
+            2023, 1, 2, 11, 11, 11, tzinfo=datetime.timezone.utc
+        )
+        assert evaluated_siae_submitted.final_reviewed_at == datetime.datetime(
+            2023, 1, 2, 11, 11, 11, tzinfo=datetime.timezone.utc
+        )
+        assert evaluated_siae_submitted.state == evaluation_enums.EvaluatedSiaeState.ACCEPTED
+
+        [siae_email, institution_email] = mail.outbox
+        assert institution_email.subject == "[Contrôle a posteriori] Passage en phase contradictoire"
+        assert institution_email.body == (
+            "Bonjour,\n\n"
+            "Les structures suivantes avaient transmis leurs justificatifs mais n’ont pas eu de retour de la DDETS, "
+            "leur contrôle est considéré positif :\n\n"
+            f"- EI Prim’vert ID-{evaluated_siae_submitted.siae_id}\n\n"
+            "Cordialement,\n\n"
+            "---\n"
+            "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
+            "merci de ne pas en tenir compte [DEV]\n"
+            "Les emplois de l'inclusion\n"
+            "http://127.0.0.1:8000"
+        )
+        assert siae_email.subject == f"Résultat du contrôle - EI Prim’vert ID-{evaluated_siae_submitted.siae_id}"
+        assert siae_email.body == (
+            "Bonjour,\n\n"
+            "La campagne de contrôle a posteriori sur les embauches réalisées en auto-prescription entre "
+            "le 02 Octobre 2022 et le 02 Décembre 2022 entre en phase contradictoire.\n\n"
+            "La DDETS 1 n’a pas étudié la conformité des justificatifs que vous avez transmis dans le délai "
+            "imparti. Par conséquent, vos auto-prescriptions sont considérées comme conformes.\n\n"
+            "Cette campagne de contrôle est terminée pour votre SIAE EI Prim’vert "
+            f"ID-{evaluated_siae_submitted.siae_id}.\n\n"
             "Cordialement,\n\n"
             "---\n"
             "[DEV] Cet email est envoyé depuis un environnement de démonstration, "

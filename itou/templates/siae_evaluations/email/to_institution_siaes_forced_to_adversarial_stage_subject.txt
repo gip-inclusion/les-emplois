@@ -1,4 +1,0 @@
-{% extends "layout/base_email_text_subject.txt" %}
-{% block subject %}
-[Contrôle a posteriori] Liste des SIAE n’ayant pas transmis les justificatifs de leurs auto-prescriptions
-{% endblock %}
