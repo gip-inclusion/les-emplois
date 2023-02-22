@@ -1,5 +1,4 @@
 with nb_structures_par_dept as (
--- nb de structures référencées par dept
     select
         département,
         "nom_département",
