@@ -53,7 +53,7 @@ select
     struct. "région",
     -- récupération du pct de sélection attendu
     -- que l'on divise par 100 pour permettre l'affichage correct sur metabase
-    max(cap_camp. "pourcentage_sélection")/100 as "part_structures_à_contrôler",
+    cast(max(cap_camp. "pourcentage_sélection") as float)/100 as "part_structures_à_contrôler",
     sum(cap_struct_cnt. "nb_contrôlées") as "nb_contrôlées",
     sum(cap_struct_cnt. "nb_acceptées") as "nb_acceptées",
     sum(cap_struct_cnt. "nb_refusées") as "nb_refusées",
