@@ -7,7 +7,7 @@ with nb_structures_par_dept as (
     from
         structures
     group by
-        département,
+        "département",
         "nom_département"
 )
 select
@@ -15,7 +15,7 @@ select
     struct."nom_département" as "nom_département",
     struct."région",
     -- récupération du pct de sélection attendu
-    max(cap_camp."pourcentage_sélection") as pct_sélection,
+    max(cap_camp."pourcentage_sélection") as "pct_sélection",
     --nb controlees : ie celles qui ont une date de contrôle non null
     sum(
         case when cap_struct."date_contrôle" is not null then
@@ -31,21 +31,21 @@ select
                 1
             else
                 0
-            end) as float) / max(nb_tot_dep.nb_struct) * 100 as pct_contrôlées,
+            end) as float) / max(nb_tot_dep.nb_struct) * 100 as "pct_contrôlées",
     -- nb de structures acceptées
-    sum(case when cap_struct.état = 'ACCEPTED' then
+    sum(case when cap_struct."état" = 'ACCEPTED' then
             1
         else
             0
-        end) as nb_acceptées,
+        end) as "nb_acceptées",
     -- nb de structures refusées
-    sum(case when cap_struct.état = 'REFUSED' then
+    sum(case when cap_struct."état" = 'REFUSED' then
             1
         else
             0
-        end) as nb_refusées,
+        end) as "nb_refusées",
     -- nb de structures en attente notif
-    sum(case when cap_struct.état = 'NOTIFICATION_PENDING' then
+    sum(case when cap_struct."état" = 'NOTIFICATION_PENDING' then
             1
         else
             0
