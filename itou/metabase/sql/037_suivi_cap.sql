@@ -48,7 +48,7 @@ cap_struct_counts as (
         cap_struct.id_structure
 )
 select
-    cap_camp.nom,
+    cap_camp.nom as "nom_campagne",
     struct. "nom_département" as "nom_département",
     struct. "région",
     -- récupération du pct de sélection attendu
