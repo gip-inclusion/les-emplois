@@ -1,3 +1,4 @@
+create table suivi_cap as
 with nb_structures_par_dept as (
     select
         "département",
