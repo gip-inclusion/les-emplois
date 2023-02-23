@@ -120,19 +120,19 @@
 {% block pre_content %}
     {# Mise en avant de Dora. #}
     {% if show_dora_banner %}
-        <section class="s-banner-01 pt-3 pb-0">
+        <section class="s-banner-01 m-0 pb-0 pt-3">
             <div class="s-banner-01__container container">
                 <div class="s-banner-01__row row">
                     <div class="s-banner-01__col col-12">
-                        <div class="d-flex flex-column flex-md-row">
-                            <div class="w-100 mt-3 pl-0 pl-md-3">
-                                {% if user.is_prescriber %}
-                                    <p class="h3 mb-2">Consultez l’offre de service de vos partenaires</p>
-                                    <p>
-                                        DORA vous aide dans la levée des freins périphériques bloquant le retour à l'emploi des bénéficiaires en facilitant l’identification des services d’insertion adaptés.
-                                    </p>
-                                    <p class="mb-0">
-                                        <a class="btn btn-primary btn-ico"
+                        <div class="bg-white">
+                            {% if user.is_prescriber %}
+                                <p class="h2">Consultez l’offre de service de vos partenaires</p>
+                                <p>
+                                    <strong>DORA</strong> vous aide dans la levée des freins périphériques bloquant le retour à l'emploi des bénéficiaires en facilitant l’identification des services d’insertion adaptés.
+                                </p>
+                                <div class="row no-gutters">
+                                    <div class="col-12 col-md-auto mt-2">
+                                        <a class="btn btn-primary btn-block btn-ico"
                                            href="https://dora.fabrique.social.gouv.fr/?utm_source=LesEmplois&utm_medium=banniereLesEmplois&utm_campaign=dashboard"
                                            aria-label="Consulter les services (ouverture dans un nouvel onglet)"
                                            rel="noopener"
@@ -140,7 +140,9 @@
                                             <span>Consulter les services</span>
                                             <i class="ri-external-link-line ri-lg"></i>
                                         </a>
-                                        <a class="btn btn-link btn-ico"
+                                    </div>
+                                    <div class="col-12 col-md-auto mt-2">
+                                        <a class="btn btn-link btn-block btn-ico"
                                            href="https://dora.fabrique.social.gouv.fr/contribuer?utm_source=LesEmplois&utm_medium=banniereLesEmplois&utm_campaign=dashboard"
                                            aria-label="Suggérer les services de vos partenaires (ouverture dans un nouvel onglet)"
                                            rel="noopener"
@@ -148,14 +150,16 @@
                                             <span>Suggérer les services de vos partenaires</span>
                                             <i class="ri-external-link-line ri-lg"></i>
                                         </a>
-                                    </p>
-                                {% elif user.is_siae_staff %}
-                                    <p class="h3 mb-2">Donnez de la visibilité à votre offre d’insertion</p>
-                                    <p>
-                                        DORA est une cartographie numérique de l'offre d'insertion nationale. Rendez vos services visibles sur votre territoire et sur tous les sites partenaires, grâce à notre démarche collective d'ouverture des données.
-                                    </p>
-                                    <p class="mb-0">
-                                        <a class="btn btn-primary btn-ico"
+                                    </div>
+                                </div>
+                            {% elif user.is_siae_staff %}
+                                <p class="h2">Donnez de la visibilité à votre offre d’insertion</p>
+                                <p>
+                                    <strong>DORA</strong> est une cartographie numérique de l'offre d'insertion nationale. Rendez vos services visibles sur votre territoire et sur tous les sites partenaires, grâce à notre démarche collective d'ouverture des données.
+                                </p>
+                                <div class="row no-gutters">
+                                    <div class="col-12 col-md-auto mt-2">
+                                        <a class="btn btn-primary btn-block btn-ico"
                                            href="https://dora.fabrique.social.gouv.fr/auth/rattachement?siret={{ current_org.siret }}&utm_source=LesEmplois&utm_medium=banniereLesEmplois&utm_campaign=dashboard"
                                            aria-label="Référencer un service (ouverture dans un nouvel onglet)"
                                            rel="noopener"
@@ -163,7 +167,9 @@
                                             <span>Référencer un service</span>
                                             <i class="ri-external-link-line ri-lg"></i>
                                         </a>
-                                        <a class="btn btn-link btn-ico"
+                                    </div>
+                                    <div class="col-12 col-md-auto mt-2">
+                                        <a class="btn btn-link btn-block btn-ico"
                                            href="https://dora.fabrique.social.gouv.fr/?utm_source=LesEmplois&utm_medium=banniereLesEmplois&utm_campaign=dashboard"
                                            aria-label="Découvrir DORA (ouverture dans un nouvel onglet)"
                                            rel="noopener"
@@ -171,44 +177,55 @@
                                             <span>Découvrir DORA</span>
                                             <i class="ri-external-link-line ri-lg"></i>
                                         </a>
-                                    </p>
-                                {% endif %}
-                            </div>
+                                    </div>
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
             </div>
         </section>
     {% elif ic_activate_url %}
-        {# Une p-inclusion-connect class somewhere #}
-        <div class="container mt-2 bg-white">
-            <div class="row">
-                <div class="col-8">
-                    <div class="d-flex flex-column flex-md-row">
-                        <div class="w-100">
-                            <span class="badge badge-pill badge-sm badge-important-lightest text-important mb-2">A découvrir</span>
-                            <p class="h2 mb-2">Inclusion Connect : un accès unique à tous vos services !</p>
-                            <p class="mb-2">
-                                Simplifiez la connexion : accédez aux différents services partenaires avec <b>le même identifiant et le même mot de passe.</b>
-                            </p>
-
-                            <a class="btn btn-primary btn-ico" href="{{ ic_activate_url }}" title="Activer Inclusion Connect">
-                                <span>Activer Inclusion Connect</span>
-                            </a>
-
-                            <a class="ml-4 text-decoration-none"
-                               href="https://plateforme-inclusion.notion.site/Un-compte-unique-pour-mes-services-num-riques-ded9135197654da590f5dde41d8bb68b"
-                               title="Plus d'infos concernant Inclusion Connect"
-                               rel="noopener"
-                               target="_blank">
-                                <span>Plus d'infos</span>
-                                <i class="ri-external-link-line ri-lg"></i>
-                            </a>
+        <section class="s-banner-01 s-banner-01--ic m-0 pb-0 pt-3 px-0 alert">
+            <div class="s-banner-01__container container">
+                <div class="s-banner-01__row row">
+                    <div class="s-banner-01__col col-12">
+                        <div class="bg-white">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
+                                <i class="ri-close-line"></i>
+                            </button>
+                            <div class="row align-items-center">
+                                <div class="d-none d-lg-block col-lg-2">
+                                    <img src="{% static "img/illustration-bg-mini-ic.svg" %}" class="img-fluid img-fitcover" alt="">
+                                </div>
+                                <div class="col-12 col-lg-10">
+                                    <span class="badge badge-pill badge-sm badge-important-lightest text-important mb-3">A découvrir</span>
+                                    <p class="h2">Inclusion Connect : un accès unique à tous vos services !</p>
+                                    <p>
+                                        Simplifiez la connexion : accédez aux différents services partenaires avec <b>le même identifiant et le même mot de passe.</b>
+                                    </p>
+                                    <div class="row no-gutters">
+                                        <div class="col-12 col-md-auto mt-2">
+                                            <a class="btn btn-primary btn-block" href="{{ ic_activate_url }}">Activer Inclusion Connect</a>
+                                        </div>
+                                        <div class="col-12 col-md-auto mt-2">
+                                            <a class="btn btn-link btn-block"
+                                               href="https://plateforme-inclusion.notion.site/Un-compte-unique-pour-mes-services-num-riques-ded9135197654da590f5dde41d8bb68b"
+                                               aria-label="Plus d'infos concernant Inclusion Connect"
+                                               rel="noopener"
+                                               target="_blank">
+                                                <span>Plus d'infos</span>
+                                                <i class="ri-external-link-line ri-lg"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
     {% endif %}
 {% endblock %}
 
