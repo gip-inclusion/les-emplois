@@ -1,4 +1,20 @@
 # Journal des modifications
+
+## [57] - 2023-02-27
+
+### Ajouté
+- Controle a posteriori: affichage de l'historique des sanctions dans les données d’aide à la décision
+- Controle a posteriori: application des suspensions d'auto-prescription
+- Candidature: bouton désactivé & tooltip pour expliquer qu'on ne peut pas modifier les informations personnelles
+- Pré-remplir l'email sur inclusion connect pour un utilisateur voulant activer un compte qui l'est déjà
+- Candidature : Ajout de motifs de refus spécifiques aux GEIQ
+- Ajout d'une bannière pour migrer les comptes vers Inclusion Connect
+
+### Modifié
+- Autocomplétion : augmentation du nombre de résultats affichés pour les communes
+- Mise à jour du SIRET associé lors de la réactivation d'une fiche salarié
+- UI : Modifications d'accessibilité et de précision de certains messages
+
 ## [56] - 2023-02-13
 
 ### Ajouté
