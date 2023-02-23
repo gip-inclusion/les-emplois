@@ -9,6 +9,7 @@ from django.utils import timezone
 
 from itou.approvals import models as approvals_models
 from itou.eligibility import models as eligibility_models
+from itou.employee_record.models import EmployeeRecord
 from itou.invitations import models as invitations_models
 from itou.job_applications import models as job_applications_models
 from itou.siae_evaluations.models import EvaluatedSiae
@@ -93,7 +94,7 @@ class Command(BaseCommand):
         self.stdout.write(
             "MOVE %s OF siae.id=%s - %s %s - %s\n"
             % (
-                "DATA" if move_all_data else "JOB APPLICATIONS",
+                "DATA" if move_all_data else "JOB APPLICATIONS AND EMPLOYEE RECORDS",
                 from_siae.pk,
                 from_siae.kind,
                 from_siae.siret,
@@ -106,6 +107,9 @@ class Command(BaseCommand):
 
         job_applications_received = job_applications_models.JobApplication.objects.filter(to_siae_id=from_id)
         self.stdout.write("| Job applications received: %s" % job_applications_received.count())
+
+        employee_records_created_count = EmployeeRecord.objects.filter(job_application__to_siae_id=from_id).count()
+        self.stdout.write(f"| Employee records created: {employee_records_created_count}")
 
         if move_all_data:
             # Move Job Description not already present in siae destination, Job Applications
@@ -204,6 +208,22 @@ class Command(BaseCommand):
 
             job_applications_sent.update(sender_siae_id=to_id)
             job_applications_received.update(to_siae_id=to_id)
+            # Also move employee records
+            employee_records_to_clone = (
+                # Not reusing the previous queryset, so we can use the updated to_siae and only take the orphans
+                # (the ones with a different `asp_id`), in case of a SIRET change the employer can (should)
+                # reactivate/deactivate the employee record to resend it to the ASP with the new SIRET.
+                EmployeeRecord.objects.filter(job_application__to_siae_id=to_id)
+                .orphans()
+                # Deduplicate to avoid errors because of the UNIQUE CONSTRAINT (asp_id, approval_number)
+                .distinct("approval_number")
+                .order_by("approval_number", "-job_application__hiring_start_at", "-pk")
+            )
+            self.stdout.write(
+                f"| Cloning {len(employee_records_to_clone)}/{employee_records_created_count} employee records"
+            )
+            for employee_record in employee_records_to_clone:
+                employee_record.clone()
 
             if move_all_data:
                 # do not move duplicated job_descriptions
@@ -230,13 +250,18 @@ class Command(BaseCommand):
                 )
 
         self.stdout.write(
-            "MOVE {} OF siae.id={} FINISHED\n".format("DATA" if move_all_data else "JOB APPLICATIONS", from_siae.pk)
+            "MOVE {} OF siae.id={} FINISHED\n".format(
+                "DATA" if move_all_data else "JOB APPLICATIONS AND EMPLOYEE RECORDS", from_siae.pk
+            )
         )
         orig_job_applications_sent = job_applications_models.JobApplication.objects.filter(sender_siae_id=from_id)
         self.stdout.write("| Job applications sent: %s\n" % orig_job_applications_sent.count())
 
         orig_job_applications_received = job_applications_models.JobApplication.objects.filter(to_siae_id=from_id)
         self.stdout.write("| Job applications received: %s\n" % orig_job_applications_received.count())
+
+        orig_employee_records = EmployeeRecord.objects.filter(job_application__to_siae_id=from_id)
+        self.stdout.write(f"| Employee records created: {orig_employee_records.count()}")
 
         self.stdout.write("INTO siae.id=%s\n" % to_siae.pk)
 
@@ -245,3 +270,6 @@ class Command(BaseCommand):
 
         dest_siae_job_applications_received = job_applications_models.JobApplication.objects.filter(to_siae_id=to_id)
         self.stdout.write("| Job applications received: %s\n" % dest_siae_job_applications_received.count())
+
+        dest_employee_records = EmployeeRecord.objects.filter(job_application__to_siae_id=to_id)
+        self.stdout.write(f"| Employee records created: {dest_employee_records.count()}")

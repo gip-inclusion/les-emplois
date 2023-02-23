@@ -2,6 +2,8 @@ import io
 
 from django.core import management
 
+from itou.employee_record.factories import EmployeeRecordFactory
+from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.factories import JobApplicationFactory
 from itou.siae_evaluations.factories import EvaluatedSiaeFactory
 from itou.siaes import factories as siaes_factories
@@ -44,6 +46,43 @@ class MoveSiaeDataTest(TestCase):
         )
         assert siae1.evaluated_siaes.count() == 0
         assert siae2.evaluated_siaes.count() == 1
+
+    def test_orphan_employee_records_are_cloned(self):
+        old_siae, new_siae = siaes_factories.SiaeFactory.create_batch(2)
+        EmployeeRecordFactory(job_application__to_siae=old_siae)
+
+        management.call_command(
+            "move_siae_data",
+            from_id=old_siae.pk,
+            to_id=new_siae.pk,
+            stdout=io.StringIO(),
+            stderr=io.StringIO(),
+            wet_run=True,
+        )
+
+        assert EmployeeRecord.objects.for_siae(old_siae).count() == 0
+        assert EmployeeRecord.objects.orphans().count() == 1
+        assert EmployeeRecord.objects.for_siae(new_siae).count() == 1
+        assert EmployeeRecord.objects.count() == 2
+
+    def test_employee_records_are_accessible_when_the_convention_is_the_same(self):
+        old_siae = siaes_factories.SiaeFactory()
+        new_siae = siaes_factories.SiaeFactory(convention=old_siae.convention)
+        EmployeeRecordFactory(job_application__to_siae=old_siae)
+
+        management.call_command(
+            "move_siae_data",
+            from_id=old_siae.pk,
+            to_id=new_siae.pk,
+            stdout=io.StringIO(),
+            stderr=io.StringIO(),
+            wet_run=True,
+        )
+
+        assert EmployeeRecord.objects.for_siae(old_siae).count() == 0
+        assert EmployeeRecord.objects.orphans().count() == 0
+        assert EmployeeRecord.objects.for_siae(new_siae).count() == 1
+        assert EmployeeRecord.objects.count() == 1
 
 
 def test_update_siaes_job_app_score():
