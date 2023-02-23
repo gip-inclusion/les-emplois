@@ -316,10 +316,6 @@ def stats_pe_tension(request):
 
 
 def render_stats_ddets(request, page_title, extra_context={}):
-    """
-    DDETS ("Directions départementales de l’emploi, du travail et des solidarités") stats shown to relevant members.
-    They can only view data for their own departement.
-    """
     department = get_stats_ddets_department(request)
     params = get_params_for_departement(department)
     context = {
@@ -337,9 +333,6 @@ def stats_ddets_auto_prescription(request):
 
 @login_required
 def stats_ddets_follow_siae_evaluation(request):
-    """
-    This dashboard shows data about siae evaluation ("Contrôle a posteriori") overall progress.
-    """
     return render_stats_ddets(request=request, page_title="Suivre le contrôle à posteriori")
 
 
@@ -351,9 +344,6 @@ def stats_ddets_iae(request):
 
 @login_required
 def stats_ddets_siae_evaluation(request):
-    """
-    This dashboard shows siae evaluation ("Contrôle a posteriori") raw data.
-    """
     extra_context = {
         "back_url": reverse("siae_evaluations_views:samples_selection"),
         "show_siae_evaluation_message": True,
@@ -365,9 +355,6 @@ def stats_ddets_siae_evaluation(request):
 
 @login_required
 def stats_ddets_hiring(request):
-    """
-    This dashboard shows data about hiring ("Facilitation de l'embauche").
-    """
     department = get_stats_ddets_department(request)
     return render_stats_ddets(
         request=request,
@@ -376,10 +363,6 @@ def stats_ddets_hiring(request):
 
 
 def render_stats_dreets(request, page_title):
-    """
-    DREETS ("Directions régionales de l’économie, de l’emploi, du travail et des solidarités") stats shown to
-    relevant members. They can only view data for their own region and can filter by department.
-    """
     region = get_stats_dreets_region(request)
     params = get_params_for_region(region)
     context = {
@@ -396,9 +379,6 @@ def stats_dreets_auto_prescription(request):
 
 @login_required
 def stats_dreets_follow_siae_evaluation(request):
-    """
-    This dashboard shows data about siae evaluation ("Contrôle a posteriori") overall progress.
-    """
     return render_stats_dreets(request=request, page_title="Suivre le contrôle à posteriori")
 
 
@@ -413,9 +393,6 @@ def stats_dreets_iae(request):
 
 @login_required
 def stats_dreets_hiring(request):
-    """
-    This dashboard shows data about hiring ("Facilitation de l'embauche").
-    """
     region = get_stats_dreets_region(request)
     return render_stats_dreets(
         request=request,
@@ -424,10 +401,6 @@ def stats_dreets_hiring(request):
 
 
 def render_stats_dgefp(request, page_title, add_params=True, extra_context={}):
-    """
-    DGEFP ("délégation générale à l'Emploi et à la Formation professionnelle") stats shown to relevant members.
-    They can view nation wide data and filter by region and/or department.
-    """
     ensure_stats_dgefp_permission(request)
     context = {
         "page_title": page_title,
@@ -446,9 +419,6 @@ def stats_dgefp_auto_prescription(request):
 
 @login_required
 def stats_dgefp_follow_siae_evaluation(request):
-    """
-    This dashboard shows data about siae evaluation ("Contrôle a posteriori") overall progress.
-    """
     return render_stats_dgefp(request=request, page_title="Suivre le contrôle à posteriori")
 
 
@@ -459,9 +429,6 @@ def stats_dgefp_iae(request):
 
 @login_required
 def stats_dgefp_siae_evaluation(request):
-    """
-    This dashboard shows siae evaluation ("Contrôle a posteriori") raw data.
-    """
     return render_stats_dgefp(
         request=request,
         page_title="Données (version bêta) du contrôle a posteriori",
@@ -476,9 +443,6 @@ def stats_dgefp_af(request):
 
 @login_required
 def stats_dihal_state(request):
-    """
-    DIHAL ("Délégation interministérielle à l'hébergement et à l'accès au logement") stats shown to relevant members.
-    """
     current_org = get_current_institution_or_404(request)
     if not request.user.can_view_stats_dihal(current_org=current_org):
         raise PermissionDenied
