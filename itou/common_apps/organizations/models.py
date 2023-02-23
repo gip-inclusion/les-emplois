@@ -14,8 +14,6 @@ class OrganizationQuerySet(models.QuerySet):
     """
 
     def member_required(self, user):
-        if user.is_superuser:
-            return self
         return self.filter(members=user, members__is_active=True)
 
     def prefetch_active_memberships(self):
