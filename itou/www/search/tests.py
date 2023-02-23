@@ -360,10 +360,10 @@ class JobDescriptionSearchViewTest(TestCase):
         self.assertContains(
             response,
             """
-            <p class="badge badge-sm badge-pill badge-pilotage text-primary mb-3">
-                <i class="ri-group-line mr-1"></i>
-                20+<span class="ml-1">candidatures</span>
-            </p>
+            <span class="badge badge-sm badge-pill badge-accent-03 text-primary">
+                <i class="ri-group-line"></i>
+                20+ candidatures
+            </span>
             """,
             html=True,
         )
@@ -531,8 +531,8 @@ class JobDescriptionSearchViewTest(TestCase):
 
         self.assertContains(response, "(2 résultats)")
         assert [job for job in response.context["results_page"]] == [job1, job_pec]
-        self.assertContains(response, capfirst(job1.display_name), html=True)
-        self.assertContains(response, capfirst(job_pec.display_name), html=True)
+        self.assertContains(response, capfirst(job1.display_name))
+        self.assertContains(response, capfirst(job_pec.display_name))
 
         self.assertContains(response, "Contrat PEC - Parcours Emploi Compétences")
         self.assertContains(response, "logo-pole-emploi.svg")
@@ -559,8 +559,8 @@ class JobDescriptionSearchViewTest(TestCase):
             {"city": city.slug, "contract_types": ["PEC_OFFER"]},
         )
         self.assertContains(response, "(1 résultat)")
-        self.assertNotContains(response, capfirst(job1.display_name), html=True)
-        self.assertContains(response, capfirst(job_pec.display_name), html=True)
+        self.assertNotContains(response, capfirst(job1.display_name))
+        self.assertContains(response, capfirst(job_pec.display_name))
 
         # filter with PEC offer, apprenticeship: returns both
         response = self.client.get(
@@ -568,8 +568,8 @@ class JobDescriptionSearchViewTest(TestCase):
             {"city": city.slug, "contract_types": ["PEC_OFFER", "APPRENTICESHIP"]},
         )
         self.assertContains(response, "(2 résultats)")
-        self.assertContains(response, capfirst(job1.display_name), html=True)
-        self.assertContains(response, capfirst(job_pec.display_name), html=True)
+        self.assertContains(response, capfirst(job1.display_name))
+        self.assertContains(response, capfirst(job_pec.display_name))
 
         # filter with only apprenticeship: PEC offer not displayed (it's fixed term)
         response = self.client.get(
@@ -577,8 +577,8 @@ class JobDescriptionSearchViewTest(TestCase):
             {"city": city.slug, "contract_types": ["APPRENTICESHIP"]},
         )
         self.assertContains(response, "(1 résultat)")
-        self.assertContains(response, capfirst(job1.display_name), html=True)
-        self.assertNotContains(response, capfirst(job_pec.display_name), html=True)
+        self.assertContains(response, capfirst(job1.display_name))
+        self.assertNotContains(response, capfirst(job_pec.display_name))
 
         # filter with FIXED_TERM : PEC offer displayed because it's its underlying contract type
         response = self.client.get(
@@ -586,8 +586,8 @@ class JobDescriptionSearchViewTest(TestCase):
             {"city": city.slug, "contract_types": ["FIXED_TERM"]},
         )
         self.assertContains(response, "(1 résultat)")
-        self.assertNotContains(response, capfirst(job1.display_name), html=True)
-        self.assertContains(response, capfirst(job_pec.display_name), html=True)
+        self.assertNotContains(response, capfirst(job1.display_name))
+        self.assertContains(response, capfirst(job_pec.display_name))
 
         # Show external company name
         job_pec.market_context_description = "MaPetiteEntreprise"
@@ -597,5 +597,5 @@ class JobDescriptionSearchViewTest(TestCase):
             {"city": city.slug},
         )
         self.assertContains(response, "(2 résultats)")
-        self.assertContains(response, capfirst(job_pec.display_name), html=True)
+        self.assertContains(response, capfirst(job_pec.display_name))
         self.assertContains(response, "MaPetiteEntreprise")
