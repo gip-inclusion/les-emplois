@@ -203,8 +203,8 @@ class JopbSeekerLoginTest(TestCase):
         assert len(messages) == 1
         assert (
             messages[0].message
-            == "Vous avez deux comptes sur la plateforme et nous detectons un conflit d'email : seconde@email.com "
-            "et wossewodda-3728@yopmail.com.Veuillez vous rapprocher du support pour débloquer la situation "
+            == "Vous avez deux comptes sur la plateforme et nous détectons un conflit d'email : seconde@email.com "
+            "et wossewodda-3728@yopmail.com. Veuillez vous rapprocher du support pour débloquer la situation "
             "en suivant <a href='https://communaute.inclusion.beta.gouv.fr/aide/emplois/#support'>ce lien</a>."
         )
 
