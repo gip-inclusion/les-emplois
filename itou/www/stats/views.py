@@ -100,7 +100,9 @@ def get_params_for_whole_country():
     }
 
 
-def render_stats(request, context, params={}, template_name="stats/stats.html"):
+def render_stats(request, context, params=None, template_name="stats/stats.html"):
+    if params is None:
+        params = {}
     view_name = get_view_name(request)
     metabase_dashboard = METABASE_DASHBOARDS.get(view_name)
     tally_form_id = None
@@ -400,7 +402,7 @@ def stats_dreets_hiring(request):
     )
 
 
-def render_stats_dgefp(request, page_title, add_params=True, extra_context=None):
+def render_stats_dgefp(request, page_title, extra_params=None, extra_context=None):
     if extra_context is None:
         extra_context = {}
     ensure_stats_dgefp_permission(request)
@@ -408,25 +410,28 @@ def render_stats_dgefp(request, page_title, add_params=True, extra_context=None)
         "page_title": page_title,
     }
     context.update(extra_context)
-    if add_params:
-        params = get_params_for_whole_country()
-        return render_stats(request=request, context=context, params=params)
-    return render_stats(request=request, context=context)
+    return render_stats(request=request, context=context, params=extra_params)
 
 
 @login_required
 def stats_dgefp_auto_prescription(request):
-    return render_stats_dgefp(request=request, page_title="Focus auto-prescription")
+    return render_stats_dgefp(
+        request=request, page_title="Focus auto-prescription", extra_params=get_params_for_whole_country()
+    )
 
 
 @login_required
 def stats_dgefp_follow_siae_evaluation(request):
-    return render_stats_dgefp(request=request, page_title="Suivre le contrôle à posteriori")
+    return render_stats_dgefp(
+        request=request, page_title="Suivre le contrôle à posteriori", extra_params=get_params_for_whole_country()
+    )
 
 
 @login_required
 def stats_dgefp_iae(request):
-    return render_stats_dgefp(request=request, page_title="Données des régions")
+    return render_stats_dgefp(
+        request=request, page_title="Données des régions", extra_params=get_params_for_whole_country()
+    )
 
 
 @login_required
@@ -435,12 +440,13 @@ def stats_dgefp_siae_evaluation(request):
         request=request,
         page_title="Données (version bêta) du contrôle a posteriori",
         extra_context={"show_siae_evaluation_message": True},
+        extra_params=get_params_for_whole_country(),
     )
 
 
 @login_required
 def stats_dgefp_af(request):
-    return render_stats_dgefp(request=request, page_title="Annexes financières actives", add_params=False)
+    return render_stats_dgefp(request=request, page_title="Annexes financières actives")
 
 
 @login_required

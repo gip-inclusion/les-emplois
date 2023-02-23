@@ -146,7 +146,7 @@ def get_view_name(request):
     return view_name
 
 
-def metabase_embedded_url(request=None, dashboard_id=None, params={}, with_title=False):
+def metabase_embedded_url(request=None, dashboard_id=None, params=None, with_title=False):
     """
     Creates an embed/signed URL for embedded Metabase dashboards:
     * expiration delay of token set at 10 minutes, kept short on purpose due to the fact that during this short time
@@ -154,6 +154,8 @@ def metabase_embedded_url(request=None, dashboard_id=None, params={}, with_title
     * do not display title of the dashboard in the iframe
     * optional parameters typically for locked filters (e.g. allow viewing data of one departement only)
     """
+    if params is None:
+        params = {}
     if dashboard_id is None:
         view_name = get_view_name(request)
         metabase_dashboard = METABASE_DASHBOARDS.get(view_name)
