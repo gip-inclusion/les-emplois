@@ -336,9 +336,9 @@ def stats_ddets_auto_prescription(request):
 
 
 @login_required
-def stats_ddets_follow_diagnosis_control(request):
+def stats_ddets_follow_siae_evaluation(request):
     """
-    This dashboard shows data about the diagnosis control ("Contrôle a posteriori") overall progress.
+    This dashboard shows data about siae evaluation ("Contrôle a posteriori") overall progress.
     """
     return render_stats_ddets(request=request, page_title="Suivre le contrôle à posteriori")
 
@@ -350,13 +350,13 @@ def stats_ddets_iae(request):
 
 
 @login_required
-def stats_ddets_diagnosis_control(request):
+def stats_ddets_siae_evaluation(request):
     """
-    This dashboard shows the diagnosis control ("Contrôle a posteriori") raw data.
+    This dashboard shows siae evaluation ("Contrôle a posteriori") raw data.
     """
     extra_context = {
         "back_url": reverse("siae_evaluations_views:samples_selection"),
-        "show_diagnosis_control_message": True,
+        "show_siae_evaluation_message": True,
     }
     return render_stats_ddets(
         request=request, page_title="Données du contrôle a posteriori", extra_context=extra_context
@@ -395,9 +395,9 @@ def stats_dreets_auto_prescription(request):
 
 
 @login_required
-def stats_dreets_follow_diagnosis_control(request):
+def stats_dreets_follow_siae_evaluation(request):
     """
-    This dashboard shows data about the diagnosis control ("Contrôle a posteriori") overall progress.
+    This dashboard shows data about siae evaluation ("Contrôle a posteriori") overall progress.
     """
     return render_stats_dreets(request=request, page_title="Suivre le contrôle à posteriori")
 
@@ -445,9 +445,9 @@ def stats_dgefp_auto_prescription(request):
 
 
 @login_required
-def stats_dgefp_follow_diagnosis_control(request):
+def stats_dgefp_follow_siae_evaluation(request):
     """
-    This dashboard shows data about the diagnosis control ("Contrôle a posteriori") overall progress.
+    This dashboard shows data about siae evaluation ("Contrôle a posteriori") overall progress.
     """
     return render_stats_dgefp(request=request, page_title="Suivre le contrôle à posteriori")
 
@@ -458,14 +458,14 @@ def stats_dgefp_iae(request):
 
 
 @login_required
-def stats_dgefp_diagnosis_control(request):
+def stats_dgefp_siae_evaluation(request):
     """
-    This dashboard shows diagnosis control ("Contrôle a posteriori") raw data.
+    This dashboard shows siae evaluation ("Contrôle a posteriori") raw data.
     """
     return render_stats_dgefp(
         request=request,
         page_title="Données (version bêta) du contrôle a posteriori",
-        extra_context={"show_diagnosis_control_message": True},
+        extra_context={"show_siae_evaluation_message": True},
     )
 
 

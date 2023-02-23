@@ -75,13 +75,13 @@ METABASE_DASHBOARDS = {
     "stats_ddets_auto_prescription": {
         "dashboard_id": 267,
     },
-    "stats_ddets_follow_diagnosis_control": {
+    "stats_ddets_follow_siae_evaluation": {
         "dashboard_id": 265,
     },
     "stats_ddets_iae": {
         "dashboard_id": 117,
     },
-    "stats_ddets_diagnosis_control": {
+    "stats_ddets_siae_evaluation": {
         "dashboard_id": 144,
     },
     "stats_ddets_hiring": {
@@ -94,7 +94,7 @@ METABASE_DASHBOARDS = {
     "stats_dreets_auto_prescription": {
         "dashboard_id": 267,
     },
-    "stats_dreets_follow_diagnosis_control": {
+    "stats_dreets_follow_siae_evaluation": {
         "dashboard_id": 265,
     },
     "stats_dreets_iae": {
@@ -110,13 +110,13 @@ METABASE_DASHBOARDS = {
     "stats_dgefp_auto_prescription": {
         "dashboard_id": 267,
     },
-    "stats_dgefp_follow_diagnosis_control": {
+    "stats_dgefp_follow_siae_evaluation": {
         "dashboard_id": 265,
     },
     "stats_dgefp_iae": {
         "dashboard_id": 117,
     },
-    "stats_dgefp_diagnosis_control": {
+    "stats_dgefp_siae_evaluation": {
         "dashboard_id": 144,
     },
     "stats_dgefp_af": {
