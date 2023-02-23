@@ -400,7 +400,9 @@ def stats_dreets_hiring(request):
     )
 
 
-def render_stats_dgefp(request, page_title, add_params=True, extra_context={}):
+def render_stats_dgefp(request, page_title, add_params=True, extra_context=None):
+    if extra_context is None:
+        extra_context = {}
     ensure_stats_dgefp_permission(request)
     context = {
         "page_title": page_title,
