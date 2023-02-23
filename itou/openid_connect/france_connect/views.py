@@ -136,8 +136,8 @@ def france_connect_callback(request):  # pylint: disable=too-many-return-stateme
         return HttpResponseRedirect(url)
     except MultipleUsersFoundException as e:
         return _redirect_to_job_seeker_login_on_error(
-            "Vous avez deux comptes sur la plateforme et nous detectons un conflit d'email : "
-            f"{e.users[0].email} et {e.users[1].email}."
+            "Vous avez deux comptes sur la plateforme et nous détectons un conflit d'email : "
+            f"{e.users[0].email} et {e.users[1].email}. "
             "Veuillez vous rapprocher du support pour débloquer la situation en suivant "
             "<a href='https://communaute.inclusion.beta.gouv.fr/aide/emplois/#support'>ce lien</a>.",
             request=request,
