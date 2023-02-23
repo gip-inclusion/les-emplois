@@ -552,8 +552,11 @@ Usage:
     background-repeat: no-repeat;
     background-position: top -120px left;
 }
+.s-banner-01.s-banner-01--ic .s-banner-01__col > div::before {
+    display: none;
+}
 
-/* Workaround while waiting for next version
+/* Workaround while waiting for next theme version
 --------------------------------------------------------------------------- */
 .disabled {
     color: #B3B4C3 !important;
