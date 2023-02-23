@@ -130,6 +130,7 @@ select
     commune_structure.latitude as latitude_commune_structure,
     commune_structure.longitude as longitude_commune_structure,
     af.type_siae, 
+    type_structure,
     af.af_etp_postes_insertion,
     af.af_numero_convention,
     af.af_numero_annexe_financiere,
@@ -159,14 +160,15 @@ cross join
     left join  "fluxIAE_RefCategorieSort" as categoriesort
         on categoriesort.rcs_id = sortie.rcs_id
     left  join "fluxIAE_AnnexeFinanciere_v2" as af 
-        on emi.emi_afi_id=af.af_id_annexe_financiere and af_etat_annexe_financiere_code in ('VALIDE', 'PROVISOIRE')
+        on emi.emi_afi_id=af.af_id_annexe_financiere and af_etat_annexe_financiere_code in ('VALIDE', 'PROVISOIRE','CLOTURE')
         and emi.emi_sme_annee >= annee_en_cours_2
-        and af_mesure_dispositif_code not like '%MP%' 
         and af_mesure_dispositif_code not like '%FDI%'
     left join "fluxIAE_Structure_v2" as structure
         on af.af_id_structure = structure.structure_id_siae
     left join coordonnees_gps as commune_structure   
         on structure.structure_adresse_admin_code_insee = commune_structure.code_insee
+    left join ref_mesure_dispositif_asp as ref_asp 
+        on af.af_mesure_dispositif_code = ref_asp.af_mesure_dispositif_code
 /* On récupère le découpage établissement public territorial */   
     left join sa_ept ept on ept.code_comm = structure.structure_adresse_admin_code_insee
     left join sa_zones_infradepartementales infra on infra.code_commune = structure.structure_adresse_admin_code_insee
