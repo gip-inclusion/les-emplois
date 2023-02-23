@@ -1,7 +1,5 @@
 /*
-
 L'objectif est de créer une table qui contient des informations à l'échelle locale (bassin d'emploi, epci, etc)
-
 */
 
 with candidatures_p as (
@@ -73,6 +71,16 @@ adherents_unai as (
         inner join structures s
             on s.siret = ria."SIRET"
     where ria."Réseau IAE" = 'Unai'
+),
+adherents_cocagne as (
+    select
+        distinct (ria."SIRET") as siret,
+        ria."Réseau IAE" as reseau_cocagne,
+        s.id as id_structure
+    from reseau_iae_adherents ria
+        inner join structures s
+            on s.siret = ria."SIRET"
+    where ria."Réseau IAE" = 'Cocagne'
 )
 select
     date_candidature,
@@ -160,7 +168,11 @@ select
     case
         when adherents_unai.reseau_unai = 'Unai' then 'Oui'
         else 'Non'
-    end reseau_unai
+    end reseau_unai,
+    case
+        when adherents_cocagne.reseau_cocagne = 'Cocagne' then 'Oui'
+        else 'Non'
+    end reseau_cocagne
 from
     candidatures_p
         left join bassin_emploi
@@ -172,6 +184,8 @@ from
         left join adherents_fei
             on adherents_fei.id_structure = candidatures_p.id_structure
         left join adherents_unai
-            on adherents_unai.id_structure = candidatures_p.id_structure    
+            on adherents_unai.id_structure = candidatures_p.id_structure
+        left join adherents_cocagne
+            on adherents_cocagne.id_structure = candidatures_p.id_structure    
         left join org_prescripteur
         	on org_prescripteur.id_org = candidatures_p.id_org_prescripteur
