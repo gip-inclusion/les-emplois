@@ -454,6 +454,36 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
             self.assertContains(response, "pour devenir employeur sur la plateforme")
             user.delete()
 
+    @respx.mock
+    def test_callback_updating_email_collision(self):
+        PrescriberFactory(
+            first_name="Bernard",
+            last_name="Blier",
+            username="bernard_blier",
+            email=OIDC_USERINFO["email"],
+            identity_provider=users_enums.IdentityProvider.DJANGO,
+        )
+        user = PrescriberFactory(
+            first_name=OIDC_USERINFO["given_name"],
+            last_name=OIDC_USERINFO["family_name"],
+            username=OIDC_USERINFO["sub"],
+            email="random@email.com",
+            identity_provider=users_enums.IdentityProvider.INCLUSION_CONNECT,
+        )
+        self.client.force_login(user)
+        response = mock_oauth_dance(
+            self, UserKind.PRESCRIBER, assert_redirects=False, next_url=reverse("dashboard:edit_user_info")
+        )
+        response = self.client.get(response.url, follow=True)
+        messages = list(get_messages(response.wsgi_request))
+        assert len(messages) == 1
+        assert (
+            messages[0].message
+            == "Vous avez deux comptes sur la plateforme et nous detectons un conflit d'email : random@email.com "
+            f"et {OIDC_USERINFO['email']}. Veuillez vous rapprocher du support pour débloquer la situation "
+            "en suivant <a href='https://communaute.inclusion.beta.gouv.fr/aide/emplois/#support'>ce lien</a>."
+        )
+
 
 class InclusionConnectAccountActivationTest(InclusionConnectBaseTestCase):
     def test_new_user(self):
