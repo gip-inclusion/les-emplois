@@ -321,7 +321,7 @@ def render_stats_ddets(request, page_title, extra_context={}):
     department = get_stats_ddets_department(request)
     params = get_params_for_departement(department)
     context = {
-        "page_title": page_title,
+        "page_title": f"{page_title} ({DEPARTMENTS[department]})",
         "matomo_custom_url_suffix": format_region_and_department_for_matomo(department),
     }
     context.update(extra_context)
@@ -340,8 +340,7 @@ def stats_ddets_follow_siae_evaluation(request):
 
 @login_required
 def stats_ddets_iae(request):
-    department = get_stats_ddets_department(request)
-    return render_stats_ddets(request=request, page_title=f"Données de mon département : {DEPARTMENTS[department]}")
+    return render_stats_ddets(request=request, page_title="Données IAE de mon département")
 
 
 @login_required
@@ -357,10 +356,9 @@ def stats_ddets_siae_evaluation(request):
 
 @login_required
 def stats_ddets_hiring(request):
-    department = get_stats_ddets_department(request)
     return render_stats_ddets(
         request=request,
-        page_title=f"Données facilitation de l'embauche de mon département : {DEPARTMENTS[department]}",
+        page_title="Données facilitation de l'embauche de mon département",
     )
 
 
@@ -368,7 +366,7 @@ def render_stats_dreets(request, page_title):
     region = get_stats_dreets_region(request)
     params = get_params_for_region(region)
     context = {
-        "page_title": page_title,
+        "page_title": f"{page_title} ({region})",
         "matomo_custom_url_suffix": format_region_for_matomo(region),
     }
     return render_stats(request=request, context=context, params=params)
@@ -386,19 +384,17 @@ def stats_dreets_follow_siae_evaluation(request):
 
 @login_required
 def stats_dreets_iae(request):
-    region = get_stats_dreets_region(request)
     return render_stats_dreets(
         request=request,
-        page_title=f"Données de ma région : {region}",
+        page_title="Données IAE de ma région",
     )
 
 
 @login_required
 def stats_dreets_hiring(request):
-    region = get_stats_dreets_region(request)
     return render_stats_dreets(
         request=request,
-        page_title=f"Données facilitation de l'embauche de ma région : {region}",
+        page_title="Données facilitation de l'embauche de ma région",
     )
 
 
