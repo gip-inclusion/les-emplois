@@ -40,6 +40,8 @@
                     </li>
                 {% endif %}
                 {% if can_view_stats_ddets %}
+                    {% comment %}
+                    <!-- TODO @dejafait uncomment as soon as ready -->
                     <li class="card-text mb-3">
                         <i class="ri-line-chart-line ri-lg mr-1"></i>
                         <a href="{% url 'stats:stats_ddets_auto_prescription' %}">Focus auto-prescription</a>
@@ -50,6 +52,7 @@
                         <a href="{% url 'stats:stats_ddets_follow_siae_evaluation' %}">Suivre le contrôle à posteriori</a>
                         <span class="badge badge-pill badge-sm badge-important text-white">Nouveau</span>
                     </li>
+                    {% endcomment %}
                     <li class="card-text mb-3">
                         <i class="ri-line-chart-line ri-lg mr-1"></i>
                         <a href="{% url 'stats:stats_ddets_iae' %}">Voir les données IAE de mon département</a>
@@ -60,6 +63,8 @@
                     </li>
                 {% endif %}
                 {% if can_view_stats_dreets %}
+                    {% comment %}
+                    <!-- TODO @dejafait uncomment as soon as ready -->
                     <li class="card-text mb-3">
                         <i class="ri-line-chart-line ri-lg mr-1"></i>
                         <a href="{% url 'stats:stats_dreets_auto_prescription' %}">Focus auto-prescription</a>
@@ -70,6 +75,7 @@
                         <a href="{% url 'stats:stats_dreets_follow_siae_evaluation' %}">Suivre le contrôle à posteriori</a>
                         <span class="badge badge-pill badge-sm badge-important text-white">Nouveau</span>
                     </li>
+                    {% endcomment %}
                     <li class="card-text mb-3">
                         <i class="ri-line-chart-line ri-lg mr-1"></i>
                         <a href="{% url 'stats:stats_dreets_iae' %}">Voir les données IAE de ma région</a>
@@ -80,6 +86,8 @@
                     </li>
                 {% endif %}
                 {% if can_view_stats_dgefp %}
+                    {% comment %}
+                    <!-- TODO @dejafait uncomment as soon as ready -->
                     <li class="card-text mb-3">
                         <i class="ri-line-chart-line ri-lg mr-1"></i>
                         <a href="{% url 'stats:stats_dgefp_auto_prescription' %}">Focus auto-prescription</a>
@@ -90,6 +98,7 @@
                         <a href="{% url 'stats:stats_dgefp_follow_siae_evaluation' %}">Suivre le contrôle à posteriori</a>
                         <span class="badge badge-pill badge-sm badge-important text-white">Nouveau</span>
                     </li>
+                    {% endcomment %}
                     <li class="card-text mb-3">
                         <i class="ri-line-chart-line ri-lg mr-1"></i>
                         <a href="{% url 'stats:stats_dgefp_iae' %}">Voir les données IAE France entière</a>
