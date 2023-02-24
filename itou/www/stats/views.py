@@ -140,22 +140,6 @@ def stats_public(request):
     return render_stats(request=request, context=context)
 
 
-def stats_test1(request):
-    context = {
-        "page_title": "Test 1",
-        "tally_form_id": "waQPkB",
-    }
-    return render_stats(request=request, context=context, template_name="stats/stats_test1.html")
-
-
-def stats_test2(request):
-    context = {
-        "page_title": "Test 2",
-        "tally_form_id": "mBEr1K",
-    }
-    return render_stats(request=request, context=context, template_name="stats/stats_test2.html")
-
-
 @xframe_options_exempt
 def stats_pilotage(request, dashboard_id):
     """

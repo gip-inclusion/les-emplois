@@ -9,9 +9,6 @@ urlpatterns = [
     # Public stats.
     path("", views.stats_public, name="stats_public"),
     path("pilotage/<int:dashboard_id>", views.stats_pilotage, name="stats_pilotage"),
-    # Temporary items to easily test and debug ongoing tally popup issues.
-    path("test1", views.stats_test1, name="stats_test1"),
-    path("test2", views.stats_test2, name="stats_test2"),
     # Employer stats.
     path("siae/etp", views.stats_siae_etp, name="stats_siae_etp"),
     path("siae/hiring", views.stats_siae_hiring, name="stats_siae_hiring"),

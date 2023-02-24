@@ -16,16 +16,6 @@ METABASE_DASHBOARDS = {
     "stats_public": {
         "dashboard_id": 119,
     },
-    #
-    # Temporary items to easily test and debug ongoing tally popup issues.
-    #
-    "stats_test1": {
-        "dashboard_id": 119,
-    },
-    "stats_test2": {
-        "dashboard_id": 119,
-    },
-    #
     # Employer stats.
     #
     "stats_siae_etp": {
