@@ -206,7 +206,11 @@
                                     </p>
                                     <div class="row no-gutters">
                                         <div class="col-12 col-md-auto mt-2">
-                                            <a class="btn btn-primary btn-block" href="{{ ic_activate_url }}">Activer Inclusion Connect</a>
+                                            <a href="{{ ic_activate_url }}"
+                                               class="btn btn-primary btn-block"
+                                               data-matomo-category="activation {{ account_type_display_name }}"
+                                               data-matomo-action="clic"
+                                               data-matomo-option="activer-son-compte-inclusion-connect-bandeau">Activer Inclusion Connect</a>
                                         </div>
                                         <div class="col-12 col-md-auto mt-2">
                                             <a class="btn btn-link btn-block"
