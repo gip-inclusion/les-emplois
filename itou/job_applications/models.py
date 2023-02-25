@@ -460,6 +460,15 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         on_delete=models.SET_NULL,
     )
 
+    geiq_eligibility_diagnosis = models.ForeignKey(
+        "eligibility.GEIQEligibilityDiagnosis",
+        verbose_name="Diagnostic d'éligibilité GEIQ",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="job_applications",
+    )
+
     # Exclude flagged approvals (batch creation or import of approvals).
     # See itou.users.management.commands.import_ai_employees.
     create_employee_record = models.BooleanField(default=True, verbose_name="Création d'une fiche salarié")

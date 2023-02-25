@@ -5,7 +5,8 @@ import factory.fuzzy
 from dateutil.relativedelta import relativedelta
 
 from itou.approvals.factories import ApprovalFactory
-from itou.eligibility.factories import EligibilityDiagnosisFactory
+from itou.eligibility.enums import AuthorKind
+from itou.eligibility.factories import EligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory
 from itou.job_applications import models
 from itou.job_applications.enums import SenderKind
 from itou.jobs.models import Appellation
@@ -13,6 +14,7 @@ from itou.prescribers.factories import (
     PrescriberOrganizationWithMembershipFactory,
     PrescriberPoleEmploiWithMembershipFactory,
 )
+from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory
 from itou.siaes.models import SiaeJobDescription
 from itou.users.factories import (
@@ -36,6 +38,31 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
                 ApprovalFactory,
                 user=factory.SelfAttribute("..job_seeker"),
                 eligibility_diagnosis=factory.SelfAttribute("..eligibility_diagnosis"),
+            ),
+        )
+        # GEIQ diagnosis created by a GEIQ
+        with_geiq_eligibility_diagnosis = factory.Trait(
+            to_siae=factory.SubFactory(SiaeFactory, with_membership=True, kind=SiaeKind.GEIQ),
+            sender=factory.LazyAttribute(lambda obj: obj.to_siae.members.first()),
+            geiq_eligibility_diagnosis=factory.SubFactory(
+                GEIQEligibilityDiagnosisFactory,
+                job_seeker=factory.SelfAttribute("..job_seeker"),
+                author=factory.SelfAttribute("..sender"),
+                author_kind=AuthorKind.GEIQ,
+                author_geiq=factory.SelfAttribute("..to_siae"),
+            ),
+        )
+        with_geiq_eligibility_diagnosis_from_prescriber = factory.Trait(
+            to_siae=factory.SubFactory(SiaeFactory, with_membership=True, kind=SiaeKind.GEIQ),
+            sender=factory.LazyAttribute(lambda obj: obj.sender_prescriber_organization.members.first()),
+            geiq_eligibility_diagnosis=factory.SubFactory(
+                GEIQEligibilityDiagnosisFactory,
+                job_seeker=factory.SelfAttribute("..job_seeker"),
+                author=factory.SelfAttribute("..sender"),
+                author_kind=AuthorKind.PRESCRIBER,
+                author_prescriber_organization=factory.SubFactory(
+                    PrescriberOrganizationWithMembershipFactory, authorized=True
+                ),
             ),
         )
         sent_by_authorized_prescriber_organisation = factory.Trait(
