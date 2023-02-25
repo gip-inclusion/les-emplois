@@ -1614,6 +1614,7 @@ class JobApplicationAdminFormTest(TestCase):
         form_fields_list = [
             "job_seeker",
             "eligibility_diagnosis",
+            "geiq_eligibility_diagnosis",
             "create_employee_record",
             "resume_link",
             "sender",
