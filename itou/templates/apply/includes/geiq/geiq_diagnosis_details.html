@@ -1,0 +1,119 @@
+{% if diagnosis.is_valid %}
+    <hr>
+    {% if diagnosis.eligibility_confirmed %}
+        <h3>Éligibilité public prioritaire GEIQ validée</h3>
+    {% else %}
+        <h3>Éligibilité public prioritaire GEIQ non confirmée</h3>
+    {% endif %}
+
+    {% if diagnosis.eligibility_confirmed %}
+        <p>
+            Éligibilité GEIQ confirmée par <b>{{ diagnosis.author.get_full_name }} ({{ diagnosis.author_structure.display_name }})</b>
+        </p>
+    {% else %}
+        <p>
+            Renseignée par <b>{{ diagnosis.author.get_full_name }} ({{ diagnosis.author_structure.display_name }})</b>
+        </p>
+    {% endif %}
+
+    {% with criteria=diagnosis.administrative_criteria_display %}
+        {% if criteria %}
+            <h4>Situation administrative du candidat</h4>
+            <ul>
+                {% for c in criteria|dictsort:"ui_rank" %}
+                    <li>{{ c.name }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+ 
+    {% if diagnosis.eligibility_confirmed %}
+        <p>
+            <b>Durée de validité du diagnostic :</b> du {{ diagnosis.created_at|date:"d/m/Y" }} au {{ diagnosis.expires_at|date:"d/m/Y" }}.
+        </p>
+        {% if request.user.is_siae_staff %}
+            <div class="alert alert-info" role="status">
+                <div class="row">
+                    <div class="col-auto pr-0">
+                        <i class="ri-information-line ri-xl text-info"></i>
+                    </div>
+                    <div class="col">
+                        <p>
+                            <b>Aide à l'accompagement GEIQ</b>
+                        </p>
+                        <p>
+                            {% if diagnosis.author_prescriber_organization %}
+                                Ce diagnostic émis par un prescripteur habilité vous donnera droit en cas d’embauche,
+                            {% else %}
+                                Les critères que vous avez sélectionnés vous donnent droit en cas d’embauche,
+                            {% endif %}
+                            à une aide financière de l’État s’élevant à <b>{{ diagnosis.allowance_amount }} €</b> (sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible).
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% else %}
+        {# Existing GEIQ, diagnosis but no allowance #}
+        <div class="alert alert-warning mt-4">
+            <div class="row">
+                <div class="col-auto pr-0">
+                    <i class="ri-alert-line ri-xl text-warning"></i>
+                </div>
+                <div class="col">
+                    <p>
+                        <b>Aide à l'accompagement GEIQ</b>
+                    </p>
+                    <div class="row">
+                        <div class="col">
+                            <p>Les critères que vous avez sélectionnés ne vous permettent pas de bénéficier d’une aide financière de l’État.</p>
+                        </div>
+                        <div class="col-auto pl-0">
+                            <a href="{% url 'apply:geiq_eligibility' job_application_id=job_application.pk %}?next_url={% url 'apply:details_for_siae' job_application_id=job_application.pk %}" class="btn btn-primary">Mettre à jour</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% else %}
+    {# Diagnosis either does not exist or has expired : this part is for GEIQ only #}
+    {% if request.user.is_siae_staff %}
+        <hr>
+        <div class="row ">
+            <div class="col-auto pt-2">
+                <h3>Éligibilité public prioritaire GEIQ non confirmée</h3>
+            </div>
+            <div class="col text-right">
+                {% with back_and_next_url=request.get_full_path|urlencode %}
+                    <a href="{% url 'apply:geiq_eligibility' job_application_id=job_application.pk %}?back_url={{ back_and_next_url }}&next_url={{ back_and_next_url }}" class="btn btn-outline-primary">
+                        Vérifier
+                    </a>
+                {% endwith %}
+            </div>
+        </div>
+        {# GEIQ eligibility diagnosis expired #}
+        {% if diagnosis and not diagnosis.is_valid %}
+            <div class="alert alert-warning mt-4">
+                <div class="row">
+                    <div class="col-auto pr-0">
+                        <i class="ri-alert-line ri-xl text-warning"></i>
+                    </div>
+                    <div class="col">
+                        <p>
+                            <b>Aide à l'accompagement GEIQ</b>
+                        </p>
+                        <p>
+                            Le diagnostic du candidat a expiré le {{ diagnosis.expires_at|date:"d F Y" }}. Si vous souhaitez bénéficier d’une aide à l’accompagnement, veuillez renseigner à nouveau la situation administrative du candidat.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endif %}
+{% endif %}
+
+{# Confirmation modal for hiring #}
+{% if show_geiq_eligibility_modal %}
+    {% include "apply/includes/geiq/no_allowance_modal.html" %}
+{% endif %}

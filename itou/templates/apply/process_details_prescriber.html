@@ -12,8 +12,14 @@
         <hr>
         <h3 >Informations personnelles</h3>
         {% include "apply/includes/job_seeker_info.html" with job_application=job_application %}
-        {# Eligibility ------------------------------------------------------------------------- #}
-        {% include "apply/includes/eligibility_diagnosis.html" with eligibility_diagnosis=eligibility_diagnosis job_application=job_application %}
+        {% if siae_is_geiq and geiq_eligibility_diagnosis %}
+ 
+            {# GEIQ eligibility details #}
+            {% include "apply/includes/geiq/geiq_diagnosis_details.html" with diagnosis=geiq_eligibility_diagnosis %}
+        {% else %}
+            {# IAE Eligibility ------------------------------------------------------------------------- #}
+            {% include "apply/includes/eligibility_diagnosis.html" with eligibility_diagnosis=eligibility_diagnosis job_application=job_application %}
+        {% endif %}
     </div>
 
     {# Job application info ------------------------------------------------------------------------- #}

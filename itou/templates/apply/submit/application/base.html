@@ -26,6 +26,12 @@
                             {% else %}
                                 <span class="badge badge-base badge-pill badge-warning"><i class="ri-error-warning-line"></i>Éligibilité IAE à valider</span>
                             {% endif %}
+                        {% elif is_subject_to_geiq_eligibility_rules %}
+                            {% if geiq_eligibility_diagnosis %}
+                                <span class="badge badge-base badge-pill badge-success-light"><i class="ri-check-fill"></i>Éligibilité GEIQ confirmée</span>
+                            {% else %}
+                                <span class="badge badge-base badge-pill badge-warning-light text-warning"><i class="ri-information-line"></i>Éligibilité GEIQ non confirmée</span>
+                            {% endif %}
                         {% endif %}
                     </div>
                     <div class="d-flex flex-column flex-md-row align-items-center mb-4">
@@ -94,7 +100,11 @@
                             {% block step_title %}{% endblock %}
                         </h2>
                         <hr class="mt-5">
-                        {% bootstrap_form_errors form type="all" %}
+
+                        {% block form_errors %}
+                            <div id="form_errors">{% bootstrap_form_errors form type="all" %}</div>
+                        {% endblock %}
+
                         <form method="post">
                             {% csrf_token %}
 

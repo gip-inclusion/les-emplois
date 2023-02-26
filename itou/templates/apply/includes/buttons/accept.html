@@ -1,5 +1,9 @@
-<p>
-    <a href="{% url 'apply:accept' job_application_id=job_application.id %}" class="btn btn-primary btn-block">
-        <span>Je l'embauche</span>
-    </a>
-</p>
+<div class="my-3">
+    {% if show_geiq_eligibility_modal %}
+        <button class="btn btn-primary btn-block" data-toggle="modal" data-target="#confirm_modal">Je l'embauche</button>
+    {% else %}
+        <a href="{% url 'apply:accept' job_application_id=job_application.pk %}" class="btn btn-primary btn-block">
+            Je l'embauche
+        </a>
+    {% endif %}
+</div>

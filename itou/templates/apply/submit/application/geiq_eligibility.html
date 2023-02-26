@@ -1,0 +1,51 @@
+{% extends "apply/submit/application/base.html" %}
+{% load bootstrap4 %}
+
+{% block progress_title %}{{ block.super }} - Éligibilité GEIQ{% endblock %}
+
+{% block pre_step_title %}
+    {% if is_subject_to_geiq_eligibility_rules and geiq_eligibility_diagnosis %}
+        {% if eligibility_diagnosis.author_organization %}
+            <div class="mb-5">
+                <p>L’éligibilité GEIQ du candidat a été validée par :</p>
+                <p class="text-tertiary font-weight-bold">{{ eligibility_diagnosis.author_organization.display_name }}</p>
+            </div>
+        {% endif %}
+        <div class="alert alert-info mb-5" role="status">
+            <div class="row">
+                <div class="col-auto pr-0">
+                    <i class="ri-information-line ri-xl"></i>
+                </div>
+                <div class="col">
+                    <p class="mb-2">
+                        <strong>Date de fin de validité du diagnostic : {{ geiq_eligibility_diagnosis.expires_at|date:"d/m/Y" }}</strong>
+                    </p>
+                    <p class="mb-2">
+                        Tant que l’éligibilité à l'aide de l'accompagnement GEIQ est valide, vous n’avez rien à faire. Si vous souhaitez la mettre à jour, sa validité sera prolongée de six mois.
+                    </p>
+                    <span class="btn btn-link text-left p-0 js-display-if-javascript-enabled" data-shroud-clear>Mettre à jour l’éligibilité</span>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {% if job_seeker.address_in_qpv or job_seeker.zrr_city_name %}
+        {% include "apply/includes/known_criteria.html" %}
+    {% endif %}
+{% endblock %}
+
+{% block form_content %}
+    <div{% if geiq_eligibility_diagnosis and not form.is_bound %} class="js-shroud"{% endif %}>
+        <div class="row">
+            <div class="col-6 col-lg-7">
+                <h2>Préciser la situation administrative du candidat (facultatif)</h2>
+            </div>
+            <div class="col">{% include "apply/includes/geiq/legislative_text_link.html" %}</div>
+        </div>
+        <div class="row">
+            {# Form fragment rendered by HTMX #}
+            <div class="col-6 col-lg-7">
+                <div hx-target="this">{% include "apply/includes/geiq/geiq_administrative_criteria_form.html" %}</div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
