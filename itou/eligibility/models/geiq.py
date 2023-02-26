@@ -1,11 +1,12 @@
-from collections import Counter
-
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.utils import timezone
+from django.utils.text import slugify
 
 from itou.eligibility.enums import AdministrativeCriteriaAnnex, AdministrativeCriteriaLevel, AuthorKind
+from itou.eligibility.utils import geiq_allowance_amount
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.enums import SiaeKind
 from itou.siaes.models import Siae
@@ -27,23 +28,41 @@ from .common import (
 # Moreover, some validation rules would be tricky to avoid mixing administrative criteria of different kinds.
 # Hence a refactor, with a common abstract base for both kind of models (IAE and GEIQ)
 # and a specialization with different features for the GEIQ part :
-# - new constructor
+# - new constructor / update methods
 # - allowance amount and eligibility calculation for the diagnosis
-# - parent / child structure and annexes for administrative criteria
-# - removal of dependencies on a IAE approval (irrelevant in GEIQ context)
+# - parent / child structure and annexes for administrative criteria (for templates)
+# - removal of dependencies on an IAE approval (irrelevant in GEIQ context)
 # - ...
 
 
 class GEIQEligibilityDiagnosisQuerySet(CommonEligibilityDiagnosisQuerySet):
-    def authored_by_geiq(self, for_geiq):
-        return self.filter(author_geiq=for_geiq)
-
     def for_job_seeker(self, job_seeker):
-        return self.filter(job_seeker=job_seeker).select_related("author", "author_prescriber_organization")
+        return self.filter(job_seeker=job_seeker).select_related(
+            "author", "author_geiq", "author_prescriber_organization"
+        )
+
+    def authored_by_prescriber_or_geiq(self, geiq):
+        # In ordering, priority is given to prescriber authored diagnoses
+        return self.filter(
+            models.Q(author_geiq=geiq) | models.Q(author_prescriber_organization__isnull=False)
+        ).order_by(models.F("author_prescriber_organization").desc(nulls_last=True), "-created_at")
+
+    def diagnoses_for(self, job_seeker, for_geiq=None):
+        # Get *all* GEIQ diagnoses for given job seeker (even expired)
+        return (
+            self.for_job_seeker(job_seeker)
+            .authored_by_prescriber_or_geiq(for_geiq)
+            .prefetch_related("administrative_criteria")
+        )
+
+    def valid_diagnoses_for(self, job_seeker, for_geiq=None):
+        # Get *valid* (non-expired) GEIQ diagnoses for given job seeker
+        # This is the to-go method to get the "current" GEIQ diagnosis for a job seeker:
+        # `GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(my_job_seeker, optional_geiq).first()`
+        return self.valid().diagnoses_for(job_seeker, for_geiq)
 
 
 class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
-
     # Not in abstract model to avoid 'related_name' clashing
     job_seeker = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -92,60 +111,65 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
 
     def clean(self):
         if self.author_geiq and self.author_geiq.kind != SiaeKind.GEIQ:
-            raise ValidationError(f"La structure auteur du diagnostic n'est pas un GEIQ ({self.author_geiq.kind})")
+            raise ValidationError("L'auteur du diagnostic n'est pas un GEIQ")
 
-    def _get_eligibility_and_allowance_amount(self) -> tuple[bool, int]:
-        if self.author_kind == AuthorKind.PRESCRIBER and self.author_prescriber_organization:
-            return True, 1400
+        if self.pk:
+            return
 
-        administrative_criteria = self.administrative_criteria.all()
-        # Count by annex
-        annex_cnt = Counter(c.annex for c in administrative_criteria)
-        # Only annex 2 administrative criteria have a level defined
-        level_cnt = Counter(c.level for c in administrative_criteria if c.level)
-        eligibility, amount = False, 0
+        # The following would have been nice in a unique constraint,
+        # but infortunately functions.Now() is not immutable
+        if self.job_seeker and (
+            GEIQEligibilityDiagnosis.objects.valid()
+            .for_job_seeker(self.job_seeker)
+            .filter(models.Q(author_geiq=self.author_geiq) | models.Q(author_prescriber_organization__isnull=False))
+            .exists()
+        ):
+            raise ValidationError(f"Il existe déjà un diagnostic GEIQ valide pour cet utilisateur : {self.job_seeker}")
 
-        if annex_cnt["1"] > 0:
-            eligibility, amount = True, 814
+    def _invalidate_obsolete_geiq_diagnoses(self):
+        # If: there are one or more valid GEIQ authored diagnoses for a given job seeker
+        # And: we want to create a GEIQ diagnosis made by an authorized prescriber for this same job seeker
+        # Then: all valid GEIQ authored diagnosis with no *hiring attached* are "disabled" (i.e. forced to expire)
+        # => A diagnosis made by a prescriber have a higher priority than GEIQ ones, making them obsolete.
 
-        if level_cnt["1"] > 0:
-            # At least one level 1 criterion
-            eligibility, amount = True, max(amount, 1400)
+        if self.author_prescriber_organization and self.is_valid:
+            obsolete_geiq_diagnoses = (
+                # valid / non-expired only
+                GEIQEligibilityDiagnosis.objects.valid()
+                # for given job seeker
+                .for_job_seeker(self.job_seeker)
+                # authored by a GEIQ and have no job application attached
+                .filter(author_geiq__isnull=False, job_applications__isnull=True)
+            )
 
-        if level_cnt["2"] > 1:
-            # At least two level 2 criteria
-            eligibility, amount = True, max(amount, 1400)
+            obsolete_geiq_diagnoses.update(expires_at=self.created_at)
 
-        return eligibility, amount
+    def save(self, *args, **kwargs):
+        self.clean()
+
+        result = super().save(*args, **kwargs)
+
+        # Invalidating obsolete ones *after* saving is ok
+        self._invalidate_obsolete_geiq_diagnoses()
+
+        return result
 
     @property
     def eligibility_confirmed(self) -> bool:
-        """
-        GEIQ elibility.
-        Calculated in function of:
-            - author kind
-            - number, annex and level of administrative criteria.
-        """
-        eligibility, _ = self._get_eligibility_and_allowance_amount()
-
-        return eligibility
+        return bool(self.allowance_amount) and self.is_valid
 
     @property
     def allowance_amount(self) -> int:
-        """
-        Amount of granted allowance for job seeker.
-        Calculated in function of:
-            - author kind
-            - number, annex and level of administrative criteria.
-        Currently, only 3 amounts possible:
-            - 0
-            - 814EUR
-            - 1400EUR
-        """
+        return geiq_allowance_amount(self.author.is_prescriber_with_authorized_org, self.administrative_criteria.all())
 
-        _, amount = self._get_eligibility_and_allowance_amount()
+    @property
+    def author_structure(self):
+        return self.author_geiq or self.author_prescriber_organization
 
-        return amount
+    @property
+    def administrative_criteria_display(self):
+        # for templates
+        return self.administrative_criteria.exclude(annex=AdministrativeCriteriaAnnex.NO_ANNEX).order_by("ui_rank")
 
     @classmethod
     @transaction.atomic()
@@ -162,6 +186,8 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
             author_org = author_structure
             author_kind = AuthorKind.PRESCRIBER
         elif isinstance(author_structure, Siae) and author_structure.kind == SiaeKind.GEIQ:
+            if not administrative_criteria:
+                raise ValueError("Un diagnostic effectué par un GEIQ doit avoir au moins un critère d'éligibilité")
             author_geiq = author_structure
             author_kind = AuthorKind.GEIQ
         else:
@@ -183,6 +209,26 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
 
         return result
 
+    @classmethod
+    @transaction.atomic()
+    def update_eligibility_diagnosis(cls, diagnosis, author: User, administrative_criteria):
+        if not issubclass(diagnosis.__class__, cls):
+            raise ValueError("Le diagnositic fourni n'est pas un diagnostic GEIQ")
+
+        if not diagnosis.is_valid:
+            raise ValueError("Impossible de modifier un diagnostic GEIQ expiré")
+
+        diagnosis.author = author
+        diagnosis.expires_at = timezone.now() + relativedelta(months=cls.EXPIRATION_DELAY_MONTHS)
+        diagnosis.save()
+
+        # Differences with IAE diagnosis model update:
+        # - permission management is not handled by the model
+        # - only administrative criteria are updatable
+        diagnosis.administrative_criteria.set(administrative_criteria)
+
+        return diagnosis
+
 
 class GEIQAdministrativeCriteria(AbstractAdministrativeCriteria):
     parent = models.ForeignKey(
@@ -192,9 +238,10 @@ class GEIQAdministrativeCriteria(AbstractAdministrativeCriteria):
         null=True,
         on_delete=models.SET_NULL,
     )
+    # Some criteria do not belong to an annex or a level
     annex = models.CharField(
         verbose_name="Annexe",
-        max_length=1,
+        max_length=3,
         choices=AdministrativeCriteriaAnnex.choices,
         default=AdministrativeCriteriaAnnex.ANNEX_1,
     )
@@ -206,6 +253,7 @@ class GEIQAdministrativeCriteria(AbstractAdministrativeCriteria):
         null=True,
         blank=True,
     )
+    slug = models.SlugField(verbose_name="Référence courte", max_length=100, null=True, blank=True)
 
     class Meta:
         verbose_name = "Critère administratif GEIQ"
@@ -216,13 +264,25 @@ class GEIQAdministrativeCriteria(AbstractAdministrativeCriteria):
                 name="ac_level_annex_coherence",
                 violation_error_message="Incohérence entre l'annexe du critère administratif et son niveau",
                 check=models.Q(annex=AdministrativeCriteriaAnnex.ANNEX_1, level__isnull=True)
-                | models.Q(annex=AdministrativeCriteriaAnnex.ANNEX_2, level__isnull=False),
+                | models.Q(annex=AdministrativeCriteriaAnnex.ANNEX_2, level__isnull=False)
+                | models.Q(annex=AdministrativeCriteriaAnnex.NO_ANNEX, level__isnull=True)
+                | models.Q(annex=AdministrativeCriteriaAnnex.BOTH_ANNEXES),
             ),
         ]
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+
+        return super().save(*args, **kwargs)
+
+    @property
+    def key(self):
+        # For UI / forms
+        return self.slug.replace("-", "_") if self.slug else ""
+
 
 class GEIQSelectedAdministrativeCriteria(models.Model):
-
     eligibility_diagnosis = models.ForeignKey(
         GEIQEligibilityDiagnosis,
         on_delete=models.CASCADE,
@@ -240,4 +300,4 @@ class GEIQSelectedAdministrativeCriteria(models.Model):
         unique_together = ("eligibility_diagnosis", "administrative_criteria")
 
     def __str__(self):
-        return f"{self.pk}"
+        return str(self.pk)

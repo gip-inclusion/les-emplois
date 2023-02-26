@@ -31,6 +31,7 @@ class GEIQEligibilityDiagnosisFactory(factory.django.DjangoModelFactory):
             ),
             author=factory.LazyAttribute(lambda obj: obj.author_prescriber_organization.members.first()),
         )
+        expired = factory.Trait(expires_at=factory.LazyFunction(timezone.now))
 
     created_at = factory.LazyFunction(timezone.now)
     job_seeker = factory.SubFactory(JobSeekerFactory)

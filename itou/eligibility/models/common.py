@@ -69,7 +69,7 @@ class AbstractEligibilityDiagnosisModel(models.Model):
 
     @property
     def is_valid(self):
-        return self.expires_at and self.expires_at > timezone.now()
+        return bool(self.expires_at and self.expires_at > timezone.now())
 
 
 class AdministrativeCriteriaQuerySet(models.QuerySet):
@@ -120,7 +120,3 @@ class AbstractAdministrativeCriteria(models.Model):
         if level_display := self.get_level_display():
             name += f" - {level_display}"
         return name
-
-    @property
-    def key(self):
-        return f"level_{self.level}_{self.pk}"
