@@ -12,7 +12,7 @@ from pytest_django.asserts import assertContains, assertRedirects
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.asp.models import AllocationDuration, EducationLevel, RSAAllocation
 from itou.cities.factories import create_city_in_zrr, create_test_cities
-from itou.eligibility.factories import EligibilityDiagnosisFactory
+from itou.eligibility.factories import EligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.geo.factories import ZRRFactory
 from itou.institutions.factories import InstitutionWithMembershipFactory
@@ -21,6 +21,7 @@ from itou.job_applications.models import JobApplication
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siae_evaluations.factories import EvaluatedSiaeFactory
 from itou.siae_evaluations.models import Sanctions
+from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipAndJobsFactory
 from itou.users.enums import LackOfNIRReason
 from itou.users.factories import (
@@ -2426,3 +2427,133 @@ def test_detect_existing_job_seeker(client):
     # If we chose to cancel & go back, we should find our old wrong email in the page
     response = client.get(check_email_url)
     assertContains(response, "wrong-email@example.com")
+
+
+class ApplicationGEIQEligibilityViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.geiq = SiaeFactory(with_membership=True, with_jobs=True, kind=SiaeKind.GEIQ)
+        cls.prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True)
+        cls.orienter = PrescriberOrganizationWithMembershipFactory(authorized=False)
+        cls.job_seeker_with_geiq_diagnosis = GEIQEligibilityDiagnosisFactory(with_prescriber=True).job_seeker
+        cls.siae = SiaeFactory(with_membership=True, kind=SiaeKind.EI)
+
+    def _setup_session(self, job_seeker=None, siae_pk=None):
+        apply_session = SessionNamespace(self.client.session, f"job_application-{siae_pk or self.geiq.pk}")
+        apply_session.init(
+            {
+                "job_seeker_pk": job_seeker or JobSeekerFactory(),
+                "selected_jobs": self.geiq.job_description_through.all(),
+            }
+        )
+        apply_session.save()
+
+    def test_bypass_geiq_eligibility_diagnosis_form_for_orienter(self):
+        # When creating a job application, should bypass GEIQ eligibility form step:
+        # - if user is an authorized prescriber
+        # - if user structure is not a GEIQ : should not be possible, form asserts it and crashes
+
+        # Redirect orienter
+        self.client.force_login(self.orienter.members.first())
+        self._setup_session()
+        response = self.client.get(reverse("apply:application_geiq_eligibility", kwargs={"siae_pk": self.geiq.pk}))
+
+        # Must redirect to resume
+        assertRedirects(
+            response,
+            reverse("apply:application_resume", kwargs={"siae_pk": self.geiq.pk}),
+            fetch_redirect_response=False,
+        )
+        self.assertTemplateNotUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
+
+    def test_bypass_geiq_diganosis_for_job_seeker(self):
+        # A job seeker must not have access to GEIQ eligibility form
+        job_seeker = JobSeekerFactory()
+        self.client.force_login(job_seeker)
+        self._setup_session()
+        response = self.client.get(reverse("apply:application_geiq_eligibility", kwargs={"siae_pk": self.geiq.pk}))
+
+        # Must redirect to resume
+        assertRedirects(
+            response,
+            reverse("apply:application_resume", kwargs={"siae_pk": self.geiq.pk}),
+            fetch_redirect_response=False,
+        )
+        self.assertTemplateNotUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
+
+    def test_sanity_check_geiq_diagnosis_for_non_geiq(self):
+        # See comment im previous test:
+        # assert we're not somewhere we don't belong to (non-GEIQ)
+        self.client.force_login(self.siae.members.first())
+        self._setup_session(siae_pk=self.siae.pk)
+
+        with self.assertRaisesRegex(ValueError, "This form is only for GEIQ"):
+            self.client.get(reverse("apply:application_geiq_eligibility", kwargs={"siae_pk": self.siae.pk}))
+
+    def test_access_as_authorized_prescriber(self):
+        self.client.force_login(self.prescriber.members.first())
+        self._setup_session()
+
+        response = self.client.get(reverse("apply:application_geiq_eligibility", kwargs={"siae_pk": self.geiq.pk}))
+
+        assert response.status_code == 200
+        self.assertTemplateUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
+
+    def test_geiq_eligibility_badge(self):
+        self.client.force_login(self.prescriber.members.first())
+
+        # Badge OK if job seeker has a valid eligibility diagnosis
+        self._setup_session(self.job_seeker_with_geiq_diagnosis)
+        response = self.client.get(
+            reverse("apply:application_geiq_eligibility", kwargs={"siae_pk": self.geiq.pk}), follow=True
+        )
+
+        assert response.status_code == 200
+        self.assertContains(response, "Éligibilité GEIQ confirmée")
+        self.assertTemplateUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
+
+        # Badge KO if job seeker has no diagnosis
+        self._setup_session()
+        response = self.client.get(
+            reverse("apply:application_geiq_eligibility", kwargs={"siae_pk": self.geiq.pk}), follow=True
+        )
+
+        assert response.status_code == 200
+        self.assertContains(response, "Éligibilité GEIQ non confirmée")
+        self.assertTemplateUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
+
+    def test_geiq_diagnosis_form_validation(self):
+        self.client.force_login(self.prescriber.members.first())
+        self._setup_session(self.job_seeker_with_geiq_diagnosis)
+
+        response = self.client.post(
+            reverse("apply:application_geiq_eligibility", kwargs={"siae_pk": self.geiq.pk}),
+            data={"jeune_26_ans": True},
+        )
+
+        assertRedirects(
+            response,
+            reverse("apply:application_resume", kwargs={"siae_pk": self.geiq.pk}),
+            fetch_redirect_response=False,
+        )
+
+        # Age coherence
+        test_data = [
+            {"senior_50_ans": True, "jeune_26_ans": True},
+            {"de_45_ans_et_plus": True, "jeune_26_ans": True},
+            {"senior_50_ans": True, "sortant_ase": True},
+            {"de_45_ans_et_plus": True, "sortant_ase": True},
+        ]
+
+        for post_data in test_data:
+            with self.subTest(post_data):
+                response = self.client.post(
+                    reverse("apply:application_geiq_eligibility", kwargs={"siae_pk": self.geiq.pk}),
+                    data=post_data,
+                    follow=True,
+                )
+                assert response.status_code == 200
+                self.assertTemplateUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
+                self.assertContains(response, "Incohérence dans les critères")
+
+        # TODO: more coherence tests asked to business ...

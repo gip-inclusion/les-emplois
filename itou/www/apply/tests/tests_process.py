@@ -1514,3 +1514,19 @@ def test_refuse_jobapplication_geiq_reasons(client, reason):
     assert response.context["form"].errors == {
         "refusal_reason": [f"Sélectionnez un choix valide. {reason} n’en fait pas partie."]
     }
+
+
+def test_details_for_prescriber_geiq(client):
+    job_application = JobApplicationFactory(
+        sent_by_authorized_prescriber_organisation=True,
+        state=JobApplicationWorkflow.STATE_PROCESSING,
+        with_geiq_eligibility_diagnosis_from_prescriber=True,
+    )
+    prescriber = job_application.sender_prescriber_organization.members.first()
+    client.force_login(prescriber)
+
+    url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
+    response = client.get(url)
+    assert response.status_code == 200
+
+    assert response.context["geiq_eligibility_diagnosis"] == job_application.geiq_eligibility_diagnosis

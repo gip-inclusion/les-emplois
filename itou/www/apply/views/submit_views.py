@@ -7,7 +7,7 @@ from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.forms import ValidationError
 from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
@@ -15,11 +15,14 @@ from django.views.generic import TemplateView
 
 from itou.approvals.models import Approval
 from itou.eligibility.models import EligibilityDiagnosis
+from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.job_applications.models import JobApplication
 from itou.job_applications.notifications import (
     NewQualifiedJobAppEmployersNotification,
     NewSpontaneousJobAppEmployersNotification,
 )
+from itou.prescribers.models import PrescriberOrganization
+from itou.siaes.enums import SiaeKind
 from itou.siaes.models import Siae, SiaeJobDescription
 from itou.users.enums import UserKind
 from itou.users.models import JobSeekerProfile, User
@@ -41,6 +44,7 @@ from itou.www.apply.forms import (
 )
 from itou.www.apply.views import constants as apply_view_constants
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
+from itou.www.geiq_eligibility_views.forms import GEIQAdministrativeCriteriaForm
 
 
 logger = logging.getLogger(__name__)
@@ -117,21 +121,30 @@ class ApplicationBaseView(ApplyStepBaseView):
 
         self.job_seeker = None
         self.eligibility_diagnosis = None
+        self.geiq_eligibility_diagnosis = None
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
         self.job_seeker = get_object_or_404(User, pk=self.apply_session.get("job_seeker_pk"))
         _check_job_seeker_approval(request, self.job_seeker, self.siae)
-        self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
-            self.job_seeker, for_siae=self.siae
-        )
+        if self.siae.kind == SiaeKind.GEIQ:
+            self.geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
+                self.job_seeker, self.siae
+            ).first()
+        else:
+            # General IAE eligibility case
+            self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
+                self.job_seeker, for_siae=self.siae
+            )
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "job_seeker": self.job_seeker,
             "eligibility_diagnosis": self.eligibility_diagnosis,
             "is_subject_to_eligibility_rules": self.siae.is_subject_to_eligibility_rules,
+            "geiq_eligibility_diagnosis": self.geiq_eligibility_diagnosis,
+            "is_subject_to_geiq_eligibility_rules": self.siae.kind == SiaeKind.GEIQ,
             "can_edit_personal_information": self.request.user.can_edit_personal_information(self.job_seeker),
             "can_view_personal_information": self.request.user.can_view_personal_information(self.job_seeker),
             # Do not show the warning for job seekers
@@ -728,7 +741,11 @@ class ApplicationJobsView(ApplicationBaseView):
     def post(self, request, *args, **kwargs):
         if self.form.is_valid():
             self.apply_session.set("selected_jobs", self.form.cleaned_data.get("selected_jobs", []))
-            return HttpResponseRedirect(reverse("apply:application_eligibility", kwargs={"siae_pk": self.siae.pk}))
+            # dispatching to IAE or GEIQ eligibility
+            path_name = (
+                "application_geiq_eligibility" if self.siae.kind == SiaeKind.GEIQ else "application_eligibility"
+            )
+            return HttpResponseRedirect(reverse("apply:" + path_name, kwargs={"siae_pk": self.siae.pk}))
 
         return self.render_to_response(self.get_context_data(**kwargs))
 
@@ -754,8 +771,10 @@ class ApplicationEligibilityView(ApplicationBaseView):
         super().setup(request, *args, **kwargs)
 
         initial_data = {}
+
         if self.eligibility_diagnosis:
             initial_data["administrative_criteria"] = self.eligibility_diagnosis.administrative_criteria.all()
+
         self.form = AdministrativeCriteriaForm(
             request.user,
             siae=self.siae,
@@ -798,6 +817,86 @@ class ApplicationEligibilityView(ApplicationBaseView):
             "job_seeker": self.job_seeker,
             "back_url": reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk}),
         }
+
+
+class ApplicationGEIQEligibilityView(ApplicationBaseView):
+    template_name = "apply/submit/application/geiq_eligibility.html"
+
+    def __init__(self):
+        super().__init__()
+
+        self.form = None
+        self.geiq_author_structure = None
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        self.form = GEIQAdministrativeCriteriaForm(
+            siae=self.siae,
+            administrative_criteria=(
+                self.geiq_eligibility_diagnosis.administrative_criteria.all()
+                if self.geiq_eligibility_diagnosis
+                else []
+            ),
+            form_url=reverse("apply:application_geiq_eligibility", kwargs={"siae_pk": self.siae.pk}),
+            data=request.POST or None,
+        )
+
+    def dispatch(self, request, *args, **kwargs):
+        # GEIQ eligiblity form during job application process is only available to:
+        # - authorized prescribers
+        # - GEIQ
+        # otherwise, skip to next step: application resume
+        if not request.user.is_job_seeker:
+            if prescriber_org_pk := request.session.get("current_prescriber_organization"):
+                # Only for authorized prescribers (not orienters)
+                try:
+                    if self.request.user.is_prescriber_with_authorized_org:
+                        self.geiq_author_structure = PrescriberOrganization.objects.get(
+                            pk=prescriber_org_pk,
+                        )
+                except PrescriberOrganization.DoesNotExist:
+                    pass
+            elif self.siae and self.siae.kind == SiaeKind.GEIQ:
+                # SIAE must be a GEIQ to continue
+                self.geiq_author_structure = self.siae
+
+        if not self.geiq_author_structure:
+            return HttpResponseRedirect(reverse("apply:application_resume", kwargs={"siae_pk": self.siae.pk}))
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "back_url": reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk}),
+            "form": self.form,
+            "full_content_width": True,
+            "progress": 50,
+        }
+
+    def post(self, request, *args, **kwargs):
+        if request.htmx:
+            return render(
+                request, "apply/includes/geiq/geiq_administrative_criteria_form.html", self.get_context_data(**kwargs)
+            )
+        elif self.form.is_valid():
+            if not self.geiq_eligibility_diagnosis:
+                GEIQEligibilityDiagnosis.create_eligibility_diagnosis(
+                    self.job_seeker,
+                    request.user,
+                    self.geiq_author_structure,
+                    self.form.cleaned_data,
+                )
+            else:
+                # Check if update is really needed: may change diagnosis expiration date
+                if self.form.has_changed():
+                    GEIQEligibilityDiagnosis.update_eligibility_diagnosis(
+                        self.geiq_eligibility_diagnosis, request.user, self.form.cleaned_data
+                    )
+
+            return HttpResponseRedirect(reverse("apply:application_resume", kwargs={"siae_pk": self.siae.pk}))
+
+        return self.render_to_response(self.get_context_data(**kwargs))
 
 
 class ApplicationResumeView(ApplicationBaseView):
