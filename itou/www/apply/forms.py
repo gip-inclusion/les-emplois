@@ -5,6 +5,7 @@ from dateutil.relativedelta import relativedelta
 from django import forms
 from django.core.validators import MinLengthValidator
 from django.db.models import Q
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django_select2.forms import Select2MultipleWidget
@@ -854,3 +855,17 @@ class PrescriberFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsFor
         to_siaes = [siae for siae in to_siaes if siae.display_name]
         to_siaes = [(siae.id, siae.display_name.title()) for siae in to_siaes]
         return sorted(to_siaes, key=lambda l: l[1])
+
+
+class CheckJobSeekerGEIQEligibilityForm(forms.Form):
+    choice = forms.BooleanField(required=False, widget=forms.RadioSelect(choices=((True, "Oui"), (False, "Non"))))
+    back_url = forms.CharField(widget=forms.HiddenInput)
+    next_url = forms.CharField(widget=forms.HiddenInput)
+
+    def __init__(self, job_application, back_url, next_url, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["choice"].widget.attrs.update(
+            {"hx-post": reverse("apply:geiq_eligibility", kwargs={"job_application_id": job_application.pk})}
+        )
+        self.fields["back_url"].initial = back_url
+        self.fields["next_url"].initial = next_url
