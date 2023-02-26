@@ -64,6 +64,11 @@ urlpatterns = [
         submit_views.ApplicationEligibilityView.as_view(),
         name="application_eligibility",
     ),
+    path(
+        "<int:siae_pk>/application/geiq_eligibility",
+        submit_views.ApplicationGEIQEligibilityView.as_view(),
+        name="application_geiq_eligibility",
+    ),
     path("<int:siae_pk>/application/resume", submit_views.ApplicationResumeView.as_view(), name="application_resume"),
     path(
         "<int:siae_pk>/application/<uuid:application_pk>/end",
@@ -126,6 +131,17 @@ urlpatterns = [
     path("<uuid:job_application_id>/siae/details", process_views.details_for_siae, name="details_for_siae"),
     path("<uuid:job_application_id>/siae/process", process_views.process, name="process"),
     path("<uuid:job_application_id>/siae/eligibility", process_views.eligibility, name="eligibility"),
+    path("<uuid:job_application_id>/siae/geiq_eligibility", process_views.geiq_eligibility, name="geiq_eligibility"),
+    path(
+        "<uuid:job_application_id>/siae/geiq_eligibility_criteria",
+        process_views.geiq_eligibility_criteria,
+        name="geiq_eligibility_criteria",
+    ),
+    path(
+        "<uuid:job_application_id>/siae/continue_without_geiq_diagnosis",
+        process_views.continue_without_geiq_diagnosis,
+        name="continue_without_geiq_diagnosis",
+    ),
     path("<uuid:job_application_id>/siae/refuse", process_views.refuse, name="refuse"),
     path("<uuid:job_application_id>/siae/postpone", process_views.postpone, name="postpone"),
     path("<uuid:job_application_id>/siae/accept", process_views.accept, name="accept"),
