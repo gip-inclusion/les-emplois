@@ -1,0 +1,71 @@
+{% load bootstrap4 %}
+
+{% if request.htmx %}
+    {% comment %}
+            This fragment is also used for "normal" (non-htmx) page reload, 
+            and we only want to perform OOB swap of form errors when doing a dynamic reload. 
+    {% endcomment %}
+    <div id="form_errors" hx-swap-oob="true">{% bootstrap_form_errors form type="all" %}</div>
+    {% include "apply/includes/geiq/progress_bar.html" %}
+{% endif %}
+
+<h3 class="h5">Allocations</h3>
+
+{# A "parent" criterion, controls the visibility and filling of "children" criteria #}
+<div class="form-group">
+    <div class="form-check text-primary">
+        {{ form.beneficiaire_des_minimas_sociaux }}{{ form.beneficiaire_des_minimas_sociaux.label }}
+    </div>
+</div>
+{% if form.beneficiaire_des_minimas_sociaux.value %}
+    <div class="pl-4 text-primary">
+        {% bootstrap_field form.beneficiaire_du_rsa %}
+        {% bootstrap_field form.allocataire_ass %}
+        {% bootstrap_field form.allocataire_aah %}
+        {% bootstrap_field form.autre %}
+    </div>
+{% endif %}
+
+<h3 class="h5">Critères liés à l'âge du candidat</h3>
+{% bootstrap_field form.jeune_26_ans field_class="text-primary" %}
+
+{% if form.jeune_26_ans.value %}
+    <div class="pl-4 text-primary">{% bootstrap_field form.jeune_de_moins_de_26_ans_sans_qualification %}</div>
+{% endif %}
+{% bootstrap_field form.senior_50_ans field_class="text-primary" %}
+
+<h3 class="h5">Niveau de compétences</h3>
+{% bootstrap_field form.niveau_etude_3 field_class="text-primary" %}
+{% bootstrap_field form.maitrise_de_la_langue_francaise field_class="text-primary" %}
+ 
+<h3 class="h5">Situation professionnelle</h3>
+{% bootstrap_field form.personne_eloignee_du_marche_du_travail field_class="text-primary" %}
+{% if form.personne_eloignee_du_marche_du_travail.value %}
+    <div class="pl-4 text-primary">
+        {% bootstrap_field form.personne_inscrite_a_pole_emploi %}
+        {% if form.personne_inscrite_a_pole_emploi.value %}<div class="pl-4">{{ form.pole_emploi_related }}</div>{% endif %}
+    </div>
+{% endif %}
+{% bootstrap_field form.de_45_ans_et_plus field_class="text-primary" %}
+{% bootstrap_field form.personne_en_reconversion_professionnelle_contrainte field_class="text-primary" %}
+{% bootstrap_field form.personne_en_dispositif_insertion field_class="text-primary" %}
+ 
+<h3 class="h5">Situation de handicap</h3>
+{% bootstrap_field form.travailleur_handicape field_class="text-primary" %}
+ 
+<h3 class="h5">Situation d'hébergement</h3>
+{% bootstrap_field form.personne_sans_hebergement field_class="text-primary" %}
+{% bootstrap_field form.resident_zrr field_class="text-primary" %}
+{% bootstrap_field form.resident_qpv field_class="text-primary" %}
+ 
+<h3 class="h5">Situation familiale</h3>
+{% bootstrap_field form.parent_isole field_class="text-primary" %}
+{% bootstrap_field form.sortant_ase field_class="text-primary" %}
+ 
+<h3 class="h5">Situation juridique</h3>
+{% bootstrap_field form.sortant_de_detention_ou_personne_placee_sous_main_de_justice field_class="text-primary" %}
+{% bootstrap_field form.refugie_statutaire field_class="text-primary" %}
+{% bootstrap_field form.demandeur_asile field_class="text-primary" %}
+
+<h3 class="h5">Autre critère</h3>
+{% bootstrap_field form.mobilite field_class="text-primary" %}

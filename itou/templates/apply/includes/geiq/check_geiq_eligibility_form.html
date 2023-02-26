@@ -1,0 +1,39 @@
+{% load bootstrap4 %}
+
+{% include "apply/includes/geiq/geiq_administrative_criteria_form.html" %}
+<hr>
+<div class="text-primary">{% bootstrap_field form.proof_of_eligibility %}</div>
+<hr>
+
+<div class="my-4 text-right">
+    <a href="{{ back_url }}" class="btn btn-link">Annuler</a>
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirm_modal" {% if not form.proof_of_eligibility.value or form.errors %} disabled{% endif %}>
+        Valider les critères d'éligibilité GEIQ
+    </button>
+</div>
+
+<div id="confirm_modal" class="modal fade" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="confirm_modal">Confirmer votre choix</h3>
+            </div>
+            <div class="modal-body">
+                {% if allowance_amount != 0 %}
+                    <p>
+                        <strong>Les critères que vous avez sélectionnés vous donneront droit en cas d’embauche, à une aide financière de l’État de {{ allowance_amount }} €</strong> (sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible).
+                    </p>
+                {% else %}
+                    <p>
+                        <strong>Attention, les critères que vous avez sélectionnés ne vous permettront pas de bénéficier d’une aide financière de l’État. </strong>
+                    </p>
+                    <p>Êtes-vous sur de vouloir poursuivre l’embauche ?</p>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-outline-primary" data-dismiss="modal">Retour</button>
+                <button type="submit" class="btn btn-sm btn-primary">Confirmer</button>
+            </div>
+        </div>
+    </div>
+</div>
