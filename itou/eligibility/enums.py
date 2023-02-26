@@ -4,8 +4,10 @@ from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF
 
 
 class AdministrativeCriteriaAnnex(models.TextChoices):
+    NO_ANNEX = "0", "Aucune annexe associée"
     ANNEX_1 = "1", "Annexe 1"
     ANNEX_2 = "2", "Annexe 2"
+    BOTH_ANNEXES = "1+2", "Annexes 1 et 2"
 
 
 class AdministrativeCriteriaLevel(models.TextChoices):

@@ -263,6 +263,10 @@ class AdministrativeCriteria(AbstractAdministrativeCriteria):
         verbose_name_plural = "Critères administratifs IAE"
         ordering = ["level", "ui_rank"]
 
+    @property
+    def key(self):
+        return f"level_{self.level}_{self.pk}"
+
 
 class SelectedAdministrativeCriteria(models.Model):
     """
