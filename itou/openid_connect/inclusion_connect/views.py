@@ -274,12 +274,12 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
         _add_user_kind_error_message(request, existing_user, user_kind)
         is_successful = False
     except MultipleUsersFoundException as e:
-        # Here we have a user trying to update it's email, but with an already existing email
+        # Here we have a user trying to update his email, but with an already existing email
         # redirect him back to the edit_user_info (aka next_url) but display an error message
         messages.error(
             request,
             mark_safe(
-                "Vous avez deux comptes sur la plateforme et nous detectons un conflit d'email : "
+                "Vous avez deux comptes sur la plateforme et nous détectons un conflit d'email : "
                 f"{e.users[0].email} et {e.users[1].email}. "
                 "Veuillez vous rapprocher du support pour débloquer la situation en suivant "
                 "<a href='https://communaute.inclusion.beta.gouv.fr/aide/emplois/#support'>ce lien</a>."
