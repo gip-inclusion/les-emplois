@@ -24,7 +24,7 @@
                     <h2>Informations personnelles</h2>
                     <hr class="my-4">
                     {% if request.user.is_job_seeker %}
-                        {% include "dashboard/includes/edit_job_seeker_info_form.html" with prev_url=prev_url submit_label="Enregistrer" %}
+                        {% include "dashboard/includes/edit_job_seeker_info_form.html" with prev_url=prev_url submit_label="Enregistrer et quitter" %}
                     {% else %}
                         <form method="post" action="" class="js-prevent-multiple-submit">
                             {% csrf_token %}

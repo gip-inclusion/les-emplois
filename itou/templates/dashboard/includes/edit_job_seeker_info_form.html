@@ -1,7 +1,7 @@
 {% comment %}
 
     Usage:
-        {% include "dashboard/includes/edit_job_seeker_info_form.html" with prev_url="some_url" submit_label="Enregistrer" %}
+        {% include "dashboard/includes/edit_job_seeker_info_form.html" with prev_url="some_url" submit_label="Enregistrer et quitter" %}
 
 {% endcomment %}
 
@@ -33,7 +33,7 @@
     {% buttons %}
         <div class="text-right mb-4">
             <a class="btn btn-link" href="{{ prev_url }}">Annuler</a>
-            <button type="submit" class="btn btn-primary">Enregistrer et quitter</button>
+            <button type="submit" class="btn btn-primary">{{ submit_label }}</button>
         </div>
     {% endbuttons %}
 
