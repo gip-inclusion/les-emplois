@@ -4,14 +4,14 @@ with siae_autopr as (
             distinct (id_structure)
         ) as total_siae_autopr,
         type_structure,
-        date_part('year',date_diagnostic) as annee
+        date_part('year',date_diagnostic) as annee_diagnostic
     from
         suivi_auto_prescription sap
     where
         type_de_candidature = 'Autoprescription'
     group by 
         type_structure,
-        annee
+        annee_diagnostic
 ),
 siae_all as (
     select 
@@ -19,22 +19,22 @@ siae_all as (
             distinct (id_structure)
         ) as total_siae_all,
         type_structure,
-        date_part('year',date_diagnostic) as annee
+        date_part('year',date_diagnostic) as annee_diagnostic
     from
         suivi_auto_prescription sap
     group by 
         type_structure,
-        annee
+        annee_diagnostic
 )
 select
     total_siae_autopr as "Nombre de structures utilisant l'autoprescription",
     total_siae_all as "Nombre total de structures",
     sau.type_structure,
-    sau.annee
+    sau.annee_diagnostic
 from
     siae_autopr sau
 left join siae_all sall 
     on 
         sau.type_structure = sall.type_structure
     and 
-        sau.annee = sall.annee
+        sau.annee_diagnostic = sall.annee_diagnostic
