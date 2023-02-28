@@ -20,7 +20,7 @@
                 <small class="text-muted">({{ siae.name|title }})</small>
             {% endif %}
         </h3>
-        <p class="font-weight-bold mb-2 text-muted">{{ siae.address_on_one_line }}</p>
+        <p class="mb-2 text-muted">{{ siae.address_on_one_line }}</p>
         <p class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center mb-0">
             <span class="align-self-start">
                 <span class="badge badge-sm badge-pill badge-primary">à {{ siae.distance|floatformat:"-1"|default:"12" }} km</span>
