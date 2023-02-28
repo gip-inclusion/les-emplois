@@ -137,20 +137,64 @@
     </script>
 
     {% if tally_form_id %}
-        <script async src="https://tally.so/widgets/embed.js"></script>
+        {# Do not use `async` here otherwise the Tally popup will randomly fail to load. #}
+        <script src="https://tally.so/widgets/embed.js"></script>
 
-        <script nonce="{{ CSP_NONCE }}">
-            window.TallyConfig = {
-                "formId": "{{ tally_form_id }}",
-                "popup": {
-                    "emoji": {
-                        "text": "👋",
-                        "animation": "wave"
-                    },
-                    "open": {
-                        "trigger": "exit"
-                    }
+        {# `defer` ensures the script runs *after* embed.js above has been loaded. #}
+        <script defer nonce="{{ CSP_NONCE }}">
+
+            // Any given Tally popup will not be shown more than once every `minDaysBetweenDisplays` days.
+            const minDaysBetweenDisplays = 14;
+            const delayBeforeShowingPopupInSeconds = 5;
+            const formId = '{{ tally_form_id }}';
+            const key = 'statsTallyPopupLastShown-' + formId;
+            const todaysDate = new Date();
+
+            function supportsLocalStorage() {
+                try {
+                    return 'localStorage' in window && window['localStorage'] !== null;
+                } catch(e){
+                    return false;
                 }
+            };
+
+            function stopShowingPopupForAWhile() {
+                localStorage.setItem(key, JSON.stringify(todaysDate));
+            }
+
+            function displayTallyPopup() {
+                window.Tally.openPopup(formId, {
+                    emoji: {
+                        text: "👋",
+                        animation: "wave"
+                    },
+                    onClose: () => {
+                        stopShowingPopupForAWhile();
+                    },
+                    onSubmit: () => {
+                        stopShowingPopupForAWhile();
+                    }
+                });
+            };
+
+            function shouldDisplayTallyPopup() {
+                if (!supportsLocalStorage()) {
+                    return true;
+                }
+                infoKey = localStorage.getItem(key);
+                if (infoKey) {
+                    const lastShown = Date.parse(JSON.parse(localStorage.getItem(key)));
+                    const milliSecondsElapsed = todaysDate - lastShown;
+                    const daysElapsed = milliSecondsElapsed / (1000 * 3600 * 24);
+                    if (daysElapsed <= minDaysBetweenDisplays) {
+                        return false;
+                    };
+                };
+                return true;
+            };
+
+            if (shouldDisplayTallyPopup()) {
+                setTimeout(displayTallyPopup, delayBeforeShowingPopupInSeconds * 1000);
             };
         </script>
     {% endif %}
