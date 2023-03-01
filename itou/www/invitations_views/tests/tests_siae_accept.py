@@ -107,6 +107,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
             self,
             KIND_SIAE_STAFF,
             assert_redirects=False,
+            # Using the same email with a different case should not fail
             user_email=invitation.email.upper(),
             channel="invitation",
             previous_url=previous_url,
