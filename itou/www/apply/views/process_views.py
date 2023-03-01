@@ -668,4 +668,7 @@ def geiq_eligibility_criteria(
         "progress": 66,
     }
 
+    if job_application.job_seeker.address_in_qpv or job_application.job_seeker.zrr_city_name:
+        context |= {"geo_criteria_detected": True, "job_seeker": job_application.job_seeker}
+
     return render(request, template_name, context)

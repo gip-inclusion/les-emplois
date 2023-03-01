@@ -28,9 +28,6 @@
             </div>
         </div>
     {% endif %}
-    {% if job_seeker.address_in_qpv or job_seeker.zrr_city_name %}
-        {% include "apply/includes/known_criteria.html" %}
-    {% endif %}
 {% endblock %}
 
 {% block form_content %}
