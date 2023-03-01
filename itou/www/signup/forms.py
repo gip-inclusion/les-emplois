@@ -1,13 +1,14 @@
 from allauth.account.forms import SignupForm
 from django import forms
 from django.core.exceptions import ValidationError
+from django.db.models.fields import BLANK_CHOICE_DASH
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
-from itou.users.enums import UserKind
+from itou.users.enums import Title, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.apis import api_entreprise, geocoding as api_geocoding
@@ -118,6 +119,7 @@ class JobSeekerSituationForm(forms.Form):
 
 class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
     nir = forms.CharField(disabled=True, required=False, label="Numéro de sécurité sociale")
+    title = forms.ChoiceField(required=True, label="Civilité", choices=BLANK_CHOICE_DASH + Title.choices)
 
     def __init__(self, nir, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -132,6 +134,8 @@ class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
         self.fields["first_name"].widget.attrs["placeholder"] = "Dominique"
         self.fields["last_name"].widget.attrs["placeholder"] = "Durand"
         self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
+        if self.nir:
+            self.fields["title"].initial = {"1": Title.M, "2": Title.MME}.get(self.nir[0], "")
 
     def clean_email(self):
         email = super().clean_email()
@@ -146,6 +150,7 @@ class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
         # Create the user.
         self.user_kind = UserKind.JOB_SEEKER
         user = super().save(request)
+        user.title = self.cleaned_data["title"]
         user.first_name = self.cleaned_data["first_name"]
         user.last_name = self.cleaned_data["last_name"]
         if self.nir:

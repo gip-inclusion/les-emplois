@@ -42,6 +42,7 @@ class WelcomingTourTest(InclusionConnectBaseTestCase):
         # Second signup step: job seeker credentials.
         url = reverse("signup:job_seeker")
         post_data = {
+            "title": job_seeker.title,
             "first_name": job_seeker.first_name,
             "last_name": job_seeker.last_name,
             "email": job_seeker.email,
@@ -49,6 +50,7 @@ class WelcomingTourTest(InclusionConnectBaseTestCase):
             "password2": DEFAULT_PASSWORD,
         }
         response = self.client.post(url, data=post_data)
+        assert response.status_code == 302
         response = self.verify_email(response.wsgi_request, email=job_seeker.email)
 
         # User should be redirected to the welcoming tour as he just signed up
@@ -126,6 +128,7 @@ class WelcomingTourExceptions(TestCase):
         # Second signup step: job seeker credentials.
         url = f"{reverse('signup:job_seeker')}?next={next_to}"
         post_data = {
+            "title": job_seeker.title,
             "first_name": job_seeker.first_name,
             "last_name": job_seeker.last_name,
             "email": job_seeker.email,
@@ -133,6 +136,7 @@ class WelcomingTourExceptions(TestCase):
             "password2": DEFAULT_PASSWORD,
         }
         response = self.client.post(url, data=post_data)
+        assert response.status_code == 302
         response = self.verify_email(job_seeker.email, response.wsgi_request)
 
         # The user should not be redirected to the welcoming path if he wanted to perform

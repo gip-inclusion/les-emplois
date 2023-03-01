@@ -90,12 +90,15 @@ class JobSeekerSignupTest(TestCase):
         url = reverse("signup:job_seeker")
         response = self.client.get(url)
         assert response.status_code == 200
+        # Since provided NIR starts with a 1, suggest Monsieur title
+        assert response.context["form"]["title"].initial == "M"
 
         address_line_1 = "Test adresse"
         address_line_2 = "Test adresse complémentaire"
         post_code = self.city.post_codes[0]
 
         post_data = {
+            "title": "M",
             "first_name": "John",
             "last_name": "Doe",
             "email": "john.doe+1@siae.com",
@@ -114,6 +117,7 @@ class JobSeekerSignupTest(TestCase):
 
         job_seeker = User.objects.get(email=post_data["email"])
         assert nir == job_seeker.nir
+        assert job_seeker.title == "M"
 
     def test_job_seeker_temporary_nir(self):
         """
@@ -140,12 +144,15 @@ class JobSeekerSignupTest(TestCase):
         url = reverse("signup:job_seeker")
         response = self.client.get(url)
         assert response.status_code == 200
+        # Since no NIR was provided (or it was a temporary number), suggest nothing
+        assert response.context["form"]["title"].initial is None
 
         address_line_1 = "Test adresse"
         address_line_2 = "Test adresse complémentaire"
         post_code = self.city.post_codes[0]
 
         post_data = {
+            "title": "M",
             "first_name": "John",
             "last_name": "Doe",
             "email": "john.doe+2@siae.com",
@@ -164,6 +171,7 @@ class JobSeekerSignupTest(TestCase):
 
         job_seeker = User.objects.get(email=post_data["email"])
         assert job_seeker.nir == ""
+        assert job_seeker.title == "M"
 
     def test_job_seeker_signup(self):
         """Job-seeker signup."""
@@ -182,6 +190,7 @@ class JobSeekerSignupTest(TestCase):
         post_code = self.city.post_codes[0]
 
         post_data = {
+            "title": "M",
             "first_name": "John",
             "last_name": "Doe",
             "email": "john.doe+3@siae.com",
@@ -203,6 +212,7 @@ class JobSeekerSignupTest(TestCase):
         # `username` should be a valid UUID, see `User.generate_unique_username()`.
         assert user.username == uuid.UUID(user.username, version=4).hex
         assert user.kind == UserKind.JOB_SEEKER
+        assert user.title == "M"
 
         # Check `EmailAddress` state.
         assert user.emailaddress_set.count() == 1
@@ -240,6 +250,7 @@ class JobSeekerSignupTest(TestCase):
         response = self.client.post(
             url,
             {
+                "title": "MME",
                 "first_name": "Alice",
                 "last_name": "Evil",
                 "email": "alice@evil.com",
