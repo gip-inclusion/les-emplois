@@ -16,9 +16,6 @@ from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.validators import validate_code_safir, validate_nir, validate_siren, validate_siret
 
 
-BLANK_CHOICE = (("", "---------"),)
-
-
 def _get_organization_data_from_api(siret):
     # Fetch name and address from API entreprise.
     establishment, error = api_entreprise.etablissement_get_or_error(siret)
