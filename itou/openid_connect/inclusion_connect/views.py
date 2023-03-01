@@ -251,7 +251,7 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
     ic_user_data = USER_DATA_CLASSES[user_kind].from_user_info(user_data)
     ic_session_email = ic_session.get("user_email")
 
-    if ic_session_email and ic_session_email != ic_user_data.email:
+    if ic_session_email.lower() and ic_session_email.lower() != ic_user_data.email.lower():
         if ic_session["channel"] == InclusionConnectChannel.INVITATION:
             error = (
                 "L’adresse e-mail que vous avez utilisée pour vous connecter avec Inclusion Connect "
