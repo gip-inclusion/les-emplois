@@ -2,6 +2,7 @@ from urllib.parse import urlencode
 
 import respx
 from django.conf import settings
+from django.contrib.messages import get_messages
 from django.core import mail
 from django.shortcuts import reverse
 from django.utils.html import escape
@@ -72,7 +73,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         )
         response = self.client.get(response.url, follow=True)
         # Check user is redirected to the welcoming tour
-        last_url, _ = response.redirect_chain[-1]
+        last_url, _status_code = response.redirect_chain[-1]
         assert last_url == reverse("welcoming_tour:index")
 
         total_users_after = User.objects.count()
@@ -130,6 +131,45 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         invitation = SentSiaeStaffInvitationFactory(email="loutre@example.com")
         response = self.client.get(invitation.acceptance_link, follow=True)
         self.assertRedirects(response, reverse("account_logout"))
+
+    @respx.mock
+    def test_accept_invitation_signup_wrong_email(self):
+        invitation = SentSiaeStaffInvitationFactory()
+        response = self.client.get(invitation.acceptance_link, follow=True)
+        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
+
+        # We don't put the full path with the FQDN in the parameters
+        previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
+        next_url = reverse("invitations_views:join_siae", args=(invitation.pk,))
+        params = {
+            "user_kind": KIND_SIAE_STAFF,
+            "user_email": invitation.email,
+            "channel": "invitation",
+            "previous_url": previous_url,
+            "next_url": next_url,
+        }
+        url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
+        self.assertContains(response, url + '"')
+
+        url = reverse("dashboard:index")
+        response = mock_oauth_dance(
+            self,
+            KIND_SIAE_STAFF,
+            assert_redirects=False,
+            # the login hint is different from OIDC_USERINFO["email"] which is used to create the IC account
+            user_email=invitation.email,
+            channel="invitation",
+            previous_url=previous_url,
+            next_url=next_url,
+        )
+        # Follow the redirection.
+        response = self.client.get(response.url, follow=True)
+        # Signup should have failed : as the email used in IC isn't the one from the invitation
+        messages = list(get_messages(response.wsgi_request))
+        assert len(messages) == 1
+        assert "ne correspond pas à l’adresse e-mail de l’invitation" in messages[0].message
+        assert response.wsgi_request.get_full_path() == previous_url
+        assert not User.objects.filter(email=invitation.email).exists()
 
     def test_expired_invitation(self):
         invitation = ExpiredSiaeStaffInvitationFactory()
