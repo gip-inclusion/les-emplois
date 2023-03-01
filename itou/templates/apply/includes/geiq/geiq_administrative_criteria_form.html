@@ -1,5 +1,10 @@
 {% load bootstrap4 %}
 
+{# QPV / ZRR detection for job seeker #}
+{% if geo_criteria_detected %}
+    {% include "apply/includes/known_criteria.html" %}
+{% endif %}
+
 {% if request.htmx %}
     {% comment %}
             This fragment is also used for "normal" (non-htmx) page reload, 

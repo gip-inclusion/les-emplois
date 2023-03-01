@@ -867,10 +867,12 @@ class ApplicationGEIQEligibilityView(ApplicationBaseView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
+        geo_criteria_detected = self.job_seeker.address_in_qpv or self.job_seeker.zrr_city_name
         return super().get_context_data(**kwargs) | {
             "back_url": reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk}),
             "form": self.form,
             "full_content_width": True,
+            "geo_criteria_detected": geo_criteria_detected,
             "progress": 50,
         }
 

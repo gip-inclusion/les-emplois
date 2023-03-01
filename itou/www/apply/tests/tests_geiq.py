@@ -6,8 +6,11 @@ from django.utils import dateformat, timezone
 from itou.eligibility.factories import GEIQEligibilityDiagnosisFactory
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
 from itou.job_applications.factories import JobApplicationFactory
+from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
+from itou.users.factories import JobSeekerFactory, JobSeekerWithAddressFactory
+from itou.utils.session import SessionNamespace
 
 
 class JobApplicationGEIQEligibilityDetailsTest(TestCase):
@@ -184,3 +187,86 @@ class JobApplicationGEIQEligibilityDetailsTest(TestCase):
             response,
             f"une aide financière de l’État s’élevant à <b>{diagnosis.allowance_amount} €</b> ",
         )
+
+
+class TestJobSeekerGeoDetailsForGEIQDiagnosis(TestCase):
+    """Check that QPV and ZRR details for job seeker are displayed in GEIQ eligibility diagnosis form"""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.job_seeker = JobSeekerFactory()
+        cls.job_seeker_in_qpv = JobSeekerWithAddressFactory(with_address_in_qpv=True)
+        cls.job_seeker_in_zrr = JobSeekerWithAddressFactory(with_city_in_zrr=True)
+        cls.geiq = SiaeWithMembershipAndJobsFactory(kind=SiaeKind.GEIQ, with_jobs=True)
+        cls.prescriber_org = PrescriberOrganizationWithMembershipFactory(authorized=True)
+        cls.url_for_prescriber = reverse("apply:application_geiq_eligibility", kwargs={"siae_pk": cls.geiq.pk})
+
+    def _setup_session(self, job_seeker=None):
+        apply_session = SessionNamespace(self.client.session, f"job_application-{self.geiq.pk}")
+        apply_session.init(
+            {
+                "job_seeker_pk": job_seeker or JobSeekerFactory(),
+                "selected_jobs": self.geiq.job_description_through.all(),
+            }
+        )
+        apply_session.save()
+
+    def test_job_seeker_not_resident_in_qpv_or_zrr(self):
+        # ZRR / QPV criteria info fragment is loaded before HTMX "zone"
+        diagnosis = GEIQEligibilityDiagnosisFactory(with_geiq=True, job_seeker=self.job_seeker)
+        job_application = JobApplicationFactory(job_seeker=self.job_seeker, to_siae=diagnosis.author_geiq)
+        url = reverse("apply:geiq_eligibility_criteria", kwargs={"job_application_id": job_application.pk})
+        self.client.force_login(diagnosis.author_geiq.members.first())
+        response = self.client.get(url)
+
+        self.assertTemplateNotUsed(response, "apply/includes/known_criteria.html")
+
+    def test_job_seeker_not_resident_in_qpv_or_zrr_for_prescriber(self):
+        self.client.force_login(self.prescriber_org.members.first())
+        self._setup_session(self.job_seeker)
+        response = self.client.get(self.url_for_prescriber)
+
+        self.assertTemplateNotUsed(response, "apply/includes/known_criteria.html")
+
+    def test_job_seeker_qpv_details_display(self):
+        # Check QPV fragment is displayed:
+        diagnosis = GEIQEligibilityDiagnosisFactory(with_geiq=True, job_seeker=self.job_seeker_in_qpv)
+        job_application = JobApplicationFactory(job_seeker=self.job_seeker_in_qpv, to_siae=diagnosis.author_geiq)
+        url = reverse("apply:geiq_eligibility_criteria", kwargs={"job_application_id": job_application.pk})
+
+        self.client.force_login(diagnosis.author_geiq.members.first())
+        response = self.client.get(url)
+
+        self.assertTemplateUsed(response, "apply/includes/known_criteria.html")
+        self.assertContains(response, "Résident QPV")
+
+    def test_job_seeker_qpv_details_display_for_prescriber(self):
+        # Check QPV fragment is displayed for prescriber:
+        self.client.force_login(self.prescriber_org.members.first())
+        self._setup_session(self.job_seeker_in_qpv)
+        response = self.client.get(self.url_for_prescriber)
+
+        self.assertTemplateUsed(response, "apply/includes/known_criteria.html")
+        self.assertContains(response, "Résident QPV")
+
+    def test_job_seeker_zrr_details_display(self):
+        # Check ZRR fragment is displayed
+
+        diagnosis = GEIQEligibilityDiagnosisFactory(with_geiq=True, job_seeker=self.job_seeker_in_zrr)
+        job_application = JobApplicationFactory(job_seeker=self.job_seeker_in_zrr, to_siae=diagnosis.author_geiq)
+        url = reverse("apply:geiq_eligibility_criteria", kwargs={"job_application_id": job_application.pk})
+
+        self.client.force_login(diagnosis.author_geiq.members.first())
+        response = self.client.get(url)
+
+        self.assertTemplateUsed(response, "apply/includes/known_criteria.html")
+        self.assertContains(response, "Résident en ZRR")
+
+    def test_job_seeker_zrr_details_display_for_prescriber(self):
+        # Check QPV fragment is displayed for prescriber:
+        self.client.force_login(self.prescriber_org.members.first())
+        self._setup_session(self.job_seeker_in_zrr)
+        response = self.client.get(self.url_for_prescriber)
+
+        self.assertTemplateUsed(response, "apply/includes/known_criteria.html")
+        self.assertContains(response, "Résident en ZRR")
