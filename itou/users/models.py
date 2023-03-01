@@ -36,6 +36,7 @@ from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
+from itou.siaes.enums import SiaeKind
 from itou.siaes.models import Siae
 from itou.utils import constants as global_constants
 from itou.utils.apis.exceptions import AddressLookupError
@@ -648,9 +649,9 @@ class User(AbstractUser, AddressMixin):
         In some edge cases (e.g. SIAE created by staff and not yet officialized) the convention is absent,
         in that case we must absolutely not allow any antenna to be created.
 
-        For non SIAE structures (GEIQ, EA...) the convention logic is not implemented thus no convention ever exists.
+        For non SIAE structures (EA, EATT...) the convention logic is not implemented thus no convention ever exists.
         Antennas cannot be freely created by the user as the EA system authorities do not allow any non official SIRET
-        to be used.
+        to be used (except for GEIQ).
 
         Finally, for OPCS it has been decided for now to disallow it; those structures are strongly attached to
         a given territory and thus would not need to join others.
@@ -659,8 +660,10 @@ class User(AbstractUser, AddressMixin):
             self.is_siae_staff
             and parent_siae.is_active
             and parent_siae.has_admin(self)
-            and parent_siae.should_have_convention
-            and parent_siae.convention is not None
+            and (
+                parent_siae.kind == SiaeKind.GEIQ
+                or (parent_siae.should_have_convention and parent_siae.convention is not None)
+            )
         )
 
     def can_view_stats_dashboard_widget(self, current_org):
