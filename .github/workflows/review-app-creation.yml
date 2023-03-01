@@ -15,7 +15,6 @@ env:
   CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
   CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
   BRANCH: ${{ github.head_ref }}
-  PYTHON_VERSION: "3.10"
 
 jobs:
   create:
