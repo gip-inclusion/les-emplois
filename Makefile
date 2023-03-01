@@ -6,7 +6,7 @@
 
 # Global tasks.
 # =============================================================================
-PYTHON_VERSION := python3.10
+PYTHON_VERSION := python3.11
 PGDATABASE ?= itou
 ifeq ($(shell uname -s),Linux)
 	REQUIREMENTS_PATH := requirements/dev.txt
