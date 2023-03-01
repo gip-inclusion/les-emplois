@@ -20,7 +20,18 @@
                 <ul class="list-unstyled">
                     {% for radio in form.refusal_reason %}
                         <li>
-                            <label for="{{ radio.id_for_label }}">{{ radio.tag }} {{ radio.choice_label }}</label>
+                            <label for="{{ radio.id_for_label }}">
+                                {{ radio.tag }}
+                                {% if radio.data.value == RefusalReason.PREVENT_OBJECTIVES %}
+                                    {{ radio.choice_label }}&nbsp;<i class="ri-question-fill ri-xl text-button ml-1"
+   data-toggle="tooltip"
+   data-placement="top"
+   data-trigger="click focus"
+   title="L'embauche empêche l'atteinte des engagements contractuels avec les parties prenantes à la convention de financement mise en place par l'État."></i>
+                                {% else %}
+                                    {{ radio.choice_label }}
+                                {% endif %}
+                            </label>
                         </li>
                     {% endfor %}
                 </ul>
