@@ -6,12 +6,12 @@ récupération d'informations sur les structures à partir de la table organisat
 with candidats_p as (
     -- récupération des candidats qui ont un prescripteur comme auteur diagnostic
     select distinct
-        cdd.id as id_candidat,
+        "cdd"."id" as id_candidat,
         -- TODO dejafait: drop as soon as analistos have migrated to the new deanonymized column
-        cdd. "id_anonymisé" as id_candidat_anonymise,
-        cdd.actif,
-        cdd.age,
-        cdd.date_diagnostic,
+        "cdd"."id_anonymisé" as id_candidat_anonymise,
+        "cdd"."actif",
+        "cdd"."age",
+        "cdd"."date_diagnostic",
         case
         -- on soustrait 6 mois à la date de diagnostic pour déterminer s'il est toujours en cours ou pas
         when date_diagnostic >= date_trunc('month',
@@ -20,28 +20,28 @@ with candidats_p as (
         else
             'non'
         end diagnostic_valide,
-        cdd. "département" as departement_candidat,
-        cdd. "nom_département" as nom_departement_candidat,
-        cdd. "région" as region_candidat,
-        cdd.type_auteur_diagnostic,
-        cdd.sous_type_auteur_diagnostic,
-        cdd.nom_auteur_diagnostic,
-        cdd.id_auteur_diagnostic_prescripteur as id_org_prescripteur,
-        cdd.total_candidatures,
-        cdd.total_diagnostics,
-        cdd.total_embauches,
-        cdd.type_inscription,
-        cdd.injection_ai,
-        cdd.pe_inscrit
+        "cdd"."département" as departement_candidat,
+        "cdd"."nom_département" as nom_departement_candidat,
+        "cdd"."région" as region_candidat,
+        "cdd"."type_auteur_diagnostic",
+        "cdd"."sous_type_auteur_diagnostic",
+        "cdd"."nom_auteur_diagnostic",
+        "cdd"."id_auteur_diagnostic_prescripteur" as id_org_prescripteur,
+        "cdd"."total_candidatures",
+        "cdd"."total_diagnostics",
+        "cdd"."total_embauches",
+        "cdd"."type_inscription",
+        "cdd"."injection_ai",
+        "cdd"."pe_inscrit"
     from
         -- cdd pour CanDiDats
-        public.candidats as cdd
+        "public"."candidats" as cdd
     where
-        type_auteur_diagnostic = ('Prescripteur')
+        "cdd"."type_auteur_diagnostic" = 'Prescripteur'
 ),
 prescripteurs as (
     select
-        id,
+        "id",
         -- ajout du département du prescripteur pour les TBs privés
         "nom_département" as "nom_département_prescripteur",
         "région" as "nom_région_prescripteur"
