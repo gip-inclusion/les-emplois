@@ -5,6 +5,7 @@ with nb_structures_par_dept as (
         cast(count(*) as float) as nb_struct
     from
         structures
+    where structures.active = 1
     group by
         "département",
         "nom_département"
