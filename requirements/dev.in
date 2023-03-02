@@ -8,14 +8,10 @@ ipdb  # https://github.com/gotcha/ipdb
 
 # Code quality
 # ------------------------------------------------------------------------------
-black  # https://github.com/psf/black
-flake8  # https://github.com/PyCQA/flake8
-isort  # https://github.com/timothycrosley/isort
 pylint  # https://github.com/PyCQA/pylint
 pylint-django  # https://github.com/PyCQA/pylint-django
 pre-commit  # https://github.com/pre-commit/pre-commit
 coverage  # https://github.com/nedbat/coveragepy
-djlint  # https://www.djlint.com
 
 # Django
 # ------------------------------------------------------------------------------

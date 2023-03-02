@@ -7,4 +7,3 @@ ignore="H006,H014,H017,H023,H030,H031,T002,T003"
 custom_blocks="buttons,endbuttons"
 max_attribute_length=200
 preserve_blank_lines=true
-extend_exclude = "itou/templates/utils/widgets/duet_date_picker_widget.html"

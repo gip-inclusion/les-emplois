@@ -1,23 +1,19 @@
 repos:
-  - repo: local
+  - repo: https://github.com/psf/black
+    rev: 22.12.0
     hooks:
-      - id: black
-        name: Black
-        entry: black
-        types: [python]
-        language: system
-      - id: flake8
-        name: Flake8
-        entry: flake8
-        types: [python]
-        language: system
-      - id: isort
-        name: isort
-        entry: isort
-        types: [python]
-        language: system
-      - id: djlint
-        name: djlint
-        entry: djlint --reformat
-        types: [html]
-        language: system
+    - id: black
+  - repo: https://github.com/PyCQA/flake8
+    rev: 5.0.4
+    hooks:
+    - id: flake8
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.12.0
+    hooks:
+    - id: isort
+  - repo: https://github.com/Riverside-Healthcare/djLint
+    rev: v1.19.13
+    hooks:
+    - id: djlint-django
+      args: ["--reformat"]
+      exclude: duet_date_picker_widget.html

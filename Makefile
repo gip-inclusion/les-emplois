@@ -51,15 +51,10 @@ cdsitepackages:
 	docker exec -ti -w /usr/local/lib/$(PYTHON_VERSION)/site-packages itou_django /bin/bash
 
 quality: $(VIRTUAL_ENV)
-	black --check config itou
-	isort --check config itou
-	flake8 --count --show-source --statistics config itou
-	djlint --lint --check itou
+	pre-commit run --all-files --show-diff-on-failure
 
 fix: $(VIRTUAL_ENV)
-	black config itou
-	isort config itou
-	djlint --reformat itou
+	pre-commit run --all-files --show-diff-on-failure
 
 pylint: $(VIRTUAL_ENV)
 	pylint config itou
