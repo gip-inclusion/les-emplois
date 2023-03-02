@@ -1,8 +1,13 @@
 <div class="col mb-3 mb-md-5">
-    <div class="card c-card c-card--plateforme h-100 w-100 has-links-inside">
-        <p class="h4 card-header">
-            Salariés <span class="badge badge-pill badge-sm badge-important text-white">Nouveau</span>
-        </p>
+    <div class="card c-card h-100 w-100 has-links-inside">
+        <div class="card-header bg-light pb-3 d-flex">
+            <div class="flex-grow-1">
+                <span class="h4 m-0">Salariés</span>
+            </div>
+            <div class="ml-2">
+                <span class="badge badge-pill badge-sm badge-important text-white">Nouveau</span>
+            </div>
+        </div>
         <div class="card-body">
             <ul class="list-unstyled">
                 {% comment %}
@@ -12,39 +17,42 @@
                 decided that it probably did not make much sense initially.
                 {% endcomment %}
                 {% with suspension=current_siae.get_active_suspension_text_with_dates %}
-                    <li class="card-text mb-3">
+                    <li class="d-flex justify-content-between align-items-center mb-3">
                         {% if suspension %}
-                            <span data-toggle="tooltip" data-placement="top" title="Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle a posteriori. {{ suspension }}">
-                                <i class="ri-login-box-line disabled"></i>
-                                <a href="" class="disabled">Déclarer une embauche</a>
+                            <span class="btn-link btn-ico" data-toggle="tooltip" data-placement="top" title="Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle a posteriori. {{ suspension }}">
+                                <i class="ri-login-box-line ri-lg font-weight-normal disabled"></i>
+                                <span class="disabled">Déclarer une embauche</span>
                             </span>
                         {% else %}
-                            <i class="ri-login-box-line ri-lg mr-1"></i>
-                            <a href="{% url 'apply:start' siae_pk=current_siae.pk %} ">Déclarer une embauche</a>
+                            <a href="{% url 'apply:start' siae_pk=current_siae.pk %}" class="btn-link btn-ico">
+                                <i class="ri-login-box-line ri-lg font-weight-normal"></i>
+                                <span>Déclarer une embauche</span>
+                            </a>
                         {% endif %}
                     </li>
                 {% endwith %}
-
-                <li class="card-text mb-3">
-                    <i class="ri-contacts-book-line ri-lg mr-1"></i>
-                    <a href="{% url 'approvals:list' %}" class="matomo-event" data-matomo-category="salaries" data-matomo-action="clic" data-matomo-option="gestion-des-salaries-et-pass-iae">
-                        Gestion des salariés et PASS IAE
+                <li class="d-flex justify-content-between align-items-center mb-3">
+                    <a href="{% url 'approvals:list' %}" data-matomo-category="salaries" data-matomo-action="clic" data-matomo-option="gestion-des-salaries-et-pass-iae" class="matomo-event btn-link btn-ico">
+                        <i class="ri-contacts-book-line ri-lg font-weight-normal"></i>
+                        <span>Gestion des salariés et PASS IAE</span>
                     </a>
                 </li>
-
                 {% if can_show_employee_records %}
-                    <li class="card-text mb-3">
-                        <i class="ri-article-line ri-lg mr-1"></i>
-                        <a href="{% url 'employee_record_views:list' %}?status=NEW">Gérer mes fiches salarié (ASP)</a>
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'employee_record_views:list' %}?status=NEW" class="btn-link btn-ico">
+                            <i class="ri-article-line ri-lg font-weight-normal"></i>
+                            <span>Gérer mes fiches salarié (ASP)</span>
+                        </a>
                         {% if num_rejected_employee_records %}
-                            <span class="badge badge-pill badge-sm badge-danger">{{ num_rejected_employee_records }}</span>
+                            <span class="badge badge-pill badge-xs badge-danger">{{ num_rejected_employee_records }}</span>
                         {% endif %}
                     </li>
                 {% endif %}
-
-                <li class="card-text mb-3">
-                    <i class="ri-time-line ri-lg mr-1"></i>
-                    <a href="{% url 'approvals:pe_approval_search' %}">Prolonger/suspendre un agrément émis par Pôle emploi</a>
+                <li class="d-flex justify-content-between align-items-center mb-3">
+                    <a href="{% url 'approvals:pe_approval_search' %}" class="btn-link btn-ico">
+                        <i class="ri-time-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                        <span>Prolonger/suspendre un agrément émis par Pôle emploi</span>
+                    </a>
                 </li>
             </ul>
         </div>

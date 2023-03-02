@@ -1,29 +1,34 @@
 <div class="col mb-3 mb-md-5">
-    <div class="card c-card c-card--plateforme h-100 w-100 has-links-inside">
-        <p class="h4 card-header">
-            Contrôle a posteriori
+    <div class="card c-card h-100 w-100 has-links-inside">
+        <div class="card-header bg-light pb-3 d-flex">
+            <div class="flex-grow-1">
+                <span class="h4 m-0">Contrôle a posteriori</span>
+            </div>
             {% if campaign_in_progress %}
-                <span class="badge badge-pill badge-sm badge-important text-white">Nouveau</span>
+                <div class="ml-2">
+                    <span class="badge badge-pill badge-sm badge-important text-white">Nouveau</span>
+                </div>
             {% endif %}
-        </p>
+        </div>
         <div class="card-body">
             <ul class="list-unstyled">
                 {% for active_campaign in active_campaigns %}
                     {% if active_campaign.evaluations_asked_at %}
-                        <li class="card-text mb-3">
-                            <i class="ri-file-copy-2-line ri-lg mr-1"></i>
-                            <a href="{% url 'siae_evaluations_views:institution_evaluated_siae_list' active_campaign.pk %}">
-                                {{ active_campaign.name }}
+                        <li class="d-flex justify-content-between align-items-center mb-3">
+                            <a href="{% url 'siae_evaluations_views:institution_evaluated_siae_list' active_campaign.pk %}" class="btn-link btn-ico">
+                                <i class="ri-file-copy-2-line ri-lg font-weight-normal"></i>
+                                <span>{{ active_campaign.name }}</span>
                             </a>
                         </li>
                     {% else %}
-                        <li class="card-text mb-3">
-                            <i class="ri-line-chart-line ri-lg mr-1"></i>
-                            <a href="{% url 'siae_evaluations_views:samples_selection' %}">{{ active_campaign.name|capfirst }}</a>
+                        <li class="d-flex justify-content-between align-items-center mb-3">
+                            <a href="{% url 'siae_evaluations_views:samples_selection' %}" class="btn-link btn-ico">
+                                <i class="ri-line-chart-line ri-lg font-weight-normal"></i>
+                                <span>{{ active_campaign.name|capfirst }}</span>
+                            </a>
                         </li>
                     {% endif %}
                 {% endfor %}
-
             </ul>
         </div>
     </div>

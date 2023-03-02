@@ -1,10 +1,14 @@
 <div class="col mb-3 mb-md-5">
-    <div class="card c-card c-card--plateforme h-100 w-100 has-links-inside">
-        <h5 class="card-header">Admin</h5>
+    <div class="card c-card h-100 w-100 has-links-inside">
+        <div class="card-header bg-light pb-3">
+            <span class="h4">Admin</span>
+        </div>
         <div class="card-body">
-            <p class="card-text mb-3">
-                <i class="ri-key-2-line ri-lg"></i>
-                <a href="{% url 'admin:index' %}">Admin</a>
+            <p class="mb-3">
+                <a href="{% url 'admin:index' %}" class="btn-link btn-ico">
+                    <i class="ri-key-2-line ri-lg font-weight-normal"></i>
+                    <span>Admin</span>
+                </a>
             </p>
         </div>
     </div>

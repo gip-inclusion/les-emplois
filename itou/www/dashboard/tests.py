@@ -329,18 +329,13 @@ class DashboardViewTest(TestCase):
         response = self.client.get(reverse("dashboard:index"))
         self.assertContains(
             response,
-            "Contrôle a posteriori "
-            '<span class="badge badge-pill badge-sm badge-important text-white">Nouveau</span>',
-            count=1,
-        )
-        self.assertContains(
-            response,
-            f"""
-            <li class="card-text mb-3">
-                <a href="/siae_evaluation/evaluated_siae_sanction/{evaluated_siae_with_final_decision.pk}/">
-                    Voir le résultat du contrôle “Final decision reached”
-                </a>
-            </li>
+            """
+            <div class="flex-grow-1">
+                <span class="h4 m-0">Contrôle a posteriori</span>
+            </div>
+            <div class="ml-2">
+                <span class="badge badge-pill badge-sm badge-important text-white">Nouveau</span>
+            </div>
             """,
             html=True,
             count=1,
@@ -348,11 +343,23 @@ class DashboardViewTest(TestCase):
         self.assertContains(
             response,
             f"""
-            <li class="card-text mb-3">
-                <a href="/siae_evaluation/evaluated_siae_sanction/{evaluated_siae_campaign_closed.pk}/">
-                    Voir le résultat du contrôle “Just closed”
-                </a>
-            </li>
+            <a href="/siae_evaluation/evaluated_siae_sanction/{evaluated_siae_with_final_decision.pk}/"
+             class="btn-link btn-ico">
+                <i class="ri-eye-line ri-lg font-weight-normal"></i>
+                <span>Voir le résultat du contrôle “Final decision reached”</span>
+            </a>
+            """,
+            html=True,
+            count=1,
+        )
+        self.assertContains(
+            response,
+            f"""
+            <a href="/siae_evaluation/evaluated_siae_sanction/{evaluated_siae_campaign_closed.pk}/"
+             class="btn-link btn-ico">
+                <i class="ri-eye-line ri-lg font-weight-normal"></i>
+                <span>Voir le résultat du contrôle “Just closed”</span>
+            </a>
             """,
             html=True,
             count=1,

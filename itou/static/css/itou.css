@@ -559,10 +559,3 @@ Usage:
 .s-banner-01.s-banner-01--ic .s-banner-01__col > div::before {
     display: none;
 }
-
-/* Workaround while waiting for next theme version
---------------------------------------------------------------------------- */
-.disabled {
-    color: #B3B4C3 !important;
-    pointer-events: none;
-}
