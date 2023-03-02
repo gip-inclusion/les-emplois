@@ -1,24 +1,35 @@
 <div class="col mb-3 mb-md-5">
-    <div class="card c-card c-card--plateforme h-100 w-100 has-links-inside">
-        <p class="h4 card-header">Candidatures</p>
+    <div class="card c-card h-100 w-100 has-links-inside">
+        <div class="card-header bg-light pb-3">
+            <span class="h4">Candidatures</span>
+        </div>
         <div class="card-body">
             <ul class="list-unstyled">
-                <li class="card-text mb-3">
-                    <i class="ri-chat-4-line ri-lg"></i>
-                    <a href="{% url 'apply:list_for_prescriber' %}">Suivi des candidatures</a>
+                <li class="d-flex justify-content-between align-items-center mb-3">
+                    <a href="{% url 'apply:list_for_prescriber' %}" class="btn-link btn-ico">
+                        <i class="ri-chat-4-line ri-lg font-weight-normal"></i>
+                        <span>Suivi des candidatures</span>
+                    </a>
                 </li>
-                <li class="card-text mb-3">
-                    <i class="ri-user-follow-line ri-lg"></i>
-                    <a href="{% url 'home:hp' %}">Postuler pour un candidat</a>
+                <li class="d-flex justify-content-between align-items-center mb-3">
+                    <a href="{% url 'home:hp' %}" class="btn-link btn-ico">
+                        <i class="ri-user-follow-line ri-lg font-weight-normal"></i>
+                        <span>Postuler pour un candidat</span>
+                    </a>
                 </li>
-                <li class="card-text mb-3">
-                    <i class="ri-download-line ri-lg"></i>
-                    <a href="{% url 'apply:list_for_prescriber_exports' %}">Export des candidatures</a>
+                <li class="d-flex justify-content-between align-items-center mb-3">
+                    <a href="{% url 'apply:list_for_prescriber_exports' %}" class="btn-link btn-ico">
+                        <i class="ri-download-line ri-lg font-weight-normal"></i>
+                        <span>Export des candidatures</span>
+                    </a>
                 </li>
                 {% if current_prescriber_organization and current_prescriber_organization.kind == precriber_kind_pe %}
-                    <li class="card-text mb-3">
-                        <i class="ri-pause-circle-line ri-lg"></i>
-                        <a href="https://tally.so/r/w2Ex0M" aria-label="Suspendre un PASS IAE (ouverture dans un nouvel onglet)" target="_blank">Suspendre un PASS IAE</a><i class="ri-external-link-line ml-1"></i>
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="https://tally.so/r/w2Ex0M" aria-label="Suspendre un PASS IAE (ouverture dans un nouvel onglet)" target="_blank" class="btn-link btn-ico">
+                            <i class="ri-pause-circle-line ri-lg font-weight-normal"></i>
+                            <span>Suspendre un PASS IAE</span>
+                            <i class="ri-external-link-line ml-1 ri-lg font-weight-normal"></i>
+                        </a>
                     </li>
                 {% endif %}
             </ul>

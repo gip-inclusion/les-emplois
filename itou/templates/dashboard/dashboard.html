@@ -235,40 +235,32 @@
 
 {% block content %}
 
-    <h1 class="h1">
-        {% if user.is_job_seeker and user.get_full_name %}
-            Tableau de bord - <span class="text-muted">{{ user.get_full_name }}</span>
-        {% endif %}
-        {% if current_siae %}<span class="text-muted">{{ current_siae.display_name }}</span>{% endif %}
-        {% if current_prescriber_organization %}
-            <span class="text-muted">{{ current_prescriber_organization.display_name }}</span>
-            {% if current_prescriber_organization.is_authorized %}<i class="ri-award-line ri-2x"></i>{% endif %}
-        {% endif %}
-        {% if current_institution %}
-            Tableau de bord - <span class="text-muted">{{ current_institution.display_name }}</span>
-        {% endif %}
-    </h1>
-
-    {% if current_prescriber_organization and current_prescriber_organization.is_authorized %}
-        <p class="text-muted">
-            <span class="badge badge-pill badge-sm badge-warning">Prescripteur habilité</span>
-            {% if current_prescriber_organization.code_safir_pole_emploi %}
-                <span class="badge badge-pill badge-sm badge-light">Code SAFIR {{ current_prescriber_organization.code_safir_pole_emploi }}</span>
+    <div class="mb-3">
+        <h1 class="h1 mb-0">
+            {% if user.is_job_seeker and user.get_full_name %}Tableau de bord - {{ user.get_full_name }}{% endif %}
+            {% if current_siae %}{{ current_siae.display_name }}{% endif %}
+            {% if current_prescriber_organization %}
+                {{ current_prescriber_organization.display_name }}
+                {% if current_prescriber_organization.is_authorized %}<i class="ri-award-line"></i>{% endif %}
             {% endif %}
-        </p>
-    {% endif %}
+            {% if current_institution %}Tableau de bord - {{ current_institution.display_name }}{% endif %}
+        </h1>
 
-    {% if current_siae %}
-        <p class="text-muted">
-            SIRET {{ current_siae.siret|format_siret }}
-        </p>
-    {% endif %}
+        {% if current_prescriber_organization and current_prescriber_organization.is_authorized %}
+            <p class="mb-0">
+                <span class="badge badge-pill badge-sm badge-warning">Prescripteur habilité</span>
+                {% if current_prescriber_organization.code_safir_pole_emploi %}
+                    <span class="badge badge-pill badge-sm badge-light">Code SAFIR {{ current_prescriber_organization.code_safir_pole_emploi }}</span>
+                {% endif %}
+            </p>
+        {% endif %}
 
-    {% if current_prescriber_organization and current_prescriber_organization.siret %}
-        <p class="text-muted">
-            SIRET {{ current_prescriber_organization.siret|format_siret }}
-        </p>
-    {% endif %}
+        {% if current_siae %}<p class="mb-0">SIRET {{ current_siae.siret|format_siret }}</p>{% endif %}
+
+        {% if current_prescriber_organization and current_prescriber_organization.siret %}
+            <p class="mb-0">SIRET {{ current_prescriber_organization.siret|format_siret }}</p>
+        {% endif %}
+    </div>
 
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 mt-3">
 

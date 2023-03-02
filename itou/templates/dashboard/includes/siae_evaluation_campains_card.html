@@ -1,24 +1,30 @@
 <div class="col mb-3 mb-md-5">
-    <div class="card c-card c-card--plateforme h-100 w-100 has-links-inside">
-        <p class="h4 card-header">
-            Contrôle a posteriori <span class="badge badge-pill badge-sm badge-important text-white">Nouveau</span>
-        </p>
+    <div class="card c-card h-100 w-100 has-links-inside">
+        <div class="card-header bg-light pb-3 d-flex">
+            <div class="flex-grow-1">
+                <span class="h4 m-0">Contrôle a posteriori</span>
+            </div>
+            <div class="ml-2">
+                <span class="badge badge-pill badge-sm badge-important text-white">Nouveau</span>
+            </div>
+        </div>
         <div class="card-body">
             <ul class="list-unstyled">
                 {% for evaluated_siae in active_campaigns %}
-                    <li class="card-text mb-3">
-                        <i class="ri-file-copy-2-line ri-lg mr-1"></i>
-                        <a href="{% url 'siae_evaluations_views:siae_job_applications_list' evaluated_siae.pk %}">
-                            Justifier mes auto-prescriptions
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'siae_evaluations_views:siae_job_applications_list' evaluated_siae.pk %}" class="btn-link btn-ico">
+                            <i class="ri-file-copy-2-line ri-lg font-weight-normal"></i>
+                            <span>Justifier mes auto-prescriptions</span>
                         </a>
                         {# note vincentporte: static icon, will be displayed dynamically later.#}
-                        <i class="ri-error-warning-fill ri-lg mr-1 text-danger"></i>
+                        <i class="ri-error-warning-fill ri-lg ml-1 text-danger font-weight-normal"></i>
                     </li>
                 {% endfor %}
                 {% for evaluated_siae in evaluated_siae_notifications %}
-                    <li class="card-text mb-3">
-                        <a href="{% url "siae_evaluations_views:siae_sanction" evaluated_siae.pk %}">
-                            Voir le résultat du contrôle “{{ evaluated_siae.evaluation_campaign.name }}”
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url "siae_evaluations_views:siae_sanction" evaluated_siae.pk %}" class="btn-link btn-ico">
+                            <i class="ri-eye-line ri-lg font-weight-normal"></i>
+                            <span>Voir le résultat du contrôle “{{ evaluated_siae.evaluation_campaign.name }}”</span>
                         </a>
                     </li>
                 {% endfor %}

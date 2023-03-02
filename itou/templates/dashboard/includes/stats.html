@@ -1,124 +1,167 @@
 <div class="col mb-3 mb-md-5">
-    <div class="card c-card c-card--plateforme h-100 w-100 has-links-inside">
-        <p class="h4 card-header">Statistiques et pilotage</p>
+    <div class="card c-card h-100 w-100 has-links-inside">
+        <div class="card-header bg-light pb-3">
+            <span class="h4">Statistiques et pilotage</span>
+        </div>
         <div class="card-body">
             <ul class="list-unstyled">
                 {% if can_view_stats_siae_etp %}
-                    <li class="card-text mb-3">
-                        <i class="ri-line-chart-line ri-lg mr-1"></i>
-                        <a href="{% url 'stats:stats_siae_etp' %}">Voir les données de ma structure (extranet ASP)</a>
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'stats:stats_siae_etp' %}" class="btn-link btn-ico">
+                            <i class="ri-line-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                            <span>Voir les données de ma structure (extranet ASP)</span>
+                        </a>
                     </li>
                 {% endif %}
                 {% if can_view_stats_siae_hiring %}
-                    <li class="card-text mb-3">
-                        <i class="ri-line-chart-line ri-lg mr-1"></i>
-                        <a href="{% url 'stats:stats_siae_hiring' %}">Voir les données de recrutement de mes structures (Plateforme de l'inclusion)</a>
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'stats:stats_siae_hiring' %}" class="btn-link btn-ico">
+                            <i class="ri-line-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                            <span>Voir les données de recrutement de mes structures (Plateforme de l'inclusion)</span>
+                        </a>
                     </li>
                 {% endif %}
                 {% if can_view_stats_cd %}
-                    <li class="card-text mb-3">
-                        <i class="ri-line-chart-line ri-lg mr-1"></i>
-                        <a href="{% url 'stats:stats_cd' %}">Voir les données IAE de mon département</a>
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'stats:stats_cd' %}" class="btn-link btn-ico">
+                            <i class="ri-line-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                            <span>Voir les données IAE de mon département</span>
+                        </a>
                     </li>
                 {% endif %}
                 {% if can_view_stats_pe %}
-                    <li class="card-text mb-3">
-                        <i class="ri-line-chart-line ri-lg mr-1"></i>
-                        <a href="{% url 'stats:stats_pe_state_main' %}">Voir les données de l’état des candidatures orientées</a>
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'stats:stats_pe_state_main' %}" class="btn-link btn-ico">
+                            <i class="ri-line-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                            <span>Voir les données de l’état des candidatures orientées</span>
+                        </a>
                     </li>
-                    <li class="card-text mb-3">
-                        <i class="ri-line-chart-line ri-lg mr-1"></i>
-                        <a href="{% url 'stats:stats_pe_conversion_main' %}">Voir les données du taux de transformation</a>
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'stats:stats_pe_conversion_main' %}" class="btn-link btn-ico">
+                            <i class="ri-line-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                            <span>Voir les données du taux de transformation</span>
+                        </a>
                     </li>
-                    <li class="card-text mb-3">
-                        <i class="ri-line-chart-line ri-lg mr-1"></i>
-                        <a href="{% url 'stats:stats_pe_tension' %}">Voir les données des fiches de poste en tension</a>
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'stats:stats_pe_tension' %}" class="btn-link btn-ico">
+                            <i class="ri-line-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                            <span>Voir les données des fiches de poste en tension</span>
+                        </a>
                     </li>
-                    <li class="card-text mb-3">
-                        <i class="ri-line-chart-line ri-lg mr-1"></i>
-                        <a href="{% url 'stats:stats_pe_delay_main' %}">Voir les données du délai d'entrée en IAE</a>
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'stats:stats_pe_delay_main' %}" class="btn-link btn-ico">
+                            <i class="ri-line-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                            <span>Voir les données du délai d'entrée en IAE</span>
+                        </a>
                     </li>
                 {% endif %}
                 {% if can_view_stats_ddets %}
                     {% comment %}
                     <!-- TODO @dejafait uncomment as soon as ready -->
-                    <li class="card-text mb-3">
-                        <i class="ri-line-chart-line ri-lg mr-1"></i>
-                        <a href="{% url 'stats:stats_ddets_auto_prescription' %}">Focus auto-prescription</a>
-                        <span class="badge badge-pill badge-sm badge-important text-white">Nouveau</span>
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'stats:stats_ddets_auto_prescription' %}" class="btn-link btn-ico">
+                            <i class="ri-line-chart-line ri-lg font-weight-normal"></i>
+                            <span>Focus auto-prescription</span>
+                        </a>
+                        <span class="badge badge-pill badge-xs badge-important text-white">Nouveau</span>
                     </li>
-                    <li class="card-text mb-3">
-                        <i class="ri-line-chart-line ri-lg mr-1"></i>
-                        <a href="{% url 'stats:stats_ddets_follow_siae_evaluation' %}">Suivre le contrôle à posteriori</a>
-                        <span class="badge badge-pill badge-sm badge-important text-white">Nouveau</span>
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'stats:stats_ddets_follow_siae_evaluation' %}" class="btn-link btn-ico">
+                            <i class="ri-line-chart-line ri-lg font-weight-normal"></i>
+                            <span>Suivre le contrôle à posteriori</span>
+                        </a>
+                        <span class="badge badge-pill badge-xs badge-important text-white">Nouveau</span>
                     </li>
                     {% endcomment %}
-                    <li class="card-text mb-3">
-                        <i class="ri-line-chart-line ri-lg mr-1"></i>
-                        <a href="{% url 'stats:stats_ddets_iae' %}">Voir les données IAE de mon département</a>
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'stats:stats_ddets_iae' %}" class="btn-link btn-ico">
+                            <i class="ri-line-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                            <span>Voir les données IAE de mon département</span>
+                        </a>
                     </li>
-                    <li class="card-text mb-3">
-                        <i class="ri-line-chart-line ri-lg mr-1"></i>
-                        <a href="{% url 'stats:stats_ddets_hiring' %}">Voir les données facilitation de l'embauche</a>
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'stats:stats_ddets_hiring' %}" class="btn-link btn-ico">
+                            <i class="ri-line-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                            <span>Voir les données facilitation de l'embauche</span>
+                        </a>
                     </li>
                 {% endif %}
                 {% if can_view_stats_dreets %}
                     {% comment %}
                     <!-- TODO @dejafait uncomment as soon as ready -->
-                    <li class="card-text mb-3">
-                        <i class="ri-line-chart-line ri-lg mr-1"></i>
-                        <a href="{% url 'stats:stats_dreets_auto_prescription' %}">Focus auto-prescription</a>
-                        <span class="badge badge-pill badge-sm badge-important text-white">Nouveau</span>
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'stats:stats_dreets_auto_prescription' %}" class="btn-link btn-ico">
+                            <i class="ri-line-chart-line ri-lg font-weight-normal"></i>
+                            <span>Focus auto-prescription</span>
+                        </a>
+                        <span class="badge badge-pill badge-xs badge-important text-white">Nouveau</span>
                     </li>
-                    <li class="card-text mb-3">
-                        <i class="ri-line-chart-line ri-lg mr-1"></i>
-                        <a href="{% url 'stats:stats_dreets_follow_siae_evaluation' %}">Suivre le contrôle à posteriori</a>
-                        <span class="badge badge-pill badge-sm badge-important text-white">Nouveau</span>
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'stats:stats_dreets_follow_siae_evaluation' %}" class="btn-link btn-ico">
+                            <i class="ri-line-chart-line ri-lg font-weight-normal"></i>
+                            <soan>Suivre le contrôle à posteriori</soan>
+                        </a>
+                        <span class="badge badge-pill badge-xs badge-important text-white">Nouveau</span>
                     </li>
                     {% endcomment %}
-                    <li class="card-text mb-3">
-                        <i class="ri-line-chart-line ri-lg mr-1"></i>
-                        <a href="{% url 'stats:stats_dreets_iae' %}">Voir les données IAE de ma région</a>
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'stats:stats_dreets_iae' %}" class="btn-link btn-ico">
+                            <i class="ri-line-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                            <span>Voir les données IAE de ma région</span>
+                        </a>
                     </li>
-                    <li class="card-text mb-3">
-                        <i class="ri-line-chart-line ri-lg mr-1"></i>
-                        <a href="{% url 'stats:stats_dreets_hiring' %}">Voir les données facilitation de l'embauche</a>
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'stats:stats_dreets_hiring' %}" class="btn-link btn-ico">
+                            <i class="ri-line-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                            <span>Voir les données facilitation de l'embauche</span>
+                        </a>
                     </li>
                 {% endif %}
                 {% if can_view_stats_dgefp %}
                     {% comment %}
                     <!-- TODO @dejafait uncomment as soon as ready -->
-                    <li class="card-text mb-3">
-                        <i class="ri-line-chart-line ri-lg mr-1"></i>
-                        <a href="{% url 'stats:stats_dgefp_auto_prescription' %}">Focus auto-prescription</a>
-                        <span class="badge badge-pill badge-sm badge-important text-white">Nouveau</span>
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'stats:stats_dgefp_auto_prescription' %}">
+                            <i class="ri-line-chart-line ri-lg font-weight-normal"></i>
+                            <span>Focus auto-prescription</span>
+                        </a>
+                        <span class="badge badge-pill badge-xs badge-important text-white">Nouveau</span>
                     </li>
-                    <li class="card-text mb-3">
-                        <i class="ri-line-chart-line ri-lg mr-1"></i>
-                        <a href="{% url 'stats:stats_dgefp_follow_siae_evaluation' %}">Suivre le contrôle à posteriori</a>
-                        <span class="badge badge-pill badge-sm badge-important text-white">Nouveau</span>
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'stats:stats_dgefp_follow_siae_evaluation' %}">
+                            <i class="ri-line-chart-line ri-lg font-weight-normal"></i>
+                            <span>Suivre le contrôle à posteriori</span>
+                        </a>
+                        <span class="badge badge-pill badge-xs badge-important text-white">Nouveau</span>
                     </li>
                     {% endcomment %}
-                    <li class="card-text mb-3">
-                        <i class="ri-line-chart-line ri-lg mr-1"></i>
-                        <a href="{% url 'stats:stats_dgefp_iae' %}">Voir les données IAE France entière</a>
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'stats:stats_dgefp_iae' %}" class="btn-link btn-ico">
+                            <i class="ri-line-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                            <span>Voir les données IAE France entière</span>
+                        </a>
                     </li>
-                    <li class="card-text mb-3">
-                        <i class="ri-line-chart-line ri-lg mr-1"></i>
-                        <a href="{% url 'stats:stats_dgefp_siae_evaluation' %}">Voir les données du contrôle a posteriori (version bêta)</a>
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'stats:stats_dgefp_siae_evaluation' %}" class="btn-link btn-ico">
+                            <i class="ri-line-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                            <span>Voir les données du contrôle a posteriori (version bêta)</span>
+                        </a>
                     </li>
                 {% endif %}
                 {% if can_view_stats_dihal %}
-                    <li class="card-text mb-3">
-                        <i class="ri-line-chart-line ri-lg mr-1"></i>
-                        <a href="{% url 'stats:stats_dihal_state' %}">Voir les données des prescriptions</a>
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'stats:stats_dihal_state' %}" class="btn-link btn-ico">
+                            <i class="ri-line-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                            <span>Voir les données des prescriptions</span>
+                        </a>
                     </li>
                 {% endif %}
-                <li class="card-text mb-3">
-                    <a href="{{ ITOU_PILOTAGE_URL }}/tableaux-de-bord" rel="noopener" target="_blank" aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)">
-                        Accéder aux tableaux de bord publics
+                <li class="d-flex justify-content-between align-items-center mb-3">
+                    <a href="{{ ITOU_PILOTAGE_URL }}/tableaux-de-bord" rel="noopener" target="_blank" aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico">
+                        <i class="ri-dashboard-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                        <span>Accéder aux tableaux de bord publics</span>
+                        <i class="ri-external-link-line ri-lg font-weight-normal ml-2 align-self-start mt-1"></i>
                     </a>
-                    <i class="ri-external-link-line ri-lg mr-1"></i>
                 </li>
             </ul>
         </div>

@@ -69,14 +69,14 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
             {
                 "name": "À traiter",
                 "states": [JobApplicationWorkflow.STATE_NEW, JobApplicationWorkflow.STATE_PROCESSING],
-                "icon": "ri-user-add-line",
-                "badge": "badge-accent-02",
+                "icon": "ri-notification-4-line",
+                "badge": "badge-info-lighter",
             },
             {
                 "name": "En attente",
                 "states": [JobApplicationWorkflow.STATE_POSTPONED],
-                "icon": "ri-user-follow-line",
-                "badge": "badge-primary",
+                "icon": "ri-time-line",
+                "badge": "badge-info-lighter",
             },
         ]
         job_applications = current_org.job_applications_received.values("state").all()

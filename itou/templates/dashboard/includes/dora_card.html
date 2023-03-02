@@ -1,30 +1,47 @@
 <div class="col mb-3 mb-md-5">
-    <div class="card c-card c-card--plateforme h-100 w-100 has-links-inside">
-        <p class="h4 card-header">
-            DORA <span class="badge badge-pill badge-sm badge-important text-white">Nouveau</span>
-        </p>
+    <div class="card c-card h-100 w-100 has-links-inside">
+        <div class="card-header bg-important-lightest pb-3 d-flex">
+            <div class="flex-grow-1">
+                <span class="h4 m-0">DORA</span>
+            </div>
+            <div class="ml-2">
+                <span class="badge badge-pill badge-sm badge-important text-white">Nouveau</span>
+            </div>
+        </div>
         <div class="card-body">
             <ul class="list-unstyled">
-                <li class="card-text mb-3">
-                    <i class="ri-global-line ri-lg mr-1"></i>
-                    <a href="https://dora.fabrique.social.gouv.fr/?{{ tracker }}" rel="noopener" target="_blank" aria-label="Consulter les services d'insertion de votre territoire (ouverture dans un nouvel onglet)">
-                        Consulter les services d'insertion de votre territoire
+                <li class="d-flex justify-content-between align-items-center mb-3">
+                    <a href="https://dora.fabrique.social.gouv.fr/?{{ tracker }}"
+                       rel="noopener"
+                       target="_blank"
+                       aria-label="Consulter les services d'insertion de votre territoire (ouverture dans un nouvel onglet)"
+                       class="btn-link btn-ico">
+                        <i class="ri-global-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                        <span>Consulter les services d'insertion de votre territoire</span>
+                        <i class="ri-external-link-line ri-lg font-weight-normal ml-2 align-self-start mt-1"></i>
                     </a>
-                    <i class="ri-external-link-line ri-lg mr-1"></i>
                 </li>
-                <li class="card-text mb-3">
-                    <i class="ri-file-add-line ri-lg mr-1"></i>
-                    <a href="https://dora.fabrique.social.gouv.fr/auth/rattachement?siret={{ siret }}&{{ tracker }}" rel="noopener" target="_blank" aria-label="Référencer vos services (ouverture dans un nouvel onglet)">
-                        Référencer vos services
+                <li class="d-flex justify-content-between align-items-center mb-3">
+                    <a href="https://dora.fabrique.social.gouv.fr/auth/rattachement?siret={{ siret }}&{{ tracker }}"
+                       rel="noopener"
+                       target="_blank"
+                       aria-label="Référencer vos services (ouverture dans un nouvel onglet)"
+                       class="btn-link btn-ico">
+                        <i class="ri-file-add-line ri-lg font-weight-normal"></i>
+                        <span>Référencer vos services</span>
+                        <i class="ri-external-link-line ri-lg font-weight-normal ml-2"></i>
                     </a>
-                    <i class="ri-external-link-line ri-lg mr-1"></i>
                 </li>
-                <li class="card-text mb-3">
-                    <i class="ri-file-transfer-line ri-lg mr-1"></i>
-                    <a href="https://dora.fabrique.social.gouv.fr/contribuer?{{ tracker }}" rel="noopener" target="_blank" aria-label="Suggérer un service partenaire (ouverture dans un nouvel onglet)">
-                        Suggérer un service partenaire
+                <li class="d-flex justify-content-between align-items-center mb-3">
+                    <a href="https://dora.fabrique.social.gouv.fr/contribuer?{{ tracker }}"
+                       rel="noopener"
+                       target="_blank"
+                       aria-label="Suggérer un service partenaire (ouverture dans un nouvel onglet)"
+                       class="btn-link btn-ico">
+                        <i class="ri-file-transfer-line ri-lg font-weight-normal"></i>
+                        <span>Suggérer un service partenaire</span>
+                        <i class="ri-external-link-line ri-lg font-weight-normal ml-2"></i>
                     </a>
-                    <i class="ri-external-link-line ri-lg mr-1"></i>
                 </li>
             </ul>
         </div>
