@@ -10,7 +10,7 @@ from django.utils import timezone
 from itou.approvals.factories import ApprovalFactory
 from itou.employee_record import constants
 from itou.employee_record.enums import Status
-from itou.employee_record.exceptions import CloningError, InvalidStatusError
+from itou.employee_record.exceptions import CloningError, DuplicateCloningError, InvalidStatusError
 from itou.employee_record.factories import (
     BareEmployeeRecordFactory,
     BareEmployeeRecordUpdateNotificationFactory,
@@ -255,7 +255,7 @@ def test_clone_for_disabled_employee_record():
 
 def test_clone_when_a_duplicate_exists():
     employee_record = EmployeeRecordFactory()
-    with pytest.raises(CloningError, match=r"Duplicate asp_id / approval_number pair"):
+    with pytest.raises(DuplicateCloningError, match=r"The clone is a duplicate of"):
         employee_record.clone()
 
 
