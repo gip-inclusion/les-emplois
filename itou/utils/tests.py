@@ -104,7 +104,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
                 "matomo_custom_variables": {
                     "account_id": user.pk,
                     "is_authenticated": "yes",
-                    "account_type": "employer",
+                    "account_type": "siae_staff",
                     "account_sub_type": "employer_admin",
                     "account_current_siae_id": siae.pk,
                     "account_siae_ids": str(siae.pk),
@@ -136,7 +136,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
                 "matomo_custom_variables": {
                     "account_id": user.pk,
                     "is_authenticated": "yes",
-                    "account_type": "employer",
+                    "account_type": "siae_staff",
                     "account_sub_type": "employer_not_admin",
                     "account_current_siae_id": siae2.pk,
                     "account_siae_ids": f"{siae1.pk};{siae2.pk}",
