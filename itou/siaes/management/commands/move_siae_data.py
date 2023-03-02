@@ -9,6 +9,7 @@ from django.utils import timezone
 
 from itou.approvals import models as approvals_models
 from itou.eligibility import models as eligibility_models
+from itou.employee_record.exceptions import DuplicateCloningError
 from itou.employee_record.models import EmployeeRecord
 from itou.invitations import models as invitations_models
 from itou.job_applications import models as job_applications_models
@@ -159,6 +160,9 @@ class Command(BaseCommand):
         dest_siae_job_applications_received = job_applications_models.JobApplication.objects.filter(to_siae_id=to_id)
         self.stdout.write("| Job applications received: %s\n" % dest_siae_job_applications_received.count())
 
+        dest_employee_records_created_count = EmployeeRecord.objects.filter(job_application__to_siae_id=to_id).count()
+        self.stdout.write(f"| Employee records created: {dest_employee_records_created_count}")
+
         if move_all_data:
             self.stdout.write(f"| Brand '{to_siae.brand}' will be updated with '{from_siae.display_name}'\n")
             self.stdout.write(
@@ -223,7 +227,11 @@ class Command(BaseCommand):
                 f"| Cloning {len(employee_records_to_clone)}/{employee_records_created_count} employee records"
             )
             for employee_record in employee_records_to_clone:
-                employee_record.clone()
+                try:
+                    with transaction.atomic():
+                        employee_record.clone()
+                except DuplicateCloningError as e:
+                    self.stdout.write(f"| + Failed to clone {employee_record}: {e}")
 
             if move_all_data:
                 # do not move duplicated job_descriptions

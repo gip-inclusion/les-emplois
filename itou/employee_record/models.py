@@ -1,6 +1,7 @@
 import contextlib
 import json
 
+import django.db.utils
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.manager import Manager
@@ -17,7 +18,7 @@ from itou.utils.validators import validate_siret
 
 from . import constants
 from .enums import MovementType, NotificationStatus, NotificationType, Status
-from .exceptions import CloningError, InvalidStatusError
+from .exceptions import CloningError, DuplicateCloningError, InvalidStatusError
 
 
 # Validators
@@ -453,10 +454,9 @@ class EmployeeRecord(ASPExchangeInformation):
 
         try:
             er_copy.save()
-        except Exception as ex:
-            raise CloningError(
-                f"Can't persist employee record clone. "
-                f"Duplicate asp_id / approval_number pair? ({er_copy.asp_id=}, {er_copy.approval_number=})"
+        except django.db.utils.IntegrityError as ex:
+            raise DuplicateCloningError(
+                f"The clone is a duplicate of ({er_copy.asp_id=}, {er_copy.approval_number=})"
             ) from ex
 
         # Disable current object to avoid conflicts
