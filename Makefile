@@ -51,7 +51,7 @@ cdsitepackages:
 	docker exec -ti -w /usr/local/lib/$(PYTHON_VERSION)/site-packages itou_django /bin/bash
 
 quality: $(VIRTUAL_ENV)
-	pre-commit run --all-files --show-diff-on-failure
+	pre-commit run --all-files --show-diff-on-failure --hook-stage=manual
 
 fix: $(VIRTUAL_ENV)
 	pre-commit run --all-files --show-diff-on-failure
