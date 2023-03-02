@@ -10,6 +10,7 @@
 
   "1 0 * * * $ROOT/clevercloud/run_management_command.sh update_prescriber_organization_with_api_entreprise --verbosity 2",
   "30 0 * * * $ROOT/clevercloud/run_management_command.sh collect_analytics_data --save",
+  "0 3 * * * $ROOT/clevercloud/run_management_command.sh clearsessions",
   "0 12 * * * $ROOT/clevercloud/run_management_command.sh evaluation_campaign_notify",
   "30 20 * * * $ROOT/clevercloud/crons/populate_metabase_emplois.sh --daily",
 
