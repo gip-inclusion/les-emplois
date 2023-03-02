@@ -142,9 +142,10 @@ def get_context_institution(user, institution_pk):
 
 
 def user_to_account_type(user):
+    account_type = user.kind
     if user.is_job_seeker:
         return {
-            "account_type": "job_seeker",
+            "account_type": account_type,
             "account_sub_type": (
                 "job_seeker_with_peconnect"
                 if user.identity_provider == IdentityProvider.PE_CONNECT
@@ -153,22 +154,22 @@ def user_to_account_type(user):
         }
     elif user.is_siae_staff:
         return {
-            "account_type": "employer",
+            "account_type": account_type,
             "account_sub_type": "employer_not_admin",
         }
     elif user.is_prescriber:
         return {
-            "account_type": "prescriber",
+            "account_type": account_type,
             "account_sub_type": "prescriber_without_org",
         }
     elif user.is_labor_inspector:
         return {
-            "account_type": "labor_inspector",
+            "account_type": account_type,
             "account_sub_type": "inspector_not_admin",
         }
 
     # especially usual in tests.
     return {
-        "account_type": "unknown",
+        "account_type": account_type,
         "account_sub_type": "unknown",
     }

@@ -46,6 +46,7 @@ class PrescriberLoginView(ItouLoginView):
         context = super().get_context_data(**kwargs)
         extra_context = {
             "account_type_display_name": "prescripteur",
+            "matomo_account_type": UserKind.PRESCRIBER,
             "login_url": reverse("login:prescriber"),
             "signup_url": reverse("signup:prescriber_check_already_exists"),
             "signup_allowed": True,
@@ -62,6 +63,7 @@ class SiaeStaffLoginView(ItouLoginView):
         context = super().get_context_data(**kwargs)
         extra_context = {
             "account_type_display_name": "employeur solidaire",
+            "matomo_account_type": UserKind.SIAE_STAFF,
             "login_url": reverse("login:siae_staff"),
             "signup_url": reverse("signup:siae_select"),
             "signup_allowed": True,
@@ -120,6 +122,7 @@ class AccountMigrationBaseView(FormView):
             "inclusion_connect_url": inclusion_connect_url,
             "existing_ic_account": existing_ic_account,
             "existing_ic_account_url": existing_ic_account_url,
+            "matomo_account_type": self.user_kind,
         }
         return context | extra_context
 
