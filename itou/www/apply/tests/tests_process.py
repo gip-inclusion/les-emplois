@@ -177,7 +177,9 @@ class ProcessViewsTest(TestCase):
     def test_details_for_prescriber(self, *args, **kwargs):
         """As a prescriber, I can access the job_applications details for prescribers."""
 
-        job_application = JobApplicationFactory(with_approval=True, resume_link="")
+        job_application = JobApplicationFactory(
+            with_approval=True, resume_link="", sent_by_authorized_prescriber_organisation=True
+        )
         prescriber = job_application.sender_prescriber_organization.members.first()
 
         self.client.force_login(prescriber)
@@ -327,7 +329,6 @@ class ProcessViewsTest(TestCase):
                     state=state,
                     job_seeker=job_seeker,
                     to_siae=siae,
-                    with_eligibility_diagnosis=True,
                 )
                 previous_last_checked_at = job_seeker.last_checked_at
 
@@ -369,7 +370,6 @@ class ProcessViewsTest(TestCase):
             state=state,
             job_seeker=job_seeker,
             to_siae=siae,
-            with_eligibility_diagnosis=True,
         )
 
         # Wrong dates.
@@ -406,7 +406,6 @@ class ProcessViewsTest(TestCase):
         job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
             to_siae=siae,
-            with_eligibility_diagnosis=True,
         )
 
         hiring_start_at = today
@@ -431,6 +430,7 @@ class ProcessViewsTest(TestCase):
             state=JobApplicationWorkflow.STATE_PROCESSING,
             job_seeker=job_seeker,
             to_siae=siae,
+            eligibility_diagnosis=None,
         )
         post_data = {
             # Data for `JobSeekerPersonalDataForm`.
@@ -478,7 +478,6 @@ class ProcessViewsTest(TestCase):
             state=JobApplicationWorkflow.STATE_PROCESSING,
             job_seeker=job_seeker_user,
             to_siae=other_siae,
-            with_eligibility_diagnosis=True,
         )
         other_siae_user = job_application.to_siae.members.first()
 
@@ -522,7 +521,6 @@ class ProcessViewsTest(TestCase):
             job_seeker__nir="",
             job_seeker__pole_emploi_id="",
             job_seeker__lack_of_pole_emploi_id_reason=User.REASON_FORGOTTEN,
-            with_eligibility_diagnosis=True,
         )
 
         siae_user = job_application.to_siae.members.first()
@@ -571,17 +569,14 @@ class ProcessViewsTest(TestCase):
         job_application = JobApplicationFactory(
             job_seeker=job_seeker,
             state=JobApplicationWorkflow.STATE_PROCESSING,
-            with_eligibility_diagnosis=True,
         )
         job_app_starting_earlier = JobApplicationFactory(
             job_seeker=job_seeker,
             state=JobApplicationWorkflow.STATE_PROCESSING,
-            with_eligibility_diagnosis=True,
         )
         job_app_starting_later = JobApplicationFactory(
             job_seeker=job_seeker,
             state=JobApplicationWorkflow.STATE_PROCESSING,
-            with_eligibility_diagnosis=True,
         )
 
         # SIAE 1 logs in and accepts the first job application.
@@ -663,7 +658,6 @@ class ProcessViewsTest(TestCase):
             state=JobApplicationWorkflow.STATE_PROCESSING,
             job_seeker=job_seeker,
             to_siae=siae,
-            with_eligibility_diagnosis=True,
         )
 
         # Create a "PE Approval" that will be converted to a PASS IAE when accepting the process
@@ -691,7 +685,6 @@ class ProcessViewsTest(TestCase):
             state=JobApplicationWorkflow.STATE_PROCESSING,
             job_seeker=almost_same_job_seeker,
             to_siae=siae,
-            with_eligibility_diagnosis=True,
         )
 
         # Gracefully display a message instead of just plain crashing
@@ -705,7 +698,6 @@ class ProcessViewsTest(TestCase):
     def test_accept_nir_readonly(self, *args, **kwargs):
         job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
-            with_eligibility_diagnosis=True,
         )
 
         siae_user = job_application.to_siae.members.first()
@@ -743,7 +735,6 @@ class ProcessViewsTest(TestCase):
         job_application = JobApplicationSentByJobSeekerFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
             job_seeker__nir="",
-            with_eligibility_diagnosis=True,
         )
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
@@ -796,7 +787,6 @@ class ProcessViewsTest(TestCase):
         job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
             job_seeker__nir="",
-            with_eligibility_diagnosis=True,
         )
         other_job_seeker = JobSeekerWithAddressFactory()
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
@@ -837,7 +827,6 @@ class ProcessViewsTest(TestCase):
         job_application = JobApplicationSentByJobSeekerFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
             job_seeker__nir="",
-            with_eligibility_diagnosis=True,
         )
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
@@ -881,7 +870,6 @@ class ProcessViewsTest(TestCase):
             state=JobApplicationWorkflow.STATE_PROCESSING,
             job_seeker__nir="",
             job_seeker__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
-            with_eligibility_diagnosis=True,
         )
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
@@ -928,7 +916,6 @@ class ProcessViewsTest(TestCase):
             state=JobApplicationWorkflow.STATE_PROCESSING,
             job_seeker__nir="",
             job_seeker__lack_of_nir_reason=LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER,
-            with_eligibility_diagnosis=True,
         )
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
@@ -956,6 +943,7 @@ class ProcessViewsTest(TestCase):
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
             job_seeker=JobSeekerWithAddressFactory(with_address_in_qpv=True),
+            eligibility_diagnosis=None,
         )
 
         assert job_application.state.is_processing
@@ -1124,7 +1112,6 @@ class ProcessViewsTest(TestCase):
         job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_CANCELLED,
             job_seeker=job_seeker,
-            with_eligibility_diagnosis=True,
         )
         siae_user = job_application.to_siae.members.first()
         self.client.force_login(siae_user)
@@ -1176,7 +1163,7 @@ class ProcessTemplatesTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         """Set up data for the whole TestCase."""
-        cls.job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
+        cls.job_application = JobApplicationFactory(eligibility_diagnosis=None)
         cls.siae_user = cls.job_application.to_siae.members.first()
 
         kwargs = {"job_application_id": cls.job_application.pk}

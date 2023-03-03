@@ -33,15 +33,6 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
         with_approval = factory.Trait(
             state=models.JobApplicationWorkflow.STATE_ACCEPTED,
             approval=factory.SubFactory(ApprovalFactory, user=factory.SelfAttribute("..job_seeker")),
-            with_eligibility_diagnosis=True,
-        )
-        with_eligibility_diagnosis = factory.Trait(
-            eligibility_diagnosis=factory.SubFactory(
-                EligibilityDiagnosisFactory,
-                job_seeker=factory.SelfAttribute("..job_seeker"),
-                author=factory.SelfAttribute("..sender"),
-            ),
-            sent_by_authorized_prescriber_organisation=True,
         )
         sent_by_authorized_prescriber_organisation = factory.Trait(
             sender_prescriber_organization=factory.SubFactory(
@@ -58,6 +49,13 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
     hiring_start_at = factory.LazyFunction(lambda: datetime.now(timezone.utc).date())
     hiring_end_at = factory.LazyFunction(lambda: datetime.now(timezone.utc).date() + relativedelta(years=2))
     resume_link = "https://server.com/rockie-balboa.pdf"
+    sender_kind = SenderKind.PRESCRIBER  # Make explicit the model's default value
+    sender = factory.SubFactory(PrescriberFactory)
+    eligibility_diagnosis = factory.SubFactory(
+        EligibilityDiagnosisFactory,
+        job_seeker=factory.SelfAttribute("..job_seeker"),
+        author=factory.SelfAttribute("..sender"),
+    )
 
     @factory.post_generation
     def selected_jobs(self, create, extracted, **kwargs):

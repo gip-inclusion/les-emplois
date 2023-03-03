@@ -1621,7 +1621,7 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
 
         evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=campaign, siae=siae)
         # SIAE didn’t bother justifying this application.
-        EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae, job_application__with_eligibility_diagnosis=True)
+        EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
         inprogress_evaluated_job_app = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
         EvaluatedAdministrativeCriteriaFactory(
             evaluated_job_application=inprogress_evaluated_job_app, uploaded_at=timezone.now() - relativedelta(weeks=1)

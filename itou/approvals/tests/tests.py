@@ -772,7 +772,6 @@ class CustomApprovalAdminViewsTest(TestCase):
             state=JobApplicationWorkflow.STATE_PROCESSING,
             approval=None,
             approval_number_sent_by_email=False,
-            with_eligibility_diagnosis=True,
         )
         job_application.accept(user=job_application.to_siae.members.first())
 

@@ -79,7 +79,7 @@ class JobApplicationTransferModelTest(TestCase):
         lambda_user = JobSeekerFactory()
         target_siae.members.add(origin_user)
 
-        job_application = JobApplicationFactory(with_eligibility_diagnosis=True, to_siae=origin_siae)
+        job_application = JobApplicationFactory(to_siae=origin_siae, sent_by_authorized_prescriber_organisation=True)
 
         # Conditions hould be covered by previous test, but does not hurt (and tests raise)
         with pytest.raises(ValidationError):

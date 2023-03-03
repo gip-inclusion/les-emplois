@@ -185,10 +185,14 @@ class PrescriberOrganizationModelTest(TestCase):
         assert not org.memberships.get(user=other_user).is_admin
 
     def test_merge_two_organizations(self):
-        job_application_1 = job_applications_factories.JobApplicationSentByPrescriberOrganizationFactory()
+        job_application_1 = job_applications_factories.JobApplicationSentByPrescriberOrganizationFactory(
+            eligibility_diagnosis=None
+        )
         organization_1 = job_application_1.sender_prescriber_organization
 
-        job_application_2 = job_applications_factories.JobApplicationSentByPrescriberOrganizationFactory()
+        job_application_2 = job_applications_factories.JobApplicationSentByPrescriberOrganizationFactory(
+            eligibility_diagnosis=None
+        )
         organization_2 = job_application_2.sender_prescriber_organization
 
         count_job_applications = job_applications_models.JobApplication.objects.count()

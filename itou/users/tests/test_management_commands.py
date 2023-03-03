@@ -42,7 +42,7 @@ class DeduplicateJobSeekersManagementCommandsTest(TestCase):
         assert 1 == user1.eligibility_diagnoses.count()
 
         # Create `user2`.
-        job_app2 = JobApplicationFactory(with_eligibility_diagnosis=True, job_seeker__nir="", **kwargs)
+        job_app2 = JobApplicationFactory(job_seeker__nir="", **kwargs)
         user2 = job_app2.job_seeker
 
         assert user2.nir == ""
@@ -51,7 +51,7 @@ class DeduplicateJobSeekersManagementCommandsTest(TestCase):
         assert 1 == user2.eligibility_diagnoses.count()
 
         # Create `user3`.
-        job_app3 = JobApplicationFactory(with_eligibility_diagnosis=True, **kwargs)
+        job_app3 = JobApplicationFactory(**kwargs)
         user3 = job_app3.job_seeker
         expected_nir = user3.nir
 
@@ -109,7 +109,7 @@ class DeduplicateJobSeekersManagementCommandsTest(TestCase):
         assert job_app2.sender == user2
 
         # Create `user3` through a job application sent by a prescriber.
-        job_app3 = JobApplicationFactory(with_eligibility_diagnosis=True, job_seeker__nir="", **kwargs)
+        job_app3 = JobApplicationFactory(job_seeker__nir="", **kwargs)
         user3 = job_app3.job_seeker
         assert job_app3.sender != user3
         job_app3_sender = job_app3.sender  # The sender is a prescriber.
