@@ -744,7 +744,7 @@ class AutomaticApprovalAdminViewsTest(TestCase):
         self.assertFormError(
             response.context["adminform"],
             "eligibility_diagnosis",
-            ["Le diagnostique doit appartenir au même utilisateur que le PASS"],
+            ["Le diagnostic doit appartenir au même utilisateur que le PASS"],
         )
         assert not Approval.objects.exists()
 

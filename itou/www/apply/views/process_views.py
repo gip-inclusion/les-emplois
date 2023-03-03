@@ -256,7 +256,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
         and job_application.to_siae.is_subject_to_eligibility_rules
         and job_application.eligibility_diagnosis is None
     ):
-        messages.error(request, "Cette candidature requiert un diagnostique d'éligibilité pour être acceptée")
+        messages.error(request, "Cette candidature requiert un diagnostic d'éligibilité pour être acceptée")
         return HttpResponseClientRedirect(next_url)
 
     if request.method == "POST" and all([form.is_valid() for form in forms]):

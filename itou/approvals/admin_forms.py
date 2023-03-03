@@ -54,7 +54,7 @@ class ApprovalAdminForm(ApprovalFormMixin, forms.ModelForm):
         eligibility_diagnosis = self.cleaned_data["eligibility_diagnosis"]
         if eligibility_diagnosis and eligibility_diagnosis.job_seeker != self.cleaned_data["user"]:
             # Could we filter available eligibility diagnosis ?
-            raise forms.ValidationError("Le diagnostique doit appartenir au même utilisateur que le PASS")
+            raise forms.ValidationError("Le diagnostic doit appartenir au même utilisateur que le PASS")
         return eligibility_diagnosis
 
 
