@@ -42,9 +42,7 @@ DISABLED_NIR = 'disabled id="id_nir"'
 # patch the one used in the `models` module, not the original one in tasks
 @patch("itou.job_applications.models.huey_notify_pole_emploi", return_value=False)
 class ProcessViewsTest(TestCase):
-    def accept_job_application(
-        self, job_application, post_data=None, city=None, assert_successful=True, no_confirm_button=False
-    ):
+    def accept_job_application(self, job_application, post_data=None, city=None, assert_successful=True):
         """
         This is not a test. It's a shortcut to process "apply:accept" view steps:
         - GET
@@ -54,10 +52,7 @@ class ProcessViewsTest(TestCase):
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url_accept)
         assert response.status_code == 200
-        if no_confirm_button:
-            self.assertNotContains(response, "Confirmation de l’embauche")
-        else:
-            self.assertContains(response, "Confirmation de l’embauche")
+        self.assertContains(response, "Confirmation de l’embauche")
         # Make sure modal is hidden.
         self.assertNotContains(response, "data-htmx-open-modal")
 
