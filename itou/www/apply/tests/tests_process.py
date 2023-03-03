@@ -425,7 +425,7 @@ class ProcessViewsTest(TestCase):
         self.assertFormError(response.context["form_user_address"], "city", "Ce champ est obligatoire.")
         self.assertFormError(response.context["form_user_address"], "post_code", "Ce champ est obligatoire.")
 
-        # No eligibility diagnosis -> should not see the confirm button, nor accept posted data
+        # No eligibility diagnosis -> if job_seeker has a valid eligibility diagnosis, it's OK
         job_application = JobApplicationSentByJobSeekerFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
             job_seeker=job_seeker,
@@ -440,8 +440,32 @@ class ProcessViewsTest(TestCase):
             "answer": "",
             **address,
         }
-        response, _ = self.accept_job_application(
-            job_application=job_application, post_data=post_data, assert_successful=False, no_confirm_button=True
+        self.accept_job_application(job_application=job_application, post_data=post_data)
+
+        # if no, should not see the confirm button, nor accept posted data
+        job_application = JobApplicationSentByJobSeekerFactory(
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            job_seeker=job_seeker,
+            to_siae=siae,
+            eligibility_diagnosis=None,
+        )
+        job_application.job_seeker.eligibility_diagnoses.all().delete()
+        job_application.job_seeker.approvals.all().delete()
+        post_data = {
+            # Data for `JobSeekerPersonalDataForm`.
+            "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
+            # Data for `AcceptForm`.
+            "hiring_start_at": today.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "answer": "",
+            **address,
+        }
+        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url_accept, follow=True)
+        self.assertRedirects(
+            response, reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        )
+        assert "Cette candidature requiert un diagnostic d'éligibilité pour être acceptée." == str(
+            list(response.context["messages"])[-1]
         )
 
     def test_accept_with_active_suspension(self, *args, **kwargs):
