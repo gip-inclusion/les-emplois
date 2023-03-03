@@ -69,12 +69,17 @@ class ProcessListTest(TestCase):
                 created_at=creation_date,
                 sender=thibault_pe,
                 sender_prescriber_organization=pole_emploi,
+                eligibility_diagnosis=None,
             )
 
         maggie = job_application.job_seeker
         maggie.save(update_fields={"first_name": "Maggie"})
         JobApplicationSentByPrescriberFactory(
-            to_siae=hit_pit, sender=laurie_pe, sender_prescriber_organization=pole_emploi, job_seeker=maggie
+            to_siae=hit_pit,
+            sender=laurie_pe,
+            sender_prescriber_organization=pole_emploi,
+            job_seeker=maggie,
+            eligibility_diagnosis=None,
         )
 
         self.prescriber_base_url = reverse("apply:list_for_prescriber")

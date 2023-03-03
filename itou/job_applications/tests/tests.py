@@ -60,7 +60,9 @@ from itou.utils.testing import get_rows_from_streaming_response
 class JobApplicationModelTest(TestCase):
     def test_eligibility_diagnosis_by_siae_required(self):
         job_application = JobApplicationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING, to_siae__kind=SiaeKind.GEIQ
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            to_siae__kind=SiaeKind.GEIQ,
+            eligibility_diagnosis=None,
         )
         has_considered_valid_diagnoses = EligibilityDiagnosis.objects.has_considered_valid(
             job_application.job_seeker, for_siae=job_application.to_siae
@@ -69,7 +71,9 @@ class JobApplicationModelTest(TestCase):
         assert not job_application.eligibility_diagnosis_by_siae_required
 
         job_application = JobApplicationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING, to_siae__kind=SiaeKind.EI
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            to_siae__kind=SiaeKind.EI,
+            eligibility_diagnosis=None,
         )
         has_considered_valid_diagnoses = EligibilityDiagnosis.objects.has_considered_valid(
             job_application.job_seeker, for_siae=job_application.to_siae
@@ -82,7 +86,6 @@ class JobApplicationModelTest(TestCase):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             state=JobApplicationWorkflow.STATE_PROCESSING,
-            with_eligibility_diagnosis=True,
         )
         user = job_application.to_siae.members.first()
         job_application.accept(user=user)
@@ -295,7 +298,7 @@ class JobApplicationQuerySetTest(TestCase):
 
     def test_with_last_jobseeker_eligibility_diagnosis(self):
         job_app = JobApplicationFactory(with_approval=True)
-        diagnosis = EligibilityDiagnosisFactory(job_seeker=job_app.job_seeker)
+        diagnosis = job_app.eligibility_diagnosis
         qs = JobApplication.objects.with_last_jobseeker_eligibility_diagnosis().get(pk=job_app.pk)
         assert qs.last_jobseeker_eligibility_diagnosis == diagnosis.pk
 
@@ -479,7 +482,7 @@ class JobApplicationQuerySetTest(TestCase):
         assert job_application.accepted_at == job_application.created_at
 
     def test_with_accepted_at_for_accept_transition(self):
-        job_application = JobApplicationSentBySiaeFactory(with_eligibility_diagnosis=True)
+        job_application = JobApplicationSentBySiaeFactory()
         job_application.process()
         job_application.accept(user=job_application.sender)
 
@@ -490,7 +493,7 @@ class JobApplicationQuerySetTest(TestCase):
         assert JobApplication.objects.with_accepted_at().first().accepted_at == expected_created_at
 
     def test_with_accepted_at_with_multiple_transitions(self):
-        job_application = JobApplicationSentBySiaeFactory(with_eligibility_diagnosis=True)
+        job_application = JobApplicationSentBySiaeFactory()
         job_application.process()
         job_application.accept(user=job_application.sender)
         job_application.cancel(user=job_application.sender)
@@ -1005,7 +1008,6 @@ class JobApplicationWorkflowTest(TestCase):
             "job_seeker": job_seeker,
             "sender": job_seeker,
             "sender_kind": SenderKind.JOB_SEEKER,
-            "with_eligibility_diagnosis": True,
         }
         JobApplicationFactory(state=JobApplicationWorkflow.STATE_NEW, **kwargs)
         JobApplicationFactory(state=JobApplicationWorkflow.STATE_PROCESSING, **kwargs)
@@ -1040,7 +1042,6 @@ class JobApplicationWorkflowTest(TestCase):
             "job_seeker": job_seeker,
             "sender": job_seeker,
             "sender_kind": SenderKind.JOB_SEEKER,
-            "with_eligibility_diagnosis": True,
         }
         for state in [
             JobApplicationWorkflow.STATE_NEW,
@@ -1197,7 +1198,6 @@ class JobApplicationWorkflowTest(TestCase):
         """
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
-            with_eligibility_diagnosis=True,
         )
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         assert job_application.job_seeker.pole_emploi_id != ""
@@ -1223,7 +1223,6 @@ class JobApplicationWorkflowTest(TestCase):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             state=JobApplicationWorkflow.STATE_PROCESSING,
-            with_eligibility_diagnosis=True,
         )
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         assert job_application.job_seeker.pole_emploi_id != ""
@@ -1259,7 +1258,6 @@ class JobApplicationWorkflowTest(TestCase):
             sent_by_authorized_prescriber_organisation=True,
             job_seeker=user,
             state=JobApplicationWorkflow.STATE_PROCESSING,
-            with_eligibility_diagnosis=True,
         )
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         assert job_application.job_seeker.pole_emploi_id != ""
@@ -1291,7 +1289,9 @@ class JobApplicationWorkflowTest(TestCase):
         )
         assert approval.is_in_waiting_period
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
-            job_seeker=user, state=JobApplicationWorkflow.STATE_PROCESSING
+            job_seeker=user,
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            eligibility_diagnosis=None,
         )
         with pytest.raises(xwf_models.AbortTransition):
             job_application.accept(user=job_application.to_siae.members.first())
@@ -1384,6 +1384,7 @@ class JobApplicationWorkflowTest(TestCase):
         job_application = JobApplicationSentBySiaeFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
             to_siae__kind=SiaeKind.EI,
+            eligibility_diagnosis=None,
         )
 
         to_siae = job_application.to_siae
@@ -1553,7 +1554,7 @@ class JobApplicationCsvExportTest(TestCase):
                 job_application.hiring_start_at.strftime("%d/%m/%Y"),
                 job_application.hiring_end_at.strftime("%d/%m/%Y"),
                 "Candidat non joignable",
-                "non",
+                "oui",
                 "",
                 "",
                 "",
