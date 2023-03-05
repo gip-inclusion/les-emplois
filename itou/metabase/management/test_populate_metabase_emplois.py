@@ -14,7 +14,7 @@ from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.eligibility.models import AdministrativeCriteria
 from itou.geo.factories import QPVFactory
-from itou.geo.utils import coords_to_geometry
+from itou.geo.utils import lat_lon_to_geometry
 from itou.institutions.factories import InstitutionFactory
 from itou.job_applications.factories import JobApplicationFactory
 from itou.metabase.tables.utils import hash_content
@@ -96,7 +96,7 @@ def test_populate_job_seekers():
         nir="179038704133768",
         post_code="33360",
         geocoding_score=1,
-        coords=coords_to_geometry("48.85592", "2.41299"),
+        coords=lat_lon_to_geometry("48.85592", "2.41299"),
     )
     # Second user
     #  - job_application / approval from ai stock

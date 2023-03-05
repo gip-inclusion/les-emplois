@@ -20,7 +20,7 @@ from django.utils.http import urlencode, urlsafe_base64_decode
 from django.views.decorators.http import require_GET
 from django.views.generic import TemplateView, View
 
-from itou.common_apps.address.models import lat_lon_to_coords
+from itou.geo.utils import lat_lon_to_geometry
 from itou.openid_connect.inclusion_connect.enums import InclusionConnectChannel
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
@@ -72,7 +72,6 @@ def signup(request, template_name="signup/signup.html", redirect_field_name=REDI
 
 
 class JobSeekerSignupView(SignupView):
-
     form_class = forms.JobSeekerSignupForm
     template_name = "signup/job_seeker_signup.html"
 
@@ -372,7 +371,6 @@ def prescriber_check_already_exists(request, template_name="signup/prescriber_ch
 @valid_prescriber_signup_session_required
 @push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_request_invitation(request, membership_id, template_name="signup/prescriber_request_invitation.html"):
-
     prescriber_membership = get_object_or_404(
         PrescriberMembership.objects.select_related("organization", "user"), pk=membership_id
     )
@@ -462,7 +460,6 @@ def prescriber_choose_kind(request, template_name="signup/prescriber_choose_kind
     form = forms.PrescriberChooseKindForm(data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
-
         prescriber_kind = form.cleaned_data["kind"]
         authorization_status = None
         kind = None
@@ -723,7 +720,7 @@ def prescriber_join_org(request):
                     "post_code": session_data["prescriber_org_data"]["post_code"],
                     "city": session_data["prescriber_org_data"]["city"],
                     "department": session_data["prescriber_org_data"]["department"],
-                    "coords": lat_lon_to_coords(
+                    "coords": lat_lon_to_geometry(
                         session_data["prescriber_org_data"]["latitude"],
                         session_data["prescriber_org_data"]["longitude"],
                     ),
@@ -780,7 +777,7 @@ class FacilitatorBaseMixin:
             auth_email="",  # filled in the form
             phone="",
             geocoding_score=org_data["geocoding_score"],
-            coords=lat_lon_to_coords(org_data.get("latitude"), org_data.get("longitude")),
+            coords=lat_lon_to_geometry(org_data.get("latitude"), org_data.get("longitude")),
             created_by=None,
         )
 

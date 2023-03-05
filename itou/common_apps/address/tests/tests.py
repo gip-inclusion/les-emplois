@@ -7,7 +7,7 @@ from django.contrib.gis.geos import Point
 from itou.cities.factories import create_test_cities
 from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.address.forms import MandatoryAddressFormMixin, OptionalAddressFormMixin
-from itou.common_apps.address.models import lat_lon_to_coords
+from itou.geo.utils import lat_lon_to_geometry
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.factories import JobSeekerFactory
 from itou.users.models import User
@@ -179,7 +179,6 @@ class UtilsOptionalAddressFormMixinTest(TestCase):
         user.city = city.name
 
         with self.assertNumQueries(1):
-
             form = DummyUserModelForm(data={}, instance=user)
 
             assert form.initial["city_slug"] == city.slug
@@ -205,8 +204,8 @@ class UtilsMandatoryAddressFormMixinTest(TestCase):
 
 
 class UtilsMiscTestCase(TestCase):
-    def test_lat_lon_to_coords(self):
-        assert lat_lon_to_coords(None, None) is None
-        assert lat_lon_to_coords(1, None) is None
-        assert lat_lon_to_coords(None, 1) is None
-        assert lat_lon_to_coords(13, 42) == Point(42, 13)
+    def test_lat_lon_to_geometry(self):
+        assert lat_lon_to_geometry(None, None) is None
+        assert lat_lon_to_geometry(1, None) is None
+        assert lat_lon_to_geometry(None, 1) is None
+        assert lat_lon_to_geometry(13, 42) == Point(42, 13)

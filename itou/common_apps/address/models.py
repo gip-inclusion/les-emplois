@@ -1,7 +1,7 @@
 import logging
+from typing import Tuple
 
 from django.contrib.gis.db import models as gis_models
-from django.contrib.gis.geos import GEOSGeometry
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.template.defaultfilters import slugify
@@ -15,12 +15,6 @@ from itou.utils.validators import validate_post_code
 
 
 logger = logging.getLogger(__name__)
-
-
-def lat_lon_to_coords(lat, lon):
-    if lat is not None and lon is not None:
-        return GEOSGeometry(f"POINT({lon} {lat})")
-    return None
 
 
 class AddressMixin(models.Model):
@@ -130,7 +124,8 @@ class AddressMixin(models.Model):
         return slugify(f"{self.city}-{self.department}")
 
     @cached_property
-    def address_in_qpv(self):
+    def address_in_qpv(self) -> None | str:
+        """Return `address_on_one_line` if address in QPV, `None` otherwise"""
         try:
             if QPV.in_qpv(self, geom_field="coords"):
                 return self.address_on_one_line
@@ -139,7 +134,13 @@ class AddressMixin(models.Model):
         return None
 
     @cached_property
-    def zrr_city_name(self):
+    def city_in_zrr(self) -> None | Tuple[str, bool]:
+        """
+        Returns a tuple if address city is in ZRR:
+            - `(city_name, True)`: if fully in ZRR
+            - `(city_name, False)`: if partially in ZRR
+        or `None` if city is not in ZRR
+        """
         try:
             # Avoid circular import
             from itou.cities.models import City
@@ -154,6 +155,12 @@ class AddressMixin(models.Model):
             elif ZRR.objects.partially_in_zrr().filter(insee_code=city.code_insee):
                 return city.name, True
         return None
+
+    @property
+    def zrr_city_name(self) -> None | Tuple[str, bool]:
+        # 'zrr_city_name' is misleading, will be replaced
+        # in the meantime: alias for compatibility
+        return self.city_in_zrr
 
     def set_coords(self, address, post_code=None):
         try:

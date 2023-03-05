@@ -5,7 +5,7 @@ import pytest
 
 from itou.geo.factories import QPVFactory
 from itou.geo.models import QPV
-from itou.geo.utils import coords_to_geometry
+from itou.geo.utils import lat_lon_to_geometry
 from itou.utils.test import TestCase
 
 
@@ -33,7 +33,7 @@ class QPVModelTest(TestCase):
         # Somewhere in QPV QP093028 (Aubervilliers)
         qpv = QPV.in_qpv(
             _GoodCoordsType(
-                geom=coords_to_geometry("48.917735", "2.387311"),
+                geom=lat_lon_to_geometry("48.917735", "2.387311"),
             )
         )
 
@@ -44,7 +44,7 @@ class QPVModelTest(TestCase):
         # Somewhere not in a QPV near Aubervilliers
         assert (
             QPV.in_qpv(
-                _GoodCoordsType(geom=coords_to_geometry("48.899", "2.412")),
+                _GoodCoordsType(geom=lat_lon_to_geometry("48.899", "2.412")),
             )
             is None
         )
@@ -53,7 +53,7 @@ class QPVModelTest(TestCase):
         # Somewhere in QPV QP075019 (Paris 20e)
         qpv = QPV.in_qpv(
             _MaybeCoordsType(
-                coords=coords_to_geometry("48.85592", "2.41299"),
+                coords=lat_lon_to_geometry("48.85592", "2.41299"),
             ),
             geom_field="coords",
         )
@@ -71,8 +71,8 @@ class QPVModelTest(TestCase):
 
     def test_dunder_contains(self):
         qpv = QPV.objects.get(code="QP093028")
-        in_qpv = coords_to_geometry("48.917735", "2.387311")
-        not_in_qpv = coords_to_geometry("48.899", "2.412")
+        in_qpv = lat_lon_to_geometry("48.917735", "2.387311")
+        not_in_qpv = lat_lon_to_geometry("48.899", "2.412")
 
         assert in_qpv in qpv
         assert not_in_qpv not in qpv
