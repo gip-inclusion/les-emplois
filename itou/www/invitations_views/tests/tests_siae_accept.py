@@ -101,7 +101,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
         self.assertContains(response, url + '"')
 
-        total_users_before = User.objects.count()
+        assert User.objects.filter(email=invitation.email).first() is None
 
         response = mock_oauth_dance(
             self,
@@ -117,9 +117,6 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         # Check user is redirected to the welcoming tour
         last_url, _ = response.redirect_chain[-1]
         assert last_url == reverse("welcoming_tour:index")
-
-        total_users_after = User.objects.count()
-        assert (total_users_before + 1) == total_users_after
 
         user = User.objects.get(email=invitation.email)
         self.assert_accepted_invitation(response, invitation, user)
