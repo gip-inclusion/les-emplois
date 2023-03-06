@@ -18,6 +18,7 @@
   "55 8-18/2 * * 1-5 $ROOT/clevercloud/upload_employee_records.sh",
   "5 23 * * 1-5 $ROOT/clevercloud/archive_employee_records.sh",
 
+  "0 0 * * 1 $ROOT/clevercloud/run_management_command.sh shorten_active_sessions",
   "0 6 * * 1 $ROOT/clevercloud/crons/populate_metabase_matomo.sh",
 
   "0 0 1 * * $ROOT/clevercloud/run_management_command.sh sync_cities --wet-run",
