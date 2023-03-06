@@ -1,7 +1,6 @@
 name: 🔮 CI
 
 on:
-  merge_group:
   push:
     branches-ignore:
       - master_clever
