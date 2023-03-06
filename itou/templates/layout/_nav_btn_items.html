@@ -13,8 +13,8 @@
                         {% for s in user_siaes %}
                             {% if s.pk != current_siae.pk %}
                                 <li>
-                                    <button class="dropdown-item text-primary font-weight-bold" type="submit" name="siae_id" value="{{ s.pk }}">
-                                        <span class="badge badge-pill badge-sm badge-primary mr-1">{{ s.kind }}</span>
+                                    <button class="dropdown-item font-weight-bold" type="submit" name="siae_id" value="{{ s.pk }}">
+                                        <span class="badge badge-pill badge-xs badge-primary mr-1">{{ s.kind }}</span>
                                         {{ s.display_name|truncatechars:50 }}
                                     </button>
                                 </li>
@@ -37,8 +37,8 @@
                         {% for po in user_prescriberorganizations %}
                             {% if po.pk != current_prescriber_organization.pk %}
                                 <li>
-                                    <button class="dropdown-item text-primary" type="submit" name="prescriber_organization_id" value="{{ po.pk }}">
-                                        <span class="badge badge-pill badge-sm badge-primary mr-1">{{ po.kind }}</span>
+                                    <button class="dropdown-item font-weight-bold" type="submit" name="prescriber_organization_id" value="{{ po.pk }}">
+                                        <span class="badge badge-pill badge-xs badge-primary mr-1">{{ po.kind }}</span>
                                         {{ po.display_name|truncatechars:50 }}
                                     </button>
                                 </li>
@@ -62,8 +62,8 @@
                         {% for i in user_institutions %}
                             {% if i.pk != current_institution.pk %}
                                 <li>
-                                    <button class="dropdown-item text-primary" type="submit" name="institution_id" value="{{ i.pk }}">
-                                        <span class="badge badge-sm badge-pill badge-primary mr-1">{{ i.kind }}</span>
+                                    <button class="dropdown-item font-weight-bold" type="submit" name="institution_id" value="{{ i.pk }}">
+                                        <span class="badge badge-xs badge-pill badge-primary mr-1">{{ i.kind }}</span>
                                         {{ i.display_name|truncatechars:50 }}
                                     </button>
                                 </li>
@@ -90,7 +90,7 @@
                                     <span>{{ user.get_full_name }}</span>
                                     <br>
                                 {% endif %}
-                                <span class="fs-sm lh-sm text-secondary">{{ user.email }}</span>
+                                <span class="fs-sm lh-sm text-muted">{{ user.email }}</span>
                             </div>
                         </div>
                     </div>
@@ -99,25 +99,25 @@
                     <div class="dropdown-divider"></div>
                 </li>
                 <li>
-                    <a class="dropdown-item text-primary" href="{% url 'dashboard:index' %}">Tableau de bord</a>
+                    <a class="dropdown-item" href="{% url 'dashboard:index' %}">Tableau de bord</a>
                 </li>
                 {% if user.is_siae_staff %}
                     <li>
-                        <a class="dropdown-item text-primary" href="{% url 'dashboard:edit_user_notifications' %}">Mes notifications</a>
+                        <a class="dropdown-item" href="{% url 'dashboard:edit_user_notifications' %}">Mes notifications</a>
                     </li>
                 {% endif %}
                 <li>
                     <div class="dropdown-divider"></div>
                 </li>
                 <li>
-                    <a class="dropdown-item text-primary" href="{% url 'dashboard:edit_user_info' %}">Modifier mon profil</a>
+                    <a class="dropdown-item" href="{% url 'dashboard:edit_user_info' %}">Modifier mon profil</a>
                 </li>
                 {% if not user.has_sso_provider %}
                     <li>
-                        <a class="dropdown-item text-primary" href="{% url 'account_change_password' %}">Modifier mon mot de passe</a>
+                        <a class="dropdown-item" href="{% url 'account_change_password' %}">Modifier mon mot de passe</a>
                     </li>
                     <li>
-                        <a class="dropdown-item text-primary" href="{% url 'dashboard:edit_user_email' %}">Modifier mon adresse e-mail</a>
+                        <a class="dropdown-item" href="{% url 'dashboard:edit_user_email' %}">Modifier mon adresse e-mail</a>
                     </li>
                 {% endif %}
                 <li>
@@ -133,7 +133,7 @@
         </div>
     </li>
 {% else %}
-    <li class="dropdown mr-2">
+    <li class="dropdown">
         <button type="button" class="btn {{ button_size }} btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="loginUserDropdown{{ mobile_id }}" aria-expanded="false">
             Se connecter | S'inscrire
         </button>
