@@ -240,9 +240,9 @@ djangorestframework==3.14.0 \
     # via
     #   -r requirements/base.in
     #   drf-spectacular
-drf-spectacular==0.25.1 \
-    --hash=sha256:789696f9845ef2397c52f66154aec6d96411baf6aa09a5d40c5f0b0e99f6b3d8 \
-    --hash=sha256:d58684e702f5ad436c5bd1735d46df0e123e64de883092d38f1debb9fa4a03c9
+drf-spectacular==0.26.0 \
+    --hash=sha256:2b31c347c78ed7ed9f021f9e0fcf4e03e86ca6bfc43cb66401236f38f30fd46d \
+    --hash=sha256:3c954a86fbefab93c20f3d39edab1d435f7b16c8291883e40fba5e34265ed461
     # via -r requirements/base.in
 et-xmlfile==1.1.0 \
     --hash=sha256:8eb9e2bc2f8c97e37a2dc85a09ecdcdec9d8a396530a6d5a33b30b9a92da0c5c \
