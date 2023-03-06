@@ -84,7 +84,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
 
     @respx.mock
     def test_accept_invitation_signup_bad_email_case(self):
-        invitation = SentSiaeStaffInvitationFactory(email=OIDC_USERINFO["email"])
+        invitation = SentSiaeStaffInvitationFactory(email=OIDC_USERINFO["email"].upper())
         response = self.client.get(invitation.acceptance_link, follow=True)
         self.assertContains(response, "logo-inclusion-connect-one-line.svg")
 
@@ -108,7 +108,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
             KIND_SIAE_STAFF,
             assert_redirects=False,
             # Using the same email with a different case should not fail
-            user_email=invitation.email.upper(),
+            user_email=invitation.email.lower(),
             channel="invitation",
             previous_url=previous_url,
             next_url=next_url,
