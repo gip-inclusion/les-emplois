@@ -1,8 +1,12 @@
 import datetime
 import io
 
+from dateutil.relativedelta import relativedelta
 from django.contrib.auth.models import Group
+from django.contrib.sessions.models import Session
 from django.core.management import call_command
+from django.utils import timezone
+from freezegun import freeze_time
 
 from itou.approvals.factories import ApprovalFactory
 from itou.eligibility.models import EligibilityDiagnosis
@@ -280,3 +284,26 @@ class TestSyncPermsTestCase(TestCase):
             "view_jobseekerprofile",
             "view_user",
         ]
+
+
+@freeze_time("2023-03-06 11:40:01")
+def test_shorten_active_sessions():
+    expired_session = Session.objects.create(
+        session_key="expired",
+        expire_date=datetime.datetime(2023, 3, 6, tzinfo=timezone.utc),
+    )
+    almost_expired_session = Session.objects.create(
+        session_key="almost_expired",
+        expire_date=datetime.datetime(2023, 3, 6, 12, tzinfo=timezone.utc),
+    )
+    Session.objects.create(
+        session_key="active",
+        expire_date=datetime.datetime(2023, 3, 7, tzinfo=timezone.utc),
+    )
+
+    call_command("shorten_active_sessions")
+    assert list(Session.objects.all().order_by("expire_date").values_list("session_key", "expire_date")) == [
+        ("expired", expired_session.expire_date),
+        ("almost_expired", almost_expired_session.expire_date),
+        ("active", timezone.now() + relativedelta(hours=1)),
+    ]
