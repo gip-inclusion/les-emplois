@@ -3,7 +3,7 @@ import json
 
 import django.db.utils
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import models, transaction
 from django.db.models.manager import Manager
 from django.db.models.query import F, Q, QuerySet
 from django.utils import timezone
@@ -453,7 +453,8 @@ class EmployeeRecord(ASPExchangeInformation):
         )
 
         try:
-            er_copy.save()
+            with transaction.atomic():
+                er_copy.save()
         except django.db.utils.IntegrityError as ex:
             raise DuplicateCloningError(
                 f"The clone is a duplicate of ({er_copy.asp_id=}, {er_copy.approval_number=})"

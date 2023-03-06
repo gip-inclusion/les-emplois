@@ -228,8 +228,7 @@ class Command(BaseCommand):
             )
             for employee_record in employee_records_to_clone:
                 try:
-                    with transaction.atomic():
-                        employee_record.clone()
+                    employee_record.clone()
                 except DuplicateCloningError as e:
                     self.stdout.write(f"| + Failed to clone {employee_record}: {e}")
 
