@@ -13,7 +13,7 @@ jobs:
       DJANGO_SETTINGS_MODULE: config.settings.dev
       PYTHONPATH: .
     concurrency:
-      group: ${{ github.workflow }}-${ github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
+      group: ${{ github.workflow }}-${{ github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
       cancel-in-progress: true
     services:
       postgres:
