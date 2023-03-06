@@ -49,8 +49,7 @@ class Command(BaseCommand):
                 continue
 
             try:
-                with transaction.atomic():
-                    employee_record_clone = employee_record.clone()
+                employee_record_clone = employee_record.clone()
             except Exception as e:
                 self.stdout.write(f"  Error when cloning {employee_record.pk=}: {e}")
             else:
