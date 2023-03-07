@@ -6,8 +6,11 @@ from django.db.models import Exists, OuterRef
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
+from itou.approvals.models import Approval
+from itou.eligibility.models import EligibilityDiagnosis, GEIQEligibilityDiagnosis
 from itou.geo.models import QPV
 from itou.institutions.models import InstitutionMembership
+from itou.job_applications.models import JobApplication
 from itou.prescribers.models import PrescriberMembership
 from itou.siaes.models import SiaeMembership
 from itou.users import models
@@ -106,6 +109,97 @@ class InstitutionMembershipInline(admin.TabularInline):
         model_name = obj.institution._meta.model_name
         url = reverse(f"admin:{app_label}_{model_name}_change", args=[obj.institution_id])
         return mark_safe(f'<a href="{url}">{obj.institution_id}</a>')
+
+
+class JobApplicationInline(admin.TabularInline):
+    model = JobApplication
+    fk_name = "job_seeker"
+    extra = 0
+    can_delete = False
+    fields = ("pk_link", "sender_kind", "to_siae_link", "state")
+    readonly_fields = fields
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    @admin.display(description="PK")
+    def pk_link(self, obj):
+        url = reverse(f"admin:{obj._meta.app_label}_{obj._meta.model_name}_change", args=[obj.pk])
+        return mark_safe(f'<a href="{url}">{obj.pk}</a>')
+
+    @admin.display(description="SIAE destinataire")
+    def to_siae_link(self, obj):
+        url = reverse(f"admin:{obj._meta.app_label}_{obj._meta.model_name}_change", args=[obj.to_siae.pk])
+        return mark_safe(f"<a href='{url}'>{obj.to_siae.display_name}</a> — SIRET : {obj.to_siae.siret}")
+
+
+class EligibilityDiagnosisInline(admin.TabularInline):
+    model = EligibilityDiagnosis
+    fk_name = "job_seeker"
+    extra = 0
+    can_delete = False
+    fields = (
+        "pk_link",
+        "author",
+        "author_kind",
+        "is_valid",
+    )
+    readonly_fields = fields
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    @admin.display(description="PK")
+    def pk_link(self, obj):
+        url = reverse(f"admin:{obj._meta.app_label}_{obj._meta.model_name}_change", args=[obj.pk])
+        return mark_safe(f'<a href="{url}">{obj.pk}</a>')
+
+    def is_valid(self, obj):
+        return obj.is_valid
+
+    is_valid.boolean = True
+    is_valid.short_description = "En cours de validité"
+
+
+class GEIQEligibilityDiagnosisInline(EligibilityDiagnosisInline):
+    model = GEIQEligibilityDiagnosis
+
+
+class ApprovalInline(admin.TabularInline):
+    model = Approval
+    fk_name = "user"
+    extra = 0
+    can_delete = False
+    fields = (
+        "pk_link",
+        "start_at",
+        "end_at",
+        "is_valid",
+    )
+    readonly_fields = fields
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    @admin.display(description="Numéro")
+    def pk_link(self, obj):
+        url = reverse(f"admin:{obj._meta.app_label}_{obj._meta.model_name}_change", args=[obj.pk])
+        return mark_safe(f'<a href="{url}">{obj.number}</a>')
+
+    def is_valid(self, obj):
+        return obj.is_valid()
+
+    is_valid.boolean = True
+    is_valid.short_description = "En cours de validité"
 
 
 class CreatedByProxyFilter(admin.SimpleListFilter):
@@ -274,6 +368,12 @@ class ItouUserAdmin(UserAdmin):
             "is_siae_staff": {"siaemembership_set": SiaeMembershipInline},
             "is_prescriber": {"prescribermembership_set": PrescriberMembershipInline},
             "is_labor_inspector": {"institutionmembership_set": InstitutionMembershipInline},
+            "is_job_seeker": {
+                "eligibility_diagnoses": EligibilityDiagnosisInline,
+                "geiq_eligibility_diagnoses": GEIQEligibilityDiagnosisInline,
+                "approvals": ApprovalInline,
+                "job_applications": JobApplicationInline,
+            },
         }
         for check, related_fields in conditional_inlines.items():
             for field_name, inline_class in related_fields.items():
