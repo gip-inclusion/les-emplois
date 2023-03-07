@@ -129,12 +129,6 @@ class ItouUserAdmin(UserAdmin):
 
     add_form = ItouUserCreationForm
     form = UserAdminForm
-    inlines = [
-        SiaeMembershipInline,
-        PrescriberMembershipInline,
-        InstitutionMembershipInline,
-        PkSupportRemarkInline,
-    ]
     list_display = (
         "pk",
         "email",
@@ -270,6 +264,23 @@ class ItouUserAdmin(UserAdmin):
         if obj and obj.has_sso_provider:
             rof += ("first_name", "last_name", "email", "username")
         return rof
+
+    def get_inlines(self, request, obj):
+        inlines = [PkSupportRemarkInline]
+        if not obj:
+            return tuple(inlines)
+
+        conditional_inlines = {
+            "is_siae_staff": {"siaemembership_set": SiaeMembershipInline},
+            "is_prescriber": {"prescribermembership_set": PrescriberMembershipInline},
+            "is_labor_inspector": {"institutionmembership_set": InstitutionMembershipInline},
+        }
+        for check, related_fields in conditional_inlines.items():
+            for field_name, inline_class in related_fields.items():
+                if getattr(obj, check) or getattr(obj, field_name).all():
+                    inlines.insert(-1, inline_class)
+
+        return tuple(inlines)
 
 
 @admin.register(models.JobSeekerProfile)
