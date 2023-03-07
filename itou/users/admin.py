@@ -18,6 +18,25 @@ from itou.users.admin_forms import ItouUserCreationForm, UserAdminForm
 from itou.utils.admin import PkSupportRemarkInline
 
 
+class EmailAddressInline(admin.TabularInline):
+    model = EmailAddress
+    extra = 0
+    can_delete = False
+    fields = ("pk_link", "verified", "primary")
+    readonly_fields = fields
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    @admin.display(description="PK")
+    def pk_link(self, obj):
+        url = reverse(f"admin:{obj._meta.app_label}_{obj._meta.model_name}_change", args=[obj.pk])
+        return mark_safe(f'<a href="{url}">{obj.email}</a>')
+
+
 class SiaeMembershipInline(admin.TabularInline):
     model = SiaeMembership
     extra = 0
@@ -363,6 +382,7 @@ class ItouUserAdmin(UserAdmin):
         inlines = [PkSupportRemarkInline]
         if not obj:
             return tuple(inlines)
+        inlines.insert(0, EmailAddressInline)
 
         conditional_inlines = {
             "is_siae_staff": {"siaemembership_set": SiaeMembershipInline},
