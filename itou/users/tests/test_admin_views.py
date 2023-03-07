@@ -43,6 +43,8 @@ def test_no_email_sent(client):
             "last_checked_at_1": naive_now.time(),
             # email was set by SSO.
             "kind": UserKind.JOB_SEEKER,
+            "emailaddress_set-INITIAL_FORMS": "0",
+            "emailaddress_set-TOTAL_FORMS": "0",
             "eligibility_diagnoses-INITIAL_FORMS": "0",
             "eligibility_diagnoses-TOTAL_FORMS": "0",
             "geiq_eligibility_diagnoses-INITIAL_FORMS": "0",
