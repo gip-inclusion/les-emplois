@@ -318,9 +318,12 @@ class TestAcceptPrescriberWithOrgInvitation(InclusionConnectBaseTestCase):
         response = self.client.get(invitation.acceptance_link, follow=True)
         assert reverse("login:prescriber") in response.wsgi_request.get_full_path()
         assert not invitation.accepted
-        self.assertContains(response, reverse("login:activate_prescriber_account") + '"')
-
         next_url = reverse("invitations_views:join_prescriber_organization", args=(invitation.pk,))
+
+        self.assertContains(
+            response, reverse("login:activate_prescriber_account") + "?" + urlencode({"next": next_url})
+        )
+
         previous_url = f"{reverse('login:prescriber')}?{urlencode({'next': next_url})}"
         response = mock_oauth_dance(
             self,

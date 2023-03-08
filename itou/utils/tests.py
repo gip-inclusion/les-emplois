@@ -47,7 +47,13 @@ from itou.utils.tasks import sanitize_mailjet_recipients
 from itou.utils.templatetags import dict_filters, format_filters
 from itou.utils.test import TestCase
 from itou.utils.tokens import SIAE_SIGNUP_MAGIC_LINK_TIMEOUT, SiaeSignupTokenGenerator
-from itou.utils.urls import get_absolute_url, get_external_link_markup, get_safe_url, get_tally_form_url
+from itou.utils.urls import (
+    add_url_params,
+    get_absolute_url,
+    get_external_link_markup,
+    get_safe_url,
+    get_tally_form_url,
+)
 from itou.utils.validators import (
     alphanumeric,
     validate_af_number,
@@ -569,7 +575,35 @@ class UtilsTemplateFiltersTestCase(TestCase):
                 assert format_filters.format_approval_number(number) == expected
 
 
-class UtilsEmailsTestCase(TestCase):
+class UtilsUrlsTestCase(TestCase):
+    def test_add_url_params(self):
+        """Test `urls.add_url_params()`."""
+
+        base_url = "http://localhost/test?next=/siae/search%3Fdistance%3D100%26city%3Dstrasbourg-67"
+
+        url_test = add_url_params(base_url, {"test": "value"})
+        assert (
+            url_test
+            == "http://localhost/test?next=%2Fsiae%2Fsearch%3Fdistance%3D100%26city%3Dstrasbourg-67&test=value"
+        )
+
+        url_test = add_url_params(base_url, {"mypath": "%2Fvalue%2Fpath"})
+
+        assert url_test == (
+            "http://localhost/test?next=%2Fsiae%2Fsearch%3Fdistance%3D100%26city%3Dstrasbourg-67"
+            "&mypath=%252Fvalue%252Fpath"
+        )
+
+        url_test = add_url_params(base_url, {"mypath": None})
+
+        assert url_test == "http://localhost/test?next=%2Fsiae%2Fsearch%3Fdistance%3D100%26city%3Dstrasbourg-67"
+
+        url_test = add_url_params(base_url, {"mypath": ""})
+
+        assert (
+            url_test == "http://localhost/test?next=%2Fsiae%2Fsearch%3Fdistance%3D100%26city%3Dstrasbourg-67&mypath="
+        )
+
     def test_get_safe_url(self):
         """Test `urls.get_safe_url()`."""
 
@@ -783,7 +817,6 @@ class SiaeSignupTokenGeneratorTest(TestCase):
 
 class CnilCompositionPasswordValidatorTest(SimpleTestCase):
     def test_validate(self):
-
         # Good passwords.
 
         # lower + upper + special char
@@ -1019,7 +1052,6 @@ class SessionNamespaceTest(TestCase):
 
 
 class JSONTest(TestCase):
-
     SYMMETRIC_CONVERSION = [
         (None, "null"),
         (False, "false"),

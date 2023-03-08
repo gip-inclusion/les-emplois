@@ -46,7 +46,7 @@
                                 </div>
                             </div>
                         {% endif %}
-                        <form method="post" action="{{ activate_account_url }}">
+                        <form method="post">
                             {% csrf_token %}
                             <fieldset>
                                 {% bootstrap_form_errors form type="all" %}
