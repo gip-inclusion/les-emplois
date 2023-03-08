@@ -19,7 +19,7 @@ from itou.common_apps.resume.forms import ResumeFormMixin
 from itou.eligibility.models import AdministrativeCriteria
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
-from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS, SiaeKind
+from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS, ContractType, SiaeKind
 from itou.users.models import JobSeekerProfile, User
 from itou.utils import constants as global_constants
 from itou.utils.validators import validate_nir, validate_pole_emploi_id
@@ -428,10 +428,14 @@ class AnswerForm(forms.Form):
 class AcceptForm(forms.ModelForm):
     """
     Allow an SIAE to add an answer message when postponing or accepting.
+    If SIAE is a GEIQ, add specific fields (contract type, number of hours per week)
     """
+
+    GEIQ_REQUIRED_FIELDS = ("contract_type", "contract_type_details", "nb_hours_per_week")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
         self.fields["hiring_start_at"].required = True
         for field in ["hiring_start_at", "hiring_end_at"]:
             self.fields[field].widget = DuetDatePickerWidget()
@@ -439,51 +443,89 @@ class AcceptForm(forms.ModelForm):
         # They also can be accepted after a refusal.
         # That's why some fields are already filled in with obsolete data.
         # Erase them now to start from new.
-        for field in ["answer", "hiring_start_at", "hiring_end_at"]:
+        for field in ["answer", "hiring_start_at", "hiring_end_at", "contract_type", "contract_type_details"]:
             self.initial[field] = ""
+        self.initial["nb_hours_per_week"] = None
+
+        if job_application := kwargs.get("instance"):
+            is_geiq = job_application.to_siae.kind == SiaeKind.GEIQ
+            # Remove or make GEIQ specific fields mandatory
+            for geiq_field_name in self.GEIQ_REQUIRED_FIELDS:
+                if is_geiq:
+                    # Contract type details are dynamic and not required all the time
+                    self.fields[geiq_field_name].required = geiq_field_name != "contract_type_details"
+                else:
+                    self.fields.pop(geiq_field_name)
+
+            if is_geiq:
+                # Change default size (too large)
+                self.fields["contract_type_details"].widget.attrs.update({"rows": 2})
+            else:
+                # Add specific details to help texts for IAE
+                self.fields["hiring_start_at"].help_text += (
+                    " La date est modifiable jusqu'à la veille de la date saisie. En cas de premier PASS IAE pour "
+                    "la personne, cette date déclenche le début de son parcours."
+                )
+                self.fields["hiring_end_at"].help_text += (
+                    " Elle sert uniquement à des fins d'informations et est sans conséquence sur les déclarations "
+                    "à faire dans l'extranet 2.0 de l'ASP. "
+                    "<b>Ne pas compléter cette date dans le cadre d’un CDI Inclusion</b>"
+                )
 
     class Meta:
         model = JobApplication
-        fields = ["hiring_start_at", "hiring_end_at", "answer"]
+        fields = [
+            "contract_type",
+            "contract_type_details",
+            "nb_hours_per_week",
+            "hiring_start_at",
+            "hiring_end_at",
+            "answer",
+        ]
         help_texts = {
             # Make it clear to employers that `hiring_start_at` has an impact on the start of the
             # "parcours IAE" and the payment of the "aide au poste".
-            "hiring_start_at": (
-                "Au format JJ/MM/AAAA, par exemple  %(date)s. Il n'est pas possible d'antidater un contrat. "
-                "La date est modifiable jusqu'à la veille de la date saisie. En cas de premier PASS IAE pour "
-                "la personne, cette date déclenche le début de son parcours."
-            )
-            % {"date": datetime.date.today().strftime("%d/%m/%Y")},
-            "hiring_end_at": (
-                "Au format JJ/MM/AAAA, par exemple  %(date)s. "
-                "Elle sert uniquement à des fins d'informations et est sans conséquence sur les déclarations "
-                "à faire dans l'extranet 2.0 de l'ASP. "
-                "<b>Ne pas compléter cette date dans le cadre d’un CDI Inclusion</b>"
-            )
+            "hiring_start_at": "Au format JJ/MM/AAAA, par exemple  %(date)s. "
+            "Il n'est pas possible d'antidater un contrat." % {"date": datetime.date.today().strftime("%d/%m/%Y")},
+            "hiring_end_at": "Au format JJ/MM/AAAA, par exemple  %(date)s."
             % {
                 "date": (datetime.date.today() + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)).strftime(
                     "%d/%m/%Y"
                 )
             },
+            "contract_type_details": (
+                "Si vous avez choisi un autre type de contrat, merci de bien vouloir fournir plus de précisions"
+            ),
         }
 
     def clean_hiring_start_at(self):
         hiring_start_at = self.cleaned_data["hiring_start_at"]
+
         if hiring_start_at and hiring_start_at < datetime.date.today():
             raise forms.ValidationError(JobApplication.ERROR_START_IN_PAST)
+
         return hiring_start_at
 
     def clean(self):
         cleaned_data = super().clean()
 
-        if self.errors:
-            return cleaned_data
+        hiring_start_at = self.cleaned_data.get("hiring_start_at")
+        hiring_end_at = self.cleaned_data.get("hiring_end_at")
 
-        hiring_start_at = self.cleaned_data["hiring_start_at"]
-        hiring_end_at = self.cleaned_data["hiring_end_at"]
-
-        if hiring_end_at and hiring_end_at < hiring_start_at:
+        if hiring_end_at and hiring_start_at and hiring_end_at < hiring_start_at:
             raise forms.ValidationError(JobApplication.ERROR_END_IS_BEFORE_START)
+
+        if self.instance.to_siae.kind == SiaeKind.GEIQ:
+            # This validation is enforced by database constraints,
+            # but we are nice enough to display a warning message to the user
+            # (constraints violation message are generic)
+            contract_type = self.cleaned_data.get("contract_type")
+            contract_type_details = self.cleaned_data.get("contract_type_details")
+
+            if contract_type == ContractType.OTHER and not contract_type_details:
+                raise forms.ValidationError(
+                    {"contract_type_details": ["Les précisions sont nécessaires pour ce type de contrat"]}
+                )
 
         return cleaned_data
 
