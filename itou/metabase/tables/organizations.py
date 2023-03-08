@@ -68,7 +68,7 @@ def get_org_last_job_application_creation_date(org):
 
 ORGANIZATION_KIND_TO_READABLE_KIND = {
     PrescriberOrganizationKind.PE: "Pôle emploi",
-    PrescriberOrganizationKind.CAP_EMPLOI: "CAP emploi",
+    PrescriberOrganizationKind.CAP_EMPLOI: "Cap emploi",
     PrescriberOrganizationKind.ML: "Mission locale",
     PrescriberOrganizationKind.DEPT: "Département",
     PrescriberOrganizationKind.OTHER: "Autre",

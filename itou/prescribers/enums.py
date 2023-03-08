@@ -2,7 +2,7 @@ from django.db import models
 
 
 class PrescriberOrganizationKind(models.TextChoices):
-    CAP_EMPLOI = "CAP_EMPLOI", "CAP emploi"
+    CAP_EMPLOI = "CAP_EMPLOI", "Cap emploi"
     ML = "ML", "Mission locale"
     OIL = "OIL", "Opérateur d'intermédiation locative"
     ODC = "ODC", "Organisation délégataire d'un CD"
