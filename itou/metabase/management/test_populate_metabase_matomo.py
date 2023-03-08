@@ -64,20 +64,22 @@ def test_matomo_retry(monkeypatch, respx_mock, capsys):
         "\t> fetching date=2022-06-13 dashboard='tb 136 - Prescripteurs habilité",
         "\t> fetching date=2022-06-13 dashboard='tb 140 - ETP conventionnés' pag",
         "\t> fetching date=2022-06-13 dashboard='tb 150 - Fiches de poste en ten",
+        "\t> fetching date=2022-06-13 dashboard='tb 216 - Les femmes dans l'IAE",
         "\t> fetching date=2022-06-13 dashboard='tb 217 - Suivi pass IAE' pageUr",
+        "\t> fetching date=2022-06-13 dashboard='tb 218 - Cartographie de l'IAE",
         "\t> fetching date=2022-06-13 dashboard='tb 32 - Acceptés en auto-prescr",
         "\t> fetching date=2022-06-13 dashboard='tb 43 - Statistiques des emploi",
         "\t> fetching date=2022-06-13 dashboard='tb 52 - Typologie de prescripte",
         "\t> fetching date=2022-06-13 dashboard='tb 54 - Typologie des employeur",
         "\t> fetching date=2022-06-13 dashboard='tb 90 - Analyse des métiers' pa",
-        "> about to fetch count=11 public dashboards from Matomo.",
-    ] + ["For more information check: https://httpstatuses.com/500"] * 33 + [
+        "> about to fetch count=13 public dashboards from Matomo.",
+    ] + ["For more information check: https://httpstatuses.com/500"] * 39 + [
         "attempt=1 failed with outcome=Server error '500 Internal Server Error'"
-    ] * 11 + [
+    ] * 13 + [
         "attempt=2 failed with outcome=Server error '500 Internal Server Error'"
-    ] * 11 + [
+    ] * 13 + [
         "attempt=3 failed with outcome=Server error '500 Internal Server Error'"
-    ] * 11
+    ] * 13
 
 
 @override_settings(MATOMO_BASE_URL="https://mato.mo", MATOMO_AUTH_TOKEN="foobar")
@@ -95,7 +97,7 @@ def test_matomo_populate_public(monkeypatch, respx_mock):
     with connection.cursor() as cursor:
         cursor.execute("SELECT * FROM suivi_visiteurs_tb_publics_v0")
         rows = cursor.fetchall()
-        assert len(rows) == 11
+        assert len(rows) == 13
         assert rows[0] == (
             "25",
             "26",
@@ -351,7 +353,9 @@ def test_matomo_empty_output(monkeypatch, respx_mock, capsys):
         "\t! empty matomo values for date=2022-06-13 dashboard=tb 136 - Prescripteurs " "habilités",
         "\t! empty matomo values for date=2022-06-13 dashboard=tb 140 - ETP " "conventionnés",
         "\t! empty matomo values for date=2022-06-13 dashboard=tb 150 - Fiches de " "poste en tension",
+        "\t! empty matomo values for date=2022-06-13 dashboard=tb 216 - Les femmes dans " "l'IAE",
         "\t! empty matomo values for date=2022-06-13 dashboard=tb 217 - Suivi pass " "IAE",
+        "\t! empty matomo values for date=2022-06-13 dashboard=tb 218 - Cartographie de " "l'IAE",
         "\t! empty matomo values for date=2022-06-13 dashboard=tb 32 - Acceptés en " "auto-prescription",
         "\t! empty matomo values for date=2022-06-13 dashboard=tb 43 - Statistiques " "des emplois",
         "\t! empty matomo values for date=2022-06-13 dashboard=tb 52 - Typologie de " "prescripteurs",
@@ -367,8 +371,12 @@ def test_matomo_empty_output(monkeypatch, respx_mock, capsys):
         "pageUrl=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/etp-conventionnes/",
         "\t> fetching date=2022-06-13 dashboard='tb 150 - Fiches de poste en tension' "
         "pageUrl=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/postes-en-tension/",
+        "\t> fetching date=2022-06-13 dashboard='tb 216 - Les femmes dans l'IAE' "
+        "pageUrl=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/femmes-iae/",
         "\t> fetching date=2022-06-13 dashboard='tb 217 - Suivi pass IAE' "
         "pageUrl=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/suivi-pass-iae/",
+        "\t> fetching date=2022-06-13 dashboard='tb 218 - Cartographie de l'IAE' "
+        "pageUrl=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/cartographies-iae/",
         "\t> fetching date=2022-06-13 dashboard='tb 32 - Acceptés en "
         "auto-prescription' "
         "pageUrl=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/auto-prescription/",
@@ -380,5 +388,5 @@ def test_matomo_empty_output(monkeypatch, respx_mock, capsys):
         "pageUrl=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/zoom-employeurs/",
         "\t> fetching date=2022-06-13 dashboard='tb 90 - Analyse des métiers' "
         "pageUrl=https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/metiers/",
-        "> about to fetch count=11 public dashboards from Matomo.",
+        "> about to fetch count=13 public dashboards from Matomo.",
     ]
