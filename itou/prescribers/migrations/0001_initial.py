@@ -260,7 +260,7 @@ class Migration(migrations.Migration):
                     "kind",
                     models.CharField(
                         choices=[
-                            ("CAP_EMPLOI", "CAP emploi"),
+                            ("CAP_EMPLOI", "Cap emploi"),
                             ("ML", "Mission locale"),
                             ("OIL", "Opérateur d'intermédiation locative"),
                             ("ODC", "Organisation délégataire d'un CD"),

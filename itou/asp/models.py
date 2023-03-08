@@ -318,7 +318,7 @@ class PrescriberType(models.TextChoices):
     """
 
     ML = "01", "Mission locale"
-    CAP_EMPLOI = "02", "CAP emploi"
+    CAP_EMPLOI = "02", "Cap emploi"
     PE = "03", "Pôle emploi"
     PLIE = "04", "Plan local pour l'insertion et l'emploi"
     DEPT = "05", "Service départementaux"
