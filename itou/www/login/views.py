@@ -3,12 +3,11 @@ from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from django.utils.http import urlencode
 from django.views.generic import FormView
 
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
-from itou.utils.urls import get_safe_url
+from itou.utils.urls import add_url_params, get_safe_url
 from itou.www.login.forms import AccountMigrationForm, ItouLoginForm
 
 
@@ -44,6 +43,12 @@ class PrescriberLoginView(ItouLoginView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        ic_base_url = reverse("login:activate_prescriber_account")
+
+        if context["redirect_field_value"] is not None:
+            ic_base_url = add_url_params(ic_base_url, {REDIRECT_FIELD_NAME: context["redirect_field_value"]})
+
         extra_context = {
             "account_type_display_name": "prescripteur",
             "matomo_account_type": UserKind.PRESCRIBER,
@@ -51,7 +56,7 @@ class PrescriberLoginView(ItouLoginView):
             "signup_url": reverse("signup:prescriber_check_already_exists"),
             "signup_allowed": True,
             "uses_inclusion_connect": True,
-            "inclusion_connect_url": reverse("login:activate_prescriber_account"),
+            "inclusion_connect_url": f"{ic_base_url}",
         }
         return context | extra_context
 
@@ -61,6 +66,12 @@ class SiaeStaffLoginView(ItouLoginView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        ic_base_url = reverse("login:activate_siae_staff_account")
+
+        if context["redirect_field_value"] is not None:
+            ic_base_url = add_url_params(ic_base_url, {REDIRECT_FIELD_NAME: context["redirect_field_value"]})
+
         extra_context = {
             "account_type_display_name": "employeur solidaire",
             "matomo_account_type": UserKind.SIAE_STAFF,
@@ -68,7 +79,7 @@ class SiaeStaffLoginView(ItouLoginView):
             "signup_url": reverse("signup:siae_select"),
             "signup_allowed": True,
             "uses_inclusion_connect": True,
-            "inclusion_connect_url": reverse("login:activate_siae_staff_account"),
+            "inclusion_connect_url": f"{ic_base_url}",
         }
         return context | extra_context
 
@@ -103,27 +114,32 @@ class AccountMigrationBaseView(FormView):
     form_class = AccountMigrationForm
 
     def _get_inclusion_connect_base_params(self):
-        return {
-            "user_kind": self.user_kind,
-            "previous_url": self.request.get_full_path(),
-        }
+        params = {"user_kind": self.user_kind, "previous_url": self.request.get_full_path()}
+
+        next = get_safe_url(self.request, REDIRECT_FIELD_NAME)
+
+        if next:
+            params["next_url"] = next
+
+        return params
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         params = self._get_inclusion_connect_base_params()
         existing_ic_account = self.request.GET.get("existing_ic_account")
-        inclusion_connect_url = f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
+        inclusion_connect_url = add_url_params(reverse("inclusion_connect:authorize"), params)
         existing_ic_account_url = None
         if existing_ic_account:
             params["user_email"] = existing_ic_account
-            existing_ic_account_url = f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
+            existing_ic_account_url = add_url_params(reverse("inclusion_connect:authorize"), params)
+
         extra_context = {
-            "activate_account_url": reverse(self.url_name),
             "inclusion_connect_url": inclusion_connect_url,
             "existing_ic_account": existing_ic_account,
             "existing_ic_account_url": existing_ic_account_url,
             "matomo_account_type": self.user_kind,
         }
+
         return context | extra_context
 
     def form_valid(self, form):
@@ -133,13 +149,13 @@ class AccountMigrationBaseView(FormView):
             email=email, kind=self.user_kind, identity_provider=IdentityProvider.INCLUSION_CONNECT
         ).exists():
             params = {"existing_ic_account": email}
-            return HttpResponseRedirect(f"{self.request.get_full_path()}?{urlencode(params)}")
+            return HttpResponseRedirect(add_url_params(self.request.get_full_path(), params))
         return super().form_valid(form)
 
     def get_success_url(self):
         params = self._get_inclusion_connect_base_params()
         params["user_email"] = self.form.cleaned_data["email"]
-        return f"{reverse('inclusion_connect:activate_account')}?{urlencode(params)}"
+        return add_url_params(reverse("inclusion_connect:activate_account"), params)
 
 
 class PrescriberAccountMigrationView(AccountMigrationBaseView):

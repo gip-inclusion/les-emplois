@@ -121,6 +121,35 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         user = User.objects.get(email=invitation.email)
         self.assert_accepted_invitation(response, invitation, user)
 
+    @respx.mock
+    def test_accept_existing_user_not_logged_in_using_IC(self):
+        invitation = SentSiaeStaffInvitationFactory(email=OIDC_USERINFO["email"])
+        user = SiaeStaffFactory(email=OIDC_USERINFO["email"], has_completed_welcoming_tour=True)
+        response = self.client.get(invitation.acceptance_link, follow=True)
+        assert reverse("login:siae_staff") in response.wsgi_request.get_full_path()
+        assert not invitation.accepted
+        next_url = reverse("invitations_views:join_siae", args=(invitation.pk,))
+
+        self.assertContains(
+            response, reverse("login:activate_siae_staff_account") + "?" + urlencode({"next": next_url})
+        )
+
+        previous_url = f"{reverse('login:siae_staff')}?{urlencode({'next': next_url})}"
+        response = mock_oauth_dance(
+            self,
+            UserKind.SIAE_STAFF,
+            assert_redirects=False,
+            user_email=user.email,
+            channel="invitation",
+            previous_url=previous_url,
+            next_url=next_url,
+        )
+        # Follow the redirection.
+        response = self.client.get(response.url, follow=True)
+
+        assert response.context["user"].is_authenticated
+        self.assert_accepted_invitation(response, invitation, user)
+
     def test_accept_invitation_logged_in_user(self):
         # A logged in user should log out before accepting an invitation.
         logged_in_user = SiaeStaffFactory()
