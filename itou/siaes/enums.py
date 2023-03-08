@@ -61,9 +61,13 @@ class ContractType(models.TextChoices):
 
     @classmethod
     def choices_for_siae(cls, siae):
-        choices = None
+        return cls.choices_for_siae_kind(siae.kind, siae.siret in settings.ACI_CONVERGENCE_SIRET_WHITELIST)
 
-        match siae.kind:
+    @classmethod
+    def choices_for_siae_kind(cls, kind, aci_convergence=False):
+        choices = []
+
+        match kind:
             case SiaeKind.GEIQ:
                 choices = [cls.APPRENTICESHIP, cls.PROFESSIONAL_TRAINING, cls.OTHER]
             case SiaeKind.EA | SiaeKind.EATT:
@@ -89,7 +93,7 @@ class ContractType(models.TextChoices):
                 choices.remove(cls.FIXED_TERM_I_PHC)
                 choices.remove(cls.FIXED_TERM_I_CVG)
 
-        if siae.kind == SiaeKind.ACI and siae.siret in settings.ACI_CONVERGENCE_SIRET_WHITELIST:
+        if kind == SiaeKind.ACI and aci_convergence:
             choices[-1:-1] = [
                 cls.FIXED_TERM_I_PHC,
                 cls.FIXED_TERM_I_CVG,
