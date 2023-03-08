@@ -8,6 +8,7 @@ import pytest
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core import mail, management
+from django.core.exceptions import ValidationError
 from django.db.models import Max
 from django.forms.models import model_to_dict
 from django.template.defaultfilters import title
@@ -39,7 +40,7 @@ from itou.job_applications.models import JobApplication, JobApplicationTransitio
 from itou.job_applications.notifications import NewQualifiedJobAppEmployersNotification
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
-from itou.siaes.enums import SiaeKind
+from itou.siaes.enums import ContractType, SiaeKind
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
 from itou.users.factories import ItouStaffFactory, JobSeekerFactory, SiaeStaffFactory
 from itou.users.models import User
@@ -222,6 +223,71 @@ class JobApplicationModelTest(TestCase):
         for job_application, sender_kind_display in items:
             with self.subTest(sender_kind_display):
                 assert job_application.get_sender_kind_display() == sender_kind_display
+
+    def test_geiq_fields_validation(self):
+        # Full clean
+        with self.assertRaisesRegex(
+            ValidationError, "Le nombre d'heures par semaine ne peut être saisi que pour un GEIQ"
+        ):
+            JobApplicationFactory(to_siae__kind=SiaeKind.EI, nb_hours_per_week=20)
+
+        with self.assertRaisesRegex(
+            ValidationError, "Les précisions sur le type de contrat ne peuvent être saisies que pour un GEIQ"
+        ):
+            JobApplicationFactory(to_siae__kind=SiaeKind.EI, contract_type_details="foo")
+
+        with self.assertRaisesRegex(ValidationError, "Le type de contrat ne peut être saisi que pour un GEIQ"):
+            JobApplicationFactory(to_siae__kind=SiaeKind.EI, contract_type=ContractType.OTHER)
+
+        # Constraints
+        with self.assertRaisesRegex(ValidationError, "Incohérence dans les champs concernant le contrat GEIQ"):
+            JobApplicationFactory(
+                to_siae__kind=SiaeKind.GEIQ,
+                contract_type=ContractType.PROFESSIONAL_TRAINING,
+                contract_type_details="foo",
+            )
+
+        with self.assertRaisesRegex(ValidationError, "Incohérence dans les champs concernant le contrat GEIQ"):
+            JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, nb_hours_per_week=1)
+
+        with self.assertRaisesRegex(ValidationError, "Incohérence dans les champs concernant le contrat GEIQ"):
+            JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, contract_type=ContractType.OTHER)
+
+        with self.assertRaisesRegex(ValidationError, "Incohérence dans les champs concernant le contrat GEIQ"):
+            JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, contract_type_details="foo")
+
+        with self.assertRaisesRegex(ValidationError, "Incohérence dans les champs concernant le contrat GEIQ"):
+            JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, contract_type_details="foo", nb_hours_per_week=1)
+
+        with self.assertRaisesRegex(ValidationError, "Incohérence dans les champs concernant le contrat GEIQ"):
+            JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, contract_type=ContractType.OTHER, nb_hours_per_week=1)
+
+        # Validators
+        with self.assertRaisesRegex(
+            ValidationError,
+            f"Assurez-vous que cette valeur est supérieure ou égale à {JobApplication.GEIQ_MIN_HOURS_PER_WEEK}.",
+        ):
+            JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, nb_hours_per_week=0)
+
+        with self.assertRaisesRegex(
+            ValidationError,
+            f"Assurez-vous que cette valeur est inférieure ou égale à {JobApplication.GEIQ_MAX_HOURS_PER_WEEK}.",
+        ):
+            JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, nb_hours_per_week=49)
+
+        # Should pass: normal cases
+        JobApplicationFactory()
+
+        for contract_type in [ContractType.APPRENTICESHIP, ContractType.PROFESSIONAL_TRAINING]:
+            with self.subTest(contract_type):
+                JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, contract_type=contract_type, nb_hours_per_week=35)
+
+        JobApplicationFactory(
+            to_siae__kind=SiaeKind.GEIQ,
+            contract_type=ContractType.OTHER,
+            nb_hours_per_week=30,
+            contract_type_details="foo",
+        )
 
 
 class JobApplicationQuerySetTest(TestCase):
@@ -1598,6 +1664,9 @@ class JobApplicationAdminFormTest(TestCase):
             "transferred_from",
             "created_at",
             "updated_at",
+            "contract_type",
+            "nb_hours_per_week",
+            "contract_type_details",
         ]
         form = JobApplicationAdminForm()
         assert list(form.fields.keys()) == form_fields_list

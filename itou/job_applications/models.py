@@ -5,6 +5,7 @@ import uuid
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import BooleanField, Case, Count, Exists, F, Max, OuterRef, Q, Subquery, When
 from django.db.models.functions import Coalesce, Greatest, TruncMonth
@@ -20,6 +21,7 @@ from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.enums import Origin, RefusalReason, SenderKind
 from itou.job_applications.tasks import huey_notify_pole_emploi
+from itou.siaes.enums import ContractType, SiaeKind
 from itou.siaes.models import Siae
 from itou.utils.emails import get_email_message, send_email_messages
 from itou.utils.urls import get_absolute_url
@@ -433,6 +435,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     WEEKS_BEFORE_CONSIDERED_OLD = 3
 
+    GEIQ_MIN_HOURS_PER_WEEK = 1
+    GEIQ_MAX_HOURS_PER_WEEK = 48
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     job_seeker = models.ForeignKey(
@@ -578,18 +583,70 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now, db_index=True)
     updated_at = models.DateTimeField(verbose_name="Date de modification", blank=True, null=True, db_index=True)
 
+    # GEIQ only
+    contract_type = models.CharField(
+        verbose_name="Type de contrat",
+        max_length=30,
+        choices=ContractType.choices_for_siae_kind(SiaeKind.GEIQ),
+        blank=True,
+    )
+    nb_hours_per_week = models.PositiveSmallIntegerField(
+        verbose_name="Nombre d'heures par semaine",
+        blank=True,
+        null=True,
+        validators=[
+            MinValueValidator(GEIQ_MIN_HOURS_PER_WEEK),
+            MaxValueValidator(GEIQ_MAX_HOURS_PER_WEEK),
+        ],
+    )
+    contract_type_details = models.TextField(verbose_name="Précisions sur le type de contrat", blank=True)
+
     objects = JobApplicationQuerySet.as_manager()
 
     class Meta:
         verbose_name = "Candidature"
         verbose_name_plural = "Candidatures"
         ordering = ["-created_at"]
+        constraints = [
+            models.CheckConstraint(
+                name="geiq_fields_coherence",
+                violation_error_message="Incohérence dans les champs concernant le contrat GEIQ",
+                check=models.Q(
+                    contract_type__in=[ContractType.PROFESSIONAL_TRAINING, ContractType.APPRENTICESHIP],
+                    contract_type_details="",
+                    nb_hours_per_week__gt=0,
+                )
+                | (
+                    models.Q(contract_type=ContractType.OTHER, nb_hours_per_week__gt=0)
+                    & ~models.Q(contract_type_details="")
+                )
+                | models.Q(
+                    contract_type="",
+                    contract_type_details="",
+                    nb_hours_per_week=None,
+                ),
+            ),
+        ]
 
     def __str__(self):
         return str(self.id)
 
+    def clean(self):
+        super().clean()
+
+        # `to_siae` is not guaranteed to exist if a `full_clean` is performed in some occasions (f.i. in an admin form)
+        # checking existence of `to_siae_id` keeps us safe here
+        if self.to_siae_id and self.to_siae.kind != SiaeKind.GEIQ:
+            if self.contract_type:
+                raise ValidationError("Le type de contrat ne peut être saisi que pour un GEIQ")
+            if self.contract_type_details:
+                raise ValidationError("Les précisions sur le type de contrat ne peuvent être saisies que pour un GEIQ")
+            if self.nb_hours_per_week:
+                raise ValidationError("Le nombre d'heures par semaine ne peut être saisi que pour un GEIQ")
+
     def save(self, *args, **kwargs):
         self.updated_at = timezone.now()
+        self.full_clean()
         return super().save(*args, **kwargs)
 
     @property
