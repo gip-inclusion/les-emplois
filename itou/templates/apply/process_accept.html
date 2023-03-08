@@ -12,11 +12,12 @@
     </div>
 
     {% block htmx %}
-        <div class="c-form">
+        <div class="c-form" id="formTarget">
             <form method="post"
                   action=""
                   hx-post="{{ request.path }}"
                   hx-swap="outerHTML show:#acceptForm:top"
+                  hx-target="#formTarget"
                   class="js-format-nir"
                   id="acceptForm"
                   aria-labelledby="dialogLabel"
@@ -49,7 +50,7 @@
 
                 <hr>
                 <h2>Embauche</h2>
-                {% bootstrap_form form_accept alert_error_type="all" %}
+                {% bootstrap_form form_accept alert_error_type="non_fields" %}
 
                 {% buttons %}
                     <hr>
