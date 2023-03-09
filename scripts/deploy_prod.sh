@@ -17,7 +17,8 @@ git fetch origin
 git checkout master
 git rebase origin/master master
 git checkout master_clever
-git rebase origin/master_clever master_clever
+# Since we changed the deployment process, a hard reset is needed to resync local master_clever with origin
+git reset --hard origin/master_clever
 
 # merge master into master_clever
 git merge master --no-edit --ff-only
