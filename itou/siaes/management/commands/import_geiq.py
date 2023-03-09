@@ -27,13 +27,13 @@ def get_geiq_df():
     info_stats["rows_in_file"] = len(df)
 
     column_mapping = {
-        "name": "name",
-        "street": "address_line_1",
-        "street2": "address_line_2",
-        "zip": "post_code",
-        "city": "city",
-        "siret": "siret",
-        "email": "auth_email",
+        "Nom": "name",
+        "Rue": "address_line_1",
+        "Rue (suite)": "address_line_2",
+        "Code Postal": "post_code",
+        "Ville": "city",
+        "SIRET": "siret",
+        "e-mail": "auth_email",
     }
     df = remap_columns(df, column_mapping=column_mapping)
 
