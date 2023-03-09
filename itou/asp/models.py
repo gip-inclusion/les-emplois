@@ -315,6 +315,8 @@ class PrescriberType(models.TextChoices):
     So they can be summarized as a simple list of text choices.
 
     Similar to EmployerType above, and with the same padding issue
+
+    Translation of ASP ref file: ref_orienteur_v4.csv
     """
 
     ML = "01", "Mission locale"
@@ -459,7 +461,7 @@ class Country(PrettyPrintMixin, models.Model):
 
     Code and name of world countries
 
-    Imported from ASP reference file: ref_insee_pays_v4.csv
+    Imported from ASP reference file: ref_grp_pays_v1, ref_insee_pays_v4.csv
     """
 
     _CODE_FRANCE = "100"
