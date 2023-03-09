@@ -1,5 +1,20 @@
 # Journal des modifications
 
+## [58] - 2023-03-13
+
+### Ajouté
+- Contrôle a posteriori : l’absence de réponse de l’administration dans les délais impartis implique consentement
+- Ajout d'un lien pour modifier ses informations personnelles sur Inclusion Connect
+- Ajout d'un bandeau de promotion de RDV-Insertion dans la liste des candidatures des SIAE
+- Ajout d'explications pour le motif de refus "L’embauche empêche la réalisation des objectifs du dialogue de gestion"
+
+### Modifié
+- Inscription : Rendre la civilité obligatoire pour les candidats
+- UI : Amélioration du parcours de gestion des candidatures
+- GEIQ : Autoriser la création d'antenne
+- Stats : Montrer la popup Tally au maximum une fois toutes les deux semaines
+- UI : Autres corrections et améliorations
+
 ## [57] - 2023-02-27
 
 ### Ajouté
