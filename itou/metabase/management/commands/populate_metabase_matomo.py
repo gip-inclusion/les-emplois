@@ -190,7 +190,7 @@ def multiget_matomo_dashboards(at: datetime.datetime, dashboard_options: list[Ma
             )
             for options in dashboard_options
         ]
-        for future in concurrent.futures.as_completed(futures, timeout=60 * 60 * 2):  # 2h max for all dashboards
+        for future in concurrent.futures.as_completed(futures, timeout=60 * 60 * 3):  # 3h max for all dashboards
             cols, rows = future.result()
             if rows is None:
                 continue
