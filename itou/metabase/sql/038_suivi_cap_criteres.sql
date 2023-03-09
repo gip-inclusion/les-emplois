@@ -6,7 +6,8 @@ select
     case when "cap_criteres"."état" = 'REFUSED_2' then 'REFUSED' else "cap_criteres"."état" end as état,
     "camp"."nom" as "nom_campagne",
     "structs"."nom_département" as "nom_département",
-    "structs"."région" as "nom_région"
+    "structs"."région" as "nom_région",
+    "structs"."type" as "type_structure"
 from
     "cap_critères_iae" cap_criteres
     left join "critères_iae" criteres on cap_criteres."id_critère_iae" = criteres.id
