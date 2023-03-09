@@ -72,8 +72,7 @@ def clean_string(s):
     """
     if s is None:
         return None
-    s = s.strip()
-    return " ".join(s.split())
+    return " ".join(str(s).strip().split())
 
 
 def remap_columns(df, column_mapping):
