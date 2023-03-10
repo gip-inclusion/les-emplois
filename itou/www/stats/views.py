@@ -20,6 +20,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.clickjacking import xframe_options_exempt
 
+from itou.analytics.models import StatsDashboardVisit
 from itou.common_apps.address.departments import (
     DEPARTMENT_TO_REGION,
     DEPARTMENTS,
@@ -27,6 +28,7 @@ from itou.common_apps.address.departments import (
     format_region_and_department_for_matomo,
     format_region_for_matomo,
 )
+from itou.utils import constants as global_constants
 from itou.utils.apis.metabase import (
     ASP_SIAE_FILTER_KEY,
     C1_SIAE_FILTER_KEY,
@@ -126,6 +128,26 @@ def render_stats(request, context, params=None, template_name="stats/stats.html"
         # E.g. `/stats/ddets/iae/Provence-Alpes-Cote-d-Azur/04---Alpes-de-Haute-Provence`
         base_context["matomo_custom_url"] += f"/{matomo_custom_url_suffix}"
 
+    if request.user.is_authenticated:
+        siae_pk = request.session.get(global_constants.ITOU_SESSION_CURRENT_SIAE_KEY)
+        prescriber_org_pk = request.session.get(global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY)
+        institution_pk = request.session.get(global_constants.ITOU_SESSION_CURRENT_INSTITUTION_KEY)
+        user_kind = request.user.kind
+        department = base_context.get("department")
+        region = DEPARTMENT_TO_REGION[department] if department else base_context.get("region")
+        dashboard_id = metabase_dashboard.get("dashboard_id")
+        StatsDashboardVisit.objects.create(
+            dashboard_id=dashboard_id,
+            dashboard_name=view_name,
+            department=department,
+            region=region,
+            current_siae_id=siae_pk,
+            current_prescriber_organization_id=prescriber_org_pk,
+            current_institution_id=institution_pk,
+            user_kind=user_kind,
+            user_id=request.user.pk,
+        )
+
     return render(request, template_name, base_context)
 
 
@@ -166,6 +188,7 @@ def stats_siae_etp(request):
     current_org = get_stats_siae_etp_current_org(request)
     context = {
         "page_title": "Données de ma structure (extranet ASP)",
+        "department": current_org.department,
         "matomo_custom_url_suffix": format_region_and_department_for_matomo(current_org.department),
     }
     return render_stats(
@@ -185,6 +208,7 @@ def stats_siae_hiring(request):
     current_org = get_stats_siae_hiring_current_org(request)
     context = {
         "page_title": "Données de recrutement de mes structures (Plateforme de l'inclusion)",
+        "department": current_org.department,
         "matomo_custom_url_suffix": format_region_and_department_for_matomo(current_org.department),
     }
     return render_stats(
@@ -211,6 +235,7 @@ def stats_cd(request):
     params = get_params_for_departement(department)
     context = {
         "page_title": f"Données de mon département : {DEPARTMENTS[department]}",
+        "department": department,
         "matomo_custom_url_suffix": format_region_and_department_for_matomo(department),
     }
     return render_stats(request=request, context=context, params=params)
@@ -232,16 +257,23 @@ def render_stats_pe(request, page_title):
     params = {
         DEPARTMENT_FILTER_KEY: [DEPARTMENTS[d] for d in departments],
     }
-    if current_org.is_dgpe:
-        matomo_custom_url_suffix = "dgpe"
-    elif current_org.is_drpe:
-        matomo_custom_url_suffix = f"{format_region_for_matomo(current_org.region)}/drpe"
-    else:
-        matomo_custom_url_suffix = format_region_and_department_for_matomo(current_org.department)
     context = {
         "page_title": page_title,
-        "matomo_custom_url_suffix": matomo_custom_url_suffix,
     }
+    if current_org.is_dgpe:
+        context |= {
+            "matomo_custom_url_suffix": "dgpe",
+        }
+    elif current_org.is_drpe:
+        context |= {
+            "matomo_custom_url_suffix": f"{format_region_for_matomo(current_org.region)}/drpe",
+            "region": current_org.region,
+        }
+    else:
+        context |= {
+            "matomo_custom_url_suffix": format_region_and_department_for_matomo(current_org.department),
+            "department": current_org.department,
+        }
     return render_stats(request=request, context=context, params=params)
 
 
@@ -306,6 +338,7 @@ def render_stats_ddets(request, page_title, extra_context={}):
     params = get_params_for_departement(department)
     context = {
         "page_title": f"{page_title} ({DEPARTMENTS[department]})",
+        "department": department,
         "matomo_custom_url_suffix": format_region_and_department_for_matomo(department),
     }
     context.update(extra_context)
@@ -352,6 +385,7 @@ def render_stats_dreets(request, page_title):
     context = {
         "page_title": f"{page_title} ({region})",
         "matomo_custom_url_suffix": format_region_for_matomo(region),
+        "region": region,
     }
     return render_stats(request=request, context=context, params=params)
 
