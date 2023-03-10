@@ -1,5 +1,6 @@
 import factory
 
+from itou.common_apps.address.departments import DEPARTMENTS
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution, InstitutionMembership
 from itou.users.factories import LaborInspectorFactory
@@ -13,6 +14,7 @@ class InstitutionFactory(factory.django.DjangoModelFactory):
 
     name = factory.Faker("name", locale="fr_FR")
     kind = InstitutionKind.DDETS
+    department = factory.fuzzy.FuzzyChoice(DEPARTMENTS.keys())
 
 
 class InstitutionMembershipFactory(factory.django.DjangoModelFactory):

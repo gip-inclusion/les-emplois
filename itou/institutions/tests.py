@@ -36,7 +36,7 @@ class InstitutionModelTest(TestCase):
 
 
 def test_deactivate_last_admin(client):
-    institution = InstitutionWithMembershipFactory()
+    institution = InstitutionWithMembershipFactory(department="")
     membership = institution.memberships.first()
     assert membership.is_admin
 
