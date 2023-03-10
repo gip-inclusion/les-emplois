@@ -28,7 +28,7 @@ from django.core.management.base import BaseCommand
 from django.db.models import Count, Max, Min, Prefetch, Q
 from django.utils import timezone
 
-from itou.analytics.models import Datum
+from itou.analytics.models import Datum, StatsDashboardVisit
 from itou.approvals.models import Approval, PoleEmploiApproval
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
@@ -110,6 +110,7 @@ class Command(BaseCommand):
 
     def populate_analytics(self):
         populate_table(analytics.AnalyticsTable, batch_size=10_000, querysets=[Datum.objects.all()])
+        populate_table(analytics.DashboardVisitTable, batch_size=10_000, querysets=[StatsDashboardVisit.objects.all()])
 
     def populate_siaes(self):
         ONE_MONTH_AGO = timezone.now() - timezone.timedelta(days=30)

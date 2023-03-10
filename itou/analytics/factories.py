@@ -1,6 +1,10 @@
 import factory
+import factory.fuzzy
 
-from .models import Datum
+from itou.common_apps.address.departments import DEPARTMENTS
+from itou.users.enums import UserKind
+
+from .models import Datum, StatsDashboardVisit
 
 
 class DatumFactory(factory.django.DjangoModelFactory):
@@ -8,3 +12,17 @@ class DatumFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = Datum
+
+
+class StatsDashboardVisitFactory(factory.django.DjangoModelFactory):
+    dashboard_id = factory.Faker("pyint")
+    department = factory.fuzzy.FuzzyChoice(DEPARTMENTS.keys())
+    region = factory.Faker("region", locale="fr_FR")
+    current_siae_id = factory.Faker("pyint")
+    current_prescriber_organization_id = factory.Faker("pyint")
+    current_institution_id = factory.Faker("pyint")
+    user_kind = factory.fuzzy.FuzzyChoice(UserKind.values)
+    user_id = factory.Faker("pyint")
+
+    class Meta:
+        model = StatsDashboardVisit

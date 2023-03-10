@@ -8,7 +8,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertNumQueries
 
-from itou.analytics.factories import DatumFactory
+from itou.analytics.factories import DatumFactory, StatsDashboardVisitFactory
 from itou.approvals.enums import Origin
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.eligibility.factories import EligibilityDiagnosisFactory
@@ -29,6 +29,7 @@ from itou.users.enums import IdentityProvider
 from itou.users.factories import JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
 
 
+@freeze_time("2023-03-10")
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
 def test_populate_analytics():
@@ -36,6 +37,10 @@ def test_populate_analytics():
     data0 = DatumFactory(code="ER-101", bucket="2021-12-31")
     data1 = DatumFactory(code="ER-102", bucket="2020-10-17")
     data2 = DatumFactory(code="ER-102-3436", bucket="2022-08-16")
+
+    stats1 = StatsDashboardVisitFactory()
+    stats2 = StatsDashboardVisitFactory()
+
     management.call_command("populate_metabase_emplois", mode="analytics")
     with connection.cursor() as cursor:
         cursor.execute("SELECT * FROM c1_analytics_v0 ORDER BY date")
@@ -63,6 +68,38 @@ def test_populate_analytics():
                 datetime.date(2022, 8, 16),
                 data2.value,
                 "FS avec une erreur 3436 au premier retour",
+                date_maj,
+            ),
+        ]
+
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM c1_private_dashboard_visits_v0 ORDER BY measured_at")
+        rows = cursor.fetchall()
+        assert rows == [
+            (
+                str(stats1.pk),
+                datetime.datetime(2023, 3, 10),
+                str(stats1.dashboard_id),
+                stats1.department,
+                stats1.region,
+                str(stats1.current_siae_id),
+                str(stats1.current_prescriber_organization_id),
+                str(stats1.current_institution_id),
+                stats1.user_kind,
+                str(stats1.user_id),
+                date_maj,
+            ),
+            (
+                str(stats2.pk),
+                datetime.datetime(2023, 3, 10),
+                str(stats2.dashboard_id),
+                stats2.department,
+                stats2.region,
+                str(stats2.current_siae_id),
+                str(stats2.current_prescriber_organization_id),
+                str(stats2.current_institution_id),
+                stats2.user_kind,
+                str(stats2.user_id),
                 date_maj,
             ),
         ]
