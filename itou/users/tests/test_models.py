@@ -679,10 +679,33 @@ class ModelTest(TestCase):
             authorized=True, kind=PrescriberOrganizationKind.PE, department="93"
         )
         user = regular_pe_agency.members.get()
+        assert not regular_pe_agency.is_dtpe
         assert not regular_pe_agency.is_drpe
         assert not regular_pe_agency.is_dgpe
         assert user.can_view_stats_pe(current_org=regular_pe_agency)
         assert user.get_stats_pe_departments(current_org=regular_pe_agency) == ["93"]
+
+    def test_can_view_stats_pe_as_dtpe_with_single_department(self):
+        dtpe_with_single_department = PrescriberOrganizationWithMembershipFactory(
+            authorized=True, kind=PrescriberOrganizationKind.PE, code_safir_pole_emploi="49104", department="49"
+        )
+        user = dtpe_with_single_department.members.get()
+        assert dtpe_with_single_department.is_dtpe
+        assert not dtpe_with_single_department.is_drpe
+        assert not dtpe_with_single_department.is_dgpe
+        assert user.can_view_stats_pe(current_org=dtpe_with_single_department)
+        assert user.get_stats_pe_departments(current_org=dtpe_with_single_department) == ["49"]
+
+    def test_can_view_stats_pe_as_dtpe_with_multiple_departments(self):
+        dtpe_with_multiple_departments = PrescriberOrganizationWithMembershipFactory(
+            authorized=True, kind=PrescriberOrganizationKind.PE, code_safir_pole_emploi="72203", department="72"
+        )
+        user = dtpe_with_multiple_departments.members.get()
+        assert dtpe_with_multiple_departments.is_dtpe
+        assert not dtpe_with_multiple_departments.is_drpe
+        assert not dtpe_with_multiple_departments.is_dgpe
+        assert user.can_view_stats_pe(current_org=dtpe_with_multiple_departments)
+        assert user.get_stats_pe_departments(current_org=dtpe_with_multiple_departments) == ["72", "53"]
 
     def test_can_view_stats_pe_as_drpe(self):
         drpe = PrescriberOrganizationWithMembershipFactory(
@@ -691,6 +714,7 @@ class ModelTest(TestCase):
         user = drpe.members.get()
         assert drpe.is_drpe
         assert not drpe.is_dgpe
+        assert not drpe.is_dtpe
         assert user.can_view_stats_pe(current_org=drpe)
         assert user.get_stats_pe_departments(current_org=drpe) == ["75", "77", "78", "91", "92", "93", "94", "95"]
 
@@ -700,6 +724,7 @@ class ModelTest(TestCase):
         )
         user = dgpe.members.get()
         assert not dgpe.is_drpe
+        assert not dgpe.is_dtpe
         assert dgpe.is_dgpe
         assert user.can_view_stats_pe(current_org=dgpe)
         assert user.get_stats_pe_departments(current_org=dgpe) == DEPARTMENTS.keys()

@@ -34,7 +34,11 @@ from itou.common_apps.address.format import format_address
 from itou.common_apps.address.models import AddressMixin
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
-from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
+from itou.prescribers.enums import (
+    DTPE_SAFIR_CODE_TO_DEPARTMENTS,
+    PrescriberAuthorizationStatus,
+    PrescriberOrganizationKind,
+)
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.enums import SiaeKind
 from itou.siaes.models import Siae
@@ -753,6 +757,9 @@ class User(AbstractUser, AddressMixin):
             return DEPARTMENTS.keys()
         if current_org.is_drpe:
             return REGIONS[current_org.region]
+        if current_org.is_dtpe:
+            departments = DTPE_SAFIR_CODE_TO_DEPARTMENTS[current_org.code_safir_pole_emploi]
+            return [current_org.department] if departments is None else departments
         return [current_org.department]
 
     def can_view_stats_ddets(self, current_org):

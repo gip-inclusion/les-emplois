@@ -269,9 +269,14 @@ def render_stats_pe(request, page_title):
             "matomo_custom_url_suffix": f"{format_region_for_matomo(current_org.region)}/drpe",
             "region": current_org.region,
         }
+    elif current_org.is_dtpe:
+        context |= {
+            "matomo_custom_url_suffix": f"{format_region_and_department_for_matomo(current_org.department)}/dtpe",
+            "department": current_org.department,
+        }
     else:
         context |= {
-            "matomo_custom_url_suffix": format_region_and_department_for_matomo(current_org.department),
+            "matomo_custom_url_suffix": f"{format_region_and_department_for_matomo(current_org.department)}/agence",
             "department": current_org.department,
         }
     return render_stats(request=request, context=context, params=params)

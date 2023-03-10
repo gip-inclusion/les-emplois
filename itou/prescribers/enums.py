@@ -49,3 +49,117 @@ class PrescriberAuthorizationStatus(models.TextChoices):
     VALIDATED = "VALIDATED", "Habilitation validée"
     REFUSED = "REFUSED", "Validation de l'habilitation refusée"
     NOT_REQUIRED = "NOT_REQUIRED", "Pas d'habilitation nécessaire"
+
+
+# DGPE, as in "Direction Générale Pôle emploi" is a special PE agency which oversees the whole country.
+DGPE_SAFIR_CODE = "00162"
+
+# DRPE, as in "Direction Régionale Pôle emploi", are special PE agencies which oversee their whole region.
+# We keep it simple by hardcoding their (short) list here to avoid the complexity of adding a field or a kind.
+DRPE_SAFIR_CODES = [
+    "13992",  # Provence-Alpes-Côte d'Azur
+    "20010",  # Corse
+    "21069",  # Bourgogne-Franche-Comté
+    "31096",  # Occitanie
+    "33127",  # Nouvelle-Aquitaine
+    "35076",  # Bretagne
+    "44116",  # Pays de la Loire
+    "45054",  # Centre-Val de Loire
+    "59212",  # Hauts-de-France
+    "67085",  # Grand Est
+    "69188",  # Auvergne-Rhône-Alpes
+    "75980",  # Île-de-France
+    "76115",  # Normandie
+    "97110",  # Guadeloupe
+    "97210",  # Martinique
+    "97310",  # Guyane
+    "97410",  # La Réunion
+    "97600",  # Mayotte
+]
+
+# DTPE, as in "Direction Territoriale Pôle emploi", are special PE agencies which generally oversee
+# their whole department and sometimes more than one department.
+# We keep it simple by hardcoding their list here to avoid the complexity of adding a field or a kind.
+# By default (`None`) a DTPE oversees its own department unless a list of several departments is specified below.
+DTPE_SAFIR_CODE_TO_DEPARTMENTS = {
+    # Note that the first two digits of the SAFIR code usually indicate the department.
+    "10038": None,
+    "11030": ["09", "11"],
+    "13010": None,
+    "14056": None,
+    "17041": ["16", "17"],
+    "18029": None,
+    "20423": None,
+    "20431": None,
+    "21265": None,
+    "22045": None,
+    "24036": ["19", "24"],
+    "25019": ["25", "90"],
+    "26085": None,
+    "27002": None,
+    "28004": None,
+    "29110": None,
+    "30600": ["30", "48"],
+    "311": None,
+    "31403": None,
+    "33390": None,
+    "34300": None,
+    "35141": None,
+    "37056": None,
+    "38040": None,
+    "40029": ["40", "47"],
+    "4016": None,
+    "42060": None,
+    "44060": None,
+    "45000": None,
+    "49104": None,
+    "51023": None,
+    "54127": None,
+    "56106": None,
+    "57561": None,
+    "59470": None,
+    "6013": None,
+    "60260": None,
+    "62750": None,
+    "63074": None,
+    "64093": None,
+    "65020": ["65", "32"],
+    "66004": None,
+    "67014": None,
+    "68311": None,
+    "69050": None,
+    "70007": ["39", "70"],
+    "71002": None,
+    "72203": ["72", "53"],
+    "73055": None,
+    "74063": None,
+    "75082": None,
+    "76266": None,
+    "77206": None,
+    "78201": None,
+    "80073": None,
+    "8056": None,
+    "81003": ["81", "12"],
+    "82013": ["82", "46"],
+    "83142": None,
+    "84002": None,
+    "85004": None,
+    "86083": ["79", "86"],
+    "87068": ["23", "87"],
+    "88654": None,
+    "89031": ["58", "89"],
+    "91211": None,
+    "92301": None,
+    "93326": None,
+    "94305": None,
+    "951": None,
+    "952": None,
+    "95204": None,
+    "97201": None,
+    "97312": None,
+    "97460": None,
+    "97549": None,
+    "97600": None,
+    "97715": None,
+    "97716": None,
+}

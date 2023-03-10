@@ -8,7 +8,13 @@ from django.utils.http import urlencode
 
 from itou.common_apps.address.models import AddressMixin
 from itou.common_apps.organizations.models import MembershipAbstract, OrganizationAbstract, OrganizationQuerySet
-from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
+from itou.prescribers.enums import (
+    DGPE_SAFIR_CODE,
+    DRPE_SAFIR_CODES,
+    DTPE_SAFIR_CODE_TO_DEPARTMENTS,
+    PrescriberAuthorizationStatus,
+    PrescriberOrganizationKind,
+)
 from itou.utils.emails import get_email_message
 from itou.utils.urls import get_absolute_url, get_tally_form_url
 from itou.utils.validators import validate_code_safir, validate_siret
@@ -87,32 +93,6 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
 
     In case 3, we talk about "prescripteur habilité" in French.
     """
-
-    # DGPE, as in "Direction Générale Pôle emploi" is a special PE agency which oversees the whole country.
-    DGPE_SAFIR_CODE = "00162"
-
-    # DRPE, as in "Direction Régionale Pôle emploi", are special PE agencies which oversee their whole region.
-    # We keep it simple by hardcoding their (short) list here to avoid the complexity of adding a field or a kind.
-    DRPE_SAFIR_CODES = [
-        "13992",
-        "20010",
-        "21069",
-        "31096",
-        "33127",
-        "35076",
-        "44116",
-        "45054",
-        "59212",
-        "67085",
-        "69188",
-        "75980",
-        "76115",
-        "97110",
-        "97210",
-        "97310",
-        "97410",
-        "97600",
-    ]
 
     # Rules:
     # - a SIRET was not mandatory in the past (some entries still have a "blank" siret)
@@ -300,14 +280,25 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
         """
         DGPE, as in "Direction Générale Pôle emploi" is a special PE agency which oversees the whole country.
         """
-        return self.kind == PrescriberOrganizationKind.PE and self.code_safir_pole_emploi == self.DGPE_SAFIR_CODE
+        return self.kind == PrescriberOrganizationKind.PE and self.code_safir_pole_emploi == DGPE_SAFIR_CODE
 
     @property
     def is_drpe(self):
         """
         DRPE, as in "Direction Régionale Pôle emploi", are special PE agencies which oversee their whole region.
         """
-        return self.kind == PrescriberOrganizationKind.PE and self.code_safir_pole_emploi in self.DRPE_SAFIR_CODES
+        return self.kind == PrescriberOrganizationKind.PE and self.code_safir_pole_emploi in DRPE_SAFIR_CODES
+
+    @property
+    def is_dtpe(self):
+        """
+        DTPE, as in "Direction Territoriale Pôle emploi", are special PE agencies which generally oversee
+        their whole department and sometimes more than one department.
+        """
+        return (
+            self.kind == PrescriberOrganizationKind.PE
+            and self.code_safir_pole_emploi in DTPE_SAFIR_CODE_TO_DEPARTMENTS
+        )
 
 
 class PrescriberMembership(MembershipAbstract):
