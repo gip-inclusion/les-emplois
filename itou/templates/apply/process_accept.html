@@ -34,6 +34,7 @@
 
                 {% if form_personal_data %}
                     {% if form_personal_data.nir_error %}{{ form_personal_data.nir_error|safe }}{% endif %}
+
                     {% bootstrap_form_errors form_personal_data type='non_fields' %}
                     {% bootstrap_field form_personal_data.nir %}
                     {% bootstrap_field form_personal_data.lack_of_nir %}
@@ -50,7 +51,18 @@
 
                 <hr>
                 <h2>Embauche</h2>
-                {% bootstrap_form form_accept alert_error_type="non_fields" %}
+                {% bootstrap_form_errors form_accept type="non_fields" %}
+                {% if siae_is_geiq %}
+                    {% bootstrap_field form_accept.contract_type %}
+                    <div id="contractTypeDetails" {% if not form_accept.is_bound or form_accept.contract_type.value != hide_value %}class="d-none"{% endif %}>
+                        {% bootstrap_field form_accept.contract_type_details %}
+                    </div>
+                    {% bootstrap_field form_accept.nb_hours_per_week %}
+                {% endif %}
+                {% bootstrap_field form_accept.hiring_start_at %}
+                {% bootstrap_field form_accept.hiring_end_at %}
+                {% bootstrap_field form_accept.answer %}
+
 
                 {% buttons %}
                     <hr>
@@ -99,8 +111,26 @@
 
 {% block script %}
     {{ block.super }}
+
     <script src="{% static 'js/split_nir.js' %}"></script>
+
     <!-- Needed to use the Datepicker JS widget. -->
     {{ form_accept.media }}
     {% if form_personal_data %}{{ form_personal_data.media }}{% endif %}
+
+    {# HTMX: dynamic contract type details field, must be reloaded at each DOM swap (otherwise invalidated) #}
+    <script nonce="{{ CSP_NONCE }}">
+        htmx.onLoad(function() {
+            var contractType = $("#id_contract_type");
+            var contractTypeDetails = $("#contractTypeDetails");
+            contractType.change(function() {
+                if (contractType.val() == '{{ hide_value }}') {
+                   contractTypeDetails.removeClass("d-none"); 
+                } else {
+                    $("#id_contract_type_details").val('');
+                    contractTypeDetails.addClass("d-none"); 
+                } 
+            });
+        });
+    </script>
 {% endblock %}

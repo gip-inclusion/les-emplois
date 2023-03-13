@@ -17,6 +17,7 @@ from django_xworkflows import models as xwf_models
 
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.siaes.enums import ContractType, SiaeKind
 from itou.siaes.models import Siae
 from itou.users.models import ApprovalAlreadyExistsError
 from itou.utils import constants as global_constants
@@ -249,6 +250,8 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
         "form_personal_data": form_personal_data,
         "job_application": job_application,
         "can_view_personal_information": True,  # SIAE members have access to personal info
+        "siae_is_geiq": job_application.to_siae.kind == SiaeKind.GEIQ,
+        "hide_value": ContractType.OTHER.value,
     }
 
     if not job_application.hiring_without_approval and job_application.eligibility_diagnosis_by_siae_required:
