@@ -167,6 +167,7 @@ class TestSyncPermsTestCase(TestCase):
             "change_emailaddress",
             "view_emailaddress",
             "view_datum",
+            "view_statsdashboardvisit",
             "add_approval",
             "change_approval",
             "delete_approval",

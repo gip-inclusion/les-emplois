@@ -25,6 +25,7 @@ class StatsDashboardVisitAdmin(admin.ModelAdmin):
     list_display = [
         "measured_at",
         "dashboard_id",
+        "dashboard_name",
         "department",
         "region",
         "current_siae_id",
@@ -32,7 +33,7 @@ class StatsDashboardVisitAdmin(admin.ModelAdmin):
         "current_institution_id",
         "user_kind",
     ]
-    list_filter = ["dashboard_id", "department", "region", "user_kind"]
+    list_filter = ["dashboard_name", "department", "region", "user_kind"]
     ordering = ["-measured_at"]
     date_hierarchy = "measured_at"
 

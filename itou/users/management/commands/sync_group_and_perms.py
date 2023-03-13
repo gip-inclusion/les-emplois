@@ -35,6 +35,7 @@ def get_permissions_dict():
         "itou-admin": {
             account_models.EmailAddress: PERMS_ADD,
             analytics_models.Datum: PERMS_READ,
+            analytics_models.StatsDashboardVisit: PERMS_READ,
             approvals_models.Approval: PERMS_ALL,
             approvals_models.PoleEmploiApproval: PERMS_READ,
             approvals_models.Suspension: PERMS_ALL,
