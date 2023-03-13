@@ -1,5 +1,3 @@
-import time
-
 import pytest
 import tenacity
 from django.core import management
@@ -48,8 +46,7 @@ MATOMO_ONLINE_CONTENT = (
 @pytest.mark.respx(base_url="https://mato.mo")
 @pytest.mark.usefixtures("metabase")
 @freeze_time("2022-06-21")
-def test_matomo_retry(monkeypatch, respx_mock, capsys):
-    monkeypatch.setattr(time, "sleep", lambda x: None)
+def test_matomo_retry(respx_mock, capsys):
     respx_mock.get("/index.php").respond(
         500,
         content=f"{MATOMO_HEADERS}\n{MATOMO_ONLINE_CONTENT}".encode("utf-16"),
@@ -87,8 +84,7 @@ def test_matomo_retry(monkeypatch, respx_mock, capsys):
 @pytest.mark.respx(base_url="https://mato.mo")
 @pytest.mark.usefixtures("metabase")
 @freeze_time("2022-06-21")
-def test_matomo_populate_public(monkeypatch, respx_mock):
-    monkeypatch.setattr(time, "sleep", lambda x: None)
+def test_matomo_populate_public(respx_mock):
     respx_mock.get("/index.php").respond(
         200,
         content=f"{MATOMO_HEADERS}\n{MATOMO_ONLINE_CONTENT}".encode("utf-16"),
@@ -199,7 +195,6 @@ def test_matomo_populate_private(monkeypatch, respx_mock):
 
     # rewrite the REGIONS import or the test, even with mocked HTTP calls, is several minutes
     monkeypatch.setattr(populate_metabase_matomo, "REGIONS", {"Bretagne": ["75", "31"]})
-    monkeypatch.setattr(time, "sleep", lambda x: None)
     respx_mock.get("/index.php").respond(
         200,
         content=f"{MATOMO_HEADERS}\n{MATOMO_ONLINE_CONTENT}".encode("utf-16"),
@@ -337,8 +332,7 @@ def test_matomo_populate_private(monkeypatch, respx_mock):
 @pytest.mark.respx(base_url="https://mato.mo")
 @pytest.mark.usefixtures("metabase")
 @freeze_time("2022-06-21")
-def test_matomo_empty_output(monkeypatch, respx_mock, capsys):
-    monkeypatch.setattr(time, "sleep", lambda x: None)
+def test_matomo_empty_output(respx_mock, capsys):
     MATOMO_ONLINE_EMPTY_CONTENT = "0," * 56 + "0"
     respx_mock.get("/index.php").respond(
         200,
