@@ -53,11 +53,11 @@ visiteurs_prives_0 as (
         svtp0."Département" as departement,
         svtp0."Nom Département" as nom_departement
     from
-        suivi_visiteurs_tb_prives_v0 svtp0 /* Nouvelle table créée par Victor qui démarre le 19/12/22 */
+        suivi_visiteurs_tb_prives_v1 svtp0 /* Nouvelle table créée par Victor qui démarre le 01/01/22 */
 ),
 /* Tables finales utilisées pour l'union all */
-visiteur_utilisateurs as ( 
-    select 
+visiteur_utilisateurs as (
+    select
         semaine,
         tableau_de_bord,
         visiteurs_uniques,
@@ -65,7 +65,7 @@ visiteur_utilisateurs as (
         vup.nombre_utilisateurs,
         vu.departement,
         vu.nom_departement
-    from 
+    from
         visiteurs_prives vu
     left join visiteurs_utilisateurs_privés vup
         on
@@ -73,7 +73,7 @@ visiteur_utilisateurs as (
         and vu.departement = vup.departement
 ),
 visiteur_utilisateurs_0 as (
-    select 
+    select
         semaine,
         tableau_de_bord,
         visiteurs_uniques,
@@ -81,7 +81,7 @@ visiteur_utilisateurs_0 as (
         vup.nombre_utilisateurs,
         vu.departement,
         vu.nom_departement
-    from 
+    from
         visiteurs_prives_0 vu
     left join visiteurs_utilisateurs_privés vup
         on

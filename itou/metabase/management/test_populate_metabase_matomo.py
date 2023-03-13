@@ -91,7 +91,7 @@ def test_matomo_populate_public(respx_mock):
     )
     management.call_command("populate_metabase_matomo", wet_run=True, mode="public")
     with connection.cursor() as cursor:
-        cursor.execute("SELECT * FROM suivi_visiteurs_tb_publics_v0")
+        cursor.execute("SELECT * FROM suivi_visiteurs_tb_publics_v1")
         rows = cursor.fetchall()
         assert len(rows) == 13
         assert rows[0] == (
@@ -201,7 +201,7 @@ def test_matomo_populate_private(monkeypatch, respx_mock):
     )
     management.call_command("populate_metabase_matomo", wet_run=True, mode="private")
     with connection.cursor() as cursor:
-        cursor.execute("SELECT * FROM suivi_visiteurs_tb_prives_v0")
+        cursor.execute("SELECT * FROM suivi_visiteurs_tb_prives_v1")
         rows = cursor.fetchall()
         assert len(rows) == 23
         assert rows[0] == (

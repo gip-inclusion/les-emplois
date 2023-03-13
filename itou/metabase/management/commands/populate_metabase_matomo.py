@@ -101,8 +101,8 @@ MATOMO_OPTIONS = {
 
 MATOMO_TIMEOUT = 60  # in seconds. Matomo can be slow.
 
-METABASE_PUBLIC_DASHBOARDS_TABLE_NAME = "suivi_visiteurs_tb_publics_v0"
-METABASE_PRIVATE_DASHBOARDS_TABLE_NAME = "suivi_visiteurs_tb_prives_v0"
+METABASE_PUBLIC_DASHBOARDS_TABLE_NAME = "suivi_visiteurs_tb_publics_v1"
+METABASE_PRIVATE_DASHBOARDS_TABLE_NAME = "suivi_visiteurs_tb_prives_v1"
 
 
 def matomo_api_call(options):
