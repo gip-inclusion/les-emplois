@@ -5,6 +5,7 @@ select
     -- REFUSED et REFUSED_2 correspondent au même état (?) - à confirmer par Zo
     case when "cap_criteres"."état" = 'REFUSED_2' then 'REFUSED' else "cap_criteres"."état" end as état,
     "camp"."nom" as "nom_campagne",
+    "structs"."département" as "département",
     "structs"."nom_département" as "nom_département",
     "structs"."région" as "nom_région",
     "structs"."type" as "type_structure"
