@@ -6,6 +6,7 @@ select
     structures.type,
     structures.nom_département as nom_département,
     structures."région" as région,
+    structures.active as active,
     case when cap_structures. "date_contrôle" is not null then
         1
     else
@@ -15,8 +16,4 @@ select
 from
     "public"."structures" structures
     left join "public"."cap_structures" cap_structures on structures. "id" = cap_structures. "id_structure"
-    left join "cap_campagnes" cap_campagnes on cap_structures.id_cap_campagne = cap_campagnes.id
-where
-    structures. "active" = 1 
-    --and
-    --cap_structures. "date_contrôle" is not null;
+    left join "cap_campagnes" cap_campagnes on cap_structures.id_cap_campagne = cap_campagnes.id;
