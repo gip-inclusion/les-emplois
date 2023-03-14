@@ -938,7 +938,7 @@ class SuspensionModelTest(TestCase):
         today = timezone.localdate()
         start_at = today - relativedelta(days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS * 2)
         end_at = start_at + relativedelta(months=2)
-        approval = ApprovalFactory.build(start_at=start_at, end_at=end_at)
+        approval = ApprovalFactory.build(start_at=start_at, end_at=end_at, eligibility_diagnosis=None)
 
         # Suspension.start_date is too old.
         suspension = SuspensionFactory.build(approval=approval)
@@ -970,7 +970,7 @@ class SuspensionModelTest(TestCase):
     def test_start_in_future(self):
         start_at = timezone.localdate() + relativedelta(days=10)
         # Build provides a local object without saving it to the database.
-        suspension = SuspensionFactory.build(start_at=start_at)
+        suspension = SuspensionFactory.build(start_at=start_at, approval__eligibility_diagnosis=None)
         assert suspension.start_in_future
 
     def test_start_in_approval_boundaries(self):
@@ -1002,7 +1002,7 @@ class SuspensionModelTest(TestCase):
     def test_is_in_progress(self):
         start_at = timezone.localdate() - relativedelta(days=10)
         # Build provides a local object without saving it to the database.
-        suspension = SuspensionFactory.build(start_at=start_at)
+        suspension = SuspensionFactory.build(start_at=start_at, approval__eligibility_diagnosis=None)
         assert suspension.is_in_progress
 
     def test_get_overlapping_suspensions(self):
@@ -1538,14 +1538,14 @@ class ApprovalConcurrentModelTest(TransactionTestCase):
     def test_nominal_process(self):
         with transaction.atomic():
             # create a first approval out of the blue, ensure the number is correct.
-            approval_1 = ApprovalFactory.build(user=JobSeekerFactory(), number=None)
+            approval_1 = ApprovalFactory.build(user=JobSeekerFactory(), number=None, eligibility_diagnosis=None)
             assert Approval.objects.count() == 0
             approval_1.save()
             assert approval_1.number == "XXXXX0000001"
             assert Approval.objects.count() == 1
 
             # if a second one is created after the save, no worries man.
-            approval_2 = ApprovalFactory.build(user=JobSeekerFactory(), number=None)
+            approval_2 = ApprovalFactory.build(user=JobSeekerFactory(), number=None, eligibility_diagnosis=None)
             approval_2.save()
             assert approval_2.number == "XXXXX0000002"
 
@@ -1574,7 +1574,9 @@ class ApprovalConcurrentModelTest(TransactionTestCase):
         def first_request():
             nonlocal approval
             with transaction.atomic():
-                approval = ApprovalFactory.build(user=user1, number=Approval.get_next_number())
+                approval = ApprovalFactory.build(
+                    user=user1, number=Approval.get_next_number(), eligibility_diagnosis=None
+                )
                 time.sleep(0.2)  # sleep long enough for the concurrent request to start
                 approval.save()
 
@@ -1582,7 +1584,9 @@ class ApprovalConcurrentModelTest(TransactionTestCase):
             nonlocal approval2
             with transaction.atomic():
                 time.sleep(0.1)  # ensure we are not the first to take the lock
-                approval2 = ApprovalFactory.build(user=user2, number=Approval.get_next_number())
+                approval2 = ApprovalFactory.build(
+                    user=user2, number=Approval.get_next_number(), eligibility_diagnosis=None
+                )
                 time.sleep(0.2)  # sleep long enough to save() after the first request's save()
                 approval2.save()
 

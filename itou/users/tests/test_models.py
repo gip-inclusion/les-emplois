@@ -976,7 +976,13 @@ def user_with_approval_in_waiting_period():
     user = JobSeekerFactory()
     end_at = timezone.localdate() - relativedelta(days=30)
     start_at = end_at - relativedelta(years=2)
-    ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
+    # Force the approval to have no eligibility diagnosis
+    ApprovalFactory(
+        user=user,
+        start_at=start_at,
+        end_at=end_at,
+        eligibility_diagnosis=None,
+    )
     return user
 
 

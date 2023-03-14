@@ -166,7 +166,6 @@ def test_populate_job_seekers():
         job_seeker=user_3,
         created_at=datetime.datetime(2023, 1, 1, tzinfo=datetime.timezone.utc),
         with_approval=True,
-        approval=ApprovalFactory(user=user_3),
         eligibility_diagnosis__author_kind="siae_staff",
         eligibility_diagnosis__author_prescriber_organization=None,
         eligibility_diagnosis__author_siae=SiaeFactory(),

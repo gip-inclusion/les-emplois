@@ -1233,7 +1233,7 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
         # Create an approval in waiting period.
         end_at = datetime.date.today() - relativedelta(days=30)
         start_at = end_at - relativedelta(years=2)
-        ApprovalFactory(user=job_seeker, start_at=start_at, end_at=end_at)
+        ApprovalFactory(user=job_seeker, start_at=start_at, end_at=end_at, eligibility_diagnosis=None)
 
         user = PrescriberFactory()
         self.client.force_login(user)
@@ -1683,7 +1683,7 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
         # Create an approval in waiting period.
         end_at = datetime.date.today() - relativedelta(days=30)
         start_at = end_at - relativedelta(years=2)
-        ApprovalFactory(user=job_seeker, start_at=start_at, end_at=end_at)
+        ApprovalFactory(user=job_seeker, start_at=start_at, end_at=end_at, eligibility_diagnosis=None)
 
         user = siae.members.first()
         self.client.force_login(user)

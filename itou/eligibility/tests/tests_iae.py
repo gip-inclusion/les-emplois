@@ -70,7 +70,7 @@ class EligibilityDiagnosisManagerTest(TestCase):
         assert has_considered_valid
 
         # Has a valid PASS IAE but NO diagnosis.
-        approval = ApprovalFactory()
+        approval = ApprovalFactory(eligibility_diagnosis=None)
         job_seeker = approval.user
         assert 0 == job_seeker.eligibility_diagnoses.count()
         has_considered_valid = EligibilityDiagnosis.objects.has_considered_valid(job_seeker=job_seeker)
@@ -119,7 +119,7 @@ class EligibilityDiagnosisManagerTest(TestCase):
 
         # Has expired Itou diagnosis but has an ongoing PASS IAE.
         expired_diagnosis = ExpiredEligibilityDiagnosisFactory()
-        ApprovalFactory(user=expired_diagnosis.job_seeker)
+        ApprovalFactory(user=expired_diagnosis.job_seeker, eligibility_diagnosis=expired_diagnosis)
         has_considered_valid = EligibilityDiagnosis.objects.has_considered_valid(
             job_seeker=expired_diagnosis.job_seeker
         )
