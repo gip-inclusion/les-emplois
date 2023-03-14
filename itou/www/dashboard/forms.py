@@ -8,6 +8,7 @@ from itou.job_applications.notifications import (
     NewQualifiedJobAppEmployersNotification,
     NewSpontaneousJobAppEmployersNotification,
 )
+from itou.users.enums import IdentityProvider
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.apis.exceptions import AddressLookupError
@@ -17,8 +18,8 @@ from itou.utils.widgets import DuetDatePickerWidget, MultipleSwitchCheckboxWidge
 class SSOReadonlyMixin:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance.has_sso_provider:
-            # When a user has logged in with a SSO,
+        if self.instance.has_sso_provider and self.instance.identity_provider != IdentityProvider.PE_CONNECT:
+            # When a user has logged in with a SSO other than PEAMU
             # it should see the field but most should be disabled
             # (that’s a requirement on FranceConnect’s side).
             disabled_fields = ["first_name", "last_name", "email", "birthdate"]
@@ -52,8 +53,8 @@ class EditJobSeekerInfoForm(JobSeekerNIRUpdateMixin, MandatoryAddressFormMixin, 
         )
 
         # Noboby can edit its own email.
-        if self.instance.has_sso_provider:
-            # If the job seeker uses SSO, point them to the modification process
+        if self.instance.identity_provider == IdentityProvider.FRANCE_CONNECT:
+            # If the job seeker uses France Connect, point them to the modification process
             self.fields["email"].help_text = (
                 "Si vous souhaitez modifier votre adresse e-mail merci de "
                 f"<a href='{global_constants.ITOU_ASSISTANCE_URL}/#support' target='_blank'>"
