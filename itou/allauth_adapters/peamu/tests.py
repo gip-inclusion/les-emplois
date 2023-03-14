@@ -98,6 +98,16 @@ class PEAMUTests(OAuth2TestsMixin, TestCase):
         assert EmailAddress.objects.filter(email="john.doe@example.com").count() == 0
 
     @mock.patch("itou.external_data.signals.import_user_pe_data_on_peamu_login")
+    def test_update_user_info(self, mock_login_signal):
+        self.login(self.get_mocked_response())
+        assert mock_login_signal.call_count == 1
+        assert User.objects.count() == 1
+
+        self.login(self.get_mocked_response(family_name="Snow"))
+        assert User.objects.count() == 1
+        assert User.objects.get().last_name == "Snow"
+
+    @mock.patch("itou.external_data.signals.import_user_pe_data_on_peamu_login")
     def test_email_verification_is_skipped_for_peamu_account(self, mock_login_signal):
         test_email = "john.doe@example.com"
         self.login(self.get_mocked_response())
