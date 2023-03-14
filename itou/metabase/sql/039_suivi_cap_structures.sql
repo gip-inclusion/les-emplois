@@ -4,7 +4,8 @@ select
     cap_structures.id_structure id_cap_structure,
     structures.id id_structure,
     structures.type,
-    structures.nom_département as nom_département,
+    structures."département" as "département",
+    structures."nom_département" as "nom_département",
     structures."région" as région,
     case when structures.active = 1 then
         'Oui'
