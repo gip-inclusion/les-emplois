@@ -6,11 +6,14 @@ select
     structures.type,
     structures.nom_département as nom_département,
     structures."région" as région,
-    structures.active as active,
-    case when cap_structures. "date_contrôle" is not null then
-        1
+    case when structures.active = 1 then
+        'Oui'
     else
-        0
+        'Non' end as active,
+    case when cap_structures. "date_contrôle" is not null then
+        'Oui'
+    else
+        'Non'
     end as "controlee",
     cap_structures.état
 from
