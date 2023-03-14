@@ -56,8 +56,8 @@ class TestDisplayApproval(TestCase):
         self.assertContains(response, "Imprimer ce PASS IAE")
         self.assertContains(response, "Astuce pour conserver cette attestation en format PDF")
 
-    def test_no_display_approval_no_job_applications(self, *args, **kwargs):
-        approval = ApprovalFactory()
+    def test_dont_display_approval_with_no_eligibility_diagnosis_and_no_job_applications(self, *args, **kwargs):
+        approval = ApprovalFactory(eligibility_diagnosis=None)
         siae_member = SiaeMembershipFactory().user
         self.client.force_login(siae_member)
 
@@ -88,7 +88,8 @@ class TestDisplayApproval(TestCase):
         self.assertContains(response, "Imprimer ce PASS IAE")
         self.assertContains(response, "Astuce pour conserver cette attestation en format PDF")
 
-    def test_display_approval_missing_diagnosis_ai_approval(self, *args, **kwargs):
+    def test_display_approval_missing_diagnosis_ai_job_application(self, *args, **kwargs):
+        # TODO(alaurent) remove once last approvals were manually fixed
         # On November 30th, 2021, AI were delivered approvals without a diagnosis.
         job_application = JobApplicationFactory(
             with_approval=True,
@@ -110,7 +111,8 @@ class TestDisplayApproval(TestCase):
         self.assertContains(response, "Imprimer ce PASS IAE")
         self.assertContains(response, "Astuce pour conserver cette attestation en format PDF")
 
-    def test_display_approval_missing_diagnosis_ai_job_application(self, *args, **kwargs):
+    def test_display_approval_missing_diagnosis_ai_approval(self, *args, **kwargs):
+        # TODO(alaurent) remove once last approvals were manually fixed
         # On November 30th, 2021, AI were delivered approvals without a diagnosis.
         job_application = JobApplicationFactory(
             with_approval=True,

@@ -32,7 +32,11 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
         job_seeker_with_address = factory.Trait(job_seeker=factory.SubFactory(JobSeekerWithMockedAddressFactory))
         with_approval = factory.Trait(
             state=models.JobApplicationWorkflow.STATE_ACCEPTED,
-            approval=factory.SubFactory(ApprovalFactory, user=factory.SelfAttribute("..job_seeker")),
+            approval=factory.SubFactory(
+                ApprovalFactory,
+                user=factory.SelfAttribute("..job_seeker"),
+                eligibility_diagnosis=factory.SelfAttribute("..eligibility_diagnosis"),
+            ),
         )
         sent_by_authorized_prescriber_organisation = factory.Trait(
             sender_prescriber_organization=factory.SubFactory(

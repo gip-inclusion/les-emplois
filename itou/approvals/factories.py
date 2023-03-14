@@ -7,6 +7,7 @@ from dateutil.relativedelta import relativedelta
 from faker import Faker
 
 from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, Suspension
+from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.enums import SiaeKind
@@ -25,6 +26,7 @@ class ApprovalFactory(factory.django.DjangoModelFactory):
     number = factory.fuzzy.FuzzyText(length=7, chars=string.digits, prefix=Approval.ASP_ITOU_PREFIX)
     start_at = factory.LazyFunction(datetime.date.today)
     end_at = factory.LazyAttribute(lambda obj: Approval.get_default_end_date(obj.start_at))
+    eligibility_diagnosis = factory.SubFactory(EligibilityDiagnosisFactory, job_seeker=factory.SelfAttribute("..user"))
 
     @factory.post_generation
     def with_jobapplication(self, create, extracted, **kwargs):
