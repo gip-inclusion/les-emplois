@@ -21,21 +21,6 @@ class SummaryEmployeeRecordsTest(TestCase):
         response = self.client.get(self.url)
         assert response.status_code == 200
 
-    def test_hiring_end_at_date_in_header(self):
-        hiring_end_at = self.job_application.hiring_end_at
-        self.client.force_login(self.user)
-        response = self.client.get(self.url)
-        assert response.status_code == 200
-        self.assertContains(response, f"Fin du contrat : <b>{hiring_end_at.strftime('%e').lstrip()}")
-
-    def test_no_hiring_end_at_in_header(self):
-        self.job_application.hiring_end_at = None
-        self.job_application.save()
-        self.client.force_login(self.user)
-        response = self.client.get(self.url)
-        assert response.status_code == 200
-        self.assertContains(response, "Fin du contrat : <b>Non renseigné")
-
     def test_asp_batch_file_infos(self):
         self.client.force_login(self.user)
         response = self.client.get(self.url)
@@ -46,12 +31,12 @@ class SummaryEmployeeRecordsTest(TestCase):
 
         response = self.client.get(self.url)
         self.assertContains(response, "Horodatage ASP")
-        self.assertContains(response, "Création : RIAE_FS_20210410130000")
+        self.assertContains(response, "Création : <b>RIAE_FS_20210410130000")
 
         EmployeeRecordUpdateNotificationFactory(
             employee_record=self.employee_record, asp_batch_file="RIAE_FS_20210510130000.json"
         )
         response = self.client.get(self.url)
         self.assertContains(response, "Horodatage ASP")
-        self.assertContains(response, "Création : RIAE_FS_20210410130000")
-        self.assertContains(response, "Modification : RIAE_FS_20210510130000")
+        self.assertContains(response, "Création : <b>RIAE_FS_20210410130000")
+        self.assertContains(response, "Modification : <b>RIAE_FS_20210510130000")

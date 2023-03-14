@@ -1,4 +1,4 @@
-{% extends "layout/content_small.html" %}
+{% extends "layout/content.html" %}
 {% load static %}
 {% load format_filters %}
 {% load list_filters %}
@@ -8,40 +8,40 @@
     Nouvelle fiche salarié ASP - étape {{ step }} - {{ current_siae.display_name }} {{ block.super }}
 {% endblock %}
 
-{% block content %}
-
-    <div class="content-small">
-
-        <h1 class="h1-hero-c1">Fiches salarié ASP</h1>
-        <h2 class="h1 text-muted">{{ job_application.job_seeker.get_full_name|title }}</h2>
-
-        <div class="card bg-gray-400 p-3 mb-3">
-            <div class="card-body p-1">
-                <div class="row">
-                    <div class="col-sm-9 pt-3">
-                        <div>
-                            Début du contrat : <b>{{ job_application.hiring_start_at|default_if_none:"Non renseigné" }}</b>
-                        </div>
-                        <div>
-                            Fin du contrat : <b>{{ job_application.hiring_end_at|default_if_none:"Non renseigné" }}</b>
-                        </div>
-                        <div>
-                            Numéro de PASS IAE : <b>{{ job_application.approval.number|format_approval_number }}</b>
-                        </div>
-                    </div>
-                    <div class="col-sm-3 text-right">
-                        <img src="{% static 'img/employee_record/asp_upload.svg' %}" alt="Transfert ASP">
-                    </img>
+{% block pre_content %}
+    <section class="s-title-01 p-0">
+        <div class="s-title-01__container container">
+            <div class="s-title-01__row row">
+                <div class="s-title-01__col col-12">
+                    <h1 class="h1">Fiches salarié ASP : {{ job_application.job_seeker.get_full_name|title }}</h1>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
+{% endblock %}
 
-    <ul class="list-unstyled multi-steps my-5">
-        {% for pstep, label in steps %}
-            <li {% if pstep == step %}class="is-active"{% endif %}>{{ label }}</li>
-        {% endfor %}
-    </ul>
+{% block content_container_css_classes %}s-section p-0{% endblock %}
+{% block content %}
+
+    <div class="s-section__row row mb-3 mb-md-5">
+        <div class="s-section__col col-12 col-lg-8">
+            {% with total_steps=5 percent_steps=20 %}
+                {% for pstep, label in steps %}
+                    {% if pstep == step %}
+                        <div class="c-stepper">
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width:{% widthratio percent_steps 1 pstep %}%" aria-valuenow="{% widthratio percent_steps 1 pstep %}" aria-valuemin="0" aria-valuemax="100">
+                                </div>
+                            </div>
+                            <p>
+                                <strong>Étape {{ pstep }}</strong>/{{ total_steps }} : {{ label }}
+                            </p>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endwith %}
+        </div>
+    </div>
 
     {% if step == 1 %}
         {% include "employee_record/includes/create_step_1.html" %}
@@ -54,7 +54,5 @@
     {% elif step == 5 %}
         {% include "employee_record/includes/create_step_5.html" %}
     {% endif %}
-
-</div>
 
 {% endblock %}

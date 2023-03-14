@@ -1,23 +1,53 @@
 {% load bootstrap4 %}
 
-<h4>Etat civil du salarié</h4>
+<div class="row">
+    <div class="col-12 col-lg-8">
+        <div class="c-form">
+            <form method="post" action="" class="js-prevent-multiple-submit">
+                {% csrf_token %}
+                <fieldset>
+                    <legend>
+                        Etat civil du salarié
+                    </legend>
+                    {% bootstrap_form_errors form type="all" %}
 
-{% bootstrap_form_errors form type="all" %}
-
-<form method="post" action="" class="js-prevent-multiple-submit">
-    {% csrf_token %}
-
-    {% bootstrap_field form.title %}
-    {% bootstrap_field form.first_name %}
-    {% bootstrap_field form.last_name %}
-    {% bootstrap_field form.birthdate %}
-
-    {% bootstrap_field form.birth_country %}
-    {% bootstrap_field form.insee_commune %}
-    {% bootstrap_field form.insee_commune_code %}
-
-    {% buttons %}
-        <a class="btn btn btn-outline-secondary" href="#">Annuler</a>
-        <button type="submit" class="btn btn-primary">Continuer</button>
-    {% endbuttons %}
-</form>
+                    <div class="form-row">
+                        <div class="col-12 col-md-6">{% bootstrap_field form.title %}</div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-12 col-md-6">{% bootstrap_field form.first_name %}</div>
+                        <div class="col-12 col-md-6">{% bootstrap_field form.last_name %}</div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-12 col-md-6">{% bootstrap_field form.birthdate %}</div>
+                        <div class="col-12 col-md-6">{% bootstrap_field form.birth_country %}</div>
+                    </div>
+                    {% bootstrap_field form.insee_commune %}
+                    {% bootstrap_field form.insee_commune_code %}
+                </fieldset>
+                <hr class="mb-3">
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <small id="fieldRequired">* champs obligatoires</small>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-row align-items-center justify-content-lg-between">
+                            <div class="form-group col-12 col-md-6 col-lg-auto order-2 order-md-1">
+                                <a href="{% url "employee_record_views:list" %}?status={{ status }}" class="btn btn-block btn-ico btn-link pl-lg-0 justify-content-center">
+                                    <i class="ri-arrow-go-back-line ri-lg"></i>
+                                    <span>Retour à la liste</span>
+                                </a>
+                            </div>
+                            <div class="form-group col-12 col-md-6 col-lg-auto order-1 order-md-2">
+                                <button type="submit" class="btn btn-block btn-ico btn-primary" aria-label="Passer à l'étape suivante">
+                                    <span>Étape suivante</span>
+                                    <i class="ri-arrow-right-line ri-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -5,55 +5,65 @@
 
 {% block title %}Détail fiche salarié ASP - {{ current_siae.display_name }} {{ block.super }}{% endblock %}
 
-{% block content %}
-
-    <div class="content-small mb-3">
-        <h1 class="h1-hero-c1">Détail fiche salarié ASP</h1>
-        <h2 class="h1 text-muted">{{ employee_record.job_seeker.get_full_name|title }}</h2>
-
-        <div class="card bg-gray-400 p-3 mb-3">
-            <div class="card-body p-1">
-                <div class="row">
-                    <div class="col-sm-9 pt-3">
-                        {% with job_application=employee_record.job_application %}
-                            <div>
-                                Début du contrat : <b>{{ job_application.hiring_start_at }}</b>
-                            </div>
-                            <div>
-                                Fin du contrat : <b>{{ job_application.hiring_end_at|default:"Non renseigné" }}</b>
-                            </div>
-                            <div>
-                                Numéro de PASS IAE : <b>{{ job_application.approval.number|format_approval_number }}</b>
-                            </div>
-                        {% endwith %}
-                        <div>
-                            <b>{{ employee_record.get_status_display }}</b> le {{ employee_record.updated_at }}
-                        </div>
-                        {% if employee_record.asp_batch_file %}
-                            <div class="mt-3">
-                                <b>Horodatage ASP:</b>
-                            </div>
-                            <div>Création : {{ employee_record.asp_batch_file|remove_json_extension }}</div>
-                            {% for update_notification in employee_record.update_notifications.all %}
-                                {% if update_notification.asp_batch_file %}
-                                    <div>Modification : {{ update_notification.asp_batch_file|remove_json_extension }}</div>
-                                {% endif %}
-                            {% endfor %}
-                        {% endif %}
-                    </div>
-                    <div class="col-sm-3 text-right">
-                        <img src="{% static 'img/employee_record/asp_upload.svg' %}" alt="Transfert ASP">
-                    </img>
+{% block pre_content %}
+    <section class="s-title-01 p-0">
+        <div class="s-title-01__container container">
+            <div class="s-title-01__row row">
+                <div class="s-title-01__col col-12">
+                    <h1 class="h1">Détail fiche salarié ASP: {{ employee_record.job_seeker.get_full_name|title }}</h1>
                 </div>
             </div>
         </div>
+    </section>
+{% endblock %}
+
+{% block content_container_css_classes %}s-section p-0{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="col-12 col-lg-8 order-2 order-lg-1">
+            <div class="c-box">
+                {% include "employee_record/includes/employee_record_summary.html" %}
+                <hr class="mb-3">
+                <div class="row mt-3">
+                    <div class="col-12 col-md-auto">
+                        <a href="{% url "employee_record_views:list" %}?status={{ status }}" class="btn btn-block btn-link pl-lg-0">
+                            <i class="ri-arrow-go-back-line ri-lg"></i>
+                            <span>Retour à la liste</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-4 order-1 order-lg-2 mb-3">
+            <div class="c-box">
+                <p>{{ employee_record.get_status_display }} le {{ employee_record.updated_at }}</p>
+                <hr class="my-3">
+                {% with job_application=employee_record.job_application %}
+                    <p>
+                        <b>PASS IAE :</b>
+                        <br>
+                        {{ job_application.approval.number|format_approval_number }}
+                    </p>
+                {% endwith %}
+                {% if employee_record.asp_batch_file %}
+                    <hr class="my-3">
+                    <p>
+                        <strong>Horodatage ASP :</strong>
+                    </p>
+                    <ul class="list-unstyled">
+                        <li>
+                            Création : <b>{{ employee_record.asp_batch_file|remove_json_extension }}</b>
+                        </li>
+                        {% for update_notification in employee_record.update_notifications.all %}
+                            {% if update_notification.asp_batch_file %}
+                                <li>
+                                    Modification : <b>{{ update_notification.asp_batch_file|remove_json_extension }}</b>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
     </div>
-
-    {% include "employee_record/includes/employee_record_summary.html" %}
-
-    <a href="{% url "employee_record_views:list" %}?status={{ status }}" class="btn btn-primary">Retour à la liste</a>
-
-</div>
-
-
 {% endblock %}

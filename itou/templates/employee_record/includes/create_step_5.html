@@ -1,42 +1,97 @@
 {% load bootstrap4 %}
+{% load format_filters %}
 {% load static %}
 
-<h4 class="h3">Récapitulatif et validation de la fiche salarié</h4>
+<div class="row">
+    <div class="col-12 col-lg-8 order-2 order-lg-1">
+        <div class="c-form">
+            <legend>
+                Récapitulatif et validation de la fiche salarié
+            </legend>
 
-{% include "employee_record/includes/employee_record_summary.html" %}
 
-{% if employee_record.status == 'NEW' or employee_record.status == "REJECTED" %}
-    <div class="alert alert-warning">
-        <p>Si ce récapitulatif est conforme et complet, la fiche salarié sera envoyée pour validation à l'ASP.</p>
-        <p>
-            Le traitement est effectué à intervalle régulier et vous serez notifié du changement d'état
-            de la fiche salarié sur la liste récapitulative accessible depuis le tableau de bord.
-        </p>
-        <p class="mb-0">
-            Après validation de la fiche salarié, <b>la modification de la date de début du PASS IAE n'est plus possible</b>.
-        </p>
+            {% if employee_record.status == 'NEW' or employee_record.status == "REJECTED" %}
+                <div class="mb-3 mb-md-5">
+                    <p>
+                        Si ce récapitulatif est conforme et complet, <strong>la fiche salarié sera envoyée pour validation à l'ASP</strong>.
+                    </p>
+                    <p>
+                        Le traitement est effectué à intervalle régulier et vous serez notifié du changement d'état
+                        de la fiche salarié sur la liste récapitulative accessible depuis le tableau de bord.
+                    </p>
+                    <p class="mb-0">
+                        <i class="ri-error-warning-line ri-lg mr-1"></i><strong>Après validation de la fiche salarié, la modification de la date de début du PASS IAE n'est plus possible.</strong>
+                    </p>
+                </div>
+
+                {% include "employee_record/includes/employee_record_summary.html" %}
+
+                <form method="post" action="{% url "employee_record_views:create_step_5" employee_record.job_application.id %}" class="js-prevent-multiple-submit">
+                    {% csrf_token %}
+                    <hr class="mb-3">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-row align-items-center justify-content-lg-between">
+                                <div class="form-group col-12 col-md-6 col-lg-auto order-3 order-md-1">
+                                    <a href="{% url "employee_record_views:create_step_4" employee_record.job_application.id %}" class="btn btn-block btn-ico btn-link pl-0 justify-content-center" aria-label="Retour à l'étape précédente">
+                                        <i class="ri-arrow-left-line ri-lg"></i>
+                                        <span>Étape précédente</span>
+                                    </a>
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg-auto order-1 order-md-2">
+                                    <button type="submit" class="btn btn-block btn-ico btn-primary">
+                                        <span>Valider la fiche salarié</span>
+                                        <i class="ri-arrow-right-line ri-lg"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+            {% else %}
+                <div class="mb-3 mb-md-5">
+                    <p>
+                        <b>La création de cette fiche salariée est terminée.</b>
+                    </p>
+                    <p>
+                        Vous pouvez suivre l'avancement de son traitement par l'ASP via la liste récapitulative accessible depuis le tableau de bord.
+                    </p>
+                    <a href="{% url "employee_record_views:list" %}?status=NEW" class="btn btn-link pl-0">
+                        Retour à la liste des fiches salarié
+                    </a>
+                </div>
+
+                {% include "employee_record/includes/employee_record_summary.html" %}
+            {% endif %}
+        </div>
     </div>
-
-    <form method="post" action="{% url "employee_record_views:create_step_5" employee_record.job_application.id %}" class="js-prevent-multiple-submit">
-        {% csrf_token %}
-        {% buttons %}
-            <a class="btn btn-outline-secondary" href="{% url "employee_record_views:create_step_4" employee_record.job_application.id %}">Précédent</a>
-            <button type="submit" class="btn btn-primary">Valider la fiche salarié</button>
-        {% endbuttons %}
-    </form>
-
-{% else %}
-    <div class="alert alert-success">
-        <p>
-            <b>La création de cette fiche salariée est terminée.</b>
-        </p>
-        <p class="mb-0">
-            Vous pouvez suivre l'avancement de son traitement par l'ASP via la liste récapitulative accessible depuis le tableau de bord.
-        </p>
+    <div class="col-12 col-lg-4 order-1 order-lg-2 mb-3">
+        <div class="c-box">
+            {% with job_application=employee_record.job_application %}
+                <p>
+                    <b>PASS IAE :</b>
+                    <br>
+                    {{ job_application.approval.number|format_approval_number }}
+                </p>
+                <hr class="my-3">
+                {% if approval_can_be_suspended_by_siae %}
+                    <a href="{% url 'approvals:suspend' approval_id=job_application.approval.id %}?back_url={{ request.get_full_path|urlencode }}"
+                       class="btn btn-secondary btn-ico btn-block justify-content-center mb-1"
+                       aria-label="Suspendre le PASS IAE">
+                        <i class="ri-pause-circle-line ri-lg"></i>
+                        <span>Suspendre</span>
+                    </a>
+                {% endif %}
+                <a class="btn btn-outline-primary btn-block matomo-event"
+                   data-matomo-action="telechargement-pdf"
+                   data-matomo-category="agrement"
+                   data-matomo-option="detail-agrement"
+                   href="{% url 'approvals:display_printable_approval' approval_id=job_application.approval.id %}"
+                   target="_blank">
+                    Afficher le PASS IAE
+                </a>
+            {% endwith %}
+        </div>
     </div>
-    <div class="mb-3">
-        <a href="{% url "employee_record_views:list" %}?status=NEW" class="btn btn-primary">
-            Retour à la liste des fiches salarié
-        </a>
-    </div>
-{% endif %}
+</div>
