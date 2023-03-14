@@ -6,6 +6,7 @@ fi
 
 cd "$APP_HOME" || exit 1
 
+set -o pipefail
 set -o errexit
 
 OUTPUT_PATH=shared_bucket/populate_metabase_matomo
