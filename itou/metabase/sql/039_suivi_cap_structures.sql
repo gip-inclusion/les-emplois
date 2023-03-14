@@ -11,7 +11,7 @@ select
         'Oui'
     else
         'Non' end as active,
-    case when cap_structures. "date_contrôle" is not null then
+    case when "cap_structures"."date_contrôle" is not null then
         'Oui'
     else
         'Non'
