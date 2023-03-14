@@ -333,9 +333,6 @@ class DashboardViewTest(TestCase):
             <div class="flex-grow-1">
                 <span class="h4 m-0">Contrôle a posteriori</span>
             </div>
-            <div class="ml-2">
-                <span class="badge badge-pill badge-sm badge-important text-white">Nouveau</span>
-            </div>
             """,
             html=True,
             count=1,
