@@ -12,6 +12,7 @@ from itou.prescribers.models import PrescriberMembership
 from itou.siaes.models import SiaeMembership
 from itou.users import models
 from itou.users.admin_forms import ItouUserCreationForm, UserAdminForm
+from itou.users.enums import IdentityProvider
 from itou.utils.admin import PkSupportRemarkInline
 
 
@@ -268,7 +269,9 @@ class ItouUserAdmin(UserAdmin):
         if not request.user.is_superuser:
             rof += ("is_staff", "is_superuser", "groups", "user_permissions")
         if obj and obj.has_sso_provider:
-            rof += ("first_name", "last_name", "email", "username")
+            rof += ("username",)
+            if obj.identity_provider != IdentityProvider.PE_CONNECT:
+                rof += ("first_name", "last_name", "email")
         return rof
 
 
