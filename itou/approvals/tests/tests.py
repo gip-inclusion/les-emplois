@@ -827,6 +827,7 @@ class CustomApprovalAdminViewsTest(TestCase):
             "created_by": user.pk,
             "origin": Origin.ADMIN,
             "number": f"{Approval.ASP_ITOU_PREFIX}1234567",
+            "eligibility_diagnosis": job_application.eligibility_diagnosis,
         }
         response = self.client.post(url, data=post_data)
         assert response.status_code == 200
@@ -839,6 +840,7 @@ class CustomApprovalAdminViewsTest(TestCase):
             "user": job_application.job_seeker.pk,
             "created_by": user.pk,
             "origin": Origin.ADMIN,
+            "eligibility_diagnosis": job_application.eligibility_diagnosis,
         }
         response = self.client.post(url, data=post_data)
         assert response.status_code == 302
