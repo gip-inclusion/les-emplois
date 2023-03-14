@@ -56,11 +56,6 @@ with autopr_candidates as (
     left join candidats c
     on
         cd.id_candidat = c.id
-    where 
-        état = 'Candidature acceptée'
-        and c.type_auteur_diagnostic = 'Employeur'
-        and cd.origine = 'Employeur'
-        and c.id_auteur_diagnostic_employeur = cd.id_structure
 ),
 all_candidates as (
     select
