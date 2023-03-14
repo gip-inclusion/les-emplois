@@ -1,99 +1,104 @@
 {% load format_filters %}
 {% load tally %}
-<div class="card my-5">
-
-    <div class="card-header">
-        <div class="row">
-            <div class="col-md-7">
-                <h3 class="h2">{{ item.job_seeker.get_full_name|title }}</h3>
+<div class="c-card card has-links-inside my-3 my-md-4">
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-12 col-md">
+                <h3 class="h3 m-0">{{ item.job_seeker.get_full_name|title }}</h3>
             </div>
-
             {# Statuses #}
-            <div class="col-md-5 text-right">
+            <div class="col-12 col-md-auto">
                 {% if form.status.value == "SENT" %}
-                    <p class="badge badge-pill badge-sm badge-warning">
+                    <span class="badge badge-pill badge-sm badge-warning">
                         Transmise à l'ASP le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
-                    </p>
+                    </span>
                 {% elif form.status.value == "REJECTED" %}
-                    <p class="badge badge-pill badge-sm badge-danger">
+                    <span class="badge badge-pill badge-sm badge-danger">
                         Retour en erreur le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
-                    </p>
+                    </span>
                 {% elif form.status.value == "PROCESSED" %}
-                    <p class="badge badge-pill badge-sm badge-success">
+                    <span class="badge badge-pill badge-sm badge-success">
                         Intégrée ASP le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
-                    </p>
+                    </span>
                 {% elif form.status.value == "READY" %}
-                    <p class="badge badge-pill badge-sm badge-secondary">
+                    <span class="badge badge-pill badge-sm badge-secondary">
                         Complétée le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
-                    </p>
+                    </span>
                 {% elif form.status.value == "DISABLED" %}
-                    <p class="badge badge-pill badge-sm badge-emploi-lightest">
+                    <span class="badge badge-pill badge-sm badge-emploi-lightest">
                         Désactivée le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
-                    </p>
+                    </span>
                 {% endif %}
             </div>
         </div>
-    </div>
 
-    <div class="card-body">
         <div class="row">
-            <div class="col-md-7">
-                <p class="m-0">
-                    Début de contrat :&nbsp;<b>{{ item.hiring_start_at|default_if_none:"Non renseigné" }}</b>
-                </p>
-                <p class="m-0">
-                    Fin de contrat :&nbsp;<b>{{ item.hiring_end_at|default_if_none:"Non renseigné" }}</b>
-                </p>
-                <p class="m-0">
-                    Numéro de PASS IAE (agrément) :&nbsp;<b>{{ item.approval.number|format_approval_number }}</b>
-                </p>
+            <div class="col-12">
+                <ul class="list-unstyled fs-sm">
+                    <li>
+                        Début de contrat :&nbsp;<b>{{ item.hiring_start_at|default_if_none:"Non renseigné" }}</b>
+                    </li>
+                    <li>
+                        Fin de contrat :&nbsp;<b>{{ item.hiring_end_at|default_if_none:"Non renseigné" }}</b>
+                    </li>
+                    <li>
+                        Numéro de PASS IAE :&nbsp;<b>{{ item.approval.number|format_approval_number }}</b>
+                    </li>
+                </ul>
             </div>
-
         </div>
 
         {# ASP error #}
         {% if form.status.value == "REJECTED" %}
-            <div class="my-3 alert alert-emploi">
-                <p>
+            <div class="alert alert-warning">
+                <p class="mb-0">
                     <b>Informations sur l'erreur de traitement :</b>
                 </p>
                 {% if employee_record.asp_processing_code == "3308" %}
-                    <p>Il semblerait que la commune de naissance sélectionnée ne corresponde pas au département de naissance choisi.</p>
-                    <p>
+                    <p class="mb-0">
+                        Il semblerait que la commune de naissance sélectionnée ne corresponde pas au département de naissance choisi.
+                    </p>
+                    <p class="mb-0">
                         Si vous ne trouvez pas la commune de naissance que vous souhaitez renseigner dans le menu déroulant, renseignez une autre ville de naissance pour débloquer le transfert.
                     </p>
-                    <p>Vous pourrez ensuite modifier cette information dans l’Extranet IAE 2.0 de l’ASP une fois la fiche transmise.</p>
+                    <p class="mb-0">
+                        Vous pourrez ensuite modifier cette information dans l’Extranet IAE 2.0 de l’ASP une fois la fiche transmise.
+                    </p>
                     <small>(Erreur {{ employee_record.asp_processing_code }})</small>
                 {% elif employee_record.asp_processing_code == "3417" %}
-                    <p>L’adresse renseignée n’est pas référencée.</p>
-                    <p>Renseignez l’adresse postale de votre structure pour débloquer le transfert.</p>
-                    <p>Vous pourrez ensuite modifier cette information dans l’Extranet IAE 2.0 de l’ASP une fois la fiche transmise.</p>
+                    <p class="mb-0">L’adresse renseignée n’est pas référencée.</p>
+                    <p class="mb-0">Renseignez l’adresse postale de votre structure pour débloquer le transfert.</p>
+                    <p class="mb-0">
+                        Vous pourrez ensuite modifier cette information dans l’Extranet IAE 2.0 de l’ASP une fois la fiche transmise.
+                    </p>
                     <small>(Erreur {{ employee_record.asp_processing_code }})</small>
                 {% elif employee_record.asp_processing_code == "3435" %}
-                    <p>
+                    <p class="mb-0">
                         Nous n’avons pas encore reçu d’annexe financière à jour pour votre structure. Nous ne pouvons donc pas transmettre votre fiche salarié à l’ASP.
                     </p>
-                    <p>
+                    <p class="mb-0">
                         Pour résoudre ce problème, rendez-vous dans l’ASP et vérifiez que votre annexe financière “valide” ou “provisoire” est à jour.
                     </p>
-                    <p>Si c’est le cas, patientez une semaine, et tentez de renvoyer la fiche salarié.</p>
+                    <p class="mb-0">Si c’est le cas, patientez une semaine, et tentez de renvoyer la fiche salarié.</p>
                     <p>
                         Si elle n’est pas à jour, demandez à votre DDETS de la mettre à jour dans l’ASP, et patientez une semaine le temps que nous recevions l’information avant de tenter le renvoi de la fiche salarié.
                     </p>
-                    <p>
+                    <p class="mb-0">
                         Vous pouvez vérifier vos annexes financières de rattachement dans votre tableau de bord, rubrique “Annexes financières” en bas à gauche.
                     </p>
                     <small>(Erreur {{ employee_record.asp_processing_code }})</small>
                 {% elif employee_record.asp_processing_code == "3436" %}
-                    <p>La fiche salarié associée à ce PASS IAE et à votre SIRET a déjà été intégrée à l’ASP.</p>
-                    <p>Connectez-vous à l’ASP pour la retrouver et déclarer les contrats associés.</p>
-                    <p>
+                    <p class="mb-0">La fiche salarié associée à ce PASS IAE et à votre SIRET a déjà été intégrée à l’ASP.</p>
+                    <p class="mb-0">Connectez-vous à l’ASP pour la retrouver et déclarer les contrats associés.</p>
+                    <p class="mb-0">
                         Si vos SIAE ont un SIRET commun pour 2 mesures, que vous avez déjà créé cette fiche salarié pour l’une des 2 mesures, vous devez vous rendre dans l’ASP pour gérer les autres contrats associés à ce PASS IAE.
                     </p>
-                    <p>Pour changer de mesure, créez directement un nouveau contrat dans l’ASP et sélectionnez la bonne mesure.</p>
+                    <p class="mb-0">
+                        Pour changer de mesure, créez directement un nouveau contrat dans l’ASP et sélectionnez la bonne mesure.
+                    </p>
                     <small>(Erreur {{ employee_record.asp_processing_code }})</small>
                 {% else %}
-                    <p>
+                    <p class="mb-0">
                         Erreur {{ employee_record.asp_processing_code }} :&nbsp;<small>{{ employee_record.asp_processing_label }}</small>
                     </p>
                 {% endif %}
@@ -103,7 +108,7 @@
         {# Actions #}
         {% if form.status.value == "NEW" %}
             {% if item.job_seeker.lack_of_nir_reason == "NIR_ASSOCIATED_TO_OTHER" %}
-                <div class="alert alert-warning mt-4" role="status">
+                <div class="alert alert-warning" role="status">
                     <div class="row">
                         <div class="col-auto pr-0">
                             <i class="ri-error-warning-line ri-xl text-warning"></i>
@@ -117,12 +122,12 @@
                             </p>
                         </div>
                         <div class="col-auto align-self-center">
-                            <a class="btn btn-primary" href="{% tally_form_url "wzxQlg" %}{{ item.nir_tally_params }}" target="_blank" rel="noopener">Régulariser le n° de sécurité sociale</a>
+                            <a class="btn btn-sm btn-primary" href="{% tally_form_url "wzxQlg" %}{{ item.nir_tally_params }}" target="_blank" rel="noopener">Régulariser le n° de sécurité sociale</a>
                         </div>
                     </div>
                 </div>
             {% elif item.has_suspension or item.has_prolongation %}
-                <div class="alert alert-warning mt-4" role="status">
+                <div class="alert alert-warning" role="status">
                     <div class="row">
                         <div class="col-auto pr-0">
                             <i class="ri-error-warning-line ri-xl text-warning"></i>
@@ -137,39 +142,39 @@
                             </p>
                         </div>
                         <div class="col-auto align-self-center">
-                            <a class="btn btn-primary" href="{% url "employee_record_views:create" item.id %}">Mettre à jour</a>
+                            <a class="btn btn-sm btn-primary" href="{% url "employee_record_views:create" item.id %}">Mettre à jour</a>
                         </div>
                     </div>
                 </div>
             {% else %}
                 <div class="text-right">
                     {% if item.employee_record_new %}
-                        <a href="{% url "employee_record_views:disable" item.employee_record_new.id %}?status=NEW" class="btn btn-outline-primary mt-2">Désactiver la fiche salarié</a>
+                        <a href="{% url "employee_record_views:disable" item.employee_record_new.id %}?status=NEW" class="btn btn-sm btn-outline-primary mt-2">Désactiver la fiche salarié</a>
                     {% endif %}
-                    <a href="{% url "employee_record_views:create" item.id %}" class="btn btn-outline-primary mt-2">Créer la fiche salarié</a>
+                    <a href="{% url "employee_record_views:create" item.id %}" class="btn btn-sm btn-outline-primary mt-2">Créer la fiche salarié</a>
                 </div>
             {% endif %}
         {% elif form.status.value == "READY" %}
             <div class="text-right">
-                <a href="{% url "employee_record_views:summary" employee_record.id %}?status=READY" class="btn btn-outline-primary mt-2">Voir le détail de la fiche salarié</a>
+                <a href="{% url "employee_record_views:summary" employee_record.id %}?status=READY" class="btn btn-sm btn-outline-primary mt-2">Voir le détail de la fiche salarié</a>
             </div>
         {% elif form.status.value == "SENT" %}
             <div class="text-right">
-                <a href="{% url "employee_record_views:summary" employee_record.id %}?status=SENT" class="btn btn-outline-primary mt-2">Voir le détail de la fiche salarié</a>
+                <a href="{% url "employee_record_views:summary" employee_record.id %}?status=SENT" class="btn btn-sm btn-outline-primary mt-2">Voir le détail de la fiche salarié</a>
             </div>
         {% elif form.status.value == "REJECTED" %}
             <div class="text-right">
-                <a href="{% url "employee_record_views:disable" employee_record.id %}?status=REJECTED" class="btn btn-outline-primary mt-2">Désactiver la fiche salarié</a>
-                <a href="{% url "employee_record_views:create" item.id %}" class="btn btn-outline-primary mt-2">Modifier la fiche salarié</a>
+                <a href="{% url "employee_record_views:disable" employee_record.id %}?status=REJECTED" class="btn btn-sm btn-outline-primary mt-2">Désactiver la fiche salarié</a>
+                <a href="{% url "employee_record_views:create" item.id %}" class="btn btn-sm btn-outline-primary mt-2">Modifier la fiche salarié</a>
             </div>
         {% elif form.status.value == "PROCESSED" %}
             <div class="text-right">
-                <a href="{% url "employee_record_views:disable" employee_record.id %}?status=PROCESSED" class="btn btn-outline-primary mt-2">Désactiver la fiche salarié</a>
-                <a href="{% url "employee_record_views:summary" employee_record.id %}?status=PROCESSED" class="btn btn-outline-primary mt-2">Voir le détail de la fiche salarié</a>
+                <a href="{% url "employee_record_views:disable" employee_record.id %}?status=PROCESSED" class="btn btn-sm btn-outline-primary mt-2">Désactiver la fiche salarié</a>
+                <a href="{% url "employee_record_views:summary" employee_record.id %}?status=PROCESSED" class="btn btn-sm btn-outline-primary mt-2">Voir le détail de la fiche salarié</a>
             </div>
         {% elif form.status.value == "DISABLED" %}
             <div class="text-right">
-                <a href="{% url "employee_record_views:reactivate" employee_record.id %}" class="btn btn-outline-primary mt-2">Réactiver la fiche salarié</a>
+                <a href="{% url "employee_record_views:reactivate" employee_record.id %}" class="btn btn-sm btn-outline-primary mt-2">Réactiver la fiche salarié</a>
             </div>
         {% endif %}
     </div>

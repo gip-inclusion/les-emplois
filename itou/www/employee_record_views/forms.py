@@ -254,7 +254,7 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
     - social allowances
     """
 
-    pole_emploi = forms.BooleanField(required=False, label="Le salarié est-il inscrit à Pôle emploi ?")
+    pole_emploi = forms.BooleanField(required=False, label="Inscrit à Pôle emploi ?")
     pole_emploi_id = forms.CharField(
         label="Identifiant Pôle emploi",
         required=False,
@@ -262,10 +262,22 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
     )
 
     # A set of transient checkboxes used to collapse optional blocks
-    rsa_allocation = forms.BooleanField(required=False, label="Le salarié est-il bénéficiaire du RSA ?")
-    ass_allocation = forms.BooleanField(required=False, label="Le salarié est-il bénéficiaire de l'ASS ?")
-    aah_allocation = forms.BooleanField(required=False, label="Le salarié est-il bénéficiaire de l'AAH ?")
-    unemployed = forms.BooleanField(required=False, label="Le salarié était-il sans emploi à l'embauche ?")
+    rsa_allocation = forms.BooleanField(
+        required=False,
+        label="Bénéficiaire du RSA",
+        help_text="Revenu de solidarité active",
+    )
+    ass_allocation = forms.BooleanField(
+        required=False,
+        label="Bénéficiaire de l'ASS ?",
+        help_text="Allocation de solidarité spécifique",
+    )
+    aah_allocation = forms.BooleanField(
+        required=False,
+        label="Bénéficiaire de l'AAH ?",
+        help_text="Allocation aux adultes handicapés",
+    )
+    unemployed = forms.BooleanField(required=False, label="Sans emploi à l'embauche ?")
 
     # This field is a subset of the possible choices of `has_rsa_allocation` model field
     rsa_markup = forms.ChoiceField(required=False, label="Majoration du RSA", choices=RSAAllocation.choices[1:])
@@ -361,9 +373,9 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
         ]
         labels = {
             "education_level": "Niveau de formation",
-            "resourceless": "Salarié sans ressource ?",
+            "resourceless": "Sans ressource ?",
             "pole_emploi_since": "Inscrit depuis",
-            "has_rsa_allocation": "Le salarié est-il bénéficiaire du RSA ?",
+            "has_rsa_allocation": "Bénéficiaire du RSA ?",
         }
 
 

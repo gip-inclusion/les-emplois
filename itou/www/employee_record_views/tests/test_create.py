@@ -158,26 +158,6 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
 
         assert response.status_code == 200
 
-    def test_hiring_end_at_date_in_header(self):
-
-        hiring_end_at = self.job_application.hiring_end_at
-
-        self.client.force_login(self.user)
-        response = self.client.get(self.url)
-
-        assert response.status_code == 200
-        self.assertContains(response, f"Fin du contrat : <b>{hiring_end_at.strftime('%e').lstrip()}")
-
-    def test_no_hiring_end_at_in_header(self):
-        self.job_application.hiring_end_at = None
-        self.job_application.save()
-
-        self.client.force_login(self.user)
-        response = self.client.get(self.url)
-
-        assert response.status_code == 200
-        self.assertContains(response, "Fin du contrat : <b>Non renseigné")
-
     def test_title(self):
         # Job seeker / employee must have a title
 

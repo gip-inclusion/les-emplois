@@ -1,23 +1,40 @@
 {% load bootstrap4 %}
 {% load static %}
 
-<h4 class="h3">Annexe financière</h4>
-
-<div class="alert alert-info">
-    <p class="mb-0">
-        Le choix d'une annexe financière est <b>optionnel</b>, et dans tous les cas, l'information n'est pas transmise à l'ASP.
-    </p>
+<div class="row">
+    <div class="col-12 col-lg-8">
+        <div class="c-form">
+            <form method="post" action="{% url "employee_record_views:create_step_4" job_application.id %}" class="js-prevent-multiple-submit">
+                {% csrf_token %}
+                <fieldset>
+                    <legend>
+                        Annexe financière
+                    </legend>
+                    <p>
+                        Si vous utilisez un logiciel de gestion des salariés, veuillez sélectionner une annexe financière. Sinon, vous pouvez passer à l'étape suivante.
+                    </p>
+                    {% bootstrap_form form alert_error_type="all" %}
+                </fieldset>
+                <hr class="mb-3">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-row align-items-center justify-content-lg-between">
+                            <div class="form-group col-12 col-md-6 col-lg-auto order-3 order-md-1">
+                                <a href="{% url "employee_record_views:create_step_3" job_application.id %}" class="btn btn-block btn-ico btn-link pl-0 justify-content-center" aria-label="Retour à l'étape précédente">
+                                    <i class="ri-arrow-left-line ri-lg"></i>
+                                    <span>Étape précédente</span>
+                                </a>
+                            </div>
+                            <div class="form-group col-12 col-md-6 col-lg-auto order-1 order-md-2">
+                                <button type="submit" class="btn btn-block btn-ico btn-primary" aria-label="Passer à l'étape suivante">
+                                    <span>Étape suivante</span>
+                                    <i class="ri-arrow-right-line ri-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
-
-<form method="post" action="{% url "employee_record_views:create_step_4" job_application.id %}" class="js-prevent-multiple-submit">
-
-    {% csrf_token %}
-
-    {% bootstrap_form form alert_error_type="all" %}
-
-    {% buttons %}
-        <a class="btn btn btn-outline-secondary" href="{% url "employee_record_views:create_step_3" job_application.id %}">Précédent</a>
-        <button type="submit" class="btn btn-primary">Continuer</button>
-    {% endbuttons %}
-
-</form>
