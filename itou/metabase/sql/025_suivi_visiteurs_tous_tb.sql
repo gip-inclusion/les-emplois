@@ -23,7 +23,7 @@ visiteurs_publics as (
         vp."Tableau de bord" as tableau_de_bord,
         to_number(vp."Unique visitors", '99') as visiteurs_uniques
     from
-        suivi_visiteurs_tb_publics_V0 vp /* Nouvelle table créée par Victor qui reprend toutes les infos des visiteurs des TBs publics */
+        suivi_visiteurs_tb_publics_V1 vp /* Nouvelle table créée par Victor qui reprend toutes les infos des visiteurs des TBs publics */
 )
 select
     semaine,
