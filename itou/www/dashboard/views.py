@@ -66,10 +66,14 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
             .select_related("evaluation_campaign")
         )
 
+        states_to_process = [JobApplicationWorkflow.STATE_NEW, JobApplicationWorkflow.STATE_PROCESSING]
+        if current_org.can_have_prior_action:
+            states_to_process.append(JobApplicationWorkflow.STATE_PRIOR_TO_HIRE)
+
         job_applications_categories = [
             {
                 "name": "À traiter",
-                "states": [JobApplicationWorkflow.STATE_NEW, JobApplicationWorkflow.STATE_PROCESSING],
+                "states": states_to_process,
                 "icon": "ri-notification-4-line",
                 "badge": "badge-info-lighter",
             },
