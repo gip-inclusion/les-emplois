@@ -22,7 +22,7 @@ from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.employee_record.enums import Status
-from itou.employee_record.factories import EmployeeRecordFactory
+from itou.employee_record.factories import BareEmployeeRecordFactory, EmployeeRecordFactory
 from itou.job_applications.admin_forms import JobApplicationAdminForm
 from itou.job_applications.enums import Origin, RefusalReason, SenderKind
 from itou.job_applications.export import JOB_APPLICATION_CSV_HEADERS, stream_xlsx_export
@@ -108,41 +108,6 @@ class JobApplicationModelTest(TestCase):
 
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
         assert job_application.is_sent_by_authorized_prescriber
-
-    def test_can_be_cancelled(self):
-        """
-        A user can cancel a job application provided that it has no related
-        employee record in SENT or PROCESSED state or that is does not come from
-        AI stock.
-        """
-        today = datetime.date.today()
-        job_application_ok = JobApplicationFactory(with_approval=True, hiring_start_at=today)
-        assert job_application_ok.can_be_cancelled
-
-        # Can be cancelled with a related employee record in NEW, READY, REJECTED status
-        EmployeeRecordFactory(job_application=job_application_ok, status=Status.NEW)
-        assert job_application_ok.can_be_cancelled
-
-        job_application_ok = JobApplicationFactory(with_approval=True, hiring_start_at=today)
-        EmployeeRecordFactory(job_application=job_application_ok, status=Status.READY)
-        assert job_application_ok.can_be_cancelled
-
-        job_application_ok = JobApplicationFactory(with_approval=True, hiring_start_at=today)
-        EmployeeRecordFactory(job_application=job_application_ok, status=Status.REJECTED)
-        assert job_application_ok.can_be_cancelled
-
-        # Can't be cancelled with a related employee record in PROCESSED or SENT status
-        job_application_not_ok = JobApplicationFactory(with_approval=True, hiring_start_at=today)
-        EmployeeRecordFactory(job_application=job_application_not_ok, status=Status.SENT)
-        assert not job_application_not_ok.can_be_cancelled
-
-        job_application_not_ok = JobApplicationFactory(with_approval=True, hiring_start_at=today)
-        EmployeeRecordFactory(job_application=job_application_not_ok, status=Status.PROCESSED)
-        assert not job_application_not_ok.can_be_cancelled
-
-        # Comes from AI stock.
-        job_application = JobApplicationFactory.build(origin=Origin.AI_STOCK)
-        assert not job_application.can_be_cancelled
 
     def test_can_be_archived(self):
         """
@@ -288,6 +253,21 @@ class JobApplicationModelTest(TestCase):
             nb_hours_per_week=30,
             contract_type_details="foo",
         )
+
+
+def test_can_be_cancelled():
+    assert JobApplicationFactory().can_be_cancelled is True
+
+
+def test_can_be_cancelled_when_origin_is_ai_stock():
+    assert JobApplicationFactory(origin=Origin.AI_STOCK).can_be_cancelled is False
+
+
+@pytest.mark.parametrize("status", Status)
+def test_can_be_cancelled_when_an_employee_record_exists(status):
+    job_application = JobApplicationFactory()
+    BareEmployeeRecordFactory(job_application=job_application, status=status)
+    assert job_application.can_be_cancelled is False
 
 
 class JobApplicationQuerySetTest(TestCase):

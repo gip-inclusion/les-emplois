@@ -2,6 +2,7 @@ from django.contrib import admin, messages
 from django.urls import path
 from django.urls.base import reverse
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 
 from itou.approvals import models
 from itou.approvals.admin_forms import ApprovalAdminForm
@@ -182,14 +183,21 @@ class ApprovalAdmin(admin.ModelAdmin):
             obj.created_by = request.user
             obj.origin = Origin.ADMIN
 
-        # Is there an employee record linked ?
-        employee_record = EmployeeRecord.objects.filter(approval_number=obj.number).first()
-        if employee_record and employee_record.is_blocking_job_application_cancellation:
+        # Is there an employee record linked?
+        if employee_records := EmployeeRecord.objects.filter(approval_number=obj.number):
+            employee_record_links = ", ".join(
+                '<a href="'
+                + reverse(f"admin:{er._meta.app_label}_{er._meta.model_name}_change", args=[er.pk])
+                + f'">{er.pk}</a>'
+                for er in employee_records
+            )
             messages.set_level(request, messages.ERROR)
             messages.error(
                 request,
-                f"Il existe une fiche salarié bloquante (ID: {employee_record.pk}) "
-                f"pour la modification de ce PASS IAE ({obj.number}).",
+                mark_safe(
+                    f"Il existe une ou plusieurs fiches salarié bloquantes ({employee_record_links}) "
+                    f"pour la modification de ce PASS IAE ({obj.number})."
+                ),
             )
             return
 

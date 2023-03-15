@@ -11,6 +11,7 @@ from django.contrib.messages import get_messages
 from django.core import mail
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import IntegrityError, transaction
+from django.forms import model_to_dict
 from django.template.defaultfilters import title
 from django.test import TransactionTestCase
 from django.urls import reverse
@@ -720,6 +721,31 @@ class AutomaticApprovalAdminViewsTest(TestCase):
             response.context["adminform"],
             "number",
             [ApprovalAdminForm.ERROR_NUMBER_CANNOT_BE_CHANGED % approval.number],
+        )
+
+    def test_edit_approval_with_an_existing_employee_record(self):
+        user = ItouStaffFactory()
+        user.user_permissions.add(
+            Permission.objects.get(
+                content_type=ContentType.objects.get_for_model(Approval), codename="change_approval"
+            )
+        )
+        self.client.force_login(user)
+
+        approval = ApprovalFactory()
+        employee_record = EmployeeRecordFactory(approval_number=approval.number)
+
+        response = self.client.post(
+            reverse("admin:approvals_approval_change", args=[approval.pk]),
+            data=model_to_dict(approval, fields={"start_at", "end_at", "user", "number"}),
+            follow=True,
+        )
+        assert response.status_code == 200
+        print(list(response.context["messages"]))
+        assert (
+            f"Il existe une ou plusieurs fiches salarié bloquantes "
+            f'(<a href="/admin/employee_record/employeerecord/{employee_record.pk}/change/">{employee_record.pk}</a>) '
+            f"pour la modification de ce PASS IAE ({approval.number})." == str(list(response.context["messages"])[0])
         )
 
     def test_create_approval(self):

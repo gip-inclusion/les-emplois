@@ -627,35 +627,6 @@ class EmployeeRecordJobApplicationConstraintsTest(TestCase):
         self.employee_record = EmployeeRecord.from_job_application(self.job_application)
         self.employee_record.update_as_ready()
 
-    @mock.patch(
-        "itou.common_apps.address.format.get_geocoding_data",
-        side_effect=mock_get_geocoding_data,
-    )
-    def test_job_application_is_cancellable(self, _mock):
-        # A job application can be cancelled only if there is no
-        # linked employee records with ACCEPTED or SENT status
-
-        # status is READY
-        assert self.job_application.can_be_cancelled
-
-        # status is SENT
-        self.employee_record.update_as_sent(self.faker.asp_batch_filename(), 1, None)
-        assert not self.job_application.can_be_cancelled
-
-        # status is REJECTED
-        self.employee_record.update_as_rejected("12", "JSON Invalide", None)
-        assert self.job_application.can_be_cancelled
-
-        # status is PROCESSED
-        self.employee_record.update_as_ready()
-        self.employee_record.update_as_sent(self.faker.asp_batch_filename(), 1, None)
-        process_code, process_message = (
-            EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
-            "La ligne de la fiche salarié a été enregistrée avec succès.",
-        )
-        self.employee_record.update_as_processed(process_code, process_message, "{}")
-        assert not self.job_application.can_be_cancelled
-
 
 class TestEmployeeRecordQueryset:
     @pytest.mark.parametrize("status", list(Status))
