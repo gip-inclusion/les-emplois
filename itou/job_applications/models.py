@@ -703,15 +703,10 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def can_be_cancelled(self):
         if self.origin == Origin.AI_STOCK:
             return False
-        if self.hiring_start_at:
-            # A job application can be canceled provided that
-            # there is no employee record linked with a status:
-            # - SENT
-            # - ACCEPTED
-            # (likely to be accepted or already accepted by ASP)
-            employee_record = self.employee_record.first()
-            blocked = employee_record and employee_record.is_blocking_job_application_cancellation
-            return not blocked
+        if not self.employee_record.exists():
+            # A job application can be canceled provided that there is no employee record linked to it,
+            # as it is possible that some information were already sent to the ASP.
+            return True
         return False
 
     @property

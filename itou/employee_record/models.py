@@ -580,17 +580,6 @@ class EmployeeRecord(ASPExchangeInformation):
         return self._batch_line_number
 
     @property
-    def is_blocking_job_application_cancellation(self):
-        """
-        Linked job application can't be cancelled if the employee record
-        is sent or already processed.
-        """
-        return self.status in [
-            Status.SENT,
-            Status.PROCESSED,
-        ]
-
-    @property
     def is_orphan(self):
         """Orphan employee records have different stored and actual `asp_id` fields."""
         return self.job_application.to_siae.convention.asp_id != self.asp_id
