@@ -41,7 +41,7 @@ from itou.job_applications.notifications import NewQualifiedJobAppEmployersNotif
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
 from itou.siaes.enums import ContractType, SiaeKind
-from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
+from itou.siaes.factories import SiaeFactory, SiaeWithMembershipAndJobsFactory
 from itou.users.factories import ItouStaffFactory, JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
 from itou.users.models import User
 from itou.utils import constants as global_constants
@@ -283,6 +283,52 @@ def test_can_be_cancelled_when_an_employee_record_exists(status):
     job_application = JobApplicationFactory()
     BareEmployeeRecordFactory(job_application=job_application, status=status)
     assert job_application.can_be_cancelled is False
+
+
+def test_can_have_prior_action():
+    geiq = SiaeFactory.build(kind=SiaeKind.GEIQ)
+    non_geiq = SiaeFactory.build(kind=SiaeKind.AI)
+
+    assert (
+        JobApplicationFactory.build(to_siae=geiq, state=JobApplicationWorkflow.STATE_NEW).can_have_prior_action
+        is False
+    )
+    assert (
+        JobApplicationFactory.build(to_siae=geiq, state=JobApplicationWorkflow.STATE_POSTPONED).can_have_prior_action
+        is True
+    )
+    assert (
+        JobApplicationFactory.build(
+            to_siae=non_geiq, state=JobApplicationWorkflow.STATE_POSTPONED
+        ).can_have_prior_action
+        is False
+    )
+
+
+def test_can_change_prior_actions():
+    geiq = SiaeFactory(kind=SiaeKind.GEIQ)
+    non_geiq = SiaeFactory(kind=SiaeKind.ACI)
+
+    assert (
+        JobApplicationFactory.build(to_siae=geiq, state=JobApplicationWorkflow.STATE_NEW).can_change_prior_actions
+        is False
+    )
+    assert (
+        JobApplicationFactory.build(
+            to_siae=geiq, state=JobApplicationWorkflow.STATE_POSTPONED
+        ).can_change_prior_actions
+        is True
+    )
+    assert (
+        JobApplicationFactory.build(to_siae=geiq, state=JobApplicationWorkflow.STATE_ACCEPTED).can_change_prior_actions
+        is False
+    )
+    assert (
+        JobApplicationFactory.build(
+            to_siae=non_geiq, state=JobApplicationWorkflow.STATE_POSTPONED
+        ).can_change_prior_actions
+        is False
+    )
 
 
 class JobApplicationQuerySetTest(TestCase):

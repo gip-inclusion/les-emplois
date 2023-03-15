@@ -77,3 +77,17 @@ class Origin(models.TextChoices):
     # On November 30th, 2021, AI were delivered approvals without a diagnosis.
     AI_STOCK = "ai_stock", "Créée lors de l'import du stock AI"
     ADMIN = "admin", "Créée depuis l'admin"
+
+
+class ProfessionalSituationExperience(models.TextChoices):
+    PMSMP = "PROFESSIONAL_SITUATION_EXPERIENCE_PMSMP", "PMSMP"
+    MRS = "PROFESSIONAL_SITUATION_EXPERIENCE_MRS", "MRS"
+    STAGE = "PROFESSIONAL_SITUATION_EXPERIENCE_STAGE", "STAGE"
+    OTHER = "PROFESSIONAL_SITUATION_EXPERIENCE_OTHER", "Autre"
+
+
+class Prequalification(models.TextChoices):
+    LOCAL_PLAN = "PREQUALIFICATION_LOCAL_PLAN", "Dispositif régional ou sectoriel"
+    AFPR = "PREQUALIFICATION_AFPR", "AFPR"
+    POE = "PREQUALIFICATION_POE", "POE"
+    OTHER = "PREQUALIFICATION_OTHER", "Autre"

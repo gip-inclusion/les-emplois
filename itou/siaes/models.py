@@ -417,6 +417,10 @@ class Siae(AddressMixin, OrganizationAbstract):
         return not self.is_active and timezone.now() > self.grace_period_end_date
 
     @property
+    def can_have_prior_action(self):
+        return self.kind == SiaeKind.GEIQ
+
+    @property
     def can_use_employee_record(self):
         """
         Check if this SIAE can use the employee record app
