@@ -39,7 +39,7 @@ endif
 
 venv: $(VIRTUAL_ENV)
 
-PIP_COMPILE_FLAGS := --upgrade --allow-unsafe --generate-hashes
+PIP_COMPILE_FLAGS := --allow-unsafe --generate-hashes $(PIP_COMPILE_OPTIONS)
 compile-deps: $(VIRTUAL_ENV)
 	pip-compile $(PIP_COMPILE_FLAGS) -o requirements/base.txt requirements/base.in
 	pip-compile $(PIP_COMPILE_FLAGS) -o requirements/dev.txt requirements/dev.in
