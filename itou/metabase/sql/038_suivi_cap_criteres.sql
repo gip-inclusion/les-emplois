@@ -14,8 +14,6 @@ select
         'Non vérifié'
         when "cap_criteres"."état" = 'PENDING' and "cap_criteres"."date_transmission" is null then
         'Non transmis'
-    else
-        "cap_criteres"."état"
     end as "état",
     "camp"."nom" as "nom_campagne",
     "structs"."département" as "département",
