@@ -153,6 +153,24 @@ class DashboardViewTest(TestCase):
         assert response.status_code == 200
         assert response.context["num_rejected_employee_records"] == 0
 
+    def test_dashboard_applications_to_process(self):
+        non_geiq_url = reverse("apply:list_for_siae") + "?states=new&amp;states=processing"
+        geiq_url = non_geiq_url + "&amp;states=prior_to_hire"
+
+        # Not a GEIQ
+        user = SiaeFactory(kind=SiaeKind.ACI, with_membership=True).members.first()
+        self.client.force_login(user)
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertContains(response, non_geiq_url)
+        self.assertNotContains(response, geiq_url)
+
+        # GEIQ
+        user = SiaeFactory(kind=SiaeKind.GEIQ, with_membership=True).members.first()
+        self.client.force_login(user)
+        response = self.client.get(reverse("dashboard:index"))
+
+        self.assertContains(response, geiq_url)
+
     def test_dashboard_agreements_and_job_postings(self):
         for kind in [
             SiaeKind.AI,
