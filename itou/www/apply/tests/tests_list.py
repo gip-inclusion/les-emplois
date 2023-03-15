@@ -18,6 +18,7 @@ from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
 from itou.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationWithMembershipFactory
+from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory, SiaeJobDescriptionFactory
 from itou.users.factories import PrescriberFactory
 from itou.utils.test import TestCase, format_html
@@ -250,6 +251,32 @@ class ProcessListSiaeTest(ProcessListTest):
 
         assert len(applications) == 1
         assert applications[0].state == state_accepted
+
+    def test_list_for_siae_view__filtered_by_state_prior_to_hire(self):
+        """
+        Eddie wants to see only job applications in prior_to_hire state
+        """
+        params = urlencode({"states": [JobApplicationWorkflow.STATE_PRIOR_TO_HIRE]}, True)
+        url = f"{self.siae_base_url}?{params}"
+        PRIOR_TO_HIRE_LABEL = "Action préalable à l’embauche</label>"
+
+        # prior_to_hire filter doesn't exist for non-GEIQ SIAE and is ignored
+        self.client.force_login(self.eddie_hit_pit)
+        response = self.client.get(url)
+        self.assertNotContains(response, PRIOR_TO_HIRE_LABEL)
+
+        applications = response.context["job_applications_page"].object_list
+        assert len(applications) == 9
+
+        # With a GEIQ user, the filter is present and works
+        self.hit_pit.kind = SiaeKind.GEIQ
+        self.hit_pit.save()
+        response = self.client.get(url)
+        self.assertContains(response, PRIOR_TO_HIRE_LABEL)
+
+        applications = response.context["job_applications_page"].object_list
+        assert len(applications) == 1
+        assert applications[0].state == JobApplicationWorkflow.STATE_PRIOR_TO_HIRE
 
     def test_list_for_siae_view__filtered_by_many_states(self):
         """
