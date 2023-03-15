@@ -3,7 +3,20 @@ select
     "criteres"."id" as "id_critère",
     "criteres"."niveau" as "niveau_critère",
     -- REFUSED et REFUSED_2 correspondent au même état (?) - à confirmer par Zo
-    case when "cap_criteres"."état" = 'REFUSED_2' then 'REFUSED' else "cap_criteres"."état" end as "état",
+    case 
+        when "cap_criteres"."état" = 'ACCEPTED' then
+        'Accepté'
+        when "cap_criteres"."état" = 'REFUSED_2' then
+        'Refusé'
+        when "cap_criteres"."état" = 'REFUSED' then
+        'Refusé'
+        when "cap_criteres"."état" = 'PENDING' and "cap_criteres"."date_transmission" is not null then
+        'Non vérifié'
+        when "cap_criteres"."état" = 'PENDING' and "cap_criteres"."date_transmission" is null then
+        'Non transmis'
+    else
+        "cap_criteres"."état"
+    end as "état",
     "camp"."nom" as "nom_campagne",
     "structs"."département" as "département",
     "structs"."nom_département" as "nom_département",
