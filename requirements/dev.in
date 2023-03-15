@@ -32,4 +32,5 @@ respx  # https://lundberg.github.io/respx/
 pytest  # https://github.com/pytest-dev/pytest
 pytest-django # https://github.com/pytest-dev/pytest-django/
 pytest-mock  # https://github.com/pytest-dev/pytest-mock/
+pytest-timeout  # https://github.com/pytest-dev/pytest-timeout
 pytest-xdist  # https://pypi.org/project/pytest-xdist/
