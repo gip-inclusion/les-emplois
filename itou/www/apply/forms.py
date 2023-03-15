@@ -868,6 +868,12 @@ class SiaeFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsForm):
         if siae.kind not in SIAE_WITH_CONVENTION_KINDS:
             del self.fields["eligibility_validated"]
 
+        if not siae.can_have_prior_action:
+            # Drop "pré-embauche" state from filter for non-GEIQ SIAE
+            self.fields["states"].choices = [
+                (k, v) for k, v in self.fields["states"].choices if k != JobApplicationWorkflow.STATE_PRIOR_TO_HIRE
+            ]
+
     def get_qs_filters(self):
         qs_list = super().get_qs_filters()
         data = self.cleaned_data
