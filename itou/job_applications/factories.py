@@ -8,7 +8,7 @@ from itou.approvals.factories import ApprovalFactory
 from itou.eligibility.enums import AuthorKind
 from itou.eligibility.factories import EligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory
 from itou.job_applications import models
-from itou.job_applications.enums import SenderKind
+from itou.job_applications.enums import Prequalification, ProfessionalSituationExperience, SenderKind
 from itou.jobs.models import Appellation
 from itou.prescribers.factories import (
     PrescriberOrganizationWithMembershipFactory,
@@ -24,6 +24,7 @@ from itou.users.factories import (
     JobSeekerWithMockedAddressFactory,
     PrescriberFactory,
 )
+from itou.utils.types import InclusiveDateRange
 
 
 class JobApplicationFactory(factory.django.DjangoModelFactory):
@@ -113,6 +114,20 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
                         siae=self.to_siae, appellation=siae_job_description
                     )
                 self.selected_jobs.add(siae_job_description)
+
+
+class PriorActionFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.PriorAction
+
+    job_application = factory.SubFactory(JobApplicationFactory)
+    action = factory.fuzzy.FuzzyChoice(Prequalification.values + ProfessionalSituationExperience.values)
+    dates = factory.LazyFunction(
+        lambda: InclusiveDateRange(
+            datetime.now(timezone.utc).date(),
+            datetime.now(timezone.utc).date() + relativedelta(years=2),
+        )
+    )
 
 
 class JobApplicationSentByJobSeekerFactory(JobApplicationFactory):

@@ -288,7 +288,7 @@ class ProcessListSiaeTest(ProcessListTest):
         response = self.client.get(url)
         applications = response.context["job_applications_page"].object_list
 
-        assert len(applications) == 5
+        assert len(applications) == 6
         assert applications[0].created_at >= start_date
         assert applications[0].created_at <= end_date
 
@@ -317,7 +317,7 @@ class ProcessListSiaeTest(ProcessListTest):
 
         applications = response.context["job_applications_page"].object_list
 
-        assert len(applications) == 8
+        assert len(applications) == 9
         assert applications[0].sender_prescriber_organization.id == sender_organization.id
 
     def test_view__filtered_by_sender_name(self):
@@ -332,7 +332,7 @@ class ProcessListSiaeTest(ProcessListTest):
 
         applications = response.context["job_applications_page"].object_list
 
-        assert len(applications) == 7
+        assert len(applications) == 8
         assert applications[0].sender.id == sender.id
 
     def test_view__filtered_by_job_seeker_name(self):
@@ -362,7 +362,7 @@ class ProcessListSiaeTest(ProcessListTest):
 
         applications = response.context["job_applications_page"].object_list
 
-        assert len(applications) == 8
+        assert len(applications) == 9
         assert applications[0].sender_prescriber_organization.id in senders_ids
 
     def test_view__filtered_by_pass_state(self):
@@ -658,7 +658,7 @@ class ProcessListPrescriberTest(ProcessListTest):
         response = self.client.get(url)
 
         applications = response.context["job_applications_page"].object_list
-        assert len(applications) == 8
+        assert len(applications) == 9
         assert applications[0].to_siae.pk in to_siaes_ids
 
 

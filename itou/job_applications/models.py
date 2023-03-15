@@ -19,12 +19,19 @@ from itou.eligibility.models import EligibilityDiagnosis, SelectedAdministrative
 from itou.employee_record import enums as employeerecord_enums
 from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
 from itou.employee_record.models import EmployeeRecord
-from itou.job_applications.enums import Origin, RefusalReason, SenderKind
+from itou.job_applications.enums import (
+    Origin,
+    Prequalification,
+    ProfessionalSituationExperience,
+    RefusalReason,
+    SenderKind,
+)
 from itou.job_applications.tasks import huey_notify_pole_emploi
 from itou.siaes.enums import ContractType, SiaeKind
 from itou.siaes.models import Siae
 from itou.users.enums import UserKind
 from itou.utils.emails import get_email_message, send_email_messages
+from itou.utils.models import InclusiveDateRangeField
 from itou.utils.urls import get_absolute_url
 
 
@@ -40,6 +47,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
     STATE_NEW = "new"
     STATE_PROCESSING = "processing"
     STATE_POSTPONED = "postponed"
+    STATE_PRIOR_TO_HIRE = "prior_to_hire"
     STATE_ACCEPTED = "accepted"
     STATE_REFUSED = "refused"
     STATE_CANCELLED = "cancelled"
@@ -50,6 +58,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
         (STATE_NEW, "Nouvelle candidature"),
         (STATE_PROCESSING, "Candidature à l'étude"),
         (STATE_POSTPONED, "Candidature en liste d'attente"),
+        (STATE_PRIOR_TO_HIRE, "Action préalable à l’embauche"),
         (STATE_ACCEPTED, "Candidature acceptée"),
         (STATE_REFUSED, "Candidature déclinée"),
         (STATE_CANCELLED, "Embauche annulée"),
@@ -61,6 +70,8 @@ class JobApplicationWorkflow(xwf_models.Workflow):
     TRANSITION_PROCESS = "process"
     TRANSITION_POSTPONE = "postpone"
     TRANSITION_ACCEPT = "accept"
+    TRANSITION_MOVE_TO_PRIOR_TO_HIRE = "move_to_prior_to_hire"
+    TRANSITION_CANCEL_PRIOR_TO_HIRE = "cancel_prior_to_hire"
     TRANSITION_REFUSE = "refuse"
     TRANSITION_CANCEL = "cancel"
     TRANSITION_RENDER_OBSOLETE = "render_obsolete"
@@ -70,20 +81,32 @@ class JobApplicationWorkflow(xwf_models.Workflow):
         (TRANSITION_PROCESS, "Étudier la candidature"),
         (TRANSITION_POSTPONE, "Reporter la candidature"),
         (TRANSITION_ACCEPT, "Accepter la candidature"),
+        (TRANSITION_MOVE_TO_PRIOR_TO_HIRE, "Passer en pré-embauche"),
+        (TRANSITION_CANCEL_PRIOR_TO_HIRE, "Annuler la pré-embauche"),
         (TRANSITION_REFUSE, "Décliner la candidature"),
         (TRANSITION_CANCEL, "Annuler la candidature"),
         (TRANSITION_RENDER_OBSOLETE, "Rendre obsolete la candidature"),
         (TRANSITION_TRANSFER, "Transfert de la candidature vers une autre SIAE"),
     )
 
-    CAN_BE_ACCEPTED_STATES = [STATE_PROCESSING, STATE_POSTPONED, STATE_OBSOLETE, STATE_REFUSED, STATE_CANCELLED]
+    CAN_BE_ACCEPTED_STATES = [
+        STATE_PROCESSING,
+        STATE_POSTPONED,
+        STATE_PRIOR_TO_HIRE,
+        STATE_OBSOLETE,
+        STATE_REFUSED,
+        STATE_CANCELLED,
+    ]
     CAN_BE_TRANSFERRED_STATES = CAN_BE_ACCEPTED_STATES
+    CAN_ADD_PRIOR_ACTION_STATES = [STATE_PROCESSING, STATE_POSTPONED, STATE_OBSOLETE, STATE_REFUSED, STATE_CANCELLED]
 
     transitions = (
         (TRANSITION_PROCESS, STATE_NEW, STATE_PROCESSING),
-        (TRANSITION_POSTPONE, STATE_PROCESSING, STATE_POSTPONED),
+        (TRANSITION_POSTPONE, [STATE_PROCESSING, STATE_PRIOR_TO_HIRE], STATE_POSTPONED),
         (TRANSITION_ACCEPT, CAN_BE_ACCEPTED_STATES, STATE_ACCEPTED),
-        (TRANSITION_REFUSE, [STATE_PROCESSING, STATE_POSTPONED], STATE_REFUSED),
+        (TRANSITION_MOVE_TO_PRIOR_TO_HIRE, CAN_ADD_PRIOR_ACTION_STATES, STATE_PRIOR_TO_HIRE),
+        (TRANSITION_CANCEL_PRIOR_TO_HIRE, [STATE_PRIOR_TO_HIRE], STATE_PROCESSING),
+        (TRANSITION_REFUSE, [STATE_PROCESSING, STATE_PRIOR_TO_HIRE, STATE_POSTPONED], STATE_REFUSED),
         (TRANSITION_CANCEL, STATE_ACCEPTED, STATE_CANCELLED),
         (TRANSITION_RENDER_OBSOLETE, [STATE_NEW, STATE_PROCESSING, STATE_POSTPONED], STATE_OBSOLETE),
         (TRANSITION_TRANSFER, CAN_BE_TRANSFERRED_STATES, STATE_NEW),
@@ -740,6 +763,14 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         ]
 
     @property
+    def can_have_prior_action(self):
+        return self.to_siae.can_have_prior_action and not self.state.is_new
+
+    @property
+    def can_change_prior_actions(self):
+        return self.can_have_prior_action and not self.state.is_accepted
+
+    @property
     def is_refused_due_to_deactivation(self):
         return (
             self.state == JobApplicationWorkflow.STATE_REFUSED
@@ -1169,3 +1200,24 @@ class JobApplicationTransitionLog(xwf_models.BaseTransitionLog):
     def pretty_to_state(self):
         choices = dict(JobApplicationWorkflow.STATE_CHOICES)
         return choices[self.to_state]
+
+
+class PriorAction(models.Model):
+
+    job_application = models.ForeignKey(JobApplication, related_name="prior_actions", on_delete=models.CASCADE)
+    action = models.TextField(
+        verbose_name="Action",
+        choices=[
+            ("Mise en situation professionnelle", ProfessionalSituationExperience.choices),
+            ("Pré-qualification", Prequalification.choices),
+        ],
+    )
+    dates = InclusiveDateRangeField(verbose_name="Dates")
+
+    @property
+    def action_kind(self):
+        if self.action in ProfessionalSituationExperience.values:
+            return "Mise en situation professionnelle"
+        elif self.action in Prequalification.values:
+            return "Pré-qualification"
+        return "Inconnu"

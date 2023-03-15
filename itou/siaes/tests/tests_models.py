@@ -334,6 +334,12 @@ class SiaeQuerySetTest(TestCase):
         result = Siae.objects.with_has_active_members().get(pk=siae.pk)
         assert not result.has_active_members
 
+    def test_can_have_prior_action(self):
+        siae = SiaeFactory()
+        assert siae.can_have_prior_action is False
+        geiq = SiaeFactory(kind=SiaeKind.GEIQ)
+        assert geiq.can_have_prior_action is True
+
 
 class SiaeJobDescriptionQuerySetTest(TestCase):
     def setUp(self):
