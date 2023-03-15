@@ -25,7 +25,7 @@ from .constants import CAMPAIGN_VIEWABLE_DURATION
 
 def select_min_max_job_applications(job_applications):
     # select SELECTION_PERCENTAGE % max, within bounds
-    # minimum MIN job_applications, maximun MAX job_applications
+    # minimum MIN job_applications, maximum MAX job_applications
 
     limit = int(
         job_applications.count()
