@@ -15,7 +15,7 @@ visiteurs_prives_0 as (
         svtp0."Tableau de bord" as tableau_de_bord,
         to_number(svtp0."Unique visitors", '9999') as visiteurs_uniques
     from
-        suivi_visiteurs_tb_prives_v1 svtp0 /* Nouvelle table créée par Victor qui démarre le 01/01/22 */
+        suivi_visiteurs_tb_prives_v0 svtp0 /* Nouvelle table créée par Victor qui démarre le 19/12/22 */
 ),
 visiteurs_publics as (
     select
