@@ -8,7 +8,7 @@ with siae_autopr as (
     from
         suivi_auto_prescription sap
     where
-        type_de_candidature = 'Autoprescription'
+        type_de_candidature = 'Autoprescription' and active = 1
     group by 
         type_structure,
         annee_diagnostic
@@ -22,6 +22,8 @@ siae_all as (
         date_part('year',date_diagnostic) as annee_diagnostic
     from
         suivi_auto_prescription sap
+    where 
+        active = 1
     group by 
         type_structure,
         annee_diagnostic
