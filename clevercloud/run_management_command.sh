@@ -8,4 +8,4 @@ if [[ "$CRON_ENABLED" != "1" ]]; then
 fi
 
 cd "$APP_HOME"
-django-admin $@
+django-admin "$@"
