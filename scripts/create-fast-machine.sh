@@ -15,6 +15,7 @@ if [[ ! $RUN_DIRECTORY =~ "scripts" ]]; then
 fi
 
 # If the script is loaded from the root we can import the local environment variables
+# shellcheck source=/dev/null
 source .env
 if [ -z "$CLEVER_TOKEN" ]; then
   echo "please add 'CLEVER_TOKEN=some_token' in .env at the root of the project in order to run this script. You can find its value with 'clever login'"
