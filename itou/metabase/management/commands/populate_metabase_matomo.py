@@ -5,6 +5,7 @@ import io
 import threading
 import urllib
 from dataclasses import dataclass
+from time import sleep
 
 import httpx
 import tenacity
@@ -169,13 +170,18 @@ def get_matomo_dashboard(at: datetime.datetime, options: MatomoFetchOptions):
         if not column_names:
             column_names = list(row.keys())
         results.append(list(row.values()))
+    # The private dashboards are so many that we need to sleep before 2 calls, as Matomo
+    # severely limits the client request rate to the point of the timeout (10 minutes for a single call)
+    # Introducing a delay of 1 second between the calls drops the complete fetch from impossible (timeout
+    # after 2 hours) to less than 5 minutes.
+    sleep(1)
     return column_names, results
 
 
 def multiget_matomo_dashboards(at: datetime.datetime, dashboard_options: list[MatomoFetchOptions]):
     all_rows = []
     column_names = None
-    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+    with concurrent.futures.ThreadPoolExecutor() as executor:
         futures = [
             executor.submit(
                 get_matomo_dashboard,
