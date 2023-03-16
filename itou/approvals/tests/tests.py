@@ -764,6 +764,7 @@ class AutomaticApprovalAdminViewsTest(TestCase):
             "end_at": "31/12/2102",
             "user": other_job_seeker.pk,
             "eligibility_diagnosis": diagnosis.pk,
+            "origin": Origin.DEFAULT,  # Will be overriden
         }
         response = self.client.post(url, data=post_data)
         assert response.status_code == 200
@@ -779,11 +780,34 @@ class AutomaticApprovalAdminViewsTest(TestCase):
             "end_at": "31/12/2102",
             "user": diagnosis.job_seeker_id,
             "eligibility_diagnosis": diagnosis.pk,
+            "origin": Origin.DEFAULT,  # Will be overriden
         }
         response = self.client.post(url, data=post_data)
         assert Approval.objects.count() == 1
         approval = Approval.objects.get()
         assert approval.eligibility_diagnosis == diagnosis
+        assert approval.origin == Origin.ADMIN
+
+    def test_create_pe_approval_manually(self):
+        user = ItouStaffFactory()
+        content_type = ContentType.objects.get_for_model(Approval)
+        permission = Permission.objects.get(content_type=content_type, codename="add_approval")
+        user.user_permissions.add(permission)
+        self.client.force_login(user)
+
+        other_job_seeker = JobSeekerFactory()
+        url = reverse("admin:approvals_approval_add")
+
+        post_data = {
+            "start_at": "01/01/2100",
+            "end_at": "31/12/2102",
+            "user": other_job_seeker.pk,
+            "number": "123456789123",
+            "origin": Origin.DEFAULT,  # Will be overriden
+        }
+        self.client.post(url, data=post_data)
+        approval = Approval.objects.get()
+        assert approval.origin == Origin.PE_APPROVAL
 
 
 class CustomApprovalAdminViewsTest(TestCase):

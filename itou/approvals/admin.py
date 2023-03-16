@@ -158,7 +158,6 @@ class ApprovalAdmin(admin.ModelAdmin):
     readonly_fields = (
         "created_at",
         "created_by",
-        "origin",
         "pe_notification_status",
         "pe_notification_time",
         "pe_notification_endpoint",
@@ -173,9 +172,8 @@ class ApprovalAdmin(admin.ModelAdmin):
     )
 
     def get_readonly_fields(self, request, obj=None):
-        if obj and (obj.origin not in [Origin.ADMIN, Origin.DEFAULT]):
-            # Only allow to edit eligibility diagnosis on approvals that should have one
-            return ("eligibility_diagnosis",) + self.readonly_fields
+        if obj:
+            return ("origin",) + self.readonly_fields
         return self.readonly_fields
 
     def save_model(self, request, obj, form, change):
