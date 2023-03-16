@@ -91,13 +91,12 @@
             {% else %}
                 {% for job_application in job_applications_page %}
                     <div class="c-card card my-4 has-links-inside">
-                        {% include "apply/includes/list_card_header.html" with job_application=job_application %}
-                        {% include "apply/includes/list_card_body.html" with job_application=job_application %}
+                        {% include "apply/includes/list_card_body_siae.html" with job_application=job_application siae_kind=siae.kind %}
                         <div class="card-footer text-right">
                             <a class="btn btn-sm btn-outline-primary"
                                href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}?back_url={{ request.get_full_path|urlencode }}"
                                aria-label="Gérer la candidature de {{ job_application.job_seeker.get_full_name|mask_unless:job_application.user_can_view_personal_information }}">
-                                Gérer la candidature
+                                Voir sa candidature
                             </a>
                         </div>
                     </div>

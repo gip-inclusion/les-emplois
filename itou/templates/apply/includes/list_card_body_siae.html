@@ -1,0 +1,136 @@
+{% load str_filters %}
+
+<div class="card-body">
+    <div class="fs-sm d-flex align-items-center mb-3">
+        <span class="text-secondary flex-grow-1">
+            Émise le {{ job_application.created_at|date:"d F Y" }} par
+ 
+            {% if request.user == job_application.sender %}
+                <strong>Vous</strong>
+            {% elif job_application.sender_kind == SenderKind.JOB_SEEKER %}
+                <strong>Le candidat lui-même</strong>
+            {% elif job_application.sender_kind == SenderKind.SIAE_STAFF %}
+                <strong class="mr-2">{{ job_application.sender_siae.display_name }}</strong>
+                {% if request.user.is_siae_staff %}
+                    <span class="badge badge-pill badge-sm badge-info">
+                        {% if job_application.origin == JobApplicationOrigin.PE_APPROVAL %}
+                            <i class="ri-hotel-line"></i>&nbsp;Employeur (Import agrément Pôle emploi)
+                        {% else %}
+                            <i class="ri-hotel-line"></i>&nbsp;Employeur (Auto-prescription)
+                        {% endif %}
+                    </span>
+                {% endif %}
+            {% elif job_application.sender_kind == SenderKind.PRESCRIBER %}
+                <strong class="mr-2">{{ job_application.sender_prescriber_organization.display_name }}</strong>
+                {% if job_application.sender_prescriber_organization %}
+                    {% if job_application.is_sent_by_authorized_prescriber %}
+                        <i class="ri-group-line"></i>&nbsp;Prescripteur habilité
+                    {% else %}
+                        <i class="ri-group-line"></i>&nbsp;Orienteur
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+
+        </span>
+        {% include "apply/includes/state_badge.html" with job_application=job_application %}
+    </div>
+    {% with all_jobs=job_application.selected_jobs.all %}
+        <p>
+            {% if all_jobs|length > 1 %}
+                <a class="d-flex flex-wrap align-items-center text-decoration-none has-collapse-caret collapsed"
+                   data-toggle="collapse"
+                   href="#collapseJobs"
+                   role="button"
+                   aria-expanded="false"
+                   aria-controls="collapseExample">
+                {% endif %}
+
+                {% if not job_application.selected_jobs.exists %}
+                    <span class="font-weight-bold mr-1 mr-md-2">Candidature spontanée</span>
+                {% else %}
+                    {% with all_jobs|first as first_job %}
+                        <i class="ri-briefcase-line ri-xl mr-1"></i>
+                        <span class="font-weight-bold mr-1 mr-md-2">{{ first_job.display_name }}</span>
+
+                        {% if first_job.location %}
+                            <span class="fs-sm text-nowrap">
+                                <i class="ri-map-pin-2-line ri-sm mr-1"></i>
+                                {{ first_job.location }}
+                            </span>
+                        {% endif %}
+                    {% endwith %}
+                {% endif %}
+
+                {% if all_jobs|length > 1 %}
+                    {% with other_job_number=all_jobs|length|add:"-1" %}
+                        <span class="ml-auto fs-sm text-decoration-underline">+ {{ other_job_number }} autre{{ other_job_number|pluralize }} poste{{ other_job_number|pluralize }}</span>
+                    {% endwith %}
+                </a>
+            {% endif %}
+        </p>
+
+        {% if all_jobs|length > 1 %}
+            <ul class="list-group list-group-sm list-group-flush collapse" id="collapseJobs">
+                {% for job in all_jobs|slice:"1:" %}
+                    <li class="list-group-item list-group-item-action">
+                        <a class="d-flex flex-wrap align-items-center text-decoration-none" href="">
+                            <span class="font-weight-bold mr-1 mr-md-2">{{ job.display_name }}</span>
+
+                            {% if job.location %}
+                                <span class="ml-auto fs-sm text-nowrap">
+                                    <i class="ri-map-pin-2-line ri-sm mr-1"></i>
+                                    {{ job.location }}
+                                </span>
+
+                            {% endif %}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <hr />
+    <div class="row">
+        <div class="col-12 col-lg-5 mb-3 mb-lg-0">
+            <h3 class="h3 mb-1">
+                {{ job_application.job_seeker.get_full_name|mask_unless:job_application.user_can_view_personal_information }}
+            </h3>
+            {% if job_application.job_seeker.city %}
+                <span class="d-block mb-2 text-nowrap">
+                    {% if job_application.job_seeker.department %}{{ job_application.job_seeker.department }} -{% endif %}
+                    {{ job_application.job_seeker.city }}
+                </span>
+            {% endif %}
+
+            {% if siae_kind in SiaeWithConventionKinds %}
+                {% with approval=job_application.job_seeker.latest_common_approval %}
+                    {% if approval %}
+                        <span class="badge badge-xs badge-pill{% if approval.state == 'EXPIRED' %} badge-emploi-light{% else %} badge-success-lighter{% endif %} text-primary">
+                            <i class="{% if approval.state == 'EXPIRED' %}ri-close-circle-line{% elif approval.state == 'SUSPENDED' %}ri-pause-circle-line{% else %}ri-checkbox-circle-line{% endif %}"></i>
+                            PASS IAE {{ approval.get_state_display }}
+                        </span>
+                    {% else %}
+                        {% if job_application.to_siae.is_subject_to_eligibility_rules or request.user.is_prescriber %}
+                            {% if eligibility_diagnosis and eligibility_diagnosis.is_considered_valid %}
+                                {% if job_application.is_sent_by_authorized_prescriber %}
+                                    <span class="badge badge-xs badge-pill badge-success-light text-primary">
+                                        <i class="ri-check-line"></i>
+                                        Éligible à l’IAE
+                                    </span>
+                                {% endif %}
+                            {% else %}
+                                <span class="badge badge-xs badge-pill badge-accent-02-lighter text-primary">
+                                    <i class="ri-error-warning-line"></i>
+                                    Éligibilité à l’IAE à valider
+                                </span>
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+
+                {% endwith %}
+            {% endif %}
+        </div>
+    </div>
+
+</div>

@@ -7,7 +7,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.db.models import BooleanField, Case, Count, Exists, F, Max, OuterRef, Q, Subquery, When
+from django.db.models import BooleanField, Case, Count, Exists, F, Max, OuterRef, Prefetch, Q, Subquery, When
 from django.db.models.functions import Coalesce, Greatest, TruncMonth
 from django.urls import reverse
 from django.utils import timezone
@@ -240,7 +240,10 @@ class JobApplicationQuerySet(models.QuerySet):
             "sender_siae",
             "sender_prescriber_organization",
             "to_siae__convention",
-        ).prefetch_related("selected_jobs__appellation")
+        ).prefetch_related(
+            "selected_jobs__appellation",
+            Prefetch("job_seeker__approvals", queryset=Approval.objects.order_by("-start_at")),
+        )
 
         qs = (
             qs.with_has_suspended_approval().with_is_pending_for_too_long().with_last_jobseeker_eligibility_diagnosis()
