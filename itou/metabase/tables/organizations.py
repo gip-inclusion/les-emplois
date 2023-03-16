@@ -78,6 +78,7 @@ TABLE = MetabaseTable(name="organisations")
 TABLE.add_columns(
     [
         {"name": "id", "type": "integer", "comment": "ID organisation", "fn": lambda o: o.id},
+        {"name": "siret", "type": "varchar", "comment": "SIRET organisation", "fn": lambda o: o.siret},
         {"name": "nom", "type": "varchar", "comment": "Nom organisation", "fn": lambda o: o.display_name},
         {
             "name": "type",
