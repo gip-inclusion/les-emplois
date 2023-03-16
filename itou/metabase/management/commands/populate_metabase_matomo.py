@@ -192,7 +192,7 @@ def multiget_matomo_dashboards(at: datetime.datetime, dashboard_options: list[Ma
         ]
         for future in concurrent.futures.as_completed(futures, timeout=60 * 60 * 3):  # 3h max for all dashboards
             cols, rows = future.result()
-            if not cols or not rows:
+            if rows is None:
                 continue
             # redefine column_names every time, they should always be the same
             column_names = cols
