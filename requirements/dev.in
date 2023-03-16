@@ -2,6 +2,8 @@
 
 pip-tools  # https://github.com/jazzband/pip-tools/
 
+# Utils
+# ------------------------------------------------------------------------------
 beautifulsoup4  # https://code.launchpad.net/beautifulsoup
 html5lib  # https://github.com/html5lib/html5lib-python
 ipdb  # https://github.com/gotcha/ipdb
@@ -9,28 +11,27 @@ ipdb  # https://github.com/gotcha/ipdb
 # Code quality
 # ------------------------------------------------------------------------------
 black  # https://github.com/psf/black
-flake8  # https://github.com/PyCQA/flake8
-isort  # https://github.com/timothycrosley/isort
-pylint  # https://github.com/PyCQA/pylint
-pylint-django  # https://github.com/PyCQA/pylint-django
-pre-commit  # https://github.com/pre-commit/pre-commit
 coverage  # https://github.com/nedbat/coveragepy
 djlint  # https://www.djlint.com
+flake8  # https://github.com/PyCQA/flake8
+isort  # https://github.com/timothycrosley/isort
+pre-commit  # https://github.com/pre-commit/pre-commit
+pylint  # https://github.com/PyCQA/pylint
+pylint-django  # https://github.com/PyCQA/pylint-django
 
 # Django
 # ------------------------------------------------------------------------------
-factory-boy  # https://github.com/FactoryBoy/factory_boy
-
+django-admin-logs  # https://pypi.org/project/django-admin-logs/
 django-debug-toolbar  # https://github.com/jazzband/django-debug-toolbar
 django-extensions  # https://github.com/django-extensions/django-extensions
-django-admin-logs  # https://pypi.org/project/django-admin-logs/
 
 # Test & Mock
 # ------------------------------------------------------------------------------
+factory-boy  # https://github.com/FactoryBoy/factory_boy
 freezegun  # https://github.com/spulec/freezegun
-respx  # https://lundberg.github.io/respx/
 pytest  # https://github.com/pytest-dev/pytest
 pytest-django # https://github.com/pytest-dev/pytest-django/
 pytest-mock  # https://github.com/pytest-dev/pytest-mock/
 pytest-timeout  # https://github.com/pytest-dev/pytest-timeout
 pytest-xdist  # https://pypi.org/project/pytest-xdist/
+respx  # https://lundberg.github.io/respx/
