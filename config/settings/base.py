@@ -585,6 +585,9 @@ CSP_FRAME_SRC = [
     "https://communaute.inclusion.beta.gouv.fr",
     "https://inclusion.beta.gouv.fr",
 ]
+CSP_FRAME_ANCESTORS = [
+    "https://pilotage.inclusion.beta.gouv.fr",
+]
 CSP_IMG_SRC = [
     "'self'",
     "data:",  # Because of tarteaucitron.js
