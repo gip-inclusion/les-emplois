@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-BACKUP_DIR_PATH='/backups'
-BACKUP_FILE_PREFIX='backup'
+export BACKUP_DIR_PATH='/backups'
+export BACKUP_FILE_PREFIX='backup'
