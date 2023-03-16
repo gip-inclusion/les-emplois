@@ -2,6 +2,7 @@ from django import forms
 from django.forms import widgets
 
 from itou.approvals.models import Approval
+from itou.job_applications.enums import Origin
 
 
 class ApprovalFormMixin:
@@ -41,22 +42,37 @@ class ApprovalAdminForm(ApprovalFormMixin, forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # TODO(alaurent) Update when all old approvals have a diagnosis
-        if not self.instance.pk:
-            self.fields["eligibility_diagnosis"].required = True
-
         # ex nihilo with arbitrary numbers because we have noticed holes in
         # the approvals transmitted by PE and we have complaints from users.
         if "number" in self.fields:
             self.fields["number"].required = False
             self.fields["number"].help_text += self.ADDITIONAL_HELP_TEXT_NUMBER
 
-    def clean_eligibility_diagnosis(self):
-        eligibility_diagnosis = self.cleaned_data["eligibility_diagnosis"]
+    def get_origin(self):
+        if self.instance.pk:
+            return self.instance.origin
+        return self.cleaned_data["origin"]
+
+    def set_origin(self):
+        number = self.cleaned_data["number"]
+        # Only set to PE approval if there's a number and it's not from ITOU
+        if number and not number.startswith(Approval.ASP_ITOU_PREFIX):
+            self.cleaned_data["origin"] = Origin.PE_APPROVAL
+        else:
+            self.cleaned_data["origin"] = Origin.ADMIN
+
+    def clean(self):
+        super().clean()
+
+        if "origin" in self.cleaned_data:
+            self.set_origin()
+
+        eligibility_diagnosis = self.cleaned_data.get("eligibility_diagnosis")
         if eligibility_diagnosis and eligibility_diagnosis.job_seeker != self.cleaned_data["user"]:
             # Could we filter available eligibility diagnosis ?
-            raise forms.ValidationError("Le diagnostic doit appartenir au même utilisateur que le PASS")
-        return eligibility_diagnosis
+            self.add_error("eligibility_diagnosis", "Le diagnostic doit appartenir au même utilisateur que le PASS")
+        elif not eligibility_diagnosis and self.get_origin() in [Origin.ADMIN, Origin.DEFAULT]:
+            self.add_error("eligibility_diagnosis", "Ce champ est obligatoire")
 
 
 class ManuallyAddApprovalFromJobApplicationForm(ApprovalFormMixin, forms.ModelForm):
