@@ -1083,7 +1083,7 @@ class ProcessViewsTest(TestCase):
 
     def test_cancel(self, *args, **kwargs):
         # Hiring date is today: cancellation should be possible.
-        job_application = JobApplicationFactory(with_approval=True)
+        job_application = JobApplicationFactory(with_approval=True, to_siae__subject_to_eligibility=True)
         siae_user = job_application.to_siae.members.first()
         self.client.force_login(siae_user)
         url = reverse("apply:cancel", kwargs={"job_application_id": job_application.pk})
@@ -1092,6 +1092,11 @@ class ProcessViewsTest(TestCase):
         self.assertContains(response, "Confirmer l'annulation de l'embauche")
         self.assertContains(
             response, "En validant, <b>vous renoncez aux aides au poste</b> liées à cette candidature pour tous"
+        )
+        self.assertNotContains(
+            response,
+            "En annulant cette embauche, vous confirmez que le salarié n’avait pas encore commencé à "
+            "travailler dans votre structure.",
         )
 
         post_data = {
@@ -1103,6 +1108,25 @@ class ProcessViewsTest(TestCase):
 
         job_application.refresh_from_db()
         assert job_application.state.is_cancelled
+
+    def test_cancel_saie_not_subject_to_eligibility(self, *args, **kwargs):
+        # Hiring date is today: cancellation should be possible.
+        job_application = JobApplicationFactory(with_approval=True, to_siae__not_subject_to_eligibility=True)
+        siae_user = job_application.to_siae.members.first()
+        self.client.force_login(siae_user)
+        url = reverse("apply:cancel", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url)
+        assert response.status_code == 200
+        self.assertContains(response, "Confirmer l'annulation de l'embauche")
+        self.assertNotContains(
+            response, "En validant, <b>vous renoncez aux aides au poste</b> liées à cette candidature pour tous"
+        )
+        self.assertContains(
+            response,
+            "En annulant cette embauche, vous confirmez que le salarié n’avait pas encore commencé à "
+            "travailler dans votre structure.",
+        )
+        # Not need to the form POST, only the warning above changes
 
     def test_cannot_cancel(self, *args, **kwargs):
         job_application = JobApplicationFactory(
