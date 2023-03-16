@@ -17,7 +17,7 @@ echo "Running the ASP import script"
 # Every command in this script will be written before being executed
 set +x
 
-cd $APP_HOME || exit 255
+cd "$APP_HOME" || exit
 
 FLUX_IAE_FILE=$(find asp_shared_bucket/ -name 'fluxIAE_*.zip' -type f -mtime -5)
 if [[ ! -f "$FLUX_IAE_FILE" ]]; then
@@ -36,8 +36,8 @@ mkdir -p itou/siaes/management/commands/data/
 rm -rf itou/siaes/management/commands/data/*
 
 # Unzip ASP files
-unzip -P $ASP_UNZIP_PASSWORD "$FLUX_IAE_FILE" -d itou/siaes/management/commands/data/
-unzip -P $ASP_UNZIP_PASSWORD "$CONTACT_EA_FILE" -d itou/siaes/management/commands/data/
+unzip -P "$ASP_UNZIP_PASSWORD" "$FLUX_IAE_FILE" -d itou/siaes/management/commands/data/
+unzip -P "$ASP_UNZIP_PASSWORD" "$CONTACT_EA_FILE" -d itou/siaes/management/commands/data/
 
 # Perform the necessary data imports
 mkdir -p $OUTPUT_PATH/populate_metabase_fluxiae

@@ -16,6 +16,6 @@ if [[ "$INSTANCE_NUMBER" != "0" ]]; then
 fi
 
 # $APP_HOME is set by default by clever cloud.
-cd $APP_HOME
+cd "$APP_HOME" || exit
 
 django-admin transfer_employee_records --archive

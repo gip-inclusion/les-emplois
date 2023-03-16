@@ -7,40 +7,40 @@
 # - https://github.com/CleverCloud/clever-tools/
 # - https://www.clever-cloud.com/doc/getting-started/cli/
 
-RUN_DIRECTORY=`dirname $0`
+RUN_DIRECTORY=$(dirname "$0")
 if [[ ! $RUN_DIRECTORY =~ "scripts" ]]; then
    echo "This script is meant to be run from the root of the project, in order to properly load everything, like this:"
-   echo "./scripts/`basename $0`"
+   echo "./scripts/$(basename "$0")"
    exit 1
 fi
 
 # If the script is loaded from the root we can import the local environment variables
 source .env
-if [ -z $CLEVER_TOKEN ]; then
+if [ -z "$CLEVER_TOKEN" ]; then
   echo "please add 'CLEVER_TOKEN=some_token' in .env at the root of the project in order to run this script. You can find its value with 'clever login'"
   exit 1
 fi
-if [ -z $CLEVER_SECRET ]; then
+if [ -z "$CLEVER_SECRET" ]; then
   echo "please add 'CLEVER_SECRET=some_secret' in .env at the root of the project in order to run this script. You can find its value with 'clever login'"
   exit 1
 fi
 
-clever login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
+clever login --token "$CLEVER_TOKEN" --secret "$CLEVER_SECRET"
 
 APP_NAME=c1-fast-machine-$(date +%y-%m-%d-%Hh-%M)
 
-clever create $APP_NAME --type python --region par --alias $APP_NAME --org Itou
-clever link $APP_NAME --org Itou
-clever scale --flavor XL --alias $APP_NAME
+clever create "$APP_NAME" --type python --region par --alias "$APP_NAME" --org Itou
+clever link "$APP_NAME" --org Itou
+clever scale --flavor XL --alias "$APP_NAME"
 
-clever env set ITOU_ENVIRONMENT "FAST-MACHINE" --alias $APP_NAME
+clever env set ITOU_ENVIRONMENT "FAST-MACHINE" --alias "$APP_NAME"
 
-clever service link-addon c1-bucket-config --alias $APP_NAME
-clever service link-addon c1-deployment-config --alias $APP_NAME
-clever service link-addon c1-imports-config --alias $APP_NAME
-clever service link-addon c1-prod-database-encrypted  --alias $APP_NAME
+clever service link-addon c1-bucket-config --alias "$APP_NAME"
+clever service link-addon c1-deployment-config --alias "$APP_NAME"
+clever service link-addon c1-imports-config --alias "$APP_NAME"
+clever service link-addon c1-prod-database-encrypted  --alias "$APP_NAME"
 
-clever deploy --alias $APP_NAME --branch master_clever --force
+clever deploy --alias "$APP_NAME" --branch master_clever --force
 
 cat << EOF
 
