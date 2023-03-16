@@ -46,7 +46,9 @@ MATOMO_ONLINE_CONTENT = (
 @pytest.mark.respx(base_url="https://mato.mo")
 @pytest.mark.usefixtures("metabase")
 @freeze_time("2022-06-21")
-def test_matomo_retry(respx_mock, capsys):
+def test_matomo_retry(monkeypatch, respx_mock, capsys):
+    monkeypatch.setattr("tenacity.wait_fixed", lambda _a: None)
+
     respx_mock.get("/index.php").respond(
         500,
         content=f"{MATOMO_HEADERS}\n{MATOMO_ONLINE_CONTENT}".encode("utf-16"),
