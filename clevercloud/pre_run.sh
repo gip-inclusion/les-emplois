@@ -1,6 +1,6 @@
 #!/bin/bash -l
 
-cd secrets-vault
+cd secrets-vault || exit
 git pull
-cd -
-sops -d secrets-vault/c1/$ITOU_ENVIRONMENT.enc.env > .env
+cd - || exit
+sops -d secrets-vault/c1/"$ITOU_ENVIRONMENT".enc.env > .env
