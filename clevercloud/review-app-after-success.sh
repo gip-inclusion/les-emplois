@@ -23,4 +23,4 @@ PGPASSWORD=$POSTGRESQL_ADDON_PASSWORD \
 # `ls $APP_HOME` does not work as the current user
 # does not have execution rights on the $APP_HOME directory.
 echo "Loading fixtures"
-ls -d "$APP_HOME"/itou/fixtures/django/* | xargs django-admin loaddata
+find "$APP_HOME"/itou/fixtures/django/ -name '*.json' | sort | xargs django-admin loaddata

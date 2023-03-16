@@ -16,8 +16,8 @@ echo "Downloading last available backup..."
 echo "Download is over."
 
 # Get the latest backup filename and path
-ITOU_DB_BACKUP_NAME=$(ls "$PATH_TO_ITOU_BACKUPS"/backups | tail -n1)
-ITOU_DB_BACKUP_PATH=$PATH_TO_ITOU_BACKUPS/backups/$ITOU_DB_BACKUP_NAME
+ITOU_DB_BACKUP_PATH=$(find "$PATH_TO_ITOU_BACKUPS"/backups/* | sort | tail -n1)
+ITOU_DB_BACKUP_NAME=$(basename "$ITOU_DB_BACKUP_PATH")
 
 echo "Going to inject ITOU_DB_BACKUP_PATH=$ITOU_DB_BACKUP_PATH"
 
