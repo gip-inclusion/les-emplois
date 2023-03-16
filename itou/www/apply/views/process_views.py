@@ -371,7 +371,7 @@ def cancel(request, job_application_id, template_name="apply/process_cancel.html
     """
     Trigger the `cancel` transition.
     """
-    queryset = JobApplication.objects.siae_member_required(request.user)
+    queryset = JobApplication.objects.siae_member_required(request.user).select_related("to_siae")
     job_application = get_object_or_404(queryset, id=job_application_id)
     check_waiting_period(job_application)
     next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
