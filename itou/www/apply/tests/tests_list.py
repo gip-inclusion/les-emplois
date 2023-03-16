@@ -188,7 +188,8 @@ class ProcessListSiaeTest(ProcessListTest):
             + 1  # get list of senders (distinct sender_id)
             + 1  # get list of job seekers (distinct job_seeker_id)
             + 1  # get list of administrative criteria
-            + 2  # get list of job application + prefetch of job descriptions
+            + 3  # get list of job application + prefetch of job descriptions + prefetch of approvals
+            + 8  # get PE Approval per user. Can't use prefetch as there is no Foreign Key constraint
             + 1  # get list of sender org (distinct sender_prescriber_organization_id)
             + 3  # count, list & prefetch of job application
             + 1  # check user membership again
@@ -659,7 +660,7 @@ def test_list_for_unauthorized_prescriber_view(client):
         + 1  # get list of senders (distinct sender_id)
         + 1  # get list of job seekers (distinct job_seeker_id)
         + 1  # get list of administrative criteria
-        + 2  # get list of job application + prefetch of job descriptions
+        + 3  # get list of job application + prefetch of job descriptions + prefetch of approvals
         + 1  # get list of siaes (distinct)
         + 3  # count, list & prefetch of job application
         + 1  # check user membership again

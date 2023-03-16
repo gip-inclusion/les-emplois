@@ -469,11 +469,14 @@ class User(AbstractUser, AddressMixin):
     def latest_approval(self):
         if not self.is_job_seeker:
             return None
-        approvals = Approval.objects.filter(user=self).order_by("-start_at")
+
+        approvals = self.approvals.all()
+
         if not approvals:
             return None
         if approvals.valid().exists():
             return approvals.valid().first()
+
         approval = sorted(
             approvals,
             key=lambda x: (
@@ -489,7 +492,9 @@ class User(AbstractUser, AddressMixin):
     def latest_pe_approval(self):
         if not self.is_job_seeker:
             return None
-        approval_numbers = Approval.objects.filter(user=self).values_list("number", flat=True)
+
+        approval_numbers = self.approvals.all().values_list("number", flat=True)
+
         pe_approvals = PoleEmploiApproval.objects.find_for(self).exclude(number__in=approval_numbers)
         if not pe_approvals:
             return None
@@ -517,6 +522,11 @@ class User(AbstractUser, AddressMixin):
             > else, return the PASS in waiting period.
           * if outdated, we consider there's no PASS. Return the latest PE approval, if any.
         """
+
+        # if there is a latest PASS IAE that is valid, it is returned.
+        if self.latest_approval and self.latest_approval.is_valid():
+            return self.latest_approval
+
         if (
             self.latest_approval
             and self.latest_approval.is_in_waiting_period

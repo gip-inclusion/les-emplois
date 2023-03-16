@@ -4,7 +4,9 @@ from django.test.client import RequestFactory
 from django.utils.html import escape
 
 from itou.job_applications.enums import Origin
-from itou.job_applications.factories import JobApplicationSentBySiaeFactory
+from itou.job_applications.factories import JobApplicationSentByJobSeekerFactory, JobApplicationSentBySiaeFactory
+from itou.jobs.factories import create_test_romes_and_appellations
+from itou.jobs.models import Appellation
 from itou.users.factories import JobSeekerWithAddressFactory, SiaeStaffFactory
 from itou.utils.enums_context_processors import expose_enums
 
@@ -22,12 +24,39 @@ def get_request():
 # Job applications list (SIAE)
 
 
-def test_job_application_auto_prescription_badge_in_list():
-    tmpl = load_template("apply/includes/list_card_body.html")
+def test_job_application_multiple_jobs():
+    create_test_romes_and_appellations(["M1805"], appellations_per_rome=3)
+
+    tmpl = load_template("apply/includes/list_card_body_siae.html")
+
+    job_application = JobApplicationSentBySiaeFactory(
+        selected_jobs=Appellation.objects.all(),
+    )
+    job_application.user_can_view_personal_information = True
+
     rendered = tmpl.render(
         Context(
             {
-                "job_application": JobApplicationSentBySiaeFactory(),
+                "job_application": job_application,
+                "request": get_request(),
+                **expose_enums(),
+            }
+        )
+    )
+
+    # We have 3 selected_jobs, so we should display the first one
+    # and 2 more
+    assert "2 autres postes" in rendered
+
+
+def test_job_application_auto_prescription_badge_in_list():
+    tmpl = load_template("apply/includes/list_card_body.html")
+    job_application = JobApplicationSentBySiaeFactory()
+    job_application.user_can_view_personal_information = True
+    rendered = tmpl.render(
+        Context(
+            {
+                "job_application": job_application,
                 "request": get_request(),
                 **expose_enums(),
             }
@@ -39,10 +68,12 @@ def test_job_application_auto_prescription_badge_in_list():
 
 def test_job_application_imported_from_pe_in_list():
     tmpl = load_template("apply/includes/list_card_body.html")
+    job_application = JobApplicationSentBySiaeFactory(origin=Origin.PE_APPROVAL)
+    job_application.user_can_view_personal_information = True
     rendered = tmpl.render(
         Context(
             {
-                "job_application": JobApplicationSentBySiaeFactory(origin=Origin.PE_APPROVAL),
+                "job_application": job_application,
                 "request": get_request(),
                 **expose_enums(),
             }
@@ -50,6 +81,58 @@ def test_job_application_imported_from_pe_in_list():
     )
 
     assert "Import agrément Pôle emploi" in rendered
+
+
+def test_job_application_job_seeker_in_list():
+    tmpl = load_template("apply/includes/list_card_body.html")
+    job_application = JobApplicationSentByJobSeekerFactory()
+    job_application.user_can_view_personal_information = True
+    rendered = tmpl.render(
+        Context(
+            {
+                "job_application": job_application,
+                "request": get_request(),
+                **expose_enums(),
+            }
+        )
+    )
+
+    assert "Le candidat lui-même" in rendered
+
+
+def test_job_application_state_badge_new():
+    tmpl = load_template("apply/includes/state_badge.html")
+    job_application = JobApplicationSentByJobSeekerFactory()
+    rendered = tmpl.render(
+        Context(
+            {
+                "job_application": job_application,
+                "request": get_request(),
+                **expose_enums(),
+            }
+        )
+    )
+
+    assert "badge-info" in rendered
+
+
+def test_job_application_state_badge_processing():
+    tmpl = load_template("apply/includes/state_badge.html")
+    job_application = JobApplicationSentByJobSeekerFactory()
+    job_application.state.is_new = False
+    job_application.state.is_processing = True
+
+    rendered = tmpl.render(
+        Context(
+            {
+                "job_application": job_application,
+                "request": get_request(),
+                **expose_enums(),
+            }
+        )
+    )
+
+    assert "badge-accent-03" in rendered
 
 
 # QPV / ZRR eligibility details
