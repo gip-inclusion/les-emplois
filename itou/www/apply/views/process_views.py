@@ -286,8 +286,11 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
         "form_personal_data": form_personal_data,
         "job_application": job_application,
         "can_view_personal_information": True,  # SIAE members have access to personal info
-        "hide_value": ContractType.OTHER.value,
         "matomo_custom_title": "Candidature acceptée",
+        "gieq_other_contract_type_hidden_value": ContractType.OTHER.value,
+        # don't make new query, job_application.to_siae.job_description_through.all was already called
+        "has_job_description": bool(job_application.to_siae.job_description_through.all()),
+        "hired_job_other_hidden_value": form_accept.OTHER_HIRED_JOB,
     }
 
     if not job_application.hiring_without_approval and job_application.eligibility_diagnosis_by_siae_required:

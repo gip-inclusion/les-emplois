@@ -9,7 +9,9 @@ from itou.job_applications.factories import (
     JobApplicationSentByPrescriberFactory,
     JobApplicationSentBySiaeFactory,
 )
+from itou.jobs.factories import create_test_romes_and_appellations
 from itou.siaes.enums import ContractType, SiaeKind
+from itou.siaes.factories import SiaeJobDescriptionFactory
 from itou.users.factories import JobSeekerFactory, PrescriberFactory
 from itou.utils.test import TestCase
 from itou.www.apply import forms as apply_forms
@@ -111,14 +113,22 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
         ]
 
     def test_accept_form_geiq_fields_validation(self):
+        create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ)
+        job_description = SiaeJobDescriptionFactory(siae=job_application.to_siae)
         post_data = {"hiring_start_at": f"{datetime.now():%Y-%m-%d}"}
         form = apply_forms.AcceptForm(instance=job_application, data=post_data)
 
         assert form.errors == {
             "contract_type": ["Ce champ est obligatoire."],
             "nb_hours_per_week": ["Ce champ est obligatoire."],
+            "hired_job": ["Ce champ est obligatoire."],
+            "location_code": ["Ce champ est obligatoire."],
+            "location_label": ["Ce champ est obligatoire."],
         }
+
+        # Add job related fields
+        post_data |= {"hired_job": job_description.pk, "location_code": 1, "location_label": 1}
 
         post_data |= {"contract_type": ContractType.APPRENTICESHIP}
         form = apply_forms.AcceptForm(instance=job_application, data=post_data)
@@ -135,7 +145,10 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
             "contract_type_details": ["Les précisions sont nécessaires pour ce type de contrat"],
         }
 
-        post_data |= {"nb_hours_per_week": 35, "contract_type": ContractType.PROFESSIONAL_TRAINING}
+        post_data |= {
+            "nb_hours_per_week": 35,
+            "contract_type": ContractType.PROFESSIONAL_TRAINING,
+        }
         form = apply_forms.AcceptForm(instance=job_application, data=post_data)
 
         assert form.is_valid()
@@ -144,6 +157,8 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
         form = apply_forms.AcceptForm(instance=job_application, data=post_data)
 
         assert form.is_valid()
+
+        # TODO(alaurent) check when hired_job is Autre
 
     def test_save_geiq_form_fields_from_view(self):
         # non-GEIQ accept case tests are in `tests_process.py`

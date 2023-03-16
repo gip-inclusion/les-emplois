@@ -213,14 +213,9 @@ class FinancialAnnexSelectForm(forms.Form):
     )
 
 
-# SIAE job descriptions forms (2 steps and session based)
-
-
-class EditJobDescriptionForm(forms.ModelForm):
-
-    JOBS_AUTOCOMPLETE_URL = reverse_lazy("autocomplete:jobs")
-
+class JobAppellationAndLocationMixin(forms.Form):
     # See: itou/static/js/job_autocomplete.js
+    JOBS_AUTOCOMPLETE_URL = reverse_lazy("autocomplete:jobs")
     job_appellation = forms.CharField(
         label="Poste (code ROME)",
         widget=forms.TextInput(
@@ -231,18 +226,22 @@ class EditJobDescriptionForm(forms.ModelForm):
                 "autocomplete": "off",
             }
         ),
+        required=False,
     )
     # Hidden placeholder field for "real" job appellation.
     job_appellation_code = forms.CharField(
-        max_length=6, widget=forms.HiddenInput(attrs={"class": "js-job-autocomplete-hidden form-control"})
+        max_length=6,
+        widget=forms.HiddenInput(attrs={"class": "js-job-autocomplete-hidden form-control"}),
+        required=False,
     )
 
+    # See: itou/static/js/city_autocomplete_field.js
     LOCATION_AUTOCOMPLETE_URL = reverse_lazy("autocomplete:cities")
     location_label = forms.CharField(
         label="Localisation du poste (si différent du siège)",
         widget=forms.TextInput(
             attrs={
-                "class": "js-city-autocomplete-input form-control",
+                "class": "js-city4jobs-autocomplete-input form-control",
                 "data-autosubmit-on-enter-pressed": 0,
                 "data-autocomplete-source-url": LOCATION_AUTOCOMPLETE_URL,
                 "placeholder": "Ex. Poitiers",
@@ -251,14 +250,39 @@ class EditJobDescriptionForm(forms.ModelForm):
         ),
         required=False,
     )
-
+    # Hidden placeholder field for "real" city
     location_code = forms.CharField(
-        required=False, widget=forms.HiddenInput(attrs={"class": "js-city-autocomplete-hidden"})
+        widget=forms.HiddenInput(attrs={"class": "js-city4jobs-autocomplete-hidden"}),
+        required=False,
     )
 
     def __init__(self, current_siae: Siae, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # Pass SIAE id in autocomplete call
+        self.fields["job_appellation"].widget.attrs.update(
+            {
+                "data-autocomplete-source-url": self.JOBS_AUTOCOMPLETE_URL + f"?siae_id={current_siae.pk}",
+            }
+        )
+
+    def clean_job_appellation_code(self):
+        job_appellation_code = self.cleaned_data.get("job_appellation_code")
+        try:
+            return int(job_appellation_code)
+        except (ValueError, TypeError):
+            if self.fields["job_appellation_code"].required:
+                raise forms.ValidationError("Le poste n'est pas correctement renseigné.")
+            return None
+
+
+# SIAE job descriptions forms (2 steps and session based)
+class EditJobDescriptionForm(JobAppellationAndLocationMixin, forms.ModelForm):
+    def __init__(self, current_siae: Siae, *args, **kwargs):
+        super().__init__(current_siae, *args, **kwargs)
         self.instance.siae = current_siae
+
+        self.fields["job_appellation"].required = True
+        self.fields["job_appellation_code"].required = True
 
         if self.instance.pk:
             self.fields["job_appellation"].initial = self.instance.appellation.name
@@ -271,13 +295,6 @@ class EditJobDescriptionForm(forms.ModelForm):
 
             if self.instance.contract_type != ContractType.OTHER:
                 self.fields["other_contract_type"].widget.attrs.update({"disabled": "disabled"})
-
-        # Pass SIAE id in autocomplete call
-        self.fields["job_appellation"].widget.attrs.update(
-            {
-                "data-autocomplete-source-url": self.JOBS_AUTOCOMPLETE_URL + f"?siae_id={current_siae.pk}",
-            }
-        )
 
         self.fields["custom_name"].widget.attrs.update({"placeholder": ""})
         self.fields["hours_per_week"].widget.attrs.update({"placeholder": ""})
@@ -327,12 +344,6 @@ class EditJobDescriptionForm(forms.ModelForm):
             "custom_name": "Si le champ est renseigné, il sera utilisé à la place du nom ci-dessus.",
             "other_contract_type": "Veuillez préciser quel est le type de contrat.",
         }
-
-    def clean_job_appellation_code(self):
-        job_appellation_code = self.cleaned_data.get("job_appellation_code")
-        if not job_appellation_code:
-            raise forms.ValidationError("Le poste n'est pas correctement renseigné.")
-        return int(job_appellation_code)
 
     def clean_open_positions(self):
         open_positions = self.cleaned_data.get("open_positions")

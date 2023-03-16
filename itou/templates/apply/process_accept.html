@@ -42,11 +42,18 @@
                 {% endif %}
 
                 <hr>
-                <h2>Embauche</h2>
+                <h2>Contrat</h2>
                 {% bootstrap_form_errors form_accept type="non_fields" %}
+                {% if has_job_description %}
+                    {% bootstrap_field form_accept.hired_job %}
+                {% endif %}
+                <div id="jobAppellation" {% if has_job_description %}class="d-none"{% endif %}>
+                    {% bootstrap_field form_accept.job_appellation %}
+                </div>
+                {% bootstrap_field form_accept.location_label %}
                 {% if job_application.to_siae.kind == SiaeKind.GEIQ %}
                     {% bootstrap_field form_accept.contract_type %}
-                    <div id="contractTypeDetails" {% if not form_accept.is_bound or form_accept.contract_type.value != hide_value %}class="d-none"{% endif %}>
+                    <div id="contractTypeDetails" {% if not form_accept.is_bound or form_accept.contract_type.value != gieq_other_contract_type_hidden_value %}class="d-none"{% endif %}>
                         {% bootstrap_field form_accept.contract_type_details %}
                     </div>
                     {% bootstrap_field form_accept.nb_hours_per_week %}
@@ -105,6 +112,8 @@
     {{ block.super }}
 
     <script src="{% static 'js/split_nir.js' %}"></script>
+    <script src="{% static "js/job_autocomplete.js" %}"></script>
+    <script src="{% static "js/city_autocomplete_field_for_jobs.js" %}"></script>
 
     <!-- Needed to use the Datepicker JS widget. -->
     {{ form_accept.media }}
@@ -116,13 +125,28 @@
             var contractType = $("#id_contract_type");
             var contractTypeDetails = $("#contractTypeDetails");
             contractType.change(function() {
-                if (contractType.val() == '{{ hide_value }}') {
-                   contractTypeDetails.removeClass("d-none"); 
+                if (contractType.val() == '{{ gieq_other_contract_type_hidden_value }}') {
+                   contractTypeDetails.removeClass("d-none");
                 } else {
                     $("#id_contract_type_details").val('');
-                    contractTypeDetails.addClass("d-none"); 
-                } 
+                    contractTypeDetails.addClass("d-none");
+                }
             });
         });
     </script>
+    <script nonce="{{ CSP_NONCE }}">
+        htmx.onLoad(function() {
+            var hiredJob = $("#id_hired_job");
+            var jobAppellation = $("#jobAppellation");
+            hiredJob.change(function() {
+                if (hiredJob.val() == '{{ hired_job_other_hidden_value }}') {
+                   jobAppellation.removeClass("d-none");
+                } else {
+                    $("#id_job_appelation").val('');
+                    jobAppellation.addClass("d-none");
+                }
+            });
+        });
+    </script>
+
 {% endblock %}

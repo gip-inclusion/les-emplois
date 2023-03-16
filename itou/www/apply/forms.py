@@ -1,5 +1,6 @@
 import contextlib
 import datetime
+from operator import itemgetter
 
 import sentry_sdk
 from dateutil.relativedelta import relativedelta
@@ -28,6 +29,7 @@ from itou.utils import constants as global_constants
 from itou.utils.types import InclusiveDateRange
 from itou.utils.validators import validate_nir, validate_pole_emploi_id
 from itou.utils.widgets import DuetDatePickerWidget
+from itou.www.siaes_views.forms import JobAppellationAndLocationMixin
 
 
 class UserExistsForm(forms.Form):
@@ -434,16 +436,44 @@ class AnswerForm(forms.Form):
     )
 
 
-class AcceptForm(forms.ModelForm):
+class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
     """
     Allow an SIAE to add an answer message when postponing or accepting.
     If SIAE is a GEIQ, add specific fields (contract type, number of hours per week)
     """
 
-    GEIQ_REQUIRED_FIELDS = ("contract_type", "contract_type_details", "nb_hours_per_week")
+    GEIQ_REQUIRED_FIELDS = (
+        "hired_job",
+        "location_label",
+        "location_code",
+        "contract_type",
+        "nb_hours_per_week",
+    )
+    GEIQ_SPECIFIC_FIELDS = (
+        "contract_type",
+        "contract_type_details",
+        "nb_hours_per_week",
+    )
+    OTHER_HIRED_JOB = "Autre"
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        self.instance = kwargs["instance"]
+        super().__init__(self.instance.to_siae, *args, **kwargs)
+
+        self.fields["job_appellation"].label = "Préciser le nom du poste (code ROME)"
+        self.fields["location_label"].label = "Localisation du poste"
+
+        # Default to empty choice ?
+        available_jobs = sorted(
+            [
+                (job_description.pk, f"{job_description.display_name} - {job_description.display_location}")
+                for job_description in self.instance.to_siae.job_description_through.all()
+            ],
+            key=itemgetter(1),
+        )
+        self.fields["hired_job"].choices = (
+            [("", "---------")] + available_jobs + [(self.OTHER_HIRED_JOB, self.OTHER_HIRED_JOB)]
+        )
 
         self.fields["hiring_start_at"].required = True
         for field in ["hiring_start_at", "hiring_end_at"]:
@@ -456,14 +486,14 @@ class AcceptForm(forms.ModelForm):
             self.initial[field] = ""
         self.initial["nb_hours_per_week"] = None
 
-        if job_application := kwargs.get("instance"):
-            is_geiq = job_application.to_siae.kind == SiaeKind.GEIQ
+        if self.instance:
+            is_geiq = self.instance.to_siae.kind == SiaeKind.GEIQ
             # Remove or make GEIQ specific fields mandatory
-            for geiq_field_name in self.GEIQ_REQUIRED_FIELDS:
-                if is_geiq:
-                    # Contract type details are dynamic and not required all the time
-                    self.fields[geiq_field_name].required = geiq_field_name != "contract_type_details"
-                else:
+            if is_geiq:
+                for geiq_field_name in self.GEIQ_REQUIRED_FIELDS:
+                    self.fields[geiq_field_name].required = True
+            else:
+                for geiq_field_name in self.GEIQ_SPECIFIC_FIELDS:
                     self.fields.pop(geiq_field_name)
 
             if is_geiq:
@@ -484,6 +514,11 @@ class AcceptForm(forms.ModelForm):
     class Meta:
         model = JobApplication
         fields = [
+            "hired_job",
+            "job_appellation",
+            "job_appellation_code",
+            "location_label",
+            "location_code",
             "contract_type",
             "contract_type_details",
             "nb_hours_per_week",
