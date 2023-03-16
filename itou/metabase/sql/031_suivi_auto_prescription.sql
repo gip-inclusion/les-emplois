@@ -71,6 +71,7 @@ select
     origine_détaillée,
     autopr_all.id_structure,
     s.siret,
+    s.active,
     type_structure,
     nom_structure,
     s.ville,
