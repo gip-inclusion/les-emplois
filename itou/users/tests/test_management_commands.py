@@ -291,15 +291,15 @@ class TestSyncPermsTestCase(TestCase):
 def test_shorten_active_sessions():
     expired_session = Session.objects.create(
         session_key="expired",
-        expire_date=datetime.datetime(2023, 3, 6, tzinfo=timezone.utc),
+        expire_date=datetime.datetime(2023, 3, 6, tzinfo=datetime.timezone.utc),
     )
     almost_expired_session = Session.objects.create(
         session_key="almost_expired",
-        expire_date=datetime.datetime(2023, 3, 6, 12, tzinfo=timezone.utc),
+        expire_date=datetime.datetime(2023, 3, 6, 12, tzinfo=datetime.timezone.utc),
     )
     Session.objects.create(
         session_key="active",
-        expire_date=datetime.datetime(2023, 3, 7, tzinfo=timezone.utc),
+        expire_date=datetime.datetime(2023, 3, 7, tzinfo=datetime.timezone.utc),
     )
 
     call_command("shorten_active_sessions")
