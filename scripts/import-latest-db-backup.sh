@@ -3,6 +3,7 @@
 # PLEASE RUN THIS SCRIPT WITH:
 # make postgres_restore_latest_backup
 
+# shellcheck source=/dev/null
 source .env
 
 if [ -z "$PATH_TO_ITOU_BACKUPS" ]; then
