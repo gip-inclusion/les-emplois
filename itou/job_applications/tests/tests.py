@@ -42,7 +42,7 @@ from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
 from itou.siaes.enums import ContractType, SiaeKind
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
-from itou.users.factories import ItouStaffFactory, JobSeekerFactory, SiaeStaffFactory
+from itou.users.factories import ItouStaffFactory, JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.templatetags import format_filters
@@ -288,6 +288,10 @@ class JobApplicationModelTest(TestCase):
             nb_hours_per_week=30,
             contract_type_details="foo",
         )
+
+    def test_application_on_non_job_seeker(self):
+        with self.assertRaisesRegex(ValidationError, "Seul un candidat peut candidater"):
+            JobApplicationFactory(job_seeker=PrescriberFactory())
 
 
 class JobApplicationQuerySetTest(TestCase):
@@ -1806,6 +1810,13 @@ class JobApplicationAdminFormTest(TestCase):
         job_application.sender_prescriber_organization = None
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert form.is_valid()
+
+    def test_application_on_non_job_seeker(self):
+        job_application = JobApplicationFactory()
+        job_application.job_seeker = PrescriberFactory()
+        form = JobApplicationAdminForm(model_to_dict(job_application))
+        assert not form.is_valid()
+        assert ["Seul un candidat peut candidater"] == form.errors["__all__"]
 
 
 class JobApplicationsEnumsTest(TestCase):

@@ -20,6 +20,7 @@ from itou.eligibility.models import AdministrativeCriteria
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS, ContractType, SiaeKind
+from itou.users.enums import UserKind
 from itou.users.models import JobSeekerProfile, User
 from itou.utils import constants as global_constants
 from itou.utils.validators import validate_nir, validate_pole_emploi_id
@@ -94,6 +95,12 @@ class CheckJobSeekerNirForm(forms.Form):
                     'target="_blank" aria-label="Ouverture dans un nouvel onglet">nous contacter</a>.'
                 )
                 raise forms.ValidationError(mark_safe(error_message))
+        elif existing_account and existing_account.kind != UserKind.JOB_SEEKER:
+            error_message = (
+                "Vous ne pouvez postuler pour cet utilisateur car ce numéro de sécurité sociale "
+                "est assicé à un prescripteur ou à un employeur."
+            )
+            raise forms.ValidationError(error_message)
         else:
             # For the moment, consider NIR to be unique among users.
             self.job_seeker = existing_account
