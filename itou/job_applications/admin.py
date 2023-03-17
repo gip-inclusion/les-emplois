@@ -19,6 +19,16 @@ class TransitionLogInline(admin.TabularInline):
         return False
 
 
+class PriorActionInline(admin.TabularInline):
+    model = models.PriorAction
+    extra = 0
+    can_delete = False
+    readonly_fields = ("action", "dates")
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+
 class JobsInline(admin.TabularInline):
     model = models.JobApplication.selected_jobs.through
     extra = 1
@@ -78,7 +88,7 @@ class JobApplicationAdmin(admin.ModelAdmin):
         "transferred_from",
         "origin",
     )
-    inlines = (JobsInline, TransitionLogInline, UUIDSupportRemarkInline)
+    inlines = (JobsInline, PriorActionInline, TransitionLogInline, UUIDSupportRemarkInline)
     search_fields = ("pk", "to_siae__siret", "job_seeker__email", "sender__email")
 
     def save_model(self, request, obj, form, change):
