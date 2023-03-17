@@ -128,7 +128,7 @@ def render_stats(request, context, params=None, template_name="stats/stats.html"
         # E.g. `/stats/ddets/iae/Provence-Alpes-Cote-d-Azur/04---Alpes-de-Haute-Provence`
         base_context["matomo_custom_url"] += f"/{matomo_custom_url_suffix}"
 
-    if request.user.is_authenticated:
+    if request.user.is_authenticated and metabase_dashboard:
         siae_pk = request.session.get(global_constants.ITOU_SESSION_CURRENT_SIAE_KEY)
         prescriber_org_pk = request.session.get(global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY)
         institution_pk = request.session.get(global_constants.ITOU_SESSION_CURRENT_INSTITUTION_KEY)

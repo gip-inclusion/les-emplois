@@ -11,6 +11,7 @@ from itou.common_apps.address.departments import DEPARTMENT_TO_REGION
 from itou.institutions.factories import InstitutionWithMembershipFactory
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory
+from itou.users.factories import PrescriberFactory
 from itou.utils.apis.metabase import METABASE_DASHBOARDS
 from itou.utils.test import TestCase
 
@@ -31,6 +32,16 @@ class StatsViewTest(TestCase):
         PILOTAGE_DASHBOARDS_WHITELIST=[123], METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar"
     )
     def test_stats_pilotage_authorized_dashboard_id(self):
+        url = reverse("stats:stats_pilotage", kwargs={"dashboard_id": 123})
+        response = self.client.get(url)
+        assert response.status_code == 200
+
+    @override_settings(
+        PILOTAGE_DASHBOARDS_WHITELIST=[123], METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar"
+    )
+    def test_stats_pilotage_authorized_dashboard_id_while_authenticated(self):
+        user = PrescriberFactory()
+        self.client.force_login(user)
         url = reverse("stats:stats_pilotage", kwargs={"dashboard_id": 123})
         response = self.client.get(url)
         assert response.status_code == 200
