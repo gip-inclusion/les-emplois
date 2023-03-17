@@ -10,7 +10,7 @@ from itou.job_applications.factories import (
     JobApplicationSentBySiaeFactory,
 )
 from itou.siaes.enums import ContractType, SiaeKind
-from itou.users.factories import JobSeekerFactory
+from itou.users.factories import JobSeekerFactory, PrescriberFactory
 from itou.utils.test import TestCase
 from itou.www.apply import forms as apply_forms
 
@@ -49,6 +49,15 @@ class CheckJobSeekerNirFormTest(TestCase):
         form = apply_forms.CheckJobSeekerNirForm(job_seeker=user, data=form_data)
         assert not form.is_valid()
         assert "Ce numéro de sécurité sociale est déjà utilisé par un autre compte." in form.errors["nir"][0]
+
+        existing_account = PrescriberFactory(nir=JobSeekerFactory.build().nir)
+        form_data = {"nir": existing_account.nir}
+        form = apply_forms.CheckJobSeekerNirForm(data=form_data)
+        assert not form.is_valid()
+        assert (
+            "Vous ne pouvez postuler pour cet utilisateur car ce numéro de sécurité sociale "
+            "est assicé à un prescripteur ou à un employeur."
+        ) == form.errors["nir"][0]
 
 
 class RefusalFormTest(TestCase):

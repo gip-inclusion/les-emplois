@@ -23,6 +23,7 @@ from itou.job_applications.enums import Origin, RefusalReason, SenderKind
 from itou.job_applications.tasks import huey_notify_pole_emploi
 from itou.siaes.enums import ContractType, SiaeKind
 from itou.siaes.models import Siae
+from itou.users.enums import UserKind
 from itou.utils.emails import get_email_message, send_email_messages
 from itou.utils.urls import get_absolute_url
 
@@ -642,6 +643,11 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     def clean(self):
         super().clean()
+
+        # We have severals cases of job_applications on job_seekers or siae_staff
+        # We don't know how it happened, so we'll just add a sanity check here
+        if self.job_seeker_id and self.job_seeker.kind != UserKind.JOB_SEEKER:
+            raise ValidationError("Seul un candidat peut candidater")
 
         # `to_siae` is not guaranteed to exist if a `full_clean` is performed in some occasions (f.i. in an admin form)
         # checking existence of `to_siae_id` keeps us safe here
