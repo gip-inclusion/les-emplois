@@ -1,6 +1,8 @@
 import factory
+from django.utils import timezone
 
-from itou.employee_record.enums import NotificationStatus, NotificationType
+from itou.employee_record import constants
+from itou.employee_record.enums import NotificationStatus, NotificationType, Status
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification
 from itou.job_applications.factories import (
     JobApplicationWithApprovalNotCancellableFactory,
@@ -14,6 +16,14 @@ class BareEmployeeRecordFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = EmployeeRecord
+
+    class Params:
+        archivable = factory.Trait(
+            status=Status.PROCESSED,
+            processed_at=factory.LazyFunction(
+                lambda: timezone.now() - timezone.timedelta(days=constants.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS)
+            ),
+        )
 
 
 class EmployeeRecordFactory(BareEmployeeRecordFactory):
