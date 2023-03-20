@@ -152,8 +152,23 @@ class JobApplicationInline(admin.TabularInline):
 
     @admin.display(description="SIAE destinataire")
     def to_siae_link(self, obj):
-        url = reverse(f"admin:{obj._meta.app_label}_{obj._meta.model_name}_change", args=[obj.to_siae.pk])
+        app_label = obj.to_siae._meta.app_label
+        model_name = obj.to_siae._meta.model_name
+        url = reverse(f"admin:{app_label}_{model_name}_change", args=[obj.to_siae.pk])
         return mark_safe(f"<a href='{url}'>{obj.to_siae.display_name}</a> — SIRET : {obj.to_siae.siret}")
+
+
+class SentJobApplicationInline(JobApplicationInline):
+    fk_name = "sender"
+    fields = ("pk_link", "job_seeker_link", "to_siae_link", "state")
+    readonly_fields = fields
+
+    @admin.display(description="Candidat")
+    def job_seeker_link(self, obj):
+        app_label = obj.job_seeker._meta.app_label
+        model_name = obj.job_seeker._meta.model_name
+        url = reverse(f"admin:{app_label}_{model_name}_change", args=[obj.job_seeker.pk])
+        return mark_safe(f"<a href='{url}'>{obj.job_seeker.get_full_name()}</a>")
 
 
 class EligibilityDiagnosisInline(admin.TabularInline):
@@ -388,8 +403,14 @@ class ItouUserAdmin(UserAdmin):
         inlines.insert(0, EmailAddressInline)
 
         conditional_inlines = {
-            "is_siae_staff": {"siaemembership_set": SiaeMembershipInline},
-            "is_prescriber": {"prescribermembership_set": PrescriberMembershipInline},
+            "is_siae_staff": {
+                "siaemembership_set": SiaeMembershipInline,
+                "job_applications_sent": SentJobApplicationInline,
+            },
+            "is_prescriber": {
+                "prescribermembership_set": PrescriberMembershipInline,
+                "job_applications_sent": SentJobApplicationInline,
+            },
             "is_labor_inspector": {"institutionmembership_set": InstitutionMembershipInline},
             "is_job_seeker": {
                 "eligibility_diagnoses": EligibilityDiagnosisInline,
