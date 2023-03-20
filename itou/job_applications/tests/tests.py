@@ -290,7 +290,10 @@ class JobApplicationModelTest(TestCase):
         )
 
     def test_application_on_non_job_seeker(self):
-        with self.assertRaisesRegex(ValidationError, "Seul un candidat peut candidater"):
+        with self.assertRaisesRegex(
+            ValidationError,
+            "Impossible de candidater pour cet utilisateur, celui-ci n'est pas un compte candidat",
+        ):
             JobApplicationFactory(job_seeker=PrescriberFactory())
 
 
@@ -1816,7 +1819,9 @@ class JobApplicationAdminFormTest(TestCase):
         job_application.job_seeker = PrescriberFactory()
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
-        assert ["Seul un candidat peut candidater"] == form.errors["__all__"]
+        assert ["Impossible de candidater pour cet utilisateur, celui-ci n'est pas un compte candidat"] == form.errors[
+            "__all__"
+        ]
 
 
 class JobApplicationsEnumsTest(TestCase):
