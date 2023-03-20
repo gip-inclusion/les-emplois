@@ -227,6 +227,14 @@ class JobApplicationModelTest(TestCase):
         with self.assertRaisesRegex(ValidationError, "Incohérence dans les champs concernant le contrat GEIQ"):
             JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, contract_type=ContractType.OTHER, nb_hours_per_week=1)
 
+        # Mind the parens in RE...
+        with self.assertRaisesRegex(
+            ValidationError, "Une candidature ne peut avoir les deux types de diagnostics \\(IAE et GEIQ\\)"
+        ):
+            JobApplicationFactory(
+                with_geiq_eligibility_diagnosis=True, eligibility_diagnosis=EligibilityDiagnosisFactory()
+            )
+
         # Validators
         with self.assertRaisesRegex(
             ValidationError,
