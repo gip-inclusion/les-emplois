@@ -733,7 +733,7 @@ class AutomaticApprovalAdminViewsTest(TestCase):
         self.client.force_login(user)
 
         approval = ApprovalFactory()
-        employee_record = EmployeeRecordFactory(approval_number=approval.number)
+        employee_record = EmployeeRecordFactory(approval_number=approval.number, status=Status.PROCESSED)
 
         response = self.client.post(
             reverse("admin:approvals_approval_change", args=[approval.pk]),
@@ -743,7 +743,6 @@ class AutomaticApprovalAdminViewsTest(TestCase):
             follow=True,
         )
         assert response.status_code == 200
-        print(list(response.context["messages"]))
         assert (
             f"Il existe une ou plusieurs fiches salarié bloquantes "
             f'(<a href="/admin/employee_record/employeerecord/{employee_record.pk}/change/">{employee_record.pk}</a>) '
