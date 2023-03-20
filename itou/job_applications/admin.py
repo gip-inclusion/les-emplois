@@ -46,6 +46,7 @@ class JobApplicationAdmin(admin.ModelAdmin):
     raw_id_fields = (
         "job_seeker",
         "eligibility_diagnosis",
+        "geiq_eligibility_diagnosis",
         "sender",
         "sender_siae",
         "sender_prescriber_organization",
