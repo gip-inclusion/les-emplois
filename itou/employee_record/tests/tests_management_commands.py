@@ -2,9 +2,7 @@ from unittest import mock
 
 import pytest
 from django.test.utils import override_settings
-from django.utils import timezone
 
-from itou.employee_record import constants
 from itou.employee_record.enums import NotificationType, Status
 from itou.employee_record.mocks.transfer_employee_records import (
     SFTPAllDupsConnectionMock,
@@ -178,25 +176,6 @@ class EmployeeRecordManagementCommandTest(ManagementCommandTestCase):
 
         employee_record.refresh_from_db()
         assert employee_record.status == Status.READY
-
-    def test_archive_employee_records(self):
-        """
-        Check archiving old processed employee records
-        """
-
-        # Fake a date older than archiving delay
-        self.employee_record.status = Status.PROCESSED
-        self.employee_record.processed_at = timezone.now() - timezone.timedelta(
-            days=constants.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS
-        )
-        self.employee_record.save()
-
-        self.call_command(archive=True)
-        self.employee_record.refresh_from_db()
-
-        # Check correct status and empty archived JSON
-        assert self.employee_record.status == Status.ARCHIVED
-        assert self.employee_record.archived_json is None
 
     @mock.patch("pysftp.Connection", SFTPAllDupsConnectionMock)
     @mock.patch(
