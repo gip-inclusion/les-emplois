@@ -77,6 +77,12 @@ class AbstractEligibilityDiagnosisAdmin(admin.ModelAdmin):
         "author_kind",
     )
 
+    def is_valid(self, obj):
+        return obj.is_valid
+
+    is_valid.boolean = True
+    is_valid.short_description = "En cours de validité"
+
 
 @admin.register(models.EligibilityDiagnosis)
 class EligibilityDiagnosisAdmin(AbstractEligibilityDiagnosisAdmin):
@@ -100,12 +106,6 @@ class EligibilityDiagnosisAdmin(AbstractEligibilityDiagnosisAdmin):
             "is_valid",
             "is_considered_valid",
         )
-
-    def is_valid(self, obj):
-        return obj.is_valid
-
-    is_valid.boolean = True
-    is_valid.short_description = "En cours de validité"
 
     def is_considered_valid(self, obj):
         """
