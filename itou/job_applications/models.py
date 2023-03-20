@@ -647,7 +647,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         # We have severals cases of job_applications on job_seekers or siae_staff
         # We don't know how it happened, so we'll just add a sanity check here
         if self.job_seeker_id and self.job_seeker.kind != UserKind.JOB_SEEKER:
-            raise ValidationError("Seul un candidat peut candidater")
+            raise ValidationError(
+                "Impossible de candidater pour cet utilisateur, celui-ci n'est pas un compte candidat"
+            )
 
         # `to_siae` is not guaranteed to exist if a `full_clean` is performed in some occasions (f.i. in an admin form)
         # checking existence of `to_siae_id` keeps us safe here

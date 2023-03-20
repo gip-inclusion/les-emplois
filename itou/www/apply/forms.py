@@ -96,16 +96,19 @@ class CheckJobSeekerNirForm(forms.Form):
                     'target="_blank" aria-label="Ouverture dans un nouvel onglet">nous contacter</a>.'
                 )
                 raise forms.ValidationError(mark_safe(error_message))
-        elif existing_account and existing_account.kind != UserKind.JOB_SEEKER:
-            error_message = (
-                "Vous ne pouvez postuler pour cet utilisateur car ce numéro de sécurité sociale "
-                "est assicé à un prescripteur ou à un employeur."
-            )
-            raise forms.ValidationError(error_message)
         else:
             # For the moment, consider NIR to be unique among users.
             self.job_seeker = existing_account
         return nir
+
+    def clean(self):
+        super().clean()
+        if self.job_seeker and self.job_seeker.kind != UserKind.JOB_SEEKER:
+            error_message = (
+                "Vous ne pouvez postuler pour cet utilisateur car ce numéro de sécurité sociale "
+                "n'est pas associé à un compte candidat."
+            )
+            raise forms.ValidationError(error_message)
 
     def get_job_seeker(self):
         return self.job_seeker
