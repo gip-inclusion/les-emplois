@@ -56,7 +56,11 @@ class JobApplicationGEIQEligibilityDetailsTest(TestCase):
 
     def test_details_as_geiq_with_valid_eligibility_diagnosis(self):
         diagnosis = GEIQEligibilityDiagnosisFactory(with_geiq=True)
-        job_application = JobApplicationFactory(to_siae=diagnosis.author_geiq, geiq_eligibility_diagnosis=diagnosis)
+        job_application = JobApplicationFactory(
+            to_siae=diagnosis.author_geiq,
+            geiq_eligibility_diagnosis=diagnosis,
+            eligibility_diagnosis=None,
+        )
 
         self.client.force_login(diagnosis.author_geiq.members.first())
         response = self.client.get(
@@ -81,7 +85,11 @@ class JobApplicationGEIQEligibilityDetailsTest(TestCase):
 
     def test_details_as_geiq_with_expired_eligibility_diagnosis(self):
         diagnosis = GEIQEligibilityDiagnosisFactory(with_geiq=True, expired=True)
-        job_application = JobApplicationFactory(to_siae=diagnosis.author_geiq, geiq_eligibility_diagnosis=diagnosis)
+        job_application = JobApplicationFactory(
+            to_siae=diagnosis.author_geiq,
+            geiq_eligibility_diagnosis=diagnosis,
+            eligibility_diagnosis=None,
+        )
 
         self.client.force_login(diagnosis.author_geiq.members.first())
         response = self.client.get(

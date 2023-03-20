@@ -51,6 +51,7 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
                 author_kind=AuthorKind.GEIQ,
                 author_geiq=factory.SelfAttribute("..to_siae"),
             ),
+            eligibility_diagnosis=None,
         )
         with_geiq_eligibility_diagnosis_from_prescriber = factory.Trait(
             to_siae=factory.SubFactory(SiaeFactory, with_membership=True, kind=SiaeKind.GEIQ),
@@ -64,6 +65,7 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
                     PrescriberOrganizationWithMembershipFactory, authorized=True
                 ),
             ),
+            eligibility_diagnosis=None,
         )
         sent_by_authorized_prescriber_organisation = factory.Trait(
             sender_prescriber_organization=factory.SubFactory(

@@ -635,6 +635,11 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                     nb_hours_per_week=None,
                 ),
             ),
+            models.CheckConstraint(
+                name="diagnoses_coherence",
+                violation_error_message="Une candidature ne peut avoir les deux types de diagnostics (IAE et GEIQ)",
+                check=~models.Q(eligibility_diagnosis__isnull=False, geiq_eligibility_diagnosis__isnull=False),
+            ),
         ]
 
     def __str__(self):
