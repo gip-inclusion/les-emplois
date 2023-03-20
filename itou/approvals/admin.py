@@ -8,6 +8,7 @@ from itou.approvals import models
 from itou.approvals.admin_forms import ApprovalAdminForm
 from itou.approvals.admin_views import manually_add_approval, manually_refuse_approval
 from itou.approvals.enums import Origin
+from itou.employee_record import enums as employee_record_enums
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
 from itou.utils.admin import PkSupportRemarkInline
@@ -181,8 +182,16 @@ class ApprovalAdmin(admin.ModelAdmin):
             obj.created_by = request.user
             obj.origin = Origin.ADMIN
 
-        # Is there an employee record linked?
-        if employee_records := EmployeeRecord.objects.filter(approval_number=obj.number):
+        # Prevent the approval modification when an employee record exists and is READY, SENT, or PROCESSED
+        employee_records = EmployeeRecord.objects.filter(
+            approval_number=obj.number,
+            status__in=[
+                employee_record_enums.Status.READY,
+                employee_record_enums.Status.SENT,
+                employee_record_enums.Status.PROCESSED,
+            ],
+        )
+        if employee_records:
             employee_record_links = ", ".join(
                 '<a href="'
                 + reverse(f"admin:{er._meta.app_label}_{er._meta.model_name}_change", args=[er.pk])
