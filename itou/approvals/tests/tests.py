@@ -737,7 +737,9 @@ class AutomaticApprovalAdminViewsTest(TestCase):
 
         response = self.client.post(
             reverse("admin:approvals_approval_change", args=[approval.pk]),
-            data=model_to_dict(approval, fields={"start_at", "end_at", "user", "number"}),
+            data=model_to_dict(
+                approval, fields={"start_at", "end_at", "user", "number", "origin", "eligibility_diagnosis"}
+            ),
             follow=True,
         )
         assert response.status_code == 200
