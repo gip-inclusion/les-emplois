@@ -22,6 +22,13 @@ class ApprovalFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Approval
 
+    class Params:
+        # Use old (but realistic) dates so `expired` can be used anywhere without triggering specials cases
+        expired = factory.Trait(
+            start_at=factory.Faker("date_time_between", start_date="-5y", end_date="-3y"),
+            end_at=factory.Faker("date_time_between", start_date="-3y", end_date="-2y"),
+        )
+
     user = factory.SubFactory(JobSeekerFactory)
     number = factory.fuzzy.FuzzyText(length=7, chars=string.digits, prefix=Approval.ASP_ITOU_PREFIX)
     start_at = factory.LazyFunction(datetime.date.today)

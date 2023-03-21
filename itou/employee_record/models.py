@@ -2,8 +2,10 @@ import contextlib
 import json
 
 import django.db.utils
+from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
+from django.db.models import Exists, OuterRef
 from django.db.models.manager import Manager
 from django.db.models.query import F, Q, QuerySet
 from django.utils import timezone
@@ -16,7 +18,6 @@ from itou.siaes.models import Siae, SiaeFinancialAnnex
 from itou.users.models import JobSeekerProfile
 from itou.utils.validators import validate_siret
 
-from . import constants
 from .enums import MovementType, NotificationStatus, NotificationType, Status
 from .exceptions import CloningError, DuplicateCloningError, InvalidStatusError
 
@@ -32,11 +33,6 @@ def validate_asp_batch_filename(value):
     if value and value.startswith("RIAE_FS_") and value.endswith(".json") and len(value) == 27:
         return
     raise ValidationError(f"Le format du nom de fichier ASP est incorrect: {value}")
-
-
-# Oddly enough, no month param for timedeltas
-# => approximate 1 month to 30 days (see base settings)
-ARCHIVING_DELTA = timezone.timedelta(days=constants.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS)
 
 
 class ASPExchangeInformation(models.Model):
@@ -140,10 +136,21 @@ class EmployeeRecordQuerySet(models.QuerySet):
         return self.filter(asp_batch_file=filename, asp_batch_line_number=line_number)
 
     def archivable(self):
-        """
-        Fetch employee records in PROCESSED state for more than EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS
-        """
-        return self.filter(status=Status.PROCESSED, processed_at__lte=timezone.now() - ARCHIVING_DELTA)
+        prolongation_cutoff = timezone.now() - relativedelta(
+            months=Approval.IS_OPEN_TO_PROLONGATION_BOUNDARIES_MONTHS_AFTER_END,
+        )
+        return (
+            self.annotate(
+                approval_is_valid=Exists(Approval.objects.filter(number=OuterRef("approval_number")).valid())
+            )
+            .exclude(
+                status=Status.ARCHIVED,
+            )
+            .filter(
+                approval_is_valid=False,
+                job_application__approval__end_at__lt=prolongation_cutoff,
+            )
+        )
 
     def asp_duplicates(self):
         """
@@ -387,14 +394,10 @@ class EmployeeRecord(ASPExchangeInformation):
 
     def update_as_archived(self, save=True):
         """
-        Can only archive employee record if already PROCESSED
-        `save` parameter is for bulk updates in management command
+        :param save: Tell the method to call `.save()`
         """
-        if self.status != Status.PROCESSED:
-            raise InvalidStatusError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
-
-        # Check that we are past archiving delay before ... archiving
-        if self.processed_at >= timezone.now() - ARCHIVING_DELTA:
+        # We only archive an employee record when the job seeker's approval is expired and can not longer be prolonged
+        if self.job_application.approval.is_valid() or self.job_application.approval.can_be_prolonged:
             raise InvalidStatusError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
 
         # Remove proof of processing after delay

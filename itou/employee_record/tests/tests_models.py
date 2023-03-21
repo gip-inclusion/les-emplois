@@ -8,7 +8,6 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 from itou.approvals.factories import ApprovalFactory
-from itou.employee_record import constants
 from itou.employee_record.enums import Status
 from itou.employee_record.exceptions import CloningError, DuplicateCloningError, InvalidStatusError
 from itou.employee_record.factories import (
@@ -184,26 +183,11 @@ class EmployeeRecordModelTest(TestCase):
         assert result.id == employee_record.id
 
     def test_archivable(self):
-        """
-        Check queryset lookup of archived employee records
-        """
-        employee_record = EmployeeRecordFactory(
-            with_batch_information=True,
-            status=Status.PROCESSED,
-            processed_at=timezone.now(),
-        )
-
-        # Processed to recently, should not be found
+        EmployeeRecordFactory()
         assert EmployeeRecord.objects.archivable().count() == 0
 
-        # Fake older date
-        employee_record.processed_at = timezone.now() - timezone.timedelta(
-            days=constants.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS
-        )
-
-        employee_record.save()
-
-        assert EmployeeRecord.objects.archivable().count() == 1
+        archivable_employee_record = EmployeeRecordFactory(job_application__approval__expired=True)
+        assert list(EmployeeRecord.objects.archivable()) == [archivable_employee_record]
 
 
 @pytest.mark.parametrize("status", list(Status))
@@ -544,36 +528,20 @@ class EmployeeRecordLifeCycleTest(TestCase):
         side_effect=mock_get_geocoding_data,
     )
     def test_state_archived(self, _mock):
-        self.employee_record.update_as_sent(self.faker.asp_batch_filename(), 1, None)
+        approval = self.employee_record.job_application.approval
 
-        # No processing date at the moment
-        assert self.employee_record.processed_at is None
-
-        process_code, process_message = (
-            EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
-            "La ligne de la fiche salarié a été enregistrée avec succès.",
-        )
-        self.employee_record.update_as_processed(process_code, process_message, "{}")
-
-        # Can't archive, too recent
+        # Can't archive while the approval is valid
+        assert approval.is_valid()
         with pytest.raises(InvalidStatusError):
             self.employee_record.update_as_archived()
 
-        # Fake old date, but not to old
-        self.employee_record.processed_at = timezone.now() - timezone.timedelta(
-            days=constants.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS - 1
-        )
-
-        with pytest.raises(InvalidStatusError):
-            self.employee_record.update_as_archived()
-
-        # Fake a date older than archiving delay
-        self.employee_record.processed_at = timezone.now() - timezone.timedelta(
-            days=constants.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS
-        )
+        # Make the approval expires
+        approval.start_at = timezone.now().date() - timedelta(days=2)
+        approval.end_at = timezone.now().date() - timedelta(days=1)
+        approval.save()
+        assert not approval.is_valid()
 
         self.employee_record.update_as_archived()
-
         # Check correct status and empty archived JSON
         assert self.employee_record.status == Status.ARCHIVED
         assert self.employee_record.archived_json is None
