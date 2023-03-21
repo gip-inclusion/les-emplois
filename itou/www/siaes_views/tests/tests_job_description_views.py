@@ -80,7 +80,7 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
         assert self.siae.job_description_through.count() == 4
         self.assertContains(
             response,
-            '<h3 class="h6">4 métiers exercés dans votre structure</h3>',
+            '<h3 class="h4 mb-0">4 métiers exercés</h3>',
             html=True,
             count=1,
         )
@@ -89,7 +89,6 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
 
         for job in self.siae.job_description_through.all():
             with self.subTest(job.pk):
-                self.assertContains(response, f"{job.appellation.rome.code}")
                 self.assertContains(response, f"/job_description/{job.pk}/card")
                 self.assertContains(response, f"toggle_job_description_form_{job.pk}")
                 self.assertContains(response, f"#_delete_modal_{job.pk}")
@@ -363,7 +362,6 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
 
 class UpdateJobDescriptionViewTest(JobDescriptionAbstractTest):
     def setUp(self):
-
         super().setUp()
 
         self.job_description = self.siae.job_description_through.first()
