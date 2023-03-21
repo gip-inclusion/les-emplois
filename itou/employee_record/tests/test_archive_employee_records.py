@@ -15,7 +15,7 @@ def command_fixture():
 
 
 def test_management_command_default_run(command):
-    employee_record = factories.BareEmployeeRecordFactory(archivable=True)
+    employee_record = factories.EmployeeRecordFactory(archivable=True)
     assert list(EmployeeRecord.objects.archivable()) == [employee_record]
 
     command.handle()
@@ -23,14 +23,16 @@ def test_management_command_default_run(command):
 
     assert employee_record.status != Status.ARCHIVED
     assert command.stdout.getvalue().split("\n") == [
-        "Archiving employee records (more than 390 days old)",
+        "Start archiving employee records",
         "Found 1 archivable employee record(s)",
+        f"Archiving {employee_record.pk=}",
+        "1/1 employee record(s) can be archived",
         "",
     ]
 
 
 def test_management_command_wet_run(command):
-    employee_record = factories.BareEmployeeRecordFactory(archivable=True)
+    employee_record = factories.EmployeeRecordFactory(archivable=True)
 
     command.handle(wet_run=True)
     employee_record.refresh_from_db()
@@ -38,9 +40,11 @@ def test_management_command_wet_run(command):
     assert employee_record.status == Status.ARCHIVED
     assert employee_record.archived_json is None
     assert command.stdout.getvalue().split("\n") == [
-        "Archiving employee records (more than 390 days old)",
+        "Start archiving employee records",
         "Found 1 archivable employee record(s)",
-        "Archived 1/1 employee record(s)",
+        f"Archiving {employee_record.pk=}",
+        "1/1 employee record(s) can be archived",
+        "1/1/1 employee record(s) were archived",
         "",
     ]
 

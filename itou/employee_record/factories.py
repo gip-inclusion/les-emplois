@@ -1,8 +1,6 @@
 import factory
-from django.utils import timezone
 
-from itou.employee_record import constants
-from itou.employee_record.enums import NotificationStatus, NotificationType, Status
+from itou.employee_record.enums import NotificationStatus, NotificationType
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification
 from itou.job_applications.factories import (
     JobApplicationWithApprovalNotCancellableFactory,
@@ -16,14 +14,6 @@ class BareEmployeeRecordFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = EmployeeRecord
-
-    class Params:
-        archivable = factory.Trait(
-            status=Status.PROCESSED,
-            processed_at=factory.LazyFunction(
-                lambda: timezone.now() - timezone.timedelta(days=constants.EMPLOYEE_RECORD_ARCHIVING_DELAY_IN_DAYS)
-            ),
-        )
 
 
 class EmployeeRecordFactory(BareEmployeeRecordFactory):
@@ -41,6 +31,7 @@ class EmployeeRecordFactory(BareEmployeeRecordFactory):
     siret = factory.SelfAttribute(".job_application.to_siae.siret")
 
     class Params:
+        archivable = factory.Trait(job_application__approval__expired=True)
         orphan = factory.Trait(asp_id=0)
         with_batch_information = factory.Trait(
             asp_batch_file=factory.Faker("asp_batch_filename"), asp_batch_line_number=factory.Sequence(int)
