@@ -65,23 +65,11 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         raise PermissionDenied
 
     form = SelectEmployeeRecordStatusForm(data=request.GET)
-
-    # Employee records are created with a job application object
-    # At this stage, new job applications / hirings do not have
-    # an associated employee record object
-    # Objects in this list can be either:
-    # - employee records: iterate on their job application object
-    # - basic job applications: iterate as-is
-    employee_records_list = True
-
-    navigation_pages = None
-    data = None
-
-    # See comment above on `employee_records_list` var
     form.full_clean()  # We do not use is_valid to validate each field independently
     status = Status(form.cleaned_data.get("status") or Status.NEW)
     order_by = EmployeeRecordOrder(form.cleaned_data.get("order") or EmployeeRecordOrder.HIRING_START_AT_DESC)
 
+    # Prepare .order_by() parameters for JobApplication() and EmployeeRecord()
     job_application_order_by = {
         EmployeeRecordOrder.NAME_ASC: ("job_seeker__last_name", "job_seeker__first_name"),
         EmployeeRecordOrder.NAME_DESC: ("-job_seeker__last_name", "-job_seeker__first_name"),
@@ -95,11 +83,10 @@ def list_employee_records(request, template_name="employee_record/list.html"):
 
     # Construct badges
 
-    # Badges for "real" employee records
-    employee_record_statuses = (
-        EmployeeRecord.objects.for_siae(siae).values("status").annotate(cnt=Count("status")).order_by("-status")
-    )
-    employee_record_badges = {row["status"]: row["cnt"] for row in employee_record_statuses}
+    employee_record_badges = {
+        row["status"]: row["cnt"]
+        for row in EmployeeRecord.objects.for_siae(siae).values("status").annotate(cnt=Count("status"))
+    }
 
     eligible_job_applications = JobApplication.objects.eligible_as_employee_record(siae)
     if status == Status.NEW:
@@ -125,8 +112,12 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         (employee_record_badges.get(Status.DISABLED, 0), "emploi-lightest"),
     ]
 
-    # Not needed every time (not pulled-up), and DRY here
-    base_query = EmployeeRecord.objects.full_fetch().order_by(*employee_record_order_by)
+    # Employee records are created with a job application object.
+    # At this stage, job applications do not have an associated employee record.
+    # Objects in this list can be either:
+    # - employee records: iterate on their job application object
+    # - job applications: iterate as-is
+    employee_records_list = True
     need_manual_regularization = False
 
     if status == Status.NEW:
@@ -144,16 +135,18 @@ def list_employee_records(request, template_name="employee_record/list.html"):
 
         employee_records_list = False
     else:
-        data = base_query.filter(status=status).for_siae(siae)
-
-    if data:
-        navigation_pages = pager(data, request.GET.get("page", 1), items_per_page=10)
+        data = (
+            EmployeeRecord.objects.full_fetch()
+            .for_siae(siae)
+            .filter(status=status)
+            .order_by(*employee_record_order_by)
+        )
 
     context = {
         "form": form,
         "employee_records_list": employee_records_list,
         "badges": status_badges,
-        "navigation_pages": navigation_pages,
+        "navigation_pages": pager(data, request.GET.get("page", 1), items_per_page=10) if data else None,
         "feature_availability_date": EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
         "need_manual_regularization": need_manual_regularization,
         "ordered_by_label": order_by.label,
