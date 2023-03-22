@@ -162,6 +162,8 @@ class SentJobApplicationInline(JobApplicationInline):
     fk_name = "sender"
     fields = ("pk_link", "job_seeker_link", "to_siae_link", "state")
     readonly_fields = fields
+    verbose_name = "Candidature envoyée"
+    verbose_name_plural = "Candidatures envoyées"
 
     @admin.display(description="Candidat")
     def job_seeker_link(self, obj):
@@ -419,9 +421,11 @@ class ItouUserAdmin(UserAdmin):
                 "job_applications": JobApplicationInline,
             },
         }
+        strict_fields = {"job_applications", "job_applications_sent"}
         for check, related_fields in conditional_inlines.items():
             for field_name, inline_class in related_fields.items():
-                if getattr(obj, check) or getattr(obj, field_name).all():
+                is_strict = field_name in strict_fields
+                if getattr(obj, check) or (not is_strict and getattr(obj, field_name).all()):
                     inlines.insert(-1, inline_class)
 
         return tuple(inlines)
