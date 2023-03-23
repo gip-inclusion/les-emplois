@@ -1,13 +1,12 @@
 <div class="my-3">
+    {% url 'apply:accept' job_application_id=job_application.pk as accept_url %}
     {% if show_geiq_eligibility_modal %}
         <button class="btn btn-primary btn-block" data-toggle="modal" data-target="#confirm_no_allowance_modal">
             Je l'embauche
         </button>
         {# Confirmation modal for hiring #}
-        {% include "apply/includes/geiq/no_allowance_modal.html" %}
+        {% include "apply/includes/geiq/no_allowance_modal.html" with next_url=accept_url %}
     {% else %}
-        <a href="{% url 'apply:accept' job_application_id=job_application.pk %}" class="btn btn-primary btn-block">
-            Je l'embauche
-        </a>
+        <a href="{{ accept_url }}" class="btn btn-primary btn-block">Je l'embauche</a>
     {% endif %}
 </div>

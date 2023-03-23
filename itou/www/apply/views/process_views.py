@@ -111,7 +111,6 @@ def details_for_siae(request, job_application_id, template_name="apply/process_d
     if show_geiq_eligibility_modal:
         context |= {
             "show_geiq_eligibility_modal": show_geiq_eligibility_modal,
-            "next_url": reverse("apply:accept", kwargs={"job_application_id": job_application.pk}),
         }
 
     if geiq_eligibility_diagnosis:
