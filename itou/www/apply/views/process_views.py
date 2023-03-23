@@ -86,9 +86,9 @@ def details_for_siae(request, job_application_id, template_name="apply/process_d
 
     back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("apply:list_for_siae"))
     geiq_eligibility_diagnosis = None
-    siae_is_geiq = job_application.to_siae.kind == SiaeKind.GEIQ
 
-    if siae_is_geiq:
+    show_geiq_eligibility_modal = False
+    if job_application.to_siae.kind == SiaeKind.GEIQ:
         # Get current GEIQ diagnosis or *last expired one*
         geiq_eligibility_diagnosis = (
             job_application.geiq_eligibility_diagnosis
@@ -97,9 +97,7 @@ def details_for_siae(request, job_application_id, template_name="apply/process_d
             ).first()
         )
 
-    show_geiq_eligibility_modal = siae_is_geiq and (
-        not geiq_eligibility_diagnosis or not geiq_eligibility_diagnosis.is_valid
-    )
+        show_geiq_eligibility_modal = not geiq_eligibility_diagnosis or not geiq_eligibility_diagnosis.is_valid
 
     context = {
         "can_view_personal_information": True,  # SIAE members have access to personal info
@@ -108,7 +106,6 @@ def details_for_siae(request, job_application_id, template_name="apply/process_d
         "job_application": job_application,
         "transition_logs": transition_logs,
         "back_url": back_url,
-        "siae_is_geiq": siae_is_geiq,
     }
 
     if show_geiq_eligibility_modal:
@@ -160,9 +157,8 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
     back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("apply:list_for_prescriber"))
 
     # Latest GEIQ diagnosis for this job seeker created by a *prescriber*
-    siae_is_geiq = job_application.to_siae.kind == SiaeKind.GEIQ
     geiq_eligibility_diagnosis = (
-        siae_is_geiq
+        job_application.to_siae.kind == SiaeKind.GEIQ
         and GEIQEligibilityDiagnosis.objects.valid()
         .filter(author_prescriber_organization__isnull=False)
         .for_job_seeker(job_application.job_seeker)
@@ -175,7 +171,6 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
         "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
         "job_application": job_application,
         "transition_logs": transition_logs,
-        "siae_is_geiq": siae_is_geiq,
         "back_url": back_url,
     }
 
@@ -301,7 +296,6 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
         "form_personal_data": form_personal_data,
         "job_application": job_application,
         "can_view_personal_information": True,  # SIAE members have access to personal info
-        "siae_is_geiq": job_application.to_siae.kind == SiaeKind.GEIQ,
         "hide_value": ContractType.OTHER.value,
     }
 
