@@ -1,0 +1,25 @@
+{% load bootstrap4 %}
+<div id="{{ main_div_id }}">
+    <form hx-post="{{ form_url }}"
+          hx-target="#{{ main_div_id }}"
+          hx-swap="outerHTML"
+          {% if form.action_only %}hx-trigger="submit, reset, change from:#id_action"{% endif %}
+          class="js-prevent-multiple-submit mb-3">
+        {% csrf_token %}
+        {% bootstrap_field form.action show_label=False %}
+        {% if not form.action_only %}
+            <div class="row">
+                <div class="col">{% bootstrap_field form.start_at %}</div>
+                <div class="col">{% bootstrap_field form.end_at %}</div>
+            </div>
+            {% bootstrap_form_errors form type='non_fields' %}
+            <div class="text-right">
+                <button class="btn btn-secondary btn-sm" hx-get="{{ form_url }}">Annuler</button>
+                <button type="submit" class="btn btn-primary btn-sm editing-prior-action">
+                    Enregistrer l'action préalable à l'embauche
+                </button>
+            </div>
+        {% endif %}
+    </form>
+    {% if final_hr %}<hr>{% endif %}
+</div>

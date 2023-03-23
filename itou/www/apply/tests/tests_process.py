@@ -7,13 +7,13 @@ from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
-from pytest_django.asserts import assertContains, assertNotContains
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.approvals.factories import PoleEmploiApprovalFactory, SuspensionFactory
 from itou.approvals.models import Approval, Suspension
 from itou.cities.factories import create_test_cities
 from itou.eligibility.enums import AuthorKind
-from itou.eligibility.factories import EligibilityDiagnosisFactory
+from itou.eligibility.factories import EligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordFactory
@@ -22,6 +22,7 @@ from itou.job_applications.factories import (
     JobApplicationFactory,
     JobApplicationSentByJobSeekerFactory,
     JobApplicationSentByPrescriberOrganizationFactory,
+    PriorActionFactory,
 )
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siae_evaluations.factories import EvaluatedSiaeFactory
@@ -31,6 +32,7 @@ from itou.siaes.factories import SiaeFactory
 from itou.users.enums import LackOfNIRReason, UserKind
 from itou.users.factories import JobSeekerWithAddressFactory, PrescriberFactory
 from itou.users.models import User
+from itou.utils.htmx.testing import assertSoupEqual, parse_response_to_soup, update_page_with_htmx
 from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.format_filters import format_nir
 from itou.utils.test import TestCase
@@ -38,6 +40,7 @@ from itou.utils.widgets import DuetDatePickerWidget
 
 
 DISABLED_NIR = 'disabled id="id_nir"'
+PRIOR_ACTION_SECTION_TITLE = "Action préalable à l'embauche"
 
 
 # patch the one used in the `models` module, not the original one in tasks
@@ -103,6 +106,7 @@ class ProcessViewsTest(TestCase):
         self.assertContains(response, format_nir(job_application.job_seeker.nir))
         self.assertContains(response, job_application.job_seeker.pole_emploi_id)
         self.assertContains(response, job_application.job_seeker.phone)
+        self.assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)  # the SIAE is not a GEIQ
 
         job_application.job_seeker.created_by = siae_user
         job_application.job_seeker.phone = ""
@@ -1562,3 +1566,281 @@ def test_accept_button(client):
 
     response = client.get(reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk}))
     assertContains(response, DIRECT_ACCEPT_BUTTON)
+
+
+def test_add_prior_action_new(client):
+    # State is new
+    job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ)
+    client.force_login(job_application.to_siae.members.first())
+    add_prior_action_url = reverse("apply:add_prior_action", kwargs={"job_application_id": job_application.pk})
+    response = client.post(
+        add_prior_action_url,
+        data={
+            "action": job_applications_enums.Prequalification.AFPR,
+            "start_at": timezone.localdate(),
+            "end_at": timezone.localdate() + relativedelta(days=2),
+        },
+    )
+    assert response.status_code == 403
+    assert not job_application.prior_actions.exists()
+
+
+def test_add_prior_action_processing(client):
+    job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, state=JobApplicationWorkflow.STATE_PROCESSING)
+    client.force_login(job_application.to_siae.members.first())
+    add_prior_action_url = reverse("apply:add_prior_action", kwargs={"job_application_id": job_application.pk})
+    today = timezone.localdate()
+    response = client.post(
+        add_prior_action_url,
+        data={
+            "action": job_applications_enums.Prequalification.AFPR,
+            "start_at": today,
+            "end_at": today + relativedelta(days=2),
+        },
+    )
+    assert response.status_code == 200
+    job_application.refresh_from_db()
+    assert job_application.state.is_prior_to_hire
+    prior_action = job_application.prior_actions.get()
+    assert prior_action.action == job_applications_enums.Prequalification.AFPR
+    assert prior_action.dates.lower == today
+    assert prior_action.dates.upper == today + relativedelta(days=2)
+
+    # State is accepted
+    job_application.state = JobApplicationWorkflow.STATE_ACCEPTED
+    job_application.save(update_fields=("state",))
+    response = client.post(
+        add_prior_action_url,
+        data={
+            "action": job_applications_enums.Prequalification.POE,
+            "start_at": timezone.localdate(),
+            "end_at": timezone.localdate() + relativedelta(days=2),
+        },
+    )
+    assert response.status_code == 403
+    assert not job_application.prior_actions.filter(action=job_applications_enums.Prequalification.POE).exists()
+
+    # State is processing but SIAE is not a GEIQ
+    job_application = JobApplicationFactory(to_siae__kind=SiaeKind.AI, state=JobApplicationWorkflow.STATE_PROCESSING)
+    client.force_login(job_application.to_siae.members.first())
+    response = client.post(
+        add_prior_action_url,
+        data={
+            "action": job_applications_enums.Prequalification.AFPR,
+            "start_at": timezone.localdate(),
+            "end_at": timezone.localdate() + relativedelta(days=2),
+        },
+    )
+    assert response.status_code == 404
+    assert not job_application.prior_actions.exists()
+
+
+def test_modify_prior_action(client):
+    job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, state=JobApplicationWorkflow.STATE_POSTPONED)
+    prior_action = PriorActionFactory(
+        job_application=job_application, action=job_applications_enums.Prequalification.AFPR
+    )
+    client.force_login(job_application.to_siae.members.first())
+    modify_prior_action_url = reverse(
+        "apply:modify_prior_action",
+        kwargs={"job_application_id": job_application.pk, "prior_action_id": prior_action.pk},
+    )
+    new_start_date = timezone.localdate() - relativedelta(days=10)
+    new_end_date = new_start_date + relativedelta(days=6)
+    response = client.post(
+        modify_prior_action_url,
+        data={
+            "action": job_applications_enums.ProfessionalSituationExperience.PMSMP,
+            "start_at": new_start_date,
+            "end_at": new_end_date,
+        },
+    )
+    assert response.status_code == 200
+    prior_action.refresh_from_db()
+    assert prior_action.dates.lower == new_start_date
+    assert prior_action.dates.upper == new_end_date
+    assert prior_action.action == job_applications_enums.ProfessionalSituationExperience.PMSMP
+
+    job_application.state = JobApplicationWorkflow.STATE_ACCEPTED
+    job_application.save(update_fields=("state",))
+    response = client.post(
+        modify_prior_action_url,
+        data={
+            "action": job_applications_enums.ProfessionalSituationExperience.MRS,
+            "start_at": new_start_date,
+            "end_at": new_end_date,
+        },
+    )
+    assert response.status_code == 403
+    prior_action.refresh_from_db()
+    assert prior_action.action == job_applications_enums.ProfessionalSituationExperience.PMSMP
+
+
+def test_htmx_add_prior_action_and_cancel(client):
+    job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, state=JobApplicationWorkflow.STATE_PROCESSING)
+    client.force_login(job_application.to_siae.members.first())
+    details_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+    response = client.get(details_url)
+    simulated_page = parse_response_to_soup(response, selector="#main")
+
+    add_prior_action_url = reverse("apply:add_prior_action", kwargs={"job_application_id": job_application.pk})
+    response = client.post(
+        add_prior_action_url,
+        data={
+            "action": job_applications_enums.Prequalification.AFPR,
+        },
+    )
+    update_page_with_htmx(simulated_page, "#add_prior_action > form", response)
+    # Click on Annuler
+    response = client.get(add_prior_action_url)
+    update_page_with_htmx(
+        simulated_page,
+        "#add_prior_action > form > div > button[hx-get]",
+        response,
+    )
+
+    # Check that a fresh reload gets us in the same state
+    response = client.get(details_url)
+    assertSoupEqual(parse_response_to_soup(response, selector="#main"), simulated_page)
+
+
+def test_htmx_modify_prior_action_and_cancel(client):
+    job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, state=JobApplicationWorkflow.STATE_PROCESSING)
+    prior_action = PriorActionFactory(job_application=job_application)
+    client.force_login(job_application.to_siae.members.first())
+    details_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+    response = client.get(details_url)
+    simulated_page = parse_response_to_soup(response, selector="#main")
+
+    modify_prior_action_url = reverse(
+        "apply:modify_prior_action",
+        kwargs={"job_application_id": job_application.pk, "prior_action_id": prior_action.pk},
+    )
+    response = client.get(modify_prior_action_url + "?modify=")
+    update_page_with_htmx(
+        simulated_page,
+        f"#prior-action-{ prior_action.pk }-modify-btn",
+        response,
+    )
+    # Click on Annuler
+    response = client.get(modify_prior_action_url)
+    update_page_with_htmx(simulated_page, f"#prior-action-{ prior_action.pk } > form > div > button[hx-get]", response)
+
+    # Check that a fresh reload gets us in the same state
+    response = client.get(details_url)
+    assertSoupEqual(parse_response_to_soup(response, selector="#main"), simulated_page)
+
+
+@pytest.mark.parametrize("with_geiq_diagnosis", [True, False])
+def test_details_for_siae_with_prior_action(client, with_geiq_diagnosis):
+    job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ)
+    user = job_application.to_siae.members.first()
+    client.force_login(user)
+    if with_geiq_diagnosis:
+        GEIQEligibilityDiagnosisFactory(
+            job_seeker=job_application.job_seeker,
+            author_geiq=job_application.to_siae,
+            author=user,
+            author_kind=AuthorKind.GEIQ,
+        )
+
+    details_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+    response = client.get(details_url)
+    # The job application is still new
+    assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)
+
+    # Switch state to processing
+    response = client.post(reverse("apply:process", kwargs={"job_application_id": job_application.pk}))
+    assertRedirects(response, details_url)
+    job_application.refresh_from_db()
+    assert job_application.state == JobApplicationWorkflow.STATE_PROCESSING
+
+    END_AT_LABEL = "Date de fin prévisionnelle"
+    MISSING_FIELD_MESSAGE = "Ce champ est obligatoire"
+    ADD_AN_ACTION_SELECTED = '<option value="" selected>Ajouter une action</option>'
+
+    # Now the prior action section is visible
+    response = client.get(details_url)
+    assertContains(response, PRIOR_ACTION_SECTION_TITLE)
+    # With PriorActionForm
+    assertContains(response, ADD_AN_ACTION_SELECTED)
+    # but not the dates fields
+    assertNotContains(response, END_AT_LABEL)
+
+    simulated_page = parse_response_to_soup(response, selector="#main")
+
+    add_prior_action_url = reverse("apply:add_prior_action", kwargs={"job_application_id": job_application.pk})
+    # Select the action type
+    response = client.post(add_prior_action_url, data={"action": job_applications_enums.Prequalification.AFPR})
+    update_page_with_htmx(simulated_page, "#add_prior_action > form", response)
+
+    # To get access to date fields
+    assertContains(response, END_AT_LABEL)
+    assertNotContains(response, MISSING_FIELD_MESSAGE)
+    assertNotContains(response, ADD_AN_ACTION_SELECTED)  # since AFPR is selected
+
+    # Check when posting with missing fields
+    response = client.post(
+        add_prior_action_url, data={"action": job_applications_enums.Prequalification.AFPR, "start_at": ""}
+    )
+    assertContains(response, END_AT_LABEL)
+    assert response.context["form"].has_error("start_at")
+    assert response.context["form"].has_error("end_at")
+    assertContains(response, MISSING_FIELD_MESSAGE)
+    update_page_with_htmx(simulated_page, "#add_prior_action > form", response)
+
+    # Check basic consistency on dates
+    response = client.post(
+        add_prior_action_url,
+        data={
+            "action": job_applications_enums.Prequalification.AFPR,
+            "start_at": timezone.localdate(),
+            "end_at": timezone.localdate() - relativedelta(days=2),
+        },
+    )
+    assertContains(response, "La date de fin prévisionnelle doit être postérieure à la date de début")
+    update_page_with_htmx(simulated_page, "#add_prior_action > form", response)
+
+    response = client.post(
+        add_prior_action_url,
+        data={
+            "action": job_applications_enums.Prequalification.AFPR,
+            "start_at": timezone.localdate(),
+            "end_at": timezone.localdate() + relativedelta(days=2),
+        },
+    )
+    assertContains(response, "Type : <b>Pré-qualification</b>", html=True)
+    assertContains(response, "Nom : <b>AFPR</b>", html=True)
+    # A new form accepting a new action is back
+    assertContains(response, ADD_AN_ACTION_SELECTED)
+    update_page_with_htmx(simulated_page, "#add_prior_action > form", response)
+
+    job_application.refresh_from_db()
+    assert job_application.state == JobApplicationWorkflow.STATE_PRIOR_TO_HIRE
+    prior_action = job_application.prior_actions.get()
+    assert prior_action.action == job_applications_enums.Prequalification.AFPR
+
+    # Check that a full reload gets us an equivalent HTML
+    response = client.get(details_url)
+    assertSoupEqual(parse_response_to_soup(response, selector="#main"), simulated_page)
+    # Let's modify the prior action
+    modify_prior_action_url = reverse(
+        "apply:modify_prior_action",
+        kwargs={"job_application_id": job_application.pk, "prior_action_id": prior_action.pk},
+    )
+    response = client.get(modify_prior_action_url + "?modify=")
+    update_page_with_htmx(simulated_page, f"#prior-action-{ prior_action.pk }-modify-btn", response)
+    response = client.post(
+        modify_prior_action_url,
+        data={
+            "action": job_applications_enums.Prequalification.POE,
+            "start_at": timezone.localdate(),
+            "end_at": timezone.localdate() + relativedelta(days=2),
+        },
+    )
+    update_page_with_htmx(simulated_page, f"#prior-action-{ prior_action.pk } > form", response)
+    prior_action.refresh_from_db()
+    assert prior_action.action == job_applications_enums.Prequalification.POE
+    # Check that a full reload gets us an equivalent HTML
+    response = client.get(details_url)
+    assertSoupEqual(parse_response_to_soup(response, selector="#main"), simulated_page)

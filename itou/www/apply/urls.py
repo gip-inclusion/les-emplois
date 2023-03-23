@@ -148,6 +148,16 @@ urlpatterns = [
     path("<uuid:job_application_id>/siae/cancel", process_views.cancel, name="cancel"),
     path("<uuid:job_application_id>/siae/archive", process_views.archive, name="archive"),
     path("<uuid:job_application_id>/siae/transfer", process_views.transfer, name="transfer"),
+    path(
+        "<uuid:job_application_id>/siae/prior-action/add",
+        process_views.add_or_modify_prior_action,
+        name="add_prior_action",
+    ),
+    path(
+        "<uuid:job_application_id>/siae/prior-action/<int:prior_action_id>",
+        process_views.add_or_modify_prior_action,
+        name="modify_prior_action",
+    ),
     # Variant of accept process (employer does not need an approval)
     path(
         "<uuid:job_application_id>/siae/edit_contract_start_date",
