@@ -1241,6 +1241,19 @@ class ProcessTemplatesTest(TestCase):
         self.assertNotContains(response, self.url_postpone)
         self.assertNotContains(response, self.url_accept)
 
+    def test_details_template_for_state_prior_to_hire(self):
+        """Test actions available when the state is prior_to_hire."""
+        self.client.force_login(self.siae_user)
+        self.job_application.state = JobApplicationWorkflow.STATE_PRIOR_TO_HIRE
+        self.job_application.save()
+        response = self.client.get(self.url_details)
+        # Test template content.
+        self.assertNotContains(response, self.url_process)
+        self.assertContains(response, self.url_eligibility)
+        self.assertContains(response, self.url_refuse)
+        self.assertNotContains(response, self.url_postpone)
+        self.assertNotContains(response, self.url_accept)
+
     def test_details_template_for_state_processing_but_suspended_siae(self):
         """Test actions available when the state is processing but SIAE is suspended"""
         Sanctions.objects.create(
