@@ -1,6 +1,6 @@
 <div class="my-3">
     {% url 'apply:accept' job_application_id=job_application.pk as accept_url %}
-    {% if not geiq_eligibility_diagnosis or not geiq_eligibility_diagnosis.is_valid %}
+    {% if show_geiq_eligibility_modal %}
         <button class="btn btn-primary btn-block" data-toggle="modal" data-target="#confirm_no_allowance_modal">
             Je l'embauche
         </button>

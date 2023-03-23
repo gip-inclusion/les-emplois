@@ -87,6 +87,7 @@ def details_for_siae(request, job_application_id, template_name="apply/process_d
     back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("apply:list_for_siae"))
     geiq_eligibility_diagnosis = None
 
+    show_geiq_eligibility_modal = False
     if job_application.to_siae.kind == SiaeKind.GEIQ:
         # Get current GEIQ diagnosis or *last expired one*
         geiq_eligibility_diagnosis = (
@@ -96,15 +97,27 @@ def details_for_siae(request, job_application_id, template_name="apply/process_d
             ).first()
         )
 
+        show_geiq_eligibility_modal = not geiq_eligibility_diagnosis or not geiq_eligibility_diagnosis.is_valid
+
     context = {
         "can_view_personal_information": True,  # SIAE members have access to personal info
         "eligibility_diagnosis": job_application.get_eligibility_diagnosis(),
         "expired_eligibility_diagnosis": expired_eligibility_diagnosis,
-        "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
         "job_application": job_application,
         "transition_logs": transition_logs,
         "back_url": back_url,
     }
+
+    if show_geiq_eligibility_modal:
+        context |= {
+            "show_geiq_eligibility_modal": show_geiq_eligibility_modal,
+        }
+
+    if geiq_eligibility_diagnosis:
+        # show_geiq_eligibility_modal = True
+        context |= {
+            "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
+        }
 
     return render(request, template_name, context)
 
