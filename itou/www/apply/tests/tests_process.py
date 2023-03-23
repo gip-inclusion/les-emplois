@@ -7,6 +7,7 @@ from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
+from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.approvals.factories import PoleEmploiApprovalFactory, SuspensionFactory
 from itou.approvals.models import Approval, Suspension
@@ -1530,3 +1531,22 @@ def test_details_for_prescriber_geiq(client):
     assert response.status_code == 200
 
     assert response.context["geiq_eligibility_diagnosis"] == job_application.geiq_eligibility_diagnosis
+
+
+def test_accept_button(client):
+    job_application = JobApplicationFactory(
+        state=JobApplicationWorkflow.STATE_PROCESSING,
+        to_siae__kind=SiaeKind.GEIQ,
+    )
+    accept_url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+    DIRECT_ACCEPT_BUTTON = f"""<a href="{accept_url}" class="btn btn-primary btn-block">Je l'embauche</a>"""
+    client.force_login(job_application.to_siae.members.first())
+    response = client.get(reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk}))
+    # GEIQ without GEIQ diagnosis: we get the modals
+    assertNotContains(response, DIRECT_ACCEPT_BUTTON)
+
+    job_application.to_siae.kind = SiaeKind.AI
+    job_application.to_siae.save(update_fields=("kind",))
+
+    response = client.get(reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk}))
+    assertContains(response, DIRECT_ACCEPT_BUTTON)
