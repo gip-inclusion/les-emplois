@@ -12,7 +12,7 @@
         <hr>
         <h3 >Informations personnelles</h3>
         {% include "apply/includes/job_seeker_info.html" with job_application=job_application %}
-        {% if siae_is_geiq and geiq_eligibility_diagnosis %}
+        {% if job_application.to_siae.kind == SiaeKind.GEIQ and geiq_eligibility_diagnosis %}
  
             {# GEIQ eligibility details #}
             {% include "apply/includes/geiq/geiq_diagnosis_details.html" with diagnosis=geiq_eligibility_diagnosis %}
