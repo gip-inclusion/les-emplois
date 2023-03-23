@@ -14,9 +14,9 @@
         </form>
     {% endif %}
 
-    {# Possible next steps when the state is processing ------------------------------------------------------ #}
+    {# Possible next steps when the state is processing / prior_to_hire ------------------------------------- #}
 
-    {% if job_application.state.is_processing %}
+    {% if job_application.state.is_processing or job_application.state.is_prior_to_hire %}
         {% if job_application.eligibility_diagnosis_by_siae_required %}
             {% include "apply/includes/buttons/new_diagnosis.html" %}
         {% else %}
