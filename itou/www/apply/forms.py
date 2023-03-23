@@ -19,11 +19,12 @@ from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
 from itou.common_apps.resume.forms import ResumeFormMixin
 from itou.eligibility.models import AdministrativeCriteria
 from itou.job_applications import enums as job_applications_enums
-from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.job_applications.models import JobApplication, JobApplicationWorkflow, PriorAction
 from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS, ContractType, SiaeKind
 from itou.users.enums import UserKind
 from itou.users.models import JobSeekerProfile, User
 from itou.utils import constants as global_constants
+from itou.utils.types import InclusiveDateRange
 from itou.utils.validators import validate_nir, validate_pole_emploi_id
 from itou.utils.widgets import DuetDatePickerWidget
 
@@ -539,6 +540,53 @@ class AcceptForm(forms.ModelForm):
                 )
 
         return cleaned_data
+
+
+class PriorActionForm(forms.ModelForm):
+    """
+    Allows to add a new prior action or edit one
+    """
+
+    class Meta:
+        model = PriorAction
+        fields = [
+            "action",
+        ]
+
+    def __init__(self, *args, action_only=False, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Change empty label from "---------" to our value
+        self.fields["action"].choices = [
+            (k, v if k else "Ajouter une action") for k, v in self.fields["action"].choices
+        ]
+        self.action_only = action_only
+        if not self.action_only:
+            self.fields["start_at"] = forms.DateField(
+                label="Date de début",
+                widget=DuetDatePickerWidget(),
+            )
+            self.fields["end_at"] = forms.DateField(
+                label="Date de fin prévisionnelle",
+                widget=DuetDatePickerWidget(),
+            )
+            if self.instance.pk:
+                self.initial["start_at"] = self.instance.dates.lower
+                self.initial["end_at"] = self.instance.dates.upper
+
+    def clean(self):
+        super().clean()
+        if not self.action_only:
+            start_at = self.cleaned_data.get("start_at")
+            end_at = self.cleaned_data.get("end_at")
+
+            if end_at and end_at < start_at:
+                raise forms.ValidationError("La date de fin prévisionnelle doit être postérieure à la date de début.")
+
+    def save(self, commit=True):
+        if self.cleaned_data.get("start_at") and self.cleaned_data.get("end_at"):
+            self.instance.dates = InclusiveDateRange(self.cleaned_data["start_at"], self.cleaned_data["end_at"])
+        return super().save()
 
 
 class EditHiringDateForm(forms.ModelForm):

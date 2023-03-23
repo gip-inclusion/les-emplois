@@ -67,4 +67,17 @@ htmx.onLoad((target) => {
     const target = this.getAttribute("data-disable-target")
     $(target).attr("disabled", this.checked)
   })
+
+  /**
+    * JS to allow to disable buttons (elements with "btn" class)
+    * when other elements are present.
+    * Typically useful when forms are available and you don't want the user
+    * to be confused in which button to use or to forget to validate the editing form.
+  **/
+  $('[data-disable-btn-if]').each(function() {
+    const selector = this.getAttribute("data-disable-btn-if")
+    $('.btn', this).toggleClass("disabled", $(selector).length !== 0)
+    // null value removes the attribute altogether instead of having aria-disabled="false"
+    $('a.btn', this).attr("aria-disabled", $(selector).length !== 0 || null)
+  })
 });

@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.template.response import TemplateResponse
 from django.urls import reverse, reverse_lazy
@@ -18,7 +18,7 @@ from django_xworkflows import models as xwf_models
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.utils import geiq_allowance_amount
-from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.job_applications.models import JobApplication, JobApplicationWorkflow, PriorAction
 from itou.siaes.enums import ContractType, SiaeKind
 from itou.siaes.models import Siae
 from itou.users.models import ApprovalAlreadyExistsError
@@ -31,6 +31,7 @@ from itou.www.apply.forms import (
     AnswerForm,
     CheckJobSeekerGEIQEligibilityForm,
     JobSeekerPersonalDataForm,
+    PriorActionForm,
     RefusalForm,
     UserAddressForm,
 )
@@ -52,6 +53,14 @@ def check_waiting_period(job_application):
         siae=job_application.to_siae, sender_prescriber_organization=job_application.sender_prescriber_organization
     ):
         raise PermissionDenied(apply_view_constants.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY)
+
+
+def _get_geiq_eligibility_diagnosis_for_siae(job_application):
+    # Get current GEIQ diagnosis or *last expired one*
+    return (
+        job_application.geiq_eligibility_diagnosis
+        or GEIQEligibilityDiagnosis.objects.diagnoses_for(job_application.job_seeker, job_application.to_siae).first()
+    )
 
 
 @login_required
@@ -88,13 +97,7 @@ def details_for_siae(request, job_application_id, template_name="apply/process_d
     geiq_eligibility_diagnosis = None
 
     if job_application.to_siae.kind == SiaeKind.GEIQ:
-        # Get current GEIQ diagnosis or *last expired one*
-        geiq_eligibility_diagnosis = (
-            job_application.geiq_eligibility_diagnosis
-            or GEIQEligibilityDiagnosis.objects.diagnoses_for(
-                job_application.job_seeker, job_application.to_siae
-            ).first()
-        )
+        geiq_eligibility_diagnosis = _get_geiq_eligibility_diagnosis_for_siae(job_application)
 
     context = {
         "can_view_personal_information": True,  # SIAE members have access to personal info
@@ -104,6 +107,9 @@ def details_for_siae(request, job_application_id, template_name="apply/process_d
         "job_application": job_application,
         "transition_logs": transition_logs,
         "back_url": back_url,
+        "add_prior_action_form": (
+            PriorActionForm(action_only=True) if job_application.can_change_prior_actions else None
+        ),
     }
 
     return render(request, template_name, context)
@@ -651,3 +657,93 @@ def geiq_eligibility_criteria(
         context |= {"geo_criteria_detected": True, "job_seeker": job_application.job_seeker}
 
     return render(request, template_name, context)
+
+
+@login_required
+def add_or_modify_prior_action(request, job_application_id, prior_action_id=None):
+    queryset = JobApplication.objects.siae_member_required(request.user)
+    job_application = get_object_or_404(
+        queryset,
+        id=job_application_id,
+    )
+    if not job_application.can_change_prior_actions:
+        return HttpResponseForbidden()
+
+    prior_action = (
+        get_object_or_404(PriorAction.objects.filter(job_application=job_application), pk=prior_action_id)
+        if prior_action_id
+        else None
+    )
+
+    if prior_action and not request.POST and "modify" not in request.GET:
+        # GET on prior-action/<prior_action_id/ to get readonly infos
+        return render(
+            request,
+            "apply/includes/job_application_prior_action.html",
+            {
+                "job_application": job_application,
+                "prior_action": prior_action,
+            },
+        )
+
+    form = PriorActionForm(
+        request.POST or None,
+        instance=prior_action,
+        # GET on /prior-action/add
+        action_only=prior_action is None and request.method == "GET",
+    )
+
+    if request.POST:
+        # First POST in add form, dates could not be filled
+        # Do not show errors
+        if prior_action is None and "start_at" not in request.POST:
+            for field in ["start_at", "end_at"]:
+                if field not in request.POST and field in form.errors:
+                    del form.errors[field]
+        elif form.is_valid():
+            state_update = False
+            with transaction.atomic():
+                if prior_action is None:
+                    form.instance.job_application = job_application
+                    if not job_application.state.is_prior_to_hire:
+                        job_application.move_to_prior_to_hire(user=request.user)
+                        state_update = True
+                form.save()
+            geiq_eligibility_diagnosis = None
+            if state_update and job_application.to_siae.kind == SiaeKind.GEIQ:
+                geiq_eligibility_diagnosis = _get_geiq_eligibility_diagnosis_for_siae(job_application)
+            return render(
+                request,
+                "apply/includes/job_application_prior_action.html",
+                {
+                    "job_application": job_application,
+                    "prior_action": form.instance,
+                    # If we were in the "add" form, make sure to keep an other add form
+                    "add_prior_action_form": PriorActionForm(action_only=True) if prior_action is None else None,
+                    # If out-of-band changes are needed
+                    "with_oob_state_update": state_update,
+                    "transition_logs": (
+                        job_application.logs.select_related("user").all().order_by("timestamp")
+                        if state_update
+                        else None
+                    ),
+                    "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
+                },
+            )
+
+    context = {
+        "form": form,
+        "job_application": job_application,
+        "main_div_id": f"prior-action-{ prior_action.pk }" if prior_action else "add_prior_action",
+        "form_url": (
+            reverse(
+                "apply:modify_prior_action",
+                kwargs={"job_application_id": job_application.pk, "prior_action_id": prior_action.pk},
+            )
+            if prior_action
+            else reverse("apply:add_prior_action", kwargs={"job_application_id": job_application.pk})
+        ),
+        # When editing existing action, we want to keep the hr from job_application_prior_action.html
+        "final_hr": prior_action is not None,
+    }
+    return render(request, "apply/includes/job_application_prior_action_form.html", context)
