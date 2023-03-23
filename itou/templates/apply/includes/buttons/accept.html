@@ -1,12 +1,13 @@
 <div class="my-3">
     {% url 'apply:accept' job_application_id=job_application.pk as accept_url %}
-    {% if show_geiq_eligibility_modal %}
+    {% if job_application.to_siae.kind != SiaeKind.GEIQ or geiq_eligibility_diagnosis and geiq_eligibility_diagnosis.is_valid %}
+        <a href="{{ accept_url }}" class="btn btn-primary btn-block">Je l'embauche</a>
+    {% else %}
+        {# GEIQ SIAE without valid geiq_eligibility_diagnosis #}
         <button class="btn btn-primary btn-block" data-toggle="modal" data-target="#confirm_no_allowance_modal">
             Je l'embauche
         </button>
         {# Confirmation modal for hiring #}
         {% include "apply/includes/geiq/no_allowance_modal.html" with next_url=accept_url %}
-    {% else %}
-        <a href="{{ accept_url }}" class="btn btn-primary btn-block">Je l'embauche</a>
     {% endif %}
 </div>
