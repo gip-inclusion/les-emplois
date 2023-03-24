@@ -161,7 +161,9 @@ class PoleEmploiApiClient:
             raise PoleEmploiAPIBadResponse(API_CLIENT_EMPTY_NIR_BAD_RESPONSE)
         return id_national
 
-    def mise_a_jour_pass_iae(self, approval, encrypted_identifier, siae_siret, siae_type, origine_candidature):
+    def mise_a_jour_pass_iae(
+        self, approval, encrypted_identifier, siae_siret, siae_type, origine_candidature, typologie_prescripteur=None
+    ):
         """Example of a JSON response:
         {'codeSortie': 'S000', 'idNational': 'some identifier', 'message': 'Pass IAE prescrit'}
         The only valid result is HTTP 200 + codeSortie = "S000".
@@ -181,6 +183,8 @@ class PoleEmploiApiClient:
             "typeSIAE": siae_type,
             "origineCandidature": origine_candidature,
         }
+        if typologie_prescripteur is not None:
+            params["typologiePrescripteur"] = typologie_prescripteur
         data = self._request(f"{self.base_url}/maj-pass-iae/v1/passIAE/miseAjour", params)
         code_sortie = data.get("codeSortie")
         if code_sortie != API_MAJ_PASS_SUCCESS:

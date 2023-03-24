@@ -43,6 +43,24 @@ class PrescriberOrganizationKind(models.TextChoices):
     SPIP = "SPIP", "SPIP - Service pénitentiaire d'insertion et de probation"
     OTHER = "Autre", "Autre"
 
+    def to_PE_typologie_prescripteur(self):
+        if self in PE_SENSITIVE_PRESCRIBER_KINDS:
+            return PrescriberOrganizationKind.OTHER
+        return self
+
+
+# Sensitive prescriber kinds that we do not want to send via PE API
+PE_SENSITIVE_PRESCRIBER_KINDS = {
+    PrescriberOrganizationKind.ASE,
+    PrescriberOrganizationKind.CAARUD,
+    PrescriberOrganizationKind.CIDFF,
+    PrescriberOrganizationKind.CSAPA,
+    PrescriberOrganizationKind.PENSION,
+    PrescriberOrganizationKind.PJJ,
+    PrescriberOrganizationKind.PREVENTION,
+    PrescriberOrganizationKind.SPIP,
+}
+
 
 class PrescriberAuthorizationStatus(models.TextChoices):
     NOT_SET = "NOT_SET", "Habilitation en attente de validation"
