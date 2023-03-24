@@ -537,7 +537,9 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
                 encrypted_nir,
                 siae.siret,
                 type_siae,
-                job_application_enums.sender_kind_to_pe_origine_candidature(job_application.sender_kind),
+                origine_candidature=job_application_enums.sender_kind_to_pe_origine_candidature(
+                    job_application.sender_kind
+                ),
             )
         except PoleEmploiAPIException:
             logger.info("! notify_pole_emploi approval=%s got a recoverable error in maj_pass_iae", self)
@@ -1307,7 +1309,9 @@ class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
                 encrypted_nir,
                 self.siae_siret,
                 type_siae,
-                "PRES",  # hardcoded, PE approvals are assumed as coming from prescribers
+                origine_candidature=job_application_enums.sender_kind_to_pe_origine_candidature(
+                    job_application_enums.SenderKind.PRESCRIBER
+                ),  # hardcoded, PE approvals are assumed as coming from prescribers
             )
         except PoleEmploiAPIException:
             logger.info("! notify_pole_emploi pe_approval=%s got a recoverable error in maj_pass_iae", self)
