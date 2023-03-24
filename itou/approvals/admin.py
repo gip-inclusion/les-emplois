@@ -136,7 +136,11 @@ class StartDateFilter(admin.SimpleListFilter):
     parameter_name = "starts"
 
     def lookups(self, request, model_admin):
-        return (("past", "< aujourd’hui"), ("today", "= aujourd’hui"), ("future", "> aujourd’hui"))
+        return (
+            ("past", "< aujourd’hui"),
+            ("today", "= aujourd’hui"),
+            ("future", "> aujourd’hui"),
+        )
 
     def queryset(self, request, queryset):
         value = self.value()
@@ -152,9 +156,24 @@ class StartDateFilter(admin.SimpleListFilter):
 @admin.register(models.Approval)
 class ApprovalAdmin(admin.ModelAdmin):
     form = ApprovalAdminForm
-    list_display = ("pk", "number", "user", "birthdate", "start_at", "end_at", "is_valid", "created_at")
+    list_display = (
+        "pk",
+        "number",
+        "user",
+        "birthdate",
+        "start_at",
+        "end_at",
+        "is_valid",
+        "created_at",
+    )
     list_select_related = ("user",)
-    search_fields = ("pk", "number", "user__first_name", "user__last_name", "user__email")
+    search_fields = (
+        "pk",
+        "number",
+        "user__first_name",
+        "user__last_name",
+        "user__email",
+    )
     list_filter = (
         IsValidFilter,
         StartDateFilter,
@@ -270,7 +289,14 @@ class IsInProgressFilter(admin.SimpleListFilter):
 
 @admin.register(models.Suspension)
 class SuspensionAdmin(admin.ModelAdmin):
-    list_display = ("pk", "approval", "start_at", "end_at", "created_at", "is_in_progress")
+    list_display = (
+        "pk",
+        "approval",
+        "start_at",
+        "end_at",
+        "created_at",
+        "is_in_progress",
+    )
     list_display_links = ("pk", "approval")
     raw_id_fields = ("approval", "siae", "created_by", "updated_by")
     list_filter = (
@@ -318,6 +344,7 @@ class ProlongationAdmin(admin.ModelAdmin):
         "created_by",
         "updated_by",
     )
+    exclude = ("report_file",)
     list_filter = (
         IsInProgressFilter,
         "reason",
@@ -328,6 +355,7 @@ class ProlongationAdmin(admin.ModelAdmin):
         "created_by",
         "updated_at",
         "updated_by",
+        "report_file_link",
     )
     inlines = (PkSupportRemarkInline,)
 
@@ -336,6 +364,11 @@ class ProlongationAdmin(admin.ModelAdmin):
 
     is_in_progress.boolean = True
     is_in_progress.short_description = "En cours"
+
+    def report_file_link(self, obj):
+        return mark_safe(f"<a href='{obj.report_file.link}'>{obj.report_file.key}</a>")
+
+    report_file_link.short_description = "Lien du fichier bilan"
 
     def get_queryset(self, request):
         # Speed up the list display view by fecthing related objects.
@@ -364,7 +397,15 @@ class PoleEmploiApprovalAdmin(admin.ModelAdmin):
         "is_valid",
         "created_at",
     )
-    search_fields = ("pk", "pole_emploi_id", "nir", "number", "first_name", "last_name", "birth_name")
+    search_fields = (
+        "pk",
+        "pole_emploi_id",
+        "nir",
+        "number",
+        "first_name",
+        "last_name",
+        "birth_name",
+    )
     list_filter = (IsValidFilter,)
     date_hierarchy = "birthdate"
 
