@@ -13,6 +13,7 @@ from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.approvals.models import Approval
 from itou.job_applications.factories import JobApplicationFactory
 from itou.job_applications.models import JobApplicationWorkflow
+from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.siaes.enums import SiaeKind, siae_kind_to_pe_type_siae
 from itou.siaes.factories import SiaeFactory
 from itou.users.factories import JobSeekerFactory
@@ -90,6 +91,70 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
             "origineCandidature": "PRES",
             "statutReponsePassIAE": "A",
             "typeSIAE": 836,
+        }
+        assert approval.pe_notification_status == "notification_success"
+        assert approval.pe_notification_time == now
+        assert approval.pe_notification_endpoint is None
+        assert approval.pe_notification_exit_code is None
+
+    @respx.mock
+    def test_notification_accepted_with_prescriber_organization(self):
+        now = timezone.now()
+        respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
+            200, json=API_RECHERCHE_RESULT_KNOWN
+        )
+        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
+        approval = ApprovalFactory(
+            with_jobapplication=True,
+            with_jobapplication__to_siae__kind=SiaeKind.ACI,
+            with_jobapplication__sent_by_authorized_prescriber_organisation=True,
+            with_jobapplication__sender_prescriber_organization__kind=PrescriberOrganizationKind.CAF,
+        )
+        approval.notify_pole_emploi(at=now)
+        approval.refresh_from_db()
+        payload = json.loads(respx.calls.last.request.content)
+        assert payload == {
+            "dateDebutPassIAE": approval.start_at.isoformat(),
+            "dateFinPassIAE": approval.end_at.isoformat(),
+            "idNational": "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ",
+            "numPassIAE": approval.number,
+            "numSIRETsiae": approval.jobapplication_set.first().to_siae.siret,
+            "origineCandidature": "PRES",
+            "statutReponsePassIAE": "A",
+            "typeSIAE": 836,
+            "typologiePrescripteur": "CAF",
+        }
+        assert approval.pe_notification_status == "notification_success"
+        assert approval.pe_notification_time == now
+        assert approval.pe_notification_endpoint is None
+        assert approval.pe_notification_exit_code is None
+
+    @respx.mock
+    def test_notification_accepted_with_sensitive_prescriber_organization(self):
+        now = timezone.now()
+        respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
+            200, json=API_RECHERCHE_RESULT_KNOWN
+        )
+        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
+        approval = ApprovalFactory(
+            with_jobapplication=True,
+            with_jobapplication__to_siae__kind=SiaeKind.ACI,
+            with_jobapplication__sent_by_authorized_prescriber_organisation=True,
+            with_jobapplication__sender_prescriber_organization__kind=PrescriberOrganizationKind.SPIP,
+        )
+        approval.notify_pole_emploi(at=now)
+        approval.refresh_from_db()
+        payload = json.loads(respx.calls.last.request.content)
+        assert payload == {
+            "dateDebutPassIAE": approval.start_at.isoformat(),
+            "dateFinPassIAE": approval.end_at.isoformat(),
+            "idNational": "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ",
+            "numPassIAE": approval.number,
+            "numSIRETsiae": approval.jobapplication_set.first().to_siae.siret,
+            "origineCandidature": "PRES",
+            "statutReponsePassIAE": "A",
+            "typeSIAE": 836,
+            "typologiePrescripteur": "Autre",
         }
         assert approval.pe_notification_status == "notification_success"
         assert approval.pe_notification_time == now
@@ -273,6 +338,7 @@ class PoleEmploiApprovalNotifyPoleEmploiIntegrationTest(TestCase):
             "origineCandidature": "PRES",
             "statutReponsePassIAE": "A",
             "typeSIAE": siae_kind_to_pe_type_siae(pe_approval.siae_kind),
+            "typologiePrescripteur": "PE",
         }
         assert pe_approval.pe_notification_status == "notification_success"
         assert pe_approval.pe_notification_time == now

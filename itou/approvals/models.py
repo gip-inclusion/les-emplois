@@ -17,6 +17,7 @@ from unidecode import unidecode
 from itou.approvals.enums import Origin
 from itou.approvals.notifications import NewProlongationToAuthorizedPrescriberNotification
 from itou.job_applications import enums as job_application_enums
+from itou.prescribers import enums as prescribers_enums
 from itou.siaes import enums as siae_enums
 from itou.utils.apis import enums as api_enums, pole_emploi_api_client
 from itou.utils.apis.pole_emploi import PoleEmploiAPIBadResponse, PoleEmploiAPIException
@@ -531,6 +532,12 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             self.pe_save_error(api_enums.PEApiEndpoint.RECHERCHE_INDIVIDU, exc.response_code, at)
             return
 
+        typologie_prescripteur = None
+        if prescriber_org := job_application.sender_prescriber_organization:
+            typologie_prescripteur = prescribers_enums.PrescriberOrganizationKind(
+                prescriber_org.kind
+            ).to_PE_typologie_prescripteur()
+
         try:
             pe_client.mise_a_jour_pass_iae(
                 self,
@@ -540,6 +547,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
                 origine_candidature=job_application_enums.sender_kind_to_pe_origine_candidature(
                     job_application.sender_kind
                 ),
+                typologie_prescripteur=typologie_prescripteur,
             )
         except PoleEmploiAPIException:
             logger.info("! notify_pole_emploi approval=%s got a recoverable error in maj_pass_iae", self)
@@ -1309,9 +1317,11 @@ class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
                 encrypted_nir,
                 self.siae_siret,
                 type_siae,
+                # hardcoded, PE approvals are assumed as coming from prescribers
                 origine_candidature=job_application_enums.sender_kind_to_pe_origine_candidature(
                     job_application_enums.SenderKind.PRESCRIBER
-                ),  # hardcoded, PE approvals are assumed as coming from prescribers
+                ),
+                typologie_prescripteur=prescribers_enums.PrescriberOrganizationKind.PE,
             )
         except PoleEmploiAPIException:
             logger.info("! notify_pole_emploi pe_approval=%s got a recoverable error in maj_pass_iae", self)

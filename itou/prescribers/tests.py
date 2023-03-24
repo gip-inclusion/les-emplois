@@ -644,3 +644,44 @@ class UpdateRefusedPrescriberOrganizationKindManagementCommandsTest(TestCase):
             ).count()
         )
         assert 1 == PrescriberOrganization.objects.filter(kind=PrescriberOrganizationKind.OTHER).count()
+
+
+@pytest.mark.parametrize("organization_kind", PrescriberOrganizationKind)
+def test_organization_kind_to_PE_typologie_prescripteur(organization_kind):
+    # If you add a new value to PrescriberOrganizationKind:
+    # can this kind be sent to PoleEmploi or should it be considered as "sensitive" ?
+    # Cf PE_SENSITIVE_PRESCRIBER_KINDS variable
+    EXPECTED_TYPOLOGIE = {
+        PrescriberOrganizationKind.AFPA: "AFPA",
+        PrescriberOrganizationKind.ASE: "Autre",
+        PrescriberOrganizationKind.CAARUD: "Autre",
+        PrescriberOrganizationKind.CADA: "CADA",
+        PrescriberOrganizationKind.CAF: "CAF",
+        PrescriberOrganizationKind.CAP_EMPLOI: "CAP_EMPLOI",
+        PrescriberOrganizationKind.CAVA: "CAVA",
+        PrescriberOrganizationKind.CCAS: "CCAS",
+        PrescriberOrganizationKind.CHRS: "CHRS",
+        PrescriberOrganizationKind.CHU: "CHU",
+        PrescriberOrganizationKind.CIDFF: "Autre",
+        PrescriberOrganizationKind.CPH: "CPH",
+        PrescriberOrganizationKind.CSAPA: "Autre",
+        PrescriberOrganizationKind.DEPT: "DEPT",
+        PrescriberOrganizationKind.E2C: "E2C",
+        PrescriberOrganizationKind.EPIDE: "EPIDE",
+        PrescriberOrganizationKind.HUDA: "HUDA",
+        PrescriberOrganizationKind.ML: "ML",
+        PrescriberOrganizationKind.MSA: "MSA",
+        PrescriberOrganizationKind.OACAS: "OACAS",
+        PrescriberOrganizationKind.ODC: "ODC",
+        PrescriberOrganizationKind.OIL: "OIL",
+        PrescriberOrganizationKind.OTHER: "Autre",
+        PrescriberOrganizationKind.PE: "PE",
+        PrescriberOrganizationKind.PENSION: "Autre",
+        PrescriberOrganizationKind.PIJ_BIJ: "PIJ_BIJ",
+        PrescriberOrganizationKind.PJJ: "Autre",
+        PrescriberOrganizationKind.PLIE: "PLIE",
+        PrescriberOrganizationKind.PREVENTION: "Autre",
+        PrescriberOrganizationKind.RS_FJT: "RS_FJT",
+        PrescriberOrganizationKind.SPIP: "Autre",
+    }
+    assert organization_kind.to_PE_typologie_prescripteur() == EXPECTED_TYPOLOGIE[organization_kind]
