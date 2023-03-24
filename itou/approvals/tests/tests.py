@@ -689,6 +689,36 @@ class PoleEmploiApprovalManagerTest(TestCase):
 
 
 class AutomaticApprovalAdminViewsTest(TestCase):
+    def test_create_approval_with_a_wrong_number(self):
+        """
+        We cannot create an approval starting with ASP_ITOu_PREFIX
+        """
+        user = ItouStaffFactory()
+        content_type = ContentType.objects.get_for_model(Approval)
+        permission = Permission.objects.get(content_type=content_type, codename="add_approval")
+        user.user_permissions.add(permission)
+
+        self.client.force_login(user)
+
+        url = reverse("admin:approvals_approval_add")
+
+        diagnosis = EligibilityDiagnosisFactory()
+        post_data = {
+            "start_at": "01/01/2100",
+            "end_at": "31/12/2102",
+            "user": diagnosis.job_seeker_id,
+            "eligibility_diagnosis": diagnosis.pk,
+            "origin": Origin.DEFAULT,  # Will be overriden
+            "number": "XXXXX1234567",
+        }
+        response = self.client.post(url, data=post_data)
+        assert response.status_code == 200
+        self.assertFormError(
+            response.context["adminform"],
+            "number",
+            [ApprovalAdminForm.ERROR_NUMBER],
+        )
+
     def test_edit_approval_with_a_wrong_number(self):
         """
         Given an existing approval, when setting a different number,

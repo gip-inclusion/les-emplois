@@ -54,7 +54,7 @@ class ApprovalAdminForm(ApprovalFormMixin, forms.ModelForm):
         return self.cleaned_data["origin"]
 
     def set_origin(self):
-        number = self.cleaned_data["number"]
+        number = self.cleaned_data.get("number")
         # Only set to PE approval if there's a number and it's not from ITOU
         if number and not number.startswith(Approval.ASP_ITOU_PREFIX):
             self.cleaned_data["origin"] = Origin.PE_APPROVAL
