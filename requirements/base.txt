@@ -226,9 +226,9 @@ django-import-export==3.1.0 \
     --hash=sha256:0760414c125142f5db02382f661b091f7597dbbebf82c8797c7830cc140a6a1a \
     --hash=sha256:5f72cb49ad92f4393f0bdb8396f344232445555e77fc501dd294bcd3d1788606
     # via -r requirements/base.in
-django-select2==8.1.0 \
-    --hash=sha256:adea411c96fc0ecff47db86c82f392d1aee418ca5a83b7205920912754fa5ab8 \
-    --hash=sha256:c2922ff3a7843451fcf529db72f0594824a10dec34cb12d903e32aca642929e4
+django-select2==8.1.1 \
+    --hash=sha256:72b282393a1d0b2211d386826c5af34be0031cd7a6b57c1aacd829f49c293d84 \
+    --hash=sha256:8a3862e4fc82ca2fb8419da1212b5f3637943bc8a54d8d023fa2582453f6d37f
     # via -r requirements/base.in
 django-xworkflows==1.0.0 \
     --hash=sha256:b233b5244fb864f95ba935bd3f2214c55600db6294dbca544a6f9eb14918fb06 \
