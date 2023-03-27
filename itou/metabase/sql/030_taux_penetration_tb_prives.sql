@@ -1,16 +1,16 @@
 /* Dans cette table nous regroupons les visiteurs uniques ainsi que le nombre et type d'utilisateurs des TBs privés afin de calculer le taux de pénétration */
-with visiteurs_utilisateurs_privés as (
+with "visiteurs_utilisateurs_privés" as (
     select
         count (utilisateur) as nombre_utilisateurs,
         utilisateur,
         numero_departement as departement,
-        nom_département as nom_departement
+        "nom_département" as nom_departement
     from
         suivi_utilisateurs_tb_prives sutp
     group by
         utilisateur,
         numero_departement,
-        nom_département
+        "nom_département"
 ),
 /* Création des tables intermédiaires avec création d'une colonne utilisateurs afin de faire les jointures avec la table utilisateurs */
 visiteurs_prives as (
@@ -67,7 +67,7 @@ visiteur_utilisateurs as (
         vu.nom_departement
     from
         visiteurs_prives vu
-    left join visiteurs_utilisateurs_privés vup
+    left join "visiteurs_utilisateurs_privés" vup
         on
         vu.utilisateur = vup.utilisateur
         and vu.departement = vup.departement
@@ -83,7 +83,7 @@ visiteur_utilisateurs_0 as (
         vu.nom_departement
     from
         visiteurs_prives_0 vu
-    left join visiteurs_utilisateurs_privés vup
+    left join "visiteurs_utilisateurs_privés" vup
         on
         vu.utilisateur = vup.utilisateur
         and vu.departement = vup.departement

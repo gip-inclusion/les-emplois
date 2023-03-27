@@ -12,9 +12,11 @@ L'objectif est de retravailler les variables de la table fluxIAE_AnnexeFinancier
 with "AnnexeFinanciere_v1" as (
     select
         /* Reformatage de la colonne type de structure par exemple on passe de ACI_DC à ACI */
-        substring(
-            af.af_mesure_dispositif_code from 1 for char_length(af.af_mesure_dispositif_code)-3
-        ) as type_siae,
+        trim(substr(
+            af.af_mesure_dispositif_code,
+            1,
+            char_length(af.af_mesure_dispositif_code)-3
+        )) as type_siae,
         /* Les dates dans les tables fluxIAE sont par défaut au format string */
         to_date(
             af.af_date_debut_effet, 'dd/mm/yyyy'

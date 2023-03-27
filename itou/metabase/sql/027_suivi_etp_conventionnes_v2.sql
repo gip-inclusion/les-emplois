@@ -26,7 +26,7 @@ select
     af.af_mesure_dispositif_id,
     af.af_mesure_dispositif_code,
     af.af_numero_avenant_modification,
-    af.af_etp_postes_insertion as effectif_mensuel_conventionné,
+    af.af_etp_postes_insertion as "effectif_mensuel_conventionné",
     (
         af.af_etp_postes_insertion *(
             (
@@ -35,7 +35,7 @@ select
                 date_part('month', af_date_fin_effet_v2) - date_part('month', af_date_debut_effet_v2)
             )+ 1
         )/ 12
-    ) as effectif_annuel_conventionné,
+    ) as "effectif_annuel_conventionné",
     type_structure,
     structure.structure_denomination,
     structure.structure_adresse_admin_commune as commune_structure,

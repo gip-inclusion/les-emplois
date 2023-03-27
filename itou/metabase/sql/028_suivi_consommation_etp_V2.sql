@@ -92,8 +92,8 @@ calcul_etp as (
                 )
             ) / nombre_mois_saisis
         end moyenne_nb_etp_annuels_depuis_debut_annee,
-        effectif_mensuel_conventionné,
-        effectif_annuel_conventionné,
+        "effectif_mensuel_conventionné",
+        "effectif_annuel_conventionné",
         etp.duree_annexe,
         etp.type_structure,
         etp.structure_denomination,
@@ -120,8 +120,8 @@ calcul_etp as (
         etp.af_numero_convention,
         etp.af_numero_annexe_financiere,
         etp.af_etat_annexe_financiere_code,
-        effectif_mensuel_conventionné,
-        effectif_annuel_conventionné,
+        "effectif_mensuel_conventionné",
+        "effectif_annuel_conventionné",
         annee_af,
         etp.type_structure,
         etp.structure_denomination,
@@ -134,8 +134,8 @@ select
     case
         /* On calcule la moyenne des etp consommés depuis le début de l'année et on la compare avec le nombre d'etp 
                 conventionnés */
-        when moyenne_nb_etp_mensuels_depuis_debut_annee < effectif_mensuel_conventionné then 'sous-consommation'
-        when moyenne_nb_etp_mensuels_depuis_debut_annee > effectif_mensuel_conventionné then 'sur-consommation'
+        when moyenne_nb_etp_mensuels_depuis_debut_annee < "effectif_mensuel_conventionné" then 'sous-consommation'
+        when moyenne_nb_etp_mensuels_depuis_debut_annee > "effectif_mensuel_conventionné" then 'sur-consommation'
         else 'conforme'
     end consommation_ETP
 from

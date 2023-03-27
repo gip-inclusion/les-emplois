@@ -25,7 +25,7 @@ left join
     c.id_candidat = pc.id_candidat
 where
     date_embauche is not null
-    and état = 'Candidature acceptée'
+    and "état" = 'Candidature acceptée'
     and origine != 'Employeur'
 group by
     c.id_candidat,

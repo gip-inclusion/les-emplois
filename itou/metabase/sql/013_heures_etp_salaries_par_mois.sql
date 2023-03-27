@@ -26,7 +26,7 @@ from
         identifiant_salarie,
         nombre_etp_consommes,
         nombre_heures_travaillees, 
-        af_etp_postes_insertion as nombre_etp_conventionnés,
+        af_etp_postes_insertion as "nombre_etp_conventionnés",
         date_saisie,
         etablissement_Public_Territorial,
         nom_epci,

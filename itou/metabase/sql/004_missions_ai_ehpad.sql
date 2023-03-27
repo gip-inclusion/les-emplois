@@ -73,9 +73,11 @@ select
     s.nom_departement_structure as departement_structure,
     s.nom_region_structure as region_structure,
     s.structure_code_naf as code_naf_structure,
-    substring(
-        cm.contrat_mesure_disp_code from 1 for char_length(cm.contrat_mesure_disp_code) - 3
-    ) as type_structure,
+    trim(substr(
+        cm.contrat_mesure_disp_code,
+        1,
+        char_length(cm.contrat_mesure_disp_code) - 3
+    )) as type_structure,
     commune_structure.latitude as latitude_structure,
     commune_structure.longitude as longitude_structure
 from

@@ -9,7 +9,7 @@ with candidats_p as (
     select
         distinct cdd.id as id_candidat,
         /* TODO dejafait drop as soon as analistos have migrated to the new deanonymized column */
-        cdd.id_anonymisé as id_candidat_anonymise,
+        cdd."id_anonymisé" as id_candidat_anonymise,
         cdd.actif,
         cdd.age,
         cdd.date_diagnostic,
@@ -18,9 +18,9 @@ with candidats_p as (
             when date_diagnostic >= date_trunc('month', CURRENT_DATE) - interval '5 months' then 'Oui'
             else 'non'
         end diagnostic_valide,
-        cdd.département as departement_candidat,
-        cdd.nom_département as nom_departement_candidat,
-        cdd.région as region_candidat,
+        cdd."département" as departement_candidat,
+        cdd."nom_département" as nom_departement_candidat,
+        cdd."région" as region_candidat,
         cdd.type_auteur_diagnostic,
         cdd.sous_type_auteur_diagnostic,
         cdd.nom_auteur_diagnostic,
@@ -39,9 +39,9 @@ with candidats_p as (
 prescripteurs as (
     select
         id,
-        nom_département as nom_département_prescripteur,
+        "nom_département" as "nom_département_prescripteur",
         /* Ajout du département du prescripteur pour les TBs privés */
-        région as nom_région_prescripteur
+        "région" as "nom_région_prescripteur"
     from
         organisations o
 )
@@ -54,7 +54,7 @@ select
         /* ajout d'une colonne permettant de calculer le taux de candidats acceptées tout en faisant une jointure avec la table candidatures */
         when total_embauches > 0 then concat(cast(id_candidat as varchar), '_accepté')
         else null
-    end candidature_acceptée,
+    end "candidature_acceptée",
     actif,
     age,
     date_diagnostic,
@@ -100,8 +100,8 @@ select
     end type_auteur_diagnostic_detaille,
     nom_auteur_diagnostic,
     id_org_prescripteur,
-    nom_département_prescripteur,
-    nom_région_prescripteur,
+    "nom_département_prescripteur",
+    "nom_région_prescripteur",
     total_candidatures,
     total_diagnostics,
     total_embauches,

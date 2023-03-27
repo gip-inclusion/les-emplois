@@ -4,7 +4,7 @@ with etp_conventionnes as (
         type_siae,
         nom_departement_af,
         nom_region_af,
-        sum(nombre_etp_conventionnés) as nombre_etp_conventionnes 
+        sum("nombre_etp_conventionnés") as nombre_etp_conventionnes
     from nombre_etp_conventionnes
     where annee_af = date_part('year', current_date) 
     group by 
@@ -18,7 +18,7 @@ select
         filter (
             where 
                 (origine = 'Employeur') 
-                and (état = 'Candidature acceptée')
+                and ("état" = 'Candidature acceptée')
                 and type_structure in ('EI', 'ETTI', 'AI', 'ACI', 'EITI')) as nombre_candidatures_acceptees_employeurs,
     /* Nombre de candidatures initiées par l'employeur de type SIAE */
     count(distinct candidatures_echelle_locale.id) 
@@ -29,21 +29,21 @@ select
     count(distinct candidatures_echelle_locale.id) 
         filter (
             where 
-                (état = 'Candidature acceptée')
+                ("état" = 'Candidature acceptée')
                 and type_structure in ('EI', 'ETTI', 'AI', 'ACI', 'EITI')) as nombre_candidatures_acceptees,
     count(distinct id_fiche_de_poste) AS Nombre_fiches_poste_ouvertes, 
     count(distinct candidatures_echelle_locale.id) AS nombre_candidatures,
     count(distinct candidatures_echelle_locale.id) 
         filter (
-            where (état = 'Candidature déclinée')) as nombre_candidatures_refusees,
+            where ("état" = 'Candidature déclinée')) as nombre_candidatures_refusees,
     count(distinct candidatures_echelle_locale.id) 
         filter (
-            where (état = 'Candidature déclinée')and origine != 'Employeur') as nb_candidatures_refusees_non_emises_par_employeur_siae,
+            where ("état" = 'Candidature déclinée')and origine != 'Employeur') as nb_candidatures_refusees_non_emises_par_employeur_siae,
     count(distinct id_structure) as nombre_siae,
     nombre_etp_conventionnes,
     type_structure,
-    nom_département_structure,
-    région_structure,
+    "nom_département_structure",
+    "région_structure",
     candidatures_echelle_locale.ville,
     nom_epci,
     candidatures_echelle_locale.code_commune,
@@ -61,8 +61,8 @@ left join
 left join 
     etp_conventionnes 
         on etp_conventionnes.type_siae = candidatures_echelle_locale.type_structure
-        and etp_conventionnes.nom_departement_af = candidatures_echelle_locale.nom_département_structure
-        and etp_conventionnes.nom_region_af = candidatures_echelle_locale.région_structure
+        and etp_conventionnes.nom_departement_af = candidatures_echelle_locale."nom_département_structure"
+        and etp_conventionnes.nom_region_af = candidatures_echelle_locale."région_structure"
 where 
     candidatures_echelle_locale.injection_ai = 0 
     and recrutement_ouvert = 1
@@ -71,8 +71,8 @@ where
     and type_structure  in ('EI', 'ETTI', 'AI', 'ACI', 'EITI')
 group by 
     type_structure,
-    nom_département_structure,
-    région_structure,
+    "nom_département_structure",
+    "région_structure",
     nombre_etp_conventionnes,
     candidatures_echelle_locale.ville,
     nom_epci,

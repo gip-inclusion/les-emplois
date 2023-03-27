@@ -14,46 +14,46 @@ with date_1ere_candidature as (
     select 
         c.id_candidat,
         /* TODO dejafait drop as soon as analistos have migrated to the new deanonymized column */
-        c.id_candidat_anonymisé,
+        c."id_candidat_anonymisé",
         min(date_candidature) as date_1ere_candidature,
         min(
             case 
                 when date_embauche is null then '2099-01-01'
                 else date_embauche
             end) as date_1ere_embauche,
-        candidats.nom_département as nom_département_candidat,
+        candidats."nom_département" as "nom_département_candidat",
         date_candidature,
         date_embauche,
         origine,
-        origine_détaillée, 
+        "origine_détaillée",
         id_org_prescripteur
     from 
         candidatures c 
     inner join candidats on c.id_candidat = candidats.id 
         where c.origine = 'Prescripteur habilité' /* Modification du filtre initialement fait par Soumia, qui n'était pas bon */
-        and c.origine_détaillée  = 'Prescripteur habilité PE'
+        and c."origine_détaillée" = 'Prescripteur habilité PE'
     group by 
         c.id_candidat,
         /* TODO dejafait drop as soon as analistos have migrated to the new deanonymized column */
-        c.id_candidat_anonymisé,
-        candidats.nom_département,
+        c."id_candidat_anonymisé",
+        candidats."nom_département",
         date_candidature,
         date_embauche,
         origine,
-        origine_détaillée, 
+        "origine_détaillée",
         id_org_prescripteur 
 ),
 prescripteurs as (
     select 
         id,
-        nom_département as nom_département_prescripteur /* Ajout du département du prescripteur pour les TBs privés */
+        "nom_département" as "nom_département_prescripteur" /* Ajout du département du prescripteur pour les TBs privés */
     from organisations o 
 )
 select 
     id_candidat,
     /* TODO dejafait drop as soon as analistos have migrated to the new deanonymized column */
-    id_candidat_anonymisé,
-    nom_département_candidat,
+    "id_candidat_anonymisé",
+    "nom_département_candidat",
     date_candidature,
     date_embauche,
     case 
@@ -65,11 +65,11 @@ select
         when ((date_1ere_embauche - date_1ere_candidature) / 30) >= 4 and ((date_1ere_embauche - date_1ere_candidature) /30) < 5 then 'e- Entre 4 et 5 mois'
         when ((date_1ere_embauche - date_1ere_candidature) / 30) >= 5 and ((date_1ere_embauche - date_1ere_candidature) /30) < 6 then 'f- Entre 5 et 6 mois'
         when ((date_1ere_embauche - date_1ere_candidature) / 30) >= 6 then 'g- 6 mois et plus'
-    end délai_embauche,
+    end "délai_embauche",
     origine,
-    origine_détaillée,
+    "origine_détaillée",
     id_org_prescripteur,
-    nom_département_prescripteur
+    "nom_département_prescripteur"
 from 
     date_1ere_candidature
         left join prescripteurs p

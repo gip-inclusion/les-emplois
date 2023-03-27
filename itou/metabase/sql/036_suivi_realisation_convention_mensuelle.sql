@@ -24,8 +24,8 @@ select
     af_date_fin_effet_v2,
     annee_af,
     duree_annexe,
-    effectif_mensuel_conventionné,
-    effectif_annuel_conventionné,
+    "effectif_mensuel_conventionné",
+    "effectif_annuel_conventionné",
     scec.type_structure,
     scec.structure_denomination,
     scec.commune_structure,
@@ -42,5 +42,5 @@ from
 left join suivi_etp_realises_par_structure serps
     on
     serps.id_annexe_financiere = scec.id_annexe_financiere
-    and serps.annee = scec.année
+    and serps.annee = scec."année"
     and serps.mois = scec.month

@@ -23,7 +23,7 @@ select
     s.structure_adresse_admin_commune as commune_structure, 
     s.structure_adresse_admin_code_insee as code_insee_structure,
     af.type_siae, 
-    af.af_etp_postes_insertion as nombre_etp_conventionnés,
+    af.af_etp_postes_insertion as "nombre_etp_conventionnés",
     af.nom_departement_af,
     af.nom_region_af,
     af.num_dep_af as code_departement_af

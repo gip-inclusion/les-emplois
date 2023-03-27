@@ -11,8 +11,8 @@ with candidatures_p as (
 org_prescripteur as ( /* On récupère l'id et le dept des organismes prescripteurs afin de filtrer selon le département de l'agence PE associée */
 	select
 		org.id as id_org,
-		org.nom_département as dept_org,  /*bien mettre nom département et pas département */
-		org.région as région_org
+		org."nom_département" as dept_org,  /*bien mettre nom département et pas département */
+		org."région" as "région_org"
 	from
 		organisations org
 ),
@@ -29,7 +29,7 @@ bassin_emploi as ( /* On récupère les infos locales à partir des données inf
         s.id as id_structure /* on récupère que l'id des structures de la table structure */
     from sa_zones_infradepartementales be
         left join structures s
-            on s.ville = be.libelle_commune and s.nom_département = be.nom_departement /* il faut rajouter le département car la France n'est pas originale en terme de noms de ville */
+            on s.ville = be.libelle_commune and s."nom_département" = be.nom_departement /* il faut rajouter le département car la France n'est pas originale en terme de noms de ville */
 ),
 /*On créé une colonne par réseau au cas ou une même structure appartienne à différents réseaux */
 adherents_coorace as (
@@ -85,68 +85,68 @@ adherents_cocagne as (
 select
     date_candidature,
     date_embauche,
-    délai_de_réponse,
-    extract (DAY FROM délai_de_réponse) as temps_de_reponse,
-    délai_prise_en_compte,
-    extract (DAY FROM délai_prise_en_compte) as temps_de_prise_en_compte,
-    candidatures_p.département_structure,
-    état,
+    "délai_de_réponse",
+    extract (DAY FROM "délai_de_réponse") as temps_de_reponse,
+    "délai_prise_en_compte",
+    extract (DAY FROM "délai_prise_en_compte") as temps_de_prise_en_compte,
+    candidatures_p."département_structure",
+    "état",
     id,
     /* TODO dejafait drop as soon as analistos have migrated to the new deanonymized column */
-    id_anonymisé,
+    "id_anonymisé",
     id_candidat,
     /* TODO dejafait drop as soon as analistos have migrated to the new deanonymized column */
-    id_candidat_anonymisé,
+    "id_candidat_anonymisé",
     candidatures_p.id_structure,
     motif_de_refus,
-    candidatures_p.nom_département_structure,
+    candidatures_p."nom_département_structure",
     nom_structure,
     type_structure,
     case
 		when candidatures_p.origine = 'Candidat' then 'Candidature en ligne'
 		else candidatures_p.origine
 	end origine,
-    origine_détaillée,
+    "origine_détaillée",
     case /* Ajout colonne avec des noms de prescripteurs correspondant à ceux de la table taux_transformation_prescripteurs */
-        when candidatures_p.origine_détaillée = 'Prescripteur habilité AFPA' then 'AFPA - Agence nationale pour la formation professionnelle des adultes'
-        when candidatures_p.origine_détaillée = 'Prescripteur habilité ASE' then 'ASE - Aide sociale à l''enfance'
-        when candidatures_p.origine_détaillée = 'Prescripteur habilité Autre' then 'Autre'
-        when candidatures_p.origine_détaillée = 'Prescripteur habilité CAARUD' then 'CAARUD - Centre d''accueil et d''accompagnement à la réduction de risques pour usagers de drogues'
-        when candidatures_p.origine_détaillée = 'Prescripteur habilité CADA' then 'CADA - Centre d''accueil de demandeurs d''asile'
-        when candidatures_p.origine_détaillée = 'Prescripteur habilité CAF' then 'CAF - Caisse d''allocations familiales'
-        when candidatures_p.origine_détaillée = 'Prescripteur habilité CAP_EMPLOI' then 'CAP emploi'
-        when candidatures_p.origine_détaillée = 'Prescripteur habilité CAVA' then 'ACAVA - Centre d''adaptation à la vie active'
-        when candidatures_p.origine_détaillée = 'Prescripteur habilité CCAS' then 'CCAS - Centre communal d''action sociale ou centre intercommunal d''action sociale'
-        when candidatures_p.origine_détaillée = 'Prescripteur habilité CHRS' then 'CHRS - Centre d''hébergement et de réinsertion sociale'
-        when candidatures_p.origine_détaillée = 'Prescripteur habilité CHU' then 'CHU - Centre d''hébergement d''urgence'
-        when candidatures_p.origine_détaillée = 'Prescripteur habilité CIDFF' then 'CIDFF - Centre d''information sur les droits des femmes et des familles'
-        when candidatures_p.origine_détaillée = 'Prescripteur habilité CPH' then 'CPH - Centre provisoire d''hébergement'
-        when candidatures_p.origine_détaillée = 'Prescripteur habilité CSAPA' then 'CSAPA - Centre de soins, d''accompagnement et de prévention en addictologie'
-        when candidatures_p.origine_détaillée = 'Prescripteur habilité DEPT' then 'Service social du conseil départemental'
-        when candidatures_p.origine_détaillée = 'Prescripteur habilité E2C' then 'E2C - École de la deuxième chance'
-        when candidatures_p.origine_détaillée = 'Prescripteur habilité EPIDE' then 'EPIDE - Établissement pour l''insertion dans l''emploi'
-        when candidatures_p.origine_détaillée = 'Prescripteur habilité HUDA' then 'HUDA - Hébergement d''urgence pour demandeurs d''asile'
-        when candidatures_p.origine_détaillée = 'Prescripteur habilité ML' then 'Mission Locale'
-        when candidatures_p.origine_détaillée = 'Prescripteur habilité MSA' then 'MSA - Mutualité Sociale Agricole'
-        when candidatures_p.origine_détaillée = 'Prescripteur habilité OACAS' then 'OACAS - Structure porteuse d''un agrément national organisme d''accueil communautaire et d''activité solidaire'
-        when candidatures_p.origine_détaillée = 'Prescripteur habilité ODC' then 'Organisation délégataire d''un CD'
-        when candidatures_p.origine_détaillée = 'Prescripteur habilité OIL' then 'Opérateur d''intermédiation locative'
-        when candidatures_p.origine_détaillée = 'Prescripteur habilité PE' then 'Pôle emploi'
-        when candidatures_p.origine_détaillée = 'Prescripteur habilité PENSION' then 'Pension de famille / résidence accueil'
-        when candidatures_p.origine_détaillée = 'Prescripteur habilité PIJ_BIJ' then 'PIJ-BIJ - Point/Bureau information jeunesse'
-        when candidatures_p.origine_détaillée = 'Prescripteur habilité PJJ' then 'PJJ - Protection judiciaire de la jeunesse'
-        when candidatures_p.origine_détaillée = 'Prescripteur habilité PLIE' then 'PLIE - Plan local pour l''insertion et l''emploi'
-        when candidatures_p.origine_détaillée = 'Prescripteur habilité PREVENTION' then 'Service ou club de prévention'
-        when candidatures_p.origine_détaillée = 'Prescripteur habilité RS_FJT' then 'Résidence sociale / FJT - Foyer de Jeunes Travailleurs'
-        when candidatures_p.origine_détaillée = 'Prescripteur habilité SPIP' then 'SPIP - Service pénitentiaire d''insertion et de probation'
+        when candidatures_p."origine_détaillée" = 'Prescripteur habilité AFPA' then 'AFPA - Agence nationale pour la formation professionnelle des adultes'
+        when candidatures_p."origine_détaillée" = 'Prescripteur habilité ASE' then 'ASE - Aide sociale à l''enfance'
+        when candidatures_p."origine_détaillée" = 'Prescripteur habilité Autre' then 'Autre'
+        when candidatures_p."origine_détaillée" = 'Prescripteur habilité CAARUD' then 'CAARUD - Centre d''accueil et d''accompagnement à la réduction de risques pour usagers de drogues'
+        when candidatures_p."origine_détaillée" = 'Prescripteur habilité CADA' then 'CADA - Centre d''accueil de demandeurs d''asile'
+        when candidatures_p."origine_détaillée" = 'Prescripteur habilité CAF' then 'CAF - Caisse d''allocations familiales'
+        when candidatures_p."origine_détaillée" = 'Prescripteur habilité CAP_EMPLOI' then 'CAP emploi'
+        when candidatures_p."origine_détaillée" = 'Prescripteur habilité CAVA' then 'ACAVA - Centre d''adaptation à la vie active'
+        when candidatures_p."origine_détaillée" = 'Prescripteur habilité CCAS' then 'CCAS - Centre communal d''action sociale ou centre intercommunal d''action sociale'
+        when candidatures_p."origine_détaillée" = 'Prescripteur habilité CHRS' then 'CHRS - Centre d''hébergement et de réinsertion sociale'
+        when candidatures_p."origine_détaillée" = 'Prescripteur habilité CHU' then 'CHU - Centre d''hébergement d''urgence'
+        when candidatures_p."origine_détaillée" = 'Prescripteur habilité CIDFF' then 'CIDFF - Centre d''information sur les droits des femmes et des familles'
+        when candidatures_p."origine_détaillée" = 'Prescripteur habilité CPH' then 'CPH - Centre provisoire d''hébergement'
+        when candidatures_p."origine_détaillée" = 'Prescripteur habilité CSAPA' then 'CSAPA - Centre de soins, d''accompagnement et de prévention en addictologie'
+        when candidatures_p."origine_détaillée" = 'Prescripteur habilité DEPT' then 'Service social du conseil départemental'
+        when candidatures_p."origine_détaillée" = 'Prescripteur habilité E2C' then 'E2C - École de la deuxième chance'
+        when candidatures_p."origine_détaillée" = 'Prescripteur habilité EPIDE' then 'EPIDE - Établissement pour l''insertion dans l''emploi'
+        when candidatures_p."origine_détaillée" = 'Prescripteur habilité HUDA' then 'HUDA - Hébergement d''urgence pour demandeurs d''asile'
+        when candidatures_p."origine_détaillée" = 'Prescripteur habilité ML' then 'Mission Locale'
+        when candidatures_p."origine_détaillée" = 'Prescripteur habilité MSA' then 'MSA - Mutualité Sociale Agricole'
+        when candidatures_p."origine_détaillée" = 'Prescripteur habilité OACAS' then 'OACAS - Structure porteuse d''un agrément national organisme d''accueil communautaire et d''activité solidaire'
+        when candidatures_p."origine_détaillée" = 'Prescripteur habilité ODC' then 'Organisation délégataire d''un CD'
+        when candidatures_p."origine_détaillée" = 'Prescripteur habilité OIL' then 'Opérateur d''intermédiation locative'
+        when candidatures_p."origine_détaillée" = 'Prescripteur habilité PE' then 'Pôle emploi'
+        when candidatures_p."origine_détaillée" = 'Prescripteur habilité PENSION' then 'Pension de famille / résidence accueil'
+        when candidatures_p."origine_détaillée" = 'Prescripteur habilité PIJ_BIJ' then 'PIJ-BIJ - Point/Bureau information jeunesse'
+        when candidatures_p."origine_détaillée" = 'Prescripteur habilité PJJ' then 'PJJ - Protection judiciaire de la jeunesse'
+        when candidatures_p."origine_détaillée" = 'Prescripteur habilité PLIE' then 'PLIE - Plan local pour l''insertion et l''emploi'
+        when candidatures_p."origine_détaillée" = 'Prescripteur habilité PREVENTION' then 'Service ou club de prévention'
+        when candidatures_p."origine_détaillée" = 'Prescripteur habilité RS_FJT' then 'Résidence sociale / FJT - Foyer de Jeunes Travailleurs'
+        when candidatures_p."origine_détaillée" = 'Prescripteur habilité SPIP' then 'SPIP - Service pénitentiaire d''insertion et de probation'
     end type_auteur_diagnostic_detaille,
-    candidatures_p.région_structure,
+    candidatures_p."région_structure",
     safir_org_prescripteur,
     id_org_prescripteur,
     nom_org_prescripteur,
-    nom_prénom_conseiller,
+    "nom_prénom_conseiller",
     dept_org,
-    région_org,
+    "région_org",
     injection_ai,
     ville,
     nom_epci,

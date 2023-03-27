@@ -11,7 +11,7 @@ with candidature as (
         distinct (id_candidat) identifiant_candidat, 
 	    date_candidature,
 	    count(distinct (candidatures.id)) nombre_candidature,
-	    état, 
+	    "état",
 	    date_inscription
    from 
        candidatures 
@@ -26,7 +26,7 @@ with candidature as (
         identifiant_candidat,
         date_candidature,
         date_inscription,
-        état
+        "état"
 order by 
         identifiant_candidat ),
 /* Nb candidats qui 30 jours après leur inscription restent sans candidatures */
@@ -44,7 +44,7 @@ candidats_avc_candidature_acceptee as (
         identifiant_candidat,
         sum( 
             case
-                when état = 'Candidature acceptée' then 1 
+                when "état" = 'Candidature acceptée' then 1
                 else 0 
             end ) as nb_candidature_acceptee, 
         date_inscription
