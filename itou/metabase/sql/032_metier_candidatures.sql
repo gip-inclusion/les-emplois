@@ -1,8 +1,8 @@
 select
     cel.*,
-    grand_domaine as metier,
-    crdp.code_rome,
-    nom_rome
+    crdp."grand_domaine" as metier,
+    fdp."nom_rome" as nom_rome,
+    crdp."code_rome" as code_rome
 from
     candidatures_echelle_locale cel
 inner join fiches_de_poste_par_candidature fdpc on
