@@ -451,8 +451,7 @@ def archive(request, job_application_id):
         JobApplicationWorkflow.STATE_OBSOLETE,
     ]
 
-    args = {"states": [c for c in cancelled_states]}
-    qs = urlencode(args, doseq=True)
+    qs = urlencode({"states": cancelled_states}, doseq=True)
     url = reverse("apply:list_for_siae")
     next_url = f"{url}?{qs}"
 
