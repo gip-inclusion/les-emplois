@@ -1187,8 +1187,7 @@ class ProcessViewsTest(TestCase):
 
         response = self.client.post(url)
 
-        args = {"states": [c for c in cancelled_states]}
-        qs = urlencode(args, doseq=True)
+        qs = urlencode({"states": cancelled_states}, doseq=True)
         url = reverse("apply:list_for_siae")
         next_url = f"{url}?{qs}"
         self.assertRedirects(response, next_url)

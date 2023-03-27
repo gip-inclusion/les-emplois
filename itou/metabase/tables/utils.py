@@ -268,7 +268,7 @@ def get_active_siae_pks():
     than 10k integers thus should not use much memory. The end result being both simpler code
     and better performance.
     """
-    return [siae_pk for siae_pk in Siae.objects.active().values_list("pk", flat=True)]
+    return list(Siae.objects.active().values_list("pk", flat=True))
 
 
 @functools.cache

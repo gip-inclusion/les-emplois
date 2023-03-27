@@ -8,24 +8,22 @@ def _fill_user_last_checked_at(apps, schema_editor):
 
     # Récupération de la dernière acceptation de candidature pour chaque JobSeekerProfile
     JobApplicationTransitionLog = apps.get_model("job_applications", "JobApplicationTransitionLog")
-    last_application_acceptance = {
-        job_seeker_id: max_timestamp
-        for job_seeker_id, max_timestamp in JobApplicationTransitionLog.objects.filter(to_state="accepted")
+    last_application_acceptance = dict(
+        JobApplicationTransitionLog.objects.filter(to_state="accepted")
         .values("job_application__job_seeker_id")
         .annotate(max_timestamp=Max("timestamp"))
         .values_list("job_application__job_seeker_id", "max_timestamp")
-    }
+    )
 
     # Récupération de la dernière validation d'une fiche salariée pour chaque JobSeekerProfile
     # (on prend la date de traitement de l'ASP en proxy à défaut d'avoir la vraie date de validation)
     EmployeeRecord = apps.get_model("employee_record", "EmployeeRecord")
-    last_employee_record_process = {
-        job_seeker_id: max_timestamp
-        for job_seeker_id, max_timestamp in EmployeeRecord.objects.filter(processed_at__isnull=False)
+    last_employee_record_process = dict(
+        EmployeeRecord.objects.filter(processed_at__isnull=False)
         .values("job_application__job_seeker_id")
         .annotate(max_timestamp=Max("processed_at"))
         .values_list("job_application__job_seeker_id", "max_timestamp")
-    }
+    )
 
     User = apps.get_model("users", "User")
 

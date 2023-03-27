@@ -530,7 +530,7 @@ class JobDescriptionSearchViewTest(TestCase):
         )
 
         self.assertContains(response, "(2 résultats)")
-        assert [job for job in response.context["results_page"]] == [job1, job_pec]
+        assert list(response.context["results_page"]) == [job1, job_pec]
         self.assertContains(response, capfirst(job1.display_name))
         self.assertContains(response, capfirst(job_pec.display_name))
 
