@@ -85,6 +85,7 @@
             {% else %}
                 {% for job_application in job_applications_page %}
                     <div class="c-card card my-4 has-links-inside">
+                        {# TODO: when working on this template in the near future, try to refactor with list_card_body_siae.html #}
                         {% include "apply/includes/list_card_header.html" with job_application=job_application %}
                         {% include "apply/includes/list_card_body.html" with job_application=job_application %}
                         <div class="card-footer text-right">

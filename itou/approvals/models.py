@@ -107,6 +107,26 @@ class CommonApprovalMixin(models.Model):
             )
         return result
 
+    @property
+    def is_suspended(self):
+        # Only Approvals may be suspended, but it's required in state property
+        return False
+
+    @property
+    def state(self):
+        if not self.is_valid():
+            return enums.ApprovalStatus.EXPIRED
+        if self.is_suspended:
+            return enums.ApprovalStatus.SUSPENDED
+        if self.is_in_progress:
+            return enums.ApprovalStatus.VALID
+        # When creating an approval, it usually starts in the future.
+        # That's why the default "valid" state is future.
+        return enums.ApprovalStatus.FUTURE
+
+    def get_state_display(self):
+        return self.state.label
+
 
 class CommonApprovalQuerySet(models.QuerySet):
     """
@@ -287,19 +307,6 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
                 f"pour {self.user.get_full_name()} ({self.user.email})."
             )
         super().clean()
-
-    @property
-    def state(self):
-        if not self.is_valid():
-            return enums.ApprovalStatus.EXPIRED
-        if self.is_suspended:
-            return enums.ApprovalStatus.SUSPENDED
-        if self.is_in_progress:
-            return enums.ApprovalStatus.VALID
-        return enums.ApprovalStatus.FUTURE
-
-    def get_state_display(self):
-        return self.state.label
 
     @property
     def number_with_spaces(self):
