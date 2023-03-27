@@ -19,6 +19,7 @@ pre-commit  # https://github.com/pre-commit/pre-commit
 pylint  # https://github.com/PyCQA/pylint
 pylint-django  # https://github.com/PyCQA/pylint-django
 shellcheck-py  # https://github.com/shellcheck-py/shellcheck-py
+sqlfluff  # https://github.com/sqlfluff/sqlfluff
 
 # Django
 # ------------------------------------------------------------------------------
