@@ -1,60 +1,6 @@
 <div class="card c-card has-links-inside my-4">
     <div class="card-body">
-        <div class="fs-sm d-flex align-items-center">
-            <span class="text-secondary flex-grow-1">
-                Émise le {{ job_application.created_at|date }} par <strong>{{ job_application.sender.get_full_name|title }}</strong>
-                <i class="ri-group-line ml-2" aria-hidden="true"></i> {{ job_application.get_sender_kind_display }}
-            </span>
-            {% include "apply/includes/state_badge.html" with job_application=job_application %}
-        </div>
-        <hr>
-        {% with selected_jobs_count=job_application.selected_jobs.all|length %}
-            {% if selected_jobs_count > 0 %}
-                {% for job in job_application.selected_jobs.all %}
-                    {% if forloop.first %}
-                        <p class="mx-2">
-                            {% if selected_jobs_count > 1 %}
-                                <a class="d-flex flex-wrap align-items-center text-decoration-none has-collapse-caret"
-                                   data-toggle="collapse"
-                                   href="#collapse-job-application-{{ job_application.id }}"
-                                   role="button"
-                                   aria-expanded="false"
-                                   aria-controls="collapse-job-application-{{ job_application.id }}">
-                                {% endif %}
-                                <i class="ri-briefcase-line ri-xl mr-1"></i>
-                                <span class="font-weight-bold mr-1 mr-md-2">{{ job }}</span>
-                                <span class="fs-sm text-nowrap">
-                                    <i class="ri-map-pin-2-line ri-sm mr-1"></i>
-                                    {{ job.display_location }}
-                                </span>
-                                {% if selected_jobs_count > 1 %}
-                                    <span class="ml-auto fs-sm text-decoration-underline">
-                                        + {{ selected_jobs_count|add:"-1" }} autre{{ selected_jobs_count|add:"-1"|pluralize }} poste{{ selected_jobs_count|add:"-1"|pluralize }}
-                                    </span>
-                                </a>
-                            {% endif %}
-                        </p>
-                    {% else %}
-                        <ul class="list-group list-group-sm list-group-flush collapse" id="collapse-job-application-{{ job_application.id }}">
-                            <li class="list-group-item list-group-item-action">
-                                <span class="d-flex flex-wrap align-items-center text-decoration-none">
-                                    <span class="font-weight-bold mr-1 mr-md-2">{{ job }}</span>
-                                    <span class="ml-auto fs-sm text-nowrap">
-                                        <i class="ri-map-pin-2-line ri-sm mr-1"></i>
-                                        {{ job.display_location }}
-                                    </span>
-                                </span>
-                            </li>
-                        </ul>
-                    {% endif %}
-                {% endfor %}
-            {% else %}
-                <p class="mx-2">
-                    <i class="ri-briefcase-line ri-xl mr-1"></i>
-                    <span class="font-weight-bold mr-1 mr-md-2">Candidature spontanée</span>
-                </p>
-            {% endif %}
-        {% endwith %}
+        {% include "approvals/includes/job_description_list.html" with job_application=job_application %}
     </div>
     <div class="card-footer text-right bg-light">
         <a href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}"

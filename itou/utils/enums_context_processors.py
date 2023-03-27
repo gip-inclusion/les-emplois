@@ -15,5 +15,4 @@ def expose_enums(*args):
         "SenderKind": job_applications_enums.SenderKind,
         "RefusalReason": job_applications_enums.RefusalReason,
         "SiaeKind": siaes_enums.SiaeKind,
-        "SiaeWithConventionKinds": siaes_enums.SIAE_WITH_CONVENTION_KINDS,
     }

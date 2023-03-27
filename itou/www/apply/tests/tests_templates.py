@@ -46,7 +46,7 @@ def test_job_application_multiple_jobs():
 
     # We have 3 selected_jobs, so we should display the first one
     # and 2 more
-    assert "2 autres postes" in rendered
+    assert "Voir les 3 postes" in rendered
 
 
 def test_job_application_auto_prescription_badge_in_list():
