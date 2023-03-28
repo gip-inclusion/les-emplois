@@ -3,6 +3,7 @@
 {% load bootstrap4 %}
 {% load redirection_fields %}
 {% load static %}
+{% load theme_inclusion %}
 
 {% block title %}Connexion {{ block.super }}{% endblock %}
 
@@ -70,7 +71,10 @@
                                        data-matomo-category="connexion {{ matomo_account_type }}"
                                        data-matomo-action="clic"
                                        data-matomo-option="se-connecter-avec-inclusion-connect">
-                                        <img src="{% static 'img/inclusion_connect/logo-inclusion-connect-one-line.svg' %}" alt="Se connecter avec Inclusion Connect" height="14">
+                                        <picture>
+                                            <source srcset="{% static_theme_images 'logo-inclusion-connect-one-line.svg' %}" height="14" type="image/svg+xml" media="(min-width: 30em)">
+                                            <img src="{% static_theme_images 'logo-inclusion-connect-two-lines.svg' %}" height="37" alt="Se connecter avec Inclusion Connect">
+                                        </picture>
                                     </a>
                                 </div>
                             {% else %}
