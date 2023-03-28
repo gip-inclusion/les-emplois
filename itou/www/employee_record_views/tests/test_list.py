@@ -210,7 +210,7 @@ class ListEmployeeRecordsTest(TestCase):
             (
                 "3417",
                 "Le code INSEE de la commune de l’adresse doit correspondre à un code INSEE de commune référencée",
-                "L’adresse renseignée n’est pas référencée.",
+                "La commune de résidence du salarié n’est pas référencée",
             ),
             (
                 "3435",
