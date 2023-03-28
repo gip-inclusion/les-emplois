@@ -346,8 +346,7 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
     employee_record = job_application.employee_record.full_fetch().exclude(status=Status.DISABLED).first()
 
     if request.method == "POST":
-        if employee_record.status in [Status.NEW, Status.REJECTED, Status.DISABLED]:
-            employee_record.update_as_ready()
+        employee_record.update_as_ready()
         return HttpResponseRedirect(reverse("employee_record_views:create_step_5", args=(job_application.pk,)))
 
     context = {
