@@ -1,4 +1,5 @@
 {% load static %}
+{% load theme_inclusion %}
 
 <h2>Créez un compte les emplois de l’inclusion avec Inclusion Connect</h2>
 <p class="mt-5">
@@ -13,7 +14,10 @@
            data-matomo-category="inscription {{ account_type_display_name }}"
            data-matomo-action="clic"
            data-matomo-option="se-connecter-avec-inclusion-connect">
-            <img src="{% static 'img/inclusion_connect/logo-inclusion-connect-one-line.svg' %}" alt="Se connecter avec Inclusion Connect" height="14">
+            <picture>
+                <source srcset="{% static_theme_images 'logo-inclusion-connect-one-line.svg' %}" height="14" type="image/svg+xml" media="(min-width: 30em)">
+                <img src="{% static_theme_images 'logo-inclusion-connect-two-lines.svg' %}" height="37" alt="Se connecter avec Inclusion Connect">
+            </picture>
         </a>
         <br>
         <!-- To edit the following page, use this link : https://www.notion.so/Simplifions-l-utilisation-des-services-destination-des-professionnels-de-l-inclusion-ded9135197654da590f5dde41d8bb68b -->
