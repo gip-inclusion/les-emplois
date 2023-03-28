@@ -9,8 +9,21 @@
                 Récapitulatif et validation de la fiche salarié
             </legend>
 
+            {% if employee_record.status == 'READY' %}
+                <div class="mb-3 mb-md-5">
+                    <p>
+                        <b>La création de cette fiche salariée est terminée.</b>
+                    </p>
+                    <p>
+                        Vous pouvez suivre l'avancement de son traitement par l'ASP via la liste récapitulative accessible depuis le tableau de bord.
+                    </p>
+                    <a href="{% url "employee_record_views:list" %}?status=NEW" class="btn btn-link pl-0">
+                        Retour à la liste des fiches salarié
+                    </a>
+                </div>
 
-            {% if employee_record.status == 'NEW' or employee_record.status == "REJECTED" %}
+                {% include "employee_record/includes/employee_record_summary.html" %}
+            {% else %}
                 <div class="mb-3 mb-md-5">
                     <p>
                         Si ce récapitulatif est conforme et complet, <strong>la fiche salarié sera envoyée pour validation à l'ASP</strong>.
@@ -48,21 +61,6 @@
                         </div>
                     </div>
                 </form>
-
-            {% else %}
-                <div class="mb-3 mb-md-5">
-                    <p>
-                        <b>La création de cette fiche salariée est terminée.</b>
-                    </p>
-                    <p>
-                        Vous pouvez suivre l'avancement de son traitement par l'ASP via la liste récapitulative accessible depuis le tableau de bord.
-                    </p>
-                    <a href="{% url "employee_record_views:list" %}?status=NEW" class="btn btn-link pl-0">
-                        Retour à la liste des fiches salarié
-                    </a>
-                </div>
-
-                {% include "employee_record/includes/employee_record_summary.html" %}
             {% endif %}
         </div>
     </div>
