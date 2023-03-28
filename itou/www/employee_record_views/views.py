@@ -310,10 +310,10 @@ def create_step_4(request, job_application_id, template_name="employee_record/cr
         raise PermissionDenied
 
     employee_record = (
-        EmployeeRecord.objects.full_fetch()
-        .exclude(status=Status.DISABLED)
+        job_application.employee_record.full_fetch()
         .select_related("job_application__to_siae__convention")
-        .get(job_application=job_application)
+        .exclude(status=Status.DISABLED)
+        .first()
     )
     form = NewEmployeeRecordStep4(employee_record, data=request.POST or None)
 
@@ -343,9 +343,7 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
     if not job_application.job_seeker.has_jobseeker_profile:
         raise PermissionDenied
 
-    employee_record = get_object_or_404(
-        EmployeeRecord.objects.full_fetch().exclude(status=Status.DISABLED), job_application=job_application
-    )
+    employee_record = job_application.employee_record.full_fetch().exclude(status=Status.DISABLED).first()
 
     if request.method == "POST":
         if employee_record.status in [Status.NEW, Status.REJECTED, Status.DISABLED]:
