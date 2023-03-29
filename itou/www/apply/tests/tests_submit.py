@@ -2522,6 +2522,20 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
         self.assertContains(response, "Éligibilité GEIQ non confirmée")
         self.assertTemplateUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
 
+        # Badge is KO if job seeker has a valid diagnosis without allowance
+        diagnosis = GEIQEligibilityDiagnosisFactory(with_geiq=True)
+        assert diagnosis.allowance_amount == 0
+        assert not diagnosis.eligibility_confirmed
+
+        self.client.force_login(self.prescriber_org.members.first())
+        self._setup_session(diagnosis.job_seeker, diagnosis.author_geiq.pk)
+        response = self.client.get(
+            reverse("apply:application_geiq_eligibility", kwargs={"siae_pk": diagnosis.author_geiq.pk}), follow=True
+        )
+        assert response.status_code == 200
+        self.assertContains(response, "Éligibilité GEIQ non confirmée")
+        self.assertTemplateUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
+
     def test_geiq_diagnosis_form_validation(self):
         self.client.force_login(self.prescriber.members.first())
         self._setup_session(self.job_seeker_with_geiq_diagnosis)
