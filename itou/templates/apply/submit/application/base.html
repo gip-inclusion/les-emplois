@@ -27,7 +27,7 @@
                                 <span class="badge badge-base badge-pill badge-warning"><i class="ri-error-warning-line"></i>Éligibilité IAE à valider</span>
                             {% endif %}
                         {% elif is_subject_to_geiq_eligibility_rules %}
-                            {% if geiq_eligibility_diagnosis %}
+                            {% if geiq_eligibility_diagnosis.eligibility_confirmed %}
                                 <span class="badge badge-base badge-pill badge-success-light"><i class="ri-check-fill"></i>Éligibilité GEIQ confirmée</span>
                             {% else %}
                                 <span class="badge badge-base badge-pill badge-warning-light text-warning"><i class="ri-information-line"></i>Éligibilité GEIQ non confirmée</span>
