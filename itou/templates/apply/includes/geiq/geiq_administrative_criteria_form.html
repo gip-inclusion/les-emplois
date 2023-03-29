@@ -15,13 +15,8 @@
 {% endif %}
 
 <h3 class="h5">Allocations</h3>
-
 {# A "parent" criterion, controls the visibility and filling of "children" criteria #}
-<div class="form-group">
-    <div class="form-check text-primary">
-        {{ form.beneficiaire_des_minimas_sociaux }}{{ form.beneficiaire_des_minimas_sociaux.label }}
-    </div>
-</div>
+{% bootstrap_field form.beneficiaire_des_minimas_sociaux %}
 {% if form.beneficiaire_des_minimas_sociaux.value %}
     <div class="pl-4 text-primary">
         {% bootstrap_field form.beneficiaire_du_rsa %}
@@ -33,7 +28,6 @@
 
 <h3 class="h5">Critères liés à l'âge du candidat</h3>
 {% bootstrap_field form.jeune_26_ans field_class="text-primary" %}
-
 {% if form.jeune_26_ans.value %}
     <div class="pl-4 text-primary">{% bootstrap_field form.jeune_de_moins_de_26_ans_sans_qualification %}</div>
 {% endif %}
