@@ -200,10 +200,10 @@ class JobApplicationQuerySet(models.QuerySet):
             )
         )
 
-    def with_last_jobseeker_eligibility_diagnosis(self):
+    def with_jobseeker_eligibility_diagnosis(self):
         """
-        Gives the last eligibility diagnosis for jobseeker because the "eligibility_diagnosis"
-        on `job_applications` model is rarely present.
+        Gives the "eligibility_diagnosis" linked to the job application or if none is found
+        the last eligibility diagnosis for jobseeker
         """
         sub_query = Subquery(
             (
@@ -213,17 +213,17 @@ class JobApplicationQuerySet(models.QuerySet):
             ),
             output_field=models.IntegerField(),
         )
-        return self.annotate(last_jobseeker_eligibility_diagnosis=Coalesce(sub_query, None))
+        return self.annotate(jobseeker_eligibility_diagnosis=Coalesce(F("eligibility_diagnosis"), sub_query, None))
 
-    def with_last_eligibility_diagnosis_criterion(self, criterion):
+    def with_eligibility_diagnosis_criterion(self, criterion):
         """
         Create an annotation by criterion given (used in the filters form).
         The criterion parameter must be the primary key of an AdministrativeCriteria.
         """
         subquery = SelectedAdministrativeCriteria.objects.filter(
-            eligibility_diagnosis=OuterRef("last_jobseeker_eligibility_diagnosis"), administrative_criteria=criterion
+            eligibility_diagnosis=OuterRef("jobseeker_eligibility_diagnosis"), administrative_criteria=criterion
         )
-        return self.annotate(**{f"last_eligibility_diagnosis_criterion_{criterion}": Exists(subquery)})
+        return self.annotate(**{f"eligibility_diagnosis_criterion_{criterion}": Exists(subquery)})
 
     def with_list_related_data(self, criteria=None):
         """
@@ -246,14 +246,12 @@ class JobApplicationQuerySet(models.QuerySet):
             Prefetch("job_seeker__approvals", queryset=Approval.objects.order_by("-start_at")),
         )
 
-        qs = (
-            qs.with_has_suspended_approval().with_is_pending_for_too_long().with_last_jobseeker_eligibility_diagnosis()
-        )
+        qs = qs.with_has_suspended_approval().with_is_pending_for_too_long().with_jobseeker_eligibility_diagnosis()
 
         # Adding an annotation by selected criterion
         for criterion in criteria:
             # The criterion given to this method is a primary key of an AdministrativeCriteria
-            qs = qs.with_last_eligibility_diagnosis_criterion(int(criterion))
+            qs = qs.with_eligibility_diagnosis_criterion(int(criterion))
 
         # Many job applications from AI exports share the exact same `created_at` value thus we secondarily order
         # by pk to prevent flakyness in the resulting pagination (a same job application appearing both on page 1

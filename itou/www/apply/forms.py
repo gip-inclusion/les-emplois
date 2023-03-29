@@ -699,7 +699,7 @@ class FilterJobApplicationsForm(forms.Form):
             # The date is not enough to know if an approval is valid or not
             filters["has_suspended_approval"] = False
         if data.get("eligibility_validated"):
-            filters["last_jobseeker_eligibility_diagnosis__isnull"] = False
+            filters["jobseeker_eligibility_diagnosis__isnull"] = False
         if data.get("start_date"):
             filters["created_at__gte"] = data.get("start_date")
         if data.get("end_date"):
@@ -709,10 +709,10 @@ class FilterJobApplicationsForm(forms.Form):
         if data.get("selected_jobs"):
             filters["selected_jobs__appellation__code__in"] = data.get("selected_jobs")
         if data.get("criteria"):
-            # Filter on the `last_eligibility_diagnosis_criterion_{criterion}` annotation,
+            # Filter on the `eligibility_diagnosis_criterion_{criterion}` annotation,
             # which is set in `with_list_related_data()`.
             for criterion in data.get("criteria"):
-                filters[f"last_eligibility_diagnosis_criterion_{criterion}"] = True
+                filters[f"eligibility_diagnosis_criterion_{criterion}"] = True
 
         filters = [Q(**filters)]
 

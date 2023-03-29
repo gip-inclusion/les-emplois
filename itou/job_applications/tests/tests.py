@@ -357,15 +357,15 @@ class JobApplicationQuerySetTest(TestCase):
         qs = JobApplication.objects.with_is_pending_for_too_long().get(pk=job_app.pk)
         assert not qs.is_pending_for_too_long
 
-    def test_with_last_jobseeker_eligibility_diagnosis(self):
+    def test_with_jobseeker_eligibility_diagnosis(self):
         job_app = JobApplicationFactory(with_approval=True)
         diagnosis = job_app.eligibility_diagnosis
-        qs = JobApplication.objects.with_last_jobseeker_eligibility_diagnosis().get(pk=job_app.pk)
-        assert qs.last_jobseeker_eligibility_diagnosis == diagnosis.pk
+        qs = JobApplication.objects.with_jobseeker_eligibility_diagnosis().get(pk=job_app.pk)
+        assert qs.jobseeker_eligibility_diagnosis == diagnosis.pk
 
-    def test_with_last_eligibility_diagnosis_criterion(self):
-        job_app = JobApplicationFactory(with_approval=True)
-        diagnosis = EligibilityDiagnosisFactory(job_seeker=job_app.job_seeker)
+    def test_with_eligibility_diagnosis_criterion(self):
+        job_app = JobApplicationFactory(with_approval=True, eligibility_diagnosis=None)
+        diagnosis = EligibilityDiagnosisFactory(job_seeker=job_app.job_seeker, created_at=timezone.now())
 
         level1_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_1).first()
         level2_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_2).first()
@@ -375,18 +375,38 @@ class JobApplicationQuerySetTest(TestCase):
 
         diagnosis.administrative_criteria.add(level1_criterion)
         diagnosis.administrative_criteria.add(level2_criterion)
-        diagnosis.save()
+
+        older_diagnosis = EligibilityDiagnosisFactory(
+            job_seeker=job_app.job_seeker, created_at=timezone.now() - relativedelta(months=1)
+        )
+        older_diagnosis.administrative_criteria.add(level1_other_criterion)
 
         qs = (
-            JobApplication.objects.with_last_jobseeker_eligibility_diagnosis()
-            .with_last_eligibility_diagnosis_criterion(level1_criterion.pk)
-            .with_last_eligibility_diagnosis_criterion(level2_criterion.pk)
-            .with_last_eligibility_diagnosis_criterion(level1_other_criterion.pk)
+            JobApplication.objects.with_jobseeker_eligibility_diagnosis()
+            .with_eligibility_diagnosis_criterion(level1_criterion.pk)
+            .with_eligibility_diagnosis_criterion(level2_criterion.pk)
+            .with_eligibility_diagnosis_criterion(level1_other_criterion.pk)
             .get(pk=job_app.pk)
         )
-        assert getattr(qs, f"last_eligibility_diagnosis_criterion_{level1_criterion.pk}")
-        assert getattr(qs, f"last_eligibility_diagnosis_criterion_{level2_criterion.pk}")
-        assert not getattr(qs, f"last_eligibility_diagnosis_criterion_{level1_other_criterion.pk}")
+        # Check that with_jobseeker_eligibility_diagnosis works and retrieves the most recent diagnosis
+        assert getattr(qs, f"eligibility_diagnosis_criterion_{level1_criterion.pk}")
+        assert getattr(qs, f"eligibility_diagnosis_criterion_{level2_criterion.pk}")
+        assert not getattr(qs, f"eligibility_diagnosis_criterion_{level1_other_criterion.pk}")
+
+        job_app.eligibility_diagnosis = older_diagnosis
+        job_app.save()
+
+        qs = (
+            JobApplication.objects.with_jobseeker_eligibility_diagnosis()
+            .with_eligibility_diagnosis_criterion(level1_criterion.pk)
+            .with_eligibility_diagnosis_criterion(level2_criterion.pk)
+            .with_eligibility_diagnosis_criterion(level1_other_criterion.pk)
+            .get(pk=job_app.pk)
+        )
+        # Check that with_jobseeker_eligibility_diagnosis uses job_app.eligibility_diagnosis in priority
+        assert not getattr(qs, f"eligibility_diagnosis_criterion_{level1_criterion.pk}")
+        assert not getattr(qs, f"eligibility_diagnosis_criterion_{level2_criterion.pk}")
+        assert getattr(qs, f"eligibility_diagnosis_criterion_{level1_other_criterion.pk}")
 
     def test_with_list_related_data(self):
         job_app = JobApplicationFactory(with_approval=True)
@@ -414,10 +434,10 @@ class JobApplicationQuerySetTest(TestCase):
         assert hasattr(qs, "selected_jobs")
         assert hasattr(qs, "has_suspended_approval")
         assert hasattr(qs, "is_pending_for_too_long")
-        assert hasattr(qs, "last_jobseeker_eligibility_diagnosis")
-        assert hasattr(qs, f"last_eligibility_diagnosis_criterion_{level1_criterion.pk}")
-        assert hasattr(qs, f"last_eligibility_diagnosis_criterion_{level2_criterion.pk}")
-        assert hasattr(qs, f"last_eligibility_diagnosis_criterion_{level1_other_criterion.pk}")
+        assert hasattr(qs, "jobseeker_eligibility_diagnosis")
+        assert hasattr(qs, f"eligibility_diagnosis_criterion_{level1_criterion.pk}")
+        assert hasattr(qs, f"eligibility_diagnosis_criterion_{level2_criterion.pk}")
+        assert hasattr(qs, f"eligibility_diagnosis_criterion_{level1_other_criterion.pk}")
 
     def test_eligible_as_employee_record(self):
         # Results must be a list of job applications:
