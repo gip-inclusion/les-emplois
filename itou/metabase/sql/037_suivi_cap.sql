@@ -66,6 +66,7 @@ from
     left join structures struct on cap_struct_cnt.id_structure = struct.id
     left join cap_campagnes cap_camp on cap_camp.id = cap_struct_cnt.id_cap_campagne
     left join nb_structures_par_dept nb_tot_dep on nb_tot_dep. "nom_département" = struct. "nom_département"
+where struct.active = 1
 group by
     cap_camp.nom,
     struct. "région",
