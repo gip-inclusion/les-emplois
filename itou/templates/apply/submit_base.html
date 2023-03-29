@@ -7,7 +7,11 @@
 
     <h1 class="h1-hero-c1">
         {% if request.user.is_siae_staff %}
-            Déclarer une embauche
+            {% if current_siae.kind == SiaeKind.GEIQ %}
+                Enregistrer une candidature
+            {% else %}
+                Déclarer une embauche
+            {% endif %}
         {% else %}
             Postuler
             {% if request.user.is_prescriber and job_seeker %}

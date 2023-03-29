@@ -198,7 +198,26 @@ class DashboardViewTest(TestCase):
                 response = self.client.get(reverse("dashboard:index"))
                 self.assertNotContains(response, "Prolonger/suspendre un agrément émis par Pôle emploi")
                 self.assertNotContains(response, "Déclarer une embauche")
-                self.assertNotContains(response, reverse("apply:start", kwargs={"siae_pk": siae.pk}))
+
+    def test_dashboard_job_applications(self):
+        for kind in [SiaeKind.GEIQ]:
+            with self.subTest(f"should display when siae_kind={kind}"):
+                siae = SiaeFactory(kind=kind, with_membership=True)
+                user = siae.members.first()
+                self.client.force_login(user)
+
+                response = self.client.get(reverse("dashboard:index"))
+                self.assertContains(response, "Enregistrer une candidature")
+                self.assertContains(response, reverse("apply:start", kwargs={"siae_pk": siae.pk}))
+
+        for kind in set(SiaeKind) - {SiaeKind.GEIQ}:
+            with self.subTest(f"should not display when siae_kind={kind}"):
+                siae = SiaeFactory(kind=kind, with_membership=True)
+                user = siae.members.first()
+                self.client.force_login(user)
+
+                response = self.client.get(reverse("dashboard:index"))
+                self.assertNotContains(response, "Enregistrer une candidature")
 
     def test_dashboard_agreements_with_suspension_sanction(self):
         siae = SiaeFactory(subject_to_eligibility=True, with_membership=True)

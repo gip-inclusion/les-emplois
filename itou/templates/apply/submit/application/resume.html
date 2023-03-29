@@ -69,6 +69,53 @@
                 </div>
             </div>
         {% endif %}
+    {% elif is_subject_to_geiq_eligibility_rules %}
+        {% if not request.user.is_job_seeker and geiq_eligibility_diagnosis.author_organization %}
+            <div class="mb-5">
+                <p>L’éligibilité GEIQ du candidat a été validée par :</p>
+                <p class="text-tertiary font-weight-bold">{{ geiq_eligibility_diagnosis.author_organization.display_name }}</p>
+            </div>
+        {% endif %}
+        {# Nothing is displayed to GEIQ members when the job seeker is not eligible #}
+        {% if not request.user.is_siae_staff or geiq_eligibility_diagnosis %}
+            <div class="alert alert-info mb-5" role="status">
+                <div class="row">
+                    <div class="col-auto pr-0">
+                        <i class="ri-information-line ri-xl"></i>
+                    </div>
+                    <div class="col">
+                        {% if geiq_eligibility_diagnosis %}
+                            <p class="mb-2">
+                                <strong>Date de fin de validité du diagnostic : {{ geiq_eligibility_diagnosis.expires_at|date:"d/m/Y" }}</strong>
+                            </p>
+                            <p class="mb-0">
+                                {% if request.user.is_prescriber %}
+                                    Tant que l’éligibilité GEIQ est valide, l’employeur n’aura pas à valider les critères administratifs du candidat.
+                                {% elif request.user.is_siae_staff %}
+                                    Tant que l’éligibilité GEIQ est valide, vous n’aurez pas à valider les critères administratifs du candidat.
+                                {% elif request.user.is_job_seeker %}
+                                    Tant que votre éligibilité GEIQ est valide, l’employeur n’aura pas à valider votre éligibilité à un accompagnement par le GEIQ.
+                                {% endif %}
+                            </p>
+                        {% else %}
+                            {% if request.user.is_prescriber %}
+                                <p class="mb-2">
+                                    <strong>Information</strong>
+                                </p>
+                                <p class="mb-0">
+                                    En cas d’embauche, l’employeur se chargera de valider l’éligibilité à un accompagnement par le GEIQ.
+                                </p>
+                            {% elif request.user.is_job_seeker %}
+                                <p class="mb-2">
+                                    <strong>Information</strong>
+                                </p>
+                                <p class="mb-0">L’employeur se chargera de valider votre éligibilité à un accompagnement par le GEIQ.</p>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
     {% endif %}
 {% endblock %}
 
@@ -95,30 +142,56 @@
                             </ul>
                         {% else %}
                             <p class="mb-0">
-                                {% if request.user.is_job_seeker %}
-                                    Pour retenir l’attention du recruteur, décrivez votre situation,
-                                    votre parcours, vos compétences et expliquez les freins socio-professionnels rencontrés.
-                                    <br />
-                                    Vous pouvez vous appuyer sur le document
-                                    <a class="text-important"
-                                       href="{{ ITOU_COMMUNITY_URL }}/doc/emplois/diagnostic-socio-professionnel/"
-                                       target="_blank"
-                                       rel="noreferrer noopener"
-                                       aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
-                                    <br />
-                                    Précisez également dans le message, vos motivations, vos compétences, ainsi que vos disponibilités.
-                                {% else %}
-                                    Pour retenir l’attention du recruteur, décrivez la situation actuelle du candidat,
-                                    son parcours, ses compétences et expliquez les freins socio-professionnels rencontrés.
-                                    <br />
-                                    Vous pouvez vous appuyer sur le document
-                                    <a class="text-important"
-                                       href="{{ ITOU_COMMUNITY_URL }}/doc/emplois/diagnostic-socio-professionnel/"
-                                       target="_blank"
-                                       rel="noreferrer noopener"
-                                       aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
-                                    <br />
-                                    Précisez également dans le message, ses motivations, ses compétences, ainsi que ses disponibilités.
+                                {% if is_subject_to_eligibility_rules %}
+                                    {% if request.user.is_job_seeker %}
+                                        Pour retenir l’attention du recruteur, décrivez votre situation,
+                                        votre parcours, vos compétences et expliquez les freins socio-professionnels rencontrés.
+                                        <br />
+                                        Vous pouvez vous appuyer sur le document
+                                        <a class="text-important"
+                                           href="{{ ITOU_COMMUNITY_URL }}/doc/emplois/diagnostic-socio-professionnel/"
+                                           target="_blank"
+                                           rel="noreferrer noopener"
+                                           aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
+                                        <br />
+                                        Précisez également dans le message, vos motivations, vos compétences, ainsi que vos disponibilités.
+                                    {% else %}
+                                        Pour retenir l’attention du recruteur, décrivez la situation actuelle du candidat,
+                                        son parcours, ses compétences et expliquez les freins socio-professionnels rencontrés.
+                                        <br />
+                                        Vous pouvez vous appuyer sur le document
+                                        <a class="text-important"
+                                           href="{{ ITOU_COMMUNITY_URL }}/doc/emplois/diagnostic-socio-professionnel/"
+                                           target="_blank"
+                                           rel="noreferrer noopener"
+                                           aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
+                                        <br />
+                                        Précisez également dans le message, ses motivations, ses compétences, ainsi que ses disponibilités.
+                                    {% endif %}
+                                {% elif is_subject_to_geiq_eligibility_rules %}
+                                    {% if request.user.is_job_seeker %}
+                                        Pour retenir l’attention du recruteur, décrivez votre situation actuelle,
+                                        votre parcours, vos compétences et expliquez les freins socio-professionnels rencontrés.
+                                        <br />
+                                        Vous pouvez également vous appuyer sur les conseils donnés sur
+                                        <a href="https://www.lesgeiq.fr/orienter-un-candidat-vers-un-geiq-de-votre-territoire"
+                                           target="_blank"
+                                           rel="noreferrer noopener"
+                                           aria-label="Orienter un candidat vers un Geiq de votre territoire (ouverture dans un nouvel onglet)">https://www.lesgeiq.fr/orienter-un-candidat-vers-un-geiq-de-votre-territoire</a>.
+                                        <br />
+                                        Précisez également dans le message, vos motivations, vos compétences ainsi que vos disponibilités.
+                                    {% else %}
+                                        Pour retenir l’attention du recruteur, décrivez la situation actuelle du candidat,
+                                        son parcours, ses compétences et expliquez les freins socio-professionnels rencontrés.
+                                        <br />
+                                        Vous pouvez également vous appuyer sur les conseils donnés sur
+                                        <a href="https://www.lesgeiq.fr/orienter-un-candidat-vers-un-geiq-de-votre-territoire"
+                                           target="_blank"
+                                           rel="noreferrer noopener"
+                                           aria-label="Orienter un candidat vers un Geiq de votre territoire (ouverture dans un nouvel onglet)">https://www.lesgeiq.fr/orienter-un-candidat-vers-un-geiq-de-votre-territoire</a>.
+                                        <br />
+                                        Précisez également dans le message, ses motivations, ses compétences ainsi que ses disponibilités.
+                                    {% endif %}
                                 {% endif %}
                             </p>
                         {% endif %}
@@ -177,8 +250,12 @@
 
 {% block form_submit_button %}
     {% if request.user.is_siae_staff %}
-        <button type="submit" class="btn btn-primary">Enregistrer</button>
+        <button type="submit" class="btn btn-primary">
+            Enregistrer
+        </button>
     {% else %}
-        <button type="submit" class="btn btn-primary">Envoyer la candidature</button>
+        <button type="submit" class="btn btn-primary">
+            Envoyer la candidature
+        </button>
     {% endif %}
 {% endblock %}
