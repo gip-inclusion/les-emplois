@@ -17,9 +17,9 @@
     <div class="shadow rounded p-4">
         <div class="row">
             <div class="col">
-                <h6>
-                    Le{{ job_pager.paginator.count|pluralize }} métier{{ job_pager.paginator.count|pluralize }} exercé{{ job_pager.paginator.count|pluralize }} dans votre structure
-                </h6>
+                <h3 class="h6">
+                    {{ job_pager.paginator.count }} métier{{ job_pager.paginator.count|pluralize }} exercé{{ job_pager.paginator.count|pluralize }} dans votre structure
+                </h3>
             </div>
             <div class="col text-right">
                 <a class="btn btn-primary btn-sm" href="{% url "siaes_views:edit_job_description" %}?page={{ page|default:1 }}" aria-label="Créer une nouvelle fiche de poste">Créer une nouvelle fiche de poste</a>

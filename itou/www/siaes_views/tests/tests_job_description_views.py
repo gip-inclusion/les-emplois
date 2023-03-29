@@ -77,8 +77,13 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
     def test_job_application_list_response_content(self):
         response = self._login(self.user)
 
-        assert response.status_code == 200
         assert self.siae.job_description_through.count() == 4
+        self.assertContains(
+            response,
+            '<h3 class="h6">4 métiers exercés dans votre structure</h3>',
+            html=True,
+            count=1,
+        )
         assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in self.client.session
         assert ITOU_SESSION_CURRENT_PAGE_KEY in self.client.session
 
