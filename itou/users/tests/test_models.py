@@ -105,6 +105,24 @@ class ModelTest(TestCase):
         prescribermembership = PrescriberMembershipFactory(user=prescriber, organization__is_authorized=True)
         assert prescriber.is_prescriber_of_authorized_organization(prescribermembership.organization_id)
 
+    def test_is_orienter(self):
+        job_seeker = JobSeekerFactory()
+        assert job_seeker.is_orienter is False
+
+        # PrescriberFactory does not create a prescriber organization
+        prescriber = PrescriberOrganizationWithMembershipFactory()
+        assert prescriber.members.first().is_orienter is False
+
+        siae_staff = SiaeStaffFactory()
+        assert siae_staff.is_orienter is False
+
+        label_inspector = LaborInspectorFactory()
+        assert label_inspector.is_orienter is False
+
+        # PrescriberFactory create the simplest form of prescriber: an orienter
+        orienter = PrescriberFactory()
+        assert orienter.is_orienter is True
+
     def test_generate_unique_username(self):
         unique_username = User.generate_unique_username()
         assert unique_username == uuid.UUID(unique_username, version=4).hex
@@ -153,7 +171,10 @@ class ModelTest(TestCase):
             User.clean_pole_emploi_fields(cleaned_data)
 
         # If both fields are present at the same time, `pole_emploi_id` takes precedence.
-        job_seeker = JobSeekerFactory(pole_emploi_id="69970749", lack_of_pole_emploi_id_reason=User.REASON_FORGOTTEN)
+        job_seeker = JobSeekerFactory(
+            pole_emploi_id="69970749",
+            lack_of_pole_emploi_id_reason=User.REASON_FORGOTTEN,
+        )
         cleaned_data = {
             "pole_emploi_id": job_seeker.pole_emploi_id,
             "lack_of_pole_emploi_id_reason": job_seeker.lack_of_pole_emploi_id_reason,
@@ -261,7 +282,12 @@ class ModelTest(TestCase):
         user.refresh_from_db()  # Retrieve object as stored in DB to get raw JSON values and avoid surprises.
         assert has_performed_update
         assert user.external_data_source_history == [
-            {"field_name": "first_name", "value": "Lola", "source": provider.value, "created_at": now_str}
+            {
+                "field_name": "first_name",
+                "value": "Lola",
+                "source": provider.value,
+                "created_at": now_str,
+            }
         ]
 
         # Update history.
@@ -273,8 +299,18 @@ class ModelTest(TestCase):
         user.refresh_from_db()
         assert has_performed_update
         assert user.external_data_source_history == [
-            {"field_name": "first_name", "value": "Lola", "source": provider.value, "created_at": now_str},
-            {"field_name": "first_name", "value": "Jeanne", "source": provider.value, "created_at": now_str},
+            {
+                "field_name": "first_name",
+                "value": "Lola",
+                "source": provider.value,
+                "created_at": now_str,
+            },
+            {
+                "field_name": "first_name",
+                "value": "Jeanne",
+                "source": provider.value,
+                "created_at": now_str,
+            },
         ]
 
         # Don't update the history if value is the same.
@@ -286,8 +322,18 @@ class ModelTest(TestCase):
         assert not has_performed_update
         # NB: created_at would have changed if has_performed_update had been True since we did not use mock.patch \
         assert user.external_data_source_history == [
-            {"field_name": "first_name", "value": "Lola", "source": provider.value, "created_at": now_str},
-            {"field_name": "first_name", "value": "Jeanne", "source": provider.value, "created_at": now_str},
+            {
+                "field_name": "first_name",
+                "value": "Lola",
+                "source": provider.value,
+                "created_at": now_str,
+            },
+            {
+                "field_name": "first_name",
+                "value": "Jeanne",
+                "source": provider.value,
+                "created_at": now_str,
+            },
         ]
 
         # Allow storing empty values.
@@ -299,9 +345,24 @@ class ModelTest(TestCase):
         user.refresh_from_db()
         assert has_performed_update
         assert user.external_data_source_history == [
-            {"field_name": "first_name", "value": "Lola", "source": provider.value, "created_at": now_str},
-            {"field_name": "first_name", "value": "Jeanne", "source": provider.value, "created_at": now_str},
-            {"field_name": "last_name", "value": "", "source": provider.value, "created_at": now_str},
+            {
+                "field_name": "first_name",
+                "value": "Lola",
+                "source": provider.value,
+                "created_at": now_str,
+            },
+            {
+                "field_name": "first_name",
+                "value": "Jeanne",
+                "source": provider.value,
+                "created_at": now_str,
+            },
+            {
+                "field_name": "last_name",
+                "value": "",
+                "source": provider.value,
+                "created_at": now_str,
+            },
         ]
 
         # Allow replacing empty values.
@@ -313,10 +374,30 @@ class ModelTest(TestCase):
         user.refresh_from_db()
         assert has_performed_update
         assert user.external_data_source_history == [
-            {"field_name": "first_name", "value": "Lola", "source": provider.value, "created_at": now_str},
-            {"field_name": "first_name", "value": "Jeanne", "source": provider.value, "created_at": now_str},
-            {"field_name": "last_name", "value": "", "source": provider.value, "created_at": now_str},
-            {"field_name": "last_name", "value": "Trombignard", "source": provider.value, "created_at": now_str},
+            {
+                "field_name": "first_name",
+                "value": "Lola",
+                "source": provider.value,
+                "created_at": now_str,
+            },
+            {
+                "field_name": "first_name",
+                "value": "Jeanne",
+                "source": provider.value,
+                "created_at": now_str,
+            },
+            {
+                "field_name": "last_name",
+                "value": "",
+                "source": provider.value,
+                "created_at": now_str,
+            },
+            {
+                "field_name": "last_name",
+                "value": "Trombignard",
+                "source": provider.value,
+                "created_at": now_str,
+            },
         ]
 
     def test_last_hire_was_made_by_siae(self):
@@ -650,7 +731,10 @@ class ModelTest(TestCase):
 
         # Non admin prescriber can access as well.
         org = PrescriberOrganizationWithMembershipFactory(
-            authorized=True, kind=PrescriberOrganizationKind.DEPT, membership__is_admin=False, department="93"
+            authorized=True,
+            kind=PrescriberOrganizationKind.DEPT,
+            membership__is_admin=False,
+            department="93",
         )
         user = org.members.get()
         assert user.can_view_stats_cd(current_org=org)
@@ -687,7 +771,10 @@ class ModelTest(TestCase):
 
     def test_can_view_stats_pe_as_dtpe_with_single_department(self):
         dtpe_with_single_department = PrescriberOrganizationWithMembershipFactory(
-            authorized=True, kind=PrescriberOrganizationKind.PE, code_safir_pole_emploi="49104", department="49"
+            authorized=True,
+            kind=PrescriberOrganizationKind.PE,
+            code_safir_pole_emploi="49104",
+            department="49",
         )
         user = dtpe_with_single_department.members.get()
         assert dtpe_with_single_department.is_dtpe
@@ -698,7 +785,10 @@ class ModelTest(TestCase):
 
     def test_can_view_stats_pe_as_dtpe_with_multiple_departments(self):
         dtpe_with_multiple_departments = PrescriberOrganizationWithMembershipFactory(
-            authorized=True, kind=PrescriberOrganizationKind.PE, code_safir_pole_emploi="72203", department="72"
+            authorized=True,
+            kind=PrescriberOrganizationKind.PE,
+            code_safir_pole_emploi="72203",
+            department="72",
         )
         user = dtpe_with_multiple_departments.members.get()
         assert dtpe_with_multiple_departments.is_dtpe
@@ -709,18 +799,33 @@ class ModelTest(TestCase):
 
     def test_can_view_stats_pe_as_drpe(self):
         drpe = PrescriberOrganizationWithMembershipFactory(
-            authorized=True, kind=PrescriberOrganizationKind.PE, department="93", code_safir_pole_emploi="75980"
+            authorized=True,
+            kind=PrescriberOrganizationKind.PE,
+            department="93",
+            code_safir_pole_emploi="75980",
         )
         user = drpe.members.get()
         assert drpe.is_drpe
         assert not drpe.is_dgpe
         assert not drpe.is_dtpe
         assert user.can_view_stats_pe(current_org=drpe)
-        assert user.get_stats_pe_departments(current_org=drpe) == ["75", "77", "78", "91", "92", "93", "94", "95"]
+        assert user.get_stats_pe_departments(current_org=drpe) == [
+            "75",
+            "77",
+            "78",
+            "91",
+            "92",
+            "93",
+            "94",
+            "95",
+        ]
 
     def test_can_view_stats_pe_as_dgpe(self):
         dgpe = PrescriberOrganizationWithMembershipFactory(
-            authorized=True, kind=PrescriberOrganizationKind.PE, department="93", code_safir_pole_emploi="00162"
+            authorized=True,
+            kind=PrescriberOrganizationKind.PE,
+            department="93",
+            code_safir_pole_emploi="00162",
         )
         user = dgpe.members.get()
         assert not dgpe.is_drpe
@@ -806,7 +911,12 @@ class ModelTest(TestCase):
         assert not user.can_view_stats_dashboard_widget(current_org=institution)
 
     def test_user_kind(self):
-        non_staff_kinds = [UserKind.JOB_SEEKER, UserKind.PRESCRIBER, UserKind.SIAE_STAFF, UserKind.LABOR_INSPECTOR]
+        non_staff_kinds = [
+            UserKind.JOB_SEEKER,
+            UserKind.PRESCRIBER,
+            UserKind.SIAE_STAFF,
+            UserKind.LABOR_INSPECTOR,
+        ]
 
         for kind in non_staff_kinds:
             user = UserFactory(kind=kind, is_staff=True)
@@ -1017,7 +1127,11 @@ class LatestApprovalTestCase(TestCase):
 
         user = JobSeekerFactory()
 
-        ApprovalFactory(user=user, start_at=datetime.date(2016, 12, 20), end_at=datetime.date(2018, 12, 20))
+        ApprovalFactory(
+            user=user,
+            start_at=datetime.date(2016, 12, 20),
+            end_at=datetime.date(2018, 12, 20),
+        )
 
         # PoleEmploiApproval 1.
         pe_approval_1 = PoleEmploiApprovalFactory(
