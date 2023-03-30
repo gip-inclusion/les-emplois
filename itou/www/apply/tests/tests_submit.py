@@ -2433,8 +2433,8 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.geiq = SiaeFactory(with_membership=True, with_jobs=True, kind=SiaeKind.GEIQ)
-        cls.prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True)
-        cls.orienter = PrescriberOrganizationWithMembershipFactory(authorized=False)
+        cls.prescriber_org = PrescriberOrganizationWithMembershipFactory(authorized=True)
+        cls.orienter = PrescriberFactory()
         cls.job_seeker_with_geiq_diagnosis = GEIQEligibilityDiagnosisFactory(with_prescriber=True).job_seeker
         cls.siae = SiaeFactory(with_membership=True, kind=SiaeKind.EI)
 
@@ -2454,7 +2454,7 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
         # - if user structure is not a GEIQ : should not be possible, form asserts it and crashes
 
         # Redirect orienter
-        self.client.force_login(self.orienter.members.first())
+        self.client.force_login(self.orienter)
         self._setup_session()
         response = self.client.get(reverse("apply:application_geiq_eligibility", kwargs={"siae_pk": self.geiq.pk}))
 
@@ -2491,7 +2491,7 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
             self.client.get(reverse("apply:application_geiq_eligibility", kwargs={"siae_pk": self.siae.pk}))
 
     def test_access_as_authorized_prescriber(self):
-        self.client.force_login(self.prescriber.members.first())
+        self.client.force_login(self.prescriber_org.members.first())
         self._setup_session()
 
         response = self.client.get(reverse("apply:application_geiq_eligibility", kwargs={"siae_pk": self.geiq.pk}))
@@ -2500,7 +2500,7 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
         self.assertTemplateUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
 
     def test_geiq_eligibility_badge(self):
-        self.client.force_login(self.prescriber.members.first())
+        self.client.force_login(self.prescriber_org.members.first())
 
         # Badge OK if job seeker has a valid eligibility diagnosis
         self._setup_session(self.job_seeker_with_geiq_diagnosis)
@@ -2537,7 +2537,7 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
         self.assertTemplateUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
 
     def test_geiq_diagnosis_form_validation(self):
-        self.client.force_login(self.prescriber.members.first())
+        self.client.force_login(self.prescriber_org.members.first())
         self._setup_session(self.job_seeker_with_geiq_diagnosis)
 
         response = self.client.post(

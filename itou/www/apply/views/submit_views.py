@@ -847,7 +847,8 @@ class ApplicationGEIQEligibilityView(ApplicationBaseView):
         # - authorized prescribers
         # - GEIQ
         # otherwise, skip to next step: application resume
-        if not request.user.is_job_seeker:
+        # Note: don't forget to redirect orienters
+        if not any([request.user.is_job_seeker, request.user.is_orienter]):
             if prescriber_org_pk := request.session.get("current_prescriber_organization"):
                 # Only for authorized prescribers (not orienters)
                 try:
