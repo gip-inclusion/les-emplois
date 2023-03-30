@@ -21,7 +21,6 @@ from itou.job_applications.notifications import (
     NewQualifiedJobAppEmployersNotification,
     NewSpontaneousJobAppEmployersNotification,
 )
-from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.enums import SiaeKind
 from itou.siaes.models import Siae, SiaeJobDescription
 from itou.users.enums import UserKind
@@ -843,26 +842,8 @@ class ApplicationGEIQEligibilityView(ApplicationBaseView):
         )
 
     def dispatch(self, request, *args, **kwargs):
-        # GEIQ eligiblity form during job application process is only available to:
-        # - authorized prescribers
-        # - GEIQ
-        # otherwise, skip to next step: application resume
-        # Note: don't forget to redirect orienters
-        if not any([request.user.is_job_seeker, request.user.is_orienter]):
-            if prescriber_org_pk := request.session.get("current_prescriber_organization"):
-                # Only for authorized prescribers (not orienters)
-                try:
-                    if self.request.user.is_prescriber_with_authorized_org:
-                        self.geiq_author_structure = PrescriberOrganization.objects.get(
-                            pk=prescriber_org_pk,
-                        )
-                except PrescriberOrganization.DoesNotExist:
-                    pass
-            elif self.siae and self.siae.kind == SiaeKind.GEIQ:
-                # SIAE must be a GEIQ to continue
-                self.geiq_author_structure = self.siae
-
-        if not self.geiq_author_structure:
+        # GEIQ eligibility form during job application process is only available to authorized prescribers
+        if not request.user.is_prescriber_with_authorized_org:
             return HttpResponseRedirect(reverse("apply:application_resume", kwargs={"siae_pk": self.siae.pk}))
 
         return super().dispatch(request, *args, **kwargs)
@@ -883,11 +864,12 @@ class ApplicationGEIQEligibilityView(ApplicationBaseView):
                 request, "apply/includes/geiq/geiq_administrative_criteria_form.html", self.get_context_data(**kwargs)
             )
         elif self.form.is_valid():
+            user_info = get_user_info(request)
             if not self.geiq_eligibility_diagnosis:
                 GEIQEligibilityDiagnosis.create_eligibility_diagnosis(
                     self.job_seeker,
-                    request.user,
-                    self.geiq_author_structure,
+                    user_info.user,
+                    user_info.prescriber_organization,
                     self.form.cleaned_data,
                 )
             else:

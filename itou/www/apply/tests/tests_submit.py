@@ -2466,7 +2466,20 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
         )
         self.assertTemplateNotUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
 
-    def test_bypass_geiq_diganosis_for_job_seeker(self):
+    def test_bypass_geiq_diagnosis_for_staff_members(self):
+        self.client.force_login(self.geiq.members.first())
+        self._setup_session()
+        response = self.client.get(reverse("apply:application_geiq_eligibility", kwargs={"siae_pk": self.geiq.pk}))
+
+        # Must redirect to resume
+        assertRedirects(
+            response,
+            reverse("apply:application_resume", kwargs={"siae_pk": self.geiq.pk}),
+            fetch_redirect_response=False,
+        )
+        self.assertTemplateNotUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
+
+    def test_bypass_geiq_diagnosis_for_job_seeker(self):
         # A job seeker must not have access to GEIQ eligibility form
         job_seeker = JobSeekerFactory()
         self.client.force_login(job_seeker)
