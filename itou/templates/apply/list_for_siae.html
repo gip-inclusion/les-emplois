@@ -17,15 +17,12 @@
                     <h1 class="s-title-01__title h1-hero-c1">
                         <strong>Candidatures reçues</strong>
                     </h1>
-                    <h2 class="h3 text-muted">{{ siae.display_name }}</h2>
-
+                    <h2 class="h2">{{ siae.display_name }}</h2>
                     {% if siae.is_subject_to_eligibility_rules %}
-                        <div class="alert alert-info mt-3">
-                            <p>
-                                Toute demande de PASS IAE doit être effectuée <b>au plus tard le jour de l'embauche</b>.
-                            </p>
-                            <p class="mb-0">Les demandes rétroactives ne sont pas autorisées.</p>
-                        </div>
+                        <p class="mb-0">
+                            Toute demande de PASS IAE doit être effectuée <b>au plus tard le jour de l'embauche</b>.
+                        </p>
+                        <p>Les demandes rétroactives ne sont pas autorisées.</p>
                     {% endif %}
                 </div>
             </div>
@@ -37,10 +34,10 @@
     <div class="row">
         <div class="col-12 col-md-4 mb-3 mb-md-5">
             <aside class="c-aside-filters">
-                <a class="c-aside-filters__btn__collapse" data-toggle="collapse" href="#candidatures-filter-form" aria-expanded="false" aria-controls="candidatures-filter-form">
+                <button class="c-aside-filters__btn__collapse" data-toggle="collapse" href="#candidatures-filter-form" aria-expanded="false" aria-controls="candidatures-filter-form">
                     <i class="ri-filter-line"></i>
                     <span>Filtrer les candidatures</span>
-                </a>
+                </button>
                 <div class="c-aside-filters__card collapse" id="candidatures-filter-form">
                     <form method="get" action="" id="js-job-applications-filters-form">
                         <div class="c-aside-filters__card__body">
@@ -80,8 +77,9 @@
                 <div>
                     {% include "apply/includes/job_applications_export_button.html" %}
                     {% if filters_counter > 0 %}
-                        <a href="{% url 'apply:list_for_siae' %}" class="btn btn-link pl-0">
-                            Réinitialiser les filtres ({{ filters_counter }})
+                        <a href="{% url 'apply:list_for_siae' %}" class="btn btn-link btn-ico pl-0">
+                            <i class="ri-close-fill"></i>
+                            <span>Réinitialiser les filtres ({{ filters_counter }})</span>
                         </a>
                     {% endif %}
                 </div>
@@ -94,9 +92,7 @@
                 {% for job_application in job_applications_page %}
                     <div class="c-card card my-4 has-links-inside">
                         {% include "apply/includes/list_card_header.html" with job_application=job_application %}
-
                         {% include "apply/includes/list_card_body.html" with job_application=job_application %}
-
                         <div class="card-footer text-right">
                             <a class="btn btn-sm btn-outline-primary"
                                href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}?back_url={{ request.get_full_path|urlencode }}"
@@ -134,5 +130,4 @@
     <!-- Needed to use Select2MultipleWidget. -->
     {{ filters_form.media.js }}
     <script src='{% static "js/job_applications_filters.js" %}'></script>
-
 {% endblock %}

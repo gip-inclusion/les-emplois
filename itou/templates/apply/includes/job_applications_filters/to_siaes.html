@@ -1,12 +1,11 @@
 {% load bootstrap4 %}
 
 {% if filters_form.to_siaes %}
-    <div class="pt-3 w-100 border-bottom">
-        <button class="p-0 btn collapse-caret" data-toggle="collapse" data-target="#collapse_filter_tosiae" type="button" aria-expanded="true" aria-controls="collapse_filter_tosiae">
-            <span class="h5 mb-1">Structure destinataire</span>
-        </button>
-    </div>
-    <div class="collapse show p-1 mt-1" id="collapse_filter_tosiae">
+    <fieldset>
+        <legend>
+            Structure destinataire
+        </legend>
         {% bootstrap_field filters_form.to_siaes show_label=False %}
-    </div>
+    </fieldset>
+
 {% endif %}
