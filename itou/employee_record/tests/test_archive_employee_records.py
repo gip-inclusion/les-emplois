@@ -18,7 +18,7 @@ def test_management_command_default_run(command):
     employee_record = factories.EmployeeRecordFactory(archivable=True)
     assert list(EmployeeRecord.objects.archivable()) == [employee_record]
 
-    command.handle()
+    command.handle(wet_run=False)
     employee_record.refresh_from_db()
 
     assert employee_record.status != Status.ARCHIVED

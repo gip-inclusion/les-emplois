@@ -207,7 +207,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
         )
         return df
 
-    def handle(self, file_path, dry_run=False, **options):
+    def handle(self, file_path, *, dry_run, **options):
         self.dry_run = dry_run
         self.set_logger(options.get("verbosity"))
         sample_size = options.get("sample_size")

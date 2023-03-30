@@ -87,7 +87,7 @@ class Command(BaseCommand):
             print(f"Running:\n{query}")
             self.cursor.execute(query)
 
-    def handle(self, dry_run=False, reset=False, **options):
+    def handle(self, *, dry_run, reset, **options):
         self.dry_run = dry_run
         self.stdout.write("Merging approvals / PASS IAE")
         self.cursor = connection.cursor()

@@ -47,7 +47,7 @@ class Command(BaseCommand):
         if verbosity > 1:
             self.logger.setLevel(logging.DEBUG)
 
-    def handle(self, dry_run=False, **options):
+    def handle(self, *, dry_run, **options):
 
         self.set_logger(options.get("verbosity"))
 

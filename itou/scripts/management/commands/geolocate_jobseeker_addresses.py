@@ -290,6 +290,7 @@ class Command(BaseCommand):
     def handle(
         self,
         action,
+        *,
         filename: str,
         wet_run: bool,
         **options,

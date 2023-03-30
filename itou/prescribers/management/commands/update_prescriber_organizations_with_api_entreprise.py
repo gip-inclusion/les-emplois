@@ -55,7 +55,7 @@ class Command(BaseCommand):
         if verbosity > 1:
             self.logger.setLevel(logging.DEBUG)
 
-    def handle(self, days, n_organizations, verbosity, **options):
+    def handle(self, *, days, n_organizations, verbosity, **options):
         self.set_logger(verbosity)
 
         prescriber_orgs = PrescriberOrganization.objects.filter(

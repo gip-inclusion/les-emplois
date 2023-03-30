@@ -223,7 +223,7 @@ class Command(EmployeeRecordTransferCommand):
         for batch in chunks(new_notifications, EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS):
             self._upload_batch_file(conn, batch, dry_run)
 
-    def handle(self, upload=False, download=False, preflight=False, wet_run=False, asp_test=False, **options):
+    def handle(self, *, upload, download, preflight, wet_run, asp_test, **options):
         if not settings.ASP_FS_SFTP_HOST:
             self.stdout.write("Your environment is missing ASP_FS_SFTP_HOST to run this command.")
             return

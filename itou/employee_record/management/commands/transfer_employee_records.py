@@ -276,15 +276,7 @@ class Command(EmployeeRecordTransferCommand):
         for batch in chunks(ready_employee_records, EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS):
             self._upload_batch_file(sftp, batch, dry_run)
 
-    def handle(
-        self,
-        upload=False,
-        download=False,
-        preflight=False,
-        dry_run=False,
-        asp_test=False,
-        **_,
-    ):
+    def handle(self, *, upload, download, preflight, dry_run, asp_test, **_):
         if preflight:
             self.stdout.write("Preflight activated, checking for possible serialization errors...")
             self.preflight(EmployeeRecord)

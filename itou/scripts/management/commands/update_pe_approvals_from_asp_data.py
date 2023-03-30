@@ -152,7 +152,7 @@ class Command(BaseCommand):
             "--dry-run", dest="dry_run", action="store_true", help="Only print possible errors and stats"
         )
 
-    def handle(self, file_path, dry_run=False, **options):
+    def handle(self, file_path, *, dry_run, **options):
         self.dry_run = dry_run
         self.stdout.write("Importing NIR from ASP data.")
         # The fastest way I’ve found to parse this file is to use a CsvDictReader with a CSV file

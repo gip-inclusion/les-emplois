@@ -246,7 +246,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
 
         self.write_fixture_file(export_path, records)
 
-    def handle(self, dry_run=False, **options):
+    def handle(self, *, dry_run, **options):
         self.dry_run = dry_run
         self.set_logger(options.get("verbosity"))
 

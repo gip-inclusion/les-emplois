@@ -57,7 +57,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--wet-run", dest="wet_run", action="store_true")
 
-    def handle(self, wet_run, **options):
+    def handle(self, *, wet_run, **options):
         cities_from_api = fetch_cities() + fetch_cities(districts_only=True)
 
         cities_added_by_api = []

@@ -169,7 +169,7 @@ class Command(XlsxExportMixin, DeprecatedLoggerMixin, BaseCommand):
             # We are only logging for now.
             self.NIR_DUPLICATES_LOGS.append(log_info)
 
-    def handle(self, wet_run=False, no_xlsx=False, **options):
+    def handle(self, *, wet_run, no_xlsx, **options):
 
         self.set_logger(options.get("verbosity"))
 

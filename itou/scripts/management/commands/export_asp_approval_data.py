@@ -27,7 +27,7 @@ class Command(BaseCommand):
         )
         parser.add_argument("--wet-run", action="store_true", dest="wet_run")
 
-    def handle(self, file_path, wet_run=False, **options):
+    def handle(self, file_path, *, wet_run, **options):
         nb_unknown_approval_errors = 0
         nb_unknown_user_errors = 0
         nb_unknown_errors = 0

@@ -147,7 +147,7 @@ class Command(BaseCommand):
 
             self.stdout.write(" - done!")
 
-    def handle(self, dry_run=False, **options):
+    def handle(self, *, dry_run, **options):
         self.stdout.write("+ Checking employee records coherence before transfering to ASP")
 
         if dry_run:
