@@ -3,14 +3,14 @@
 <div class="card my-5">
 
     <div class="card-body">
-        <div class="row">
-            <div class="col-md-7">
+        <div class="d-flex flex-column flex-md-row align-items-center m-0">
+            <div class="order-2 order-md-1 mr-auto">
                 <h3 class="h2 mb-1">{{ approval.user.get_full_name|title }}</h3>
                 <p class="small">Pass N° {{ approval|format_approval_number }}</p>
             </div>
 
             {# Statuses #}
-            <div class="col-md-5 text-right">
+            <div class="order-1 order-md-2 ml-auto align-self-start">
                 <p class="small">
                     <span class="badge badge-pill{% if approval.state == 'EXPIRED' %} badge-dark{% else %} badge-success{% endif %}">
                         <i class="{% if approval.state == 'EXPIRED' %}ri-forbid-2-line{% elif approval.state == 'SUSPENDED' %}ri-error-warning-line{% else %}ri-checkbox-circle-line{% endif %}"></i>
