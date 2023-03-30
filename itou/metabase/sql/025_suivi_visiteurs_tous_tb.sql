@@ -2,32 +2,35 @@
 
 with visiteurs_prives as (
     select
-        svtp."Date" as semaine,
+        svtp."Date"              as semaine,
         /* Obligé de mettre les titres des colonnes entre "" sinon j'avais un message d'erreur de mon GUI */
-        svtp."Tableau de bord" as tableau_de_bord,
+        svtp."Tableau de bord"   as tableau_de_bord,
         svtp."Visiteurs uniques" as visiteurs_uniques,
-        'TB privé' as type_de_tb
+        'TB privé'               as type_de_tb
     from
-        suivi_visiteurs_tb_prives svtp /* Ancienne table créée par Victor qui débute en 2022 et s'arrête à la semaine du 12/12/22 */
+        suivi_visiteurs_tb_prives as svtp /* Ancienne table créée par Victor qui débute en 2022 et s'arrête à la semaine du 12/12/22 */
 ),
+
 visiteurs_prives_0 as (
     select
-        to_date(svtp0."Date", 'YYYY-MM-DD') as semaine,
-        svtp0."Tableau de bord" as tableau_de_bord,
-        to_number(svtp0."Unique visitors", '9999') as visiteurs_uniques,
-        'TB privé' as type_de_tb
+        svtp0."Tableau de bord"                    as tableau_de_bord,
+        'TB privé'                                 as type_de_tb,
+        to_date(svtp0."Date", 'YYYY-MM-DD')        as semaine,
+        to_number(svtp0."Unique visitors", '9999') as visiteurs_uniques
     from
-        suivi_visiteurs_tb_prives_v1 svtp0 /* Nouvelle table créée par Victor qui démarre le 01/01/22 */
+        suivi_visiteurs_tb_prives_v1 as svtp0 /* Nouvelle table créée par Victor qui démarre le 01/01/22 */
 ),
+
 visiteurs_publics as (
     select
-        to_date(vp."Date", 'YYYY-MM-DD') as semaine,
-        vp."Tableau de bord" as tableau_de_bord,
-        to_number(vp."Unique visitors", '9999') as visiteurs_uniques,
-        'TB public' as type_de_tb
+        vp."Tableau de bord"                    as tableau_de_bord,
+        'TB public'                             as type_de_tb,
+        to_date(vp."Date", 'YYYY-MM-DD')        as semaine,
+        to_number(vp."Unique visitors", '9999') as visiteurs_uniques
     from
-        suivi_visiteurs_tb_publics_v1 vp /* Nouvelle table créée par Victor qui reprend toutes les infos des visiteurs des TBs publics */
+        suivi_visiteurs_tb_publics_v1 as vp /* Nouvelle table créée par Victor qui reprend toutes les infos des visiteurs des TBs publics */
 )
+
 select
     semaine,
     tableau_de_bord,

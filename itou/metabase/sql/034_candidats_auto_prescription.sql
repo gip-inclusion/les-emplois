@@ -1,6 +1,6 @@
 with autopr_candidates as (
-    select
-        distinct(c.id),
+    select distinct
+
         cd."état",
         c.age,
         c."total_critères_niveau_1",
@@ -30,7 +30,6 @@ with autopr_candidates as (
         c.total_candidatures,
         c.total_embauches,
         c.date_diagnostic,
-        date_part('year', c.date_diagnostic) as "année_diagnostic",
         c.id_auteur_diagnostic_employeur,
         c.type_auteur_diagnostic,
         c.sous_type_auteur_diagnostic,
@@ -40,35 +39,40 @@ with autopr_candidates as (
         cd."département_structure",
         cd."nom_département_structure",
         cd."région_structure",
+        (c.id),
+        date_part('year', c.date_diagnostic) as "année_diagnostic",
         /* on considère que l'on a de l'auto prescription lorsque l'employeur est l'auteur du diagnostic et effectue l'embauche */
         /* En créant une colonne on peut comparer les candidatures classiques à l'auto prescription */
         case
-            when c.type_auteur_diagnostic = 'Employeur'
-            and cd.origine = 'Employeur'
-            and c.id_auteur_diagnostic_employeur = cd.id_structure then 'Autoprescription'
+            when
+                c.type_auteur_diagnostic = 'Employeur'
+                and cd.origine = 'Employeur'
+                and c.id_auteur_diagnostic_employeur = cd.id_structure then 'Autoprescription'
             else 'parcours classique'
-        end type_de_candidature,
+        end                                  as type_de_candidature,
         case
             when c.injection_ai = 0 then 'Non'
             else 'Oui'
-        end reprise_de_stock_ai_candidats
+        end                                  as reprise_de_stock_ai_candidats
     from
-        candidatures cd
-    left join candidats c
-    on
-        cd.id_candidat = c.id
+        candidatures as cd
+    left join candidats as c
+        on
+            cd.id_candidat = c.id
 ),
+
 all_candidates as (
     select
         c2.id,
         count(c2.id) as total_candidats
-    from candidats c2
-    left join candidatures cd2
-        on 
-            c2.id = cd2.id_candidat 
+    from candidats as c2
+    left join candidatures as cd2
+        on
+            c2.id = cd2.id_candidat
     where cd2."état" = 'Candidature acceptée'
     group by c2.id
 )
+
 select
     autopr_c.id,
     "état",
@@ -115,6 +119,6 @@ select
     reprise_de_stock_ai_candidats
 from
     autopr_candidates as autopr_c
-left join all_candidates ac
-    on 
+left join all_candidates as ac
+    on
         autopr_c.id = ac.id

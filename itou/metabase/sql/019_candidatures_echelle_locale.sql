@@ -3,22 +3,23 @@ L'objectif est de créer une table qui contient des informations à l'échelle l
 */
 
 with candidatures_p as (
-    select
-        *
+    select *
     from
         candidatures
 ),
+
 org_prescripteur as ( /* On récupère l'id et le dept des organismes prescripteurs afin de filtrer selon le département de l'agence PE associée */
-	select
-		org.id as id_org,
-		org."nom_département" as dept_org,  /*bien mettre nom département et pas département */
-		org."région" as "région_org"
-	from
-		organisations org
+    select
+        org.id                as id_org,
+        org."nom_département" as dept_org,  /*bien mettre nom département et pas département */
+        org."région"          as "région_org"
+    from
+        organisations as org
 ),
+
 bassin_emploi as ( /* On récupère les infos locales à partir des données infra départementales */
     select
-        be.libelle_commune as ville,
+        be.libelle_commune      as ville,
         be.type_epci,
         be.nom_departement,
         be.nom_region,
@@ -26,87 +27,106 @@ bassin_emploi as ( /* On récupère les infos locales à partir des données inf
         be.code_commune,
         be.nom_arrondissement,
         be.nom_zone_emploi_2020 as bassin_d_emploi, /* zone d'emploi = bassin d'emploi */
-        s.id as id_structure /* on récupère que l'id des structures de la table structure */
-    from sa_zones_infradepartementales be
-        left join structures s
-            on s.ville = be.libelle_commune and s."nom_département" = be.nom_departement /* il faut rajouter le département car la France n'est pas originale en terme de noms de ville */
+        s.id                    as id_structure /* on récupère que l'id des structures de la table structure */
+    from sa_zones_infradepartementales as be
+    left join structures as s
+        on s.ville = be.libelle_commune and s."nom_département" = be.nom_departement /* il faut rajouter le département car la France n'est pas originale en terme de noms de ville */
 ),
+
 /*On créé une colonne par réseau au cas ou une même structure appartienne à différents réseaux */
 adherents_coorace as (
-    select
-        distinct (ria."SIRET") as siret,
+    select distinct
         ria."Réseau IAE" as reseau_coorace,
-        s.id as id_structure
-    from reseau_iae_adherents ria
-        inner join structures s
-            on s.siret = ria."SIRET"
+        s.id             as id_structure,
+        (ria."SIRET")    as siret
+    from reseau_iae_adherents as ria
+    inner join structures as s
+        on s.siret = ria."SIRET"
     where ria."Réseau IAE" = 'Coorace'
 ),
+
 adherents_fei as (
-    select
-        distinct (ria."SIRET") as siret,
+    select distinct
         ria."Réseau IAE" as reseau_fei,
-        s.id as id_structure
-    from reseau_iae_adherents ria
-        inner join structures s
-            on s.siret = ria."SIRET"
+        s.id             as id_structure,
+        (ria."SIRET")    as siret
+    from reseau_iae_adherents as ria
+    inner join structures as s
+        on s.siret = ria."SIRET"
     where ria."Réseau IAE" = 'FEI'
 ),
+
 adherents_emmaus as (
-    select
-        distinct (ria."SIRET") as siret,
+    select distinct
         ria."Réseau IAE" as reseau_emmaus,
-        s.id as id_structure
-    from reseau_iae_adherents ria
-        inner join structures s
-            on s.siret = ria."SIRET"
+        s.id             as id_structure,
+        (ria."SIRET")    as siret
+    from reseau_iae_adherents as ria
+    inner join structures as s
+        on s.siret = ria."SIRET"
     where ria."Réseau IAE" = 'Emmaus'
 ),
+
 adherents_unai as (
-    select
-        distinct (ria."SIRET") as siret,
+    select distinct
         ria."Réseau IAE" as reseau_unai,
-        s.id as id_structure
-    from reseau_iae_adherents ria
-        inner join structures s
-            on s.siret = ria."SIRET"
+        s.id             as id_structure,
+        (ria."SIRET")    as siret
+    from reseau_iae_adherents as ria
+    inner join structures as s
+        on s.siret = ria."SIRET"
     where ria."Réseau IAE" = 'Unai'
 ),
+
 adherents_cocagne as (
-    select
-        distinct (ria."SIRET") as siret,
+    select distinct
         ria."Réseau IAE" as reseau_cocagne,
-        s.id as id_structure
-    from reseau_iae_adherents ria
-        inner join structures s
-            on s.siret = ria."SIRET"
+        s.id             as id_structure,
+        (ria."SIRET")    as siret
+    from reseau_iae_adherents as ria
+    inner join structures as s
+        on s.siret = ria."SIRET"
     where ria."Réseau IAE" = 'Cocagne'
 )
+
 select
     date_candidature,
     date_embauche,
     "délai_de_réponse",
-    extract (DAY FROM "délai_de_réponse") as temps_de_reponse,
     "délai_prise_en_compte",
-    extract (DAY FROM "délai_prise_en_compte") as temps_de_prise_en_compte,
     candidatures_p."département_structure",
     "état",
     id,
-    /* TODO dejafait drop as soon as analistos have migrated to the new deanonymized column */
     "id_anonymisé",
     id_candidat,
     /* TODO dejafait drop as soon as analistos have migrated to the new deanonymized column */
     "id_candidat_anonymisé",
     candidatures_p.id_structure,
+    /* TODO dejafait drop as soon as analistos have migrated to the new deanonymized column */
     motif_de_refus,
     candidatures_p."nom_département_structure",
     nom_structure,
     type_structure,
-    case
-		when candidatures_p.origine = 'Candidat' then 'Candidature en ligne'
-		else candidatures_p.origine
-	end origine,
     "origine_détaillée",
+    candidatures_p."région_structure",
+    safir_org_prescripteur,
+    id_org_prescripteur,
+    nom_org_prescripteur,
+    "nom_prénom_conseiller",
+    dept_org,
+    "région_org",
+    injection_ai,
+    ville,
+    nom_epci,
+    code_commune,
+    nom_arrondissement,
+    bassin_d_emploi,
+    extract(day from "délai_de_réponse")      as temps_de_reponse,
+    extract(day from "délai_prise_en_compte") as temps_de_prise_en_compte,
+    case
+        when candidatures_p.origine = 'Candidat' then 'Candidature en ligne'
+        else candidatures_p.origine
+    end                                       as origine,
     case /* Ajout colonne avec des noms de prescripteurs correspondant à ceux de la table taux_transformation_prescripteurs */
         when candidatures_p."origine_détaillée" = 'Prescripteur habilité AFPA' then 'AFPA - Agence nationale pour la formation professionnelle des adultes'
         when candidatures_p."origine_détaillée" = 'Prescripteur habilité ASE' then 'ASE - Aide sociale à l''enfance'
@@ -139,53 +159,40 @@ select
         when candidatures_p."origine_détaillée" = 'Prescripteur habilité PREVENTION' then 'Service ou club de prévention'
         when candidatures_p."origine_détaillée" = 'Prescripteur habilité RS_FJT' then 'Résidence sociale / FJT - Foyer de Jeunes Travailleurs'
         when candidatures_p."origine_détaillée" = 'Prescripteur habilité SPIP' then 'SPIP - Service pénitentiaire d''insertion et de probation'
-    end type_auteur_diagnostic_detaille,
-    candidatures_p."région_structure",
-    safir_org_prescripteur,
-    id_org_prescripteur,
-    nom_org_prescripteur,
-    "nom_prénom_conseiller",
-    dept_org,
-    "région_org",
-    injection_ai,
-    ville,
-    nom_epci,
-    code_commune,
-    nom_arrondissement,
-    bassin_d_emploi,
+    end                                       as type_auteur_diagnostic_detaille,
     case
         when adherents_emmaus.reseau_emmaus = 'Emmaus' then 'Oui'
         else 'Non'
-    end reseau_emmaus,
+    end                                       as reseau_emmaus,
     case
         when adherents_coorace.reseau_coorace = 'Coorace' then 'Oui'
         else 'Non'
-    end reseau_coorace,
+    end                                       as reseau_coorace,
     case
         when adherents_fei.reseau_fei = 'FEI' then 'Oui'
         else 'Non'
-    end reseau_fei,
+    end                                       as reseau_fei,
     case
         when adherents_unai.reseau_unai = 'Unai' then 'Oui'
         else 'Non'
-    end reseau_unai,
+    end                                       as reseau_unai,
     case
         when adherents_cocagne.reseau_cocagne = 'Cocagne' then 'Oui'
         else 'Non'
-    end reseau_cocagne
+    end                                       as reseau_cocagne
 from
     candidatures_p
-        left join bassin_emploi
-            on bassin_emploi.id_structure = candidatures_p.id_structure
-        left join adherents_emmaus
-            on adherents_emmaus.id_structure = candidatures_p.id_structure
-        left join adherents_coorace
-            on adherents_coorace.id_structure = candidatures_p.id_structure
-        left join adherents_fei
-            on adherents_fei.id_structure = candidatures_p.id_structure
-        left join adherents_unai
-            on adherents_unai.id_structure = candidatures_p.id_structure
-        left join adherents_cocagne
-            on adherents_cocagne.id_structure = candidatures_p.id_structure    
-        left join org_prescripteur
-        	on org_prescripteur.id_org = candidatures_p.id_org_prescripteur
+left join bassin_emploi
+    on bassin_emploi.id_structure = candidatures_p.id_structure
+left join adherents_emmaus
+    on adherents_emmaus.id_structure = candidatures_p.id_structure
+left join adherents_coorace
+    on adherents_coorace.id_structure = candidatures_p.id_structure
+left join adherents_fei
+    on adherents_fei.id_structure = candidatures_p.id_structure
+left join adherents_unai
+    on adherents_unai.id_structure = candidatures_p.id_structure
+left join adherents_cocagne
+    on adherents_cocagne.id_structure = candidatures_p.id_structure
+left join org_prescripteur
+    on org_prescripteur.id_org = candidatures_p.id_org_prescripteur
