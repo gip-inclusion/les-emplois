@@ -6,74 +6,91 @@
 
 {% block extra_head %}{{ filters_form.media.css }}{% endblock %}
 
+{% block content_container_css_classes %}s-section pt-0{% endblock %}
+
+{% block pre_content %}
+    <section class="s-title-01 p-0">
+        <div class="s-title-01__container container">
+            <div class="s-title-01__row row">
+                <div class="s-title-01__col col-12">
+                    <h1 class="s-title-01__title h1-hero-c1">
+                        <strong>Suivi des candidatures</strong>
+                    </h1>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
 {% block content %}
 
-    <h1 class="h1-hero-c1">Suivi des candidatures</h1>
-
     <div class="row">
-        <div class="col-12 col-md-4 mt-2">
-            <a id="js-job-applications-filters-button"
-               class="btn btn-primary d-block d-md-none"
-               href="#js-job-applications-filters-form"
-               data-toggle="collapse"
-               role="button"
-               aria-expanded="false"
-               aria-controls="collapseFilter">
-                Filtres des résultats <i class="ri-filter-line"></i>
-            </a>
-            <form method="get" action="" id="js-job-applications-filters-form" class="collapse show">
-                <div class="card c-card h-100 w-100 c-card--emploi">
-                    <div class="card-header">
-                        <h3>Filtrer les candidatures</h3>
-                    </div>
-                    <div class="card-body">
-                        {% include "apply/includes/job_applications_filters/job_seekers.html" %}
-                        {% include "apply/includes/job_applications_filters/statut.html" %}
-                        {% include "apply/includes/job_applications_filters/to_siaes.html" %}
-                        {% include "apply/includes/job_applications_filters/sender.html" %}
-                        {% include "apply/includes/job_applications_filters/dates.html" %}
-                        {% include "apply/includes/job_applications_filters/selected_jobs.html" %}
-                        {% include "apply/includes/job_applications_filters/pass.html" %}
-                        {% include "apply/includes/job_applications_filters/eligibility_validated.html" %}
-                        {% include "apply/includes/job_applications_filters/criteria.html" %}
-                        {% include "apply/includes/job_applications_filters/departments.html" %}
-                    </div>
-                    <div class="card-footer text-right">
-                        <button id="js-job-applications-filters-apply-button" type="submit" class="btn btn-primary" aria-label="Appliquer les filtres sur les candidatures">
-                            Appliquer
-                        </button>
-                    </div>
+        <div class="col-12 col-md-4 mb-3 mb-md-5">
+            <aside class="c-aside-filters">
+                <button class="c-aside-filters__btn__collapse" data-toggle="collapse" href="#candidatures-filter-form" aria-expanded="false" aria-controls="candidatures-filter-form">
+                    <i class="ri-filter-line"></i>
+                    <span>Filtrer les candidatures</span>
+                </button>
+                <div class="c-aside-filters__card collapse" id="candidatures-filter-form">
+                    <form method="get" action="" id="js-job-applications-filters-form">
+                        <div class="c-aside-filters__card__body">
+                            {% include "apply/includes/job_applications_filters/statut.html" %}
+                            <hr>
+                            {% include "apply/includes/job_applications_filters/job_seekers.html" %}
+                            <hr>
+                            {% include "apply/includes/job_applications_filters/to_siaes.html" %}
+                            <hr>
+                            {% include "apply/includes/job_applications_filters/sender.html" %}
+                            <hr>
+                            {% include "apply/includes/job_applications_filters/dates.html" %}
+                            <hr>
+                            {% include "apply/includes/job_applications_filters/selected_jobs.html" %}
+                            <hr>
+                            {% include "apply/includes/job_applications_filters/pass.html" %}
+                            <hr>
+                            {% include "apply/includes/job_applications_filters/eligibility_validated.html" %}
+                            <hr>
+                            {% include "apply/includes/job_applications_filters/criteria.html" %}
+                            <hr>
+                            {% include "apply/includes/job_applications_filters/departments.html" %}
+                            <button id="js-job-applications-filters-apply-button" type="submit" class="btn btn-block btn-primary mt-3" aria-label="Appliquer les filtres">
+                                Appliquer
+                            </button>
+                        </div>
+                    </form>
                 </div>
-            </form>
+            </aside>
         </div>
-        <div class="col-12 col-md-8 mt-2">
-            <div class="clearfix">
-                <div class="float-left">
-                    <p class="h1">
-                        {% with job_applications_page.paginator.count as counter %}
-                            <span class="badge badge-pill badge-emploi">{{ counter }}</span> <strong>résultat{{ counter|pluralizefr }}</strong>
-                        {% endwith %}
-                    </p>
-                </div>
-                <div class="float-right">
+
+        <div class="col-12 col-md-8">
+            <div class="d-flex flex-column flex-sm-row align-items-sm-center">
+                <p class="h2 mb-0 flex-grow-1">
+                    {% with job_applications_page.paginator.count as counter %}
+                        {{ counter }} <strong>résultat{{ counter|pluralizefr }}</strong>
+                    {% endwith %}
+                </p>
+                <div>
                     {% include "apply/includes/job_applications_export_button.html" %}
                     {% if filters_counter > 0 %}
-                        <a href="{% url 'apply:list_for_prescriber' %}" class="btn btn-outline-primary">
-                            Réinitialiser les filtres ({{ filters_counter }})
+                        <a href="{% url 'apply:list_for_prescriber' %}" class="btn btn-link btn-ico pl-0">
+                            <i class="ri-close-fill"></i>
+                            <span>Réinitialiser les filtres ({{ filters_counter }})</span>
                         </a>
                     {% endif %}
                 </div>
             </div>
 
             {% if not job_applications_page %}
-                <h2 class="font-weight-normal text-muted">Aucune candidature pour le moment.</h2>
+                <h2 class="font-weight-normal text-muted my-4">Aucune candidature pour le moment.</h2>
             {% else %}
                 {% for job_application in job_applications_page %}
-                    <div class="card mb-3 mt-4">
+                    <div class="c-card card my-4 has-links-inside">
                         {% include "apply/includes/list_card_header.html" with job_application=job_application %}
                         {% include "apply/includes/list_card_body.html" with job_application=job_application %}
-                        <div class="card-footer">
-                            <a href="{% url 'apply:details_for_prescriber' job_application_id=job_application.id %}?back_url={{ request.get_full_path|urlencode }}">
+                        <div class="card-footer text-right">
+                            <a href="{% url 'apply:details_for_prescriber' job_application_id=job_application.id %}?back_url={{ request.get_full_path|urlencode }}"
+                               class="btn btn-sm btn-outline-primary"
+                               aria-label="Plus d’informations sur la candidature de {{ job_application.job_seeker.get_full_name|mask_unless:job_application.user_can_view_personal_information }}">
                                 Plus d’informations
                             </a>
                         </div>
@@ -88,6 +105,17 @@
 
 {% block script %}
     {{ block.super }}
+    <script nonce="{{ CSP_NONCE }}">
+        // Show or Hide the search-filter-form sidebar based on responsive breakpoint
+        var breakpointMD = getComputedStyle(document.documentElement).getPropertyValue("--breakpoint-md");
+        $(window).on("load resize", function() {
+            if (window.matchMedia("(min-width: "+breakpointMD+")").matches) {
+                $("candidatures-filter-form").collapse("show");
+            } else {
+                $("candidatures-filter-form").collapse("hide");
+            }
+        });
+    </script>
     <!-- Needed to use Select2MultipleWidget. -->
     {{ filters_form.media.js }}
     <script src='{% static "js/job_applications_filters.js" %}'></script>
