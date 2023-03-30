@@ -86,7 +86,7 @@ class Command(BaseCommand):
         )
         parser.add_argument("--wet-run", action="store_true", dest="wet_run")
 
-    def handle(self, file_path, wet_run=False, **options):
+    def handle(self, file_path, *, wet_run, **options):
         now = timezone.localdate()
 
         count_before = PoleEmploiApproval.objects.count()

@@ -209,7 +209,7 @@ class Command(BaseCommand):
         parser.add_argument("--mode", action="store", dest="mode", type=str, choices=self.MODE_TO_OPERATION.keys())
         parser.add_argument("--wet-run", dest="wet_run", action="store_true")
 
-    def handle(self, mode, wet_run, **options):
+    def handle(self, mode, *, wet_run, **options):
         today = datetime.date.today()
         max_date = datetime.date.today() - datetime.timedelta(days=today.weekday() + 1)
         # NOTE(vperron): if you need to initiate this table, just run the following line with

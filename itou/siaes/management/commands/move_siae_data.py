@@ -70,7 +70,7 @@ class Command(BaseCommand):
         )
         parser.add_argument("--wet-run", action=argparse.BooleanOptionalAction, default=False)
 
-    def handle(self, from_id, to_id, wet_run=False, only_job_applications=False, **options):
+    def handle(self, from_id, to_id, *, wet_run, only_job_applications, **options):
         if from_id == to_id:
             self.stderr.write("Unable to use the same siae as source and destination (ID %s)\n" % from_id)
             return

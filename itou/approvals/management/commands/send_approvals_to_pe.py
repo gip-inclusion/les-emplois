@@ -23,7 +23,7 @@ class Command(BaseCommand):
         parser.add_argument("--wet-run", dest="wet_run", action="store_true")
         parser.add_argument("--delay", action="store", dest="delay", default=0, type=int, choices=range(0, 5))
 
-    def handle(self, wet_run=False, delay=0, **options):
+    def handle(self, *, wet_run, delay, **options):
         today = timezone.localdate()
         queryset = (
             approvals_models.Approval.objects.filter(

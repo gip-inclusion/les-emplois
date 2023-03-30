@@ -57,7 +57,7 @@ class Command(BaseCommand):
             "Région": org.region,
         }
 
-    def handle(self, no_csv=False, **options):
+    def handle(self, *, no_csv, **options):
 
         self.no_csv = no_csv
 

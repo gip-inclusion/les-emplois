@@ -17,7 +17,7 @@ class Command(BaseCommand):
         parser.add_argument("--wet-run", action="store_true", dest="wet_run")
 
     @transaction.atomic()
-    def handle(self, for_siae, wet_run=False, **options):
+    def handle(self, for_siae, *, wet_run=False, **options):
         siae = siaes_models.Siae.objects.filter(pk=for_siae).select_related("convention").first()
         if not siae:
             self.stderr.write(f"No SIAE found for pk={for_siae!r}.")

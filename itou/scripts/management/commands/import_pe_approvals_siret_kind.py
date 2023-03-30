@@ -35,7 +35,7 @@ class Command(BaseCommand):
         )
         parser.add_argument("--wet-run", action="store_true", dest="wet_run")
 
-    def handle(self, file_path, wet_run=False, **options):
+    def handle(self, file_path, *, wet_run, **options):
         df = pd.read_excel(file_path)
         self.stdout.write(f"Ready to import up to length={len(df)} approvals from file={file_path}")
         df.apply(lambda row: update_approval(row, wet_run, self.stdout), axis=1)

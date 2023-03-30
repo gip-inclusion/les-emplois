@@ -120,7 +120,7 @@ class Command(BaseCommand):
         parser.add_argument("--wet-run", dest="wet_run", action="store_true")
 
     @timeit
-    def handle(self, wet_run=False, **options):
+    def handle(self, *, wet_run, **options):
         geiq_df, info_stats = get_geiq_df()
         info_stats |= sync_structures(
             df=geiq_df,

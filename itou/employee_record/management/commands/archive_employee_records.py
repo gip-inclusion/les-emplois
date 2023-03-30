@@ -11,7 +11,7 @@ class Command(BaseCommand):
         parser.add_argument("--wet-run", action="store_true")
 
     @transaction.atomic()
-    def handle(self, wet_run=False, **options):
+    def handle(self, *, wet_run, **options):
         self.stdout.write("Start archiving employee records")
 
         archivable = (

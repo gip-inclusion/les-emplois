@@ -32,7 +32,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--wet-run", dest="wet_run", action="store_true")
 
-    def handle(self, wet_run=False, **options):
+    def handle(self, *, wet_run, **options):
         now = timezone.now()
         pe_client = pole_emploi_api_client()
 

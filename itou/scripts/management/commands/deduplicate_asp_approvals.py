@@ -22,7 +22,7 @@ class Command(BaseCommand):
             help="Path of the ASP CSV file to deduplicate",
         )
 
-    def handle(self, file_path, debug, **options):
+    def handle(self, file_path, *, debug, **options):
         def debug_log(s):
             if debug:
                 self.stdout.write(f"[DEBUG_LOG] {s}")
