@@ -407,6 +407,10 @@ class User(AbstractUser, AddressMixin):
         return self.kind == UserKind.PRESCRIBER
 
     @property
+    def is_orienter(self):
+        return self.is_prescriber and not self.prescriberorganization_set.exists()
+
+    @property
     def is_siae_staff(self):
         return self.kind == UserKind.SIAE_STAFF
 
