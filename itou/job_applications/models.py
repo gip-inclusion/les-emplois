@@ -700,10 +700,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         Returns True if an eligibility diagnosis must be made by an SIAE
         when processing an application, False otherwise.
         """
-        return (
-            (self.state in JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES)
-            and self.to_siae.is_subject_to_eligibility_rules
-            and not self.job_seeker.has_valid_diagnosis(for_siae=self.to_siae)
+        return self.to_siae.is_subject_to_eligibility_rules and not self.job_seeker.has_valid_diagnosis(
+            for_siae=self.to_siae
         )
 
     @property

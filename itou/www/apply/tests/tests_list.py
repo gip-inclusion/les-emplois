@@ -190,7 +190,7 @@ class ProcessListSiaeTest(ProcessListTest):
             + 1  # get list of administrative criteria
             + 3  # get list of job application + prefetch of job descriptions + prefetch of approvals
             + 8  # get PE Approval per user. Can't use prefetch as there is no Foreign Key constraint
-            + 10  # get last valid eligibility diagnosis. Me may make more than one query per job application.
+            + 16  # get last valid eligibility diagnosis. Me may make more than one query per job application.
             # We could try to prefetch, but we would have to skip models methods and it's not a good move
             + 1  # get list of sender org (distinct sender_prescriber_organization_id)
             + 3  # count, list & prefetch of job application
