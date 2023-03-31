@@ -24,6 +24,12 @@ asttokens==2.1.0 \
     --hash=sha256:1b28ed85e254b724439afc783d4bee767f780b936c3fe8b3275332f42cf5f561 \
     --hash=sha256:4aa76401a151c8cc572d906aad7aea2a841780834a19d780f4321c0fe1b54635
     # via stack-data
+async-timeout==4.0.2 \
+    --hash=sha256:2163e1640ddb52b7a8c80d0a67a08587e5d245cc9c553a74a847056bc2976b15 \
+    --hash=sha256:8ca1e4fcf50d07413d66d1a5e416e42cfdf5851c981d679a09851a6853383b3c
+    # via
+    #   -r requirements/base.txt
+    #   redis
 attrs==22.1.0 \
     --hash=sha256:29adc2665447e5191d0e7c568fde78b21f9672d344281d0c6e1ab085429b22b6 \
     --hash=sha256:86efa402f67bf2df34f51a335487cf46b1ec130d02b8d39fd248abfd30da551c
@@ -996,9 +1002,9 @@ pyyaml==6.0 \
     #   drf-spectacular
     #   pre-commit
     #   tablib
-redis==4.5.3 \
-    --hash=sha256:56732e156fe31801c4f43396bd3ca0c2a7f6f83d7936798531b9848d103381aa \
-    --hash=sha256:7df17a0a2b72a4c8895b462dd07616c51b1dcb48fdd7ecb7b6f4bf39ecb2e94e
+redis==4.5.4 \
+    --hash=sha256:2c19e6767c474f2e85167909061d525ed65bea9301c0770bb151e041b7ac89a2 \
+    --hash=sha256:73ec35da4da267d6847e47f68730fdd5f62e2ca69e3ef5885c6a78a9374c3893
     # via -r requirements/base.txt
 regex==2022.10.31 \
     --hash=sha256:052b670fafbe30966bbe5d025e90b2a491f85dfe5b2583a163b5e60a85a321ad \
