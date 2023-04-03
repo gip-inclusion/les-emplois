@@ -151,7 +151,9 @@
             <div class="c-box p-3 p-md-4">
                 <div class="d-flex align-items-center">
                     <div class="flex-grow-1">
-                        <span class="h4 m-0">Résultat</span>
+                        {% with cnt=navigation_pages.paginator.count %}
+                            <span class="h4 m-0">{{ cnt|default:"Aucun" }} résultat{{ cnt|pluralize }}</span>
+                        {% endwith %}
                     </div>
                     <div>
                         <span class="btn-link fs-sm">Trier par :</span>

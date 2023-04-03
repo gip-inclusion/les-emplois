@@ -353,3 +353,15 @@ class ListEmployeeRecordsTest(TestCase):
             recordZ.job_application,
             recordA.job_application,
         )
+
+    def test_display_result_count(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url + "?status=NEW")
+        self.assertContains(response, "1 résultat")
+
+        JobApplicationWithApprovalNotCancellableFactory(to_siae=self.siae)
+        response = self.client.get(self.url + "?status=NEW")
+        self.assertContains(response, "2 résultats")
+
+        response = self.client.get(self.url + "?status=READY")
+        self.assertContains(response, "Aucun résultat")
