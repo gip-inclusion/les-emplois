@@ -1,7 +1,7 @@
 from datetime import datetime
-from html import escape
 from urllib.parse import urlencode
 
+import respx
 from allauth.account.models import EmailAddress, EmailConfirmationHMAC
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
@@ -9,8 +9,9 @@ from django.core import mail
 from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.html import escape
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertNotContains
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 from rest_framework.authtoken.models import Token
 
 from itou.approvals.factories import ApprovalFactory
@@ -23,7 +24,11 @@ from itou.job_applications.notifications import (
     NewQualifiedJobAppEmployersNotification,
     NewSpontaneousJobAppEmployersNotification,
 )
-from itou.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
+from itou.openid_connect.inclusion_connect.test import (
+    InclusionConnectBaseTestCase,
+    override_inclusion_connect_settings,
+)
+from itou.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
 from itou.prescribers import factories as prescribers_factories
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.siae_evaluations import enums as evaluation_enums
@@ -510,84 +515,7 @@ class DashboardViewTest(TestCase):
         response = self.client.get(reverse("dashboard:index"))
         self.assertNotContains(response, "Consultez l’offre de service de vos partenaires")
 
-    def test_ic_banner_is_not_shown_for_job_seeker(self):
-        user = JobSeekerFactory()
-        self.client.force_login(user)
-
-        response = self.client.get(reverse("dashboard:index"))
-        self.assertNotContains(response, "Inclusion Connect : un accès unique à tous vos services !")
-
-    def test_ic_banner_is_not_shown_for_labor_inspector(self):
-        user = InstitutionMembershipFactory().user
-        self.client.force_login(user)
-
-        response = self.client.get(reverse("dashboard:index"))
-        self.assertNotContains(response, "Inclusion Connect : un accès unique à tous vos services !")
-
-    def test_ic_banner_for_prescribers(self):
-        prescriber_organization = prescribers_factories.PrescriberOrganizationWithMembershipFactory(
-            department="01",
-        )
-        user = prescriber_organization.members.first()
-        self.client.force_login(user)
-
-        # Not shown if user already uses IC
-        user.identity_provider = IdentityProvider.INCLUSION_CONNECT
-        user.save()
-        response = self.client.get(reverse("dashboard:index"))
-        self.assertNotContains(response, "Inclusion Connect : un accès unique à tous vos services !")
-
-        # Shown if user doesn't use IC
-        user.identity_provider = IdentityProvider.DJANGO
-        user.save()
-        response = self.client.get(reverse("dashboard:index"))
-        self.assertContains(response, "Inclusion Connect : un accès unique à tous vos services !")
-        params = {
-            "user_kind": UserKind.PRESCRIBER,
-            "previous_url": reverse("dashboard:index"),
-            "user_email": user.email,
-        }
-        ic_activate_url = escape(f"{reverse('inclusion_connect:activate_account')}?{urlencode(params)}")
-        self.assertContains(response, ic_activate_url + '"')
-
-        # Shown even if user is in DORA departments
-        prescriber_organization.department = "08"
-        prescriber_organization.save()
-        response = self.client.get(reverse("dashboard:index"))
-        self.assertContains(response, "Inclusion Connect : un accès unique à tous vos services !")
-
-    def test_ic_banner_for_siae_staff(self):
-        siae = SiaeFactory(with_membership=True, department="01")
-        user = siae.members.first()
-        self.client.force_login(user)
-
-        # Not shown if user already uses IC
-        user.identity_provider = IdentityProvider.INCLUSION_CONNECT
-        user.save()
-        response = self.client.get(reverse("dashboard:index"))
-        self.assertNotContains(response, "Inclusion Connect : un accès unique à tous vos services !")
-
-        # Shown if user doesn't use IC
-        user.identity_provider = IdentityProvider.DJANGO
-        user.save()
-        response = self.client.get(reverse("dashboard:index"))
-        self.assertContains(response, "Inclusion Connect : un accès unique à tous vos services !")
-        params = {
-            "user_kind": UserKind.SIAE_STAFF,
-            "previous_url": reverse("dashboard:index"),
-            "user_email": user.email,
-        }
-        ic_activate_url = escape(f"{reverse('inclusion_connect:activate_account')}?{urlencode(params)}")
-        self.assertContains(response, ic_activate_url + '"')
-
-        # Shown even if user is in DORA departments
-        siae.department = "08"
-        siae.save()
-        response = self.client.get(reverse("dashboard:index"))
-        self.assertContains(response, "Inclusion Connect : un accès unique à tous vos services !")
-
     def test_dashboard_prescriber_suspend_link(self):
-
         user = JobSeekerFactory()
         self.client.force_login(user)
         response = self.client.get(reverse("dashboard:index"))
@@ -1595,3 +1523,53 @@ def test_api_token_view_for_non_siae_admin(client):
 
     response = client.get(url)
     assert response.status_code == 403
+
+
+@respx.mock
+@override_inclusion_connect_settings
+def test_prescriber_using_django_has_to_activate_ic_account(client):
+    user = PrescriberFactory(identity_provider=IdentityProvider.DJANGO, email=OIDC_USERINFO["email"])
+    client.force_login(user)
+    url = reverse("home:hp")
+    response = client.get(url, follow=True)
+    activate_ic_account_url = reverse("dashboard:activate_ic_account")
+    assertRedirects(response, activate_ic_account_url)
+    params = {
+        "user_kind": UserKind.PRESCRIBER,
+        "previous_url": activate_ic_account_url,
+        "user_email": user.email,
+    }
+    url = escape(f"{reverse('inclusion_connect:activate_account')}?{urlencode(params)}")
+    assertContains(response, url + '"')
+    response = mock_oauth_dance(
+        client,
+        UserKind.PRESCRIBER,
+        previous_url=activate_ic_account_url,
+    )
+    user.refresh_from_db()
+    assert user.identity_provider == IdentityProvider.INCLUSION_CONNECT
+
+
+@respx.mock
+@override_inclusion_connect_settings
+def test_siae_staff_using_django_has_to_activate_ic_account(client):
+    user = SiaeStaffFactory(with_siae=True, identity_provider=IdentityProvider.DJANGO, email=OIDC_USERINFO["email"])
+    client.force_login(user)
+    url = reverse("home:hp")
+    response = client.get(url, follow=True)
+    activate_ic_account_url = reverse("dashboard:activate_ic_account")
+    assertRedirects(response, activate_ic_account_url)
+    params = {
+        "user_kind": UserKind.SIAE_STAFF,
+        "previous_url": activate_ic_account_url,
+        "user_email": user.email,
+    }
+    url = escape(f"{reverse('inclusion_connect:activate_account')}?{urlencode(params)}")
+    assertContains(response, url + '"')
+    response = mock_oauth_dance(
+        client,
+        UserKind.SIAE_STAFF,
+        previous_url=activate_ic_account_url,
+    )
+    user.refresh_from_db()
+    assert user.identity_provider == IdentityProvider.INCLUSION_CONNECT

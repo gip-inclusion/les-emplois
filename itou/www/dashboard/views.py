@@ -1,7 +1,9 @@
 from allauth.account.views import PasswordChangeView
 from django.conf import settings
 from django.contrib import auth, messages
+from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import Q
@@ -11,6 +13,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.http import urlencode
 from django.views.decorators.http import require_POST
+from django.views.generic import TemplateView
 from rest_framework.authtoken.models import Token
 
 from itou.api.token_auth.views import TOKEN_ID_STR
@@ -24,12 +27,12 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.siae_evaluations.constants import CAMPAIGN_VIEWABLE_DURATION
 from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
 from itou.siaes.models import Siae, SiaeFinancialAnnex
-from itou.users.enums import IdentityProvider, UserKind
+from itou.users.enums import IdentityProvider
 from itou.utils import constants as global_constants
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
-from itou.utils.urls import get_absolute_url, get_safe_url
+from itou.utils.urls import add_url_params, get_absolute_url, get_safe_url
 from itou.www.dashboard.forms import (
     EditJobSeekerInfoForm,
     EditNewJobAppEmployersNotificationForm,
@@ -119,18 +122,6 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         current_org = get_current_institution_or_404(request)
         active_campaigns = EvaluationCampaign.objects.for_institution(current_org).viewable()
 
-    ic_activate_url = None
-    if request.user.identity_provider != IdentityProvider.INCLUSION_CONNECT and request.user.kind in [
-        UserKind.PRESCRIBER,
-        UserKind.SIAE_STAFF,
-    ]:
-        params = {
-            "user_kind": request.user.kind,
-            "previous_url": request.get_full_path(),
-            "user_email": request.user.email,
-        }
-        ic_activate_url = f"{reverse('inclusion_connect:activate_account')}?{urlencode(params)}"
-
     context = {
         "current_org": current_org,
         "job_applications_categories": job_applications_categories,
@@ -158,7 +149,6 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
             and current_org
             and current_org.department in ["08", "60", "91", "974"]
         ),
-        "ic_activate_url": ic_activate_url,
     }
 
     return render(request, template_name, context)
@@ -394,3 +384,28 @@ def api_token(request, template_name="dashboard/api_token.html"):
     }
 
     return render(request, template_name, context)
+
+
+class AccountMigrationView(LoginRequiredMixin, TemplateView):
+    template_name = "account/activate_inclusion_connect_account.html"
+
+    def _get_inclusion_connect_base_params(self):
+        params = {
+            "user_kind": self.request.user.kind,
+            "previous_url": self.request.get_full_path(),
+            "user_email": self.request.user.email,
+        }
+        next = get_safe_url(self.request, REDIRECT_FIELD_NAME)
+        if next:
+            params["next_url"] = next
+        return params
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        params = self._get_inclusion_connect_base_params()
+        inclusion_connect_url = add_url_params(reverse("inclusion_connect:activate_account"), params)
+        extra_context = {
+            "inclusion_connect_url": inclusion_connect_url,
+            "matomo_account_type": self.request.user.kind,
+        }
+        return context | extra_context

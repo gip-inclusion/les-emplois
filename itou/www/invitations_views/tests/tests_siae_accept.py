@@ -129,12 +129,15 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         assert reverse("login:siae_staff") in response.wsgi_request.get_full_path()
         assert not invitation.accepted
         next_url = reverse("invitations_views:join_siae", args=(invitation.pk,))
-
-        self.assertContains(
-            response, reverse("login:activate_siae_staff_account") + "?" + urlencode({"next": next_url})
-        )
-
         previous_url = f"{reverse('login:siae_staff')}?{urlencode({'next': next_url})}"
+        params = {
+            "user_kind": UserKind.SIAE_STAFF,
+            "previous_url": previous_url,
+            "next_url": next_url,
+        }
+        url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
+        self.assertContains(response, url + '"')
+
         response = mock_oauth_dance(
             self.client,
             UserKind.SIAE_STAFF,

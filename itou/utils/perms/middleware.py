@@ -1,8 +1,10 @@
 from django.contrib import messages
+from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import safestring
 
+from itou.users.enums import IdentityProvider, UserKind
 from itou.utils import constants as global_constants
 from itou.www.login import urls as login_urls
 
@@ -37,6 +39,17 @@ class ItouCurrentOrganizationMiddleware:
             return self.get_response(request)
 
         if user.is_authenticated:
+            # FIXME(alaurent) move to a dedicated Middleware ?
+            # Force Inclusion Connect
+            if (
+                user.identity_provider != IdentityProvider.INCLUSION_CONNECT
+                and user.kind in [UserKind.PRESCRIBER, UserKind.SIAE_STAFF]
+                and not request.path.startswith("/dashboard/activate_ic_account")  # Allow to access ic activation view
+                and not request.path.startswith("/inclusion_connect")  # Allow to access ic views
+            ):
+                # Add request.path as next param ?
+                return HttpResponseRedirect(reverse("dashboard:activate_ic_account"))
+
             if user.is_siae_staff:
                 current_siae_pk = request.session.get(global_constants.ITOU_SESSION_CURRENT_SIAE_KEY)
                 siae_set = user.siae_set.filter(siaemembership__is_active=True).active_or_in_grace_period()
