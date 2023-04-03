@@ -69,7 +69,7 @@ class WelcomingTourTest(InclusionConnectBaseTestCase):
         session = self.client.session
         session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = {"url_history": []}
         session.save()
-        response = mock_oauth_dance(self, KIND_PRESCRIBER, assert_redirects=False)
+        response = mock_oauth_dance(self.client, KIND_PRESCRIBER, assert_redirects=False)
         response = self.client.get(response.url, follow=True)
 
         # User should be redirected to the welcoming tour as he just signed up
@@ -77,7 +77,7 @@ class WelcomingTourTest(InclusionConnectBaseTestCase):
         self.assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
         self.client.logout()
-        response = mock_oauth_dance(self, KIND_PRESCRIBER, assert_redirects=False)
+        response = mock_oauth_dance(self.client, KIND_PRESCRIBER, assert_redirects=False)
         response = self.client.get(response.url, follow=True)
         assert response.wsgi_request.path != reverse("welcoming_tour:index")
         self.assertContains(response, "Revoir le message")
@@ -89,7 +89,7 @@ class WelcomingTourTest(InclusionConnectBaseTestCase):
         previous_url = reverse("signup:siae_user", args=(siae.pk, token))
         next_url = reverse("signup:siae_join", args=(siae.pk, token))
         response = mock_oauth_dance(
-            self,
+            self.client,
             KIND_SIAE_STAFF,
             assert_redirects=False,
             previous_url=previous_url,
@@ -102,7 +102,7 @@ class WelcomingTourTest(InclusionConnectBaseTestCase):
         self.assertTemplateUsed(response, "welcoming_tour/siae_staff.html")
 
         self.client.logout()
-        response = mock_oauth_dance(self, KIND_SIAE_STAFF, assert_redirects=False)
+        response = mock_oauth_dance(self.client, KIND_SIAE_STAFF, assert_redirects=False)
         response = self.client.get(response.url, follow=True)
         assert response.wsgi_request.path != reverse("welcoming_tour:index")
         self.assertContains(response, "Revoir le message")

@@ -100,7 +100,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
 
         # Connect with Inclusion Connect.
         response = mock_oauth_dance(
-            self,
+            self.client,
             KIND_PRESCRIBER,
             assert_redirects=False,
             user_email=email,
@@ -179,7 +179,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         self.assertContains(response, url + '"')
 
         response = mock_oauth_dance(
-            self,
+            self.client,
             KIND_PRESCRIBER,
             assert_redirects=False,
             previous_url=previous_url,
@@ -270,7 +270,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
 
         previous_url = reverse("signup:prescriber_user")
         response = mock_oauth_dance(
-            self,
+            self.client,
             KIND_PRESCRIBER,
             assert_redirects=False,
             previous_url=previous_url,
@@ -357,7 +357,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         self.assertContains(response, url + '"')
 
         response = mock_oauth_dance(
-            self,
+            self.client,
             KIND_PRESCRIBER,
             assert_redirects=False,
             previous_url=previous_url,
@@ -499,7 +499,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         self.assertContains(response, url + '"')
 
         response = mock_oauth_dance(
-            self,
+            self.client,
             KIND_PRESCRIBER,
             assert_redirects=False,
             previous_url=previous_url,
@@ -577,7 +577,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         self.assertContains(response, url + '"')
 
         response = mock_oauth_dance(
-            self,
+            self.client,
             KIND_PRESCRIBER,
             assert_redirects=False,
             previous_url=previous_url,
@@ -685,7 +685,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
 
         # Connect with Inclusion Connect.
         response = mock_oauth_dance(
-            self,
+            self.client,
             KIND_PRESCRIBER,
             assert_redirects=False,
             previous_url=previous_url,
@@ -754,7 +754,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
 
         # Connect with Inclusion Connect.
         response = mock_oauth_dance(
-            self,
+            self.client,
             KIND_PRESCRIBER,
             assert_redirects=False,
             previous_url=previous_url,
@@ -831,7 +831,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
         previous_url = reverse("signup:prescriber_user")
         next_url = reverse("signup:prescriber_join_org")
         response = mock_oauth_dance(
-            self,
+            self.client,
             KIND_PRESCRIBER,
             assert_redirects=False,
             previous_url=previous_url,
@@ -898,7 +898,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
         previous_url = reverse("signup:prescriber_user")
         next_url = reverse("signup:prescriber_join_org")
         response = mock_oauth_dance(
-            self,
+            self.client,
             KIND_PRESCRIBER,
             assert_redirects=False,
             previous_url=previous_url,
@@ -953,7 +953,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
         next_url = reverse("signup:prescriber_join_org")
         wrong_email = "athos@touspourun.com"
         response = mock_oauth_dance(
-            self,
+            self.client,
             KIND_PRESCRIBER,
             user_email=pe_email,
             channel="pole_emploi",

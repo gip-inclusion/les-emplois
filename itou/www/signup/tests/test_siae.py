@@ -77,7 +77,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         self.assertContains(response, url + '"')
 
         response = mock_oauth_dance(
-            self,
+            self.client,
             KIND_SIAE_STAFF,
             assert_redirects=False,
             previous_url=previous_url,
@@ -139,7 +139,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         self.assertContains(response, url + '"')
 
         response = mock_oauth_dance(
-            self,
+            self.client,
             KIND_SIAE_STAFF,
             assert_redirects=False,
             previous_url=previous_url,
@@ -211,7 +211,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         self.assertContains(response, url + '"')
 
         response = mock_oauth_dance(
-            self,
+            self.client,
             KIND_SIAE_STAFF,
             assert_redirects=False,
             previous_url=previous_url,

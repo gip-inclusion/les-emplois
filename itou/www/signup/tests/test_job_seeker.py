@@ -287,7 +287,7 @@ class JobSeekerSignupTest(TestCase):
         fc_url = reverse("france_connect:authorize")
         self.assertContains(response, fc_url)
 
-        mock_oauth_dance(self)
+        mock_oauth_dance(self.client)
         job_seeker = User.objects.get(email=FC_USERINFO["email"])
         assert nir == job_seeker.nir
 
@@ -311,6 +311,6 @@ class JobSeekerSignupTest(TestCase):
         fc_url = reverse("france_connect:authorize")
         self.assertContains(response, fc_url)
 
-        mock_oauth_dance(self)
+        mock_oauth_dance(self.client)
         job_seeker = User.objects.get(email=FC_USERINFO["email"])
         assert not job_seeker.nir

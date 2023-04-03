@@ -63,7 +63,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         total_users_before = User.objects.count()
 
         response = mock_oauth_dance(
-            self,
+            self.client,
             KIND_SIAE_STAFF,
             assert_redirects=False,
             user_email=invitation.email,
@@ -104,7 +104,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         assert User.objects.filter(email=invitation.email).first() is None
 
         response = mock_oauth_dance(
-            self,
+            self.client,
             KIND_SIAE_STAFF,
             assert_redirects=False,
             # Using the same email with a different case should not fail
@@ -136,7 +136,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
 
         previous_url = f"{reverse('login:siae_staff')}?{urlencode({'next': next_url})}"
         response = mock_oauth_dance(
-            self,
+            self.client,
             UserKind.SIAE_STAFF,
             assert_redirects=False,
             user_email=user.email,
@@ -180,7 +180,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
 
         url = reverse("dashboard:index")
         response = mock_oauth_dance(
-            self,
+            self.client,
             KIND_SIAE_STAFF,
             assert_redirects=False,
             # the login hint is different from OIDC_USERINFO["email"] which is used to create the IC account
@@ -276,7 +276,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
         next_url = reverse("invitations_views:join_siae", args=(invitation.pk,))
         response = mock_oauth_dance(
-            self,
+            self.client,
             KIND_SIAE_STAFF,
             assert_redirects=False,
             user_email=invitation.email,

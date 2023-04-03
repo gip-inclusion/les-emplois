@@ -238,7 +238,7 @@ class TestAcceptPrescriberWithOrgInvitation(InclusionConnectBaseTestCase):
 
         # Singup fails on Inclusion Connect with email different than the one from the invitation
         response = mock_oauth_dance(
-            self,
+            self.client,
             UserKind.PRESCRIBER,
             assert_redirects=False,
             user_email=invitation.email,
@@ -259,7 +259,7 @@ class TestAcceptPrescriberWithOrgInvitation(InclusionConnectBaseTestCase):
         invitation.email = OIDC_USERINFO["email"]
         invitation.save()
         response = mock_oauth_dance(
-            self,
+            self.client,
             UserKind.PRESCRIBER,
             assert_redirects=False,
             user_email=invitation.email,
@@ -341,7 +341,7 @@ class TestAcceptPrescriberWithOrgInvitation(InclusionConnectBaseTestCase):
 
         previous_url = f"{reverse('login:prescriber')}?{urlencode({'next': next_url})}"
         response = mock_oauth_dance(
-            self,
+            self.client,
             UserKind.PRESCRIBER,
             assert_redirects=False,
             user_email=user.email,
