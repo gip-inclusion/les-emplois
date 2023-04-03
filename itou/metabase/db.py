@@ -120,6 +120,14 @@ def build_custom_table(table_name, sql_request):
     rename_table_atomically(new_table_name, table_name)
 
 
+def list_table_names():
+    path = f"{get_current_dir()}/sql"
+    for filename in sorted([f for f in os.listdir(path) if f.endswith(".sql")]):
+        full_path = os.path.join(path, filename)
+        table_name = "_".join(filename.split(".")[0].split("_")[1:])
+        yield filename, full_path, table_name
+
+
 def build_final_tables():
     """
     Build final custom tables one by one by playing SQL requests in `sql` folder.
@@ -136,11 +144,9 @@ def build_final_tables():
     """
     create_unversioned_tables_if_needed()
 
-    path = f"{get_current_dir()}/sql"
-    for filename in sorted([f for f in os.listdir(path) if f.endswith(".sql")]):
+    for filename, full_path, table_name in list_table_names():
         print(f"Running {filename} ...")
-        table_name = "_".join(filename.split(".")[0].split("_")[1:])
-        with open(os.path.join(path, filename), encoding="utf-8") as file:
+        with open(full_path, encoding="utf-8") as file:
             sql_request = file.read()
         build_custom_table(table_name=table_name, sql_request=sql_request)
         print("Done.")
