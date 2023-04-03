@@ -44,7 +44,7 @@ class TestApprovalsListView:
         response = client.get(url)
 
         assertContains(response, "2 résultats")
-        assertContains(response, approval.user.get_full_name(), count=2)
+        assertContains(response, approval.user.get_full_name(), count=3)
         assertContains(response, reverse("approvals:detail", kwargs={"pk": approval.pk}))
         assertContains(response, reverse("approvals:detail", kwargs={"pk": another_approval.pk}))
 
@@ -172,33 +172,33 @@ class TestApprovalsListView:
 
         assertContains(
             response,
-            """<span class="badge badge-pill  badge-success  ">
-                        <i class="ri-checkbox-circle-line"></i>
-                        <span class="font-weight-normal">&nbsp;PASS IAE Valide</span>
-                    </span>""",
+            """<span class="badge badge-sm badge-pill text-wrap badge-success">
+                <i class="ri-checkbox-circle-line ri-xl" aria-hidden="true"></i>
+                PASS IAE Valide
+            </span>""",
             html=True,
         )
         assertContains(
             response,
-            """<span class="badge badge-pill  badge-success  ">
-                        <i class="ri-checkbox-circle-line"></i>
-                        <span class="font-weight-normal">&nbsp;PASS IAE Valide (non démarré)</span>
-                    </span>""",
+            """<span class="badge badge-sm badge-pill text-wrap badge-success">
+                <i class="ri-checkbox-circle-line ri-xl" aria-hidden="true"></i>
+                PASS IAE Valide (non démarré)
+            </span>""",
             html=True,
         )
         assertContains(
             response,
-            """<span class="badge badge-pill  badge-success  ">
-                        <i class="ri-error-warning-line"></i>
-                        <span class="font-weight-normal">&nbsp;PASS IAE Valide (suspendu)</span>
-                    </span>""",
+            """<span class="badge badge-sm badge-pill text-wrap badge-success">
+                <i class="ri-error-warning-line ri-xl" aria-hidden="true"></i>
+                PASS IAE Valide (suspendu)
+            </span>""",
             html=True,
         )
         assertContains(
             response,
-            """<span class="badge badge-pill  badge-dark  ">
-                        <i class="ri-forbid-2-line"></i>
-                        <span class="font-weight-normal">&nbsp;PASS IAE Expiré</span>
-                    </span>""",
+            """<span class="badge badge-sm badge-pill text-wrap badge-dark">
+                <i class="ri-forbid-2-line ri-xl" aria-hidden="true"></i>
+                PASS IAE Expiré
+            </span>""",
             html=True,
         )

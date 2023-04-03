@@ -1,31 +1,29 @@
 {% load format_filters %}
 
-<div class="card my-5">
-
-    <div class="card-body">
-        <div class="d-flex flex-column flex-md-row align-items-center m-0">
-            <div class="order-2 order-md-1 mr-auto">
-                <h3 class="h2 mb-1">{{ approval.user.get_full_name|title }}</h3>
-                <p class="small">Pass N° {{ approval|format_approval_number }}</p>
+<div class="c-card card my-4 has-links-inside">
+    <div class="card-header pb-3">
+        <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center">
+            <div class="order-2 order-md-1 flex-fill-1">
+                <h3 class="h3 mb-1">{{ approval.user.get_full_name|title }}</h3>
+                <p class="fs-sm mb-0">Pass N° {{ approval|format_approval_number }}</p>
             </div>
-
-            {# Statuses #}
-            <div class="order-1 order-md-2 ml-auto align-self-start">
-                <p class="small">
-                    <span class="badge badge-pill{% if approval.state == 'EXPIRED' %} badge-dark{% else %} badge-success{% endif %}">
-                        <i class="{% if approval.state == 'EXPIRED' %}ri-forbid-2-line{% elif approval.state == 'SUSPENDED' %}ri-error-warning-line{% else %}ri-checkbox-circle-line{% endif %}"></i>
-                        <span class="font-weight-normal">&nbsp;PASS IAE {{ approval.get_state_display }}</span>
-                    </span>
-                </p>
+            <div class="order-1 order-md-2 mb-2 mb-md-0">
+                <span class="badge badge-sm badge-pill text-wrap{% if approval.state == 'EXPIRED' %} badge-dark{% else %} badge-success{% endif %}">
+                    <i class="{% if approval.state == 'EXPIRED' %}ri-forbid-2-line{% elif approval.state == 'SUSPENDED' %}ri-error-warning-line{% else %}ri-checkbox-circle-line{% endif %} ri-xl" aria-hidden="true"></i>
+                    PASS IAE {{ approval.get_state_display }}
+                </span>
             </div>
         </div>
     </div>
 
-    <div class="card-footer bg-light">
-        <div class="text-right">
-            <a class="btn btn-outline-primary bg-white matomo-event" href="{% url 'approvals:detail' pk=approval.id %}" data-matomo-category="salaries" data-matomo-action="clic" data-matomo-option="details-salarie">
-                Voir son profil
-            </a>
-        </div>
+    <div class="card-footer text-right bg-light">
+        <a href="{% url 'approvals:detail' pk=approval.id %}"
+           class="btn btn-sm btn-outline-primary bg-white matomo-event"
+           data-matomo-category="salaries"
+           data-matomo-action="clic"
+           data-matomo-option="details-salarie"
+           aria-label="Voir le profil de {{ approval.user.get_full_name }}">
+            Voir son profil
+        </a>
     </div>
 </div>

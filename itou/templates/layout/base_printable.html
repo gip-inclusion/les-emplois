@@ -27,16 +27,13 @@
                     margin: 0mm;  /* hides title and date */
                     size: A4;
                 }
-                @media print {
-                    .no-print {
-                        display: none;
-                    }
-                }
         </style>
         {% block extra_head %}{% endblock %}
     </head>
     <body>
-        {% block content %}{% endblock %}
-        {% block script %}{% endblock %}
+        <main>
+            {% block content %}{% endblock %}
+            {% block script %}{% endblock %}
+        </main>
     </body>
 </html>

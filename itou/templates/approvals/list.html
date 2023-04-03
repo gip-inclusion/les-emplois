@@ -7,52 +7,63 @@
 
 {% block extra_head %}{{ filters_form.media.css }}{% endblock %}
 
+{% block content_container_css_classes %}s-section pt-0{% endblock %}
+
+{% block pre_content %}
+    <section class="s-title-01 p-0">
+        <div class="s-title-01__container container">
+            <div class="s-title-01__row row">
+                <div class="s-title-01__col col-12">
+                    <h1 class="s-title-01__title h1-hero-c1">
+                        <strong>Gestion des salariés et PASS IAE</strong>
+                    </h1>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+
 {% block content %}
 
-
-    <h1 class="h1-hero-c1">Gestion des salariés et PASS IAE</h1>
-
     <div class="row">
-        <div class="col-12 col-md-4 mt-2">
-            <button id="js-approvals-filters-button"
-                    type="button"
-                    class="btn btn-outline-primary w-100 d-block d-md-none"
-                    data-target="#js-approvals-filters-form"
-                    data-toggle="collapse"
-                    aria-expanded="false"
-                    aria-controls="collapseFilter">
-                <i class="ri-filter-line" aria-hidden="true"></i> Filtrer les résultats
-            </button>
-            <form method="get" id="js-approvals-filters-form" class="collapse">
-                <div class="card c-card h-100 w-100 c-card--emploi">
-                    <div class="card-header">
-                        <h3>Filtrer les résultats</h3>
-                    </div>
-                    <div class="card-body">
-                        {% include "approvals/includes/approvals_filters/users.html" %}
-                        {% include "approvals/includes/approvals_filters/status.html" %}
-                    </div>
+        <div class="col-12 col-md-4 mb-3 mb-md-5">
+            <aside class="c-aside-filters">
+                <button class="c-aside-filters__btn__collapse" data-toggle="collapse" data-target="#job-aside-filters-form" aria-expanded="false" aria-controls="job-aside-filters-form">
+                    <i class="ri-filter-line" aria-hidden="true"></i>
+                    <span>Filtrer les résultats</span>
+                </button>
+                <div class="c-aside-filters__card collapse" id="job-aside-filters-form">
+                    <form method="get" action="" id="js-job-applications-filters-form">
+                        <div class="c-aside-filters__card__body">
+                            {% include "approvals/includes/approvals_filters/users.html" %}
+                            <hr>
+                            {% include "approvals/includes/approvals_filters/status.html" %}
+                            <button id="js-job-applications-filters-apply-button" type="submit" class="btn btn-block btn-primary mt-3" aria-label="Appliquer les filtres">
+                                Appliquer
+                            </button>
+                        </div>
+                    </form>
                 </div>
-            </form>
+            </aside>
         </div>
-        <div class="col-12 col-md-8 mt-2">
-            <div class="clearfix">
-                <div class="float-left">
-                    <p class="h1">
-                        {% with paginator.count as counter %}<strong>{{ counter }} résultat{{ counter|pluralizefr }}</strong>{% endwith %}
-                    </p>
-                </div>
-                <div class="float-right">
+
+        <div class="col-12 col-md-8">
+            <div class="d-flex flex-column flex-sm-row align-items-sm-center">
+                <h2 class="h2 mb-0 flex-grow-1">
+                    {% with paginator.count as counter %}<strong>{{ counter }} résultat{{ counter|pluralizefr }}</strong>{% endwith %}
+                </h2>
+                <div>
                     {% if filters_counter > 0 %}
-                        <a href="{% url 'approvals:list' %}" class="btn btn-outline-primary bg-white">
-                            Réinitialiser les filtres ({{ filters_counter }})
+                        <a href="{% url 'approvals:list' %}" class="btn btn-link btn-ico pl-0">
+                            <i class="ri-close-fill"></i>
+                            <span>Réinitialiser les filtres ({{ filters_counter }})</span>
                         </a>
                     {% endif %}
                 </div>
             </div>
-
             {% if not approval_list %}
-                <h2 class="font-weight-normal text-muted mt-4">Aucun salarié pour le moment.</h2>
+                <p class="my-3 my-md-4">Aucun salarié pour le moment.</p>
             {% else %}
                 {% for approval in approval_list %}
                     {% include "approvals/includes/list_card.html" with approval=approval %}
@@ -70,4 +81,5 @@
     <!-- Needed to use the Select2MultipleWidget JS widget. -->
     {{ filters_form.media.js }}
     <script src='{% static "js/approvals_filters.js" %}'></script>
+    <script src='{% static "js/job_aside_collapse_filters.js" %}'></script>
 {% endblock %}

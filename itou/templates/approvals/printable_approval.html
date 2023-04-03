@@ -29,35 +29,36 @@
                     <span class="d-block font-weight-bold">Votre structure :</span>
                     <span class="d-block">{{ siae.display_name|title }}</span>
                     {% if siae.address_on_one_line %}
-                        <span class="d-block">{{ siae.address_line_1 }}</span>
-                        <span class="d-block">{{ siae.address_line_2 }}</span>
-                        <span class="d-block">{{ siae.post_code }} - {{ siae.city }}</span>
+                        <address class="d-block">
+                            {{ siae.address_line_1 }}
+                            <br>
+                            {% if siae.address_line_2 %}
+                                {{ siae.address_line_2 }}
+                                <br>
+                            {% endif %}
+                            {{ siae.post_code }} - {{ siae.city }}
+                        </address>
                     {% endif %}
                 </div>
             </div>
         </section>
 
         <section class="mt-5">
-
             <span class="d-block font-weight-bold">Références à rappeler :</span>
-
-            <span class="d-block">PASS IAE n° {{ approval.number|format_approval_number }}</span>
-
-            <span class="d-block">du {{ approval.start_at|date:"d/m/Y" }} au {{ approval.end_at|date:"d/m/Y" }}</span>
-
-            <span class="d-block">délivré par les emplois de l'inclusion</span>
-
-            {% if approval.user.pole_emploi_id %}
-                <span class="d-block">Identifiant Pôle emploi : {{ approval.user.pole_emploi_id }}</span>
-            {% endif %}
-
+            <ul class="list-unstyled">
+                <li class="d-block">PASS IAE n° {{ approval.number|format_approval_number }}</li>
+                <li class="d-block">du {{ approval.start_at|date:"d/m/Y" }} au {{ approval.end_at|date:"d/m/Y" }}</li>
+                <li class="d-block">délivré par les emplois de l'inclusion</li>
+                {% if approval.user.pole_emploi_id %}
+                    <li class="d-block">Identifiant Pôle emploi : {{ approval.user.pole_emploi_id }}</li>
+                {% endif %}
+            </ul>
         </section>
 
         <section class="mt-5">
-            <p>
-                Objet :
-                <span class="font-weight-bold">Décision d'agrément pour un parcours d'insertion par l'activité économique</span>
-            </p>
+            <h1 class="ff-base fs-base">
+                Objet :<b>Décision d'agrément pour un parcours d'insertion par l'activité économique</b>
+            </h1>
             <p class="text-justify">
                 {% if diagnosis_author %}
                     Au vu du diagnostic individuel réalisé par {{ diagnosis_author|title }}
@@ -83,16 +84,16 @@
             </p>
         </section>
 
-        <div class="row justify-content-center no-print">
+        <div class="row justify-content-center d-print-none">
             <div class="mt-5 mb-2">
-                <button id="printButton" class="btn btn-primary btn-primary-lg btn-ico" type="button">
-                    <i class="ri-printer-line ri-xl"></i>
+                <button id="printButton" class="btn btn-primary btn-primary-lg btn-ico" aria-label="Imprimer le PASS IAE de {{ approval.user.get_full_name }}">
+                    <i class="ri-printer-line ri-xl" aria-hidden="true"></i>
                     <span>Imprimer ce PASS IAE</span>
                 </button>
             </div>
         </div>
-        <div class="row justify-content-center no-print">
-            <a class="fs-xs" href="https://communaute.inclusion.beta.gouv.fr/doc/emplois/embaucher-un-candidat/#attestation-pass-iae">
+        <div class="row justify-content-center d-print-none">
+            <a class="btn-link btn-sm" href="https://communaute.inclusion.beta.gouv.fr/doc/emplois/embaucher-un-candidat/#attestation-pass-iae">
                 Astuce pour conserver cette attestation en format PDF
             </a>
         </div>
