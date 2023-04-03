@@ -22,6 +22,7 @@ $(document).ready(function(){
         form.attr('action', actionUrl);
         form.find('input[type=email]').val(email);
         form.find('input[type=password]').val("password");
+        form.find('input[name=demo_banner_account]').val(true);
         form.submit();
     });
 });
