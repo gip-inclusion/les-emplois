@@ -9,6 +9,7 @@ from itou.approvals.admin_forms import ApprovalAdminForm
 from itou.approvals.admin_views import manually_add_approval, manually_refuse_approval
 from itou.approvals.enums import Origin
 from itou.employee_record import enums as employee_record_enums
+from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
 from itou.utils.admin import PkSupportRemarkInline
@@ -68,6 +69,9 @@ class JobApplicationInline(admin.StackedInline):
 
         if not obj.create_employee_record:
             return "Création désactivée"
+
+        if obj.hiring_start_at < EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE.date():
+            return "Date de début du contrat avant l'interopérabilité"
 
         already_exists = obj.candidate_has_employee_record
 

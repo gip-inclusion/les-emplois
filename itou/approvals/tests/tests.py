@@ -969,6 +969,11 @@ class CustomApprovalAdminViewsTest(TestCase):
         msg = JobApplicationInline.employee_record_status(job_application)
         assert msg == "Création désactivée"
 
+        # When hiring start date is before employee record availability date
+        job_application = JobApplicationFactory(hiring_start_at="2021-09-26")
+        msg = JobApplicationInline.employee_record_status(job_application)
+        assert msg == "Date de début du contrat avant l'interopérabilité"
+
         # When employee records are allowed (or not) for the SIAE
         for kind in SiaeKind:
             with self.subTest("SIAE doesn't use employee records", kind=kind):
