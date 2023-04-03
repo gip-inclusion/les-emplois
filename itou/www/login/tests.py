@@ -204,7 +204,7 @@ class JopbSeekerLoginTest(TestCase):
         )
 
         # Temporary NIR is not stored with user information.
-        response = mock_oauth_dance(self, expected_route="login:job_seeker")
+        response = mock_oauth_dance(self.client, expected_route="login:job_seeker")
         messages = list(get_messages(response.wsgi_request))
         assert len(messages) == 1
         assert (

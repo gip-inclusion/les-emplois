@@ -8,6 +8,7 @@ from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
+from pytest_django.asserts import assertRedirects
 
 from itou.openid_connect.constants import OIDC_STATE_CLEANUP
 from itou.users.enums import IdentityProvider, UserKind
@@ -42,7 +43,7 @@ FC_USERINFO = {
 
 # Make sure this decorator is before test definition, not here.
 # @respx.mock
-def mock_oauth_dance(test_class, expected_route="dashboard:index"):
+def mock_oauth_dance(client, expected_route="dashboard:index"):
     # No session is created with France Connect in contrary to Inclusion Connect
     # so there's no use to go through france_connect:authorize
 
@@ -54,8 +55,8 @@ def mock_oauth_dance(test_class, expected_route="dashboard:index"):
 
     csrf_signed = FranceConnectState.create_signed_csrf_token()
     url = reverse("france_connect:callback")
-    response = test_class.client.get(url, data={"code": "123", "state": csrf_signed})
-    test_class.assertRedirects(response, reverse(expected_route))
+    response = client.get(url, data={"code": "123", "state": csrf_signed})
+    assertRedirects(response, reverse(expected_route))
     return response
 
 
@@ -272,7 +273,7 @@ class FranceConnectTest(TestCase):
 
     @respx.mock
     def test_callback(self):
-        mock_oauth_dance(self)
+        mock_oauth_dance(self.client)
         assert User.objects.count() == 1
         user = User.objects.get(email=FC_USERINFO["email"])
         assert user.first_name == FC_USERINFO["given_name"]
@@ -287,7 +288,7 @@ class FranceConnectTest(TestCase):
 
         for kind in [UserKind.PRESCRIBER, UserKind.SIAE_STAFF, UserKind.LABOR_INSPECTOR]:
             user = UserFactory(username=fc_user_data.username, email=fc_user_data.email, kind=kind)
-            mock_oauth_dance(self, expected_route=f"login:{kind}")
+            mock_oauth_dance(self.client, expected_route=f"login:{kind}")
             user.delete()
 
     def test_logout_no_id_token(self):

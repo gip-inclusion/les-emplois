@@ -20,6 +20,7 @@ from django.test import RequestFactory
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
+from pytest_django.asserts import assertRedirects
 
 from itou.openid_connect.inclusion_connect.views import InclusionConnectSession
 from itou.users import enums as users_enums
@@ -69,7 +70,7 @@ def generate_access_token(data):
 # Make sure this decorator is before test definition, not here.
 # @respx.mock
 def mock_oauth_dance(
-    test_class,
+    client,
     user_kind,
     previous_url=None,
     next_url=None,
@@ -94,7 +95,7 @@ def mock_oauth_dance(
 
     # Calling this view is mandatory to start a new session.
     authorize_url = f"{reverse('inclusion_connect:authorize')}?{urlencode(authorize_params)}"
-    response = test_class.client.get(authorize_url)
+    response = client.get(authorize_url)
     if register:
         assert response.url.startswith(
             "https://inclusion.connect.fake/realms/foobar/protocol/openid-connect/registrations"
@@ -116,9 +117,9 @@ def mock_oauth_dance(
 
     csrf_signed = InclusionConnectState.create_signed_csrf_token()
     url = reverse("inclusion_connect:callback")
-    response = test_class.client.get(url, data={"code": "123", "state": csrf_signed})
+    response = client.get(url, data={"code": "123", "state": csrf_signed})
     if assert_redirects:
-        test_class.assertRedirects(response, reverse(expected_route))
+        assertRedirects(response, reverse(expected_route))
     return response
 
 
@@ -358,7 +359,7 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
 
     @respx.mock
     def test_resume_endpoint_with_already_finished_registration(self):
-        mock_oauth_dance(self, UserKind.PRESCRIBER)
+        mock_oauth_dance(self.client, UserKind.PRESCRIBER)
         url = f"{reverse('inclusion_connect:resume_registration')}"
         response = self.client.get(url)
         self.assertRedirects(response, reverse("home:hp"))
@@ -385,7 +386,7 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
     @respx.mock
     def test_callback_prescriber_created(self):
         ### User does not exist.
-        mock_oauth_dance(self, UserKind.PRESCRIBER)
+        mock_oauth_dance(self.client, UserKind.PRESCRIBER)
         assert User.objects.count() == 1
         user = User.objects.get(email=OIDC_USERINFO["email"])
         assert user.first_name == OIDC_USERINFO["given_name"]
@@ -399,7 +400,7 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
     def test_callback_siae_staff_created(self):
         ### User does not exist.
         # Don't check redirection as the user isn't an siae member yet, so it won't work.
-        mock_oauth_dance(self, UserKind.SIAE_STAFF, assert_redirects=False)
+        mock_oauth_dance(self.client, UserKind.SIAE_STAFF, assert_redirects=False)
         assert User.objects.count() == 1
         user = User.objects.get(email=OIDC_USERINFO["email"])
         assert user.first_name == OIDC_USERINFO["given_name"]
@@ -420,7 +421,7 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
             email=OIDC_USERINFO["email"],
             identity_provider=users_enums.IdentityProvider.DJANGO,
         )
-        mock_oauth_dance(self, UserKind.PRESCRIBER)
+        mock_oauth_dance(self.client, UserKind.PRESCRIBER)
         assert User.objects.count() == 1
         user = User.objects.get(email=OIDC_USERINFO["email"])
         assert user.first_name == OIDC_USERINFO["given_name"]
@@ -435,7 +436,7 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
 
         for kind in [UserKind.JOB_SEEKER, UserKind.SIAE_STAFF, UserKind.LABOR_INSPECTOR]:
             user = UserFactory(username=ic_user_data.username, email=ic_user_data.email, kind=kind)
-            response = mock_oauth_dance(self, UserKind.PRESCRIBER, assert_redirects=False)
+            response = mock_oauth_dance(self.client, UserKind.PRESCRIBER, assert_redirects=False)
             response = self.client.get(response.url, follow=True)
             self.assertContains(response, "existe déjà avec cette adresse e-mail")
             self.assertContains(response, "pour devenir prescripteur sur la plateforme")
@@ -448,7 +449,7 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
         for kind in [UserKind.JOB_SEEKER, UserKind.PRESCRIBER, UserKind.LABOR_INSPECTOR]:
             user = UserFactory(username=ic_user_data.username, email=ic_user_data.email, kind=kind)
             # Don't check redirection as the user isn't an siae member yet, so it won't work.
-            response = mock_oauth_dance(self, UserKind.SIAE_STAFF, assert_redirects=False)
+            response = mock_oauth_dance(self.client, UserKind.SIAE_STAFF, assert_redirects=False)
             response = self.client.get(response.url, follow=True)
             self.assertContains(response, "existe déjà avec cette adresse e-mail")
             self.assertContains(response, "pour devenir employeur sur la plateforme")
@@ -472,7 +473,7 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
         )
         self.client.force_login(user)
         response = mock_oauth_dance(
-            self, UserKind.PRESCRIBER, assert_redirects=False, next_url=reverse("dashboard:edit_user_info")
+            self.client, UserKind.PRESCRIBER, assert_redirects=False, next_url=reverse("dashboard:edit_user_info")
         )
         response = self.client.get(response.url, follow=True)
         messages = list(get_messages(response.wsgi_request))
@@ -564,7 +565,7 @@ class InclusionConnectLoginTest(InclusionConnectBaseTestCase):
         He can log in again later.
         """
         # Create an account with IC.
-        mock_oauth_dance(self, UserKind.PRESCRIBER)
+        mock_oauth_dance(self.client, UserKind.PRESCRIBER)
 
         # Then log out.
         response = self.client.post(reverse("account_logout"))
@@ -575,7 +576,7 @@ class InclusionConnectLoginTest(InclusionConnectBaseTestCase):
         self.assertContains(response, "logo-inclusion-connect-one-line.svg")
         self.assertContains(response, reverse("login:activate_prescriber_account"))
 
-        response = mock_oauth_dance(self, UserKind.PRESCRIBER, assert_redirects=False)
+        response = mock_oauth_dance(self.client, UserKind.PRESCRIBER, assert_redirects=False)
         expected_redirection = reverse("dashboard:index")
         self.assertRedirects(response, expected_redirection)
 
@@ -600,7 +601,7 @@ class InclusionConnectLoginTest(InclusionConnectBaseTestCase):
         # - IC side: account creation
         # - Django side: account update.
         # This logic is already tested here: InclusionConnectModelTest
-        response = mock_oauth_dance(self, UserKind.PRESCRIBER, assert_redirects=False)
+        response = mock_oauth_dance(self.client, UserKind.PRESCRIBER, assert_redirects=False)
         # This existing user should not see the welcoming tour.
         expected_redirection = reverse("dashboard:index")
         self.assertRedirects(response, expected_redirection)
@@ -622,14 +623,14 @@ class InclusionConnectLoginTest(InclusionConnectBaseTestCase):
         assert not auth.get_user(self.client).is_authenticated
 
         # Then login with Inclusion Connect.
-        mock_oauth_dance(self, UserKind.PRESCRIBER, assert_redirects=False)
+        mock_oauth_dance(self.client, UserKind.PRESCRIBER, assert_redirects=False)
         assert auth.get_user(self.client).is_authenticated
 
 
 class InclusionConnectLogoutTest(InclusionConnectBaseTestCase):
     @respx.mock
     def test_simple_logout(self):
-        mock_oauth_dance(self, UserKind.PRESCRIBER)
+        mock_oauth_dance(self.client, UserKind.PRESCRIBER)
         respx.get(constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(200)
         logout_url = reverse("inclusion_connect:logout")
         response = self.client.get(logout_url)
@@ -637,7 +638,7 @@ class InclusionConnectLogoutTest(InclusionConnectBaseTestCase):
 
     @respx.mock
     def test_logout_with_redirection(self):
-        mock_oauth_dance(self, UserKind.PRESCRIBER)
+        mock_oauth_dance(self.client, UserKind.PRESCRIBER)
         expected_redirection = reverse("dashboard:index")
         respx.get(constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(200)
 
@@ -652,7 +653,7 @@ class InclusionConnectLogoutTest(InclusionConnectBaseTestCase):
         When ac IC user wants to log out from his local account,
         he should be logged out too from IC.
         """
-        response = mock_oauth_dance(self, UserKind.PRESCRIBER)
+        response = mock_oauth_dance(self.client, UserKind.PRESCRIBER)
         assert auth.get_user(self.client).is_authenticated
         # Follow the redirection.
         response = self.client.get(response.url)
@@ -686,7 +687,7 @@ class InclusionConnectLogoutTest(InclusionConnectBaseTestCase):
     def test_logout_with_incomplete_state(self):
         # This happens while testing. It should never happen for real users, but it's still painful for us.
 
-        mock_oauth_dance(self, UserKind.PRESCRIBER)
+        mock_oauth_dance(self.client, UserKind.PRESCRIBER)
         respx.get(constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(200)
 
         session = self.client.session
