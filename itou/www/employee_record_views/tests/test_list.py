@@ -69,6 +69,25 @@ class ListEmployeeRecordsTest(TestCase):
             response = self.client.get(self.url + f"?status={status.value}")
             self.assertNotContains(response, approval_number_formatted)
 
+    def test_job_seeker_filter(self):
+        approval_number_formatted = format_filters.format_approval_number(self.job_application.approval.number)
+        other_job_application = JobApplicationWithApprovalNotCancellableFactory(to_siae=self.siae)
+        other_approval_number_formatted = format_filters.format_approval_number(other_job_application.approval.number)
+        self.client.force_login(self.user)
+
+        response = self.client.get(self.url)
+        self.assertContains(response, approval_number_formatted)
+        self.assertContains(response, other_approval_number_formatted)
+
+        response = self.client.get(self.url + f"?job_seekers={self.job_seeker.pk}")
+        self.assertContains(response, approval_number_formatted)
+        self.assertNotContains(response, other_approval_number_formatted)
+
+        response = self.client.get(self.url + "?job_seekers=0")
+        self.assertContains(response, "Sélectionnez un choix valide. 0 n’en fait pas partie.")
+        self.assertContains(response, approval_number_formatted)
+        self.assertContains(response, other_approval_number_formatted)
+
     def test_employee_records_with_hiring_end_at(self):
         self.client.force_login(self.user)
         hiring_end_at = self.job_application.hiring_end_at
