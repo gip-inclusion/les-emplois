@@ -18,4 +18,9 @@ urlpatterns = [
         "switch_prescriber_organization", views.switch_prescriber_organization, name="switch_prescriber_organization"
     ),
     path("switch_institution", views.switch_institution, name="switch_institution"),
+    path(
+        "activate_ic_account",
+        views.AccountMigrationView.as_view(),
+        name="activate_ic_account",
+    ),
 ]

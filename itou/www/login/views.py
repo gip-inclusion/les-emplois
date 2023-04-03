@@ -1,14 +1,11 @@
 from allauth.account.views import LoginView
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
-from django.http import HttpResponseRedirect
 from django.urls import reverse
-from django.views.generic import FormView
 
-from itou.users.enums import IdentityProvider, UserKind
-from itou.users.models import User
+from itou.users.enums import UserKind
 from itou.utils.urls import add_url_params, get_safe_url
-from itou.www.login.forms import AccountMigrationForm, ItouLoginForm
+from itou.www.login.forms import ItouLoginForm
 
 
 class ItouLoginView(LoginView):
@@ -44,10 +41,18 @@ class PrescriberLoginView(ItouLoginView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        ic_base_url = reverse("login:activate_prescriber_account")
+        params = {
+            "user_kind": UserKind.PRESCRIBER,
+            "previous_url": self.request.get_full_path(),
+        }
+        if context["redirect_field_value"]:
+            params["next_url"] = context["redirect_field_value"]
 
-        if context["redirect_field_value"] is not None:
-            ic_base_url = add_url_params(ic_base_url, {REDIRECT_FIELD_NAME: context["redirect_field_value"]})
+        inclusion_connect_url = (
+            add_url_params(reverse("inclusion_connect:authorize"), params)
+            if settings.INCLUSION_CONNECT_BASE_URL
+            else None
+        )
 
         extra_context = {
             "account_type_display_name": "prescripteur",
@@ -56,7 +61,7 @@ class PrescriberLoginView(ItouLoginView):
             "signup_url": reverse("signup:prescriber_check_already_exists"),
             "signup_allowed": True,
             "uses_inclusion_connect": True,
-            "inclusion_connect_url": f"{ic_base_url}",
+            "inclusion_connect_url": inclusion_connect_url,
         }
         return context | extra_context
 
@@ -67,10 +72,18 @@ class SiaeStaffLoginView(ItouLoginView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        ic_base_url = reverse("login:activate_siae_staff_account")
+        params = {
+            "user_kind": UserKind.SIAE_STAFF,
+            "previous_url": self.request.get_full_path(),
+        }
+        if context["redirect_field_value"]:
+            params["next_url"] = context["redirect_field_value"]
 
-        if context["redirect_field_value"] is not None:
-            ic_base_url = add_url_params(ic_base_url, {REDIRECT_FIELD_NAME: context["redirect_field_value"]})
+        inclusion_connect_url = (
+            add_url_params(reverse("inclusion_connect:authorize"), params)
+            if settings.INCLUSION_CONNECT_BASE_URL
+            else None
+        )
 
         extra_context = {
             "account_type_display_name": "employeur solidaire",
@@ -79,7 +92,7 @@ class SiaeStaffLoginView(ItouLoginView):
             "signup_url": reverse("signup:siae_select"),
             "signup_allowed": True,
             "uses_inclusion_connect": True,
-            "inclusion_connect_url": f"{ic_base_url}",
+            "inclusion_connect_url": inclusion_connect_url,
         }
         return context | extra_context
 
@@ -107,62 +120,3 @@ class JobSeekerLoginView(ItouLoginView):
             "show_peamu": bool(settings.PEAMU_AUTH_BASE_URL),
         }
         return context | extra_context
-
-
-class AccountMigrationBaseView(FormView):
-    template_name = "account/activate_inclusion_connect_account.html"
-    form_class = AccountMigrationForm
-
-    def _get_inclusion_connect_base_params(self):
-        params = {"user_kind": self.user_kind, "previous_url": self.request.get_full_path()}
-
-        next = get_safe_url(self.request, REDIRECT_FIELD_NAME)
-
-        if next:
-            params["next_url"] = next
-
-        return params
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        params = self._get_inclusion_connect_base_params()
-        existing_ic_account = self.request.GET.get("existing_ic_account")
-        inclusion_connect_url = add_url_params(reverse("inclusion_connect:authorize"), params)
-        existing_ic_account_url = None
-        if existing_ic_account:
-            params["user_email"] = existing_ic_account
-            existing_ic_account_url = add_url_params(reverse("inclusion_connect:authorize"), params)
-
-        extra_context = {
-            "inclusion_connect_url": inclusion_connect_url,
-            "existing_ic_account": existing_ic_account,
-            "existing_ic_account_url": existing_ic_account_url,
-            "matomo_account_type": self.user_kind,
-        }
-
-        return context | extra_context
-
-    def form_valid(self, form):
-        self.form = form
-        email = self.form.cleaned_data["email"]
-        if User.objects.filter(
-            email=email, kind=self.user_kind, identity_provider=IdentityProvider.INCLUSION_CONNECT
-        ).exists():
-            params = {"existing_ic_account": email}
-            return HttpResponseRedirect(add_url_params(self.request.get_full_path(), params))
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        params = self._get_inclusion_connect_base_params()
-        params["user_email"] = self.form.cleaned_data["email"]
-        return add_url_params(reverse("inclusion_connect:activate_account"), params)
-
-
-class PrescriberAccountMigrationView(AccountMigrationBaseView):
-    url_name = "login:activate_prescriber_account"
-    user_kind = UserKind.PRESCRIBER
-
-
-class SiaeStaffAccountMigrationView(AccountMigrationBaseView):
-    url_name = "login:activate_siae_staff_account"
-    user_kind = UserKind.SIAE_STAFF

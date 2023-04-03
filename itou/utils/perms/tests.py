@@ -1,7 +1,18 @@
+from functools import partial
+
+import pytest
 from django.test import override_settings
 from django.urls import reverse
+from pytest_django.asserts import assertRedirects
 
-from itou.users.factories import ItouStaffFactory, JobSeekerFactory, PrescriberFactory
+from itou.users.enums import IdentityProvider
+from itou.users.factories import (
+    ItouStaffFactory,
+    JobSeekerFactory,
+    LaborInspectorFactory,
+    PrescriberFactory,
+    SiaeStaffFactory,
+)
 from itou.utils.test import TestCase
 
 
@@ -67,3 +78,27 @@ class UserHijackPermTestCase(TestCase):
         assert response.status_code == 302
         assert response["Location"] == "/bar/"
         assert cm.records[0].message == f"admin={hijacker} has ended impersonation of user={hijacked}"
+
+
+@pytest.mark.parametrize(
+    "user_factory,identity_provider,is_redirected",
+    [
+        (ItouStaffFactory, IdentityProvider.DJANGO, False),
+        (JobSeekerFactory, IdentityProvider.DJANGO, False),
+        (JobSeekerFactory, IdentityProvider.PE_CONNECT, False),
+        (JobSeekerFactory, IdentityProvider.FRANCE_CONNECT, False),
+        (PrescriberFactory, IdentityProvider.DJANGO, True),
+        (PrescriberFactory, IdentityProvider.INCLUSION_CONNECT, False),
+        (partial(SiaeStaffFactory, with_siae=True), IdentityProvider.DJANGO, True),
+        (partial(SiaeStaffFactory, with_siae=True), IdentityProvider.INCLUSION_CONNECT, False),
+        (LaborInspectorFactory, IdentityProvider.DJANGO, False),
+    ],
+)
+def test_redirect_to_ic_activation_view(client, user_factory, identity_provider, is_redirected):
+    user = user_factory(identity_provider=identity_provider)
+    client.force_login(user)
+    response = client.get(reverse("home:hp"), follow=True)
+    if is_redirected:
+        assertRedirects(response, reverse("dashboard:activate_ic_account"))
+    else:
+        assert response.status_code == 200

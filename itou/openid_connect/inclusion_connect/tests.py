@@ -97,11 +97,9 @@ def mock_oauth_dance(
     authorize_url = f"{reverse('inclusion_connect:authorize')}?{urlencode(authorize_params)}"
     response = client.get(authorize_url)
     if register:
-        assert response.url.startswith(
-            "https://inclusion.connect.fake/realms/foobar/protocol/openid-connect/registrations"
-        )
+        assert response.url.startswith(constants.INCLUSION_CONNECT_ENDPOINT_REGISTER)
     else:
-        assert response.url.startswith("https://inclusion.connect.fake/realms/foobar/protocol/openid-connect/auth")
+        assert response.url.startswith(constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE)
 
     # User is logged out from IC when an error happens during the oauth dance.
     respx.get(constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(200)
@@ -574,7 +572,7 @@ class InclusionConnectLoginTest(InclusionConnectBaseTestCase):
         login_url = reverse("login:prescriber")
         response = self.client.get(login_url)
         self.assertContains(response, "logo-inclusion-connect-one-line.svg")
-        self.assertContains(response, reverse("login:activate_prescriber_account"))
+        self.assertContains(response, reverse("inclusion_connect:authorize"))
 
         response = mock_oauth_dance(self.client, UserKind.PRESCRIBER, assert_redirects=False)
         expected_redirection = reverse("dashboard:index")
@@ -595,6 +593,7 @@ class InclusionConnectLoginTest(InclusionConnectBaseTestCase):
         user = PrescriberFactory(
             has_completed_welcoming_tour=True,
             **InclusionConnectPrescriberData.user_info_mapping_dict(user_info),
+            identity_provider=IdentityProvider.DJANGO,
         )
 
         # Existing user connects with IC which results in:

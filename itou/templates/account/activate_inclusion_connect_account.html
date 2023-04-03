@@ -18,59 +18,27 @@
                         <picture class="d-block mb-5">
                             <img class="img-fluid" src="{% static_theme_images 'logo-inclusion-connect.svg' %}" width="240" alt="Inclusion Connect"/>
                         </picture>
-                        <h1 class="h2 mb-lg-4">Activer Inclusion Connect</h1>
-                        <ol class="mb-lg-4">
-                            <li>Saisissez la même adresse e-mail que celle actuellement utilisée sur les emplois de l’inclusion</li>
-                            <li>Cliquez sur “Valider”</li>
-                            <li>Laissez-vous guider</li>
-                        </ol>
-                        {% if existing_ic_account %}
-                            <div class="alert alert-info" role="status">
-                                <div class="row">
-                                    <div class="col-auto pr-0">
-                                        <i class="ri-information-line ri-xl text-info"></i>
-                                    </div>
-                                    <div class="col">
-                                        <p class="mb-0">
-                                            <strong>
-                                                Vous avez déjà un compte Inclusion Connect associé à l'adresse
-                                                <br>
-                                                {{ existing_ic_account }}
-                                            </strong>
-                                        </p>
-                                        <a href="{{ existing_ic_account_url }}"
-                                           class="btn btn-link matomo-event"
-                                           data-matomo-category="connexion {{ matomo_account_type }}"
-                                           data-matomo-action="clic"
-                                           data-matomo-option="se-connecter-avec-inclusion-connect">Se connecter</a>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endif %}
-                        <form method="post">
-                            {% csrf_token %}
-                            <fieldset>
-                                {% bootstrap_form_errors form type="all" %}
-                                {% redirection_input_field name=redirect_field_name value=redirect_field_value %}
-                                {% bootstrap_field form.email %}
-                            </fieldset>
-                            <button type="submit"
-                                    class="btn btn-block btn-primary matomo-event"
-                                    data-matomo-category="activation {{ matomo_account_type }}"
-                                    data-matomo-action="clic"
-                                    data-matomo-option="activer-son-compte-inclusion-connect">
-                                Valider
-                            </button>
-                        </form>
-                        <hr class="my-3 my-lg-4">
-                        <div class="text-center">
-                            <h2 class="h5">Vous avez déjà un compte Inclusion Connect ?</h2>
-                            <a href="{{ inclusion_connect_url }}"
-                               class="btn btn-link matomo-event"
-                               data-matomo-category="connexion {{ matomo_account_type }}"
-                               data-matomo-action="clic"
-                               data-matomo-option="se-connecter-avec-inclusion-connect">Se connecter</a>
-                        </div>
+                        <h1 class="h2 mb-lg-4">Un accès unique à tous vos services !</h1>
+                        <p>Le service Inclusion Connect est à présent obligatoire pour se connecter à la plateforme des emplois.</p>
+                        <p>
+                            Il vous permettra d'accéder aux différents services partenaires avec <b>le même identifiant et le même mot de passe.</b>
+                        </p>
+                        <p>Il vous suffit de cliquer sur le bouton ci-desous pour activer votre compte</p>
+                        <a href="{{ inclusion_connect_url }}"
+                           class="btn btn-block btn-primary matomo-event"
+                           data-matomo-category="activation {{ matomo_account_type }}"
+                           data-matomo-action="clic"
+                           data-matomo-option="activer-son-compte-inclusion-connect">
+                            Activer mon compte Inclusion Connect
+                        </a>
+                        <a class="btn btn-link btn-block"
+                           href="https://plateforme-inclusion.notion.site/Un-compte-unique-pour-mes-services-num-riques-ded9135197654da590f5dde41d8bb68b"
+                           aria-label="Plus d'infos concernant Inclusion Connect"
+                           rel="noopener"
+                           target="_blank">
+                            <span>Plus d'infos</span>
+                            <i class="ri-external-link-line ri-lg"></i>
+                        </a>
                     </div>
                 </div>
                 <div class="s-section__col d-none d-lg-flex col-lg-6 p-lg-6 justify-content-center align-items-center bg-light">

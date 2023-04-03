@@ -16,7 +16,7 @@ from itou.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oaut
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory, PrescriberPoleEmploiFactory
 from itou.siaes.factories import SiaeFactory
-from itou.users.enums import UserKind
+from itou.users.enums import IdentityProvider, UserKind
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory
 from itou.users.models import User
 from itou.utils import constants as global_constants
@@ -191,6 +191,8 @@ class TestAcceptPrescriberWithOrgInvitation(InclusionConnectBaseTestCase):
     def assert_invitation_is_accepted(self, response, user, invitation, new_user=True):
         if new_user:
             self.assertRedirects(response, reverse("welcoming_tour:index"))
+        elif user.identity_provider == IdentityProvider.DJANGO:
+            self.assertRedirects(response, reverse("dashboard:activate_ic_account"))
         else:
             self.assertRedirects(response, reverse("dashboard:index"))
 
@@ -334,12 +336,15 @@ class TestAcceptPrescriberWithOrgInvitation(InclusionConnectBaseTestCase):
         assert reverse("login:prescriber") in response.wsgi_request.get_full_path()
         assert not invitation.accepted
         next_url = reverse("invitations_views:join_prescriber_organization", args=(invitation.pk,))
-
-        self.assertContains(
-            response, reverse("login:activate_prescriber_account") + "?" + urlencode({"next": next_url})
-        )
-
         previous_url = f"{reverse('login:prescriber')}?{urlencode({'next': next_url})}"
+        params = {
+            "user_kind": UserKind.PRESCRIBER,
+            "previous_url": previous_url,
+            "next_url": next_url,
+        }
+        url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
+        self.assertContains(response, url + '"')
+
         response = mock_oauth_dance(
             self.client,
             UserKind.PRESCRIBER,
@@ -357,7 +362,7 @@ class TestAcceptPrescriberWithOrgInvitation(InclusionConnectBaseTestCase):
 
     def test_accept_existing_user_not_logged_in_using_django_auth(self):
         invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
-        user = PrescriberFactory(has_completed_welcoming_tour=True)
+        user = PrescriberFactory(has_completed_welcoming_tour=True, identity_provider="DJANGO")
         # The user verified its email
         EmailAddress(user_id=user.pk, email=user.email, verified=True, primary=True).save()
         invitation = PrescriberWithOrgSentInvitationFactory(

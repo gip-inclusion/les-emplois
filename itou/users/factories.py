@@ -14,7 +14,7 @@ from itou.cities.factories import create_city_in_zrr, create_city_partially_in_z
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.geo.factories import QPVFactory, ZRRFactory
 from itou.users import models
-from itou.users.enums import Title, UserKind
+from itou.users.enums import IdentityProvider, Title, UserKind
 from itou.utils.mocks.address_format import get_random_geocoding_api_result
 from itou.utils.validators import validate_nir
 
@@ -68,10 +68,19 @@ class ItouStaffFactory(UserFactory):
 
 class PrescriberFactory(UserFactory):
     kind = UserKind.PRESCRIBER
+    identity_provider = IdentityProvider.INCLUSION_CONNECT
 
 
 class SiaeStaffFactory(UserFactory):
     kind = UserKind.SIAE_STAFF
+    identity_provider = IdentityProvider.INCLUSION_CONNECT
+
+    @factory.post_generation
+    def with_siae(self, created, extracted, **kwargs):
+        from itou.siaes.factories import SiaeMembershipFactory
+
+        if created and extracted is True:
+            SiaeMembershipFactory(user=self)
 
 
 class LaborInspectorFactory(UserFactory):

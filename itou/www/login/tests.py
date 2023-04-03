@@ -1,4 +1,4 @@
-from urllib.parse import quote, urlencode
+from urllib.parse import urlencode
 
 import respx
 from django.contrib.messages import get_messages
@@ -6,7 +6,7 @@ from django.test import override_settings
 from django.test.client import RequestFactory
 from django.urls import reverse
 from django.utils.html import escape
-from pytest_django.asserts import assertContains, assertRedirects
+from pytest_django.asserts import assertContains
 
 from itou.openid_connect.france_connect import constants as fc_constants
 from itou.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance
@@ -21,6 +21,7 @@ from itou.users.factories import (
     SiaeStaffFactory,
 )
 from itou.utils.test import TestCase, reload_module
+from itou.utils.urls import add_url_params
 from itou.www.login.forms import ItouLoginForm
 
 
@@ -66,17 +67,27 @@ class PrescriberLoginTest(InclusionConnectBaseTestCase):
         url = reverse("login:prescriber")
         response = self.client.get(url)
         self.assertContains(response, "Se connecter avec Inclusion Connect")
-        self.assertContains(response, reverse("login:activate_prescriber_account"))
+        params = {
+            "user_kind": UserKind.PRESCRIBER,
+            "previous_url": url,
+        }
+        inclusion_connect_url = escape(add_url_params(reverse("inclusion_connect:authorize"), params))
+        self.assertContains(response, inclusion_connect_url + '"')
         self.assertContains(response, "Adresse e-mail")
         self.assertContains(response, "Mot de passe")
 
-        params = urlencode({"next": "/activate"})
-        url = f"{reverse('login:prescriber')}?{params}"
-        response = self.client.get(url)
-        self.assertContains(response, f"{reverse('login:activate_prescriber_account')}?{params}")
+        url_with_next = add_url_params(reverse("login:prescriber"), {"next": "/next_url"})
+        response = self.client.get(url_with_next)
+        params = {
+            "user_kind": UserKind.PRESCRIBER,
+            "previous_url": url_with_next,
+            "next_url": "/next_url",
+        }
+        inclusion_connect_url = escape(add_url_params(reverse("inclusion_connect:authorize"), params))
+        self.assertContains(response, inclusion_connect_url + '"')
 
     def test_login_using_django(self):
-        user = PrescriberFactory()
+        user = PrescriberFactory(identity_provider=IdentityProvider.DJANGO)
         url = reverse("login:prescriber")
         response = self.client.get(url)
         assert response.status_code == 200
@@ -109,18 +120,27 @@ class SiaeStaffLoginTest(InclusionConnectBaseTestCase):
         url = reverse("login:siae_staff")
         response = self.client.get(url)
         self.assertContains(response, "Se connecter avec Inclusion Connect")
-        self.assertContains(response, f"{reverse('login:activate_siae_staff_account')}")
+        params = {
+            "user_kind": UserKind.SIAE_STAFF,
+            "previous_url": url,
+        }
+        inclusion_connect_url = escape(add_url_params(reverse("inclusion_connect:authorize"), params))
+        self.assertContains(response, inclusion_connect_url + '"')
         self.assertContains(response, "Adresse e-mail")
         self.assertContains(response, "Mot de passe")
 
-        params = urlencode({"next": "/activate"})
-
-        url = f"{reverse('login:siae_staff')}?{params}"
-        response = self.client.get(url)
-        self.assertContains(response, f"{reverse('login:activate_siae_staff_account')}?{params}")
+        url_with_next = add_url_params(reverse("login:siae_staff"), {"next": "/next_url"})
+        response = self.client.get(url_with_next)
+        params = {
+            "user_kind": UserKind.SIAE_STAFF,
+            "previous_url": url_with_next,
+            "next_url": "/next_url",
+        }
+        inclusion_connect_url = escape(add_url_params(reverse("inclusion_connect:authorize"), params))
+        self.assertContains(response, inclusion_connect_url + '"')
 
     def test_login_using_django(self):
-        user = SiaeStaffFactory()
+        user = SiaeStaffFactory(identity_provider=IdentityProvider.DJANGO)
         url = reverse("login:siae_staff")
         response = self.client.get(url)
         assert response.status_code == 200
@@ -216,104 +236,49 @@ class JopbSeekerLoginTest(TestCase):
 
 
 def test_prescriber_account_activation_view_with_next(client):
-    next_url = "/test_join"
-    url = f"{reverse('login:activate_prescriber_account')}?{urlencode({'next': next_url})}"
+    user = PrescriberFactory(identity_provider=IdentityProvider.DJANGO)
+    client.force_login(user)
+
+    url = reverse("dashboard:activate_ic_account")
     response = client.get(url)
     # Check the href link
-    params = urlencode({"user_kind": UserKind.PRESCRIBER, "previous_url": url, "next_url": next_url})
-    ic_auhtorize_url = escape(f"{reverse('inclusion_connect:authorize')}?{params}")
+    params = {
+        "user_kind": UserKind.PRESCRIBER,
+        "previous_url": url,
+        "user_email": user.email,
+    }
+    ic_auhtorize_url = escape(f"{reverse('inclusion_connect:activate_account')}?{urlencode(params)}")
     assertContains(response, f'{ic_auhtorize_url}"')
 
-
-def test_siae_staff_account_activation_view_with_next(client):
     next_url = "/test_join"
-    url = f"{reverse('login:activate_siae_staff_account')}?{urlencode({'next': next_url})}"
+    url = f"{reverse('dashboard:activate_ic_account')}?{urlencode({'next': next_url})}"
     response = client.get(url)
-    params = urlencode({"user_kind": UserKind.SIAE_STAFF, "previous_url": url, "next_url": next_url})
     # Check the href link
-    ic_auhtorize_url = escape(f"{reverse('inclusion_connect:authorize')}?{params}")
+    params["previous_url"] = url
+    params["next_url"] = next_url
+    ic_auhtorize_url = escape(f"{reverse('inclusion_connect:activate_account')}?{urlencode(params)}")
     assertContains(response, f'{ic_auhtorize_url}"')
-
-
-def test_prescriber_account_activation_view(client):
-    url = reverse("login:activate_prescriber_account")
-    response = client.post(url, data={"email": "toto@email.com"}, follow=False)
-    assert response.url.startswith(reverse("inclusion_connect:activate_account"))
-    assert f"user_email={quote('toto@email.com')}" in response.url
-    assert "user_kind=prescriber" in response.url
-
-
-def test_prescriber_account_activation_view_with_next_url(client):
-    next_url = "/test_join"
-    url = f"{reverse('login:activate_prescriber_account')}?{urlencode({'next': next_url})}"
-    response = client.post(url, data={"email": "toto@email.com"}, follow=False)
-    assert response.url.startswith(reverse("inclusion_connect:activate_account"))
-    assert f"user_email={quote('toto@email.com')}" in response.url
-    assert urlencode({"next_url": next_url}) in response.url
-    assert "user_kind=prescriber" in response.url
-
-
-def test_prescriber_account_activation_view_already_exists(client):
-    user = PrescriberFactory(identity_provider=IdentityProvider.INCLUSION_CONNECT)
-    url = reverse("login:activate_prescriber_account")
-    response = client.post(url, data={"email": user.email}, follow=True)
-    assertRedirects(response, f"{url}?{urlencode({'existing_ic_account': user.email})}")
-    assertContains(response, "Vous avez déjà un compte Inclusion Connect associé à l'adresse")
-    assertContains(response, f"user_email={quote(user.email)}")
-
-
-def test_prescriber_account_activation_view_already_exists_with_next(client):
-    user = PrescriberFactory(identity_provider=IdentityProvider.INCLUSION_CONNECT)
-    next_url = "/test_join"
-    url = f"{reverse('login:activate_prescriber_account')}?{urlencode({'next': next_url})}"
-    response = client.post(url, data={"email": user.email}, follow=True)
-    assertRedirects(
-        response,
-        reverse("login:activate_prescriber_account")
-        + "?"
-        + urlencode({"existing_ic_account": user.email, "next": next_url}),
-    )
-    assertContains(response, "Vous avez déjà un compte Inclusion Connect associé à l'adresse")
-    assertContains(response, f"user_email={quote(user.email)}")
 
 
 def test_siae_staff_account_activation_view(client):
-    url = reverse("login:activate_siae_staff_account")
-    response = client.post(url, data={"email": "toto@email.com"}, follow=False)
-    assert response.url.startswith(reverse("inclusion_connect:activate_account"))
-    assert f"user_email={quote('toto@email.com')}" in response.url
-    assert "user_kind=siae_staff" in response.url
+    user = SiaeStaffFactory(with_siae=True, identity_provider=IdentityProvider.DJANGO)
+    client.force_login(user)
 
+    url = reverse("dashboard:activate_ic_account")
+    response = client.get(url)
+    # Check the href link
+    params = {
+        "user_kind": UserKind.SIAE_STAFF,
+        "previous_url": url,
+        "user_email": user.email,
+    }
+    ic_auhtorize_url = escape(f"{reverse('inclusion_connect:activate_account')}?{urlencode(params)}")
+    assertContains(response, f'{ic_auhtorize_url}"')
 
-def test_siae_staff_account_activation_view_with_next_url(client):
     next_url = "/test_join"
-    url = f"{reverse('login:activate_siae_staff_account')}?{urlencode({'next': next_url})}"
-    response = client.post(url, data={"email": "toto@email.com"}, follow=False)
-    assert response.url.startswith(reverse("inclusion_connect:activate_account"))
-    assert f"user_email={quote('toto@email.com')}" in response.url
-    assert urlencode({"next_url": next_url}) in response.url
-    assert "user_kind=siae_staff" in response.url
-
-
-def test_siae_staff_account_activation_view_already_exists(client):
-    user = SiaeStaffFactory(identity_provider=IdentityProvider.INCLUSION_CONNECT)
-    url = reverse("login:activate_siae_staff_account")
-    response = client.post(url, data={"email": user.email}, follow=True)
-    assertRedirects(response, f"{url}?{urlencode({'existing_ic_account': user.email})}")
-    assertContains(response, "Vous avez déjà un compte Inclusion Connect associé à l'adresse")
-    assertContains(response, f"user_email={quote(user.email)}")
-
-
-def test_siae_staff_account_activation_view_already_exists_with_next(client):
-    user = SiaeStaffFactory(identity_provider=IdentityProvider.INCLUSION_CONNECT)
-    next_url = "/test_join"
-    url = f"{reverse('login:activate_siae_staff_account')}?{urlencode({'next': next_url})}"
-    response = client.post(url, data={"email": user.email}, follow=True)
-    assertRedirects(
-        response,
-        reverse("login:activate_siae_staff_account")
-        + "?"
-        + urlencode({"existing_ic_account": user.email, "next": next_url}),
-    )
-    assertContains(response, "Vous avez déjà un compte Inclusion Connect associé à l'adresse")
-    assertContains(response, f"user_email={quote(user.email)}")
+    url = f"{reverse('dashboard:activate_ic_account')}?{urlencode({'next': next_url})}"
+    response = client.get(url)
+    # Check the href link
+    params["previous_url"] = url
+    params["next_url"] = next_url
+    ic_auhtorize_url = escape(f"{reverse('inclusion_connect:activate_account')}?{urlencode(params)}")
