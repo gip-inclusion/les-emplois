@@ -17,9 +17,9 @@
             $("#status-filter-form form").submit();
         });
         $("#order-form-group :input").click(function(event) {
-            // Fill the hidden order input of the form
-            $("#id_order").val(event.target.value);
-            $("#status-filter-form form").submit();
+            let input = $("#id_order")
+            input.val(event.target.value); // Fill the hidden order input of the form
+            input.change(); // Fire a change event to notify handlers
         });
         // Show or Hide the search-filter-form sidebar based on responsive breakpoint
         var breakpointMD = getComputedStyle(document.documentElement).getPropertyValue("--breakpoint-md");
@@ -138,6 +138,13 @@
                                         </div>
                                     {% endfor %}
                                 </div>
+                            </fieldset>
+                            {# Job seeker filter #}
+                            <fieldset>
+                                <legend>
+                                    Par candidat
+                                </legend>
+                                {% bootstrap_field filters_form.job_seekers show_label=False %}
                             </fieldset>
                         </div>
                         {# Filled via jQuery #}
