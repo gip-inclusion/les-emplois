@@ -11,7 +11,7 @@ PGDATABASE ?= itou
 ifeq ($(shell uname -s),Linux)
 	REQUIREMENTS_PATH := requirements/dev.txt
 else
-	REQUIREMENTS_PATH := requirements/dev.in
+	REQUIREMENTS_PATH := requirements/dev-mac.txt
 endif
 
 VIRTUAL_ENV ?= .venv
