@@ -6,67 +6,61 @@
 
     <h1 class="h1-hero-c1">{{ approval.user.get_full_name|title }}</h1>
 
-    <div class="card my-4">
-        <div class="card-body">
+    <div class="c-box mb-3 mb-lg-5">
+        {# Approval status. #}
+        <div>{% include "approvals/includes/status.html" with common_approval=approval %}</div>
 
-            {# Approval status. #}
-            <div class="card-text">{% include "approvals/includes/status.html" with common_approval=approval %}</div>
-
-            {# Approval actions. #}
-            {% if approval and request.user.is_siae_staff %}
+        {# Approval actions. #}
+        {% if approval and request.user.is_siae_staff %}
+            <div class="d-flex justify-content-between mb-3">
                 {% if approval_can_be_suspended_by_siae %}
-                    <a href="{% url 'approvals:suspend' approval_id=approval.id %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-link">
+                    <a href="{% url 'approvals:suspend' approval_id=approval.id %}?back_url={{ request.get_full_path|urlencode }}"
+                       class="btn btn-link"
+                       aria-label="Suspendre le PASS IAE de {{ approval.user.get_full_name }}">
                         Suspendre
                     </a>
                 {% elif hire_by_other_siae %}
                     <span class="btn btn-link disabled text-muted">Suspendre</span>
-                    <i class="ri-information-line ri-xl text-info" data-toggle="tooltip" title="La suspension n’est pas possible, un autre employeur a embauché le candidat.">
-                    </i>
+                    <i class="ri-information-line ri-xl text-info" data-toggle="tooltip" title="La suspension n’est pas possible : un autre employeur ayant embauché le candidat."></i>
                 {% endif %}
                 {% if approval_can_be_prolonged_by_siae %}
-                    <a href="{% url 'approvals:declare_prolongation' approval_id=approval.id %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-link">
+                    <a href="{% url 'approvals:declare_prolongation' approval_id=approval.id %}?back_url={{ request.get_full_path|urlencode }}"
+                       class="btn btn-link"
+                       aria-label="Prolonger le PASS IAE de {{ approval.user.get_full_name }}">
                         Prolonger
                     </a>
                 {% endif %}
-                <a class="btn btn-outline-primary float-right matomo-event"
+                <a class="btn btn-outline-primary matomo-event"
                    data-matomo-action="telechargement-pdf"
                    data-matomo-category="agrement"
                    data-matomo-option="detail-agrement"
                    href="{% url 'approvals:display_printable_approval' approval_id=approval.id %}"
-                   target="_blank">
+                   target="_blank"
+                   aria-label="Afficher le PASS IAE de {{ approval.user.get_full_name }}">
                     Afficher le PASS IAE
                 </a>
-            {% endif %}
-
-        </div>
+            </div>
+        {% endif %}
     </div>
 
     {# Job seeker info ------------------------------------------------------------------------- #}
-    <div class="card my-4">
-        <div class="card-body">
-            <div class="card-text">
-                <h2>Informations du salarié</h2>
-                <hr class="my-4">
-                <h3>Informations personnelles</h3>
-                {# TODO(alaurent) It would be great to remove the use for job_application here #}
-                {% include "apply/includes/job_seeker_info.html" with with_matomo_event=True %}
-                {# Eligibility ------------------------------------------------------------------------- #}
-                {% include "apply/includes/eligibility_diagnosis.html" with eligibility_diagnosis=eligibility_diagnosis job_application=job_application %}
-            </div>
-        </div>
+    <div class="c-box mb-3 mb-lg-5">
+        <h2>Informations du salarié</h2>
+        <hr>
+        <h3>Informations personnelles</h3>
+        {# TODO(alaurent) It would be great to remove the use for job_application here #}
+        {% include "apply/includes/job_seeker_info.html" with with_matomo_event=True %}
+        {# Eligibility ------------------------------------------------------------------------- #}
+        {% include "apply/includes/eligibility_diagnosis.html" with eligibility_diagnosis=eligibility_diagnosis job_application=job_application %}
     </div>
 
     {# Job applications ------------------------------------------------------------------------ #}
-    <div class="card my-4">
-        <div class="card-body">
-            <div class="card-text">
-                <h2>Candidatures de ce salarié</h2>
-                <hr class="my-4">
-                {% for job_application_for_card in all_job_applications %}
-                    {% include "approvals/includes/job_applications.html" with job_application=job_application_for_card %}
-                {% endfor %}
-            </div>
-        </div>
+    <div class="c-box mb-3 mb-lg-5">
+        <h2>Candidatures de ce salarié</h2>
+        <hr>
+        {% for job_application_for_card in all_job_applications %}
+            {% include "approvals/includes/job_applications.html" with job_application=job_application_for_card %}
+        {% endfor %}
     </div>
 
 {% endblock %}

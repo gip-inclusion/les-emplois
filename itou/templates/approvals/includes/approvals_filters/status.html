@@ -1,13 +1,13 @@
 {% load bootstrap4 %}
 
-<div class="pt-3 w-100 border-bottom">
-    <button class="p-0 btn collapse-caret" data-toggle="collapse" data-target="#collapse_filter_status" type="button" aria-expanded="true" aria-controls="collapse_filter_status">
-        <span class="h5 mb-1">Statut du PASS IAE</span>
-    </button>
-</div>
-<div class="form_group collapse show p-1" id="collapse_filter_status">
-    {% bootstrap_field filters_form.status_valid form_group_class="" %}
-    {% bootstrap_field filters_form.status_suspended form_group_class="" %}
-    {% bootstrap_field filters_form.status_future form_group_class="" %}
-    {% bootstrap_field filters_form.status_expired form_group_class="" %}
-</div>
+<fieldset>
+    <legend>
+        Statut du PASS IAE
+    </legend>
+    <ul class="list-unstyled">
+        <li>{% bootstrap_field filters_form.status_valid form_group_class="" %}</li>
+        <li>{% bootstrap_field filters_form.status_suspended form_group_class="" %}</li>
+        <li>{% bootstrap_field filters_form.status_future form_group_class="" %}</li>
+        <li>{% bootstrap_field filters_form.status_expired form_group_class="" %}</li>
+    </ul>
+</fieldset>

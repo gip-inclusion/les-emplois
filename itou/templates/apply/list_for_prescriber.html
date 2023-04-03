@@ -27,12 +27,12 @@
     <div class="row">
         <div class="col-12 col-md-4 mb-3 mb-md-5">
             <aside class="c-aside-filters">
-                <button class="c-aside-filters__btn__collapse" data-toggle="collapse" data-target="#candidatures-filter-form" aria-expanded="false" aria-controls="candidatures-filter-form">
-                    <i class="ri-filter-line"></i>
+                <button class="c-aside-filters__btn__collapse" data-toggle="collapse" data-target="#job-aside-filters-form" aria-expanded="false" aria-controls="job-aside-filters-form">
+                    <i class="ri-filter-line" aria-hidden="true"></i>
                     <span>Filtrer les candidatures</span>
                 </button>
-                <div class="c-aside-filters__card collapse" id="candidatures-filter-form">
-                    <form method="get" id="js-job-applications-filters-form">
+                <div class="c-aside-filters__card collapse" id="job-aside-filters-form">
+                    <form method="get" action="" id="js-job-applications-filters-form">
                         <div class="c-aside-filters__card__body">
                             {% include "apply/includes/job_applications_filters/statut.html" %}
                             <hr>
@@ -82,7 +82,7 @@
                 </div>
 
                 {% if not job_applications_page %}
-                    <h2 class="font-weight-normal text-muted my-4">Aucune candidature pour le moment.</h2>
+                    <p class="my-3 my-md-4">Aucune candidature pour le moment.</p>
                 {% else %}
                     {% for job_application in job_applications_page %}
                         <div class="c-card card my-4 has-links-inside">
@@ -108,18 +108,8 @@
 
 {% block script %}
     {{ block.super }}
-    <script nonce="{{ CSP_NONCE }}">
-        // Show or Hide the search-filter-form sidebar based on responsive breakpoint
-        var breakpointMD = getComputedStyle(document.documentElement).getPropertyValue("--breakpoint-md");
-        $(window).on("load resize", function() {
-            if (window.matchMedia("(min-width: "+breakpointMD+")").matches) {
-                $("candidatures-filter-form").collapse("show");
-            } else {
-                $("candidatures-filter-form").collapse("hide");
-            }
-        });
-    </script>
     <!-- Needed to use Select2MultipleWidget. -->
     {{ filters_form.media.js }}
     <script src='{% static "js/job_applications_filters.js" %}'></script>
+    <script src='{% static "js/job_aside_collapse_filters.js" %}'></script>
 {% endblock %}

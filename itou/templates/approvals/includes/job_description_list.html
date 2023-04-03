@@ -33,7 +33,7 @@
     {# élément à passer au dessus du précédent en vue mobile #}
     <span class="order-1 order-md-2 ml-auto">{% state_badge job_application %}</span>
 </div>
-
+<hr class="my-3">
 {% with all_jobs=job_application.selected_jobs.all %}
     <p>
         {% if all_jobs|length == 0 %}
