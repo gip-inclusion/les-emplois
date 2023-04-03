@@ -439,7 +439,11 @@ class DashboardViewTest(TestCase):
     def test_dora_banner_is_shown_for_siae(self):
         for department in ["08", "60", "91", "974"]:
             with self.subTest(department=department):
-                siae = SiaeFactory(with_membership=True, department=department)
+                siae = SiaeFactory(
+                    with_membership=True,
+                    department=department,
+                    membership__user__identity_provider=IdentityProvider.INCLUSION_CONNECT,
+                )
                 self.client.force_login(siae.members.first())
 
                 response = self.client.get(reverse("dashboard:index"))
@@ -450,6 +454,7 @@ class DashboardViewTest(TestCase):
             with self.subTest(department=department):
                 prescriber_organization = prescribers_factories.PrescriberOrganizationWithMembershipFactory(
                     department=department,
+                    membership__user__identity_provider=IdentityProvider.INCLUSION_CONNECT,
                 )
                 self.client.force_login(prescriber_organization.members.first())
 
@@ -511,11 +516,11 @@ class DashboardViewTest(TestCase):
         ic_activate_url = escape(f"{reverse('inclusion_connect:activate_account')}?{urlencode(params)}")
         self.assertContains(response, ic_activate_url + '"')
 
-        # Not shown if user has dora banner
+        # Shown even if user is in DORA departments
         prescriber_organization.department = "08"
         prescriber_organization.save()
         response = self.client.get(reverse("dashboard:index"))
-        self.assertNotContains(response, "Inclusion Connect : un accès unique à tous vos services !")
+        self.assertContains(response, "Inclusion Connect : un accès unique à tous vos services !")
 
     def test_ic_banner_for_siae_staff(self):
         siae = SiaeFactory(with_membership=True, department="01")
@@ -541,11 +546,11 @@ class DashboardViewTest(TestCase):
         ic_activate_url = escape(f"{reverse('inclusion_connect:activate_account')}?{urlencode(params)}")
         self.assertContains(response, ic_activate_url + '"')
 
-        # Not shown if user has dora banner
+        # Shown even if user is in DORA departments
         siae.department = "08"
         siae.save()
         response = self.client.get(reverse("dashboard:index"))
-        self.assertNotContains(response, "Inclusion Connect : un accès unique à tous vos services !")
+        self.assertContains(response, "Inclusion Connect : un accès unique à tous vos services !")
 
     def test_dashboard_prescriber_suspend_link(self):
 
