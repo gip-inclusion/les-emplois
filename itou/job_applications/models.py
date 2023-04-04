@@ -242,6 +242,7 @@ class JobApplicationQuerySet(models.QuerySet):
             "to_siae__convention",
         ).prefetch_related(
             "selected_jobs__appellation",
+            "selected_jobs__location",
             Prefetch("job_seeker__approvals", queryset=Approval.objects.order_by("-start_at")),
         )
 
