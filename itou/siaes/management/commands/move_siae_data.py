@@ -63,6 +63,12 @@ class Command(BaseCommand):
             required=True,
         )
         parser.add_argument(
+            "--preserve-to-siae-data",
+            action=argparse.BooleanOptionalAction,
+            default=False,
+            help="Do not override <TO> SIAE brand, description, phone and coords with <FROM> data.",
+        )
+        parser.add_argument(
             "--only-job-applications",
             action=argparse.BooleanOptionalAction,
             default=False,
@@ -70,7 +76,7 @@ class Command(BaseCommand):
         )
         parser.add_argument("--wet-run", action=argparse.BooleanOptionalAction, default=False)
 
-    def handle(self, from_id, to_id, *, wet_run, only_job_applications, **options):
+    def handle(self, from_id, to_id, *, wet_run, only_job_applications, preserve_to_siae_data, **options):
         if from_id == to_id:
             self.stderr.write("Unable to use the same siae as source and destination (ID %s)\n" % from_id)
             return
@@ -163,7 +169,7 @@ class Command(BaseCommand):
         dest_employee_records_created_count = EmployeeRecord.objects.filter(job_application__to_siae_id=to_id).count()
         self.stdout.write(f"| Employee records created: {dest_employee_records_created_count}")
 
-        if move_all_data:
+        if move_all_data and not preserve_to_siae_data:
             self.stdout.write(f"| Brand '{to_siae.brand}' will be updated with '{from_siae.display_name}'\n")
             self.stdout.write(
                 f"| Description \n{to_siae.description}\nwill be updated with\n{from_siae.description}\n"
@@ -241,13 +247,14 @@ class Command(BaseCommand):
                 suspensions.update(siae_id=to_id)
                 invitations.update(siae_id=to_id)
                 evaluated_siaes.update(siae_id=to_id)
-                to_siae_qs.update(
-                    brand=from_siae.display_name,
-                    description=from_siae.description,
-                    phone=from_siae.phone,
-                    coords=from_siae.coords,
-                    geocoding_score=from_siae.geocoding_score,
-                )
+                if preserve_to_siae_data:
+                    to_siae_qs.update(
+                        brand=from_siae.display_name,
+                        description=from_siae.description,
+                        phone=from_siae.phone,
+                        coords=from_siae.coords,
+                        geocoding_score=from_siae.geocoding_score,
+                    )
                 from_siae_qs.update(
                     block_job_applications=True,
                     job_applications_blocked_at=timezone.now(),
