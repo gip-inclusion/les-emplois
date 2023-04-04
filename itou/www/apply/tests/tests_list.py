@@ -25,7 +25,8 @@ from itou.utils.widgets import DuetDatePickerWidget
 
 
 class ProcessListTest(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         """
         Create three organizations with two members each:
         - pole_emploi: job seekers agency.
@@ -83,21 +84,21 @@ class ProcessListTest(TestCase):
             eligibility_diagnosis=None,
         )
 
-        self.prescriber_base_url = reverse("apply:list_for_prescriber")
-        self.job_seeker_base_url = reverse("apply:list_for_job_seeker")
-        self.siae_base_url = reverse("apply:list_for_siae")
-        self.prescriber_exports_url = reverse("apply:list_for_prescriber_exports")
-        self.siae_exports_url = reverse("apply:list_for_siae_exports")
+        cls.prescriber_base_url = reverse("apply:list_for_prescriber")
+        cls.job_seeker_base_url = reverse("apply:list_for_job_seeker")
+        cls.siae_base_url = reverse("apply:list_for_siae")
+        cls.prescriber_exports_url = reverse("apply:list_for_prescriber_exports")
+        cls.siae_exports_url = reverse("apply:list_for_siae_exports")
 
         # Variables available for unit tests
-        self.pole_emploi = pole_emploi
-        self.hit_pit = hit_pit
-        self.l_envol = l_envol
-        self.thibault_pe = thibault_pe
-        self.laurie_pe = laurie_pe
-        self.eddie_hit_pit = eddie_hit_pit
-        self.audrey_envol = audrey_envol
-        self.maggie = maggie
+        cls.pole_emploi = pole_emploi
+        cls.hit_pit = hit_pit
+        cls.l_envol = l_envol
+        cls.thibault_pe = thibault_pe
+        cls.laurie_pe = laurie_pe
+        cls.eddie_hit_pit = eddie_hit_pit
+        cls.audrey_envol = audrey_envol
+        cls.maggie = maggie
 
 
 ####################################################
