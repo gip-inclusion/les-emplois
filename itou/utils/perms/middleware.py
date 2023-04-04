@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
@@ -46,6 +47,7 @@ class ItouCurrentOrganizationMiddleware:
                 and user.kind in [UserKind.PRESCRIBER, UserKind.SIAE_STAFF]
                 and not request.path.startswith("/dashboard/activate_ic_account")  # Allow to access ic activation view
                 and not request.path.startswith("/inclusion_connect")  # Allow to access ic views
+                and settings.FORCE_IC_LOGIN  # Allow to disable on dev setup
             ):
                 # Add request.path as next param ?
                 return HttpResponseRedirect(reverse("dashboard:activate_ic_account"))
