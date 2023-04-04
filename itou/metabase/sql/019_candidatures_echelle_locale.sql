@@ -3,19 +3,42 @@ L'objectif est de créer une table qui contient des informations à l'échelle l
 */
 
 with candidatures_p as (
-    select *
+    select
+        id,
+        "id_anonymisé",
+        id_candidat,
+        "id_candidat_anonymisé",
+        date_candidature,
+        date_embauche,
+        "délai_de_réponse",
+        "délai_prise_en_compte",
+        "département_structure",
+        safir_org_prescripteur,
+        id_structure,
+        id_org_prescripteur,
+        motif_de_refus,
+        "nom_département_structure",
+        "région_structure",
+        nom_structure,
+        type_structure,
+        "origine_détaillée",
+        nom_org_prescripteur,
+        "nom_prénom_conseiller",
+        origine,
+        injection_ai,
+        "état"
     from
         candidatures
 ),
 
 org_prescripteur as ( /* On récupère l'id et le dept des organismes prescripteurs afin de filtrer selon le département de l'agence PE associée */
     select
-        org.id                as id_org,
-        org.siret             as siret,
-        org."nom_département" as dept_org,  /*bien mettre nom département et pas département */
-        org."région"          as "région_org"
+        org.id                  as id_org,
+        org.siret               as siret_org_prescripteur,
+        org."nom_département"   as dept_org,  /*bien mettre nom département et pas département */
+        org."région"            as "région_org"
     from
-        organisations as org
+        organisations           as org
 ),
 
 bassin_emploi as ( /* On récupère les infos locales à partir des données infra départementales */
@@ -91,37 +114,38 @@ adherents_cocagne as (
 )
 
 select
-    date_candidature,
-    date_embauche,
-    "délai_de_réponse",
-    "délai_prise_en_compte",
+    candidatures_p.date_candidature,
+    candidatures_p.date_embauche,
+    candidatures_p."délai_de_réponse",
+    candidatures_p."délai_prise_en_compte",
     candidatures_p."département_structure",
-    "état",
-    id,
-    "id_anonymisé",
-    id_candidat,
+    candidatures_p."état",
+    candidatures_p.id,
+    candidatures_p."id_anonymisé",
+    candidatures_p.id_candidat,
     /* TODO dejafait drop as soon as analistos have migrated to the new deanonymized column */
-    "id_candidat_anonymisé",
+    candidatures_p."id_candidat_anonymisé",
     candidatures_p.id_structure,
     /* TODO dejafait drop as soon as analistos have migrated to the new deanonymized column */
-    motif_de_refus,
+    candidatures_p.motif_de_refus,
     candidatures_p."nom_département_structure",
-    nom_structure,
-    type_structure,
-    "origine_détaillée",
+    candidatures_p.nom_structure,
+    candidatures_p.type_structure,
+    candidatures_p."origine_détaillée",
     candidatures_p."région_structure",
-    safir_org_prescripteur,
-    id_org_prescripteur,
-    nom_org_prescripteur,
+    candidatures_p.safir_org_prescripteur,
+    candidatures_p.id_org_prescripteur,
+    candidatures_p.nom_org_prescripteur,
+    org_prescripteur.siret_org_prescripteur,
     "nom_prénom_conseiller",
-    dept_org,
-    "région_org",
-    injection_ai,
-    ville,
-    nom_epci,
-    code_commune,
-    nom_arrondissement,
-    bassin_d_emploi,
+    org_prescripteur.dept_org,
+    org_prescripteur."région_org",
+    candidatures_p.injection_ai,
+    bassin_emploi.ville,
+    bassin_emploi.nom_epci,
+    bassin_emploi.code_commune,
+    bassin_emploi.nom_arrondissement,
+    bassin_emploi.bassin_d_emploi,
     extract(day from "délai_de_réponse")      as temps_de_reponse,
     extract(day from "délai_prise_en_compte") as temps_de_prise_en_compte,
     case
