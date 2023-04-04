@@ -4,6 +4,7 @@ from django.utils.http import urlencode
 from pytest_django.asserts import assertContains, assertNumQueries
 
 from itou.approvals.factories import SuspensionFactory
+from itou.cities.factories import create_city_saint_andre
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.eligibility.models import AdministrativeCriteria
@@ -13,11 +14,11 @@ from itou.job_applications.factories import (
     JobApplicationSentByJobSeekerFactory,
     JobApplicationSentByPrescriberFactory,
 )
-from itou.job_applications.models import JobApplicationWorkflow
+from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
 from itou.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationWithMembershipFactory
-from itou.siaes.factories import SiaeFactory
+from itou.siaes.factories import SiaeFactory, SiaeJobDescriptionFactory
 from itou.users.factories import PrescriberFactory
 from itou.utils.test import TestCase, format_html
 from itou.utils.widgets import DuetDatePickerWidget
@@ -180,21 +181,46 @@ class ProcessListSiaeTest(ProcessListTest):
         """
         Eddie wants to see a list of job applications sent to his SIAE.
         """
+        city = create_city_saint_andre()
+        create_test_romes_and_appellations(["N4105"], appellations_per_rome=2)
+        appellations = Appellation.objects.all()[:2]
+        job1 = SiaeJobDescriptionFactory(siae=self.hit_pit, appellation=appellations[0], location=city)
+        job2 = SiaeJobDescriptionFactory(siae=self.hit_pit, appellation=appellations[1], location=city)
+        for job_application in JobApplication.objects.all():
+            job_application.selected_jobs.set([job1, job2])
         self.client.force_login(self.eddie_hit_pit)
         with self.assertNumQueries(
             1  # fetch django session
             + 1  # fetch user
             + 3  # check for membership & infos
+            #
+            # SiaeFilterJobApplicationsForm:
             + 1  # get list of senders (distinct sender_id)
             + 1  # get list of job seekers (distinct job_seeker_id)
             + 1  # get list of administrative criteria
-            + 3  # get list of job application + prefetch of job descriptions + prefetch of approvals
-            + 8  # get PE Approval per user. Can't use prefetch as there is no Foreign Key constraint
-            + 16  # get last valid eligibility diagnosis. Me may make more than one query per job application.
-            # We could try to prefetch, but we would have to skip models methods and it's not a good move
-            + 1  # get list of sender org (distinct sender_prescriber_organization_id)
-            + 3  # count, list & prefetch of job application
-            + 1  # check user membership again
+            + 1  # get list of job application
+            + 1  # prefetch selected jobs
+            + 1  # prefetch jobs appellation
+            + 1  # select distinct sender_prescriber_organization
+            #
+            # Paginate the job applications queryset:
+            + 1  # has_suspended_approval subquery
+            + 1  # select job applications with annotations
+            + 1  # prefetch selected jobs
+            + 1  # prefetch jobs appellation
+            + 1  # prefetch jobs location
+            + 1  # prefetch approvals
+            #
+            # Render template:
+            + 1  # context processor: user siae membership
+            # 6 job applications
+            + 6
+            * (
+                1  # select poleemploiapproval (latest_pe_approval)
+                + 1  # select latest eligibility diagnosis (job_application.eligibility_diagnosis_by_siae_required)
+                + 1  # select last valid diagnosis made by prescriber (does not exist)
+                + 1  # select last valid diagnosis made by siae (exists)
+            )
             + 3  # update session
         ):
             response = self.client.get(self.siae_base_url)
