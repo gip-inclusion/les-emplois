@@ -408,7 +408,9 @@ class User(AbstractUser, AddressMixin):
 
     @property
     def is_orienter(self):
-        return self.is_prescriber and not self.prescriberorganization_set.exists()
+        # Covers both "orienteur" (unauthorized prescriber)
+        # and "orienteur solo" (unauthorized prescriber without organization)
+        return self.is_prescriber and not self.is_prescriber_with_authorized_org
 
     @property
     def is_siae_staff(self):

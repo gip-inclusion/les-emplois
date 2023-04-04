@@ -70,6 +70,7 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
     Case 1
         A "prescriber" is alone (e.g. "éducateur de rue"). In this case there is only a `User` object
             - User.kind = "prescriber"
+        This kind of prescriber can't be "authorized", because authorization is set on the prescriber organization.
 
     Case 2
         A "prescriber" is a member of an organization (e.g. an association of unemployed people etc.)
@@ -89,9 +90,11 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
 
     In the last 2 cases, there can be n members by organization.
 
-    In case 1 and case 2, we talk about "orienteur" in French.
+    Case 1: refers to an orienter without organisation ("orienteur solo").
 
-    In case 3, we talk about "prescripteur habilité" in French.
+    Case 2: refers to an unauthorized prescriber ("orienteur" or simply "prescripteur").
+
+    Case 3: refers to an authorized prescriber ("prescripteur habilité").
     """
 
     # Rules:

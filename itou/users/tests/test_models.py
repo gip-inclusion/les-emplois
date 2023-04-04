@@ -109,10 +109,6 @@ class ModelTest(TestCase):
         job_seeker = JobSeekerFactory()
         assert job_seeker.is_orienter is False
 
-        # PrescriberFactory does not create a prescriber organization
-        prescriber = PrescriberOrganizationWithMembershipFactory()
-        assert prescriber.members.first().is_orienter is False
-
         siae_staff = SiaeStaffFactory()
         assert siae_staff.is_orienter is False
 
@@ -122,6 +118,10 @@ class ModelTest(TestCase):
         # PrescriberFactory create the simplest form of prescriber: an orienter
         orienter = PrescriberFactory()
         assert orienter.is_orienter is True
+
+        # PrescriberFactory does not create a prescriber organization
+        prescriber = PrescriberOrganizationWithMembershipFactory()
+        assert prescriber.members.first().is_orienter is True
 
     def test_generate_unique_username(self):
         unique_username = User.generate_unique_username()
