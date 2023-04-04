@@ -1,5 +1,5 @@
 select
-    cav."date",
+    cav.date,
     cav.type_detail,
     cav.value,
     lag(cav.value) over (
