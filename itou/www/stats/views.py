@@ -207,7 +207,7 @@ def stats_siae_hiring(request):
     """
     current_org = get_stats_siae_hiring_current_org(request)
     context = {
-        "page_title": "Données de recrutement de mes structures (Plateforme de l'inclusion)",
+        "page_title": "Données de candidatures de mes structures",
         "department": current_org.department,
         "matomo_custom_url_suffix": format_region_and_department_for_matomo(current_org.department),
     }
