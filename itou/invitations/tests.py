@@ -10,6 +10,8 @@ from itou.invitations.factories import (
     SiaeStaffInvitationFactory,
 )
 from itou.invitations.models import InvitationAbstract, SiaeStaffInvitation
+from itou.prescribers.factories import PrescriberMembershipFactory
+from itou.siaes.factories import SiaeMembershipFactory
 from itou.users.factories import PrescriberFactory, SiaeStaffFactory
 from itou.utils.test import TestCase
 
@@ -107,6 +109,19 @@ class TestPrescriberWithOrgInvitation(TestCase):
         org_members_after = invitation.organization.members.count()
         assert org_members + 1 == org_members_after
 
+    def test_add_inactive_member_back_to_organization(self):
+        invitation = PrescriberWithOrgSentInvitationFactory(email="hey@you.com")
+        PrescriberMembershipFactory(
+            organization=invitation.organization, user__email=invitation.email, is_active=False
+        )
+        org_members = invitation.organization.members.count()
+        org_active_members = invitation.organization.active_members.count()
+        invitation.add_invited_user_to_organization()
+        org_members_after = invitation.organization.members.count()
+        org_active_members_after = invitation.organization.active_members.count()
+        assert org_members == org_members_after
+        assert org_active_members + 1 == org_active_members_after
+
 
 class TestPrescriberWithOrgInvitationEmails(SimpleTestCase):
     def test_accepted_notif_sender(self):
@@ -151,6 +166,17 @@ class TestSiaeInvitation(TestCase):
         invitation.add_invited_user_to_siae()
         siae_members_after = invitation.siae.members.count()
         assert siae_members + 1 == siae_members_after
+
+    def test_add_inactive_member_back_to_siae(self):
+        invitation = SentSiaeStaffInvitationFactory(email="hey@you.com")
+        SiaeMembershipFactory(siae=invitation.siae, user__email=invitation.email, is_active=False)
+        siae_members = invitation.siae.members.count()
+        siae_active_members = invitation.siae.active_members.count()
+        invitation.add_invited_user_to_siae()
+        siae_members_after = invitation.siae.members.count()
+        siae_active_members_after = invitation.siae.active_members.count()
+        assert siae_members == siae_members_after
+        assert siae_active_members + 1 == siae_active_members_after
 
 
 class TestSiaeInvitationEmails(SimpleTestCase):
