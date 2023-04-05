@@ -2,25 +2,43 @@
 
 {% block title %}Collaborateurs {{ block.super }}{% endblock %}
 
+{% block pre_content %}
+    <section class="s-title-01 p-0">
+        <div class="s-title-01__container container">
+            <div class="s-title-01__row row">
+                <div class="s-title-01__col col-12">
+                    <h1 class="s-title-01__title h1">
+                        <strong>Collaborateurs</strong>
+                    </h1>
+                    <h2 class="h2">{{ institution.display_name }}</h2>
+                    <div class="alert alert-info">
+                        <p class="mb-0">
+                            Vous êtes connecté(e) en tant que <b>{{ user.get_full_name|title }}</b> ({{ user.email }})
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block content_container_css_classes %}s-section pt-0 mt-0{% endblock %}
 {% block content %}
+    <div class="c-box">
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between">
+            <h3 class="h4 mb-0">Collaborateurs</h3>
+            <div class="flex-column flex-md-row btn-group btn-group-sm btn-group-action" role="group" aria-label="Actions sur les collaborateurs">
+                <a class="btn btn-primary btn-ico justify-content-center mt-3 mt-md-0" href="{% url 'invitations_views:invite_labor_inspector' %}">
+                    <i class="ri-user-add-line ri-lg"></i>
+                    <span>Inviter des collaborateurs</span>
+                </a>
+            </div>
+        </div>
 
-    <h1 class="h1-hero-c1">Collaborateurs</h1>
-
-    <h2 class="h1 text-muted">{{ institution.display_name }}</h2>
-
-    <div class="alert alert-info">
-        <p class="mb-0">
-            Vous êtes connecté(e) en tant que <b>{{ user.get_full_name|title }}</b> ({{ user.email }})
-        </p>
+        {% with active_admin_members=institution.active_admin_members base_url="institutions_views" %}
+            {% include "includes/members.html" %}
+        {% endwith %}
     </div>
-
-    {% with active_admin_members=institution.active_admin_members base_url="institutions_views" %}
-        {% include "includes/members.html" %}
-    {% endwith %}
-
-    <a href="{% url 'invitations_views:invite_labor_inspector' %}" class="align-self-center">
-        <span class="btn btn-primary mb-1 w-100 w-sm-auto mt-2">Inviter des collaborateurs</span>
-    </a>
 
     {% if pending_invitations %}
         {% include "invitations_views/includes/pending_invitations.html" %}
