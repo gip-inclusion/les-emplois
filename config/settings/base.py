@@ -646,3 +646,5 @@ if S3_STORAGE_ENDPOINT_DOMAIN:
     ]
 CSP_INCLUDE_NONCE_IN = ["script-src", "script-src-elem"]
 CSP_REPORT_URI = os.getenv("CSP_REPORT_URI", None)
+
+AIRFLOW_BASE_URL = os.getenv("AIRFLOW_BASE_URL")

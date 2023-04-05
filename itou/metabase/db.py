@@ -5,7 +5,9 @@ import copy
 import gc
 import logging
 import os
+import urllib
 
+import httpx
 import psycopg2
 from django.conf import settings
 from django.utils import timezone
@@ -13,7 +15,6 @@ from psycopg2 import extras as psycopg2_extras, sql
 from psycopg2.extras import LoggingConnection, LoggingCursor
 
 from itou.metabase.utils import chunked_queryset, compose, convert_boolean_to_int
-from itou.utils.python import timeit
 
 
 logger = logging.getLogger("django.db.backends")
@@ -104,52 +105,14 @@ def create_table(table_name: str, columns: list[str, str], reset=False):
         conn.commit()
 
 
-@timeit
-def build_custom_table(table_name, sql_request):
-    """
-    Build a new table with given sql_request.
-    Minimize downtime by building a temporary table first then swap the two tables atomically.
-    """
-    new_table_name = get_new_table_name(table_name)
-    with MetabaseDatabaseCursor() as (cur, conn):
-        cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(new_table_name)))
-        conn.commit()
-        cur.execute(sql.SQL("CREATE TABLE {} AS {}").format(sql.Identifier(new_table_name), sql.SQL(sql_request)))
-        conn.commit()
-
-    rename_table_atomically(new_table_name, table_name)
-
-
-def list_table_names():
-    path = f"{get_current_dir()}/sql"
-    for filename in sorted([f for f in os.listdir(path) if f.endswith(".sql")]):
-        full_path = os.path.join(path, filename)
-        table_name = "_".join(filename.split(".")[0].split("_")[1:])
-        yield filename, full_path, table_name
-
-
 def build_final_tables():
-    """
-    Build final custom tables one by one by playing SQL requests in `sql` folder.
-
-    Typically:
-    - 001_fluxIAE_DateDerniereMiseAJour.sql
-    - 002_missions_ai_ehpad.sql
-    - ...
-
-    The numerical prefixes ensure the order of execution is deterministic.
-
-    The name of the table being created with the query is derived from the filename,
-    # e.g. '002_missions_ai_ehpad.sql' => 'missions_ai_ehpad'
-    """
+    # FIXME(vperron): this has to be moved to DBT seeds.
     create_unversioned_tables_if_needed()
-
-    for filename, full_path, table_name in list_table_names():
-        print(f"Running {filename} ...")
-        with open(full_path, encoding="utf-8") as file:
-            sql_request = file.read()
-        build_custom_table(table_name=table_name, sql_request=sql_request)
-        print("Done.")
+    response = httpx.post(
+        urllib.parse.urljoin(settings.AIRFLOW_BASE_URL, "api/v1/dags/final_tables/dagRuns"),
+        json={"conf": {}},
+    )
+    response.raise_for_status()
 
 
 def create_unversioned_tables_if_needed():

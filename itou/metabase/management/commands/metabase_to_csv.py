@@ -1,5 +1,5 @@
 """
-This can come in handy for instance to compare two Metabase databases,
+This can come in handy for instance to compare two Metabase tables,
 before and after a big change can be a good idea
 
 For the record, we then used
@@ -19,7 +19,7 @@ import os
 from django.core.management.base import BaseCommand
 from psycopg2 import sql
 
-from itou.metabase.db import MetabaseDatabaseCursor, list_table_names
+from itou.metabase.db import MetabaseDatabaseCursor
 
 
 class Command(BaseCommand):
@@ -30,27 +30,21 @@ class Command(BaseCommand):
         parser.add_argument("--table_name", action="store", dest="table_name", type=str)
 
     def handle(self, prefix, table_name, **kwargs):
-        if table_name:
-            table_names = [table_name]
-        else:
-            table_names = [table_name for _, _, table_name in list_table_names()]
-
         with MetabaseDatabaseCursor() as (cursor, _conn):
-            for table_name in table_names:
-                self.stdout.write(f"exporting {table_name=}")
-                cursor.execute(
-                    sql.SQL(
-                        "SELECT column_name FROM information_schema.columns "
-                        "WHERE table_schema = 'public' AND table_name = {table_name};"
-                    ).format(
-                        table_name=sql.Literal(table_name),
-                    )
+            self.stdout.write(f"exporting {table_name=}")
+            cursor.execute(
+                sql.SQL(
+                    "SELECT column_name FROM information_schema.columns "
+                    "WHERE table_schema = 'public' AND table_name = {table_name};"
+                ).format(
+                    table_name=sql.Literal(table_name),
                 )
-                column_names = sorted([str(d[0]) for d in cursor.fetchall()])
-                if prefix:
-                    os.makedirs(prefix, exist_ok=True)
-                    filename = f"{prefix}/{table_name}.csv"
-                else:
-                    filename = f"{table_name}.csv"
-                with open(filename, mode="w", encoding="utf-8") as f:
-                    cursor.copy_to(f, table_name, sep=";", null="\\\\N", columns=column_names)
+            )
+            column_names = sorted([str(d[0]) for d in cursor.fetchall()])
+            if prefix:
+                os.makedirs(prefix, exist_ok=True)
+                filename = f"{prefix}/{table_name}.csv"
+            else:
+                filename = f"{table_name}.csv"
+            with open(filename, mode="w", encoding="utf-8") as f:
+                cursor.copy_to(f, table_name, sep=";", null="\\\\N", columns=column_names)
