@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect
+from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.template.response import TemplateResponse
 from django.urls import reverse, reverse_lazy
@@ -657,6 +657,44 @@ def geiq_eligibility_criteria(
         context |= {"geo_criteria_detected": True, "job_seeker": job_application.job_seeker}
 
     return render(request, template_name, context)
+
+
+@require_http_methods(["POST"])
+def delete_prior_action(request, job_application_id, prior_action_id):
+    queryset = JobApplication.objects.siae_member_required(request.user)
+    job_application = get_object_or_404(
+        queryset,
+        id=job_application_id,
+    )
+    if not job_application.can_change_prior_actions:
+        return HttpResponseForbidden()
+
+    prior_action = get_object_or_404(PriorAction.objects.filter(job_application=job_application), pk=prior_action_id)
+
+    state_changed = False
+    with transaction.atomic():
+        prior_action.delete()
+        if job_application.state.is_prior_to_hire and not job_application.prior_actions.exists():
+            job_application.cancel_prior_to_hire(user=request.user)
+            state_changed = True
+
+    return (
+        render(
+            request,
+            "apply/includes/out_of_band_changes_on_job_application_state_update_siae.html",
+            {
+                "job_application": job_application,
+                "transition_logs": job_application.logs.select_related("user").all().order_by("timestamp"),
+                "geiq_eligibility_diagnosis": (
+                    _get_geiq_eligibility_diagnosis_for_siae(job_application)
+                    if job_application.to_siae.kind == SiaeKind.GEIQ
+                    else None
+                ),
+            },
+        )
+        if state_changed
+        else HttpResponse()
+    )
 
 
 @login_required
