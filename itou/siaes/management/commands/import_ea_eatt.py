@@ -172,9 +172,7 @@ class Command(BaseCommand):
     help = "Import the content of the EA+EATT csv file into the database."
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            "--wet-run", dest="wet_run", action="store_true", help="Do not make any modifications to the database"
-        )
+        parser.add_argument("--wet-run", dest="wet_run", action="store_true")
 
     @timeit
     def handle(self, wet_run=False, **options):
