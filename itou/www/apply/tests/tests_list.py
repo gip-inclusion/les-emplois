@@ -214,14 +214,6 @@ class ProcessListSiaeTest(ProcessListTest):
             #
             # Render template:
             + 1  # context processor: user siae membership
-            # 6 job applications
-            + 6
-            * (
-                1  # select poleemploiapproval (latest_pe_approval)
-                + 1  # select latest eligibility diagnosis (job_application.eligibility_diagnosis_by_siae_required)
-                + 1  # select last valid diagnosis made by prescriber (does not exist)
-                + 1  # select last valid diagnosis made by siae (exists)
-            )
             + 3  # update session
         ):
             response = self.client.get(self.siae_base_url)

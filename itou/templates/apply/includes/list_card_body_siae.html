@@ -17,29 +17,6 @@
                 </span>
             {% endif %}
 
-            {% if siae.is_subject_to_eligibility_rules %}
-                {% with approval=job_application.job_seeker.latest_common_approval %}
-                    {% if approval %}
-                        <span class="badge badge-xs badge-pill{% if approval.state == 'EXPIRED' %} badge-emploi-light{% else %} badge-success-lighter{% endif %} text-primary">
-                            <i class="{% if approval.state == 'EXPIRED' %}ri-close-circle-line{% elif approval.state == 'SUSPENDED' %}ri-pause-circle-line{% else %}ri-checkbox-circle-line{% endif %}"></i>
-                            PASS IAE {{ approval.get_state_display|lower }}
-                        </span>
-                    {% else %}
-                        {% if job_application.eligibility_diagnosis_by_siae_required %}
-                            <span class="badge badge-xs badge-pill badge-accent-02-lighter text-primary">
-                                <i class="ri-error-warning-line"></i>
-                                Éligibilité à l’IAE à valider
-                            </span>
-                        {% else %}
-                            <span class="badge badge-xs badge-pill badge-success-light text-primary">
-                                <i class="ri-check-line"></i>
-                                Éligible à l’IAE
-                            </span>
-                        {% endif %}
-                    {% endif %}
-
-                {% endwith %}
-            {% endif %}
         </div>
     </div>
 
