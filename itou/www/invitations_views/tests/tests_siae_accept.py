@@ -253,6 +253,8 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         self.client.force_login(user)
         response = self.client.get(invitation.acceptance_link, follow=True)
         self.assertRedirects(response, reverse("welcoming_tour:index"))
+        # /invitations/<uui>/join_siae then /welcoming_tour/index
+        assert len(response.redirect_chain) == 2
 
         current_siae = get_current_siae_or_404(response.wsgi_request)
         assert siae.pk == current_siae.pk
