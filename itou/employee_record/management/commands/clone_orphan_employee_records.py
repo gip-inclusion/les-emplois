@@ -14,12 +14,7 @@ class Command(BaseCommand):
             type=int,
             required=True,
         )
-        parser.add_argument(
-            "--wet-run",
-            action="store_true",
-            dest="wet_run",
-            help="Just report, don't do anything",
-        )
+        parser.add_argument("--wet-run", action="store_true", dest="wet_run")
 
     @transaction.atomic()
     def handle(self, for_siae, wet_run=False, **options):
