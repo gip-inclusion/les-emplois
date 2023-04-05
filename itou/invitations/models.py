@@ -6,7 +6,6 @@ from django.conf import settings
 from django.db import models
 from django.shortcuts import get_object_or_404, reverse
 from django.utils import timezone
-from django.utils.http import urlencode
 
 from itou.users.enums import KIND_LABOR_INSPECTOR, KIND_PRESCRIBER, KIND_SIAE_STAFF, UserKind
 from itou.users.models import User
@@ -80,6 +79,13 @@ class InvitationAbstract(models.Model):
         raise NotImplementedError
 
     @property
+    def acceptance_url_for_existing_user(self):
+        """
+        URL usable by an existing user to accept the invitation.
+        """
+        raise NotImplementedError
+
+    @property
     def expiration_date(self):
         return self.sent_at + relativedelta(days=self.EXPIRATION_DAYS)
 
@@ -143,13 +149,15 @@ class PrescriberWithOrgInvitation(InvitationAbstract):
 
     @property
     def acceptance_link(self):
-        kwargs = {"invitation_id": self.pk}
-        signup_kwargs = {"invitation_type": KIND_PRESCRIBER, **kwargs}
-        args = {"redirect_to": reverse("invitations_views:join_prescriber_organization", kwargs=kwargs)}
-        acceptance_path = "{}?{}".format(
-            reverse("invitations_views:new_user", kwargs=signup_kwargs), urlencode(args, True)
+        return get_absolute_url(
+            reverse(
+                "invitations_views:new_user", kwargs={"invitation_type": KIND_PRESCRIBER, "invitation_id": self.pk}
+            )
         )
-        return get_absolute_url(acceptance_path)
+
+    @property
+    def acceptance_url_for_existing_user(self):
+        return reverse("invitations_views:join_prescriber_organization", kwargs={"invitation_id": self.pk})
 
     def add_invited_user_to_organization(self):
         user = User.objects.get(email=self.email)
@@ -213,13 +221,15 @@ class SiaeStaffInvitation(InvitationAbstract):
 
     @property
     def acceptance_link(self):
-        kwargs = {"invitation_id": self.pk}
-        signup_kwargs = {"invitation_type": KIND_SIAE_STAFF, **kwargs}
-        args = {"redirect_to": reverse("invitations_views:join_siae", kwargs=kwargs)}
-        acceptance_path = "{}?{}".format(
-            reverse("invitations_views:new_user", kwargs=signup_kwargs), urlencode(args, True)
+        return get_absolute_url(
+            reverse(
+                "invitations_views:new_user", kwargs={"invitation_type": KIND_SIAE_STAFF, "invitation_id": self.pk}
+            )
         )
-        return get_absolute_url(acceptance_path)
+
+    @property
+    def acceptance_url_for_existing_user(self):
+        return reverse("invitations_views:join_siae", kwargs={"invitation_id": self.pk})
 
     def add_invited_user_to_siae(self):
         user = User.objects.get(email=self.email)
@@ -285,13 +295,16 @@ class LaborInspectorInvitation(InvitationAbstract):
 
     @property
     def acceptance_link(self):
-        kwargs = {"invitation_id": self.pk}
-        signup_kwargs = {"invitation_type": KIND_LABOR_INSPECTOR, **kwargs}
-        args = {"redirect_to": reverse("invitations_views:join_institution", kwargs=kwargs)}
-        acceptance_path = "{}?{}".format(
-            reverse("invitations_views:new_user", kwargs=signup_kwargs), urlencode(args, True)
+        return get_absolute_url(
+            reverse(
+                "invitations_views:new_user",
+                kwargs={"invitation_type": KIND_LABOR_INSPECTOR, "invitation_id": self.pk},
+            )
         )
-        return get_absolute_url(acceptance_path)
+
+    @property
+    def acceptance_url_for_existing_user(self):
+        return reverse("invitations_views:join_institution", kwargs={"invitation_id": self.pk})
 
     def add_invited_user_to_institution(self):
         user = User.objects.get(email=self.email)

@@ -23,7 +23,6 @@ from itou.utils import constants as global_constants
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
-from itou.utils.urls import get_safe_url
 from itou.www.invitations_views.forms import (
     LaborInspectorInvitationFormSet,
     NewUserInvitationForm,
@@ -39,7 +38,7 @@ def handle_invited_user_registration_with_django(request, invitation, invitation
     if form.is_valid():
         user = form.save(request)
         get_adapter().login(request, user)
-        return redirect(get_safe_url(request, "redirect_to"))
+        return redirect(invitation.acceptance_url_for_existing_user)
     context = {"form": form, "invitation": invitation}
     return render(request, "invitations_views/new_user.html", context=context)
 
@@ -50,7 +49,7 @@ def handle_invited_user_registration_with_inclusion_connect(request, invitation,
         "user_email": invitation.email,
         "channel": InclusionConnectChannel.INVITATION.value,
         "previous_url": request.get_full_path(),
-        "next_url": get_safe_url(request, "redirect_to"),
+        "next_url": invitation.acceptance_url_for_existing_user,
     }
     inclusion_connect_url = (
         f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
@@ -96,7 +95,7 @@ def new_user(request, invitation_type, invitation_id):
         login_url = reverse(f"login:{invitation.USER_KIND}")
         next_step_url = "{url}?next={redirect_to}".format(
             url=login_url,
-            redirect_to=get_safe_url(request, "redirect_to"),
+            redirect_to=invitation.acceptance_url_for_existing_user,
         )
         return redirect(next_step_url)
 
