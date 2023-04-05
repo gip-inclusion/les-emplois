@@ -70,7 +70,7 @@ def new_user(request, invitation_type, invitation_id):
     invitation = get_object_or_404(invitation_class, pk=invitation_id)
 
     if request.user.is_authenticated:
-        if not request.user.email == invitation.email:
+        if not request.user.email.lower() == invitation.email.lower():
             message = (
                 "Un utilisateur est déjà connecté.<br>"
                 "Merci de déconnecter ce compte en cliquant sur le bouton ci-dessous. "

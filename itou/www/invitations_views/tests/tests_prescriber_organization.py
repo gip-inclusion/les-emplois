@@ -287,6 +287,19 @@ class TestAcceptPrescriberWithOrgInvitation(InclusionConnectBaseTestCase):
         response = self.client.get(invitation.acceptance_link, follow=True)
         self.assert_invitation_is_accepted(response, user, invitation, new_user=False)
 
+    def test_accept_existing_user_email_different_case(self):
+        user = PrescriberFactory(has_completed_welcoming_tour=True, email="HEY@example.com")
+        invitation = PrescriberWithOrgSentInvitationFactory(
+            sender=self.sender,
+            organization=self.organization,
+            first_name=user.first_name,
+            last_name=user.last_name,
+            email="hey@example.com",
+        )
+        self.client.force_login(user)
+        response = self.client.get(invitation.acceptance_link, follow=True)
+        self.assert_invitation_is_accepted(response, user, invitation, new_user=False)
+
     def test_accept_existing_user_belongs_to_another_organization(self):
         user = PrescriberOrganizationWithMembershipFactory().members.first()
         user.has_completed_welcoming_tour = True

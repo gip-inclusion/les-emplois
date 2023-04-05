@@ -311,3 +311,12 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         assert reverse("account_logout") == response.wsgi_request.path
         assert not invitation.accepted
         self.assertContains(response, "Un utilisateur est déjà connecté.")
+
+    def test_accept_existing_user_email_different_case(self):
+        user = SiaeStaffFactory(has_completed_welcoming_tour=True, email="HEY@example.com")
+        invitation = SentSiaeStaffInvitationFactory(
+            email="hey@example.com",
+        )
+        self.client.force_login(user)
+        response = self.client.get(invitation.acceptance_link, follow=True)
+        self.assert_accepted_invitation(response, invitation, user)
