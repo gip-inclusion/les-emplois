@@ -6,6 +6,7 @@ import gc
 import logging
 import os
 
+import httpx
 import psycopg2
 from django.conf import settings
 from django.utils import timezone
@@ -129,27 +130,14 @@ def list_table_names():
 
 
 def build_final_tables():
-    """
-    Build final custom tables one by one by playing SQL requests in `sql` folder.
-
-    Typically:
-    - 001_fluxIAE_DateDerniereMiseAJour.sql
-    - 002_missions_ai_ehpad.sql
-    - ...
-
-    The numerical prefixes ensure the order of execution is deterministic.
-
-    The name of the table being created with the query is derived from the filename,
-    # e.g. '002_missions_ai_ehpad.sql' => 'missions_ai_ehpad'
-    """
-    create_unversioned_tables_if_needed()
-
-    for filename, full_path, table_name in list_table_names():
-        print(f"Running {filename} ...")
-        with open(full_path, encoding="utf-8") as file:
-            sql_request = file.read()
-        build_custom_table(table_name=table_name, sql_request=sql_request)
-        print("Done.")
+    # FIXME(vperron): je n'ai pas fait le refactor complet pour le moment, mais
+    # j'ai vérifé en CLI que ce simple POST lance bien le DAG ciblé.
+    # Du coup on peut déjà tout remplacer dès aujourd'hui: tout ce code et le SQL qui va avec.
+    #
+    # https://the:creds@airflow-pilotage.cleverapps.io/api/v1/dags/final_tables/dagRuns
+    # -H 'Content-Type: application/json'
+    # -d '{"conf": {}}')
+    return httpx.post(settings.AIRFLOW_FINAL_TABLES_DAG_URL)
 
 
 def create_unversioned_tables_if_needed():
