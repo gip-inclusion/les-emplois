@@ -91,6 +91,11 @@ def new_user(request, invitation_type, invitation_id):
         return render(request, "invitations_views/invitation_errors.html", context={"invitation": invitation})
 
     if User.objects.filter(email__iexact=invitation.email).exists():
+        if request.user.is_authenticated:
+            # We know that request.user.email & invitation.email match
+            # so let's skip the login dance
+            return redirect(invitation.acceptance_url_for_existing_user)
+
         # The user exists but he should log in first.
         login_url = reverse(f"login:{invitation.USER_KIND}")
         next_step_url = "{url}?next={redirect_to}".format(
