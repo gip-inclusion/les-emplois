@@ -1676,6 +1676,87 @@ def test_modify_prior_action(client):
     assert prior_action.action == job_applications_enums.ProfessionalSituationExperience.PMSMP
 
 
+def test_delete_prior_action_accepted(client):
+    job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, state=JobApplicationWorkflow.STATE_ACCEPTED)
+    prior_action = PriorActionFactory(
+        job_application=job_application, action=job_applications_enums.Prequalification.AFPR
+    )
+    client.force_login(job_application.to_siae.members.first())
+    delete_prior_action_url = reverse(
+        "apply:delete_prior_action",
+        kwargs={"job_application_id": job_application.pk, "prior_action_id": prior_action.pk},
+    )
+    response = client.post(delete_prior_action_url, data={})
+    # Once the application is accepted you cannot delete prior actions
+    assert response.status_code == 403
+    prior_action.refresh_from_db()
+
+
+@pytest.mark.parametrize("with_geiq_diagnosis", [True, False])
+def test_delete_prior_action(client, with_geiq_diagnosis):
+    job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, state=JobApplicationWorkflow.STATE_PROCESSING)
+    prior_action1 = PriorActionFactory(
+        job_application=job_application, action=job_applications_enums.Prequalification.AFPR
+    )
+    prior_action2 = PriorActionFactory(
+        job_application=job_application, action=job_applications_enums.Prequalification.AFPR
+    )
+    user = job_application.to_siae.members.first()
+    if with_geiq_diagnosis:
+        GEIQEligibilityDiagnosisFactory(
+            job_seeker=job_application.job_seeker,
+            author_geiq=job_application.to_siae,
+            author=user,
+            author_kind=AuthorKind.GEIQ,
+        )
+    # Create transition logs
+    job_application.move_to_prior_to_hire(user=user)
+    delete_prior_action1_url = reverse(
+        "apply:delete_prior_action",
+        kwargs={"job_application_id": job_application.pk, "prior_action_id": prior_action1.pk},
+    )
+    delete_prior_action2_url = reverse(
+        "apply:delete_prior_action",
+        kwargs={"job_application_id": job_application.pk, "prior_action_id": prior_action2.pk},
+    )
+    client.force_login(user)
+    details_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+    response = client.get(details_url)
+    simulated_page = parse_response_to_soup(response, selector="#main")
+
+    # Delete first action
+    response = client.post(delete_prior_action1_url, data={})
+    assert response.status_code == 200
+    update_page_with_htmx(
+        simulated_page,
+        f"form[hx-post='{delete_prior_action1_url}']",
+        response,
+    )
+    job_application.refresh_from_db()
+    assert job_application.prior_actions.count() == 1
+    assert job_application.state.is_prior_to_hire
+
+    # Check that a fresh reload gets us in the same state
+    response = client.get(details_url)
+    assertSoupEqual(parse_response_to_soup(response, selector="#main"), simulated_page)
+
+    # Delete second action
+    response = client.post(delete_prior_action2_url, data={})
+    assert response.status_code == 200
+    update_page_with_htmx(
+        simulated_page,
+        f"#delete_prior_action_{ prior_action2.pk }_modal > div > div > div > form",
+        response,
+    )
+    job_application.refresh_from_db()
+    assert job_application.prior_actions.count() == 0
+    assert job_application.state.is_processing
+
+    # Check that a fresh reload gets us in the same state
+    response = client.get(details_url)
+    assertSoupEqual(parse_response_to_soup(response, selector="#main"), simulated_page)
+
+
 def test_htmx_add_prior_action_and_cancel(client):
     job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, state=JobApplicationWorkflow.STATE_PROCESSING)
     client.force_login(job_application.to_siae.members.first())

@@ -158,6 +158,11 @@ urlpatterns = [
         process_views.add_or_modify_prior_action,
         name="modify_prior_action",
     ),
+    path(
+        "<uuid:job_application_id>/siae/prior-action/<int:prior_action_id>/delete",
+        process_views.delete_prior_action,
+        name="delete_prior_action",
+    ),
     # Variant of accept process (employer does not need an approval)
     path(
         "<uuid:job_application_id>/siae/edit_contract_start_date",
