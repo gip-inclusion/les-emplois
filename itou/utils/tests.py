@@ -30,6 +30,7 @@ from itou.approvals.models import Suspension
 from itou.common_apps.resume.forms import ResumeFormMixin
 from itou.institutions.factories import InstitutionFactory, InstitutionWithMembershipFactory
 from itou.job_applications.factories import JobApplicationFactory
+from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory
 from itou.siaes.models import Siae, SiaeMembership
@@ -44,7 +45,7 @@ from itou.utils.perms.context_processors import get_current_organization_and_per
 from itou.utils.perms.user import get_user_info
 from itou.utils.sync import DiffItem, DiffItemKind, yield_sync_diff
 from itou.utils.tasks import sanitize_mailjet_recipients
-from itou.utils.templatetags import dict_filters, format_filters
+from itou.utils.templatetags import dict_filters, format_filters, job_applications
 from itou.utils.test import TestCase
 from itou.utils.tokens import SIAE_SIGNUP_MAGIC_LINK_TIMEOUT, SiaeSignupTokenGenerator
 from itou.utils.urls import (
@@ -1289,3 +1290,14 @@ def test_matomo_context_processor(client, settings):
         "window.location.origin).href]);"
     ) in str_content
     assert "window._paq.push(['setDocumentTitle', 'Fiche de la structure d&#x27;insertion']);" in str_content
+
+
+@pytest.mark.parametrize("state", [s[0] for s in JobApplicationWorkflow.STATE_CHOICES])
+def test_job_application_state_badge_processing(state, snapshot):
+    job_application = JobApplicationFactory(id="00000000-0000-0000-0000-000000000000", state=state)
+    assert job_applications.state_badge(job_application) == snapshot
+
+
+def test_job_application_state_badge_oob_swap(snapshot):
+    job_application = JobApplicationFactory(id="00000000-0000-0000-0000-000000000000")
+    assert job_applications.state_badge(job_application, hx_swap_oob=True) == snapshot

@@ -1,3 +1,4 @@
+{% load job_applications %}
 {% load str_filters %}
 <div class="card-body">
     <div class="row">
@@ -54,7 +55,7 @@
         <div class="col-12 col-md-12 col-lg-4 pl-lg-0">
             <p class="font-weight-bold mb-1">Statut :</p>
             <p class="fs-sm card-text">
-                {% include "apply/includes/state_badge.html" with job_application=job_application %}
+                {% state_badge job_application %}
                 {% if job_application.has_suspended_approval %}
                     <br>
                     <span class="badge badge-sm badge-pill badge-warning">PASS IAE suspendu</span>

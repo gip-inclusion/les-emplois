@@ -1,3 +1,4 @@
+{% load job_applications %}
 <div class="fs-sm d-flex flex-column flex-md-row align-items-center mb-3">
     <span class="text-secondary order-2 order-md-1 mr-auto">
         Émise le {{ job_application.created_at|date:"d F Y" }} par
@@ -30,9 +31,7 @@
 
     </span>
     {# élément à passer au dessus du précédent en vue mobile #}
-    <span class="order-1 order-md-2 ml-auto">
-        {% include "apply/includes/state_badge.html" with job_application=job_application %}
-    </span>
+    <span class="order-1 order-md-2 ml-auto">{% state_badge job_application %}</span>
 </div>
 
 {% with all_jobs=job_application.selected_jobs.all %}

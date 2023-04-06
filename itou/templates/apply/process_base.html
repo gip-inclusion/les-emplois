@@ -1,4 +1,5 @@
 {% extends "layout/content_small.html" %}
+{% load job_applications %}
 {% load str_filters %}
 
 {% block title %}
@@ -18,7 +19,7 @@
                     <h1 class="s-title-01__title h1-hero-c1">
                         <strong>Candidature de</strong> <span class="text-muted">{{ job_application.job_seeker.get_full_name|title|mask_unless:can_view_personal_information }}</span>
                     </h1>
-                    <p>{% include "apply/includes/state_badge.html" with job_application=job_application %}</p>
+                    <p>{% state_badge job_application %}</p>
                 </div>
             </div>
         </div>
