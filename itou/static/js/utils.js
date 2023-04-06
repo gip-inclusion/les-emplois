@@ -69,19 +69,6 @@ htmx.onLoad((target) => {
   })
 
   /**
-    * JS to allow to dimiss a modal on form submission
-    * This is needed because data-dismiss="modal" on a button
-    * prevents its default submit behavior meaning a button with data-dismiss
-    * and type=submit does not submit the form.
-    * And since we use HTMX to swap this part, the modal disappears but not the
-    * global div with modal-backdrop which freezes the whole page
-  **/
-  $('form[data-dismiss-modal-on-submit]', target).submit(function(e) {
-    const modalId = this.getAttribute("data-dismiss-modal-on-submit")
-    $(modalId).modal("hide")
-  })
-
-  /**
     * JS to allow to disable buttons (elements with "btn" class)
     * when other elements are present.
     * Typically useful when forms are available and you don't want the user

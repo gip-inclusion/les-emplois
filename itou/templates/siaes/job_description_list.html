@@ -160,12 +160,7 @@
                 <div class="row">
                     <div class="col-auto text-center">{% include "includes/pagination.html" with page=job_pager %}</div>
                     <div class="col text-right">
-                        <button type="button"
-                                class="btn btn-outline-primary btn-sm"
-                                data-htmx-open-modal="#js-modal-preview"
-                                aria-label="Aperçu dans les résultats de recherche"
-                                hx-get="{% url "siaes_views:card_search_preview" %}"
-                                hx-target="#js-modal-preview-body">
+                        <button type="button" class="btn btn-outline-primary btn-sm" aria-label="Aperçu dans les résultats de recherche" hx-get="{% url "siaes_views:card_search_preview" %}" hx-target="#js-modal-preview-body">
                             Aperçu dans les résultats de recherche
                             <div class="htmx-indicator spinner-border spinner-border-sm" role="status">
                                 <span class="sr-only">Chargement…</span>
