@@ -68,6 +68,8 @@ PUBLIC_DASHBOARDS = {
 
 PRIVATE_DEPARTMENT_DASHBOARDS = {
     "stats/cd/{}": "tb 118 - Données IAE CD",
+    "stats/ddets/auto_prescription/{}": "tb 267 - Focus auto-prescription DREETS/DDETS",
+    "stats/ddets/follow_siae_evaluation/{}": "tb 265 - Suivi CAP DREETS/DDETS",
     "stats/ddets/hiring/{}": "tb 160 - Facilitation de l'embauche DREETS/DDETS",
     "stats/ddets/iae/{}": "tb 117 - Données IAE DREETS/DDETS",
     "stats/pe/conversion/main/{}": "tb 169 - Taux de transformation PE",
@@ -78,6 +80,8 @@ PRIVATE_DEPARTMENT_DASHBOARDS = {
 }
 
 PRIVATE_REGION_DASHBOARDS = {
+    "stats/dreets/auto_prescription/{}": "tb 267 - Focus auto-prescription DREETS/DDETS",
+    "stats/dreets/follow_siae_evaluation/{}": "tb 265 - Suivi CAP DREETS/DDETS",
     "stats/dreets/hiring/{}": "tb 160 - Facilitation de l'embauche DREETS/DDETS",
     "stats/dreets/iae/{}": "tb 117 - Données IAE DREETS/DDETS",
     "stats/pe/conversion/main/{}/drpe": "tb 169 - Taux de transformation PE",
@@ -250,13 +254,37 @@ class Command(BaseCommand):
         }
         api_call_options = [
             MatomoFetchOptions(
-                "TB DGEFP",
+                "TB DGEFP AP",
+                base_options
+                | {
+                    "segment": f"pageUrl=={constants.EMPLOIS_SITE_URL}/stats/dgefp/auto_prescription/",
+                },
+                base_extra_columns,
+            ),
+            MatomoFetchOptions(
+                "TB DGEFP CAP",
+                base_options
+                | {
+                    "segment": f"pageUrl=={constants.EMPLOIS_SITE_URL}/stats/dgefp/follow_siae_evaluation/",
+                },
+                base_extra_columns,
+            ),
+            MatomoFetchOptions(
+                "TB DGEFP IAE",
                 base_options
                 | {
                     "segment": f"pageUrl=={constants.EMPLOIS_SITE_URL}/stats/dgefp/iae/",
                 },
                 base_extra_columns,
-            )
+            ),
+            MatomoFetchOptions(
+                "TB DIHAL",
+                base_options
+                | {
+                    "segment": f"pageUrl=={constants.EMPLOIS_SITE_URL}/stats/dihal/state/",
+                },
+                base_extra_columns,
+            ),
         ]
 
         def _options_from_url_path(url_path):

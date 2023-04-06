@@ -205,7 +205,7 @@ def test_matomo_populate_private(monkeypatch, respx_mock):
     with connection.cursor() as cursor:
         cursor.execute("SELECT * FROM suivi_visiteurs_tb_prives_v1")
         rows = cursor.fetchall()
-        assert len(rows) == 23
+        assert len(rows) == 32
         assert rows[0] == (
             "25",
             "26",
@@ -291,19 +291,24 @@ def test_matomo_populate_private(monkeypatch, respx_mock):
             "9.3",
             "11 min 2s",
             "2022-06-13",
-            "TB DGEFP",
+            "TB DGEFP AP",
             None,
             None,
             None,
         )
         assert [line[-5:] for line in rows] == [
-            ("2022-06-13", "TB DGEFP", None, None, None),
+            ("2022-06-13", "TB DGEFP AP", None, None, None),
+            ("2022-06-13", "TB DGEFP CAP", None, None, None),
+            ("2022-06-13", "TB DGEFP IAE", None, None, None),
+            ("2022-06-13", "TB DIHAL", None, None, None),
             ("2022-06-13", "tb 117 - Données IAE DREETS/DDETS", None, None, "Bretagne"),
             ("2022-06-13", "tb 149 - Candidatures orientées PE", None, None, "Bretagne"),
             ("2022-06-13", "tb 160 - Facilitation de l'embauche DREETS/DDETS", None, None, "Bretagne"),
             ("2022-06-13", "tb 162 - Fiches de poste en tension PE", None, None, "Bretagne"),
             ("2022-06-13", "tb 168 - Délai d'entrée en IAE", None, None, "Bretagne"),
             ("2022-06-13", "tb 169 - Taux de transformation PE", None, None, "Bretagne"),
+            ("2022-06-13", "tb 265 - Suivi CAP DREETS/DDETS", None, None, "Bretagne"),
+            ("2022-06-13", "tb 267 - Focus auto-prescription DREETS/DDETS", None, None, "Bretagne"),
             ("2022-06-13", "tb 117 - Données IAE DREETS/DDETS", "31 - Haute-Garonne", "31", "Occitanie"),
             ("2022-06-13", "tb 118 - Données IAE CD", "31 - Haute-Garonne", "31", "Occitanie"),
             ("2022-06-13", "tb 149 - Candidatures orientées PE", "31 - Haute-Garonne", "31", "Occitanie"),
@@ -318,6 +323,8 @@ def test_matomo_populate_private(monkeypatch, respx_mock):
             ("2022-06-13", "tb 165 - Recrutement SIAE", "31 - Haute-Garonne", "31", "Occitanie"),
             ("2022-06-13", "tb 168 - Délai d'entrée en IAE", "31 - Haute-Garonne", "31", "Occitanie"),
             ("2022-06-13", "tb 169 - Taux de transformation PE", "31 - Haute-Garonne", "31", "Occitanie"),
+            ("2022-06-13", "tb 265 - Suivi CAP DREETS/DDETS", "31 - Haute-Garonne", "31", "Occitanie"),
+            ("2022-06-13", "tb 267 - Focus auto-prescription DREETS/DDETS", "31 - Haute-Garonne", "31", "Occitanie"),
             ("2022-06-13", "tb 117 - Données IAE DREETS/DDETS", "75 - Paris", "75", "Île-de-France"),
             ("2022-06-13", "tb 118 - Données IAE CD", "75 - Paris", "75", "Île-de-France"),
             ("2022-06-13", "tb 149 - Candidatures orientées PE", "75 - Paris", "75", "Île-de-France"),
@@ -326,6 +333,8 @@ def test_matomo_populate_private(monkeypatch, respx_mock):
             ("2022-06-13", "tb 165 - Recrutement SIAE", "75 - Paris", "75", "Île-de-France"),
             ("2022-06-13", "tb 168 - Délai d'entrée en IAE", "75 - Paris", "75", "Île-de-France"),
             ("2022-06-13", "tb 169 - Taux de transformation PE", "75 - Paris", "75", "Île-de-France"),
+            ("2022-06-13", "tb 265 - Suivi CAP DREETS/DDETS", "75 - Paris", "75", "Île-de-France"),
+            ("2022-06-13", "tb 267 - Focus auto-prescription DREETS/DDETS", "75 - Paris", "75", "Île-de-France"),
         ]
 
 
