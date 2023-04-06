@@ -2,6 +2,8 @@ import io
 
 import pytest
 
+from itou.approvals import factories as approvals_factories
+
 from .. import factories, models
 from ..management.commands import sanitize_employee_records
 
@@ -16,6 +18,7 @@ def test_handle_dry_run_option(mocker, command):
     mocker.patch.object(command, "_check_jobseeker_profiles")
     mocker.patch.object(command, "_check_3436_error_code")
     mocker.patch.object(command, "_check_orphans")
+    mocker.patch.object(command, "_check_missed_notifications")
 
     command.handle(dry_run=True)
     assert command.stdout.getvalue().split("\n") == [
@@ -105,6 +108,62 @@ def test_missing_approvals(command):
         "* Checking missing employee records approval:",
         " - found 1 missing approval(s)",
         " - fixing missing approvals: DELETING employee records",
+        " - done!",
+        "",
+    ]
+
+
+def test_missed_notifications(command, faker):
+    # Prolongation() after the last employee record snapshot are what we want
+    employee_record_with_prolongation = factories.EmployeeRecordFactory(status=models.Status.ARCHIVED)
+    approvals_factories.ProlongationFactory(approval=employee_record_with_prolongation.job_application.approval)
+
+    # Approval() created after the last employee record snapshot are also what we want
+    employee_record_before_approval_creation = factories.EmployeeRecordFactory(
+        status=models.Status.ARCHIVED,
+        job_application__approval__created_at=faker.future_datetime(),  # So it pass the date filter
+    )
+
+    # Prolongation() before the last employee record snapshot are ignored
+    approvals_factories.ProlongationFactory(
+        approval=factories.EmployeeRecordFactory(
+            status=models.Status.ARCHIVED,
+            job_application__approval__created_at=faker.date_time_between(end_date="-1y"),
+        ).job_application.approval,
+        created_at=faker.date_time_between(start_date="-1y", end_date="-1d"),
+    )
+
+    # Approval() that can no longer be prolonged are ignored
+    factories.EmployeeRecordFactory(
+        status=models.Status.ARCHIVED,
+        job_application__approval__expired=True,
+        job_application__approval__created_at=faker.future_datetime(),
+    )
+
+    # All Suspension() are ignored
+    approvals_factories.SuspensionFactory(
+        approval=factories.EmployeeRecordFactory(status=models.Status.ARCHIVED).job_application.approval
+    )
+
+    # EmployeeRecordUpdateNotification() should be taken into account
+    factories.EmployeeRecordUpdateNotificationFactory(
+        employee_record__status=models.Status.ARCHIVED,
+        employee_record__job_application__approval__created_at=faker.future_datetime(end_date="+1d"),
+        created_at=faker.date_time_between(start_date="+1d", end_date="+30d"),
+    )
+
+    # Various cases are now set up, finally check the behavior
+    command._check_missed_notifications(dry_run=False)
+    assert (
+        models.EmployeeRecordUpdateNotification.objects.filter(
+            employee_record__in=[employee_record_with_prolongation, employee_record_before_approval_creation],
+        ).count()
+        == 2
+    )
+    assert command.stdout.getvalue().split("\n") == [
+        "* Checking missing employee records notifications:",
+        " - found 2 missing notification(s)",
+        " - 2 notification(s) created",
         " - done!",
         "",
     ]
