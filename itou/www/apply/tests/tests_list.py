@@ -612,6 +612,13 @@ class ProcessListPrescriberTest(ProcessListTest):
         assert 200 == response.status_code
         assert format_html(response, id="besoin-dun-chiffre") == []  # no link to pilotage
 
+    def test_list_for_prescriber_exports_view_without_organization(self):
+        prescriber = PrescriberFactory()
+        self.client.force_login(prescriber)
+        response = self.client.get(self.prescriber_exports_url)
+        assert 200 == response.status_code
+        assert format_html(response, id="besoin-dun-chiffre") == []  # no link to pilotage
+
     def test_list_for_prescriber_exports_download_view(self):
         """
         Connect as Thibault to see a list of available job applications exports
