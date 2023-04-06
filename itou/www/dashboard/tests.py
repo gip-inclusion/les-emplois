@@ -239,7 +239,7 @@ class DashboardViewTest(TestCase):
         membershipfactory = InstitutionMembershipFactory(institution__kind=InstitutionKind.DIHAL)
         self.client.force_login(membershipfactory.user)
         response = self.client.get(reverse("dashboard:index"))
-        self.assertContains(response, "Voir les données des prescriptions")
+        self.assertContains(response, "Suivre les prescriptions des AHI")
         self.assertContains(response, reverse("stats:stats_dihal_state"))
 
     def test_dashboard_siae_evaluations_institution_access(self):

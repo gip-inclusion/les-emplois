@@ -474,6 +474,6 @@ def stats_dihal_state(request):
     if not request.user.can_view_stats_dihal(current_org=current_org):
         raise PermissionDenied
     context = {
-        "page_title": "Suivi des prescriptions",
+        "page_title": "Suivi des prescriptions des AHI",
     }
     return render_stats(request=request, context=context, params={})
