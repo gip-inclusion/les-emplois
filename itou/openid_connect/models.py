@@ -111,17 +111,16 @@ class OIDConnectUserData:
         user_data_dict = dataclasses.asdict(self)
         user_data_dict = {key: value for key, value in user_data_dict.items() if value}
         try:
-            # If the same username exists with another identity_provider, it may not be the same user
-            # so don't update and return it !
+            # Look if a user with the given sub (username) exists for this identity_provider
             # We can't use a get_or_create here because we have to set the provider data for each field.
             user = User.objects.get(username=self.username, identity_provider=self.identity_provider)
             created = False
         except User.DoesNotExist:
             try:
-                # Don't update a user not created by another SSO provider.
                 user = User.objects.get(email=self.email)
                 created = False
                 if user.identity_provider not in [IdentityProvider.DJANGO, self.identity_provider]:
+                    # Don't update a user handled by another SSO provider.
                     return user, created
             except User.DoesNotExist:
                 # User.objects.create_user does the following:
@@ -134,9 +133,10 @@ class OIDConnectUserData:
                 user = User.objects.create_user(**user_data_dict)
                 created = True
         else:
-            # If we can find another user with self.email then the code will crash when updating the first user.
             other_user = User.objects.exclude(pk=user.pk).filter(email=self.email).first()
             if other_user:
+                # We found a user with its sub, but there's another user using its email.
+                # This happens when the user tried to update its email with one already used by another account.
                 raise MultipleUsersFoundException([user, other_user])
 
         if user.kind != user_data_dict["kind"]:
