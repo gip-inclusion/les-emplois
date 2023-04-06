@@ -100,41 +100,6 @@ def test_job_application_job_seeker_in_list():
     assert "Le candidat lui-même" in rendered
 
 
-def test_job_application_state_badge_new():
-    tmpl = load_template("apply/includes/state_badge.html")
-    job_application = JobApplicationSentByJobSeekerFactory()
-    rendered = tmpl.render(
-        Context(
-            {
-                "job_application": job_application,
-                "request": get_request(),
-                **expose_enums(),
-            }
-        )
-    )
-
-    assert "badge-info" in rendered
-
-
-def test_job_application_state_badge_processing():
-    tmpl = load_template("apply/includes/state_badge.html")
-    job_application = JobApplicationSentByJobSeekerFactory()
-    job_application.state.is_new = False
-    job_application.state.is_processing = True
-
-    rendered = tmpl.render(
-        Context(
-            {
-                "job_application": job_application,
-                "request": get_request(),
-                **expose_enums(),
-            }
-        )
-    )
-
-    assert "badge-accent-03" in rendered
-
-
 # QPV / ZRR eligibility details
 
 

@@ -1,5 +1,0 @@
-<span id="state_{{ job_application.pk }}"
-      class="badge badge-sm badge-pill text-wrap mb-1 {% if job_application.state.is_new %}badge-info{% elif job_application.state.is_processing %}badge-accent-03 text-primary{% elif job_application.state.is_postponed %}badge-accent-03 text-primary{% elif job_application.state.is_prior_to_hire %}badge-accent-02 text-primary{% elif job_application.state.is_accepted %}badge-success{% elif job_application.state.is_refused %}badge-danger{% elif job_application.state.is_cancelled %}badge-primary{% elif job_application.state.is_obsolete %}badge-primary{% endif %}"
-      {% if out_of_band_swap %} hx-swap-oob="true"{% endif %}>
-    {{ job_application.get_state_display }}
-</span>
