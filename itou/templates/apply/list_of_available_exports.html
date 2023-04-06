@@ -3,113 +3,126 @@
 
 {% block title %}Export des suivis de candidatures {{ block.super }}{% endblock %}
 
-{% block content %}
-    {% if export_for == "siae" %}
-        <h1 class="h1-hero-c1">Export des candidatures reçues chez {{ siae.display_name }}</h1>
-    {% else %}
-        <h1 class="h1-hero-c1">Export des candidatures</h1>
-    {% endif %}
+{% block pre_content %}
+    <section class="s-title-01 p-0">
+        <div class="s-title-01__container container">
+            <div class="s-title-01__row row">
+                <div class="s-title-01__col col-12">
+                    {% if export_for == "siae" %}
+                        <h1 class="s-title-01__title h1">Export des candidatures reçues</h1>
+                        <h2 class="h2">{{ siae.display_name }}</h2>
+                    {% else %}
+                        <h1 class="s-title-01__title h1">Export des candidatures</h1>
+                    {% endif %}
 
-    {% if not job_applications_by_month %}
-        <h2 class="h1 font-weight-normal text-muted">Aucune candidature pour le moment.</h2>
-    {% else %}
-
-        {% if export_for == "siae" or can_view_stats_pe %}
-            <div id="besoin-dun-chiffre" class="card my-4">
-                <div class="card-body">
-                    <p class="card-title">
-                        <i class="ri-information-line mr-1"></i>
-                        <b>Besoin d'un chiffre ?</b>
-                    </p>
-                    <p class="card-text">
-                        {% if export_for == "siae" %}
-                            <span class="text-primary">Accédez aux <a href="{% url 'stats:stats_siae_hiring' %}"  target="_blank" rel="noopener">données de recrutement de votre structure</a> (non nominatives) compilées, calculées et mises à jour quotidiennement.</span>
-                        {% elif export_for == "prescriber" and can_view_stats_pe %}
-                            <span class="text-primary">Accédez aux données de votre agence (non nominatives) compilées, calculées et mises à jour quotidiennement :</span>
-                            <ul>
-                                <li>
-                                    <a href="{% url 'stats:stats_pe_state_main' %}"  target="_blank" rel="noopener">Voir les données de l'ensemble de l'état des candidatures orientées</a>
-                                </li>
-                                <li>
-                                    <a href="{% url 'stats:stats_pe_conversion_main' %}"  target="_blank" rel="noopener">Voir les données du taux de transformation des candidatures</a>
-                                </li>
-                            </ul>
-                        {% endif %}
-                    </p>
+                    {% if export_for == "siae" or can_view_stats_pe %}
+                        <div class="alert alert-info mt-3" id="besoin-dun-chiffre">
+                            <p class="mb-0">
+                                <i class="ri-information-line mr-1" aria-hidden="true"></i>
+                                <b>Besoin d'un chiffre ?</b>
+                            </p>
+                            {% if export_for == "siae" %}
+                                <p class="mb-0">
+                                    Accédez aux <a href="{% url 'stats:stats_siae_hiring' %}"  target="_blank" rel="noopener">données de recrutement de votre structure</a> (non nominatives) compilées, calculées et mises à jour quotidiennement.
+                                </p>
+                            {% elif export_for == "prescriber" and can_view_stats_pe %}
+                                <p class="mb-0">
+                                    Accédez aux données de votre agence (non nominatives) compilées, calculées et mises à jour quotidiennement :
+                                </p>
+                                <ul>
+                                    <li>
+                                        <a href="{% url 'stats:stats_pe_state_main' %}"  target="_blank" rel="noopener">Voir les données de l'ensemble de l'état des candidatures orientées</a>
+                                    </li>
+                                    <li>
+                                        <a href="{% url 'stats:stats_pe_conversion_main' %}"  target="_blank" rel="noopener">Voir les données du taux de transformation des candidatures</a>
+                                    </li>
+                                </ul>
+                            {% endif %}
+                        </div>
+                    {% endif %}
                 </div>
             </div>
-        {% endif %}
+        </div>
+    </section>
+{% endblock %}
 
-        <div class="table-responsive">
-            <table class="table table-striped table-bordered">
-                <caption>Liste des candidatures reçues</caption>
-                <thead>
-                    <tr>
-                        <th scope="col">Contenu du fichier</th>
-                        <th scope="col">Nombre de candidatures</th>
-                        <th scope="col">Télécharger (.xlsx)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Toutes les candidatures</td>
-                        <td>{{ total_job_applications }}</td>
-                        <td>
-                            {% if export_for == "siae" %}
-                                <i class="ri-download-line mr-1"></i>
-                                <a class="matomo-event text-decoration-none"
-                                   data-matomo-category="candidatures"
-                                   data-matomo-action="exports"
-                                   data-matomo-option="export-siae"
-                                   aria-label="Télécharger cet export SIAE"
-                                   href="{% url 'apply:list_for_siae_exports_download' %}">
-                                    Télécharger
-                                </a>
-                            {% else %}
-                                <i class="ri-download-line mr-1"></i>
-                                <a class="matomo-event text-decoration-none"
-                                   data-matomo-category="candidatures"
-                                   data-matomo-action="exports"
-                                   data-matomo-option="export-prescripteur"
-                                   aria-label="Télécharger cet export prescripteur"
-                                   href="{% url 'apply:list_for_prescriber_exports_download' %}">
-                                    Télécharger
-                                </a>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% for month in job_applications_by_month %}
+{% block content_container_css_classes %}s-section pt-0 mt-0{% endblock %}
+{% block content %}
+    <div class="c-box">
+        {% if not job_applications_by_month %}
+            <h2 class="h4">Aucune candidature pour le moment.</h2>
+        {% else %}
+            <h2 class="h4">Candidatures reçues</h2>
+            <div class="table-responsive-lg mt-3">
+                <table class="table">
+                    <caption class="sr-only">Liste des candidatures reçues</caption>
+                    <thead>
                         <tr>
-                            <td>{{ month.month|date:"F Y"|capfirst }}</td>
-                            <td>{{ month.c }}</td>
+                            <th scope="col">Contenu du fichier</th>
+                            <th scope="col">Nombre de candidatures</th>
+                            <th scope="col">Télécharger (.xlsx)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Toutes les candidatures</td>
+                            <td>{{ total_job_applications }}</td>
                             <td>
                                 {% if export_for == "siae" %}
-                                    <i class="ri-download-line mr-1"></i>
-                                    <a class="matomo-event text-decoration-none"
+                                    <a class="matomo-event btn-link"
                                        data-matomo-category="candidatures"
                                        data-matomo-action="exports"
                                        data-matomo-option="export-siae"
                                        aria-label="Télécharger cet export SIAE"
-                                       href="{% url 'apply:list_for_siae_exports_download' month_identifier=month.month|date:"Y-m" %}">
+                                       href="{% url 'apply:list_for_siae_exports_download' %}">
+                                        <i class="ri-download-line mr-1" aria-hidden="true"></i>
                                         Télécharger
                                     </a>
                                 {% else %}
-                                    <i class="ri-download-line mr-1"></i>
-                                    <a class="matomo-event text-decoration-none"
+                                    <a class="matomo-event btn-link"
                                        data-matomo-category="candidatures"
                                        data-matomo-action="exports"
                                        data-matomo-option="export-prescripteur"
                                        aria-label="Télécharger cet export prescripteur"
-                                       href="{% url 'apply:list_for_prescriber_exports_download' month_identifier=month.month|date:"Y-m" %}">
+                                       href="{% url 'apply:list_for_prescriber_exports_download' %}">
+                                        <i class="ri-download-line mr-1" aria-hidden="true"></i>
                                         Télécharger
                                     </a>
                                 {% endif %}
                             </td>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    {% endif %}
-
+                        {% for month in job_applications_by_month %}
+                            <tr>
+                                <td>{{ month.month|date:"F Y"|capfirst }}</td>
+                                <td>{{ month.c }}</td>
+                                <td>
+                                    {% if export_for == "siae" %}
+                                        <a class="matomo-event btn-link"
+                                           data-matomo-category="candidatures"
+                                           data-matomo-action="exports"
+                                           data-matomo-option="export-siae"
+                                           aria-label="Télécharger cet export SIAE"
+                                           href="{% url 'apply:list_for_siae_exports_download' month_identifier=month.month|date:"Y-m" %}">
+                                            <i class="ri-download-line mr-1" aria-hidden="true"></i>
+                                            Télécharger
+                                        </a>
+                                    {% else %}
+                                        <a class="matomo-event btn-link"
+                                           data-matomo-category="candidatures"
+                                           data-matomo-action="exports"
+                                           data-matomo-option="export-prescripteur"
+                                           aria-label="Télécharger cet export prescripteur"
+                                           href="{% url 'apply:list_for_prescriber_exports_download' month_identifier=month.month|date:"Y-m" %}">
+                                            <i class="ri-download-line mr-1" aria-hidden="true"></i>
+                                            Télécharger
+                                        </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </div>
 {% endblock %}

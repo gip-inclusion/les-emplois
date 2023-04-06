@@ -573,36 +573,30 @@ class ProcessListPrescriberTest(ProcessListTest):
         assert 200 == response.status_code
         assertContains(response, "Toutes les candidatures")
         assert format_html(response, id="besoin-dun-chiffre") == [
-            '<div class="card my-4" id="besoin-dun-chiffre">\n'
-            ' <div class="card-body">\n'
-            '  <p class="card-title">\n'
-            '   <i class="ri-information-line mr-1">\n'
-            "   </i>\n"
-            "   <b>\n"
-            "    Besoin d'un chiffre ?\n"
-            "   </b>\n"
-            "  </p>\n"
-            '  <p class="card-text">\n'
-            '   <span class="text-primary">\n'
-            "    Accédez aux données de votre agence (non nominatives) compilées, "
+            '<div class="alert alert-info mt-3" id="besoin-dun-chiffre">\n'
+            ' <p class="mb-0">\n'
+            '  <i aria-hidden="true" class="ri-information-line mr-1">\n'
+            "  </i>\n"
+            "  <b>\n"
+            "   Besoin d'un chiffre ?\n"
+            "  </b>\n"
+            " </p>\n"
+            ' <p class="mb-0">\n'
+            "  Accédez aux données de votre agence (non nominatives) compilées, "
             "calculées et mises à jour quotidiennement :\n"
-            "   </span>\n"
-            "  </p>\n"
-            "  <ul>\n"
-            "   <li>\n"
-            '    <a href="/stats/pe/state/main" rel="noopener" target="_blank">\n'
-            "     Voir les données de l'ensemble de l'état des candidatures orientées\n"
-            "    </a>\n"
-            "   </li>\n"
-            "   <li>\n"
-            '    <a href="/stats/pe/conversion/main" rel="noopener" target="_blank">\n'
-            "     Voir les données du taux de transformation des candidatures\n"
-            "    </a>\n"
-            "   </li>\n"
-            "  </ul>\n"
-            "  <p>\n"
-            "  </p>\n"
-            " </div>\n"
+            " </p>\n"
+            " <ul>\n"
+            "  <li>\n"
+            '   <a href="/stats/pe/state/main" rel="noopener" target="_blank">\n'
+            "    Voir les données de l'ensemble de l'état des candidatures orientées\n"
+            "   </a>\n"
+            "  </li>\n"
+            "  <li>\n"
+            '   <a href="/stats/pe/conversion/main" rel="noopener" target="_blank">\n'
+            "    Voir les données du taux de transformation des candidatures\n"
+            "   </a>\n"
+            "  </li>\n"
+            " </ul>\n"
             "</div>\n",
         ]
 
@@ -770,25 +764,21 @@ class ProcessListExportsSiaeTest(ProcessListTest):
         assert 200 == response.status_code
         assertContains(response, "Toutes les candidatures")
         assert format_html(response, id="besoin-dun-chiffre") == [
-            '<div class="card my-4" id="besoin-dun-chiffre">\n'
-            ' <div class="card-body">\n'
-            '  <p class="card-title">\n'
-            '   <i class="ri-information-line mr-1">\n'
-            "   </i>\n"
-            "   <b>\n"
-            "    Besoin d'un chiffre ?\n"
-            "   </b>\n"
-            "  </p>\n"
-            '  <p class="card-text">\n'
-            '   <span class="text-primary">\n'
-            "    Accédez aux\n"
-            '    <a href="/stats/siae/hiring" rel="noopener" target="_blank">\n'
-            "     données de recrutement de votre structure\n"
-            "    </a>\n"
-            "    (non nominatives) compilées, calculées et mises à jour quotidiennement.\n"
-            "   </span>\n"
-            "  </p>\n"
-            " </div>\n"
+            '<div class="alert alert-info mt-3" id="besoin-dun-chiffre">\n'
+            ' <p class="mb-0">\n'
+            '  <i aria-hidden="true" class="ri-information-line mr-1">\n'
+            "  </i>\n"
+            "  <b>\n"
+            "   Besoin d'un chiffre ?\n"
+            "  </b>\n"
+            " </p>\n"
+            ' <p class="mb-0">\n'
+            "  Accédez aux\n"
+            '  <a href="/stats/siae/hiring" rel="noopener" target="_blank">\n'
+            "   données de recrutement de votre structure\n"
+            "  </a>\n"
+            "  (non nominatives) compilées, calculées et mises à jour quotidiennement.\n"
+            " </p>\n"
             "</div>\n",
         ]
 
