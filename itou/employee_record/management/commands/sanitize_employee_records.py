@@ -1,7 +1,13 @@
 import django.db.transaction as transaction
+from dateutil.relativedelta import relativedelta
 from django.core.management.base import BaseCommand
+from django.db.models import F, Max
+from django.db.models.functions import Greatest
+from django.utils import timezone
 
-from itou.employee_record.models import EmployeeRecord
+from itou.approvals.models import Approval
+from itou.employee_record.enums import NotificationType, Status
+from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification
 
 
 class Command(BaseCommand):
@@ -147,6 +153,57 @@ class Command(BaseCommand):
 
             self.stdout.write(" - done!")
 
+    @transaction.atomic()
+    def _check_missed_notifications(self, dry_run):
+        self.stdout.write("* Checking missing employee records notifications:")
+
+        prolongation_cutoff = timezone.now() - relativedelta(
+            months=Approval.IS_OPEN_TO_PROLONGATION_BOUNDARIES_MONTHS_AFTER_END,
+        )
+        employee_record_with_missing_notification = (
+            EmployeeRecord.objects.annotate(
+                last_employee_record_snapshot=Greatest(
+                    # We take `updated_at` and not `created_at` to mimic how the trigger would have behaved if the
+                    # employee record was never ARCHIVED. For exemple, if the ER was DISABLED before ARCHIVED then no
+                    # notification would have been sent, the trigger ask for a PROCESSED, if a prolongation was
+                    # submitted between those two events.
+                    F("updated_at"),
+                    Max(F("update_notifications__created_at")),
+                ),
+                last_approval_change=Greatest(
+                    F("job_application__approval__created_at"),
+                    # We only use prolongations because even if a suspension will postpone the approval's end date
+                    # it's not really useful to the employee on the ASP side, and it significantly speeds up the query.
+                    Max(F("job_application__approval__prolongation__created_at")),
+                ),
+            )
+            .filter(
+                status=Status.ARCHIVED,
+                job_application__approval__end_at__gte=prolongation_cutoff,  # Take approvals that can still be used
+                asp_id=F("job_application__to_siae__convention__asp_id"),  # Exclude orphans
+                last_employee_record_snapshot__lt=F("last_approval_change"),
+            )
+            .order_by(
+                "job_application__approval__number",
+                "job_application__to_siae__siret",
+            )
+        )
+
+        self.stdout.write(f" - found {len(employee_record_with_missing_notification)} missing notification(s)")
+
+        total_created = 0
+        if not dry_run:
+            for employee_record in employee_record_with_missing_notification:
+                _, created = EmployeeRecordUpdateNotification.objects.update_or_create(
+                    employee_record=employee_record,
+                    notification_type=NotificationType.APPROVAL,
+                    status=Status.NEW,
+                    defaults={"updated_at": timezone.now},
+                )
+                total_created += int(created)
+            self.stdout.write(f" - {total_created} notification(s) created")
+        self.stdout.write(" - done!")
+
     def handle(self, *, dry_run, **options):
         self.stdout.write("+ Checking employee records coherence before transferring to ASP")
 
@@ -157,5 +214,6 @@ class Command(BaseCommand):
         self._check_jobseeker_profiles(dry_run)
         self._check_3436_error_code(dry_run)
         self._check_orphans(dry_run)
+        self._check_missed_notifications(dry_run)
 
         self.stdout.write("+ Employee records sanitizing done. Have a great day!")
