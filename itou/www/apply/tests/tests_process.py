@@ -58,7 +58,7 @@ class ProcessViewsTest(TestCase):
         assert response.status_code == 200
         self.assertContains(response, "Confirmation de l’embauche")
         # Make sure modal is hidden.
-        self.assertNotContains(response, "data-htmx-open-modal")
+        assert response.headers.get("HX-Trigger") is None
 
         if not post_data:
             hiring_start_at = timezone.localdate()
@@ -76,9 +76,12 @@ class ProcessViewsTest(TestCase):
 
         response = self.client.post(url_accept, HTTP_HX_REQUEST="true", data=post_data)
         if assert_successful:
-            self.assertContains(response, "data-htmx-open-modal")
+            assert (
+                response.headers.get("HX-Trigger")
+                == '{"modalControl": {"id": "js-confirmation-modal", "action": "show"}}'
+            )
         else:
-            self.assertNotContains(response, "data-htmx-open-modal")
+            assert response.headers.get("HX-Trigger") is None
 
         post_data = post_data | {"confirmed": "True"}
         response = self.client.post(url_accept, HTTP_HX_REQUEST="true", data=post_data)

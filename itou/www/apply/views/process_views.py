@@ -6,6 +6,7 @@ from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
+from django.template import loader
 from django.template.response import TemplateResponse
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
@@ -23,6 +24,7 @@ from itou.siaes.enums import ContractType, SiaeKind
 from itou.siaes.models import Siae
 from itou.users.models import ApprovalAlreadyExistsError
 from itou.utils import constants as global_constants
+from itou.utils.htmx import hx_trigger_modal_control
 from itou.utils.perms.prescriber import get_all_available_job_applications_as_prescriber
 from itou.utils.perms.user import get_user_info
 from itou.utils.urls import get_external_link_markup, get_safe_url
@@ -297,11 +299,11 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
 
     if request.method == "POST" and all([form.is_valid() for form in forms]):
         if request.htmx and not request.POST.get("confirmed"):
-            context["modal_shown"] = True
             return TemplateResponse(
                 request=request,
                 template=template_name,
                 context=context,
+                headers=hx_trigger_modal_control("js-confirmation-modal", "show"),
             )
 
         try:
@@ -678,11 +680,10 @@ def delete_prior_action(request, job_application_id, prior_action_id):
             job_application.cancel_prior_to_hire(user=request.user)
             state_changed = True
 
-    return (
-        render(
-            request,
+    content = (
+        loader.render_to_string(
             "apply/includes/out_of_band_changes_on_job_application_state_update_siae.html",
-            {
+            context={
                 "job_application": job_application,
                 "transition_logs": job_application.logs.select_related("user").all().order_by("timestamp"),
                 "geiq_eligibility_diagnosis": (
@@ -691,9 +692,13 @@ def delete_prior_action(request, job_application_id, prior_action_id):
                     else None
                 ),
             },
+            request=request,
         )
         if state_changed
-        else HttpResponse()
+        else ""
+    )
+    return HttpResponse(
+        content, headers=hx_trigger_modal_control(f"delete_prior_action_{ prior_action_id }_modal", "hide")
     )
 
 

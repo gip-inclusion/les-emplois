@@ -17,6 +17,7 @@ from itou.siaes.models import Siae, SiaeFinancialAnnex, SiaeJobDescription
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.apis.exceptions import GeocodingDataError
+from itou.utils.htmx import hx_trigger_modal_control
 from itou.utils.pagination import pager
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
@@ -90,7 +91,10 @@ def card_search_preview(request, template_name="siaes/includes/_card_siae.html")
         "siae": siae,
         "jobs_descriptions": job_descriptions,
     }
-    return HttpResponse(render_to_string(template_name, context))
+    return HttpResponse(
+        render_to_string(template_name, context),
+        headers=hx_trigger_modal_control("js-modal-preview", "show"),
+    )
 
 
 @login_required

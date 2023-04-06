@@ -42,7 +42,6 @@
                             <form hx-post="{% url 'apply:delete_prior_action' job_application_id=job_application.id prior_action_id=prior_action.pk %}"
                                   hx-target="#prior-action-{{ prior_action.pk }}"
                                   hx-swap="outerHTML"
-                                  data-dismiss-modal-on-submit="#delete_prior_action_{{ prior_action.pk }}_modal"
                                   class="d-block js-prevent-multiple-submit">
                                 {% csrf_token %}
                                 <div class="text-right">
