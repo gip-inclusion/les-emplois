@@ -275,17 +275,17 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
         is_successful = False
     except MultipleUsersFoundException as e:
         # Here we have a user trying to update his email, but with an already existing email
-        # redirect him back to the edit_user_info (aka next_url) but display an error message
+        # let him login, but display a message because we didn't update his email
         messages.error(
             request,
             mark_safe(
-                "Vous avez deux comptes sur la plateforme et nous détectons un conflit d'email : "
-                f"{e.users[0].email} et {e.users[1].email}. "
+                "Vous avez modifié votre e-mail sur Inclusion Connect, mais celui-ci est déjà associé à un compte "
+                f"sur la plateforme. Nous n'avons donc pas pu mettre à jour {e.users[0].email} en {e.users[1].email}. "
                 "Veuillez vous rapprocher du support pour débloquer la situation en suivant "
                 "<a href='https://communaute.inclusion.beta.gouv.fr/aide/emplois/#support'>ce lien</a>."
             ),
         )
-        return HttpResponseRedirect(ic_session["next_url"] or reverse("home:hp"))
+        user = e.users[0]
 
     if not is_successful:
         logout_url_params = {
