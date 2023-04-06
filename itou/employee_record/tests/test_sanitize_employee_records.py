@@ -19,7 +19,7 @@ def test_handle_dry_run_option(mocker, command):
 
     command.handle(dry_run=True)
     assert command.stdout.getvalue().split("\n") == [
-        "+ Checking employee records coherence before transfering to ASP",
+        "+ Checking employee records coherence before transferring to ASP",
         " - DRY-RUN mode: not fixing, just reporting",
         "+ Employee records sanitizing done. Have a great day!",
         "",

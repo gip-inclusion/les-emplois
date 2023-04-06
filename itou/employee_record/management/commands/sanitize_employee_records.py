@@ -17,7 +17,7 @@ class Command(BaseCommand):
             help="Just check and report, don't fix anything",
         )
 
-    # Check and fix methods: add as many as needed..
+    # Check and fix methods: add as many as needed.
 
     def _check_3436_error_code(self, dry_run):
         # Report all employee records with ASP error code 3436
@@ -68,7 +68,7 @@ class Command(BaseCommand):
             self.stdout.write(" - done!")
 
     def _check_jobseeker_profiles(self, dry_run):
-        # Check incoherences in user profile leading to validation errors at processing time.
+        # Check incoherence in user profile leading to validation errors at processing time.
         # Employee records in this case are switched back to status NEW for further processing by end-user.
         # Most frequent error cases are:
         # - no HEXA address
@@ -148,7 +148,7 @@ class Command(BaseCommand):
             self.stdout.write(" - done!")
 
     def handle(self, *, dry_run, **options):
-        self.stdout.write("+ Checking employee records coherence before transfering to ASP")
+        self.stdout.write("+ Checking employee records coherence before transferring to ASP")
 
         if dry_run:
             self.stdout.write(" - DRY-RUN mode: not fixing, just reporting")
