@@ -1,5 +1,31 @@
 # Journal des modifications
 
+## [60] - 2023-04-11
+
+### Ajouté
+
+- API : Possibilité de créer son token d’accès
+- Fiches salariés : Ajout du filtre par nom du candidat à la liste des fiches salarié
+- GEIQ : Ajout d'actions préalables à l'embauche
+
+### Modifié
+
+- Fiches salariés : Précision du message d’erreur lors de la création quand lorsqu’une fiche archivée existe
+- Liste des candidatures : Légère correction en cas de multiples diagnostiques d’éligibilité
+- Liste des candidatures : Refonte et affichage de la localisation des postes pour les employeurs
+- Liste des métiers d’une SIAE : Afficher le nombre de métiers
+
+## [59] - 2023-03-27
+
+### Ajouté
+
+- GEIQ : Permettre à un prescripteur habilité de valider l'éligibilité GEIQ d'un candidat
+- GEIQ : Ajout des champs type de contrat et durée hebdomadaire à l’écran de validation d’embauche
+
+### Modifié
+
+- GEIQ : Adaptation du texte de confirmation d’annulation d’embauche
+
 ## [58] - 2023-03-13
 
 ### Ajouté
