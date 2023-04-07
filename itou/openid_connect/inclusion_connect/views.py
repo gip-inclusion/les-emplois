@@ -3,7 +3,6 @@ import logging
 from urllib.error import HTTPError
 
 import httpx
-import jwt
 from allauth.account.adapter import get_adapter
 from django.contrib import messages
 from django.contrib.auth import login
@@ -218,7 +217,6 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
     access_token = token_data.get("access_token")
     if not access_token:
         return _redirect_to_login_page_on_error(error_msg="Access token field missing.", request=request)
-    decode_access_token = jwt.decode(access_token, algorithms=["RS256"], options={"verify_signature": False})
 
     # Check if state is valid and session exists
     ic_state = InclusionConnectState.get_from_csrf(state)
@@ -242,7 +240,7 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
     if error_rediction:
         return error_rediction
 
-    if "sub" not in user_data or user_data["sub"] != decode_access_token["sub"]:
+    if "sub" not in user_data:
         # 'sub' is the unique identifier from Inclusion Connect, we need that to match a user later on.
         return _redirect_to_login_page_on_error(error_msg="Sub parameter error.", request=request)
 
