@@ -367,9 +367,6 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
 
 @login_required
 def summary(request, employee_record_id, template_name="employee_record/summary.html"):
-    """
-    Display the summary of a given employee record (no update possible)
-    """
     siae = get_current_siae_or_404(request)
 
     if not siae.can_use_employee_record:
@@ -395,9 +392,6 @@ def summary(request, employee_record_id, template_name="employee_record/summary.
 
 @login_required
 def disable(request, employee_record_id, template_name="employee_record/disable.html"):
-    """
-    Display the form to disable a given employee record
-    """
     siae = get_current_siae_or_404(request)
 
     if not siae.can_use_employee_record:
@@ -433,9 +427,6 @@ def disable(request, employee_record_id, template_name="employee_record/disable.
 
 @login_required
 def reactivate(request, employee_record_id, template_name="employee_record/reactivate.html"):
-    """
-    Display the form to reactivate a given employee record
-    """
     siae = get_current_siae_or_404(request)
 
     if not siae.can_use_employee_record:

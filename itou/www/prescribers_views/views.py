@@ -16,9 +16,6 @@ from itou.www.prescribers_views.forms import EditPrescriberOrganizationForm
 
 
 def card(request, org_id, template_name="prescribers/card.html"):
-    """
-    Prescriber organization's card (or "Fiche" in French).
-    """
     prescriber_org = get_object_or_404(PrescriberOrganization, pk=org_id, is_authorized=True)
     back_url = get_safe_url(request, "back_url")
     context = {
@@ -31,9 +28,6 @@ def card(request, org_id, template_name="prescribers/card.html"):
 
 @login_required
 def edit_organization(request, template_name="prescribers/edit_organization.html"):
-    """
-    Edit a prescriber organization.
-    """
     organization = get_current_org_or_404(request)
     if not organization.has_admin(request.user):
         raise PermissionDenied

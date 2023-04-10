@@ -176,10 +176,6 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
 @login_required
 @require_http_methods(["POST"])
 def process(request, job_application_id):
-    """
-    Trigger the `process` transition.
-    """
-
     queryset = JobApplication.objects.siae_member_required(request.user)
     job_application = get_object_or_404(queryset, id=job_application_id)
 
@@ -224,10 +220,6 @@ def refuse(request, job_application_id, template_name="apply/process_refuse.html
 
 @login_required
 def postpone(request, job_application_id, template_name="apply/process_postpone.html"):
-    """
-    Trigger the `postpone` transition.
-    """
-
     queryset = JobApplication.objects.siae_member_required(request.user)
     job_application = get_object_or_404(queryset, id=job_application_id)
     check_waiting_period(job_application)
