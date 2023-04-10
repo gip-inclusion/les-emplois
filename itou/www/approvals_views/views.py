@@ -70,6 +70,7 @@ class ApprovalDetailView(ApprovalBaseViewMixin, DetailView):
         context["approval_can_be_prolonged_by_siae"] = self.object.can_be_prolonged_by_siae(self.siae)
         job_application = self.get_job_application(self.object)
         context["job_application"] = job_application
+        context["matomo_custom_title"] = "Profil salarié"
         if job_application:
             context["eligibility_diagnosis"] = job_application.get_eligibility_diagnosis()
         context["all_job_applications"] = (
@@ -165,6 +166,7 @@ class ApprovalPrintableDisplay(ApprovalBaseViewMixin, TemplateView):
                 "itou_assistance_url": global_constants.ITOU_ASSISTANCE_URL,
                 "diagnosis_author": diagnosis_author,
                 "diagnosis_author_org_name": diagnosis_author_org_name,
+                "matomo_custom_title": "Attestation de délivrance d'agrément",
             }
         )
         return context

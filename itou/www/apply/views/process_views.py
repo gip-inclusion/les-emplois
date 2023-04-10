@@ -112,6 +112,7 @@ def details_for_siae(request, job_application_id, template_name="apply/process_d
         "add_prior_action_form": (
             PriorActionForm(action_only=True) if job_application.can_change_prior_actions else None
         ),
+        "matomo_custom_title": "Candidature",
     }
 
     return render(request, template_name, context)
@@ -166,6 +167,7 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
         "job_application": job_application,
         "transition_logs": transition_logs,
         "back_url": back_url,
+        "matomo_custom_title": "Candidature",
     }
 
     return render(request, template_name, context)
@@ -215,6 +217,7 @@ def refuse(request, job_application_id, template_name="apply/process_refuse.html
         "form": form,
         "job_application": job_application,
         "can_view_personal_information": True,  # SIAE members have access to personal info
+        "matomo_custom_title": "Candidature refusée",
     }
     return render(request, template_name, context)
 
@@ -247,6 +250,7 @@ def postpone(request, job_application_id, template_name="apply/process_postpone.
         "form": form,
         "job_application": job_application,
         "can_view_personal_information": True,  # SIAE members have access to personal info
+        "matomo_custom_title": "Candidature différée",
     }
     return render(request, template_name, context)
 
@@ -291,6 +295,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
         "job_application": job_application,
         "can_view_personal_information": True,  # SIAE members have access to personal info
         "hide_value": ContractType.OTHER.value,
+        "matomo_custom_title": "Candidature acceptée",
     }
 
     if not job_application.hiring_without_approval and job_application.eligibility_diagnosis_by_siae_required:
@@ -439,6 +444,7 @@ def cancel(request, job_application_id, template_name="apply/process_cancel.html
     context = {
         "can_view_personal_information": True,  # SIAE members have access to personal info
         "job_application": job_application,
+        "matomo_custom_title": "Candidature annulée",
     }
     return render(request, template_name, context)
 
@@ -550,6 +556,7 @@ def eligibility(request, job_application_id, template_name="apply/process_eligib
         "can_view_personal_information": True,  # SIAE members have access to personal info
         "form_administrative_criteria": form_administrative_criteria,
         "job_seeker": job_application.job_seeker,
+        "matomo_custom_title": "Evaluation de la candidature",
     }
     return render(request, template_name, context)
 

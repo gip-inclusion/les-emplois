@@ -29,6 +29,11 @@ class EmployerSearchBaseView(FormView):
         kwargs["data"] = self.request.GET or None
         return kwargs
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["matomo_custom_title"] = "Recherche d'employeurs solidaires"
+        return context
+
     def get(self, request, *args, **kwargs):
         # rewire the GET onto the POST since in this particular view, the form data is passed by GET
         # to be able to share the search results URL.
@@ -248,5 +253,11 @@ def search_prescribers_results(request, template_name="search/prescribers_search
         )
         prescriber_orgs_page = pager(prescriber_orgs, request.GET.get("page"), items_per_page=10)
 
-    context = {"city": city, "distance": distance, "form": form, "prescriber_orgs_page": prescriber_orgs_page}
+    context = {
+        "city": city,
+        "distance": distance,
+        "form": form,
+        "prescriber_orgs_page": prescriber_orgs_page,
+        "matomo_custom_title": "Recherche d'organisations prescriptrices",
+    }
     return render(request, template_name, context)

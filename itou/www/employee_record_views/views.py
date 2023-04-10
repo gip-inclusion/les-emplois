@@ -164,6 +164,7 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         "feature_availability_date": EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
         "need_manual_regularization": need_manual_regularization,
         "ordered_by_label": order_by.label,
+        "matomo_custom_title": "Fiches salarié ASP",
     }
 
     return render(request, template_name, context)
@@ -188,6 +189,7 @@ def create(request, job_application_id, template_name="employee_record/create.ht
         "form": form,
         "steps": STEPS,
         "step": 1,
+        "matomo_custom_title": "Nouvelle fiche salarié ASP - Étape 1",
     }
 
     return render(request, template_name, context)
@@ -239,6 +241,7 @@ def create_step_2(request, job_application_id, template_name="employee_record/cr
         "job_seeker": job_seeker,
         "steps": STEPS,
         "step": 2,
+        "matomo_custom_title": "Nouvelle fiche salarié ASP - Étape 2",
     }
 
     return render(request, template_name, context)
@@ -292,6 +295,7 @@ def create_step_3(request, job_application_id, template_name="employee_record/cr
         "is_registered_to_pole_emploi": bool(job_application.job_seeker.pole_emploi_id),
         "steps": STEPS,
         "step": 3,
+        "matomo_custom_title": "Nouvelle fiche salarié ASP - Étape 3",
     }
 
     return render(request, template_name, context)
@@ -326,6 +330,7 @@ def create_step_4(request, job_application_id, template_name="employee_record/cr
         "form": form,
         "steps": STEPS,
         "step": 4,
+        "matomo_custom_title": "Nouvelle fiche salarié ASP - Étape 4",
     }
 
     return render(request, template_name, context)
@@ -354,6 +359,7 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
         "job_application": job_application,
         "steps": STEPS,
         "step": 5,
+        "matomo_custom_title": "Nouvelle fiche salarié ASP - Étape 5",
     }
 
     return render(request, template_name, context)
@@ -381,6 +387,7 @@ def summary(request, employee_record_id, template_name="employee_record/summary.
     context = {
         "employee_record": employee_record,
         "status": status,
+        "matomo_custom_title": "Détail fiche salarié ASP",
     }
 
     return render(request, template_name, context)
@@ -419,6 +426,7 @@ def disable(request, employee_record_id, template_name="employee_record/disable.
     context = {
         "employee_record": employee_record,
         "back_url": back_url,
+        "matomo_custom_title": "Désactiver la fiche salarié ASP",
     }
     return render(request, template_name, context)
 
@@ -461,5 +469,6 @@ def reactivate(request, employee_record_id, template_name="employee_record/react
     context = {
         "employee_record": employee_record,
         "back_url": back_url,
+        "matomo_custom_title": "Réactiver la fiche salarié ASP",
     }
     return render(request, template_name, context)

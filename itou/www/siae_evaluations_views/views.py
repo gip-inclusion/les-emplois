@@ -76,6 +76,7 @@ def samples_selection(request, template_name="siae_evaluations/samples_selection
         "max": evaluation_enums.EvaluationChosenPercent.MAX,
         "back_url": back_url,
         "form": form,
+        "matomo_custom_title": "Contrôle a posteriori : sélectionner l'échantillon",
     }
     return render(request, template_name, context)
 
@@ -234,6 +235,7 @@ class InstitutionEvaluatedSiaeNotifyMixin(LoginRequiredMixin, SingleObjectMixin)
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(evaluation_campaign_data_context(self.object))
+        context["matomo_custom_title"] = "Notifier la sanction du contrôle"
         return context
 
     @property
@@ -361,6 +363,7 @@ def evaluated_siae_sanction(request, evaluated_siae_pk, viewer_type):
     context = evaluation_campaign_data_context(evaluated_siae)
     context["evaluated_siae"] = evaluated_siae
     context["is_siae"] = viewer_type == "siae"
+    context["matomo_custom_title"] = "Notification de sanction"
     try:
         context["sanctions"] = evaluated_siae.sanctions
     except EvaluatedSiae.sanctions.RelatedObjectDoesNotExist:
@@ -608,6 +611,7 @@ def siae_select_criteria(
         "level_2_fields": level_2_fields,
         "kind": siae.kind,
         "back_url": back_url,
+        "matomo_custom_title": "Contrôle a posteriori : sélection des critères",
     }
     return render(request, template_name, context)
 
@@ -649,6 +653,7 @@ def siae_upload_doc(
         "s3_upload": S3Upload(kind="evaluations"),
         "form": form,
         "back_url": back_url,
+        "matomo_custom_title": "Contrôle a posteriori : téléversement des justificatifs",
     }
     return render(request, template_name, context)
 

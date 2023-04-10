@@ -21,7 +21,11 @@ def card(request, org_id, template_name="prescribers/card.html"):
     """
     prescriber_org = get_object_or_404(PrescriberOrganization, pk=org_id, is_authorized=True)
     back_url = get_safe_url(request, "back_url")
-    context = {"prescriber_org": prescriber_org, "back_url": back_url}
+    context = {
+        "prescriber_org": prescriber_org,
+        "back_url": back_url,
+        "matomo_custom_title": "Fiche de l'organisation prescriptrice",
+    }
     return render(request, template_name, context)
 
 

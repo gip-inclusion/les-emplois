@@ -1,11 +1,6 @@
 {% extends "layout/content_small.html" %}
 
-{% block title %}
-    Profil salarié
-    -
-    {{ approval.user.get_full_name }}
-    {{ block.super }}
-{% endblock %}
+{% block title %}Profil salarié - {{ approval.user.get_full_name }} {{ block.super }}{% endblock %}
 
 {% block content %}
 

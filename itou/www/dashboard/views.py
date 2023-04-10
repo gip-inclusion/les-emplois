@@ -289,6 +289,7 @@ def edit_job_seeker_info(request, job_application_id, template_name="dashboard/e
         "form": form,
         "job_application": job_application,
         "prev_url": back_url,
+        "matomo_custom_title": "Informations personnelles du candidat",
     }
 
     return render(request, template_name, context)

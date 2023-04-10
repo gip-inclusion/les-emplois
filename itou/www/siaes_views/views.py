@@ -74,6 +74,7 @@ def job_description_card(request, job_description_id, template_name="siaes/job_d
         "others_active_jobs": others_active_jobs,
         "back_url": back_url,
         "breadcrumbs": breadcrumbs,
+        "matomo_custom_title": "Détails de la fiche de poste",
     }
     return render(request, template_name, context)
 
@@ -419,6 +420,7 @@ def card(request, siae_id, template_name="siaes/card.html"):
         "back_url": back_url,
         "active_jobs_descriptions": active_jobs_descriptions,
         "other_jobs_descriptions": other_jobs_descriptions,
+        "matomo_custom_title": "Fiche de la structure d'insertion",
     }
     return render(request, template_name, context)
 

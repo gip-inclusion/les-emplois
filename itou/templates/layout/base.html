@@ -200,6 +200,14 @@
                 {% if matomo_custom_url %}
                     window._paq.push(['setCustomUrl', location.origin + '{{ matomo_custom_url }}']);
                 {% endif %}
+
+                {% if matomo_custom_title %}
+                    window._paq.push(['setDocumentTitle', '{{ matomo_custom_title }}']);
+                {% else %}
+                    // defaults to a stripped version (no suffix) of the page title.
+                    const title = document.title.replace(/- Les emplois de l'inclusion/g,'').trim();
+                    window._paq.push(['setDocumentTitle', title]);
+                {% endif %}
             </script>
             <script src="{% static "js/matomo.js" %}"></script>
         {% endif %}
