@@ -1,3 +1,5 @@
+from urllib.parse import urlencode
+
 import itou.approvals.enums as approvals_enums
 import itou.job_applications.enums as job_applications_enums
 import itou.prescribers.enums as prescribers_enums
@@ -18,3 +20,17 @@ def expose_enums(*args):
         "SiaeKind": siaes_enums.SiaeKind,
         "PrescriberOrganizationKind": prescribers_enums.PrescriberOrganizationKind,
     }
+
+
+def matomo(request):
+    # only keep Matomo-related GET params for now
+    params = {k: v for k, v in request.GET.lists() if k.startswith(("utm_", "mtm_", "piwik_"))}
+    url = request.resolver_match.route
+    if params:
+        url = f"{request.resolver_match.route}?{urlencode(sorted(params.items()), doseq=True)}"
+    context = {
+        "matomo_custom_url": url,
+    }
+    if request.user:
+        context["matomo_user_id"] = request.user.pk
+    return context
