@@ -1,11 +1,3 @@
-import os
-
-from django.core.management.base import BaseCommand
-from psycopg2 import sql
-
-from itou.metabase.db import MetabaseDatabaseCursor, list_table_names
-
-
 """
 This can come in handy for instance to compare two Metabase databases,
 before and after a big change can be a good idea
@@ -14,17 +6,23 @@ For the record, we then used
 
     cd before
     for file in $(ls); do echo "splitting $file"; sort $file | split -C 5m --numeric-suffixes - $file; rm $file; done
-    cf after
+    cd ../after
     for file in $(ls); do echo "splitting $file"; sort $file | split -C 5m --numeric-suffixes - $file; rm $file; done
-    cd..
+    cd ..
     for f in $(ls before); do diff -q before/$f after/$f; done
 
 To do the final comparison. Meld or vimdiff can be used to inspect what's wrong.
 """
 
+import os
+
+from django.core.management.base import BaseCommand
+from psycopg2 import sql
+
+from itou.metabase.db import MetabaseDatabaseCursor, list_table_names
+
 
 class Command(BaseCommand):
-
     help = "Dumps Metabase database to stable CSV-like files"
 
     def add_arguments(self, parser):
