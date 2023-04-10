@@ -57,10 +57,11 @@ class InclusionConnectSession:
         return request
 
 
-def _redirect_to_login_page_on_error(error_msg, request=None):
+def _redirect_to_login_page_on_error(error_msg=None, request=None):
     if request:
         messages.error(request, "Une erreur technique est survenue. Merci de recommencer.")
-    logger.error(error_msg, exc_info=True)
+    if error_msg:
+        logger.error(error_msg, exc_info=True)
     return HttpResponseRedirect(reverse("home:hp"))
 
 
@@ -221,7 +222,7 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
     # Check if state is valid and session exists
     ic_state = InclusionConnectState.get_from_csrf(state)
     if ic_state is None or not ic_state.is_valid():
-        return _redirect_to_login_page_on_error(error_msg="Invalid state.", request=request)
+        return _redirect_to_login_page_on_error(request=request)
     ic_session = request.session.get(constants.INCLUSION_CONNECT_SESSION_KEY)
     if ic_session is None:
         return _redirect_to_login_page_on_error(error_msg="Missing session.", request=request)
