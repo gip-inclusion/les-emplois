@@ -6,7 +6,7 @@ from django.core import mail
 from django.template.loader import get_template
 
 from itou.utils import constants as global_constants
-from itou.utils.enums_context_processors import expose_enums
+from itou.utils.context_processors import expose_enums
 
 
 def remove_extra_line_breaks(text):
