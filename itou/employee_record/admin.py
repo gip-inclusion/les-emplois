@@ -1,10 +1,9 @@
 from django.contrib import admin, messages
-from django.urls import reverse
 from django.utils import timezone
-from django.utils.safestring import mark_safe
 
 import itou.employee_record.models as models
 
+from ..utils.admin import get_admin_view_link
 from ..utils.templatetags.str_filters import pluralizefr
 from .enums import Status
 
@@ -142,18 +141,13 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
 
     def job_seeker_link(self, obj):
         if job_seeker := obj.job_application.job_seeker:
-            url = reverse("admin:users_user_change", args=[job_seeker.pk])
-            return mark_safe(f'<a href="{url}">{job_seeker}</a>')
+            return get_admin_view_link(job_seeker, content=job_seeker)
 
         return "-"
 
     def job_seeker_profile_link(self, obj):
-        job_seeker = obj.job_application.job_seeker
-        app_label = job_seeker._meta.app_label
-
-        model_name = job_seeker.jobseeker_profile._meta.model_name
-        url = reverse(f"admin:{app_label}_{model_name}_change", args=[job_seeker.pk])
-        return mark_safe(f'<a href="{url}">Profil salarié ID:{job_seeker.pk}</a>')
+        job_seeker_profile = obj.job_application.job_seeker.jobseeker_profile
+        return get_admin_view_link(job_seeker_profile, content=f"Profil salarié ID:{job_seeker_profile.pk}")
 
     def asp_processing_type(self, obj):
         if obj.processed_as_duplicate:

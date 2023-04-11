@@ -1,7 +1,5 @@
 from django.contrib import admin, messages
 from django.urls import path
-from django.urls.base import reverse
-from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
 from itou.approvals import models
@@ -12,7 +10,7 @@ from itou.employee_record import enums as employee_record_enums
 from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
-from itou.utils.admin import PkSupportRemarkInline
+from itou.utils.admin import PkSupportRemarkInline, get_admin_view_link
 
 
 class JobApplicationInline(admin.StackedInline):
@@ -48,8 +46,9 @@ class JobApplicationInline(admin.StackedInline):
 
     @admin.display(description="SIAE destinataire")
     def to_siae_link(self, obj):
-        to_siae_link = reverse("admin:siaes_siae_change", args=[obj.to_siae.pk])
-        return format_html(f"<a href='{to_siae_link}'>{obj.to_siae.display_name}</a> — SIRET : {obj.to_siae.siret}")
+        return mark_safe(
+            get_admin_view_link(obj.to_siae, content=obj.to_siae.display_name) + f" — SIRET : {obj.to_siae.siret}"
+        )
 
     # Custom read-only fields as workaround :
     # there is no direct relation between approvals and employee records
@@ -58,11 +57,12 @@ class JobApplicationInline(admin.StackedInline):
     @admin.display(description="Statut de la fiche salarié")
     def employee_record_status(obj):
         if employee_record := obj.employee_record.first():
-            url = reverse("admin:employee_record_employeerecord_change", args=[employee_record.id])
             debug = f"ID: {employee_record.id}"
             if employee_record.is_orphan:
                 debug += ", ORPHAN"
-            return format_html(f"<a href='{url}'><b>{employee_record.get_status_display()} ({debug})</b></a>")
+            return get_admin_view_link(
+                employee_record, content=mark_safe(f"<b>{employee_record.get_status_display()} ({debug})</b>")
+            )
 
         if not obj.to_siae.can_use_employee_record:
             return "La SIAE n'utilise pas les fiches salariés"
@@ -196,13 +196,7 @@ class ApprovalAdmin(admin.ModelAdmin):
             ],
         )
         if employee_records:
-            employee_record_links = ", ".join(
-                '<a href="'
-                + reverse(f"admin:{er._meta.app_label}_{er._meta.model_name}_change", args=[er.pk])
-                + f'">{er.pk}</a>'
-                for er in employee_records
-            )
-            messages.set_level(request, messages.ERROR)
+            employee_record_links = ", ".join(get_admin_view_link(er) for er in employee_records)
             messages.error(
                 request,
                 mark_safe(

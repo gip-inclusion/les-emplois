@@ -3,7 +3,6 @@ from allauth.account.models import EmailAddress
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.db.models import Exists, OuterRef
-from django.urls import reverse
 from django.utils.safestring import mark_safe
 
 from itou.approvals.models import Approval
@@ -16,7 +15,7 @@ from itou.siaes.models import SiaeMembership
 from itou.users import models
 from itou.users.admin_forms import ItouUserCreationForm, UserAdminForm
 from itou.users.enums import IdentityProvider
-from itou.utils.admin import PkSupportRemarkInline
+from itou.utils.admin import PkSupportRemarkInline, get_admin_view_link
 
 
 class EmailAddressInline(admin.TabularInline):
@@ -34,8 +33,7 @@ class EmailAddressInline(admin.TabularInline):
 
     @admin.display(description="PK")
     def pk_link(self, obj):
-        url = reverse(f"admin:{obj._meta.app_label}_{obj._meta.model_name}_change", args=[obj.pk])
-        return mark_safe(f'<a href="{url}">{obj.email}</a>')
+        return get_admin_view_link(obj, content=obj.email)
 
 
 class SiaeMembershipInline(admin.TabularInline):
@@ -63,10 +61,7 @@ class SiaeMembershipInline(admin.TabularInline):
         return True
 
     def siae_id_link(self, obj):
-        app_label = obj.siae._meta.app_label
-        model_name = obj.siae._meta.model_name
-        url = reverse(f"admin:{app_label}_{model_name}_change", args=[obj.siae_id])
-        return mark_safe(f'<a href="{url}">{obj.siae_id}</a>')
+        return get_admin_view_link(obj.siae)
 
 
 class PrescriberMembershipInline(admin.TabularInline):
@@ -92,10 +87,7 @@ class PrescriberMembershipInline(admin.TabularInline):
         return True
 
     def organization_id_link(self, obj):
-        app_label = obj.organization._meta.app_label
-        model_name = obj.organization._meta.model_name
-        url = reverse(f"admin:{app_label}_{model_name}_change", args=[obj.organization_id])
-        return mark_safe(f'<a href="{url}">{obj.organization_id}</a>')
+        return get_admin_view_link(obj.organization)
 
 
 class InstitutionMembershipInline(admin.TabularInline):
@@ -125,10 +117,7 @@ class InstitutionMembershipInline(admin.TabularInline):
         return True
 
     def institution_id_link(self, obj):
-        app_label = obj.institution._meta.app_label
-        model_name = obj.institution._meta.model_name
-        url = reverse(f"admin:{app_label}_{model_name}_change", args=[obj.institution_id])
-        return mark_safe(f'<a href="{url}">{obj.institution_id}</a>')
+        return get_admin_view_link(obj.institution)
 
 
 class JobApplicationInline(admin.TabularInline):
@@ -147,15 +136,13 @@ class JobApplicationInline(admin.TabularInline):
 
     @admin.display(description="PK")
     def pk_link(self, obj):
-        url = reverse(f"admin:{obj._meta.app_label}_{obj._meta.model_name}_change", args=[obj.pk])
-        return mark_safe(f'<a href="{url}">{obj.pk}</a>')
+        return get_admin_view_link(obj)
 
     @admin.display(description="SIAE destinataire")
     def to_siae_link(self, obj):
-        app_label = obj.to_siae._meta.app_label
-        model_name = obj.to_siae._meta.model_name
-        url = reverse(f"admin:{app_label}_{model_name}_change", args=[obj.to_siae.pk])
-        return mark_safe(f"<a href='{url}'>{obj.to_siae.display_name}</a> — SIRET : {obj.to_siae.siret}")
+        return mark_safe(
+            get_admin_view_link(obj.to_siae, content=obj.to_siae.display_name) + f" — SIRET : {obj.to_siae.siret}"
+        )
 
 
 class SentJobApplicationInline(JobApplicationInline):
@@ -167,10 +154,7 @@ class SentJobApplicationInline(JobApplicationInline):
 
     @admin.display(description="Candidat")
     def job_seeker_link(self, obj):
-        app_label = obj.job_seeker._meta.app_label
-        model_name = obj.job_seeker._meta.model_name
-        url = reverse(f"admin:{app_label}_{model_name}_change", args=[obj.job_seeker.pk])
-        return mark_safe(f"<a href='{url}'>{obj.job_seeker.get_full_name()}</a>")
+        return get_admin_view_link(obj.job_seeker, content=obj.job_seeker.get_full_name())
 
 
 class EligibilityDiagnosisInline(admin.TabularInline):
@@ -194,8 +178,7 @@ class EligibilityDiagnosisInline(admin.TabularInline):
 
     @admin.display(description="PK")
     def pk_link(self, obj):
-        url = reverse(f"admin:{obj._meta.app_label}_{obj._meta.model_name}_change", args=[obj.pk])
-        return mark_safe(f'<a href="{url}">{obj.pk}</a>')
+        return get_admin_view_link(obj)
 
     def is_valid(self, obj):
         return obj.is_valid
@@ -229,8 +212,7 @@ class ApprovalInline(admin.TabularInline):
 
     @admin.display(description="Numéro")
     def pk_link(self, obj):
-        url = reverse(f"admin:{obj._meta.app_label}_{obj._meta.model_name}_change", args=[obj.pk])
-        return mark_safe(f'<a href="{url}">{obj.number}</a>')
+        return get_admin_view_link(obj, content=obj.number)
 
     def is_valid(self, obj):
         return obj.is_valid()
@@ -366,8 +348,7 @@ class ItouUserAdmin(UserAdmin):
             return "Adresse non-géolocalisée"
 
         if qpv := QPV.in_qpv(obj, geom_field="coords"):
-            url = reverse("admin:geo_qpv_change", args=[qpv.pk])
-            return mark_safe(f'<a href="{url}">{qpv}</a>')
+            return get_admin_view_link(qpv, content=qpv)
 
         return "Adresse hors QPV"
 

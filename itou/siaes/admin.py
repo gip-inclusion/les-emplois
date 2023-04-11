@@ -1,7 +1,6 @@
 import datetime
 
 from django.contrib import admin, messages
-from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django.utils.timezone import now
 from import_export import resources
@@ -11,7 +10,7 @@ from import_export.fields import Field
 from itou.common_apps.organizations.admin import HasMembersFilter, MembersInline, OrganizationAdmin
 from itou.siaes import enums, models
 from itou.siaes.admin_forms import SiaeAdminForm
-from itou.utils.admin import ItouGISMixin, PkSupportRemarkInline
+from itou.utils.admin import ItouGISMixin, PkSupportRemarkInline, get_admin_view_link
 from itou.utils.apis.exceptions import GeocodingDataError
 
 
@@ -42,10 +41,7 @@ class JobsInline(admin.TabularInline):
     )
 
     def jobdescription_id_link(self, obj):
-        app_label = obj._meta.app_label
-        model_name = obj._meta.model_name
-        url = reverse(f"admin:{app_label}_{model_name}_change", args=[obj.id])
-        return mark_safe(f'<a href="{url}"><strong>Fiche de poste ID: {obj.id}</strong></a>')
+        return get_admin_view_link(obj, content=mark_safe(f"<strong>Fiche de poste ID: {obj.id}</strong>"))
 
     jobdescription_id_link.short_description = "Lien vers la fiche de poste"
 
@@ -84,10 +80,7 @@ class SiaesInline(admin.TabularInline):
         return False
 
     def siae_id_link(self, obj):
-        app_label = obj._meta.app_label
-        model_name = obj._meta.model_name
-        url = reverse(f"admin:{app_label}_{model_name}_change", args=[obj.id])
-        return mark_safe(f'<a href="{url}">{obj.id}</a>')
+        return get_admin_view_link(obj)
 
 
 class SiaeResource(resources.ModelResource):

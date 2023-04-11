@@ -947,7 +947,7 @@ class CustomApprovalAdminViewsTest(TestCase):
         employee_record = EmployeeRecordFactory()
         url = reverse("admin:employee_record_employeerecord_change", args=[employee_record.id])
         msg = JobApplicationInline.employee_record_status(employee_record.job_application)
-        assert msg == f"<a href='{url}'><b>Nouvelle (ID: {employee_record.pk})</b></a>"
+        assert msg == f'<a href="{url}"><b>Nouvelle (ID: {employee_record.pk})</b></a>'
 
         # When the job application will lead to a duplicate employee record but is still proposed
         job_application = JobApplicationFactory(
@@ -962,7 +962,7 @@ class CustomApprovalAdminViewsTest(TestCase):
         employee_record = EmployeeRecordFactory(orphan=True)
         url = reverse("admin:employee_record_employeerecord_change", args=[employee_record.id])
         msg = JobApplicationInline.employee_record_status(employee_record.job_application)
-        assert msg == f"<a href='{url}'><b>Nouvelle (ID: {employee_record.pk}, ORPHAN)</b></a>"
+        assert msg == f'<a href="{url}"><b>Nouvelle (ID: {employee_record.pk}, ORPHAN)</b></a>'
 
         # When employee record creation is disabled for that job application
         job_application = JobApplicationFactory(create_employee_record=False)
