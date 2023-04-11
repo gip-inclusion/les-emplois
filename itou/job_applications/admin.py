@@ -1,11 +1,14 @@
-from django.contrib import admin
+from django.contrib import admin, messages
+from django.db import transaction
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
+from itou.employee_record import models as employee_record_models
 from itou.job_applications import models
 from itou.job_applications.admin_forms import JobApplicationAdminForm
 from itou.job_applications.enums import Origin
 from itou.utils.admin import UUIDSupportRemarkInline
+from itou.utils.templatetags.str_filters import pluralizefr
 
 
 class TransitionLogInline(admin.TabularInline):
@@ -90,6 +93,47 @@ class JobApplicationAdmin(admin.ModelAdmin):
     )
     inlines = (JobsInline, PriorActionInline, TransitionLogInline, UUIDSupportRemarkInline)
     search_fields = ("pk", "to_siae__siret", "job_seeker__email", "sender__email")
+
+    @admin.action(description="Créer une fiche salarié pour les candidatures sélectionnées")
+    @transaction.atomic()
+    def create_employee_record(self, request, queryset):
+        created, ignored = [], []
+
+        for job_application in queryset:
+            if job_application.employee_record.for_siae(job_application.to_siae).exists():
+                ignored.append(job_application)
+                continue
+
+            try:
+                employee_record = employee_record_models.EmployeeRecord.from_job_application(
+                    job_application, clean=False
+                )
+                employee_record.save()
+            except Exception as ex:
+                messages.error(request, f"{job_application.pk} : {ex}")
+            else:
+                created.append(employee_record)
+
+        if created:
+            s = pluralizefr(created)
+            links = ", ".join(
+                '<a href="'
+                + reverse(f"admin:{er._meta.app_label}_{er._meta.model_name}_change", args=[er.pk])
+                + f'">{er.pk}</a>'
+                for er in created
+            )
+            messages.success(request, mark_safe(f"{len(created)} fiche{s} salarié{s} créée{s} : {links}"))
+        if ignored:
+            s = pluralizefr(ignored)
+            links = ", ".join(
+                '<a href="'
+                + reverse(f"admin:{ja._meta.app_label}_{ja._meta.model_name}_change", args=[ja.pk])
+                + f'">{ja.pk}</a>'
+                for ja in ignored
+            )
+            messages.warning(request, mark_safe(f"{len(ignored)} candidature{s} ignorée{s} : {links}"))
+
+    actions = [create_employee_record]
 
     def save_model(self, request, obj, form, change):
         if not change:
