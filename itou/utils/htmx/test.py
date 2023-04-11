@@ -1,10 +1,10 @@
 from urllib.parse import urlparse
 
 import pytest
-from bs4 import BeautifulSoup, NavigableString
+from bs4 import NavigableString
 from django.test.client import Client
 
-from itou.utils.test import TestCase
+from itou.utils.test import TestCase, parse_response_to_soup
 
 
 class HtmxClient(Client):
@@ -34,20 +34,6 @@ class HtmxTestCase(TestCase):
     @pytest.fixture(autouse=True)
     def htmx_client(self):
         self.htmx_client = HtmxClient()
-
-
-def parse_response_to_soup(response, selector=None, no_html_body=False):
-    soup = BeautifulSoup(response.content, "html5lib", from_encoding=response.charset or "utf-8")
-    if no_html_body:
-        # If the provided HTML does not contain <html><body> tags
-        # html5lib will always add them around the response:
-        # ignore them
-        soup = soup.body
-    if selector is not None:
-        [soup] = soup.select(selector)
-    for csrf_token_input in soup.find_all("input", attrs={"name": "csrfmiddlewaretoken"}):
-        csrf_token_input["value"] = "NORMALIZED_CSRF_TOKEN"
-    return soup
 
 
 def _handle_swap(page, *, target, new_elements, mode):

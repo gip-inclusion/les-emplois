@@ -1,12 +1,13 @@
 from unittest import mock
 
 from django.urls import reverse
+from pytest_django.asserts import assertContains
 
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.factories import PrescriberOrganizationFactory, PrescriberOrganizationWithMembershipFactory
 from itou.prescribers.models import PrescriberOrganization
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
-from itou.utils.test import TestCase
+from itou.utils.test import TestCase, parse_response_to_soup
 
 
 class CardViewTest(TestCase):
@@ -118,3 +119,50 @@ class EditOrganizationTest(TestCase):
 
         url = reverse("dashboard:index")
         assert url == response.url
+
+
+class TestEditOrganization:
+    def test_pe_cannot_edit(self, client, snapshot):
+        organization = PrescriberOrganizationWithMembershipFactory(
+            authorized=True,
+            kind=PrescriberOrganizationKind.PE,
+            name="Pôle emploi",
+            siret="12345678901234",
+            phone="0600000000",
+            email="pe@mailinator.com",
+            department="53",
+        )
+        user = organization.members.first()
+        url = reverse("prescribers_views:edit_organization")
+
+        client.force_login(user)
+        response = client.get(url)
+        form = parse_response_to_soup(response, selector="form.js-prevent-multiple-submit")
+        assert str(form) == snapshot(name="Fields are disabled")
+        assertContains(response, "Affichage des informations en lecture seule", count=1)
+
+        post_data = {
+            "name": "foo",
+            "siret": organization.siret,
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+            "address_line_1": "2 Rue de Soufflenheim",
+            "address_line_2": "",
+            "city": "Betschdorf",
+            "post_code": "67660",
+            "department": "67",
+            "email": "",
+            "phone": "0610203050",
+            "website": "https://famous-siae.com",
+        }
+        with mock.patch(
+            "itou.utils.apis.geocoding.call_ban_geocoding_api",
+            return_value=BAN_GEOCODING_API_RESULT_MOCK,
+        ) as mock_call_ban_geocoding_api:
+            response = client.post(url, data=post_data)
+        assert response.status_code == 200
+        mock_call_ban_geocoding_api.assert_not_called()
+
+        # Data was not modified.
+        organization_refreshed = PrescriberOrganization.objects.get(pk=organization.pk)
+        for field in [f for f in PrescriberOrganization._meta.get_fields() if not f.is_relation]:
+            assert getattr(organization, field.name) == getattr(organization_refreshed, field.name)

@@ -213,6 +213,9 @@ colorama==0.4.6 \
     # via
     #   djlint
     #   sqlfluff
+colored==1.4.4 \
+    --hash=sha256:04ff4d4dd514274fe3b99a21bb52fb96f2688c01e93fba7bef37221e7cb56ce0
+    # via syrupy
 coverage==7.2.3 \
     --hash=sha256:06ddd9c0249a0546997fdda5a30fbcb40f23926df0a874a60a8a185bc3a87d93 \
     --hash=sha256:0743b0035d4b0e32bc1df5de70fba3059662ace5b9a2a86a9f894cfe66569013 \
@@ -993,6 +996,7 @@ pytest==7.3.0 \
     #   pytest-timeout
     #   pytest-xdist
     #   sqlfluff
+    #   syrupy
 pytest-django==4.5.2 \
     --hash=sha256:c60834861933773109334fe5a53e83d1ef4828f2203a1d6a0fa9972f4f75ab3e \
     --hash=sha256:d9076f759bb7c36939dbdd5ae6633c18edfc2902d1a69fdbefd2426b970ce6c2
@@ -1257,6 +1261,10 @@ stack-data==0.6.1 \
     --hash=sha256:6c9a10eb5f342415fe085db551d673955611afb821551f554d91772415464315 \
     --hash=sha256:960cb054d6a1b2fdd9cbd529e365b3c163e8dabf1272e02cfe36b58403cff5c6
     # via ipython
+syrupy==4.0.1 \
+    --hash=sha256:53d3107cc5e18a5def189c721879cea2cdafdee34b879f602133ca08837d0e4b \
+    --hash=sha256:60e3e94782444e0f978cd3b207de32f6da3199b15a2db32eab02f83cebb63ae8
+    # via -r requirements/dev.in
 tablib[html,ods,xls,xlsx,yaml]==3.2.1 \
     --hash=sha256:870d7e688f738531a14937a055e8bba404fbc388e77d4d500b2c904075d1019c \
     --hash=sha256:a57f2770b8c225febec1cb1e65012a69cf30dd28be810e0ff98d024768c7d0f1
