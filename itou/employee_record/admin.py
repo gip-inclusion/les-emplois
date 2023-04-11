@@ -47,12 +47,12 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
 
         if total_created:
             s = pluralizefr(total_created)
-            messages.add_message(request, messages.SUCCESS, f"{total_created} notification{s} planifiée{s}")
+            messages.success(request, f"{total_created} notification{s} planifiée{s}")
 
         total_updated = len(queryset) - total_created
         if total_updated:
             s = pluralizefr(total_updated)
-            messages.add_message(request, messages.SUCCESS, f"{total_updated} notification{s} mise{s} à jour")
+            messages.success(request, f"{total_updated} notification{s} mise{s} à jour")
 
     actions = [
         update_employee_record_as_ready,
