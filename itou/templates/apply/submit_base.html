@@ -1,26 +1,10 @@
 {% extends "layout/content_small.html" %}
-{% load str_filters %}
 
 {% block title %}Postuler {{ block.super }}{% endblock %}
 
 {% block content %}
 
-    <h1>
-        {% if request.user.is_siae_staff %}
-            {% if current_siae.kind == SiaeKind.GEIQ %}
-                Enregistrer une candidature
-            {% else %}
-                Déclarer une embauche
-            {% endif %}
-        {% else %}
-            Postuler
-            {% if request.user.is_prescriber and job_seeker %}
-                pour <span class="text-muted">{{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</span>
-            {% endif %}
-            chez <span class="text-muted">{{ siae.display_name }}</span>
-        {% endif %}
-    </h1>
-    {% if request.user.is_siae_staff and job_seeker %}<h2 class="h1">{{ job_seeker.get_full_name|title }}</h2>{% endif %}
+    <h1>{% include 'apply/includes/_submit_title.html' %}</h1>
 
     {% include "approvals/includes/card.html" with common_approval=job_seeker.latest_common_approval %}
 

@@ -670,7 +670,6 @@ class CheckJobSeekerInformations(ApplicationBaseView):
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "form": self.form,
-            "can_view_personal_information": self.request.user.can_view_personal_information(self.job_seeker),
         }
 
 
@@ -716,7 +715,6 @@ class CheckPreviousApplications(ApplicationBaseView):
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "prev_application": self.previous_applications.latest("created_at"),
-            "can_view_personal_information": self.request.user.can_view_personal_information(self.job_seeker),
         }
 
 

@@ -1,6 +1,5 @@
 {% extends "layout/base.html" %}
 {% load bootstrap4 %}
-{% load str_filters %}
 
 {% block title %}Postuler {{ block.super }}{% endblock %}
 {% block content_full_viewport %}
@@ -9,15 +8,7 @@
             <div class="row">
                 <div class="col-12 col-lg-7">
                     <div class="d-flex flex-column flex-md-row align-items-center">
-                        <h1 class="my-5 flex-grow-1">
-                            {% if request.user.is_job_seeker %}
-                                Postuler
-                            {% elif request.user.is_siae_staff %}
-                                Auto-prescription pour {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}
-                            {% else %}
-                                Postuler pour {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}
-                            {% endif %}
-                        </h1>
+                        <h1 class="my-5 flex-grow-1">{% include 'apply/includes/_submit_title.html' %}</h1>
                         {% if is_subject_to_eligibility_rules %}
                             {% if job_seeker.has_valid_common_approval %}
                                 <span class="badge badge-base badge-pill badge-success"><i class="ri-check-fill"></i>Pass IAE valide</span>
