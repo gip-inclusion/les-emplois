@@ -31,6 +31,13 @@ class EditPrescriberOrganizationForm(forms.ModelForm):
             self.fields["siret"].required = False
             self.fields["siret"].widget.attrs["readonly"] = True
 
+        # PE users often mistakenly edit this page, to the point where the
+        # support asked to disable it, and have them reach out in case of
+        # changes.
+        if self.instance.kind == PrescriberOrganizationKind.PE:
+            for field in self.fields.values():
+                field.disabled = True
+
     class Meta:
         model = PrescriberOrganization
         fields = [

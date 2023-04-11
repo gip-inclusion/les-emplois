@@ -37,3 +37,4 @@ pytest-mock  # https://github.com/pytest-dev/pytest-mock/
 pytest-timeout  # https://github.com/pytest-dev/pytest-timeout
 pytest-xdist  # https://pypi.org/project/pytest-xdist/
 respx  # https://lundberg.github.io/respx/
+syrupy  # https://github.com/tophat/syrupy

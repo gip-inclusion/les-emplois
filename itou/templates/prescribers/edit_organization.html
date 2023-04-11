@@ -10,7 +10,14 @@
     <h2 class="h1 text-muted">{{ organization.display_name }}</h2>
 
     <div class="alert alert-info">
-        <p class="mb-0">Les coordonnées de contact de votre organisation sont visibles par tous les utilisateurs connectés.</p>
+        <p class="mb-0">
+            {% if organization.kind == PrescriberOrganizationKind.PE %}
+                Affichage des informations en lecture seule. Si vous souhaitez modifier ces informations, merci de
+                <a href="{{ ITOU_ASSISTANCE_URL }}" target="_blank">contacter notre support technique</a>.
+            {% else %}
+                Les coordonnées de contact de votre organisation sont visibles par tous les utilisateurs connectés.
+            {% endif %}
+        </p>
     </div>
 
     <form method="post" action="" class="js-prevent-multiple-submit">

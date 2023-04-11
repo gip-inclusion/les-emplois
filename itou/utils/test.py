@@ -32,6 +32,20 @@ def pprint_html(response, **selectors):
     print("\n\n".join(format_html(response, **selectors)))
 
 
+def parse_response_to_soup(response, selector=None, no_html_body=False):
+    soup = BeautifulSoup(response.content, "html5lib", from_encoding=response.charset or "utf-8")
+    if no_html_body:
+        # If the provided HTML does not contain <html><body> tags
+        # html5lib will always add them around the response:
+        # ignore them
+        soup = soup.body
+    if selector is not None:
+        [soup] = soup.select(selector)
+    for csrf_token_input in soup.find_all("input", attrs={"name": "csrfmiddlewaretoken"}):
+        csrf_token_input["value"] = "NORMALIZED_CSRF_TOKEN"
+    return soup
+
+
 class NoInlineClient(Client):
     def request(self, **request):
         response = super().request(**request)
