@@ -70,7 +70,7 @@ class JobApplicationInline(admin.StackedInline):
         if not obj.create_employee_record:
             return "Création désactivée"
 
-        if obj.hiring_start_at < EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE.date():
+        if obj.hiring_start_at and obj.hiring_start_at < EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE.date():
             return "Date de début du contrat avant l'interopérabilité"
 
         already_exists = obj.candidate_has_employee_record
