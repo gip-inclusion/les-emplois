@@ -7,7 +7,7 @@ from itou.employee_record import models as employee_record_models
 from itou.job_applications import models
 from itou.job_applications.admin_forms import JobApplicationAdminForm
 from itou.job_applications.enums import Origin
-from itou.utils.admin import UUIDSupportRemarkInline
+from itou.utils.admin import UUIDSupportRemarkInline, get_admin_view_link
 from itou.utils.templatetags.str_filters import pluralizefr
 
 
@@ -116,21 +116,11 @@ class JobApplicationAdmin(admin.ModelAdmin):
 
         if created:
             s = pluralizefr(created)
-            links = ", ".join(
-                '<a href="'
-                + reverse(f"admin:{er._meta.app_label}_{er._meta.model_name}_change", args=[er.pk])
-                + f'">{er.pk}</a>'
-                for er in created
-            )
+            links = ", ".join(get_admin_view_link(er) for er in created)
             messages.success(request, mark_safe(f"{len(created)} fiche{s} salarié{s} créée{s} : {links}"))
         if ignored:
             s = pluralizefr(ignored)
-            links = ", ".join(
-                '<a href="'
-                + reverse(f"admin:{ja._meta.app_label}_{ja._meta.model_name}_change", args=[ja.pk])
-                + f'">{ja.pk}</a>'
-                for ja in ignored
-            )
+            links = ", ".join(get_admin_view_link(ja) for ja in ignored)
             messages.warning(request, mark_safe(f"{len(ignored)} candidature{s} ignorée{s} : {links}"))
 
     actions = [create_employee_record]

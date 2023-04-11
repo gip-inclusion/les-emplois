@@ -1,8 +1,8 @@
 from django.contrib import admin, messages
-from django.urls import reverse
 from django.utils.safestring import mark_safe
 
 from itou.siae_evaluations import models
+from itou.utils.admin import get_admin_view_link
 from itou.utils.export import to_streaming_response
 
 
@@ -23,10 +23,7 @@ class EvaluatedSiaesInline(admin.TabularInline):
         return obj.state
 
     def id_link(self, obj):
-        app_label = obj._meta.app_label
-        model_name = obj._meta.model_name
-        url = reverse(f"admin:{app_label}_{model_name}_change", args=[obj.id])
-        return mark_safe(f'<a href="{url}">Lien vers la Siae évaluée <strong>{obj}</strong></a>')
+        return get_admin_view_link(obj, content=mark_safe(f"Lien vers la Siae évaluée <strong>{obj}</strong>"))
 
     id_link.short_description = "Lien vers les Siaes évaluées"
 
@@ -46,10 +43,7 @@ class EvaluatedJobApplicationsInline(admin.TabularInline):
         return obj.state
 
     def id_link(self, obj):
-        app_label = obj._meta.app_label
-        model_name = obj._meta.model_name
-        url = reverse(f"admin:{app_label}_{model_name}_change", args=[obj.id])
-        return mark_safe(f'<a href="{url}">Lien vers la candidature évaluée <strong>{obj}</strong></a>')
+        return get_admin_view_link(obj, content=mark_safe(f"Lien vers la candidature évaluée <strong>{obj}</strong>"))
 
     id_link.short_description = "Lien vers les candidatures évaluées"
 
@@ -71,10 +65,9 @@ class EvaluatedAdministrativeCriteriaInline(admin.TabularInline):
     extra = 0
 
     def id_link(self, obj):
-        app_label = obj._meta.app_label
-        model_name = obj._meta.model_name
-        url = reverse(f"admin:{app_label}_{model_name}_change", args=[obj.id])
-        return mark_safe(f'<a href="{url}">Lien vers le critère administratif <strong>{obj}</strong></a>')
+        return get_admin_view_link(
+            obj, content=mark_safe(f"Lien vers le critère administratif <strong>{obj}</strong>")
+        )
 
     id_link.short_description = "Lien vers les critères administratifs évalués"
 

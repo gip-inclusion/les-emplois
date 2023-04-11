@@ -1,8 +1,15 @@
 from django.contrib.contenttypes.admin import GenericStackedInline
 from django.contrib.gis.forms import fields as gis_fields
+from django.urls import reverse
+from django.utils.html import format_html
 
 from itou.utils.models import PkSupportRemark, UUIDSupportRemark
 from itou.utils.widgets import OSMWidget
+
+
+def get_admin_view_link(obj, *, content=None, view="change"):
+    url = reverse(f"admin:{obj._meta.app_label}_{obj._meta.model_name}_{view}", args=[obj.pk])
+    return format_html('<a href="{}">{}</a>', url, content or obj.pk)
 
 
 class AbstractSupportRemarkInline(GenericStackedInline):
