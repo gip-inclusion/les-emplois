@@ -328,7 +328,7 @@
 		"pk": 19,
 		"fields": {
 			"name": "Jeune de moins de 26 ans sans qualification (niveau 4 maximum)",
-			"desc": "",
+			"desc": "Disposant au plus d’une qualification de niveau 4 sans expérience professionnelle ou n’ayant pas exercé une activité professionnelle depuis au moins 2 ans en rapport avec leur qualification — sans emploi et ne suivant pas des études ou une formation",
 			"written_proof": "Justificatif de diplôme, attestation de non-indemnisation, certificats de travail ou attestation sur l'honneur",
 			"written_proof_url": "",
 			"written_proof_validity": "",
