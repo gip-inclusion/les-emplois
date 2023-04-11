@@ -599,7 +599,7 @@ class EmployeeRecord(ASPExchangeInformation):
         return siae.siret
 
     @classmethod
-    def from_job_application(cls, job_application):
+    def from_job_application(cls, job_application, clean=True):
         """
         Alternative and main FS constructor from a JobApplication object
 
@@ -614,7 +614,8 @@ class EmployeeRecord(ASPExchangeInformation):
 
         fs = cls(job_application=job_application)
 
-        fs.clean()
+        if clean:
+            fs.clean()
 
         # Mandatory check, must be done only once
         if (
