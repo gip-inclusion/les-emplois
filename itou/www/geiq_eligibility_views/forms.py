@@ -66,7 +66,7 @@ class GEIQAdministrativeCriteriaForm(forms.Form):
 
             # Displayed for GEIQ, not for prescribers
             if not accept_no_criteria and criterion.written_proof:
-                self.fields[criterion.key].help_text = (
+                self.fields[criterion.key].help_text += (
                     f"<p class='mt-2 form-text text-muted fs-xs'><strong>Pièce justificative :</strong> "
                     f"{criterion.written_proof}</p>"
                 )
