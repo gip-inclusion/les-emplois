@@ -1,6 +1,6 @@
 **Carte Notion : **
 
-Pensez à mettre le label "no-changelog" si nécessaire.
+<!-- Pensez à mettre le label "no-changelog" si nécessaire. -->
 
 ### Pourquoi ?
 
