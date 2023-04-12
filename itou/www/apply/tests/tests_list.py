@@ -190,6 +190,14 @@ class ProcessListSiaeTest(ProcessListTest):
         job2 = SiaeJobDescriptionFactory(siae=self.hit_pit, appellation=appellations[1], location=city)
         for job_application in JobApplication.objects.all():
             job_application.selected_jobs.set([job1, job2])
+
+        # Add a diagnosis present on 2 applications
+        diagnosis = EligibilityDiagnosisFactory(job_seeker=self.maggie)
+        level1_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_1).first()
+        level2_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_2).first()
+        diagnosis.administrative_criteria.add(level1_criterion)
+        diagnosis.administrative_criteria.add(level2_criterion)
+
         self.client.force_login(self.eddie_hit_pit)
         with self.assertNumQueries(
             1  # fetch django session
@@ -212,6 +220,7 @@ class ProcessListSiaeTest(ProcessListTest):
             + 1  # prefetch jobs appellation
             + 1  # prefetch jobs location
             + 1  # prefetch approvals
+            + 1  # manually prefetch administrative_criteria
             #
             # Render template:
             + 1  # context processor: user siae membership
@@ -236,6 +245,87 @@ class ProcessListSiaeTest(ProcessListTest):
         response = self.client.get(self.siae_base_url)
         self.assertContains(response, "Aucune candidature pour le moment.")
         self.assertContains(response, promo_text)
+
+    def test_list_for_siae_view__show_criteria(self):
+        # Add a diagnosis present on 2 applications
+        diagnosis = EligibilityDiagnosisFactory(job_seeker=self.maggie)
+        criteria = AdministrativeCriteria.objects.filter(
+            name__in=[
+                # Level 1 criteria
+                "Allocataire AAH",
+                "Allocataire ASS",
+                "Bénéficiaire du RSA",
+                # Level 2 criterion
+                "Senior (+50 ans)",
+            ]
+        )
+        assert len(criteria) == 4
+        diagnosis.administrative_criteria.add(*criteria)
+
+        self.client.force_login(self.eddie_hit_pit)
+        # Only show maggie's applications
+        job_seekers_ids = [self.maggie.id]
+        params = urlencode({"job_seekers": job_seekers_ids}, True)
+        url = f"{self.siae_base_url}?{params}"
+        response = self.client.get(url)
+
+        # 4 criteria: all are shown
+        self.assertContains(response, "<li>Allocataire AAH</li>", html=True)
+        self.assertContains(response, "<li>Allocataire ASS</li>", html=True)
+        self.assertContains(response, "<li>Bénéficiaire du RSA</li>", html=True)
+        SENIOR_CRITERION = "<li>Senior (+50 ans)</li>"
+        self.assertContains(response, SENIOR_CRITERION, html=True)
+
+        # Add a 5th criterion to the diagnosis
+        diagnosis.administrative_criteria.add(AdministrativeCriteria.objects.get(name="DETLD (+ 24 mois)"))
+
+        response = self.client.get(url)
+        # Only the 3 first are shown (ordered by level & name)
+        # The 4th line has been replaced by "+ 2 autres critères"
+        self.assertContains(response, "<li>Allocataire AAH</li>", html=True)
+        self.assertContains(response, "<li>Allocataire ASS</li>", html=True)
+        self.assertContains(response, "<li>Bénéficiaire du RSA</li>", html=True)
+        self.assertNotContains(response, SENIOR_CRITERION, html=True)
+        # DETLD is also not shown
+        self.assertContains(response, "+ 2 autres critères")
+
+    def test_list_for_siae_view__hide_criteria_for_non_SIAE_employers(self):
+        # Add a diagnosis present on 2 applications
+        diagnosis = EligibilityDiagnosisFactory(job_seeker=self.maggie)
+        # Level 1 criteria
+        diagnosis.administrative_criteria.add(AdministrativeCriteria.objects.get(name="Allocataire AAH"))
+
+        TITLE = '<h4 class="h5 mb-2">Critères administratifs IAE</h4>'
+        CRITERION = "<li>Allocataire AAH</li>"
+
+        self.client.force_login(self.eddie_hit_pit)
+        # Only show maggie's applications
+        job_seekers_ids = [self.maggie.id]
+        params = urlencode({"job_seekers": job_seekers_ids}, True)
+        url = f"{self.siae_base_url}?{params}"
+
+        expect_to_see_criteria = {
+            SiaeKind.EA: False,
+            SiaeKind.EATT: False,
+            SiaeKind.EI: True,
+            SiaeKind.GEIQ: False,
+            SiaeKind.OPCS: False,
+            SiaeKind.ACI: True,
+            SiaeKind.AI: True,
+            SiaeKind.EITI: True,
+            SiaeKind.ETTI: True,
+        }
+        for kind in SiaeKind:
+            with self.subTest(kind=kind):
+                self.hit_pit.kind = kind
+                self.hit_pit.save(update_fields=("kind",))
+                response = self.client.get(url)
+                if expect_to_see_criteria[kind]:
+                    self.assertContains(response, TITLE, html=True)
+                    self.assertContains(response, CRITERION, html=True)
+                else:
+                    self.assertNotContains(response, TITLE, html=True)
+                    self.assertNotContains(response, CRITERION, html=True)
 
     def test_list_for_siae_view__filtered_by_one_state(self):
         """

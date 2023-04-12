@@ -1,8 +1,12 @@
+from collections import defaultdict
+
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render
 from django.utils.text import slugify
 
+from itou.eligibility.models import SelectedAdministrativeCriteria
 from itou.job_applications.export import stream_xlsx_export
+from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS
 from itou.utils.pagination import pager
 from itou.utils.perms.prescriber import get_all_available_job_applications_as_prescriber, get_current_org_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
@@ -120,6 +124,35 @@ def list_for_prescriber_exports_download(request, month_identifier=None):
     return stream_xlsx_export(job_applications, filename)
 
 
+def _add_administrative_criteria(job_applications):
+    diagnoses_ids = tuple(
+        job_application.jobseeker_eligibility_diagnosis
+        for job_application in job_applications
+        if job_application.jobseeker_eligibility_diagnosis is not None
+    )
+
+    diagnosis_criteria = defaultdict(list)
+    for selected_criteria in (
+        SelectedAdministrativeCriteria.objects.filter(eligibility_diagnosis__in=diagnoses_ids)
+        .select_related("administrative_criteria")
+        .order_by("administrative_criteria__level", "administrative_criteria__name")
+    ):
+        diagnosis_criteria[selected_criteria.eligibility_diagnosis_id].append(
+            selected_criteria.administrative_criteria
+        )
+
+    for job_application in job_applications:
+        ja_criteria = diagnosis_criteria[job_application.jobseeker_eligibility_diagnosis]
+        if len(ja_criteria) > 4:
+            # Only show the 3 first
+            extra_nb = len(ja_criteria) - 3
+            ja_criteria = ja_criteria[:3]
+        else:
+            extra_nb = 0
+        job_application.preloaded_administrative_criteria = ja_criteria
+        job_application.preloaded_administrative_criteria_extra_nb = extra_nb
+
+
 @login_required
 def list_for_siae(request, template_name="apply/list_for_siae.html"):
     """
@@ -145,6 +178,9 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
 
     # SIAE members have access to personal info
     _add_user_can_view_personal_information(job_applications_page, lambda ja: True)
+
+    if siae.kind in SIAE_WITH_CONVENTION_KINDS:
+        _add_administrative_criteria(job_applications_page)
 
     context = {
         "siae": siae,
