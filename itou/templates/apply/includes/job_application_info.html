@@ -1,3 +1,4 @@
+{% load str_filters %}
 <ul>
     {% if request.user.is_prescriber %}
         <li>
@@ -8,20 +9,22 @@
         Date de la candidature : <b>{{ job_application.created_at|date:"d F Y à H:i" }}</b>
     </li>
 
-    {% if job_application.selected_jobs.exists %}
-        <li>
-            Métier(s) recherché(s) :
-            <ul>
-                {% for job in job_application.selected_jobs.all %}
-                    <li>
-                        <b>{{ job.display_name }}</b> ({{ job.appellation.rome_id }})
-                    </li>
-                {% endfor %}
-            </ul>
-        </li>
-    {% else %}
-        <li>Candidature spontanée</li>
-    {% endif %}
+    {% with jobs=job_application.selected_jobs.all %}
+        {% if jobs %}
+            <li>
+                Métier{{ jobs|pluralizefr }} recherché{{ jobs|pluralizefr }} :
+                <ul>
+                    {% for job in jobs %}
+                        <li>
+                            <b>{{ job.display_name }}</b> ({{ job.appellation.rome_id }})
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% else %}
+            <li>Candidature spontanée</li>
+        {% endif %}
+    {% endwith %}
 </ul>
 
 <h4 class="h6">Message de candidature envoyé à l'employeur</h4>

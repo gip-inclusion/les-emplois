@@ -1,5 +1,6 @@
 {% extends "layout/base_email_text_body.txt" %}
 {% load format_filters %}
+{% load str_filters %}
 {% block body %}
 
 La candidature suivante a été envoyée avec succès à l'entreprise {{ job_application.to_siae.display_name }} ({{ job_application.to_siae.kind }}) localisée à {{ job_application.to_siae.city }} !
@@ -23,14 +24,16 @@ La candidature suivante a été envoyée avec succès à l'entreprise {{ job_app
 
 {% endif %}
 
-{% if job_application.selected_jobs.exists %}
+{% with jobs=job_application.selected_jobs.all %}
+{% if jobs %}
 
-*Métier(s) recherché(s)* :
+*Métier{{ jobs|pluralizefr }} recherché{{ jobs|pluralizefr }}* :
 
-{% for job in job_application.selected_jobs.all %}
+{% for job in jobs %}
 - {{ job.display_name }}{% endfor %}
 
 {% endif %}
+{% endwith %}
 
 -----
 

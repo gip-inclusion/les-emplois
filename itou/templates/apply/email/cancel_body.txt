@@ -1,5 +1,6 @@
 {% extends "layout/base_email_text_body.txt" %}
 {% load format_filters %}
+{% load str_filters %}
 {% block body %}
 
 Embauche annulée
@@ -24,14 +25,16 @@ Nous vous confirmons que l'embauche de {{ job_application.job_seeker.get_full_na
 
 {% endif %}
 
-{% if job_application.selected_jobs.exists %}
+{% with jobs=job_application.selected_jobs.all %}
+{% if jobs %}
 
-*Métier(s) recherché(s)* :
+*Métier{{ jobs|pluralizefr }} recherché{{ jobs|pluralizefr }}* :
 
-{% for job in job_application.selected_jobs.all %}
+{% for job in jobs %}
 - {{ job.display_name }}{% endfor %}
 
 {% endif %}
+{% endwith %}
 
 *Candidature envoyée par :*
 
