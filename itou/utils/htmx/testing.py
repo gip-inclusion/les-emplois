@@ -44,7 +44,7 @@ def parse_response_to_soup(response, selector=None, no_html_body=False):
         # ignore them
         soup = soup.body
     if selector is not None:
-        soup = soup.select_one(selector)
+        [soup] = soup.select(selector)
     for csrf_token_input in soup.find_all("input", attrs={"name": "csrfmiddlewaretoken"}):
         csrf_token_input["value"] = "NORMALIZED_CSRF_TOKEN"
     return soup
