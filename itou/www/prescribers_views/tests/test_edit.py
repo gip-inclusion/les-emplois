@@ -19,9 +19,8 @@ class CardViewTest(TestCase):
         assert response.context["prescriber_org"] == prescriber_org
 
 
-class EditOrganizationTest(TestCase):
-    @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
-    def test_edit(self, mock_call_ban_geocoding_api):
+class TestEditOrganization:
+    def test_edit(self, client):
         """Edit a prescriber organization."""
 
         organization = PrescriberOrganizationWithMembershipFactory(
@@ -29,10 +28,10 @@ class EditOrganizationTest(TestCase):
         )
         user = organization.members.first()
 
-        self.client.force_login(user)
+        client.force_login(user)
 
         url = reverse("prescribers_views:edit_organization")
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
 
         post_data = {
@@ -48,7 +47,11 @@ class EditOrganizationTest(TestCase):
             "phone": "0610203050",
             "website": "https://famous-siae.com",
         }
-        response = self.client.post(url, data=post_data)
+        with mock.patch(
+            "itou.utils.apis.geocoding.call_ban_geocoding_api",
+            return_value=BAN_GEOCODING_API_RESULT_MOCK,
+        ) as mock_call_ban_geocoding_api:
+            response = client.post(url, data=post_data)
         assert response.status_code == 302
 
         mock_call_ban_geocoding_api.assert_called_once()
@@ -77,11 +80,10 @@ class EditOrganizationTest(TestCase):
         membership.is_admin = False
         membership.save()
         url = reverse("prescribers_views:edit_organization")
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 403
 
-    @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
-    def test_edit_with_multiple_memberships_and_same_siret(self, mock_call_ban_geocoding_api):
+    def test_edit_with_multiple_memberships_and_same_siret(self, client):
         """
         Updating information of the prescriber organization must be possible
         when user is member of multiple orgs with the same SIRET (and different types)
@@ -95,10 +97,10 @@ class EditOrganizationTest(TestCase):
         org2.members.add(user)
         org2.save()
 
-        self.client.force_login(user)
+        client.force_login(user)
 
         url = reverse("prescribers_views:edit_organization")
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
 
         post_data = {
@@ -114,14 +116,16 @@ class EditOrganizationTest(TestCase):
             "phone": "0610203050",
             "website": "https://famous-siae.com",
         }
-        response = self.client.post(url, data=post_data)
+        with mock.patch(
+            "itou.utils.apis.geocoding.call_ban_geocoding_api",
+            return_value=BAN_GEOCODING_API_RESULT_MOCK,
+        ):
+            response = client.post(url, data=post_data)
         assert response.status_code == 302
 
         url = reverse("dashboard:index")
         assert url == response.url
 
-
-class TestEditOrganization:
     def test_pe_cannot_edit(self, client, snapshot):
         organization = PrescriberOrganizationWithMembershipFactory(
             authorized=True,
