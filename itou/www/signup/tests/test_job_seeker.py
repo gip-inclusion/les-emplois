@@ -14,8 +14,7 @@ from itou.users.enums import UserKind
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from itou.users.models import User
 from itou.utils import constants as global_constants
-from itou.utils.test import TestCase
-from itou.utils.testing import reload_module
+from itou.utils.test import TestCase, reload_module
 from itou.www.signup.forms import JobSeekerSituationForm
 
 

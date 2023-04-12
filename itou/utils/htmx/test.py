@@ -25,7 +25,7 @@ class HtmxTestCase(TestCase):
 
     Usage
     ```
-    class MyTestWithUnittest(itou.utils.htmx.testing.HtmxTestCase):
+    class MyTestWithUnittest(itou.utils.htmx.test.HtmxTestCase):
         def a_test(self):
             response = self.htmx_client.get("/)
     ```

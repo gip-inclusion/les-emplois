@@ -35,7 +35,7 @@ from itou.users.models import User
 from itou.utils.models import InclusiveDateRange
 from itou.utils.session import SessionNamespace
 from itou.utils.storage.s3 import S3Upload
-from itou.utils.storage.testing import S3AccessingTestCase
+from itou.utils.storage.test import S3AccessingTestCase
 from itou.utils.test import TestCase
 
 

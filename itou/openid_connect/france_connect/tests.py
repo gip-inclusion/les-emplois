@@ -13,8 +13,7 @@ from itou.openid_connect.constants import OIDC_STATE_CLEANUP
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.factories import JobSeekerFactory, UserFactory
 from itou.users.models import User
-from itou.utils.test import TestCase
-from itou.utils.testing import reload_module
+from itou.utils.test import TestCase, reload_module
 
 from ..models import InvalidKindException
 from . import constants

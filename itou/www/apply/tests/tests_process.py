@@ -32,7 +32,7 @@ from itou.siaes.factories import SiaeFactory
 from itou.users.enums import LackOfNIRReason, UserKind
 from itou.users.factories import JobSeekerWithAddressFactory, PrescriberFactory
 from itou.users.models import User
-from itou.utils.htmx.testing import assertSoupEqual, parse_response_to_soup, update_page_with_htmx
+from itou.utils.htmx.test import assertSoupEqual, parse_response_to_soup, update_page_with_htmx
 from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.format_filters import format_nir
 from itou.utils.test import TestCase

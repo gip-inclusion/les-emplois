@@ -46,8 +46,7 @@ from itou.users.factories import ItouStaffFactory, JobSeekerFactory, PrescriberF
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.templatetags import format_filters
-from itou.utils.test import TestCase
-from itou.utils.testing import get_rows_from_streaming_response
+from itou.utils.test import TestCase, get_rows_from_streaming_response
 
 
 @override_settings(

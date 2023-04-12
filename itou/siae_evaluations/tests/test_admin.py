@@ -13,7 +13,7 @@ from itou.siae_evaluations.factories import (
 )
 from itou.siaes.factories import SiaeMembershipFactory
 from itou.users.factories import ItouStaffFactory
-from itou.utils.testing import get_rows_from_streaming_response
+from itou.utils.test import get_rows_from_streaming_response
 
 
 class TestEvaluationCampaignAdmin:

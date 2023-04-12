@@ -38,7 +38,7 @@ from ..constants import OIDC_STATE_CLEANUP
 from ..models import InvalidKindException
 from . import constants
 from .models import InclusionConnectPrescriberData, InclusionConnectSiaeStaffData, InclusionConnectState
-from .testing import InclusionConnectBaseTestCase
+from .test import InclusionConnectBaseTestCase
 
 
 OIDC_USERINFO = {

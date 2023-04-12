@@ -21,7 +21,7 @@ from itou.users.enums import KIND_SIAE_STAFF
 from itou.users.factories import JobSeekerFactory
 from itou.utils.perms.user import UserInfo
 from itou.utils.storage.s3 import S3Upload
-from itou.utils.storage.testing import S3AccessingTestCase
+from itou.utils.storage.test import S3AccessingTestCase
 from itou.utils.test import TestCase
 
 

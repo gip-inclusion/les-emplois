@@ -10,7 +10,7 @@ from django.db import connection
 from factory import Faker
 
 from itou.utils import faker_providers
-from itou.utils.htmx.testing import HtmxClient
+from itou.utils.htmx.test import HtmxClient
 from itou.utils.test import NoInlineClient
 
 
