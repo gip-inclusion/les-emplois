@@ -4,7 +4,7 @@ from allauth.account.models import EmailConfirmationHMAC
 from django.core import mail
 from django.urls import reverse
 
-from itou.openid_connect.inclusion_connect.testing import InclusionConnectBaseTestCase
+from itou.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
 from itou.openid_connect.inclusion_connect.tests import mock_oauth_dance
 from itou.siaes.factories import SiaeFactory
 from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF

@@ -23,7 +23,7 @@ from itou.job_applications.notifications import (
     NewQualifiedJobAppEmployersNotification,
     NewSpontaneousJobAppEmployersNotification,
 )
-from itou.openid_connect.inclusion_connect.testing import InclusionConnectBaseTestCase
+from itou.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
 from itou.prescribers import factories as prescribers_factories
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.siae_evaluations import enums as evaluation_enums

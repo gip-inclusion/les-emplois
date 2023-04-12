@@ -11,7 +11,7 @@ from django.utils.html import escape
 
 from itou.invitations.factories import PrescriberWithOrgSentInvitationFactory
 from itou.invitations.models import PrescriberWithOrgInvitation
-from itou.openid_connect.inclusion_connect.testing import InclusionConnectBaseTestCase
+from itou.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
 from itou.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory, PrescriberPoleEmploiFactory

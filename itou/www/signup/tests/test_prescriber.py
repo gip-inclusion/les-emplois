@@ -13,7 +13,7 @@ from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 
 from itou.openid_connect.inclusion_connect.constants import INCLUSION_CONNECT_SESSION_KEY
-from itou.openid_connect.inclusion_connect.testing import InclusionConnectBaseTestCase
+from itou.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
 from itou.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.factories import (

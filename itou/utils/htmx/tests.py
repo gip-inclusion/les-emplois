@@ -4,7 +4,7 @@ import pytest
 from bs4 import BeautifulSoup
 from django_htmx.middleware import HtmxDetails
 
-from .testing import HtmxTestCase, assertSoupEqual, parse_response_to_soup, update_page_with_htmx
+from itou.utils.htmx.test import HtmxTestCase, assertSoupEqual, parse_response_to_soup, update_page_with_htmx
 
 
 # Unittest style

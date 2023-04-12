@@ -10,7 +10,7 @@ from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.openid_connect.france_connect import constants as fc_constants
 from itou.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance
-from itou.openid_connect.inclusion_connect.testing import InclusionConnectBaseTestCase
+from itou.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
 from itou.users import enums as users_enums
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.factories import (
@@ -20,8 +20,7 @@ from itou.users.factories import (
     PrescriberFactory,
     SiaeStaffFactory,
 )
-from itou.utils.test import TestCase
-from itou.utils.testing import reload_module
+from itou.utils.test import TestCase, reload_module
 from itou.www.login.forms import ItouLoginForm
 
 

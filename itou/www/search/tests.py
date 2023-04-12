@@ -12,7 +12,7 @@ from itou.siaes.enums import POLE_EMPLOI_SIRET, ContractNature, ContractType, Jo
 from itou.siaes.factories import SiaeFactory, SiaeJobDescriptionFactory
 from itou.siaes.models import Siae
 from itou.utils.test import TestCase
-from itou.www.testing import NUM_CSRF_SESSION_REQUESTS
+from itou.www.test import NUM_CSRF_SESSION_REQUESTS
 
 
 class SearchSiaeTest(TestCase):

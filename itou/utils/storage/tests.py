@@ -2,8 +2,7 @@ import pytest
 from django.conf import settings
 
 from itou.utils.storage.s3 import S3Upload
-
-from .testing import S3AccessingTestCase
+from itou.utils.storage.test import S3AccessingTestCase
 
 
 class S3Tests(S3AccessingTestCase):
