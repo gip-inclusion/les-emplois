@@ -1,7 +1,7 @@
 {% load str_filters %}
 <div class="card-body">
     <div class="row">
-        <div class="col-12 col-md-6 col-lg-5 mb-3 mb-lg-0">
+        <div class="col-12 col-md-6 col-lg-4 mb-3 mb-lg-0">
             {% with jobs=job_application.selected_jobs.all %}
                 <p class="font-weight-bold mb-1">Métier{{ jobs|pluralizefr }} recherché{{ jobs|pluralizefr }} :</p>
                 {% if not jobs %}
@@ -51,7 +51,7 @@
                 {% endif %}
             </p>
         </div>
-        <div class="col-12 col-md-12 col-lg-3 pl-lg-0">
+        <div class="col-12 col-md-12 col-lg-4 pl-lg-0">
             <p class="font-weight-bold mb-1">Statut :</p>
             <p class="fs-sm card-text">
                 {% include "apply/includes/state_badge.html" with job_application=job_application %}
