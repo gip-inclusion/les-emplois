@@ -6,8 +6,8 @@ from itou.utils.urls import get_tally_form_url
 register = template.Library()
 
 
-@register.simple_tag(takes_context=True)
-def tally_form_url(context, form_id, **kwargs):
+@register.simple_tag
+def tally_form_url(form_id, **kwargs):
     """
     Wraps `itou.utils.urls.get_tally_form_url` for template usage.
     Can use context variables.
