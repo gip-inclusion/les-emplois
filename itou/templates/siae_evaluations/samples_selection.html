@@ -81,13 +81,6 @@
                         <p>{{ min }}% {{ form.chosen_percent }} {{ max }}%</p>
                     </div>
 
-                    <h3>Désactiver le contrôle pour cette campagne</h3>
-                    {{ form.opt_out.errors }}
-                    <label for="{{ form.opt_out.id_for_label }}">
-                        {{ form.opt_out }}
-                        {{ form.opt_out.label }}
-                    </label>
-
                     {% buttons %}
                         <button type="submit" class="btn btn-primary float-right">Valider</button>
                     {% endbuttons %}

@@ -3,7 +3,6 @@ from django import forms
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
-from django.forms import widgets
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 
@@ -19,19 +18,6 @@ from itou.utils.widgets import DuetDatePickerWidget
 
 
 class SetChosenPercentForm(forms.ModelForm):
-    opt_out = forms.BooleanField(
-        label="Je choisis de ne pas débuter le contrôle",
-        required=False,
-        widget=widgets.CheckboxInput(
-            attrs={
-                "aria-expanded": "true",
-                "aria-controls": "ratio-select",
-                "data-target": "#ratio-select",
-                "data-toggle": "collapse",
-            }
-        ),
-    )
-
     class Meta:
         model = EvaluationCampaign
         fields = ["chosen_percent"]
@@ -47,11 +33,6 @@ class SetChosenPercentForm(forms.ModelForm):
                 }
             )
         }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Use default when not specified. Can be omitted when opt_out is True.
-        self.fields["chosen_percent"].required = False
 
 
 class SubmitEvaluatedAdministrativeCriteriaProofForm(forms.ModelForm):
