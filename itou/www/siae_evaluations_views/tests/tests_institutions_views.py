@@ -168,21 +168,6 @@ class SamplesSelectionViewTest(TestCase):
         assert updated_evaluation_campaign.percent_set_at is not None
         assert updated_evaluation_campaign.chosen_percent == post_data["chosen_percent"]
 
-    def test_post_form_opt_out(self):
-        EvaluationCampaignFactory(institution=self.institution, name="Campagne 2022")
-
-        self.client.force_login(self.user)
-        response = self.client.post(self.url, data={"opt_out": "on"})
-
-        assert list(messages.get_messages(response.wsgi_request)) == [
-            Message(
-                messages.SUCCESS,
-                "DDETS Ille et Vilaine ne participera pas à la campagne de contrôle a posteriori Campagne 2022.",
-            )
-        ]
-        self.assertRedirects(response, reverse("dashboard:index"))
-        assert not EvaluationCampaign.objects.exists()
-
 
 class InstitutionEvaluatedSiaeListViewTest(TestCase):
     def setUp(self):

@@ -8,7 +8,7 @@ from django.db.models import Min, Q
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_list_or_404, get_object_or_404, render
 from django.urls import reverse
-from django.utils import text, timezone
+from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.views import generic
 from django.views.decorators.http import require_POST
@@ -52,14 +52,6 @@ def samples_selection(request, template_name="siae_evaluations/samples_selection
     form = SetChosenPercentForm(instance=evaluation_campaign, data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
-        if form.cleaned_data["opt_out"]:
-            msg = (
-                f"{text.capfirst(institution)} ne participera pas à la campagne de contrôle a posteriori "
-                f"{evaluation_campaign.name}."
-            )
-            evaluation_campaign.delete()
-            messages.success(request, msg)
-            return HttpResponseRedirect(dashboard_url)
         form.instance.percent_set_at = timezone.now()
         form.save()
         messages.success(
