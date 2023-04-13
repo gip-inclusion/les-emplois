@@ -22,11 +22,7 @@ class TransferUpdatesManagementCommandTest(ManagementCommandTestCase):
 
     @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
     def test_dry_run_upload(self):
-        out, _ = self.call_command(upload=True)
-        # FIXME(rsebille): Refactor test and factory to make it possible to use a full snapshot.
-        # With upload=True and wet_run=False we print the JSON representation of the notification,
-        # using the first 4 lines is sufficient enough to check that we are indeed in dry run mode.
-        assert "".join(out.splitlines(keepends=True)[:4]) == self.snapshot
+        self.call_command(upload=True)
 
         self.notification.refresh_from_db()
         assert er_enums.NotificationStatus.NEW == self.notification.status
@@ -72,12 +68,12 @@ class TransferUpdatesManagementCommandTest(ManagementCommandTestCase):
 
     @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
     def test_asp_test(self):
-        out, _ = self.call_command(test=True, wet_run=True)
+        out, _ = self.call_command(test=True, download=True, wet_run=True)
         assert out == self.snapshot
 
     @override_settings(ASP_FS_SFTP_HOST="")
     def test_wrong_environment(self):
-        out, _ = self.call_command(wet_run=True)
+        out, _ = self.call_command(download=True, wet_run=True)
         assert out == self.snapshot
 
     # Next part is about testing --preflight option,

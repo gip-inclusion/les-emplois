@@ -1,18 +1,29 @@
 # serializer version: 1
-# name: EmployeeRecordManagementCommandTest.test_smoke_download
+# name: EmployeeRecordManagementCommandTest.test_asp_test
   '''
-  Connected to django_tests@foobar.com
-  Current dir: PWD
+  Using *TEST* JSON serializers (SIRET number mapping)
+  Connected to "foobar.com" as "django_tests"
+  Current remote dir is "PWD"
   Starting DOWNLOAD of employee records
   No feedback files found
-  Employee records processing done
+  Employee records processing done!
+  
+  '''
+# ---
+# name: EmployeeRecordManagementCommandTest.test_smoke_download
+  '''
+  Connected to "foobar.com" as "django_tests"
+  Current remote dir is "PWD"
+  Starting DOWNLOAD of employee records
+  No feedback files found
+  Employee records processing done!
   
   '''
 # ---
 # name: EmployeeRecordManagementCommandTest.test_smoke_download_and_upload
   '''
-  Connected to django_tests@foobar.com
-  Current dir: PWD
+  Connected to "foobar.com" as "django_tests"
+  Current remote dir is "PWD"
   Starting UPLOAD of employee records
   Successfully uploaded: RIAE_FS_20210927000000.json
   Starting DOWNLOAD of employee records
@@ -20,40 +31,46 @@
   Record: line_number=1, processing_code=None, processing_label=None
   Parsed 1/1 files
   Deleting 'RIAE_FS_20210927000000_FichierRetour.json' from SFTP server
-  Employee records processing done
+  Employee records processing done!
   
   '''
 # ---
 # name: EmployeeRecordManagementCommandTest.test_smoke_upload
   '''
-  Connected to django_tests@foobar.com
-  Current dir: PWD
+  Connected to "foobar.com" as "django_tests"
+  Current remote dir is "PWD"
   Starting UPLOAD of employee records
   Successfully uploaded: RIAE_FS_20210927000000.json
-  Employee records processing done
+  Employee records processing done!
   
   '''
 # ---
 # name: EmployeeRecordManagementCommandTest.test_upload_and_download_success[download]
   '''
-  Connected to django_tests@foobar.com
-  Current dir: PWD
+  Connected to "foobar.com" as "django_tests"
+  Current remote dir is "PWD"
   Starting DOWNLOAD of employee records
   Fetching file: result_file='RIAE_FS_20210927000000_FichierRetour.json'
   Record: line_number=1, processing_code='0000', processing_label='La ligne de la fiche salarié a été enregistrée avec succès.'
   Parsed 1/1 files
   Deleting 'RIAE_FS_20210927000000_FichierRetour.json' from SFTP server
-  Employee records processing done
+  Employee records processing done!
   
   '''
 # ---
 # name: EmployeeRecordManagementCommandTest.test_upload_and_download_success[upload]
   '''
-  Connected to django_tests@foobar.com
-  Current dir: PWD
+  Connected to "foobar.com" as "django_tests"
+  Current remote dir is "PWD"
   Starting UPLOAD of employee records
   Successfully uploaded: RIAE_FS_20210927000000.json
-  Employee records processing done
+  Employee records processing done!
+  
+  '''
+# ---
+# name: EmployeeRecordManagementCommandTest.test_wrong_environment
+  '''
+  Your environment is missing ASP_FS_SFTP_HOST to run this command.
   
   '''
 # ---

@@ -2,16 +2,18 @@
 # name: TransferUpdatesManagementCommandTest.test_asp_test
   '''
   Using *TEST* JSON serializers (SIRET number mapping)
-  Connected to: django_tests@foobar.com
-  Current remote dir is: PWD
+  Connected to "foobar.com" as "django_tests"
+  Current remote dir is "PWD"
+  Starting DOWNLOAD of employee record notifications
+  No new feedback file found
   Employee record notifications processing done!
   
   '''
 # ---
 # name: TransferUpdatesManagementCommandTest.test_download[download]
   '''
-  Connected to: django_tests@foobar.com
-  Current remote dir is: PWD
+  Connected to "foobar.com" as "django_tests"
+  Current remote dir is "PWD"
   Starting DOWNLOAD of employee record notifications
   Fetching file: RIAE_FS_20210927000000_FichierRetour.json
   Parsed 1/1 files
@@ -22,8 +24,8 @@
 # ---
 # name: TransferUpdatesManagementCommandTest.test_download[upload]
   '''
-  Connected to: django_tests@foobar.com
-  Current remote dir is: PWD
+  Connected to "foobar.com" as "django_tests"
+  Current remote dir is "PWD"
   Starting UPLOAD of 1 notification(s)
   Successfully uploaded: RIAE_FS_20210927000000.json
   Employee record notifications processing done!
@@ -32,27 +34,16 @@
 # ---
 # name: TransferUpdatesManagementCommandTest.test_dry_run_empty_download
   '''
-  DRY-RUN mode
-  Connected to: django_tests@foobar.com
-  Current remote dir is: PWD
+  Connected to "foobar.com" as "django_tests"
+  Current remote dir is "PWD"
   Starting DOWNLOAD of employee record notifications
   No new feedback file found
   Employee record notifications processing done!
   
   '''
 # ---
-# name: TransferUpdatesManagementCommandTest.test_dry_run_upload
-  '''
-  DRY-RUN mode
-  Connected to: django_tests@foobar.com
-  Current remote dir is: PWD
-  Starting UPLOAD of 1 notification(s)
-  
-  '''
-# ---
 # name: TransferUpdatesManagementCommandTest.test_preflight_with_error
   '''
-  DRY-RUN mode
   Preflight activated, checking for possible serialization errors...
   Found 2 object(s) to check, split in chunks of 700 objects.
   Checking file #1 (chunk of 2 objects)
@@ -65,7 +56,6 @@
 # ---
 # name: TransferUpdatesManagementCommandTest.test_preflight_without_error
   '''
-  DRY-RUN mode
   Preflight activated, checking for possible serialization errors...
   Found 1 object(s) to check, split in chunks of 700 objects.
   Checking file #1 (chunk of 1 objects)
@@ -75,7 +65,6 @@
 # ---
 # name: TransferUpdatesManagementCommandTest.test_preflight_without_object
   '''
-  DRY-RUN mode
   Preflight activated, checking for possible serialization errors...
   No object to check. Exiting preflight.
   
@@ -83,8 +72,8 @@
 # ---
 # name: TransferUpdatesManagementCommandTest.test_upload
   '''
-  Connected to: django_tests@foobar.com
-  Current remote dir is: PWD
+  Connected to "foobar.com" as "django_tests"
+  Current remote dir is "PWD"
   Starting UPLOAD of 1 notification(s)
   Successfully uploaded: RIAE_FS_20210927000000.json
   Employee record notifications processing done!
