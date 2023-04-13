@@ -224,36 +224,30 @@ class Command(EmployeeRecordTransferCommand):
             self._upload_batch_file(conn, batch, dry_run)
 
     def handle(self, *, upload, download, preflight, wet_run, asp_test, **options):
-        if not settings.ASP_FS_SFTP_HOST:
-            self.stdout.write("Your environment is missing ASP_FS_SFTP_HOST to run this command.")
-            return
-
-        dry_run = not wet_run
-
-        self.asp_test = asp_test
-        if self.asp_test:
-            self.stdout.write("Using *TEST* JSON serializers (SIRET number mapping)")
-
-        if dry_run:
-            self.stdout.write("DRY-RUN mode")
-
         if preflight:
             self.stdout.write("Preflight activated, checking for possible serialization errors...")
             self.preflight(EmployeeRecordUpdateNotification)
-            # No other operations are allowed after a preflight
-            return
+        elif upload or download:
+            if not settings.ASP_FS_SFTP_HOST:
+                self.stdout.write("Your environment is missing ASP_FS_SFTP_HOST to run this command.")
+                return
 
-        with self.get_sftp_connection() as sftp:
-            user = settings.ASP_FS_SFTP_USER or "django_tests"
-            self.stdout.write(f"Connected to: {user}@{settings.ASP_FS_SFTP_HOST}")
-            self.stdout.write(f"Current remote dir is: {sftp.pwd}")
+            self.asp_test = asp_test
+            if asp_test:
+                self.stdout.write("Using *TEST* JSON serializers (SIRET number mapping)")
 
-            # Send files to ASP
-            if upload:
-                self.upload(sftp, dry_run)
+            with self.get_sftp_connection() as sftp:
+                self.stdout.write(f'Connected to "{settings.ASP_FS_SFTP_HOST}" as "{settings.ASP_FS_SFTP_USER}"')
+                self.stdout.write(f'Current remote dir is "{sftp.pwd}"')
 
-            # Fetch result files from ASP
-            if download:
-                self.download(sftp, dry_run)
+                # Send files to ASP
+                if upload:
+                    self.upload(sftp, not wet_run)
 
-        self.stdout.write("Employee record notifications processing done!")
+                # Fetch result files from ASP
+                if download:
+                    self.download(sftp, not wet_run)
+
+            self.stdout.write("Employee record notifications processing done!")
+        else:
+            self.stdout.write("No valid options (upload, download or preflight) were given")

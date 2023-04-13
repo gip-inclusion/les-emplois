@@ -276,7 +276,7 @@ class Command(EmployeeRecordTransferCommand):
         for batch in chunks(ready_employee_records, EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS):
             self._upload_batch_file(sftp, batch, dry_run)
 
-    def handle(self, *, upload, download, preflight, dry_run, asp_test, **_):
+    def handle(self, *, upload, download, preflight, dry_run, asp_test, **options):
         if preflight:
             self.stdout.write("Preflight activated, checking for possible serialization errors...")
             self.preflight(EmployeeRecord)
@@ -290,18 +290,17 @@ class Command(EmployeeRecordTransferCommand):
                 self.stdout.write("Using *TEST* JSON serializers (SIRET number mapping)")
 
             with self.get_sftp_connection() as sftp:
-                user = settings.ASP_FS_SFTP_USER
-                self.stdout.write(f"Connected to {user}@{settings.ASP_FS_SFTP_HOST}")
-                self.stdout.write(f"Current dir: {sftp.pwd}")
+                self.stdout.write(f'Connected to "{settings.ASP_FS_SFTP_HOST}" as "{settings.ASP_FS_SFTP_USER}"')
+                self.stdout.write(f'Current remote dir is "{sftp.pwd}"')
 
-                # Send files
+                # Send files to ASP
                 if upload:
                     self.upload(sftp, dry_run)
 
-                # Fetch results from ASP
+                # Fetch result files from ASP
                 if download:
                     self.download(sftp, dry_run)
 
-            self.stdout.write("Employee records processing done")
+            self.stdout.write("Employee records processing done!")
         else:
-            self.stdout.write("No valid options (upload, download, archive or preflight) were given")
+            self.stdout.write("No valid options (upload, download or preflight) were given")

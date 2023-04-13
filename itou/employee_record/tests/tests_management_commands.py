@@ -143,6 +143,16 @@ class EmployeeRecordManagementCommandTest(ManagementCommandTestCase):
             == "La ligne de la fiche salarié a été enregistrée avec succès."
         )
 
+    @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
+    def test_asp_test(self):
+        out, _ = self.call_command(test=True, download=True)
+        assert out == self.snapshot
+
+    @override_settings(ASP_FS_SFTP_HOST="")
+    def test_wrong_environment(self):
+        out, _ = self.call_command(download=True)
+        assert out == self.snapshot
+
     @mock.patch("pysftp.Connection", SFTPAllDupsConnectionMock)
     @mock.patch(
         "itou.common_apps.address.format.get_geocoding_data",
