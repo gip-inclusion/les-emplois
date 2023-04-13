@@ -715,18 +715,6 @@ class EmployeeRecordBatch:
 
 
 class EmployeeRecordUpdateNotificationQuerySet(QuerySet):
-    def new(self):
-        return self.filter(status=NotificationStatus.NEW)
-
-    def sent(self):
-        return self.filter(status=NotificationStatus.SENT)
-
-    def processed(self):
-        return self.filter(status=NotificationStatus.PROCESSED)
-
-    def rejected(self):
-        return self.filter(status=NotificationStatus.REJECTED)
-
     def find_by_batch(self, filename, line_number):
         return self.filter(asp_batch_file=filename, asp_batch_line_number=line_number)
 

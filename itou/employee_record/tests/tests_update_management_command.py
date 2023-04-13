@@ -108,7 +108,7 @@ class TransferUpdatesManagementCommandTest(ManagementCommandTestCase):
         EmployeeRecordUpdateNotification.objects.all().delete()
         out, _ = self.call_command(preflight=True)
 
-        assert not EmployeeRecordUpdateNotification.objects.new()
+        assert not EmployeeRecordUpdateNotification.objects.filter(status=er_enums.NotificationStatus.NEW)
         assert "Preflight activated, checking for possible serialization errors..." in out
         assert "No object to check. Exiting preflight." in out
 

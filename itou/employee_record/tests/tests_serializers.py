@@ -2,7 +2,7 @@ from datetime import timedelta
 
 from django.utils import timezone
 
-from itou.employee_record.enums import Status
+from itou.employee_record.enums import NotificationStatus, Status
 from itou.employee_record.factories import EmployeeRecordWithProfileFactory
 from itou.employee_record.models import EmployeeRecordBatch, EmployeeRecordUpdateNotification
 from itou.employee_record.serializers import (
@@ -115,7 +115,7 @@ class EmployeeRecordUpdateNotificationSerializerTest(TestCase):
                 asp_batch_line_number=idx,
             ).save()
 
-        new_notifications = EmployeeRecordUpdateNotification.objects.new()
+        new_notifications = EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW)
 
         batch = EmployeeRecordBatch(new_notifications)
         data = EmployeeRecordUpdateNotificationBatchSerializer(batch).data
