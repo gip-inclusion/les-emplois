@@ -192,7 +192,7 @@
             {% endif %}
         {% endblock %}
 
-        {% if ITOU_FQDN in ALLOWED_HOSTS %}
+        {% if MATOMO_BASE_URL %}
             {# Matomo/Piwik open source web analytics #}
             <script nonce="{{ CSP_NONCE }}">
                 window._paq = window._paq || [];
