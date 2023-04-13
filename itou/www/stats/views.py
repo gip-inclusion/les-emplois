@@ -120,13 +120,11 @@ def render_stats(request, context, params=None, template_name="stats/stats.html"
     # Key value pairs in context override preexisting pairs in base_context.
     base_context.update(context)
 
-    matomo_custom_url_prefix = request.resolver_match.route  # e.g. "stats/pe/delay/main"
-    base_context["matomo_custom_url"] = f"/{matomo_custom_url_prefix}"
-    if "matomo_custom_url_suffix" in base_context:
-        matomo_custom_url_suffix = base_context["matomo_custom_url_suffix"]
-        del base_context["matomo_custom_url_suffix"]
+    matomo_custom_url = request.resolver_match.route  # e.g. "stats/pe/delay/main"
+    if suffix := base_context.pop("matomo_custom_url_suffix", None):
         # E.g. `/stats/ddets/iae/Provence-Alpes-Cote-d-Azur/04---Alpes-de-Haute-Provence`
-        base_context["matomo_custom_url"] += f"/{matomo_custom_url_suffix}"
+        matomo_custom_url += f"/{suffix}"
+    base_context["matomo_custom_url"] = matomo_custom_url
 
     if request.user.is_authenticated and metabase_dashboard:
         siae_pk = request.session.get(global_constants.ITOU_SESSION_CURRENT_SIAE_KEY)

@@ -160,14 +160,17 @@ def test_siae_stats_log_visit(client, view_name, settings):
     ],
 )
 def test_ddets_stats_log_visit(client, view_name):
-    institution = InstitutionWithMembershipFactory(kind="DDETS")
+    institution = InstitutionWithMembershipFactory(kind="DDETS", department="22")
     user = institution.members.get()
     client.force_login(user)
 
     assertQuerysetEqual(StatsDashboardVisit.objects.all(), [])
 
-    response = client.get(reverse(f"stats:{view_name}"))
+    url = reverse(f"stats:{view_name}")
+    response = client.get(url)
     assert response.status_code == 200
+    # Check that the base slash of the URL is not included; it's added by the Javascript.
+    assert response.context["matomo_custom_url"] == f"{url[1:]}/Bretagne/22---Cotes-d-Armor"
 
     assert_stats_dashboard_equal(
         (
