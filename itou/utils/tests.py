@@ -1268,6 +1268,12 @@ def test_matomo_context_processor(client, settings):
     user.asp_uid = "1234567890"
     user.save(update_fields=["asp_uid"])
     client.force_login(user)
+
+    # check that we don't crash when the route is not resolved
+    response = client.get("/doesnotexist")
+    assert response.status_code == 404
+
+    # canonical case
     url = reverse("siaes_views:card", kwargs={"siae_id": siae.pk})
     response = client.get(f"{url}?foo=bar&mtm_foo=truc&mtm_bar=bidule")
     assert response.status_code == 200
