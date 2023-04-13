@@ -45,56 +45,58 @@
         </div>
 
         <div class="col-12 col-md-8">
-            <div class="d-flex flex-column flex-sm-row align-items-sm-center">
-                <p class="h2 mb-0 flex-grow-1">
-                    {% with job_applications_page.paginator.count as counter %}
-                        {{ counter }} <strong>résultat{{ counter|pluralizefr }}</strong>
-                    {% endwith %}
-                </p>
-                <div>
-                    {% include "apply/includes/job_applications_export_button.html" %}
-                    {% if filters_counter > 0 %}
-                        <a href="{% url 'apply:list_for_job_seeker' %}" class="btn btn-link btn-ico pl-0">
-                            <i class="ri-close-fill"></i>
-                            <span>Réinitialiser les filtres ({{ filters_counter }})</span>
-                        </a>
-                    {% endif %}
-                </div>
-            </div>
-
-            {% if not job_applications_page %}
-                <h2 class="font-weight-normal text-muted my-4">Aucune candidature pour le moment.</h2>
-            {% else %}
-                {% for job_application in job_applications_page %}
-                    <div class="c-card card my-4 has-links-inside">
-                        {# TODO: when working on this template in the near future, try to refactor with list_card_body_siae.html #}
-                        {% include "apply/includes/list_card_header.html" with job_application=job_application %}
-                        {% include "apply/includes/list_card_body.html" with job_application=job_application %}
-                        <div id="answer{{ forloop.counter0 }}" class="card-body collapse">
-                            <p class="font-weight-bold mb-1">Message de candidature :</p>
-                            <div class="fs-sm">{{ job_application.message|linebreaks }}</div>
-                            {% if job_application.state.is_refused and job_application.answer %}
-                                <p class="font-weight-bold mb-1">Réponse :</p>
-                                <div class="fs-sm">{{ job_application.answer|linebreaks }}</div>
-                            {% elif job_application.state.is_postponed and job_application.answer %}
-                                <p class="font-weight-bold mb-1">Motif de la mise en liste d'attente :</p>
-                                <div class="fs-sm">{{ job_application.answer|linebreaks }}</div>
-                            {% endif %}
-                        </div>
-                        <div class="card-footer text-right">
-                            <a href="#"
-                               class="btn btn-sm btn-outline-primary"
-                               data-toggle="collapse"
-                               data-target="#answer{{ forloop.counter0 }}"
-                               aria-expanded="false"
-                               aria-controls="answer{{ forloop.counter0 }}"
-                               aria-label="Plus d'informations sur cette candidature">Plus d'informations</a>
-                        </div>
+            <section aria-labelledby="results">
+                <div class="d-flex flex-column flex-sm-row align-items-sm-center">
+                    <h2 id="results" class="mb-0 flex-grow-1">
+                        {% with job_applications_page.paginator.count as counter %}
+                            {{ counter }} <strong>résultat{{ counter|pluralizefr }}</strong>
+                        {% endwith %}
+                    </h2>
+                    <div>
+                        {% include "apply/includes/job_applications_export_button.html" %}
+                        {% if filters_counter > 0 %}
+                            <a href="{% url 'apply:list_for_job_seeker' %}" class="btn btn-link btn-ico pl-0">
+                                <i class="ri-close-fill"></i>
+                                <span>Réinitialiser les filtres ({{ filters_counter }})</span>
+                            </a>
+                        {% endif %}
                     </div>
-                {% endfor %}
+                </div>
 
-                {% include "includes/pagination.html" with page=job_applications_page %}
-            {% endif %}
+                {% if not job_applications_page %}
+                    <h2 class="font-weight-normal text-muted my-4">Aucune candidature pour le moment.</h2>
+                {% else %}
+                    {% for job_application in job_applications_page %}
+                        <div class="c-card card my-4 has-links-inside">
+                            {# TODO: when working on this template in the near future, try to refactor with list_card_body_siae.html #}
+                            {% include "apply/includes/list_card_header.html" with job_application=job_application %}
+                            {% include "apply/includes/list_card_body.html" with job_application=job_application %}
+                            <div id="answer{{ forloop.counter0 }}" class="card-body collapse">
+                                <p class="font-weight-bold mb-1">Message de candidature :</p>
+                                <div class="fs-sm">{{ job_application.message|linebreaks }}</div>
+                                {% if job_application.state.is_refused and job_application.answer %}
+                                    <p class="font-weight-bold mb-1">Réponse :</p>
+                                    <div class="fs-sm">{{ job_application.answer|linebreaks }}</div>
+                                {% elif job_application.state.is_postponed and job_application.answer %}
+                                    <p class="font-weight-bold mb-1">Motif de la mise en liste d'attente :</p>
+                                    <div class="fs-sm">{{ job_application.answer|linebreaks }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="card-footer text-right">
+                                <a href="#"
+                                   class="btn btn-sm btn-outline-primary"
+                                   data-toggle="collapse"
+                                   data-target="#answer{{ forloop.counter0 }}"
+                                   aria-expanded="false"
+                                   aria-controls="answer{{ forloop.counter0 }}"
+                                   aria-label="Plus d'informations sur cette candidature">Plus d'informations</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                    {% include "includes/pagination.html" with page=job_applications_page %}
+                {% endif %}
+            </section>
         </div>
     </div>
 {% endblock %}
