@@ -1,10 +1,12 @@
 from io import StringIO
 
+import pytest
 from django.core import management
 
 from itou.utils.test import TestCase
 
 
+@pytest.mark.usefixtures("unittest_compatibility")
 class ManagementCommandTestCase(TestCase):
 
     # Override as needed

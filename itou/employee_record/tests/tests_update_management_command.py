@@ -1,5 +1,6 @@
 from unittest import mock
 
+import freezegun
 import pytest
 from django.test import override_settings
 
@@ -17,54 +18,44 @@ class TransferUpdatesManagementCommandTest(ManagementCommandTestCase):
 
     MANAGEMENT_COMMAND_NAME = "transfer_employee_records_updates"
 
-    def setUp(self):
-        self.notification = EmployeeRecordUpdateNotificationFactory()
+    @classmethod
+    def setUpTestData(cls):
+        cls.notification = EmployeeRecordUpdateNotificationFactory()
 
     @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
     def test_dry_run_upload(self):
-        out, _ = self.call_command(upload=True, download=False)
-
-        assert "DRY-RUN mode" in out
-        assert "Connected to:" in out
-        assert "Current remote dir is:" in out
-        assert "Starting UPLOAD" in out
-        assert "DRY-RUN: (not) sending" in out
-        assert "Employee record notifications processing done" in out
+        out, _ = self.call_command(upload=True)
+        # FIXME(rsebille): Refactor test and factory to make it possible to use a full snapshot.
+        # With upload=True and wet_run=False we print the JSON representation of the notification,
+        # using the first 4 lines is sufficient enough to check that we are indeed in dry run mode.
+        assert "".join(out.splitlines(keepends=True)[:4]) == self.snapshot
 
         self.notification.refresh_from_db()
         assert er_enums.NotificationStatus.NEW == self.notification.status
 
     @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
     def test_upload(self):
-        out, _ = self.call_command(upload=True, download=False, wet_run=True)
-
-        assert "DRY-RUN mode" not in out
-        assert "Connected to:" in out
-        assert "Current remote dir is:" in out
-        assert "Starting UPLOAD" in out
-        assert "DRY-RUN: (not) sending" not in out
-        assert "DRY-RUN: Not updating notification status" not in out
-        assert "Employee record notifications processing done" in out
+        with freezegun.freeze_time("2021-09-27"):
+            out, _ = self.call_command(upload=True, wet_run=True)
+        assert out == self.snapshot
 
         self.notification.refresh_from_db()
         assert er_enums.NotificationStatus.SENT == self.notification.status
 
     @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
     def test_dry_run_empty_download(self):
-        out, _ = self.call_command(upload=False, download=True)
-
-        assert "DRY-RUN mode" in out
-        assert "Connected to:" in out
-        assert "Current remote dir is:" in out
-        assert "Starting DOWNLOAD" in out
-        assert "Employee record notifications processing done" in out
+        out, _ = self.call_command(download=True)
+        assert out == self.snapshot
 
         self.notification.refresh_from_db()
         assert er_enums.NotificationStatus.NEW == self.notification.status
 
     @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
     def test_download(self):
-        self.call_command(upload=True, wet_run=True)
+        with freezegun.freeze_time("2021-09-27"):
+            out, _ = self.call_command(upload=True, wet_run=True)
+        assert out == self.snapshot(name="upload")
+
         self.notification.refresh_from_db()
         assert self.notification.status == er_enums.Status.SENT
         assert self.notification.asp_batch_line_number == 1
@@ -73,12 +64,7 @@ class TransferUpdatesManagementCommandTest(ManagementCommandTestCase):
         assert self.notification.archived_json["codeTraitement"] is None
 
         out, _ = self.call_command(download=True, wet_run=True)
-
-        assert "DRY-RUN mode" not in out
-        assert "Connected to:" in out
-        assert "Current remote dir is:" in out
-        assert "Starting DOWNLOAD" in out
-        assert "Employee record notifications processing done" in out
+        assert out == self.snapshot(name="download")
 
         self.notification.refresh_from_db()
         assert self.notification.status == er_enums.Status.PROCESSED
@@ -88,15 +74,13 @@ class TransferUpdatesManagementCommandTest(ManagementCommandTestCase):
 
     @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
     def test_asp_test(self):
-        out, _ = self.call_command(upload=False, download=False, test=True, wet_run=True)
-
-        assert "Using *TEST* JSON serializers" in out
+        out, _ = self.call_command(test=True, wet_run=True)
+        assert out == self.snapshot
 
     @override_settings(ASP_FS_SFTP_HOST="")
     def test_wrong_environment(self):
-        out, _ = self.call_command(upload=False, download=False, wet_run=True)
-
-        assert "Your environment is missing ASP_FS_SFTP_HOST to run this command." in out
+        out, _ = self.call_command(wet_run=True)
+        assert out == self.snapshot
 
     # Next part is about testing --preflight option,
     # which is common to all `EmployeeRecordTransferCommand` subclasses.
@@ -104,24 +88,22 @@ class TransferUpdatesManagementCommandTest(ManagementCommandTestCase):
     # (such as the management command for employee record transfers).
 
     def test_preflight_without_object(self):
-        # Test --preflight option if there is no object ready to be transfered.
+        # Test --preflight option if there is no object ready to be transferred.
         EmployeeRecordUpdateNotification.objects.all().delete()
+
         out, _ = self.call_command(preflight=True)
+        assert out == self.snapshot
 
         assert not EmployeeRecordUpdateNotification.objects.filter(status=er_enums.NotificationStatus.NEW)
-        assert "Preflight activated, checking for possible serialization errors..." in out
-        assert "No object to check. Exiting preflight." in out
 
     def test_preflight_without_error(self):
-        # Test --preflight option if all objects ready to be transfered
+        # Test --preflight option if all objects ready to be transferred
         # have a correct JSON structure.
         out, _ = self.call_command(preflight=True)
-
-        assert "Preflight activated, checking for possible serialization errors..." in out
-        assert "All serializations ok, you may skip preflight..." in out
+        assert out == self.snapshot
 
     def test_preflight_with_error(self):
-        # Test --preflight option with an object ready to be transfered,
+        # Test --preflight option with an object ready to be transferred,
         # but with an incorrect JSON structure.
 
         # Create a notification with a bad structure : no HEXA address
