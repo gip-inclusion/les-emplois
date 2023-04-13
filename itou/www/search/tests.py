@@ -1,5 +1,6 @@
 from django.contrib.gis.geos import Point
 from django.template.defaultfilters import capfirst
+from django.test import override_settings
 from django.urls import reverse
 
 from itou.cities.factories import create_city_guerande, create_city_saint_andre, create_city_vannes
@@ -11,7 +12,7 @@ from itou.prescribers.factories import PrescriberOrganizationFactory
 from itou.siaes.enums import POLE_EMPLOI_SIRET, ContractNature, ContractType, JobSource, SiaeKind
 from itou.siaes.factories import SiaeFactory, SiaeJobDescriptionFactory
 from itou.siaes.models import Siae
-from itou.utils.test import TestCase
+from itou.utils.test import TestCase, pprint_html
 from itou.www.test import NUM_CSRF_SESSION_REQUESTS
 
 
@@ -23,6 +24,7 @@ class SearchSiaeTest(TestCase):
         response = self.client.get(self.url, {"city": "foo-44"})
         self.assertContains(response, "Aucun résultat avec les filtres actuels.")
 
+    @override_settings(MATOMO_BASE_URL="https://matomo.example.com")
     def test_district(self):
         city_slug = "paris-75"
         paris_city = City.objects.create(
@@ -53,6 +55,8 @@ class SearchSiaeTest(TestCase):
             response = self.client.get(self.url, {"city": city_slug})
 
         self.assertContains(response, "Employeurs solidaires à 25 km du centre de Paris (75)")
+        # look for the matomo_custom_title
+        self.assertContains(response, "Recherche d&#x27;employeurs solidaires")
         self.assertContains(response, "(2 résultats)")
         self.assertContains(response, "Arrondissements de Paris")
 
