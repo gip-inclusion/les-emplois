@@ -19,7 +19,6 @@ INSEE_CODES_WITH_DISTRICTS = {"13055", "75056", "69123"}
 
 
 class EmployerSearchBaseView(FormView):
-
     template_name = "search/siaes_search_results.html"
     form_class = SiaeSearchForm
     initial = {"distance": SiaeSearchForm.DISTANCE_DEFAULT}
@@ -28,11 +27,6 @@ class EmployerSearchBaseView(FormView):
         kwargs = super().get_form_kwargs()
         kwargs["data"] = self.request.GET or None
         return kwargs
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["matomo_custom_title"] = "Recherche d'employeurs solidaires"
-        return context
 
     def get(self, request, *args, **kwargs):
         # rewire the GET onto the POST since in this particular view, the form data is passed by GET
@@ -120,13 +114,14 @@ class EmployerSearchBaseView(FormView):
             "results_page": self.get_results_page(siaes, job_descriptions),
             "siaes_count": siaes.count(),
             "job_descriptions_count": job_descriptions.count(),
+            "matomo_custom_title": "Recherche d'employeurs solidaires",
         }
-
         return render(self.request, self.template_name, context)
 
     def form_invalid(self, form):
         context = {
             "form": form,
+            "matomo_custom_title": "Recherche d'employeurs solidaires",
         }
         return render(self.request, self.template_name, context)
 
@@ -192,7 +187,6 @@ class EmployerSearchView(EmployerSearchBaseView):
 
 
 class JobDescriptionSearchView(EmployerSearchBaseView):
-
     form_class = JobDescriptionSearchForm
 
     def add_form_choices(self, form, _siaes, job_descriptions):
@@ -241,7 +235,6 @@ def search_prescribers_results(request, template_name="search/prescribers_search
     prescriber_orgs_page = None
 
     if form.is_valid():
-
         city = form.cleaned_data["city"]
         distance = form.cleaned_data["distance"]
 
