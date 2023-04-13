@@ -1,7 +1,9 @@
 import pytest
+from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
+from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNumQueries
 
 from itou.approvals.factories import SuspensionFactory
@@ -21,7 +23,7 @@ from itou.jobs.models import Appellation
 from itou.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationWithMembershipFactory
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory, SiaeJobDescriptionFactory
-from itou.users.factories import PrescriberFactory
+from itou.users.factories import JobSeekerFactory, PrescriberFactory
 from itou.utils.test import TestCase, parse_response_to_soup
 from itou.utils.widgets import DuetDatePickerWidget
 
@@ -636,6 +638,58 @@ class ProcessListSiaeTest(ProcessListTest):
 
         assert len(applications) == 1
         assert appellation1 in [job_desc.appellation for job_desc in applications[0].selected_jobs.all()]
+
+
+class TestListForSiae:
+    @freeze_time("2023-04-13")
+    def test_warns_about_long_awaiting_applications(self, client, snapshot):
+        hit_pit = SiaeFactory(pk=42, name="Hit Pit", with_membership=True)
+
+        now = timezone.now()
+        org = PrescriberOrganizationWithMembershipFactory(
+            membership__user__first_name="Max", membership__user__last_name="Throughput"
+        )
+        sender = org.active_members.get()
+        job_seeker = JobSeekerFactory(first_name="Jacques", last_name="Henry")
+        JobApplicationFactory(
+            id="11111111-1111-1111-1111-111111111111",
+            to_siae=hit_pit,
+            job_seeker=job_seeker,
+            sender=sender,
+            message="Third application",
+            created_at=now - relativedelta(weeks=2),
+        )
+        JobApplicationFactory(
+            id="22222222-2222-2222-2222-222222222222",
+            to_siae=hit_pit,
+            job_seeker=job_seeker,
+            sender=sender,
+            message="Second application",
+            created_at=now - relativedelta(weeks=3, days=5),
+        )
+        JobApplicationFactory(
+            id="33333333-3333-3333-3333-333333333333",
+            to_siae=hit_pit,
+            job_seeker=job_seeker,
+            sender=sender,
+            message="First application",
+            created_at=now - relativedelta(weeks=8),
+        )
+
+        client.force_login(hit_pit.members.get())
+        response = client.get(reverse("apply:list_for_siae"))
+        results_section = parse_response_to_soup(response, selector="section[aria-labelledby='results']")
+        assert str(results_section) == snapshot(name="SIAE - warnings for 2222 and 3333")
+
+        client.force_login(sender)
+        response = client.get(reverse("apply:list_for_prescriber"))
+        results_section = parse_response_to_soup(response, selector="section[aria-labelledby='results']")
+        assert str(results_section) == snapshot(name="PRESCRIBER - warnings for 2222 and 3333")
+
+        client.force_login(job_seeker)
+        response = client.get(reverse("apply:list_for_job_seeker"))
+        results_section = parse_response_to_soup(response, selector="section[aria-labelledby='results']")
+        assert str(results_section) == snapshot(name="JOB SEEKER - no warnings")
 
 
 ####################################################
