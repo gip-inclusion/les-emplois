@@ -9,7 +9,6 @@ from rest_framework.renderers import JSONRenderer
 
 from itou.employee_record import constants
 from itou.employee_record.enums import NotificationStatus
-from itou.employee_record.exceptions import SerializationError
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, EmployeeRecordUpdateNotification, Status
 from itou.employee_record.serializers import EmployeeRecordSerializer, EmployeeRecordUpdateNotificationSerializer
 from itou.utils.iterators import chunks
@@ -122,6 +121,7 @@ class EmployeeRecordTransferCommand(BaseCommand):
             f"{EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS} objects."
         )
 
+        errors = False
         for idx, elements in enumerate(chunks(new_objects, EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS), 1):
             # A batch + serializer must be created with notifications for correct serialization
             batch = EmployeeRecordBatch(elements)
@@ -129,12 +129,13 @@ class EmployeeRecordTransferCommand(BaseCommand):
             self.stdout.write(f"Checking file #{idx} (chunk of {len(elements)} objects)")
 
             for obj in batch.elements:
-                ser = object_serializer(obj)
                 try:
-                    ser.data  # Invoke DRF serialization
-                except Exception as secondary_ex:
-                    # Attach cause exception for more details
-                    raise SerializationError(f"JSON serialization of {obj=} failed.") from secondary_ex
+                    object_serializer(obj).data  # Invoke DRF serialization
+                except Exception as ex:
+                    self.stdout.write(f"ERROR: serialization of {obj} failed!")
+                    self.stdout.write("".join(f"> {line}" for line in str(ex).splitlines(keepends=True)))
+                    errors = True
 
-        # Good to go !
-        self.stdout.write("All serializations ok, you may skip preflight...")
+        if not errors:
+            # Good to go !
+            self.stdout.write("All serializations ok, you may skip preflight...")
