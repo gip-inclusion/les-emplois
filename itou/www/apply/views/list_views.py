@@ -2,10 +2,12 @@ from collections import defaultdict
 
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render
+from django.utils import timezone
 from django.utils.text import slugify
 
 from itou.eligibility.models import SelectedAdministrativeCriteria
 from itou.job_applications.export import stream_xlsx_export
+from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS
 from itou.utils.pagination import pager
 from itou.utils.perms.prescriber import get_all_available_job_applications_as_prescriber, get_current_org_or_404
@@ -20,6 +22,16 @@ from itou.www.apply.forms import (
 def _add_user_can_view_personal_information(job_applications, can_view):
     for job_application in job_applications:
         job_application.user_can_view_personal_information = can_view(job_application.job_seeker)
+
+
+def _add_pending_for_weeks(job_applications):
+    SECONDS_IN_WEEK = 7 * 24 * 60 * 60
+    for job_app in job_applications:
+        pending_for_weeks = None
+        if job_app.state in JobApplicationWorkflow.PENDING_STATES:
+            pending_for_seconds = (timezone.now() - job_app.last_change).total_seconds()
+            pending_for_weeks = int(pending_for_seconds // SECONDS_IN_WEEK)
+        job_app.pending_for_weeks = pending_for_weeks
 
 
 @login_required
@@ -39,6 +51,7 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
         filters_counter = filters_form.get_qs_filters_counter(qs_filters)
 
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=10)
+    _add_pending_for_weeks(job_applications_page)
 
     # The candidate has obviously access to its personal info
     _add_user_can_view_personal_information(job_applications_page, lambda ja: True)
@@ -71,6 +84,7 @@ def list_for_prescriber(request, template_name="apply/list_for_prescriber.html")
         filters_counter = filters_form.get_qs_filters_counter(qs_filters)
 
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=10)
+    _add_pending_for_weeks(job_applications_page)
     _add_user_can_view_personal_information(job_applications_page, request.user.can_view_personal_information)
 
     context = {
@@ -175,6 +189,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         filters_counter = filters_form.get_qs_filters_counter(qs_filters)
 
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=10)
+    _add_pending_for_weeks(job_applications_page)
 
     # SIAE members have access to personal info
     _add_user_can_view_personal_information(job_applications_page, lambda ja: True)

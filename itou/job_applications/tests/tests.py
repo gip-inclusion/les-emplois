@@ -376,32 +376,6 @@ class JobApplicationQuerySetTest(TestCase):
         last_change = job_app.logs.order_by("-timestamp").first()
         assert qs.last_change == last_change.timestamp
 
-    def test_with_is_pending_for_too_long(self):
-        freshness_limit = timezone.now() - relativedelta(weeks=JobApplication.WEEKS_BEFORE_CONSIDERED_OLD)
-
-        # Sent before the freshness limit.
-        job_app = JobApplicationSentByJobSeekerFactory(created_at=freshness_limit - relativedelta(days=1))
-        qs = JobApplication.objects.with_is_pending_for_too_long().get(pk=job_app.pk)
-        assert hasattr(qs, "is_pending_for_too_long")
-        assert qs.is_pending_for_too_long
-
-        # Freshly sent.
-        job_app = JobApplicationSentByJobSeekerFactory()
-        qs = JobApplication.objects.with_is_pending_for_too_long().get(pk=job_app.pk)
-        assert not qs.is_pending_for_too_long
-
-        # Sent before the freshness limit but accepted.
-        job_app = JobApplicationSentByJobSeekerFactory(
-            created_at=freshness_limit - relativedelta(days=1), state=JobApplicationWorkflow.STATE_ACCEPTED
-        )
-        qs = JobApplication.objects.with_is_pending_for_too_long().get(pk=job_app.pk)
-        assert not qs.is_pending_for_too_long
-
-        # Freshly sent and freshly accepted. The Holy Grail!
-        job_app = JobApplicationSentByJobSeekerFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
-        qs = JobApplication.objects.with_is_pending_for_too_long().get(pk=job_app.pk)
-        assert not qs.is_pending_for_too_long
-
     def test_with_jobseeker_eligibility_diagnosis(self):
         job_app = JobApplicationFactory(with_approval=True)
         diagnosis = job_app.eligibility_diagnosis
@@ -478,7 +452,6 @@ class JobApplicationQuerySetTest(TestCase):
         assert hasattr(qs, "to_siae")
         assert hasattr(qs, "selected_jobs")
         assert hasattr(qs, "has_suspended_approval")
-        assert hasattr(qs, "is_pending_for_too_long")
         assert hasattr(qs, "jobseeker_eligibility_diagnosis")
         assert hasattr(qs, f"eligibility_diagnosis_criterion_{level1_criterion.pk}")
         assert hasattr(qs, f"eligibility_diagnosis_criterion_{level2_criterion.pk}")

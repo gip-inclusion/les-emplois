@@ -2,12 +2,11 @@ import datetime
 import logging
 import uuid
 
-from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.db.models import BooleanField, Case, Count, Exists, F, Max, OuterRef, Prefetch, Q, Subquery, When
+from django.db.models import Case, Count, Exists, F, Max, OuterRef, Prefetch, Q, Subquery, When
 from django.db.models.functions import Coalesce, Greatest, TruncMonth
 from django.urls import reverse
 from django.utils import timezone
@@ -212,17 +211,6 @@ class JobApplicationQuerySet(models.QuerySet):
             )
         )
 
-    def with_is_pending_for_too_long(self):
-        freshness_limit = timezone.now() - relativedelta(weeks=self.model.WEEKS_BEFORE_CONSIDERED_OLD)
-        pending_states = JobApplicationWorkflow.PENDING_STATES
-        return self.with_last_change().annotate(
-            is_pending_for_too_long=Case(
-                When(last_change__lt=freshness_limit, state__in=pending_states, then=True),
-                default=False,
-                output_field=BooleanField(),
-            )
-        )
-
     def with_jobseeker_eligibility_diagnosis(self):
         """
         Gives the "eligibility_diagnosis" linked to the job application or if none is found
@@ -269,7 +257,7 @@ class JobApplicationQuerySet(models.QuerySet):
             Prefetch("job_seeker__approvals", queryset=Approval.objects.order_by("-start_at")),
         )
 
-        qs = qs.with_has_suspended_approval().with_is_pending_for_too_long().with_jobseeker_eligibility_diagnosis()
+        qs = qs.with_has_suspended_approval().with_last_change().with_jobseeker_eligibility_diagnosis()
 
         # Adding an annotation by selected criterion
         for criterion in criteria:
