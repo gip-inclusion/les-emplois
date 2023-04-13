@@ -91,3 +91,40 @@ def itou_faker_provider(_session_faker):
 @pytest.fixture(scope="function")
 def unittest_compatibility(request, faker):
     request.instance.faker = faker
+
+
+@pytest.fixture(autouse=True)
+def django_ensure_matomo_titles(monkeypatch) -> None:
+    from django.template import base, defaulttags, loader, loader_tags
+
+    original_render = loader.render_to_string
+
+    def assertive_render(template_name, context=None, request=None, using=None):
+        template = loader.get_template(template_name, using=using)
+
+        def _walk_template_nodes(nodelist, condition_fn):
+            for node in nodelist:
+                if isinstance(node, (loader_tags.ExtendsNode, defaulttags.IfNode)):
+                    return _walk_template_nodes(node.nodelist, condition_fn)
+                if condition_fn(node):
+                    return node
+
+        def is_title_node(node):
+            return isinstance(node, loader_tags.BlockNode) and node.name == "title"
+
+        def is_variable_node(node):
+            return (
+                isinstance(node, base.VariableNode) and "block.super" not in str(node) and "CSP_NONCE" not in str(node)
+            )
+
+        title_node = _walk_template_nodes(template.template.nodelist, is_title_node)
+        if title_node:
+            var_node = _walk_template_nodes(title_node.nodelist, is_variable_node)
+            if var_node and "matomo_custom_title" not in context:
+                raise AssertionError(
+                    f"template={template_name} uses a variable title; "
+                    "please provide a `matomo_custom_title` in the context !"
+                )
+        return original_render(template_name, context, request, using)
+
+    monkeypatch.setattr(loader, "render_to_string", assertive_render)
