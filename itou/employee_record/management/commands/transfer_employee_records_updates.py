@@ -7,7 +7,7 @@ from rest_framework.renderers import JSONRenderer
 from sentry_sdk.crons import monitor
 
 from itou.employee_record import constants
-from itou.employee_record.enums import MovementType, Status
+from itou.employee_record.enums import MovementType, NotificationStatus, Status
 from itou.employee_record.exceptions import SerializationError
 from itou.employee_record.mocks.fake_serializers import TestEmployeeRecordUpdateNotificationBatchSerializer
 from itou.employee_record.models import EmployeeRecordBatch, EmployeeRecordUpdateNotification
@@ -213,7 +213,7 @@ class Command(EmployeeRecordTransferCommand):
 
     @monitor(monitor_slug="transfer-employee-records-updates-upload")
     def upload(self, conn: pysftp.Connection, dry_run: bool):
-        new_notifications = EmployeeRecordUpdateNotification.objects.new()
+        new_notifications = EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW)
 
         if len(new_notifications) > 0:
             self.stdout.write(f"Starting UPLOAD of {len(new_notifications)} notification(s)")

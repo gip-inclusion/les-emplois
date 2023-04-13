@@ -8,6 +8,7 @@ from django.utils import timezone
 from rest_framework.renderers import JSONRenderer
 
 from itou.employee_record import constants
+from itou.employee_record.enums import NotificationStatus
 from itou.employee_record.exceptions import SerializationError
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, EmployeeRecordUpdateNotification, Status
 from itou.employee_record.serializers import EmployeeRecordSerializer, EmployeeRecordUpdateNotificationSerializer
@@ -101,7 +102,7 @@ class EmployeeRecordTransferCommand(BaseCommand):
         assert object_class in [EmployeeRecord, EmployeeRecordUpdateNotification]
 
         new_objects = (
-            EmployeeRecordUpdateNotification.objects.new()
+            EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW)
             if object_class == EmployeeRecordUpdateNotification
             else EmployeeRecord.objects.filter(status=Status.READY)
         )

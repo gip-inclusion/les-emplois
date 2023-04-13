@@ -3,7 +3,7 @@ from datetime import timedelta
 from django.utils import timezone
 
 from itou.approvals.factories import ApprovalFactory, ProlongationFactory, SuspensionFactory
-from itou.employee_record.enums import Status
+from itou.employee_record.enums import NotificationStatus, Status
 from itou.employee_record.factories import EmployeeRecordFactory
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification
 from itou.utils.test import TestCase
@@ -23,7 +23,7 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
 
         assert 1 == EmployeeRecord.objects.count()
         assert today + timedelta(days=1) == approval.start_at
-        assert 1 == EmployeeRecordUpdateNotification.objects.new().count()
+        assert 1 == EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW).count()
 
     def test_update_approval_end_date(self):
         # If a modification occurs on the `end_date` field of an approval linked to a processed employee record
@@ -38,7 +38,7 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
 
         assert 1 == EmployeeRecord.objects.count()
         assert today + timedelta(days=2) == approval.end_at
-        assert 1 == EmployeeRecordUpdateNotification.objects.new().count()
+        assert 1 == EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW).count()
 
     def test_update_approval_twice(self):
         # If SEVERAL modifications occurs on a monitored field of an approval linked to a processed employee record
@@ -53,13 +53,13 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
 
         assert 1 == EmployeeRecord.objects.count()
         assert today + timedelta(days=1) == approval.start_at
-        assert 1 == EmployeeRecordUpdateNotification.objects.new().count()
+        assert 1 == EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW).count()
 
         approval.start_at = today
         approval.save()
 
         assert today == approval.start_at
-        assert 1 == EmployeeRecordUpdateNotification.objects.new().count()
+        assert 1 == EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW).count()
 
     def test_update_non_monitored_fields(self):
         # If a modification occurs on an approval linked to any or no employee record,
@@ -72,7 +72,7 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
         approval.save()
 
         assert 1 == EmployeeRecord.objects.count()
-        assert 0 == EmployeeRecordUpdateNotification.objects.new().count()
+        assert 0 == EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW).count()
 
     def test_update_on_approval_without_linked_employee_record(self):
         # If a date modification occurs on an approval NOT linked to any employee record,
@@ -83,7 +83,7 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
         approval.end_at = today + timedelta(days=2)
         approval.save()
 
-        assert 0 == EmployeeRecordUpdateNotification.objects.new().count()
+        assert 0 == EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW).count()
 
     def test_update_on_non_processed_employee_record(self):
         # If a date modification occurs on an approval linked to an employee record NOT in processed state,
@@ -97,7 +97,7 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
                 approval.created_at = today + timedelta(days=2)
                 approval.save()
 
-                assert 0 == EmployeeRecordUpdateNotification.objects.new().count()
+                assert 0 == EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW).count()
 
     def test_update_on_multiple_employee_records(self):
         # If a date modification occurs on an approval linked to *N* processed employee record,
@@ -116,7 +116,7 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
         approval.save()
 
         self.assertQuerysetEqual(
-            EmployeeRecordUpdateNotification.objects.new(),
+            EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW),
             [employee_record_1.pk, employee_record_2.pk],
             transform=lambda notif: notif.employee_record_id,
             ordered=False,
@@ -134,7 +134,7 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
             start_at=start_at,
         )
 
-        assert 1 == EmployeeRecordUpdateNotification.objects.new().count()
+        assert 1 == EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW).count()
         assert employee_record.pk == EmployeeRecordUpdateNotification.objects.earliest("created_at").employee_record.pk
 
     def test_update_with_prolongation(self):
@@ -148,5 +148,5 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
             start_at=approval.end_at,
         )
 
-        assert 1 == EmployeeRecordUpdateNotification.objects.new().count()
+        assert 1 == EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW).count()
         assert employee_record.pk == EmployeeRecordUpdateNotification.objects.earliest("created_at").employee_record.pk
