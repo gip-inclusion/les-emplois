@@ -1,11 +1,9 @@
 from unittest import mock
 
 import freezegun
-import pytest
 from django.test import override_settings
 
 import itou.employee_record.enums as er_enums
-from itou.employee_record.exceptions import SerializationError
 from itou.employee_record.factories import EmployeeRecordUpdateNotificationFactory
 from itou.employee_record.mocks.transfer_employee_records import SFTPGoodConnectionMock
 from itou.employee_record.models import EmployeeRecordUpdateNotification
@@ -107,12 +105,12 @@ class TransferUpdatesManagementCommandTest(ManagementCommandTestCase):
         # but with an incorrect JSON structure.
 
         # Create a notification with a bad structure : no HEXA address
-        bad_notification = EmployeeRecordUpdateNotificationFactory()
+        bad_notification = EmployeeRecordUpdateNotificationFactory(pk=42)
         # Beware of 1:1 objects auto-update when not at top level
         # (i.e. don't do: bad_notification.employee_record.job_seeker.jobseeker_profile.hexa_commune = None).
         profile = bad_notification.employee_record.job_seeker.jobseeker_profile
         profile.hexa_commune = None
         profile.save()
 
-        with pytest.raises(SerializationError):
-            self.call_command(preflight=True)
+        out, _ = self.call_command(preflight=True)
+        assert out == self.snapshot
