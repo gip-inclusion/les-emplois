@@ -68,47 +68,49 @@
         </div>
 
         <div class="col-12 col-md-8">
-            <div class="d-flex flex-column flex-sm-row align-items-sm-center">
-                <p class="h2 mb-0 flex-grow-1">
-                    {% with job_applications_page.paginator.count as counter %}
-                        {{ counter }} <strong>résultat{{ counter|pluralizefr }}</strong>
-                    {% endwith %}
-                </p>
-                <div>
-                    {% include "apply/includes/job_applications_export_button.html" %}
-                    {% if filters_counter > 0 %}
-                        <a href="{% url 'apply:list_for_siae' %}" class="btn btn-link btn-ico pl-0">
-                            <i class="ri-close-fill"></i>
-                            <span>Réinitialiser les filtres ({{ filters_counter }})</span>
-                        </a>
-                    {% endif %}
-                </div>
-            </div>
-
-            {% if not job_applications_page %}
-                <h2 class="font-weight-normal text-muted my-4">Aucune candidature pour le moment.</h2>
-                {% include "apply/includes/rdv_insertion_promo_card.html" %}
-            {% else %}
-                {% for job_application in job_applications_page %}
-                    <div class="c-card card my-4 has-links-inside">
-                        {% include "apply/includes/list_card_body_siae.html" %}
-                        <div class="card-footer text-right bg-light">
-                            <a class="btn btn-sm btn-outline-primary bg-white"
-                               href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}?back_url={{ request.get_full_path|urlencode }}"
-                               aria-label="Gérer la candidature de {{ job_application.job_seeker.get_full_name|mask_unless:job_application.user_can_view_personal_information }}">
-                                Voir sa candidature
+            <section aria-labelledby="results">
+                <div class="d-flex flex-column flex-sm-row align-items-sm-center">
+                    <h2 id="results" class="mb-0 flex-grow-1">
+                        {% with job_applications_page.paginator.count as counter %}
+                            {{ counter }} <strong>résultat{{ counter|pluralizefr }}</strong>
+                        {% endwith %}
+                    </h2>
+                    <div>
+                        {% include "apply/includes/job_applications_export_button.html" %}
+                        {% if filters_counter > 0 %}
+                            <a href="{% url 'apply:list_for_siae' %}" class="btn btn-link btn-ico pl-0">
+                                <i class="ri-close-fill"></i>
+                                <span>Réinitialiser les filtres ({{ filters_counter }})</span>
                             </a>
-                        </div>
+                        {% endif %}
                     </div>
+                </div>
 
-                    {% if forloop.counter == 1 %}
-                        {% include "apply/includes/rdv_insertion_promo_card.html" %}
-                    {% endif %}
+                {% if not job_applications_page %}
+                    <h2 class="font-weight-normal text-muted my-4">Aucune candidature pour le moment.</h2>
+                    {% include "apply/includes/rdv_insertion_promo_card.html" %}
+                {% else %}
+                    {% for job_application in job_applications_page %}
+                        <div class="c-card card my-4 has-links-inside">
+                            {% include "apply/includes/list_card_body_siae.html" %}
+                            <div class="card-footer text-right bg-light">
+                                <a class="btn btn-sm btn-outline-primary bg-white"
+                                   href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}?back_url={{ request.get_full_path|urlencode }}"
+                                   aria-label="Gérer la candidature de {{ job_application.job_seeker.get_full_name|mask_unless:job_application.user_can_view_personal_information }}">
+                                    Voir sa candidature
+                                </a>
+                            </div>
+                        </div>
 
-                {% endfor %}
+                        {% if forloop.counter == 1 %}
+                            {% include "apply/includes/rdv_insertion_promo_card.html" %}
+                        {% endif %}
 
-                {% include "includes/pagination.html" with page=job_applications_page %}
-            {% endif %}
+                    {% endfor %}
+
+                    {% include "includes/pagination.html" with page=job_applications_page %}
+                {% endif %}
+            </section>
         </div>
     </div>
 {% endblock %}
