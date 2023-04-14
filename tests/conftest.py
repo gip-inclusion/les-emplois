@@ -11,6 +11,7 @@ import pandas  # noqa F401
 import paramiko
 import patchy
 import pytest
+import respx
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from django.conf import settings
@@ -26,6 +27,7 @@ from factory import Faker
 from paramiko import ServerInterface
 from pytest_django.lazy_django import django_settings_is_configured
 from pytest_django.plugin import INVALID_TEMPLATE_VARS_ENV
+from respx.patterns import M
 
 
 # Rewrite before importing itou code.
@@ -514,3 +516,55 @@ def sftp_client_factory_fixture(sftp_host_key, sftp_directory):
         return paramiko.SFTPClient.from_transport(client_transport)
 
     return sftp_client_factory
+
+
+@pytest.fixture(scope="session", autouse=True)
+def nu_validator_passthrough():
+    from tests.utils.test import nu_validation_client
+
+    if nu_validation_client is not None:
+        respx.route(M(url=nu_validation_client.url)).pass_through()
+
+
+def pytest_addoption(parser):
+    parser.addoption(
+        "--nu-validation",
+        action="store",
+        default="sync",
+        help=(
+            "Weither the Nu validation should happen synchronously (with direct failure & final report) "
+            "or asynchronously (with final report only)"
+        ),
+        choices=("sync", "async"),
+    )
+
+
+def pytest_configure(config):
+    from tests.utils.test import nu_validation_client
+
+    if nu_validation_client is not None and config.getoption("--nu-validation") == "async":
+        nu_validation_client.start_worker()
+
+
+@pytest.hookimpl
+def pytest_sessionfinish(session, exitstatus):
+    from tests.utils.test import nu_validation_client
+
+    if nu_validation_client is not None:
+        # Waiting for queue to be empty
+        nu_validation_client.work_queue.join()
+        from pprint import pprint
+
+        pprint(nu_validation_client.source_to_messages)
+        unique_messages = set()
+        unique_messages.update(*nu_validation_client.source_to_messages.values())
+        pprint(sorted(unique_messages))
+        print("Nb unique messages", len(unique_messages))
+        print(
+            "Nb messages",
+            sum(len(source_details) for source_details in nu_validation_client.source_to_details.values()),
+        )
+        print("Nb validations", nu_validation_client.nb_validation)
+        print("Nb validations with issues", nu_validation_client.nb_validation_with_messages)
+        if session.config.getoption("verbose") > 0:
+            pprint(nu_validation_client.source_to_details)

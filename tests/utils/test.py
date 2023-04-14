@@ -2,11 +2,15 @@ import importlib
 import inspect
 import io
 import linecache
+import os
 import os.path
+import queue
 import random
 import re
+import threading
 from contextlib import contextmanager
 
+import httpx
 import openpyxl
 import sqlparse
 from bs4 import BeautifulSoup
@@ -25,6 +29,104 @@ from itou.common_apps.address.departments import DEPARTMENTS
 
 # SAVEPOINT + RELEASE from the ATOMIC_REQUESTS transaction
 BASE_NUM_QUERIES = 2
+
+
+class NuMessage:
+    def __init__(self, message, content):
+        self.content = content
+        self.message_infos = message
+
+    @property
+    def message(self):
+        return self.message_infos["message"]
+
+    def extract(self, context: int | None = None):
+        if context is None:
+            return self.message_infos["extract"]
+        last_line = self.message_infos["lastLine"]
+        return "\n".join(self.content.decode().splitlines()[max(0, last_line - context) : last_line + context])
+
+
+class NuValidationError(Exception):
+    def __init__(self, messages, content):
+        super().__init__(*sorted(set(msg["message"] for msg in messages)))
+        self.content = content
+        self.messages = [NuMessage(message, content) for message in messages]
+
+    def debug(self, context=10):
+        for message in self.messages:
+            print("-" * 40)
+            print(f"/!\\ {message.message}")
+            print("-" * 40)
+            print(message.extract(context))
+            print()
+
+
+class NuValidationClient:
+    def __init__(self, url):
+        self.url = url
+        self.client = httpx.Client()
+        self.work_queue = queue.Queue()
+        self.source_to_messages = {}
+        self.source_to_details = {}
+        self.worker = None
+
+        self.nb_validation = 0
+        self.nb_validation_with_messages = 0
+
+    def validate(self, source, content, partial=False):
+        if self.worker is not None:
+            self._add_work(source, content, partial)
+            return
+        messages = self._validate(source, content, partial)
+        if messages:
+            error = NuValidationError(messages, content)
+            raise error
+
+    def start_worker(self):
+        if self.worker is None:
+            self.worker = threading.Thread(target=self._work, daemon=True)
+            self.worker.start()
+
+    def _add_work(self, source, content, partial):
+        self.work_queue.put((source, content, partial))
+
+    def _work(self):
+        while True:
+            work = self.work_queue.get()
+            [source, content, partial] = work
+            self._validate(source, content, partial)
+            self.work_queue.task_done()
+
+    def _validate(self, source, content, partial):
+        if partial:
+            content = b'<!DOCTYPE html><html lang=""><head><title>Test</title></head><body>%b</body></html>' % content
+        messages = self.client.post(
+            self.url,
+            params={
+                "out": "json",
+                "level": os.getenv("NU_VALIDATION_LEVEL", "error"),
+                "filterpattern": (
+                    ".*Attribute “hx-.*” not allowed on element “.*” at this point.|"
+                    ".*Attribute “matomo-.*” not allowed on element “.*” at this point.|"
+                    ".*Bad value “None” for attribute “lang” on element “select”.*|"  # https://github.com/codingjoe/django-select2/pull/206/files  # noqa: E501
+                    "The value of the “for” attribute of the “label” element must be the ID of a non-hidden form control."  # duet-date-picker magic  # noqa: E501
+                ),
+            },
+            content=content,
+            headers={"Content-Type": "text/html;charset=utf-8"},
+        ).json()["messages"]
+        self.nb_validation += 1
+        if messages:
+            self.nb_validation_with_messages += 1
+            self.source_to_messages.setdefault(source, set()).update(msg["message"] for msg in messages)
+            self.source_to_details.setdefault(source, []).extend(messages)
+        return messages
+
+
+nu_validation_client = None
+if nu_url := os.getenv("NU_VALIDATION_HOST"):
+    nu_validation_client = NuValidationClient(nu_url)
 
 
 def pprint_html(response, **selectors):
@@ -116,6 +218,12 @@ class NoInlineClient(Client):
             assert " ondrop=" not in content
             assert " oninput=" not in content
             assert "<script>" not in content
+        if nu_validation_client is not None:
+            if hasattr(response, "content") and response.content:
+                # Basic heuristic to detect partial response
+                partial = b"<html" not in response.content and b"<body" not in response.content
+                nu_validation_client.validate(response.resolver_match.route, response.content, partial)
+
         return response
 
 
