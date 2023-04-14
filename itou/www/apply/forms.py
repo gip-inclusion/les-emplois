@@ -1,6 +1,7 @@
 import contextlib
 import datetime
 
+import sentry_sdk
 from dateutil.relativedelta import relativedelta
 from django import forms
 from django.core.validators import MinLengthValidator
@@ -799,6 +800,7 @@ class SiaePrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
         required=False, label="Fiches de poste", widget=forms.CheckboxSelectMultiple
     )
 
+    @sentry_sdk.trace
     def __init__(self, job_applications_qs, *args, **kwargs):
         self.job_applications_qs = job_applications_qs
         super().__init__(*args, **kwargs)
