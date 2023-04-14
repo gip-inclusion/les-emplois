@@ -2283,7 +2283,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
                                min="2022-11-24"
                                name="temporary_suspension_from"
                                required
-                               title=""/>
+                               title=""></duet-date-picker>
               <div class="invalid-feedback">
                Ce champ est obligatoire.
               </div>
@@ -2327,7 +2327,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
                                min="2022-11-24"
                                name="temporary_suspension_to"
                                required
-                               title="" />
+                               title=""></duet-date-picker>
               <div class="invalid-feedback">
                Ce champ est obligatoire.
               </div>
@@ -2380,7 +2380,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
                                name="temporary_suspension_from"
                                required
                                title=""
-                               value="invalid" />
+                               value="invalid"></duet-date-picker>
               <div class="invalid-feedback">
                Saisissez une date valide.
               </div>
@@ -2403,7 +2403,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
                                name="temporary_suspension_to"
                                required
                                title=""
-                               value="invalid" />
+                               value="invalid"></duet-date-picker>
               <div class="invalid-feedback">
                Saisissez une date valide.
               </div>
@@ -2451,7 +2451,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
                                name="temporary_suspension_from"
                                required
                                title=""
-                               value="2022-11-20" />
+                               value="2022-11-20"></duet-date-picker>
               <div class="invalid-feedback">
                Assurez-vous que cette valeur est supérieure ou égale à 2022-11-24.
               </div>
@@ -2474,7 +2474,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
                                name="temporary_suspension_to"
                                required
                                title=""
-                               value="2022-11-20" />
+                               value="2022-11-20"></duet-date-picker>
               <div class="invalid-feedback">
                Assurez-vous que cette valeur est supérieure ou égale à 2022-11-24.
               </div>
@@ -2578,7 +2578,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
                                name="permanent_suspension"
                                required
                                title=""
-                               value="invalid" />
+                               value="invalid"></duet-date-picker>
               <div class="invalid-feedback">
                Saisissez une date valide.
               </div>
@@ -2709,7 +2709,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
                                name="subsidy_cut_from"
                                required
                                title=""
-                               value="invalid" />
+                               value="invalid"></duet-date-picker>
               <div class="invalid-feedback">
                Saisissez une date valide.
               </div>
@@ -2724,7 +2724,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
                                name="subsidy_cut_to"
                                required
                                title=""
-                               value="invalid" />
+                               value="invalid"></duet-date-picker>
               <div class="invalid-feedback">
                Saisissez une date valide.
               </div>
