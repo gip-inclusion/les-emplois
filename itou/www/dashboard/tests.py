@@ -193,7 +193,6 @@ class DashboardViewTest(TestCase):
 
                 response = self.client.get(reverse("dashboard:index"))
                 self.assertContains(response, "Prolonger/suspendre un agrément émis par Pôle emploi")
-                self.assertContains(response, "Déclarer une embauche")
                 self.assertContains(response, reverse("apply:start", kwargs={"siae_pk": siae.pk}))
 
         for kind in [SiaeKind.EA, SiaeKind.EATT, SiaeKind.GEIQ, SiaeKind.OPCS]:
@@ -204,10 +203,17 @@ class DashboardViewTest(TestCase):
 
                 response = self.client.get(reverse("dashboard:index"))
                 self.assertNotContains(response, "Prolonger/suspendre un agrément émis par Pôle emploi")
-                self.assertNotContains(response, "Déclarer une embauche")
 
     def test_dashboard_job_applications(self):
-        for kind in [SiaeKind.GEIQ]:
+        should_display = [
+            SiaeKind.ACI,
+            SiaeKind.AI,
+            SiaeKind.EI,
+            SiaeKind.EITI,
+            SiaeKind.ETTI,
+            SiaeKind.GEIQ,
+        ]
+        for kind in should_display:
             with self.subTest(f"should display when siae_kind={kind}"):
                 siae = SiaeFactory(kind=kind, with_membership=True)
                 user = siae.members.first()
@@ -217,7 +223,7 @@ class DashboardViewTest(TestCase):
                 self.assertContains(response, "Enregistrer une candidature")
                 self.assertContains(response, reverse("apply:start", kwargs={"siae_pk": siae.pk}))
 
-        for kind in set(SiaeKind) - {SiaeKind.GEIQ}:
+        for kind in set(SiaeKind) - set(should_display):
             with self.subTest(f"should not display when siae_kind={kind}"):
                 siae = SiaeFactory(kind=kind, with_membership=True)
                 user = siae.members.first()
@@ -238,8 +244,8 @@ class DashboardViewTest(TestCase):
 
         response = self.client.get(reverse("dashboard:index"))
         self.assertContains(response, "Prolonger/suspendre un agrément émis par Pôle emploi")
-        # Check that "Déclarer une embauche" is here, but not its matching link
-        self.assertContains(response, "Déclarer une embauche")
+        # Check that "Enregistrer une candidature" is here, but not its matching link
+        self.assertContains(response, "Enregistrer une candidature")
         self.assertNotContains(response, reverse("apply:start", kwargs={"siae_pk": siae.pk}))
         # Check that the button tooltip is there
         self.assertContains(

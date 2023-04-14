@@ -20,13 +20,23 @@
                         <span>Voir toutes les candidatures</span>
                     </a>
                 </li>
-                {% if current_siae.kind == SiaeKind.GEIQ %}
-                    <li class="d-flex justify-content-between align-items-center mb-3">
-                        <a href="{% url 'apply:start' siae_pk=current_siae.pk %}" class="btn-link btn-ico">
-                            <i class="ri-draft-line ri-lg font-weight-normal"></i>
-                            <span>Enregistrer une candidature</span>
-                        </a>
-                    </li>
+                {% if current_siae.kind == SiaeKind.GEIQ or current_siae.is_subject_to_eligibility_rules %}
+                    {% with suspension=current_siae.get_active_suspension_text_with_dates %}
+                        <li class="d-flex justify-content-between align-items-center mb-3">
+                            {% if suspension %}
+                                {# CHECKME: should we tweak the tooltip title from "déclarer d'embauche" to "enregistrer une candidature" #}
+                                <span class="btn-link btn-ico" data-toggle="tooltip" data-placement="top" title="Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle a posteriori. {{ suspension }}">
+                                    <i class="ri-draft-line ri-lg font-weight-normal disabled"></i>
+                                    <span class="disabled">Enregistrer une candidature</span>
+                                </span>
+                            {% else %}
+                                <a href="{% url 'apply:start' siae_pk=current_siae.pk %}" class="btn-link btn-ico">
+                                    <i class="ri-draft-line ri-lg font-weight-normal"></i>
+                                    <span>Enregistrer une candidature</span>
+                                </a>
+                            {% endif %}
+                        </li>
+                    {% endwith %}
                 {% endif %}
                 <li class="d-flex justify-content-between align-items-center mb-3">
                     <a href="{% url 'apply:list_for_siae_exports' %}" class="btn-link btn-ico">
