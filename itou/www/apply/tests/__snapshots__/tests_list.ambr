@@ -1,0 +1,39 @@
+# serializer version: 1
+# name: ProcessListExportsSiaeTest.test_list_for_siae_exports_view
+  '''
+  <div class="alert alert-info mt-3" id="besoin-dun-chiffre">
+                              <p class="mb-0">
+                                  <i aria-hidden="true" class="ri-information-line mr-1"></i>
+                                  <b>Besoin d'un chiffre ?</b>
+                              </p>
+                              
+                                  <p class="mb-0">
+                                      Accédez aux <a href="/stats/siae/hiring" rel="noopener" target="_blank">données de recrutement de votre structure</a> (non nominatives) compilées, calculées et mises à jour quotidiennement.
+                                  </p>
+                              
+                          </div>
+  '''
+# ---
+# name: ProcessListPrescriberTest.test_list_for_prescriber_pe_exports_view
+  '''
+  <div class="alert alert-info mt-3" id="besoin-dun-chiffre">
+                              <p class="mb-0">
+                                  <i aria-hidden="true" class="ri-information-line mr-1"></i>
+                                  <b>Besoin d'un chiffre ?</b>
+                              </p>
+                              
+                                  <p class="mb-0">
+                                      Accédez aux données de votre agence (non nominatives) compilées, calculées et mises à jour quotidiennement :
+                                  </p>
+                                  <ul>
+                                      <li>
+                                          <a href="/stats/pe/state/main" rel="noopener" target="_blank">Voir les données de l'ensemble de l'état des candidatures orientées</a>
+                                      </li>
+                                      <li>
+                                          <a href="/stats/pe/conversion/main" rel="noopener" target="_blank">Voir les données du taux de transformation des candidatures</a>
+                                      </li>
+                                  </ul>
+                              
+                          </div>
+  '''
+# ---

@@ -91,8 +91,9 @@ def itou_faker_provider(_session_faker):
 
 
 @pytest.fixture(scope="function")
-def unittest_compatibility(request, faker):
+def unittest_compatibility(request, faker, snapshot):
     request.instance.faker = faker
+    request.instance.snapshot = snapshot
 
 
 @pytest.fixture(autouse=True)
