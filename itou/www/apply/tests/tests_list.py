@@ -1,3 +1,4 @@
+import pytest
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
@@ -21,7 +22,7 @@ from itou.prescribers.factories import PrescriberMembershipFactory, PrescriberOr
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory, SiaeJobDescriptionFactory
 from itou.users.factories import PrescriberFactory
-from itou.utils.test import TestCase, format_html
+from itou.utils.test import TestCase, parse_response_to_soup
 from itou.utils.widgets import DuetDatePickerWidget
 
 
@@ -642,7 +643,10 @@ class ProcessListSiaeTest(ProcessListTest):
 ####################################################
 
 
+@pytest.mark.usefixtures("unittest_compatibility")
 class ProcessListPrescriberTest(ProcessListTest):
+    besoin_dun_chiffre = "besoin-dun-chiffre"
+
     def test_list_for_prescriber_view(self):
         """
         Connect as Thibault to see a list of job applications
@@ -662,46 +666,19 @@ class ProcessListPrescriberTest(ProcessListTest):
 
         assert 200 == response.status_code
         assertContains(response, "Toutes les candidatures")
-        assert format_html(response, id="besoin-dun-chiffre") == [
-            '<div class="alert alert-info mt-3" id="besoin-dun-chiffre">\n'
-            ' <p class="mb-0">\n'
-            '  <i aria-hidden="true" class="ri-information-line mr-1">\n'
-            "  </i>\n"
-            "  <b>\n"
-            "   Besoin d'un chiffre ?\n"
-            "  </b>\n"
-            " </p>\n"
-            ' <p class="mb-0">\n'
-            "  Accédez aux données de votre agence (non nominatives) compilées, "
-            "calculées et mises à jour quotidiennement :\n"
-            " </p>\n"
-            " <ul>\n"
-            "  <li>\n"
-            '   <a href="/stats/pe/state/main" rel="noopener" target="_blank">\n'
-            "    Voir les données de l'ensemble de l'état des candidatures orientées\n"
-            "   </a>\n"
-            "  </li>\n"
-            "  <li>\n"
-            '   <a href="/stats/pe/conversion/main" rel="noopener" target="_blank">\n'
-            "    Voir les données du taux de transformation des candidatures\n"
-            "   </a>\n"
-            "  </li>\n"
-            " </ul>\n"
-            "</div>\n",
-        ]
+        soup = parse_response_to_soup(response, selector=f"#{self.besoin_dun_chiffre}")
+        assert str(soup) == self.snapshot
 
     def test_list_for_prescriber_exports_view(self):
         self.client.force_login(self.audrey_envol)
         response = self.client.get(self.prescriber_exports_url)
-        assert 200 == response.status_code
-        assert format_html(response, id="besoin-dun-chiffre") == []  # no link to pilotage
+        self.assertNotContains(response, self.besoin_dun_chiffre)
 
     def test_list_for_prescriber_exports_view_without_organization(self):
         prescriber = PrescriberFactory()
         self.client.force_login(prescriber)
         response = self.client.get(self.prescriber_exports_url)
-        assert 200 == response.status_code
-        assert format_html(response, id="besoin-dun-chiffre") == []  # no link to pilotage
+        self.assertNotContains(response, self.besoin_dun_chiffre)
 
     def test_list_for_prescriber_exports_download_view(self):
         """
@@ -843,6 +820,7 @@ class ProcessListExportsPrescriberTest(ProcessListTest):
 ####################################################
 
 
+@pytest.mark.usefixtures("unittest_compatibility")
 class ProcessListExportsSiaeTest(ProcessListTest):
     def test_list_for_siae_exports_view(self):
         """
@@ -853,24 +831,8 @@ class ProcessListExportsSiaeTest(ProcessListTest):
 
         assert 200 == response.status_code
         assertContains(response, "Toutes les candidatures")
-        assert format_html(response, id="besoin-dun-chiffre") == [
-            '<div class="alert alert-info mt-3" id="besoin-dun-chiffre">\n'
-            ' <p class="mb-0">\n'
-            '  <i aria-hidden="true" class="ri-information-line mr-1">\n'
-            "  </i>\n"
-            "  <b>\n"
-            "   Besoin d'un chiffre ?\n"
-            "  </b>\n"
-            " </p>\n"
-            ' <p class="mb-0">\n'
-            "  Accédez aux\n"
-            '  <a href="/stats/siae/hiring" rel="noopener" target="_blank">\n'
-            "   données de recrutement de votre structure\n"
-            "  </a>\n"
-            "  (non nominatives) compilées, calculées et mises à jour quotidiennement.\n"
-            " </p>\n"
-            "</div>\n",
-        ]
+        soup = parse_response_to_soup(response, selector="#besoin-dun-chiffre")
+        assert str(soup) == self.snapshot
 
     def test_list_for_siae_exports_as_prescriber_view(self):
         """
