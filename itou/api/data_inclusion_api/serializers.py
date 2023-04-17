@@ -3,6 +3,7 @@ import re
 from django.utils import text, timezone
 from rest_framework import serializers
 
+from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.enums import SiaeKind
 from itou.siaes.models import Siae
@@ -126,7 +127,7 @@ class PrescriberOrgStructureSerializer(serializers.ModelSerializer):
     """
 
     id = serializers.UUIDField(source="uid")
-    typologie = serializers.ChoiceField(source="kind", choices=SiaeKind.choices)
+    typologie = serializers.ChoiceField(source="kind", choices=PrescriberOrganizationKind.choices)
     nom = serializers.CharField(source="name")
     rna = serializers.CharField(default="")
     presentation_resume = serializers.SerializerMethodField()
