@@ -7,8 +7,11 @@
     <section class="s-section-twocolumns s-section">
         <div class="container">
             <div class="row">
+                <h1 class="mt-4">{% include 'apply/includes/_submit_title.html' %}</h1>
+                {% block content_full_viewport_messages %}{% endblock %}
+            </div>
+            <div class="row">
                 <div class="col-12 col-lg-6 order-md-1 pr-lg-5 mt-4">
-                    <h1>{% include 'apply/includes/_submit_title.html' %}</h1>
 
                     <div class="card c-card c-card--emploi mb-3 mb-lg-5">
                         <div class="card-body">
