@@ -108,7 +108,7 @@ class ProcessViewsTest(TestCase):
         self.assertContains(response, "Ce candidat a pris le contrôle de son compte utilisateur.")
         self.assertContains(response, format_nir(job_application.job_seeker.nir))
         self.assertContains(response, job_application.job_seeker.pole_emploi_id)
-        self.assertContains(response, job_application.job_seeker.phone)
+        self.assertContains(response, job_application.job_seeker.phone.replace(" ", ""))
         self.assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)  # the SIAE is not a GEIQ
 
         job_application.job_seeker.created_by = siae_user

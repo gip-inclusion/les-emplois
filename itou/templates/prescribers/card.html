@@ -36,7 +36,7 @@
     {% if user.is_authenticated and prescriber_org.phone %}
         <p>
             <i class="ri-phone-line mr-1" aria-label="Téléphone"></i>
-            <a href="tel:{{ prescriber_org.phone }}">{{ prescriber_org.phone|format_phone }}</a>
+            <a href="tel:{{ prescriber_org.phone|cut:" " }}">{{ prescriber_org.phone|format_phone }}</a>
         </p>
     {% endif %}
 

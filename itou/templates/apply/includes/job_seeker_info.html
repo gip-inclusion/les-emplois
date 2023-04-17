@@ -28,7 +28,7 @@
         <li>
             Téléphone : 
             {% if job_application.job_seeker.phone %}
-                <a href="tel:{{ job_application.job_seeker.phone }}">{{ job_application.job_seeker.phone|format_phone }}</a>
+                <a href="tel:{{ job_application.job_seeker.phone|cut:" " }}">{{ job_application.job_seeker.phone|format_phone }}</a>
             {% else %}
                 <span>Non renseigné</span>
             {% endif %}
