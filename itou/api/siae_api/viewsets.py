@@ -81,6 +81,8 @@ class SiaeViewSet(viewsets.ReadOnlyModelViewSet):
     # No permission is required on this API and everybody can query anything − it’s read-only.
     permission_classes = []
 
+    queryset = Siae.objects.prefetch_job_description_through(with_is_popular=False)
+
     NOT_FOUND_RESPONSE = OpenApiExample(
         "Not Found",
         description="Not Found",
@@ -126,7 +128,7 @@ On peut spécifier la direction de tri :
 
     def get_queryset(self):
         # We only get to this point if permissions are OK
-        queryset = Siae.objects.prefetch_job_description_through(with_is_popular=False)
+        queryset = super().get_queryset()
 
         # Get (registered) query parameters filters
         queryset = self._filter_by_query_params(self.request, queryset)

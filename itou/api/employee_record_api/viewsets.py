@@ -66,6 +66,8 @@ class AbstractEmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
     # Enforce the default one (IsAuthenticated)
     permission_classes = [EmployeeRecordAPIPermission]
 
+    queryset = EmployeeRecord.objects.full_fetch()
+
 
 def _annotate_convert_created_at(queryset):
     # Add a new `creation_date` field (cast of `created_at` to a date)
@@ -162,7 +164,7 @@ class EmployeeRecordViewSet(AbstractEmployeeRecordViewSet):
 
     def get_queryset(self):
         # We only get to this point if permissions are OK
-        queryset = EmployeeRecord.objects.full_fetch()
+        queryset = super().get_queryset()
 
         # Get (registered) query parameters filters
         queryset = self._filter_by_query_params(self.request, queryset)
