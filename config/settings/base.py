@@ -522,6 +522,10 @@ SPECTACULAR_SETTINGS = {
     "TITLE": "API - Les emplois de l'inclusion",
     "DESCRIPTION": "Documentation de l'API **emplois.inclusion.beta.gouv.fr**",
     "VERSION": "1.0.0",
+    "ENUM_NAME_OVERRIDES": {
+        "SiaeKindEnum": "itou.siaes.enums.SiaeKind",
+        "PrescriberOrganizationKindEnum": "itou.prescribers.enums.PrescriberOrganizationKind",
+    },
 }
 
 # Requests default timeout is None... See https://blog.mathieu-leplatre.info/handling-requests-timeout-in-python.html
