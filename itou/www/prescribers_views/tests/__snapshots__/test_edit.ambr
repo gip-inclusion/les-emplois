@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestEditOrganization.test_pe_cannot_edit[Fields are disabled]
   '''
-  <form action="" class="js-prevent-multiple-submit" method="post">
+  <form class="js-prevent-multiple-submit" method="post">
   
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
   

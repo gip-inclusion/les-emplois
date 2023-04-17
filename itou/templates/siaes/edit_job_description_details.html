@@ -23,7 +23,7 @@
         <div class="text-center mb-3">
             <img src="{% static 'img/edit_job_description_header.svg' %}" alt="">
         </div>
-        <form method="post" action="" class="js-prevent-multiple-submit">
+        <form method="post" class="js-prevent-multiple-submit">
             {% bootstrap_form_errors form type="all" %}
             {% csrf_token %}
             <h1 class="text-center mb-5">Description de ma fiche de poste</h1>

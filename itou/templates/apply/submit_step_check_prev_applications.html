@@ -19,7 +19,7 @@
             {% endif %}
         {% endwith %}
 
-        <form method="post" action="" class="js-prevent-multiple-submit">
+        <form method="post" class="js-prevent-multiple-submit">
             {% csrf_token %}
             <input type="hidden" name="force_new_application" value="force">
             {% buttons %}

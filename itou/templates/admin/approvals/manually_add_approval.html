@@ -1,7 +1,7 @@
 {% extends "admin/change_form.html" %}
 
 {% block content %}
-    <form action="" method="post" id="{{ opts.model_name }}_form" novalidate>
+    <form method="post" id="{{ opts.model_name }}_form" novalidate>
 
         {% if errors %}
             <p class="errornote">
