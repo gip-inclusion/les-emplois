@@ -1,3 +1,4 @@
+from drf_spectacular.utils import PolymorphicProxySerializer, extend_schema
 from rest_framework import authentication, exceptions, generics
 
 from itou.api.data_inclusion_api import enums, serializers
@@ -5,6 +6,17 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 
 
+@extend_schema(
+    responses=PolymorphicProxySerializer(
+        component_name="DataInclusionStructure",
+        serializers={
+            "orga": serializers.PrescriberOrgStructureSerializer,
+            "siae": serializers.SiaeStructureSerializer,
+        },
+        resource_type_field_name="type",
+        many=True,
+    )
+)
 class DataInclusionStructureView(generics.ListAPIView):
     """
     # API au format data.inclusion
