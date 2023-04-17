@@ -68,7 +68,9 @@ jobs:
       run: make quality
     - name: 🚧 Check pending migrations
       run: django-admin makemigrations --check --dry-run --noinput
-    - name: 🤹‍ Django tests
+    - name: 👓 Check spectacular documentation
+      run: django-admin spectacular --validate --fail-on-warn --file /dev/null
+    - name: 🤹 Django tests
       run: make test
       env:
         DJANGO_DEBUG: True
