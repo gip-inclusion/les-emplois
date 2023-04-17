@@ -1,3 +1,5 @@
+import os
+
 # Workaround being able to use freezegun with pandas.
 # https://github.com/spulec/freezegun/issues/98
 import pandas  # noqa F401
@@ -95,6 +97,10 @@ def unittest_compatibility(request, faker):
 
 @pytest.fixture(autouse=True)
 def django_ensure_matomo_titles(monkeypatch) -> None:
+    is_running_on_ci = os.getenv("CI", False)
+    if not is_running_on_ci:
+        return
+
     from django.template import base, defaulttags, loader, loader_tags
 
     original_render = loader.render_to_string
