@@ -1,4 +1,5 @@
 import re
+import typing
 
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema_field
@@ -33,6 +34,11 @@ class NullField(serializers.Field):
         return None
 
 
+class CodeComInsee(typing.TypedDict):
+    codeComInsee: str | None
+    codeDpt: str
+
+
 class _PersonSerializer(serializers.Serializer):
 
     passIae = serializers.CharField(source="approval_number")
@@ -55,13 +61,13 @@ class _PersonSerializer(serializers.Serializer):
     passDateDeb = serializers.DateField(format="%d/%m/%Y", source="approval.start_at")
     passDateFin = serializers.DateField(format="%d/%m/%Y", source="approval.end_at")
 
-    def get_nomUsage(self, obj: EmployeeRecord):
+    def get_nomUsage(self, obj: EmployeeRecord) -> str:
         return unidecode(obj.job_seeker.last_name).upper()
 
-    def get_prenom(self, obj: EmployeeRecord):
+    def get_prenom(self, obj: EmployeeRecord) -> str:
         return unidecode(obj.job_seeker.first_name).upper()
 
-    def get_codeComInsee(self, obj: EmployeeRecord):
+    def get_codeComInsee(self, obj: EmployeeRecord) -> CodeComInsee:
         # Another ASP subtlety, making top-level and children with the same name
         # The commune can be empty if the job seeker is not born in France
         if birth_place := obj.job_seeker.birth_place:
@@ -95,7 +101,7 @@ class _AddressSerializer(serializers.Serializer):
     codeinseecom = serializers.CharField(source="jobseeker_profile.hexa_commune.code")
     codepostalcedex = serializers.CharField(source="jobseeker_profile.hexa_post_code")
 
-    def get_adrCpltDistribution(self, obj: User):
+    def get_adrCpltDistribution(self, obj: User) -> str | None:
         # Don't send extended address if it must be truncated:
         # Do not lower quality of data on 'itou' side
         # Check ASP rule : T030_c026_rg002
@@ -109,7 +115,7 @@ class _AddressSerializer(serializers.Serializer):
             return None
         return additional_address
 
-    def get_adrLibelleVoie(self, obj: User):
+    def get_adrLibelleVoie(self, obj: User) -> str | None:
         # Remove diacritics and parenthesis from adrLibelleVoie field fixes ASP error 3330
         # (parenthesis are not described as invalid characters in specification document).
         lane = obj.jobseeker_profile.hexa_lane_name
