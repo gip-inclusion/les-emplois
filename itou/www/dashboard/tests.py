@@ -112,7 +112,6 @@ class DashboardViewTest(TestCase):
 
         url = reverse("dashboard:index")
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertContains(response, "Gérer mes fiches salarié")
         self.assertNotContains(response, "badge-danger")
         assert response.context["num_rejected_employee_records"] == 0
@@ -134,7 +133,6 @@ class DashboardViewTest(TestCase):
         session[global_constants.ITOU_SESSION_CURRENT_SIAE_KEY] = siae.pk
         session.save()
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertContains(response, "badge-danger")
         assert response.context["num_rejected_employee_records"] == 2
 
@@ -142,7 +140,6 @@ class DashboardViewTest(TestCase):
         session[global_constants.ITOU_SESSION_CURRENT_SIAE_KEY] = other_siae.pk
         session.save()
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertContains(response, "badge-danger")
         assert response.context["num_rejected_employee_records"] == 1
 
@@ -667,7 +664,6 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         self.client.force_login(user)
         url = reverse("dashboard:edit_user_info")
         response = self.client.get(url)
-        assert response.status_code == 200
         # There's a specific view to edit the email so we don't show it here
         self.assertNotContains(response, "Adresse électronique")
         # Check that the NIR field is disabled
@@ -777,7 +773,6 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         self.client.force_login(user)
         url = reverse("dashboard:edit_user_info")
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertContains(response, "Adresse électronique")
 
         post_data = {

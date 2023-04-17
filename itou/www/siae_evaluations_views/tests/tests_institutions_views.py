@@ -207,7 +207,6 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
                 kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
             )
         )
-        assert response.status_code == 200
         self.assertContains(response, "Liste des Siae à contrôler", html=True, count=1)
 
         # institution with ended evaluation_campaign
@@ -219,7 +218,6 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
                 kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
             )
         )
-        assert response.status_code == 200
         self.assertContains(response, "Liste des Siae contrôlées", html=True, count=1)
 
     def test_recently_closed_campaign(self):
@@ -235,7 +233,6 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
                 kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
             )
         )
-        assert response.status_code == 200
         url = reverse(
             "siae_evaluations_views:institution_evaluated_siae_detail",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
@@ -477,7 +474,6 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
                 kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
             )
         )
-        assert response.status_code == 200
         assert response.context["back_url"] == reverse("dashboard:index")
         self.assertContains(response, dateformat.format(evaluation_campaign.evaluations_asked_at, "d F Y"))
 
@@ -499,7 +495,6 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         )
 
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertContains(response, evaluated_siae)
         self.assertContains(response, en_attente)
         self.assertContains(
@@ -514,7 +509,6 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             submitted_at=timezone.now(), proof_url="https://server.com/rocky-balboa.pdf"
         )
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertContains(response, a_traiter)
 
         EvaluatedAdministrativeCriteria.objects.filter(
@@ -522,7 +516,6 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         ).update(review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED)
 
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertContains(response, en_cours)
 
         EvaluatedAdministrativeCriteria.objects.filter(
@@ -530,7 +523,6 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         ).update(review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED)
 
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertContains(response, en_cours)
 
         # REVIEWED
@@ -543,7 +535,6 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         ).update(review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED)
 
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertContains(response, phase_contradictoire)
 
         EvaluatedAdministrativeCriteria.objects.filter(
@@ -553,7 +544,6 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         evaluated_siae.final_reviewed_at = review_time
         evaluated_siae.save(update_fields=["final_reviewed_at"])
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertContains(response, resultat_positif)
 
     def test_num_queries(self):
@@ -635,7 +625,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluation_campaign.ended_at = timezone.now()
         evaluation_campaign.save(update_fields=["ended_at"])
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertNotContains(response, self.submit_text)
 
     def test_recently_closed_campaign(self):
@@ -652,7 +641,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
-        assert response.status_code == 200
         url = reverse(
             "siae_evaluations_views:institution_evaluated_job_application",
             kwargs={"evaluated_job_application_pk": job_app.pk},
@@ -918,7 +906,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         # EvaluatedAdministrativeCriteria not yet submitted
         pending_status = "En attente"
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertContains(response, evaluated_siae)
         formatted_number = format_approval_number(evaluated_job_application.job_application.approval.number)
         self.assertContains(response, formatted_number, html=True, count=1)
@@ -948,7 +935,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluated_administrative_criteria.proof_url = "https://server.com/rocky-balboa.pdf"
         evaluated_administrative_criteria.save(update_fields=["proof_url"])
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertContains(response, back_url)
         self.assertContains(response, uploaded_status)
         self.assertContains(response, validation_button_disabled, html=True, count=1)
@@ -960,7 +946,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluated_administrative_criteria.submitted_at = timezone.now()
         evaluated_administrative_criteria.save(update_fields=["submitted_at"])
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertContains(response, evaluated_job_application_url)
         self.assertContains(response, back_url)
         self.assertNotContains(response, uploaded_status)
@@ -985,7 +970,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(response, self.control_text)
 
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertContains(response, evaluated_job_application_url)
         self.assertContains(response, back_url)
         self.assertContains(response, validation_button, html=True, count=2)
@@ -1007,7 +991,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluated_siae.save(update_fields=["reviewed_at", "final_reviewed_at"])
 
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertContains(response, evaluated_job_application_url)
         self.assertContains(response, back_url)
         self.assertNotContains(response, self.submit_text)
@@ -1032,7 +1015,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluated_siae.save(update_fields=["reviewed_at", "final_reviewed_at"])
 
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertContains(response, evaluated_job_application_url)
         self.assertContains(response, back_url)
         self.assertContains(response, validation_button, html=True, count=2)
@@ -1053,7 +1035,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluated_siae.save(update_fields=["reviewed_at"])
 
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertContains(response, evaluated_job_application_url)
         self.assertContains(response, back_url)
         self.assertContains(response, validation_button_disabled, html=True, count=1)
@@ -1082,7 +1063,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             update_fields=["proof_url", "review_state", "submitted_at", "uploaded_at"]
         )
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertContains(response, validation_button_disabled, html=True, count=1)
         self.assertContains(response, back_url)
         self.assertContains(response, evaluated_job_application_url)
@@ -1093,7 +1073,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluated_administrative_criteria.submitted_at = timezone.now()
         evaluated_administrative_criteria.save(update_fields=["submitted_at"])
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertContains(response, evaluated_job_application_url)
         self.assertContains(response, back_url)
         self.assertNotContains(response, uploaded_status)
@@ -1108,7 +1087,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluated_administrative_criteria.save(update_fields=["review_state"])
 
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertContains(response, evaluated_job_application_url)
         self.assertContains(response, back_url)
         self.assertContains(response, validation_button, html=True, count=2)
@@ -1131,7 +1109,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluated_siae.save(update_fields=["reviewed_at", "final_reviewed_at"])
 
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertContains(response, evaluated_job_application_url)
         self.assertContains(response, back_url)
         self.assertNotContains(response, self.submit_text)
@@ -1157,7 +1134,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluated_administrative_criteria.save(update_fields=["review_state"])
 
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertContains(response, evaluated_job_application_url)
         self.assertContains(response, back_url)
         self.assertContains(response, validation_button, html=True, count=2)
@@ -1178,7 +1154,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluated_siae.save(update_fields=["final_reviewed_at"])
 
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertContains(response, evaluated_job_application_url)
         self.assertContains(response, back_url)
         self.assertNotContains(response, self.submit_text)
@@ -1424,7 +1399,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
 
         # not yet submitted by Siae
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertContains(response, en_attente)
 
         # submitted by Siae
@@ -1433,7 +1407,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         ).update(submitted_at=timezone.now(), proof_url="https://server.com/rocky-balboa.pdf")
 
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertContains(response, a_traiter)
 
         # refused
@@ -1442,7 +1415,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         ).update(review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED)
 
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertContains(response, refuse)
 
         # accepted
@@ -1451,7 +1423,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         ).update(review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED)
 
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertContains(response, valide)
 
     def test_job_application_adversarial_stage(self):
@@ -2237,7 +2208,6 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
                 "temporary_suspension_to": datetime.date(2023, 1, 1),
             },
         )
-        assert response.status_code == 200
         self.assertContains(
             response,
             """
@@ -3077,7 +3047,6 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
                 kwargs={"evaluated_job_application_pk": job_app.pk},
             )
         )
-        assert response.status_code == 200
         self.assertContains(
             response,
             """
@@ -3140,7 +3109,6 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
                 kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
             )
         )
-        assert response.status_code == 200
         assert response.context["evaluated_job_application"] == evaluated_job_application
         assert response.context["evaluated_siae"] == evaluated_siae
         assert isinstance(response.context["form"], LaborExplanationForm)
@@ -3213,7 +3181,6 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
                 kwargs={"evaluated_job_application_pk": past_job_application.pk},
             )
         )
-        assert response.status_code == 200
         self.assertNotContains(response, self.save_text)
         self.assertContains(
             response,
@@ -3267,7 +3234,6 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         evaluated_administrative_criteria.proof_url = "https://server.com/rocky-balboa.pdf"
         evaluated_administrative_criteria.save(update_fields=["submitted_at", "proof_url"])
         response = self.client.get(url_view)
-        assert response.status_code == 200
         self.assertContains(response, refuse_url)
         self.assertContains(response, accepte_url)
         self.assertNotContains(response, reinit_url)
@@ -3277,7 +3243,6 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         evaluated_administrative_criteria.save(update_fields=["review_state"])
 
         response = self.client.get(url_view)
-        assert response.status_code == 200
         self.assertNotContains(response, refuse_url)
         self.assertNotContains(response, accepte_url)
         self.assertContains(response, reinit_url)
@@ -3290,7 +3255,6 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         evaluated_administrative_criteria.save(update_fields=["review_state"])
 
         response = self.client.get(url_view)
-        assert response.status_code == 200
         self.assertNotContains(response, refuse_url)
         self.assertNotContains(response, accepte_url)
         self.assertContains(response, reinit_url)
@@ -3303,7 +3267,6 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         evaluated_administrative_criteria.save(update_fields=["review_state"])
 
         response = self.client.get(url_view)
-        assert response.status_code == 200
         self.assertContains(response, refuse_url)
         self.assertContains(response, accepte_url)
         self.assertNotContains(response, reinit_url)
@@ -3315,7 +3278,6 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         evaluated_administrative_criteria.save(update_fields=["review_state"])
 
         response = self.client.get(url_view)
-        assert response.status_code == 200
         self.assertNotContains(response, refuse_url)
         self.assertNotContains(response, accepte_url)
         self.assertNotContains(response, reinit_url)
@@ -3436,7 +3398,6 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
 
         # Unset
         response = self.client.get(url_view)
-        assert response.status_code == 200
         self.assertContains(response, "badge-pilotage")
         self.assertContains(response, "À traiter")
 
@@ -3444,7 +3405,6 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
         evaluated_administrative_criteria.save(update_fields=["review_state"])
         response = self.client.get(url_view)
-        assert response.status_code == 200
         self.assertContains(response, "badge-danger")
         self.assertContains(response, "Problème constaté")
 
@@ -3452,7 +3412,6 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria.save(update_fields=["review_state"])
         response = self.client.get(url_view)
-        assert response.status_code == 200
         self.assertContains(response, "badge-success")
         self.assertContains(response, "Validé")
 

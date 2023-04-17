@@ -617,7 +617,6 @@ class InclusionConnectLoginTest(InclusionConnectBaseTestCase):
         # This is already tested in itou.www.login.tests but only at form level.
         post_data = {"login": user.email, "password": DEFAULT_PASSWORD}
         response = self.client.post(reverse("login:prescriber"), data=post_data)
-        assert response.status_code == 200
         error_message = "Votre compte est relié à Inclusion Connect."
         self.assertContains(response, error_message)
         assert not auth.get_user(self.client).is_authenticated

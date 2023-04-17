@@ -286,7 +286,6 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
         # Step application's resume.
         # ----------------------------------------------------------------------
         response = self.client.get(next_url)
-        assert response.status_code == 200
         self.assertContains(response, "Envoyer la candidature")
 
         # Test fields mandatory to upload to S3
@@ -326,7 +325,6 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
         # Step application's end.
         # ----------------------------------------------------------------------
         response = self.client.get(next_url)
-        assert response.status_code == 200
         # 1 in desktop header
         # + 1 in mobile header
         # + 1 in the page content
@@ -451,7 +449,6 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
         # ----------------------------------------------------------------------
 
         response = self.client.get(next_url)
-        assert response.status_code == 200
 
         next_url = reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk})
         self.assertContains(response, "Status de prescripteur habilité non vérifié")
@@ -625,7 +622,6 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
         # Step application's resume.
         # ----------------------------------------------------------------------
         response = self.client.get(next_url)
-        assert response.status_code == 200
 
         # Test fields mandatory to upload to S3
         s3_upload = S3Upload(kind="resume")
@@ -869,7 +865,6 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
         # Step application's resume.
         # ----------------------------------------------------------------------
         response = self.client.get(next_url)
-        assert response.status_code == 200
 
         # Test fields mandatory to upload to S3
         s3_upload = S3Upload(kind="resume")
@@ -1180,7 +1175,6 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
         # Step application's resume.
         # ----------------------------------------------------------------------
         response = self.client.get(next_url)
-        assert response.status_code == 200
 
         # Test fields mandatory to upload to S3
         s3_upload = S3Upload(kind="resume")
@@ -1629,7 +1623,6 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
         # Step application's resume.
         # ----------------------------------------------------------------------
         response = self.client.get(next_url)
-        assert response.status_code == 200
         self.assertContains(response, "Enregistrer")
 
         # Test fields mandatory to upload to S3
@@ -1774,7 +1767,6 @@ class ApplicationViewTest(S3AccessingTestCase):
         apply_session.save()
 
         response = self.client.get(reverse("apply:application_resume", kwargs={"siae_pk": siae.pk}))
-        assert response.status_code == 200
         self.assertContains(response, 'name="selected_jobs"')
         self.assertContains(response, 'name="resume_link"')
 
@@ -1890,7 +1882,6 @@ class LastCheckedAtViewTest(TestCase):
         self.job_seeker.last_checked_at -= datetime.timedelta(days=500)
         self.job_seeker.save(update_fields=["last_checked_at"])
         response = self.client.get(url)
-        assert response.status_code == 200
         warning_check = self.assertContains if sees_warning else self.assertNotContains
         warning_check(response, "Merci de vérifier la validité des informations")
         link_check(response, f'<a class="btn btn-link" href="{update_url}">Vérifier le profil</a>', html=True)
@@ -1970,7 +1961,6 @@ class UpdateJobSeekerViewTestCase(TestCase):
 
         # STEP 1
         response = self.client.get(self.step_1_url)
-        assert response.status_code == 200
         self.assertContains(response, self.job_seeker.first_name)
         self.assertNotContains(response, self.INFO_MODIFIABLE_PAR_CANDIDAT_UNIQUEMENT)
 
@@ -1993,12 +1983,10 @@ class UpdateJobSeekerViewTestCase(TestCase):
 
         # If you go back to step 1, new data is shown
         response = self.client.get(self.step_1_url)
-        assert response.status_code == 200
         self.assertContains(response, NEW_FIRST_NAME)
 
         # STEP 2
         response = self.client.get(self.step_2_url)
-        assert response.status_code == 200
         self.assertContains(response, self.job_seeker.phone)
         self.assertNotContains(response, self.INFO_MODIFIABLE_PAR_CANDIDAT_UNIQUEMENT)
 
@@ -2022,13 +2010,10 @@ class UpdateJobSeekerViewTestCase(TestCase):
 
         # If you go back to step 2, new data is shown
         response = self.client.get(self.step_2_url)
-        assert response.status_code == 200
         self.assertContains(response, NEW_ADDRESS_LINE)
 
         # STEP 3
         response = self.client.get(self.step_3_url)
-        assert response.status_code == 200
-
         self.assertContains(response, "Niveau de formation")
 
         post_data = {
@@ -2065,13 +2050,10 @@ class UpdateJobSeekerViewTestCase(TestCase):
 
         # If you go back to step 3, new data is shown
         response = self.client.get(self.step_3_url)
-        assert response.status_code == 200
         self.assertContains(response, '<option value="40" selected="">Formation de niveau BAC</option>', html=True)
 
         # Step END
         response = self.client.get(self.step_end_url)
-        assert response.status_code == 200
-
         self.assertContains(response, NEW_FIRST_NAME)
         self.assertContains(response, NEW_ADDRESS_LINE)
         self.assertContains(response, "Formation de niveau BAC")
@@ -2107,7 +2089,6 @@ class UpdateJobSeekerViewTestCase(TestCase):
 
         # STEP 1
         response = self.client.get(self.step_1_url)
-        assert response.status_code == 200
         self.assertContains(response, self.job_seeker.first_name)
         self.assertContains(response, self.INFO_MODIFIABLE_PAR_CANDIDAT_UNIQUEMENT)
 
@@ -2120,7 +2101,6 @@ class UpdateJobSeekerViewTestCase(TestCase):
 
         # STEP 2
         response = self.client.get(self.step_2_url)
-        assert response.status_code == 200
         self.assertContains(response, self.job_seeker.phone)
         self.assertContains(response, self.INFO_MODIFIABLE_PAR_CANDIDAT_UNIQUEMENT)
 
@@ -2132,8 +2112,6 @@ class UpdateJobSeekerViewTestCase(TestCase):
 
         # STEP 3
         response = self.client.get(self.step_3_url)
-        assert response.status_code == 200
-
         self.assertContains(response, "Niveau de formation")
 
         post_data = {
@@ -2170,13 +2148,10 @@ class UpdateJobSeekerViewTestCase(TestCase):
 
         # If you go back to step 3, new data is shown
         response = self.client.get(self.step_3_url)
-        assert response.status_code == 200
         self.assertContains(response, '<option value="40" selected="">Formation de niveau BAC</option>', html=True)
 
         # Step END
         response = self.client.get(self.step_end_url)
-        assert response.status_code == 200
-
         self.assertContains(response, "Formation de niveau BAC")
 
         previous_last_checked_at = self.job_seeker.last_checked_at
@@ -2298,8 +2273,6 @@ class UpdateJobSeekerStep3ViewTestCase(TestCase):
         response = self.client.get(
             reverse("apply:update_job_seeker_step_3", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk})
         )
-        assert response.status_code == 200
-
         self.assertContains(
             response,
             '<input type="checkbox" name="ass_allocation" class="form-check-input" id="id_ass_allocation" checked="">',
@@ -2389,8 +2362,6 @@ def test_detect_existing_job_seeker(client):
         "birthdate": job_seeker_profile.user.birthdate,
     }
     response = client.post(next_url, data=post_data)
-    assert response.status_code == 200
-
     assertContains(
         response,
         (
@@ -2521,7 +2492,6 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
             reverse("apply:application_geiq_eligibility", kwargs={"siae_pk": self.geiq.pk}), follow=True
         )
 
-        assert response.status_code == 200
         self.assertContains(response, "Éligibilité GEIQ confirmée")
         self.assertTemplateUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
 
@@ -2531,7 +2501,6 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
             reverse("apply:application_geiq_eligibility", kwargs={"siae_pk": self.geiq.pk}), follow=True
         )
 
-        assert response.status_code == 200
         self.assertContains(response, "Éligibilité GEIQ non confirmée")
         self.assertTemplateUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
 
@@ -2545,7 +2514,6 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
         response = self.client.get(
             reverse("apply:application_geiq_eligibility", kwargs={"siae_pk": diagnosis.author_geiq.pk}), follow=True
         )
-        assert response.status_code == 200
         self.assertContains(response, "Éligibilité GEIQ non confirmée")
         self.assertTemplateUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
 
@@ -2579,7 +2547,6 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
                     data=post_data,
                     follow=True,
                 )
-                assert response.status_code == 200
                 self.assertTemplateUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
                 self.assertContains(response, "Incohérence dans les critères")
 

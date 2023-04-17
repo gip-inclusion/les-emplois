@@ -174,7 +174,6 @@ class PEAMUTests(OAuth2TestsMixin, TestCase):
 
         url = reverse("signup:job_seeker")
         response = self.client.get(url)
-        assert response.status_code == 200
         pe_url = reverse("peamu_login")
         self.assertContains(response, pe_url)
 
@@ -193,7 +192,6 @@ class PEAMUTests(OAuth2TestsMixin, TestCase):
         # Temporary NIR is not stored with user information.
         url = reverse("signup:job_seeker")
         response = self.client.get(url)
-        assert response.status_code == 200
         pe_url = reverse("peamu_login")
         self.assertContains(response, pe_url)
 

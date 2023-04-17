@@ -25,7 +25,6 @@ class TestDisplayApproval(TestCase):
             reverse("approvals:display_printable_approval", kwargs={"approval_id": job_application.approval_id})
         )
 
-        assert response.status_code == 200
         assert response.context["approval"] == job_application.approval
         assert response.context["siae"] == job_application.to_siae
         self.assertContains(response, global_constants.ITOU_ASSISTANCE_URL)
@@ -49,7 +48,6 @@ class TestDisplayApproval(TestCase):
             reverse("approvals:display_printable_approval", kwargs={"approval_id": job_application.approval_id})
         )
 
-        assert response.status_code == 200
         assert response.context["approval"] == job_application.approval
         assert response.context["siae"] == job_application.to_siae
         self.assertContains(response, global_constants.ITOU_ASSISTANCE_URL)
@@ -81,7 +79,6 @@ class TestDisplayApproval(TestCase):
             reverse("approvals:display_printable_approval", kwargs={"approval_id": job_application.approval_id})
         )
 
-        assert response.status_code == 200
         assert response.context["approval"] == job_application.approval
         assert response.context["siae"] == job_application.to_siae
         self.assertContains(response, global_constants.ITOU_ASSISTANCE_URL)
@@ -104,7 +101,6 @@ class TestDisplayApproval(TestCase):
             reverse("approvals:display_printable_approval", kwargs={"approval_id": job_application.approval_id})
         )
 
-        assert response.status_code == 200
         assert response.context["approval"] == job_application.approval
         assert response.context["siae"] == job_application.to_siae
         self.assertContains(response, global_constants.ITOU_ASSISTANCE_URL)
@@ -127,7 +123,6 @@ class TestDisplayApproval(TestCase):
             reverse("approvals:display_printable_approval", kwargs={"approval_id": job_application.approval_id})
         )
 
-        assert response.status_code == 200
         assert response.context["approval"] == job_application.approval
         assert response.context["siae"] == job_application.to_siae
         self.assertContains(response, global_constants.ITOU_ASSISTANCE_URL)

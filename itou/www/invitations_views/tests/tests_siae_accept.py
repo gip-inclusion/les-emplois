@@ -204,7 +204,6 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
 
         # User wants to join our website but it's too late!
         response = self.client.get(invitation.acceptance_link, follow=True)
-        assert response.status_code == 200
         self.assertContains(response, "expirée")
 
         user = SiaeStaffFactory(email=invitation.email)

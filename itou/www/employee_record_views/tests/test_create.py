@@ -264,8 +264,6 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
         url = reverse("employee_record_views:create_step_2", args=(self.job_application.pk,))
         response = self.client.get(url)
 
-        assert response.status_code == 200
-
         self.assertContains(response, "Aucune adresse n'a été saisie sur les emplois de l'inclusion !")
         self.assertContains(response, "L'adresse du salarié n'a pu être vérifiée automatiquement.")
 
@@ -279,7 +277,6 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
         url = reverse("employee_record_views:create_step_3", args=(self.job_application.pk,))
         response = self.client.get(url)
 
-        assert response.status_code == 200
         self.assertNotContains(response, "L'adresse du salarié n'a pu être vérifiée automatiquement.")
         self.assertNotContains(response, "Aucune adresse n'a été saisie sur les emplois de l'inclusion !")
 
@@ -296,8 +293,6 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
         # Changed job application: new URL
         self.url = reverse("employee_record_views:create_step_2", args=(self.job_application.pk,))
         response = self.client.get(self.url)
-
-        assert response.status_code == 200
 
         # Check that when lookup fails, user is properly notified
         # to input employee address manually
@@ -574,7 +569,6 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
         employee_record.save()
 
         response = self.client.post(url, data)
-        assert response.status_code == 200
         self.assertContains(
             response,
             "Il est impossible de créer cette fiche salarié pour la raison suivante",

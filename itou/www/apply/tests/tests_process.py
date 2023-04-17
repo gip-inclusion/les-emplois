@@ -55,7 +55,6 @@ class ProcessViewsTest(TestCase):
         """
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url_accept)
-        assert response.status_code == 200
         self.assertContains(response, "Confirmation de l’embauche")
         # Make sure modal is hidden.
         assert response.headers.get("HX-Trigger") is None
@@ -189,7 +188,6 @@ class ProcessViewsTest(TestCase):
 
         url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
-        assert response.status_code == 200
         # Job seeker nir is displayed
         self.assertContains(response, format_nir(job_application.job_seeker.nir))
         # Approval is displayed
@@ -357,7 +355,6 @@ class ProcessViewsTest(TestCase):
 
                 # test how hiring_end_date is displayed
                 response = self.client.get(next_url)
-                assert response.status_code == 200
                 # test case hiring_end_at
                 if hiring_end_at:
                     self.assertContains(response, f"Fin : {hiring_end_at.strftime('%d')}")
@@ -1096,7 +1093,6 @@ class ProcessViewsTest(TestCase):
         self.client.force_login(siae_user)
         url = reverse("apply:cancel", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertContains(response, "Confirmer l'annulation de l'embauche")
         self.assertContains(
             response, "En validant, <b>vous renoncez aux aides au poste</b> liées à cette candidature pour tous"
@@ -1124,7 +1120,6 @@ class ProcessViewsTest(TestCase):
         self.client.force_login(siae_user)
         url = reverse("apply:cancel", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertContains(response, "Confirmer l'annulation de l'embauche")
         self.assertNotContains(
             response, "En validant, <b>vous renoncez aux aides au poste</b> liées à cette candidature pour tous"
