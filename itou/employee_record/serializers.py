@@ -1,5 +1,7 @@
 import re
 
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from unidecode import unidecode
 
@@ -18,6 +20,7 @@ class NullIfEmptyCharField(serializers.CharField):
         return super().to_representation(value)
 
 
+@extend_schema_field(OpenApiTypes.NONE)
 class NullField(serializers.Field):
     def to_representation(self, _):
         # Field value is always replaced by `None`.
