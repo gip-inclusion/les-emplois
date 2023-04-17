@@ -77,7 +77,6 @@ class ApprovalProlongationTest(TestCase):
             "preview": "1",
         }
         response = self.client.post(url, data=post_data)
-        assert response.status_code == 200
         self.assertContains(response, escape("Sélectionnez un choix valide."))
 
         # With valid reason

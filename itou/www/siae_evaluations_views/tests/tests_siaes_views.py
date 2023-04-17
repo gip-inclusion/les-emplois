@@ -103,7 +103,6 @@ class SiaeJobApplicationListViewTest(S3AccessingTestCase):
             response = self.client.get(self.url(evaluated_siae))
 
         assert evaluated_siae.evaluation_campaign.evaluations_asked_at == response.context["evaluations_asked_at"]
-        assert response.status_code == 200
         assert evaluated_job_application == response.context["evaluated_job_applications"][0]
         assert reverse("dashboard:index") == response.context["back_url"]
 
@@ -121,7 +120,6 @@ class SiaeJobApplicationListViewTest(S3AccessingTestCase):
 
         # no criterion selected
         response = self.client.get(self.url(evaluated_siae))
-        assert response.status_code == 200
         self.assertContains(
             response,
             reverse(
@@ -136,7 +134,6 @@ class SiaeJobApplicationListViewTest(S3AccessingTestCase):
             proof_url="",
         )
         response = self.client.get(self.url(evaluated_siae))
-        assert response.status_code == 200
         self.assertContains(
             response,
             reverse(
@@ -152,7 +149,6 @@ class SiaeJobApplicationListViewTest(S3AccessingTestCase):
         )
         self.client.force_login(self.user)
         response = self.client.get(self.url(evaluated_job_application.evaluated_siae))
-        assert response.status_code == 200
         self.assertContains(
             response,
             reverse(
@@ -496,7 +492,6 @@ class SiaeUploadDocsViewTest(S3AccessingTestCase):
             kwargs={"evaluated_administrative_criteria_pk": evaluated_administrative_criteria.pk},
         )
         response = self.client.get(url)
-        assert response.status_code == 200
 
         # Test fields mandatory to upload to S3
         s3_upload = S3Upload(kind="evaluations")

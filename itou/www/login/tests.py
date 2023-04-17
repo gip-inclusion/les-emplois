@@ -65,7 +65,6 @@ class PrescriberLoginTest(InclusionConnectBaseTestCase):
     def test_login_options(self):
         url = reverse("login:prescriber")
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertContains(response, "Se connecter avec Inclusion Connect")
         self.assertContains(response, reverse("login:activate_prescriber_account"))
         self.assertContains(response, "Adresse e-mail")
@@ -74,7 +73,6 @@ class PrescriberLoginTest(InclusionConnectBaseTestCase):
         params = urlencode({"next": "/activate"})
         url = f"{reverse('login:prescriber')}?{params}"
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertContains(response, f"{reverse('login:activate_prescriber_account')}?{params}")
 
     def test_login_using_django(self):
@@ -101,7 +99,6 @@ class PrescriberLoginTest(InclusionConnectBaseTestCase):
             "password": "a",
         }
         response = self.client.post(url, data=form_data)
-        assert response.status_code == 200
         self.assertContains(
             response, "Votre compte est relié à Inclusion Connect. Merci de vous connecter avec ce service."
         )
@@ -111,7 +108,6 @@ class SiaeStaffLoginTest(InclusionConnectBaseTestCase):
     def test_login_options(self):
         url = reverse("login:siae_staff")
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertContains(response, "Se connecter avec Inclusion Connect")
         self.assertContains(response, f"{reverse('login:activate_siae_staff_account')}")
         self.assertContains(response, "Adresse e-mail")
@@ -121,7 +117,6 @@ class SiaeStaffLoginTest(InclusionConnectBaseTestCase):
 
         url = f"{reverse('login:siae_staff')}?{params}"
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertContains(response, f"{reverse('login:activate_siae_staff_account')}?{params}")
 
     def test_login_using_django(self):
@@ -148,7 +143,6 @@ class SiaeStaffLoginTest(InclusionConnectBaseTestCase):
             "password": "a",
         }
         response = self.client.post(url, data=form_data)
-        assert response.status_code == 200
         self.assertContains(
             response, "Votre compte est relié à Inclusion Connect. Merci de vous connecter avec ce service."
         )
@@ -158,7 +152,6 @@ class LaborInspectorLoginTest(TestCase):
     def test_login_options(self):
         url = reverse("login:labor_inspector")
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertNotContains(response, "S'identifier avec Inclusion Connect")
         self.assertContains(response, "Adresse e-mail")
         self.assertContains(response, "Mot de passe")

@@ -37,7 +37,6 @@ class CardViewTest(TestCase):
         siae = SiaeFactory(with_membership=True)
         url = reverse("siaes_views:card", kwargs={"siae_id": siae.pk})
         response = self.client.get(url)
-        assert response.status_code == 200
         assert response.context["siae"] == siae
         self.assertContains(response, escape(siae.display_name))
         self.assertContains(response, siae.email)
@@ -537,7 +536,6 @@ class JobDescriptionCardViewTest(TestCase):
         job_description.save()
         url = reverse("siaes_views:job_description_card", kwargs={"job_description_id": job_description.pk})
         response = self.client.get(url)
-        assert response.status_code == 200
         assert response.context["job"] == job_description
         assert response.context["siae"] == siae
         self.assertContains(response, job_description.description)
@@ -717,7 +715,6 @@ class CreateSiaeViewTest(TestCase):
             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         }
         response = self.client.post(url, data=post_data)
-        assert response.status_code == 200
 
         expected_message = f"Le SIRET doit commencer par le SIREN {siae.siren}"
         self.assertContains(response, escape(expected_message))
@@ -757,7 +754,6 @@ class CreateSiaeViewTest(TestCase):
             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         }
         response = self.client.post(url, data=post_data)
-        assert response.status_code == 200
 
         expected_message = "Le SIRET doit commencer par le SIREN"
         self.assertNotContains(response, escape(expected_message))
@@ -792,7 +788,6 @@ class CreateSiaeViewTest(TestCase):
             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         }
         response = self.client.post(url, data=post_data)
-        assert response.status_code == 200
 
         expected_message = "Le SIRET doit commencer par le SIREN"
         self.assertNotContains(response, escape(expected_message))
@@ -942,7 +937,6 @@ class EditSiaeViewTest(TestCase):
 
         url = reverse("siaes_views:edit_siae_step_contact_infos")
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertContains(response, "Informations générales")
 
         post_data = {
@@ -958,7 +952,6 @@ class EditSiaeViewTest(TestCase):
         response = self.client.post(url, data=post_data)
 
         # Ensure form validation is done
-        assert response.status_code == 200
         self.assertContains(response, "Ce champ est obligatoire")
 
         # Go to next step: description
@@ -967,7 +960,6 @@ class EditSiaeViewTest(TestCase):
         self.assertRedirects(response, reverse("siaes_views:edit_siae_step_description"))
 
         response = self.client.post(url, data=post_data, follow=True)
-        assert response.status_code == 200
         self.assertContains(response, "Présentation de l'activité")
 
         # Go to next step: summary
@@ -980,13 +972,11 @@ class EditSiaeViewTest(TestCase):
         self.assertRedirects(response, reverse("siaes_views:edit_siae_step_preview"))
 
         response = self.client.post(url, data=post_data, follow=True)
-        assert response.status_code == 200
         self.assertContains(response, "Aperçu de la fiche")
 
         # Go back, should not be an issue
         step_2_url = reverse("siaes_views:edit_siae_step_description")
         response = self.client.get(step_2_url)
-        assert response.status_code == 200
         self.assertContains(response, "Présentation de l'activité")
         assert self.client.session["edit_siae_session_key"] == {
             "address_line_1": "1 Rue Jeanne d'Arc",
@@ -1004,7 +994,6 @@ class EditSiaeViewTest(TestCase):
 
         # Go forward again
         response = self.client.post(step_2_url, data=post_data, follow=True)
-        assert response.status_code == 200
         self.assertContains(response, "Aperçu de la fiche")
         self.assertContains(response, "On est très très forts pour tout")
 
@@ -1059,7 +1048,6 @@ class EditSiaeViewWithWrongAddressTest(TestCase):
 
         url = reverse("siaes_views:edit_siae_step_contact_infos")
         response = self.client.get(url)
-        assert response.status_code == 200
         self.assertContains(response, "Informations générales")
 
         post_data = {
@@ -1087,7 +1075,6 @@ class EditSiaeViewWithWrongAddressTest(TestCase):
 
         # Save the object for real
         response = self.client.post(response.redirect_chain[-1][0])
-        assert response.status_code == 200
         self.assertContains(response, "L'adresse semble erronée")
 
 

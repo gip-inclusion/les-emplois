@@ -70,7 +70,6 @@ class JobApplicationGEIQEligibilityDetailsTest(TestCase):
             )
         )
 
-        assert response.status_code == 200
         self.assertTemplateUsed(response, "apply/includes/geiq/geiq_diagnosis_details.html")
         self.assertContains(
             response,
@@ -99,7 +98,6 @@ class JobApplicationGEIQEligibilityDetailsTest(TestCase):
             )
         )
 
-        assert response.status_code == 200
         self.assertTemplateUsed(response, "apply/includes/geiq/geiq_diagnosis_details.html")
         self.assertContains(response, "Le diagnostic du candidat a expiré")
         self.assertContains(

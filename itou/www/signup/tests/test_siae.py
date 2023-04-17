@@ -62,7 +62,6 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
 
         # No error when opening magic link a second time.
         response = self.client.get(magic_link)
-        assert response.status_code == 200
         self.assertContains(response, "logo-inclusion-connect-one-line.svg")
 
         # Check IC will redirect to the correct url
@@ -181,7 +180,6 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         )
         response = self.client.post(url, data=post_data)
         mock_call_ban_geocoding_api.assert_not_called()
-        assert response.status_code == 200
         self.assertContains(response, f"SIRET « {FAKE_SIRET} » non reconnu.")
 
         # Mock a valid answer from the server

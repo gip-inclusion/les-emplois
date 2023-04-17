@@ -284,7 +284,6 @@ class JobSeekerSignupTest(TestCase):
 
         url = reverse("signup:job_seeker")
         response = self.client.get(url)
-        assert response.status_code == 200
         fc_url = reverse("france_connect:authorize")
         self.assertContains(response, fc_url)
 
@@ -309,7 +308,6 @@ class JobSeekerSignupTest(TestCase):
         # Temporary NIR is not stored with user information.
         url = reverse("signup:job_seeker")
         response = self.client.get(url)
-        assert response.status_code == 200
         fc_url = reverse("france_connect:authorize")
         self.assertContains(response, fc_url)
 
