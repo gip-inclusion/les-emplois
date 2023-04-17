@@ -12,7 +12,7 @@
 {% if siae.phone %}
     <p>
         <i class="ri-phone-line ri-xl mr-2"></i>
-        <a aria-label="Contact téléphonique" href="tel:{{ siae.phone }}" class="font-weight-bold">{{ siae.phone|format_phone }}</a>
+        <a aria-label="Contact téléphonique" href="tel:{{ siae.phone|cut:" " }}" class="font-weight-bold">{{ siae.phone|format_phone }}</a>
     </p>
 {% endif %}
 
