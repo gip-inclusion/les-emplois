@@ -15,7 +15,7 @@
     </div>
 
     <div class="c-form">
-        <form method="post" action="" class="js-prevent-multiple-submit">
+        <form method="post" class="js-prevent-multiple-submit">
             {% csrf_token %}
 
             {% bootstrap_form form alert_error_type="all" %}

@@ -42,7 +42,7 @@
 
                     <div class="row mt-3">
                         <div class="col-md-12">
-                            <form method="post" action="" class="js-prevent-multiple-submit">
+                            <form method="post" class="js-prevent-multiple-submit">
                                 {% csrf_token %}
                                 {% bootstrap_form_errors form alert_error_type="all" %}
                                 {{ form.proof_url.as_hidden }}

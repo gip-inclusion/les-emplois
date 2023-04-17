@@ -12,7 +12,7 @@
     <div class="c-form mt-3">
         <h3 class="h2 font-weight-bold">Notifications e-mail</h3>
         <h4 class="h3 font-weight-bold">Nouvelles candidatures</h4>
-        <form method="post" action="" class="js-prevent-multiple-submit">
+        <form method="post" class="js-prevent-multiple-submit">
             {% csrf_token %}
 
             {% bootstrap_form_errors new_job_app_notification_form type="all" %}

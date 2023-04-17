@@ -11,7 +11,7 @@
         <small class="text-muted">Employeur solidaire</small>
     </h1>
 
-    <form method="get" action="" role="form">
+    <form method="get" role="form">
 
         {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
 
@@ -71,7 +71,7 @@
                 </p>
             </div>
 
-            <form method="post" action="" class="js-prevent-multiple-submit">
+            <form method="post" class="js-prevent-multiple-submit">
 
                 {% csrf_token %}
 
