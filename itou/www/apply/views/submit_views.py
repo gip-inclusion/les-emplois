@@ -295,8 +295,11 @@ class CheckNIRForSenderView(ApplyStepForSenderBaseView):
     def __init__(self):
         super().__init__()
         self.form = None
+        self.process = None
 
     def setup(self, request, *args, **kwargs):
+        if process := kwargs.pop("process", None):
+            self.process = process
         super().setup(request, *args, **kwargs)
         self.form = CheckJobSeekerNirForm(job_seeker=None, data=request.POST or None)
 
@@ -349,6 +352,7 @@ class CheckNIRForSenderView(ApplyStepForSenderBaseView):
         return super().get_context_data(**kwargs) | {
             "form": self.form,
             "form_action": reverse("apply:check_nir_for_sender", kwargs={"siae_pk": self.siae.pk}),
+            "process": self.process,
         }
 
 

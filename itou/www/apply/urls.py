@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import include, path
 
 from itou.www.apply.views import edit_views, list_views, process_views, submit_views
 
@@ -103,6 +103,20 @@ urlpatterns = [
         "<int:siae_pk>/update_job_seeker/<int:job_seeker_pk>/end",
         submit_views.UpdateJobSeekerStepEndView.as_view(),
         name="update_job_seeker_step_end",
+    ),
+    # Direct hire process
+    path(
+        "<int:siae_pk>/hire/",
+        include(
+            [
+                path(
+                    "check_nir",
+                    submit_views.CheckNIRForSenderView.as_view(),
+                    name="check_nir_for_hire",
+                    kwargs={"process": "hire"},
+                )
+            ]
+        ),
     ),
     # List.
     path("job_seeker/list", list_views.list_for_job_seeker, name="list_for_job_seeker"),
