@@ -1,6 +1,11 @@
 import datetime
 import io
+import json
+import logging
+from unittest import mock
 
+import httpx
+from allauth.account.models import EmailAddress
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.models import Group
 from django.contrib.sessions.models import Session
@@ -12,6 +17,23 @@ from itou.approvals.factories import ApprovalFactory
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
 from itou.job_applications.models import JobApplication
+from itou.prescribers.enums import PrescriberOrganizationKind
+from itou.prescribers.factories import (
+    PrescriberFactory,
+    PrescriberMembershipFactory,
+    PrescriberOrganizationFactory,
+    PrescriberPoleEmploiFactory,
+)
+from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS, SiaeKind
+from itou.siaes.factories import SiaeMembershipFactory
+from itou.users.factories import JobSeekerFactory, SiaeStaffFactory
+from itou.users.management.commands.new_users_to_mailjet import (
+    MAILJET_API_URL,
+    NEW_ORIENTEURS_LISTID,
+    NEW_PE_LISTID,
+    NEW_PRESCRIBERS_LISTID,
+    NEW_SIAE_LISTID,
+)
 from itou.users.models import User
 from itou.utils.test import TestCase
 
@@ -308,3 +330,535 @@ def test_shorten_active_sessions():
         ("almost_expired", almost_expired_session.expire_date),
         ("active", timezone.now() + relativedelta(hours=1)),
     ]
+
+
+class TestCommandNewUsersToMailJet:
+    @freeze_time("2023-05-02")
+    def test_wet_run_siae(self, caplog, respx_mock, settings):
+        settings.MAILJET_API_KEY = "MAILJET_KEY"
+        settings.MAILJET_SECRET_KEY = "MAILJET_SECRET_KEY"
+
+        # Job seekers are ignored.
+        JobSeekerFactory(with_verified_email=True)
+        for kind in set(SiaeKind) - set(SIAE_WITH_CONVENTION_KINDS):
+            SiaeMembershipFactory(user__with_verified_email=True, siae__kind=kind)
+        # Missing verified email.
+        SiaeMembershipFactory(siae__kind=SiaeKind.EI)
+        not_primary = SiaeMembershipFactory(siae__kind=SiaeKind.EI).user
+        EmailAddress.objects.create(user=not_primary, email=not_primary.email, primary=False, verified=True)
+        # Past users are ignored.
+        SiaeMembershipFactory(
+            user__date_joined=datetime.datetime(2023, 1, 12, tzinfo=datetime.timezone.utc),
+            user__with_verified_email=True,
+            siae__kind=SiaeKind.EI,
+        )
+        # Inactive memberships are ignored.
+        SiaeMembershipFactory(user__with_verified_email=True, siae__kind=SiaeKind.EI, is_active=False)
+        # Inactive users are ignored.
+        SiaeMembershipFactory(user__with_verified_email=True, user__is_active=False, siae__kind=SiaeKind.EI)
+        # New email not verified is ignored.
+        changed_email = SiaeMembershipFactory(user__with_verified_email=True, siae__kind=SiaeKind.EI).user
+        changed_email.email = "changed@mailinator.com"
+        changed_email.save(update_fields=["email"])
+
+        annie = SiaeStaffFactory(
+            first_name="Annie",
+            last_name="Amma",
+            email="annie.amma@mailinator.com",
+            with_verified_email=True,
+        )
+        bob = SiaeStaffFactory(
+            first_name="Bob",
+            last_name="Bailey",
+            email="bob.bailey@mailinator.com",
+            with_verified_email=True,
+        )
+        cindy = SiaeStaffFactory(
+            first_name="Cindy",
+            last_name="Cinnamon",
+            email="cindy.cinnamon@mailinator.com",
+            with_verified_email=True,
+        )
+        dave = SiaeStaffFactory(
+            first_name="Dave",
+            last_name="Doll",
+            email="dave.doll@mailinator.com",
+            with_verified_email=True,
+        )
+        eve = SiaeStaffFactory(
+            first_name="Eve",
+            last_name="Ebi",
+            email="eve.ebi@mailinator.com",
+            with_verified_email=True,
+        )
+        SiaeMembershipFactory(user=annie, siae__kind=SiaeKind.EI)
+        SiaeMembershipFactory(user=bob, siae__kind=SiaeKind.AI)
+        SiaeMembershipFactory(user=cindy, siae__kind=SiaeKind.ACI)
+        SiaeMembershipFactory(user=dave, siae__kind=SiaeKind.ETTI)
+        SiaeMembershipFactory(user=eve, siae__kind=SiaeKind.EITI)
+        post_mock = respx_mock.post(f"{MAILJET_API_URL}REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts").mock(
+            return_value=httpx.Response(201, json={"Count": 1, "Data": [{"JobID": 123456789}], "Total": 1})
+        )
+        respx_mock.get(f"{MAILJET_API_URL}REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts/123456789").mock(
+            side_effect=[
+                httpx.Response(
+                    200,
+                    json={
+                        "Count": 1,
+                        "Data": [
+                            {
+                                "ContactsLists": [{"ListID": NEW_SIAE_LISTID, "Action": "addnoforce"}],
+                                "Count": 2,
+                                "Error": "",
+                                "ErrorFile": "",
+                                "JobStart": "2023-05-02T11:11:11",
+                                "JobEnd": "",
+                                "Status": "In Progress",
+                            }
+                        ],
+                        "Total": 1,
+                    },
+                ),
+                httpx.Response(
+                    200,
+                    json={
+                        "Count": 1,
+                        "Data": [
+                            {
+                                "ContactsLists": [{"ListID": NEW_SIAE_LISTID, "Action": "addnoforce"}],
+                                "Count": 5,
+                                "Error": "",
+                                "ErrorFile": "",
+                                "JobStart": "2023-05-02T11:11:11",
+                                "JobEnd": "2023-05-02T12:34:56",
+                                "Status": "Completed",
+                            }
+                        ],
+                        "Total": 1,
+                    },
+                ),
+            ]
+        )
+        with mock.patch("itou.users.management.commands.new_users_to_mailjet.time.sleep") as time_mock:
+            call_command("new_users_to_mailjet", wet_run=True)
+            time_mock.assert_called_once_with(2)
+        [postcall] = post_mock.calls
+
+        assert json.loads(postcall.request.content) == {
+            "Action": "addnoforce",
+            "Contacts": [
+                {"Email": "annie.amma@mailinator.com", "Name": "Annie Amma"},
+                {"Email": "bob.bailey@mailinator.com", "Name": "Bob Bailey"},
+                {"Email": "cindy.cinnamon@mailinator.com", "Name": "Cindy Cinnamon"},
+                {"Email": "dave.doll@mailinator.com", "Name": "Dave Doll"},
+                {"Email": "eve.ebi@mailinator.com", "Name": "Eve Ebi"},
+            ],
+        }
+        assert caplog.record_tuples == [
+            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "SIAE users count: 5"),
+            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "PE prescribers count: 0"),
+            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Prescribers count: 0"),
+            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Orienteurs count: 0"),
+            (
+                "itou.users.management.commands.new_users_to_mailjet",
+                logging.INFO,
+                f"MailJet processed batch for list ID {NEW_SIAE_LISTID} in 5025 seconds.",
+            ),
+        ]
+
+    @freeze_time("2023-05-02")
+    def test_wet_run_prescribers(self, caplog, respx_mock, settings):
+        settings.MAILJET_API_KEY = "MAILJET_KEY"
+        settings.MAILJET_SECRET_KEY = "MAILJET_SECRET_KEY"
+
+        pe = PrescriberPoleEmploiFactory()
+        other_org = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.ML, authorized=True)
+        alice = PrescriberFactory(
+            first_name="Alice",
+            last_name="Aamar",
+            email="alice.aamar@mailinator.com",
+            with_verified_email=True,
+        )
+        PrescriberMembershipFactory(user=alice, organization=pe)
+        justin = PrescriberFactory(
+            first_name="Justin",
+            last_name="Wood",
+            email="justin.wood@mailinator.com",
+            with_verified_email=True,
+        )
+        PrescriberMembershipFactory(user=justin, organization=other_org)
+
+        for organization in [pe, other_org]:
+            # Ignored, email is not the primary email.
+            not_primary = PrescriberMembershipFactory(organization=organization).user
+            EmailAddress.objects.create(user=not_primary, email=not_primary.email, primary=False, verified=True)
+            # Past users are ignored.
+            PrescriberMembershipFactory(
+                user__date_joined=datetime.datetime(2023, 1, 12, tzinfo=datetime.timezone.utc),
+                user__with_verified_email=True,
+                organization=organization,
+            )
+            # Inactive users are ignored.
+            PrescriberMembershipFactory(
+                user__is_active=False, user__with_verified_email=True, organization=organization
+            )
+            # New email not verified is ignored.
+            changed_email = PrescriberMembershipFactory(user__with_verified_email=True, organization=organization).user
+            changed_email.email = f"changed+{organization}@mailinator.com"
+            changed_email.save(update_fields=["email"])
+
+        pe_post_mock = respx_mock.post(f"{MAILJET_API_URL}REST/contactslist/{NEW_PE_LISTID}/managemanycontacts").mock(
+            return_value=httpx.Response(201, json={"Count": 1, "Data": [{"JobID": 123456789}], "Total": 1})
+        )
+        respx_mock.get(f"{MAILJET_API_URL}REST/contactslist/{NEW_PE_LISTID}/managemanycontacts/123456789").mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "Count": 1,
+                    "Data": [
+                        {
+                            "ContactsLists": [{"ListID": NEW_PE_LISTID, "Action": "addnoforce"}],
+                            "Count": 1,
+                            "Error": "",
+                            "ErrorFile": "",
+                            "JobStart": "2023-05-02T11:11:11",
+                            "JobEnd": "2023-05-02T11:11:56",
+                            "Status": "Completed",
+                        }
+                    ],
+                    "Total": 1,
+                },
+            ),
+        )
+        other_org_post_mock = respx_mock.post(
+            f"{MAILJET_API_URL}REST/contactslist/{NEW_PRESCRIBERS_LISTID}/managemanycontacts"
+        ).mock(return_value=httpx.Response(201, json={"Count": 1, "Data": [{"JobID": 123456789}], "Total": 1}))
+        respx_mock.get(
+            f"{MAILJET_API_URL}REST/contactslist/{NEW_PRESCRIBERS_LISTID}/managemanycontacts/123456789"
+        ).mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "Count": 1,
+                    "Data": [
+                        {
+                            "ContactsLists": [{"ListID": NEW_PRESCRIBERS_LISTID, "Action": "addnoforce"}],
+                            "Count": 1,
+                            "Error": "",
+                            "ErrorFile": "",
+                            "JobStart": "2023-05-02T11:11:11",
+                            "JobEnd": "2023-05-02T11:11:56",
+                            "Status": "Completed",
+                        }
+                    ],
+                    "Total": 1,
+                },
+            ),
+        )
+        call_command("new_users_to_mailjet", wet_run=True)
+        [pe_postcall] = pe_post_mock.calls
+        assert json.loads(pe_postcall.request.content) == {
+            "Action": "addnoforce",
+            "Contacts": [{"Email": "alice.aamar@mailinator.com", "Name": "Alice Aamar"}],
+        }
+        [other_org_postcall] = other_org_post_mock.calls
+        assert json.loads(other_org_postcall.request.content) == {
+            "Action": "addnoforce",
+            "Contacts": [
+                {"Email": "alice.aamar@mailinator.com", "Name": "Alice Aamar"},
+                {"Email": "justin.wood@mailinator.com", "Name": "Justin Wood"},
+            ],
+        }
+        assert caplog.record_tuples == [
+            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "SIAE users count: 0"),
+            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "PE prescribers count: 1"),
+            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Prescribers count: 2"),
+            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Orienteurs count: 0"),
+            (
+                "itou.users.management.commands.new_users_to_mailjet",
+                logging.INFO,
+                f"MailJet processed batch for list ID {NEW_PE_LISTID} in 45 seconds.",
+            ),
+            (
+                "itou.users.management.commands.new_users_to_mailjet",
+                logging.INFO,
+                f"MailJet processed batch for list ID {NEW_PRESCRIBERS_LISTID} in 45 seconds.",
+            ),
+        ]
+
+    @freeze_time("2023-05-02")
+    def test_wet_run_orienteurs(self, caplog, respx_mock, settings):
+        settings.MAILJET_API_KEY = "MAILJET_KEY"
+        settings.MAILJET_SECRET_KEY = "MAILJET_SECRET_KEY"
+
+        PrescriberFactory(
+            first_name="Billy",
+            last_name="Boo",
+            email="billy.boo@mailinator.com",
+            with_verified_email=True,
+        )
+        sonny = PrescriberFactory(
+            first_name="Sonny",
+            last_name="Sunder",
+            email="sonny.sunder@mailinator.com",
+            with_verified_email=True,
+        )
+        # Inactive memberships are considered orienteur.
+        PrescriberMembershipFactory(user=sonny, is_active=False)
+        # Members of unauthorized organizations are orienteurs.
+        timmy = PrescriberFactory(
+            first_name="Timmy",
+            last_name="Timber",
+            email="timmy.timber@mailinator.com",
+            with_verified_email=True,
+        )
+        timmy = PrescriberMembershipFactory(user=timmy, organization__kind=PrescriberOrganizationKind.OTHER)
+        # Past users are ignored.
+        PrescriberFactory(
+            with_verified_email=True, date_joined=datetime.datetime(2023, 1, 12, tzinfo=datetime.timezone.utc)
+        )
+        # Inactive users are ignored.
+        PrescriberFactory(
+            with_verified_email=True,
+            is_active=False,
+            date_joined=datetime.datetime(2023, 1, 12, tzinfo=datetime.timezone.utc),
+        )
+        # Ignored, email is not the primary email.
+        not_primary = PrescriberFactory()
+        EmailAddress.objects.create(user=not_primary, email=not_primary.email, primary=False, verified=True)
+        # New email not verified is ignored.
+        changed_email = PrescriberFactory(with_verified_email=True)
+        changed_email.email = "changed@mailinator.com"
+        changed_email.save(update_fields=["email"])
+
+        post_mock = respx_mock.post(
+            f"{MAILJET_API_URL}REST/contactslist/{NEW_ORIENTEURS_LISTID}/managemanycontacts"
+        ).mock(return_value=httpx.Response(201, json={"Count": 1, "Data": [{"JobID": 123456789}], "Total": 1}))
+        respx_mock.get(
+            f"{MAILJET_API_URL}REST/contactslist/{NEW_ORIENTEURS_LISTID}/managemanycontacts/123456789"
+        ).mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "Count": 1,
+                    "Data": [
+                        {
+                            "ContactsLists": [{"ListID": NEW_ORIENTEURS_LISTID, "Action": "addnoforce"}],
+                            "Count": 1,
+                            "Error": "",
+                            "ErrorFile": "",
+                            "JobStart": "2023-05-02T11:11:11",
+                            "JobEnd": "2023-05-02T11:11:56",
+                            "Status": "Completed",
+                        }
+                    ],
+                    "Total": 1,
+                },
+            ),
+        )
+        call_command("new_users_to_mailjet", wet_run=True)
+        [postcall] = post_mock.calls
+        assert json.loads(postcall.request.content) == {
+            "Action": "addnoforce",
+            "Contacts": [
+                {"Email": "billy.boo@mailinator.com", "Name": "Billy Boo"},
+                {"Email": "sonny.sunder@mailinator.com", "Name": "Sonny Sunder"},
+                {"Email": "timmy.timber@mailinator.com", "Name": "Timmy Timber"},
+            ],
+        }
+        assert caplog.record_tuples == [
+            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "SIAE users count: 0"),
+            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "PE prescribers count: 0"),
+            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Prescribers count: 0"),
+            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Orienteurs count: 3"),
+            (
+                "itou.users.management.commands.new_users_to_mailjet",
+                logging.INFO,
+                f"MailJet processed batch for list ID {NEW_ORIENTEURS_LISTID} in 45 seconds.",
+            ),
+        ]
+
+    @freeze_time("2023-05-02")
+    def test_wet_run_batch(self, caplog, respx_mock, settings):
+        settings.MAILJET_API_KEY = "MAILJET_KEY"
+        settings.MAILJET_SECRET_KEY = "MAILJET_SECRET_KEY"
+
+        annie = SiaeStaffFactory(
+            first_name="Annie",
+            last_name="Amma",
+            email="annie.amma@mailinator.com",
+            with_verified_email=True,
+        )
+        bob = SiaeStaffFactory(
+            first_name="Bob",
+            last_name="Bailey",
+            email="bob.bailey@mailinator.com",
+            with_verified_email=True,
+        )
+        SiaeMembershipFactory(user=annie, siae__kind=SiaeKind.EI)
+        SiaeMembershipFactory(user=bob, siae__kind=SiaeKind.AI)
+        post_mock = respx_mock.post(f"{MAILJET_API_URL}REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts").mock(
+            side_effect=[
+                httpx.Response(201, json={"Count": 1, "Data": [{"JobID": 1}], "Total": 1}),
+                httpx.Response(201, json={"Count": 1, "Data": [{"JobID": 2}], "Total": 1}),
+            ]
+        )
+        respx_mock.get(f"{MAILJET_API_URL}REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts/1").mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "Count": 1,
+                    "Data": [
+                        {
+                            "ContactsLists": [{"ListID": NEW_SIAE_LISTID, "Action": "addnoforce"}],
+                            "Count": 1,
+                            "Error": "",
+                            "ErrorFile": "",
+                            "JobStart": "2023-05-02T11:11:11",
+                            "JobEnd": "2023-05-02T11:12:00",
+                            "Status": "Completed",
+                        }
+                    ],
+                    "Total": 1,
+                },
+            ),
+        )
+        respx_mock.get(f"{MAILJET_API_URL}REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts/2").mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "Count": 1,
+                    "Data": [
+                        {
+                            "ContactsLists": [{"ListID": NEW_SIAE_LISTID, "Action": "addnoforce"}],
+                            "Count": 1,
+                            "Error": "",
+                            "ErrorFile": "",
+                            "JobStart": "2023-05-02T11:23:00",
+                            "JobEnd": "2023-05-02T11:24:00",
+                            "Status": "Completed",
+                        }
+                    ],
+                    "Total": 1,
+                },
+            ),
+        )
+        with mock.patch("itou.users.management.commands.new_users_to_mailjet.Command.BATCH_SIZE", 1):
+            call_command("new_users_to_mailjet", wet_run=True)
+        [postcall1, postcall2] = post_mock.calls
+
+        assert json.loads(postcall1.request.content) == {
+            "Action": "addnoforce",
+            "Contacts": [
+                {"Email": "annie.amma@mailinator.com", "Name": "Annie Amma"},
+            ],
+        }
+        assert json.loads(postcall2.request.content) == {
+            "Action": "addnoforce",
+            "Contacts": [
+                {"Email": "bob.bailey@mailinator.com", "Name": "Bob Bailey"},
+            ],
+        }
+        assert caplog.record_tuples == [
+            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "SIAE users count: 2"),
+            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "PE prescribers count: 0"),
+            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Prescribers count: 0"),
+            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Orienteurs count: 0"),
+            (
+                "itou.users.management.commands.new_users_to_mailjet",
+                logging.INFO,
+                f"MailJet processed batch for list ID {NEW_SIAE_LISTID} in 49 seconds.",
+            ),
+            (
+                "itou.users.management.commands.new_users_to_mailjet",
+                logging.INFO,
+                f"MailJet processed batch for list ID {NEW_SIAE_LISTID} in 60 seconds.",
+            ),
+        ]
+
+    @freeze_time("2023-05-02")
+    def test_wet_run_errors(self, caplog, respx_mock, settings):
+        settings.MAILJET_API_KEY = "MAILJET_KEY"
+        settings.MAILJET_SECRET_KEY = "MAILJET_SECRET_KEY"
+
+        annie = SiaeStaffFactory(
+            first_name="Annie",
+            last_name="Amma",
+            email="annie.amma@mailinator.com",
+            with_verified_email=True,
+        )
+        SiaeMembershipFactory(user=annie, siae__kind=SiaeKind.EI)
+        post_mock = respx_mock.post(f"{MAILJET_API_URL}REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts").mock(
+            return_value=httpx.Response(201, json={"Count": 1, "Data": [{"JobID": 1}], "Total": 1}),
+        )
+        respx_mock.get(f"{MAILJET_API_URL}REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts/1").mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "Count": 1,
+                    "Data": [
+                        {
+                            "ContactsLists": [{"ListID": NEW_SIAE_LISTID, "Action": "addnoforce"}],
+                            "Count": 1,
+                            "Error": "The blips failed to blap.",
+                            "ErrorFile": "https://mailjet.com/my-errors.html",
+                            "JobStart": "2023-05-02T11:11:11",
+                            "JobEnd": "2023-05-02T11:12:00",
+                            "Status": "Error",
+                        }
+                    ],
+                    "Total": 1,
+                },
+            ),
+        )
+        call_command("new_users_to_mailjet", wet_run=True)
+        [postcall] = post_mock.calls
+
+        assert json.loads(postcall.request.content) == {
+            "Action": "addnoforce",
+            "Contacts": [
+                {"Email": "annie.amma@mailinator.com", "Name": "Annie Amma"},
+            ],
+        }
+        assert caplog.record_tuples == [
+            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "SIAE users count: 1"),
+            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "PE prescribers count: 0"),
+            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Prescribers count: 0"),
+            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Orienteurs count: 0"),
+            (
+                "itou.users.management.commands.new_users_to_mailjet",
+                logging.ERROR,
+                f"MailJet errors for list ID {NEW_SIAE_LISTID}: The blips failed to blap.",
+            ),
+            (
+                "itou.users.management.commands.new_users_to_mailjet",
+                logging.ERROR,
+                f"MailJet errors file for list ID {NEW_SIAE_LISTID}: https://mailjet.com/my-errors.html",
+            ),
+            (
+                "itou.users.management.commands.new_users_to_mailjet",
+                logging.INFO,
+                f"MailJet processed batch for list ID {NEW_SIAE_LISTID} in 49 seconds.",
+            ),
+        ]
+
+    @freeze_time("2026-05-02")
+    def test_wet_run_limits_history_to_a_year(self, caplog, respx_mock, settings):
+        settings.MAILJET_API_KEY = "MAILJET_KEY"
+        settings.MAILJET_SECRET_KEY = "MAILJET_SECRET_KEY"
+
+        # Past users are ignored.
+        SiaeMembershipFactory(
+            user__date_joined=datetime.datetime(2025, 5, 1, tzinfo=datetime.timezone.utc),
+            user__with_verified_email=True,
+            siae__kind=SiaeKind.EI,
+        )
+        post_mock = respx_mock.post(f"{MAILJET_API_URL}REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts")
+        call_command("new_users_to_mailjet", wet_run=True)
+        assert post_mock.called is False
+        assert caplog.record_tuples == [
+            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "SIAE users count: 0"),
+            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "PE prescribers count: 0"),
+            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Prescribers count: 0"),
+            ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Orienteurs count: 0"),
+        ]

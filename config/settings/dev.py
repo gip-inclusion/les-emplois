@@ -87,3 +87,6 @@ METABASE_PORT = os.getenv("PGPORT", "5432")  # noqa: F405
 METABASE_USER = os.getenv("PGUSER", "postgres")  # noqa: F405o
 METABASE_PASSWORD = os.getenv("PGPASSWORD", "password")  # noqa: F405
 METABASE_DATABASE = os.getenv("PGDATABASE", "metabase")  # noqa: F405
+
+MAILJET_API_KEY_PRINCIPAL = os.getenv("API_MAILJET_KEY", "API_MAILJET_KEY")
+MAILJET_SECRET_KEY_PRINCIPAL = os.getenv("API_MAILJET_SECRET", "API_MAILJET_SECRET")
