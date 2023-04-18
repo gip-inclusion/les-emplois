@@ -36,6 +36,7 @@ def _verify_emails_for_user(self, create, extracted, **kwargs):
     for email in emails:
         email_address, _ = allauth_models.EmailAddress.objects.get_or_create(user=self, email=email)
         email_address.verified = True
+        email_address.primary = True
         email_address.save()
         self.emailaddress_set.add(email_address)
 

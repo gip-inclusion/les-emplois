@@ -466,6 +466,9 @@ HUEY = {
     "immediate": ITOU_ENVIRONMENT not in ("DEMO", "PROD"),
 }
 
+MAILJET_API_KEY_PRINCIPAL = os.getenv("API_MAILJET_KEY")
+MAILJET_SECRET_KEY_PRINCIPAL = os.getenv("API_MAILJET_SECRET")
+
 # Email https://anymail.readthedocs.io/en/stable/esps/mailjet/
 ANYMAIL = {
     # it's the default but our probes need this at import time.
