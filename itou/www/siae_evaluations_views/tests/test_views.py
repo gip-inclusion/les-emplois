@@ -62,7 +62,9 @@ class EvaluatedSiaeSanctionViewTest(TestCase):
         self.assertContains(
             response,
             """
-            <b>Commentaire de votre DDETS</b>
+            <p>
+                <b>Commentaire de votre DDETS</b>
+            </p>
             <div class="card">
                 <div class="card-body">A envoyé une photo de son chat. Séparé de son chat pendant une journée.</div>
             </div>
