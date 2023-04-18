@@ -38,7 +38,7 @@
                             {# Go to the next step. #}
                             <button type="submit" name="confirm" value="1" class="btn btn-sm btn-link">Poursuivre la création du compte</button>
                             {# Reload this page with a new form. #}
-                            <a href="{% url 'apply:check_email_for_sender' siae_pk=siae.pk %}?email={{ email_to_create|urlencode }}" name="cancel" value="1" class="btn btn-sm btn-primary">Modifier l'email du candidat</a>
+                            <a href="{% url 'apply:check_email_for_sender' siae_pk=siae.pk %}?email={{ email_to_create|urlencode }}" class="btn btn-sm btn-primary">Modifier l'email du candidat</a>
                         </div>
                     </div>
                 </div>
