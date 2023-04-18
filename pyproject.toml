@@ -8,36 +8,3 @@ custom_blocks="buttons,endbuttons"
 max_attribute_length=200
 preserve_blank_lines=true
 extend_exclude = "itou/templates/utils/widgets/duet_date_picker_widget.html"
-
-[tool.sqlfluff.core]
-dialect = "postgres"
-ignore = "templating"
-exclude_rules = "AM01,LT05"  # ambiguous distincts and long lines are ignored.
-templater = "jinja"
-
-[tool.sqlfluff.layout.type.alias_expression]
-# https://docs.sqlfluff.com/en/stable/layout.html#aligned-elements
-# We want non-default spacing _before_ the alias expressions.
-spacing_before = "align"
-# We want to align them within the next outer select clause.
-# This means for example that alias expressions within the FROM
-# or JOIN clause would _not_ be aligned with them.
-align_within = "select_clause"
-# The point at which to stop searching outward for siblings, which
-# in this example would likely be the boundary of a CTE. Stopping
-# when we hit brackets is usually a good rule of thumb for this
-# configuration.
-align_scope = "bracketed"
-
-
-[tool.sqlfluff.rules.capitalisation.keywords]
-capitalisation_policy = "lower"
-
-[tool.sqlfluff.rules.capitalisation.functions]
-extended_capitalisation_policy = "lower"
-
-[tool.sqlfluff.rules.capitalisation.literals]
-capitalisation_policy = "lower"
-
-[tool.sqlfluff.rules.references.special_chars]
-additional_allowed_characters = "àéè '"
