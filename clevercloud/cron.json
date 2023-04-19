@@ -13,6 +13,7 @@
   "0 3 * * * $ROOT/clevercloud/run_management_command.sh clearsessions",
   "0 12 * * * $ROOT/clevercloud/run_management_command.sh evaluation_campaign_notify",
   "30 20 * * * $ROOT/clevercloud/crons/populate_metabase_emplois.sh --daily",
+  "15 3 * * * $ROOT/scripts/expire-elastic-indices",
 
   "25 8-18/2 * * 1-5 $ROOT/clevercloud/download_employee_records.sh",
   "55 8-18/2 * * 1-5 $ROOT/clevercloud/upload_employee_records.sh",
