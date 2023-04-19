@@ -2,6 +2,7 @@ import logging
 
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
@@ -303,17 +304,28 @@ class CheckNIRForSenderView(ApplyStepForSenderBaseView):
         super().setup(request, *args, **kwargs)
         self.form = CheckJobSeekerNirForm(job_seeker=None, data=request.POST or None)
 
+    def redirect_to_check_email(self, session_uuid):
+        return HttpResponseRedirect(
+            reverse(
+                "apply:search_by_email_for_hire" if self.process == "hire" else "apply:search_by_email_for_sender",
+                kwargs={"siae_pk": self.siae.pk, "session_uuid": session_uuid},
+            )
+        )
+
+    def redirect_to_check_infos(self, job_seeker_pk):
+        return HttpResponseRedirect(
+            reverse(
+                "apply:check_infos_for_hire" if self.process == "hire" else "apply:step_check_job_seeker_info",
+                kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": job_seeker_pk},
+            )
+        )
+
     def post(self, request, *args, **kwargs):
         if self.form.data.get("skip"):
             # Redirect to search by e-mail address.
             job_seeker_session = SessionNamespace.create_temporary(request.session)
             job_seeker_session.init({"user": {"nir": ""}})
-            return HttpResponseRedirect(
-                reverse(
-                    "apply:search_by_email_for_sender",
-                    kwargs={"siae_pk": self.siae.pk, "session_uuid": job_seeker_session.name},
-                )
-            )
+            return self.redirect_to_check_email(job_seeker_session.name)
 
         context = {}
         if self.form.is_valid():
@@ -323,21 +335,11 @@ class CheckNIRForSenderView(ApplyStepForSenderBaseView):
             if not job_seeker:
                 job_seeker_session = SessionNamespace.create_temporary(request.session)
                 job_seeker_session.init({"user": {"nir": self.form.cleaned_data["nir"]}})
-                return HttpResponseRedirect(
-                    reverse(
-                        "apply:search_by_email_for_sender",
-                        kwargs={"siae_pk": self.siae.pk, "session_uuid": job_seeker_session.name},
-                    )
-                )
+                return self.redirect_to_check_email(job_seeker_session.name)
 
             # The NIR we found is correct
             if self.form.data.get("confirm"):
-                return HttpResponseRedirect(
-                    reverse(
-                        "apply:step_check_job_seeker_info",
-                        kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": job_seeker.pk},
-                    )
-                )
+                return self.redirect_to_check_infos(job_seeker.pk)
 
             context = {
                 # Ask the sender to confirm the NIR we found is associated to the correct user
@@ -351,7 +353,11 @@ class CheckNIRForSenderView(ApplyStepForSenderBaseView):
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "form": self.form,
-            "form_action": reverse("apply:check_nir_for_sender", kwargs={"siae_pk": self.siae.pk}),
+            "form_action": (
+                reverse("apply:check_nir_for_hire", kwargs={"siae_pk": self.siae.pk})
+                if self.process == "hire"
+                else reverse("apply:check_nir_for_sender", kwargs={"siae_pk": self.siae.pk})
+            ),
             "process": self.process,
         }
 
@@ -1382,3 +1388,16 @@ class UpdateJobSeekerStepEndView(UpdateJobSeekerBaseView):
                 kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
             ),
         }
+
+
+@login_required
+@user_passes_test(lambda u: u.is_siae_staff, login_url="/", redirect_field_name=None)
+def check_infos_for_hire(request, siae_pk, job_seeker_pk):
+    siae = get_object_or_404(Siae, pk=siae_pk)
+    job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), pk=job_seeker_pk)
+    context = {
+        "siae": siae,
+        "job_seeker": job_seeker,
+        "breadcrumbs": {"Déclarer une embauche": ""},
+    }
+    return render(request, "apply/hire/check_infos.html", context)

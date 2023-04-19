@@ -1,0 +1,16 @@
+{% extends "layout/content_small.html" %}
+{% load static %}
+{% load bootstrap4 %}
+
+{% block title %}Déclarer une embauche {{ block.super }}{% endblock %}
+
+{% block breadcrumbs %}
+    {% include "layout/breadcrumbs_from_dashboard.html" %}
+{% endblock %}
+
+{% block content %}
+    <h1 class="h1-hero-c1">
+        Informations personnelles de <span class="text-muted">{{ job_seeker.get_full_name|title }}</span>
+    </h1>
+
+{% endblock %}

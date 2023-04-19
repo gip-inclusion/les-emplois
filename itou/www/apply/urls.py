@@ -114,7 +114,18 @@ urlpatterns = [
                     submit_views.CheckNIRForSenderView.as_view(),
                     name="check_nir_for_hire",
                     kwargs={"process": "hire"},
-                )
+                ),
+                path(
+                    "search-by-email/<uuid:session_uuid>",
+                    submit_views.SearchByEmailForSenderView.as_view(),
+                    name="search_by_email_for_hire",
+                    kwargs={"process": "hire"},
+                ),
+                path(
+                    "<int:job_seeker_pk>/check_infos",
+                    submit_views.check_infos_for_hire,
+                    name="check_infos_for_hire",
+                ),
             ]
         ),
     ),
