@@ -470,8 +470,8 @@ HUEY = {
 ANYMAIL = {
     # it's the default but our probes need this at import time.
     "MAILJET_API_URL": "https://api.mailjet.com/v3.1/",
-    "MAILJET_API_KEY": os.getenv("API_MAILJET_KEY"),
-    "MAILJET_SECRET_KEY": os.getenv("API_MAILJET_SECRET"),
+    "MAILJET_API_KEY": os.getenv("API_MAILJET_KEY_APP"),
+    "MAILJET_SECRET_KEY": os.getenv("API_MAILJET_SECRET_APP"),
     "WEBHOOK_SECRET": os.getenv("MAILJET_WEBHOOK_SECRET"),
 }
 
