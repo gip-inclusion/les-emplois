@@ -37,6 +37,10 @@ def parse_response_to_soup(response, selector=None, no_html_body=False):
         [soup] = soup.select(selector)
     for csrf_token_input in soup.find_all("input", attrs={"name": "csrfmiddlewaretoken"}):
         csrf_token_input["value"] = "NORMALIZED_CSRF_TOKEN"
+    if "nonce" in soup.attrs:
+        soup["nonce"] = "NORMALIZED_CSP_NONCE"
+    for csp_nonce_script in soup.find_all("script", {"nonce": True}):
+        csp_nonce_script["nonce"] = "NORMALIZED_CSP_NONCE"
     return soup
 
 
