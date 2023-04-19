@@ -4,6 +4,7 @@ import pysftp
 from django.conf import settings
 from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
+from sentry_sdk.crons import monitor
 
 from itou.employee_record import constants
 from itou.employee_record.enums import MovementType, Status
@@ -11,7 +12,6 @@ from itou.employee_record.exceptions import SerializationError
 from itou.employee_record.mocks.fake_serializers import TestEmployeeRecordUpdateNotificationBatchSerializer
 from itou.employee_record.models import EmployeeRecordBatch, EmployeeRecordUpdateNotification
 from itou.employee_record.serializers import EmployeeRecordUpdateNotificationBatchSerializer
-from itou.utils import sentry
 from itou.utils.iterators import chunks
 
 from ...common_management import EmployeeRecordTransferCommand
@@ -157,7 +157,7 @@ class Command(EmployeeRecordTransferCommand):
 
         return record_errors
 
-    @sentry.Monitor("390204fd-95ff-42b0-ae32-8cd39b9c4f9a")
+    @monitor(monitor_slug="transfer-employee-records-updates-download")
     def download(self, conn: pysftp.Connection, dry_run: bool):
 
         parser = JSONParser()
@@ -211,7 +211,7 @@ class Command(EmployeeRecordTransferCommand):
 
                 conn.remove(file)
 
-    @sentry.Monitor("03ae914a-1908-4b4b-adcf-e5d124bb8242")
+    @monitor(monitor_slug="transfer-employee-records-updates-upload")
     def upload(self, conn: pysftp.Connection, dry_run: bool):
         new_notifications = EmployeeRecordUpdateNotification.objects.new()
 
