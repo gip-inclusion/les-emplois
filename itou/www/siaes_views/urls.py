@@ -8,7 +8,6 @@ app_name = "siaes_views"
 
 urlpatterns = [
     path("<int:siae_id>/card", views.card, name="card"),
-    path("card_search_preview", views.card_search_preview, name="card_search_preview"),
     path("job_description/<int:job_description_id>/card", views.job_description_card, name="job_description_card"),
     path("job_description_list", views.job_description_list, name="job_description_list"),
     path("edit_job_description", views.edit_job_description, name="edit_job_description"),

@@ -2,12 +2,10 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
-from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from django.views.decorators.http import require_safe
 
 from itou.cities.models import City
 from itou.common_apps.address.departments import department_from_postcode
@@ -17,7 +15,6 @@ from itou.siaes.models import Siae, SiaeFinancialAnnex, SiaeJobDescription
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.apis.exceptions import GeocodingDataError
-from itou.utils.htmx import hx_trigger_modal_control
 from itou.utils.pagination import pager
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
@@ -77,25 +74,6 @@ def job_description_card(request, job_description_id, template_name="siaes/job_d
         "matomo_custom_title": "Détails de la fiche de poste",
     }
     return render(request, template_name, context)
-
-
-@login_required
-@require_safe
-def card_search_preview(request, template_name="siaes/includes/_card_siae.html"):
-    siae = get_current_siae_or_404(request, with_job_descriptions=True)
-    job_descriptions = (
-        SiaeJobDescription.objects.filter(siae__pk=siae.pk, is_active=True)
-        .prefetch_related("appellation", "appellation__rome", "siae")
-        .order_by_most_recent()
-    )
-    context = {
-        "siae": siae,
-        "jobs_descriptions": job_descriptions,
-    }
-    return HttpResponse(
-        render_to_string(template_name, context),
-        headers=hx_trigger_modal_control("js-modal-preview", "show"),
-    )
 
 
 @login_required
