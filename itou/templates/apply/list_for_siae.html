@@ -87,7 +87,23 @@
                 </div>
 
                 {% if not job_applications_page %}
-                    <p class="my-3 my-md-4">Aucune candidature pour le moment.</p>
+                    <div class="text-center my-4">
+                        <img class="img-fluid" src="{% static 'img/illustration-siae-card-no-result.svg' %}" alt="" loading="lazy">
+                        <p class="mb-1 mt-3">
+                            <strong>Aucune candidature pour le moment</strong>
+                        </p>
+                        <p>
+                            <i>
+                                Pour recevoir des candidatures, verifiez que les postes ouverts
+                                <br class="d-none d-lg-inline">
+                                dans votre structure sont bien à jour.
+                            </i>
+                        </p>
+                        <a href="{% url 'siaes_views:job_description_list' %}" class="btn btn-outline-primary btn-ico w-100 w-md-auto justify-content-center">
+                            <i class="ri-briefcase-line ri-lg font-weight-normal"></i>
+                            <span>Gérer les métiers et recrutements</span>
+                        </a>
+                    </div>
                     {% include "apply/includes/rdv_insertion_promo_card.html" %}
                 {% else %}
                     {% for job_application in job_applications_page %}

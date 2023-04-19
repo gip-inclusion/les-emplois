@@ -246,7 +246,7 @@ class ProcessListSiaeTest(ProcessListTest):
         other_siae = SiaeFactory(with_membership=True)
         self.client.force_login(other_siae.members.first())
         response = self.client.get(self.siae_base_url)
-        self.assertContains(response, "Aucune candidature pour le moment.")
+        self.assertContains(response, "Aucune candidature pour le moment")
         self.assertContains(response, promo_text)
 
     def test_list_for_siae_view__show_criteria(self):

@@ -64,7 +64,23 @@
                 </div>
 
                 {% if not job_applications_page %}
-                    <p class="my-3 my-md-4">Aucune candidature pour le moment.</p>
+                    <div class="text-center my-4">
+                        <img class="img-fluid" src="{% static 'img/illustration-siae-card-no-result.svg' %}" alt="" loading="lazy">
+                        <p class="mb-1 mt-3">
+                            <strong>Aucune candidature pour le moment</strong>
+                        </p>
+                        <p>
+                            <i>
+                                Vous trouverez ici vos candidatures, émises par un prescripteur
+                                <br class="d-none d-lg-inline">
+                                ou par vous même.
+                            </i>
+                        </p>
+                        <a href="{% url 'home:hp' %}" class="btn btn-outline-primary btn-ico w-100 w-md-auto justify-content-center">
+                            <i class="ri-briefcase-3-line ri-lg font-weight-normal"></i>
+                            <span>Rechercher une entreprise</span>
+                        </a>
+                    </div>
                 {% else %}
                     {% for job_application in job_applications_page %}
                         <div class="c-card card my-4 has-links-inside">
