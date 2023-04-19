@@ -194,7 +194,7 @@
 
         {% if MATOMO_BASE_URL %}
             {# Matomo/Piwik open source web analytics #}
-            <script nonce="{{ CSP_NONCE }}">
+            <script id="matomo-custom-init" nonce="{{ CSP_NONCE }}">
                 window._paq = window._paq || [];
                 /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
 

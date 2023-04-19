@@ -46,7 +46,7 @@ from itou.utils.perms.user import get_user_info
 from itou.utils.sync import DiffItem, DiffItemKind, yield_sync_diff
 from itou.utils.tasks import sanitize_mailjet_recipients
 from itou.utils.templatetags import dict_filters, format_filters, job_applications
-from itou.utils.test import TestCase
+from itou.utils.test import TestCase, parse_response_to_soup
 from itou.utils.tokens import SIAE_SIGNUP_MAGIC_LINK_TIMEOUT, SiaeSignupTokenGenerator
 from itou.utils.urls import (
     add_url_params,
@@ -1255,7 +1255,7 @@ def test_redact_email_adresse(email, expected):
     assert redact_email_address(email) == expected
 
 
-def test_matomo_context_processor(client, settings):
+def test_matomo_context_processor(client, settings, snapshot):
     """Test on a canically problematic view that we get the right Matomo properties.
 
     Namely, verify that the URL params are cleaned, sorted, the title is forced, and
@@ -1264,7 +1264,7 @@ def test_matomo_context_processor(client, settings):
     Also ensure the user ID is correctly set.
     """
     settings.MATOMO_BASE_URL = "https://fake.matomo.url"
-    siae = SiaeFactory(with_membership=True)
+    siae = SiaeFactory(with_membership=True, membership__user__pk=99999)
     user = siae.members.first()
     client.force_login(user)
 
@@ -1280,14 +1280,8 @@ def test_matomo_context_processor(client, settings):
     assert response.context["matomo_custom_url"] == "siae/<int:siae_id>/card?city=paris&mtm_bar=bidule&mtm_foo=truc"
     assert response.context["matomo_custom_title"] == "Fiche de la structure d'insertion"
     assert response.context["matomo_user_id"] == user.pk
-    str_content = response.content.decode("utf-8")
-    assert f"window._paq.push(['setUserId', '{user.pk}']);" in str_content
-    assert (
-        "window._paq.push(['setCustomUrl', "
-        "new URL('siae/&lt;int:siae_id&gt;/card?city=paris&mtm_bar=bidule&amp;mtm_foo=truc', "
-        "window.location.origin).href]);"
-    ) in str_content
-    assert "window._paq.push(['setDocumentTitle', 'Fiche de la structure d&#x27;insertion']);" in str_content
+    script_content = parse_response_to_soup(response, selector="#matomo-custom-init")
+    assert str(script_content) == snapshot(name="matomo custom init")
 
 
 @pytest.mark.parametrize("state", [s[0] for s in JobApplicationWorkflow.STATE_CHOICES])
