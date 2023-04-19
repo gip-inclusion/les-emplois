@@ -1266,8 +1266,6 @@ def test_matomo_context_processor(client, settings):
     settings.MATOMO_BASE_URL = "https://fake.matomo.url"
     siae = SiaeFactory(with_membership=True)
     user = siae.members.first()
-    user.asp_uid = "1234567890"
-    user.save(update_fields=["asp_uid"])
     client.force_login(user)
 
     # check that we don't crash when the route is not resolved
