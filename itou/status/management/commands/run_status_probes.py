@@ -2,10 +2,10 @@ import logging
 
 from django.core.management.base import BaseCommand
 from django.utils import timezone
+from sentry_sdk.crons import monitor
 from tqdm import tqdm
 
 from itou.status import models, probes
-from itou.utils import sentry
 
 
 logger = logging.getLogger(__name__)
@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 class Command(BaseCommand):
     help = "Run status probes"
 
-    @sentry.Monitor("8a1c1061-6fea-4357-9188-54528fc42db2")
+    @monitor(monitor_slug="run-status-probes")
     def handle(self, **options):
         self.stdout.write("Start probing")
 
