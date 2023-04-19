@@ -1276,17 +1276,17 @@ def test_matomo_context_processor(client, settings):
 
     # canonical case
     url = reverse("siaes_views:card", kwargs={"siae_id": siae.pk})
-    response = client.get(f"{url}?foo=bar&mtm_foo=truc&mtm_bar=bidule")
+    response = client.get(f"{url}?foo=bar&mtm_foo=truc&mtm_bar=bidule&city=paris")
     assert response.status_code == 200
     assert response.context["siae"] == siae
-    assert response.context["matomo_custom_url"] == "siae/<int:siae_id>/card?mtm_bar=bidule&mtm_foo=truc"
+    assert response.context["matomo_custom_url"] == "siae/<int:siae_id>/card?city=paris&mtm_bar=bidule&mtm_foo=truc"
     assert response.context["matomo_custom_title"] == "Fiche de la structure d'insertion"
     assert response.context["matomo_user_id"] == user.pk
     str_content = response.content.decode("utf-8")
     assert f"window._paq.push(['setUserId', '{user.pk}']);" in str_content
     assert (
         "window._paq.push(['setCustomUrl', "
-        "new URL('siae/&lt;int:siae_id&gt;/card?mtm_bar=bidule&amp;mtm_foo=truc', "
+        "new URL('siae/&lt;int:siae_id&gt;/card?city=paris&mtm_bar=bidule&amp;mtm_foo=truc', "
         "window.location.origin).href]);"
     ) in str_content
     assert "window._paq.push(['setDocumentTitle', 'Fiche de la structure d&#x27;insertion']);" in str_content
