@@ -21,7 +21,7 @@ HELP_TEXT = """
 """
 
 
-def organization_merge_into(from_id, to_id, dry_run=False):
+def organization_merge_into(from_id, to_id, *, wet_run):
     if from_id == to_id:
         logger.error("Unable to use the same organization as source and destination (ID %s)", from_id)
         return
@@ -74,16 +74,15 @@ def organization_merge_into(from_id, to_id, dry_run=False):
         to_organization.name,
     )
 
-    if dry_run:
+    if wet_run:
+        with transaction.atomic():
+            job_applications.update(sender_prescriber_organization_id=to_id)
+            members.update(organization_id=to_id)
+            diagnoses.update(author_prescriber_organization_id=to_id)
+            invitations.update(organization_id=to_id)
+            from_organization.delete()
+    else:
         logger.info("Nothing to do in dry run mode.")
-        return
-
-    with transaction.atomic():
-        job_applications.update(sender_prescriber_organization_id=to_id)
-        members.update(organization_id=to_id)
-        diagnoses.update(author_prescriber_organization_id=to_id)
-        invitations.update(organization_id=to_id)
-        from_organization.delete()
 
 
 class Command(BaseCommand):
@@ -106,7 +105,7 @@ class Command(BaseCommand):
             help="ID of the prescriber organization to keep.",
             required=True,
         )
-        parser.add_argument("--dry-run", action=argparse.BooleanOptionalAction, default=False)
+        parser.add_argument("--wet-run", action=argparse.BooleanOptionalAction, default=False)
 
-    def handle(self, from_id, to_id, *, dry_run, **options):
-        organization_merge_into(from_id, to_id, dry_run)
+    def handle(self, from_id, to_id, *, wet_run, **options):
+        organization_merge_into(from_id, to_id, wet_run)

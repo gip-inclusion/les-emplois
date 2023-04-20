@@ -198,7 +198,7 @@ class PrescriberOrganizationModelTest(TestCase):
         count_job_applications = job_applications_models.JobApplication.objects.count()
         assert PrescriberOrganization.objects.count() == 2
         assert count_job_applications == 2
-        organization_merge_into(organization_1.id, organization_2.id)
+        organization_merge_into(organization_1.id, organization_2.id, wet_run=True)
         assert count_job_applications == job_applications_models.JobApplication.objects.count()
         assert PrescriberOrganization.objects.count() == 1
 
