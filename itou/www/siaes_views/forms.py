@@ -271,7 +271,7 @@ class EditJobDescriptionForm(forms.ModelForm):
                 self.fields["location_code"].initial = self.instance.location.slug
 
             if self.instance.contract_type != ContractType.OTHER:
-                self.fields["other_contract_type"].widget.attrs.update({"disabled": "true"})
+                self.fields["other_contract_type"].widget.attrs.update({"disabled": "disabled"})
 
         # Pass SIAE id in autocomplete call
         self.fields["job_appellation"].widget.attrs.update(
