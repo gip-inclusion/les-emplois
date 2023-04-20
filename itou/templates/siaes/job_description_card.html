@@ -17,7 +17,7 @@
             {% if can_update_job_description %}
                 <div class="row mb-4">
                     <div class="col">
-                        <a href="{% url "siaes_views:update_job_description" job_description_id=job.pk %}" class="btn btn-sm btn-outline-primary" arial-label="Modifier la fiche de poste">
+                        <a href="{% url "siaes_views:update_job_description" job_description_id=job.pk %}" class="btn btn-sm btn-outline-primary" aria-label="Modifier la fiche de poste">
                             Modifier
                         </a>
                     </div>
