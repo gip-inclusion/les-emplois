@@ -1395,9 +1395,20 @@ class UpdateJobSeekerStepEndView(UpdateJobSeekerBaseView):
 def check_infos_for_hire(request, siae_pk, job_seeker_pk):
     siae = get_object_or_404(Siae, pk=siae_pk)
     job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), pk=job_seeker_pk)
+    geiq_eligibility_diagnosis = None
+    eligibility_diagnosis = None
+    if siae.kind == SiaeKind.GEIQ:
+        geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(job_seeker, siae).first()
+    else:
+        # General IAE eligibility case
+        eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(job_seeker, for_siae=siae)
     context = {
         "siae": siae,
         "job_seeker": job_seeker,
         "breadcrumbs": {"Déclarer une embauche": ""},
+        "eligibility_diagnosis": eligibility_diagnosis,
+        "is_subject_to_eligibility_rules": siae.is_subject_to_eligibility_rules,
+        "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
+        "is_subject_to_geiq_eligibility_rules": siae.kind == SiaeKind.GEIQ,
     }
     return render(request, "apply/hire/check_infos.html", context)
