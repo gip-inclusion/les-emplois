@@ -1269,8 +1269,11 @@ def test_matomo_context_processor(client, settings, snapshot):
     client.force_login(user)
 
     # check that we don't crash when the route is not resolved
-    response = client.get("/doesnotexist")
+    response = client.get("/doesnotexist?token=blah&mtm_foo=truc")
     assert response.status_code == 404
+    assert response.context["matomo_custom_url"] == "/doesnotexist?mtm_foo=truc"
+    script_content = parse_response_to_soup(response, selector="#matomo-custom-init")
+    assert str(script_content) == snapshot(name="matomo custom init 404")
 
     # canonical case
     url = reverse("siaes_views:card", kwargs={"siae_id": siae.pk})
@@ -1281,7 +1284,7 @@ def test_matomo_context_processor(client, settings, snapshot):
     assert response.context["matomo_custom_title"] == "Fiche de la structure d'insertion"
     assert response.context["matomo_user_id"] == user.pk
     script_content = parse_response_to_soup(response, selector="#matomo-custom-init")
-    assert str(script_content) == snapshot(name="matomo custom init")
+    assert str(script_content) == snapshot(name="matomo custom init siae card")
 
 
 @pytest.mark.parametrize("state", [s[0] for s in JobApplicationWorkflow.STATE_CHOICES])
