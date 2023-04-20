@@ -52,14 +52,14 @@
             {% if siae.description %}
                 <div class="my-3 my-lg-5">
                     <h3>Son activité</h3>
-                    <p>{{ form_data.description | linebreaks }}</p>
+                    {{ form_data.description | linebreaks }}
                 </div>
             {% endif %}
 
             {% if siae.provided_support %}
                 <div class="my-3 my-lg-5">
                     <h3>L'accompagnement proposé</h3>
-                    <p>{{ form_data.provided_support | linebreaks }}</p>
+                    {{ form_data.provided_support | linebreaks }}
                 </div>
             {% endif %}
 
