@@ -11,3 +11,4 @@ Indiquer le problème que nous sommes en train de résoudre et les objectifs mé
 Attirer l'attention sur les décisions d'architecture ou de conception importantes.
 
 ### Captures d'écran <!-- optionnel -->
+
