@@ -26,14 +26,14 @@
 
 {% if siae.is_opcs %}
     <h3>Contexte du marché</h3>
-    <p class="mb-4">{{ job.market_context_description|linebreaks }}</p>
+    <div class="mb-4">{{ job.market_context_description|linebreaks }}</div>
 {% endif %}
 
 <h3>Description du poste</h3>
-{% if job.description %}<p class="mb-4">{{ job.description|linebreaks }}</p>{% endif %}
+{% if job.description %}<div class="mb-4">{{ job.description|linebreaks }}</div>{% endif %}
 
 <h3>Profil recherché et prérequis</h3>
-{% if job.profile_description %}<p class="mb-4">{{ job.profile_description|linebreaks }}</p>{% endif %}
+{% if job.profile_description %}<div class="mb-4">{{ job.profile_description|linebreaks }}</div>{% endif %}
 
 {% if job.is_resume_mandatory %}
     <div class="alert alert-warning mb-4">
