@@ -36,6 +36,22 @@
 {% endblock %}
 
 {% block post_content %}
+
+    {% if tally_embed_form_id %}
+        <section class="s-section mt-0 pt-0">
+            <div class="s-section__container container">
+                <iframe data-tally-src="https://tally.so/embed/{{ tally_embed_form_id }}?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1"
+                        loading="lazy"
+                        width="100%"
+                        height="189"
+                        frameborder="0"
+                        marginheight="0"
+                        marginwidth="0"
+                        title="Aidez-nous à améliorer votre outil !">
+                </iframe>
+            </div>
+        </section>
+    {% endif %}
     <section class="s-section mt-0 pt-0">
         <div class="s-section__container container">
             <div class="s-section__row row row-cols-1 row-cols-md-2 row-cols-lg-3">
@@ -136,17 +152,19 @@
         });
     </script>
 
-    {% if tally_form_id %}
+    {% if tally_popup_form_id or tally_embed_form_id %}
         {# Do not use `async` here otherwise the Tally popup will randomly fail to load. #}
         <script src="https://tally.so/widgets/embed.js"></script>
+    {% endif %}
 
+    {% if tally_popup_form_id %}
         {# `defer` ensures the script runs *after* embed.js above has been loaded. #}
         <script defer nonce="{{ CSP_NONCE }}">
 
             // Any given Tally popup will not be shown more than once every `minDaysBetweenDisplays` days.
             const minDaysBetweenDisplays = 14;
             const delayBeforeShowingPopupInSeconds = 45;
-            const formId = '{{ tally_form_id }}';
+            const formId = '{{ tally_popup_form_id }}';
             const key = 'statsTallyPopupLastShown-' + formId;
             const todaysDate = new Date();
 

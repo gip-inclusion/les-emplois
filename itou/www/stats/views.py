@@ -107,14 +107,17 @@ def render_stats(request, context, params=None, template_name="stats/stats.html"
         params = {}
     view_name = get_view_name(request)
     metabase_dashboard = METABASE_DASHBOARDS.get(view_name)
-    tally_form_id = None
+    tally_popup_form_id = None
+    tally_embed_form_id = None
     if settings.TALLY_URL and metabase_dashboard:
-        tally_form_id = metabase_dashboard.get("tally_form_id")
+        tally_popup_form_id = metabase_dashboard.get("tally_popup_form_id")
+        tally_embed_form_id = metabase_dashboard.get("tally_embed_form_id")
 
     base_context = {
         "iframeurl": metabase_embedded_url(request=request, params=params),
         "stats_base_url": settings.METABASE_SITE_URL,
-        "tally_form_id": tally_form_id,
+        "tally_popup_form_id": tally_popup_form_id,
+        "tally_embed_form_id": tally_embed_form_id,
     }
 
     # Key value pairs in context override preexisting pairs in base_context.
