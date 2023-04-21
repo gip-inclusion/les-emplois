@@ -182,8 +182,11 @@ class ApplyStepForSenderBaseView(ApplyStepBaseView):
     def __init__(self):
         super().__init__()
         self.sender = None
+        self.process = None
 
     def setup(self, request, *args, **kwargs):
+        if process := kwargs.pop("process", None):
+            self.process = process
         super().setup(request, *args, **kwargs)
         self.sender = request.user
 
@@ -191,6 +194,14 @@ class ApplyStepForSenderBaseView(ApplyStepBaseView):
         if self.sender.kind not in [UserKind.PRESCRIBER, UserKind.SIAE_STAFF]:
             return HttpResponseRedirect(reverse("apply:start", kwargs={"siae_pk": self.siae.pk}))
         return super().dispatch(request, *args, **kwargs)
+
+    def redirect_to_check_infos(self, job_seeker_pk):
+        return HttpResponseRedirect(
+            reverse(
+                "apply:check_infos_for_hire" if self.process == "hire" else "apply:step_check_job_seeker_info",
+                kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": job_seeker_pk},
+            )
+        )
 
 
 class StartView(ApplyStepBaseView):
@@ -296,11 +307,8 @@ class CheckNIRForSenderView(ApplyStepForSenderBaseView):
     def __init__(self):
         super().__init__()
         self.form = None
-        self.process = None
 
     def setup(self, request, *args, **kwargs):
-        if process := kwargs.pop("process", None):
-            self.process = process
         super().setup(request, *args, **kwargs)
         self.form = CheckJobSeekerNirForm(job_seeker=None, data=request.POST or None)
 
@@ -309,14 +317,6 @@ class CheckNIRForSenderView(ApplyStepForSenderBaseView):
             reverse(
                 "apply:search_by_email_for_hire" if self.process == "hire" else "apply:search_by_email_for_sender",
                 kwargs={"siae_pk": self.siae.pk, "session_uuid": session_uuid},
-            )
-        )
-
-    def redirect_to_check_infos(self, job_seeker_pk):
-        return HttpResponseRedirect(
-            reverse(
-                "apply:check_infos_for_hire" if self.process == "hire" else "apply:step_check_job_seeker_info",
-                kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": job_seeker_pk},
             )
         )
 
@@ -369,6 +369,7 @@ class SearchByEmailForSenderView(ApplyStepForSenderBaseView):
     def __init__(self):
         super().__init__()
         self.form = None
+        self.process = None
 
     def setup(self, request, *args, **kwargs):
         self.job_seeker_session = SessionNamespace(request.session, kwargs["session_uuid"])
@@ -405,12 +406,7 @@ class SearchByEmailForSenderView(ApplyStepForSenderBaseView):
             if self.form.data.get("confirm"):
 
                 if not can_add_nir:
-                    return HttpResponseRedirect(
-                        reverse(
-                            "apply:step_check_job_seeker_info",
-                            kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": job_seeker.pk},
-                        )
-                    )
+                    return self.redirect_to_check_infos(job_seeker.pk)
 
                 try:
                     job_seeker.nir = nir
@@ -426,12 +422,7 @@ class SearchByEmailForSenderView(ApplyStepForSenderBaseView):
                     messages.warning(request, msg)
                     logger.exception("step_job_seeker: error when saving job_seeker=%s nir=%s", job_seeker, nir)
                 else:
-                    return HttpResponseRedirect(
-                        reverse(
-                            "apply:step_check_job_seeker_info",
-                            kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": job_seeker.pk},
-                        )
-                    )
+                    return self.redirect_to_check_infos(job_seeker.pk)
 
         return self.render_to_response(
             self.get_context_data(**kwargs)
@@ -448,6 +439,11 @@ class SearchByEmailForSenderView(ApplyStepForSenderBaseView):
             "form": self.form,
             "nir": self.job_seeker_session.get("user", {}).get("nir"),
             "siae": self.siae,
+            "back_url": (
+                reverse("apply:check_nir_for_hire", kwargs={"siae_pk": self.siae.pk})
+                if self.process == "hire"
+                else reverse("apply:check_nir_for_sender", kwargs={"siae_pk": self.siae.pk})
+            ),
         }
 
 
@@ -1402,9 +1398,15 @@ def check_infos_for_hire(request, siae_pk, job_seeker_pk):
     else:
         # General IAE eligibility case
         eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(job_seeker, for_siae=siae)
+
+    if not job_seeker.has_jobseeker_profile:
+        profile = JobSeekerProfile(user=job_seeker)
+    else:
+        profile = job_seeker.jobseeker_profile
     context = {
         "siae": siae,
         "job_seeker": job_seeker,
+        "profile": profile,
         "breadcrumbs": {"Déclarer une embauche": ""},
         "eligibility_diagnosis": eligibility_diagnosis,
         "is_subject_to_eligibility_rules": siae.is_subject_to_eligibility_rules,

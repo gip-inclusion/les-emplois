@@ -23,18 +23,13 @@
         <div class="col-12">
             <div class="c-form">
 
-                <h2>État civil</h2>
                 <a class="btn btn-link" href="{% url "apply:update_job_seeker_step_1" siae_pk=siae.pk job_seeker_pk=job_seeker.pk %}">Mettre à jour</a>
 
-
-                <h2>Domiciliation</h2>
-                <h2>Situation du candidat</h2>
-                Regarder la page de récap de update_job_seeker_step_end pour récupérer
-
+                {% include "apply/includes/profile_infos.html" %}
 
                 {% buttons %}
                     <div class="text-right">
-                        <a class="btn btn-link" href="{{ back_url }}">Retour</a>
+                        <a class="btn btn-link" href="{% url 'apply:check_nir_for_hire' siae_pk=siae.pk %}">Annuler</a>
                         <a class="btn btn-primary" href="{{ next_url }}">Suivant</a>
                     </div>
                 {% endbuttons %}
