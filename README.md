@@ -132,6 +132,37 @@ Si les changements paraissent corrects, ils peuvent être ajoutés à `git` et
 
 Voir notre [documentation interne](https://team.inclusion.beta.gouv.fr/les-procedures/recette-test).
 
+## Lancer les tests
+
+Le projet utilise [pytest](https://docs.pytest.org/).
+
+Lancer la suite complète, comme sur la CI :
+```sh
+make test
+```
+
+Lancer un test en particulier :
+```sh
+pytest itou/utils/tests.py::JSONTest::test_encoder
+```
+
+### MacOS
+
+Les Mac utilisant l’architecture M1 ont besoin d’émuler le jeu d’instructions
+`amd64`, ce qui rend l’exécution de la suite de test plus longue et peut
+rapidement rencontrer les sécurités (_timeout_) configurées.
+
+Pour éviter ces erreurs,
+[pytest-timeout](https://github.com/pytest-dev/pytest-timeout#usage) propose
+deux options :
+
+1. Définir la variable d’environnement `PYTEST_TIMEOUT`, par exemple à une
+   valeur de `60` secondes.
+2. Utiliser `--timeout` lors de l’invocation de `pytest` :
+    ```sh
+    pytest --timeout 60
+    ```
+
 ## Front-end
 
 - https://getbootstrap.com/docs/4.3/getting-started/introduction/
