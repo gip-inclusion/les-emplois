@@ -17,7 +17,7 @@
 
         {% include "approvals/includes/card.html" with common_approval=approval %}
         <div class="c-form">
-            <form method="post" action="" class="js-prevent-multiple-submit">
+            <form method="post" class="js-prevent-multiple-submit">
 
                 {% csrf_token %}
 
@@ -62,7 +62,7 @@
         {# Preview mode: ask for confirmation before committing to DB. #}
 
         <div class="c-form">
-            <form method="post" action="" class="js-prevent-multiple-submit">
+            <form method="post" class="js-prevent-multiple-submit">
 
                 {% csrf_token %}
 
