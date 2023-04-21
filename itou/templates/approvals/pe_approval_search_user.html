@@ -14,7 +14,7 @@
 
         {% bootstrap_form form alert_error_type="all" %}
 
-        <p>{% include "signup/includes/no_email_link.html" with link_text="Le candidat n'a pas d'e-mail ?" %}</p>
+        <div>{% include "signup/includes/no_email_link.html" with link_text="Le candidat n'a pas d'e-mail ?" %}</div>
 
         {% buttons %}
             <button type="submit" class="btn btn-primary">Continuer</button>
