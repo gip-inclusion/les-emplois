@@ -126,6 +126,11 @@ urlpatterns = [
                     submit_views.check_infos_for_hire,
                     name="check_infos_for_hire",
                 ),
+                path(
+                    "<int:job_seeker_pk>/check_prev_applications",
+                    submit_views.check_prev_applications_for_hire,
+                    name="check_prev_applications_for_hire",
+                ),
             ]
         ),
     ),

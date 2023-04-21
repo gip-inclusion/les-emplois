@@ -1,0 +1,34 @@
+{% extends "layout/content_small.html" %}
+{% load bootstrap4 %}
+
+{% block title %}Déclarer une embauche {{ block.super }}{% endblock %}
+
+{% block breadcrumbs %}
+    {% include "layout/breadcrumbs_from_dashboard.html" %}
+{% endblock %}
+
+{% block content %}
+
+    <h1>Déclarer l'embauche de {{ job_seeker.get_full_name }}</h1>
+
+    {% include "approvals/includes/card.html" with common_approval=job_seeker.latest_common_approval %}
+
+    <div class="alert alert-warning" role="status">
+
+        {% with prev_application.created_at|date:"d F Y à H:i" as prev_created_at %}
+            <p class="mb-0">
+                Le candidat a déjà postulé chez cet employeur le <b>{{ prev_created_at }}</b>
+            </p>
+        {% endwith %}
+
+        <form method="post" class="js-prevent-multiple-submit">
+            {% csrf_token %}
+            <input type="hidden" name="force_new_application" value="force">
+            {% buttons %}
+                <a class="btn btn-outline-primary" href="{% url 'home:hp' %}">Annuler</a>
+                <button type="submit" class="btn btn-primary">Postuler à nouveau</button>
+            {% endbuttons %}
+        </form>
+    </div>
+
+{% endblock %}

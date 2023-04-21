@@ -1414,3 +1414,24 @@ def check_infos_for_hire(request, siae_pk, job_seeker_pk):
         "is_subject_to_geiq_eligibility_rules": siae.kind == SiaeKind.GEIQ,
     }
     return render(request, "apply/hire/check_infos.html", context)
+
+
+@login_required
+@user_passes_test(lambda u: u.is_siae_staff, login_url="/", redirect_field_name=None)
+def check_prev_applications_for_hire(request, siae_pk, job_seeker_pk):
+    siae = get_object_or_404(Siae, pk=siae_pk)
+    job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), pk=job_seeker_pk)
+    previous_applications = job_seeker.job_applications.filter(to_siae=siae)
+    if not previous_applications.exists():
+        return HttpResponseRedirect(reverse("apply:application_jobs", kwargs={"siae_pk": siae.pk}))
+    if request.POST.get("force_new_application") == "force":
+        return HttpResponseRedirect(reverse("apply:application_jobs", kwargs={"siae_pk": siae.pk}))
+    return render(
+        request,
+        "apply/hire/check_prev_applications.html",
+        {
+            "siae": siae,
+            "job_seeker": job_seeker,
+            "prev_application": previous_applications.latest("created_at"),
+        },
+    )

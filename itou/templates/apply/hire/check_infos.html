@@ -30,7 +30,7 @@
                 {% buttons %}
                     <div class="text-right">
                         <a class="btn btn-link" href="{% url 'apply:check_nir_for_hire' siae_pk=siae.pk %}">Annuler</a>
-                        <a class="btn btn-primary" href="{{ next_url }}">Suivant</a>
+                        <a class="btn btn-primary" href="{% url 'apply:check_prev_applications_for_hire' siae_pk=siae.pk job_seeker_pk=job_seeker.pk %}">Suivant</a>
                     </div>
                 {% endbuttons %}
             </div>
