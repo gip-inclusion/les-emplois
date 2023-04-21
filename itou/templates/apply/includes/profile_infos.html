@@ -1,0 +1,94 @@
+{% load format_filters %}
+
+<h2>État civil</h2>
+<ul class="list-unstyled">
+    <li class="mb-3">
+        <b>{{ profile.user.get_title_display }} {{ profile.user.get_full_name }}</b>
+    </li>
+    <li class="mb-3">
+        Numéro de sécurité sociale : 
+        {% if profile.user.nir %}
+            <b>{{ profile.user.nir|format_nir }}</b>
+        {% elif profile.user.lack_of_nir_reason %}
+            <b>{{ profile.user.get_lack_of_nir_reason_display }}</b>
+        {% else %}
+            <span>Non renseigné</span>
+        {% endif %}
+    </li>
+    <li class="mb-3">
+        Date de naissance : <b>le {{ profile.user.birthdate }}</b>
+    </li>
+</ul>
+<hr class="my-4">
+
+<h2>Coordonnées</h2>
+<ul class="list-unstyled">
+    <li class="mb-3">
+        <b>{{ profile.user.address_on_one_line }}</b>
+    </li>
+    {% if profile.user.phone %}
+        <li class="mb-3">
+            Téléphone : <b>{{ profile.user.phone|format_phone }}</b>
+        </li>
+    {% endif %}
+</ul>
+<hr class="my-4">
+
+<h2>Situation</h2>
+<ul class="list-unstyled">
+    <li class="mb-3">
+        Niveau de formation : <b>{{ profile.get_education_level_display }}</b>
+    </li>
+    {% if profile.resourceless %}
+        <li class="mb-3">
+            <b>Sans ressources</b>
+        </li>
+    {% endif %}
+    {% if profile.pole_emploi_since %}
+        <li class="mb-3">
+            Inscrit à Pôle emploi depuis : <b>{{ profile.get_pole_emploi_since_display|lower }}</b>
+        </li>
+    {% endif %}
+    {% if profile.user.pole_emploi_id or profile.user.lack_of_pole_emploi_id_reason %}
+        <li class="mb-3">
+            Identifiant Pôle emploi :
+            <b>
+                {% if profile.user.pole_emploi_id %}
+                    {{ profile.user.pole_emploi_id }}
+                {% else %}
+                    {{ profile.user.get_lack_of_pole_emploi_id_reason_display }}
+                {% endif %}
+            </b>
+        </li>
+    {% endif %}
+    {% if profile.unemployed_since %}
+        <li class="mb-3">
+            Sans emploi depuis : <b>{{ profile.get_unemployed_since_display|lower }}</b>
+        </li>
+    {% endif %}
+    {% if profile.rqth_employee %}
+        <li class="mb-3">
+            <b>Titulaire de la RQTH</b>
+        </li>
+    {% endif %}
+    {% if profile.oeth_employee %}
+        <li class="mb-3">
+            <b>Bénéficiaire de la loi handicap (OETH)</b>
+        </li>
+    {% endif %}
+    {% if profile.rsa_allocation_since %}
+        <li class="mb-3">
+            {{ profile.get_has_rsa_allocation_display }} depuis : <b>{{ profile.get_rsa_allocation_since_display|lower }}</b>
+        </li>
+    {% endif %}
+    {% if profile.ass_allocation_since %}
+        <li class="mb-3">
+            Bénéficiaire de l'ASS depuis : <b>{{ profile.get_ass_allocation_since_display|lower }}</b>
+        </li>
+    {% endif %}
+    {% if profile.aah_allocation_since %}
+        <li class="mb-3">
+            Bénéficiaire de l'AAH depuis : <b>{{ profile.get_aah_allocation_since_display|lower }}</b>
+        </li>
+    {% endif %}
+</ul>
