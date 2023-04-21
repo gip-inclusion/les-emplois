@@ -13,7 +13,7 @@
 
     {% block htmx %}
         <div class="c-form" id="formTarget">
-            <form method="post" hx-post="{{ request.path }}" hx-swap="outerHTML show:#acceptForm:top" hx-target="#formTarget" class="js-format-nir" id="acceptForm" aria-labelledby="dialogLabel">
+            <form method="post" hx-post="{{ request.path }}" hx-swap="outerHTML show:#acceptForm:top" hx-target="#formTarget" class="js-format-nir" id="acceptForm">
                 {% if has_form_error %}
                     <div class="alert alert-danger">
                         <p class="mb-0">Merci de corriger les erreurs ci-dessous</p>
