@@ -1,0 +1,40 @@
+{% extends "layout/content_small.html" %}
+{% load bootstrap4 %}
+
+{% block title %}Déclarer une embauche {{ block.super }}{% endblock %}
+
+{% block breadcrumbs %}
+    {% include "layout/breadcrumbs_from_dashboard.html" %}
+{% endblock %}
+
+{% block content %}
+
+    <div class="d-flex flex-column flex-md-row align-items-center">
+        <h1 class="my-5 flex-grow-1">
+            Déclarer l'embauche de <span class="text-muted">{{ job_seeker.get_full_name|title }}</span>
+        </h1>
+        {% include 'apply/includes/eligibility_badge.html' %}
+    </div>
+
+    {% include "approvals/includes/card.html" with common_approval=job_seeker.latest_common_approval %}
+
+
+    <h2>Candidat</h2>
+
+    <h3>Informations personnelles</h3>
+    TODO: reprendre la section correspondante de itou/templates/apply/includes/job_seeker_info.html
+    Potentiellement en prenant un job_seeker et un job_application pour pouvoir être utilisé sans job_application
+    ou en faisant un sous-include/template avec juste les infos du job_seeker
+
+
+
+    <form method="post" class="js-prevent-multiple-submit">
+        {% csrf_token %}
+        <input type="hidden" name="force_new_application" value="force">
+        {% buttons %}
+            <a class="btn btn-outline-primary" href="{% url 'home:hp' %}">Annuler</a>
+            <button type="submit" class="btn btn-primary">Postuler à nouveau</button>
+        {% endbuttons %}
+    </form>
+
+{% endblock %}

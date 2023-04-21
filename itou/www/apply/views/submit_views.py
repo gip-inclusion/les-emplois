@@ -1422,10 +1422,10 @@ def check_prev_applications_for_hire(request, siae_pk, job_seeker_pk):
     siae = get_object_or_404(Siae, pk=siae_pk)
     job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), pk=job_seeker_pk)
     previous_applications = job_seeker.job_applications.filter(to_siae=siae)
-    if not previous_applications.exists():
-        return HttpResponseRedirect(reverse("apply:application_jobs", kwargs={"siae_pk": siae.pk}))
-    if request.POST.get("force_new_application") == "force":
-        return HttpResponseRedirect(reverse("apply:application_jobs", kwargs={"siae_pk": siae.pk}))
+    if not previous_applications.exists() or request.POST.get("force_new_application") == "force":
+        return HttpResponseRedirect(
+            reverse("apply:hire_infos", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk})
+        )
     return render(
         request,
         "apply/hire/check_prev_applications.html",
@@ -1433,5 +1433,20 @@ def check_prev_applications_for_hire(request, siae_pk, job_seeker_pk):
             "siae": siae,
             "job_seeker": job_seeker,
             "prev_application": previous_applications.latest("created_at"),
+        },
+    )
+
+
+@login_required
+@user_passes_test(lambda u: u.is_siae_staff, login_url="/", redirect_field_name=None)
+def hire_infos(request, siae_pk, job_seeker_pk):
+    siae = get_object_or_404(Siae, pk=siae_pk)
+    job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), pk=job_seeker_pk)
+    return render(
+        request,
+        "apply/hire/infos.html",
+        {
+            "siae": siae,
+            "job_seeker": job_seeker,
         },
     )
