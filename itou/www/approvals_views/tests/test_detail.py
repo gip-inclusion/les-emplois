@@ -188,8 +188,6 @@ class TestApprovalDetailView:
             + 1  # template: approval.remainder fetches approval suspensions to compute remaining days
             + 1  # template: approval.suspensions_for_status_card lists approval suspensions
             + 1  # template: approval.prolongations_for_status_card
-            # template: apply/includes/job_seeker_info.html
-            + 1  # get job_seeker information (job_application.job_seeker)
             # template: eligibility_diagnosis.html
             + 1  # prescribers_prescriberorganization (job_application.is_sent_by_authorized_prescriber)
             + 1  # get user infos (eligibility_diagnosis.author.get_full_name)

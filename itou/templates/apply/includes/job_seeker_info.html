@@ -2,33 +2,33 @@
 {% load str_filters %}
 <ul>
     <li>
-        Prénom : <b>{{ job_application.job_seeker.first_name|mask_unless:can_view_personal_information }}</b>
+        Prénom : <b>{{ job_seeker.first_name|mask_unless:can_view_personal_information }}</b>
     </li>
     <li>
-        Nom : <b>{{ job_application.job_seeker.last_name|mask_unless:can_view_personal_information }}</b>
+        Nom : <b>{{ job_seeker.last_name|mask_unless:can_view_personal_information }}</b>
     </li>
     <li>
         Numéro de sécurité sociale : 
-        {% if job_application.job_seeker.nir %}
-            <b>{{ job_application.job_seeker.nir|format_nir }}</b>
-        {% elif job_application.job_seeker.lack_of_nir_reason %}
-            <b>{{ job_application.job_seeker.get_lack_of_nir_reason_display }}</b>
+        {% if job_seeker.nir %}
+            <b>{{ job_seeker.nir|format_nir }}</b>
+        {% elif job_seeker.lack_of_nir_reason %}
+            <b>{{ job_seeker.get_lack_of_nir_reason_display }}</b>
         {% else %}
             <span>Non renseigné</span>
         {% endif %}
     </li>
     {% if can_view_personal_information %}
         <li>
-            Date de naissance : <b>{{ job_application.job_seeker.birthdate|date:"d/m/Y" }}</b>
+            Date de naissance : <b>{{ job_seeker.birthdate|date:"d/m/Y" }}</b>
         </li>
         <li>
-            E-mail : <a href="mailto:{{ job_application.job_seeker.email }}">{{ job_application.job_seeker.email }}</a>
+            E-mail : <a href="mailto:{{ job_seeker.email }}">{{ job_seeker.email }}</a>
         </li>
 
         <li>
             Téléphone : 
-            {% if job_application.job_seeker.phone %}
-                <a href="tel:{{ job_application.job_seeker.phone|cut:" " }}">{{ job_application.job_seeker.phone|format_phone }}</a>
+            {% if job_seeker.phone %}
+                <a href="tel:{{ job_seeker.phone|cut:" " }}">{{ job_seeker.phone|format_phone }}</a>
             {% else %}
                 <span>Non renseigné</span>
             {% endif %}
@@ -36,8 +36,8 @@
 
         <li>
             Adresse : 
-            {% if job_application.job_seeker.address_on_one_line %}
-                <b>{{ job_application.job_seeker.address_on_one_line }}</b>
+            {% if job_seeker.address_on_one_line %}
+                <b>{{ job_seeker.address_on_one_line }}</b>
             {% else %}
                 <span>Non renseignée</span>
             {% endif %}
@@ -45,8 +45,8 @@
 
         <li>
             Identifiant Pôle emploi : 
-            {% if job_application.job_seeker.pole_emploi_id %}
-                <b>{{ job_application.job_seeker.pole_emploi_id }}</b>
+            {% if job_seeker.pole_emploi_id %}
+                <b>{{ job_seeker.pole_emploi_id }}</b>
             {% else %}
                 <span>Non renseigné</span>
             {% endif %}
@@ -63,10 +63,10 @@
     {% endif %}
 </ul>
 <p>
-    <a href="{% if can_edit_personal_information %}{% url 'dashboard:edit_job_seeker_info' job_seeker_pk=job_application.job_seeker_id %}?back_url={{ request.get_full_path|urlencode }}&from_application={{ job_application.pk }}{% endif %}"
+    <a href="{% if can_edit_personal_information %}{% url 'dashboard:edit_job_seeker_info' job_seeker_pk=job_seeker.pk %}?back_url={{ request.get_full_path|urlencode }}{% if job_application %}&from_application={{ job_application.pk }}{% endif %}{% endif %}"
        class="btn btn-outline-primary{% if with_matomo_event %} matomo-event{% endif %}{% if not can_edit_personal_information %} disabled{% endif %}"
        {% if with_matomo_event %}data-matomo-category="salaries" data-matomo-action="clic" data-matomo-option="modfifier-les-informations-personnelles"{% endif %}
-       aria-label="Modifier les informations personnelles de {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}">
+       aria-label="Modifier les informations personnelles de {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}">
         Modifier les informations personnelles
     </a>
     {% if not can_edit_personal_information %}
