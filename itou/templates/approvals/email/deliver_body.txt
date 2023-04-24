@@ -5,7 +5,7 @@
 Merci d'avoir confirmé l'embauche d'un candidat sur les emplois de l'inclusion. Vous trouverez ci-dessous votre PASS IAE (il équivaut à l'agrément Pôle emploi conformément aux articles L 5132-1 à L 5132-17 du code du travail) :
 
 PASS IAE N° : {{ job_application.approval.number_with_spaces }}
-Valide du {{ job_application.approval.start_at|date:"d/m/Y" }} au {{ job_application.approval.end_at|date:"d/m/Y" }}
+Nombre de jours restants sur le PASS IAE débutant le {{ job_application.approval.start_at|date:"d/m/Y" }} : {{ job_application.approval.remainder.days }} jours*.
 
 Délivré pour l'embauche de :
 Nom : {{ job_application.approval.user.last_name }}
@@ -23,14 +23,16 @@ Au sein de la structure :
 {{ job_application.to_siae.address_line_2 }}{% endif %}
 {{ job_application.to_siae.post_code }} {{ job_application.to_siae.city }}
 
-Pour le compte de Pôle emploi,
-
 Votre contact : {{ itou_assistance_url }}
 
 Afin de nous aider à évaluer la performance de notre service, accepteriez-vous de répondre à quelques questions ?
 Prenez 30 secondes pour nous donner votre avis ! Cliquez sur : {{ siae_survey_link }}
 
 Merci de votre participation et à très bientôt sur les emplois de l'inclusion !
+
+
+* Le reliquat est calculé sur la base d’un nombre de jours calendaires : il décroit donc tous les jours
+(samedi, dimanche et jours fériés compris).
 {% else %}
 Merci d'avoir confirmé l'embauche d'un candidat sur les emplois de l'inclusion.
 
