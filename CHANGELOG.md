@@ -1,5 +1,23 @@
 # Journal des modifications
 
+## [61] - 2023-04-24
+
+### Ajouté
+
+- GEIQ : Ouverture du parcours auto-prescription
+
+### Modifié
+
+- API : Correction de multiples erreurs dans la documentation du schéma
+- Améliorations diverses de HTML (meilleure accessibilité et correction de défauts de rendu)
+- Candidatures : Affichage des critères administratifs du diagnostic d’éligibilité sur les cartes
+- Candidatures : Amélioration UI de la liste de candidatures
+- Candidatures : Indication de la durée en semaines pour laquelle une candidature est restée sans réponse
+- Contrôle a posteriori : Retrait de l’option pour se désinscrire d’une campagne
+- GEIQ : Clarification du texte d’éligibilité jeunes -26 ans
+- Gestion d’organisation : Passage en lecture seule pour pôle emploi
+- Métiers et recrutement : Amélioration de l’affichage de la liste
+
 ## [60] - 2023-04-11
 
 ### Ajouté
