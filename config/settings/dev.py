@@ -87,3 +87,5 @@ METABASE_PORT = os.getenv("PGPORT", "5432")  # noqa: F405
 METABASE_USER = os.getenv("PGUSER", "postgres")  # noqa: F405o
 METABASE_PASSWORD = os.getenv("PGPASSWORD", "password")  # noqa: F405
 METABASE_DATABASE = os.getenv("PGDATABASE", "metabase")  # noqa: F405
+
+del SENTRY_DSN  # noqa: F821
