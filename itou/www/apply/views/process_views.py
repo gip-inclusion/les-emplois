@@ -338,7 +338,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
                     "<li> sa date de naissance"
                     "<li> son identifiant Pôle Emploi"
                     "<li> la référence d’un agrément Pôle Emploi ou d’un PASS IAE lui appartenant (si vous l’avez) "
-                    "<ul>"
+                    "</ul>"
                 ),
             )
             return HttpResponseClientRedirect(next_url)
