@@ -15,7 +15,7 @@
   '<span id="state_00000000-0000-0000-0000-000000000000" class="badge badge-sm badge-pill text-wrap mb-1 badge-primary">Embauché ailleurs</span>'
 # ---
 # name: test_job_application_state_badge_processing[postponed]
-  '<span id="state_00000000-0000-0000-0000-000000000000" class="badge badge-sm badge-pill text-wrap mb-1 badge-accent-03 text-primary">Candidature en liste d\'attente</span>'
+  '<span id="state_00000000-0000-0000-0000-000000000000" class="badge badge-sm badge-pill text-wrap mb-1 badge-accent-03 text-primary">Candidature en attente</span>'
 # ---
 # name: test_job_application_state_badge_processing[prior_to_hire]
   '<span id="state_00000000-0000-0000-0000-000000000000" class="badge badge-sm badge-pill text-wrap mb-1 badge-accent-02 text-primary">Action préalable à l’embauche</span>'

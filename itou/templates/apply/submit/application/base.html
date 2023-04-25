@@ -11,17 +11,32 @@
                         <h1 class="my-5 flex-grow-1">{% include 'apply/includes/_submit_title.html' %}</h1>
                         {% if is_subject_to_eligibility_rules %}
                             {% if job_seeker.has_valid_common_approval %}
-                                <span class="badge badge-base badge-pill badge-success"><i class="ri-check-fill"></i>Pass IAE valide</span>
+                                <span class="badge badge-base badge-pill badge-success-lighter text-success">
+                                    <i class="ri-pass-valid-line" aria-hidden="true"></i>
+                                    PASS IAE valide
+                                </span>
                             {% elif eligibility_diagnosis %}
-                                <span class="badge badge-base badge-pill badge-success"><i class="ri-check-fill"></i>Éligible à l’IAE</span>
+                                <span class="badge badge-base badge-pill badge-success-lighter text-success">
+                                    <i class="ri-check-line" aria-hidden="true"></i>
+                                    Éligible à l’IAE
+                                </span>
                             {% else %}
-                                <span class="badge badge-base badge-pill badge-warning"><i class="ri-error-warning-line"></i>Éligibilité IAE à valider</span>
+                                <span class="badge badge-base badge-pill badge-accent-02-lighter text-primary">
+                                    <i class="ri-error-warning-line" aria-hidden="true"></i>
+                                    Éligibilité IAE à valider
+                                </span>
                             {% endif %}
                         {% elif is_subject_to_geiq_eligibility_rules %}
                             {% if geiq_eligibility_diagnosis.eligibility_confirmed %}
-                                <span class="badge badge-base badge-pill badge-success-light"><i class="ri-check-fill"></i>Éligibilité GEIQ confirmée</span>
+                                <span class="badge badge-base badge-pill badge-success-lighter text-success">
+                                    <i class="ri-check-line" aria-hidden="true"></i>
+                                    Éligibilité GEIQ confirmée
+                                </span>
                             {% else %}
-                                <span class="badge badge-base badge-pill badge-warning-light text-warning"><i class="ri-information-line"></i>Éligibilité GEIQ non confirmée</span>
+                                <span class="badge badge-base badge-pill badge-accent-02-lighter text-primary">
+                                    <i class="ri-error-warning-line" aria-hidden="true"></i>
+                                    Éligibilité GEIQ non confirmée
+                                </span>
                             {% endif %}
                         {% endif %}
                     </div>
