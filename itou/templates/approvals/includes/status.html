@@ -62,7 +62,7 @@ Arguments:
             Reliquat : <span{% if common_approval.remainder %} class="text-success"{% endif %}>{{ common_approval.remainder.days }} jours restants</span>
             <i class="ri-information-line ri-xl"
                data-toggle="tooltip"
-               title="Le reliquat est calculé sur la base d'un nombre de jours calendaires : il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i>
+               title="Le reliquat est calculé sur la base d'un nombre de jours calendaires. Si le PASS IAE n'est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i>
         </li>
 
         {% if common_approval.is_pass_iae %}

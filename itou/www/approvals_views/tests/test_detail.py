@@ -61,6 +61,52 @@ class TestApprovalDetailView:
         assertContains(response, '<i class="ri-group-line mr-2" aria-hidden="true"></i>Prescripteur habilité', count=1)
         assertContains(response, '<i class="ri-group-line mr-2" aria-hidden="true"></i>Orienteur', count=1)
 
+    def test_approval_status_includes(self, client):
+        """
+        templates/approvals/includes/status.html
+        This template is used in approval views but also in many other places.
+        Test its content only once.
+        """
+        job_application = JobApplicationFactory(with_approval=True, sent_by_authorized_prescriber_organisation=True)
+        approval = job_application.approval
+
+        # Employer version
+        user = job_application.to_siae.members.first()
+        client.force_login(user)
+
+        url = reverse("approvals:detail", kwargs={"pk": approval.pk})
+        response = client.get(url)
+        assertContains(response, approval.start_at.strftime("%d/%m/%Y"))
+        assertContains(response, str(approval.remainder.days))
+
+        # Fixme: change calcul mode.
+        assertContains(
+            response,
+            f"PASS IAE valide jusqu’au {approval.end_at.strftime('%d/%m/%Y')}, si le contrat démarre aujourd’hui",
+        )
+
+        # Job application accepted.
+        job_application.state = JobApplicationWorkflow.STATE_ACCEPTED
+        job_application.save()
+        response = client.get(url)
+        # Fixme: change calcul mode.
+        assertContains(
+            response,
+            f"PASS IAE valide jusqu’au {approval.end_at.strftime('%d/%m/%Y')}, si le contrat démarre aujourd’hui",
+        )
+
+        # Prescriber version
+        user = job_application.sender
+        client.force_login(user)
+
+        url = reverse("approvals:detail", kwargs={"pk": approval.pk})
+        response = client.get(url)
+
+        # Suspensions! Take a snapshot.
+        # Last one first.
+
+        # Then older ones in antichronological order.
+
     def test_suspend_button(self, client):
         approval = ApprovalFactory(with_jobapplication=True)
         job_application = approval.jobapplication_set.get()
