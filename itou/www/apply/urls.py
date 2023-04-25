@@ -136,6 +136,17 @@ urlpatterns = [
                     submit_views.hire_infos,
                     name="hire_infos",
                 ),
+                path(
+                    "<int:job_seeker_pk>/eligibility",
+                    submit_views.ApplicationEligibilityView.as_view(),
+                    name="hire_eligibility",
+                    kwargs={"process": "hire"},
+                ),
+                path(
+                    "<int:job_seeker_pk>/confirm",
+                    submit_views.confirm_hire,
+                    name="confirm_hire",
+                ),
             ]
         ),
     ),

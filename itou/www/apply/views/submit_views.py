@@ -820,9 +820,12 @@ class ApplicationEligibilityView(ApplicationBaseView):
         super().__init__()
 
         self.form = None
+        self.process = None
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
+        if process := kwargs.pop("process", None):
+            self.process = process
 
         initial_data = {}
 
@@ -846,11 +849,7 @@ class ApplicationEligibilityView(ApplicationBaseView):
             self.job_seeker.has_valid_common_approval,
         ]
         if any(bypass_eligibility_conditions):
-            return HttpResponseRedirect(
-                reverse(
-                    "apply:application_resume", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk}
-                )
-            )
+            return HttpResponseRedirect(self.get_next_url())
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -861,13 +860,21 @@ class ApplicationEligibilityView(ApplicationBaseView):
                 EligibilityDiagnosis.create_diagnosis(self.job_seeker, user_info, self.form.cleaned_data)
             elif self.eligibility_diagnosis and not self.form.data.get("shrouded"):
                 EligibilityDiagnosis.update_diagnosis(self.eligibility_diagnosis, user_info, self.form.cleaned_data)
-            return HttpResponseRedirect(
-                reverse(
-                    "apply:application_resume", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk}
-                )
-            )
+            return HttpResponseRedirect(self.get_next_url())
 
         return self.render_to_response(self.get_context_data(**kwargs))
+
+    def get_back_url(self):
+        if self.process == "hire":
+            return reverse("apply:hire_infos", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk})
+        return reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk})
+
+    def get_next_url(self):
+        if self.process == "hire":
+            return reverse("apply:confirm_hire", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk})
+        return reverse(
+            "apply:application_resume", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk}
+        )
 
     def get_context_data(self, **kwargs):
         new_expires_at_if_updated = timezone.now() + relativedelta(months=EligibilityDiagnosis.EXPIRATION_DELAY_MONTHS)
@@ -877,9 +884,7 @@ class ApplicationEligibilityView(ApplicationBaseView):
             "new_expires_at_if_updated": new_expires_at_if_updated,
             "progress": 50,
             "job_seeker": self.job_seeker,
-            "back_url": reverse(
-                "apply:application_jobs", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk}
-            ),
+            "back_url": self.get_back_url(),
             "full_content_width": True,
         }
 
@@ -1442,9 +1447,27 @@ def check_prev_applications_for_hire(request, siae_pk, job_seeker_pk):
 def hire_infos(request, siae_pk, job_seeker_pk):
     siae = get_object_or_404(Siae, pk=siae_pk)
     job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), pk=job_seeker_pk)
+    apply_session = SessionNamespace(request.session, f"job_application-{siae.pk}")
+    apply_session.init({})
     return render(
         request,
         "apply/hire/infos.html",
+        {
+            "siae": siae,
+            "job_seeker": job_seeker,
+            "can_view_personal_information": request.user.can_view_personal_information(job_seeker),
+        },
+    )
+
+
+@login_required
+@user_passes_test(lambda u: u.is_siae_staff, login_url="/", redirect_field_name=None)
+def confirm_hire(request, siae_pk, job_seeker_pk):
+    siae = get_object_or_404(Siae, pk=siae_pk)
+    job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), pk=job_seeker_pk)
+    return render(
+        request,
+        "apply/hire/confirmation.html",
         {
             "siae": siae,
             "job_seeker": job_seeker,

@@ -24,8 +24,12 @@
     <h3>Informations personnelles</h3>
     {% include "apply/includes/job_seeker_info.html" with job_seeker=job_seeker %}
 
+    TODO: réutiliser le hire_infos et rajouter les critères d'éligibilité et les infos contrat$
+
+    TODO: rajouter la modale de confirmation existante
+
     {% buttons %}
-        <a class="btn btn-block btn-primary" href="{% url 'apply:hire_eligibility' job_seeker_pk=job_seeker.pk siae_pk=siae.pk %}">Valider les critères d'éligibilité</a>
+        <a class="btn btn-block btn-primary" href="">Confirmer l'embauche</a>
         <a class="btn btn-block btn-outline-primary" href="{% url 'home:hp' %}">Annuler l'embauche</a>
     {% endbuttons %}
 </form>
