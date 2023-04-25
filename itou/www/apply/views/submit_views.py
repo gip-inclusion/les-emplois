@@ -1007,6 +1007,8 @@ class ApplicationEndView(ApplyStepBaseView):
         )
 
     def post(self, request, *args, **kwargs):
+        if not self.request.user.can_edit_personal_information(self.job_application.job_seeker):
+            raise PermissionDenied("Votre utilisateur n'est pas autorisé à modifier les informations de ce candidat")
         if self.form.is_valid():
             self.form.save()
             # Redirect to the same page, so we don't have a POST method

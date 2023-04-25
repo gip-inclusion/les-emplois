@@ -17,6 +17,7 @@ from itou.eligibility.models import EligibilityDiagnosis
 from itou.geo.factories import ZRRFactory
 from itou.institutions.factories import InstitutionWithMembershipFactory
 from itou.job_applications.enums import SenderKind
+from itou.job_applications.factories import JobApplicationFactory
 from itou.job_applications.models import JobApplication
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siae_evaluations.factories import EvaluatedSiaeFactory
@@ -1846,6 +1847,32 @@ class ApplicationViewTest(S3AccessingTestCase):
         )
         assert new_eligibility_diagnosis != eligibility_diagnosis
         assert new_eligibility_diagnosis.author == prescriber
+
+
+def test_application_end_update_job_seeker(client):
+    job_application = JobApplicationFactory(job_seeker_with_address=True)
+    job_seeker = job_application.job_seeker
+    # Ensure sender cannot update job seeker infos
+    assert not job_seeker.can_edit_personal_information(job_application.sender)
+    assert job_seeker.address_line_2 == ""
+    url = reverse(
+        "apply:application_end", kwargs={"siae_pk": job_application.to_siae.pk, "application_pk": job_application.pk}
+    )
+    client.force_login(job_application.sender)
+    response = client.post(
+        url,
+        data={
+            "address_line_1": job_seeker.address_line_1,
+            "address_line_2": "something new",
+            "post_code": job_seeker.post_code,
+            "city_slug": job_seeker.city_slug,
+            "city": job_seeker.city,
+            "phone": job_seeker.phone,
+        },
+    )
+    assert response.status_code == 403
+    job_seeker.refresh_from_db()
+    assert job_seeker.address_line_2 == ""
 
 
 class LastCheckedAtViewTest(TestCase):
