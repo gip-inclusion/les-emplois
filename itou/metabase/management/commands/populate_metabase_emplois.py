@@ -312,6 +312,8 @@ class Command(BaseCommand):
             .only(
                 "pk",
                 "created_at",
+                "hiring_start_at",
+                "origin",
                 "sender_kind",
                 "sender_siae__kind",
                 "sender_prescriber_organization__kind",

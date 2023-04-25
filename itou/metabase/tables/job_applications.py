@@ -161,6 +161,15 @@ TABLE.add_columns(
             "fn": get_job_application_detailed_origin,
         },
         {
+            "name": "parcours_de_création",
+            "type": "varchar",
+            "comment": (
+                "Parcours de création de la candidature "
+                "(Normale, reprise de stock AI, import agrément PE, action support...)"
+            ),
+            "fn": lambda o: o.get_origin_display(),
+        },
+        {
             "name": "délai_prise_en_compte",
             "type": "interval",
             "comment": (
@@ -218,7 +227,7 @@ TABLE.add_columns(
             "name": "nom_complet_structure",
             "type": "varchar",
             "comment": "Nom complet de la structure destinaire de la candidature",
-            "fn": lambda o: f"{o.to_siae.kind} - ID {o.to_siae.id} - {o.to_siae.display_name}",
+            "fn": lambda o: f"{o.to_siae.kind} - ID {o.to_siae_id} - {o.to_siae.display_name}",
         },
     ]
 )
