@@ -22,19 +22,12 @@
     <h2>Candidat</h2>
 
     <h3>Informations personnelles</h3>
-    TODO: reprendre la section correspondante de itou/templates/apply/includes/job_seeker_info.html
-    Potentiellement en prenant un job_seeker et un job_application pour pouvoir être utilisé sans job_application
-    ou en faisant un sous-include/template avec juste les infos du job_seeker
+    {% include "apply/includes/job_seeker_info.html" with job_seeker=job_seeker %}
 
-
-
-    <form method="post" class="js-prevent-multiple-submit">
-        {% csrf_token %}
-        <input type="hidden" name="force_new_application" value="force">
-        {% buttons %}
-            <a class="btn btn-outline-primary" href="{% url 'home:hp' %}">Annuler</a>
-            <button type="submit" class="btn btn-primary">Postuler à nouveau</button>
-        {% endbuttons %}
-    </form>
+    {% buttons %}
+        <a class="btn btn-block btn-primary" href="url vers eligibility">Valider les critères d'éligibilité</a>
+        <a class="btn btn-block btn-outline-primary" href="{% url 'home:hp' %}">Annuler l'embauche</a>
+    {% endbuttons %}
+</form>
 
 {% endblock %}

@@ -1448,5 +1448,6 @@ def hire_infos(request, siae_pk, job_seeker_pk):
         {
             "siae": siae,
             "job_seeker": job_seeker,
+            "can_view_personal_information": request.user.can_view_personal_information(job_seeker),
         },
     )
