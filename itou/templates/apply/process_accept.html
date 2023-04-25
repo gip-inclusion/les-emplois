@@ -88,7 +88,7 @@
                     <p>
                         Êtes-vous sûr(e) de vouloir confirmer l’embauche de <strong>{{ job_application.job_seeker.first_name }} {{ job_application.job_seeker.last_name }}</strong> dans la structure suivante ?
                     </p>
-                    <p>{% include "siaes/includes/_siae_info.html" with siae=job_application.to_siae %}</p>
+                    {% include "siaes/includes/_siae_info.html" with siae=job_application.to_siae %}
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Retour</button>
