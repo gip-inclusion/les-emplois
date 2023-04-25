@@ -94,7 +94,6 @@ class JobSeekerNirForm(forms.Form):
 
 
 class JobSeekerSituationForm(forms.Form):
-
     ERROR_NOTHING_CHECKED = (
         "Si vous êtes dans l’une des situations ci-dessous, vous devez cocher au moins une case  avant de continuer"
     )
@@ -169,7 +168,6 @@ class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
 
 
 class SiaeSearchBySirenForm(forms.Form):
-
     siren = forms.CharField(
         label="Numéro SIREN de votre structure",
         min_length=9,
@@ -277,7 +275,6 @@ class PrescriberChooseOrgKindForm(forms.Form):
 
 
 class PrescriberChooseKindForm(forms.Form):
-
     KIND_AUTHORIZED_ORG = "authorized_org"
     KIND_UNAUTHORIZED_ORG = "unauthorized_org"
 
@@ -294,7 +291,6 @@ class PrescriberChooseKindForm(forms.Form):
 
 
 class PrescriberConfirmAuthorizationForm(forms.Form):
-
     CONFIRM_AUTHORIZATION_CHOICES = (
         (1, "Oui, je confirme que mon organisation est habilitée par le Préfet"),
         (0, "Non, mon organisation n’est pas habilitée par le Préfet"),
