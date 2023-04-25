@@ -35,21 +35,19 @@
 </div>
 <hr class="my-3">
 {% with all_jobs=job_application.selected_jobs.all %}
-    <p>
+    <div>
         {% if all_jobs|length == 0 %}
             <i class="ri-briefcase-line ri-xl mr-1"></i><span class="font-weight-bold mr-1 mr-md-2">Candidature spontanée</span>
         {% elif all_jobs|length == 1 %}
             {% with job=all_jobs.0 %}
-                <div class="text-primary">
-                    <i class="ri-briefcase-line ri-xl mr-1"></i>
-                    <span class="font-weight-bold mr-1 mr-md-2">{{ job.display_name }}</span>
-                    {% if job.location %}
-                        <span class="fs-sm text-nowrap">
-                            <i class="ri-map-pin-2-line ri-sm mr-1"></i>
-                            {{ first_job.location }}
-                        </span>
-                    {% endif %}
-                </div>
+                <i class="ri-briefcase-line ri-xl mr-1"></i>
+                <span class="font-weight-bold mr-1 mr-md-2">{{ job.display_name }}</span>
+                {% if job.location %}
+                    <span class="fs-sm text-nowrap">
+                        <i class="ri-map-pin-2-line ri-sm mr-1"></i>
+                        {{ first_job.location }}
+                    </span>
+                {% endif %}
             {% endwith %}
         {% else %}
             <a class="d-flex flex-wrap align-items-center text-decoration-none has-collapse-caret collapsed"
@@ -79,5 +77,5 @@
                 {% endfor %}
             </ul>
         {% endif %}
-    </p>
+    </div>
 {% endwith %}
