@@ -58,7 +58,10 @@
                 {% state_badge job_application %}
                 {% if job_application.has_suspended_approval %}
                     <br>
-                    <span class="badge badge-sm badge-pill badge-warning">PASS IAE suspendu</span>
+                    <span class="badge badge-sm badge-pill badge-success-lighter text-success">
+                        <i class="ri-pass-pending-line" aria-hidden="true"></i>
+                        PASS IAE valide (suspendu)
+                    </span>
                 {% endif %}
             </p>
         </div>

@@ -56,7 +56,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
     STATE_CHOICES = (
         (STATE_NEW, "Nouvelle candidature"),
         (STATE_PROCESSING, "Candidature à l'étude"),
-        (STATE_POSTPONED, "Candidature en liste d'attente"),
+        (STATE_POSTPONED, "Candidature en attente"),
         (STATE_PRIOR_TO_HIRE, "Action préalable à l’embauche"),
         (STATE_ACCEPTED, "Candidature acceptée"),
         (STATE_REFUSED, "Candidature déclinée"),
@@ -795,7 +795,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     @property
     def candidate_has_employee_record(self):
-
         if not self.approval:
             return False
 
@@ -922,7 +921,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
         # Approval issuance logic.
         if not self.hiring_without_approval and self.to_siae.is_subject_to_eligibility_rules:
-
             if self.job_seeker.has_common_approval_in_waiting_period:
                 if self.job_seeker.approval_can_be_renewed_by(
                     siae=self.to_siae, sender_prescriber_organization=self.sender_prescriber_organization
@@ -1191,7 +1189,6 @@ class JobApplicationTransitionLog(xwf_models.BaseTransitionLog):
 
 
 class PriorAction(models.Model):
-
     job_application = models.ForeignKey(JobApplication, related_name="prior_actions", on_delete=models.CASCADE)
     action = models.TextField(
         verbose_name="Action",
