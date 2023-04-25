@@ -3,39 +3,37 @@
         <h3 >{{ evaluated_siae }}</h3>
     </div>
     <div class="col-lg-3 col-md-3 col-4">
-        <p class="small mb-0">
-            {% if evaluated_siae.evaluation_is_final %}
-                <p class="badge badge-pill{% if evaluated_siae.state == "ACCEPTED" %} badge-success{% elif evaluated_siae.state == "NOTIFICATION_PENDING" %} badge-accent-03 text-primary{% else %} badge-danger{% endif %} float-right">
-                    {% if evaluated_siae.state == "ACCEPTED" %}
-                        <i class="ri-checkbox-circle-line mr-1"></i> Résultat positif
-                    {% elif evaluated_siae.state == "REFUSED" %}
-                        <i class="ri-close-circle-line mr-1"></i> Résultat négatif
-                    {% elif evaluated_siae.state == "NOTIFICATION_PENDING" %}
-                        <i class="ri-arrow-right-circle-line mr-1"></i> Notification à faire
-                    {% else %}
-                        Non contrôlée
-                    {% endif %}
-                </p>
-            {% else %}
-                {% if evaluated_siae.state == "SUBMITTED" %}
-                    <p class="badge badge-pill badge-pilotage float-right">
-                        {% if evaluated_siae.reviewed_at %}Phase contradictoire -{% endif %}
-                        À traiter
-                    </p>
-                {% elif evaluated_siae.state == "REFUSED" or evaluated_siae.state == "ACCEPTED" %}
-                    <p class="badge badge-pill badge-pilotage float-right">
-                        {% if evaluated_siae.reviewed_at %}Phase contradictoire -{% endif %}
-                        En cours
-                    </p>
-                {% elif evaluated_siae.state == "ADVERSARIAL_STAGE" %}
-                    <p class="badge badge-pill badge-marche-light float-right">Phase contradictoire</p>
+        {% if evaluated_siae.evaluation_is_final %}
+            <p class="badge badge-pill{% if evaluated_siae.state == "ACCEPTED" %} badge-success{% elif evaluated_siae.state == "NOTIFICATION_PENDING" %} badge-accent-03 text-primary{% else %} badge-danger{% endif %} float-right">
+                {% if evaluated_siae.state == "ACCEPTED" %}
+                    <i class="ri-checkbox-circle-line mr-1"></i> Résultat positif
+                {% elif evaluated_siae.state == "REFUSED" %}
+                    <i class="ri-close-circle-line mr-1"></i> Résultat négatif
+                {% elif evaluated_siae.state == "NOTIFICATION_PENDING" %}
+                    <i class="ri-arrow-right-circle-line mr-1"></i> Notification à faire
                 {% else %}
-                    <p class="badge badge-pill badge-emploi float-right">
-                        {% if evaluated_siae.reviewed_at %}Phase contradictoire -{% endif %}
-                        En attente
-                    </p>
+                    Non contrôlée
                 {% endif %}
+            </p>
+        {% else %}
+            {% if evaluated_siae.state == "SUBMITTED" %}
+                <p class="badge badge-pill badge-pilotage float-right">
+                    {% if evaluated_siae.reviewed_at %}Phase contradictoire -{% endif %}
+                    À traiter
+                </p>
+            {% elif evaluated_siae.state == "REFUSED" or evaluated_siae.state == "ACCEPTED" %}
+                <p class="badge badge-pill badge-pilotage float-right">
+                    {% if evaluated_siae.reviewed_at %}Phase contradictoire -{% endif %}
+                    En cours
+                </p>
+            {% elif evaluated_siae.state == "ADVERSARIAL_STAGE" %}
+                <p class="badge badge-pill badge-marche-light float-right">Phase contradictoire</p>
+            {% else %}
+                <p class="badge badge-pill badge-emploi float-right">
+                    {% if evaluated_siae.reviewed_at %}Phase contradictoire -{% endif %}
+                    En attente
+                </p>
             {% endif %}
-        </p>
+        {% endif %}
     </div>
 </div>

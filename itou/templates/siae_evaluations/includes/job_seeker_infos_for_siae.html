@@ -7,33 +7,31 @@
         </h3>
     </div>
     <div class="col-lg-4 col-md-5 col-12 text-right">
-        <p class="small mb-0">
-            {% if state == "REFUSED_2" %}
-                <p class="badge badge-pill badge-danger float-right">problème constaté</p>
+        {% if state == "REFUSED_2" %}
+            <p class="badge badge-pill badge-danger float-right">problème constaté</p>
 
-            {% elif reviewed_at %}
-                {% if state == "ACCEPTED" %}
-                    <p class="badge badge-pill badge-success float-right">validé</p>
-                {% elif state == "UPLOADED" %}
-                    <p class="badge badge-pill badge-success float-right">traité</p>
-                {% elif state == "SUBMITTED" %}
-                    <p class="badge badge-pill badge-communaute-light float-right">transmis</p>
-                {% else %}
-                    <p class="badge badge-pill badge-pilotage float-right">nouveaux justificatifs à traiter</p>
-                {% endif %}
-
+        {% elif reviewed_at %}
+            {% if state == "ACCEPTED" %}
+                <p class="badge badge-pill badge-success float-right">validé</p>
+            {% elif state == "UPLOADED" %}
+                <p class="badge badge-pill badge-success float-right">traité</p>
+            {% elif state == "SUBMITTED" %}
+                <p class="badge badge-pill badge-communaute-light float-right">transmis</p>
             {% else %}
-                {% if state == "PENDING" %}
-                    <p class="badge badge-pill badge-pilotage float-right">à traiter</p>
-                {% elif state == "PROCESSING" %}
-                    <p class="badge badge-pill badge-pilotage float-right">en cours</p>
-                {% elif state == "UPLOADED" %}
-                    <p class="badge badge-pill badge-success float-right">traité</p>
-                {% elif state == "SUBMITTED" or state == "REFUSED" or state == "ACCEPTED" %}
-                    <p class="badge badge-pill badge-communaute-light float-right">transmis</p>
-                {% endif %}
+                <p class="badge badge-pill badge-pilotage float-right">nouveaux justificatifs à traiter</p>
             {% endif %}
-        </p>
+
+        {% else %}
+            {% if state == "PENDING" %}
+                <p class="badge badge-pill badge-pilotage float-right">à traiter</p>
+            {% elif state == "PROCESSING" %}
+                <p class="badge badge-pill badge-pilotage float-right">en cours</p>
+            {% elif state == "UPLOADED" %}
+                <p class="badge badge-pill badge-success float-right">traité</p>
+            {% elif state == "SUBMITTED" or state == "REFUSED" or state == "ACCEPTED" %}
+                <p class="badge badge-pill badge-communaute-light float-right">transmis</p>
+            {% endif %}
+        {% endif %}
     </div>
 </div>
 <div class="row">
