@@ -1,6 +1,7 @@
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from django.utils import timezone
+from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.approvals.factories import ApprovalFactory, SuspensionFactory
@@ -9,6 +10,7 @@ from itou.job_applications.enums import SenderKind
 from itou.job_applications.factories import JobApplicationFactory, JobApplicationSentByPrescriberOrganizationFactory
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.factories import PrescriberFactory, PrescriberOrganizationFactory
+from itou.utils.templatetags.format_filters import format_approval_number
 
 
 class TestApprovalDetailView:
@@ -60,6 +62,90 @@ class TestApprovalDetailView:
         )
         assertContains(response, '<i class="ri-group-line mr-2" aria-hidden="true"></i>Prescripteur habilité', count=1)
         assertContains(response, '<i class="ri-group-line mr-2" aria-hidden="true"></i>Orienteur', count=1)
+
+    @freeze_time("2023-04-26")
+    def test_approval_status_includes(self, client):
+        """
+        templates/approvals/includes/status.html
+        This template is used in approval views but also in many other places.
+        Test its content only once.
+        """
+        job_application = JobApplicationFactory(
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            with_approval=True,
+            sent_by_authorized_prescriber_organisation=True,
+        )
+        approval = job_application.approval
+
+        # Employer version
+        user = job_application.to_siae.members.first()
+        client.force_login(user)
+
+        url = reverse("approvals:detail", kwargs={"pk": approval.pk})
+        response = client.get(url)
+        assertContains(response, format_approval_number(approval))
+        assertContains(response, approval.start_at.strftime("%d/%m/%Y"))
+        assertContains(response, str(approval.remainder.days))
+        assertNotContains(
+            response,
+            "PASS IAE valide jusqu’au 25/04/2025, si le contrat démarre aujourd’hui.",
+        )
+
+        url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        response = client.get(url)
+        assertContains(
+            response,
+            "PASS IAE valide jusqu’au 25/04/2025, si le contrat démarre aujourd’hui.",
+        )
+
+        # Job application accepted.
+        job_application.state = JobApplicationWorkflow.STATE_ACCEPTED
+        job_application.save()
+        response = client.get(url)
+        assertNotContains(
+            response,
+            "PASS IAE valide jusqu’au 25/04/2025, si le contrat démarre aujourd’hui.",
+        )
+
+        ## Suspensions
+        # Valid
+        SuspensionFactory(
+            approval=approval,
+            start_at=timezone.localdate() - relativedelta(days=7),
+            end_at=timezone.localdate() + relativedelta(days=3),
+        )
+        # Older
+        SuspensionFactory(
+            approval=approval,
+            start_at=timezone.localdate() - relativedelta(days=30),
+            end_at=timezone.localdate() - relativedelta(days=20),
+        )
+        # Clear cached property
+        # del approval.can_be_suspended
+        # del approval.is_suspended
+
+        url = reverse("approvals:detail", kwargs={"pk": approval.pk})
+        response = client.get(url)
+
+        # Use a snapshot instead.
+
+        assertContains(response, "Suspension en cours")
+        assertContains(response, "du 19/04/2023 au 29/04/2023")
+        assertContains(response, "Suspensions passées")
+        assertContains(response, "du 27/03/2023 au 06/04/2023")
+        assertContains(response, "Modifier")
+        assertContains(response, "Annuler")
+
+        # Prescriber version
+        user = job_application.sender
+        client.force_login(user)
+
+        url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
+        response = client.get(url)
+        assertNotContains(
+            response,
+            "PASS IAE valide jusqu’au 25/04/2025, si le contrat démarre aujourd’hui.",
+        )
 
     def test_suspend_button(self, client):
         approval = ApprovalFactory(with_jobapplication=True)

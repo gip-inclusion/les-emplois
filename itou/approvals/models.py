@@ -86,7 +86,7 @@ class CommonApprovalMixin(models.Model):
 
     def _get_obj_remainder(self, obj):
         """
-        Return the remaining time on a object with start_at and end_at dete fields
+        Return the remaining time on an object with start_at and end_at dete fields
         A.k.a an Approval, a Suspension or a Prolongation
         """
         return max(obj.end_at - timezone.localdate(), datetime.timedelta(0)) - max(
@@ -96,7 +96,7 @@ class CommonApprovalMixin(models.Model):
     @property
     def remainder(self):
         """
-        Return the remaining time of an Approval, we don't count future suspended preriods.
+        Return the remaining time of an Approval, we don't count future suspended periods.
         """
         result = self._get_obj_remainder(self)
         if hasattr(self, "suspension_set"):
@@ -106,6 +106,14 @@ class CommonApprovalMixin(models.Model):
                 datetime.timedelta(0),
             )
         return result
+
+    @property
+    def remainder_as_date(self):
+        """
+        Return an estimated end date if this approval was "activated" today:
+        prolongations are taken into account but not suspensions as an approval can be unsuspended.
+        """
+        return timezone.localdate() + relativedelta(days=self.remainder.days)
 
     @property
     def is_suspended(self):
@@ -340,6 +348,19 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
     @cached_property
     def suspensions_by_start_date_asc(self):
         return self.suspension_set.all().order_by("start_at")
+
+    @cached_property
+    def suspensions_for_status_card(self):
+        suspensions = self.suspension_set.all().order_by("-start_at")
+        if not suspensions:
+            return
+
+        older_suspensions = suspensions
+        last_in_progress_suspension = None
+        if suspensions[0].is_in_progress:
+            [last_in_progress_suspension, *older_suspensions] = suspensions
+
+        return {"last_in_progress": last_in_progress_suspension, "older": older_suspensions}
 
     def last_old_suspension(self, exclude_pk=None):
         return self.suspensions_by_start_date_asc.exclude(pk=exclude_pk).old().last()

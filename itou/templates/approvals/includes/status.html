@@ -26,110 +26,45 @@ Arguments:
     </p>
 {% endif %}
 
-<p class="mb-0">
-    {% if common_approval.is_pass_iae %}
-        PASS IAE disponible :
-    {% else %}
-        Agrément existant :
-    {% endif %}
-</p>
-
-{% if user.is_siae_staff and job_application.is_pending %}
-    {% comment %}
-    If the PASS IAE number is displayed at this time, some employers think that there is
-    no need to validate the application because a number is already assigned.
-    {% endcomment %}
-    <p>
-        <b>Pour obtenir son numéro, vous devez valider l'embauche et demander l'obtention d'un PASS IAE.</b>
-    </p>
-{% else %}
-    <p>
-        <b>{{ common_approval.number|format_approval_number }}</b>
-    </p>
-{% endif %}
-
-{% if job_application.origin == JobApplicationOrigin.PE_APPROVAL %}
-    <p>Ce PASS IAE a été importé depuis un agrément Pôle emploi.</p>
-{% endif %}
-
-{% if common_approval.is_valid %}
-
-    <ul class="list-unstyled pl-2 border-left approval-left-border">
-
-        <li>Date de début : {{ common_approval.start_at|date:"d/m/Y" }}</li>
-        <li>
-            Date de fin prévisionnelle : {{ common_approval.end_at|date:"d/m/Y" }}
-            <i class="ri-information-line ri-xl" data-toggle="tooltip" title="La date de fin prévisionnelle est amenée à évoluer si le PASS IAE est prolongé ou suspendu."></i>
-        </li>
-        <li>
-            Reliquat : <span{% if common_approval.remainder %} class="text-success"{% endif %}>{{ common_approval.remainder.days }} jours restants</span>
-            <i class="ri-information-line ri-xl"
-               data-toggle="tooltip"
-               title="Le reliquat est calculé sur la base d'un nombre de jours calendaires. Si le PASS IAE n'est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i>
-        </li>
-
+<div class="pl-2 border-left approval-left-border">
+    <p class="mb-1">
         {% if common_approval.is_pass_iae %}
-            {# Suspensions history. #}
-            {% with common_approval.suspensions_by_start_date_asc as suspensions %}
-                {% if suspensions %}
-                    <li>
-                        Suspensions :
-                        <ul>
-                            {% for s in suspensions %}
-                                <li>
-                                    <span{% if s.is_in_progress %} class="text-danger"{% endif %}>
-                                        du {{ s.start_at|date:"d/m/Y" }} au {{ s.end_at|date:"d/m/Y" }}
-                                    </span>
-                                    {% if s.is_in_progress %}
-                                        <small>
-                                            <b>En cours</b>
-                                        </small>
-                                    {% endif %}
-                                    {% if current_siae %}
-                                        {% call_method s "can_be_handled_by_siae" current_siae as can_be_handled %}
-                                            {% if can_be_handled %}
-                                                <small>
-                                                    <a href="{% url 'approvals:suspension_update' suspension_id=s.pk %}?back_url={{ request.get_full_path|urlencode }}">Modifier</a>
-                                                    <a href="{% url 'approvals:suspension_delete' suspension_id=s.pk %}?back_url={{ request.get_full_path|urlencode }}">Annuler</a>
-                                                </small>
-                                            {% endif %}
-                                        {% endif %}
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </li>
-                    {% endif %}
-                {% endwith %}
+            PASS IAE disponible :
+        {% else %}
+            Agrément existant :
+        {% endif %}
+        {% if user.is_siae_staff and job_application.is_pending %}
+            {% comment %}
+            If the PASS IAE number is displayed at this time, some employers think that there is
+            no need to validate the application because a number is already assigned.
+            {% endcomment %}
+            <b>pour obtenir son numéro, vous devez valider l'embauche et demander l'obtention d'un PASS IAE.</b>
+        {% else %}
+            <b>{{ common_approval.number|format_approval_number }}</b>
+        {% endif %}
+    </p>
 
-                {# Prolongations history. #}
-                {% with common_approval.prolongations_by_start_date_asc as prolongations %}
-                    {% if prolongations %}
-                        <li>
-                            Prolongations :
-                            <ul>
-                                {% for p in prolongations %}
-                                    <li{% if p.is_in_progress %} class="font-weight-bold"{% endif %}>
-                                        du {{ p.start_at|date:"d/m/Y" }} au {{ p.end_at|date:"d/m/Y" }}
-                                        <br>
-                                        <small>{{ p.get_reason_display }}</small>
-                                        {% if p.validated_by %}
-                                            <br>
-                                            <small>
-                                                Autorisation par <i>{{ p.validated_by.get_full_name|title }}</i> ({{ p.validated_by.email }})
-                                            </small>
-                                        {% endif %}
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </li>
-                    {% endif %}
-                {% endwith %}
+    {% if job_application.origin == JobApplicationOrigin.PE_APPROVAL %}
+        <p class="mb-1">Ce PASS IAE a été importé depuis un agrément Pôle emploi.</p>
+    {% endif %}
+
+    {% if common_approval.is_valid %}
+        <p class="mb-1">Date de début : {{ common_approval.start_at|date:"d/m/Y" }}</p>
+        <ul class="list-unstyled">
+            <li class="h4 mt-4 pb-2">
+                Nombre de jours restants sur le PASS IAE : {{ common_approval.remainder.days }} jour{{ common_approval.remainder.days|pluralize }} 
+                <i class="ri-information-line ri-xl"
+                   data-toggle="tooltip"
+                   title="Le reliquat est calculé sur la base d'un nombre de jours calendaires. Si le PASS IAE n'est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i>
+            </li>
+
+            {% if job_application.is_pending and user.is_siae_staff %}
+                <li>
+                    PASS IAE valide jusqu’au {{ common_approval.remainder_as_date|date:"d/m/Y" }}, si le contrat démarre aujourd’hui.
+                </li>
             {% endif %}
-
         </ul>
-
     {% elif common_approval.is_in_waiting_period %}
-
         <p class="text-danger">
             <b>Expiré</b> le {{ common_approval.end_at|date:"d/m/Y" }} (depuis {{ common_approval.end_at|timesince }})
         </p>
@@ -151,3 +86,65 @@ Arguments:
             {% endif %}
         {% endif %}
     {% endif %}
+</div>
+
+{% if common_approval.is_valid and common_approval.is_pass_iae %}
+    {# Suspensions history. #}
+    {% with common_approval.suspensions_for_status_card as suspensions %}
+        {% if suspensions.last_in_progress or suspensions.older %}
+            <div class="pl-2 border-left approval-left-border">
+                {% if suspensions.last_in_progress %}
+                    <p class="mb-1">Suspension en cours :</p>
+                    <ul class="list-unstyled">
+                        <li>
+                            <b>du {{ suspensions.last_in_progress.start_at|date:"d/m/Y" }} au {{ suspensions.last_in_progress.end_at|date:"d/m/Y" }}</b>
+                            {% if current_siae %}
+                                <!-- djlint:off -->{% call_method suspensions.last_in_progress "can_be_handled_by_siae" current_siae as can_be_handled %}<!-- djlint:on -->
+                                {% if can_be_handled %}
+                                    <small>
+                                        <a class="ml-3" href="{% url 'approvals:suspension_update' suspension_id=suspensions.last_in_progress.pk %}?back_url={{ request.get_full_path|urlencode }}">Modifier</a>
+                                        <a class="ml-3" href="{% url 'approvals:suspension_delete' suspension_id=suspensions.last_in_progress.pk %}?back_url={{ request.get_full_path|urlencode }}">Annuler</a>
+                                    </small>
+                                {% endif %}
+                            {% endif %}
+                        </li>
+                    </ul>
+                {% endif %}
+                {% if suspensions.older %}
+                    <p class="mb-1">Suspensions passées :</p>
+                    <ul class="list-unstyled">
+                        {% for s in suspensions.older %}
+                            <li>
+                                <span>du {{ s.start_at|date:"d/m/Y" }} au {{ s.end_at|date:"d/m/Y" }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {# Prolongations history. #}
+    {% with common_approval.prolongations_by_start_date_asc as prolongations %}
+        {% if prolongations %}
+            <div class="pl-2 border-left approval-left-border">
+                <p class="mb-1">Prolongations :</p>
+                <ul class="list-unstyled">
+                    {% for p in prolongations %}
+                        <li{% if p.is_in_progress %} class="font-weight-bold"{% endif %}>
+                            du {{ p.start_at|date:"d/m/Y" }} au {{ p.end_at|date:"d/m/Y" }}
+                            <br>
+                            <small>{{ p.get_reason_display }}</small>
+                            {% if p.validated_by %}
+                                <br>
+                                <small>
+                                    Autorisation par <i>{{ p.validated_by.get_full_name|title }}</i> ({{ p.validated_by.email }})
+                                </small>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    {% endwith %}
+{% endif %}
