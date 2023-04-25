@@ -52,14 +52,16 @@
             {% endif %}
         </li>
 
-        <li>
-            CV : 
-            {% if job_application.get_resume_link %}
-                <a href="{{ job_application.get_resume_link }}">Télécharger le CV</a>
-            {% else %}
-                <span>Non renseigné</span>
-            {% endif %}
-        </li>
+        {% if job_application %}
+            <li>
+                CV : 
+                {% if job_application.get_resume_link %}
+                    <a href="{{ job_application.get_resume_link }}">Télécharger le CV</a>
+                {% else %}
+                    <span>Non renseigné</span>
+                {% endif %}
+            </li>
+        {% endif %}
     {% endif %}
 </ul>
 <p>
