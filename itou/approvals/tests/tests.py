@@ -559,6 +559,17 @@ class ApprovalModelTest(TestCase):
         # Substract to remainder the relaining suspension time
         assert approval.remainder == datetime.timedelta(days=109)
 
+    @freeze_time("2023-04-26")
+    def test_remainder_as_date(self):
+        """
+        Only test return type and value as the algorithm is already tested in `self.test_remainder`.
+        """
+        approval = ApprovalFactory(
+            start_at=datetime.date(2021, 7, 26),
+            end_at=datetime.date(2023, 7, 25),
+        )
+        assert approval.remainder_as_date == datetime.date(2023, 7, 25)
+
 
 class PoleEmploiApprovalModelTest(TestCase):
     def test_format_name_as_pole_emploi(self):
