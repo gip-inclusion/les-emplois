@@ -3,6 +3,8 @@
 SiaeConvention object logic used by the import_siae.py script is gathered here.
 
 """
+import datetime
+
 from django.utils import timezone
 
 from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS
@@ -65,6 +67,12 @@ def update_existing_conventions():
             convention.save()
 
         should_be_active = does_siae_have_an_active_convention(siae)
+
+        # TODO @dejafait DROP after 2023/05/31
+        # 199 SIAE were deactivated on 2023/04/24 but per ASP's orders we have to keep them artifically alive
+        # until at least 2023/05/31.
+        should_be_active = should_be_active or convention.deactivated_at.date() == datetime.date(2023, 4, 24)
+
         if convention.is_active != should_be_active:
             if should_be_active:
                 # Inactive convention should be activated.
