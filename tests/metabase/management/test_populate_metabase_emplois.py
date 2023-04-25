@@ -9,6 +9,7 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertNumQueries
 
 from itou.approvals.enums import Origin
+from itou.common_apps.address.departments import DEPARTMENTS
 from itou.eligibility.models import AdministrativeCriteria
 from itou.geo.utils import coords_to_geometry
 from itou.metabase.tables.utils import hash_content
@@ -396,6 +397,65 @@ def test_populate_criteria():
         rows = cursor.fetchall()
         assert len(rows) == 18
         assert rows[0] == (1, "Bénéficiaire du RSA", "1", "Revenu de solidarité active", datetime.date(2023, 2, 1))
+
+
+@freeze_time("2023-02-02")
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.usefixtures("metabase")
+def test_populate_job_applications():
+    ja = JobApplicationFactory()
+
+    num_queries = 1  # Select siaes for get_active_siae_pks()
+    num_queries += 1  # Count job applications
+    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
+    num_queries += 1  # COMMIT Create table
+    num_queries += 1  # Select job application IDs
+    num_queries += 1  # Select one chunk of job application IDs
+    num_queries += 1  # Select job applications with columns
+    num_queries += 1  # Select job application transition logs
+    num_queries += 1  # COMMIT (inject_chunk)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    with assertNumQueries(num_queries):
+        management.call_command("populate_metabase_emplois", mode="job_applications")
+
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM candidatures ORDER BY id")
+        rows = cursor.fetchall()
+        assert len(rows) == 1
+        assert rows == [
+            (
+                str(ja.pk),
+                hash_content(ja.pk),
+                ja.created_at.date(),
+                ja.hiring_start_at,
+                "Nouvelle candidature",
+                "Orienteur",
+                "Orienteur sans organisation",
+                "Créée normalement via les emplois",
+                None,
+                None,
+                None,
+                ja.job_seeker_id,
+                hash_content(ja.job_seeker_id),
+                ja.to_siae_id,
+                ja.to_siae.kind,
+                ja.to_siae.display_name,
+                f"{ja.to_siae.kind} - ID {ja.to_siae_id} - {ja.to_siae.display_name}",
+                ja.to_siae.department,
+                DEPARTMENTS.get(ja.to_siae.department),
+                ja.to_siae.region,
+                None,
+                None,
+                None,
+                None,
+                None,
+                0,
+                "",
+                datetime.date(2023, 2, 1),
+            ),
+        ]
 
 
 @freeze_time("2023-02-02")
