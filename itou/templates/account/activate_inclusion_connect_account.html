@@ -52,7 +52,7 @@
                             <fieldset>
                                 {% bootstrap_form_errors form type="all" %}
                                 {% redirection_input_field name=redirect_field_name value=redirect_field_value %}
-                                {% bootstrap_field form.email form_group_class="form-group" %}
+                                {% bootstrap_field form.email %}
                             </fieldset>
                             <button type="submit"
                                     class="btn btn-block btn-primary matomo-event"
