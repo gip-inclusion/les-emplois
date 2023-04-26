@@ -31,8 +31,8 @@ Prenez 30 secondes pour nous donner votre avis ! Cliquez sur : {{ siae_survey_
 Merci de votre participation et à très bientôt sur les emplois de l'inclusion !
 
 
-* Le reliquat est calculé sur la base d’un nombre de jours calendaires : il décroit donc tous les jours
-(samedi, dimanche et jours fériés compris).
+* Le reliquat est calculé sur la base d’un nombre de jours calendaires.
+Si le PASS IAE n'est pas suspendu, il décroit donc tous les jours (samedi, dimanche et jours fériés compris).
 {% else %}
 Merci d'avoir confirmé l'embauche d'un candidat sur les emplois de l'inclusion.
 
