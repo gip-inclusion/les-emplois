@@ -4,13 +4,15 @@ from django.contrib.gis.db import models as gis_models
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Q
 from django.template.defaultfilters import slugify
+from django.utils import timezone
 from django.utils.functional import cached_property
 
 from itou.common_apps.address.departments import DEPARTMENTS, REGIONS, department_from_postcode
 from itou.geo.models import QPV, ZRR
 from itou.utils.apis.exceptions import AddressLookupError, GeocodingDataError
-from itou.utils.apis.geocoding import get_geocoding_data
+from itou.utils.apis.geocoding import batch as batch_geocode, get_geocoding_data
 from itou.utils.validators import validate_post_code
 
 
@@ -26,6 +28,46 @@ def lat_lon_to_coords(lat, lon):
     if lat is not None and lon is not None:
         return GEOSGeometry(f"POINT({lon} {lat})")
     return None
+
+
+def geolocate_qs(qs, is_verbose=False):
+    now = timezone.now()
+
+    non_geolocated_qs = qs.filter(
+        Q(coords__isnull=True) | Q(geocoding_score__isnull=True) | Q(geocoding_score__lt=BAN_API_RELIANCE_SCORE)
+    )
+
+    if is_verbose:
+        print(
+            f"> about to geolocate count={non_geolocated_qs.count()} objects "
+            "without geolocation or with a low score."
+        )
+
+    # Note : we could also order by latest geolocalization attempt. An order is necessary though
+    # for the zip() to work correctly later.
+    localizable_qs = non_geolocated_qs.exclude(Q(address_line_1="") | Q(post_code="")).order_by("pk")
+
+    if is_verbose:
+        print(f"> count={localizable_qs.count()} of these have an address and a post code.")
+
+    for obj, geo_result in zip(
+        localizable_qs, batch_geocode(localizable_qs.values("pk", "address_line_1", "post_code"))
+    ):
+        score = float(geo_result["result_score"] or 0.0)
+        if is_verbose:
+            print(
+                f"API result score={geo_result['result_score'] or 0.0} "
+                f"label='{geo_result['result_label'] or 'unknown'}' "
+                f"searched_address='{obj.address_line_1} {obj.post_code}' object_pk={obj.pk}"
+            )
+        if score >= BAN_API_RELIANCE_SCORE:
+            if obj.geocoding_score and obj.geocoding_score > score:  # do not yield lower scores than the current
+                continue
+            obj.coords = lat_lon_to_coords(geo_result["latitude"], geo_result["longitude"])
+            obj.geocoding_score = score
+            obj.ban_api_resolved_address = geo_result["result_label"]
+            obj.geocoding_updated_at = now
+            yield obj
 
 
 class AddressMixin(models.Model):

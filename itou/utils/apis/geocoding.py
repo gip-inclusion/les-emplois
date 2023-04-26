@@ -1,4 +1,7 @@
+import csv
 import logging
+import urllib.parse
+from io import StringIO
 
 import httpx
 from django.conf import settings
@@ -10,9 +13,23 @@ from itou.utils.apis.exceptions import AddressLookupError, GeocodingDataError
 
 logger = logging.getLogger(__name__)
 
+BATCH_GEOCODE_API_SEPARATOR = ";"
+BATCH_GEOCODE_API_PARAMS = {
+    "columns": [
+        "address_line_1",
+        "post_code",
+    ],
+    "result_columns": [
+        "id",
+        "result_label",
+        "result_score",
+        "latitude",
+        "longitude",
+    ],
+}
+
 
 def call_ban_geocoding_api(address, post_code=None, limit=1):
-
     api_url = f"{settings.API_BAN_BASE_URL}/search/"
 
     args = {"q": address, "limit": limit}
@@ -73,3 +90,24 @@ def get_geocoding_data(address, post_code=None, limit=1):
         "latitude": latitude,
         "coords": GEOSGeometry(f"POINT({longitude} {latitude})"),
     }
+
+
+def _addresses_to_csv(addresses):
+    with StringIO() as out:
+        writer = csv.DictWriter(out, fieldnames=addresses[0].keys(), delimiter=BATCH_GEOCODE_API_SEPARATOR)
+        writer.writeheader()
+        writer.writerows(addresses)
+        return out.getvalue().encode("utf-8")
+
+
+def batch(addresses):
+    url = urllib.parse.urljoin(settings.API_BAN_BASE_URL, "/search/csv/")
+    with httpx.stream(
+        "POST",
+        url,
+        data=BATCH_GEOCODE_API_PARAMS,
+        files={"data": _addresses_to_csv(addresses)},
+        timeout=None,  # No timeout for a streaming operation.
+    ) as response:
+        response.raise_for_status()
+        yield from csv.DictReader(response.iter_lines(), delimiter=BATCH_GEOCODE_API_SEPARATOR)
