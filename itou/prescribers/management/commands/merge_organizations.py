@@ -21,7 +21,30 @@ HELP_TEXT = """
 """
 
 
+def _model_sanity_check():
+    # Sanity check to prevent dangerous deletes
+    relation_fields = {
+        field.name
+        for field in prescribers_models.PrescriberOrganization._meta.get_fields()
+        if field.is_relation and not field.many_to_one
+    }
+    expected_fields = {
+        "eligibilitydiagnosis",
+        "geiqeligibilitydiagnosis",
+        "invitations",
+        "jobapplication",
+        "members",
+        "prescribermembership",
+    }
+    if relation_fields != expected_fields:
+        raise RuntimeError(
+            f"Extra relations found, please update this script to handle: {relation_fields - expected_fields}"
+        )
+
+
 def organization_merge_into(from_id, to_id, *, wet_run):
+    _model_sanity_check()
+
     if from_id == to_id:
         logger.error("Unable to use the same organization as source and destination (ID %s)", from_id)
         return
