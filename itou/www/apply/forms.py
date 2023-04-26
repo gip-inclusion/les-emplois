@@ -367,11 +367,8 @@ class SubmitJobApplicationForm(forms.ModelForm, ResumeFormMixin):
             self.fields["message"].label = "Message d’information"
             help_text = "Ce message ne sera plus modifiable après l’envoi et une copie sera transmise au candidat."
         else:
-            self.fields["message"].label = "Message à l’employeur"
-            help_text = (
-                "Message obligatoire à destination de l’employeur (avec copie transmise au candidat)"
-                " et non modifiable après l’envoi."
-            )
+            self.fields["message"].label = "Message à l’employeur (avec copie transmise au candidat)"
+            help_text = "Message obligatoire et non modifiable après l’envoi."
         self.fields["message"].help_text = help_text
 
     class Meta:
