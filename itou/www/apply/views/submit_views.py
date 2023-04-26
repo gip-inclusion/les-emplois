@@ -33,6 +33,7 @@ from itou.utils.session import SessionNamespace, SessionNamespaceRequiredMixin
 from itou.utils.storage.s3 import S3Upload
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
+    AcceptForm,
     ApplicationJobsForm,
     CheckJobSeekerInfoForm,
     CheckJobSeekerNirForm,
@@ -1473,10 +1474,13 @@ def confirm_hire(request, siae_pk, job_seeker_pk):
             expired_eligibility_diagnosis = EligibilityDiagnosis.objects.last_expired(
                 job_seeker=job_seeker, for_siae=siae
             )
+    form_accept = AcceptForm()
+
     return render(
         request,
         "apply/hire/confirmation.html",
         {
+            "form_accept": form_accept,
             "siae": siae,
             "job_seeker": job_seeker,
             "eligibility_diagnosis": eligibility_diagnosis,
