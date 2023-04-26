@@ -26,7 +26,7 @@ from itou.prescribers.factories import (
 )
 from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS, SiaeKind
 from itou.siaes.factories import SiaeMembershipFactory
-from itou.users.factories import JobSeekerFactory, SiaeStaffFactory
+from itou.users.factories import JobSeekerFactory, JobSeekerWithAddressFactory, SiaeStaffFactory
 from itou.users.management.commands.new_users_to_mailjet import (
     MAILJET_API_URL,
     NEW_ORIENTEURS_LISTID,
@@ -862,3 +862,44 @@ class TestCommandNewUsersToMailJet:
             ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Prescribers count: 0"),
             ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Orienteurs count: 0"),
         ]
+
+
+@freeze_time("2023-05-01")
+def test_update_job_seeker_coords(settings, capsys, respx_mock):
+    js1 = JobSeekerWithAddressFactory(coords="POINT (2.387311 48.917735)", geocoding_score=0.65)  # score too low
+    js2 = JobSeekerWithAddressFactory(coords=None, geocoding_score=0.9)  # no coords
+    js3 = JobSeekerWithAddressFactory(coords="POINT (5.43567 12.123876)", geocoding_score=0.76)  # score too low
+    JobSeekerWithAddressFactory(with_address_in_qpv=True)
+
+    settings.API_BAN_BASE_URL = "https://geo.foo"
+    respx_mock.post("https://geo.foo/search/csv/").respond(
+        200,
+        text=(
+            "id;result_label;result_score;latitude;longitude\n"
+            "42;7 rue de Laroche;0.77;42.42;13.13\n"  # score is lower than the minimum fiability score
+            "12;5 rue Bigot;0.32;42.42;13.13\n"  # score is lower than the current one
+            "78;9 avenue Delorme 92220 Boulogne;0.83;42.42;13.13\n"  # score is higher than current one
+        ),
+    )
+
+    call_command("update_job_seeker_coords", wet_run=True)
+    stdout, stderr = capsys.readouterr()
+    assert stderr == ""
+    assert stdout.splitlines() == [
+        "> about to geolocate count=3 objects without geolocation or with a low " "score.",
+        "> count=3 of these have an address and a post code.",
+        "API result score=0.77 label='7 rue de Laroche' "
+        f"searched_address='{js1.address_line_1} {js1.post_code}' object_pk={js1.id}",
+        "API result score=0.32 label='5 rue Bigot' "
+        f"searched_address='{js2.address_line_1} {js2.post_code}' object_pk={js2.id}",
+        "API result score=0.83 label='9 avenue Delorme 92220 Boulogne' "
+        f"searched_address='{js3.address_line_1} {js3.post_code}' object_pk={js3.id}",
+        "> count=1 job seekers geolocated with a high score.",
+    ]
+
+    js3.refresh_from_db()
+    assert js3.ban_api_resolved_address == "9 avenue Delorme 92220 Boulogne"
+    assert js3.geocoding_updated_at == datetime.datetime(2023, 5, 1, 0, 0, tzinfo=datetime.timezone.utc)
+    assert js3.geocoding_score == 0.83
+    assert js3.coords.x == 13.13
+    assert js3.coords.y == 42.42
