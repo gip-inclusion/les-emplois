@@ -466,8 +466,8 @@ HUEY = {
     "immediate": ITOU_ENVIRONMENT not in ("DEMO", "PROD"),
 }
 
-MAILJET_API_KEY_PRINCIPAL = os.getenv("API_MAILJET_KEY")
-MAILJET_SECRET_KEY_PRINCIPAL = os.getenv("API_MAILJET_SECRET")
+MAILJET_API_KEY_PRINCIPAL = os.getenv("API_MAILJET_KEY_PRINCIPAL")
+MAILJET_SECRET_KEY_PRINCIPAL = os.getenv("API_MAILJET_SECRET_PRINCIPAL")
 
 # Email https://anymail.readthedocs.io/en/stable/esps/mailjet/
 ANYMAIL = {
