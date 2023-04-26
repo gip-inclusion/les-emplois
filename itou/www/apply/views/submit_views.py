@@ -1465,12 +1465,22 @@ def hire_infos(request, siae_pk, job_seeker_pk):
 def confirm_hire(request, siae_pk, job_seeker_pk):
     siae = get_object_or_404(Siae, pk=siae_pk)
     job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), pk=job_seeker_pk)
+    eligibility_diagnosis = None
+    expired_eligibility_diagnosis = None
+    if siae.is_subject_to_eligibility_rules:
+        eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(job_seeker, for_siae=siae)
+        if eligibility_diagnosis is None:
+            expired_eligibility_diagnosis = EligibilityDiagnosis.objects.last_expired(
+                job_seeker=job_seeker, for_siae=siae
+            )
     return render(
         request,
         "apply/hire/confirmation.html",
         {
             "siae": siae,
             "job_seeker": job_seeker,
+            "eligibility_diagnosis": eligibility_diagnosis,
+            "expired_eligibility_diagnosis": expired_eligibility_diagnosis,
             "can_view_personal_information": request.user.can_view_personal_information(job_seeker),
         },
     )

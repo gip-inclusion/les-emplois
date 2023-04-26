@@ -24,7 +24,9 @@
     <h3>Informations personnelles</h3>
     {% include "apply/includes/job_seeker_info.html" with job_seeker=job_seeker %}
 
-    TODO: réutiliser le hire_infos et rajouter les critères d'éligibilité et les infos contrat$
+    {% include "apply/includes/eligibility_diagnosis.html" with eligibility_diagnosis=eligibility_diagnosis siae=siae job_seeker=job_seeeker sent_by_authorized_prescriber=False %}
+
+    TODO: Ajouter le formulaire d'infos contrat
 
     TODO: rajouter la modale de confirmation existante
 
