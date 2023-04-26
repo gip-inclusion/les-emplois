@@ -98,6 +98,16 @@ class AddressMixin(models.Model):
     coords = gis_models.PointField(geography=True, null=True, blank=True)
     # BAN API score between 0 and 1 indicating the relevance of the geocoding result.
     geocoding_score = models.FloatField(verbose_name="Score du geocoding", blank=True, null=True)
+    geocoding_updated_at = models.DateTimeField(
+        verbose_name="Dernière modification du geocoding",
+        blank=True,
+        null=True,
+    )
+    ban_api_resolved_address = models.TextField(
+        verbose_name="Libellé d'adresse retourné par le dernier geocoding",
+        blank=True,
+        null=True,
+    )
 
     class Meta:
         abstract = True
