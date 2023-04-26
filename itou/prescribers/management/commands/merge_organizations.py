@@ -58,6 +58,11 @@ def organization_merge_into(from_id, to_id, *, wet_run):
     diagnoses = eligibility_models.EligibilityDiagnosis.objects.filter(author_prescriber_organization_id=from_id)
     logger.info("| Diagnoses: %s", diagnoses.count())
 
+    geiq_diagnoses = eligibility_models.GEIQEligibilityDiagnosis.objects.filter(
+        author_prescriber_organization_id=from_id
+    )
+    logger.info("| GEIQ Diagnoses: %s", geiq_diagnoses.count())
+
     # Don't move invitations for existing members
     # The goal is to keep information about the original information
     invitations = invitations_models.PrescriberWithOrgInvitation.objects.filter(organization_id=from_id).exclude(
@@ -79,6 +84,7 @@ def organization_merge_into(from_id, to_id, *, wet_run):
             job_applications.update(sender_prescriber_organization_id=to_id)
             members.update(organization_id=to_id)
             diagnoses.update(author_prescriber_organization_id=to_id)
+            geiq_diagnoses.update(author_prescriber_organization_id=to_id)
             invitations.update(organization_id=to_id)
             from_organization.delete()
     else:

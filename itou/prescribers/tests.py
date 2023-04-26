@@ -13,6 +13,7 @@ from django.test import override_settings
 from django.urls import reverse
 from django.utils.timezone import get_current_timezone
 
+from itou.eligibility.factories import GEIQEligibilityDiagnosisFactory
 from itou.job_applications import factories as job_applications_factories, models as job_applications_models
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.factories import (
@@ -195,12 +196,18 @@ class PrescriberOrganizationModelTest(TestCase):
         )
         organization_2 = job_application_2.sender_prescriber_organization
 
+        geiq_diagnosis = GEIQEligibilityDiagnosisFactory(
+            with_prescriber=True, author_prescriber_organization=organization_1
+        )
+
         count_job_applications = job_applications_models.JobApplication.objects.count()
         assert PrescriberOrganization.objects.count() == 2
         assert count_job_applications == 2
         organization_merge_into(organization_1.id, organization_2.id, wet_run=True)
         assert count_job_applications == job_applications_models.JobApplication.objects.count()
         assert PrescriberOrganization.objects.count() == 1
+        geiq_diagnosis.refresh_from_db()
+        assert geiq_diagnosis.author_prescriber_organization_id == organization_2.pk
 
     @respx.mock
     @override_settings(
