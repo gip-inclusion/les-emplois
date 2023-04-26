@@ -72,52 +72,56 @@ Arguments:
             {# Suspensions history. #}
             {% with common_approval.suspensions_by_start_date_asc as suspensions %}
                 {% if suspensions %}
-                    Suspensions :
-                    <ul>
-                        {% for s in suspensions %}
-                            <li>
-                                <span{% if s.is_in_progress %} class="text-danger"{% endif %}>
-                                    du {{ s.start_at|date:"d/m/Y" }} au {{ s.end_at|date:"d/m/Y" }}
-                                </span>
-                                {% if s.is_in_progress %}
-                                    <small>
-                                        <b>En cours</b>
-                                    </small>
-                                {% endif %}
-                                {% if current_siae %}
-                                    {% call_method s "can_be_handled_by_siae" current_siae as can_be_handled %}
-                                        {% if can_be_handled %}
-                                            <small>
-                                                <a href="{% url 'approvals:suspension_update' suspension_id=s.pk %}?back_url={{ request.get_full_path|urlencode }}">Modifier</a>
-                                                <a href="{% url 'approvals:suspension_delete' suspension_id=s.pk %}?back_url={{ request.get_full_path|urlencode }}">Annuler</a>
-                                            </small>
-                                        {% endif %}
+                    <li>
+                        Suspensions :
+                        <ul>
+                            {% for s in suspensions %}
+                                <li>
+                                    <span{% if s.is_in_progress %} class="text-danger"{% endif %}>
+                                        du {{ s.start_at|date:"d/m/Y" }} au {{ s.end_at|date:"d/m/Y" }}
+                                    </span>
+                                    {% if s.is_in_progress %}
+                                        <small>
+                                            <b>En cours</b>
+                                        </small>
                                     {% endif %}
-                                </li>
-                            {% endfor %}
-                        </ul>
+                                    {% if current_siae %}
+                                        {% call_method s "can_be_handled_by_siae" current_siae as can_be_handled %}
+                                            {% if can_be_handled %}
+                                                <small>
+                                                    <a href="{% url 'approvals:suspension_update' suspension_id=s.pk %}?back_url={{ request.get_full_path|urlencode }}">Modifier</a>
+                                                    <a href="{% url 'approvals:suspension_delete' suspension_id=s.pk %}?back_url={{ request.get_full_path|urlencode }}">Annuler</a>
+                                                </small>
+                                            {% endif %}
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </li>
                     {% endif %}
                 {% endwith %}
 
                 {# Prolongations history. #}
                 {% with common_approval.prolongations_by_start_date_asc as prolongations %}
                     {% if prolongations %}
-                        Prolongations :
-                        <ul>
-                            {% for p in prolongations %}
-                                <li{% if p.is_in_progress %} class="font-weight-bold"{% endif %}>
-                                    du {{ p.start_at|date:"d/m/Y" }} au {{ p.end_at|date:"d/m/Y" }}
-                                    <br>
-                                    <small>{{ p.get_reason_display }}</small>
-                                    {% if p.validated_by %}
+                        <li>
+                            Prolongations :
+                            <ul>
+                                {% for p in prolongations %}
+                                    <li{% if p.is_in_progress %} class="font-weight-bold"{% endif %}>
+                                        du {{ p.start_at|date:"d/m/Y" }} au {{ p.end_at|date:"d/m/Y" }}
                                         <br>
-                                        <small>
-                                            Autorisation par <i>{{ p.validated_by.get_full_name|title }}</i> ({{ p.validated_by.email }})
-                                        </small>
-                                    {% endif %}
-                                </li>
-                            {% endfor %}
-                        </ul>
+                                        <small>{{ p.get_reason_display }}</small>
+                                        {% if p.validated_by %}
+                                            <br>
+                                            <small>
+                                                Autorisation par <i>{{ p.validated_by.get_full_name|title }}</i> ({{ p.validated_by.email }})
+                                            </small>
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </li>
                     {% endif %}
                 {% endwith %}
             {% endif %}
