@@ -343,8 +343,10 @@ class ItouUserAdmin(UserAdmin):
     @admin.display(description="Adresse en QPV")
     def address_in_qpv(self, obj):
         # DO NOT PUT THIS FIELD IN 'list_display' : dynamically computed, only for detail page
-        if not obj.coords or obj.geocoding_score < BAN_API_RELIANCE_SCORE:
+        if not obj.coords:
             return "Adresse non-géolocalisée"
+        elif obj.geocoding_score < BAN_API_RELIANCE_SCORE:
+            return "Adresse imprécise"
 
         if qpv := QPV.in_qpv(obj, geom_field="coords"):
             return get_admin_view_link(qpv, content=qpv)

@@ -11,6 +11,7 @@ from itou.approvals.enums import Origin
 from itou.approvals.models import Approval
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
+from itou.common_apps.address.models import BAN_API_RELIANCE_SCORE
 from itou.geo.enums import ZRRStatus
 from itou.geo.models import ZRR
 from itou.job_applications.models import JobApplicationWorkflow
@@ -283,7 +284,9 @@ def get_qpv_job_seeker_pks():
     """
     qpv_job_seekers = User.objects.raw(
         # Takes only ~2s on local dev.
-        "SELECT uu.id FROM users_user uu INNER JOIN geo_qpv gq ON ST_Contains(gq.geometry, uu.coords::geometry)"
+        "SELECT uu.id FROM users_user uu "
+        "INNER JOIN geo_qpv gq ON ST_Contains(gq.geometry, uu.coords::geometry) "
+        f"WHERE uu.coords IS NOT NULL AND uu.geocoding_score > {BAN_API_RELIANCE_SCORE}"
     )
     # A list of ~100k integers is permanently loaded in memory. It is fortunately not a very high volume of data.
     # Objects returned by `raw` are defered which means their fields are not preloaded unless they have been
