@@ -1,6 +1,6 @@
-{% if job_application.to_siae.is_subject_to_eligibility_rules or request.user.is_prescriber %}
+{% if siae.is_subject_to_eligibility_rules or request.user.is_prescriber %}
     {% if eligibility_diagnosis and eligibility_diagnosis.is_considered_valid %}
-        {% if job_application.is_sent_by_authorized_prescriber %}
+        {% if sent_by_authorized_prescriber %}
             {% comment %}
                 Les candidatures envoyées par des prescripteurs habilités ne sont pas affichées de manière
                 hiérarchisée afin de ne pas induire les employeurs en erreur.
@@ -86,7 +86,7 @@
 
         {% endif %}
 
-    {% elif job_application.job_seeker.latest_pe_approval and job_application.job_seeker.latest_pe_approval.is_valid %}
+    {% elif job_seeker.latest_pe_approval and job_seeker.latest_pe_approval.is_valid %}
 
         <hr>
         <h3>Critères d'éligibilité</h3>

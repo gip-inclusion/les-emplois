@@ -21,7 +21,7 @@
                             {% include "apply/includes/geiq/geiq_diagnosis_details.html" with diagnosis=geiq_eligibility_diagnosis %}
                         {% else %}
                             {# IAE Eligibility ------------------------------------------------------------------------- #}
-                            {% include "apply/includes/eligibility_diagnosis.html" with eligibility_diagnosis=eligibility_diagnosis job_application=job_application %}
+                            {% include "apply/includes/eligibility_diagnosis.html" with eligibility_diagnosis=eligibility_diagnosis siae=job_application.to_siae job_seeker=job_application.job_seeeker sent_by_authorized_prescriber=job_application.is_sent_by_authorized_prescriber %}
                         {% endif %}
                     </div>
 

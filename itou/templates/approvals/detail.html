@@ -61,7 +61,7 @@
                         <h3>Informations personnelles</h3>
                         {% include "apply/includes/job_seeker_info.html" with job_seeker=approval.user job_application=job_application with_matomo_event=True can_view_personal_information=can_view_personal_information can_edit_personal_information=can_edit_personal_information request=request only %}
                         {# Eligibility ------------------------------------------------------------------------- #}
-                        {% include "apply/includes/eligibility_diagnosis.html" with eligibility_diagnosis=eligibility_diagnosis job_application=job_application %}
+                        {% include "apply/includes/eligibility_diagnosis.html" with eligibility_diagnosis=eligibility_diagnosis siae=job_application.to_siae job_seeker=job_application.job_seeeker sent_by_authorized_prescriber=job_application.is_sent_by_authorized_prescriber %}
                     </div>
 
                     {# Job applications ------------------------------------------------------------------------ #}
