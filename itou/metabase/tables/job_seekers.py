@@ -3,6 +3,7 @@ from functools import partial
 
 from django.utils import timezone
 
+from itou.common_apps.address.models import BAN_API_RELIANCE_SCORE
 from itou.eligibility.enums import AdministrativeCriteriaLevel, AuthorKind
 from itou.eligibility.models import AdministrativeCriteria
 from itou.metabase.tables.utils import (
@@ -168,9 +169,10 @@ def get_birth_month_from_nir(job_seeker):
 
 
 def get_job_seeker_qpv_info(job_seeker):
-    if not job_seeker.coords or job_seeker.geocoding_score < 0.8:
-        # Under this geocoding score, we can't assert the quality of the QPV information.
+    if not job_seeker.coords:
         return "Adresse non-géolocalisée"
+    elif job_seeker.geocoding_score < BAN_API_RELIANCE_SCORE:
+        return "Adresse imprécise"
     if job_seeker.pk in get_qpv_job_seeker_pks():
         return "Adresse en QPV"
     return "Adresse hors QPV"
