@@ -102,7 +102,7 @@
                                                 <p class="h4">S’identifier avec vos identifiants</p>
                                                 {% bootstrap_form_errors form type="all" %}
                                                 {% redirection_input_field name=redirect_field_name value=redirect_field_value %}
-                                                {% bootstrap_field form.login form_group_class="form-group" %}
+                                                {% bootstrap_field form.login %}
                                                 {% bootstrap_field form.password form_group_class="form-group mb-2" %}
                                                 <div class="form-group">
                                                     <a href="{% url 'account_reset_password' %}" class="btn-link fs-sm">Mot de passe oublié ?</a>
@@ -126,7 +126,7 @@
                                             <p class="h4">S’identifier avec vos identifiants</p>
                                             {% bootstrap_form_errors form type="all" %}
                                             {% redirection_input_field name=redirect_field_name value=redirect_field_value %}
-                                            {% bootstrap_field form.login form_group_class="form-group" %}
+                                            {% bootstrap_field form.login %}
                                             {% bootstrap_field form.password form_group_class="form-group mb-2" %}
                                             <div class="form-group">
                                                 <a href="{% url 'account_reset_password' %}" class="btn-link fs-sm">Mot de passe oublié ?</a>
