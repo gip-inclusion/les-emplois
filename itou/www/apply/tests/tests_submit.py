@@ -141,7 +141,6 @@ def test_check_nir_job_seeker_with_lack_of_nir_reason(client):
     session_data = client.session[f"job_application-{siae.pk}"]
     assert session_data == {
         "back_url": "/",
-        "job_seeker_pk": user.pk,
         "nir": None,
         "selected_jobs": [],
     }
@@ -171,7 +170,6 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
     def default_session_data(self):
         return {
             "back_url": "/",
-            "job_seeker_pk": None,
             "nir": None,
             "selected_jobs": [],
         }
@@ -207,10 +205,7 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
         assert response.status_code == 302
 
         session_data = self.client.session[f"job_application-{siae.pk}"]
-        expected_session_data = self.default_session_data | {
-            "job_seeker_pk": user.pk,
-        }
-        assert session_data == expected_session_data
+        assert session_data == self.default_session_data
 
         next_url = reverse("apply:check_nir_for_job_seeker", kwargs={"siae_pk": siae.pk})
         assert response.url == next_url
@@ -231,10 +226,7 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
         assert user.nir == nir
 
         session_data = self.client.session[f"job_application-{siae.pk}"]
-        expected_session_data = self.default_session_data | {
-            "job_seeker_pk": user.pk,
-        }
-        assert session_data == expected_session_data
+        assert session_data == self.default_session_data
 
         next_url = reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk, "job_seeker_pk": user.pk})
         assert response.url == next_url
@@ -278,7 +270,6 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
         assert response.status_code == 302
 
         assert self.client.session[f"job_application-{siae.pk}"] == self.default_session_data | {
-            "job_seeker_pk": user.pk,
             "selected_jobs": [siae.job_description_through.first().pk],
         }
 
@@ -430,7 +421,6 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
     def default_session_data(self):
         return {
             "back_url": "/",
-            "job_seeker_pk": None,
             "nir": None,
             "selected_jobs": [],
         }
@@ -600,7 +590,6 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
         new_job_seeker = User.objects.get(email=dummy_job_seeker_profile.user.email)
         expected_session_data = self.default_session_data | {
             "nir": dummy_job_seeker_profile.user.nir,
-            "job_seeker_pk": new_job_seeker.pk,
         }
         assert self.client.session[f"job_application-{siae.pk}"] == expected_session_data
 
@@ -618,7 +607,6 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
 
         assert self.client.session[f"job_application-{siae.pk}"] == self.default_session_data | {
             "nir": dummy_job_seeker_profile.user.nir,
-            "job_seeker_pk": new_job_seeker.pk,
             "selected_jobs": [siae.job_description_through.first().pk],
         }
 
@@ -839,7 +827,6 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
         new_job_seeker = User.objects.get(email=dummy_job_seeker_profile.user.email)
         expected_session_data = self.default_session_data | {
             "nir": dummy_job_seeker_profile.user.nir,
-            "job_seeker_pk": new_job_seeker.pk,
         }
         assert self.client.session[f"job_application-{siae.pk}"] == expected_session_data
 
@@ -857,7 +844,6 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
 
         assert self.client.session[f"job_application-{siae.pk}"] == self.default_session_data | {
             "nir": dummy_job_seeker_profile.user.nir,
-            "job_seeker_pk": new_job_seeker.pk,
             "selected_jobs": [siae.job_description_through.first().pk],
         }
 
@@ -974,7 +960,6 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
     def default_session_data(self):
         return {
             "back_url": "/",
-            "job_seeker_pk": None,
             "nir": None,
             "selected_jobs": [],
         }
@@ -1159,7 +1144,6 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
         new_job_seeker = User.objects.get(email=dummy_job_seeker_profile.user.email)
         expected_session_data = self.default_session_data | {
             "nir": dummy_job_seeker_profile.user.nir,
-            "job_seeker_pk": new_job_seeker.pk,
         }
         assert self.client.session[f"job_application-{siae.pk}"] == expected_session_data
 
@@ -1177,7 +1161,6 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
 
         assert self.client.session[f"job_application-{siae.pk}"] == self.default_session_data | {
             "nir": dummy_job_seeker_profile.user.nir,
-            "job_seeker_pk": new_job_seeker.pk,
             "selected_jobs": [siae.job_description_through.first().pk],
         }
 
@@ -1428,7 +1411,6 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
     def default_session_data(self):
         return {
             "back_url": "/",
-            "job_seeker_pk": None,
             "nir": None,
             "selected_jobs": [],
         }
@@ -1615,7 +1597,6 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
         new_job_seeker = User.objects.get(email=dummy_job_seeker_profile.user.email)
         expected_session_data = self.default_session_data | {
             "nir": dummy_job_seeker_profile.user.nir,
-            "job_seeker_pk": new_job_seeker.pk,
         }
         assert self.client.session[f"job_application-{siae.pk}"] == expected_session_data
 
@@ -1633,7 +1614,6 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
 
         assert self.client.session[f"job_application-{siae.pk}"] == self.default_session_data | {
             "nir": dummy_job_seeker_profile.user.nir,
-            "job_seeker_pk": new_job_seeker.pk,
             "selected_jobs": [siae.job_description_through.first().pk],
         }
 
@@ -1774,7 +1754,6 @@ class ApplicationViewTest(S3AccessingTestCase):
         apply_session = SessionNamespace(self.client.session, f"job_application-{siae.pk}")
         apply_session.init(
             {
-                "job_seeker_pk": job_seeker.pk,
                 "selected_jobs": siae.job_description_through.all(),
             }
         )
@@ -1796,7 +1775,6 @@ class ApplicationViewTest(S3AccessingTestCase):
         apply_session = SessionNamespace(self.client.session, f"job_application-{siae.pk}")
         apply_session.init(
             {
-                "job_seeker_pk": job_seeker.pk,
                 "selected_jobs": siae.job_description_through.all(),
             }
         )
@@ -1814,7 +1792,7 @@ class ApplicationViewTest(S3AccessingTestCase):
 
         self.client.force_login(siae.members.first())
         apply_session = SessionNamespace(self.client.session, f"job_application-{siae.pk}")
-        apply_session.init({"job_seeker_pk": job_seeker.pk})
+        apply_session.init({})  # We still need a session, even if empty
         apply_session.save()
 
         response = self.client.get(
@@ -1833,7 +1811,7 @@ class ApplicationViewTest(S3AccessingTestCase):
 
         self.client.force_login(prescriber)
         apply_session = SessionNamespace(self.client.session, f"job_application-{siae.pk}")
-        apply_session.init({"job_seeker_pk": job_seeker.pk})
+        apply_session.init({})  # We still need a session, even if empty
         apply_session.save()
 
         response = self.client.get(
@@ -1851,7 +1829,7 @@ class ApplicationViewTest(S3AccessingTestCase):
 
         self.client.force_login(siae.members.first())
         apply_session = SessionNamespace(self.client.session, f"job_application-{siae.pk}")
-        apply_session.init({"job_seeker_pk": eligibility_diagnosis.job_seeker})
+        apply_session.init({})  # We still need a session, even if empty
         apply_session.save()
 
         response = self.client.get(
@@ -1876,7 +1854,7 @@ class ApplicationViewTest(S3AccessingTestCase):
 
         self.client.force_login(prescriber)
         apply_session = SessionNamespace(self.client.session, f"job_application-{siae.pk}")
-        apply_session.init({"job_seeker_pk": eligibility_diagnosis.job_seeker})
+        apply_session.init({})  # We still need a session, even if empty
         apply_session.save()
 
         # if "shrouded" is present then we don't update the eligibility diagnosis
@@ -1959,7 +1937,6 @@ class LastCheckedAtViewTest(TestCase):
         apply_session = SessionNamespace(self.client.session, f"job_application-{self.siae.pk}")
         apply_session.init(
             {
-                "job_seeker_pk": self.job_seeker.pk,
                 "selected_jobs": [],
             }
         )
@@ -2034,7 +2011,6 @@ class UpdateJobSeekerViewTestCase(TestCase):
         apply_session = SessionNamespace(self.client.session, f"job_application-{self.siae.pk}")
         apply_session.init(
             {
-                "job_seeker_pk": self.job_seeker.pk,
                 "selected_jobs": [],
             }
         )
@@ -2053,7 +2029,6 @@ class UpdateJobSeekerViewTestCase(TestCase):
         apply_session = SessionNamespace(self.client.session, f"job_application-{self.siae.pk}")
         apply_session.init(
             {
-                "job_seeker_pk": self.job_seeker.pk,
                 "selected_jobs": [],
             }
         )
@@ -2181,7 +2156,6 @@ class UpdateJobSeekerViewTestCase(TestCase):
         apply_session = SessionNamespace(self.client.session, f"job_application-{self.siae.pk}")
         apply_session.init(
             {
-                "job_seeker_pk": self.job_seeker.pk,
                 "selected_jobs": [],
             }
         )
@@ -2357,7 +2331,6 @@ class UpdateJobSeekerStep3ViewTestCase(TestCase):
         apply_session = SessionNamespace(self.client.session, f"job_application-{siae.pk}")
         apply_session.init(
             {
-                "job_seeker_pk": job_seeker.pk,
                 "selected_jobs": [],
             }
         )
@@ -2393,7 +2366,6 @@ def test_detect_existing_job_seeker(client):
 
     default_session_data = {
         "back_url": "/",
-        "job_seeker_pk": None,
         "nir": None,
         "selected_jobs": [],
     }
@@ -2509,11 +2481,10 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
         cls.job_seeker_with_geiq_diagnosis = GEIQEligibilityDiagnosisFactory(with_prescriber=True).job_seeker
         cls.siae = SiaeFactory(with_membership=True, kind=SiaeKind.EI)
 
-    def _setup_session(self, job_seeker=None, siae_pk=None):
+    def _setup_session(self, siae_pk=None):
         apply_session = SessionNamespace(self.client.session, f"job_application-{siae_pk or self.geiq.pk}")
         apply_session.init(
             {
-                "job_seeker_pk": job_seeker or JobSeekerFactory(),
                 "selected_jobs": self.geiq.job_description_through.all(),
             }
         )
@@ -2527,7 +2498,7 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
 
         # Redirect orienter
         self.client.force_login(self.orienter)
-        self._setup_session(job_seeker=job_seeker)
+        self._setup_session()
         response = self.client.get(
             reverse(
                 "apply:application_geiq_eligibility", kwargs={"siae_pk": self.geiq.pk, "job_seeker_pk": job_seeker.pk}
@@ -2545,7 +2516,7 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
     def test_bypass_geiq_diagnosis_for_staff_members(self):
         job_seeker = JobSeekerFactory()
         self.client.force_login(self.geiq.members.first())
-        self._setup_session(job_seeker=job_seeker)
+        self._setup_session()
         response = self.client.get(
             reverse(
                 "apply:application_geiq_eligibility", kwargs={"siae_pk": self.geiq.pk, "job_seeker_pk": job_seeker.pk}
@@ -2564,7 +2535,7 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
         # A job seeker must not have access to GEIQ eligibility form
         job_seeker = JobSeekerFactory()
         self.client.force_login(job_seeker)
-        self._setup_session(job_seeker=job_seeker)
+        self._setup_session()
         response = self.client.get(
             reverse(
                 "apply:application_geiq_eligibility", kwargs={"siae_pk": self.geiq.pk, "job_seeker_pk": job_seeker.pk}
@@ -2584,7 +2555,7 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
         # See comment im previous test:
         # assert we're not somewhere we don't belong to (non-GEIQ)
         self.client.force_login(self.siae.members.first())
-        self._setup_session(job_seeker=job_seeker, siae_pk=self.siae.pk)
+        self._setup_session(siae_pk=self.siae.pk)
 
         with self.assertRaisesRegex(ValueError, "This form is only for GEIQ"):
             self.client.get(
@@ -2597,7 +2568,7 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
     def test_access_as_authorized_prescriber(self):
         job_seeker = JobSeekerFactory()
         self.client.force_login(self.prescriber_org.members.first())
-        self._setup_session(job_seeker=job_seeker)
+        self._setup_session()
 
         response = self.client.get(
             reverse(
@@ -2612,7 +2583,7 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
         self.client.force_login(self.prescriber_org.members.first())
 
         # Badge OK if job seeker has a valid eligibility diagnosis
-        self._setup_session(self.job_seeker_with_geiq_diagnosis)
+        self._setup_session()
         response = self.client.get(
             reverse(
                 "apply:application_geiq_eligibility",
@@ -2626,7 +2597,7 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
 
         # Badge KO if job seeker has no diagnosis
         job_seeker_without_diagnosis = JobSeekerFactory()
-        self._setup_session(job_seeker=job_seeker_without_diagnosis)
+        self._setup_session()
         response = self.client.get(
             reverse(
                 "apply:application_geiq_eligibility",
@@ -2644,7 +2615,7 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
         assert not diagnosis.eligibility_confirmed
 
         self.client.force_login(self.prescriber_org.members.first())
-        self._setup_session(diagnosis.job_seeker, diagnosis.author_geiq.pk)
+        self._setup_session(diagnosis.author_geiq.pk)
         response = self.client.get(
             reverse(
                 "apply:application_geiq_eligibility",
@@ -2657,7 +2628,7 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
 
     def test_geiq_diagnosis_form_validation(self):
         self.client.force_login(self.prescriber_org.members.first())
-        self._setup_session(self.job_seeker_with_geiq_diagnosis)
+        self._setup_session()
 
         response = self.client.post(
             reverse(
