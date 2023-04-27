@@ -92,6 +92,12 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
                 self.assertContains(response, f"/job_description/{job.pk}/card")
                 self.assertContains(response, f"toggle_job_description_form_{job.pk}")
                 self.assertContains(response, f"#_delete_modal_{job.pk}")
+                self.assertContains(
+                    response,
+                    f"""<input type="hidden" name="job_description_id" value="{job.pk}"/>""",
+                    html=True,
+                    count=2,
+                )
 
     def test_block_job_applications(self):
         response = self._login(self.user)
