@@ -42,25 +42,37 @@
                 {% endif %}
 
                 <hr>
-                <h2>Contrat</h2>
-                {% bootstrap_form_errors form_accept type="non_fields" %}
-                {% if has_job_description %}
-                    {% bootstrap_field form_accept.hired_job %}
-                {% endif %}
-                <div id="jobAppellation" {% if has_job_description %}class="d-none"{% endif %}>
-                    {% bootstrap_field form_accept.job_appellation %}
+                <div id="form_accept">
+                    <h2>Contrat</h2>
+                    {% bootstrap_form_errors form_accept type="non_fields" %}
+ 
+                    {% if has_job_description %}
+                        {% bootstrap_field form_accept.hired_job %}
+                    {% else %}
+                        {% bootstrap_field form_accept.job_appellation %}
+                        {% bootstrap_field form_accept.job_appellation_code %}
+                    {% endif %}
+
+                    {% if form_accept.hired_job.value == hired_job_other_hidden_value %}
+                        {% bootstrap_field form_accept.job_appellation %}
+                        {% bootstrap_field form_accept.job_appellation_code %}
+                    {% endif %}
+ 
+                    {% bootstrap_field form_accept.location_label %}
+                    {% bootstrap_field form_accept.location_code %}
+
+                    {% if job_application.to_siae.kind == SiaeKind.GEIQ %}
+                        {% bootstrap_field form_accept.contract_type %}
+                        <div id="contractTypeDetails" {% if not form_accept.is_bound or form_accept.contract_type.value != gieq_other_contract_type_hidden_value %}class="d-none"{% endif %}>
+                            {% bootstrap_field form_accept.contract_type_details %}
+                        </div>
+                        {% bootstrap_field form_accept.nb_hours_per_week %}
+                    {% endif %}
+ 
+                    {% bootstrap_field form_accept.hiring_start_at %}
+                    {% bootstrap_field form_accept.hiring_end_at %}
+                    {% bootstrap_field form_accept.answer %}
                 </div>
-                {% bootstrap_field form_accept.location_label %}
-                {% if job_application.to_siae.kind == SiaeKind.GEIQ %}
-                    {% bootstrap_field form_accept.contract_type %}
-                    <div id="contractTypeDetails" {% if not form_accept.is_bound or form_accept.contract_type.value != gieq_other_contract_type_hidden_value %}class="d-none"{% endif %}>
-                        {% bootstrap_field form_accept.contract_type_details %}
-                    </div>
-                    {% bootstrap_field form_accept.nb_hours_per_week %}
-                {% endif %}
-                {% bootstrap_field form_accept.hiring_start_at %}
-                {% bootstrap_field form_accept.hiring_end_at %}
-                {% bootstrap_field form_accept.answer %}
 
 
                 {% buttons %}
@@ -136,7 +148,7 @@
     </script>
     <script nonce="{{ CSP_NONCE }}">
         htmx.onLoad(function() {
-            var hiredJob = $("#id_hired_job");
+            var hiredJob = $("#{{ form_accept.hired_job.id_for_label }}");
             var jobAppellation = $("#jobAppellation");
             hiredJob.change(function() {
                 if (hiredJob.val() == '{{ hired_job_other_hidden_value }}') {

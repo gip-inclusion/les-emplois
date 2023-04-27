@@ -610,6 +610,12 @@ class SiaeJobDescription(models.Model):
         null=True,
     )
     source_url = models.URLField(verbose_name="URL source de l'offre", max_length=512, null=True, blank=True)
+
+    # Job descriptions are now directly linked to job applications / hirings (`hired_job`).
+    # A job application could be accepted without a matching job description.
+    # It's no longer the case and if there's no job description, a new one is
+    # automatically created at the end of the hiring process.
+    # `created_at_hiring` marks job descriptions created in this situation.
     created_at_hiring = models.BooleanField(
         verbose_name="Fiche de poste créée automatiquement à l'embauche", default=False
     )

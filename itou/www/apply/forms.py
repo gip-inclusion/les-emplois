@@ -2,7 +2,7 @@ import contextlib
 import datetime
 from operator import itemgetter
 
-import sentry_sdk
+# import sentry_sdk
 from dateutil.relativedelta import relativedelta
 from django import forms
 from django.core.validators import MinLengthValidator
@@ -23,6 +23,7 @@ from itou.eligibility.models import AdministrativeCriteria
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow, PriorAction
 from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS, ContractType, SiaeKind
+from itou.siaes.models import SiaeJobDescription
 from itou.users.enums import UserKind
 from itou.users.models import JobSeekerProfile, User
 from itou.utils import constants as global_constants
@@ -147,7 +148,6 @@ class CheckJobSeekerInfoForm(forms.ModelForm):
 
 
 class CreateOrUpdateJobSeekerStep1Form(forms.ModelForm):
-
     REQUIRED_FIELDS = [
         "title",
         "first_name",
@@ -209,7 +209,6 @@ class CreateOrUpdateJobSeekerStep2Form(MandatoryAddressFormMixin, forms.ModelFor
 
 
 class CreateOrUpdateJobSeekerStep3Form(forms.ModelForm):
-
     # A set of transient checkboxes used to collapse optional blocks
     pole_emploi = forms.BooleanField(required=False, label="Inscrit à Pôle emploi")
     unemployed = forms.BooleanField(required=False, label="Sans emploi")
@@ -454,30 +453,61 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
         "contract_type_details",
         "nb_hours_per_week",
     )
-    OTHER_HIRED_JOB = "Autre"
+    OTHER_HIRED_JOB = "other"
+
+    # Can't use a `ModelChoiceField`: choices are constrained (can't add custom value)
+    hired_job = forms.ChoiceField()
 
     def __init__(self, *args, **kwargs):
         self.instance = kwargs["instance"]
+        self.confirmed = False
+
+        # Some POST data are sent sideways: bring them back to home
+        # `confirmed` for modal confirmation is sent via HTMX
+        data = kwargs.get("data")
+        if data and data.get("confirmed"):
+            self.confirmed = bool(data.get("confirmed"))
+
         super().__init__(self.instance.to_siae, *args, **kwargs)
 
         self.fields["job_appellation"].label = "Préciser le nom du poste (code ROME)"
         self.fields["location_label"].label = "Localisation du poste"
 
-        # Default to empty choice ?
-        available_jobs = sorted(
-            [
-                (job_description.pk, f"{job_description.display_name} - {job_description.display_location}")
-                for job_description in self.instance.to_siae.job_description_through.all()
-            ],
-            key=itemgetter(1),
-        )
-        self.fields["hired_job"].choices = (
-            [("", "---------")] + available_jobs + [(self.OTHER_HIRED_JOB, self.OTHER_HIRED_JOB)]
-        )
+        # `hired_job` can't be used from model directly because of constrained choices
+        # we must use a "simple" ChoiceField and update the value on cleaning
+        self.fields["hired_job"].label = "Poste retenu"
+
+        def _sort_jobs(jobs):
+            return sorted(
+                [
+                    (job_description.pk, f"{job_description.display_name} - {job_description.display_location}")
+                    for job_description in jobs
+                ],
+                key=itemgetter(1),
+            )
+
+        # Using opt groups
+        jobs = self.instance.to_siae.job_description_through.all().order_by("custom_name", "is_active")
+        active_jobs = _sort_jobs(tuple(job for job in jobs if job.is_active))
+        inactive_jobs = _sort_jobs(tuple(job for job in jobs if not job.is_active))
+
+        if jobs:
+            choices = [("", "Sélectionnez un nouveau poste")]
+            if active_jobs:
+                choices.append(("Postes ouverts au recrutement", active_jobs))
+
+            if inactive_jobs:
+                choices.append(("Postes fermés au recrutement", inactive_jobs))
+
+            choices.append(("Autre poste", [(self.OTHER_HIRED_JOB, "Créez un nouveau poste")]))
+            self.fields["hired_job"].choices = choices
+
+        self.fields["hired_job"].widget.attrs.update({"hx-post": ""})
 
         self.fields["hiring_start_at"].required = True
         for field in ["hiring_start_at", "hiring_end_at"]:
             self.fields[field].widget = DuetDatePickerWidget()
+
         # Job applications can be accepted twice if they have been cancelled.
         # They also can be accepted after a refusal.
         # That's why some fields are already filled in with obsolete data.
@@ -514,7 +544,6 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
     class Meta:
         model = JobApplication
         fields = [
-            "hired_job",
             "job_appellation",
             "job_appellation_code",
             "location_label",
@@ -559,6 +588,12 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
         if hiring_end_at and hiring_start_at and hiring_end_at < hiring_start_at:
             raise forms.ValidationError(JobApplication.ERROR_END_IS_BEFORE_START)
 
+        hired_job = self.cleaned_data.get("hired_job")
+        job_appellation_id = self.cleaned_data.get("job_appellation_code")
+
+        if hired_job == self.OTHER_HIRED_JOB and not job_appellation_id:
+            raise forms.ValidationError({"job_appellation": "Un poste doit être saisi"})
+
         if self.instance.to_siae.kind == SiaeKind.GEIQ:
             # This validation is enforced by database constraints,
             # but we are nice enough to display a warning message to the user
@@ -570,6 +605,44 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
                 raise forms.ValidationError(
                     {"contract_type_details": ["Les précisions sont nécessaires pour ce type de contrat"]}
                 )
+
+        location_code = self.cleaned_data.get("location_code")
+        other_job = hired_job == self.OTHER_HIRED_JOB
+
+        if other_job and not location_code:
+            # location becomes mandatory in this case only:
+            raise forms.ValidationError(
+                {"location_label": "La localisation est obligatoire en cas de création d'un poste"}
+            )
+
+        # All validations done, do some work before saving ...
+        if other_job:
+            city = City.objects.filter(slug=location_code).first()
+
+            # Check that the new job application is not a duplicate from the list
+            if exisiting_job_description := SiaeJobDescription.objects.filter(
+                location=city, appellation_id=job_appellation_id
+            ).first():
+                # Found one matching: reuse it and don't create a new one
+                self.instance.hired_job = exisiting_job_description
+            else:
+                # If no job description in the list is matching, eventually create a new one:
+                # - inactive
+                # - marked as autogenerated
+                # - associated to current job application
+                new_job_description = SiaeJobDescription(
+                    siae=self.instance.to_siae,
+                    appellation_id=job_appellation_id,
+                    location=city,
+                    is_active=False,
+                    created_at_hiring=True,
+                    description="Poste créé automatiquement lors de l'acceptation de la candidature.",
+                )
+                new_job_description.save()
+                self.instance.hired_job = new_job_description
+        else:
+            # A job description has been selected is the list: link it to current hiring
+            self.instance.hired_job_id = hired_job
 
         return cleaned_data
 
@@ -831,7 +904,7 @@ class SiaePrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
         required=False, label="Fiches de poste", widget=forms.CheckboxSelectMultiple
     )
 
-    @sentry_sdk.trace
+    # @sentry_sdk.trace
     def __init__(self, job_applications_qs, *args, **kwargs):
         self.job_applications_qs = job_applications_qs
         super().__init__(*args, **kwargs)

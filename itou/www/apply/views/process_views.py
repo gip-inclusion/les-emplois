@@ -52,7 +52,8 @@ def check_waiting_period(job_application):
     # This code should still stay relevant for the 3.5 years to come to account for the PE approvals
     # that have been delivered in December 2021 (and that may have 2 years waiting periods)
     if job_application.job_seeker.approval_can_be_renewed_by(
-        siae=job_application.to_siae, sender_prescriber_organization=job_application.sender_prescriber_organization
+        siae=job_application.to_siae,
+        sender_prescriber_organization=job_application.sender_prescriber_organization,
     ):
         raise PermissionDenied(apply_view_constants.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY)
 
@@ -252,7 +253,6 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
     """
     Trigger the `accept` transition.
     """
-
     queryset = JobApplication.objects.siae_member_required(request.user)
     job_application = get_object_or_404(queryset, id=job_application_id)
     check_waiting_period(job_application)
@@ -294,7 +294,10 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
     }
 
     if not job_application.hiring_without_approval and job_application.eligibility_diagnosis_by_siae_required:
-        messages.error(request, "Cette candidature requiert un diagnostic d'éligibilité pour être acceptée.")
+        messages.error(
+            request,
+            "Cette candidature requiert un diagnostic d'éligibilité pour être acceptée.",
+        )
         return HttpResponseRedirect(next_url)
 
     if request.method == "POST" and all([form.is_valid() for form in forms]):
@@ -305,7 +308,6 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
                 context=context,
                 headers=hx_trigger_modal_control("js-confirmation-modal", "show"),
             )
-
         try:
             with transaction.atomic():
                 if form_personal_data:
@@ -314,6 +316,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
                     form_user_address.save()
                 # After each successful transition, a save() is performed by django-xworkflows,
                 # so use `commit=False` to avoid a double save.
+                print(job_application.__dict__)
                 job_application = form_accept.save(commit=False)
                 job_application.accept(user=request.user)
 
@@ -410,7 +413,15 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
 
         return HttpResponseClientRedirect(next_url)
 
-    return render(request, template_name, {**context, "has_form_error": any(form.errors for form in forms)})
+    if form_accept.errors:
+        [(code, _), *_] = form_accept.errors.items()
+        context |= {"error_anchor": code}
+
+    return render(
+        request,
+        template_name,
+        {**context, "has_form_error": any(form.errors for form in forms)},
+    )
 
 
 @login_required
@@ -540,7 +551,9 @@ def eligibility(request, job_application_id, template_name="apply/process_eligib
     if request.method == "POST" and form_administrative_criteria.is_valid():
         user_info = get_user_info(request)
         EligibilityDiagnosis.create_diagnosis(
-            job_application.job_seeker, user_info, administrative_criteria=form_administrative_criteria.cleaned_data
+            job_application.job_seeker,
+            user_info,
+            administrative_criteria=form_administrative_criteria.cleaned_data,
         )
         messages.success(request, "Éligibilité confirmée !")
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
@@ -569,11 +582,17 @@ def geiq_eligibility(request, job_application_id, template_name="apply/process_g
     if request.method == "POST" and form.is_valid() and request.htmx:
         if form.cleaned_data["choice"]:
             return HttpResponseRedirect(
-                reverse("apply:geiq_eligibility_criteria", kwargs={"job_application_id": job_application.pk})
+                reverse(
+                    "apply:geiq_eligibility_criteria",
+                    kwargs={"job_application_id": job_application.pk},
+                )
             )
         else:
             return HttpResponseRedirect(
-                reverse("apply:continue_without_geiq_diagnosis", kwargs={"job_application_id": job_application.pk})
+                reverse(
+                    "apply:continue_without_geiq_diagnosis",
+                    kwargs={"job_application_id": job_application.pk},
+                )
                 + f"?next_url={request.session.get('next_url')}"
             )
 
@@ -597,7 +616,9 @@ def geiq_eligibility(request, job_application_id, template_name="apply/process_g
 
 @login_required
 def continue_without_geiq_diagnosis(
-    request, job_application_id, template_name="apply/includes/geiq/continue_without_geiq_diagnosis_form.html"
+    request,
+    job_application_id,
+    template_name="apply/includes/geiq/continue_without_geiq_diagnosis_form.html",
 ):
     job_application = get_object_or_404(JobApplication, pk=job_application_id)
     next_url = request.session.get("next_url")
@@ -617,7 +638,9 @@ def continue_without_geiq_diagnosis(
 
 @login_required
 def geiq_eligibility_criteria(
-    request, job_application_id, template_name="apply/includes/geiq/check_geiq_eligibility_form.html"
+    request,
+    job_application_id,
+    template_name="apply/includes/geiq/check_geiq_eligibility_form.html",
 ):
     """Dynamic GEIQ eligibility criteria form (HTMX)"""
 
@@ -643,7 +666,10 @@ def geiq_eligibility_criteria(
                 GEIQEligibilityDiagnosis.update_eligibility_diagnosis(diagnosis, request.user, criteria)
             else:
                 GEIQEligibilityDiagnosis.create_eligibility_diagnosis(
-                    job_application.job_seeker, request.user, job_application.to_siae, criteria
+                    job_application.job_seeker,
+                    request.user,
+                    job_application.to_siae,
+                    criteria,
                 )
 
             del request.session["back_url"]
@@ -658,7 +684,10 @@ def geiq_eligibility_criteria(
     }
 
     if job_application.job_seeker.address_in_qpv or job_application.job_seeker.zrr_city_name:
-        context |= {"geo_criteria_detected": True, "job_seeker": job_application.job_seeker}
+        context |= {
+            "geo_criteria_detected": True,
+            "job_seeker": job_application.job_seeker,
+        }
 
     return render(request, template_name, context)
 
@@ -700,7 +729,8 @@ def delete_prior_action(request, job_application_id, prior_action_id):
         else ""
     )
     return HttpResponse(
-        content, headers=hx_trigger_modal_control(f"delete_prior_action_{ prior_action_id }_modal", "hide")
+        content,
+        headers=hx_trigger_modal_control(f"delete_prior_action_{ prior_action_id }_modal", "hide"),
     )
 
 
@@ -715,7 +745,10 @@ def add_or_modify_prior_action(request, job_application_id, prior_action_id=None
         return HttpResponseForbidden()
 
     prior_action = (
-        get_object_or_404(PriorAction.objects.filter(job_application=job_application), pk=prior_action_id)
+        get_object_or_404(
+            PriorAction.objects.filter(job_application=job_application),
+            pk=prior_action_id,
+        )
         if prior_action_id
         else None
     )
@@ -783,10 +816,16 @@ def add_or_modify_prior_action(request, job_application_id, prior_action_id=None
         "form_url": (
             reverse(
                 "apply:modify_prior_action",
-                kwargs={"job_application_id": job_application.pk, "prior_action_id": prior_action.pk},
+                kwargs={
+                    "job_application_id": job_application.pk,
+                    "prior_action_id": prior_action.pk,
+                },
             )
             if prior_action
-            else reverse("apply:add_prior_action", kwargs={"job_application_id": job_application.pk})
+            else reverse(
+                "apply:add_prior_action",
+                kwargs={"job_application_id": job_application.pk},
+            )
         ),
         # When editing existing action, we want to keep the hr from job_application_prior_action.html
         "final_hr": prior_action is not None,
