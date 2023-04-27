@@ -610,6 +610,9 @@ class SiaeJobDescription(models.Model):
         null=True,
     )
     source_url = models.URLField(verbose_name="URL source de l'offre", max_length=512, null=True, blank=True)
+    created_at_hiring = models.BooleanField(
+        verbose_name="Fiche de poste créée automatiquement à l'embauche", default=False
+    )
 
     objects = SiaeJobDescriptionQuerySet.as_manager()
 
