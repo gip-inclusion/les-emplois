@@ -8,41 +8,87 @@
     <form method="post" class="js-prevent-multiple-submit js-format-nir">
         <div class="card c-card p-3">
             <div class="card-body">
-                {% if nir %}
-                    <div class="form-group form-group-required">
-                        <label for="id_nir">Numéro de sécurité sociale du candidat</label>
-                        <input id="id_nir" name="nir" class="form-control" disabled value="{{ nir }}">
-                    </div>
-                {% endif %}
-
-                <div class="alert alert-info mt-4 mb-4">
-                    <div class="row">
-                        <div class="col-auto pr-0">
-                            <i class="ri-information-line ri-xl"></i>
-                        </div>
-                        <div class="col">
-                            <p class="mb-2">
-                                <strong>Créer un compte pour votre candidat</strong>
-                            </p>
-                            <p class="mb-0">
-                                Aucun utilisateur n'est inscrit avec ce numéro de sécurité sociale. Merci de renseigner l'adresse e-mail de votre candidat pour l'inscrire.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
                 {% csrf_token %}
 
-                {% bootstrap_form form alert_error_type="all" %}
+                {% if form.with_email %}
+                    {% if nir %}
+                        <div class="form-group form-group-required">
+                            <label for="id_ro_nir">Numéro de sécurité sociale du candidat</label>
+                            <input id="id_ro_nir" name="nir" class="form-control" disabled value="{{ nir }}">
+                        </div>
+                    {% endif %}
 
-                <div>{% include "signup/includes/no_email_link.html" with link_text="Le candidat n'a pas d'e-mail ?" %}</div>
+                    <div class="alert alert-info mt-4 mb-4">
+                        <div class="row">
+                            <div class="col-auto pr-0">
+                                <i class="ri-information-line ri-xl"></i>
+                            </div>
+                            <div class="col">
+                                <p class="mb-2">
+                                    <strong>Créer un compte pour votre candidat</strong>
+                                </p>
+                                <p class="mb-0">
+                                    Aucun utilisateur n'est inscrit avec ce numéro de sécurité sociale. Merci de renseigner l'adresse e-mail de votre candidat pour l'inscrire.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>{% include "signup/includes/no_email_link.html" with link_text="Le candidat n'a pas d'e-mail ?" %}</div>
+                {% endif %}
+
+                {% bootstrap_form_errors form type="all" %}
+
+                {% bootstrap_form form %}
+
+                {% if not form.with_email %}
+                    {% if form.errors %}
+                        <div class="alert alert-info">
+                            <div class="row">
+                                <div class="col-auto pr-0">
+                                    <i class="ri-information-line ri-xl text-info"></i>
+                                </div>
+                                <div class="col">
+                                    <p class="mb-0">
+                                        Vous possédez un numéro de sécurité sociale temporaire ?
+                                        <button type="submit" name="step" value="email" class="btn btn-link p-0 matomo-event" data-matomo-category="nir-temporaire" data-matomo-action="etape-suivante" data-matomo-option="candidature">
+                                            Cliquez ici pour accéder à l'étape suivante.
+                                        </button>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <div class="row">
+                                <div class="col-auto pr-0">
+                                    <i class="ri-information-line ri-xl text-info"></i>
+                                </div>
+                                <div class="col">
+                                    <p class="mb-0">
+                                        Le candidat n'a pas de numéro de sécurité sociale ?
+                                        <br>
+                                        <a href="https://www.ameli.fr/assure/droits-demarches/principes/numero-securite-sociale"
+                                           aria-label="ameli.fr, article concernant le numéro de sécurité sociale (ouverture dans un nouvel onglet)"
+                                           rel="noopener"
+                                           target="_blank">ameli.fr</a><i class="ri-external-link-line ml-1"></i>, le site de l'assurance maladie, vous explique comment l'obtenir.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endif %}
 
                 {% buttons %}
                     <hr class="my-3 my-lg-5">
 
                     <div class="row mt-3 mt-lg-5 justify-content-end">
                         <div class="col-6 col-lg-auto">
-                            <a href="{% url 'apply:check_nir_for_sender' siae_pk=siae.pk %}" class="btn btn-link" aria-label="Retourner à l'étape précédente">Retour</a>
+                            {% if form.with_email %}
+                                <a class="btn btn-link" aria-label="Retourner à l'étape précédente" href="{% url 'apply:check_nir_for_sender' siae_pk=siae.pk %}">Retour</a>
+                            {% else %}
+                                <a class="btn btn-link" aria-label="Retourner au tableau de bord" href="{% url 'dashboard:index' %}">Retour</a>
+                            {% endif %}
                         </div>
                         <div class="col-6 col-lg-auto">
                             {# Reload this page and show a modal containing more information about the job seeker. #}
@@ -54,7 +100,7 @@
                 {% endbuttons %}
             </div>
         </div>
-        {% if preview_mode %}
+        {% if preview_mode == "email" %}
             <!-- Modal -->
             <div class="modal" id="email-confirmation-modal" tabindex="-1" role="dialog" aria-labelledby="email-confirmation-label" aria-modal="true">
                 <div class="modal-dialog">
@@ -92,6 +138,36 @@
                     </div>
                 </div>
             </div>
+        {% elif preview_mode == "nir" %}
+            <!-- Modal -->
+            <div class="modal" id="nir-confirmation-modal" tabindex="-1" role="dialog" aria-labelledby="nir-confirmation-label" aria-modal="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3 class="modal-title" id="nir-confirmation-label">Utilisateur trouvé</h3>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+                                <i class="ri-close-line"></i>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>
+                                Le numéro {{ form.nir.value|format_nir }} est associé au compte de <b>{{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</b>.
+                            </p>
+                            <p>
+                                Si cette candidature n'est pas pour <b>{{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur « Ce n'est pas mon candidat » afin de modifier le numéro de sécurité sociale.
+                            </p>
+                        </div>
+                        <div class="modal-footer">
+                            {% buttons %}
+                                {# Reload this page with a new form. #}
+                                <button type="submit" name="cancel" value="1" class="btn btn-sm btn-secondary">Ce n'est pas mon candidat</button>
+                                {# Go to the next step. #}
+                                <button type="submit" name="confirm" value="1" class="btn btn-sm btn-primary">Continuer</button>
+                            {% endbuttons %}
+                        </div>
+                    </div>
+                </div>
+            </div>
         {% endif %}
     </form>
 {% endblock %}
@@ -103,6 +179,7 @@
         <script nonce="{{ CSP_NONCE }}">
             // Adding the "show" CSS class is not enough and not documented.
             // A JS initialization is recommended.
+            $("#nir-confirmation-modal").modal("show");
             $("#email-confirmation-modal").modal("show");
         </script>
     {% endif %}

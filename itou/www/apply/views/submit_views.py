@@ -33,13 +33,13 @@ from itou.utils.storage.s3 import S3Upload
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
     ApplicationJobsForm,
+    CheckJobSeekerForSenderForm,
     CheckJobSeekerInfoForm,
     CheckJobSeekerNirForm,
     CreateOrUpdateJobSeekerStep1Form,
     CreateOrUpdateJobSeekerStep2Form,
     CreateOrUpdateJobSeekerStep3Form,
     SubmitJobApplicationForm,
-    UserExistsForm,
 )
 from itou.www.apply.views import constants as apply_view_constants
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
@@ -224,7 +224,6 @@ class StartView(ApplyStepBaseView):
         self.apply_session.init(
             {
                 "back_url": self._coalesce_back_url(),
-                "nir": None,
                 "selected_jobs": [request.GET["job_description_id"]] if "job_description_id" in request.GET else [],
             }
         )
@@ -294,123 +293,133 @@ class CheckNIRForJobSeekerView(ApplyStepForJobSeekerBaseView):
         }
 
 
-class CheckNIRForSenderView(ApplyStepForSenderBaseView):
-    template_name = "apply/submit_step_check_job_seeker_nir.html"
-
-    def __init__(self):
-        super().__init__()
-        self.form = None
-
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.form = CheckJobSeekerNirForm(job_seeker=None, data=request.POST or None)
-
-    def post(self, request, *args, **kwargs):
-        if self.form.data.get("skip"):
-            # Redirect to search by e-mail address.
-            return HttpResponseRedirect(reverse("apply:check_email_for_sender", kwargs={"siae_pk": self.siae.pk}))
-
-        context = {}
-        if self.form.is_valid():
-            job_seeker = self.form.get_job_seeker()
-
-            # No user found with that NIR, save the NIR in the session and redirect to search by e-mail address.
-            if not job_seeker:
-                self.apply_session.set("nir", self.form.cleaned_data["nir"])
-                return HttpResponseRedirect(reverse("apply:check_email_for_sender", kwargs={"siae_pk": self.siae.pk}))
-
-            # The NIR we found is correct
-            if self.form.data.get("confirm"):
-                return HttpResponseRedirect(
-                    reverse(
-                        "apply:step_check_job_seeker_info",
-                        kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": job_seeker.pk},
-                    )
-                )
-
-            context = {
-                # Ask the sender to confirm the NIR we found is associated to the correct user
-                "preview_mode": bool(self.form.data.get("preview")),
-                "job_seeker": job_seeker,
-                "can_view_personal_information": self.sender.can_view_personal_information(job_seeker),
-            }
-
-        return self.render_to_response(self.get_context_data(**kwargs) | context)
-
-    def get_context_data(self, **kwargs):
-        return super().get_context_data(**kwargs) | {
-            "form": self.form,
-            "form_action": reverse("apply:check_nir_for_sender", kwargs={"siae_pk": self.siae.pk}),
-        }
-
-
-class CheckEmailForSenderView(ApplyStepForSenderBaseView):
+class CheckJobSeekerForSenderView(ApplyStepForSenderBaseView):
     template_name = "apply/submit_step_job_seeker.html"
 
     def __init__(self):
         super().__init__()
         self.form = None
+        self.nir = None
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.form = UserExistsForm(initial=request.GET, data=request.POST or None)
+        initial = {}
+        if session_uuid := request.GET.get("from_session"):
+            # Similar job seeker found in create step 1
+            # User is coming back: retrieve nir & email from session if supplied
+            job_seeker_session = SessionNamespace(request.session, session_uuid)
+            if job_seeker_session.exists():
+                if nir := job_seeker_session.get("user", {}).get("nir"):
+                    initial["nir"] = nir
+                    self.nir = nir
+                if email := job_seeker_session.get("user", {}).get("email"):
+                    initial["email"] = email
+
+        self.form = CheckJobSeekerForSenderForm(
+            initial=initial,
+            data=request.POST or None,
+            with_email=(
+                # The user filled the email field
+                request.POST.get("email")
+                # The user clicked the button "Cliquez ici pour accéder à l'étape suivante"
+                or request.POST.get("step") == "email"
+                # The user is coming back from create user step 1
+                or "email" in initial
+            ),
+        )
 
     def post(self, request, *args, **kwargs):
         can_add_nir = False
-        preview_mode = False
+        preview_mode = ""
         job_seeker = None
+        nir = None
 
         if self.form.is_valid():
-            job_seeker = self.form.get_user()
-            nir = self.apply_session.get("nir") or ""
-            can_add_nir = nir and self.sender.can_add_nir(job_seeker)
+            if not self.form.with_email:
+                job_seeker = self.form.get_job_seeker()
 
-            # No user found with that email, redirect to create a new account.
-            if not job_seeker:
-                job_seeker_session = SessionNamespace.create_temporary(request.session)
-                job_seeker_session.init({"user": {"email": self.form.cleaned_data["email"], "nir": nir}})
-                return HttpResponseRedirect(
-                    reverse(
-                        "apply:create_job_seeker_step_1_for_sender",
-                        kwargs={"siae_pk": self.siae.pk, "session_uuid": job_seeker_session.name},
-                    )
-                )
-
-            # Ask the sender to confirm the email we found is associated to the correct user
-            if self.form.data.get("preview"):
-                preview_mode = True
-
-            # The email we found is correct
-            if self.form.data.get("confirm"):
-
-                if not can_add_nir:
-                    return HttpResponseRedirect(
-                        reverse(
-                            "apply:step_check_job_seeker_info",
-                            kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": job_seeker.pk},
+                if job_seeker is not None:
+                    # The NIR we found is correct
+                    if self.form.data.get("confirm"):
+                        return HttpResponseRedirect(
+                            reverse(
+                                "apply:step_check_job_seeker_info",
+                                kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": job_seeker.pk},
+                            )
                         )
-                    )
-
-                try:
-                    job_seeker.nir = nir
-                    job_seeker.lack_of_nir_reason = ""
-                    job_seeker.save(update_fields=["nir", "lack_of_nir_reason"])
-                except ValidationError:
-                    msg = mark_safe(
-                        f"Le<b> numéro de sécurité sociale</b> renseigné ({ nir }) est "
-                        "déjà utilisé par un autre candidat sur la Plateforme.<br>"
-                        "Merci de renseigner <b>le numéro personnel et unique</b> "
-                        "du candidat pour lequel vous souhaitez postuler."
-                    )
-                    messages.warning(request, msg)
-                    logger.exception("step_job_seeker: error when saving job_seeker=%s nir=%s", job_seeker, nir)
+                    if self.form.data.get("preview"):
+                        preview_mode = "nir"
                 else:
+                    # The NIR is valid but no job seeker found, let's try with an email
+                    self.form = CheckJobSeekerForSenderForm(
+                        {"nir": self.form.cleaned_data["nir"]},
+                        with_email=True,
+                    )
+                    # The template will check for errors but the user did not have the chance
+                    # to fill the email: hide the "required field" error preemptively
+                    self.form.full_clean()
+                    del self.form.errors["email"]
+
+            else:
+                job_seeker = self.form.get_user()
+                nir = self.form.cleaned_data.get("nir")
+                can_add_nir = nir and self.sender.can_add_nir(job_seeker)
+
+                # No user found with that email, redirect to create a new account.
+                if not job_seeker:
+                    job_seeker_session = SessionNamespace.create_temporary(request.session)
+                    job_seeker_session.init({"user": {"email": self.form.cleaned_data["email"], "nir": nir}})
                     return HttpResponseRedirect(
                         reverse(
-                            "apply:step_check_job_seeker_info",
-                            kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": job_seeker.pk},
+                            "apply:create_job_seeker_step_1_for_sender",
+                            kwargs={"siae_pk": self.siae.pk, "session_uuid": job_seeker_session.name},
                         )
                     )
+
+                # Ask the sender to confirm the email we found is associated to the correct user
+                if self.form.data.get("preview"):
+                    preview_mode = "email"
+
+                # The email we found is correct
+                if self.form.data.get("confirm"):
+
+                    if not can_add_nir:
+                        return HttpResponseRedirect(
+                            reverse(
+                                "apply:step_check_job_seeker_info",
+                                kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": job_seeker.pk},
+                            )
+                        )
+
+                    try:
+                        job_seeker.nir = nir
+                        job_seeker.lack_of_nir_reason = ""
+                        job_seeker.save(update_fields=["nir", "lack_of_nir_reason"])
+                    except ValidationError:
+                        msg = mark_safe(
+                            f"Le<b> numéro de sécurité sociale</b> renseigné ({ nir }) est "
+                            "déjà utilisé par un autre candidat sur la Plateforme.<br>"
+                            "Merci de renseigner <b>le numéro personnel et unique</b> "
+                            "du candidat pour lequel vous souhaitez postuler."
+                        )
+                        messages.warning(request, msg)
+                        logger.exception("step_job_seeker: error when saving job_seeker=%s nir=%s", job_seeker, nir)
+                    else:
+                        return HttpResponseRedirect(
+                            reverse(
+                                "apply:step_check_job_seeker_info",
+                                kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": job_seeker.pk},
+                            )
+                        )
+        elif request.POST.get("step") == "email":
+            # Invalid from coming from "Cliquez ici pour accéder à l'étape suivante" button:
+            # - the provided nir was invalid: remove it
+            self.form.data |= {"nir": ""}
+            # - the user did not have the chance to fill the email: hide the "required field" error
+            del self.form.errors["email"]
+
+        if hasattr(self.form, "cleaned_data") and self.form.cleaned_data.get("nir"):
+            self.nir = self.form.cleaned_data.get("nir")
 
         return self.render_to_response(
             self.get_context_data(**kwargs)
@@ -425,8 +434,8 @@ class CheckEmailForSenderView(ApplyStepForSenderBaseView):
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "form": self.form,
-            "nir": self.apply_session.get("nir"),
             "siae": self.siae,
+            "nir": self.nir,
         }
 
 
@@ -469,7 +478,7 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
                 # If an existing job seeker matches the info, a confirmation is required
                 context["confirmation_needed"] = True
                 context["redacted_existing_email"] = redact_email_address(existing_job_seeker.email)
-                context["email_to_create"] = self.job_seeker_session.get("user", {}).get("email", "")
+                context["session_uuid"] = kwargs["session_uuid"]
 
             if not context["confirmation_needed"]:
                 self.job_seeker_session.set("user", self.job_seeker_session.get("user", {}) | self.form.cleaned_data)

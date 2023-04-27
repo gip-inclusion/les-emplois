@@ -15,11 +15,10 @@ urlpatterns = [
         submit_views.PendingAuthorizationForSender.as_view(),
         name="pending_authorization_for_sender",
     ),
-    path("<int:siae_pk>/sender/check_nir", submit_views.CheckNIRForSenderView.as_view(), name="check_nir_for_sender"),
     path(
-        "<int:siae_pk>/sender/check_email",
-        submit_views.CheckEmailForSenderView.as_view(),
-        name="check_email_for_sender",
+        "<int:siae_pk>/sender/check_nir",
+        submit_views.CheckJobSeekerForSenderView.as_view(),
+        name="check_nir_for_sender",
     ),
     path(
         "<int:siae_pk>/sender/create_job_seeker/<uuid:session_uuid>/1",

@@ -116,6 +116,20 @@ class CheckJobSeekerNirForm(forms.Form):
         return self.job_seeker
 
 
+class CheckJobSeekerForSenderForm(CheckJobSeekerNirForm, UserExistsForm):
+    def __init__(self, *args, with_email, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.with_email = with_email
+
+        if not with_email:
+            self.fields["email"].required = False
+            self.fields["email"].widget = forms.HiddenInput()
+        else:
+            self.fields["nir"].required = False
+            self.fields["nir"].widget = forms.HiddenInput()
+
+
 class CheckJobSeekerInfoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
