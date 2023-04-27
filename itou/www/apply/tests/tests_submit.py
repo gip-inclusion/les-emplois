@@ -38,6 +38,7 @@ from itou.utils.session import SessionNamespace
 from itou.utils.storage.s3 import S3Upload
 from itou.utils.storage.test import S3AccessingTestCase
 from itou.utils.test import TestCase
+from itou.utils.urls import add_url_params
 
 
 fake = faker.Faker(locale="fr_FR")
@@ -141,7 +142,6 @@ def test_check_nir_job_seeker_with_lack_of_nir_reason(client):
     session_data = client.session[f"job_application-{siae.pk}"]
     assert session_data == {
         "back_url": "/",
-        "nir": None,
         "selected_jobs": [],
     }
 
@@ -170,7 +170,6 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
     def default_session_data(self):
         return {
             "back_url": "/",
-            "nir": None,
             "selected_jobs": [],
         }
 
@@ -421,7 +420,6 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
     def default_session_data(self):
         return {
             "back_url": "/",
-            "nir": None,
             "selected_jobs": [],
         }
 
@@ -467,12 +465,12 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
         response = self.client.post(next_url, data={"nir": dummy_job_seeker_profile.user.nir, "confirm": 1})
         assert response.status_code == 302
         session = self.client.session
-        expected_session_data = self.default_session_data | {
-            "nir": dummy_job_seeker_profile.user.nir,
-        }
-        assert self.client.session[f"job_application-{siae.pk}"] == expected_session_data
+        assert self.client.session[f"job_application-{siae.pk}"] == self.default_session_data
 
-        next_url = reverse("apply:check_email_for_sender", kwargs={"siae_pk": siae.pk})
+        next_url = add_url_params(
+            reverse("apply:check_email_for_sender", kwargs={"siae_pk": siae.pk}),
+            {"nir": dummy_job_seeker_profile.user.nir},
+        )
         assert response.url == next_url
 
         # Step get job seeker e-mail.
@@ -588,9 +586,7 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
 
         assert job_seeker_session_name not in self.client.session
         new_job_seeker = User.objects.get(email=dummy_job_seeker_profile.user.email)
-        expected_session_data = self.default_session_data | {
-            "nir": dummy_job_seeker_profile.user.nir,
-        }
+        expected_session_data = self.default_session_data | {}
         assert self.client.session[f"job_application-{siae.pk}"] == expected_session_data
 
         next_url = reverse("apply:application_jobs", kwargs={"siae_pk": siae.pk, "job_seeker_pk": new_job_seeker.pk})
@@ -606,7 +602,6 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
         assert response.status_code == 302
 
         assert self.client.session[f"job_application-{siae.pk}"] == self.default_session_data | {
-            "nir": dummy_job_seeker_profile.user.nir,
             "selected_jobs": [siae.job_description_through.first().pk],
         }
 
@@ -704,12 +699,12 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
 
         response = self.client.post(next_url, data={"nir": dummy_job_seeker_profile.user.nir, "confirm": 1})
         assert response.status_code == 302
-        expected_session_data = self.default_session_data | {
-            "nir": dummy_job_seeker_profile.user.nir,
-        }
-        assert self.client.session[f"job_application-{siae.pk}"] == expected_session_data
+        assert self.client.session[f"job_application-{siae.pk}"] == self.default_session_data
 
-        next_url = reverse("apply:check_email_for_sender", kwargs={"siae_pk": siae.pk})
+        next_url = add_url_params(
+            reverse("apply:check_email_for_sender", kwargs={"siae_pk": siae.pk}),
+            {"nir": dummy_job_seeker_profile.user.nir},
+        )
         assert response.url == next_url
 
         # Step get job seeker e-mail.
@@ -825,10 +820,7 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
 
         assert job_seeker_session_name not in self.client.session
         new_job_seeker = User.objects.get(email=dummy_job_seeker_profile.user.email)
-        expected_session_data = self.default_session_data | {
-            "nir": dummy_job_seeker_profile.user.nir,
-        }
-        assert self.client.session[f"job_application-{siae.pk}"] == expected_session_data
+        assert self.client.session[f"job_application-{siae.pk}"] == self.default_session_data
 
         next_url = reverse("apply:application_jobs", kwargs={"siae_pk": siae.pk, "job_seeker_pk": new_job_seeker.pk})
         assert response.url == next_url
@@ -843,7 +835,6 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
         assert response.status_code == 302
 
         assert self.client.session[f"job_application-{siae.pk}"] == self.default_session_data | {
-            "nir": dummy_job_seeker_profile.user.nir,
             "selected_jobs": [siae.job_description_through.first().pk],
         }
 
@@ -960,7 +951,6 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
     def default_session_data(self):
         return {
             "back_url": "/",
-            "nir": None,
             "selected_jobs": [],
         }
 
@@ -1007,12 +997,12 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
         response = self.client.post(next_url, data={"nir": dummy_job_seeker_profile.user.nir, "confirm": 1})
         assert response.status_code == 302
 
-        expected_session_data = self.default_session_data | {
-            "nir": dummy_job_seeker_profile.user.nir,
-        }
-        assert self.client.session[f"job_application-{siae.pk}"] == expected_session_data
+        assert self.client.session[f"job_application-{siae.pk}"] == self.default_session_data
 
-        next_url = reverse("apply:check_email_for_sender", kwargs={"siae_pk": siae.pk})
+        next_url = add_url_params(
+            reverse("apply:check_email_for_sender", kwargs={"siae_pk": siae.pk}),
+            {"nir": dummy_job_seeker_profile.user.nir},
+        )
         assert response.url == next_url
 
         # Step get job seeker e-mail.
@@ -1142,10 +1132,7 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
 
         assert job_seeker_session_name not in self.client.session
         new_job_seeker = User.objects.get(email=dummy_job_seeker_profile.user.email)
-        expected_session_data = self.default_session_data | {
-            "nir": dummy_job_seeker_profile.user.nir,
-        }
-        assert self.client.session[f"job_application-{siae.pk}"] == expected_session_data
+        assert self.client.session[f"job_application-{siae.pk}"] == self.default_session_data
 
         next_url = reverse("apply:application_jobs", kwargs={"siae_pk": siae.pk, "job_seeker_pk": new_job_seeker.pk})
         assert response.url == next_url
@@ -1160,7 +1147,6 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
         assert response.status_code == 302
 
         assert self.client.session[f"job_application-{siae.pk}"] == self.default_session_data | {
-            "nir": dummy_job_seeker_profile.user.nir,
             "selected_jobs": [siae.job_description_through.first().pk],
         }
 
@@ -1322,7 +1308,10 @@ class ApplyAsPrescriberNirExceptionsTest(S3AccessingTestCase):
         nir = "141068078200557"
         post_data = {"nir": nir, "confirm": 1}
         response = self.client.post(last_url, data=post_data)
-        next_url = reverse("apply:check_email_for_sender", kwargs={"siae_pk": siae.pk})
+        next_url = add_url_params(
+            reverse("apply:check_email_for_sender", kwargs={"siae_pk": siae.pk}),
+            {"nir": nir},
+        )
         self.assertRedirects(response, next_url)
 
         # Create a job seeker with this NIR right after the check. Sorry.
@@ -1379,7 +1368,10 @@ class ApplyAsPrescriberNirExceptionsTest(S3AccessingTestCase):
         nir = "141068078200557"
         post_data = {"nir": nir, "confirm": 1}
         response = self.client.post(last_url, data=post_data)
-        next_url = reverse("apply:check_email_for_sender", kwargs={"siae_pk": siae.pk})
+        next_url = add_url_params(
+            reverse("apply:check_email_for_sender", kwargs={"siae_pk": siae.pk}),
+            {"nir": nir},
+        )
         self.assertRedirects(response, next_url)
 
         # Enter an existing email.
@@ -1411,7 +1403,6 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
     def default_session_data(self):
         return {
             "back_url": "/",
-            "nir": None,
             "selected_jobs": [],
         }
 
@@ -1474,12 +1465,12 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
         response = self.client.post(next_url, data={"nir": dummy_job_seeker_profile.user.nir, "confirm": 1})
         assert response.status_code == 302
 
-        expected_session_data = self.default_session_data | {
-            "nir": dummy_job_seeker_profile.user.nir,
-        }
-        assert self.client.session[f"job_application-{siae.pk}"] == expected_session_data
+        assert self.client.session[f"job_application-{siae.pk}"] == self.default_session_data
 
-        next_url = reverse("apply:check_email_for_sender", kwargs={"siae_pk": siae.pk})
+        next_url = add_url_params(
+            reverse("apply:check_email_for_sender", kwargs={"siae_pk": siae.pk}),
+            {"nir": dummy_job_seeker_profile.user.nir},
+        )
         assert response.url == next_url
 
         # Step get job seeker e-mail.
@@ -1595,10 +1586,7 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
 
         assert job_seeker_session_name not in self.client.session
         new_job_seeker = User.objects.get(email=dummy_job_seeker_profile.user.email)
-        expected_session_data = self.default_session_data | {
-            "nir": dummy_job_seeker_profile.user.nir,
-        }
-        assert self.client.session[f"job_application-{siae.pk}"] == expected_session_data
+        assert self.client.session[f"job_application-{siae.pk}"] == self.default_session_data
 
         next_url = reverse("apply:application_jobs", kwargs={"siae_pk": siae.pk, "job_seeker_pk": new_job_seeker.pk})
         assert response.url == next_url
@@ -1613,7 +1601,6 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
         assert response.status_code == 302
 
         assert self.client.session[f"job_application-{siae.pk}"] == self.default_session_data | {
-            "nir": dummy_job_seeker_profile.user.nir,
             "selected_jobs": [siae.job_description_through.first().pk],
         }
 
@@ -2366,7 +2353,6 @@ def test_detect_existing_job_seeker(client):
 
     default_session_data = {
         "back_url": "/",
-        "nir": None,
         "selected_jobs": [],
     }
 
@@ -2391,10 +2377,12 @@ def test_detect_existing_job_seeker(client):
     NEW_NIR = "197013625838386"
     response = client.post(next_url, data={"nir": NEW_NIR, "confirm": 1})
     assert response.status_code == 302
-    expected_session_data = default_session_data | {"nir": NEW_NIR}
-    assert client.session[f"job_application-{siae.pk}"] == expected_session_data
+    assert client.session[f"job_application-{siae.pk}"] == default_session_data
 
-    next_url = reverse("apply:check_email_for_sender", kwargs={"siae_pk": siae.pk})
+    next_url = add_url_params(
+        reverse("apply:check_email_for_sender", kwargs={"siae_pk": siae.pk}),
+        {"nir": NEW_NIR},
+    )
     assert response.url == next_url
 
     # Step get job seeker e-mail.
