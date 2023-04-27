@@ -124,8 +124,11 @@ class ApplicationBaseView(ApplyStepBaseView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
+        # If no job_seeker_pk present in kwargs, fallback to active session
+        # This fallback will be removed in a followup commit
+        job_seeker_pk = kwargs.get("job_seeker_pk", self.apply_session.get("job_seeker_pk"))
 
-        self.job_seeker = get_object_or_404(User, pk=self.apply_session.get("job_seeker_pk"))
+        self.job_seeker = get_object_or_404(User, pk=job_seeker_pk)
         _check_job_seeker_approval(request, self.job_seeker, self.siae)
         if self.siae.kind == SiaeKind.GEIQ:
             self.geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
@@ -254,19 +257,34 @@ class CheckNIRForJobSeekerView(ApplyStepForJobSeekerBaseView):
     def get(self, request, *args, **kwargs):
         # The NIR already exists, go to next step
         if self.job_seeker.nir:
-            return HttpResponseRedirect(reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": self.siae.pk}))
+            return HttpResponseRedirect(
+                reverse(
+                    "apply:step_check_job_seeker_info",
+                    kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
+                )
+            )
 
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         if self.form.data.get("skip"):
-            return HttpResponseRedirect(reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": self.siae.pk}))
+            return HttpResponseRedirect(
+                reverse(
+                    "apply:step_check_job_seeker_info",
+                    kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
+                )
+            )
 
         if self.form.is_valid():
             self.job_seeker.nir = self.form.cleaned_data["nir"]
             self.job_seeker.lack_of_nir_reason = ""
             self.job_seeker.save()
-            return HttpResponseRedirect(reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": self.siae.pk}))
+            return HttpResponseRedirect(
+                reverse(
+                    "apply:step_check_job_seeker_info",
+                    kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
+                )
+            )
 
         return self.render_to_response(self.get_context_data(**kwargs))
 
@@ -306,7 +324,10 @@ class CheckNIRForSenderView(ApplyStepForSenderBaseView):
             if self.form.data.get("confirm"):
                 self.apply_session.set("job_seeker_pk", job_seeker.pk)
                 return HttpResponseRedirect(
-                    reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": self.siae.pk})
+                    reverse(
+                        "apply:step_check_job_seeker_info",
+                        kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": job_seeker.pk},
+                    )
                 )
 
             context = {
@@ -372,7 +393,10 @@ class CheckEmailForSenderView(ApplyStepForSenderBaseView):
 
                 if not can_add_nir:
                     return HttpResponseRedirect(
-                        reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": self.siae.pk})
+                        reverse(
+                            "apply:step_check_job_seeker_info",
+                            kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": job_seeker.pk},
+                        )
                     )
 
                 try:
@@ -390,7 +414,10 @@ class CheckEmailForSenderView(ApplyStepForSenderBaseView):
                     logger.exception("step_job_seeker: error when saving job_seeker=%s nir=%s", job_seeker, nir)
                 else:
                     return HttpResponseRedirect(
-                        reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": self.siae.pk})
+                        reverse(
+                            "apply:step_check_job_seeker_info",
+                            kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": job_seeker.pk},
+                        )
                     )
 
         return self.render_to_response(
@@ -615,7 +642,7 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
 
             self.apply_session.set("job_seeker_pk", profile.user.pk)
             self.job_seeker_session.delete()
-            url = reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk})
+            url = reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": profile.user.pk})
         return HttpResponseRedirect(url)
 
     def get_context_data(self, **kwargs):
@@ -653,7 +680,10 @@ class CheckJobSeekerInformations(ApplicationBaseView):
         )
         if has_required_info:
             return HttpResponseRedirect(
-                reverse("apply:step_check_prev_applications", kwargs={"siae_pk": self.siae.pk})
+                reverse(
+                    "apply:step_check_prev_applications",
+                    kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
+                )
             )
 
         return super().get(request, *args, **kwargs)
@@ -662,7 +692,10 @@ class CheckJobSeekerInformations(ApplicationBaseView):
         if self.form.is_valid():
             self.form.save()
             return HttpResponseRedirect(
-                reverse("apply:step_check_prev_applications", kwargs={"siae_pk": self.siae.pk})
+                reverse(
+                    "apply:step_check_prev_applications",
+                    kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
+                )
             )
 
         return self.render_to_response(self.get_context_data(**kwargs))
@@ -692,7 +725,11 @@ class CheckPreviousApplications(ApplicationBaseView):
 
     def get(self, request, *args, **kwargs):
         if not self.previous_applications.exists():
-            return HttpResponseRedirect(reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk}))
+            return HttpResponseRedirect(
+                reverse(
+                    "apply:application_jobs", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk}
+                )
+            )
 
         # Limit the possibility of applying to the same SIAE for 24 hours.
         if not request.user.is_siae_staff and self.previous_applications.created_in_past(hours=24).exists():
@@ -708,7 +745,11 @@ class CheckPreviousApplications(ApplicationBaseView):
         # At this point we know that the candidate is applying to an SIAE where he or she has already applied.
         # Allow a new job application if the user confirm it despite the duplication warning.
         if request.POST.get("force_new_application") == "force":
-            return HttpResponseRedirect(reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk}))
+            return HttpResponseRedirect(
+                reverse(
+                    "apply:application_jobs", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk}
+                )
+            )
 
         return self.render_to_response(self.get_context_data(**kwargs))
 
@@ -742,7 +783,9 @@ class ApplicationJobsView(ApplicationBaseView):
             path_name = (
                 "application_geiq_eligibility" if self.siae.kind == SiaeKind.GEIQ else "application_eligibility"
             )
-            return HttpResponseRedirect(reverse("apply:" + path_name, kwargs={"siae_pk": self.siae.pk}))
+            return HttpResponseRedirect(
+                reverse("apply:" + path_name, kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk})
+            )
 
         return self.render_to_response(self.get_context_data(**kwargs))
 
@@ -789,7 +832,11 @@ class ApplicationEligibilityView(ApplicationBaseView):
             self.job_seeker.has_valid_common_approval,
         ]
         if any(bypass_eligibility_conditions):
-            return HttpResponseRedirect(reverse("apply:application_resume", kwargs={"siae_pk": self.siae.pk}))
+            return HttpResponseRedirect(
+                reverse(
+                    "apply:application_resume", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk}
+                )
+            )
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -800,7 +847,11 @@ class ApplicationEligibilityView(ApplicationBaseView):
                 EligibilityDiagnosis.create_diagnosis(self.job_seeker, user_info, self.form.cleaned_data)
             elif self.eligibility_diagnosis and not self.form.data.get("shrouded"):
                 EligibilityDiagnosis.update_diagnosis(self.eligibility_diagnosis, user_info, self.form.cleaned_data)
-            return HttpResponseRedirect(reverse("apply:application_resume", kwargs={"siae_pk": self.siae.pk}))
+            return HttpResponseRedirect(
+                reverse(
+                    "apply:application_resume", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk}
+                )
+            )
 
         return self.render_to_response(self.get_context_data(**kwargs))
 
@@ -812,7 +863,9 @@ class ApplicationEligibilityView(ApplicationBaseView):
             "new_expires_at_if_updated": new_expires_at_if_updated,
             "progress": 50,
             "job_seeker": self.job_seeker,
-            "back_url": reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk}),
+            "back_url": reverse(
+                "apply:application_jobs", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk}
+            ),
         }
 
 
@@ -835,21 +888,30 @@ class ApplicationGEIQEligibilityView(ApplicationBaseView):
                 if self.geiq_eligibility_diagnosis
                 else []
             ),
-            form_url=reverse("apply:application_geiq_eligibility", kwargs={"siae_pk": self.siae.pk}),
+            form_url=reverse(
+                "apply:application_geiq_eligibility",
+                kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
+            ),
             data=request.POST or None,
         )
 
     def dispatch(self, request, *args, **kwargs):
         # GEIQ eligibility form during job application process is only available to authorized prescribers
         if not request.user.is_prescriber_with_authorized_org:
-            return HttpResponseRedirect(reverse("apply:application_resume", kwargs={"siae_pk": self.siae.pk}))
+            return HttpResponseRedirect(
+                reverse(
+                    "apply:application_resume", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk}
+                )
+            )
 
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         geo_criteria_detected = self.job_seeker.address_in_qpv or self.job_seeker.zrr_city_name
         return super().get_context_data(**kwargs) | {
-            "back_url": reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk}),
+            "back_url": reverse(
+                "apply:application_jobs", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk}
+            ),
             "form": self.form,
             "full_content_width": True,
             "geo_criteria_detected": geo_criteria_detected,
@@ -877,7 +939,11 @@ class ApplicationGEIQEligibilityView(ApplicationBaseView):
                         self.geiq_eligibility_diagnosis, request.user, self.form.cleaned_data
                     )
 
-            return HttpResponseRedirect(reverse("apply:application_resume", kwargs={"siae_pk": self.siae.pk}))
+            return HttpResponseRedirect(
+                reverse(
+                    "apply:application_resume", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk}
+                )
+            )
 
         return self.render_to_response(self.get_context_data(**kwargs))
 
@@ -979,7 +1045,7 @@ class ApplicationResumeView(ApplicationBaseView):
             ),
             "back_url": reverse(
                 f"apply:application_{'jobs' if any(bypass_eligibility_conditions) else 'eligibility'}",
-                kwargs={"siae_pk": self.siae.pk},
+                kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
             ),
             "progress": 75,
             "full_content_width": True,
@@ -1297,7 +1363,9 @@ class UpdateJobSeekerStepEndView(UpdateJobSeekerBaseView):
         else:
             self.profile.save()
             self.job_seeker_session.delete()
-            url = reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk})
+            url = reverse(
+                "apply:application_jobs", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk}
+            )
         return HttpResponseRedirect(url)
 
     def get_context_data(self, **kwargs):

@@ -205,7 +205,6 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis(TestCase):
         cls.job_seeker_in_zrr = JobSeekerWithAddressFactory(with_city_in_zrr=True)
         cls.geiq = SiaeWithMembershipAndJobsFactory(kind=SiaeKind.GEIQ, with_jobs=True)
         cls.prescriber_org = PrescriberOrganizationWithMembershipFactory(authorized=True)
-        cls.url_for_prescriber = reverse("apply:application_geiq_eligibility", kwargs={"siae_pk": cls.geiq.pk})
 
     def _setup_session(self, job_seeker=None):
         apply_session = SessionNamespace(self.client.session, f"job_application-{self.geiq.pk}")
@@ -230,7 +229,12 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis(TestCase):
     def test_job_seeker_not_resident_in_qpv_or_zrr_for_prescriber(self):
         self.client.force_login(self.prescriber_org.members.first())
         self._setup_session(self.job_seeker)
-        response = self.client.get(self.url_for_prescriber)
+        response = self.client.get(
+            reverse(
+                "apply:application_geiq_eligibility",
+                kwargs={"siae_pk": self.geiq.pk, "job_seeker_pk": self.job_seeker.pk},
+            )
+        )
 
         self.assertTemplateNotUsed(response, "apply/includes/known_criteria.html")
 
@@ -250,7 +254,12 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis(TestCase):
         # Check QPV fragment is displayed for prescriber:
         self.client.force_login(self.prescriber_org.members.first())
         self._setup_session(self.job_seeker_in_qpv)
-        response = self.client.get(self.url_for_prescriber)
+        response = self.client.get(
+            reverse(
+                "apply:application_geiq_eligibility",
+                kwargs={"siae_pk": self.geiq.pk, "job_seeker_pk": self.job_seeker_in_qpv.pk},
+            )
+        )
 
         self.assertTemplateUsed(response, "apply/includes/known_criteria.html")
         self.assertContains(response, "Résident QPV")
@@ -272,7 +281,12 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis(TestCase):
         # Check QPV fragment is displayed for prescriber:
         self.client.force_login(self.prescriber_org.members.first())
         self._setup_session(self.job_seeker_in_zrr)
-        response = self.client.get(self.url_for_prescriber)
+        response = self.client.get(
+            reverse(
+                "apply:application_geiq_eligibility",
+                kwargs={"siae_pk": self.geiq.pk, "job_seeker_pk": self.job_seeker_in_zrr.pk},
+            )
+        )
 
         self.assertTemplateUsed(response, "apply/includes/known_criteria.html")
         self.assertContains(response, "Résident en ZRR")

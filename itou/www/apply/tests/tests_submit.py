@@ -61,6 +61,11 @@ class ApplyTest(TestCase):
             "apply:application_eligibility",
             "apply:application_resume",
         }
+        routes_without_job_seeker_pk = {
+            "apply:check_nir_for_sender",
+            "apply:check_email_for_sender",
+            "apply:check_nir_for_job_seeker",
+        }
         user = JobSeekerFactory()
         siae = SiaeFactory(with_jobs=True)
 
@@ -70,6 +75,10 @@ class ApplyTest(TestCase):
                 response = self.client.get(reverse(route, kwargs={"siae_pk": siae.pk}))
                 assert response.status_code == 403
                 assert response.context["exception"] == "A session namespace doesn't exist."
+                if route not in routes_without_job_seeker_pk:
+                    response = self.client.get(reverse(route, kwargs={"siae_pk": siae.pk, "job_seeker_pk": user.pk}))
+                    assert response.status_code == 403
+                    assert response.context["exception"] == "A session namespace doesn't exist."
 
     def test_we_raise_a_permission_denied_on_missing_temporary_session_for_create_job_seeker(self):
         routes = {
@@ -227,7 +236,7 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
         }
         assert session_data == expected_session_data
 
-        next_url = reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk})
+        next_url = reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk, "job_seeker_pk": user.pk})
         assert response.url == next_url
 
         # Step check job seeker info.
@@ -247,7 +256,7 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
 
         assert user.pole_emploi_id == post_data["pole_emploi_id"]
 
-        next_url = reverse("apply:step_check_prev_applications", kwargs={"siae_pk": siae.pk})
+        next_url = reverse("apply:step_check_prev_applications", kwargs={"siae_pk": siae.pk, "job_seeker_pk": user.pk})
         assert response.url == next_url
 
         # Step check previous job applications.
@@ -256,7 +265,7 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
         response = self.client.get(next_url)
         assert response.status_code == 302
 
-        next_url = reverse("apply:application_jobs", kwargs={"siae_pk": siae.pk})
+        next_url = reverse("apply:application_jobs", kwargs={"siae_pk": siae.pk, "job_seeker_pk": user.pk})
         assert response.url == next_url
 
         # Step application's jobs.
@@ -273,7 +282,7 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
             "selected_jobs": [siae.job_description_through.first().pk],
         }
 
-        next_url = reverse("apply:application_eligibility", kwargs={"siae_pk": siae.pk})
+        next_url = reverse("apply:application_eligibility", kwargs={"siae_pk": siae.pk, "job_seeker_pk": user.pk})
         assert response.url == next_url
 
         # Step application's eligibility.
@@ -281,7 +290,7 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
         response = self.client.get(next_url)
         assert response.status_code == 302
 
-        next_url = reverse("apply:application_resume", kwargs={"siae_pk": siae.pk})
+        next_url = reverse("apply:application_resume", kwargs={"siae_pk": siae.pk, "job_seeker_pk": user.pk})
         assert response.url == next_url
 
         # Step application's resume.
@@ -357,7 +366,9 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
         # Temporary number should be skipped.
         response = self.client.post(next_url, data={"nir": "123456789KLOIU", "skip": 1}, follow=True)
         assert response.status_code == 200
-        assert response.redirect_chain[-1][0] == reverse("apply:application_jobs", kwargs={"siae_pk": siae.pk})
+        assert response.redirect_chain[-1][0] == reverse(
+            "apply:application_jobs", kwargs={"siae_pk": siae.pk, "job_seeker_pk": user.pk}
+        )
 
         user.refresh_from_db()
         assert not user.nir
@@ -391,7 +402,9 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
             assert response.status_code == 403
             assert "Vous avez terminé un parcours" in response.context["exception"]
             last_url = response.redirect_chain[-1][0]
-            assert last_url == reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk})
+            assert last_url == reverse(
+                "apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk, "job_seeker_pk": user.pk}
+            )
 
     def test_apply_as_job_seeker_on_sender_tunnel(self):
         siae = SiaeFactory()
@@ -591,7 +604,7 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
         }
         assert self.client.session[f"job_application-{siae.pk}"] == expected_session_data
 
-        next_url = reverse("apply:application_jobs", kwargs={"siae_pk": siae.pk})
+        next_url = reverse("apply:application_jobs", kwargs={"siae_pk": siae.pk, "job_seeker_pk": new_job_seeker.pk})
         assert response.url == next_url
 
         # Step application's jobs.
@@ -609,7 +622,9 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
             "selected_jobs": [siae.job_description_through.first().pk],
         }
 
-        next_url = reverse("apply:application_eligibility", kwargs={"siae_pk": siae.pk})
+        next_url = reverse(
+            "apply:application_eligibility", kwargs={"siae_pk": siae.pk, "job_seeker_pk": new_job_seeker.pk}
+        )
         assert response.url == next_url
 
         # Step application's eligibility.
@@ -617,7 +632,7 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
         response = self.client.get(next_url)
         assert response.status_code == 302
 
-        next_url = reverse("apply:application_resume", kwargs={"siae_pk": siae.pk})
+        next_url = reverse("apply:application_resume", kwargs={"siae_pk": siae.pk, "job_seeker_pk": new_job_seeker.pk})
         assert response.url == next_url
 
         # Step application's resume.
@@ -828,7 +843,7 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
         }
         assert self.client.session[f"job_application-{siae.pk}"] == expected_session_data
 
-        next_url = reverse("apply:application_jobs", kwargs={"siae_pk": siae.pk})
+        next_url = reverse("apply:application_jobs", kwargs={"siae_pk": siae.pk, "job_seeker_pk": new_job_seeker.pk})
         assert response.url == next_url
 
         # Step application's jobs.
@@ -846,7 +861,9 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
             "selected_jobs": [siae.job_description_through.first().pk],
         }
 
-        next_url = reverse("apply:application_eligibility", kwargs={"siae_pk": siae.pk})
+        next_url = reverse(
+            "apply:application_eligibility", kwargs={"siae_pk": siae.pk, "job_seeker_pk": new_job_seeker.pk}
+        )
         assert response.url == next_url
 
         # Step application's eligibility.
@@ -860,7 +877,7 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
         assert response.status_code == 302
         assert EligibilityDiagnosis.objects.has_considered_valid(new_job_seeker, for_siae=siae)
 
-        next_url = reverse("apply:application_resume", kwargs={"siae_pk": siae.pk})
+        next_url = reverse("apply:application_resume", kwargs={"siae_pk": siae.pk, "job_seeker_pk": new_job_seeker.pk})
         assert response.url == next_url
 
         # Step application's resume.
@@ -943,7 +960,9 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
         # …until the eligibility step which should trigger a 200 OK.
         assert response.status_code == 200
         last_url = response.redirect_chain[-1][0]
-        assert last_url == reverse("apply:application_jobs", kwargs={"siae_pk": siae.pk})
+        assert last_url == reverse(
+            "apply:application_jobs", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk}
+        )
 
 
 class ApplyAsPrescriberTest(S3AccessingTestCase):
@@ -1144,7 +1163,7 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
         }
         assert self.client.session[f"job_application-{siae.pk}"] == expected_session_data
 
-        next_url = reverse("apply:application_jobs", kwargs={"siae_pk": siae.pk})
+        next_url = reverse("apply:application_jobs", kwargs={"siae_pk": siae.pk, "job_seeker_pk": new_job_seeker.pk})
         assert response.url == next_url
 
         # Step application's jobs.
@@ -1162,7 +1181,9 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
             "selected_jobs": [siae.job_description_through.first().pk],
         }
 
-        next_url = reverse("apply:application_eligibility", kwargs={"siae_pk": siae.pk})
+        next_url = reverse(
+            "apply:application_eligibility", kwargs={"siae_pk": siae.pk, "job_seeker_pk": new_job_seeker.pk}
+        )
         assert response.url == next_url
 
         # Step application's eligibility.
@@ -1170,7 +1191,7 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
         response = self.client.get(next_url)
         assert response.status_code == 302
 
-        next_url = reverse("apply:application_resume", kwargs={"siae_pk": siae.pk})
+        next_url = reverse("apply:application_resume", kwargs={"siae_pk": siae.pk, "job_seeker_pk": new_job_seeker.pk})
         assert response.url == next_url
 
         # Step application's resume.
@@ -1250,7 +1271,9 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
         assert response.status_code == 403
         assert "Le candidat a terminé un parcours" in response.context["exception"]
         last_url = response.redirect_chain[-1][0]
-        assert last_url == reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk})
+        assert last_url == reverse(
+            "apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk}
+        )
 
     def test_apply_as_prescriber_on_job_seeker_tunnel(self):
         siae = SiaeFactory()
@@ -1339,7 +1362,9 @@ class ApplyAsPrescriberNirExceptionsTest(S3AccessingTestCase):
 
         response = self.client.post(next_url, data=post_data)
         self.assertRedirects(
-            response, reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk}), target_status_code=302
+            response,
+            reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk}),
+            target_status_code=302,
         )
 
         response = self.client.post(next_url, data=post_data, follow=True)
@@ -1379,7 +1404,9 @@ class ApplyAsPrescriberNirExceptionsTest(S3AccessingTestCase):
         post_data = {"email": job_seeker.email, "confirm": "1"}
         response = self.client.post(next_url, data=post_data)
         self.assertRedirects(
-            response, reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk}), target_status_code=302
+            response,
+            reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk}),
+            target_status_code=302,
         )
 
         response = self.client.post(next_url, data=post_data, follow=True)
@@ -1592,7 +1619,7 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
         }
         assert self.client.session[f"job_application-{siae.pk}"] == expected_session_data
 
-        next_url = reverse("apply:application_jobs", kwargs={"siae_pk": siae.pk})
+        next_url = reverse("apply:application_jobs", kwargs={"siae_pk": siae.pk, "job_seeker_pk": new_job_seeker.pk})
         assert response.url == next_url
 
         # Step application's jobs.
@@ -1610,7 +1637,9 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
             "selected_jobs": [siae.job_description_through.first().pk],
         }
 
-        next_url = reverse("apply:application_eligibility", kwargs={"siae_pk": siae.pk})
+        next_url = reverse(
+            "apply:application_eligibility", kwargs={"siae_pk": siae.pk, "job_seeker_pk": new_job_seeker.pk}
+        )
         assert response.url == next_url
 
         # Step application's eligibility.
@@ -1618,7 +1647,7 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
         response = self.client.get(next_url)
         assert response.status_code == 302
 
-        next_url = reverse("apply:application_resume", kwargs={"siae_pk": siae.pk})
+        next_url = reverse("apply:application_resume", kwargs={"siae_pk": siae.pk, "job_seeker_pk": new_job_seeker.pk})
         assert response.url == next_url
 
         # Step application's resume.
@@ -1702,7 +1731,9 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
         assert response.status_code == 403
         assert "Le candidat a terminé un parcours" in response.context["exception"]
         last_url = response.redirect_chain[-1][0]
-        assert last_url == reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk})
+        assert last_url == reverse(
+            "apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk}
+        )
 
 
 class ApplyAsOtherTest(TestCase):
@@ -1739,16 +1770,19 @@ class ApplicationViewTest(S3AccessingTestCase):
         siae = SiaeFactory(subject_to_eligibility=True, with_membership=True, with_jobs=True)
 
         self.client.force_login(siae.members.first())
+        job_seeker = JobSeekerFactory()
         apply_session = SessionNamespace(self.client.session, f"job_application-{siae.pk}")
         apply_session.init(
             {
-                "job_seeker_pk": JobSeekerFactory(),
+                "job_seeker_pk": job_seeker.pk,
                 "selected_jobs": siae.job_description_through.all(),
             }
         )
         apply_session.save()
 
-        response = self.client.get(reverse("apply:application_jobs", kwargs={"siae_pk": siae.pk}))
+        response = self.client.get(
+            reverse("apply:application_jobs", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk})
+        )
         assert response.status_code == 200
         assert response.context["form"].initial["selected_jobs"] == [
             jd.pk for jd in siae.job_description_through.all()
@@ -1756,46 +1790,59 @@ class ApplicationViewTest(S3AccessingTestCase):
 
     def test_application_resume_hidden_fields(self):
         siae = SiaeFactory(with_membership=True, with_jobs=True)
+        job_seeker = JobSeekerFactory()
 
         self.client.force_login(siae.members.first())
         apply_session = SessionNamespace(self.client.session, f"job_application-{siae.pk}")
         apply_session.init(
             {
-                "job_seeker_pk": JobSeekerFactory(),
+                "job_seeker_pk": job_seeker.pk,
                 "selected_jobs": siae.job_description_through.all(),
             }
         )
         apply_session.save()
 
-        response = self.client.get(reverse("apply:application_resume", kwargs={"siae_pk": siae.pk}))
+        response = self.client.get(
+            reverse("apply:application_resume", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk})
+        )
         self.assertContains(response, 'name="selected_jobs"')
         self.assertContains(response, 'name="resume_link"')
 
     def test_application_eligibility_is_bypassed_for_siae_not_subject_to_eligibility_rules(self):
         siae = SiaeFactory(not_subject_to_eligibility=True, with_membership=True)
+        job_seeker = JobSeekerFactory()
 
         self.client.force_login(siae.members.first())
         apply_session = SessionNamespace(self.client.session, f"job_application-{siae.pk}")
-        apply_session.init({"job_seeker_pk": JobSeekerFactory()})
+        apply_session.init({"job_seeker_pk": job_seeker.pk})
         apply_session.save()
 
-        response = self.client.get(reverse("apply:application_eligibility", kwargs={"siae_pk": siae.pk}))
+        response = self.client.get(
+            reverse("apply:application_eligibility", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk})
+        )
         self.assertRedirects(
-            response, reverse("apply:application_resume", kwargs={"siae_pk": siae.pk}), fetch_redirect_response=False
+            response,
+            reverse("apply:application_resume", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk}),
+            fetch_redirect_response=False,
         )
 
     def test_application_eligibility_is_bypassed_for_unauthorized_prescriber(self):
         siae = SiaeFactory(not_subject_to_eligibility=True, with_membership=True)
         prescriber = PrescriberOrganizationWithMembershipFactory().members.first()
+        job_seeker = JobSeekerFactory()
 
         self.client.force_login(prescriber)
         apply_session = SessionNamespace(self.client.session, f"job_application-{siae.pk}")
-        apply_session.init({"job_seeker_pk": JobSeekerFactory()})
+        apply_session.init({"job_seeker_pk": job_seeker.pk})
         apply_session.save()
 
-        response = self.client.get(reverse("apply:application_eligibility", kwargs={"siae_pk": siae.pk}))
+        response = self.client.get(
+            reverse("apply:application_eligibility", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk})
+        )
         self.assertRedirects(
-            response, reverse("apply:application_resume", kwargs={"siae_pk": siae.pk}), fetch_redirect_response=False
+            response,
+            reverse("apply:application_resume", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk}),
+            fetch_redirect_response=False,
         )
 
     def test_application_eligibility_is_bypassed_when_the_job_seeker_already_has_an_approval(self):
@@ -1807,9 +1854,19 @@ class ApplicationViewTest(S3AccessingTestCase):
         apply_session.init({"job_seeker_pk": eligibility_diagnosis.job_seeker})
         apply_session.save()
 
-        response = self.client.get(reverse("apply:application_eligibility", kwargs={"siae_pk": siae.pk}))
+        response = self.client.get(
+            reverse(
+                "apply:application_eligibility",
+                kwargs={"siae_pk": siae.pk, "job_seeker_pk": eligibility_diagnosis.job_seeker.pk},
+            )
+        )
         self.assertRedirects(
-            response, reverse("apply:application_resume", kwargs={"siae_pk": siae.pk}), fetch_redirect_response=False
+            response,
+            reverse(
+                "apply:application_resume",
+                kwargs={"siae_pk": siae.pk, "job_seeker_pk": eligibility_diagnosis.job_seeker.pk},
+            ),
+            fetch_redirect_response=False,
         )
 
     def test_application_eligibility_update_diagnosis_only_if_not_shrouded(self):
@@ -1824,11 +1881,19 @@ class ApplicationViewTest(S3AccessingTestCase):
 
         # if "shrouded" is present then we don't update the eligibility diagnosis
         response = self.client.post(
-            reverse("apply:application_eligibility", kwargs={"siae_pk": siae.pk}),
+            reverse(
+                "apply:application_eligibility",
+                kwargs={"siae_pk": siae.pk, "job_seeker_pk": eligibility_diagnosis.job_seeker.pk},
+            ),
             {"level_1_1": True, "shrouded": "whatever"},
         )
         self.assertRedirects(
-            response, reverse("apply:application_resume", kwargs={"siae_pk": siae.pk}), fetch_redirect_response=False
+            response,
+            reverse(
+                "apply:application_resume",
+                kwargs={"siae_pk": siae.pk, "job_seeker_pk": eligibility_diagnosis.job_seeker.pk},
+            ),
+            fetch_redirect_response=False,
         )
         assert [eligibility_diagnosis] == list(
             EligibilityDiagnosis.objects.for_job_seeker(eligibility_diagnosis.job_seeker)
@@ -1836,11 +1901,19 @@ class ApplicationViewTest(S3AccessingTestCase):
 
         # If "shrouded" is NOT present then we update the eligibility diagnosis
         response = self.client.post(
-            reverse("apply:application_eligibility", kwargs={"siae_pk": siae.pk}),
+            reverse(
+                "apply:application_eligibility",
+                kwargs={"siae_pk": siae.pk, "job_seeker_pk": eligibility_diagnosis.job_seeker.pk},
+            ),
             {"level_1_1": True},
         )
         self.assertRedirects(
-            response, reverse("apply:application_resume", kwargs={"siae_pk": siae.pk}), fetch_redirect_response=False
+            response,
+            reverse(
+                "apply:application_resume",
+                kwargs={"siae_pk": siae.pk, "job_seeker_pk": eligibility_diagnosis.job_seeker.pk},
+            ),
+            fetch_redirect_response=False,
         )
         new_eligibility_diagnosis = (
             EligibilityDiagnosis.objects.for_job_seeker(eligibility_diagnosis.job_seeker).order_by().last()
@@ -1892,7 +1965,7 @@ class LastCheckedAtViewTest(TestCase):
         )
         apply_session.save()
 
-        url = reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk})
+        url = reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk})
         response = self.client.get(url)
         assert response.status_code == 200
 
@@ -2090,7 +2163,7 @@ class UpdateJobSeekerViewTestCase(TestCase):
         response = self.client.post(self.step_end_url)
         assertRedirects(
             response,
-            reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk}),
+            reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk}),
             fetch_redirect_response=False,
         )
         assert self.client.session.get(self.job_seeker_session_key) is None
@@ -2186,7 +2259,7 @@ class UpdateJobSeekerViewTestCase(TestCase):
         response = self.client.post(self.step_end_url)
         assertRedirects(
             response,
-            reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk}),
+            reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk}),
             fetch_redirect_response=False,
         )
         assert self.client.session.get(self.job_seeker_session_key) is None
@@ -2450,29 +2523,39 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
         # When creating a job application, should bypass GEIQ eligibility form step:
         # - if user is an authorized prescriber
         # - if user structure is not a GEIQ : should not be possible, form asserts it and crashes
+        job_seeker = JobSeekerFactory()
 
         # Redirect orienter
         self.client.force_login(self.orienter)
-        self._setup_session()
-        response = self.client.get(reverse("apply:application_geiq_eligibility", kwargs={"siae_pk": self.geiq.pk}))
+        self._setup_session(job_seeker=job_seeker)
+        response = self.client.get(
+            reverse(
+                "apply:application_geiq_eligibility", kwargs={"siae_pk": self.geiq.pk, "job_seeker_pk": job_seeker.pk}
+            )
+        )
 
         # Must redirect to resume
         assertRedirects(
             response,
-            reverse("apply:application_resume", kwargs={"siae_pk": self.geiq.pk}),
+            reverse("apply:application_resume", kwargs={"siae_pk": self.geiq.pk, "job_seeker_pk": job_seeker.pk}),
             fetch_redirect_response=False,
         )
         self.assertTemplateNotUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
 
     def test_bypass_geiq_diagnosis_for_staff_members(self):
+        job_seeker = JobSeekerFactory()
         self.client.force_login(self.geiq.members.first())
-        self._setup_session()
-        response = self.client.get(reverse("apply:application_geiq_eligibility", kwargs={"siae_pk": self.geiq.pk}))
+        self._setup_session(job_seeker=job_seeker)
+        response = self.client.get(
+            reverse(
+                "apply:application_geiq_eligibility", kwargs={"siae_pk": self.geiq.pk, "job_seeker_pk": job_seeker.pk}
+            )
+        )
 
         # Must redirect to resume
         assertRedirects(
             response,
-            reverse("apply:application_resume", kwargs={"siae_pk": self.geiq.pk}),
+            reverse("apply:application_resume", kwargs={"siae_pk": self.geiq.pk, "job_seeker_pk": job_seeker.pk}),
             fetch_redirect_response=False,
         )
         self.assertTemplateNotUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
@@ -2481,31 +2564,46 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
         # A job seeker must not have access to GEIQ eligibility form
         job_seeker = JobSeekerFactory()
         self.client.force_login(job_seeker)
-        self._setup_session()
-        response = self.client.get(reverse("apply:application_geiq_eligibility", kwargs={"siae_pk": self.geiq.pk}))
+        self._setup_session(job_seeker=job_seeker)
+        response = self.client.get(
+            reverse(
+                "apply:application_geiq_eligibility", kwargs={"siae_pk": self.geiq.pk, "job_seeker_pk": job_seeker.pk}
+            )
+        )
 
         # Must redirect to resume
         assertRedirects(
             response,
-            reverse("apply:application_resume", kwargs={"siae_pk": self.geiq.pk}),
+            reverse("apply:application_resume", kwargs={"siae_pk": self.geiq.pk, "job_seeker_pk": job_seeker.pk}),
             fetch_redirect_response=False,
         )
         self.assertTemplateNotUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
 
     def test_sanity_check_geiq_diagnosis_for_non_geiq(self):
+        job_seeker = JobSeekerFactory()
         # See comment im previous test:
         # assert we're not somewhere we don't belong to (non-GEIQ)
         self.client.force_login(self.siae.members.first())
-        self._setup_session(siae_pk=self.siae.pk)
+        self._setup_session(job_seeker=job_seeker, siae_pk=self.siae.pk)
 
         with self.assertRaisesRegex(ValueError, "This form is only for GEIQ"):
-            self.client.get(reverse("apply:application_geiq_eligibility", kwargs={"siae_pk": self.siae.pk}))
+            self.client.get(
+                reverse(
+                    "apply:application_geiq_eligibility",
+                    kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": job_seeker.pk},
+                )
+            )
 
     def test_access_as_authorized_prescriber(self):
+        job_seeker = JobSeekerFactory()
         self.client.force_login(self.prescriber_org.members.first())
-        self._setup_session()
+        self._setup_session(job_seeker=job_seeker)
 
-        response = self.client.get(reverse("apply:application_geiq_eligibility", kwargs={"siae_pk": self.geiq.pk}))
+        response = self.client.get(
+            reverse(
+                "apply:application_geiq_eligibility", kwargs={"siae_pk": self.geiq.pk, "job_seeker_pk": job_seeker.pk}
+            )
+        )
 
         assert response.status_code == 200
         self.assertTemplateUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
@@ -2516,16 +2614,25 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
         # Badge OK if job seeker has a valid eligibility diagnosis
         self._setup_session(self.job_seeker_with_geiq_diagnosis)
         response = self.client.get(
-            reverse("apply:application_geiq_eligibility", kwargs={"siae_pk": self.geiq.pk}), follow=True
+            reverse(
+                "apply:application_geiq_eligibility",
+                kwargs={"siae_pk": self.geiq.pk, "job_seeker_pk": self.job_seeker_with_geiq_diagnosis.pk},
+            ),
+            follow=True,
         )
 
         self.assertContains(response, "Éligibilité GEIQ confirmée")
         self.assertTemplateUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
 
         # Badge KO if job seeker has no diagnosis
-        self._setup_session()
+        job_seeker_without_diagnosis = JobSeekerFactory()
+        self._setup_session(job_seeker=job_seeker_without_diagnosis)
         response = self.client.get(
-            reverse("apply:application_geiq_eligibility", kwargs={"siae_pk": self.geiq.pk}), follow=True
+            reverse(
+                "apply:application_geiq_eligibility",
+                kwargs={"siae_pk": self.geiq.pk, "job_seeker_pk": job_seeker_without_diagnosis.pk},
+            ),
+            follow=True,
         )
 
         self.assertContains(response, "Éligibilité GEIQ non confirmée")
@@ -2539,7 +2646,11 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
         self.client.force_login(self.prescriber_org.members.first())
         self._setup_session(diagnosis.job_seeker, diagnosis.author_geiq.pk)
         response = self.client.get(
-            reverse("apply:application_geiq_eligibility", kwargs={"siae_pk": diagnosis.author_geiq.pk}), follow=True
+            reverse(
+                "apply:application_geiq_eligibility",
+                kwargs={"siae_pk": diagnosis.author_geiq.pk, "job_seeker_pk": job_seeker_without_diagnosis.pk},
+            ),
+            follow=True,
         )
         self.assertContains(response, "Éligibilité GEIQ non confirmée")
         self.assertTemplateUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
@@ -2549,13 +2660,19 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
         self._setup_session(self.job_seeker_with_geiq_diagnosis)
 
         response = self.client.post(
-            reverse("apply:application_geiq_eligibility", kwargs={"siae_pk": self.geiq.pk}),
+            reverse(
+                "apply:application_geiq_eligibility",
+                kwargs={"siae_pk": self.geiq.pk, "job_seeker_pk": self.job_seeker_with_geiq_diagnosis.pk},
+            ),
             data={"jeune_26_ans": True},
         )
 
         assertRedirects(
             response,
-            reverse("apply:application_resume", kwargs={"siae_pk": self.geiq.pk}),
+            reverse(
+                "apply:application_resume",
+                kwargs={"siae_pk": self.geiq.pk, "job_seeker_pk": self.job_seeker_with_geiq_diagnosis.pk},
+            ),
             fetch_redirect_response=False,
         )
 
@@ -2570,7 +2687,10 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
         for post_data in test_data:
             with self.subTest(post_data):
                 response = self.client.post(
-                    reverse("apply:application_geiq_eligibility", kwargs={"siae_pk": self.geiq.pk}),
+                    reverse(
+                        "apply:application_geiq_eligibility",
+                        kwargs={"siae_pk": self.geiq.pk, "job_seeker_pk": self.job_seeker_with_geiq_diagnosis.pk},
+                    ),
                     data=post_data,
                     follow=True,
                 )
