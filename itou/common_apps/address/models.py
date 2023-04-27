@@ -16,6 +16,11 @@ from itou.utils.validators import validate_post_code
 
 logger = logging.getLogger(__name__)
 
+# this score assures us almost zero false positives, after careful semi-manual inspection.
+# see the comments on BAN_API_LEGACY_RELIANCE_SCORE below for more details.
+# there is ample discussion about this topic in our Notion.
+BAN_API_RELIANCE_SCORE = 0.8
+
 
 def lat_lon_to_coords(lat, lon):
     if lat is not None and lon is not None:
@@ -40,7 +45,30 @@ class AddressMixin(models.Model):
 
     # Below this score, results from `adresse.data.gouv.fr` are considered unreliable.
     # This score is arbitrarily set based on general observation.
-    API_BAN_RELIABLE_MIN_SCORE = 0.4
+    #
+    # Technically this score is mainly a string distance between the model's address and the API-returned one.
+    # https://github.com/addok/addok/blob/master/docs/faq.md#how-is-the-score-computed
+    #
+    # A bit of history: this score was originally set at 0.6 (so, more or less 60% of characters matching)
+    # and has been lowered in 2019 to 0.4, mentioning that it was good enough.
+    #
+    # At the time of writing, this score is used in 3 places:
+    # - MOSTLY in the search: SIAEs and prescriber organizations are located through their coordinates.
+    # - the dashboard, to force SIAE or prescriber admins to go re-locate their structure;
+    # - in the _import_siae script, to get better looking addresses for the SIAEs if the API result is above that score
+    #
+    # In all cases, the use of this threshold is disputable since we can get incorrect results even with a
+    # high score ("rue des Clous" vs "rue des Cloÿs" is above 0.4) if the user can't double check it visually.
+    #
+    # After a bit more of a quantitative investigation, it seems that up to 85% of the SIAEs would have a score
+    # above 0.8, and 93.5% above 0.6. Upping this threshold would make:
+    # - to 0.6, 482 SIAEs have to update their coords (10x more than today)
+    # - to 0.8, 1109 SIAEs have to update their address (22x more than today)
+    # but that would enable having the same reliance score for everyone.
+    #
+    # On the longer term, since there is no way to be certain that the API address matches the user's intent we should
+    # instead implement a way for the user to confirm it directly (semi-auto selection in the form for instance)
+    BAN_API_LEGACY_RELIANCE_SCORE = 0.4
 
     DEPARTMENT_CHOICES = DEPARTMENTS.items()
 
@@ -95,10 +123,10 @@ class AddressMixin(models.Model):
         return None
 
     @property
-    def has_reliable_coords(self):
+    def has_reliable_coords_legacy(self):
         if not self.geocoding_score:
             return False
-        return self.geocoding_score >= self.API_BAN_RELIABLE_MIN_SCORE
+        return self.geocoding_score >= self.BAN_API_LEGACY_RELIANCE_SCORE
 
     @property
     def address_on_one_line(self):

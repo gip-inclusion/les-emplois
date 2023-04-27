@@ -6,6 +6,7 @@ from django.db.models import Exists, OuterRef
 from django.utils.safestring import mark_safe
 
 from itou.approvals.models import Approval
+from itou.common_apps.address.models import BAN_API_RELIANCE_SCORE
 from itou.eligibility.models import EligibilityDiagnosis, GEIQEligibilityDiagnosis
 from itou.geo.models import QPV
 from itou.institutions.models import InstitutionMembership
@@ -239,7 +240,6 @@ class CreatedByProxyFilter(admin.SimpleListFilter):
 
 @admin.register(models.User)
 class ItouUserAdmin(UserAdmin):
-
     add_form = ItouUserCreationForm
     form = UserAdminForm
     list_display = (
@@ -343,8 +343,7 @@ class ItouUserAdmin(UserAdmin):
     @admin.display(description="Adresse en QPV")
     def address_in_qpv(self, obj):
         # DO NOT PUT THIS FIELD IN 'list_display' : dynamically computed, only for detail page
-        if not obj.coords or obj.geocoding_score < 0.8:
-            # Under this geocoding score, we can't assert the quality of this field
+        if not obj.coords or obj.geocoding_score < BAN_API_RELIANCE_SCORE:
             return "Adresse non-géolocalisée"
 
         if qpv := QPV.in_qpv(obj, geom_field="coords"):

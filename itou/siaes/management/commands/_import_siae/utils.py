@@ -122,7 +122,7 @@ def geocode_siae(siae):
         # use data returned by the BAN API because it's better written using accents etc.
         # while the source data is in all caps etc.
         # Otherwise keep the old address (which is probably wrong or incomplete).
-        if siae.geocoding_score >= AddressMixin.API_BAN_RELIABLE_MIN_SCORE:
+        if siae.geocoding_score >= AddressMixin.BAN_API_LEGACY_RELIANCE_SCORE:
             siae.address_line_1 = geocoding_data["address_line_1"]
         # City is always good due to `postcode` passed in query.
         # ST MAURICE DE REMENS => Saint-Maurice-de-Rémens

@@ -15,7 +15,7 @@
     {% endif %}
 
     {# Alerte pour les employeurs en cas d'absence ou de mauvais score de geocoding. #}
-    {% if current_siae and not current_siae.has_reliable_coords %}
+    {% if current_siae and not current_siae.has_reliable_coords_legacy %}
         <div class="alert alert-warning mb-0" role="status">
             <p class="mb-0">
                 Nous n'avons pas pu géolocaliser votre établissement.
@@ -46,7 +46,7 @@
 
     {# Alerte pour les prescripteurs en cas d'absence ou de mauvais score de geocoding. #}
     {# Seuls les prescripteurs habilités apparaissent dans le moteur de recherche. #}
-    {% if current_prescriber_organization and current_prescriber_organization.is_authorized and not current_prescriber_organization.has_reliable_coords %}
+    {% if current_prescriber_organization and current_prescriber_organization.is_authorized and not current_prescriber_organization.has_reliable_coords_legacy %}
         <div class="alert alert-warning mb-0" role="status">
             <p class="mb-0">
                 Nous n'avons pas pu géolocaliser votre établissement.
