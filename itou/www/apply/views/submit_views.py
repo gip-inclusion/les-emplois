@@ -224,7 +224,6 @@ class StartView(ApplyStepBaseView):
         self.apply_session.init(
             {
                 "back_url": self._coalesce_back_url(),
-                "job_seeker_pk": user_info.user.pk if user_info.user.is_job_seeker else None,
                 "nir": None,
                 "selected_jobs": [request.GET["job_description_id"]] if "job_description_id" in request.GET else [],
             }
@@ -322,7 +321,6 @@ class CheckNIRForSenderView(ApplyStepForSenderBaseView):
 
             # The NIR we found is correct
             if self.form.data.get("confirm"):
-                self.apply_session.set("job_seeker_pk", job_seeker.pk)
                 return HttpResponseRedirect(
                     reverse(
                         "apply:step_check_job_seeker_info",
@@ -389,7 +387,6 @@ class CheckEmailForSenderView(ApplyStepForSenderBaseView):
 
             # The email we found is correct
             if self.form.data.get("confirm"):
-                self.apply_session.set("job_seeker_pk", job_seeker.pk)
 
                 if not can_add_nir:
                     return HttpResponseRedirect(
@@ -640,7 +637,6 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
             else:
                 user.save()
 
-            self.apply_session.set("job_seeker_pk", profile.user.pk)
             self.job_seeker_session.delete()
             url = reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": profile.user.pk})
         return HttpResponseRedirect(url)
@@ -1110,14 +1106,6 @@ class UpdateJobSeekerBaseView(ApplyStepBaseView):
             # Since the link leading to this process isn't visible to those users, this should never happen
             raise PermissionDenied("Votre utilisateur n'est pas autorisé à vérifier les informations de ce candidat")
         super().setup(request, *args, **kwargs)
-        if (session_job_seeker_pk := self.apply_session.get("job_seeker_pk")) != self.job_seeker.pk:
-            # This shouldn't happen. But if it does, make sure it doesn't go too far.
-            logger.error(
-                "Trying to update job_seeker=%s from url while job_seeker=%s is present in the session",
-                self.job_seeker.pk,
-                session_job_seeker_pk,
-            )
-            raise PermissionDenied("Mismatching job seekers between URL & session")
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {

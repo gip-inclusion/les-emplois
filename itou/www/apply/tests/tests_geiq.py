@@ -206,11 +206,10 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis(TestCase):
         cls.geiq = SiaeWithMembershipAndJobsFactory(kind=SiaeKind.GEIQ, with_jobs=True)
         cls.prescriber_org = PrescriberOrganizationWithMembershipFactory(authorized=True)
 
-    def _setup_session(self, job_seeker=None):
+    def _setup_session(self):
         apply_session = SessionNamespace(self.client.session, f"job_application-{self.geiq.pk}")
         apply_session.init(
             {
-                "job_seeker_pk": job_seeker or JobSeekerFactory(),
                 "selected_jobs": self.geiq.job_description_through.all(),
             }
         )
@@ -228,7 +227,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis(TestCase):
 
     def test_job_seeker_not_resident_in_qpv_or_zrr_for_prescriber(self):
         self.client.force_login(self.prescriber_org.members.first())
-        self._setup_session(self.job_seeker)
+        self._setup_session()
         response = self.client.get(
             reverse(
                 "apply:application_geiq_eligibility",
@@ -253,7 +252,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis(TestCase):
     def test_job_seeker_qpv_details_display_for_prescriber(self):
         # Check QPV fragment is displayed for prescriber:
         self.client.force_login(self.prescriber_org.members.first())
-        self._setup_session(self.job_seeker_in_qpv)
+        self._setup_session()
         response = self.client.get(
             reverse(
                 "apply:application_geiq_eligibility",
@@ -280,7 +279,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis(TestCase):
     def test_job_seeker_zrr_details_display_for_prescriber(self):
         # Check QPV fragment is displayed for prescriber:
         self.client.force_login(self.prescriber_org.members.first())
-        self._setup_session(self.job_seeker_in_zrr)
+        self._setup_session()
         response = self.client.get(
             reverse(
                 "apply:application_geiq_eligibility",
