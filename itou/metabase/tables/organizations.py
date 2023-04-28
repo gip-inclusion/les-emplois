@@ -66,14 +66,6 @@ def get_org_last_job_application_creation_date(org):
     return None
 
 
-ORGANIZATION_KIND_TO_READABLE_KIND = {
-    PrescriberOrganizationKind.PE: "Pôle emploi",
-    PrescriberOrganizationKind.CAP_EMPLOI: "Cap emploi",
-    PrescriberOrganizationKind.ML: "Mission locale",
-    PrescriberOrganizationKind.DEPT: "Département",
-    PrescriberOrganizationKind.OTHER: "Autre",
-}
-
 TABLE = MetabaseTable(name="organisations")
 TABLE.add_columns(
     [
@@ -84,7 +76,7 @@ TABLE.add_columns(
             "name": "type",
             "type": "varchar",
             "comment": "Type organisation (abrégé)",
-            "fn": lambda o: ORGANIZATION_KIND_TO_READABLE_KIND.get(o.kind, o.kind),
+            "fn": lambda o: o.kind,
         },
         {
             "name": "type_complet",
