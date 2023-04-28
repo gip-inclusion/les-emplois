@@ -57,6 +57,7 @@ from itou.metabase.tables import (
     rome_codes,
     selected_jobs,
     siaes,
+    users,
 )
 from itou.metabase.tables.utils import get_active_siae_pks
 from itou.prescribers.models import PrescriberOrganization
@@ -97,6 +98,7 @@ class Command(BaseCommand):
             "evaluated_siaes": self.populate_evaluated_siaes,
             "evaluated_job_applications": self.populate_evaluated_job_applications,
             "evaluated_criteria": self.populate_evaluated_criteria,
+            "users": self.populate_users,
             "rome_codes": self.populate_rome_codes,
             "insee_codes": self.populate_insee_codes,
             "insee_codes_vs_post_codes": self.populate_insee_codes_vs_post_codes,
@@ -383,6 +385,12 @@ class Command(BaseCommand):
     def populate_evaluated_criteria(self):
         queryset = EvaluatedAdministrativeCriteria.objects.all()
         populate_table(evaluated_criteria.TABLE, batch_size=1000, querysets=[queryset])
+
+    def populate_users(self):
+        queryset = User.objects.filter(
+            kind__in=[UserKind.SIAE_STAFF, UserKind.PRESCRIBER, UserKind.LABOR_INSPECTOR], is_active=True
+        )
+        populate_table(users.TABLE, batch_size=1000, querysets=[queryset])
 
     def populate_rome_codes(self):
         queryset = Rome.objects.all()

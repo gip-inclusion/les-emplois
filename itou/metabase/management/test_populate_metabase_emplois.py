@@ -593,6 +593,48 @@ def test_populate_evaluated_criteria():
         ]
 
 
+@freeze_time("2023-02-02")
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.usefixtures("metabase")
+def test_populate_users_exclude_job_seekers():
+    """
+    Job seeker personal data (email...) should never ever ever ever ever ever end up in Metabase.
+    Only pro users end up there.
+    """
+    JobSeekerFactory()
+    management.call_command("populate_metabase_emplois", mode="users")
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM utilisateurs ORDER BY id")
+        rows = cursor.fetchall()
+        assert len(rows) == 0
+
+
+@freeze_time("2023-02-02")
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.usefixtures("metabase")
+def test_populate_users():
+    pro_user = SiaeStaffFactory()
+
+    num_queries = 1  # Count users
+    num_queries += 1  # Select user IDs
+    num_queries += 1  # Select one chunk of user IDs
+    num_queries += 1  # Select users with columns
+    with assertNumQueries(num_queries):
+        management.call_command("populate_metabase_emplois", mode="users")
+
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM utilisateurs ORDER BY id")
+        rows = cursor.fetchall()
+        assert rows == [
+            (
+                pro_user.id,
+                pro_user.email,
+                pro_user.kind,
+                datetime.date(2023, 2, 1),
+            ),
+        ]
+
+
 def test_data_inconsistencies(capsys):
     approval = ApprovalFactory()
 
