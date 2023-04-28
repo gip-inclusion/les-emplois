@@ -52,7 +52,12 @@ class ApprovalBaseViewMixin(LoginRequiredMixin):
                 to_siae=self.siae,
                 approval=approval,
             )
-            .select_related("eligibility_diagnosis")
+            .select_related(
+                "eligibility_diagnosis",
+                "eligibility_diagnosis__author_siae",
+                "eligibility_diagnosis__author_prescriber_organization",
+                "eligibility_diagnosis__job_seeker",
+            )
             .first()
         )
 
@@ -73,6 +78,7 @@ class ApprovalDetailView(ApprovalBaseViewMixin, DetailView):
         context["matomo_custom_title"] = "Profil salarié"
         if job_application:
             context["eligibility_diagnosis"] = job_application.get_eligibility_diagnosis()
+
         context["all_job_applications"] = (
             JobApplication.objects.filter(
                 job_seeker=self.object.user,
