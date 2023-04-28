@@ -93,12 +93,13 @@ class CommonApprovalMixin(models.Model):
             obj.start_at - timezone.localdate(), datetime.timedelta(0)
         )
 
-    @property
+    @cached_property
     def remainder(self):
         """
         Return the remaining time of an Approval, we don't count future suspended periods.
         """
         result = self._get_obj_remainder(self)
+
         if hasattr(self, "suspension_set"):
             # PoleEmploiApprovals don't have suspensions
             result -= sum(
@@ -107,7 +108,7 @@ class CommonApprovalMixin(models.Model):
             )
         return result
 
-    @property
+    @cached_property
     def remainder_as_date(self):
         """
         Return an estimated end date if this approval was "activated" today:

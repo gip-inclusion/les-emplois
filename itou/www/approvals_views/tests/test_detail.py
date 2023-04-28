@@ -2,7 +2,7 @@ from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import assertContains, assertNotContains, assertNumQueries, assertRedirects
 
 from itou.approvals.factories import ApprovalFactory, SuspensionFactory
 from itou.eligibility.factories import EligibilityDiagnosisFactory
@@ -76,12 +76,34 @@ class TestApprovalDetailView:
             sent_by_authorized_prescriber_organisation=True,
         )
         approval = job_application.approval
+        expected_num_queries = (
+            1  # fetch django session
+            + 1  # fetch authenticated user
+            + 1  # verify user is active (middleware)
+            + 2  # fetch siae membership and siae infos (middleware)
+            + 1  # job_seeker.approval
+            + 1  # approval.suspension_set.end_at >= today
+            + 1  # job_application.with_accepted_at annotation coming from next query
+            + 1  # template: Suspension.can_be_handled_by_siae >> User.last_accepted_job_application
+            + 1  # template: job_application.get_eligibility_diagnosis => Siae.is_subject_to_eligibility_rules
+            + 1  # template: approval.remainder fetches approval suspensions to compute remaining days.
+            + 1  # template: approval.suspensions_for_status_card lists approval suspensions
+            + 1  # template: approval prolongations list.
+            + 1  # get job_application details (view queryset)
+            + 1  # get prefetch job_application selected_jobs
+            + 1  # get sender information (prescriber organization details)
+            + 1  # Create savepoint (atomic request to update the Django session)
+            + 1  # Update the Django session
+            + 1  # Release savepoint
+        )  # 19
 
         # Employer version
         user = job_application.to_siae.members.first()
         client.force_login(user)
 
         url = reverse("approvals:detail", kwargs={"pk": approval.pk})
+        with assertNumQueries(expected_num_queries):  # pylint: disable=not-context-manager
+            response = client.get(url)
         response = client.get(url)
         assertContains(response, format_approval_number(approval))
         assertContains(response, approval.start_at.strftime("%d/%m/%Y"))
@@ -98,7 +120,6 @@ class TestApprovalDetailView:
             "PASS IAE valide jusqu’au 25/04/2025, si le contrat démarre aujourd’hui.",
         )
 
-        # Job application accepted.
         job_application.state = JobApplicationWorkflow.STATE_ACCEPTED
         job_application.save()
         response = client.get(url)
@@ -107,7 +128,7 @@ class TestApprovalDetailView:
             "PASS IAE valide jusqu’au 25/04/2025, si le contrat démarre aujourd’hui.",
         )
 
-        ## Suspensions
+        ## Display suspensions
         # Valid
         SuspensionFactory(
             approval=approval,
@@ -120,15 +141,20 @@ class TestApprovalDetailView:
             start_at=timezone.localdate() - relativedelta(days=30),
             end_at=timezone.localdate() - relativedelta(days=20),
         )
-        # Clear cached property
-        # del approval.can_be_suspended
-        # del approval.is_suspended
 
         url = reverse("approvals:detail", kwargs={"pk": approval.pk})
-        response = client.get(url)
+        # FIXME(cms)
+        # There is a problem with queries numbers in this view but I was unable to resolve it quickly.
+        # The problem seems to be in templates/apply/includes/eligibility_diagnosis.html.
+        expected_num_queries += (
+            4  # `eligibility_diagnosis.considered_to_expire_at`
+            + 1  # eligibility_diagnosis.administrative_criteria.all
+            + 1  # ?
+        )
+        with assertNumQueries(expected_num_queries):  # pylint: disable=not-context-manager
+            response = client.get(url)
 
-        # Use a snapshot instead.
-
+        # TODO(cms): maybe use a snapshot instead.
         assertContains(response, "Suspension en cours")
         assertContains(response, "du 19/04/2023 au 29/04/2023")
         assertContains(response, "Suspensions passées")
