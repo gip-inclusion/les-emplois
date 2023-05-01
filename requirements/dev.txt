@@ -1167,9 +1167,9 @@ stack-data==0.6.1 \
     --hash=sha256:6c9a10eb5f342415fe085db551d673955611afb821551f554d91772415464315 \
     --hash=sha256:960cb054d6a1b2fdd9cbd529e365b3c163e8dabf1272e02cfe36b58403cff5c6
     # via ipython
-syrupy==4.0.1 \
-    --hash=sha256:53d3107cc5e18a5def189c721879cea2cdafdee34b879f602133ca08837d0e4b \
-    --hash=sha256:60e3e94782444e0f978cd3b207de32f6da3199b15a2db32eab02f83cebb63ae8
+syrupy==4.0.2 \
+    --hash=sha256:3c75ab6866580679b2cb9abe78e74c3e2011fffc6333651c6beb2a78a716ab80 \
+    --hash=sha256:dfd1f0fad298eee753de4f2471d4346412c4435885c4b7beea648d4934c6620a
     # via -r requirements/dev.in
 tablib[html,ods,xls,xlsx,yaml]==3.2.1 \
     --hash=sha256:870d7e688f738531a14937a055e8bba404fbc388e77d4d500b2c904075d1019c \
