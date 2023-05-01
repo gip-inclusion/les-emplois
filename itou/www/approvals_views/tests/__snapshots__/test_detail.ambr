@@ -1,0 +1,34 @@
+# serializer version: 1
+# name: TestApprovalDetailView.test_approval_status_includes[Approval suspensions list]
+  '''
+  <div class="pl-2 border-left approval-left-border" id="suspensions-list">
+                  
+                      <p class="mb-1">Suspension en cours :</p>
+                      <ul class="list-unstyled">
+                          <li>
+                              <b>du 19/04/2023 au 29/04/2023</b>
+                              
+                                  <!-- djlint:off --><!-- djlint:on -->
+                                  
+                                      <small>
+                                          <a href="/approvals/suspension/210/edit?back_url=/approvals/detail/335">Modifier</a>
+                                          <a href="/approvals/suspension/210/delete?back_url=/approvals/detail/335">Annuler</a>
+                                      </small>
+                                  
+                              
+                          </li>
+                      </ul>
+                  
+                  
+                      <p class="mb-1">Suspensions passées :</p>
+                      <ul class="list-unstyled">
+                          
+                              <li>
+                                  <span>du 27/03/2023 au 06/04/2023</span>
+                              </li>
+                          
+                      </ul>
+                  
+              </div>
+  '''
+# ---

@@ -11,6 +11,7 @@ from itou.job_applications.factories import JobApplicationFactory, JobApplicatio
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.factories import PrescriberFactory, PrescriberOrganizationFactory
 from itou.utils.templatetags.format_filters import format_approval_number
+from itou.utils.test import parse_response_to_soup
 
 
 class TestApprovalDetailView:
@@ -64,7 +65,7 @@ class TestApprovalDetailView:
         assertContains(response, '<i class="ri-group-line mr-2" aria-hidden="true"></i>Orienteur', count=1)
 
     @freeze_time("2023-04-26")
-    def test_approval_status_includes(self, client):
+    def test_approval_status_includes(self, client, snapshot):
         """
         templates/approvals/includes/status.html
         This template is used in approval views but also in many other places.
@@ -154,13 +155,8 @@ class TestApprovalDetailView:
         with assertNumQueries(expected_num_queries):  # pylint: disable=not-context-manager
             response = client.get(url)
 
-        # TODO(cms): maybe use a snapshot instead.
-        assertContains(response, "Suspension en cours")
-        assertContains(response, "du 19/04/2023 au 29/04/2023")
-        assertContains(response, "Suspensions passées")
-        assertContains(response, "du 27/03/2023 au 06/04/2023")
-        assertContains(response, "Modifier")
-        assertContains(response, "Annuler")
+        suspensions_section = parse_response_to_soup(response, selector="#suspensions-list")
+        assert str(suspensions_section) == snapshot(name="Approval suspensions list")
 
         # Prescriber version
         user = job_application.sender
