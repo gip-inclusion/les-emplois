@@ -78,8 +78,12 @@ class ProlongationFactory(factory.django.DjangoModelFactory):
     @factory.post_generation
     def set_validated_by(self, create, extracted, **kwargs):
         if not create:
-            # Simple build, do nothing.
             return
+        # Ignore setting validated_by:
+        # ProlongationFactory(set_validated_by=False)
+        if extracted is False:
+            return
+
         authorized_prescriber_org = PrescriberOrganizationWithMembershipFactory(authorized=True)
         self.validated_by = authorized_prescriber_org.members.first()
 
