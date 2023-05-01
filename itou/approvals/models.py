@@ -108,7 +108,7 @@ class CommonApprovalMixin(models.Model):
             )
         return result
 
-    @cached_property
+    @property
     def remainder_as_date(self):
         """
         Return an estimated end date if this approval was "activated" today:
@@ -350,7 +350,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
     def suspensions_by_start_date_asc(self):
         return self.suspension_set.all().order_by("start_at")
 
-    @cached_property
+    @property
     def suspensions_for_status_card(self):
         suspensions = self.suspension_set.all().order_by("-start_at")
         if not suspensions:
@@ -426,9 +426,18 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
 
     # Prolongation.
 
-    @cached_property
-    def prolongations_by_start_date_asc(self):
-        return self.prolongation_set.all().select_related("validated_by").order_by("start_at")
+    @property
+    def prolongations_for_status_card(self):
+        prolongations = self.prolongation_set.select_related("validated_by").all().order_by("-start_at")
+        if not prolongations:
+            return
+
+        older_prolongations = prolongations
+        in_progress_prolongation = None
+        if prolongations[0].is_in_progress:
+            [in_progress_prolongation, *older_prolongations] = prolongations
+
+        return {"in_progress": [in_progress_prolongation], "older": older_prolongations}
 
     @property
     def is_open_to_prolongation(self):

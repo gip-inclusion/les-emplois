@@ -1,4 +1,43 @@
 # serializer version: 1
+# name: TestApprovalDetailView.test_approval_status_includes[Approval prolongations list]
+  '''
+  <div class="pl-2 border-left approval-left-border" id="prolongations-list">
+                  
+                      <p class="mb-1">Prolongation en cours :</p>
+                      <ul class="list-unstyled">
+      
+          <li>
+              du 19/04/2023 au 29/04/2023
+              <br/>
+              <small>Fin d'une formation</small>
+              
+          </li>
+      
+  </ul>
+  
+                  
+                  <p class="mb-1">Prolongations passées :</p>
+                  <ul class="list-unstyled">
+      
+          <li>
+              du 27/03/2023 au 06/04/2023
+              <br/>
+              <small>Fin d'une formation</small>
+              
+          </li>
+      
+          <li>
+              du 25/02/2023 au 07/03/2023
+              <br/>
+              <small>Fin d'une formation</small>
+              
+          </li>
+      
+  </ul>
+  
+              </div>
+  '''
+# ---
 # name: TestApprovalDetailView.test_approval_status_includes[Approval suspensions list]
   '''
   <div class="pl-2 border-left approval-left-border" id="suspensions-list">
@@ -11,8 +50,8 @@
                                   <!-- djlint:off --><!-- djlint:on -->
                                   
                                       <small>
-                                          <a href="/approvals/suspension/210/edit?back_url=/approvals/detail/335">Modifier</a>
-                                          <a href="/approvals/suspension/210/delete?back_url=/approvals/detail/335">Annuler</a>
+                                          <a href="/approvals/suspension/1/edit?back_url=/approvals/detail/1">Modifier</a>
+                                          <a href="/approvals/suspension/1/delete?back_url=/approvals/detail/1">Annuler</a>
                                       </small>
                                   
                               
