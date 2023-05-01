@@ -92,7 +92,7 @@ Arguments:
     {# Suspensions history. #}
     {% with common_approval.suspensions_for_status_card as suspensions %}
         {% if suspensions.last_in_progress or suspensions.older %}
-            <div class="pl-2 border-left approval-left-border">
+            <div id="suspensions-list" class="pl-2 border-left approval-left-border">
                 {% if suspensions.last_in_progress %}
                     <p class="mb-1">Suspension en cours :</p>
                     <ul class="list-unstyled">
