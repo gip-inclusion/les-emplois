@@ -556,6 +556,8 @@ class ApprovalModelTest(TestCase):
             start_at=datetime.date(2022, 11, 1),
             end_at=datetime.date(2022, 12, 1),
         )
+        # Clear cache
+        del approval.remainder
         # Substract to remainder the relaining suspension time
         assert approval.remainder == datetime.timedelta(days=109)
 

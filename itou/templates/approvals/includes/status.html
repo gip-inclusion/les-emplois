@@ -125,25 +125,15 @@ Arguments:
     {% endwith %}
 
     {# Prolongations history. #}
-    {% with common_approval.prolongations_by_start_date_asc as prolongations %}
+    {% with common_approval.prolongations_for_status_card as prolongations %}
         {% if prolongations %}
-            <div class="pl-2 border-left approval-left-border">
-                <p class="mb-1">Prolongations :</p>
-                <ul class="list-unstyled">
-                    {% for p in prolongations %}
-                        <li{% if p.is_in_progress %} class="font-weight-bold"{% endif %}>
-                            du {{ p.start_at|date:"d/m/Y" }} au {{ p.end_at|date:"d/m/Y" }}
-                            <br>
-                            <small>{{ p.get_reason_display }}</small>
-                            {% if p.validated_by %}
-                                <br>
-                                <small>
-                                    Autorisation par <i>{{ p.validated_by.get_full_name|title }}</i> ({{ p.validated_by.email }})
-                                </small>
-                            {% endif %}
-                        </li>
-                    {% endfor %}
-                </ul>
+            <div id="prolongations-list" class="pl-2 border-left approval-left-border">
+                {% if prolongations.in_progress %}
+                    <p class="mb-1">Prolongation en cours :</p>
+                    {% include "approvals/includes/prolongations_list.html" with prolongations=prolongations.in_progress %}
+                {% endif %}
+                <p class="mb-1">Prolongations passées :</p>
+                {% include "approvals/includes/prolongations_list.html" with prolongations=prolongations.older %}
             </div>
         {% endif %}
     {% endwith %}

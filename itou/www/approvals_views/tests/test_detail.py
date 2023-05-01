@@ -4,7 +4,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertNumQueries, assertRedirects
 
-from itou.approvals.factories import ApprovalFactory, SuspensionFactory
+from itou.approvals.factories import ApprovalFactory, ProlongationFactory, SuspensionFactory
 from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.job_applications.enums import SenderKind
 from itou.job_applications.factories import JobApplicationFactory, JobApplicationSentByPrescriberOrganizationFactory
@@ -74,6 +74,7 @@ class TestApprovalDetailView:
         job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
             with_approval=True,
+            approval__id=1,
             sent_by_authorized_prescriber_organisation=True,
         )
         approval = job_application.approval
@@ -96,7 +97,7 @@ class TestApprovalDetailView:
             + 1  # Create savepoint (atomic request to update the Django session)
             + 1  # Update the Django session
             + 1  # Release savepoint
-        )  # 19
+        )
 
         # Employer version
         user = job_application.to_siae.members.first()
@@ -108,7 +109,7 @@ class TestApprovalDetailView:
         response = client.get(url)
         assertContains(response, format_approval_number(approval))
         assertContains(response, approval.start_at.strftime("%d/%m/%Y"))
-        assertContains(response, str(approval.remainder.days))
+        assertContains(response, f"{approval.remainder.days} jours")
         assertNotContains(
             response,
             "PASS IAE valide jusqu’au 25/04/2025, si le contrat démarre aujourd’hui.",
@@ -132,12 +133,14 @@ class TestApprovalDetailView:
         ## Display suspensions
         # Valid
         SuspensionFactory(
+            id=1,
             approval=approval,
             start_at=timezone.localdate() - relativedelta(days=7),
             end_at=timezone.localdate() + relativedelta(days=3),
         )
         # Older
         SuspensionFactory(
+            id=2,
             approval=approval,
             start_at=timezone.localdate() - relativedelta(days=30),
             end_at=timezone.localdate() - relativedelta(days=20),
@@ -157,6 +160,43 @@ class TestApprovalDetailView:
 
         suspensions_section = parse_response_to_soup(response, selector="#suspensions-list")
         assert str(suspensions_section) == snapshot(name="Approval suspensions list")
+
+        approval.suspension_set.all().delete()
+
+        ## Display prolongations
+        default_kwargs = {
+            "declared_by": PrescriberFactory(first_name="Milady", last_name="de Winter", email="milady@dewinter.com"),
+            "set_validated_by": False,
+            "approval": approval,
+        }
+        # Valid
+        ProlongationFactory(
+            id=1,
+            start_at=timezone.localdate() - relativedelta(days=7),
+            end_at=timezone.localdate() + relativedelta(days=3),
+            **default_kwargs,
+        )
+
+        # Older
+        ProlongationFactory(
+            id=2,
+            start_at=timezone.localdate() - relativedelta(days=30),
+            end_at=timezone.localdate() - relativedelta(days=20),
+            **default_kwargs,
+        )
+        ProlongationFactory(
+            id=3,
+            start_at=timezone.localdate() - relativedelta(days=60),
+            end_at=timezone.localdate() - relativedelta(days=50),
+            **default_kwargs,
+        )
+
+        url = reverse("approvals:detail", kwargs={"pk": approval.pk})
+        with assertNumQueries(expected_num_queries):  # pylint: disable=not-context-manager
+            response = client.get(url)
+
+        prolongations_section = parse_response_to_soup(response, selector="#prolongations-list")
+        assert str(prolongations_section) == snapshot(name="Approval prolongations list")
 
         # Prescriber version
         user = job_application.sender
