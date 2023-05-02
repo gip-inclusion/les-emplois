@@ -20,7 +20,6 @@ class ItouCurrentOrganizationMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-
         # Before the view is called.
         user = request.user
 
@@ -47,6 +46,7 @@ class ItouCurrentOrganizationMiddleware:
                 and user.kind in [UserKind.PRESCRIBER, UserKind.SIAE_STAFF]
                 and not request.path.startswith("/dashboard/activate_ic_account")  # Allow to access ic activation view
                 and not request.path.startswith("/inclusion_connect")  # Allow to access ic views
+                and not request.path.startswith("/hijack/release")  # Allow to release hijack
                 and settings.FORCE_IC_LOGIN  # Allow to disable on dev setup
             ):
                 # Add request.path as next param ?
