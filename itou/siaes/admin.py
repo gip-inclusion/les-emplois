@@ -46,6 +46,19 @@ class JobsInline(admin.TabularInline):
     jobdescription_id_link.short_description = "Lien vers la fiche de poste"
 
 
+class JobDescriptionHistoryInline(admin.TabularInline):
+    model = models.SiaeJobDescriptionHistory
+    readonly_fields = (
+        "updated_at",
+        "is_active",
+    )
+    verbose_name = "Historique des modifications"
+    can_delete = False
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+
 class FinancialAnnexesInline(admin.TabularInline):
     model = models.SiaeFinancialAnnex
     fields = ("number", "state", "start_at", "end_at", "is_active")
@@ -265,6 +278,8 @@ class SiaeJobDescriptionAdmin(admin.ModelAdmin):
         "source_kind",
         "source_url",
     )
+
+    inlines = (JobDescriptionHistoryInline,)
 
     def get_display_name(self, obj):
         return obj.custom_name if obj.custom_name else obj.appellation

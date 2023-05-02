@@ -194,3 +194,8 @@ class SiaeJobDescriptionFactory(factory.django.DjangoModelFactory):
     location = factory.LazyAttribute(lambda obj: City.objects.order_by("?").first())
     profile_description = factory.Faker("sentence", locale="fr_FR")
     market_context_description = factory.Faker("sentence", locale="fr_FR")
+
+
+class SiaeJobDescriptionHistoryFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.SiaeJobDescriptionHistory

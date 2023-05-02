@@ -17,12 +17,13 @@ from itou.siaes.factories import (
     SiaeAfterGracePeriodFactory,
     SiaeFactory,
     SiaeJobDescriptionFactory,
+    SiaeJobDescriptionHistoryFactory,
     SiaePendingGracePeriodFactory,
     SiaeWith2MembershipsFactory,
     SiaeWith4MembershipsFactory,
     SiaeWithMembershipAndJobsFactory,
 )
-from itou.siaes.models import Siae, SiaeJobDescription
+from itou.siaes.models import Siae, SiaeJobDescription, SiaeJobDescriptionHistory
 from itou.users.factories import JobSeekerFactory
 from itou.utils.test import TestCase
 
@@ -403,6 +404,28 @@ class SiaeJobDescriptionQuerySetTest(TestCase):
         siae.kind = SiaeKind.GEIQ
         siae.save(update_fields=["kind"])
         assert SiaeJobDescription.objects.active().count() == 1
+
+    def test_history(self):
+        siae = SiaeFactory(kind=SiaeKind.ETTI, convention=None)
+        job = SiaeJobDescriptionFactory(siae=siae, is_active=False)
+        assert SiaeJobDescriptionHistory.objects.filter(job_description=job).count() == 0
+
+        SiaeJobDescriptionHistoryFactory(job_description=job, is_active=False)
+        assert job.history_entries.count() == 1
+        assert not job.history_entries.first().is_active
+
+        # Update object but not `is_active` field
+        job.custom_name = "Test custom name"
+        job.save()
+        job.refresh_from_db()
+        assert job.history_entries.count() == 1
+
+        # Update only tracked field
+        job.is_active = True
+        job.save()
+        job.refresh_from_db()
+        assert job.history_entries.count() == 2
+        assert not job.history_entries.order_by("updated_at").first().is_active
 
 
 class SiaeContractTypeTest(TestCase):

@@ -639,6 +639,13 @@ class SiaeJobDescription(models.Model):
     def save(self, *args, **kwargs):
         if self.pk:
             self.updated_at = timezone.now()
+
+            obj = SiaeJobDescription.objects.get(pk=self.pk)
+            if obj.is_active != self.is_active:
+                new_history_entry = SiaeJobDescriptionHistory(job_description=self, is_active=self.is_active)
+                new_history_entry.save()
+                self.history_entries.add(new_history_entry)
+
         return super().save(*args, **kwargs)
 
     @property
@@ -673,6 +680,19 @@ class SiaeJobDescription(models.Model):
         if self.is_external:
             return self.source_url
         return reverse("siaes_views:job_description_card", kwargs={"job_description_id": self.pk})
+
+
+class SiaeJobDescriptionHistory(models.Model):
+    """Tracking of job description activity:
+    - only `is_active` field is tracked (at the moment)
+    - boolean value is also stored, even if redundant and deductible, for evolution concerns
+    """
+
+    job_description = models.ForeignKey(SiaeJobDescription, related_name="history_entries", on_delete=models.CASCADE)
+    updated_at = models.DateTimeField(
+        verbose_name="Dernière modification de l'ouverture du poste", default=timezone.now
+    )
+    is_active = models.BooleanField(verbose_name="Poste ouvert au recrutement")
 
 
 class SiaeConvention(models.Model):
