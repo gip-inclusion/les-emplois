@@ -79,6 +79,24 @@ class UserHijackPermTestCase(TestCase):
         assert response["Location"] == "/bar/"
         assert cm.records[0].message == f"admin={hijacker} has ended impersonation of user={hijacked}"
 
+    @override_settings(HIJACK_ALLOWED_USER_EMAILS=["foo@test.com", "bar@baz.org"])
+    def test_allowed_django_prescriber(self):
+        hijacked = PrescriberFactory(identity_provider=IdentityProvider.DJANGO)
+        hijacker = ItouStaffFactory(email="bar@baz.org")
+        self.client.force_login(hijacker)
+
+        with self.assertLogs() as cm:
+            response = self.client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk, "next": "/foo/"})
+        assert response.status_code == 302
+        assert response["Location"] == "/foo/"
+        assert cm.records[0].message == f"admin={hijacker} has started impersonation of user={hijacked}"
+
+        with self.assertLogs() as cm:
+            response = self.client.post(reverse("hijack:release"), {"user_pk": hijacked.pk, "next": "/bar/"})
+        assert response.status_code == 302
+        assert response["Location"] == "/bar/"
+        assert cm.records[0].message == f"admin={hijacker} has ended impersonation of user={hijacked}"
+
 
 @pytest.mark.parametrize(
     "user_factory,identity_provider,is_redirected",
