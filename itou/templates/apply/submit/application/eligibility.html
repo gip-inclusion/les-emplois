@@ -39,28 +39,62 @@
 {% endblock %}
 
 {% block form_content %}
-    <div{% if eligibility_diagnosis and not form.is_bound %} class="js-shroud"{% endif %}>
-        <fieldset>
-            <legend class="h3">
-                Critères administratifs de niveau 1
-            </legend>
-            {% for field in form %}
-                {% if form.LEVEL_1_PREFIX in field.name %}
-                    {% bootstrap_field field %}
-                {% endif %}
-            {% endfor %}
-        </fieldset>
+    <div class="d-flex flex-column flex-lg-row">
+        {% if is_subject_to_eligibility_rules and request.user.is_prescriber %}
+            <div class="order-0 order-lg-1">
+                <div class="alert alert-primary bg-white py-0" role="status">
+                    <div class="row">
+                        <div class="col-auto pr-0">
+                            <i class="ri-lightbulb-line ri-xl"></i>
+                        </div>
+                        <div class="col">
+                            <p class="mb-2">
+                                <strong>Bon à savoir</strong>
+                            </p>
+                            <p class="mb-0">
+                                Pour valider l'éligibilité IAE du candidat :
+                                <ol>
+                                    <li>
+                                        Veuillez vous assurer d’avoir réalisé un diagnostic socio-professionnel dans le cadre d'un entretien individuel.
+                                        Vous pouvez vous appuyer sur le document
+                                        <a class="text-important"
+                                           href="{{ ITOU_COMMUNITY_URL }}/doc/emplois/diagnostic-socio-professionnel/"
+                                           target="_blank"
+                                           rel="noreferrer noopener"
+                                           aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
+                                    </li>
+                                    <li>Il est recommandé de sélectionner le(s) critères(s) administratifs d’éligibilité correspondants.</li>
+                                </ol>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        <div class="col-12 col-lg-7 pl-0{% if eligibility_diagnosis and not form.is_bound %} js-shroud{% endif %}">
+            <fieldset>
+                <legend class="h3">
+                    Critères administratifs de niveau 1
+                </legend>
+                {% for field in form %}
+                    {% if form.LEVEL_1_PREFIX in field.name %}
+                        {% bootstrap_field field %}
+                    {% endif %}
+                {% endfor %}
+            </fieldset>
 
-        <fieldset>
-            <legend class="h3">
-                Critères administratifs de niveau 2
-            </legend>
-            {% for field in form %}
-                {% if form.LEVEL_2_PREFIX in field.name %}
-                    {% bootstrap_field field %}
-                {% endif %}
-            {% endfor %}
-        </fieldset>
-        <input type="hidden" name="shrouded" value="1" data-shroud-input />
+            <fieldset>
+                <legend class="h3">
+                    Critères administratifs de niveau 2
+                </legend>
+                {% for field in form %}
+                    {% if form.LEVEL_2_PREFIX in field.name %}
+                        {% bootstrap_field field %}
+                    {% endif %}
+                {% endfor %}
+            </fieldset>
+
+            <input type="hidden" name="shrouded" value="1" data-shroud-input />
+        </div>
     </div>
 {% endblock %}
