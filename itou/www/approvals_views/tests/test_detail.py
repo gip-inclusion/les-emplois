@@ -170,7 +170,7 @@ class TestApprovalDetailView:
             "approval": approval,
         }
         # Valid
-        ProlongationFactory(
+        active_prolongation = ProlongationFactory(
             id=1,
             start_at=timezone.localdate() - relativedelta(days=7),
             end_at=timezone.localdate() + relativedelta(days=3),
@@ -188,6 +188,14 @@ class TestApprovalDetailView:
             id=3,
             start_at=timezone.localdate() - relativedelta(days=60),
             end_at=timezone.localdate() - relativedelta(days=50),
+            **default_kwargs,
+        )
+
+        # In the future
+        ProlongationFactory(
+            id=4,
+            start_at=active_prolongation.end_at + relativedelta(days=10),
+            end_at=active_prolongation.end_at + relativedelta(days=15),
             **default_kwargs,
         )
 

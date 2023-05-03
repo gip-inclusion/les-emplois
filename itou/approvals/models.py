@@ -8,7 +8,7 @@ from django.contrib.postgres.fields import RangeBoundary, RangeOperators
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.db import models
-from django.db.models import Count, Q
+from django.db.models import Case, Count, Q, When
 from django.db.models.functions import TruncDate
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -358,6 +358,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
 
         older_suspensions = suspensions
         last_in_progress_suspension = None
+        # Suspensions cannot start in the future.
         if suspensions[0].is_in_progress:
             [last_in_progress_suspension, *older_suspensions] = suspensions
 
@@ -428,16 +429,23 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
 
     @property
     def prolongations_for_status_card(self):
-        prolongations = self.prolongation_set.select_related("validated_by").all().order_by("-start_at")
+        # Code would be easier to read if we used QS filters like this:
+        # in_progress_prolongations = self.prolongation_set.in_progress().order_by("-start_at")
+        # but this would generate 2 queries instead of one.
+        annotation = Case(When(Prolongation.objects._queryset_class().in_progress_lookup, then=True), default=False)
+        prolongations = (
+            self.prolongation_set.annotate(is_in_progress_lookup=annotation)
+            .select_related("validated_by")
+            .all()
+            .order_by("-start_at")
+        )
         if not prolongations:
             return
 
-        older_prolongations = prolongations
-        in_progress_prolongation = None
-        if prolongations[0].is_in_progress:
-            [in_progress_prolongation, *older_prolongations] = prolongations
+        in_progress_prolongations = list(filter(lambda p: p.is_in_progress_lookup, prolongations))
+        not_in_progress_prolongations = list(filter(lambda p: not p.is_in_progress_lookup, prolongations))
 
-        return {"in_progress": [in_progress_prolongation], "older": older_prolongations}
+        return {"in_progress": in_progress_prolongations, "not_in_progress": not_in_progress_prolongations}
 
     @property
     def is_open_to_prolongation(self):
