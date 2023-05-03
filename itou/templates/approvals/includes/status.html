@@ -132,8 +132,10 @@ Arguments:
                     <p class="mb-1">Prolongation en cours :</p>
                     {% include "approvals/includes/prolongations_list.html" with prolongations=prolongations.in_progress %}
                 {% endif %}
-                <p class="mb-1">Prolongations passées :</p>
-                {% include "approvals/includes/prolongations_list.html" with prolongations=prolongations.older %}
+                {% if prolongations.not_in_progress %}
+                    <p class="mb-1">Prolongations passées ou à venir :</p>
+                    {% include "approvals/includes/prolongations_list.html" with prolongations=prolongations.not_in_progress %}
+                {% endif %}
             </div>
         {% endif %}
     {% endwith %}
