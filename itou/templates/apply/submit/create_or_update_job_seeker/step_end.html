@@ -3,6 +3,7 @@
 {% load format_filters %}
 
 {% block title %}Création du compte candidat {{ block.super }}{% endblock %}
+
 {% block content_full_viewport %}
     <section class="s-section-twocolumns">
         <div class="container">
@@ -22,86 +23,92 @@
                             {% csrf_token %}
 
                             <h2>État civil</h2>
-                            <p>
-                                <b>{{ profile.user.get_title_display }} {{ profile.user.get_full_name }}</b>
-                            </p>
-                            <p>
-                                Date de naissance : <b>le {{ profile.user.birthdate }}</b>
-                            </p>
+                            <ul class="list-unstyled">
+                                <li class="mb-3">
+                                    <b>{{ profile.user.get_title_display }} {{ profile.user.get_full_name }}</b>
+                                </li>
+                                <li class="mb-3">
+                                    Date de naissance : <b>le {{ profile.user.birthdate }}</b>
+                                </li>
+                            </ul>
                             <hr class="my-4">
 
                             <h2>Coordonnées</h2>
-                            <p>
-                                <b>{{ profile.user.address_on_one_line }}</b>
-                            </p>
-                            {% if profile.user.phone %}
-                                <p>
-                                    Téléphone : <b>{{ profile.user.phone|format_phone }}</b>
-                                </p>
-                            {% endif %}
+                            <ul class="list-unstyled">
+                                <li class="mb-3">
+                                    <b>{{ profile.user.address_on_one_line }}</b>
+                                </li>
+                                {% if profile.user.phone %}
+                                    <li class="mb-3">
+                                        Téléphone : <b>{{ profile.user.phone|format_phone }}</b>
+                                    </li>
+                                {% endif %}
+                            </ul>
                             <hr class="my-4">
 
                             <h2>Situation</h2>
-                            <p>
-                                Niveau de formation : <b>{{ profile.get_education_level_display }}</b>
-                            </p>
-                            {% if profile.resourceless %}
-                                <p>
-                                    <b>Sans ressources</b>
-                                </p>
-                            {% endif %}
-                            {% if profile.pole_emploi_since %}
-                                <p>
-                                    Inscrit à Pôle emploi depuis : <b>{{ profile.get_pole_emploi_since_display|lower }}</b>
-                                </p>
-                            {% endif %}
-                            {% if profile.user.pole_emploi_id or profile.user.lack_of_pole_emploi_id_reason %}
-                                <p>
-                                    Identifiant Pôle emploi :
-                                    <b>
-                                        {% if profile.user.pole_emploi_id %}
-                                            {{ profile.user.pole_emploi_id }}
-                                        {% else %}
-                                            {{ profile.user.get_lack_of_pole_emploi_id_reason_display }}
-                                        {% endif %}
-                                    </b>
-                                </p>
-                            {% endif %}
-                            {% if profile.unemployed_since %}
-                                <p>
-                                    Sans emploi depuis : <b>{{ profile.get_unemployed_since_display|lower }}</b>
-                                </p>
-                            {% endif %}
-                            {% if profile.rqth_employee %}
-                                <p>
-                                    <b>Titulaire de la RQTH</b>
-                                </p>
-                            {% endif %}
-                            {% if profile.oeth_employee %}
-                                <p>
-                                    <b>Bénéficiaire de la loi handicap (OETH)</b>
-                                </p>
-                            {% endif %}
-                            {% if profile.rsa_allocation_since %}
-                                <p>
-                                    {{ profile.get_has_rsa_allocation_display }} depuis : <b>{{ profile.get_rsa_allocation_since_display|lower }}</b>
-                                </p>
-                            {% endif %}
-                            {% if profile.ass_allocation_since %}
-                                <p>
-                                    Bénéficiaire de l'ASS depuis : <b>{{ profile.get_ass_allocation_since_display|lower }}</b>
-                                </p>
-                            {% endif %}
-                            {% if profile.aah_allocation_since %}
-                                <p>
-                                    Bénéficiaire de l'AAH depuis : <b>{{ profile.get_aah_allocation_since_display|lower }}</b>
-                                </p>
-                            {% endif %}
+                            <ul class="list-unstyled">
+                                <li class="mb-3">
+                                    Niveau de formation : <b>{{ profile.get_education_level_display }}</b>
+                                </li>
+                                {% if profile.resourceless %}
+                                    <li class="mb-3">
+                                        <b>Sans ressources</b>
+                                    </li>
+                                {% endif %}
+                                {% if profile.pole_emploi_since %}
+                                    <li class="mb-3">
+                                        Inscrit à Pôle emploi depuis : <b>{{ profile.get_pole_emploi_since_display|lower }}</b>
+                                    </li>
+                                {% endif %}
+                                {% if profile.user.pole_emploi_id or profile.user.lack_of_pole_emploi_id_reason %}
+                                    <li class="mb-3">
+                                        Identifiant Pôle emploi :
+                                        <b>
+                                            {% if profile.user.pole_emploi_id %}
+                                                {{ profile.user.pole_emploi_id }}
+                                            {% else %}
+                                                {{ profile.user.get_lack_of_pole_emploi_id_reason_display }}
+                                            {% endif %}
+                                        </b>
+                                    </li>
+                                {% endif %}
+                                {% if profile.unemployed_since %}
+                                    <li class="mb-3">
+                                        Sans emploi depuis : <b>{{ profile.get_unemployed_since_display|lower }}</b>
+                                    </li>
+                                {% endif %}
+                                {% if profile.rqth_employee %}
+                                    <li class="mb-3">
+                                        <b>Titulaire de la RQTH</b>
+                                    </li>
+                                {% endif %}
+                                {% if profile.oeth_employee %}
+                                    <li class="mb-3">
+                                        <b>Bénéficiaire de la loi handicap (OETH)</b>
+                                    </li>
+                                {% endif %}
+                                {% if profile.rsa_allocation_since %}
+                                    <li class="mb-3">
+                                        {{ profile.get_has_rsa_allocation_display }} depuis : <b>{{ profile.get_rsa_allocation_since_display|lower }}</b>
+                                    </li>
+                                {% endif %}
+                                {% if profile.ass_allocation_since %}
+                                    <li class="mb-3">
+                                        Bénéficiaire de l'ASS depuis : <b>{{ profile.get_ass_allocation_since_display|lower }}</b>
+                                    </li>
+                                {% endif %}
+                                {% if profile.aah_allocation_since %}
+                                    <li class="mb-3">
+                                        Bénéficiaire de l'AAH depuis : <b>{{ profile.get_aah_allocation_since_display|lower }}</b>
+                                    </li>
+                                {% endif %}
+                            </ul>
 
                             <hr class="my-4">
                             {% buttons %}
                                 <div class="text-right">
-                                    <a class="btn btn-link" href="{{ back_url }}">Retour</a>
+                                    <a class="btn btn-link" href="{{ back_url }}" aria-label="Retourner à l'étape précédente">Retour</a>
                                     <button type="submit" class="btn btn-primary">Valider les informations</button>
                                 </div>
                             {% endbuttons %}
