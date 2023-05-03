@@ -4,6 +4,7 @@ import os
 from datetime import date
 
 import httpx
+from dotenv import load_dotenv
 from sentry_sdk.crons import monitor
 
 
@@ -26,4 +27,5 @@ def main():
 
 
 if __name__ == "__main__":
+    load_dotenv()
     main()
