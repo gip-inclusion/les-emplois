@@ -244,11 +244,17 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         self.assertContains(response, reverse("signup:facilitator_search"))
 
     def test_siae_select_does_not_die_under_requests(self):
-        SiaeWithMembershipAndJobsFactory(siret="40219166200001")
-        SiaeWithMembershipAndJobsFactory(siret="40219166200002")
-        SiaeWithMembershipAndJobsFactory(siret="40219166200003")
-        SiaeWithMembershipAndJobsFactory(siret="40219166200004")
-        SiaeWithMembershipAndJobsFactory(siret="40219166200005")
+        siaes = (
+            SiaeWithMembershipAndJobsFactory(siret="40219166200001"),
+            SiaeWithMembershipAndJobsFactory(siret="40219166200002"),
+            SiaeWithMembershipAndJobsFactory(siret="40219166200003"),
+            SiaeWithMembershipAndJobsFactory(siret="40219166200004"),
+            SiaeWithMembershipAndJobsFactory(siret="40219166200005"),
+        )
+        # Add more than one member to all SIAE to test prefetch and distinct
+        for siae in siaes:
+            SiaeMembershipFactory.create_batch(2, siae=siae)
+
         url = reverse("signup:siae_select")
         # ensure we only perform 4 requests, whatever the number of SIAEs sharing the
         # same SIREN. Before, this request was issuing 3*N slow requests, N being the
@@ -262,6 +268,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         ):
             response = self.client.get(url, {"siren": "402191662"})
         assert response.status_code == 200
+        self.assertContains(response, "EI", count=5)
 
 
 class SiaeSignupViewsExceptionsTest(TestCase):
