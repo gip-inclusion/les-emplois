@@ -862,6 +862,7 @@ class ApplicationEligibilityView(ApplicationBaseView):
             "back_url": reverse(
                 "apply:application_jobs", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk}
             ),
+            "full_content_width": True,
         }
 
 
