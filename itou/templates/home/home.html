@@ -6,7 +6,7 @@
 
 {% block content %}
 
-    {% include "search/includes/generic_search_home.html" with form=siae_search_form title="Prenez contact avec un employeur solidaire" url_search="search:siaes_results" template_form_name="search/includes/siaes_search_form.html" %}
+    {% include "search/includes/generic_search_home.html" with form=siae_search_form title="Rechercher un emploi inclusif" url_search="search:siaes_results" template_form_name="search/includes/siaes_search_form.html" %}
 
     {% if not user.is_authenticated %}
         <section class="bg-white text-center">
