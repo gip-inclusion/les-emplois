@@ -555,7 +555,7 @@ class DashboardViewTest(TestCase):
         self.client.force_login(approval.user)
         url = reverse("dashboard:index")
         response = self.client.get(url)
-        self.assertContains(response, "PASS IAE (agrément) disponible :")
+        self.assertContains(response, "PASS IAE disponible :")
         self.assertContains(response, format_approval_number(approval))
         self.assertContains(response, "Date de début : 21/06/2022")
         self.assertContains(response, "Date de fin prévisionnelle : 06/12/2022")
