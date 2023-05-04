@@ -137,10 +137,12 @@ class EditUserEmailForm(forms.Form):
 
     email = forms.EmailField(
         label="Nouvelle adresse e-mail",
+        widget=forms.EmailInput(attrs={"placeholder": "prenom.nom@example.com"}),
         required=True,
     )
     email_confirmation = forms.EmailField(
-        label="Confirmation",
+        label="Confirmation de l'adresse e-mail",
+        widget=forms.EmailInput(attrs={"placeholder": "prenom.nom@example.com"}),
         required=True,
     )
 
