@@ -241,10 +241,7 @@
         <h1 class="h1 mb-0">
             {% if user.is_job_seeker and user.get_full_name %}Tableau de bord - {{ user.get_full_name }}{% endif %}
             {% if current_siae %}{{ current_siae.display_name }}{% endif %}
-            {% if current_prescriber_organization %}
-                {{ current_prescriber_organization.display_name }}
-                {% if current_prescriber_organization.is_authorized %}<i class="ri-award-line"></i>{% endif %}
-            {% endif %}
+            {% if current_prescriber_organization %}{{ current_prescriber_organization.display_name }}{% endif %}
             {% if current_institution %}Tableau de bord - {{ current_institution.display_name }}{% endif %}
         </h1>
 
