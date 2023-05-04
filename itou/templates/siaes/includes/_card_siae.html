@@ -35,7 +35,7 @@
             </span>
             {% if siae.active_job_descriptions %}
                 <a class="d-none d-md-inline font-weight-bold matomo-event mt-3 mt-md-0"
-                   href="{{ siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}"
+                   href="{{ siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}#metiers"
                    data-matomo-category="candidature"
                    data-matomo-action="clic"
                    data-matomo-option="clic-metiers">
