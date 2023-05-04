@@ -249,7 +249,7 @@
         </h1>
 
         {% if current_prescriber_organization and current_prescriber_organization.is_authorized %}
-            <p class="mb-0">
+            <p class="my-1">
                 <span class="badge badge-pill badge-sm badge-warning">Prescripteur habilité</span>
                 {% if current_prescriber_organization.code_safir_pole_emploi %}
                     <span class="badge badge-pill badge-sm badge-light">Code SAFIR {{ current_prescriber_organization.code_safir_pole_emploi }}</span>
