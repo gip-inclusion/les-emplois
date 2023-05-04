@@ -47,7 +47,6 @@ class CreateSiaeForm(forms.ModelForm):
             "siret": ("Saisissez 14 chiffres. Doit être un SIRET avec le même SIREN que votre structure actuelle."),
             "kind": "Votre nouvelle structure doit avoir le même type que votre structure actuelle.",
             "brand": "Si ce champ est renseigné, il sera utilisé en tant que nom sur la fiche.",
-            "phone": "Par exemple 0610203040",
             "website": "Votre site web doit commencer par http:// ou https://",
             "description": "Texte de présentation de votre structure.",
         }
