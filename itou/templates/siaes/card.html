@@ -59,7 +59,7 @@
             <div class="c-card card rounded-lg mb-3 mb-lg-5">
                 <div class="card-body">
                     {% if not siae.block_job_applications %}
-                        <a class="btn btn-primary btn-block btn-ico"
+                        <a class="btn btn-primary btn-block btn-ico justify-content-center"
                            href="{% url 'apply:start' siae_pk=siae.pk %}{% if back_url %}?back_url={{ back_url }}{% endif %}"
                            aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
                             <i class="ri-draft-line"></i>
@@ -67,7 +67,10 @@
                         </a>
                     {% endif %}
                     {% if active_jobs_descriptions or other_jobs_descriptions %}
-                        <a href="#metiers" class="btn btn-outline-primary btn-block mt-3">Voir les métiers</a>
+                        <a href="#metiers" class="btn btn-outline-primary btn-block btn-ico mt-3 justify-content-center">
+                            <i class="ri-eye-line"></i>
+                            <span>Voir les métiers</span>
+                        </a>
                     {% endif %}
                 </div>
             </div>
