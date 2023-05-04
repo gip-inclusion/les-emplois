@@ -28,11 +28,7 @@
                            data-matomo-option="clic-onglet-employeur"
                            href="{% url "search:siaes_results" %}?{{ filters_query_string }}">
                             <i class="ri-hotel-line ri-xl font-weight-normal mr-1"></i>
-                            <span>Employeurs</span>
-                            {% if siaes_count %}
-                                <span class="d-inline d-lg-none ml-1">({{ siaes_count }})</span>
-                                <span class="d-none d-lg-inline ml-1">({{ siaes_count }} résultat{{ siaes_count|pluralize }})</span>
-                            {% endif %}
+                            <span>{{ siaes_count }} employeur{{ siaes_count|pluralize }}</span>
                         </a>
                     </li>
                     <li class="nav-item" role="presentation">
@@ -42,14 +38,8 @@
                            data-matomo-option="clic-onglet-fichesdeposte"
                            href="{% url "search:job_descriptions_results" %}?{{ filters_query_string }}">
                             <i class="ri-briefcase-4-line ri-xl font-weight-normal mr-1"></i>
-                            <span class="d-inline d-lg-none">Postes</span>
-                            <span class="d-none d-lg-inline">Postes ouverts au recrutement</span>
-                            {% if job_descriptions_count %}
-                                <span class="d-inline d-lg-none ml-1">({{ job_descriptions_count }})</span>
-                                <span class="d-none d-lg-inline ml-1">
-                                    ({{ job_descriptions_count }} résultat{{ job_descriptions_count|pluralize }})
-                                </span>
-                            {% endif %}
+                            <span class="d-inline d-lg-none">{{ job_descriptions_count }} poste{{ job_descriptions_count|pluralize }}</span>
+                            <span class="d-none d-lg-inline">{{ job_descriptions_count }} poste{{ job_descriptions_count|pluralize }} ouvert{{ job_descriptions_count|pluralize }} au recrutement</span>
                         </a>
                     </li>
                     <li class="nav-item-dropdown dropdown">

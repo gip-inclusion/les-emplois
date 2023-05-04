@@ -57,12 +57,12 @@ class SearchSiaeTest(TestCase):
         self.assertContains(response, "Employeurs solidaires à 25 km du centre de Paris (75)")
         # look for the matomo_custom_title
         self.assertContains(response, "Recherche d&#x27;employeurs solidaires")
-        self.assertContains(response, "(2 résultats)")
+        self.assertContains(response, "2 employeurs")
         self.assertContains(response, "Arrondissements de Paris")
 
         # Filter on district
         response = self.client.get(self.url, {"city": city_slug, "districts_75": ["75001"]})
-        self.assertContains(response, "(1 résultat)")
+        self.assertContains(response, "1 employeur")
         self.assertContains(response, siae_1.display_name)
 
         # Do not get arrondissements when searching the arrondissement directly
@@ -74,7 +74,7 @@ class SearchSiaeTest(TestCase):
         SiaeFactory(department="44", coords=city.coords, post_code="44117", kind=SiaeKind.AI)
 
         response = self.client.get(self.url, {"city": city.slug, "kinds": [SiaeKind.AI]})
-        self.assertContains(response, "(1 résultat)")
+        self.assertContains(response, "1 employeur")
 
         response = self.client.get(self.url, {"city": city.slug, "kinds": [SiaeKind.EI]})
         self.assertContains(response, "Aucun résultat")
@@ -96,26 +96,26 @@ class SearchSiaeTest(TestCase):
 
         # 100 km
         response = self.client.get(self.url, {"city": guerande.slug, "distance": 100})
-        self.assertContains(response, "3 résultats")
+        self.assertContains(response, "3 employeurs")
         self.assertContains(response, SIAE_VANNES.capitalize())
         self.assertContains(response, SIAE_GUERANDE.capitalize())
         self.assertContains(response, SIAE_SAINT_ANDRE.capitalize())
 
         # 15 km
         response = self.client.get(self.url, {"city": guerande.slug, "distance": 15})
-        self.assertContains(response, "2 résultats")
+        self.assertContains(response, "2 employeurs")
         self.assertContains(response, SIAE_GUERANDE.capitalize())
         self.assertContains(response, SIAE_SAINT_ANDRE.capitalize())
 
         # 100 km and 44
         response = self.client.get(self.url, {"city": guerande.slug, "distance": 100, "departments": ["44"]})
-        self.assertContains(response, "2 résultats")
+        self.assertContains(response, "2 employeurs")
         self.assertContains(response, SIAE_GUERANDE.capitalize())
         self.assertContains(response, SIAE_SAINT_ANDRE.capitalize())
 
         # 100 km and 56
         response = self.client.get(self.url, {"city": vannes.slug, "distance": 100, "departments": ["56"]})
-        self.assertContains(response, "1 résultat")
+        self.assertContains(response, "1 employeur")
         self.assertContains(response, SIAE_VANNES.capitalize())
 
     def test_order_by(self):
@@ -168,7 +168,7 @@ class SearchSiaeTest(TestCase):
         SiaeFactory(department="44", coords=city.coords, post_code="44117", kind=SiaeKind.OPCS)
 
         response = self.client.get(self.url, {"city": city.slug})
-        self.assertContains(response, "1 résultat")
+        self.assertContains(response, "1 employeur")
         self.assertContains(response, "Offres clauses sociales")
 
     def test_is_popular(self):
@@ -244,8 +244,8 @@ class JobDescriptionSearchViewTest(TestCase):
             response = self.client.get(self.url, {"city": city_slug})
 
         self.assertContains(response, "Employeurs solidaires à 25 km du centre de Paris (75)")
-        self.assertContains(response, "Postes ouverts au recrutement")
-        self.assertContains(response, "1 résultat")
+        self.assertContains(response, "1 poste ouvert au recrutement")
+        self.assertContains(response, "1 employeur")
 
         # We can't support the city districts for now.
         self.assertNotContains(response, "Arrondissements de Paris")
@@ -258,7 +258,7 @@ class JobDescriptionSearchViewTest(TestCase):
         SiaeFactory(department="44", coords=city.coords, post_code="44117", kind=SiaeKind.AI)
 
         response = self.client.get(self.url, {"city": city.slug, "kinds": [SiaeKind.AI, SiaeKind.ETTI]})
-        self.assertContains(response, "(1 résultat)")
+        self.assertContains(response, "1 employeur")
 
         response = self.client.get(self.url, {"city": city.slug, "kinds": [SiaeKind.EI]})
         self.assertContains(response, "Aucun résultat")
@@ -300,27 +300,27 @@ class JobDescriptionSearchViewTest(TestCase):
 
         # 100 km
         response = self.client.get(self.url, {"city": guerande.slug, "distance": 100})
-        self.assertContains(response, "3 résultats")
+        self.assertContains(response, "3 employeurs")
         self.assertContains(response, SIAE_VANNES.capitalize())
         self.assertContains(response, SIAE_GUERANDE.capitalize())
         self.assertContains(response, SIAE_SAINT_ANDRE.capitalize())
 
         # 15 km
         response = self.client.get(self.url, {"city": guerande.slug, "distance": 15})
-        self.assertContains(response, "2 résultats")
+        self.assertContains(response, "2 employeurs")
         self.assertContains(response, SIAE_GUERANDE.capitalize())
         self.assertContains(response, SIAE_SAINT_ANDRE.capitalize())
 
         # 100 km and 44
         response = self.client.get(self.url, {"city": guerande.slug, "distance": 100, "departments": ["44"]})
-        self.assertContains(response, "2 résultats")
+        self.assertContains(response, "2 employeurs")
         self.assertContains(response, SIAE_GUERANDE.capitalize())
         self.assertContains(response, SIAE_SAINT_ANDRE.capitalize())
         self.assertContains(response, "56 - Morbihan")  # the other department is still visible in the filters
 
         # 100 km and 56
         response = self.client.get(self.url, {"city": vannes.slug, "distance": 100, "departments": ["56"]})
-        self.assertContains(response, "1 résultat")
+        self.assertContains(response, "1 employeur")
         self.assertContains(response, SIAE_VANNES.capitalize())
 
     def test_order_by(self):
@@ -409,7 +409,7 @@ class JobDescriptionSearchViewTest(TestCase):
             self.url,
             {"city": city.slug},
         )
-        self.assertContains(response, "(2 résultats)")
+        self.assertContains(response, "2 postes")
         self.assertContains(response, capfirst(job1.display_name), html=True)
         self.assertContains(response, capfirst(job2.display_name), html=True)
         self.assertNotContains(response, capfirst(job3.display_name), html=True)
@@ -419,7 +419,7 @@ class JobDescriptionSearchViewTest(TestCase):
             self.url,
             {"city": city.slug, "contract_types": [ContractType.APPRENTICESHIP, ContractType.BUSINESS_CREATION]},
         )
-        self.assertContains(response, "(2 résultats)")
+        self.assertContains(response, "2 postes")
         self.assertContains(response, capfirst(job1.display_name), html=True)
         self.assertContains(response, capfirst(job2.display_name), html=True)
         self.assertNotContains(response, capfirst(job3.display_name), html=True)
@@ -429,7 +429,7 @@ class JobDescriptionSearchViewTest(TestCase):
             self.url,
             {"city": city.slug, "contract_types": [ContractType.APPRENTICESHIP]},
         )
-        self.assertContains(response, "(1 résultat)")
+        self.assertContains(response, "1 poste")
         self.assertContains(response, capfirst(job1.display_name), html=True)
         self.assertNotContains(response, capfirst(job2.display_name), html=True)
         self.assertNotContains(response, capfirst(job3.display_name), html=True)
@@ -478,21 +478,21 @@ class JobDescriptionSearchViewTest(TestCase):
         displayed_job_name_2 = capfirst(job2.display_name)
         displayed_job_name_3 = capfirst(job3.display_name)
 
-        self.assertContains(response, "(2 résultats)")
+        self.assertContains(response, "2 postes")
         self.assertContains(response, displayed_job_name_1, html=True)
         self.assertContains(response, displayed_job_name_2, html=True)
         self.assertNotContains(response, displayed_job_name_3, html=True)
 
         # pass both domains
         response = self.client.get(self.url, {"city": city.slug, "domains": ["N", "M"]})
-        self.assertContains(response, "(2 résultats)")
+        self.assertContains(response, "2 postes")
         self.assertContains(response, displayed_job_name_1, html=True)
         self.assertContains(response, displayed_job_name_2, html=True)
         self.assertNotContains(response, displayed_job_name_3, html=True)
 
         # filter it down.
         response = self.client.get(self.url, {"city": city.slug, "domains": ["M"]})
-        self.assertContains(response, "(1 résultat)")
+        self.assertContains(response, "1 poste")
         self.assertContains(response, displayed_job_name_1, html=True)
         self.assertNotContains(response, displayed_job_name_2, html=True)
         self.assertNotContains(response, displayed_job_name_3, html=True)
@@ -533,7 +533,7 @@ class JobDescriptionSearchViewTest(TestCase):
             {"city": city.slug},
         )
 
-        self.assertContains(response, "(2 résultats)")
+        self.assertContains(response, "2 postes")
         assert list(response.context["results_page"]) == [job1, job_pec]
         self.assertContains(response, capfirst(job1.display_name))
         self.assertContains(response, capfirst(job_pec.display_name))
@@ -562,7 +562,7 @@ class JobDescriptionSearchViewTest(TestCase):
             self.url,
             {"city": city.slug, "contract_types": ["PEC_OFFER"]},
         )
-        self.assertContains(response, "(1 résultat)")
+        self.assertContains(response, "1 poste")
         self.assertNotContains(response, capfirst(job1.display_name))
         self.assertContains(response, capfirst(job_pec.display_name))
 
@@ -571,7 +571,7 @@ class JobDescriptionSearchViewTest(TestCase):
             self.url,
             {"city": city.slug, "contract_types": ["PEC_OFFER", "APPRENTICESHIP"]},
         )
-        self.assertContains(response, "(2 résultats)")
+        self.assertContains(response, "2 postes")
         self.assertContains(response, capfirst(job1.display_name))
         self.assertContains(response, capfirst(job_pec.display_name))
 
@@ -580,7 +580,7 @@ class JobDescriptionSearchViewTest(TestCase):
             self.url,
             {"city": city.slug, "contract_types": ["APPRENTICESHIP"]},
         )
-        self.assertContains(response, "(1 résultat)")
+        self.assertContains(response, "1 poste")
         self.assertContains(response, capfirst(job1.display_name))
         self.assertNotContains(response, capfirst(job_pec.display_name))
 
@@ -589,7 +589,7 @@ class JobDescriptionSearchViewTest(TestCase):
             self.url,
             {"city": city.slug, "contract_types": ["FIXED_TERM"]},
         )
-        self.assertContains(response, "(1 résultat)")
+        self.assertContains(response, "1 poste")
         self.assertNotContains(response, capfirst(job1.display_name))
         self.assertContains(response, capfirst(job_pec.display_name))
 
@@ -600,6 +600,6 @@ class JobDescriptionSearchViewTest(TestCase):
             self.url,
             {"city": city.slug},
         )
-        self.assertContains(response, "(2 résultats)")
+        self.assertContains(response, "2 postes")
         self.assertContains(response, capfirst(job_pec.display_name))
         self.assertContains(response, "MaPetiteEntreprise")
