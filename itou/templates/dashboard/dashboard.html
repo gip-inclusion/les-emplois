@@ -264,7 +264,7 @@
         {% endif %}
     </div>
 
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 mt-3">
+    <div class="row {% if not user.is_job_seeker %}row-cols-1 row-cols-md-2 row-cols-lg-3{% endif %} mt-3">
 
         {% if user.is_staff %}
             {% include "dashboard/includes/admin_card.html" %}
