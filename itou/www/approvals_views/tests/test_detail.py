@@ -46,7 +46,7 @@ class TestApprovalDetailView:
 
         url = reverse("approvals:detail", kwargs={"pk": approval.pk})
         response = client.get(url)
-        assertContains(response, "PASS IAE (agrément) disponible")
+        assertContains(response, "PASS IAE disponible")
         assertContains(response, "Informations du salarié")
         assertContains(response, "Éligibilité à l'IAE")
         assertContains(response, "Candidatures de ce salarié")
