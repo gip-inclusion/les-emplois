@@ -55,7 +55,6 @@ class EditPrescriberOrganizationForm(forms.ModelForm):
         ]
         help_texts = {
             "siret": "Le numéro SIRET contient 14 chiffres.",
-            "phone": "Par exemple 0610203040",
             "description": "Texte de présentation de votre structure.",
             "website": "Votre site web doit commencer par http:// ou https://",
         }

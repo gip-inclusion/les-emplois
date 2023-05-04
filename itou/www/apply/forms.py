@@ -137,7 +137,6 @@ class CheckJobSeekerInfoForm(forms.ModelForm):
         ]
         help_texts = {
             "birthdate": "Au format JJ/MM/AAAA, par exemple 20/12/1978.",
-            "phone": "Par exemple 0610203040.",
         }
 
     def clean(self):

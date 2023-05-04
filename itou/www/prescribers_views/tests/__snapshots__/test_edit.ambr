@@ -230,10 +230,7 @@
     <option value="988">988 - Nouvelle-Calédonie</option>
   
   </select></div>
-  <div class="form-group"><label for="id_phone">Téléphone</label><input class="form-control" disabled="" id="id_phone" maxlength="20" name="phone" placeholder="Téléphone" title="Par exemple 0610203040" type="text" value="0600000000"/>
-      <small class="form-text text-muted">Par exemple 0610203040</small>
-  
-  </div>
+  <div class="form-group"><label for="id_phone">Téléphone</label><input class="form-control" disabled="" id="id_phone" maxlength="20" name="phone" placeholder="Téléphone" title="" type="text" value="0600000000"/></div>
   <div class="form-group"><label for="id_email">E-mail</label><input class="form-control" disabled="" id="id_email" maxlength="254" name="email" placeholder="E-mail" title="" type="email" value="pe@mailinator.com"/></div>
   <div class="form-group"><label for="id_website">Site web</label><input class="form-control" disabled="" id="id_website" maxlength="200" name="website" placeholder="Site web" title="Votre site web doit commencer par http:// ou https://" type="url"/>
       <small class="form-text text-muted">Votre site web doit commencer par http:// ou https://</small>

@@ -87,7 +87,6 @@ class EditJobSeekerInfoForm(JobSeekerNIRUpdateMixin, MandatoryAddressFormMixin, 
         ]
         help_texts = {
             "birthdate": "Au format JJ/MM/AAAA, par exemple 20/12/1978",
-            "phone": "Par exemple 0610203040",
         }
 
     def clean(self):
@@ -128,9 +127,6 @@ class EditUserInfoForm(OptionalAddressFormMixin, SSOReadonlyMixin, forms.ModelFo
             "city",
             "city_slug",
         ]
-        help_texts = {
-            "phone": "Par exemple 0610203040",
-        }
 
     def save(self, commit=True):
         self.instance.last_checked_at = timezone.now()
