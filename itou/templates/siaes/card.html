@@ -61,9 +61,9 @@
                     {% if not siae.block_job_applications %}
                         <a class="btn btn-primary btn-block btn-ico"
                            href="{% url 'apply:start' siae_pk=siae.pk %}{% if back_url %}?back_url={{ back_url }}{% endif %}"
-                           aria-label="Proposer une candidature auprès de l'employeur solidaire {{ siae.display_name }}">
+                           aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
                             <i class="ri-draft-line"></i>
-                            <span>Proposer une candidature</span>
+                            <span>Postuler</span>
                         </a>
                     {% endif %}
                     {% if active_jobs_descriptions or other_jobs_descriptions %}
@@ -162,9 +162,9 @@
                             <div class="d-flex justify-content-end mt-3">
                                 <a class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0"
                                    href="{% url 'apply:start' siae_pk=siae.pk %}{% if back_url %}?back_url={{ back_url }}{% endif %}"
-                                   aria-label="Proposer une candidature auprès de l'employeur solidaire {{ siae.display_name }}">
+                                   aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
                                     <i class="ri-draft-line"></i>
-                                    <span>Proposer une candidature</span>
+                                    <span>Postuler</span>
                                 </a>
                             </div>
                         {% endif %}

@@ -26,7 +26,7 @@ from itou.utils.test import TestCase
 
 class CardViewTest(TestCase):
     OTHER_TAB_ID = "autres-metiers"
-    APPLY = "Proposer une candidature"
+    APPLY = "Postuler"
 
     @classmethod
     def setUpTestData(cls):
@@ -149,11 +149,11 @@ class CardViewTest(TestCase):
              <div class="d-flex justify-content-end mt-3">
               <a class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0"
                  href="/apply/{siae.pk}/start"
-                 aria-label="Proposer une candidature aupr&egrave;s de l'employeur solidaire Les petits jardins">
+                 aria-label="Postuler aupr&egrave;s de l'employeur solidaire Les petits jardins">
                <i class="ri-draft-line">
                </i>
                <span>
-                Proposer une candidature
+                Postuler
                </span>
               </a>
              </div>
@@ -249,11 +249,11 @@ class CardViewTest(TestCase):
              <div class="d-flex justify-content-end mt-3">
               <a class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0"
                  href="/apply/{siae.pk}/start"
-                 aria-label="Proposer une candidature aupr&egrave;s de l'employeur solidaire Les petits jardins">
+                 aria-label="Postuler aupr&egrave;s de l'employeur solidaire Les petits jardins">
                <i class="ri-draft-line">
                </i>
                <span>
-                Proposer une candidature
+                Postuler
                </span>
               </a>
              </div>
@@ -403,11 +403,11 @@ class CardViewTest(TestCase):
              <div class="d-flex justify-content-end mt-3">
               <a class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0"
                  href="/apply/{siae.pk}/start"
-                 aria-label="Proposer une candidature aupr&egrave;s de l'employeur solidaire Les petits jardins">
+                 aria-label="Postuler aupr&egrave;s de l'employeur solidaire Les petits jardins">
                <i class="ri-draft-line">
                </i>
                <span>
-                Proposer une candidature
+                Postuler
                </span>
               </a>
              </div>
