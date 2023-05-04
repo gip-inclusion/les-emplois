@@ -248,20 +248,23 @@
             {% if current_institution %}Tableau de bord - {{ current_institution.display_name }}{% endif %}
         </h1>
 
-        {% if current_prescriber_organization and current_prescriber_organization.is_authorized %}
+        {% if current_prescriber_organization %}
             <p class="my-1">
-                <span class="badge badge-pill badge-sm badge-warning">Prescripteur habilité</span>
+                {% if current_prescriber_organization.is_authorized %}
+                    <span class="badge badge-pill badge-sm badge-warning">Prescripteur habilité</span>
+                {% endif %}
                 {% if current_prescriber_organization.code_safir_pole_emploi %}
                     <span class="badge badge-pill badge-sm badge-light">Code SAFIR {{ current_prescriber_organization.code_safir_pole_emploi }}</span>
+                {% endif %}
+                {% if current_prescriber_organization.siret %}
+                    <span class="badge badge-pill badge-sm badge-light">
+                        SIRET {{ current_prescriber_organization.siret|format_siret }}
+                    </span>
                 {% endif %}
             </p>
         {% endif %}
 
         {% if current_siae %}<p class="mb-0">SIRET {{ current_siae.siret|format_siret }}</p>{% endif %}
-
-        {% if current_prescriber_organization and current_prescriber_organization.siret %}
-            <p class="mb-0">SIRET {{ current_prescriber_organization.siret|format_siret }}</p>
-        {% endif %}
     </div>
 
     <div class="row {% if not user.is_job_seeker %}row-cols-1 row-cols-md-2 row-cols-lg-3{% endif %} mt-3">
