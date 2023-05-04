@@ -4,7 +4,6 @@
     "python.envFile": "${workspaceFolder}/.env",
     "python.languageServer": "Pylance",
     "python.linting.enabled": true,
-    "python.linting.pylintEnabled": true,
     "python.testing.pytestEnabled": true,
     "python.testing.unittestEnabled": false,
     "html.format.wrapLineLength": 0,
@@ -29,6 +28,5 @@
             "source.organizeImports": true
         }
     },
-    "isort.args":["--profile", "black"],
     "explorer.confirmDragAndDrop": false
 }

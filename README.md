@@ -112,7 +112,7 @@ A noter qu'il existe déjà (juste après le `populate_db`) un compte super-util
 
 ### Avant un commit
 
-    $ make quality  # Will run black, isort, and flake8
+    $ make quality  # Will run black, ruff and djlint
 
 ### Mettre à jour les dépendances
 

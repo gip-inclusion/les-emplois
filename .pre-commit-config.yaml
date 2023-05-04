@@ -6,14 +6,9 @@ repos:
         entry: black
         types: [python]
         language: system
-      - id: flake8
-        name: Flake8
-        entry: flake8
-        types: [python]
-        language: system
-      - id: isort
-        name: isort
-        entry: isort
+      - id: ruff
+        name: Ruff
+        entry: ruff
         types: [python]
         language: system
       - id: djlint

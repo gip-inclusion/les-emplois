@@ -64,7 +64,7 @@ jobs:
       run: |
         make venv
         echo ".venv/bin" >> $GITHUB_PATH
-    - name: ✨ Black, isort, flake8 & djlint
+    - name: ✨ Black, ruff & djlint
       run: make quality
     - name: 🚧 Check pending migrations
       run: django-admin makemigrations --check --dry-run --noinput

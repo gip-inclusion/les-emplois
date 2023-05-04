@@ -51,15 +51,14 @@ cdsitepackages:
 	docker exec -ti -w /usr/local/lib/$(PYTHON_VERSION)/site-packages itou_django /bin/bash
 
 quality: $(VIRTUAL_ENV)
-	black --check config itou
-	isort --check config itou
-	flake8 --count --show-source --statistics config itou
+	black --check config/ itou/
+	ruff check config/ itou/
 	djlint --lint --check itou
 	find * -type f -name '*.sh' -exec shellcheck --external-sources {} +
 
 fix: $(VIRTUAL_ENV)
 	black config itou
-	isort config itou
+	ruff check --fix config/ itou/
 	djlint --reformat itou
 	# Use || true because `git apply` exit with an error ("error: unrecognized input") when the pipe is empty,
 	# this happens when there is nothing to fix or shellcheck can't propose a fix.

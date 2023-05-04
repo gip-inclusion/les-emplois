@@ -13,11 +13,10 @@ ipdb  # https://github.com/gotcha/ipdb
 black  # https://github.com/psf/black
 coverage  # https://github.com/nedbat/coveragepy
 djlint  # https://www.djlint.com
-flake8  # https://github.com/PyCQA/flake8
-isort  # https://github.com/timothycrosley/isort
 pre-commit  # https://github.com/pre-commit/pre-commit
 pylint  # https://github.com/PyCQA/pylint
 pylint-django  # https://github.com/PyCQA/pylint-django
+ruff  # https://github.com/charliermarsh/ruff
 shellcheck-py  # https://github.com/shellcheck-py/shellcheck-py
 
 # Django

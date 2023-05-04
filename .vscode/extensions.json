@@ -9,10 +9,10 @@
 		"ms-vsliveshare.vsliveshare",
 		"ms-python.vscode-pylance",
 		"ms-python.python",
-		"ms-python.isort",
 		"ms-python.black-formatter",
 		"monosans.djlint",
-		"editorconfig.editorconfig"
+		"editorconfig.editorconfig",
+		"charliermarsh.ruff"
 	],
 	// List of extensions recommended by VS Code that should not be recommended for users of this workspace.
 	"unwantedRecommendations": []
