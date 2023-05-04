@@ -57,7 +57,7 @@
                         {% endif %}
                         <hr class="mt-5">
                         {% bootstrap_form_errors form type="all" %}
-                        <form method="post" class="js-enable-submit-when-valid js-collapsable-subfields">
+                        <form method="post" class="js-collapsable-subfields">
                             {% csrf_token %}
 
                             {% block form_content %}{% endblock %}

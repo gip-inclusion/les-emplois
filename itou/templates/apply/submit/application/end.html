@@ -67,7 +67,7 @@
                             <div class="c-form c-card--noshadow border-bottom {% if not form.is_bound %}d-none{% endif %}" data-swap-element-with="#informations">
                                 <h2 class="mb-5">{{ job_application.job_seeker.get_full_name }}</h2>
 
-                                <form method="post" class="js-enable-submit-when-valid">
+                                <form method="post">
                                     {% csrf_token %}
 
                                     {% bootstrap_field form.address_line_1 %}
