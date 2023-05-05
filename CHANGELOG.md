@@ -1,5 +1,27 @@
 # Journal des modifications
 
+## [62] - 2023-05-08
+
+### Ajouté
+
+- Alimentation automatique des listes de diffusion avec les nouveaux prescripteurs et employeurs
+
+### Modifié
+
+- Inclusion Connect : son utilisation est maintenant obligatoire pour tous les prescripteurs et employeurs
+- Pass IAE : affichage du nombre de jours restants au lieu de la date de fin
+- Candidatures : amélioration de la géolocalisation des adresses candidats et employeurs
+- Améliorations diverses de HTML (meilleure accessibilité et correction de défauts de rendu)
+- UI : harmonisation des badges
+- UI : amélioration de la page pour inviter des collaborateurs
+- UI : amélioration du tableau de bord prescripteur
+- Suppression du message d'aide « Par exemple 0610203040 »
+- Suppression du pre-header
+- Pied de page : affichage de cette année (et non de 2021...)
+- Remplacer « Proposer votre|une candidature » par « Postuler »
+- Tableau de bord des candidats : affichage conditionnel du titre de la colonne « PASS IAE » et élargissement de la colonne.
+
+
 ## [61] - 2023-04-24
 
 ### Ajouté
