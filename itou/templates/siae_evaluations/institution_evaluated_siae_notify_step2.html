@@ -43,18 +43,17 @@
                                 page et <a target="_blank" href="{% url 'siae_evaluations_views:sanctions_helper' %}">les sanctions
                                 prévues par l’instruction de la DGEFP
                                 <i class="ri-external-link-line"></i></a>.
-                                </p>
-                                <form method="post">
-                                    {% csrf_token %}
-                                    {% bootstrap_form form %}
-                                    <div class="float-right">
-                                        <a class="btn btn-link" href="{% url "siae_evaluations_views:institution_evaluated_siae_notify_step1" evaluated_siae.pk %}">
-                                            Retour
-                                        </a>
-                                        <button class="btn btn-primary">Passer aux précisions</button>
-                                    </div>
-                                </form>
-                            </div>
+                            </p>
+                            <form method="post">
+                                {% csrf_token %}
+                                {% bootstrap_form form %}
+                                <div class="float-right">
+                                    <a class="btn btn-link" href="{% url "siae_evaluations_views:institution_evaluated_siae_notify_step1" evaluated_siae.pk %}">
+                                        Retour
+                                    </a>
+                                    <button class="btn btn-primary">Passer aux précisions</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                     {% include "siae_evaluations/includes/evaluation_data.html" %}
