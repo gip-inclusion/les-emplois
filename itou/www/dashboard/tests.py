@@ -555,9 +555,9 @@ class DashboardViewTest(TestCase):
         self.client.force_login(approval.user)
         url = reverse("dashboard:index")
         response = self.client.get(url)
-        self.assertContains(response, "PASS IAE disponible :")
+        self.assertContains(response, "Numéro de PASS IAE")
         self.assertContains(response, format_approval_number(approval))
-        self.assertContains(response, "Date de début du PASS IAE : 21/06/2022")
+        self.assertContains(response, "Date de début : 21/06/2022")
         self.assertContains(response, "Nombre de jours restants sur le PASS IAE : 82 jours")
 
     @override_settings(TALLY_URL="http://tally.fake")

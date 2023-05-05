@@ -191,7 +191,7 @@ class ProcessViewsTest(TestCase):
         # Job seeker nir is displayed
         self.assertContains(response, format_nir(job_application.job_seeker.nir))
         # Approval is displayed
-        self.assertContains(response, "PASS IAE disponible")
+        self.assertContains(response, "Numéro de PASS IAE")
 
         self.assertContains(response, "Adresse : <span>Non renseignée</span>", html=True)
         self.assertContains(response, "CV : <span>Non renseigné</span>", html=True)
