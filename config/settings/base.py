@@ -7,6 +7,8 @@ import os
 
 from dotenv import load_dotenv
 
+from ..sentry import sentry_init
+
 
 load_dotenv()
 
@@ -355,18 +357,10 @@ ITOU_EMAIL_CONTACT = os.getenv("ITOU_EMAIL_CONTACT", "assistance@inclusion.beta.
 API_EMAIL_CONTACT = os.getenv("API_EMAIL_CONTACT", "api@inclusion.beta.gouv.fr")
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "noreply@inclusion.beta.gouv.fr")
 
-
+# Sentry
+# Expose the value through the settings_viewer app.
 SENTRY_DSN = os.getenv("SENTRY_DSN")
-try:
-    _sentry_traces_sample_rate = float(os.getenv("SENTRY_TRACES_SAMPLE_RATE", ""))
-except ValueError:
-    _sentry_traces_sample_rate = 0
-
-
-if SENTRY_DSN:
-    from ._sentry import sentry_init
-
-    sentry_init(dsn=SENTRY_DSN, traces_sample_rate=_sentry_traces_sample_rate)
+sentry_init()
 
 SHOW_TEST_ACCOUNTS_BANNER = ITOU_ENVIRONMENT in ("DEMO", "REVIEW-APP")
 

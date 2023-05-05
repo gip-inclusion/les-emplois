@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
 import os
+import sys
 from datetime import date
+from pathlib import Path
 
 import httpx
 from dotenv import load_dotenv
@@ -27,5 +29,10 @@ def main():
 
 
 if __name__ == "__main__":
+    top_level_dir = Path(__file__).resolve().parents[1]
+    sys.path.insert(0, str(top_level_dir))
+    from config.sentry import sentry_init
+
     load_dotenv()
+    sentry_init()
     main()
