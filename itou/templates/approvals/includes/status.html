@@ -29,9 +29,9 @@ Arguments:
 <div class="pl-2 border-left approval-left-border">
     <p class="mb-1">
         {% if common_approval.is_pass_iae %}
-            PASS IAE disponible :
+            Numéro de PASS IAE :
         {% else %}
-            Agrément existant :
+            Numéro d'agrément :
         {% endif %}
         {% if user.is_siae_staff and job_application.is_pending %}
             {% comment %}
