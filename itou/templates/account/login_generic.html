@@ -1,5 +1,5 @@
 {# django-allauth template override. #}
-{% extends "layout/content_full_viewport.html" %}
+{% extends "layout/content.html" %}
 {% load bootstrap4 %}
 {% load redirection_fields %}
 {% load static %}
@@ -7,25 +7,19 @@
 
 {% block title %}Connexion {{ block.super }}{% endblock %}
 
-{% block content %}
-    <section class="p-0">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <nav class="c-breadcrumb c-breadcrumb--marche" aria-label="Fil d'Ariane">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item">
-                                <a href="{% url 'home:hp' %}">Accueil</a>
-                            </li>
-                            <li class="breadcrumb-item active" aria-current="page">Se connecter / S'inscrire</li>
-                        </ol>
-                    </nav>
-                </div>
-            </div>
-        </div>
-    </section>
+{% block breadcrumbs %}
+    <nav class="c-breadcrumb c-breadcrumb--marche" aria-label="Fil d'ariane">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'home:hp' %}">Accueil</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">Se connecter / S'inscrire</li>
+        </ol>
+    </nav>
+{% endblock %}
 
-    <section class="s-title-01 p-0">
+{% block content %}
+    <section class="s-title-01">
         <div class="s-title-01__container container">
             <div class="s-title-01__row row">
                 <div class="s-title-01__col col-12">
@@ -37,7 +31,7 @@
         </div>
     </section>
 
-    <section class="s-section pt-0">
+    <section class="s-section">
         <div class="s-section__container container">
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-lg-6">

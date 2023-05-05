@@ -1,4 +1,4 @@
-{% extends "layout/content_full_viewport.html" %}
+{% extends "layout/content.html" %}
 {% load redirection_fields %}
 {% load static %}
 
@@ -9,7 +9,7 @@
     {% include "search/includes/generic_search_home.html" with form=siae_search_form title="Rechercher un emploi inclusif" url_search="search:siaes_results" template_form_name="search/includes/siaes_search_form.html" %}
 
     {% if not user.is_authenticated %}
-        <section class="bg-white text-center">
+        <section class="bg-white text-center pt-5 pb-6">
             <div class="container">
                 <h2 class="h1">Nos missions</h2>
                 <p class="lead">
@@ -53,7 +53,7 @@
 
     {% endif %}
 
-    <section class="bg-gray-400 text-center">
+    <section class="bg-gray-400 pt-5 pb-6">
         <div class="container">
             <div class="js-tac-livestorm w-100" data-url="https://app.livestorm.co/itou/upcoming?limit=3" title="Événements des emplois de l'inclusion | Livestorm">
             </div>

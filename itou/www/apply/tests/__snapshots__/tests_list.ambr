@@ -40,24 +40,24 @@
 # name: TestListForSiae.test_warns_about_long_awaiting_applications[JOB SEEKER - no warnings]
   '''
   <section aria-labelledby="results">
-                  <div class="d-flex flex-column flex-sm-row align-items-sm-center">
-                      <h2 class="mb-0 flex-grow-1" id="results">
-                          
-                              3 <strong>résultats</strong>
-                          
-                      </h2>
-                      <div>
-                          
+                          <div class="d-flex flex-column flex-sm-row align-items-sm-center">
+                              <h2 class="mb-0 flex-grow-1" id="results">
+                                  
+                                      3 <strong>résultats</strong>
+                                  
+                              </h2>
+                              <div>
+                                  
+  
+                                  
+                              </div>
+                          </div>
   
                           
-                      </div>
-                  </div>
-  
-                  
-                      
-                          <div class="c-card card my-4 has-links-inside">
                               
-                              
+                                  <div class="c-card card my-4 has-links-inside">
+                                      
+                                      
   
   <div class="card-header">
       <p class="mb-0">
@@ -77,7 +77,7 @@
       <hr class="mb-0"/>
   </div>
   
-                              
+                                      
   
   <div class="card-body">
       <div class="row">
@@ -113,19 +113,19 @@
       </div>
   </div>
   
-                              <div class="card-body collapse" id="answer0">
-                                  <p class="font-weight-bold mb-1">Message de candidature :</p>
-                                  <div class="fs-sm"><p>Third application</p></div>
-                                  
-                              </div>
-                              <div class="card-footer text-right">
-                                  <a aria-controls="answer0" aria-expanded="false" aria-label="Plus d'informations sur cette candidature" class="btn btn-sm btn-outline-primary" data-target="#answer0" data-toggle="collapse" href="#">Plus d'informations</a>
-                              </div>
-                          </div>
-                      
-                          <div class="c-card card my-4 has-links-inside">
+                                      <div class="card-body collapse" id="answer0">
+                                          <p class="font-weight-bold mb-1">Message de candidature :</p>
+                                          <div class="fs-sm"><p>Third application</p></div>
+                                          
+                                      </div>
+                                      <div class="card-footer text-right">
+                                          <a aria-controls="answer0" aria-expanded="false" aria-label="Plus d'informations sur cette candidature" class="btn btn-sm btn-outline-primary" data-target="#answer0" data-toggle="collapse" href="#">Plus d'informations</a>
+                                      </div>
+                                  </div>
                               
-                              
+                                  <div class="c-card card my-4 has-links-inside">
+                                      
+                                      
   
   <div class="card-header">
       <p class="mb-0">
@@ -145,7 +145,7 @@
       <hr class="mb-0"/>
   </div>
   
-                              
+                                      
   
   <div class="card-body">
       <div class="row">
@@ -181,19 +181,19 @@
       </div>
   </div>
   
-                              <div class="card-body collapse" id="answer1">
-                                  <p class="font-weight-bold mb-1">Message de candidature :</p>
-                                  <div class="fs-sm"><p>Second application</p></div>
-                                  
-                              </div>
-                              <div class="card-footer text-right">
-                                  <a aria-controls="answer1" aria-expanded="false" aria-label="Plus d'informations sur cette candidature" class="btn btn-sm btn-outline-primary" data-target="#answer1" data-toggle="collapse" href="#">Plus d'informations</a>
-                              </div>
-                          </div>
-                      
-                          <div class="c-card card my-4 has-links-inside">
+                                      <div class="card-body collapse" id="answer1">
+                                          <p class="font-weight-bold mb-1">Message de candidature :</p>
+                                          <div class="fs-sm"><p>Second application</p></div>
+                                          
+                                      </div>
+                                      <div class="card-footer text-right">
+                                          <a aria-controls="answer1" aria-expanded="false" aria-label="Plus d'informations sur cette candidature" class="btn btn-sm btn-outline-primary" data-target="#answer1" data-toggle="collapse" href="#">Plus d'informations</a>
+                                      </div>
+                                  </div>
                               
-                              
+                                  <div class="c-card card my-4 has-links-inside">
+                                      
+                                      
   
   <div class="card-header">
       <p class="mb-0">
@@ -213,7 +213,7 @@
       <hr class="mb-0"/>
   </div>
   
-                              
+                                      
   
   <div class="card-body">
       <div class="row">
@@ -249,36 +249,36 @@
       </div>
   </div>
   
-                              <div class="card-body collapse" id="answer2">
-                                  <p class="font-weight-bold mb-1">Message de candidature :</p>
-                                  <div class="fs-sm"><p>First application</p></div>
-                                  
-                              </div>
-                              <div class="card-footer text-right">
-                                  <a aria-controls="answer2" aria-expanded="false" aria-label="Plus d'informations sur cette candidature" class="btn btn-sm btn-outline-primary" data-target="#answer2" data-toggle="collapse" href="#">Plus d'informations</a>
-                              </div>
-                          </div>
-                      
+                                      <div class="card-body collapse" id="answer2">
+                                          <p class="font-weight-bold mb-1">Message de candidature :</p>
+                                          <div class="fs-sm"><p>First application</p></div>
+                                          
+                                      </div>
+                                      <div class="card-footer text-right">
+                                          <a aria-controls="answer2" aria-expanded="false" aria-label="Plus d'informations sur cette candidature" class="btn btn-sm btn-outline-primary" data-target="#answer2" data-toggle="collapse" href="#">Plus d'informations</a>
+                                      </div>
+                                  </div>
+                              
   
-                      
+                              
   
   
   
-                  
-              </section>
+                          
+                      </section>
   '''
 # ---
 # name: TestListForSiae.test_warns_about_long_awaiting_applications[PRESCRIBER - warnings for 2222 and 3333]
   '''
   <section aria-labelledby="results">
-                  <div class="d-flex flex-column flex-sm-row align-items-sm-center">
-                      <h2 class="mb-0 flex-grow-1" id="results">
-                          
-                              3 <strong>résultats</strong>
-                          
-                      </h2>
-                      <div>
-                          
+                          <div class="d-flex flex-column flex-sm-row align-items-sm-center">
+                              <h2 class="mb-0 flex-grow-1" id="results">
+                                  
+                                      3 <strong>résultats</strong>
+                                  
+                              </h2>
+                              <div>
+                                  
       
           <a aria-label="Exporter la liste de candidatures" class="btn btn-ico btn-link pl-0" href="/apply/prescriber/list/exports">
               <i class="ri-download-2-fill"></i>
@@ -287,15 +287,15 @@
       
   
   
-                          
-                      </div>
-                  </div>
+                                  
+                              </div>
+                          </div>
   
-                  
-                      
-                          <div class="c-card card my-4 has-links-inside">
+                          
                               
-                              
+                                  <div class="c-card card my-4 has-links-inside">
+                                      
+                                      
   
   <div class="card-header">
       <p class="mb-0">
@@ -315,7 +315,7 @@
       <hr class="mb-0"/>
   </div>
   
-                              
+                                      
   
   <div class="card-body">
       <div class="row">
@@ -351,16 +351,16 @@
       </div>
   </div>
   
-                              <div class="card-footer text-right">
-                                  <a aria-label="Plus d’informations sur la candidature de J… H…" class="btn btn-sm btn-outline-primary" href="/apply/11111111-1111-1111-1111-111111111111/prescriber/details?back_url=/apply/prescriber/list">
-                                      Plus d’informations
-                                  </a>
-                              </div>
-                          </div>
-                      
-                          <div class="c-card card my-4 has-links-inside">
+                                      <div class="card-footer text-right">
+                                          <a aria-label="Plus d’informations sur la candidature de J… H…" class="btn btn-sm btn-outline-primary" href="/apply/11111111-1111-1111-1111-111111111111/prescriber/details?back_url=/apply/prescriber/list">
+                                              Plus d’informations
+                                          </a>
+                                      </div>
+                                  </div>
                               
-                              
+                                  <div class="c-card card my-4 has-links-inside">
+                                      
+                                      
   
   <div class="card-header">
       <p class="mb-0">
@@ -385,7 +385,7 @@
       <hr class="mb-0"/>
   </div>
   
-                              
+                                      
   
   <div class="card-body">
       <div class="row">
@@ -421,16 +421,16 @@
       </div>
   </div>
   
-                              <div class="card-footer text-right">
-                                  <a aria-label="Plus d’informations sur la candidature de J… H…" class="btn btn-sm btn-outline-primary" href="/apply/22222222-2222-2222-2222-222222222222/prescriber/details?back_url=/apply/prescriber/list">
-                                      Plus d’informations
-                                  </a>
-                              </div>
-                          </div>
-                      
-                          <div class="c-card card my-4 has-links-inside">
+                                      <div class="card-footer text-right">
+                                          <a aria-label="Plus d’informations sur la candidature de J… H…" class="btn btn-sm btn-outline-primary" href="/apply/22222222-2222-2222-2222-222222222222/prescriber/details?back_url=/apply/prescriber/list">
+                                              Plus d’informations
+                                          </a>
+                                      </div>
+                                  </div>
                               
-                              
+                                  <div class="c-card card my-4 has-links-inside">
+                                      
+                                      
   
   <div class="card-header">
       <p class="mb-0">
@@ -455,7 +455,7 @@
       <hr class="mb-0"/>
   </div>
   
-                              
+                                      
   
   <div class="card-body">
       <div class="row">
@@ -491,33 +491,33 @@
       </div>
   </div>
   
-                              <div class="card-footer text-right">
-                                  <a aria-label="Plus d’informations sur la candidature de J… H…" class="btn btn-sm btn-outline-primary" href="/apply/33333333-3333-3333-3333-333333333333/prescriber/details?back_url=/apply/prescriber/list">
-                                      Plus d’informations
-                                  </a>
-                              </div>
-                          </div>
-                      
+                                      <div class="card-footer text-right">
+                                          <a aria-label="Plus d’informations sur la candidature de J… H…" class="btn btn-sm btn-outline-primary" href="/apply/33333333-3333-3333-3333-333333333333/prescriber/details?back_url=/apply/prescriber/list">
+                                              Plus d’informations
+                                          </a>
+                                      </div>
+                                  </div>
+                              
   
-                      
+                              
   
   
   
-                  
-              </section>
+                          
+                      </section>
   '''
 # ---
 # name: TestListForSiae.test_warns_about_long_awaiting_applications[SIAE - warnings for 2222 and 3333]
   '''
   <section aria-labelledby="results">
-                  <div class="d-flex flex-column flex-sm-row align-items-sm-center">
-                      <h2 class="mb-0 flex-grow-1" id="results">
-                          
-                              3 <strong>résultats</strong>
-                          
-                      </h2>
-                      <div>
-                          
+                          <div class="d-flex flex-column flex-sm-row align-items-sm-center">
+                              <h2 class="mb-0 flex-grow-1" id="results">
+                                  
+                                      3 <strong>résultats</strong>
+                                  
+                              </h2>
+                              <div>
+                                  
       
           <a aria-label="Exporter la liste de candidatures" class="btn btn-ico btn-link pl-0" href="/apply/siae/list/exports">
               <i class="ri-download-2-fill"></i>
@@ -526,14 +526,14 @@
       
   
   
-                          
-                      </div>
-                  </div>
+                                  
+                              </div>
+                          </div>
   
-                  
-                      
-                          <div class="c-card card my-4 has-links-inside">
+                          
                               
+                                  <div class="c-card card my-4 has-links-inside">
+                                      
   
   <div class="card-body">
   
@@ -579,16 +579,16 @@
   
   </div>
   
-                              <div class="card-footer text-right bg-light">
-                                  
-                                  <a aria-label="Gérer la candidature de Jacques Henry" class="btn btn-sm btn-outline-primary bg-white" href="/apply/11111111-1111-1111-1111-111111111111/siae/details?back_url=/apply/siae/list">
-                                      Voir sa candidature
-                                  </a>
-                              </div>
-                          </div>
+                                      <div class="card-footer text-right bg-light">
+                                          
+                                          <a aria-label="Gérer la candidature de Jacques Henry" class="btn btn-sm btn-outline-primary bg-white" href="/apply/11111111-1111-1111-1111-111111111111/siae/details?back_url=/apply/siae/list">
+                                              Voir sa candidature
+                                          </a>
+                                      </div>
+                                  </div>
   
-                          
-                              
+                                  
+                                      
   
   <div class="card my-4 px-4 alert-dismissible-once d-none container rounded-lg border-important bg-important-lightest" id="rdvi-promo">
       <div class="row">
@@ -618,11 +618,11 @@
       </div>
   </div>
   
-                          
+                                  
   
-                      
-                          <div class="c-card card my-4 has-links-inside">
                               
+                                  <div class="c-card card my-4 has-links-inside">
+                                      
   
   <div class="card-body">
   
@@ -668,24 +668,24 @@
   
   </div>
   
-                              <div class="card-footer text-right bg-light">
-                                  
-                                      <span class="d-inline-flex align-items-center text-warning fs-sm">
-                                          <i class="ri-time-line ri-lg mr-1"></i>
-                                          En attente de réponse depuis 3 semaines.
-                                      </span>
-                                  
-                                  <a aria-label="Gérer la candidature de Jacques Henry" class="btn btn-sm btn-outline-primary bg-white" href="/apply/22222222-2222-2222-2222-222222222222/siae/details?back_url=/apply/siae/list">
-                                      Voir sa candidature
-                                  </a>
-                              </div>
-                          </div>
+                                      <div class="card-footer text-right bg-light">
+                                          
+                                              <span class="d-inline-flex align-items-center text-warning fs-sm">
+                                                  <i class="ri-time-line ri-lg mr-1"></i>
+                                                  En attente de réponse depuis 3 semaines.
+                                              </span>
+                                          
+                                          <a aria-label="Gérer la candidature de Jacques Henry" class="btn btn-sm btn-outline-primary bg-white" href="/apply/22222222-2222-2222-2222-222222222222/siae/details?back_url=/apply/siae/list">
+                                              Voir sa candidature
+                                          </a>
+                                      </div>
+                                  </div>
   
-                          
+                                  
   
-                      
-                          <div class="c-card card my-4 has-links-inside">
                               
+                                  <div class="c-card card my-4 has-links-inside">
+                                      
   
   <div class="card-body">
   
@@ -731,28 +731,28 @@
   
   </div>
   
-                              <div class="card-footer text-right bg-light">
+                                      <div class="card-footer text-right bg-light">
+                                          
+                                              <span class="d-inline-flex align-items-center text-warning fs-sm">
+                                                  <i class="ri-time-line ri-lg mr-1"></i>
+                                                  En attente de réponse depuis 8 semaines.
+                                              </span>
+                                          
+                                          <a aria-label="Gérer la candidature de Jacques Henry" class="btn btn-sm btn-outline-primary bg-white" href="/apply/33333333-3333-3333-3333-333333333333/siae/details?back_url=/apply/siae/list">
+                                              Voir sa candidature
+                                          </a>
+                                      </div>
+                                  </div>
+  
                                   
-                                      <span class="d-inline-flex align-items-center text-warning fs-sm">
-                                          <i class="ri-time-line ri-lg mr-1"></i>
-                                          En attente de réponse depuis 8 semaines.
-                                      </span>
-                                  
-                                  <a aria-label="Gérer la candidature de Jacques Henry" class="btn btn-sm btn-outline-primary bg-white" href="/apply/33333333-3333-3333-3333-333333333333/siae/details?back_url=/apply/siae/list">
-                                      Voir sa candidature
-                                  </a>
-                              </div>
-                          </div>
+  
+                              
+  
+                              
+  
+  
   
                           
-  
-                      
-  
-                      
-  
-  
-  
-                  
-              </section>
+                      </section>
   '''
 # ---
