@@ -16,24 +16,19 @@
     margin-top: 1rem;
 }
 
-/* Spacing.
---------------------------------------------------------------------------- */
-.s-main > section {
-    padding-top: 1.5rem;
-    padding-bottom: 1.5rem;
+.container-breadcrumb:empty {
+    background-color: red;
+    display:none !important;
 }
 
+/* Spacing.
+--------------------------------------------------------------------------- */
 .h1-hero-c1 {
     font-size: 2.5rem;
     margin-bottom: 1.5rem;
 }
 
 @media (min-width: 992px) {
-    .s-main > section {
-        padding-top: 2rem;
-        padding-bottom: 3rem;
-    }
-
     .h1-hero-c1 {
         margin-bottom: 3rem;
     }

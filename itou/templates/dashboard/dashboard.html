@@ -236,94 +236,100 @@
 {% endblock %}
 
 {% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="mb-3">
+                        <h1 class="h1 mb-0">
+                            {% if user.is_job_seeker and user.get_full_name %}Tableau de bord - {{ user.get_full_name }}{% endif %}
+                            {% if current_siae %}{{ current_siae.display_name }}{% endif %}
+                            {% if current_prescriber_organization %}{{ current_prescriber_organization.display_name }}{% endif %}
+                            {% if current_institution %}Tableau de bord - {{ current_institution.display_name }}{% endif %}
+                        </h1>
 
-    <div class="mb-3">
-        <h1 class="h1 mb-0">
-            {% if user.is_job_seeker and user.get_full_name %}Tableau de bord - {{ user.get_full_name }}{% endif %}
-            {% if current_siae %}{{ current_siae.display_name }}{% endif %}
-            {% if current_prescriber_organization %}{{ current_prescriber_organization.display_name }}{% endif %}
-            {% if current_institution %}Tableau de bord - {{ current_institution.display_name }}{% endif %}
-        </h1>
+                        {% if current_prescriber_organization %}
+                            <p class="my-1">
+                                {% if current_prescriber_organization.is_authorized %}
+                                    <span class="badge badge-pill badge-sm badge-warning">Prescripteur habilité</span>
+                                {% endif %}
+                                {% if current_prescriber_organization.code_safir_pole_emploi %}
+                                    <span class="badge badge-pill badge-sm badge-light">Code SAFIR {{ current_prescriber_organization.code_safir_pole_emploi }}</span>
+                                {% endif %}
+                                {% if current_prescriber_organization.siret %}
+                                    <span class="badge badge-pill badge-sm badge-light">
+                                        SIRET {{ current_prescriber_organization.siret|format_siret }}
+                                    </span>
+                                {% endif %}
+                            </p>
+                        {% endif %}
 
-        {% if current_prescriber_organization %}
-            <p class="my-1">
-                {% if current_prescriber_organization.is_authorized %}
-                    <span class="badge badge-pill badge-sm badge-warning">Prescripteur habilité</span>
+                        {% if current_siae %}<p class="mb-0">SIRET {{ current_siae.siret|format_siret }}</p>{% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row {% if not user.is_job_seeker %}row-cols-1 row-cols-md-2 row-cols-lg-3{% endif %} mt-3">
+
+                {% if user.is_staff %}
+                    {% include "dashboard/includes/admin_card.html" %}
                 {% endif %}
-                {% if current_prescriber_organization.code_safir_pole_emploi %}
-                    <span class="badge badge-pill badge-sm badge-light">Code SAFIR {{ current_prescriber_organization.code_safir_pole_emploi }}</span>
+
+                {% if user.is_job_seeker %}
+                    {% include "dashboard/includes/job_seeker_job_applications_card.html" %}
+                    {% if user.latest_common_approval %}
+                        {% include "dashboard/includes/job_seeker_approval_card.html" %}
+                    {% endif %}
                 {% endif %}
-                {% if current_prescriber_organization.siret %}
-                    <span class="badge badge-pill badge-sm badge-light">
-                        SIRET {{ current_prescriber_organization.siret|format_siret }}
-                    </span>
+                {# end of if user.is_job_seeker #}
+
+                {% if user.is_prescriber %}
+
+                    {% if current_prescriber_organization %}
+                        {% include "dashboard/includes/prescriber_organisation_card.html" %}
+                    {% endif %}
+
+                    {% include "dashboard/includes/prescriber_job_applications_card.html" %}
+
                 {% endif %}
-            </p>
-        {% endif %}
+                {# end of if user.is_prescriber #}
 
-        {% if current_siae %}<p class="mb-0">SIRET {{ current_siae.siret|format_siret }}</p>{% endif %}
-    </div>
+                {% if user.is_siae_staff %}
+                    {% include "dashboard/includes/siae_card.html" %}
+                    {% include "dashboard/includes/siae_job_applications_card.html" %}
+                    {% if current_siae.is_subject_to_eligibility_rules %}
+                        {% include "dashboard/includes/siae_employees_card.html" %}
+                    {% endif %}
 
-    <div class="row {% if not user.is_job_seeker %}row-cols-1 row-cols-md-2 row-cols-lg-3{% endif %} mt-3">
+                    {% if active_campaigns or evaluated_siae_notifications %}
+                        {% include "dashboard/includes/siae_evaluation_campains_card.html" %}
+                    {% endif %}
 
-        {% if user.is_staff %}
-            {% include "dashboard/includes/admin_card.html" %}
-        {% endif %}
+                {% endif %}
+                {# end of if user.is_siae_staff #}
 
-        {% if user.is_job_seeker %}
-            {% include "dashboard/includes/job_seeker_job_applications_card.html" %}
-            {% if user.latest_common_approval %}
-                {% include "dashboard/includes/job_seeker_approval_card.html" %}
-            {% endif %}
-        {% endif %}
-        {# end of if user.is_job_seeker #}
+                {% if user.is_labor_inspector %}
+                    {% include "dashboard/includes/labor_inspector_organization_card.html" %}
+                {% endif %}
+                {# end of if user.is_labor_inspector #}
 
-        {% if user.is_prescriber %}
+                {% if can_view_stats_ddets and active_campaigns or can_view_stats_ddets and closed_campaigns %}
+                    {% include "dashboard/includes/labor_inspector_evaluation_campains_card.html" %}
+                {% endif %}
+            </div>
 
-            {% if current_prescriber_organization %}
-                {% include "dashboard/includes/prescriber_organisation_card.html" %}
-            {% endif %}
+            {% if can_view_stats_dashboard_widget or user.is_siae_staff or user.is_prescriber %}
+                <h2>Services partenaires</h2>
+                <div class="row row-cols-1 row-cols-md-2 mt-3">
+                    {% if can_view_stats_dashboard_widget %}
+                        {% include "dashboard/includes/stats.html" %}
+                    {% endif %}
 
-            {% include "dashboard/includes/prescriber_job_applications_card.html" %}
-
-        {% endif %}
-        {# end of if user.is_prescriber #}
-
-        {% if user.is_siae_staff %}
-            {% include "dashboard/includes/siae_card.html" %}
-            {% include "dashboard/includes/siae_job_applications_card.html" %}
-            {% if current_siae.is_subject_to_eligibility_rules %}
-                {% include "dashboard/includes/siae_employees_card.html" %}
-            {% endif %}
-
-            {% if active_campaigns or evaluated_siae_notifications %}
-                {% include "dashboard/includes/siae_evaluation_campains_card.html" %}
-            {% endif %}
-
-        {% endif %}
-        {# end of if user.is_siae_staff #}
-
-        {% if user.is_labor_inspector %}
-            {% include "dashboard/includes/labor_inspector_organization_card.html" %}
-        {% endif %}
-        {# end of if user.is_labor_inspector #}
-
-        {% if can_view_stats_ddets and active_campaigns or can_view_stats_ddets and closed_campaigns %}
-            {% include "dashboard/includes/labor_inspector_evaluation_campains_card.html" %}
-        {% endif %}
-    </div>
-
-    {% if can_view_stats_dashboard_widget or user.is_siae_staff or user.is_prescriber %}
-        <h2>Services partenaires</h2>
-        <div class="row row-cols-1 row-cols-md-2 mt-3">
-            {% if can_view_stats_dashboard_widget %}
-                {% include "dashboard/includes/stats.html" %}
-            {% endif %}
-
-            {% if user.is_siae_staff or user.is_prescriber %}
-                {% include "dashboard/includes/dora_card.html" with siret=current_org.siret tracker="utm_source=LesEmplois&utm_medium=blocLesEmplois&utm_campaign=dashboard" %}
+                    {% if user.is_siae_staff or user.is_prescriber %}
+                        {% include "dashboard/includes/dora_card.html" with siret=current_org.siret tracker="utm_source=LesEmplois&utm_medium=blocLesEmplois&utm_campaign=dashboard" %}
+                    {% endif %}
+                </div>
             {% endif %}
         </div>
-    {% endif %}
-
+    </section>
 {% endblock %}

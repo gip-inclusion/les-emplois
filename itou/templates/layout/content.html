@@ -1,14 +1,13 @@
 {% extends BASE_TEMPLATE %}
 {% block content_full_viewport %}
 
+    <div class="container container-breadcrumb">
+        {% block breadcrumbs %}{% endblock %}
+    </div>
+
     {% block pre_content %}{% endblock %}
 
-    <section class="{% block content_container_css_classes %}{% endblock %}">
-        <div class="container">
-            {% block breadcrumbs %}{% endblock %}
-            {% block content %}{% endblock %}
-        </div>
-    </section>
+    {% block content %}{% endblock %}
 
     {% block post_content %}{% endblock %}
 

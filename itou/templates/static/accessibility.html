@@ -25,166 +25,173 @@
 {% endblock %}
 
 {% block content %}
-    <h2 class="h2 mt-3 mt-lg-5">État de conformité</h2>
-    <p>Le site a été audité par la société alter way en novembre 2021.</p>
-    <p>
-        <b>Les emplois de l'inclusion</b> est partiellement conforme avec le référentiel général d'amélioration de l'accessibilité (RGAA), version 4.1.
-    </p>
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12">
+                    <h2 class="h2 mt-3 mt-lg-5">État de conformité</h2>
+                    <p>Le site a été audité par la société alter way en novembre 2021.</p>
+                    <p>
+                        <b>Les emplois de l'inclusion</b> est partiellement conforme avec le référentiel général d'amélioration de l'accessibilité (RGAA), version 4.1.
+                    </p>
 
-    <h2 class="h2 mt-3 mt-lg-5">Résultats des tests</h2>
-    <p>
-        L'audit de conformité réalisé révèle que <b>74.50%</b> des critères du RGAA version 4.1 sont respectés.
-    </p>
+                    <h2 class="h2 mt-3 mt-lg-5">Résultats des tests</h2>
+                    <p>
+                        L'audit de conformité réalisé révèle que <b>74.50%</b> des critères du RGAA version 4.1 sont respectés.
+                    </p>
 
-    <h2 class="h2 mt-3 mt-lg-5">Contenus non accessibles</h2>
-    <ul>
-        <li>
-            De nombreuses anomalies vont pénaliser les utilisateurs en situation de handicap, naviguant ou non à l'aide de technologies d'assistance
-        </li>
-        <li>
-            Les non-conformités les plus bloquantes pour les utilisateurs concernent :
-            <ul>
-                <li>Des composants d'interface riches ne respectant pas les recommandations de structuration pour l'accessibilité</li>
-                <li>Plusieurs boutons &lt;button&gt; dans liens &lt;a&gt;</li>
-                <li>Champ sans étiquette</li>
-                <li>Rôle manquant sur quelque région</li>
-                <li>La page n'est pas bien structurée</li>
-                <li>
-                    des contenus avec une structuration (titres et intertitres, paragraphes, listes) incorrecte, ou insuffisante pour une navigation efficace avec un lecteur d'écran
-                </li>
-                <li>de nombreux textes et éléments d'interface avec des contrastes insuffisants</li>
-                <li>utilisation de mots en anglais</li>
-                <li>titre de la page n'est pas à jour par rapport aux contenus</li>
-                <li>Version réduite n'est pas totalement adaptable</li>
-            </ul>
-        </li>
-    </ul>
+                    <h2 class="h2 mt-3 mt-lg-5">Contenus non accessibles</h2>
+                    <ul>
+                        <li>
+                            De nombreuses anomalies vont pénaliser les utilisateurs en situation de handicap, naviguant ou non à l'aide de technologies d'assistance
+                        </li>
+                        <li>
+                            Les non-conformités les plus bloquantes pour les utilisateurs concernent :
+                            <ul>
+                                <li>Des composants d'interface riches ne respectant pas les recommandations de structuration pour l'accessibilité</li>
+                                <li>Plusieurs boutons &lt;button&gt; dans liens &lt;a&gt;</li>
+                                <li>Champ sans étiquette</li>
+                                <li>Rôle manquant sur quelque région</li>
+                                <li>La page n'est pas bien structurée</li>
+                                <li>
+                                    des contenus avec une structuration (titres et intertitres, paragraphes, listes) incorrecte, ou insuffisante pour une navigation efficace avec un lecteur d'écran
+                                </li>
+                                <li>de nombreux textes et éléments d'interface avec des contrastes insuffisants</li>
+                                <li>utilisation de mots en anglais</li>
+                                <li>titre de la page n'est pas à jour par rapport aux contenus</li>
+                                <li>Version réduite n'est pas totalement adaptable</li>
+                            </ul>
+                        </li>
+                    </ul>
 
-    <h2 class="h2 mt-3 mt-lg-5">Établissement de cette déclaration d'accessibilité</h2>
-    <p>Cette déclaration a été établie le 22/06/2021. Elle a été mise à jour le 08/03/2022.</p>
+                    <h2 class="h2 mt-3 mt-lg-5">Établissement de cette déclaration d'accessibilité</h2>
+                    <p>Cette déclaration a été établie le 22/06/2021. Elle a été mise à jour le 08/03/2022.</p>
 
 
-    <h2 class="h2 mt-3 mt-lg-5">Technologies utilisées pour la réalisation du site</h2>
-    <ul>
-        <li>HTML5</li>
-        <li>CSS</li>
-        <li>JavaScript</li>
-    </ul>
+                    <h2 class="h2 mt-3 mt-lg-5">Technologies utilisées pour la réalisation du site</h2>
+                    <ul>
+                        <li>HTML5</li>
+                        <li>CSS</li>
+                        <li>JavaScript</li>
+                    </ul>
 
-    <h3 class="h3">Environnement de test</h3>
-    <p>
-        Les vérifications de restitution de contenus ont été réalisées sur la base de la combinaison four-nie par la base de référence du RGAA 4.1, avec les versions suivantes :
-    </p>
-    <ul>
-        <li>Agent utilisateur : Firefox</li>
-        <li>Technologie d'assistance : NVDA</li>
-    </ul>
+                    <h3 class="h3">Environnement de test</h3>
+                    <p>
+                        Les vérifications de restitution de contenus ont été réalisées sur la base de la combinaison four-nie par la base de référence du RGAA 4.1, avec les versions suivantes :
+                    </p>
+                    <ul>
+                        <li>Agent utilisateur : Firefox</li>
+                        <li>Technologie d'assistance : NVDA</li>
+                    </ul>
 
-    <h3 class="h3">
-        Outils pour évaluer l'accessibilité
-    </h3>
-    <ul>
-        <li>
-            Wave
-        </li>
-        <li>
-            WCAG Color contrast checker
-        </li>
-        <li>
-            HeadingsMap
-        </li>
-        <li>
-            Web Developer Toolbar
-        </li>
-    </ul>
+                    <h3 class="h3">
+                        Outils pour évaluer l'accessibilité
+                    </h3>
+                    <ul>
+                        <li>
+                            Wave
+                        </li>
+                        <li>
+                            WCAG Color contrast checker
+                        </li>
+                        <li>
+                            HeadingsMap
+                        </li>
+                        <li>
+                            Web Developer Toolbar
+                        </li>
+                    </ul>
 
-    <h3 class="h3">
-        Pages du site ayant fait l'objet de la vérification de conformité
-    </h3>
-    <ul>
-        <li>
-            Accueil
-        </li>
-        <li>
-            Tableau de bord (connexion en tant que "Entreprise d'Insertion")
-        </li>
-        <li>
-            Ma structure &gt; Modifier les informations de l'établissement
-        </li>
-        <li>
-            Ma structure &gt; Voir fiche
-        </li>
-        <li>
-            Mes candidatures &gt; Candidatures acceptées ou mises en liste d'attente
-        </li>
-        <li>
-            Mes candidatures &gt; Obtenir un PASS IAE (candidature spontanée) &gt; Saisie e-mail (formulaire)
-        </li>
-        <li>
-            Mes candidatures &gt; Export des candidatures
-        </li>
-        <li>
-            Ma structure &gt; Publier/gérer les fiches de postes
-        </li>
-        <li>
-            Candidature : Mes candidatures &gt; Prolonger/Suspendre un agrément &gt; Rechercher un agrément Pôle emploi
-        </li>
-        <li>
-            Connexion en tant que "Prescripteur habilité" &gt; Mes candidature &gt; Postuler pour un candidat &gt; saisir "paris"
-        </li>
-    </ul>
+                    <h3 class="h3">
+                        Pages du site ayant fait l'objet de la vérification de conformité
+                    </h3>
+                    <ul>
+                        <li>
+                            Accueil
+                        </li>
+                        <li>
+                            Tableau de bord (connexion en tant que "Entreprise d'Insertion")
+                        </li>
+                        <li>
+                            Ma structure &gt; Modifier les informations de l'établissement
+                        </li>
+                        <li>
+                            Ma structure &gt; Voir fiche
+                        </li>
+                        <li>
+                            Mes candidatures &gt; Candidatures acceptées ou mises en liste d'attente
+                        </li>
+                        <li>
+                            Mes candidatures &gt; Obtenir un PASS IAE (candidature spontanée) &gt; Saisie e-mail (formulaire)
+                        </li>
+                        <li>
+                            Mes candidatures &gt; Export des candidatures
+                        </li>
+                        <li>
+                            Ma structure &gt; Publier/gérer les fiches de postes
+                        </li>
+                        <li>
+                            Candidature : Mes candidatures &gt; Prolonger/Suspendre un agrément &gt; Rechercher un agrément Pôle emploi
+                        </li>
+                        <li>
+                            Connexion en tant que "Prescripteur habilité" &gt; Mes candidature &gt; Postuler pour un candidat &gt; saisir "paris"
+                        </li>
+                    </ul>
 
-    <h2 class="h2 mt-3 mt-lg-5">
-        Amélioration et contact
-    </h2>
-    <p>
-        Si vous n'arrivez pas à accéder à un contenu ou à un service, vous pouvez nous contacter pour être orienté vers une alternative accessible ou obtenir le contenu sous une autre forme.
-    </p>
-    <ul>
-        <li>
-            E-mail : <a href="mailto:{{ ITOU_EMAIL_CONTACT }}">{{ ITOU_EMAIL_CONTACT }}</a>
-        </li>
-        <li>
-            Adresse :
-            <br>
-            <address>
-                20 avenue de Ségur
-                <br>
-                75007 Paris
-            </address>
-        </li>
-    </ul>
-    <p>
-        Nous essayons de répondre dans les 2 jours ouvrés.
-    </p>
+                    <h2 class="h2 mt-3 mt-lg-5">
+                        Amélioration et contact
+                    </h2>
+                    <p>
+                        Si vous n'arrivez pas à accéder à un contenu ou à un service, vous pouvez nous contacter pour être orienté vers une alternative accessible ou obtenir le contenu sous une autre forme.
+                    </p>
+                    <ul>
+                        <li>
+                            E-mail : <a href="mailto:{{ ITOU_EMAIL_CONTACT }}">{{ ITOU_EMAIL_CONTACT }}</a>
+                        </li>
+                        <li>
+                            Adresse :
+                            <br>
+                            <address>
+                                20 avenue de Ségur
+                                <br>
+                                75007 Paris
+                            </address>
+                        </li>
+                    </ul>
+                    <p>
+                        Nous essayons de répondre dans les 2 jours ouvrés.
+                    </p>
 
-    <h2 class="h2 mt-3 mt-lg-5">
-        Voie de recours
-    </h2>
-    <p>
-        Cette procédure est à utiliser dans le cas suivant : vous avez signalé au responsable du site internet un défaut d'accessibilité qui vous empêche d'accéder à un contenu ou à un des services du portail et vous n'avez pas obtenu de réponse satisfaisante.
-    </p>
-    <p>
-        Vous pouvez :
-    </p>
-    <ul>
-        <li>
-            Écrire un message au Défenseur des droits
-        </li>
-        <li>
-            Contacter le délégué du Défenseur des droits dans votre région
-        </li>
-        <li>
-            Envoyer un courrier par la poste (gratuit, ne pas mettre de timbre) :
-            <br>
-            <address>
-                Défenseur des droits
-                <br>
-                Libre réponse 71120
-                <br>
-                75342 Paris CEDEX 07
-            </address>
-        </li>
-    </ul>
-
+                    <h2 class="h2 mt-3 mt-lg-5">
+                        Voie de recours
+                    </h2>
+                    <p>
+                        Cette procédure est à utiliser dans le cas suivant : vous avez signalé au responsable du site internet un défaut d'accessibilité qui vous empêche d'accéder à un contenu ou à un des services du portail et vous n'avez pas obtenu de réponse satisfaisante.
+                    </p>
+                    <p>
+                        Vous pouvez :
+                    </p>
+                    <ul>
+                        <li>
+                            Écrire un message au Défenseur des droits
+                        </li>
+                        <li>
+                            Contacter le délégué du Défenseur des droits dans votre région
+                        </li>
+                        <li>
+                            Envoyer un courrier par la poste (gratuit, ne pas mettre de timbre) :
+                            <br>
+                            <address>
+                                Défenseur des droits
+                                <br>
+                                Libre réponse 71120
+                                <br>
+                                75342 Paris CEDEX 07
+                            </address>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}

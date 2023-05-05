@@ -20,39 +20,40 @@
     </section>
 {% endblock %}
 
-{% block content_container_css_classes %}s-section p-0{% endblock %}
 {% block content %}
-
-    <div class="s-section__row row mb-3 mb-md-5">
-        <div class="s-section__col col-12 col-lg-8">
-            {% with total_steps=5 percent_steps=20 %}
-                {% for pstep, label in steps %}
-                    {% if pstep == step %}
-                        <div class="c-stepper">
-                            <div class="progress">
-                                <div class="progress-bar" role="progressbar" style="width:{% widthratio percent_steps 1 pstep %}%" aria-valuenow="{% widthratio percent_steps 1 pstep %}" aria-valuemin="0" aria-valuemax="100">
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row mb-3 mb-md-5">
+                <div class="s-section__col col-12 col-lg-8">
+                    {% with total_steps=5 percent_steps=20 %}
+                        {% for pstep, label in steps %}
+                            {% if pstep == step %}
+                                <div class="c-stepper">
+                                    <div class="progress">
+                                        <div class="progress-bar" role="progressbar" style="width:{% widthratio percent_steps 1 pstep %}%" aria-valuenow="{% widthratio percent_steps 1 pstep %}" aria-valuemin="0" aria-valuemax="100">
+                                        </div>
+                                    </div>
+                                    <p>
+                                        <strong>Étape {{ pstep }}</strong>/{{ total_steps }} : {{ label }}
+                                    </p>
                                 </div>
-                            </div>
-                            <p>
-                                <strong>Étape {{ pstep }}</strong>/{{ total_steps }} : {{ label }}
-                            </p>
-                        </div>
-                    {% endif %}
-                {% endfor %}
-            {% endwith %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endwith %}
+                </div>
+            </div>
+
+            {% if step == 1 %}
+                {% include "employee_record/includes/create_step_1.html" %}
+            {% elif step == 2 %}
+                {% include "employee_record/includes/create_step_2.html" %}
+            {% elif step == 3 %}
+                {% include "employee_record/includes/create_step_3.html" %}
+            {% elif step == 4 %}
+                {% include "employee_record/includes/create_step_4.html" %}
+            {% elif step == 5 %}
+                {% include "employee_record/includes/create_step_5.html" %}
+            {% endif %}
         </div>
-    </div>
-
-    {% if step == 1 %}
-        {% include "employee_record/includes/create_step_1.html" %}
-    {% elif step == 2 %}
-        {% include "employee_record/includes/create_step_2.html" %}
-    {% elif step == 3 %}
-        {% include "employee_record/includes/create_step_3.html" %}
-    {% elif step == 4 %}
-        {% include "employee_record/includes/create_step_4.html" %}
-    {% elif step == 5 %}
-        {% include "employee_record/includes/create_step_5.html" %}
-    {% endif %}
-
+    </section>
 {% endblock %}

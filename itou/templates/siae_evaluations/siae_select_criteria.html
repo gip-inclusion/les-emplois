@@ -9,33 +9,36 @@
 {% endblock %}
 
 {% block content %}
-    <div class="row justify-content-center">
-        <div class="col-8">
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row justify-content-center">
+                <div class="col-8">
 
-            <div class="card">
+                    <div class="card">
 
-                <div class="card-header">
-                    {% include "siae_evaluations/includes/job_seeker_infos_for_siae.html" with job_seeker=job_seeker approval=approval state=state %}
-                </div>
+                        <div class="card-header">
+                            {% include "siae_evaluations/includes/job_seeker_infos_for_siae.html" with job_seeker=job_seeker approval=approval state=state %}
+                        </div>
 
-                <div class="card-body">
+                        <div class="card-body">
 
-                    <div class="row mt-3">
-                        <div class="col-md-12">{% include "siae_evaluations/includes/criteria_form.html" %}</div>
+                            <div class="row mt-3">
+                                <div class="col-md-12">{% include "siae_evaluations/includes/criteria_form.html" %}</div>
+
+                            </div>
+
+
+                        </div>
 
                     </div>
-
+                    {% if back_url %}
+                        <p class="mt-4">
+                            <a href="{{ back_url }}">Retour</a>
+                        </p>
+                    {% endif %}
 
                 </div>
-
             </div>
-            {% if back_url %}
-                <p class="mt-4">
-                    <a href="{{ back_url }}">Retour</a>
-                </p>
-            {% endif %}
-
         </div>
-    </div>
-
+    </section>
 {% endblock %}
