@@ -1,26 +1,14 @@
 {% extends BASE_TEMPLATE %}
-{% comment %}
-
-    Extend this template when you need multiple `container`s for the content,
-    allowing `container` elements to fill the full viewport width from within
-    a fixed-width container.
-
-    Usage:
-        > {% extends "layout/content_full_viewport.html" %}
-        > {% block content %}
-        >     <main class="bg-white">
-        >         <div class="container > >             <h1>Hello World</h1> >         </div> >     </main> >     <div class="bg-dark"> >         <div class="container>
-        >             <h1>Hello World</h1>
-        >         </div>
-        >     </div>
-        >     <div class="bg-white">
-        >         <div class="container >
-        >             <h1>Hello World</h1>
-        >         </div>
-        >     </div>
-        > {% endblock %}
-
-{% endcomment %}
 {% block content_full_viewport %}
+
+    <div class="container container-breadcrumb">
+        {% block breadcrumbs %}{% endblock %}
+    </div>
+
+    {% block pre_content %}{% endblock %}
+
     {% block content %}{% endblock %}
+
+    {% block post_content %}{% endblock %}
+
 {% endblock %}

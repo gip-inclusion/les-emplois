@@ -2,4 +2,12 @@
 
 {% block title %}Notes de publication {{ block.super }}{% endblock %}
 
-{% block content %}{{ changelog_html }}{% endblock %}
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12">{{ changelog_html }}</div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

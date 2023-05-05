@@ -5,102 +5,112 @@
 {% block title %}Notifier la sanction du contrôle pour {{ evaluated_siae }}{{ block.super }}{% endblock %}
 
 {% block content %}
-    <h1>
-        Notifier la sanction du contrôle pour <span class="text-muted">{{ evaluated_siae }}</span>
-    </h1>
-    <section class="row">
-        <div class="c-stepper my-3 my-lg-6 col-lg-6">
-            <div class="progress progress--emploi">
-                <div class="progress-bar progress-bar-100" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12">
+                    <h1>
+                        Notifier la sanction du contrôle pour <span class="text-muted">{{ evaluated_siae }}</span>
+                    </h1>
                 </div>
             </div>
-            <p>
-                <strong>Étape 3</strong>/3 : Précision de la sanction
-            </p>
+            <div class="row">
+                <div class="my-3 my-lg-6 col-lg-6">
+                    <div class="c-stepper">
+                        <div class="progress progress--emploi">
+                            <div class="progress-bar progress-bar-100" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                        <p>
+                            <strong>Étape 3</strong>/3 : Précision de la sanction
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6 order-2 order-lg-1">
+                    <div class="card c-card">
+                        <div class="card-body">
+                            <h2 class="mt-2">Comment sera appliquée la sanction ?</h2>
+                            <hr class="my-4">
+                            <form method="post">
+                                {% csrf_token %}
+                                {% bootstrap_form_errors form type="all" %}
+                                {% if "training_session" in form.fields %}
+                                    <section>
+                                        <h3 class="mt-5">Participation à une session de présentation de l’auto-prescription</h3>
+                                        <p>
+                                            La SIAE doit participer à une session de présentation de l’auto-prescription. Des sessions collectives nationales seront proposées par mail, à défaut l'autorité administrative réalise une action de formation ou d’information collective ou individuelle à destination de la structure.
+                                        </p>
+                                        {% bootstrap_field form.training_session %}
+                                    </section>
+                                {% endif %}
+                                {% if "temporary_suspension_from" in form.fields %}
+                                    <section>
+                                        <h3 class="mt-5">Retrait temporaire de la capacité d’auto-prescription</h3>
+                                        <p>
+                                            La capacité d’auto-prescrire un parcours d'insertion par l'activité économique est suspendue pour une durée déterminée par l'autorité administrative.
+                                        </p>
+                                        {% bootstrap_field form.temporary_suspension_from %}
+                                        {% bootstrap_field form.temporary_suspension_to %}
+                                    </section>
+                                {% endif %}
+                                {% if "permanent_suspension" in form.fields %}
+                                    <section>
+                                        <h3 class="mt-5">Retrait définitif de la capacité d’auto-prescription</h3>
+                                        <p>
+                                            La capacité à prescrire un parcours est rompue, elle peut être rétablie par le préfet, à la demande de la structure, sous réserve de la participation de ses dirigeants ou salariés à des actions de formation définies par l'autorité administrative.
+                                        </p>
+                                        {% bootstrap_field form.permanent_suspension %}
+                                    </section>
+                                {% endif %}
+                                {% if "subsidy_cut_percent" in form.fields %}
+                                    <section>
+                                        <h3 class="mt-5">Suppression d’une partie de l’aide au poste</h3>
+                                        <p>
+                                            La suppression de l’aide attribuée aux salariés s’apprécie par l'autorité administrative, par imputation de l’année N+1. Cette notification s’accompagne d’une demande conforme auprès de l’ASP de la part du préfet ; Lorsque le département a participé aux aides financières concernées en application de l'article L. 5132-2, le préfet informe le président du conseil départemental de sa décision en vue de la récupération, le cas échéant, des montants correspondants.
+                                        </p>
+                                        {% bootstrap_field form.subsidy_cut_percent %}
+                                        {% bootstrap_field form.subsidy_cut_from %}
+                                        {% bootstrap_field form.subsidy_cut_to %}
+                                    </section>
+                                {% elif "subsidy_cut_from" in form.fields %}
+                                    <section>
+                                        <h3 class="mt-5">Suppression de toute l’aide au poste</h3>
+                                        <p>
+                                            La suppression de l’aide attribuée aux salariés s’apprécie par l'autorité administrative, par imputation de l’année N+1. Cette notification s’accompagne d’une demande conforme auprès de l’ASP de la part du préfet ; Lorsque le département a participé aux aides financières concernées en application de l'article L. 5132-2, le préfet informe le président du conseil départemental de sa décision en vue de la récupération, le cas échéant, des montants correspondants.
+                                        </p>
+                                        {% bootstrap_field form.subsidy_cut_from %}
+                                        {% bootstrap_field form.subsidy_cut_to %}
+                                    </section>
+                                {% endif %}
+                                {% if "deactivation_reason" in form.fields %}
+                                    <section>
+                                        <h3 class="mt-5">Déconventionnement de la structure</h3>
+                                        <p>
+                                            La suppression du conventionnement s’apprécie par l'autorité administrative. Cette notification s’accompagne d’une demande conforme auprès de l’ASP de la part du préfet ; Lorsque le département a participé aux aides financières concernées en application de l'article L. 5132-2, le préfet informe le président du conseil départemental de sa décision.
+                                        </p>
+                                        {% bootstrap_field form.deactivation_reason %}
+                                    </section>
+                                {% endif %}
+                                {% if "no_sanction_reason" in form.fields %}
+                                    <section>
+                                        <h3 class="mt-5">Ne pas sanctionner</h3>
+                                        {% bootstrap_field form.no_sanction_reason %}
+                                    </section>
+                                {% endif %}
+                                <div class="float-right">
+                                    <a class="btn btn-link" href="{% url "siae_evaluations_views:institution_evaluated_siae_notify_step2" evaluated_siae.pk %}">
+                                        Retour
+                                    </a>
+                                    <button class="btn btn-primary">Valider</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% include "siae_evaluations/includes/evaluation_data.html" %}
+            </div>
         </div>
     </section>
-    <div class="row">
-        <div class="col-lg-6 order-2 order-lg-1">
-            <div class="card c-card">
-                <div class="card-body">
-                    <h2 class="mt-2">Comment sera appliquée la sanction ?</h2>
-                    <hr class="my-4">
-                    <form method="post">
-                        {% csrf_token %}
-                        {% bootstrap_form_errors form type="all" %}
-                        {% if "training_session" in form.fields %}
-                            <section>
-                                <h3 class="mt-5">Participation à une session de présentation de l’auto-prescription</h3>
-                                <p>
-                                    La SIAE doit participer à une session de présentation de l’auto-prescription. Des sessions collectives nationales seront proposées par mail, à défaut l'autorité administrative réalise une action de formation ou d’information collective ou individuelle à destination de la structure.
-                                </p>
-                                {% bootstrap_field form.training_session %}
-                            </section>
-                        {% endif %}
-                        {% if "temporary_suspension_from" in form.fields %}
-                            <section>
-                                <h3 class="mt-5">Retrait temporaire de la capacité d’auto-prescription</h3>
-                                <p>
-                                    La capacité d’auto-prescrire un parcours d'insertion par l'activité économique est suspendue pour une durée déterminée par l'autorité administrative.
-                                </p>
-                                {% bootstrap_field form.temporary_suspension_from %}
-                                {% bootstrap_field form.temporary_suspension_to %}
-                            </section>
-                        {% endif %}
-                        {% if "permanent_suspension" in form.fields %}
-                            <section>
-                                <h3 class="mt-5">Retrait définitif de la capacité d’auto-prescription</h3>
-                                <p>
-                                    La capacité à prescrire un parcours est rompue, elle peut être rétablie par le préfet, à la demande de la structure, sous réserve de la participation de ses dirigeants ou salariés à des actions de formation définies par l'autorité administrative.
-                                </p>
-                                {% bootstrap_field form.permanent_suspension %}
-                            </section>
-                        {% endif %}
-                        {% if "subsidy_cut_percent" in form.fields %}
-                            <section>
-                                <h3 class="mt-5">Suppression d’une partie de l’aide au poste</h3>
-                                <p>
-                                    La suppression de l’aide attribuée aux salariés s’apprécie par l'autorité administrative, par imputation de l’année N+1. Cette notification s’accompagne d’une demande conforme auprès de l’ASP de la part du préfet ; Lorsque le département a participé aux aides financières concernées en application de l'article L. 5132-2, le préfet informe le président du conseil départemental de sa décision en vue de la récupération, le cas échéant, des montants correspondants.
-                                </p>
-                                {% bootstrap_field form.subsidy_cut_percent %}
-                                {% bootstrap_field form.subsidy_cut_from %}
-                                {% bootstrap_field form.subsidy_cut_to %}
-                            </section>
-                        {% elif "subsidy_cut_from" in form.fields %}
-                            <section>
-                                <h3 class="mt-5">Suppression de toute l’aide au poste</h3>
-                                <p>
-                                    La suppression de l’aide attribuée aux salariés s’apprécie par l'autorité administrative, par imputation de l’année N+1. Cette notification s’accompagne d’une demande conforme auprès de l’ASP de la part du préfet ; Lorsque le département a participé aux aides financières concernées en application de l'article L. 5132-2, le préfet informe le président du conseil départemental de sa décision en vue de la récupération, le cas échéant, des montants correspondants.
-                                </p>
-                                {% bootstrap_field form.subsidy_cut_from %}
-                                {% bootstrap_field form.subsidy_cut_to %}
-                            </section>
-                        {% endif %}
-                        {% if "deactivation_reason" in form.fields %}
-                            <section>
-                                <h3 class="mt-5">Déconventionnement de la structure</h3>
-                                <p>
-                                    La suppression du conventionnement s’apprécie par l'autorité administrative. Cette notification s’accompagne d’une demande conforme auprès de l’ASP de la part du préfet ; Lorsque le département a participé aux aides financières concernées en application de l'article L. 5132-2, le préfet informe le président du conseil départemental de sa décision.
-                                </p>
-                                {% bootstrap_field form.deactivation_reason %}
-                            </section>
-                        {% endif %}
-                        {% if "no_sanction_reason" in form.fields %}
-                            <section>
-                                <h3 class="mt-5">Ne pas sanctionner</h3>
-                                {% bootstrap_field form.no_sanction_reason %}
-                            </section>
-                        {% endif %}
-                        <div class="float-right">
-                            <a class="btn btn-link" href="{% url "siae_evaluations_views:institution_evaluated_siae_notify_step2" evaluated_siae.pk %}">
-                                Retour
-                            </a>
-                            <button class="btn btn-primary">Valider</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-        {% include "siae_evaluations/includes/evaluation_data.html" %}
-    </div>
 {% endblock %}

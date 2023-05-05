@@ -6,44 +6,51 @@
 {% block title %}Réactiver la fiche salarié ASP - {{ current_siae.display_name }} {{ block.super }}{% endblock %}
 
 {% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="content-small mb-3">
+                        <h1 class="h1-hero-c1">Réactiver la fiche salarié ASP</h1>
+                        <h2 class="h1 text-muted">{{ employee_record.job_seeker.get_full_name|title }}</h2>
 
-    <div class="content-small mb-3">
-        <h1 class="h1-hero-c1">Réactiver la fiche salarié ASP</h1>
-        <h2 class="h1 text-muted">{{ employee_record.job_seeker.get_full_name|title }}</h2>
-
-        <div class="card bg-gray-400 p-3 mb-3">
-            <div class="card-body p-1">
-                <div class="row">
-                    <div class="col-sm-9 pt-3">
-                        <h5 class="h4 card-title">Vous êtes sur le point de réactiver cette fiche salarié.</h5>
-                        {% with job_application=employee_record.job_application %}
-                            <div>
-                                Début du contrat : <b>{{ job_application.hiring_start_at }}</b>
+                        <div class="card bg-gray-400 p-3 mb-3">
+                            <div class="card-body p-1">
+                                <div class="row">
+                                    <div class="col-sm-9 pt-3">
+                                        <h5 class="h4 card-title">Vous êtes sur le point de réactiver cette fiche salarié.</h5>
+                                        {% with job_application=employee_record.job_application %}
+                                            <div>
+                                                Début du contrat : <b>{{ job_application.hiring_start_at }}</b>
+                                            </div>
+                                            <div>
+                                                Fin du contrat : <b>{{ job_application.hiring_end_at|default:"Non renseigné" }}</b>
+                                            </div>
+                                            <div>
+                                                Numéro de PASS IAE : <b>{{ job_application.approval.number|format_approval_number }}</b>
+                                            </div>
+                                        {% endwith %}
+                                        <div>
+                                            <b>{{ employee_record.get_status_display }}</b> le {{ employee_record.updated_at }}
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3 text-right">
+                                        <img src="{% static 'img/employee_record/asp_upload.svg' %}" alt="Transfert ASP">
+                                    </div>
+                                </div>
                             </div>
-                            <div>
-                                Fin du contrat : <b>{{ job_application.hiring_end_at|default:"Non renseigné" }}</b>
-                            </div>
-                            <div>
-                                Numéro de PASS IAE : <b>{{ job_application.approval.number|format_approval_number }}</b>
-                            </div>
-                        {% endwith %}
-                        <div>
-                            <b>{{ employee_record.get_status_display }}</b> le {{ employee_record.updated_at }}
                         </div>
                     </div>
-                    <div class="col-sm-3 text-right">
-                        <img src="{% static 'img/employee_record/asp_upload.svg' %}" alt="Transfert ASP">
-                    </div>
+                    <form method="post" class="js-prevent-multiple-submit">
+                        {% csrf_token %}
+                        <input type="hidden" name="confirm" value="true">
+                        {% buttons %}
+                            <a class="btn btn-outline-primary" href="{% url "employee_record_views:list" %}?status={{ employee_record.status }}">Retour à la liste</a>
+                            <button type="submit" class="btn btn-danger">Confirmer la réactivation</button>
+                        {% endbuttons %}
+                    </form>
                 </div>
             </div>
         </div>
-    </div>
-    <form method="post" class="js-prevent-multiple-submit">
-        {% csrf_token %}
-        <input type="hidden" name="confirm" value="true">
-        {% buttons %}
-            <a class="btn btn-outline-primary" href="{% url "employee_record_views:list" %}?status={{ employee_record.status }}">Retour à la liste</a>
-            <button type="submit" class="btn btn-danger">Confirmer la réactivation</button>
-        {% endbuttons %}
-    </form>
+    </section>
 {% endblock %}

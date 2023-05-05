@@ -5,70 +5,76 @@
 {% block title %}Bienvenue sur les emplois de l'inclusion ! {{ block.super }}{% endblock %}
 
 {% block content %}
-
-    <div id="welcoming_tour" class="carousel">
-        <ol class="carousel-indicators">
-            <li data-target="#welcoming_tour" data-slide-to="0" class="active"></li>
-            <li data-target="#welcoming_tour" data-slide-to="1"></li>
-            <li data-target="#welcoming_tour" data-slide-to="2"></li>
-        </ol>
-        <div class="carousel-inner">
-            <div class="carousel-item active">
-                <div class="d-block w-100 text-center">
-                    <h1 class="h1-hero-c1">Bienvenue sur les emplois de l'inclusion !</h1>
-                    <figure class="mx-auto mb-3 w-sm-33">
-                        <img src="{% static 'img/welcoming_tour/prescripteur_1.svg' %}" class="img-fitcover img-fluid" alt="">
-                    </figure>
-                    <p class="lead pb-5">
-                        Découvrez un outil qui accélère la mise en relation des candidats à l’insertion auprès des employeurs solidaires et simplifie la mission des acteurs de l’IAE.
-                    </p>
-                    <p class="my-3">
-                        <a class="btn btn-sm btn-primary" href="#welcoming_tour" role="button" data-slide="next">Suivant</a>
-                    </p>
-                </div>
-            </div>
-            <div class="carousel-item">
-                <div class="d-block w-100 text-center">
-                    <h1 class="h1-hero-c1">Identifiez toutes les offres d’emploi de l’inclusion localement !</h1>
-                    <figure class="mx-auto mb-3 w-sm-33">
-                        <img src="{% static 'img/welcoming_tour/prescripteur_2.svg' %}" class="img-fitcover img-fluid" alt="">
-                    </figure>
-                    <p class="lead">Optimisez les chances de vos candidats et renforcez le pilotage de leur parcours en insertion.</p>
-                    <p class="lead mb-5">
-                        Profitez d’un outil mutualisé d’accompagnement de l’IAE : mise en relation simplifiée, partage entre acteurs, simplification des procédures d’agrément, réduction des délais de recrutement.
-                    </p>
-                    <p class="my-3">
-                        <a class="btn btn-sm btn-secondary" href="#welcoming_tour" role="button" data-slide="prev">Précédent</a>
-                        <a class="btn btn-sm btn-primary" href="#welcoming_tour" role="button" data-slide="next">Suivant</a>
-                    </p>
-                </div>
-            </div>
-            <div class="carousel-item">
-                <div class="d-block w-100 text-center">
-                    <h1 class="h1-hero-c1">Suivez toutes vos candidatures en ligne</h1>
-                    <figure class="mx-auto mb-3 w-sm-33">
-                        <img src="{% static 'img/welcoming_tour/prescripteur_3.svg' %}" class="img-fitcover img-fluid" alt="">
-                    </figure>
-                    <p class="lead">
-                        Prescripteur ou orienteur... affilié ou pas à une organisation... habilitée ou non, vous pouvez tous vous inscrire !
-                        <br>
-                        Postulez pour un candidat à l’insertion en quelques clics, suivez l’avancement de ses candidatures en temps réel, échangez avec les collaborateurs de votre organisation ou rejoignez la communauté active.
-                    </p>
-                    <p class="lead mb-5">
-                        À vous de jouer maintenant !
-                        <br>
-                        Bonne découverte et bon accompagnement.
-                    </p>
-                    <p class="my-3">
-                        <a class="btn btn-sm btn-secondary" href="#welcoming_tour" role="button" data-slide="prev">Précédent</a>
-                        <a class="btn btn-sm btn-primary" href="{% url 'dashboard:index' %}" role="button" data-slide="next">Terminer</a>
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12">
+                    <div id="welcoming_tour" class="carousel">
+                        <ol class="carousel-indicators">
+                            <li data-target="#welcoming_tour" data-slide-to="0" class="active"></li>
+                            <li data-target="#welcoming_tour" data-slide-to="1"></li>
+                            <li data-target="#welcoming_tour" data-slide-to="2"></li>
+                        </ol>
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <div class="d-block w-100 text-center">
+                                    <h1 class="h1-hero-c1">Bienvenue sur les emplois de l'inclusion !</h1>
+                                    <figure class="mx-auto mb-3 w-sm-33">
+                                        <img src="{% static 'img/welcoming_tour/prescripteur_1.svg' %}" class="img-fitcover img-fluid" alt="">
+                                    </figure>
+                                    <p class="lead pb-5">
+                                        Découvrez un outil qui accélère la mise en relation des candidats à l’insertion auprès des employeurs solidaires et simplifie la mission des acteurs de l’IAE.
+                                    </p>
+                                    <p class="my-3">
+                                        <a class="btn btn-sm btn-primary" href="#welcoming_tour" role="button" data-slide="next">Suivant</a>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <div class="d-block w-100 text-center">
+                                    <h1 class="h1-hero-c1">Identifiez toutes les offres d’emploi de l’inclusion localement !</h1>
+                                    <figure class="mx-auto mb-3 w-sm-33">
+                                        <img src="{% static 'img/welcoming_tour/prescripteur_2.svg' %}" class="img-fitcover img-fluid" alt="">
+                                    </figure>
+                                    <p class="lead">Optimisez les chances de vos candidats et renforcez le pilotage de leur parcours en insertion.</p>
+                                    <p class="lead mb-5">
+                                        Profitez d’un outil mutualisé d’accompagnement de l’IAE : mise en relation simplifiée, partage entre acteurs, simplification des procédures d’agrément, réduction des délais de recrutement.
+                                    </p>
+                                    <p class="my-3">
+                                        <a class="btn btn-sm btn-secondary" href="#welcoming_tour" role="button" data-slide="prev">Précédent</a>
+                                        <a class="btn btn-sm btn-primary" href="#welcoming_tour" role="button" data-slide="next">Suivant</a>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <div class="d-block w-100 text-center">
+                                    <h1 class="h1-hero-c1">Suivez toutes vos candidatures en ligne</h1>
+                                    <figure class="mx-auto mb-3 w-sm-33">
+                                        <img src="{% static 'img/welcoming_tour/prescripteur_3.svg' %}" class="img-fitcover img-fluid" alt="">
+                                    </figure>
+                                    <p class="lead">
+                                        Prescripteur ou orienteur... affilié ou pas à une organisation... habilitée ou non, vous pouvez tous vous inscrire !
+                                        <br>
+                                        Postulez pour un candidat à l’insertion en quelques clics, suivez l’avancement de ses candidatures en temps réel, échangez avec les collaborateurs de votre organisation ou rejoignez la communauté active.
+                                    </p>
+                                    <p class="lead mb-5">
+                                        À vous de jouer maintenant !
+                                        <br>
+                                        Bonne découverte et bon accompagnement.
+                                    </p>
+                                    <p class="my-3">
+                                        <a class="btn btn-sm btn-secondary" href="#welcoming_tour" role="button" data-slide="prev">Précédent</a>
+                                        <a class="btn btn-sm btn-primary" href="{% url 'dashboard:index' %}" role="button" data-slide="next">Terminer</a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-center my-3">
+                        <a href="{% url 'dashboard:index' %}" class="btn btn-sm btn-sm btn-link">Ignorer la présentation</a>
                     </p>
                 </div>
             </div>
         </div>
-    </div>
-    <p class="text-center my-3">
-        <a href="{% url 'dashboard:index' %}" class="btn btn-sm btn-sm btn-link">Ignorer la présentation</a>
-    </p>
-
+    </section>
 {% endblock content %}

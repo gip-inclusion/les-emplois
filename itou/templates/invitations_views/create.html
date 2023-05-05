@@ -20,82 +20,88 @@
     </section>
 {% endblock %}
 
-{% block content_container_css_classes %}s-section pt-0 mt-0{% endblock %}
 {% block content %}
-    <div class="c-form">
-        <h3 class="h4">Renseignez les informations de vos collaborateurs</h3>
-
-        <form method="post" action="{{ form_post_url }}" class="js-prevent-multiple-submit">
-            {% csrf_token %}
-
-            {{ formset.management_form }}
-
-            {% bootstrap_formset_errors formset type="non_field_errors" %}
-
-            <fieldset class="mt-4">
-                {% for form in formset %}
-                    {% bootstrap_form_errors form type="non_field_errors" %}
-                    <div class="inline-form-row row align-items-top mb-2 no-gutters">
-                        {% bootstrap_form form show_label=False form_group_class="col-md pr-md-3 mb-2 inline-col" %}
-                    </div>
-                {% endfor %}
-            </fieldset>
-            <button type="button" class="btn btn-link btn-ico justify-content-center mb-3 pl-0 pt-0 add-form-row">
-                <i class="ri-user-add-line ri-lg"></i>
-                <span>Ajouter un autre collaborateur</span>
-            </button>
-
-            <hr class="mb-3">
+    <section class="s-section">
+        <div class="s-section__container container">
             <div class="row">
                 <div class="col-12">
-                    <div class="form-row align-items-center justify-content-end">
-                        <div class="form-group col-12 col-lg-auto order-2 order-lg-1">
-                            <a href="{{ back_url }}" class="btn btn-link btn-block btn-ico pl-0 justify-content-center" aria-label="Retour à l'étape précédente">
-                                <i class="ri-arrow-go-back-line ri-lg"></i>
-                                <span>Retour</span>
-                            </a>
-                        </div>
-                        <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
-                            <button type="submit" class="btn btn-ico btn-block btn-primary">
-                                <i class="ri-send-plane-line ri-lg"></i>
-                                <span>Envoyer</span>
+                    <div class="c-form">
+                        <h3 class="h4">Renseignez les informations de vos collaborateurs</h3>
+
+                        <form method="post" action="{{ form_post_url }}" class="js-prevent-multiple-submit">
+                            {% csrf_token %}
+
+                            {{ formset.management_form }}
+
+                            {% bootstrap_formset_errors formset type="non_field_errors" %}
+
+                            <fieldset class="mt-4">
+                                {% for form in formset %}
+                                    {% bootstrap_form_errors form type="non_field_errors" %}
+                                    <div class="inline-form-row row align-items-top mb-2 no-gutters">
+                                        {% bootstrap_form form show_label=False form_group_class="col-md pr-md-3 mb-2 inline-col" %}
+                                    </div>
+                                {% endfor %}
+                            </fieldset>
+                            <button type="button" class="btn btn-link btn-ico justify-content-center mb-3 pl-0 pt-0 add-form-row">
+                                <i class="ri-user-add-line ri-lg"></i>
+                                <span>Ajouter un autre collaborateur</span>
                             </button>
-                        </div>
+
+                            <hr class="mb-3">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-row align-items-center justify-content-end">
+                                        <div class="form-group col-12 col-lg-auto order-2 order-lg-1">
+                                            <a href="{{ back_url }}" class="btn btn-link btn-block btn-ico pl-0 justify-content-center" aria-label="Retour à l'étape précédente">
+                                                <i class="ri-arrow-go-back-line ri-lg"></i>
+                                                <span>Retour</span>
+                                            </a>
+                                        </div>
+                                        <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
+                                            <button type="submit" class="btn btn-ico btn-block btn-primary">
+                                                <i class="ri-send-plane-line ri-lg"></i>
+                                                <span>Envoyer</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
                     </div>
+
+                    {% if pending_invitations %}
+                        <div class="c-box mt-3 mt-md-5">
+                            <h3 class="h4">Invitations en attente</h3>
+                            <div class="table-responsive-lg mt-3">
+                                <table class="table">
+                                    <caption class="sr-only">Liste des invitations en attente</caption>
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Prénom</th>
+                                            <th scope="col">Nom</th>
+                                            <th scope="col">E-mail</th>
+                                            <th scope="col">Envoyée le</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for invitation in pending_invitations %}
+                                            <tr>
+                                                <td>{{ invitation.first_name }}</td>
+                                                <td>{{ invitation.last_name }}</td>
+                                                <td>{{ invitation.email }}</td>
+                                                <td>{{ invitation.sent_at|date }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
-        </form>
-    </div>
-
-    {% if pending_invitations %}
-        <div class="c-box mt-3 mt-md-5">
-            <h3 class="h4">Invitations en attente</h3>
-            <div class="table-responsive-lg mt-3">
-                <table class="table">
-                    <caption class="sr-only">Liste des invitations en attente</caption>
-                    <thead>
-                        <tr>
-                            <th scope="col">Prénom</th>
-                            <th scope="col">Nom</th>
-                            <th scope="col">E-mail</th>
-                            <th scope="col">Envoyée le</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for invitation in pending_invitations %}
-                            <tr>
-                                <td>{{ invitation.first_name }}</td>
-                                <td>{{ invitation.last_name }}</td>
-                                <td>{{ invitation.email }}</td>
-                                <td>{{ invitation.sent_at|date }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
         </div>
-    {% endif %}
-
+    </section>
 {% endblock %}
 
 {% block script %}

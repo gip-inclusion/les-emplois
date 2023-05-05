@@ -3,214 +3,222 @@
 {% block title %}Grille indicative de sanctions proposées par la DGEFP {{ block.super }}{% endblock %}
 
 {% block content %}
-    <span class="badge badge-pill badge-important-light text-primary">Applicable à partir de 2023</span>
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12">
+                    <span class="badge badge-pill badge-important-light text-primary">Applicable à partir de 2023</span>
 
-    <article>
-        <h1 class="mt-2">Grille indicative de sanctions proposées par la DGEFP</h1>
-        <p>
-            Annexe 3 - INSTRUCTION N° DGEFP/SDPAE/MIP/2022/83 du 5 avril 2022 relative
-            à la mise en œuvre opérationnelle du contrôle a posteriori des recrutements
-            en auto-prescription prévu par les articles R. 5132-1-12 à R. 5132-1-17 du
-            code du travail.
+                    <article>
+                        <h1 class="mt-2">Grille indicative de sanctions proposées par la DGEFP</h1>
+                        <p>
+                            Annexe 3 - INSTRUCTION N° DGEFP/SDPAE/MIP/2022/83 du 5 avril 2022 relative
+                            à la mise en œuvre opérationnelle du contrôle a posteriori des recrutements
+                            en auto-prescription prévu par les articles R. 5132-1-12 à R. 5132-1-17 du
+                            code du travail.
 
-            <a target="_blank"
-               href="https://www.legifrance.gouv.fr/download/pdf/circ?id=45319"
-               aria-label="Voir l’instruction N° DGEFP/SDPAE/MIP/2022/83 du 5 avril 2022 relative à la mise en œuvre opérationnelle du contrôle a posteriori des recrutements en auto-prescription"
-               class="d-block mt-3 mb-4">https://www.legifrance.gouv.fr/download/pdf/circ?id=45319</a>
-        </p>
+                            <a target="_blank"
+                               href="https://www.legifrance.gouv.fr/download/pdf/circ?id=45319"
+                               aria-label="Voir l’instruction N° DGEFP/SDPAE/MIP/2022/83 du 5 avril 2022 relative à la mise en œuvre opérationnelle du contrôle a posteriori des recrutements en auto-prescription"
+                               class="d-block mt-3 mb-4">https://www.legifrance.gouv.fr/download/pdf/circ?id=45319</a>
+                        </p>
 
-        <h2>Premier contrôle irrégulier constaté</h2>
-        <p>
-            Dès lors qu’une irrégularité est constatée, la participation de la SIAE
-            à une session de présentation de l’auto-prescription est obligatoire.
-        </p>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th class="bg-light" aria-label="Type d’erreur" scope="col"></th>
-                    <th class="bg-light" scope="col">
-                        <b>Taux d’erreur inférieur à 40 %</b>
-                    </th>
-                    <th class="bg-light" scope="col">
-                        <b>Taux d’erreur compris entre 40 et 80 %</b>
-                    </th>
-                    <th class="bg-light" scope="col">
-                        <b>À partir de 80 % d’erreurs</b>
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <th class="bg-white" scope="row">
-                        <b>Justificatif fourni invalide</b> (date de validité périmée, transmission d’un document erroné)
-                    </th>
-                    <td class="bg-white">
-                        <ul class="list-unstyled">
-                            <li>Participation à la prochaine session de présentation de l’auto-prescription</li>
-                        </ul>
-                    </td>
-                    <td class="bg-white">
-                        <ul class="list-unstyled">
-                            <li>Retrait temporaire de la capacité d’auto-prescription</li>
-                        </ul>
-                    </td>
-                    <td class="bg-white">
-                        <ul class="list-unstyled">
-                            <li>
-                                Retrait temporaire de la capacité d’auto-prescription
-                                <br>
-                                +
-                            </li>
-                            <li>Suppression de tout ou partie de l’aide au poste</li>
-                        </ul>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">
-                        <b>Incapacité à fournir un justificatif</b> (aucun document fourni)
-                    </th>
-                    <td class="bg-white">
-                        <ul class="list-unstyled">
-                            <li>Retrait temporaire de la capacité d’auto-prescription</li>
-                        </ul>
-                    </td>
-                    <td class="bg-white">
-                        <ul class="list-unstyled">
-                            <li>
-                                Retrait temporaire de la capacité d’auto-prescription
-                                <br>
-                                +
-                            </li>
-                            <li>Suppression de tout ou partie de l’aide au poste</li>
-                        </ul>
-                    </td>
-                    <td class="bg-white">
-                        <ul class="list-unstyled">
-                            <li>
-                                Retrait temporaire ou définitif de la capacité d’auto-prescription
-                                <br>
-                                +
-                            </li>
-                            <li>
-                                Suppression de tout ou partie l’aide au poste
-                                <br>
-                                +
-                            </li>
-                            <li>
-                                Déconventionnement de la structure <a href="#deconventionnement">*</a>
-                            </li>
-                        </ul>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <h2>
-            Nouveau contrôle irrégulier constaté pour la même structure dans les 3
-            ans suivant le premier contrôle
-        </h2>
-        <table class="table table-bordered table-hover">
-            <thead>
-                <tr>
-                    <th class="bg-light" aria-label="Type d’erreur" scope="col"></th>
-                    <th class="bg-light" scope="col">
-                        <b>Taux d’erreur inférieur à 40 %</b>
-                    </th>
-                    <th class="bg-light" scope="col">
-                        <b>Taux d’erreur compris entre 40 et 80 %</b>
-                    </th>
-                    <th class="bg-light" scope="col">
-                        <b>À partir de 80 % d’erreurs</b>
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <th class="bg-white" scope="row">
-                        <b>Justificatif fourni invalide</b> (date de validité périmée, transmission d’un document erroné)
-                    </th>
-                    <td class="bg-white">
-                        <ul class="list-unstyled">
-                            <li>Retrait temporaire de la capacité d’auto-prescription</li>
-                        </ul>
-                    </td>
-                    <td class="bg-white">
-                        <ul class="list-unstyled">
-                            <li>
-                                Retrait temporaire de la capacité d’auto-prescription
-                                <br>
-                                +
-                            </li>
-                            <li>Suppression de tout ou partie de l’aide au poste</li>
-                        </ul>
-                    </td>
-                    <td class="bg-white">
-                        <ul class="list-unstyled">
-                            <li>
-                                Retrait temporaire de la capacité d’auto-prescription
-                                <br>
-                                +
-                            </li>
-                            <li>
-                                Suppression de tout ou partie de l’aide au poste
-                                <br>
-                                +
-                            </li>
-                            <li>
-                                Déconventionnement de la structure <a href="#deconventionnement">*</a>
-                            </li>
-                        </ul>
-                    </td>
-                </tr>
-                <tr>
-                    <th class="bg-white" scope="row">
-                        <b>Incapacité à fournir un justificatif</b> (aucun document fourni)
-                    </th>
-                    <td class="bg-white">
-                        <ul class="list-unstyled">
-                            <li>
-                                Retrait temporaire de la capacité d’auto-prescription
-                                <br>
-                                +
-                            </li>
-                            <li>Suppression de tout ou partie de l’aide au poste</li>
-                        </ul>
-                    </td>
-                    <td class="bg-white">
-                        <ul class="list-unstyled">
-                            <li>
-                                Retrait temporaire de la capacité d’auto-prescription
-                                <br>
-                                +
-                            </li>
-                            <li>Suppression de tout ou partie de l’aide au poste</li>
-                        </ul>
-                    </td>
-                    <td class="bg-white">
-                        <ul class="list-unstyled">
-                            <li>
-                                Suppression définitive de la capacité d’auto-prescription
-                                <br>
-                                +
-                            </li>
-                            <li>
-                                Suppression de l’aide au poste
-                                <br>
-                                +
-                            </li>
-                            <li>
-                                Déconventionnement de la structure <a href="#deconventionnement">*</a>
-                            </li>
-                        </ul>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <p id="deconventionnement">
-            <a href="#deconventionnement">*</a>
-            Ce type de manquement peut être lié à une fraude volontaire et constitue
-            une indication du non-respect des engagements de la convention. À ce titre,
-            ces éléments cumulés avec d’autres dysfonctionnements de la structure,
-            peuvent justifier son déconventionnement.
-        </p>
-    </article>
+                        <h2>Premier contrôle irrégulier constaté</h2>
+                        <p>
+                            Dès lors qu’une irrégularité est constatée, la participation de la SIAE
+                            à une session de présentation de l’auto-prescription est obligatoire.
+                        </p>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th class="bg-light" aria-label="Type d’erreur" scope="col"></th>
+                                    <th class="bg-light" scope="col">
+                                        <b>Taux d’erreur inférieur à 40 %</b>
+                                    </th>
+                                    <th class="bg-light" scope="col">
+                                        <b>Taux d’erreur compris entre 40 et 80 %</b>
+                                    </th>
+                                    <th class="bg-light" scope="col">
+                                        <b>À partir de 80 % d’erreurs</b>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th class="bg-white" scope="row">
+                                        <b>Justificatif fourni invalide</b> (date de validité périmée, transmission d’un document erroné)
+                                    </th>
+                                    <td class="bg-white">
+                                        <ul class="list-unstyled">
+                                            <li>Participation à la prochaine session de présentation de l’auto-prescription</li>
+                                        </ul>
+                                    </td>
+                                    <td class="bg-white">
+                                        <ul class="list-unstyled">
+                                            <li>Retrait temporaire de la capacité d’auto-prescription</li>
+                                        </ul>
+                                    </td>
+                                    <td class="bg-white">
+                                        <ul class="list-unstyled">
+                                            <li>
+                                                Retrait temporaire de la capacité d’auto-prescription
+                                                <br>
+                                                +
+                                            </li>
+                                            <li>Suppression de tout ou partie de l’aide au poste</li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
+                                        <b>Incapacité à fournir un justificatif</b> (aucun document fourni)
+                                    </th>
+                                    <td class="bg-white">
+                                        <ul class="list-unstyled">
+                                            <li>Retrait temporaire de la capacité d’auto-prescription</li>
+                                        </ul>
+                                    </td>
+                                    <td class="bg-white">
+                                        <ul class="list-unstyled">
+                                            <li>
+                                                Retrait temporaire de la capacité d’auto-prescription
+                                                <br>
+                                                +
+                                            </li>
+                                            <li>Suppression de tout ou partie de l’aide au poste</li>
+                                        </ul>
+                                    </td>
+                                    <td class="bg-white">
+                                        <ul class="list-unstyled">
+                                            <li>
+                                                Retrait temporaire ou définitif de la capacité d’auto-prescription
+                                                <br>
+                                                +
+                                            </li>
+                                            <li>
+                                                Suppression de tout ou partie l’aide au poste
+                                                <br>
+                                                +
+                                            </li>
+                                            <li>
+                                                Déconventionnement de la structure <a href="#deconventionnement">*</a>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <h2>
+                            Nouveau contrôle irrégulier constaté pour la même structure dans les 3
+                            ans suivant le premier contrôle
+                        </h2>
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th class="bg-light" aria-label="Type d’erreur" scope="col"></th>
+                                    <th class="bg-light" scope="col">
+                                        <b>Taux d’erreur inférieur à 40 %</b>
+                                    </th>
+                                    <th class="bg-light" scope="col">
+                                        <b>Taux d’erreur compris entre 40 et 80 %</b>
+                                    </th>
+                                    <th class="bg-light" scope="col">
+                                        <b>À partir de 80 % d’erreurs</b>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th class="bg-white" scope="row">
+                                        <b>Justificatif fourni invalide</b> (date de validité périmée, transmission d’un document erroné)
+                                    </th>
+                                    <td class="bg-white">
+                                        <ul class="list-unstyled">
+                                            <li>Retrait temporaire de la capacité d’auto-prescription</li>
+                                        </ul>
+                                    </td>
+                                    <td class="bg-white">
+                                        <ul class="list-unstyled">
+                                            <li>
+                                                Retrait temporaire de la capacité d’auto-prescription
+                                                <br>
+                                                +
+                                            </li>
+                                            <li>Suppression de tout ou partie de l’aide au poste</li>
+                                        </ul>
+                                    </td>
+                                    <td class="bg-white">
+                                        <ul class="list-unstyled">
+                                            <li>
+                                                Retrait temporaire de la capacité d’auto-prescription
+                                                <br>
+                                                +
+                                            </li>
+                                            <li>
+                                                Suppression de tout ou partie de l’aide au poste
+                                                <br>
+                                                +
+                                            </li>
+                                            <li>
+                                                Déconventionnement de la structure <a href="#deconventionnement">*</a>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-white" scope="row">
+                                        <b>Incapacité à fournir un justificatif</b> (aucun document fourni)
+                                    </th>
+                                    <td class="bg-white">
+                                        <ul class="list-unstyled">
+                                            <li>
+                                                Retrait temporaire de la capacité d’auto-prescription
+                                                <br>
+                                                +
+                                            </li>
+                                            <li>Suppression de tout ou partie de l’aide au poste</li>
+                                        </ul>
+                                    </td>
+                                    <td class="bg-white">
+                                        <ul class="list-unstyled">
+                                            <li>
+                                                Retrait temporaire de la capacité d’auto-prescription
+                                                <br>
+                                                +
+                                            </li>
+                                            <li>Suppression de tout ou partie de l’aide au poste</li>
+                                        </ul>
+                                    </td>
+                                    <td class="bg-white">
+                                        <ul class="list-unstyled">
+                                            <li>
+                                                Suppression définitive de la capacité d’auto-prescription
+                                                <br>
+                                                +
+                                            </li>
+                                            <li>
+                                                Suppression de l’aide au poste
+                                                <br>
+                                                +
+                                            </li>
+                                            <li>
+                                                Déconventionnement de la structure <a href="#deconventionnement">*</a>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p id="deconventionnement">
+                            <a href="#deconventionnement">*</a>
+                            Ce type de manquement peut être lié à une fraude volontaire et constitue
+                            une indication du non-respect des engagements de la convention. À ce titre,
+                            ces éléments cumulés avec d’autres dysfonctionnements de la structure,
+                            peuvent justifier son déconventionnement.
+                        </p>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}

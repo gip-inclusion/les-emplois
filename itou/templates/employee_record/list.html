@@ -112,97 +112,100 @@
     </section>
 {% endblock %}
 
-{% block content_container_css_classes %}s-section p-0{% endblock %}
 {% block content %}
-    <div class="row">
-        <div class="col-12 col-md-3">
-            <aside class="c-aside-filters">
-                <button class="c-aside-filters__btn__collapse" data-toggle="collapse" data-target="#status-filter-form" aria-expanded="false" aria-controls="status-filter-form">
-                    <i class="ri-filter-line"></i>
-                    <span>Filtres des fiches salariés</span>
-                </button>
-                <div class="c-aside-filters__card rounded-lg" id="status-filter-form">
-                    <form method="get">
-                        <div class="c-aside-filters__card__body p-3 p-md-4">
-                            <fieldset>
-                                <legend>
-                                    Statut
-                                </legend>
-                                <div class="form-group">
-                                    {% for status, badge in form.status|zip:badges %}
-                                        <div class="d-flex mb-2">
-                                            <div class="flex-grow-1">{{ status }}</div>
-                                            <div>
-                                                <span class="badge badge-pill badge-sm badge-{{ badge.1 }}">{{ badge.0 }}</span>
-                                            </div>
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-md-3">
+                    <aside class="c-aside-filters">
+                        <button class="c-aside-filters__btn__collapse" data-toggle="collapse" data-target="#status-filter-form" aria-expanded="false" aria-controls="status-filter-form">
+                            <i class="ri-filter-line"></i>
+                            <span>Filtres des fiches salariés</span>
+                        </button>
+                        <div class="c-aside-filters__card rounded-lg" id="status-filter-form">
+                            <form method="get">
+                                <div class="c-aside-filters__card__body p-3 p-md-4">
+                                    <fieldset>
+                                        <legend>
+                                            Statut
+                                        </legend>
+                                        <div class="form-group">
+                                            {% for status, badge in form.status|zip:badges %}
+                                                <div class="d-flex mb-2">
+                                                    <div class="flex-grow-1">{{ status }}</div>
+                                                    <div>
+                                                        <span class="badge badge-pill badge-sm badge-{{ badge.1 }}">{{ badge.0 }}</span>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
                                         </div>
+                                    </fieldset>
+                                    {# Job seeker filter #}
+                                    <fieldset>
+                                        <legend>
+                                            Par candidat
+                                        </legend>
+                                        {% bootstrap_field filters_form.job_seekers show_label=False %}
+                                    </fieldset>
+                                </div>
+                                {# Filled via jQuery #}
+                                {{ form.order.as_hidden }}
+                            </form>
+                        </div>
+                    </aside>
+                </div>
+
+                <div class="col-12 col-md-9">
+                    <div class="c-box p-3 p-md-4">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                {% with cnt=navigation_pages.paginator.count %}
+                                    <span class="h4 m-0">{{ cnt|default:"Aucun" }} résultat{{ cnt|pluralize }}</span>
+                                {% endwith %}
+                            </div>
+                            <div>
+                                <span class="btn-link fs-sm">Trier par :</span>
+                                <button type="button" class="btn btn-sm btn-link dropdown-toggle p-0" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    {{ ordered_by_label }}
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right" id="order-form-group">
+                                    {% for order_value, order_label in form.order.field.choices %}
+                                        <button class="dropdown-item {% if order_value == form.order.value %}active{% endif %}" type="button" value="{{ order_value }}">
+                                            {{ order_label }}
+                                        </button>
                                     {% endfor %}
                                 </div>
-                            </fieldset>
-                            {# Job seeker filter #}
-                            <fieldset>
-                                <legend>
-                                    Par candidat
-                                </legend>
-                                {% bootstrap_field filters_form.job_seekers show_label=False %}
-                            </fieldset>
+                            </div>
                         </div>
-                        {# Filled via jQuery #}
-                        {{ form.order.as_hidden }}
-                    </form>
-                </div>
-            </aside>
-        </div>
 
-        <div class="col-12 col-md-9">
-            <div class="c-box p-3 p-md-4">
-                <div class="d-flex align-items-center">
-                    <div class="flex-grow-1">
-                        {% with cnt=navigation_pages.paginator.count %}
-                            <span class="h4 m-0">{{ cnt|default:"Aucun" }} résultat{{ cnt|pluralize }}</span>
-                        {% endwith %}
-                    </div>
-                    <div>
-                        <span class="btn-link fs-sm">Trier par :</span>
-                        <button type="button" class="btn btn-sm btn-link dropdown-toggle p-0" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            {{ ordered_by_label }}
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right" id="order-form-group">
-                            {% for order_value, order_label in form.order.field.choices %}
-                                <button class="dropdown-item {% if order_value == form.order.value %}active{% endif %}" type="button" value="{{ order_value }}">
-                                    {{ order_label }}
-                                </button>
-                            {% endfor %}
+                        {# "Real" employee records objects #}
+                        <div class="employee-records-list">
+                            {% if employee_records_list %}
+                                {% for employee_record in navigation_pages %}
+                                    {% with item=employee_record.job_application %}
+                                        {% include "employee_record/includes/list_item.html" %}
+                                    {% endwith %}
+                                {% endfor %}
+                                {# New employee records i.e. job applications #}
+                            {% else %}
+                                {% for item in navigation_pages %}
+                                    {% include "employee_record/includes/list_item.html" %}
+                                {% endfor %}
+                            {% endif %}
                         </div>
+
+                        {% if not navigation_pages %}
+                            <p class="my-3 my-md-4">
+                                <i class="ri-forbid-line ri-lg mr-1" aria-hidden="true"></i>
+                                <span>Aucune fiche salarié avec le statut selectionné ...</span>
+                            </p>
+                        {% endif %}
                     </div>
-                </div>
 
-                {# "Real" employee records objects #}
-                <div class="employee-records-list">
-                    {% if employee_records_list %}
-                        {% for employee_record in navigation_pages %}
-                            {% with item=employee_record.job_application %}
-                                {% include "employee_record/includes/list_item.html" %}
-                            {% endwith %}
-                        {% endfor %}
-                        {# New employee records i.e. job applications #}
-                    {% else %}
-                        {% for item in navigation_pages %}
-                            {% include "employee_record/includes/list_item.html" %}
-                        {% endfor %}
-                    {% endif %}
-                </div>
+                    {% include "includes/pagination.html" with page=navigation_pages %}
 
-                {% if not navigation_pages %}
-                    <p class="my-3 my-md-4">
-                        <i class="ri-forbid-line ri-lg mr-1" aria-hidden="true"></i>
-                        <span>Aucune fiche salarié avec le statut selectionné ...</span>
-                    </p>
-                {% endif %}
+                </div>
             </div>
-
-            {% include "includes/pagination.html" with page=navigation_pages %}
-
         </div>
-    </div>
+    </section>
 {% endblock %}

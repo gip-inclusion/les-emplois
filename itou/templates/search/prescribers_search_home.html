@@ -6,6 +6,4 @@
     {% include "search/includes/generic_search_home.html" with form=form title="Rechercher des prescripteurs habilités" url_search="search:prescribers_results" template_form_name="search/includes/prescribers_search_form.html" %}
 {% endblock %}
 
-{# The "content" block is empty here, so we hide it to avoid a gap in UI. #}
-{% block content_container_css_classes %}{{ block.super }} d-none{% endblock %}
 {% block content %}{% endblock %}
