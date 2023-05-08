@@ -3,8 +3,6 @@
 SiaeConvention object logic used by the import_siae.py script is gathered here.
 
 """
-import datetime
-
 from django.utils import timezone
 
 from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS
@@ -12,6 +10,14 @@ from itou.siaes.management.commands._import_siae.siae import does_siae_have_an_a
 from itou.siaes.management.commands._import_siae.vue_af import INACTIVE_SIAE_LIST
 from itou.siaes.management.commands._import_siae.vue_structure import ASP_ID_TO_SIRET_SIGNATURE, SIRET_TO_ASP_ID
 from itou.siaes.models import Siae, SiaeConvention
+
+
+# TODO @dejafait manually rollback to normal value 200 no sooner than 2023/05/31 once we got human confirmation
+# from the ASP that we should resume convention deactivations.
+# 199 SIAE were deactivated on 2023/04/24 but per ASP's orders we have to keep them artifically alive
+# until at least 2023/05/31.
+# See https://github.com/betagouv/itou/pull/2445 and https://github.com/betagouv/itou/pull/2498
+CONVENTION_DEACTIVATION_THRESHOLD = 1
 
 
 def update_existing_conventions():
@@ -68,13 +74,6 @@ def update_existing_conventions():
 
         should_be_active = does_siae_have_an_active_convention(siae)
 
-        # TODO @dejafait DROP after 2023/05/31
-        # 199 SIAE were deactivated on 2023/04/24 but per ASP's orders we have to keep them artifically alive
-        # until at least 2023/05/31.
-        should_be_active = should_be_active or (
-            convention.deactivated_at and convention.deactivated_at.date() == datetime.date(2023, 4, 24)
-        )
-
         if convention.is_active != should_be_active:
             if should_be_active:
                 # Inactive convention should be activated.
@@ -91,13 +90,13 @@ def update_existing_conventions():
 
     print(f"{reactivations} conventions have been reactivated")
 
-    if len(conventions_to_deactivate) >= 200:
+    if len(conventions_to_deactivate) >= CONVENTION_DEACTIVATION_THRESHOLD:
         # Early each year, all or most AF for the new year are missing in ASP AF data.
         # Instead of brutally deactivating all SIAE, we patiently wait until enough AF data is present.
         # While we wait, no SIAE is deactivated whatsoever.
         print(
-            f"ERROR: too many conventions would be deactivated ({len(conventions_to_deactivate)})"
-            f" thus none will actually be!"
+            f"ERROR: too many conventions would be deactivated ({len(conventions_to_deactivate)} is above"
+            f" threshold {CONVENTION_DEACTIVATION_THRESHOLD}) thus none will actually be!"
         )
         return
 
