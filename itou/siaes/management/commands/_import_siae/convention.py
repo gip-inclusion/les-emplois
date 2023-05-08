@@ -71,7 +71,9 @@ def update_existing_conventions():
         # TODO @dejafait DROP after 2023/05/31
         # 199 SIAE were deactivated on 2023/04/24 but per ASP's orders we have to keep them artifically alive
         # until at least 2023/05/31.
-        should_be_active = should_be_active or convention.deactivated_at.date() == datetime.date(2023, 4, 24)
+        should_be_active = should_be_active or (
+            convention.deactivated_at and convention.deactivated_at.date() == datetime.date(2023, 4, 24)
+        )
 
         if convention.is_active != should_be_active:
             if should_be_active:
