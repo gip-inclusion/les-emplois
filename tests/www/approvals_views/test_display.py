@@ -4,11 +4,10 @@ from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from freezegun import freeze_time
 
+from itou.approvals.enums import Origin
 from itou.job_applications.models import JobApplication
 from itou.utils import constants as global_constants
-from tests.approvals.factories import ApprovalFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.siaes.factories import SiaeMembershipFactory
 from tests.utils.test import TestCase
 
 
@@ -55,21 +54,53 @@ class TestDisplayApproval(TestCase):
         self.assertContains(response, global_constants.ITOU_HELP_CENTER_URL)
         self.assertContains(response, "Imprimer ce PASS IAE")
 
-    def test_display_approval_with_no_eligibility_diagnosis_and_no_job_applications(self, *args, **kwargs):
-        approval = ApprovalFactory(eligibility_diagnosis=None)
-        siae_member = SiaeMembershipFactory().user
-        self.client.force_login(siae_member)
-
-        response = self.client.get(
-            reverse("approvals:display_printable_approval", kwargs={"approval_id": approval.pk})
-        )
-        assert response.status_code == 200
-
     def test_display_approval_even_if_diagnosis_is_missing(self, *args, **kwargs):
         # An approval has been delivered but it does not come from Itou.
         # Therefore, the linked diagnosis exists but is not in our database.
         job_application = JobApplicationFactory(
             with_approval=True, eligibility_diagnosis=None, approval__number="625741810181"
+        )
+
+        siae_member = job_application.to_siae.members.first()
+        self.client.force_login(siae_member)
+
+        response = self.client.get(
+            reverse("approvals:display_printable_approval", kwargs={"approval_id": job_application.approval_id})
+        )
+
+        assert response.context["approval"] == job_application.approval
+        assert response.context["siae"] == job_application.to_siae
+        self.assertContains(response, global_constants.ITOU_HELP_CENTER_URL)
+        self.assertContains(response, "Imprimer ce PASS IAE")
+
+    def test_display_approval_missing_diagnosis_ai_job_application(self, *args, **kwargs):
+        # TODO(alaurent) remove once last approvals were manually fixed
+        # On November 30th, 2021, AI were delivered approvals without a diagnosis.
+        job_application = JobApplicationFactory(
+            with_approval=True,
+            approval__origin=Origin.AI_STOCK,
+            eligibility_diagnosis=None,
+            origin=Origin.AI_STOCK,
+        )
+
+        siae_member = job_application.to_siae.members.first()
+        self.client.force_login(siae_member)
+
+        response = self.client.get(
+            reverse("approvals:display_printable_approval", kwargs={"approval_id": job_application.approval_id})
+        )
+
+        assert response.context["approval"] == job_application.approval
+        assert response.context["siae"] == job_application.to_siae
+        self.assertContains(response, "Imprimer ce PASS IAE")
+
+    def test_display_approval_missing_diagnosis_ai_approval(self, *args, **kwargs):
+        # TODO(alaurent) remove once last approvals were manually fixed
+        # On November 30th, 2021, AI were delivered approvals without a diagnosis.
+        job_application = JobApplicationFactory(
+            with_approval=True,
+            eligibility_diagnosis=None,
+            approval__origin=Origin.AI_STOCK,
         )
 
         siae_member = job_application.to_siae.members.first()

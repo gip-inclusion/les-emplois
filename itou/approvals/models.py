@@ -297,6 +297,15 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         verbose_name = "PASS IAE"
         verbose_name_plural = "PASS IAE"
         ordering = ["-created_at"]
+        constraints = [
+            models.CheckConstraint(
+                name="approval_eligibility_diagnosis",
+                check=models.Q(origin__in=[Origin.ADMIN, Origin.DEFAULT], eligibility_diagnosis__isnull=False)
+                | models.Q(origin__in=[Origin.PE_APPROVAL, Origin.AI_STOCK], eligibility_diagnosis=None),
+                violation_error_message="Incohérence entre l'origine du PASS IAE "
+                "et la présence d'un diagnostic d'éligibilité",
+            )
+        ]
 
     def __str__(self):
         return self.number

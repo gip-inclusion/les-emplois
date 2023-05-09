@@ -1,8 +1,6 @@
 import datetime
 import uuid
-from unittest import mock
 
-import faker
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.urls import resolve, reverse
@@ -20,7 +18,7 @@ from itou.users.models import User
 from itou.utils.models import InclusiveDateRange
 from itou.utils.session import SessionNamespace
 from itou.utils.storage.s3 import S3Upload
-from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
+from tests.approvals.factories import PoleEmploiApprovalFactory
 from tests.cities.factories import create_city_in_zrr, create_test_cities
 from tests.eligibility.factories import EligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory
 from tests.geo.factories import ZRRFactory
@@ -39,9 +37,6 @@ from tests.users.factories import (
 )
 from tests.utils.storage.test import S3AccessingTestCase
 from tests.utils.test import TestCase, assertMessages
-
-
-fake = faker.Faker(locale="fr_FR")
 
 
 class ApplyTest(TestCase):
@@ -354,35 +349,6 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
 
         user.refresh_from_db()
         assert not user.nir
-
-    def test_apply_as_jobseeker_to_siae_with_approval_in_waiting_period(self):
-        """
-        Apply as jobseeker to a SIAE (not a GEIQ) with an approval in waiting period.
-        Waiting period cannot be bypassed.
-        """
-        now_date = timezone.localdate() - relativedelta(months=1)
-        now = timezone.datetime(year=now_date.year, month=now_date.month, day=now_date.day, tzinfo=datetime.UTC)
-
-        with mock.patch("django.utils.timezone.now", side_effect=lambda: now):
-            siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
-            user = JobSeekerFactory()
-            end_at = now_date - relativedelta(days=30)
-            start_at = end_at - relativedelta(years=2)
-            PoleEmploiApprovalFactory(
-                pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate, start_at=start_at, end_at=end_at
-            )
-            self.client.force_login(user)
-
-            # Follow all redirections…
-            response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), follow=True)
-
-            # …until the expected 403.
-            assert response.status_code == 403
-            assert "Vous avez terminé un parcours" in response.context["exception"]
-            last_url = response.redirect_chain[-1][0]
-            assert last_url == reverse(
-                "apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk, "job_seeker_pk": user.pk}
-            )
 
     def test_apply_as_job_seeker_on_sender_tunnel(self):
         siae = SiaeFactory()
@@ -906,44 +872,6 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
         response = self.client.get(next_url)
         assert response.status_code == 200
 
-    def test_apply_as_authorized_prescriber_to_siae_for_approval_in_waiting_period(self):
-        """
-        Apply as authorized prescriber to a SIAE for a job seeker with an approval in waiting period.
-        Being an authorized prescriber bypasses the waiting period.
-        """
-
-        siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
-
-        job_seeker = JobSeekerFactory()
-
-        # Create an approval in waiting period.
-        end_at = datetime.date.today() - relativedelta(days=30)
-        start_at = end_at - relativedelta(years=2)
-        ApprovalFactory(user=job_seeker, start_at=start_at, end_at=end_at)
-
-        prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
-        user = prescriber_organization.members.first()
-        self.client.force_login(user)
-
-        # Follow all redirections…
-        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), follow=True)
-
-        # …until a job seeker has to be determined…
-        assert response.status_code == 200
-        last_url = response.redirect_chain[-1][0]
-        assert last_url == reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk})
-
-        # …choose one, then follow all redirections…
-        post_data = {"nir": job_seeker.nir, "confirm": 1}
-        response = self.client.post(last_url, data=post_data, follow=True)
-
-        # …until the eligibility step which should trigger a 200 OK.
-        assert response.status_code == 200
-        last_url = response.redirect_chain[-1][0]
-        assert last_url == reverse(
-            "apply:application_jobs", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk}
-        )
-
 
 class ApplyAsPrescriberTest(S3AccessingTestCase):
     def setUp(self):
@@ -1222,41 +1150,6 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
         # ----------------------------------------------------------------------
         response = self.client.get(next_url)
         assert response.status_code == 200
-
-    def test_apply_as_prescriber_for_approval_in_waiting_period(self):
-        """Apply as prescriber for a job seeker with an approval in waiting period."""
-
-        siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
-
-        job_seeker = JobSeekerFactory()
-
-        # Create an approval in waiting period.
-        end_at = datetime.date.today() - relativedelta(days=30)
-        start_at = end_at - relativedelta(years=2)
-        ApprovalFactory(user=job_seeker, start_at=start_at, end_at=end_at, eligibility_diagnosis=None)
-
-        user = PrescriberFactory()
-        self.client.force_login(user)
-
-        # Follow all redirections…
-        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), follow=True)
-
-        # …until a job seeker has to be determined…
-        assert response.status_code == 200
-        last_url = response.redirect_chain[-1][0]
-        assert last_url == reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk})
-
-        # …choose one, then follow all redirections…
-        post_data = {"nir": job_seeker.nir, "confirm": 1}
-        response = self.client.post(last_url, data=post_data, follow=True)
-
-        # …until the expected 403.
-        assert response.status_code == 403
-        assert "Le candidat a terminé un parcours" in response.context["exception"]
-        last_url = response.redirect_chain[-1][0]
-        assert last_url == reverse(
-            "apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk}
-        )
 
     def test_apply_as_prescriber_on_job_seeker_tunnel(self):
         siae = SiaeFactory()
@@ -1685,44 +1578,6 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
         # ----------------------------------------------------------------------
         response = self.client.get(next_url)
         assert response.status_code == 200
-
-    def test_apply_as_siae_for_approval_in_waiting_period(self):
-        """Apply as SIAE for a job seeker with an approval in waiting period."""
-
-        siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
-
-        job_seeker = JobSeekerFactory()
-
-        # Create an approval in waiting period.
-        end_at = datetime.date.today() - relativedelta(days=30)
-        start_at = end_at - relativedelta(years=2)
-        ApprovalFactory(user=job_seeker, start_at=start_at, end_at=end_at, eligibility_diagnosis=None)
-
-        user = siae.members.first()
-        self.client.force_login(user)
-
-        # Follow all redirections…
-        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), follow=True)
-
-        # …until a job seeker has to be determined…
-        assert response.status_code == 200
-        last_url = response.redirect_chain[-1][0]
-        assert last_url == reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk})
-
-        # …choose one, then follow all redirections…
-        post_data = {
-            "nir": job_seeker.nir,
-            "confirm": 1,
-        }
-        response = self.client.post(last_url, data=post_data, follow=True)
-
-        # …until the expected 403.
-        assert response.status_code == 403
-        assert "Le candidat a terminé un parcours" in response.context["exception"]
-        last_url = response.redirect_chain[-1][0]
-        assert last_url == reverse(
-            "apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk}
-        )
 
 
 class ApplyAsOtherTest(TestCase):

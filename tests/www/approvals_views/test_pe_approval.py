@@ -26,6 +26,8 @@ class PoleEmploiApprovalSearchTest(TestCase):
         if with_job_application:
             self.job_application = JobApplicationFactory(
                 with_approval=True,
+                approval__origin=approvals_enums.Origin.PE_APPROVAL,
+                approval__eligibility_diagnosis=None,
                 to_siae=self.siae,
                 approval__number=self.pe_approval.number,
             )
@@ -122,6 +124,8 @@ class PoleEmploiApprovalSearchTest(TestCase):
         pe_approval = PoleEmploiApprovalFactory()
         job_application = JobApplicationFactory(
             with_approval=True,
+            approval__origin=approvals_enums.Origin.PE_APPROVAL,
+            approval__eligibility_diagnosis=None,
             approval__number=pe_approval.number,
             approval__user=job_seeker,
             job_seeker=job_seeker,
@@ -258,7 +262,7 @@ class PoleEmploiApprovalCreateTest(TestCase):
         """
         self.job_application = JobApplicationFactory(
             with_approval=True,
-            approval=ApprovalFactory(number=self.pe_approval.number[:12]),
+            approval=ApprovalFactory(number=self.pe_approval.number[:12], origin_pe_approval=True),
         )
 
         initial_approval_count = Approval.objects.count()

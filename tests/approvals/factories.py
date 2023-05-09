@@ -5,7 +5,7 @@ import factory.fuzzy
 from dateutil.relativedelta import relativedelta
 from faker import Faker
 
-from itou.approvals.enums import ProlongationReason
+from itou.approvals.enums import Origin, ProlongationReason
 from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, Suspension
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.enums import SiaeKind
@@ -27,6 +27,8 @@ class ApprovalFactory(factory.django.DjangoModelFactory):
             start_at=factory.Faker("date_time_between", start_date="-5y", end_date="-3y"),
             end_at=factory.Faker("date_time_between", start_date="-3y", end_date="-2y"),
         )
+        origin_pe_approval = factory.Trait(origin=Origin.PE_APPROVAL, eligibility_diagnosis=None)
+        origin_ai_stock = factory.Trait(origin=Origin.AI_STOCK, eligibility_diagnosis=None)
 
     user = factory.SubFactory(JobSeekerFactory)
     number = factory.fuzzy.FuzzyText(length=7, chars=string.digits, prefix=Approval.ASP_ITOU_PREFIX)

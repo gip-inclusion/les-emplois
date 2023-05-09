@@ -148,6 +148,7 @@ def test_populate_job_seekers():
     )
     job_application_2 = JobApplicationFactory(
         with_approval=True,
+        approval__eligibility_diagnosis=None,
         job_seeker=user_2,
         approval__origin=Origin.AI_STOCK,
     )

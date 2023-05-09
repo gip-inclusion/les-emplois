@@ -6,10 +6,11 @@ from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 
 @override_settings(METABASE_HASH_SALT="foobar2000")
 def test_hashed_approval_number():
-    approval = ApprovalFactory(number="999992012369")
+    approval = ApprovalFactory(number="XXXXX2012369")
+
     assert (
         TABLE.get(column_name="hash_numéro_pass_iae", input=approval)
-        == "314b2d285803a46c89e09ba9ad4e23a52f2e823ad28343cdff15be0cb03fee4a"
+        == "7cc9da292b108e91aa40f7287b990daeca22b296e68ee5e0457a89c97a282c27"
     )
     approval.number = None
     assert (

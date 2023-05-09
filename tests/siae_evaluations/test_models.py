@@ -9,6 +9,7 @@ from django.db import IntegrityError, transaction
 from django.utils import timezone
 from freezegun import freeze_time
 
+from itou.approvals.enums import Origin
 from itou.eligibility.enums import AdministrativeCriteriaLevel, AuthorKind
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.institutions.enums import InstitutionKind
@@ -231,6 +232,8 @@ class TestEvaluationCampaignManagerEligibleJobApplication:
         evaluation_campaign = EvaluationCampaignFactory()
         approval = campaign_eligible_job_app_objects["approval"]
         approval.number = "0123456789"
+        approval.origin = Origin.PE_APPROVAL
+        approval.eligibility_diagnosis = None
         approval.save()
         assert [] == list(evaluation_campaign.eligible_job_applications())
 

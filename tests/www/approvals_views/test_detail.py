@@ -382,7 +382,8 @@ class TestApprovalDetailView:
             to_siae=membership.siae,
             job_seeker=JobSeekerFactory(last_name="John", first_name="Doe"),
             with_approval=True,
-            approval__number="999991234568",
+            # Don't set an ASP_ITOU_PREFIX (see approval.save for details)
+            approval__number="XXXXX1234568",
         )
 
         client.force_login(membership.user)

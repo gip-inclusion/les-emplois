@@ -1,13 +1,12 @@
 # pylint: disable=too-many-lines
 import datetime
-import io
 import json
 from unittest.mock import patch
 
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
-from django.core import mail, management
+from django.core import mail
 from django.core.exceptions import ValidationError
 from django.db.models import Max
 from django.forms.models import model_to_dict
@@ -417,8 +416,10 @@ class JobApplicationQuerySetTest(TestCase):
         assert qs.jobseeker_eligibility_diagnosis == diagnosis.pk
 
     def test_with_eligibility_diagnosis_criterion(self):
-        job_app = JobApplicationFactory(with_approval=True, eligibility_diagnosis=None)
-        diagnosis = EligibilityDiagnosisFactory(job_seeker=job_app.job_seeker, created_at=timezone.now())
+        diagnosis = EligibilityDiagnosisFactory(created_at=timezone.now())
+        job_app = JobApplicationFactory(
+            with_approval=True, job_seeker=diagnosis.job_seeker, eligibility_diagnosis=diagnosis
+        )
 
         level1_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_1).first()
         level2_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_2).first()
@@ -1895,22 +1896,3 @@ class JobApplicationsEnumsTest(TestCase):
             assert len(reasons) > 0
             with self.subTest(choice):
                 assert choice.value not in reasons
-
-
-class DisplayMissingEligibilityDiagnosesCommandTest(TestCase):
-    def test_nominal(self):
-        stdout = io.StringIO()
-        user = ItouStaffFactory(email="batman@batcave.org")
-        ja = JobApplicationFactory(
-            with_approval=True,
-            eligibility_diagnosis=None,
-            approval__number="XXXXX1234567",
-            approval__created_by=user,
-        )
-        management.call_command("display_missing_eligibility_diagnoses", stdout=stdout)
-        assert stdout.getvalue().split("\n") == [
-            "number,created_at,started_at,end_at,created_by,job_seeker",
-            f"{ja.approval.number},{ja.approval.created_at.isoformat()},{ja.approval.start_at},"
-            f"{ja.approval.end_at},{ja.approval.created_by},{ja.approval.user}",
-            "",
-        ]
