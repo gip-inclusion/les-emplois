@@ -440,7 +440,7 @@ class AcceptForm(forms.ModelForm):
     If SIAE is a GEIQ, add specific fields (contract type, number of hours per week)
     """
 
-    GEIQ_REQUIRED_FIELDS = ("contract_type", "contract_type_details", "nb_hours_per_week")
+    GEIQ_REQUIRED_FIELDS = ("prehiring_guidance_days", "contract_type", "contract_type_details", "nb_hours_per_week")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -469,6 +469,7 @@ class AcceptForm(forms.ModelForm):
             if is_geiq:
                 # Change default size (too large)
                 self.fields["contract_type_details"].widget.attrs.update({"rows": 2})
+                self.initial["prehiring_guidance_days"] = 0
             else:
                 # Add specific details to help texts for IAE
                 self.fields["hiring_start_at"].help_text += (
@@ -484,6 +485,7 @@ class AcceptForm(forms.ModelForm):
     class Meta:
         model = JobApplication
         fields = [
+            "prehiring_guidance_days",
             "contract_type",
             "contract_type_details",
             "nb_hours_per_week",
@@ -502,6 +504,7 @@ class AcceptForm(forms.ModelForm):
                     "%d/%m/%Y"
                 )
             },
+            "prehiring_guidance_days": """Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche""",
             "contract_type_details": (
                 "Si vous avez choisi un autre type de contrat, merci de bien vouloir fournir plus de précisions"
             ),
