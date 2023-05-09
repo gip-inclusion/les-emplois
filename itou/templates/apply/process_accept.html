@@ -45,6 +45,7 @@
                 <h2>Embauche</h2>
                 {% bootstrap_form_errors form_accept type="non_fields" %}
                 {% if job_application.to_siae.kind == SiaeKind.GEIQ %}
+                    {% bootstrap_field form_accept.prehiring_guidance_days %}
                     {% bootstrap_field form_accept.contract_type %}
                     <div id="contractTypeDetails" {% if not form_accept.is_bound or form_accept.contract_type.value != hide_value %}class="d-none"{% endif %}>
                         {% bootstrap_field form_accept.contract_type_details %}

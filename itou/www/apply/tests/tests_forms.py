@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import pytest
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 
@@ -76,6 +77,7 @@ class RefusalFormTest(TestCase):
         assert "answer_to_prescriber" not in form.fields.keys()
 
 
+@pytest.mark.usefixtures("unittest_compatibility")
 class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
     def test_accept_form_without_geiq(self):
         # Job application accept form for a "standard" SIAE
@@ -89,6 +91,7 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
         form = apply_forms.AcceptForm(instance=JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ))
 
         assert list(form.fields.keys()) == [
+            "prehiring_guidance_days",
             "contract_type",
             "contract_type_details",
             "nb_hours_per_week",
@@ -102,6 +105,7 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
             instance=JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ), data={"contract_type": ContractType.OTHER}
         )
         assert list(form.fields.keys()) == [
+            "prehiring_guidance_days",
             "contract_type",
             "contract_type_details",
             "nb_hours_per_week",
@@ -110,11 +114,19 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
             "answer",
         ]
 
-    def test_accept_form_geiq_fields_validation(self):
+    def test_accept_form_geiq_required_fields_validation(self):
         job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ)
+
         post_data = {"hiring_start_at": f"{datetime.now():%Y-%m-%d}"}
         form = apply_forms.AcceptForm(instance=job_application, data=post_data)
+        assert form.errors == {
+            "prehiring_guidance_days": ["Ce champ est obligatoire."],
+            "contract_type": ["Ce champ est obligatoire."],
+            "nb_hours_per_week": ["Ce champ est obligatoire."],
+        }
 
+        post_data |= {"prehiring_guidance_days": self.faker.pyint()}
+        form = apply_forms.AcceptForm(instance=job_application, data=post_data)
         assert form.errors == {
             "contract_type": ["Ce champ est obligatoire."],
             "nb_hours_per_week": ["Ce champ est obligatoire."],
@@ -122,27 +134,45 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
 
         post_data |= {"contract_type": ContractType.APPRENTICESHIP}
         form = apply_forms.AcceptForm(instance=job_application, data=post_data)
-
         assert form.errors == {
             "nb_hours_per_week": ["Ce champ est obligatoire."],
         }
 
-        post_data |= {"contract_type": ContractType.OTHER}
+        post_data |= {"nb_hours_per_week": 35}
         form = apply_forms.AcceptForm(instance=job_application, data=post_data)
+        assert form.is_valid()
+
+    def test_accept_form_geiq_contract_type_field_validation(self):
+        job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ)
+        post_data = {
+            "hiring_start_at": f"{datetime.now():%Y-%m-%d}",
+            "prehiring_guidance_days": self.faker.pyint(),
+            "nb_hours_per_week": 35,
+        }
+
+        # ContractType.OTHER ask for more details
+        form = apply_forms.AcceptForm(instance=job_application, data=post_data | {"contract_type": ContractType.OTHER})
 
         assert form.errors == {
-            "nb_hours_per_week": ["Ce champ est obligatoire."],
             "contract_type_details": ["Les précisions sont nécessaires pour ce type de contrat"],
         }
 
-        post_data |= {"nb_hours_per_week": 35, "contract_type": ContractType.PROFESSIONAL_TRAINING}
-        form = apply_forms.AcceptForm(instance=job_application, data=post_data)
-
+        form = apply_forms.AcceptForm(
+            instance=job_application,
+            data=post_data | {"contract_type": ContractType.OTHER, "contract_type_details": "foo"},
+        )
         assert form.is_valid()
 
-        post_data |= {"nb_hours_per_week": 20, "contract_type": ContractType.OTHER, "contract_type_details": "foo"}
-        form = apply_forms.AcceptForm(instance=job_application, data=post_data)
+        # ContractType.APPRENTICESHIP doesn't ask for more details
+        form = apply_forms.AcceptForm(
+            instance=job_application, data=post_data | {"contract_type": ContractType.APPRENTICESHIP}
+        )
+        assert form.is_valid()
 
+        # ContractType.PROFESSIONAL_TRAINING doesn't ask for more details
+        form = apply_forms.AcceptForm(
+            instance=job_application, data=post_data | {"contract_type": ContractType.PROFESSIONAL_TRAINING}
+        )
         assert form.is_valid()
 
     def test_save_geiq_form_fields_from_view(self):
@@ -158,6 +188,7 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
         post_data = {
             "hiring_start_at": f"{datetime.now():%Y-%m-%d}",
             "hiring_end_at": f"{datetime.now() + relativedelta(months=3):%Y-%m-%d}",
+            "prehiring_guidance_days": self.faker.pyint(),
             "nb_hours_per_week": 4,
             "contract_type_details": "contract details",
             "contract_type": str(ContractType.OTHER),
