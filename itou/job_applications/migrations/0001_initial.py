@@ -246,7 +246,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "answer_to_prescriber",
-                    models.TextField(blank=True, verbose_name="Message de réponse au prescripeur"),
+                    models.TextField(blank=True, verbose_name="Message de réponse au prescripteur"),
                 ),
                 (
                     "create_employee_record",
@@ -260,7 +260,7 @@ class Migration(migrations.Migration):
                         null=True,
                         on_delete=django.db.models.deletion.SET_NULL,
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="Transferée par",
+                        verbose_name="Transférée par",
                     ),
                 ),
                 (

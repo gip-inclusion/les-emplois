@@ -535,7 +535,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     message = models.TextField(verbose_name="Message de candidature", blank=True)
     answer = models.TextField(verbose_name="Message de réponse", blank=True)
-    answer_to_prescriber = models.TextField(verbose_name="Message de réponse au prescripeur", blank=True)
+    answer_to_prescriber = models.TextField(verbose_name="Message de réponse au prescripteur", blank=True)
     refusal_reason = models.CharField(
         verbose_name="Motifs de refus", max_length=30, choices=RefusalReason.choices, blank=True
     )
@@ -592,7 +592,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     transferred_at = models.DateTimeField(verbose_name="Date de transfert", null=True, blank=True)
     transferred_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, verbose_name="Transferée par", null=True, blank=True, on_delete=models.SET_NULL
+        settings.AUTH_USER_MODEL, verbose_name="Transférée par", null=True, blank=True, on_delete=models.SET_NULL
     )
     transferred_from = models.ForeignKey(
         "siaes.Siae",

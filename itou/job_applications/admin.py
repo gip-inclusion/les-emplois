@@ -68,7 +68,6 @@ class JobApplicationAdmin(admin.ModelAdmin):
         "transferred_by",
         "transferred_from",
     )
-    exclude = ("selected_jobs",)
     list_filter = (
         ManualApprovalDeliveryRequiredFilter,
         "sender_kind",
@@ -92,6 +91,73 @@ class JobApplicationAdmin(admin.ModelAdmin):
         "origin",
     )
     inlines = (JobsInline, PriorActionInline, TransitionLogInline, UUIDSupportRemarkInline)
+
+    fieldsets = [
+        (
+            "Candidature",
+            {
+                "fields": [
+                    "state",
+                    "job_seeker",
+                    "to_siae",
+                    "sender_kind",
+                    "sender",
+                    "sender_siae",
+                    "sender_prescriber_organization",
+                    "message",
+                    "resume_link",
+                    "refusal_reason",
+                    "answer",
+                    "answer_to_prescriber",
+                    "hiring_start_at",
+                    "hiring_end_at",
+                    "hidden_for_siae",
+                    "create_employee_record",
+                ]
+            },
+        ),
+        (
+            "IAE",
+            {
+                "fields": [
+                    "eligibility_diagnosis",
+                    "hiring_without_approval",
+                    "approval",
+                    "approval_delivery_mode",
+                    "approval_number_sent_by_email",
+                    "approval_number_sent_at",
+                    "approval_manually_delivered_by",
+                    "approval_manually_refused_by",
+                    "approval_manually_refused_at",
+                ]
+            },
+        ),
+        (
+            "GEIQ",
+            {
+                "fields": [
+                    "geiq_eligibility_diagnosis",
+                    "nb_hours_per_week",
+                    "contract_type",
+                    "contract_type_details",
+                ]
+            },
+        ),
+        (
+            "Audit",
+            {
+                "fields": [
+                    "origin",
+                    "transferred_at",
+                    "transferred_by",
+                    "transferred_from",
+                    "created_at",
+                    "updated_at",
+                ]
+            },
+        ),
+    ]
+
     search_fields = ("pk", "to_siae__siret", "job_seeker__email", "sender__email")
 
     @admin.action(description="Créer une fiche salarié pour les candidatures sélectionnées")
