@@ -1086,14 +1086,17 @@ class JobSeekerProfileModelTest(TestCase):
 def user_with_approval_in_waiting_period():
     user = JobSeekerFactory()
     end_at = timezone.localdate() - relativedelta(days=30)
-    start_at = end_at - relativedelta(years=2)
-    # Force the approval to have no eligibility diagnosis
-    ApprovalFactory(
+    start_at = end_at - relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)
+    # diagnosis.created_at is a datetime, approval.start_at is a date
+    diagnosis_created_at = timezone.now() - relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)
+    approval = ApprovalFactory(
         user=user,
         start_at=start_at,
         end_at=end_at,
-        eligibility_diagnosis=None,
+        eligibility_diagnosis__created_at=diagnosis_created_at,
     )
+    assert approval.is_in_waiting_period
+    assert not approval.eligibility_diagnosis.is_valid
     return user
 
 
@@ -1231,12 +1234,24 @@ class LatestApprovalTestCase(TestCase):
     def test_cannot_bypass_waiting_period(self):
         user = user_with_approval_in_waiting_period()
 
-        # Waiting period cannot be bypassed for SIAE if no prescriber.
+        # note (fv):
+        # I had some doubts about the validity and/or the comments of some tests below.
+        # After a quick meeting, comments and tests are now aligned with business expectations.
+        # One point was not correctly tested: the absence of a *valid* eligibility diagnosis
+        # made by an authorized prescriber in the waiting period.
+        # If such a diagnosis exists when approval is in waiting period, it *can't* be renewed.
+        # However, SIAE can still approve job applications for the job seeker
+        # without an approval in this specific case.
+        # => aligned with code
+
+        # Waiting period cannot be bypassed for SIAE if no prescriber
+        # and there is no valid eligibility diagnosis this in period
         assert user.approval_can_be_renewed_by(
             siae=SiaeFactory(kind=SiaeKind.ETTI), sender_prescriber_organization=None
         )
 
-        # Waiting period cannot be bypassed for SIAE if unauthorized prescriber.
+        # Waiting period cannot be bypassed for SIAE if unauthorized prescriber
+        # and there is no valid eligibility diagnosis this in period
         assert user.approval_can_be_renewed_by(
             siae=SiaeFactory(kind=SiaeKind.ETTI),
             sender_prescriber_organization=PrescriberOrganizationFactory(),

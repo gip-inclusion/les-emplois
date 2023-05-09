@@ -207,7 +207,7 @@ class ApprovalModelTest(TestCase):
         Approval.objects.all().delete()
 
         # With pre-existing Pôle emploi approval.
-        ApprovalFactory(number="625741810182")
+        ApprovalFactory(number="625741810182", origin_pe_approval=True)
         expected_number = f"{Approval.ASP_ITOU_PREFIX}0000001"
         next_number = Approval.get_next_number()
         assert next_number == expected_number
@@ -215,7 +215,7 @@ class ApprovalModelTest(TestCase):
 
         # With various pre-existing objects.
         ApprovalFactory(number=f"{Approval.ASP_ITOU_PREFIX}8888882")
-        ApprovalFactory(number="625741810182")
+        ApprovalFactory(number="625741810182", origin_pe_approval=True)
         expected_number = f"{Approval.ASP_ITOU_PREFIX}8888883"
         next_number = Approval.get_next_number()
         assert next_number == expected_number
@@ -260,8 +260,8 @@ class ApprovalModelTest(TestCase):
         assert not approval.is_valid()
 
     def test_number_with_spaces(self):
-        approval = ApprovalFactory(number="999990000001")
-        expected = "99999 00 00001"
+        approval = ApprovalFactory(number="XXXXX0000001")
+        expected = "XXXXX 00 00001"
         assert approval.number_with_spaces == expected
 
     def test_is_last_for_user(self):
@@ -579,6 +579,18 @@ class ApprovalModelTest(TestCase):
             end_at=datetime.date(2023, 7, 25),
         )
         assert approval.remainder_as_date == datetime.date(2023, 7, 25)
+
+    def test_diagnosis_constraint(self):
+        ApprovalFactory(origin_ai_stock=True)
+        ApprovalFactory(origin_pe_approval=True)
+
+        with transaction.atomic():
+            with pytest.raises(IntegrityError):
+                ApprovalFactory(eligibility_diagnosis=None, origin=Origin.DEFAULT)
+
+        with transaction.atomic():
+            with pytest.raises(IntegrityError):
+                ApprovalFactory(eligibility_diagnosis=None, origin=Origin.ADMIN)
 
 
 class PoleEmploiApprovalModelTest(TestCase):
@@ -1627,14 +1639,14 @@ class ApprovalConcurrentModelTest(TransactionTestCase):
     def test_nominal_process(self):
         with transaction.atomic():
             # create a first approval out of the blue, ensure the number is correct.
-            approval_1 = ApprovalFactory.build(user=JobSeekerFactory(), number=None, eligibility_diagnosis=None)
+            approval_1 = ApprovalFactory.build(user=JobSeekerFactory(), number=None, origin_pe_approval=True)
             assert Approval.objects.count() == 0
             approval_1.save()
             assert approval_1.number == "XXXXX0000001"
             assert Approval.objects.count() == 1
 
             # if a second one is created after the save, no worries man.
-            approval_2 = ApprovalFactory.build(user=JobSeekerFactory(), number=None, eligibility_diagnosis=None)
+            approval_2 = ApprovalFactory.build(user=JobSeekerFactory(), number=None, origin_pe_approval=True)
             approval_2.save()
             assert approval_2.number == "XXXXX0000002"
 
@@ -1664,9 +1676,10 @@ class ApprovalConcurrentModelTest(TransactionTestCase):
             nonlocal approval
             with transaction.atomic():
                 approval = ApprovalFactory.build(
+                    # eligibility_diagnosis=None,
                     user=user1,
                     number=Approval.get_next_number(),
-                    eligibility_diagnosis=None,
+                    origin_pe_approval=True,
                 )
                 time.sleep(0.2)  # sleep long enough for the concurrent request to start
                 approval.save()
@@ -1676,9 +1689,10 @@ class ApprovalConcurrentModelTest(TransactionTestCase):
             with transaction.atomic():
                 time.sleep(0.1)  # ensure we are not the first to take the lock
                 approval2 = ApprovalFactory.build(
+                    # eligibility_diagnosis=None,
                     user=user2,
                     number=Approval.get_next_number(),
-                    eligibility_diagnosis=None,
+                    origin_pe_approval=True,
                 )
                 time.sleep(0.2)  # sleep long enough to save() after the first request's save()
                 approval2.save()

@@ -447,8 +447,8 @@ class ProcessViewsTest(TestCase):
             to_siae=siae,
             eligibility_diagnosis=None,
         )
-        job_application.job_seeker.eligibility_diagnoses.all().delete()
         job_application.job_seeker.approvals.all().delete()
+        job_application.job_seeker.eligibility_diagnoses.all().delete()
         post_data = {
             # Data for `JobSeekerPersonalDataForm`.
             "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
