@@ -392,10 +392,7 @@ class EmployeeRecord(ASPExchangeInformation):
         self.status = Status.NEW
         self.save()
 
-    def update_as_archived(self, save=True):
-        """
-        :param save: Tell the method to call `.save()`
-        """
+    def update_as_archived(self):
         # We only archive an employee record when the job seeker's approval is expired and can not longer be prolonged
         if self.job_application.approval.is_valid() or self.job_application.approval.can_be_prolonged:
             raise InvalidStatusError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
@@ -404,11 +401,8 @@ class EmployeeRecord(ASPExchangeInformation):
         self.status = Status.ARCHIVED
         self.archived_json = None
 
-        if save:
+        with transaction.atomic():  # In case we failed the "unique_asp_id_approval_number" constraint
             self.save()
-        else:
-            # Override .save() update of `updated_at` when using bulk updates
-            self.updated_at = timezone.now()
 
     def update_as_processed_as_duplicate(self, archive):
         """
