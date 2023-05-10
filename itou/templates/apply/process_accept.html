@@ -57,7 +57,8 @@
                         {% bootstrap_field form_accept.job_appellation %}
                         {% bootstrap_field form_accept.job_appellation_code %}
                     {% endif %}
- 
+
+                    <a href="#id_location_label"></a>
                     {% bootstrap_field form_accept.location_label %}
                     {% bootstrap_field form_accept.location_code %}
 
@@ -69,6 +70,7 @@
                         {% bootstrap_field form_accept.nb_hours_per_week %}
                     {% endif %}
  
+                    <a href="#hiring_start_at"></a>
                     {% bootstrap_field form_accept.hiring_start_at %}
                     {% bootstrap_field form_accept.hiring_end_at %}
                     {% bootstrap_field form_accept.answer %}
@@ -117,6 +119,7 @@
             </div>
         </div>
     </div>
+
 
 {% endblock %}
 
