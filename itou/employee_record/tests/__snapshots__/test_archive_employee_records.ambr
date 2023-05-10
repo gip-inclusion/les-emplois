@@ -1,0 +1,20 @@
+# serializer version: 1
+# name: test_management_command_default_run
+  '''
+  Start archiving employee records
+  Found 1 archivable employee record(s)
+  Archiving employee_record.pk=42
+  1/1 employee record(s) can be archived
+  
+  '''
+# ---
+# name: test_management_command_wet_run
+  '''
+  Start archiving employee records
+  Found 1 archivable employee record(s)
+  Archiving employee_record.pk=42
+  1/1 employee record(s) can be archived
+  1/1/1 employee record(s) were archived
+  
+  '''
+# ---

@@ -14,39 +14,26 @@ def command_fixture():
     return archive_employee_records.Command(stdout=io.StringIO(), stderr=io.StringIO())
 
 
-def test_management_command_default_run(command):
-    employee_record = factories.EmployeeRecordFactory(archivable=True)
+def test_management_command_default_run(command, snapshot):
+    employee_record = factories.EmployeeRecordFactory(pk=42, archivable=True)
     assert list(EmployeeRecord.objects.archivable()) == [employee_record]
 
     command.handle(wet_run=False)
     employee_record.refresh_from_db()
 
     assert employee_record.status != Status.ARCHIVED
-    assert command.stdout.getvalue().split("\n") == [
-        "Start archiving employee records",
-        "Found 1 archivable employee record(s)",
-        f"Archiving {employee_record.pk=}",
-        "1/1 employee record(s) can be archived",
-        "",
-    ]
+    assert command.stdout.getvalue() == snapshot
 
 
-def test_management_command_wet_run(command):
-    employee_record = factories.EmployeeRecordFactory(archivable=True)
+def test_management_command_wet_run(command, snapshot):
+    employee_record = factories.EmployeeRecordFactory(pk=42, archivable=True)
 
     command.handle(wet_run=True)
     employee_record.refresh_from_db()
 
     assert employee_record.status == Status.ARCHIVED
     assert employee_record.archived_json is None
-    assert command.stdout.getvalue().split("\n") == [
-        "Start archiving employee records",
-        "Found 1 archivable employee record(s)",
-        f"Archiving {employee_record.pk=}",
-        "1/1 employee record(s) can be archived",
-        "1/1/1 employee record(s) were archived",
-        "",
-    ]
+    assert command.stdout.getvalue() == snapshot
 
 
 def test_management_command_name(faker):
