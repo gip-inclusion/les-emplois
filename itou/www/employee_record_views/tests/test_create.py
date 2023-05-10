@@ -1,9 +1,11 @@
 from unittest import mock
 
+import pytest
 from django.urls import reverse
 
 from itou.asp.factories import CommuneFactory, CountryFranceFactory, CountryOutsideEuropeFactory
 from itou.employee_record.enums import Status
+from itou.employee_record.factories import EmployeeRecordFactory
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
@@ -575,6 +577,7 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
         )
 
 
+@pytest.mark.usefixtures("unittest_compatibility")
 class CreateEmployeeRecordStep4Test(AbstractCreateEmployeeRecordTest):
     """
     Selection of a financial annex
@@ -591,9 +594,20 @@ class CreateEmployeeRecordStep4Test(AbstractCreateEmployeeRecordTest):
 
         self.pass_step_3()
 
-    # Only permissions and basic access here
+    def test_retrieved_employee_record_is_the_most_recent_one(self):
+        older_employee_record = EmployeeRecordFactory(
+            orphan=True,
+            job_application=self.job_application,
+            created_at=self.faker.date_time(end_datetime="-1d"),
+        )
+        recent_employee_record = EmployeeRecord.objects.latest("created_at")
+        assert recent_employee_record != older_employee_record
+
+        response = self.client.get(self.url)
+        assert response.context["form"].employee_record == recent_employee_record
 
 
+@pytest.mark.usefixtures("unittest_compatibility")
 class CreateEmployeeRecordStep5Test(AbstractCreateEmployeeRecordTest):
     """
     Check summary of employee record and validation
@@ -624,6 +638,18 @@ class CreateEmployeeRecordStep5Test(AbstractCreateEmployeeRecordTest):
         assert employee_record.status == Status.READY
 
         assert employee_record.job_application.job_seeker.last_checked_at > previous_last_checked_at
+
+    def test_retrieved_employee_record_is_the_most_recent_one(self):
+        older_employee_record = EmployeeRecordFactory(
+            orphan=True,
+            job_application=self.job_application,
+            created_at=self.faker.date_time(end_datetime="-1d"),
+        )
+        recent_employee_record = EmployeeRecord.objects.latest("created_at")
+        assert recent_employee_record != older_employee_record
+
+        response = self.client.get(self.url)
+        assert response.context["employee_record"] == recent_employee_record
 
 
 class UpdateRejectedEmployeeRecordTest(AbstractCreateEmployeeRecordTest):

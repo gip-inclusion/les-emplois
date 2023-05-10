@@ -202,17 +202,17 @@ def sync_structures(df, source, kinds, build_structure, wet_run=False):
             deletable_skipped_count += 1
             continue
 
+        if siae.source == Siae.SOURCE_USER_CREATED:
+            # When an employer creates an antenna, it is normal that this antenna cannot be found in official exports.
+            # Thus we never attempt to delete it, as long as it has data.
+            deletable_skipped_count += 1
+            continue
+
         if could_siae_be_deleted(siae):
             print(f"siae.id={siae.id} siret={siae.siret} will be deleted.")
             if wet_run:
                 siae.delete()
                 deleted_count += 1
-            continue
-
-        if siae.source == Siae.SOURCE_USER_CREATED:
-            # When an employer creates an antenna, it is normal that this antenna cannot be found in official exports.
-            # Thus we never attempt to delete it, as long as it has data.
-            deletable_skipped_count += 1
             continue
 
         # As of 2021/04/15, 2 GEIQ are undeletable.

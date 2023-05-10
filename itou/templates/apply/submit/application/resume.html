@@ -20,7 +20,7 @@
         {% endif %}
         {# Nothing is displayed to SIAE members when the job seeker is not eligible to the IAE #}
         {% if not request.user.is_siae_staff or job_seeker.has_valid_common_approval or eligibility_diagnosis %}
-            <div class="alert alert-info mb-5" role="status">
+            <div class="alert alert-info mb-5">
                 <div class="row">
                     <div class="col-auto pr-0">
                         <i class="ri-information-line ri-xl"></i>
@@ -78,7 +78,7 @@
         {% endif %}
         {# Nothing is displayed to GEIQ members when the job seeker is not eligible #}
         {% if not request.user.is_siae_staff or geiq_eligibility_diagnosis %}
-            <div class="alert alert-info mb-5" role="status">
+            <div class="alert alert-info mb-5">
                 <div class="row">
                     <div class="col-auto pr-0">
                         <i class="ri-information-line ri-xl"></i>
@@ -124,7 +124,7 @@
     <div class="d-flex flex-column flex-lg-row">
         <div class="col-12 col-lg-7 pl-0">{% bootstrap_field form.message %}</div>
         <div>
-            <div class="alert alert-primary bg-white mt-5 py-0" role="status">
+            <div class="alert alert-primary bg-white mt-5 py-0">
                 <div class="row">
                     <div class="col-auto pr-0">
                         <i class="ri-lightbulb-line ri-xl"></i>
@@ -207,7 +207,7 @@
             {{ form.resume_link.as_hidden }}
             {% include "storage/s3_upload_form.html" with dropzone_form_id="resume_form" %}
             {% if resume_is_recommended %}
-                <div class="alert alert-warning" role="status">
+                <div class="alert alert-warning">
                     <div class="row">
                         <div class="col-auto pr-0">
                             <i class="ri-information-line ri-xl text-warning"></i>
