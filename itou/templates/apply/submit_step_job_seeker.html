@@ -2,6 +2,7 @@
 {% load bootstrap4 %}
 {% load format_filters %}
 {% load static %}
+{% load str_filters %}
 
 {% block left_column %}
     <form method="post" class="js-prevent-multiple-submit js-format-nir">
@@ -66,11 +67,11 @@
                         </div>
                         <div class="modal-body">
                             <p>
-                                L'adresse {{ form.email.value }} est associée au compte de <b>{{ job_seeker_name }}</b>.
+                                L'adresse {{ form.email.value }} est associée au compte de <b>{{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</b>.
                             </p>
                             <p>
                                 L'identité du candidat est une information clé pour la structure.
-                                Si cette candidature n'est pas pour <b>{{ job_seeker_name }}</b>, cliquez sur
+                                Si cette candidature n'est pas pour <b>{{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur
                                 « Ce n'est pas mon candidat » afin d'enregistrer ses informations
                                 personnelles.
                             </p>

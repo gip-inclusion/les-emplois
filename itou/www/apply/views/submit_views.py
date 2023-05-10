@@ -358,7 +358,7 @@ class CheckEmailForSenderView(ApplyStepForSenderBaseView):
     def post(self, request, *args, **kwargs):
         can_add_nir = False
         preview_mode = False
-        job_seeker_name = None
+        job_seeker = None
 
         if self.form.is_valid():
             job_seeker = self.form.get_user()
@@ -379,11 +379,6 @@ class CheckEmailForSenderView(ApplyStepForSenderBaseView):
             # Ask the sender to confirm the email we found is associated to the correct user
             if self.form.data.get("preview"):
                 preview_mode = True
-                # Don't display personal information to unauthorized members.
-                if self.sender.is_prescriber and not self.sender.is_prescriber_with_authorized_org:
-                    job_seeker_name = f"{job_seeker.first_name[0]}… {job_seeker.last_name[0]}…"
-                else:
-                    job_seeker_name = job_seeker.get_full_name()
 
             # The email we found is correct
             if self.form.data.get("confirm"):
@@ -422,7 +417,8 @@ class CheckEmailForSenderView(ApplyStepForSenderBaseView):
             | {
                 "can_add_nir": can_add_nir,
                 "preview_mode": preview_mode,
-                "job_seeker_name": job_seeker_name,
+                "job_seeker": job_seeker,
+                "can_view_personal_information": job_seeker and self.sender.can_view_personal_information(job_seeker),
             }
         )
 
