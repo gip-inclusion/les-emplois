@@ -3,6 +3,8 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 
+from itou.cities.factories import create_test_cities
+from itou.cities.models import City
 from itou.job_applications.factories import (
     JobApplicationFactory,
     JobApplicationSentByJobSeekerFactory,
@@ -83,7 +85,16 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
         # Job application accept form for a "standard" SIAE
         form = apply_forms.AcceptForm(instance=JobApplicationFactory(to_siae__kind=SiaeKind.EI))
 
-        assert list(form.fields.keys()) == ["hiring_start_at", "hiring_end_at", "answer"]
+        assert list(form.fields.keys()) == [
+            "job_appellation",
+            "job_appellation_code",
+            "location_label",
+            "location_code",
+            "hiring_start_at",
+            "hiring_end_at",
+            "answer",
+            "hired_job",
+        ]
         # Nothing more to see, move on...
 
     def test_accept_form_with_geiq(self):
@@ -91,12 +102,17 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
         form = apply_forms.AcceptForm(instance=JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ))
 
         assert list(form.fields.keys()) == [
+            "job_appellation",
+            "job_appellation_code",
+            "location_label",
+            "location_code",
             "contract_type",
             "contract_type_details",
             "nb_hours_per_week",
             "hiring_start_at",
             "hiring_end_at",
             "answer",
+            "hired_job",
         ]
 
         # Dynamic contract type details field
@@ -104,12 +120,17 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
             instance=JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ), data={"contract_type": ContractType.OTHER}
         )
         assert list(form.fields.keys()) == [
+            "job_appellation",
+            "job_appellation_code",
+            "location_label",
+            "location_code",
             "contract_type",
             "contract_type_details",
             "nb_hours_per_week",
             "hiring_start_at",
             "hiring_end_at",
             "answer",
+            "hired_job",
         ]
 
     def test_accept_form_geiq_fields_validation(self):
@@ -162,7 +183,12 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
 
     def test_save_geiq_form_fields_from_view(self):
         # non-GEIQ accept case tests are in `tests_process.py`
+        create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
+        create_test_cities(["54", "57"], num_per_department=2)
+
         job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, state="processing")
+        job_description = SiaeJobDescriptionFactory(siae=job_application.to_siae)
+        city = City.objects.order_by("?").first()
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
         self.client.force_login(job_application.to_siae.members.first())
@@ -172,12 +198,15 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
 
         post_data = {
             "hiring_start_at": f"{datetime.now():%Y-%m-%d}",
-            "hiring_end_at": f"{datetime.now() + relativedelta(months=3):%Y-%m-%d}",
+            "hiring_end_at": f"{datetime.now() + relativedelta(months=24):%Y-%m-%d}",
             "nb_hours_per_week": 4,
             "contract_type_details": "contract details",
             "contract_type": str(ContractType.OTHER),
+            "location_label": city.name,
+            "location_code": city.slug,
             "answer": "foo",
-            "confirmed": "True",
+            "hired_job": job_description.pk,
+            "confirmed": True,
         }
 
         response = self.client.post(url_accept, HTTP_HX_REQUEST=True, data=post_data, follow=True)
