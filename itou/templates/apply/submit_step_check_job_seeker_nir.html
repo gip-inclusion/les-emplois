@@ -2,7 +2,6 @@
 {% load bootstrap4 %}
 {% load format_filters %}
 {% load str_filters %}
-{% load redirection_fields %}
 {% load static %}
 
 {% block left_column %}
@@ -15,8 +14,6 @@
                 {% bootstrap_form_errors form type="all" %}
 
                 {% bootstrap_form form %}
-
-                {% redirection_input_field name=redirect_field_name value=redirect_field_value %}
 
                 {% if form.errors %}
                     <div class="alert alert-info">
