@@ -305,8 +305,6 @@ class EditJobDescriptionForm(JobAppellationAndLocationMixin, forms.ModelForm):
 
         self.fields["contract_type"].required = True
         self.fields["open_positions"].required = True
-        self.fields["job_appellation_code"].required = False
-        self.fields["job_appellation"].required = True
 
         if current_siae.is_opcs:
             self.fields["market_context_description"].required = True
