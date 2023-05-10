@@ -316,7 +316,6 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
                     form_user_address.save()
                 # After each successful transition, a save() is performed by django-xworkflows,
                 # so use `commit=False` to avoid a double save.
-                print(job_application.__dict__)
                 job_application = form_accept.save(commit=False)
                 job_application.accept(user=request.user)
 
