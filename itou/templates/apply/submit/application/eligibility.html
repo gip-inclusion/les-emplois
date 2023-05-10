@@ -12,7 +12,7 @@
                 <p class="text-tertiary font-weight-bold">{{ eligibility_diagnosis.author_organization.display_name }}</p>
             </div>
         {% endif %}
-        <div class="alert alert-info mb-5" role="status">
+        <div class="alert alert-info mb-5">
             <div class="row">
                 <div class="col-auto pr-0">
                     <i class="ri-information-line ri-xl"></i>
@@ -24,7 +24,9 @@
                     <p class="mb-2">
                         Tant que l’éligibilité IAE est valide, vous n’avez rien à faire. Si vous souhaitez la mettre à jour, sa validité sera prolongée jusqu'au {{ new_expires_at_if_updated|date:"d/m/Y" }}.
                     </p>
-                    <span class="btn btn-link text-left p-0 js-display-if-javascript-enabled" data-shroud-clear>Mettre à jour l’éligibilité</span>
+                    <button class="btn btn-link text-left p-0 js-display-if-javascript-enabled" data-shroud-clear>
+                        Mettre à jour l’éligibilité
+                    </button>
                 </div>
             </div>
         </div>
@@ -38,21 +40,27 @@
 
 {% block form_content %}
     <div{% if eligibility_diagnosis and not form.is_bound %} class="js-shroud"{% endif %}>
-        <h3 class="h5">Critères administratifs de niveau 1</h3>
+        <fieldset>
+            <legend class="h3">
+                Critères administratifs de niveau 1
+            </legend>
+            {% for field in form %}
+                {% if form.LEVEL_1_PREFIX in field.name %}
+                    {% bootstrap_field field %}
+                {% endif %}
+            {% endfor %}
+        </fieldset>
 
-        {% for field in form %}
-            {% if form.LEVEL_1_PREFIX in field.name %}
-                {% bootstrap_field field %}
-            {% endif %}
-        {% endfor %}
-
-        <h3 class="h5">Critères administratifs de niveau 2</h3>
-
-        {% for field in form %}
-            {% if form.LEVEL_2_PREFIX in field.name %}
-                {% bootstrap_field field %}
-            {% endif %}
-        {% endfor %}
+        <fieldset>
+            <legend class="h3">
+                Critères administratifs de niveau 2
+            </legend>
+            {% for field in form %}
+                {% if form.LEVEL_2_PREFIX in field.name %}
+                    {% bootstrap_field field %}
+                {% endif %}
+            {% endfor %}
+        </fieldset>
         <input type="hidden" name="shrouded" value="1" data-shroud-input />
     </div>
 {% endblock %}
