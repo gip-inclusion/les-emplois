@@ -272,7 +272,7 @@ def create_step_3(request, job_application_id, template_name="employee_record/cr
         form.save()
         job_application.refresh_from_db()
 
-        if job_application.employee_record.exclude(status=Status.DISABLED).first():
+        if job_application.employee_record.exclude(status=Status.DISABLED).exists():
             # The EmployeeRecord() object exists, usually its status should be NEW or REJECTED
             return HttpResponseRedirect(reverse("employee_record_views:create_step_4", args=(job_application.id,)))
 
@@ -317,7 +317,7 @@ def create_step_4(request, job_application_id, template_name="employee_record/cr
         job_application.employee_record.full_fetch()
         .select_related("job_application__to_siae__convention")
         .exclude(status=Status.DISABLED)
-        .first()
+        .latest("created_at")
     )
     form = NewEmployeeRecordStep4(employee_record, data=request.POST or None)
 
@@ -348,7 +348,7 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
     if not job_application.job_seeker.has_jobseeker_profile:
         raise PermissionDenied
 
-    employee_record = job_application.employee_record.full_fetch().exclude(status=Status.DISABLED).first()
+    employee_record = job_application.employee_record.full_fetch().exclude(status=Status.DISABLED).latest("created_at")
 
     if request.method == "POST":
         employee_record.update_as_ready()

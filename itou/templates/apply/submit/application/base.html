@@ -119,8 +119,12 @@
                             <hr class="my-5">
                             {% buttons %}
                                 <div class="text-right">
-                                    {% if back_url %}<a class="btn btn-link" href="{{ back_url }}">Retour</a>{% endif %}
-                                    {% block form_submit_button %}<button type="submit" class="btn btn-primary">Suivant</button>{% endblock %}
+                                    {% if back_url %}
+                                        <a class="btn btn-link" href="{{ back_url }}" aria-label="Retourner à l'étape précédente">Retour</a>
+                                    {% endif %}
+                                    {% block form_submit_button %}
+                                        <button type="submit" class="btn btn-primary" aria-label="Passer à l'étape suivante">Suivant</button>
+                                    {% endblock %}
                                 </div>
                             {% endbuttons %}
                         </form>
