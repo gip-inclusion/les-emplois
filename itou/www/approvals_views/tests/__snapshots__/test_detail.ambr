@@ -16,7 +16,9 @@
   
                   
                   
-                      <p class="mb-1">Prolongations passées ou à venir :</p>
+                      <p class="mb-1">
+                          Prolongations passées ou à venir :
+                      </p>
                       <ul class="list-unstyled">
       
           <li>
@@ -64,7 +66,7 @@
                       </ul>
                   
                   
-                      <p class="mb-1">Suspensions passées :</p>
+                      <p class="mb-1">Suspension passée :</p>
                       <ul class="list-unstyled">
                           
                               <li>

@@ -111,7 +111,7 @@ Arguments:
                     </ul>
                 {% endif %}
                 {% if suspensions.older %}
-                    <p class="mb-1">Suspensions passées :</p>
+                    <p class="mb-1">Suspension{{ suspensions.older|pluralize }} passée{{ suspensions.older|pluralize }} :</p>
                     <ul class="list-unstyled">
                         {% for s in suspensions.older %}
                             <li>
@@ -133,7 +133,9 @@ Arguments:
                     {% include "approvals/includes/prolongations_list.html" with prolongations=prolongations.in_progress %}
                 {% endif %}
                 {% if prolongations.not_in_progress %}
-                    <p class="mb-1">Prolongations passées ou à venir :</p>
+                    <p class="mb-1">
+                        Prolongation{{ prolongations.not_in_progress|pluralize }} passée{{ prolongations.not_in_progress|pluralize }} ou à venir :
+                    </p>
                     {% include "approvals/includes/prolongations_list.html" with prolongations=prolongations.not_in_progress %}
                 {% endif %}
             </div>
