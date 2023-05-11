@@ -483,20 +483,15 @@ class EmployeeRecordLifeCycleTest(TestCase):
         self.employee_record.update_as_disabled()
         assert self.employee_record.status == Status.DISABLED
 
-        # Now, can create new employee record on same job_application
-        new_employee_record = EmployeeRecord.from_job_application(self.employee_record.job_application)
-        assert new_employee_record.status == Status.NEW
+        # Employee record in DISABLED state block creating a new one
+        with pytest.raises(ValidationError):
+            EmployeeRecord.from_job_application(self.employee_record.job_application)
 
-        # Employee record in NEW state can be disable
-        new_employee_record.update_as_disabled()
-        assert new_employee_record.status == Status.DISABLED
-
-        # Now, can create another one employee record on same job_application
-        new_employee_record = EmployeeRecord.from_job_application(new_employee_record.job_application)
-        assert new_employee_record.status == Status.NEW
-
-        new_employee_record.update_as_ready()
-        assert new_employee_record.status == Status.READY
+        # Employee record in NEW state can be disabled
+        self.employee_record.update_as_new()
+        assert self.employee_record.status == Status.NEW
+        self.employee_record.update_as_disabled()
+        assert self.employee_record.status == Status.DISABLED
 
     @mock.patch(
         "itou.common_apps.address.format.get_geocoding_data",
@@ -512,12 +507,6 @@ class EmployeeRecordLifeCycleTest(TestCase):
         self.employee_record.update_as_rejected("12", "JSON Invalide", None)
         self.employee_record.update_as_disabled()
         assert self.employee_record.status == Status.DISABLED
-
-        # Now, can create new employee record on same job_application
-        new_employee_record = EmployeeRecord.from_job_application(self.employee_record.job_application)
-        assert new_employee_record.status == Status.NEW
-        new_employee_record.update_as_ready()
-        assert new_employee_record.status == Status.READY
 
     @mock.patch(
         "itou.common_apps.address.format.get_geocoding_data",

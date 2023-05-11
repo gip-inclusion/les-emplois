@@ -296,9 +296,9 @@ class EmployeeRecord(ASPExchangeInformation):
         """
         Prepare the employee record for transmission
 
-        Status: NEW | REJECTED => READY
+        Status: NEW | REJECTED | DISABLED => READY
         """
-        if self.status not in [Status.NEW, Status.REJECTED]:
+        if self.status not in [Status.NEW, Status.REJECTED, Status.DISABLED]:
             raise InvalidStatusError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
 
         profile = self.job_seeker.jobseeker_profile
@@ -376,13 +376,6 @@ class EmployeeRecord(ASPExchangeInformation):
             raise InvalidStatusError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
 
         self._fill_denormalized_fields()
-        # check if FS exists before reactivate
-        if (
-            EmployeeRecord.objects.exclude(status=Status.DISABLED)
-            .filter(asp_id=self.asp_id, approval_number=self.approval_number)
-            .exists()
-        ):
-            raise InvalidStatusError(EmployeeRecord.ERROR_EMPLOYEE_RECORD_IS_DUPLICATE)
 
         self.status = Status.NEW
         self.save()
@@ -596,14 +589,10 @@ class EmployeeRecord(ASPExchangeInformation):
             fs.clean()
 
         # Mandatory check, must be done only once
-        if (
-            EmployeeRecord.objects.exclude(status=Status.DISABLED)
-            .filter(
-                asp_id=job_application.to_siae.convention.asp_id,
-                approval_number=job_application.approval.number,
-            )
-            .exists()
-        ):
+        if EmployeeRecord.objects.filter(
+            asp_id=job_application.to_siae.convention.asp_id,
+            approval_number=job_application.approval.number,
+        ).exists():
             raise ValidationError(EmployeeRecord.ERROR_EMPLOYEE_RECORD_IS_DUPLICATE)
 
         fs.asp_id = job_application.to_siae.convention.asp_id
