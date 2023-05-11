@@ -12,13 +12,10 @@ def tunnel_step_is_allowed(job_application):
     Check if some steps of the tunnel are reachable or not
     given the current employee record status
     """
-    # Count is cheaper than fetching nothing
-    no_employee_record_yet = job_application.employee_record.count() == 0
-    if no_employee_record_yet:
-        return True
 
-    # There is an employee record
-    employee_record = job_application.employee_record.first()
+    employee_record = job_application.employee_record.order_by("-created_at").first()
+    if not employee_record:
+        return True
 
     return employee_record.status in [
         Status.NEW,
