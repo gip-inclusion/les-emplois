@@ -42,24 +42,33 @@ def sentry_init():
     except ValueError:
         traces_sample_rate = 0
 
-    sentry_sdk.init(
-        # DSN is read from the SENTRY_DSN environment variable.
-        #
-        integrations=[sentry_logging, DjangoIntegration(), HttpxIntegration(), HueyIntegration(), RedisIntegration()],
-        # Set traces_sample_rate to 1.0 to capture 100%
-        # of transactions for performance monitoring.
-        # We recommend adjusting this value in production.
-        traces_sample_rate=traces_sample_rate,
-        # Associate users (ID+email+username+IP) to errors.
-        # https://docs.sentry.io/platforms/python/django/
-        send_default_pii=True,
-        # Filter out sensitive email and username.
-        # Unfortunately ip_address cannot be filtered out.
-        # https://docs.sentry.io/error-reporting/configuration/filtering/?platform=python
-        before_send=strip_sentry_sensitive_data,
-        # The alternative solution
-        # https://docs.sentry.io/enriching-error-data/additional-data/?platform=python#capturing-the-user
-        # only ever works here (without access to `request.user`)
-        # and is silently ignored when used in `context_processors.py` to get access to `request.user`.
-    )
-    ignore_logger("django.security.DisallowedHost")
+    # TODO(cms): disable this flag when Django Debug Toolbar has fixed its bug.
+    # https://github.com/jazzband/django-debug-toolbar/issues/1775
+    if bool(os.getenv("SENTRY_DSN")):
+        sentry_sdk.init(
+            # DSN is read from the SENTRY_DSN environment variable.
+            #
+            integrations=[
+                sentry_logging,
+                DjangoIntegration(),
+                HttpxIntegration(),
+                HueyIntegration(),
+                RedisIntegration(),
+            ],
+            # Set traces_sample_rate to 1.0 to capture 100%
+            # of transactions for performance monitoring.
+            # We recommend adjusting this value in production.
+            traces_sample_rate=traces_sample_rate,
+            # Associate users (ID+email+username+IP) to errors.
+            # https://docs.sentry.io/platforms/python/django/
+            send_default_pii=True,
+            # Filter out sensitive email and username.
+            # Unfortunately ip_address cannot be filtered out.
+            # https://docs.sentry.io/error-reporting/configuration/filtering/?platform=python
+            before_send=strip_sentry_sensitive_data,
+            # The alternative solution
+            # https://docs.sentry.io/enriching-error-data/additional-data/?platform=python#capturing-the-user
+            # only ever works here (without access to `request.user`)
+            # and is silently ignored when used in `context_processors.py` to get access to `request.user`.
+        )
+        ignore_logger("django.security.DisallowedHost")
