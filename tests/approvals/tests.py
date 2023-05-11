@@ -876,6 +876,7 @@ class AutomaticApprovalAdminViewsTest(TestCase):
         assert approval.origin == Origin.PE_APPROVAL
 
 
+@pytest.mark.usefixtures("unittest_compatibility")
 class CustomApprovalAdminViewsTest(TestCase):
     def test_manually_add_approval(self):
         # When a Pôle emploi ID has been forgotten and the user has no NIR, an approval must be delivered
@@ -1033,6 +1034,12 @@ class CustomApprovalAdminViewsTest(TestCase):
         )
         msg = JobApplicationInline.employee_record_status(job_application)
         assert msg == "Une fiche salarié existe déjà pour ce candidat"
+
+    def test_employee_record_status_with_multiple_employee_records(self):
+        employee_record = EmployeeRecordFactory(pk=21)
+        EmployeeRecordFactory(pk=42, job_application=employee_record.job_application, status=Status.DISABLED)
+
+        assert JobApplicationInline.employee_record_status(employee_record.job_application) == self.snapshot
 
 
 class SuspensionQuerySetTest(TestCase):

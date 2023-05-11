@@ -55,14 +55,19 @@ class JobApplicationInline(admin.StackedInline):
     # there is no direct relation between approvals and employee records
     # (YET...)
     @staticmethod
-    @admin.display(description="Statut de la fiche salarié")
+    @admin.display(description="Fiches salariés")
     def employee_record_status(obj):
-        if employee_record := obj.employee_record.first():
-            debug = f"ID: {employee_record.id}"
-            if employee_record.is_orphan:
-                debug += ", ORPHAN"
-            return get_admin_view_link(
-                employee_record, content=mark_safe(f"<b>{employee_record.get_status_display()} ({debug})</b>")
+        if obj.employee_record.exists():
+            return mark_safe(
+                ", ".join(
+                    get_admin_view_link(
+                        er,
+                        content=mark_safe(
+                            f"<b>{er.get_status_display()} (ID: {er.pk}{', ORPHAN' if er.is_orphan else ''})</b>"
+                        ),
+                    )
+                    for er in obj.employee_record.all()
+                )
             )
 
         if not obj.to_siae.can_use_employee_record:
