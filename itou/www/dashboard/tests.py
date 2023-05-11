@@ -264,6 +264,7 @@ class DashboardViewTest(TestCase):
         self.assertContains(response, reverse("stats:stats_dihal_state"))
 
     def test_dashboard_siae_evaluations_institution_access(self):
+        IN_PROGRESS_LINK = "Campagne en cours"
         membershipfactory = InstitutionMembershipFactory()
         user = membershipfactory.user
         institution = membershipfactory.institution
@@ -276,6 +277,7 @@ class DashboardViewTest(TestCase):
         evaluation_campaign = EvaluationCampaignFactory(institution=institution)
         response = self.client.get(reverse("dashboard:index"))
         self.assertContains(response, "Contrôle a posteriori")
+        self.assertContains(response, IN_PROGRESS_LINK)
         self.assertContains(response, reverse("siae_evaluations_views:samples_selection"))
         self.assertNotContains(
             response,
@@ -290,6 +292,7 @@ class DashboardViewTest(TestCase):
         response = self.client.get(reverse("dashboard:index"))
         self.assertContains(response, "Contrôle a posteriori")
         self.assertNotContains(response, reverse("siae_evaluations_views:samples_selection"))
+        self.assertContains(response, IN_PROGRESS_LINK)
         self.assertContains(
             response,
             reverse(
@@ -302,6 +305,7 @@ class DashboardViewTest(TestCase):
         evaluation_campaign.save(update_fields=["ended_at"])
         response = self.client.get(reverse("dashboard:index"))
         self.assertContains(response, "Contrôle a posteriori")
+        self.assertNotContains(response, IN_PROGRESS_LINK)
         self.assertNotContains(response, reverse("siae_evaluations_views:samples_selection"))
         self.assertContains(
             response,
@@ -314,6 +318,7 @@ class DashboardViewTest(TestCase):
         evaluation_campaign.ended_at = timezone.now() - CAMPAIGN_VIEWABLE_DURATION
         evaluation_campaign.save(update_fields=["ended_at"])
         response = self.client.get(reverse("dashboard:index"))
+        self.assertNotContains(response, IN_PROGRESS_LINK)
         self.assertNotContains(response, "Contrôle a posteriori")
         self.assertNotContains(response, reverse("siae_evaluations_views:samples_selection"))
         self.assertNotContains(

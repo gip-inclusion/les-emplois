@@ -312,7 +312,7 @@
             {% include "dashboard/includes/stats.html" %}
         {% endif %}
 
-        {% if can_view_stats_ddets and active_campaigns %}
+        {% if can_view_stats_ddets and active_campaigns or can_view_stats_ddets and closed_campaigns %}
             {% include "dashboard/includes/labor_inspector_evaluation_campains_card.html" %}
         {% endif %}
 
