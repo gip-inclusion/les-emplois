@@ -1034,11 +1034,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             self.approval_delivery_mode = ""
             self.approval_manually_delivered_by = None
 
-        # Delete matching employee record, if any
-        employee_record = self.employee_record.first()
-        if employee_record:
-            employee_record.delete()
-
         # Send notification.
         user = kwargs.get("user")
         send_email_messages([self.email_cancel(cancelled_by=user)])
