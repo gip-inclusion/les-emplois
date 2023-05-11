@@ -8,10 +8,11 @@
 {% block content %}
     <div class="card c-card mt-4 p-3">
         <div class="card-body">
-            <h1>
-                Campagne du {{ evaluation_campaign.evaluated_period_start_at|date:"j F Y" }}
+            <h1>Campagne en cours</h1>
+            <h2 class="h4 text-info">
+                Contrôle des auto-prescriptions du {{ evaluation_campaign.evaluated_period_start_at|date:"j F Y" }}
                 au {{ evaluation_campaign.evaluated_period_end_at|date:"j F Y" }}
-            </h1>
+            </h2>
             <h2>Sélectionner l'échantillon</h2>
             <h3>Contrôle a posteriori des auto-prescriptions faites par les SIAE</h3>
             <h4>Sélection des structures à contrôler</h4>
