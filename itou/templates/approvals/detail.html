@@ -25,7 +25,7 @@
                         <i class="ri-pause-circle-line ri-lg font-weight-medium" aria-hidden="true"></i>
                         <span>Suspendre</span>
                     </a>
-                    <i class="btn btn-link ri-information-line ri-xl text-info pl-2 pr-3 font-weight-medium" data-toggle="tooltip" title="La suspension n’est pas possible : un autre employeur ayant embauché le candidat."></i>
+                    <i class="btn btn-link ri-information-line ri-xl text-info pl-2 pr-3 font-weight-medium" data-toggle="tooltip" title="La suspension n’est pas possible car un autre employeur a embauché le candidat."></i>
                 {% endif %}
                 {% if approval_can_be_prolonged_by_siae %}
                     <a href="{% url 'approvals:declare_prolongation' approval_id=approval.id %}?back_url={{ request.get_full_path|urlencode }}"
@@ -43,7 +43,7 @@
                    target="_blank"
                    aria-label="Afficher le PASS IAE de {{ approval.user.get_full_name }}">
                     <i class="ri-eye-line ri-lg font-weight-medium" aria-hidden="true"></i>
-                    <span>Afficher</span>
+                    <span>Afficher l'attestation</span>
                 </a>
             </div>
         {% endif %}
