@@ -48,6 +48,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
     job_applications_categories = []
     num_rejected_employee_records = 0
     active_campaigns = []
+    closed_campaigns = []
     evaluated_siae_notifications = EvaluatedSiae.objects.none()
     show_previous_year_financial_annex_info = False
 
@@ -120,7 +121,11 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
 
     if request.user.is_labor_inspector:
         current_org = get_current_institution_or_404(request)
-        active_campaigns = EvaluationCampaign.objects.for_institution(current_org).viewable()
+        for campaign in EvaluationCampaign.objects.for_institution(current_org).viewable():
+            if campaign.ended_at is None:
+                active_campaigns.append(campaign)
+            else:
+                closed_campaigns.append(campaign)
 
     context = {
         "current_org": current_org,
@@ -140,6 +145,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "can_view_stats_dihal": request.user.can_view_stats_dihal(current_org=current_org),
         "num_rejected_employee_records": num_rejected_employee_records,
         "active_campaigns": active_campaigns,
+        "closed_campaigns": closed_campaigns,
         "evaluated_siae_notifications": evaluated_siae_notifications,
         "precriber_kind_pe": PrescriberOrganizationKind.PE,
         "precriber_kind_dept": PrescriberOrganizationKind.DEPT,
