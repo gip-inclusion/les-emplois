@@ -56,14 +56,17 @@ class JobSeekerNIRUpdateMixin:
             # Disable NIR editing altogether if the job seeker already has one
             self.fields["nir"].disabled = True
             self.fields["lack_of_nir"].widget = forms.HiddenInput()
-            if not self.instance.is_handled_by_proxy and self.instance != editor:
-                nir_help_text = (
-                    "Ce candidat a pris le contrôle de son compte utilisateur. "
-                    "Vous ne pouvez pas modifier ses informations."
-                )
-            else:
-                nir_help_text = tally_link
-            self.fields["nir"].help_text = nir_help_text
+            if self.instance.pk:
+                # These messages should only appear when updating a job seeker
+                # and not when creating one
+                if not self.instance.is_handled_by_proxy and self.instance != editor:
+                    nir_help_text = (
+                        "Ce candidat a pris le contrôle de son compte utilisateur. "
+                        "Vous ne pouvez pas modifier ses informations."
+                    )
+                else:
+                    nir_help_text = tally_link
+                self.fields["nir"].help_text = nir_help_text
         else:
             self.fields["nir"].help_text = "Numéro à 15 chiffres."
 

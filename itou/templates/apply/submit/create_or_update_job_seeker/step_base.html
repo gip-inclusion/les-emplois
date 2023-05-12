@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load bootstrap4 %}
+{% load static %}
 
 {% block title %}
     {% if update_job_seeker %}
@@ -57,7 +58,7 @@
                         {% endif %}
                         <hr class="mt-5">
                         {% bootstrap_form_errors form type="all" %}
-                        <form method="post" class="js-collapsable-subfields">
+                        <form method="post" class="js-collapsable-subfields js-format-nir">
                             {% csrf_token %}
 
                             {% block form_content %}{% endblock %}
@@ -79,6 +80,8 @@
 
 {% block script %}
     {{ block.super }}
+    <script src="{% static 'js/split_nir.js' %}"></script>
+
     <script nonce="{{ CSP_NONCE }}">
         $(document).ready(() => {
             /**

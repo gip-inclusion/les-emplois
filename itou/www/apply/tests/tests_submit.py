@@ -503,13 +503,16 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
         # ----------------------------------------------------------------------
 
         response = self.client.get(next_url)
-        assert response.status_code == 200
+        # The NIR is prefilled
+        self.assertContains(response, dummy_job_seeker_profile.user.nir)
 
         post_data = {
             "title": dummy_job_seeker_profile.user.title,
             "first_name": dummy_job_seeker_profile.user.first_name,
             "last_name": dummy_job_seeker_profile.user.last_name,
             "birthdate": dummy_job_seeker_profile.user.birthdate,
+            "lack_of_nir": False,
+            "lack_of_nir_reason": "",
         }
         response = self.client.post(next_url, data=post_data)
         assert response.status_code == 302
@@ -747,6 +750,9 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
             "first_name": dummy_job_seeker_profile.user.first_name,
             "last_name": dummy_job_seeker_profile.user.last_name,
             "birthdate": dummy_job_seeker_profile.user.birthdate,
+            "nir": dummy_job_seeker_profile.user.nir,
+            "lack_of_nir": False,
+            "lack_of_nir_reason": "",
         }
         response = self.client.post(next_url, data=post_data)
         assert response.status_code == 302
@@ -1043,13 +1049,16 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
         # ----------------------------------------------------------------------
 
         response = self.client.get(next_url)
-        assert response.status_code == 200
+        # The NIR is prefilled
+        self.assertContains(response, dummy_job_seeker_profile.user.nir)
 
         post_data = {
             "title": dummy_job_seeker_profile.user.title,
             "first_name": dummy_job_seeker_profile.user.first_name,
             "last_name": dummy_job_seeker_profile.user.last_name,
             "birthdate": dummy_job_seeker_profile.user.birthdate,
+            "lack_of_nir": False,
+            "lack_of_nir_reason": "",
         }
         response = self.client.post(next_url, data=post_data)
         assert response.status_code == 302
@@ -1510,13 +1519,16 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
         # ----------------------------------------------------------------------
 
         response = self.client.get(next_url)
-        assert response.status_code == 200
+        # The NIR is prefilled
+        self.assertContains(response, dummy_job_seeker_profile.user.nir)
 
         post_data = {
             "title": dummy_job_seeker_profile.user.title,
             "first_name": dummy_job_seeker_profile.user.first_name,
             "last_name": dummy_job_seeker_profile.user.last_name,
             "birthdate": dummy_job_seeker_profile.user.birthdate,
+            "lack_of_nir": False,
+            "lack_of_nir_reason": "",
         }
         response = self.client.post(next_url, data=post_data)
         assert response.status_code == 302
@@ -2024,7 +2036,7 @@ class UpdateJobSeekerViewTestCase(TestCase):
             response = self.client.get(url)
             assert response.status_code == 403
 
-    def _check_everything_allowed(self, user):
+    def _check_everything_allowed(self, user, extra_post_data_1=None):
         self.client.force_login(user)
         apply_session = SessionNamespace(self.client.session, f"job_application-{self.siae.pk}")
         apply_session.init(
@@ -2046,12 +2058,17 @@ class UpdateJobSeekerViewTestCase(TestCase):
             "first_name": NEW_FIRST_NAME,
             "last_name": "New last name",
             "birthdate": self.job_seeker.birthdate,
+            "lack_of_nir": False,
+            "lack_of_nir_reason": "",
         }
+        if extra_post_data_1 is not None:
+            post_data.update(extra_post_data_1)
         response = self.client.post(self.step_1_url, data=post_data)
         assertRedirects(response, self.step_2_url, fetch_redirect_response=False)
 
         # Data is stored in the session but user is untouched
-        expected_job_seeker_session = {"user": post_data}
+        # (nir value is retrieved from the job_seeker and stored in the session)
+        expected_job_seeker_session = {"user": post_data | {"nir": self.job_seeker.nir}}
         assert self.client.session[self.job_seeker_session_key] == expected_job_seeker_session
         self.job_seeker.refresh_from_db()
         assert self.job_seeker.first_name != NEW_FIRST_NAME
@@ -2320,6 +2337,20 @@ class UpdateJobSeekerViewTestCase(TestCase):
             response = self.client.get(url)
             assert response.status_code == 403
 
+    def test_with_job_seeker_without_nir(self):
+        # Make sure the job seeker does not manage its own account (and has no nir)
+        self.job_seeker.nir = ""
+        self.job_seeker.lack_of_nir_reason = ""
+        self.job_seeker.created_by = SiaeStaffFactory()
+        self.job_seeker.last_login = None
+        self.job_seeker.save(update_fields=["created_by", "last_login", "nir", "lack_of_nir_reason"])
+        self._check_everything_allowed(
+            self.siae.members.first(),
+            extra_post_data_1={"nir": "", "lack_of_nir": True, "lack_of_nir_reason": LackOfNIRReason.TEMPORARY_NUMBER},
+        )
+        # Check that we could update its NIR infos
+        assert self.job_seeker.lack_of_nir_reason == LackOfNIRReason.TEMPORARY_NUMBER
+
 
 class UpdateJobSeekerStep3ViewTestCase(TestCase):
     def test_job_seeker_with_profile_has_check_boxes_ticked_in_step3(self):
@@ -2425,13 +2456,16 @@ def test_detect_existing_job_seeker(client):
     # ----------------------------------------------------------------------
 
     response = client.get(next_url)
-    assert response.status_code == 200
+    # Make sure the specified NIR is properly filled
+    assertContains(response, NEW_NIR)
 
     post_data = {
         "title": job_seeker_profile.user.title,
         "first_name": "JEREMY",  # Try without the accent and in uppercase
         "last_name": job_seeker_profile.user.last_name,
         "birthdate": job_seeker_profile.user.birthdate,
+        "lack_of_nir_reason": "",
+        "lack_of_nir": False,
     }
     response = client.post(next_url, data=post_data)
     assertContains(

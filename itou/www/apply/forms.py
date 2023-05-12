@@ -144,7 +144,7 @@ class CheckJobSeekerInfoForm(forms.ModelForm):
         self._meta.model.clean_pole_emploi_fields(self.cleaned_data)
 
 
-class CreateOrUpdateJobSeekerStep1Form(forms.ModelForm):
+class CreateOrUpdateJobSeekerStep1Form(JobSeekerNIRUpdateMixin, forms.ModelForm):
 
     REQUIRED_FIELDS = [
         "title",
@@ -170,6 +170,8 @@ class CreateOrUpdateJobSeekerStep1Form(forms.ModelForm):
     class Meta:
         model = User
         fields = [
+            "nir",
+            "lack_of_nir_reason",
             "title",
             "first_name",
             "last_name",
