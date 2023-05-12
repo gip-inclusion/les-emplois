@@ -28,6 +28,16 @@
                                     <b>{{ profile.user.get_title_display }} {{ profile.user.get_full_name }}</b>
                                 </li>
                                 <li class="mb-3">
+                                    Numéro de sécurité sociale : 
+                                    {% if profile.user.nir %}
+                                        <b>{{ profile.user.nir|format_nir }}</b>
+                                    {% elif profile.user.lack_of_nir_reason %}
+                                        <b>{{ profile.user.get_lack_of_nir_reason_display }}</b>
+                                    {% else %}
+                                        <span>Non renseigné</span>
+                                    {% endif %}
+                                </li>
+                                <li class="mb-3">
                                     Date de naissance : <b>le {{ profile.user.birthdate }}</b>
                                 </li>
                             </ul>
