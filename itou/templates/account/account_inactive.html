@@ -1,14 +1,19 @@
 {# django-allauth template override. #}
-{% extends "layout/content_small.html" %}
+{% extends "layout/content.html" %}
 
 {% block title %}Compte inactif {{ block.super }}{% endblock %}
 
 {% block content %}
-
-    <h1 class="h1-hero-c1">Compte inactif</h1>
-
-    <div class="alert alert-warning" role="status">
-        <p class="mb-0">Ce compte est inactif.</p>
-    </div>
-
+    <section class="s-title-01">
+        <div class="s-title-01__container container">
+            <div class="s-title-01__row row">
+                <div class="s-title-01__col col-12">
+                    <h1 class="s-title-01__title h1">Compte inactif</h1>
+                    <div class="alert alert-warning">
+                        <p class="mb-0">Ce compte est inactif.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}

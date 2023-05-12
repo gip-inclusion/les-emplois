@@ -1,28 +1,43 @@
-{% extends "layout/content_small.html" %}
+{% extends "layout/content.html" %}
 {% load bootstrap4 %}
 
 {% block title %}Modifier votre profil {{ block.super }}{% endblock %}
 
 {% block content %}
-    <h1 class="h1-hero-c1">Modifier votre adresse e-mail</h1>
-
-    <div class="alert alert-warning">
-        <p class="mb-0">
-            Ce changement entraînera une <b>déconnexion</b>.
-            <br>
-            Veuillez alors vous reconnecter avec votre nouvelle adresse e-mail.
-        </p>
-    </div>
-
-    <div class="c-form">
-        <form method="post" class="js-prevent-multiple-submit">
-            {% csrf_token %}
-
-            {% bootstrap_form form alert_error_type="all" %}
-
-            <div class="text-right">
-                <button type="submit" class="btn btn-primary">Enregistrer</button>
+    <section class="s-title-01">
+        <div class="s-title-01__container container">
+            <div class="s-title-01__row row">
+                <div class="s-title-01__col col-12">
+                    <h1 class="s-title-01__title h1">Modifier votre adresse e-mail</h1>
+                    <div class="alert alert-warning">
+                        <p class="mb-0">
+                            Ce changement entraînera une <b>déconnexion</b>.
+                            <br>
+                            Veuillez alors vous reconnecter avec votre nouvelle adresse e-mail.
+                        </p>
+                    </div>
+                </div>
             </div>
-        </form>
-    </div>
+        </div>
+    </section>
+
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    <div class="c-form">
+                        <form method="post" class="js-prevent-multiple-submit">
+                            {% csrf_token %}
+
+                            {% bootstrap_form form alert_error_type="all" %}
+
+                            <div class="text-right">
+                                <button type="submit" class="btn btn-primary">Enregistrer</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}

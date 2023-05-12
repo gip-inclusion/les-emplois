@@ -6,63 +6,71 @@
 
     {{ block.super }}
 
-    {# Job seeker info ------------------------------------------------------------------------- #}
-    <div class="c-box my-4">
-        <h2>Candidat</h2>
-        <hr>
-        <h3 >Informations personnelles</h3>
-        {% include "apply/includes/job_seeker_info.html" with job_seeker=job_application.job_seeker job_application=job_application can_view_personal_information=can_view_personal_information can_edit_personal_information=can_edit_personal_information request=request only %}
-        {% if job_application.to_siae.kind == SiaeKind.GEIQ %}
-            {# GEIQ eligibility details #}
-            {% include "apply/includes/geiq/geiq_diagnosis_details.html" with diagnosis=geiq_eligibility_diagnosis %}
-        {% else %}
-            {# Eligibility ------------------------------------------------------------------------- #}
-            {% include "apply/includes/eligibility_diagnosis.html" with eligibility_diagnosis=eligibility_diagnosis job_application=job_application %}
-        {% endif %}
-    </div>
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    {# Job seeker info ------------------------------------------------------------------------- #}
+                    <div class="c-box my-4">
+                        <h2>Candidat</h2>
+                        <hr>
+                        <h3 >Informations personnelles</h3>
+                        {% include "apply/includes/job_seeker_info.html" with job_seeker=job_application.job_seeker job_application=job_application can_view_personal_information=can_view_personal_information can_edit_personal_information=can_edit_personal_information request=request only %}
+                        {% if job_application.to_siae.kind == SiaeKind.GEIQ %}
+                            {# GEIQ eligibility details #}
+                            {% include "apply/includes/geiq/geiq_diagnosis_details.html" with diagnosis=geiq_eligibility_diagnosis %}
+                        {% else %}
+                            {# Eligibility ------------------------------------------------------------------------- #}
+                            {% include "apply/includes/eligibility_diagnosis.html" with eligibility_diagnosis=eligibility_diagnosis job_application=job_application %}
+                        {% endif %}
+                    </div>
 
-    {# Job application info ------------------------------------------------------------------------- #}
-    <div class="c-box my-4">
-        <h2>Candidature</h2>
-        <hr>
-        <h3>Détails de la candidature</h3>
-        {% include "apply/includes/job_application_info.html" with job_application=job_application %}
+                    {# Job application info ------------------------------------------------------------------------- #}
+                    <div class="c-box my-4">
+                        <h2>Candidature</h2>
+                        <hr>
+                        <h3>Détails de la candidature</h3>
+                        {% include "apply/includes/job_application_info.html" with job_application=job_application %}
 
-        <hr>
-        {# Sender info ------------------------------------------------------------------------- #}
-        <h3>Candidature envoyée par</h3>
-        {% include "apply/includes/job_application_sender_info.html" with job_application=job_application %}
+                        <hr>
+                        {# Sender info ------------------------------------------------------------------------- #}
+                        <h3>Candidature envoyée par</h3>
+                        {% include "apply/includes/job_application_sender_info.html" with job_application=job_application %}
 
-        {# Prior actions info #}
-        {% if job_application.can_have_prior_action %}
-            <hr>
-            <h3>Action préalable à l'embauche</h3>
-            {% for prior_action in job_application.prior_actions.all %}
-                {% include "apply/includes/job_application_prior_action.html" with job_application=job_application prior_action=prior_action add_prior_action_form=None hide_final_hr=forloop.last %}
-            {% endfor %}
-            {% if job_application.can_change_prior_actions %}
-                {% url 'apply:add_prior_action' job_application_id=job_application.id as add_prior_action_url %}
-                {% include "apply/includes/job_application_prior_action_form.html" with job_application=job_application form=add_prior_action_form main_div_id="add_prior_action" form_url=add_prior_action_url %}
-            {% endif %}
-        {% endif %}
+                        {# Prior actions info #}
+                        {% if job_application.can_have_prior_action %}
+                            <hr>
+                            <h3>Action préalable à l'embauche</h3>
+                            {% for prior_action in job_application.prior_actions.all %}
+                                {% include "apply/includes/job_application_prior_action.html" with job_application=job_application prior_action=prior_action add_prior_action_form=None hide_final_hr=forloop.last %}
+                            {% endfor %}
+                            {% if job_application.can_change_prior_actions %}
+                                {% url 'apply:add_prior_action' job_application_id=job_application.id as add_prior_action_url %}
+                                {% include "apply/includes/job_application_prior_action_form.html" with job_application=job_application form=add_prior_action_form main_div_id="add_prior_action" form_url=add_prior_action_url %}
+                            {% endif %}
+                        {% endif %}
 
-        {# Negative answers ------------------------------------------------------------------------- #}
-        {% include "apply/includes/job_application_answers.html" with job_application=job_application %}
-        {# Process ------------------------------------------------------------------------- #}
+                        {# Negative answers ------------------------------------------------------------------------- #}
+                        {% include "apply/includes/job_application_answers.html" with job_application=job_application %}
+                        {# Process ------------------------------------------------------------------------- #}
 
-        {% include "apply/includes/state_transition_siae.html" with job_application=job_application %}
+                        {% include "apply/includes/state_transition_siae.html" with job_application=job_application %}
 
-        {# Transfer ------------------------------------------------------ #}
+                        {# Transfer ------------------------------------------------------ #}
 
-        {% include "apply/includes/transfer_job_application.html" with job_application=job_application %}
+                        {% include "apply/includes/transfer_job_application.html" with job_application=job_application %}
 
-        {# History ------------------------------------------------------ #}
+                        {# History ------------------------------------------------------ #}
 
-        {% if transition_logs %}
-            <hr>
-            <h3>Historique des modifications</h3>
-            {% include "apply/includes/transition_logs.html" with job_application=job_application transition_logs=transition_logs %}
-        {% endif %}
-    </div>
+                        {% if transition_logs %}
+                            <hr>
+                            <h3>Historique des modifications</h3>
+                            {% include "apply/includes/transition_logs.html" with job_application=job_application transition_logs=transition_logs %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
 {% endblock %}

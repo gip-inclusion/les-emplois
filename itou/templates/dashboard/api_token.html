@@ -1,62 +1,78 @@
-{% extends "layout/content_small.html" %}
+{% extends "layout/content.html" %}
 {% load bootstrap4 %}
 
 {% block title %}Accès aux APIs {{ block.super }}{% endblock %}
 
 {% block content %}
-    <h1 class="h1-hero-c1">Accès aux APIs</h1>
-
-    <div class="card-deck mt-3">
-
-        <div class="card">
-            <div class="card-body">
-                <div class="col-12">
-                    <p>
-                        Une API (application programming interface ou « interface de programmation d'application ») est une interface logicielle qui permet de « connecter » le site des emplois de l'inclusion à un autre logiciel ou service afin d'échanger des données et des fonctionnalités.
-                    </p>
-                    <p>
-                        En tant qu’administrateur des structures suivantes, vous avez accès à l’API Fiches salarié (<a href="https://emplois.inclusion.beta.gouv.fr/api/v1/redoc/#tag/employee-records" target="_blank">voir la documentation ici</a>):
-                    </p>
-                    <ul>
-                        {% for siae_name in siaes_names %}<li>{{ siae_name }}</li>{% endfor %}
-                    </ul>
-                    <p>
-                        Pour vous connecter à l'API vous devez utiliser l'identifiant "{{ login_string }}" et comme mot de passe le token suivant.
-                    </p>
+    <section class="s-title-01">
+        <div class="s-title-01__container container">
+            <div class="s-title-01__row row">
+                <div class="s-title-01__col col-12">
+                    <h1 class="s-title-01__title h1">Accès aux APIs</h1>
                 </div>
-                {% if not token %}
-                    <form method="post" action="{% url 'dashboard:api_token' %}">
-                        {% csrf_token %}
+            </div>
+        </div>
+    </section>
 
-                        <div class="col-12">
-                            <div class="form-row align-items-center">
-                                <div class="form-group mb-0 col-12 col-lg order-2">
-                                    <span class="align-middle">Vous n'avez pas encore de token d'API</span>
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    <div class="card-deck mt-3">
+
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="col-12">
+                                    <p>
+                                        Une API (application programming interface ou « interface de programmation d'application ») est une interface logicielle qui permet de « connecter » le site des emplois de l'inclusion à un autre logiciel ou service afin d'échanger des données et des fonctionnalités.
+                                    </p>
+                                    <p>
+                                        En tant qu’administrateur des structures suivantes, vous avez accès à l’API Fiches salarié (<a href="https://emplois.inclusion.beta.gouv.fr/api/v1/redoc/#tag/employee-records" target="_blank">voir la documentation ici</a>):
+                                    </p>
+                                    <ul>
+                                        {% for siae_name in siaes_names %}<li>{{ siae_name }}</li>{% endfor %}
+                                    </ul>
+                                    <p>
+                                        Pour vous connecter à l'API vous devez utiliser l'identifiant "{{ login_string }}" et comme mot de passe le token suivant.
+                                    </p>
                                 </div>
-                                <div class="form-group mb-0 col-6 col-lg-auto order-1 order-lg-2">
-                                    <button class="btn btn-primary">Créer un token d'API</button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                {% else %}
-                    <div class="col-12">
-                        <div class="form-row align-items-center">
-                            <div class="form-group mb-0 col-8">
-                                Votre token d'API est :
-                                <span id="token">{{ token.key }}</span>
-                            </div>
-                            <div class="form-group mb-0 col-4 text-right">
-                                <button class="btn btn-primary" id="copy-token">
-                                    <i class="ri-file-copy-line mr-2 ri-lg"></i>Copier le token
-                                </button>
+                                {% if not token %}
+                                    <form method="post" action="{% url 'dashboard:api_token' %}">
+                                        {% csrf_token %}
+
+                                        <div class="col-12">
+                                            <div class="form-row align-items-center">
+                                                <div class="form-group mb-0 col-12 col-lg order-2">
+                                                    <span class="align-middle">Vous n'avez pas encore de token d'API</span>
+                                                </div>
+                                                <div class="form-group mb-0 col-6 col-lg-auto order-1 order-lg-2">
+                                                    <button class="btn btn-primary">Créer un token d'API</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                {% else %}
+                                    <div class="col-12">
+                                        <div class="form-row align-items-center">
+                                            <div class="form-group mb-0 col-8">
+                                                Votre token d'API est :
+                                                <span id="token">{{ token.key }}</span>
+                                            </div>
+                                            <div class="form-group mb-0 col-4 text-right">
+                                                <button class="btn btn-primary" id="copy-token">
+                                                    <i class="ri-file-copy-line mr-2 ri-lg"></i>Copier le token
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
-                {% endif %}
+                </div>
             </div>
         </div>
-    </div>
+    </section>
 
     <script nonce="{{ CSP_NONCE }}">
         var copyToken = document.getElementById('copy-token')
@@ -65,5 +81,4 @@
             navigator.clipboard.writeText(token.innerText);
         });
     </script>
-
 {% endblock %}

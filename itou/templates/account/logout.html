@@ -1,30 +1,32 @@
 {# django-allauth template override. #}
-{% extends "layout/content_small.html" %}
+{% extends "layout/content.html" %}
 {% load bootstrap4 %}
 {% load redirection_fields %}
 
 {% block title %}Déconnexion {{ block.super }}{% endblock %}
 
 {% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    <div class="alert alert-info" role="status">
+                        <h1 class="h1-hero-c1">Déconnexion</h1>
+                        <p>Voulez-vous vraiment vous déconnecter ?</p>
+                        <form method="post" action="{% url 'account_logout' %}" class="js-prevent-multiple-submit">
 
-    <div class="alert alert-info" role="status">
+                            {% csrf_token %}
 
-        <h1 class="h1-hero-c1">Déconnexion</h1>
+                            {% redirection_input_field name=redirect_field_name value=redirect_field_value %}
 
-        <p>Voulez-vous vraiment vous déconnecter ?</p>
+                            {% buttons %}
+                                <button type="submit" class="btn btn-primary">Se déconnecter</button>
+                            {% endbuttons %}
 
-        <form method="post" action="{% url 'account_logout' %}" class="js-prevent-multiple-submit">
-
-            {% csrf_token %}
-
-            {% redirection_input_field name=redirect_field_name value=redirect_field_value %}
-
-            {% buttons %}
-                <button type="submit" class="btn btn-primary">Se déconnecter</button>
-            {% endbuttons %}
-
-        </form>
-
-    </div>
-
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}

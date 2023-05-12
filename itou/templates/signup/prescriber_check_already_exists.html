@@ -1,88 +1,102 @@
-{% extends "layout/content_small.html" %}
+{% extends "layout/content.html" %}
 {% load bootstrap4 %}
 {% load static %}
 
 {% block title %}Prescripteur/Orienteur - Inscription {{ block.super }}{% endblock %}
 
 {% block content %}
-
-    <h1 class="h1-hero-c1">
-        Inscription
-        <small class="text-muted">Prescripteur/Orienteur</small>
-    </h1>
-
-    <h2 class="h1">Votre organisation est-elle déjà inscrite ?</h2>
-
-    <p class="mb-6">
-        <a href="{% url 'signup:prescriber_pole_emploi_safir_code' %}" class="fs-lg">Je travaille pour Pôle emploi</a>
-    </p>
-    <form method="post" class="js-prevent-multiple-submit">
-
-        {% csrf_token %}
-
-        {% bootstrap_form form alert_error_type="all" %}
-
-        {% buttons %}
-            <button type="submit" class="btn btn-primary">Rechercher</button>
-        {% endbuttons %}
-
-    </form>
-
-    {# Display link only before the search otherwise an organization is put in session and no longer allows creation without an organization  #}
-    {% if not prescriber_orgs_with_members_same_siret and not prescriber_orgs_with_members_same_siren %}
-        <p class="mt-3">
-            <a href="{% url 'signup:prescriber_user' %}">Je ne fais partie d'aucune organisation</a>
-        </p>
-    {% endif %}
-
-    {% if prescriber_orgs_with_members_same_siret %}
-        <div class="mt-5">
-            <h3 class="h2">Organisation(s) déjà inscrite(s) avec ce SIRET</h3>
-            <p>Par mesure de sécurité, vous devez obtenir une invitation pour rejoindre une organisation déjà inscrite.</p>
-            {% for prescriber_org in prescriber_orgs_with_members_same_siret %}
-                {% include "signup/includes/prescriber_card.html" %}
-            {% endfor %}
-        </div>
-    {% endif %}
-
-    {% if prescriber_orgs_with_members_same_siren %}
-        <div class="mt-5">
-            {% if not prescriber_orgs_with_members_same_siret %}
-                <h3 class="h2">Organisation(s) inscrite(s) avec ce SIREN sur le département</h3>
-                <p>Par mesure de sécurité, vous devez obtenir une invitation pour rejoindre une organisation déjà inscrite.</p>
-            {% else %}
-                <h3 class="h2">Autre(s) organisation(s) inscrite(s) avec ce SIREN sur le département</h3>
-            {% endif %}
-
-            {% for prescriber_org in prescriber_orgs_with_members_same_siren %}
-                {% include "signup/includes/prescriber_card.html" %}
-            {% endfor %}
-        </div>
-    {% endif %}
-
-    {% if prescriber_orgs_with_members_same_siret or prescriber_orgs_with_members_same_siren %}
-        <div class="mt-5">
-            <h3 class="h2">Ajouter mon organisation</h3>
-
-            {% if prescriber_orgs_with_members_same_siret %}
-                <div class="alert alert-warning" role="status">
-                    <p class="small mb-0">
-                        Attention une ou plusieurs organisations existent déjà avec ce SIRET.
-                        <br>
-                        Si vous ne trouvez pas votre organisation dans la liste ci-dessus ou si
-                        vous souhaitez créer un compte avec ce SIRET pour un autre type
-                        d'organisation, vous avez la possibilité de l'inscrire.
+    <section class="s-title-01">
+        <div class="s-title-01__container container">
+            <div class="s-title-01__row row">
+                <div class="s-title-01__col col-12">
+                    <h1 class="s-title-01__title h1">
+                        Inscription
+                        <small class="text-muted">Prescripteur/Orienteur</small>
+                    </h1>
+                    <h2>Votre organisation est-elle déjà inscrite ?</h2>
+                    <p>
+                        <a href="{% url 'signup:prescriber_pole_emploi_safir_code' %}">Je travaille pour Pôle emploi</a>
                     </p>
                 </div>
-            {% else %}
-                <p class="mb-0">
-                    <small>
-                        Si vous ne trouvez pas votre organisation dans la liste ci-dessus, vous avez la possibilité de l'inscrire.
-                    </small>
-                </p>
-            {% endif %}
-            <a class="btn btn btn-outline-secondary mt-3" href="{{ prev_url }}">Retour</a>
-            <a href="{% url 'signup:prescriber_choose_org' siret=form.cleaned_data.siret %}" class="btn btn-primary mt-3">Inscrire mon organisation</a>
+            </div>
         </div>
-    {% endif %}
+    </section>
+
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    <form method="post" class="js-prevent-multiple-submit">
+
+                        {% csrf_token %}
+
+                        {% bootstrap_form form alert_error_type="all" %}
+
+                        {% buttons %}
+                            <button type="submit" class="btn btn-primary">Rechercher</button>
+                        {% endbuttons %}
+
+                    </form>
+
+                    {# Display link only before the search otherwise an organization is put in session and no longer allows creation without an organization  #}
+                    {% if not prescriber_orgs_with_members_same_siret and not prescriber_orgs_with_members_same_siren %}
+                        <p class="mt-3">
+                            <a href="{% url 'signup:prescriber_user' %}">Je ne fais partie d'aucune organisation</a>
+                        </p>
+                    {% endif %}
+
+                    {% if prescriber_orgs_with_members_same_siret %}
+                        <div class="mt-5">
+                            <h3 class="h2">Organisation(s) déjà inscrite(s) avec ce SIRET</h3>
+                            <p>Par mesure de sécurité, vous devez obtenir une invitation pour rejoindre une organisation déjà inscrite.</p>
+                            {% for prescriber_org in prescriber_orgs_with_members_same_siret %}
+                                {% include "signup/includes/prescriber_card.html" %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    {% if prescriber_orgs_with_members_same_siren %}
+                        <div class="mt-5">
+                            {% if not prescriber_orgs_with_members_same_siret %}
+                                <h3 class="h2">Organisation(s) inscrite(s) avec ce SIREN sur le département</h3>
+                                <p>Par mesure de sécurité, vous devez obtenir une invitation pour rejoindre une organisation déjà inscrite.</p>
+                            {% else %}
+                                <h3 class="h2">Autre(s) organisation(s) inscrite(s) avec ce SIREN sur le département</h3>
+                            {% endif %}
+
+                            {% for prescriber_org in prescriber_orgs_with_members_same_siren %}
+                                {% include "signup/includes/prescriber_card.html" %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    {% if prescriber_orgs_with_members_same_siret or prescriber_orgs_with_members_same_siren %}
+                        <div class="mt-5">
+                            <h3 class="h2">Ajouter mon organisation</h3>
+
+                            {% if prescriber_orgs_with_members_same_siret %}
+                                <div class="alert alert-warning" role="status">
+                                    <p class="small mb-0">
+                                        Attention une ou plusieurs organisations existent déjà avec ce SIRET.
+                                        <br>
+                                        Si vous ne trouvez pas votre organisation dans la liste ci-dessus ou si
+                                        vous souhaitez créer un compte avec ce SIRET pour un autre type
+                                        d'organisation, vous avez la possibilité de l'inscrire.
+                                    </p>
+                                </div>
+                            {% else %}
+                                <p class="mb-0">
+                                    <small>
+                                        Si vous ne trouvez pas votre organisation dans la liste ci-dessus, vous avez la possibilité de l'inscrire.
+                                    </small>
+                                </p>
+                            {% endif %}
+                            <a class="btn btn btn-outline-secondary mt-3" href="{{ prev_url }}">Retour</a>
+                            <a href="{% url 'signup:prescriber_choose_org' siret=form.cleaned_data.siret %}" class="btn btn-primary mt-3">Inscrire mon organisation</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}

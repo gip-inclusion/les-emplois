@@ -1,21 +1,35 @@
 {# django-allauth template override. #}
-{% extends "layout/content_small.html" %}
+{% extends "layout/content.html" %}
 
 
 {% block title %}Connexion annulée {{ block.super }}{% endblock %}
 
 {% block content %}
+    <section class="s-title-01">
+        <div class="s-title-01__container container">
+            <div class="s-title-01__row row">
+                <div class="s-title-01__col col-12">
+                    <h1 class="s-title-01__title h1">Connexion annulée</h1>
+                    <p>Vous avez annulé votre tentative de connexion.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <h1 class="h1-hero-c1">Connexion annulée</h1>
-
-    <p>Vous avez annulé votre tentative de connexion.</p>
-    <p>
-        <a href="{% url 'login:job_seeker' %}">
-            <button class="btn btn-secondary">Retour</button>
-        </a>
-        <a href="{% url 'peamu_login' %}">
-            <button class="btn btn-primary">Se connecter à nouveau avec son compte Pôle emploi</button>
-        </a>
-    </p>
-
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    <p>
+                        <a href="{% url 'login:job_seeker' %}">
+                            <button class="btn btn-secondary">Retour</button>
+                        </a>
+                        <a href="{% url 'peamu_login' %}">
+                            <button class="btn btn-primary">Se connecter à nouveau avec son compte Pôle emploi</button>
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}

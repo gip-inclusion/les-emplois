@@ -1,4 +1,4 @@
-{% extends "layout/content_small.html" %}
+{% extends "layout/content.html" %}
 {% load format_filters %}
 
 {% block title %}{{ job.display_name }} - {{ siae.display_name }} {{ block.super }}{% endblock %}
@@ -10,62 +10,78 @@
 {% endblock %}
 
 {% block content %}
-    <h1 class="my-3 my-lg-5">Description du poste</h1>
-
-    <div class="c-box">
-        {% include "siaes/includes/_job_description_details.html" %}
-        <hr>
-        <div>
-            {% if can_update_job_description %}
-                <div class="row mb-4">
-                    <div class="col">
-                        <a href="{% url "siaes_views:update_job_description" job_description_id=job.pk %}" class="btn btn-sm btn-outline-primary" aria-label="Modifier la fiche de poste">
-                            Modifier
-                        </a>
-                    </div>
-                    <div class="col-auto">
-                        <a href="{% url "siaes_views:job_description_list" %}" class="btn btn-sm btn-primary" aria-label="Retour vers la liste des postes">
-                            Fermer
-                        </a>
-                    </div>
+    <section class="s-title-01">
+        <div class="s-title-01__container container">
+            <div class="s-title-01__row row">
+                <div class="s-title-01__col col-12">
+                    <h1 class="s-title-01__title h1">Description du poste</h1>
                 </div>
-            {% else %}
-                <div class="row mb-4">
-                    <div class="col">
-                        <a href="#job_description_link" class="btn btn-sm btn-outline-primary" data-toggle="collapse" aria-label="Partager cette fiche métier">Partager cette fiche métier</a>
-                        <div class="collapse pt-2" id="job_description_link">
-                            <p class="small mb-1">Cliquez sur le lien ci-dessous pour le copier:</p>
-                            <input type="text" class="form-control form-control-sm" value="{{ request.scheme }}://{{ request.get_host }}{{ job.get_absolute_url }}">
-                        </div>
-                    </div>
-                    {% if job.is_active and not siae.block_job_applications %}
-                        <div class="col-auto text-right">
-                            <a href="{% url "apply:start" siae_pk=siae.pk %}?job_description_id={{ job.pk }}&back_url={{ request.get_full_path|urlencode }}"
-                               class="matomo-event btn btn-sm btn-primary"
-                               data-matomo-category="candidature"
-                               data-matomo-action="clic"
-                               data-matomo-option="clic-metiers"
-                               aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
-                                Postuler
-                            </a>
-                        </div>
-                    {% endif %}
-                </div>
-
-                {% if others_active_jobs and not siae.block_job_applications %}
-                    <hr>
-                    <h2 class="h2">
-                        Consulter le{{ others_active_jobs|pluralize }} recrutement{{ others_active_jobs|pluralize }} en cours dans cette structure
-                    </h2>
-                    <ul class="list-group list-group-flush mb-4">
-                        {% for other_job in others_active_jobs %}
-                            {% include "siaes/includes/_list_siae_actives_jobs_row.html" with job=other_job %}
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-            {% endif %}
+            </div>
         </div>
-    </div>
+    </section>
+
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    <div class="c-box">
+                        {% include "siaes/includes/_job_description_details.html" %}
+                        <hr>
+                        <div>
+                            {% if can_update_job_description %}
+                                <div class="row mb-4">
+                                    <div class="col">
+                                        <a href="{% url "siaes_views:update_job_description" job_description_id=job.pk %}" class="btn btn-sm btn-outline-primary" aria-label="Modifier la fiche de poste">
+                                            Modifier
+                                        </a>
+                                    </div>
+                                    <div class="col-auto">
+                                        <a href="{% url "siaes_views:job_description_list" %}" class="btn btn-sm btn-primary" aria-label="Retour vers la liste des postes">
+                                            Fermer
+                                        </a>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="row mb-4">
+                                    <div class="col">
+                                        <a href="#job_description_link" class="btn btn-sm btn-outline-primary" data-toggle="collapse" aria-label="Partager cette fiche métier">Partager cette fiche métier</a>
+                                        <div class="collapse pt-2" id="job_description_link">
+                                            <p class="small mb-1">Cliquez sur le lien ci-dessous pour le copier:</p>
+                                            <input type="text" class="form-control form-control-sm" value="{{ request.scheme }}://{{ request.get_host }}{{ job.get_absolute_url }}">
+                                        </div>
+                                    </div>
+                                    {% if job.is_active and not siae.block_job_applications %}
+                                        <div class="col-auto text-right">
+                                            <a href="{% url "apply:start" siae_pk=siae.pk %}?job_description_id={{ job.pk }}&back_url={{ request.get_full_path|urlencode }}"
+                                               class="matomo-event btn btn-sm btn-primary"
+                                               data-matomo-category="candidature"
+                                               data-matomo-action="clic"
+                                               data-matomo-option="clic-metiers"
+                                               aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
+                                                Postuler
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                {% if others_active_jobs and not siae.block_job_applications %}
+                                    <hr>
+                                    <h2 class="h2">
+                                        Consulter le{{ others_active_jobs|pluralize }} recrutement{{ others_active_jobs|pluralize }} en cours dans cette structure
+                                    </h2>
+                                    <ul class="list-group list-group-flush mb-4">
+                                        {% for other_job in others_active_jobs %}
+                                            {% include "siaes/includes/_list_siae_actives_jobs_row.html" with job=other_job %}
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}
 
 {% block script %}

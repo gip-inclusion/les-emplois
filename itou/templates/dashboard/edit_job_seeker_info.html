@@ -1,28 +1,41 @@
-{% extends "layout/content_small.html" %}
+{% extends "layout/content.html" %}
 {% load bootstrap4 %}
 {% load static %}
 
 {% block title %}Informations personnelles de {{ job_seeker.get_full_name|title }} {{ block.super }}{% endblock %}
 
 {% block content %}
-    <h1 class="h1-hero-c1">
-        Informations personnelles de <span class="text-muted">{{ job_seeker.get_full_name|title }}</span>
-    </h1>
+    <section class="s-title-01">
+        <div class="s-title-01__container container">
+            <div class="s-title-01__row row">
+                <div class="s-title-01__col col-12">
+                    <h1 class="s-title-01__title h1">
+                        Informations personnelles de <span class="text-muted">{{ job_seeker.get_full_name|title }}</span>
+                    </h1>
+                    <div class="alert alert-warning">
+                        <p>
+                            <b>Vous allez modifier des informations sensibles</b> concernant ce candidat ou cette candidate.
+                        </p>
+                        <p class="mb-0">
+                            Tout changement entraînera une modification définitive dans notre base de données. <b>Les informations supprimées seront perdues.</b>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <div class="alert alert-warning">
-        <p>
-            <b>Vous allez modifier des informations sensibles</b> concernant ce candidat ou cette candidate.
-        </p>
-        <p class="mb-0">
-            Tout changement entraînera une modification définitive dans notre base de données. <b>Les informations
-        supprimées seront perdues.</b>
-    </p>
-</div>
-
-<div class="c-form">
-    {% include "dashboard/includes/edit_job_seeker_info_form.html" with prev_url=prev_url submit_label="Mettre à jour" %}
-</div>
-
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    <div class="c-form">
+                        {% include "dashboard/includes/edit_job_seeker_info_form.html" with prev_url=prev_url submit_label="Mettre à jour" %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}
 
 {% block script %}

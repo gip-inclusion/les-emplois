@@ -1,36 +1,48 @@
-{% extends "layout/content_small.html" %}
+{% extends "layout/content.html" %}
 {% load bootstrap4 %}
 
 {% block title %}Modifier votre organisation {{ block.super }}{% endblock %}
 
 {% block content %}
+    <section class="s-title-01">
+        <div class="s-title-01__container container">
+            <div class="s-title-01__row row">
+                <div class="s-title-01__col col-12">
+                    <h1 class="s-title-01__title h1">Modifier votre organisation</h1>
+                    <h2>{{ organization.display_name }}</h2>
+                    <div class="alert alert-info">
+                        <p class="mb-0">
+                            {% if organization.kind == PrescriberOrganizationKind.PE %}
+                                Affichage des informations en lecture seule. Si vous souhaitez modifier ces informations, merci de
+                                <a href="{{ ITOU_ASSISTANCE_URL }}" target="_blank">contacter notre support technique</a>.
+                            {% else %}
+                                Les coordonnées de contact de votre organisation sont visibles par tous les utilisateurs connectés.
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <h1 class="h1-hero-c1">Modifier votre organisation</h1>
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    <form method="post" class="js-prevent-multiple-submit">
 
-    <h2 class="h1 text-muted">{{ organization.display_name }}</h2>
+                        {% csrf_token %}
 
-    <div class="alert alert-info">
-        <p class="mb-0">
-            {% if organization.kind == PrescriberOrganizationKind.PE %}
-                Affichage des informations en lecture seule. Si vous souhaitez modifier ces informations, merci de
-                <a href="{{ ITOU_ASSISTANCE_URL }}" target="_blank">contacter notre support technique</a>.
-            {% else %}
-                Les coordonnées de contact de votre organisation sont visibles par tous les utilisateurs connectés.
-            {% endif %}
-        </p>
-    </div>
+                        {% bootstrap_form form alert_error_type="all" %}
 
-    <form method="post" class="js-prevent-multiple-submit">
+                        {% buttons %}
+                            <a class="btn btn-outline-primary" href="{% url 'dashboard:index' %}">Annuler</a>
+                            <button type="submit" class="btn btn-primary">Enregistrer</button>
+                        {% endbuttons %}
 
-        {% csrf_token %}
-
-        {% bootstrap_form form alert_error_type="all" %}
-
-        {% buttons %}
-            <a class="btn btn-outline-primary" href="{% url 'dashboard:index' %}">Annuler</a>
-            <button type="submit" class="btn btn-primary">Enregistrer</button>
-        {% endbuttons %}
-
-    </form>
-
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}

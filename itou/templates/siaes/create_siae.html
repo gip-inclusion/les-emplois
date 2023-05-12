@@ -1,57 +1,70 @@
-{% extends "layout/content_small.html" %}
+{% extends "layout/content.html" %}
 {% load bootstrap4 %}
 
 {% block title %}Créer une nouvelle structure {{ block.super }}{% endblock %}
 
 {% block content %}
-
-    <h1 class="h1-hero-c1">Créer/rejoindre une nouvelle structure</h1>
-
-    <form method="post" class="js-prevent-multiple-submit">
-
-        <div class="alert alert-info">
-            <p>Vous souhaitez rejoindre une structure :</p>
-            <ul>
-                <li>
-                    ayant déjà un ou plusieurs membres, <b>demandez à l’un de ces membres de vous inviter depuis son tableau de bord</b>
-                </li>
-                <li>
-                    connue des services des emplois de l'inclusion mais n’ayant pas encore de membre : <a href="{% url 'signup:siae_select' %}">utilisez ce formulaire</a>
-                </li>
-            </ul>
-            <p class="mb-0">Dans les autres cas, complétez le formulaire ci-dessous.</p>
-        </div>
-
-        {% csrf_token %}
-
-        {% if form.non_field_errors %}
-            <div class="alert alert-danger alert-dismissible alert-link" role="alert">
-                <p class="mb-0">
-                    {% for error in form.non_field_errors %}
-                        {{ error | safe }}
-                        {% if not forloop.last %}<br>{% endif %}
-                    {% endfor %}
-                </p>
-                <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
-                    <i class="ri-close-line"></i>
-                </button>
+    <section class="s-title-01">
+        <div class="s-title-01__container container">
+            <div class="s-title-01__row row">
+                <div class="s-title-01__col col-12">
+                    <h1 class="s-title-01__title h1">Créer/rejoindre une nouvelle structure</h1>
+                    <div class="alert alert-info">
+                        <p>Vous souhaitez rejoindre une structure :</p>
+                        <ul>
+                            <li>
+                                ayant déjà un ou plusieurs membres, <b>demandez à l’un de ces membres de vous inviter depuis son tableau de bord</b>
+                            </li>
+                            <li>
+                                connue des services des emplois de l'inclusion mais n’ayant pas encore de membre : <a href="{% url 'signup:siae_select' %}">utilisez ce formulaire</a>
+                            </li>
+                        </ul>
+                        <p class="mb-0">Dans les autres cas, complétez le formulaire ci-dessous.</p>
+                    </div>
+                </div>
             </div>
-        {% endif %}
+        </div>
+    </section>
 
-        {% for field in form %}
-            {% bootstrap_field field %}
-        {% endfor %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    <div class="c-form">
+                        <form method="post" class="js-prevent-multiple-submit">
+                            {% csrf_token %}
 
+                            {% if form.non_field_errors %}
+                                <div class="alert alert-danger alert-dismissible alert-link" role="status">
+                                    <p class="mb-0">
+                                        {% for error in form.non_field_errors %}
+                                            {{ error | safe }}
+                                            {% if not forloop.last %}<br>{% endif %}
+                                        {% endfor %}
+                                    </p>
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
+                                        <i class="ri-close-line"></i>
+                                    </button>
+                                </div>
+                            {% endif %}
 
-        <p>
-            En cliquant sur le bouton "Enregistrer", vous acceptez que vos informations et coordonnées ci-dessus soient rendues publiques.
-        </p>
-        {% buttons %}
-            <a class="btn btn-outline-primary" href="{% url 'dashboard:index' %}">Annuler</a>
+                            {% for field in form %}
+                                {% bootstrap_field field %}
+                            {% endfor %}
 
-            <button type="submit" class="btn btn-primary">Enregistrer</button>
-        {% endbuttons %}
+                            <p>
+                                En cliquant sur le bouton "Enregistrer", vous acceptez que vos informations et coordonnées ci-dessus soient rendues publiques.
+                            </p>
 
-    </form>
+                            {% buttons %}
+                                <a class="btn btn-outline-primary" href="{% url 'dashboard:index' %}">Annuler</a>
 
+                                <button type="submit" class="btn btn-primary">Enregistrer</button>
+                            {% endbuttons %}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}

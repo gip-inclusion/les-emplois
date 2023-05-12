@@ -1,40 +1,54 @@
-{% extends "layout/content_small.html" %}
+{% extends "layout/content.html" %}
 {% load bootstrap4 %}
 
 {% block title %}Annuler la suspension de PASS IAE {{ block.super }}{% endblock %}
 
 {% block content %}
-
-    <h1 class="h1-hero-c1">
-        Annuler la suspension de PASS IAE
-        <br>
-        <span class="text-muted">{{ suspension.approval.user.get_full_name|title }}</span>
-    </h1>
-
-    <div class="card my-3 text-center">
-        <div class="card-body">
-            <h5 class="h4 card-title">Vous êtes sur le point d'annuler la suspension</h5>
-            <p class="card-text">{{ suspension.get_reason_display }}</p>
-            <p class="card-text">
-                À partir du
-                <span class="badge badge-pill badge-dark">{{ suspension.start_at|date:"d/m/Y" }}</span>
-                jusqu'au
-                <span class="badge badge-pill badge-dark">{{ suspension.end_at|date:"d/m/Y" }}</span>
-            </p>
+    <section class="s-title-01">
+        <div class="s-title-01__container container">
+            <div class="s-title-01__row row">
+                <div class="s-title-01__col col-12">
+                    <h1 class="s-title-01__title h1">
+                        Annuler la suspension de PASS IAE
+                        <br>
+                        <span class="text-muted">{{ suspension.approval.user.get_full_name|title }}</span>
+                    </h1>
+                </div>
+            </div>
         </div>
-    </div>
+    </section>
 
-    <form method="post" class="js-prevent-multiple-submit">
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    <div class="card my-3 text-center">
+                        <div class="card-body">
+                            <h5 class="h4 card-title">Vous êtes sur le point d'annuler la suspension</h5>
+                            <p class="card-text">{{ suspension.get_reason_display }}</p>
+                            <p class="card-text">
+                                À partir du
+                                <span class="badge badge-pill badge-dark">{{ suspension.start_at|date:"d/m/Y" }}</span>
+                                jusqu'au
+                                <span class="badge badge-pill badge-dark">{{ suspension.end_at|date:"d/m/Y" }}</span>
+                            </p>
+                        </div>
+                    </div>
 
-        {% csrf_token %}
+                    <form method="post" class="js-prevent-multiple-submit">
 
-        <input type="hidden" name="confirm" value="true">
+                        {% csrf_token %}
 
-        {% buttons %}
-            <a class="btn btn-outline-primary" href="{{ back_url }}">Retour</a>
-            <button type="submit" class="btn btn-danger">Confirmer l'annulation de la suspension</button>
-        {% endbuttons %}
+                        <input type="hidden" name="confirm" value="true">
 
-    </form>
+                        {% buttons %}
+                            <a class="btn btn-outline-primary" href="{{ back_url }}">Retour</a>
+                            <button type="submit" class="btn btn-danger">Confirmer l'annulation de la suspension</button>
+                        {% endbuttons %}
 
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}
