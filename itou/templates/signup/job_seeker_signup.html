@@ -1,86 +1,91 @@
-{% extends "layout/content_two_columns.html" %}
+{% extends "layout/content.html" %}
 {% load bootstrap4 %}
 {% load redirection_fields %}
 {% load static %}
 
 {% block title %}Demandeur d'emploi - Inscription {{ block.super }}{% endblock %}
 
-{% block content_container_css_classes %}s-section-lg-with-background{% endblock %}
+{% block content %}
+    <section class="s-section s-section-lg-with-background">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 order-md-2 pl-lg-5 col-lg-6">
+                    <div class="py-5 py-lg-7">
+                        <h1 class="h1-hero-c1">
+                            Inscription <span class="text-muted">candidat</span>
+                        </h1>
 
-{% block right_content %}
-    <div class="py-5 py-lg-7">
-        <h1 class="h1-hero-c1">
-            Inscription <span class="text-muted">candidat</span>
-        </h1>
+                        <b class="mb-4">Inscrivez-vous avec un service tiers</b>
+                        {% if show_france_connect %}
+                            <div>{% include "signup/includes/france_connect_button.html" %}</div>
+                            <div class="mt-4 mb-3">
+                                <p class="text-center">
+                                    <b>Ou</b>
+                                </p>
+                            </div>
+                        {% else %}
+                            <p class="font-italic text-center mt-3">FranceConnect est désactivé.</p>
+                        {% endif %}
 
-        <b class="mb-4">Inscrivez-vous avec un service tiers</b>
-        {% if show_france_connect %}
-            <div>{% include "signup/includes/france_connect_button.html" %}</div>
-            <div class="mt-4 mb-3">
-                <p class="text-center">
-                    <b>Ou</b>
-                </p>
-            </div>
-        {% else %}
-            <p class="font-italic text-center mt-3">FranceConnect est désactivé.</p>
-        {% endif %}
+                        {% if show_peamu %}
+                            <div class="row mt-3">
+                                <div class="col-sm">
+                                    <div class="text-center">{% include "signup/includes/peamu_button.html" %}</div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <p class="font-italic text-center">Pôle emploi Connect est désactivé.</p>
+                        {% endif %}
 
-        {% if show_peamu %}
-            <div class="row mt-3">
-                <div class="col-sm">
-                    <div class="text-center">{% include "signup/includes/peamu_button.html" %}</div>
+                        <div class="mt-4 mb-3">
+                            <b>Ou utilisez votre adresse e-mail</b>
+                        </div>
+
+                        <form method="post" action="{% url 'signup:job_seeker' %}" role="form" class="js-prevent-multiple-submit">
+
+                            {% csrf_token %}
+
+                            {% redirection_input_field name=redirect_field_name value=redirect_field_value %}
+
+                            {# bootstrap_form_errors form alert_error_type="all" #}
+
+                            {% bootstrap_field form.email form_group_class="form-group mb-1" %}
+                            <div class="text-right small font-italic mb-0">{% include "signup/includes/no_email_link.html" %}</div>
+
+                            {% bootstrap_field form.title form_group_class="form-group mt-1" %}
+                            {% bootstrap_field form.last_name %}
+                            {% bootstrap_field form.first_name %}
+                            {% bootstrap_field form.password1 %}
+                            {% bootstrap_field form.password2 %}
+
+                            {% if form.nir %}
+                                {% bootstrap_field form.nir form_group_class="form-group mt-1" %}
+                            {% endif %}
+
+                            <div class="small pb-4 text-secondary">
+                                Vous pourrez créer et modifier des informations telles que votre adresse ou un lien vers un CV après votre inscription, à partir de votre tableau de bord.
+                            </div>
+
+                            {% include "signup/includes/submit_rgpd.html" %}
+
+                        </form>
+
+                        <div class="mt-5 mb-5">
+                            <p>Vous avez déjà un compte ?</p>
+                            <p>
+                                <a class="btn btn-outline-primary" href="{% url 'login:job_seeker' %}">Connexion</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 order-md-1 pr-lg-5 col-lg-6 bg-emploi-lightest">
+                    <!-- Hide left column on small devices. -->
+                    <div class="d-none d-md-block py-md-5 py-lg-7 text-center">
+                        <p class="display-1 ff-extra-01 mb-5">Vos informations de connexion</p>
+                        <img class="img-fluid img-fitcover w-50 w-md-auto" src="{% static 'img/job_seeker_signup.svg' %}" alt="">
+                    </div>
                 </div>
             </div>
-        {% else %}
-            <p class="font-italic text-center">Pôle emploi Connect est désactivé.</p>
-        {% endif %}
-
-        <div class="mt-4 mb-3">
-            <b>Ou utilisez votre adresse e-mail</b>
         </div>
-
-        <form method="post" action="{% url 'signup:job_seeker' %}" role="form" class="js-prevent-multiple-submit">
-
-            {% csrf_token %}
-
-            {% redirection_input_field name=redirect_field_name value=redirect_field_value %}
-
-            {# bootstrap_form_errors form alert_error_type="all" #}
-
-            {% bootstrap_field form.email form_group_class="form-group mb-1" %}
-            <div class="text-right small font-italic mb-0">{% include "signup/includes/no_email_link.html" %}</div>
-
-            {% bootstrap_field form.title form_group_class="form-group mt-1" %}
-            {% bootstrap_field form.last_name %}
-            {% bootstrap_field form.first_name %}
-            {% bootstrap_field form.password1 %}
-            {% bootstrap_field form.password2 %}
-
-            {% if form.nir %}
-                {% bootstrap_field form.nir form_group_class="form-group mt-1" %}
-            {% endif %}
-
-            <div class="small pb-4 text-secondary">
-                Vous pourrez créer et modifier des informations telles que votre adresse ou un lien vers un CV après votre inscription, à partir de votre tableau de bord.
-            </div>
-
-            {% include "signup/includes/submit_rgpd.html" %}
-
-        </form>
-
-        <div class="mt-5 mb-5">
-            <p>Vous avez déjà un compte ?</p>
-            <p>
-                <a class="btn btn-outline-primary" href="{% url 'login:job_seeker' %}">Connexion</a>
-            </p>
-        </div>
-    </div>
-{% endblock %}
-
-{% block left_content %}
-    <!-- Hide left column on small devices. -->
-    <div class="d-none d-md-block py-md-5 py-lg-7 text-center">
-        <p class="display-1 ff-extra-01 mb-5">Vos informations de connexion</p>
-        <img class="img-fluid img-fitcover w-50 w-md-auto" src="{% static 'img/job_seeker_signup.svg' %}" alt="">
-    </div>
+    </section>
 {% endblock %}
