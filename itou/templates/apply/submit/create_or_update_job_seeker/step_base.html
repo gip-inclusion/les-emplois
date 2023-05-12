@@ -1,4 +1,4 @@
-{% extends "layout/base.html" %}
+{% extends "layout/content.html" %}
 {% load bootstrap4 %}
 {% load static %}
 
@@ -11,12 +11,12 @@
     du compte candidat {{ block.super }}
 {% endblock %}
 
-{% block content_full_viewport %}
+{% block content %}
     <section class="s-section-twocolumns">
         <div class="container">
             <div class="row">
-                <div class="col-12 col-lg-5 order-md-2 pl-lg-5 d-none d-lg-block mb-6"></div>
-                <div class="col-12 col-lg-7 order-md-1 pr-lg-5">
+                <div class="col-12 col-lg-4 order-md-2 pl-lg-5 d-none d-lg-block mb-6"></div>
+                <div class="col-12 col-lg-8 order-md-1 pr-lg-5">
                     <h1 class="my-5">
                         {% if update_job_seeker %}
                             Modification

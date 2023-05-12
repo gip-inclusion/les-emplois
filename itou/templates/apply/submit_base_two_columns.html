@@ -1,13 +1,10 @@
-{% extends "layout/base.html" %}
+{% extends "layout/content.html" %}
 {% load static %}
 
 {% block title %}Postuler {{ block.super }}{% endblock %}
 
-{% block content_full_viewport %}
-
-    {% block pre_content %}{% endblock %}
-
-    <section class="s-section-twocolumns {% block content_container_css_classes %}{% endblock %}">
+{% block content %}
+    <section class="s-section-twocolumns">
         <div class="container">
             <div class="row">
                 <div class="col-12 col-lg-6 order-md-1 pr-lg-5 mt-4">
