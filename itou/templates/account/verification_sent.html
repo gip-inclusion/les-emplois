@@ -1,15 +1,19 @@
 {# django-allauth template override. #}
-{% extends "layout/content_small.html" %}
-
+{% extends "layout/content.html" %}
 
 {% block title %}Vérifiez votre adresse e-mail {{ block.super }}{% endblock %}
 
 {% block content %}
-
-    <h1 class="h1-hero-c1">Vérifiez votre adresse e-mail</h1>
-
-    <p>
-        Nous vous avons envoyé un e-mail avec un lien pour validation. Cliquez sur le lien fourni pour terminer votre inscription.
-    </p>
-
+    <section class="s-title-01">
+        <div class="s-title-01__container container">
+            <div class="s-title-01__row row">
+                <div class="s-title-01__col col-12">
+                    <h1 class="s-title-01__title h1">Vérifiez votre adresse e-mail</h1>
+                    <p>
+                        Nous vous avons envoyé un e-mail avec un lien pour validation. Cliquez sur le lien fourni pour terminer votre inscription.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}

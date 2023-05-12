@@ -1,166 +1,179 @@
-{% extends "layout/content_small.html" %}
+{% extends "layout/content.html" %}
 {% load bootstrap4 tally str_filters %}
 
 {% block title %}Employeur solidaire - Inscription {{ block.super }}{% endblock %}
 
 
 {% block content %}
-
-    <h1 class="h1-hero-c1">
-        Inscription
-        <small class="text-muted">Employeur solidaire</small>
-    </h1>
-
-    <form method="get" role="form">
-
-        {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
-
-        {% bootstrap_form siren_form alert_error_type="all" %}
-
-        <div class="text-right">
-            {% buttons %}
-                <button type="submit" class="btn btn-primary">Rechercher</button>
-            {% endbuttons %}
-        </div>
-
-    </form>
-
-
-    {% if siren_form.cleaned_data and not siaes_without_members and not siaes_with_members %}
-        <div class="alert alert-emploi mt-5" role="status">
-            <p class="mb-0">
-                Aucun résultat pour <b>{{ siren_form.cleaned_data.siren }}</b>.
-            </p>
-        </div>
-
-        <div class="alert alert-danger mt-2" role="status">
-            <p>
-                <strong>Si vous êtes une SIAE</strong> :
-                <br>
-                Merci de vérifier dans l’extranet IAE 2.0 de l’ASP si votre annexe financière “valide” ou “provisoire” est déjà enregistrée.
-            </p>
-            <p>
-                <i>Si c’est le cas</i>, tentez de vous reconnecter dans une dizaine de jours, le temps que l’ASP nous transmette l’information.
-            </p>
-            <p>
-                <i>Si ce n’est pas le cas</i>, demandez à votre DDETS d’enregistrer au plus vite l’annexe financière dans l’ASP.
-            </p>
-            <p>
-                En cas de nécessité d’inscription rapide, demandez à votre DDETS de nous contacter via <a href="https://communaute.inclusion.beta.gouv.fr/aide/emplois/#support" target="_blank" rel="noopener" aria-label="lien de contact pour votre DDETS (ouverture dans un nouvel onglet)">ce formulaire</a>.
-            </p>
-
-            <p>
-                <strong>Si vous tentez d'inscrire une Entreprise Adaptée ou un GEIQ</strong> :
-                Utilisez <a href="{% tally_form_url "wA799W" %}" target="_blank" rel="noopener" aria-label="lien pour une Entreprise Adaptée ou un GEIQ (ouverture dans un nouvel onglet)">ce formulaire</a>.
-            </p>
-
-            <p class="mb-0">
-                <strong>Si votre organisation est porteuse de la clause sociale</strong> :
-                Utilisez <a href="{% url "signup:facilitator_search" %}" rel="noopener" aria-label="lien pour une organisation porteuse de la clause sociale">ce formulaire</a>.
-            </p>
-        </div>
-    {% endif %}
-
-
-    {% if siaes_without_members and siae_select_form %}
-        <div class="mt-5">
-
-            <h3 class="h2">Entreprise{{ siaes_without_members|pluralizefr }} disponible{{ siaes_without_members|pluralizefr }}</h3>
-
-            <p class="text-muted">Les données sont fournies par la DGEFP et les extranets IAE 2.0 et EA 2 de l’ASP.</p>
-
-            <form method="post" class="js-prevent-multiple-submit">
-
-                {% csrf_token %}
-
-                {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
-
-                {% comment %}
-            A ModelChoiceField's iterator only returns a tuple with (value, label).
-            This means that using e.g. {% bootstrap_field form.siaes %} would only display
-            a radio input and a label.
-            The best solution I've yet found to display more info to the user than just a
-            label is to manually render the inputs.
-                {% endcomment %}
-                {% for siae in siaes_without_members %}
-                    <p>
-                        <label for="id_{{ siae_select_form.siaes.html_name }}_{{ forloop.counter0 }}" class="align-top">
-                            <input type="radio" name="{{ siae_select_form.siaes.html_name }}" value="{{ siae.pk }}" id="id_{{ siae_select_form.siaes.html_name }}_{{ forloop.counter0 }}" required>
-                            <b>{{ siae.siren }} {{ siae.siret_nic }}</b> - {{ siae.kind }}
-                            <br>
-                            {{ siae.display_name }}
-                            <br>
-                            {{ siae.address_line_1 }},
-                            {% if siae.address_line_2 %}{{ siae.address_line_2 }},{% endif %}
-                            {{ siae.post_code }} {{ siae.city }}
-                        </label>
-                    </p>
-                    <hr/>
-                {% endfor %}
-
-                <p>
-                    En cliquant sur "Envoyer ma demande de validation", un e-mail contenant un lien de confirmation sera envoyé au <b>correspondant technique de votre entreprise référencé dans l’extranet IAE 2.0 ou EA 2 de l'ASP</b>.
-                </p>
-                <div class="text-right">
-                    {% buttons %}
-                        <button type="submit" class="btn btn-primary">Envoyer ma demande de validation</button>
-                    {% endbuttons %}
+    <section class="s-title-01">
+        <div class="s-title-01__container container">
+            <div class="s-title-01__row row">
+                <div class="s-title-01__col col-12">
+                    <h1 class="s-title-01__title h1">
+                        Inscription
+                        <small class="text-muted">Employeur solidaire</small>
+                    </h1>
                 </div>
-            </form>
-
+            </div>
         </div>
-    {% endif %}
+    </section>
+
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    <form method="get" role="form">
+
+                        {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
+
+                        {% bootstrap_form siren_form alert_error_type="all" %}
+
+                        <div class="text-right">
+                            {% buttons %}
+                                <button type="submit" class="btn btn-primary">Rechercher</button>
+                            {% endbuttons %}
+                        </div>
+
+                    </form>
 
 
-    {% if siaes_with_members %}
-        <div class="mt-5">
+                    {% if siren_form.cleaned_data and not siaes_without_members and not siaes_with_members %}
+                        <div class="alert alert-emploi mt-5" role="status">
+                            <p class="mb-0">
+                                Aucun résultat pour <b>{{ siren_form.cleaned_data.siren }}</b>.
+                            </p>
+                        </div>
 
-            <h3 class="h2">Entreprise{{ siaes_with_members|pluralizefr }} déjà inscrite{{ siaes_with_members|pluralizefr }}</h3>
+                        <div class="alert alert-danger mt-2" role="status">
+                            <p>
+                                <strong>Si vous êtes une SIAE</strong> :
+                                <br>
+                                Merci de vérifier dans l’extranet IAE 2.0 de l’ASP si votre annexe financière “valide” ou “provisoire” est déjà enregistrée.
+                            </p>
+                            <p>
+                                <i>Si c’est le cas</i>, tentez de vous reconnecter dans une dizaine de jours, le temps que l’ASP nous transmette l’information.
+                            </p>
+                            <p>
+                                <i>Si ce n’est pas le cas</i>, demandez à votre DDETS d’enregistrer au plus vite l’annexe financière dans l’ASP.
+                            </p>
+                            <p>
+                                En cas de nécessité d’inscription rapide, demandez à votre DDETS de nous contacter via <a href="https://communaute.inclusion.beta.gouv.fr/aide/emplois/#support" target="_blank" rel="noopener" aria-label="lien de contact pour votre DDETS (ouverture dans un nouvel onglet)">ce formulaire</a>.
+                            </p>
 
-            <p class="text-muted">
-                Par mesure de sécurité, vous devez obtenir une invitation pour rejoindre
-                {% if siaes_with_members|length == 1 %}
-                    cette
-                {% else %}
-                    ces
-                {% endif %}
-                structure{{ siaes_with_members|pluralizefr }}.
-            </p>
+                            <p>
+                                <strong>Si vous tentez d'inscrire une Entreprise Adaptée ou un GEIQ</strong> :
+                                Utilisez <a href="{% tally_form_url "wA799W" %}" target="_blank" rel="noopener" aria-label="lien pour une Entreprise Adaptée ou un GEIQ (ouverture dans un nouvel onglet)">ce formulaire</a>.
+                            </p>
 
-            {% for siae in siaes_with_members %}
-                <div>
-                    <p>
-                        <b>{{ siae.siren }} {{ siae.siret_nic }}</b> - {{ siae.kind }}
-                    </p>
-                    <p>
-                        {{ siae.display_name }}
-                        <br>
-                        {{ siae.address_line_1 }},
-                        {% if siae.address_line_2 %}{{ siae.address_line_2 }},{% endif %}
-                        {{ siae.post_code }} {{ siae.city }}
-                    </p>
-                    <p>
-                        {# note: memberships.first does not work, it does not take the prefetch into account. #}
-                        {% with siae.memberships.all.0.user as admin %}
-                            {# For security, display only the first char of the last name. #}
-                            Pour obtenir une invitation, <b>veuillez contacter {{ admin.first_name|title }} {{ admin.last_name|slice:1 }}</b>.
-                        {% endwith %}
-                    </p>
+                            <p class="mb-0">
+                                <strong>Si votre organisation est porteuse de la clause sociale</strong> :
+                                Utilisez <a href="{% url "signup:facilitator_search" %}" rel="noopener" aria-label="lien pour une organisation porteuse de la clause sociale">ce formulaire</a>.
+                            </p>
+                        </div>
+                    {% endif %}
+
+
+                    {% if siaes_without_members and siae_select_form %}
+                        <div class="mt-5">
+
+                            <h3 class="h2">Entreprise{{ siaes_without_members|pluralizefr }} disponible{{ siaes_without_members|pluralizefr }}</h3>
+
+                            <p class="text-muted">Les données sont fournies par la DGEFP et les extranets IAE 2.0 et EA 2 de l’ASP.</p>
+
+                            <form method="post" class="js-prevent-multiple-submit">
+
+                                {% csrf_token %}
+
+                                {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
+
+                                {% comment %}
+                            A ModelChoiceField's iterator only returns a tuple with (value, label).
+                            This means that using e.g. {% bootstrap_field form.siaes %} would only display
+                            a radio input and a label.
+                            The best solution I've yet found to display more info to the user than just a
+                            label is to manually render the inputs.
+                                {% endcomment %}
+                                {% for siae in siaes_without_members %}
+                                    <p>
+                                        <label for="id_{{ siae_select_form.siaes.html_name }}_{{ forloop.counter0 }}" class="align-top">
+                                            <input type="radio" name="{{ siae_select_form.siaes.html_name }}" value="{{ siae.pk }}" id="id_{{ siae_select_form.siaes.html_name }}_{{ forloop.counter0 }}" required>
+                                            <b>{{ siae.siren }} {{ siae.siret_nic }}</b> - {{ siae.kind }}
+                                            <br>
+                                            {{ siae.display_name }}
+                                            <br>
+                                            {{ siae.address_line_1 }},
+                                            {% if siae.address_line_2 %}{{ siae.address_line_2 }},{% endif %}
+                                            {{ siae.post_code }} {{ siae.city }}
+                                        </label>
+                                    </p>
+                                    <hr/>
+                                {% endfor %}
+
+                                <p>
+                                    En cliquant sur "Envoyer ma demande de validation", un e-mail contenant un lien de confirmation sera envoyé au <b>correspondant technique de votre entreprise référencé dans l’extranet IAE 2.0 ou EA 2 de l'ASP</b>.
+                                </p>
+                                <div class="text-right">
+                                    {% buttons %}
+                                        <button type="submit" class="btn btn-primary">Envoyer ma demande de validation</button>
+                                    {% endbuttons %}
+                                </div>
+                            </form>
+
+                        </div>
+                    {% endif %}
+
+
+                    {% if siaes_with_members %}
+                        <div class="mt-5">
+
+                            <h3 class="h2">Entreprise{{ siaes_with_members|pluralizefr }} déjà inscrite{{ siaes_with_members|pluralizefr }}</h3>
+
+                            <p class="text-muted">
+                                Par mesure de sécurité, vous devez obtenir une invitation pour rejoindre
+                                {% if siaes_with_members|length == 1 %}
+                                    cette
+                                {% else %}
+                                    ces
+                                {% endif %}
+                                structure{{ siaes_with_members|pluralizefr }}.
+                            </p>
+
+                            {% for siae in siaes_with_members %}
+                                <div>
+                                    <p>
+                                        <b>{{ siae.siren }} {{ siae.siret_nic }}</b> - {{ siae.kind }}
+                                    </p>
+                                    <p>
+                                        {{ siae.display_name }}
+                                        <br>
+                                        {{ siae.address_line_1 }},
+                                        {% if siae.address_line_2 %}{{ siae.address_line_2 }},{% endif %}
+                                        {{ siae.post_code }} {{ siae.city }}
+                                    </p>
+                                    <p>
+                                        {# note: memberships.first does not work, it does not take the prefetch into account. #}
+                                        {% with siae.memberships.all.0.user as admin %}
+                                            {# For security, display only the first char of the last name. #}
+                                            Pour obtenir une invitation, <b>veuillez contacter {{ admin.first_name|title }} {{ admin.last_name|slice:1 }}</b>.
+                                        {% endwith %}
+                                    </p>
+                                </div>
+                                <hr/>
+                            {% endfor %}
+
+                        </div>
+                    {% endif %}
+
+
+                    {% if siaes_without_members or siaes_with_members %}
+                        <div class="mt-5 text-right">
+                            <p>
+                                En cas de problème <a href="{{ ITOU_ASSISTANCE_URL }}" target="_blank" rel="noopener" aria-label="{{ ITOU_ASSISTANCE_URL }} (ouverture dans un nouvel onglet)">contactez-nous</a>.
+                            </p>
+                        </div>
+                    {% endif %}
                 </div>
-                <hr/>
-            {% endfor %}
-
+            </div>
         </div>
-    {% endif %}
-
-
-    {% if siaes_without_members or siaes_with_members %}
-        <div class="mt-5 text-right">
-            <p>
-                En cas de problème <a href="{{ ITOU_ASSISTANCE_URL }}" target="_blank" rel="noopener" aria-label="{{ ITOU_ASSISTANCE_URL }} (ouverture dans un nouvel onglet)">contactez-nous</a>.
-            </p>
-        </div>
-    {% endif %}
-
-
+    </section>
 {% endblock %}

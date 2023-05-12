@@ -1,35 +1,51 @@
-{% extends "layout/content_small.html" %}
+{% extends "layout/content.html" %}
 {% load bootstrap4 %}
 
 {% block title %}Modification de la date de contrat {{ block.super }}{% endblock %}
 
 {% block content %}
-    <h1 class="h1-hero-c1">
-        Candidature de <span class="text-muted">{{ job_application.job_seeker.get_full_name|title }}</span>
-    </h1>
+    <section class="s-title-01">
+        <div class="s-title-01__container container">
+            <div class="s-title-01__row row">
+                <div class="s-title-01__col col-12">
+                    <h1 class="s-title-01__title h1">
+                        Candidature de <span class="text-muted">{{ job_application.job_seeker.get_full_name|title }}</span>
+                    </h1>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <div class="c-form">
-        <h2>Modification de la date de contrat</h2>
-        <form method="post" class="js-prevent-multiple-submit">
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    <div class="c-form">
+                        <h2>Modification de la date de contrat</h2>
+                        <form method="post" class="js-prevent-multiple-submit">
 
-            {% csrf_token %}
+                            {% csrf_token %}
 
-            {% bootstrap_form form alert_error_type="all" %}
+                            {% bootstrap_form form alert_error_type="all" %}
 
-            {% buttons %}
-                <hr>
-                <div class="form-row align-items-center justify-content-end">
-                    <div class="form-group mb-0 col-6 col-lg-auto">
-                        <a class="btn btn-outline-primary" href="{{ prev_url }}" aria-label="Annuler la modification de la date de contrat">Annuler</a>
-                    </div>
-                    <div class="form-group mb-0 col-6 col-lg-auto">
-                        <button type="submit" class="btn btn-block btn-primary" aria-label="Enregistrer la modification de la date de contrat">
-                            Enregistrer
-                        </button>
+                            {% buttons %}
+                                <hr>
+                                <div class="form-row align-items-center justify-content-end">
+                                    <div class="form-group mb-0 col-6 col-lg-auto">
+                                        <a class="btn btn-outline-primary" href="{{ prev_url }}" aria-label="Annuler la modification de la date de contrat">Annuler</a>
+                                    </div>
+                                    <div class="form-group mb-0 col-6 col-lg-auto">
+                                        <button type="submit" class="btn btn-block btn-primary" aria-label="Enregistrer la modification de la date de contrat">
+                                            Enregistrer
+                                        </button>
+                                    </div>
+                                </div>
+                            {% endbuttons %}
+
+                        </form>
                     </div>
                 </div>
-            {% endbuttons %}
-
-        </form>
-    </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}

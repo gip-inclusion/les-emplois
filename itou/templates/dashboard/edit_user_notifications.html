@@ -1,28 +1,42 @@
-{% extends "layout/content_small.html" %}
+{% extends "layout/content.html" %}
 {% load bootstrap4 %}
 
 {% block title %}Mes notifications {{ block.super }}{% endblock %}
 
 {% block content %}
-    <h1 class="h1-hero-c1">Mes notifications</h1>
-    <h2 class="h1">
-        <span class="text-muted">{{ current_siae.display_name }}</span>
-    </h2>
+    <section class="s-title-01">
+        <div class="s-title-01__container container">
+            <div class="s-title-01__row row">
+                <div class="s-title-01__col col-12">
+                    <h1 class="s-title-01__title h1">Mes notifications</h1>
+                    <h2>{{ current_siae.display_name }}</h2>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <div class="c-form mt-3">
-        <h3 class="h2 font-weight-bold">Notifications e-mail</h3>
-        <h4 class="h3 font-weight-bold">Nouvelles candidatures</h4>
-        <form method="post" class="js-prevent-multiple-submit">
-            {% csrf_token %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    <div class="c-form">
+                        <h3>Notifications e-mail</h3>
+                        <h4>Nouvelles candidatures</h4>
+                        <form method="post" class="js-prevent-multiple-submit">
+                            {% csrf_token %}
 
-            {% bootstrap_form_errors new_job_app_notification_form type="all" %}
-            {% bootstrap_form new_job_app_notification_form field_class="custom-control custom-switch" show_label=False %}
+                            {% bootstrap_form_errors new_job_app_notification_form type="all" %}
+                            {% bootstrap_form new_job_app_notification_form field_class="custom-control custom-switch" show_label=False %}
 
-            {% buttons %}
-                <a class="btn btn-outline-primary" href="{{ back_url }}">Annuler</a>
-                <button type="submit" class="btn btn-primary">Enregistrer</button>
-            {% endbuttons %}
+                            {% buttons %}
+                                <a class="btn btn-outline-primary" href="{{ back_url }}">Annuler</a>
+                                <button type="submit" class="btn btn-primary">Enregistrer</button>
+                            {% endbuttons %}
 
-        </form>
-    </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}

@@ -1,5 +1,5 @@
 {# django-allauth template override. #}
-{% extends "layout/content_small.html" %}
+{% extends "layout/content.html" %}
 
 {% load account %}
 {% load bootstrap4 %}
@@ -7,40 +7,57 @@
 {% block title %}Confirmer l'adresse e-mail {{ block.super }}{% endblock %}
 
 {% block content %}
-
-    <h1 class="h1-hero-c1">Confirmer l'adresse e-mail</h1>
-
-    {% if confirmation %}
-
-        <p>
-            Confirmez que <a href="mailto:{{ confirmation.email_address.email }}" aria-label="{{ confirmation.email_address.email }} est bien votre adresse e-mail">{{ confirmation.email_address.email }}</a> est bien votre adresse e-mail en cliquant sur le bouton ci-dessous.
-        </p>
-
-        <form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
-
-            {% csrf_token %}
-
-            {# `is_safe_url` is secure enough to let us use request params here. #}
-            {# See Allauth.account.adapter.DefaultAccountAdapter.is_safe_url #}
-            {% if request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
-
-            {% buttons %}
-                <button type="submit" class="btn btn-primary">Confirmer</button>
-            {% endbuttons %}
-
-        </form>
-
-    {% else %}
-
-        {% url 'account_email' as email_url %}
-
-        <div class="alert alert-danger" role="status">
-            <p>Ce lien de confirmation d'adresse e-mail a expiré ou n'est pas valide.</p>
-            <p class="mb-0">
-                Veuillez lancer <a href="{{ email_url }}">une nouvelle demande de confirmation</a>.
-            </p>
+    <section class="s-title-01">
+        <div class="s-title-01__container container">
+            <div class="s-title-01__row row">
+                <div class="s-title-01__col col-12">
+                    <h1 class="s-title-01__title h1">Confirmer l'adresse e-mail</h1>
+                    <div class="alert alert-warning">
+                        <p class="mb-0">Ce compte est inactif.</p>
+                    </div>
+                </div>
+            </div>
         </div>
+    </section>
 
-    {% endif %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    {% if confirmation %}
 
+                        <p>
+                            Confirmez que <a href="mailto:{{ confirmation.email_address.email }}" aria-label="{{ confirmation.email_address.email }} est bien votre adresse e-mail">{{ confirmation.email_address.email }}</a> est bien votre adresse e-mail en cliquant sur le bouton ci-dessous.
+                        </p>
+
+                        <form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
+
+                            {% csrf_token %}
+
+                            {# `is_safe_url` is secure enough to let us use request params here. #}
+                            {# See Allauth.account.adapter.DefaultAccountAdapter.is_safe_url #}
+                            {% if request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
+
+                            {% buttons %}
+                                <button type="submit" class="btn btn-primary">Confirmer</button>
+                            {% endbuttons %}
+
+                        </form>
+
+                    {% else %}
+
+                        {% url 'account_email' as email_url %}
+
+                        <div class="alert alert-danger">
+                            <p>Ce lien de confirmation d'adresse e-mail a expiré ou n'est pas valide.</p>
+                            <p class="mb-0">
+                                Veuillez lancer <a href="{{ email_url }}">une nouvelle demande de confirmation</a>.
+                            </p>
+                        </div>
+
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}

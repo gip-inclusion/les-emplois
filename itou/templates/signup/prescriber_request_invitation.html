@@ -1,4 +1,4 @@
-{% extends "layout/content_small.html" %}
+{% extends "layout/content.html" %}
 {% load bootstrap4 %}
 {% load static %}
 {% load format_filters %}
@@ -6,26 +6,40 @@
 {% block title %}Prescripteur/Orienteur - Inscription {{ block.super }}{% endblock %}
 
 {% block content %}
+    <section class="s-title-01">
+        <div class="s-title-01__container container">
+            <div class="s-title-01__row row">
+                <div class="s-title-01__col col-12">
+                    <h1 class="s-title-01__title h1">
+                        Inscription
+                        <small class="text-muted">Prescripteur/Orienteur</small>
+                    </h1>
+                    <div class="alert alert-info">
+                        <p class="mb-0">
+                            Renseignez vos coordonnées afin d'être invité par {{ prescriber.first_name|title }} {{ prescriber.last_name|slice:1 }} de l'organisation « {{ organization.display_name }} ».
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <h1 class="h1-hero-c1">
-        Inscription
-        <small class="text-muted">Prescripteur/Orienteur</small>
-    </h1>
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    <form method="post" class="js-prevent-multiple-submit">
+                        {% csrf_token %}
 
-    <div class="alert alert-info">
-        <p class="mb-0">
-            Renseignez vos coordonnées afin d'être invité par {{ prescriber.first_name|title }} {{ prescriber.last_name|slice:1 }} de l'organisation « {{ organization.display_name }} ».
-        </p>
-    </div>
+                        {% bootstrap_form form alert_error_type="all" %}
 
-    <form method="post" class="js-prevent-multiple-submit">
-        {% csrf_token %}
-
-        {% bootstrap_form form alert_error_type="all" %}
-
-        {% buttons %}
-            <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">Retour</a>
-            <button type="submit" class="btn btn-primary">Valider la demande</button>
-        {% endbuttons %}
-    </form>
+                        {% buttons %}
+                            <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">Retour</a>
+                            <button type="submit" class="btn btn-primary">Valider la demande</button>
+                        {% endbuttons %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}

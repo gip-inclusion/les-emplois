@@ -1,4 +1,4 @@
-{% extends "layout/content_small.html" %}
+{% extends "layout/content.html" %}
 {% load static %}
 {% load bootstrap4 %}
 
@@ -9,58 +9,66 @@
 {% endblock %}
 
 {% block content %}
-    <div class="c-stepper my-3 my-lg-6">
-        <div class="progress progress--emploi">
-            <div class="progress-bar progress-bar-33" role="progressbar" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100">
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    <div class="c-stepper my-3 my-lg-6">
+                        <div class="progress progress--emploi">
+                            <div class="progress-bar progress-bar-33" role="progressbar" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                        <p>
+                            <strong>Étape 1</strong>/3 : Informations générales
+                        </p>
+                    </div>
+
+                    <div class="c-form">
+                        <div class="text-center mb-3">
+                            <img src="{% static 'img/edit_job_description_header.svg' %}" alt="">
+                        </div>
+                        <h1 class="text-center mb-5">Informations générales de ma fiche de poste</h1>
+                        <hr>
+
+                        <form method="post" action="?step={{ step }}" class="js-prevent-multiple-submit">
+                            {% bootstrap_form_errors form alert_error_type="all" %}
+
+                            {# Bug or feature, django_bootstrap4 does not render errors raised from hidden fields validation #}
+                            {% if form.errors.job_appellation_code %}
+                                <div class="alert alert-danger alert-dismissible" role="alert">
+                                    <button class="close" type="button" data-dismiss="alert" aria-label="Fermer">&#215;</button>
+                                    {{ form.errors.job_appellation_code }}
+                                </div>
+                            {% endif %}
+
+                            {% csrf_token %}
+
+                            {# Not using compact form because of `other_contract_type` field dynamic behaviour #}
+                            {% bootstrap_field form.job_appellation %}
+                            {% bootstrap_field form.job_appellation_code %}
+                            {% bootstrap_field form.custom_name %}
+                            {% bootstrap_field form.location_label %}
+                            {% bootstrap_field form.location_code %}
+                            {% if form.market_context_description %}
+                                {% bootstrap_field form.market_context_description %}
+                            {% endif %}
+                            {% bootstrap_field form.contract_type %}
+                            <div id="_other_contract_type_group">{% bootstrap_field form.other_contract_type %}</div>
+                            {% bootstrap_field form.hours_per_week %}
+                            {% bootstrap_field form.open_positions %}
+
+                            {% buttons %}
+                                <div class="pt-3 text-right">
+                                    <a class="btn btn-outline-primary" href="{% url "siaes_views:job_description_list" %}" aria-label="Retour à la liste des métiers">Retour</a>
+                                    <button type="submit" class="btn btn-primary" aria-label="Passer à l'étape suivante">Suivant</button>
+                                </div>
+                            {% endbuttons %}
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
-        <p>
-            <strong>Étape 1</strong>/3 : Informations générales
-        </p>
-    </div>
-
-    <div class="d-block rounded-lg shadow-lg p-3 p-lg-5">
-        <div class="text-center mb-3">
-            <img src="{% static 'img/edit_job_description_header.svg' %}" alt="">
-        </div>
-        <h1 class="text-center mb-5">Informations générales de ma fiche de poste</h1>
-        <hr>
-
-        <form method="post" action="?step={{ step }}" class="js-prevent-multiple-submit">
-            {% bootstrap_form_errors form alert_error_type="all" %}
-
-            {# Bug or feature, django_bootstrap4 does not render errors raised from hidden fields validation #}
-            {% if form.errors.job_appellation_code %}
-                <div class="alert alert-danger alert-dismissible" role="alert">
-                    <button class="close" type="button" data-dismiss="alert" aria-label="Fermer">&#215;</button>
-                    {{ form.errors.job_appellation_code }}
-                </div>
-            {% endif %}
-
-            {% csrf_token %}
-
-            {# Not using compact form because of `other_contract_type` field dynamic behaviour #}
-            {% bootstrap_field form.job_appellation %}
-            {% bootstrap_field form.job_appellation_code %}
-            {% bootstrap_field form.custom_name %}
-            {% bootstrap_field form.location_label %}
-            {% bootstrap_field form.location_code %}
-            {% if form.market_context_description %}
-                {% bootstrap_field form.market_context_description %}
-            {% endif %}
-            {% bootstrap_field form.contract_type %}
-            <div id="_other_contract_type_group">{% bootstrap_field form.other_contract_type %}</div>
-            {% bootstrap_field form.hours_per_week %}
-            {% bootstrap_field form.open_positions %}
-
-            {% buttons %}
-                <div class="pt-3 text-right">
-                    <a class="btn btn-outline-primary" href="{% url "siaes_views:job_description_list" %}" aria-label="Retour à la liste des métiers">Retour</a>
-                    <button type="submit" class="btn btn-primary" aria-label="Passer à l'étape suivante">Suivant</button>
-                </div>
-            {% endbuttons %}
-        </form>
-    </div>
+    </section>
 {% endblock %}
 
 {% block script %}

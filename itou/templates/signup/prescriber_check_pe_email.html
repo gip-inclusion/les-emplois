@@ -1,33 +1,46 @@
-{% extends "layout/content_small.html" %}
+{% extends "layout/content.html" %}
 {% load bootstrap4 %}
 {% load static %}
 
 {% block title %}Prescripteur Pôle emploi - Inscription {{ block.super }}{% endblock %}
 
 {% block content %}
+    <section class="s-title-01">
+        <div class="s-title-01__container container">
+            <div class="s-title-01__row row">
+                <div class="s-title-01__col col-12">
+                    <h1 class="s-title-01__title h1">
+                        Inscription
+                        <small class="text-muted">Prescripteur Pôle emploi</small>
+                    </h1>
+                    <div class="alert alert-emploi">
+                        <p class="mb-0">
+                            Vous allez rejoindre <b>{{ pole_emploi_org.display_name }}</b>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <h1 class="h1-hero-c1">
-        Inscription
-        <small class="text-muted">Prescripteur Pôle emploi</small>
-    </h1>
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    <form method="post" class="js-prevent-multiple-submit">
 
-    <div class="alert alert-emploi">
-        <p class="lead mb-0">
-            Vous allez rejoindre <b>{{ pole_emploi_org.display_name }}</b>
-        </p>
-    </div>
+                        {% csrf_token %}
 
-    <form method="post" class="js-prevent-multiple-submit">
+                        {% bootstrap_form form alert_error_type="all" %}
 
-        {% csrf_token %}
+                        {% buttons %}
+                            <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">Retour</a>
+                            <button type="submit" class="btn btn-primary">Continuer</button>
+                        {% endbuttons %}
 
-        {% bootstrap_form form alert_error_type="all" %}
-
-        {% buttons %}
-            <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">Retour</a>
-            <button type="submit" class="btn btn-primary">Continuer</button>
-        {% endbuttons %}
-
-    </form>
-
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}

@@ -1,111 +1,125 @@
-{% extends "layout/content_small.html" %}
+{% extends "layout/content.html" %}
 {% load js_filters %}
 {% load bootstrap4 %}
 
 {% block title %}Suspendre le PASS IAE {{ block.super }}{% endblock %}
 
 {% block content %}
-
-    <h1 class="h1-hero-c1">
-        Suspendre le PASS IAE
-        <br>
-        <span class="text-muted">{{ approval.user.get_full_name|title }}</span>
-    </h1>
-
-    {% if not preview %}
-        {# Edit mode. #}
-
-        {% include "approvals/includes/card.html" with common_approval=approval %}
-        <div class="c-form">
-            <form method="post" class="js-prevent-multiple-submit">
-
-                {% csrf_token %}
-
-                {% bootstrap_form_errors form alert_error_type="all" %}
-
-                {# Split form fields for easier collapsible behaviour #}
-                {% bootstrap_field form.start_at %}
-                <div id="collapse_end_at" class="collapse{% if not form.set_default_end_date.value %} show{% endif %}">
-                    {% bootstrap_field form.end_at %}
+    <section class="s-title-01">
+        <div class="s-title-01__container container">
+            <div class="s-title-01__row row">
+                <div class="s-title-01__col col-12">
+                    <h1 class="s-title-01__title h1">
+                        Suspendre le PASS IAE
+                        <br>
+                        <span class="text-muted">{{ approval.user.get_full_name|title }}</span>
+                    </h1>
                 </div>
-                <div role="button" data-toggle="collapse" data-target="#collapse_end_at" aria-controls="collapse_end_at">
-                    {% bootstrap_field form.set_default_end_date %}
-                </div>
-                {% bootstrap_field form.reason %}
-
-                <div class="alert alert-warning">
-                    <div class="row">
-                        <div class="col-auto pr-0">
-                            <i class="ri-information-line ri-xl text-warning"></i>
-                        </div>
-                        <div class="col">
-                            <p class="mb-0">La suspension du PASS IAE pourra être levée en cas d’embauche par un autre employeur.</p>
-                        </div>
-                    </div>
-                </div>
-
-                {% bootstrap_field form.reason_explanation %}
-
-                <hr class="my-4">
-                {% buttons %}
-                    <a class="btn btn-outline-primary" href="{{ back_url }}" aria-label="Retour à l'étape précédente">Retour</a>
-                    {# Enable preview mode: preview=1. #}
-                    <button type="submit" name="preview" value="1" class="btn btn-primary" aria-label="Valider la suspension du PASS IAE de {{ approval.user.get_full_name }}">
-                        Valider la suspension
-                    </button>
-                {% endbuttons %}
-
-            </form>
+            </div>
         </div>
+    </section>
 
-    {% else %}
-        {# Preview mode: ask for confirmation before committing to DB. #}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    {% if not preview %}
+                        {# Edit mode. #}
 
-        <div class="c-form">
-            <form method="post" class="js-prevent-multiple-submit">
+                        {% include "approvals/includes/card.html" with common_approval=approval %}
+                        <div class="c-form">
+                            <form method="post" class="js-prevent-multiple-submit">
 
-                {% csrf_token %}
+                                {% csrf_token %}
 
-                {# Hide all form fields. #}
-                {% for field in form %}<input type="hidden" name="{{ field.name }}" value="{{ field.value }}">{% endfor %}
+                                {% bootstrap_form_errors form alert_error_type="all" %}
 
-                {# Show the user a summary of the info. #}
-                <div class="card my-3 text-center">
-                    <div class="card-body">
-                        <h5 class="h4 card-title">
-                            Vous êtes sur le point de suspendre ce PASS IAE
-                            <br>
-                            pour la raison suivante :
-                        </h5>
-                        <p class="card-text">{{ form.instance.get_reason_display }}</p>
-                        <p class="card-text text-success">
-                            À partir du
-                            <span class="badge badge-pill badge-success">{{ form.instance.start_at|date:"d/m/Y" }}</span>
-                            jusqu'au
-                            <span class="badge badge-pill badge-success">{{ form.instance.end_at|date:"d/m/Y" }}</span>
-                        </p>
-                    </div>
+                                {# Split form fields for easier collapsible behaviour #}
+                                {% bootstrap_field form.start_at %}
+                                <div id="collapse_end_at" class="collapse{% if not form.set_default_end_date.value %} show{% endif %}">
+                                    {% bootstrap_field form.end_at %}
+                                </div>
+                                <div role="button" data-toggle="collapse" data-target="#collapse_end_at" aria-controls="collapse_end_at">
+                                    {% bootstrap_field form.set_default_end_date %}
+                                </div>
+                                {% bootstrap_field form.reason %}
+
+                                <div class="alert alert-warning">
+                                    <div class="row">
+                                        <div class="col-auto pr-0">
+                                            <i class="ri-information-line ri-xl text-warning"></i>
+                                        </div>
+                                        <div class="col">
+                                            <p class="mb-0">La suspension du PASS IAE pourra être levée en cas d’embauche par un autre employeur.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {% bootstrap_field form.reason_explanation %}
+
+                                <hr class="my-4">
+                                {% buttons %}
+                                    <a class="btn btn-outline-primary" href="{{ back_url }}" aria-label="Retour à l'étape précédente">Retour</a>
+                                    {# Enable preview mode: preview=1. #}
+                                    <button type="submit" name="preview" value="1" class="btn btn-primary" aria-label="Valider la suspension du PASS IAE de {{ approval.user.get_full_name }}">
+                                        Valider la suspension
+                                    </button>
+                                {% endbuttons %}
+
+                            </form>
+                        </div>
+
+                    {% else %}
+                        {# Preview mode: ask for confirmation before committing to DB. #}
+
+                        <div class="c-form">
+                            <form method="post" class="js-prevent-multiple-submit">
+
+                                {% csrf_token %}
+
+                                {# Hide all form fields. #}
+                                {% for field in form %}<input type="hidden" name="{{ field.name }}" value="{{ field.value }}">{% endfor %}
+
+                                {# Show the user a summary of the info. #}
+                                <div class="card my-3 text-center">
+                                    <div class="card-body">
+                                        <h5 class="h4 card-title">
+                                            Vous êtes sur le point de suspendre ce PASS IAE
+                                            <br>
+                                            pour la raison suivante :
+                                        </h5>
+                                        <p class="card-text">{{ form.instance.get_reason_display }}</p>
+                                        <p class="card-text text-success">
+                                            À partir du
+                                            <span class="badge badge-pill badge-success">{{ form.instance.start_at|date:"d/m/Y" }}</span>
+                                            jusqu'au
+                                            <span class="badge badge-pill badge-success">{{ form.instance.end_at|date:"d/m/Y" }}</span>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="alert alert-warning" role="status">
+                                    <p>
+                                        En confirmant cette demande je certifie sur l'honneur que le motif de suspension choisi correspond à la situation du salarié.
+                                    </p>
+                                    {% buttons %}
+                                        {# Allow the user to modify the suspension: edit=1. #}
+                                        <button type="submit" name="edit" value="1" class="btn btn-secondary" aria-label="Annuler la suspension du PASS IAE de {{ approval.user.get_full_name }}">
+                                            Annuler
+                                        </button>
+                                        {# Create a suspension: save=1. #}
+                                        <button type="submit" name="save" value="1" class="btn btn-primary" aria-label="Confirmer la suspension du PASS IAE de {{ approval.user.get_full_name }}">
+                                            Confirmer la suspension
+                                        </button>
+                                    {% endbuttons %}
+                                </div>
+
+                            </form>
+                        </div>
+
+                    {% endif %}
                 </div>
-
-                <div class="alert alert-warning" role="status">
-                    <p>
-                        En confirmant cette demande je certifie sur l'honneur que le motif de suspension choisi correspond à la situation du salarié.
-                    </p>
-                    {% buttons %}
-                        {# Allow the user to modify the suspension: edit=1. #}
-                        <button type="submit" name="edit" value="1" class="btn btn-secondary" aria-label="Annuler la suspension du PASS IAE de {{ approval.user.get_full_name }}">
-                            Annuler
-                        </button>
-                        {# Create a suspension: save=1. #}
-                        <button type="submit" name="save" value="1" class="btn btn-primary" aria-label="Confirmer la suspension du PASS IAE de {{ approval.user.get_full_name }}">
-                            Confirmer la suspension
-                        </button>
-                    {% endbuttons %}
-                </div>
-
-            </form>
+            </div>
         </div>
-
-    {% endif %}
-
+    </section>
 {% endblock %}

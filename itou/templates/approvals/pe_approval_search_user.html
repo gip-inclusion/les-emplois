@@ -1,25 +1,41 @@
-{% extends "layout/content_small.html" %}
+{% extends "layout/content.html" %}
 {% load bootstrap4 %}
 
 {% block title %}Prolonger ou suspendre un agrément émis par Pôle emploi {{ block.super }}{% endblock %}
 
 {% block content %}
+    <section class="s-title-01">
+        <div class="s-title-01__container container">
+            <div class="s-title-01__row row">
+                <div class="s-title-01__col col-12">
+                    {{ block.super }}
+                    <h1 class="s-title-01__title h1">Prolonger ou suspendre un agrément émis par Pôle emploi</h1>
+                    <h2>{{ pe_approval.first_name|title }} {{ pe_approval.last_name|title }}</h2>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    {{ block.super }}
-    <h1 class="h1-hero-c1">Prolonger ou suspendre un agrément émis par Pôle emploi</h1>
-    <h3 class="h1 text-secondary">{{ pe_approval.first_name|title }} {{ pe_approval.last_name|title }}</h3>
-    <form method="post" action="{% url 'approvals:pe_approval_create' pe_approval.id %}" class="js-prevent-multiple-submit">
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    <form method="post" action="{% url 'approvals:pe_approval_create' pe_approval.id %}" class="js-prevent-multiple-submit">
 
-        {% csrf_token %}
+                        {% csrf_token %}
 
-        {% bootstrap_form form alert_error_type="all" %}
+                        {% bootstrap_form form alert_error_type="all" %}
 
-        <div>{% include "signup/includes/no_email_link.html" with link_text="Le candidat n'a pas d'e-mail ?" %}</div>
+                        <div>{% include "signup/includes/no_email_link.html" with link_text="Le candidat n'a pas d'e-mail ?" %}</div>
 
-        {% buttons %}
-            <button type="submit" class="btn btn-primary">Continuer</button>
-        {% endbuttons %}
-    </form>
+                        {% buttons %}
+                            <button type="submit" class="btn btn-primary">Continuer</button>
+                        {% endbuttons %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}
 
 {% block script %}{{ block.super }}{% endblock %}

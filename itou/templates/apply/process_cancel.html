@@ -5,41 +5,49 @@
 
     {{ block.super }}
 
-    <div class="alert alert-warning alert-dismissible fade show" role="status">
-        <div class="row">
-            <div class="col-auto pr-0">
-                <i class="ri-information-line ri-xl text-warning"></i>
-            </div>
-            <div class="col">
-                <p class="mb-0">
-                    {% if job_application.to_siae.is_subject_to_eligibility_rules %}
-                        En validant, <b>vous renoncez aux aides au poste</b> liées à cette candidature pour tous les jours travaillés de ce salarié. Si ce salarié a travaillé dans votre structure, il est préférable de suspendre son PASS IAE ci-dessus.
-                    {% else %}
-                        En annulant cette embauche, vous confirmez que le salarié n’avait pas encore commencé à travailler dans votre structure.
-                    {% endif %}
-                </p>
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    <div class="alert alert-warning alert-dismissible fade show" role="status">
+                        <div class="row">
+                            <div class="col-auto pr-0">
+                                <i class="ri-information-line ri-xl text-warning"></i>
+                            </div>
+                            <div class="col">
+                                <p class="mb-0">
+                                    {% if job_application.to_siae.is_subject_to_eligibility_rules %}
+                                        En validant, <b>vous renoncez aux aides au poste</b> liées à cette candidature pour tous les jours travaillés de ce salarié. Si ce salarié a travaillé dans votre structure, il est préférable de suspendre son PASS IAE ci-dessus.
+                                    {% else %}
+                                        En annulant cette embauche, vous confirmez que le salarié n’avait pas encore commencé à travailler dans votre structure.
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form method="post" class="js-prevent-multiple-submit">
+
+                        {% csrf_token %}
+
+                        <input type="hidden" name="confirm" value="true">
+
+                        {% buttons %}
+                            <hr>
+                            <div class="form-row align-items-center justify-content-end">
+                                <div class="form-group mb-0 col-6 col-lg-auto">
+                                    <a class="btn btn-outline-primary" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">Retour</a>
+                                </div>
+                                <div class="form-group mb-0 col-6 col-lg-auto">
+                                    <button type="submit" class="btn btn-danger btn-block">Confirmer l'annulation de l'embauche</button>
+                                </div>
+                            </div>
+                        {% endbuttons %}
+
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
-
-    <form method="post" class="js-prevent-multiple-submit">
-
-        {% csrf_token %}
-
-        <input type="hidden" name="confirm" value="true">
-
-        {% buttons %}
-            <hr>
-            <div class="form-row align-items-center justify-content-end">
-                <div class="form-group mb-0 col-6 col-lg-auto">
-                    <a class="btn btn-outline-primary" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">Retour</a>
-                </div>
-                <div class="form-group mb-0 col-6 col-lg-auto">
-                    <button type="submit" class="btn btn-danger btn-block">Confirmer l'annulation de l'embauche</button>
-                </div>
-            </div>
-        {% endbuttons %}
-
-    </form>
+    </section>
 
 {% endblock %}

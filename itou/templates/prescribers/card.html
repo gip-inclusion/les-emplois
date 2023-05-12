@@ -1,57 +1,68 @@
-{% extends "layout/content_small.html" %}
+{% extends "layout/content.html" %}
 {% load format_filters %}
 
 {% block title %}{{ siae.display_name }} {{ block.super }}{% endblock %}
 
 {% block content %}
+    <section class="s-title-01">
+        <div class="s-title-01__container container">
+            <div class="s-title-01__row row">
+                <div class="s-title-01__col col-12">
+                    <p>
+                        <b>Prescripteur habilité</b>
+                        -
+                        <i>{{ prescriber_org.get_kind_display }}</i>
+                    </p>
+                    <h1 class="s-title-01__title h1">{{ prescriber_org.name }}</h1>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <p>
-        <b>Prescripteur habilité</b>
-        -
-        <i>{{ prescriber_org.get_kind_display }}</i>
-    </p>
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    <p class="text-muted">
+                        {{ prescriber_org.address_line_1 }},
+                        {% if prescriber_org.address_line_2 %}{{ prescriber_org.address_line_2 }},{% endif %}
+                        {{ prescriber_org.post_code }} {{ prescriber_org.city }}
+                    </p>
 
-    <hr>
+                    {% if prescriber_org.description %}
+                        <hr>
+                        <div>{{ prescriber_org.description|linebreaks }}</div>
+                    {% endif %}
 
-    <h1 class="h1-hero-c1">{{ prescriber_org.name }}</h1>
+                    {% if user.is_authenticated and prescriber_org.email %}
+                        <p>
+                            <i class="ri-mail-line mr-1" aria-label="E-mail"></i>
+                            <a href="mailto:{{ prescriber_org.email }}">{{ prescriber_org.email }}</a>
+                        </p>
+                    {% endif %}
 
-    <p class="text-muted">
-        {{ prescriber_org.address_line_1 }},
-        {% if prescriber_org.address_line_2 %}{{ prescriber_org.address_line_2 }},{% endif %}
-        {{ prescriber_org.post_code }} {{ prescriber_org.city }}
-    </p>
+                    {% if user.is_authenticated and prescriber_org.phone %}
+                        <p>
+                            <i class="ri-phone-line mr-1" aria-label="Téléphone"></i>
+                            <a href="tel:{{ prescriber_org.phone|cut:" " }}">{{ prescriber_org.phone|format_phone }}</a>
+                        </p>
+                    {% endif %}
 
-    {% if prescriber_org.description %}
-        <hr>
-        <div>{{ prescriber_org.description|linebreaks }}</div>
-    {% endif %}
+                    {% if prescriber_org.website %}
+                        <p>
+                            <i class="ri-external-link-line mr-1"></i>
+                            <a href="{{ prescriber_org.website }}" rel="noopener" target="_blank" aria-label="{{ prescriber_org.website }} (ouverture dans un nouvel onglet)">{{ prescriber_org.website }}</a>
+                        </p>
+                    {% endif %}
 
-    {% if user.is_authenticated and prescriber_org.email %}
-        <p>
-            <i class="ri-mail-line mr-1" aria-label="E-mail"></i>
-            <a href="mailto:{{ prescriber_org.email }}">{{ prescriber_org.email }}</a>
-        </p>
-    {% endif %}
-
-    {% if user.is_authenticated and prescriber_org.phone %}
-        <p>
-            <i class="ri-phone-line mr-1" aria-label="Téléphone"></i>
-            <a href="tel:{{ prescriber_org.phone|cut:" " }}">{{ prescriber_org.phone|format_phone }}</a>
-        </p>
-    {% endif %}
-
-    {% if prescriber_org.website %}
-        <p>
-            <i class="ri-external-link-line mr-1"></i>
-            <a href="{{ prescriber_org.website }}" rel="noopener" target="_blank" aria-label="{{ prescriber_org.website }} (ouverture dans un nouvel onglet)">{{ prescriber_org.website }}</a>
-        </p>
-    {% endif %}
-
-    {% if back_url %}
-        <hr>
-        <p>
-            <a href="{{ back_url }}">Retour</a>
-        </p>
-    {% endif %}
-
+                    {% if back_url %}
+                        <hr>
+                        <p>
+                            <a href="{{ back_url }}">Retour</a>
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}

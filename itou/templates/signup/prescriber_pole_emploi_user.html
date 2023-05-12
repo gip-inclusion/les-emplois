@@ -1,21 +1,32 @@
-{% extends "layout/content_small.html" %}
+{% extends "layout/content.html" %}
 {% load bootstrap4 %}
 
 {% block title %}Prescripteur Pôle emploi - Inscription {{ block.super }}{% endblock %}
 
 {% block content %}
+    <section class="s-title-01">
+        <div class="s-title-01__container container">
+            <div class="s-title-01__row row">
+                <div class="s-title-01__col col-12">
+                    <h1 class="s-title-01__title h1">
+                        Inscription
+                        <small class="text-muted">Prescripteur Pôle emploi</small>
+                    </h1>
+                    <div class="alert alert-emploi">
+                        <p class="mb-0">
+                            Vous allez rejoindre <b>{{ pole_emploi_org.display_name }}</b>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <h1 class="h1-hero-c1">
-        Inscription
-        <small class="text-muted">Prescripteur Pôle emploi</small>
-    </h1>
-
-    <div class="alert alert-emploi">
-        <p class="lead mb-0">
-            Vous allez rejoindre <b>{{ pole_emploi_org.display_name }}</b>
-        </p>
-    </div>
-
-    {% include "inclusion_connect/includes/description.html" %}
-
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">{% include "inclusion_connect/includes/description.html" %}</div>
+            </div>
+        </div>
+    </section>
 {% endblock %}

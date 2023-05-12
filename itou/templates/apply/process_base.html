@@ -1,4 +1,4 @@
-{% extends "layout/content_small.html" %}
+{% extends "layout/content.html" %}
 {% load job_applications %}
 {% load str_filters %}
 
@@ -9,73 +9,75 @@
     {{ block.super }}
 {% endblock %}
 
-{% block content_container_css_classes %}s-section pt-0{% endblock %}
-
-{% block pre_content %}
-    <section class="s-title-01 p-0">
+{% block content %}
+    <section class="s-title-01">
         <div class="s-title-01__container container">
             <div class="s-title-01__row row">
                 <div class="s-title-01__col col-12">
                     <h1 class="s-title-01__title h1-hero-c1">
-                        <strong>Candidature de</strong> <span class="text-muted">{{ job_application.job_seeker.get_full_name|title|mask_unless:can_view_personal_information }}</span>
+                        Candidature de <span class="text-muted">{{ job_application.job_seeker.get_full_name|title|mask_unless:can_view_personal_information }}</span>
                     </h1>
                     <p>{% state_badge job_application %}</p>
                 </div>
             </div>
         </div>
     </section>
-{% endblock %}
 
-{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    {% if job_application.to_siae.is_subject_to_eligibility_rules %}
 
-    {% if job_application.to_siae.is_subject_to_eligibility_rules %}
+                        {% if request.user.is_siae_staff %}
+                            {% if job_application.state.is_accepted and job_application.approval %}
+                                <div class="alert alert-info">
+                                    <div class="row">
+                                        <div class="col-auto pr-0">
+                                            <i class="ri-information-line ri-xl text-info"></i>
+                                        </div>
+                                        <div class="col">
+                                            <b>PASS IAE</b>
+                                            <p class="mb-0">
+                                                Désormais, le PASS IAE est visible depuis le profil salarié, la gestion de celui-ci également (exemple : « suspendre » ou  « prolonger » un PASS IAE).
+                                            </p>
+                                        </div>
+                                        <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+                                            <a class="btn btn-sm btn-primary matomo-event"
+                                               href="{% url 'approvals:detail' pk=job_application.approval.id %}"
+                                               data-matomo-category="salaries"
+                                               data-matomo-action="clic"
+                                               data-matomo-option="detail-salarie-depuis-candidature">
+                                                Accéder au Profil salarié
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% elif not job_application.state.is_cancelled %}
+                                {# Employers need to know the expiration date of an approval #}
+                                {# to decide whether they may accept a job application or not. #}
+                                {% include "approvals/includes/card.html" with common_approval=job_application.job_seeker.latest_common_approval job_application=job_application %}
+                            {% endif %}
+                        {% elif request.user.is_prescriber %}
+                            <div class="c-box my-4">
+                                {# Approval status. #}
+                                {% if job_application.approval %}
+                                    {% include "approvals/includes/status.html" with common_approval=job_application.approval %}
+                                {% elif job_application.job_seeker.has_valid_common_approval %}
+                                    {% include "approvals/includes/status.html" with common_approval=job_application.job_seeker.latest_common_approval %}
+                                {% elif job_application.hiring_without_approval %}
+                                    Vous n'avez pas demandé de PASS IAE (agrément).
+                                {% elif job_application.approval_manually_refused_at %}
+                                    PASS IAE refusé (délai de carence non respecté).
+                                {% else %}
+                                    PASS IAE (agrément) en cours de délivrance.
+                                {% endif %}
+                            </div>
+                        {% endif %}
 
-        {% if request.user.is_siae_staff %}
-            {% if job_application.state.is_accepted and job_application.approval %}
-                <div class="alert alert-info">
-                    <div class="row">
-                        <div class="col-auto pr-0">
-                            <i class="ri-information-line ri-xl text-info"></i>
-                        </div>
-                        <div class="col">
-                            <b>PASS IAE</b>
-                            <p class="mb-0">
-                                Désormais, le PASS IAE est visible depuis le profil salarié, la gestion de celui-ci également (exemple : « suspendre » ou  « prolonger » un PASS IAE).
-                            </p>
-                        </div>
-                        <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
-                            <a class="btn btn-sm btn-primary matomo-event"
-                               href="{% url 'approvals:detail' pk=job_application.approval.id %}"
-                               data-matomo-category="salaries"
-                               data-matomo-action="clic"
-                               data-matomo-option="detail-salarie-depuis-candidature">
-                                Accéder au Profil salarié
-                            </a>
-                        </div>
-                    </div>
+                    {% endif %}
                 </div>
-            {% elif not job_application.state.is_cancelled %}
-                {# Employers need to know the expiration date of an approval #}
-                {# to decide whether they may accept a job application or not. #}
-                {% include "approvals/includes/card.html" with common_approval=job_application.job_seeker.latest_common_approval job_application=job_application %}
-            {% endif %}
-        {% elif request.user.is_prescriber %}
-            <div class="c-box my-4">
-                {# Approval status. #}
-                {% if job_application.approval %}
-                    {% include "approvals/includes/status.html" with common_approval=job_application.approval %}
-                {% elif job_application.job_seeker.has_valid_common_approval %}
-                    {% include "approvals/includes/status.html" with common_approval=job_application.job_seeker.latest_common_approval %}
-                {% elif job_application.hiring_without_approval %}
-                    Vous n'avez pas demandé de PASS IAE (agrément).
-                {% elif job_application.approval_manually_refused_at %}
-                    PASS IAE refusé (délai de carence non respecté).
-                {% else %}
-                    PASS IAE (agrément) en cours de délivrance.
-                {% endif %}
             </div>
-        {% endif %}
-
-    {% endif %}
-
+        </div>
+    </section>
 {% endblock %}

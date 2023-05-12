@@ -5,20 +5,29 @@
 
     {{ block.super }}
 
-    <div class="alert alert-warning">
-        <p class="mb-0">La date de naissance et les informations Pôle emploi sont obligatoires pour continuer.</p>
-    </div>
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    <div class="alert alert-warning">
+                        <p class="mb-0">La date de naissance et les informations Pôle emploi sont obligatoires pour continuer.</p>
+                    </div>
 
-    <form method="post" class="js-prevent-multiple-submit">
+                    <form method="post" class="js-prevent-multiple-submit">
 
-        {% csrf_token %}
+                        {% csrf_token %}
 
-        {% bootstrap_form form alert_error_type="all" %}
+                        {% bootstrap_form form alert_error_type="all" %}
 
-        {% buttons %}
-            <button type="submit" class="btn btn-primary">Continuer</button>
-        {% endbuttons %}
+                        {% buttons %}
+                            <button type="submit" class="btn btn-primary">Continuer</button>
+                        {% endbuttons %}
 
-    </form>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
 
 {% endblock %}

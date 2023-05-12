@@ -1,11 +1,25 @@
-{% extends "layout/content_small.html" %}
+{% extends "layout/content.html" %}
 
 {% block title %}Postuler {{ block.super }}{% endblock %}
 
 {% block content %}
+    <section class="s-title-01">
+        <div class="s-title-01__container container">
+            <div class="s-title-01__row row">
+                <div class="s-title-01__col col-12">
+                    <h1 class="s-title-01__title h1">{% include 'apply/includes/_submit_title.html' %}</h1>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <h1>{% include 'apply/includes/_submit_title.html' %}</h1>
-
-    {% include "approvals/includes/card.html" with common_approval=job_seeker.latest_common_approval %}
-
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    {% include "approvals/includes/card.html" with common_approval=job_seeker.latest_common_approval %}
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}
