@@ -1,12 +1,13 @@
-{% extends "layout/base.html" %}
+{% extends "layout/content.html" %}
 {% load bootstrap4 %}
 
 {% block title %}Postuler {{ block.super }}{% endblock %}
-{% block content_full_viewport %}
+
+{% block content %}
     <section class="s-section-twocolumns">
         <div class="container">
             <div class="row">
-                <div class="col-12 col-lg-7">
+                <div class="col-12 col-lg-8">
                     <div class="d-flex flex-column flex-md-row align-items-center">
                         <h1 class="my-5 flex-grow-1">{% include 'apply/includes/_submit_title.html' %}</h1>
                         {% if is_subject_to_eligibility_rules %}
@@ -85,7 +86,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-12{% if not full_content_width %} col-lg-7{% endif %}">
+                <div class="col-12{% if not full_content_width %} col-lg-8{% endif %}">
                     <div class="c-form">
                         <div class="col-12 p-0 {% if full_content_width %}col-lg-7 pr-lg-5{% endif %}">
                             <div class="card c-card c-card--emploi c-card--noshadow mb-3 mb-lg-5">

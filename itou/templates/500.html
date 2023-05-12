@@ -1,22 +1,24 @@
-{% extends "layout/base.html" %}
+{% extends "layout/content.html" %}
 
 {% block title %}Erreur 500 {{ block.super }}{% endblock %}
 
-{% block content_full_viewport %}
+{% block content %}
+    <section class="s-title-01">
+        <div class="s-title-01__container container">
+            <div class="s-title-01__row row">
+                <div class="s-title-01__col col-12">
+                    <h1 class="s-title-01__title h1">Erreur 500</h1>
+                    <h2>Une erreur technique s'est produite.</h2>
+                    <p>Notre équipe technique a été informée du problème et s'en occupera le plus rapidement possible.</p>
 
-    <section>
-        <div class="container">
-            <h1 class="h1-hero-c1">Erreur 500</h1>
-            <p class="lead">Une erreur technique s'est produite.</p>
-            <p>Notre équipe technique a été informée du problème et s'en occupera le plus rapidement possible.</p>
-
-            {# Using ITOU_ASSISTANCE_URL would have required a custom error handler. #}
-            <p>
-                Toutefois, nous vous invitons à contacter
-                <a href="https://communaute.inclusion.beta.gouv.fr/assistance/">l'assistance de la Plateforme de l'inclusion</a>
-                afin que nous disposions de toutes les informations nécessaires à la résolution du problème.
-            </p>
+                    {# Using ITOU_ASSISTANCE_URL would have required a custom error handler. #}
+                    <p>
+                        Toutefois, nous vous invitons à contacter
+                        <a href="https://communaute.inclusion.beta.gouv.fr/assistance/">l'assistance de la Plateforme de l'inclusion</a>
+                        afin que nous disposions de toutes les informations nécessaires à la résolution du problème.
+                    </p>
+                </div>
+            </div>
         </div>
     </section>
-
 {% endblock %}

@@ -1,14 +1,15 @@
-{% extends "layout/base.html" %}
+{% extends "layout/content.html" %}
 {% load bootstrap4 %}
 {% load format_filters %}
 {% load str_filters %}
 
 {% block title %}Création du compte candidat {{ block.super }}{% endblock %}
-{% block content_full_viewport %}
+
+{% block content %}
     <section class="s-section-twocolumns">
         <div class="container">
             <div class="row">
-                <div class="col-12 col-lg-7 js-swap-elements">
+                <div class="col-12 col-lg-8 js-swap-elements">
                     <h1 class="my-5">{{ request.user.is_siae_staff|yesno:"Auto-prescription enregistrée !,Candidature envoyée !" }}</h1>
                     <p>
                         {% if request.user.is_job_seeker %}
