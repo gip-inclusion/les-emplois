@@ -26,8 +26,8 @@
                             <div class="d-flex justify-content-between mb-3">
                                 {% if approval_can_be_suspended_by_siae %}
                                     <a href="{% url 'approvals:suspend' approval_id=approval.id %}?back_url={{ request.get_full_path|urlencode }}"
-                                    class="btn btn-outline-primary"
-                                    aria-label="Suspendre le PASS IAE de {{ approval.user.get_full_name }}">
+                                       class="btn btn-outline-primary"
+                                       aria-label="Suspendre le PASS IAE de {{ approval.user.get_full_name }}">
                                         Suspendre
                                     </a>
                                 {% elif hire_by_other_siae %}
@@ -36,18 +36,18 @@
                                 {% endif %}
                                 {% if approval_can_be_prolonged_by_siae %}
                                     <a href="{% url 'approvals:declare_prolongation' approval_id=approval.id %}?back_url={{ request.get_full_path|urlencode }}"
-                                    class="btn btn-outline-primary"
-                                    aria-label="Prolonger le PASS IAE de {{ approval.user.get_full_name }}">
+                                       class="btn btn-outline-primary"
+                                       aria-label="Prolonger le PASS IAE de {{ approval.user.get_full_name }}">
                                         Prolonger
                                     </a>
                                 {% endif %}
                                 <a class="btn btn-primary matomo-event"
-                                data-matomo-action="telechargement-pdf"
-                                data-matomo-category="agrement"
-                                data-matomo-option="detail-agrement"
-                                href="{% url 'approvals:display_printable_approval' approval_id=approval.id %}"
-                                target="_blank"
-                                aria-label="Afficher le PASS IAE de {{ approval.user.get_full_name }}">
+                                   data-matomo-action="telechargement-pdf"
+                                   data-matomo-category="agrement"
+                                   data-matomo-option="detail-agrement"
+                                   href="{% url 'approvals:display_printable_approval' approval_id=approval.id %}"
+                                   target="_blank"
+                                   aria-label="Afficher le PASS IAE de {{ approval.user.get_full_name }}">
                                     Afficher l'attestation
                                 </a>
                             </div>
