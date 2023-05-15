@@ -1,6 +1,5 @@
 import dataclasses
 import logging
-from urllib.error import HTTPError
 
 import httpx
 from allauth.account.adapter import get_adapter
@@ -15,7 +14,7 @@ from django.utils.safestring import mark_safe
 from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF, IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils.constants import ITOU_ASSISTANCE_URL
-from itou.utils.urls import get_absolute_url
+from itou.utils.urls import add_url_params, get_absolute_url
 
 from ..models import InvalidKindException, MultipleUsersFoundException
 from . import constants
@@ -314,16 +313,9 @@ def inclusion_connect_logout(request):
             raise KeyError("Missing session key.")
         token = ic_session["token"]
 
-    params = {"id_token_hint": token}
-    complete_url = f"{constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT}?{urlencode(params)}"
-    # Logout user from IC with HTTPX to benefit from respx in tests
-    # and to handle post logout redirection more easily.
-    # It's okay if there's an error on Inclusion Connect : we don't want to crash on our side.
-    try:
-        response = httpx.get(complete_url)
-    except HTTPError as e:
-        logger.exception("Error during IC logout : '%s'", e)
-    else:
-        if response.status_code != 200:
-            logger.error("Error during IC logout. Status code: %s", response.status_code)
-    return HttpResponseRedirect(post_logout_redirect_url)
+    params = {
+        "id_token_hint": token,
+        "post_logout_redirect_uri": get_absolute_url(post_logout_redirect_url),
+    }
+    complete_url = add_url_params(constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT, params)
+    return HttpResponseRedirect(complete_url)

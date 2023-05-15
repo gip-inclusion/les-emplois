@@ -35,6 +35,7 @@ from itou.users.factories import (
 )
 from itou.users.models import User
 from itou.utils.test import assertMessages
+from itou.utils.urls import add_url_params, get_absolute_url
 
 from ..constants import OIDC_STATE_CLEANUP
 from ..models import InvalidKindException
@@ -431,7 +432,12 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
         user = UserFactory(username=ic_user_data.username, email=ic_user_data.email, kind=UserKind.SIAE_STAFF)
 
         response = mock_oauth_dance(self.client, UserKind.PRESCRIBER, assert_redirects=False)
-        response = self.client.get(response.url, follow=True)
+        self.assertRedirects(
+            response,
+            add_url_params(reverse("inclusion_connect:logout"), {"redirect_url": reverse("home:hp")}),
+            fetch_redirect_response=False,
+        )
+        response = self.client.get(reverse("home:hp"))
         self.assertContains(response, "existe déjà avec cette adresse e-mail")
         self.assertContains(response, "pour devenir prescripteur sur la plateforme")
         assert get_user(self.client).is_authenticated is False
@@ -448,7 +454,12 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
         user = UserFactory(username=ic_user_data.username, email=ic_user_data.email, kind=UserKind.PRESCRIBER)
 
         response = mock_oauth_dance(self.client, UserKind.SIAE_STAFF, assert_redirects=False)
-        response = self.client.get(response.url, follow=True)
+        self.assertRedirects(
+            response,
+            add_url_params(reverse("inclusion_connect:logout"), {"redirect_url": reverse("home:hp")}),
+            fetch_redirect_response=False,
+        )
+        response = self.client.get(reverse("home:hp"))
         self.assertContains(response, "existe déjà avec cette adresse e-mail")
         self.assertContains(response, "pour devenir employeur sur la plateforme")
         assert get_user(self.client).is_authenticated is False
@@ -466,7 +477,12 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
         for kind in [UserKind.JOB_SEEKER, UserKind.LABOR_INSPECTOR]:
             user = UserFactory(username=ic_user_data.username, email=ic_user_data.email, kind=kind)
             response = mock_oauth_dance(self.client, UserKind.PRESCRIBER, assert_redirects=False)
-            response = self.client.get(response.url, follow=True)
+            self.assertRedirects(
+                response,
+                add_url_params(reverse("inclusion_connect:logout"), {"redirect_url": reverse("home:hp")}),
+                fetch_redirect_response=False,
+            )
+            response = self.client.get(reverse("home:hp"))
             self.assertContains(response, "existe déjà avec cette adresse e-mail")
             self.assertContains(response, "pour devenir prescripteur sur la plateforme")
             user.delete()
@@ -479,7 +495,12 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
             user = UserFactory(username=ic_user_data.username, email=ic_user_data.email, kind=kind)
             # Don't check redirection as the user isn't an siae member yet, so it won't work.
             response = mock_oauth_dance(self.client, UserKind.SIAE_STAFF, assert_redirects=False)
-            response = self.client.get(response.url, follow=True)
+            self.assertRedirects(
+                response,
+                add_url_params(reverse("inclusion_connect:logout"), {"redirect_url": reverse("home:hp")}),
+                fetch_redirect_response=False,
+            )
+            response = self.client.get(reverse("home:hp"))
             self.assertContains(response, "existe déjà avec cette adresse e-mail")
             self.assertContains(response, "pour devenir employeur sur la plateforme")
             user.delete()
@@ -664,21 +685,33 @@ class InclusionConnectLogoutTest(InclusionConnectBaseTestCase):
     @respx.mock
     def test_simple_logout(self):
         mock_oauth_dance(self.client, UserKind.PRESCRIBER)
-        respx.get(constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(200)
         logout_url = reverse("inclusion_connect:logout")
         response = self.client.get(logout_url)
-        self.assertRedirects(response, reverse("home:hp"))
+        self.assertRedirects(
+            response,
+            add_url_params(
+                constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT,
+                {"id_token_hint": 123456, "post_logout_redirect_uri": get_absolute_url(reverse("home:hp"))},
+            ),
+            fetch_redirect_response=False,
+        )
 
     @respx.mock
     def test_logout_with_redirection(self):
         mock_oauth_dance(self.client, UserKind.PRESCRIBER)
         expected_redirection = reverse("dashboard:index")
-        respx.get(constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(200)
 
         params = {"redirect_url": expected_redirection}
         logout_url = f"{reverse('inclusion_connect:logout')}?{urlencode(params)}"
         response = self.client.get(logout_url)
-        self.assertRedirects(response, expected_redirection)
+        self.assertRedirects(
+            response,
+            add_url_params(
+                constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT,
+                {"id_token_hint": 123456, "post_logout_redirect_uri": get_absolute_url(expected_redirection)},
+            ),
+            fetch_redirect_response=False,
+        )
 
     @respx.mock
     def test_django_account_logout_from_ic(self):

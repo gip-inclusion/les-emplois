@@ -28,6 +28,7 @@ from itou.utils import constants as global_constants
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.test import assertMessages
+from itou.utils.urls import add_url_params
 from itou.www.signup.forms import PrescriberChooseKindForm
 
 
@@ -838,13 +839,16 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
             next_url=next_url,
         )
         # Follow the redirection.
-        response = self.client.get(response.url, follow=True)
-        self.assertTemplateNotUsed(response, "welcoming_tour/prescriber.html")
+        response = self.client.get(response.url)
+        self.assertRedirects(
+            response,
+            add_url_params(reverse("inclusion_connect:logout"), {"token": 123456}),
+            fetch_redirect_response=False,
+        )
 
         # The user should be logged out and redirected to the home page.
         assert not self.client.session.get(INCLUSION_CONNECT_SESSION_KEY)
         assert not auth.get_user(self.client).is_authenticated
-        self.assertRedirects(response, reverse("home:hp"))
 
         # Check user was created but did not join an organisation
         user = User.objects.get(email=OIDC_USERINFO["email"])
@@ -981,13 +985,15 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
             previous_url=previous_url,
             next_url=next_url,
         )
-        # Follow the redirection.
-        response = self.client.get(response.url, follow=True)
+        self.assertRedirects(
+            response,
+            add_url_params(reverse("inclusion_connect:logout"), {"redirect_url": previous_url}),
+            fetch_redirect_response=False,
+        )
 
+        # IC logout redirects to previous_url
+        response = self.client.get(previous_url)
         # Show an error and don't create an organization.
-        assert response.wsgi_request.path == signup_url
-        self.assertTemplateNotUsed(response, "welcoming_tour/prescriber.html")
-        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
         assertMessages(
             response,
             [
@@ -1047,12 +1053,14 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
             next_url=next_url,
             user_info_email=wrong_email,
         )
-        # Follow the redirection.
-        response = self.client.get(response.url, follow=True)
+        self.assertRedirects(
+            response,
+            add_url_params(reverse("inclusion_connect:logout"), {"redirect_url": previous_url}),
+            fetch_redirect_response=False,
+        )
 
-        # Response should contain elements available only to prescribers on the welcoming tour.
-        self.assertTemplateNotUsed(response, "welcoming_tour/prescriber.html")
-        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
+        # IC logout redirects to previous_url
+        response = self.client.get(previous_url)
         assertMessages(
             response,
             [
