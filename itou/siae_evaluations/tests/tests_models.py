@@ -277,6 +277,20 @@ class EvaluationCampaignManagerTest(TestCase):
         email = mail.outbox[1]
         assert len(email.to) == 2
 
+    def test_create_campaigns_on_specific_DDETS(self):
+        evaluated_period_start_at = timezone.now() - relativedelta(months=2)
+        evaluated_period_end_at = timezone.now() - relativedelta(months=1)
+        ratio_selection_end_at = timezone.now() + relativedelta(months=1)
+
+        institution_ids = InstitutionWith2MembershipFactory.create_batch(2, kind=InstitutionKind.DDETS)
+        assert 1 == create_campaigns(
+            evaluated_period_start_at,
+            evaluated_period_end_at,
+            ratio_selection_end_at,
+            institution_ids=[institution_ids[0].pk],
+        )
+        assert 1 == EvaluationCampaign.objects.all().count()
+
     def test_eligible_siaes(self):
 
         evaluation_campaign = EvaluationCampaignFactory()

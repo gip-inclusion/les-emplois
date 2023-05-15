@@ -51,9 +51,9 @@ def validate_institution(institution_id):
         raise ValidationError(f"Sélectionnez une institution de type {InstitutionKind.DDETS}")
 
 
-def create_campaigns(evaluated_period_start_at, evaluated_period_end_at, ratio_selection_end_at):
+def create_campaigns(evaluated_period_start_at, evaluated_period_end_at, ratio_selection_end_at, institution_ids=None):
     """
-    Create a campaign for each institution whose kind is DDETS.
+    Create a campaign for each institution whose kind is DDETS (possibly limited by institution_ids).
     This method is intented to be executed manually, until it will be automised.
     """
 
@@ -63,6 +63,8 @@ def create_campaigns(evaluated_period_start_at, evaluated_period_end_at, ratio_s
     )
 
     institutions = Institution.objects.filter(kind=InstitutionKind.DDETS)
+    if institution_ids:
+        institutions = institutions.filter(pk__in=institution_ids)
 
     evaluation_campaign_list = EvaluationCampaign.objects.bulk_create(
         EvaluationCampaign(
