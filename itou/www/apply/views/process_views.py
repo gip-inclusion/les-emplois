@@ -295,6 +295,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
         return HttpResponseRedirect(next_url)
 
     if request.method == "POST" and all([form.is_valid() for form in forms]):
+
         if request.htmx and not request.POST.get("confirmed"):
             return TemplateResponse(
                 request=request,
@@ -408,6 +409,20 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
         return HttpResponseClientRedirect(next_url)
 
     return render(request, template_name, {**context, "has_form_error": any(form.errors for form in forms)})
+
+
+def reload_qualification_fields(
+    request, job_application_id, template_name="apply/includes/geiq/geiq_qualification_fields.html"
+):
+    # This is an HTMX part
+    queryset = JobApplication.objects.siae_member_required(request.user)
+    job_application = get_object_or_404(queryset, id=job_application_id)
+    form_accept = AcceptForm(instance=job_application, data=request.POST or None)
+    ctx = {
+        "form_accept": form_accept,
+        "job_application": job_application,
+    }
+    return render(request, template_name, ctx)
 
 
 @login_required

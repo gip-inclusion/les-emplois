@@ -6,6 +6,7 @@ from dateutil.relativedelta import relativedelta
 from django import forms
 from django.core.validators import MinLengthValidator
 from django.db.models import Q
+from django.db.models.fields import BLANK_CHOICE_DASH
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
@@ -442,7 +443,18 @@ class AcceptForm(forms.ModelForm):
     If SIAE is a GEIQ, add specific fields (contract type, number of hours per week)
     """
 
-    GEIQ_REQUIRED_FIELDS = ("prehiring_guidance_days", "contract_type", "contract_type_details", "nb_hours_per_week")
+    GEIQ_REQUIRED_FIELDS = (
+        "prehiring_guidance_days",
+        "contract_type",
+        "contract_type_details",
+        "nb_hours_per_week",
+        "qualification_type",
+        "qualification_level",
+        "planned_training_days",
+    )
+
+    # Choices are dynamically set on HTMX reload
+    qualification_level = forms.ChoiceField(choices=[], label="Niveau de qualification")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -457,6 +469,7 @@ class AcceptForm(forms.ModelForm):
         for field in ["answer", "hiring_start_at", "hiring_end_at", "contract_type", "contract_type_details"]:
             self.initial[field] = ""
         self.initial["nb_hours_per_week"] = None
+        post_data = kwargs.get("data")
 
         if job_application := kwargs.get("instance"):
             is_geiq = job_application.to_siae.kind == SiaeKind.GEIQ
@@ -472,7 +485,32 @@ class AcceptForm(forms.ModelForm):
                 # Change default size (too large)
                 self.fields["contract_type_details"].widget.attrs.update({"rows": 2})
                 self.initial["prehiring_guidance_days"] = 0
+                self.initial["planned_training_days"] = 0
                 self.fields["hiring_start_at"].help_text = "Au format JJ/MM/AAAA, par exemple  %(date)s."
+                # Dynamic selection of qualification level
+                self.fields["qualification_type"].widget.attrs.update(
+                    {
+                        "hx-post": reverse(
+                            "apply:reload_qualification_fields", kwargs={"job_application_id": job_application.pk}
+                        ),
+                        "hx-swap": "outerHTML show:#id_qualification_type:top",
+                        "hx-target": "#geiq_qualification_fields_block",
+                    },
+                )
+                # Set dynamically in a custom form field,
+                # otherwise choices values are overriden at every HTMX reload
+                self.fields["qualification_level"].choices = (
+                    BLANK_CHOICE_DASH + job_applications_enums.QualificationLevel.choices
+                )
+                if (
+                    post_data
+                    and post_data.get("qualification_type") == job_applications_enums.QualificationType.STATE_DIPLOMA
+                ):
+                    # Remove irrelevant option
+                    idx = 1 + job_applications_enums.QualificationLevel.values.index(
+                        job_applications_enums.QualificationLevel.NOT_RELEVANT
+                    )
+                    self.fields["qualification_level"].choices.pop(idx)
             else:
                 # Add specific details to help texts for IAE
                 self.fields["hiring_start_at"].help_text += (
@@ -493,6 +531,8 @@ class AcceptForm(forms.ModelForm):
             "contract_type_details",
             "nb_hours_per_week",
             "hiring_start_at",
+            "qualification_type",
+            "planned_training_days",
             "hiring_end_at",
             "answer",
         ]
@@ -508,6 +548,7 @@ class AcceptForm(forms.ModelForm):
                 )
             },
             "prehiring_guidance_days": """Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche""",
+            "planned_training_days": """Laissez "0" si vous n'avez pas prévu de jours de formation pour le candidat""",
             "contract_type_details": (
                 "Si vous avez choisi un autre type de contrat, merci de bien vouloir fournir plus de précisions"
             ),

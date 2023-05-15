@@ -182,4 +182,10 @@ urlpatterns = [
         edit_views.edit_contract_start_date,
         name="edit_contract_start_date",
     ),
+    # HTMX fragments loading
+    path(
+        "<uuid:job_application_id>/accept/reload_qualification_fields",
+        process_views.reload_qualification_fields,
+        name="reload_qualification_fields",
+    ),
 ]

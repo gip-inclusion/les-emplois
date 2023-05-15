@@ -53,6 +53,10 @@
                     {% bootstrap_field form_accept.nb_hours_per_week %}
                 {% endif %}
                 {% bootstrap_field form_accept.hiring_start_at %}
+
+                {# reloadable training and qualification for GEIQ #}
+                {% include "apply/includes/geiq/geiq_qualification_fields.html" %}
+
                 {% bootstrap_field form_accept.hiring_end_at %}
                 {% bootstrap_field form_accept.answer %}
 

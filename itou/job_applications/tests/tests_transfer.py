@@ -142,7 +142,7 @@ class JobApplicationTransferModelTest(TestCase):
         with self.assertNumQueries(
             2  # Check user is in both origin and dest siae
             + 6  # Caused by `full_clean()` : `clean_fields()`
-            + 2  # Integrity constraints check (full clean)
+            + 3  # Integrity constraints check (full clean)
             + 1  # Update job application
             + 1  # Check if approvals are linked to diagnosis because of on_delete=set_null
             + 1  # Check if job applications are linked because of on_delete=set_null
