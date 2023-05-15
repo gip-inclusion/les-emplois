@@ -91,3 +91,16 @@ class Prequalification(models.TextChoices):
     AFPR = "PREQUALIFICATION_AFPR", "AFPR"
     POE = "PREQUALIFICATION_POE", "POE"
     OTHER = "PREQUALIFICATION_OTHER", "Autre"
+
+
+class QualificationType(models.TextChoices):
+    STATE_DIPLOMA = "STATE_DIPLOMA", "Diplôme d'état ou titre homologué"
+    CQP = "CQP", "CQP"
+    CCN = "CCN", "Positionnement de CCN"
+
+
+class QualificationLevel(models.TextChoices):
+    LEVEL_3 = "LEVEL_3", "Niveau 3 (CAP, BEP)"
+    LEVEL_4 = "LEVEL_4", "Niveau 4 (BP, Bac général, Techno ou Pro, BT)"
+    LEVEL_5 = "LEVEL_5", "Niveau 5 ou + (Bac+2 ou +)"
+    NOT_RELEVANT = "NOT_RELEVANT", "Non concerné"

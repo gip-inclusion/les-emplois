@@ -22,6 +22,8 @@ from itou.job_applications.enums import (
     Origin,
     Prequalification,
     ProfessionalSituationExperience,
+    QualificationLevel,
+    QualificationType,
     RefusalReason,
     SenderKind,
 )
@@ -629,6 +631,24 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     )
     contract_type_details = models.TextField(verbose_name="Précisions sur le type de contrat", blank=True)
 
+    qualification_type = models.CharField(
+        verbose_name="Type de qualification",
+        max_length=20,
+        choices=QualificationType.choices,
+        blank=True,
+    )
+    qualification_level = models.CharField(
+        verbose_name="Niveau de qualification",
+        max_length=40,
+        choices=QualificationLevel.choices,
+        blank=True,
+    )
+    planned_training_days = models.PositiveSmallIntegerField(
+        verbose_name="Nombre de jours de formation prévus",
+        blank=True,
+        null=True,
+    )
+
     objects = JobApplicationQuerySet.as_manager()
 
     class Meta:
@@ -658,6 +678,14 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 name="diagnoses_coherence",
                 violation_error_message="Une candidature ne peut avoir les deux types de diagnostics (IAE et GEIQ)",
                 check=~models.Q(eligibility_diagnosis__isnull=False, geiq_eligibility_diagnosis__isnull=False),
+            ),
+            models.CheckConstraint(
+                name="qualification_coherence",
+                violation_error_message="Incohérence dans les champs concernant la qualification pour le contrat GEIQ",
+                check=~models.Q(
+                    qualification_level=QualificationLevel.NOT_RELEVANT,
+                    qualification_type=QualificationType.STATE_DIPLOMA,
+                ),
             ),
         ]
 

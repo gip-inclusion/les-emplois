@@ -24,7 +24,7 @@ from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.employee_record.enums import Status
 from itou.employee_record.factories import BareEmployeeRecordFactory, EmployeeRecordFactory
 from itou.job_applications.admin_forms import JobApplicationAdminForm
-from itou.job_applications.enums import Origin, RefusalReason, SenderKind
+from itou.job_applications.enums import Origin, QualificationLevel, QualificationType, RefusalReason, SenderKind
 from itou.job_applications.export import JOB_APPLICATION_CSV_HEADERS, stream_xlsx_export
 from itou.job_applications.factories import (
     JobApplicationFactory,
@@ -275,6 +275,24 @@ def test_can_be_cancelled():
 
 def test_can_be_cancelled_when_origin_is_ai_stock():
     assert JobApplicationFactory(origin=Origin.AI_STOCK).can_be_cancelled is False
+
+
+def test_geiq_qualification_fields_contraint():
+    with pytest.raises(
+        Exception, match="Incohérence dans les champs concernant la qualification pour le contrat GEIQ"
+    ):
+        JobApplicationFactory(
+            to_siae__kind=SiaeKind.GEIQ,
+            qualification_type=QualificationType.STATE_DIPLOMA,
+            qualification_level=QualificationLevel.NOT_RELEVANT,
+        )
+
+    for qualification_type in [QualificationType.CQP, QualificationType.CCN]:
+        JobApplicationFactory(
+            to_siae__kind=SiaeKind.GEIQ,
+            qualification_type=qualification_type,
+            qualification_level=QualificationLevel.NOT_RELEVANT,
+        )
 
 
 @pytest.mark.parametrize("status", Status)
@@ -1702,6 +1720,9 @@ class JobApplicationAdminFormTest(TestCase):
             "contract_type",
             "nb_hours_per_week",
             "contract_type_details",
+            "qualification_type",
+            "qualification_level",
+            "planned_training_days",
         ]
         form = JobApplicationAdminForm()
         assert list(form.fields.keys()) == form_fields_list

@@ -141,6 +141,9 @@ class JobApplicationAdmin(admin.ModelAdmin):
                     "nb_hours_per_week",
                     "contract_type",
                     "contract_type_details",
+                    "qualification_type",
+                    "qualification_level",
+                    "planned_training_days",
                 ]
             },
         ),
