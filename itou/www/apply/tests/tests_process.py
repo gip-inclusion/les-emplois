@@ -54,6 +54,7 @@ class ProcessViewsTest(TestCase):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         self.cities = create_test_cities(["54", "57"], num_per_department=2)
         self.random_city = City.objects.order_by("?").first()
+        self.random_appellation = Appellation.objects.order_by("?").first()
 
     def accept_job_application(
         self, job_application, post_data=None, city=None, assert_successful=True, job_description=None
@@ -92,6 +93,7 @@ class ProcessViewsTest(TestCase):
         # Update: job application are now linked to a jpb description
         post_data |= {
             "hired_job": job_description.pk,
+            # "job_appelation_code": self.random_appellation.code
         }
 
         response = self.client.post(url_accept, HTTP_HX_REQUEST="true", data=post_data)
@@ -104,7 +106,7 @@ class ProcessViewsTest(TestCase):
         else:
             assert response.headers.get("HX-Trigger") is None
 
-        post_data = post_data | {"confirmed": "True"}
+        post_data |= {"confirmed": "True"}
         response = self.client.post(url_accept, HTTP_HX_REQUEST="true", data=post_data)
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
         # django-htmx triggers a client side redirect when it receives a response with the HX-Redirect header.
@@ -113,6 +115,9 @@ class ProcessViewsTest(TestCase):
         # See https://django-htmx.readthedocs.io/en/latest/http.html#django_htmx.http.HttpResponseClientRedirect # noqa
         if assert_successful:
             self.assertRedirects(response, next_url, status_code=200)
+            job_application.refresh_from_db()
+            assert job_application.state == JobApplicationWorkflow.STATE_ACCEPTED
+
         return response, next_url
 
     def test_details_for_siae(self, *args, **kwargs):
@@ -325,8 +330,6 @@ class ProcessViewsTest(TestCase):
         assert job_application.state.is_postponed
 
     def test_accept(self, *args, **kwargs):
-        # cities = create_test_cities(["54", "57"], num_per_department=2)
-        # city = self.cities[0]
         city = self.random_city
         today = timezone.localdate()
 
@@ -493,8 +496,6 @@ class ProcessViewsTest(TestCase):
 
     def test_accept_with_active_suspension(self, *args, **kwargs):
         """Test the `accept` transition with active suspension for active user"""
-        # cities = create_test_cities(["54", "57"], num_per_department=2)
-        # city = self.cities[0]
         city = self.random_city
         today = timezone.localdate()
         # the old job of job seeker
@@ -547,6 +548,8 @@ class ProcessViewsTest(TestCase):
             "city_slug": city.slug,
         }
         self.accept_job_application(job_application=job_application, post_data=post_data)
+        assert job_application.state == JobApplicationWorkflow.STATE_ACCEPTED
+
         get_job_application = JobApplication.objects.get(pk=job_application.pk)
         g_suspension = get_job_application.approval.suspension_set.in_progress().last()
 
@@ -561,7 +564,6 @@ class ProcessViewsTest(TestCase):
         """
         Test the "manual approval delivery mode" path of the view.
         """
-        # [city] = create_test_cities(["57"], num_per_department=1)
         city = self.random_city
 
         job_application = JobApplicationFactory(
@@ -599,8 +601,6 @@ class ProcessViewsTest(TestCase):
         assert job_application.approval_delivery_mode == job_application.APPROVAL_DELIVERY_MODE_MANUAL
 
     def test_accept_and_update_hiring_start_date_of_two_job_applications(self, *args, **kwargs):
-        # cities = create_test_cities(["54", "57"], num_per_department=2)
-        # city = cities[0]
         city = self.random_city
         job_seeker = JobSeekerWithAddressFactory()
         base_for_post_data = {
@@ -699,8 +699,6 @@ class ProcessViewsTest(TestCase):
         assert job_app_starting_later.approval.start_at == job_app_starting_earlier.hiring_start_at
 
     def test_accept_with_double_user(self, *args, **kwargs):
-        # cities = create_test_cities(["54"], num_per_department=1)
-        # city = cities[0]
         city = self.random_city
 
         siae = SiaeFactory(with_membership=True)
@@ -781,7 +779,6 @@ class ProcessViewsTest(TestCase):
         )
 
     def test_accept_no_nir_update(self, *args, **kwargs):
-        # [city] = create_test_cities(["57"], num_per_department=1)
         city = self.random_city
 
         job_application = JobApplicationSentByJobSeekerFactory(
@@ -834,7 +831,6 @@ class ProcessViewsTest(TestCase):
         assert job_application.job_seeker.nir == NEW_NIR
 
     def test_accept_no_nir_other_user(self, *args, **kwargs):
-        # [city] = create_test_cities(["57"], num_per_department=1)
         city = self.random_city
 
         job_application = JobApplicationFactory(
@@ -875,7 +871,6 @@ class ProcessViewsTest(TestCase):
         )
 
     def test_accept_no_nir_update_with_reason(self, *args, **kwargs):
-        # [city] = create_test_cities(["57"], num_per_department=1)
         city = self.random_city
 
         job_application = JobApplicationSentByJobSeekerFactory(
@@ -918,7 +913,6 @@ class ProcessViewsTest(TestCase):
         assert job_application.job_seeker.lack_of_nir_reason == LackOfNIRReason.NO_NIR
 
     def test_accept_lack_of_nir_reason_update(self, *args, **kwargs):
-        # [city] = create_test_cities(["57"], num_per_department=1)
         city = self.random_city
 
         job_application = JobApplicationFactory(
@@ -1182,9 +1176,7 @@ class ProcessViewsTest(TestCase):
     def test_accept_after_cancel(self, *args, **kwargs):
         # A canceled job application is not linked to an approval
         # unless the job seeker has an accepted job application.
-        # cities = create_test_cities(["54", "57"], num_per_department=2)
         city = self.random_city
-        # city = cities[0]
         job_seeker = JobSeekerWithAddressFactory(city=city.name)
         job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_CANCELLED,

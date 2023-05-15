@@ -59,6 +59,7 @@ class EditSiaeJobDescriptionFormTest(TestCase):
         post_data = {}
 
         form = EditJobDescriptionForm(current_siae=siae, data=post_data)
+        print(form.errors)
         assert form.errors is not None
         assert "job_appellation_code" in form.errors.keys()
         assert "job_appellation" in form.errors.keys()
