@@ -4,31 +4,31 @@
 
 {% block title %}Embauche - Eligibilité GEIQ {{ block.super }}{% endblock %}
 
-{% block pre_content %}
-    <div class="container mb-4">
-        <div class="row">
-            <div class="col-12 mt-5">
-                <h1 class="h1-hero-c1">
-                    Candidature de
-                    <span class="text-muted">{{ job_application.job_seeker.get_full_name|title|mask_unless:can_view_personal_information }}</span>
-                </h1>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12 col-lg-7">
-                <div class="c-stepper col-12">
-                    <div class="progress progress--emploi mb-2">{% include "apply/includes/geiq/progress_bar.html" %}</div>
-                    <span>Embauche - Eligibilité GEIQ</span>
-                </div>
-            </div>
-        </div>
-    </div>
-{% endblock %}
-
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
-            <div class="row border rounded bg-white ml-lg-0 pl-lg-2">
+            <div class="row">
+                <div class="col-12 mt-5">
+                    <h1 class="h1-hero-c1">
+                        Candidature de
+                        <span class="text-muted">{{ job_application.job_seeker.get_full_name|title|mask_unless:can_view_personal_information }}</span>
+                    </h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    <div class="c-stepper col-12">
+                        <div class="progress progress--emploi mb-2">{% include "apply/includes/geiq/progress_bar.html" %}</div>
+                        <span>Embauche - Eligibilité GEIQ</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="c-box">
                 <div class="col-12 pl-lg-0">
                     <div class="container">
                         <div class="row">
