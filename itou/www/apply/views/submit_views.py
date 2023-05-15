@@ -124,11 +124,7 @@ class ApplicationBaseView(ApplyStepBaseView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        # If no job_seeker_pk present in kwargs, fallback to active session
-        # This fallback will be removed in a followup commit
-        job_seeker_pk = kwargs.get("job_seeker_pk", self.apply_session.get("job_seeker_pk"))
-
-        self.job_seeker = get_object_or_404(User, pk=job_seeker_pk)
+        self.job_seeker = get_object_or_404(User, pk=kwargs["job_seeker_pk"])
         _check_job_seeker_approval(request, self.job_seeker, self.siae)
         if self.siae.kind == SiaeKind.GEIQ:
             self.geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(

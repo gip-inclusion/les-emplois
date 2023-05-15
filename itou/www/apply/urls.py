@@ -49,35 +49,19 @@ urlpatterns = [
     ),
     # Submit - common.
     path(
-        "<int:siae_pk>/step_check_job_seeker_info",
-        submit_views.CheckJobSeekerInformations.as_view(),
-        name="step_check_job_seeker_info",
-    ),
-    path(
         "<int:siae_pk>/create/<int:job_seeker_pk>/check_job_seeker_info",
         submit_views.CheckJobSeekerInformations.as_view(),
         name="step_check_job_seeker_info",
-    ),
-    path(
-        "<int:siae_pk>/step_check_prev_applications",
-        submit_views.CheckPreviousApplications.as_view(),
-        name="step_check_prev_applications",
     ),
     path(
         "<int:siae_pk>/create/<int:job_seeker_pk>/check_prev_applications",
         submit_views.CheckPreviousApplications.as_view(),
         name="step_check_prev_applications",
     ),
-    path("<int:siae_pk>/application/jobs", submit_views.ApplicationJobsView.as_view(), name="application_jobs"),
     path(
         "<int:siae_pk>/create/<int:job_seeker_pk>/select_jobs",
         submit_views.ApplicationJobsView.as_view(),
         name="application_jobs",
-    ),
-    path(
-        "<int:siae_pk>/application/eligibility",
-        submit_views.ApplicationEligibilityView.as_view(),
-        name="application_eligibility",
     ),
     path(
         "<int:siae_pk>/create/<int:job_seeker_pk>/eligibility",
@@ -85,16 +69,10 @@ urlpatterns = [
         name="application_eligibility",
     ),
     path(
-        "<int:siae_pk>/application/geiq_eligibility",
-        submit_views.ApplicationGEIQEligibilityView.as_view(),
-        name="application_geiq_eligibility",
-    ),
-    path(
         "<int:siae_pk>/create/<int:job_seeker_pk>/geiq_eligibility",
         submit_views.ApplicationGEIQEligibilityView.as_view(),
         name="application_geiq_eligibility",
     ),
-    path("<int:siae_pk>/application/resume", submit_views.ApplicationResumeView.as_view(), name="application_resume"),
     path(
         "<int:siae_pk>/create/<int:job_seeker_pk>/resume",
         submit_views.ApplicationResumeView.as_view(),
