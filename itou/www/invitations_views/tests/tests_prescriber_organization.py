@@ -248,8 +248,8 @@ class TestAcceptPrescriberWithOrgInvitation(InclusionConnectBaseTestCase):
             previous_url=previous_url,
             next_url=next_url,
         )
-        # Follow the redirection.
-        response = self.client.get(response.url, follow=True)
+        # Inclusion connect redirects to previous_url
+        response = self.client.get(previous_url, follow=True)
         # Signup should have failed : as the email used in IC isn't the one from the invitation
         assertMessages(
             response,
