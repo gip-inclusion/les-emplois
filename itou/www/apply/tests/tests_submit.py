@@ -46,7 +46,8 @@ fake = faker.Faker(locale="fr_FR")
 class ApplyTest(TestCase):
     def test_anonymous_access(self):
         siae = SiaeFactory(with_jobs=True)
-        url = reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk})
+        job_seeker = JobSeekerFactory()
+        url = reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk})
         response = self.client.get(url)
         assert response.status_code == 403
 
@@ -72,11 +73,12 @@ class ApplyTest(TestCase):
         self.client.force_login(user)
         for route in routes:
             with self.subTest(route=route):
-                response = self.client.get(reverse(route, kwargs={"siae_pk": siae.pk}))
-                assert response.status_code == 403
-                assert response.context["exception"] == "A session namespace doesn't exist."
                 if route not in routes_without_job_seeker_pk:
                     response = self.client.get(reverse(route, kwargs={"siae_pk": siae.pk, "job_seeker_pk": user.pk}))
+                    assert response.status_code == 403
+                    assert response.context["exception"] == "A session namespace doesn't exist."
+                else:
+                    response = self.client.get(reverse(route, kwargs={"siae_pk": siae.pk}))
                     assert response.status_code == 403
                     assert response.context["exception"] == "A session namespace doesn't exist."
 
