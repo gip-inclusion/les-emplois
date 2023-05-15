@@ -1,10 +1,10 @@
-{% extends "layout/content.html" %}
+{% extends BASE_TEMPLATE %}
 {% load bootstrap4 %}
 
 {% block title %}Postuler {{ block.super }}{% endblock %}
 
 {% block content %}
-    <section class="s-section-twocolumns">
+    <section class="s-section-twocolumns s-section">
         <div class="container">
             <div class="row">
                 <div class="col-12 col-lg-8">
@@ -88,7 +88,7 @@
             <div class="row">
                 <div class="col-12{% if not full_content_width %} col-lg-8{% endif %}">
                     <div class="c-form">
-                        <div class="col-12 p-0 {% if full_content_width %}col-lg-7 pr-lg-5{% endif %}">
+                        <div class="col-12 p-0 {% if full_content_width %}col-lg-8 pr-lg-4{% endif %}">
                             <div class="card c-card c-card--emploi c-card--noshadow mb-3 mb-lg-5">
                                 <div class="card-body">
                                     <p>
@@ -100,7 +100,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 p-0 {% if full_content_width %}col-lg-7 pr-lg-5{% endif %}">
+                        <div class="col-12 p-0 {% if full_content_width %}col-lg-8 pr-lg-4{% endif %}">
                             {% block pre_step_title %}{% endblock %}
                         </div>
                         <h2>
