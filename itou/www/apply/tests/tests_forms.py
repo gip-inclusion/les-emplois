@@ -1,8 +1,9 @@
 from datetime import datetime
 
 import pytest
-from dateutil.relativedelta import relativedelta
 from django.urls import reverse
+from faker import Faker
+from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.job_applications.factories import (
     JobApplicationFactory,
@@ -10,10 +11,14 @@ from itou.job_applications.factories import (
     JobApplicationSentByPrescriberFactory,
     JobApplicationSentBySiaeFactory,
 )
+from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.enums import ContractType, SiaeKind
 from itou.users.factories import JobSeekerFactory, PrescriberFactory
 from itou.utils.test import TestCase
 from itou.www.apply import forms as apply_forms
+
+
+faker = Faker()
 
 
 class CheckJobSeekerNirFormTest(TestCase):
@@ -187,7 +192,7 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
 
         post_data = {
             "hiring_start_at": f"{datetime.now():%Y-%m-%d}",
-            "hiring_end_at": f"{datetime.now() + relativedelta(months=3):%Y-%m-%d}",
+            "hiring_end_at": f"{faker.future_date(end_date='+3M'):%Y-%m-%d}",
             "prehiring_guidance_days": self.faker.pyint(),
             "nb_hours_per_week": 4,
             "contract_type_details": "contract details",
@@ -209,3 +214,45 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
         assert job_application.contract_type == post_data["contract_type"]
         assert job_application.contract_type_details == post_data["contract_type_details"]
         assert job_application.nb_hours_per_week == post_data["nb_hours_per_week"]
+
+    def test_apply_with_past_hiring_date(self):
+        # GEIQ can temporarily accept job applications with a past hiring date
+
+        # with a SIAE
+        job_application = JobApplicationFactory(to_siae__kind=SiaeKind.EI, state="processing")
+        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+
+        self.client.force_login(job_application.to_siae.members.first())
+
+        response = self.client.get(url_accept)
+        assert response.status_code == 200
+
+        post_data = {
+            "hiring_start_at": f"{faker.past_date(start_date='-1d'):%Y-%m-%d}",
+            "hiring_end_at": f"{faker.future_date(end_date='+3M'):%Y-%m-%d}",
+            "prehiring_guidance_days": self.faker.pyint(),
+            "nb_hours_per_week": 5,
+            "contract_type_details": "contract details",
+            "contract_type": str(ContractType.OTHER),
+            "answer": "foobar",
+            "confirmed": "True",
+        }
+
+        response = self.client.post(url_accept, HTTP_HX_REQUEST=True, data=post_data, follow=True)
+
+        assert response.status_code == 200
+        assertContains(response, "Il n'est pas possible d'antidater un contrat.")
+        # Testing a redirect with HTMX is really incomplete, so we also check hiring status
+        job_application.refresh_from_db()
+        assert job_application.state == JobApplicationWorkflow.STATE_PROCESSING
+
+        # with a GEIQ
+        job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, state="processing")
+        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        self.client.force_login(job_application.to_siae.members.first())
+        response = self.client.post(url_accept, HTTP_HX_REQUEST=True, data=post_data, follow=True)
+
+        assert response.status_code == 200
+        assertNotContains(response, "Il n'est pas possible d'antidater un contrat.")
+        job_application.refresh_from_db()
+        assert job_application.state == JobApplicationWorkflow.STATE_ACCEPTED
