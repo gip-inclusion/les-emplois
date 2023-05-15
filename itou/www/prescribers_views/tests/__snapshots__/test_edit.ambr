@@ -3,9 +3,9 @@
   '''
   <form class="js-prevent-multiple-submit" method="post">
   
-          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
   
-          <div class="form-group form-group-required"><label for="id_address_line_1">Adresse</label><input class="form-control" disabled="" id="id_address_line_1" maxlength="255" name="address_line_1" placeholder="Adresse" required="" title="" type="text"/></div>
+                          <div class="form-group form-group-required"><label for="id_address_line_1">Adresse</label><input class="form-control" disabled="" id="id_address_line_1" maxlength="255" name="address_line_1" placeholder="Adresse" required="" title="" type="text"/></div>
   <div class="form-group"><label for="id_address_line_2">Complément d'adresse</label><input class="form-control" disabled="" id="id_address_line_2" maxlength="255" name="address_line_2" placeholder="Complément d'adresse" title="Appartement, suite, bloc, bâtiment, boite postale, etc." type="text"/>
       <small class="form-text text-muted">Appartement, suite, bloc, bâtiment, boite postale, etc.</small>
   
@@ -241,11 +241,11 @@
   
   </div>
   
-          <div class="form-group">
-              <a class="btn btn-outline-primary" href="/dashboard/">Annuler</a>
-              <button class="btn btn-primary" type="submit">Enregistrer</button>
-          </div>
+                          <div class="form-group">
+                              <a class="btn btn-outline-primary" href="/dashboard/">Annuler</a>
+                              <button class="btn btn-primary" type="submit">Enregistrer</button>
+                          </div>
   
-      </form>
+                      </form>
   '''
 # ---

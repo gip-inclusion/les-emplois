@@ -1,5 +1,5 @@
 {# django-allauth template override. #}
-{% extends "layout/content.html" %}
+{% extends BASE_TEMPLATE %}
 {% load bootstrap4 %}
 {% load redirection_fields %}
 {% load static %}
@@ -8,7 +8,7 @@
 {% block title %}Connexion {{ block.super }}{% endblock %}
 
 {% block breadcrumbs %}
-    <nav class="c-breadcrumb c-breadcrumb--marche" aria-label="Fil d'ariane">
+    <nav class="c-breadcrumb" aria-label="Fil d'ariane">
         <ol class="breadcrumb">
             <li class="breadcrumb-item">
                 <a href="{% url 'home:hp' %}">Accueil</a>
