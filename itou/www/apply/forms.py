@@ -472,6 +472,7 @@ class AcceptForm(forms.ModelForm):
                 # Change default size (too large)
                 self.fields["contract_type_details"].widget.attrs.update({"rows": 2})
                 self.initial["prehiring_guidance_days"] = 0
+                self.fields["hiring_start_at"].help_text = "Au format JJ/MM/AAAA, par exemple  %(date)s."
             else:
                 # Add specific details to help texts for IAE
                 self.fields["hiring_start_at"].help_text += (
@@ -515,7 +516,8 @@ class AcceptForm(forms.ModelForm):
     def clean_hiring_start_at(self):
         hiring_start_at = self.cleaned_data["hiring_start_at"]
 
-        if hiring_start_at and hiring_start_at < datetime.date.today():
+        # Hiring in the past is *temporarily* possible for GEIQ
+        if hiring_start_at and hiring_start_at < datetime.date.today() and self.instance.to_siae.kind != SiaeKind.GEIQ:
             raise forms.ValidationError(JobApplication.ERROR_START_IN_PAST)
 
         return hiring_start_at
