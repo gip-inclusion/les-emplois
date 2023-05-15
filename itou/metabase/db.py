@@ -65,14 +65,17 @@ def rename_table_atomically(from_table_name, to_table_name):
     """
     Rename from_table_name to to_table_name.
     Most of the time, we replace an existing table, so we will first rename
-    to_table_name to z_old_<to_table_name>. Of course we first delete z_old_<to_table_name> if it exists.
+    to_table_name to z_old_<to_table_name>.
     This allows us to take our time filling the new table without locking the current one.
-    Note that the old table z_old_<to_table_name> is *not* deleted this time but will be at the beginning of
-    the next call of this function.
+    Note that when the old table z_old_<to_table_name> is deleted, all its obsolete airflow staging views
+    are deleted as well, they will be rebuilt by the next run of the airflow DAG `final_tables`.
     """
 
     with MetabaseDatabaseCursor() as (cur, conn):
-        cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(get_old_table_name(to_table_name))))
+        # CASCADE will drop airflow staging views (e.g. stg_structures) as well.
+        cur.execute(
+            sql.SQL("DROP TABLE IF EXISTS {} CASCADE").format(sql.Identifier(get_old_table_name(to_table_name)))
+        )
         conn.commit()
         cur.execute(
             sql.SQL("ALTER TABLE IF EXISTS {} RENAME TO {}").format(
@@ -85,6 +88,11 @@ def rename_table_atomically(from_table_name, to_table_name):
                 sql.Identifier(from_table_name),
                 sql.Identifier(to_table_name),
             )
+        )
+        conn.commit()
+        # CASCADE will drop airflow staging views (e.g. stg_structures) as well.
+        cur.execute(
+            sql.SQL("DROP TABLE IF EXISTS {} CASCADE").format(sql.Identifier(get_old_table_name(to_table_name)))
         )
         conn.commit()
 
