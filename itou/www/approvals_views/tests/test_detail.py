@@ -121,6 +121,10 @@ class TestApprovalDetailView:
             response,
             "PASS IAE valide jusqu’au 25/04/2025, si le contrat démarre aujourd’hui.",
         )
+        assertNotContains(
+            response,
+            "Date de fin prévisionnelle : 25/04/2025",
+        )
 
         job_application.state = JobApplicationWorkflow.STATE_ACCEPTED
         job_application.save()
@@ -214,7 +218,12 @@ class TestApprovalDetailView:
         response = client.get(url)
         assertNotContains(
             response,
-            "PASS IAE valide jusqu’au 25/04/2025, si le contrat démarre aujourd’hui.",
+            "PASS IAE valide jusqu’au 30/05/2025, si le contrat démarre aujourd’hui.",
+        )
+
+        assertContains(
+            response,
+            "Date de fin prévisionnelle : 30/05/2025",
         )
 
     def test_suspend_button(self, client):
