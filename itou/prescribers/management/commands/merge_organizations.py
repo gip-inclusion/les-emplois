@@ -137,4 +137,4 @@ class Command(BaseCommand):
         parser.add_argument("--wet-run", action=argparse.BooleanOptionalAction, default=False)
 
     def handle(self, from_id, to_id, *, wet_run, **options):
-        organization_merge_into(from_id, to_id, wet_run)
+        organization_merge_into(from_id, to_id, wet_run=wet_run)
