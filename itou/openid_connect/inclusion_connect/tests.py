@@ -12,6 +12,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from django.contrib import auth
+from django.contrib.auth import get_user
 from django.contrib.messages import get_messages
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.exceptions import ValidationError
@@ -429,10 +430,44 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
         assert user.identity_provider == users_enums.IdentityProvider.INCLUSION_CONNECT
 
     @respx.mock
+    def test_callback_allows_siae_staff_on_prescriber_login_only(self):
+        ic_user_data = InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)
+        user = UserFactory(username=ic_user_data.username, email=ic_user_data.email, kind=UserKind.SIAE_STAFF)
+
+        response = mock_oauth_dance(self.client, UserKind.PRESCRIBER, assert_redirects=False)
+        response = self.client.get(response.url, follow=True)
+        self.assertContains(response, "existe déjà avec cette adresse e-mail")
+        self.assertContains(response, "pour devenir prescripteur sur la plateforme")
+        assert get_user(self.client).is_authenticated is False
+
+        response = mock_oauth_dance(self.client, UserKind.PRESCRIBER, assert_redirects=False, register=False)
+        response = self.client.get(response.url, follow=True)
+        user.refresh_from_db()
+        assert user.kind == UserKind.SIAE_STAFF
+        assert get_user(self.client).is_authenticated is True
+
+    @respx.mock
+    def test_callback_allows_prescriber_on_siae_staff_login_only(self):
+        ic_user_data = InclusionConnectSiaeStaffData.from_user_info(OIDC_USERINFO)
+        user = UserFactory(username=ic_user_data.username, email=ic_user_data.email, kind=UserKind.PRESCRIBER)
+
+        response = mock_oauth_dance(self.client, UserKind.SIAE_STAFF, assert_redirects=False)
+        response = self.client.get(response.url, follow=True)
+        self.assertContains(response, "existe déjà avec cette adresse e-mail")
+        self.assertContains(response, "pour devenir employeur sur la plateforme")
+        assert get_user(self.client).is_authenticated is False
+
+        response = mock_oauth_dance(self.client, UserKind.SIAE_STAFF, assert_redirects=False, register=False)
+        response = self.client.get(response.url, follow=True)
+        user.refresh_from_db()
+        assert user.kind == UserKind.PRESCRIBER
+        assert get_user(self.client).is_authenticated is True
+
+    @respx.mock
     def test_callback_redirect_prescriber_on_too_many_kind_exception(self):
         ic_user_data = InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)
 
-        for kind in [UserKind.JOB_SEEKER, UserKind.SIAE_STAFF, UserKind.LABOR_INSPECTOR]:
+        for kind in [UserKind.JOB_SEEKER, UserKind.LABOR_INSPECTOR]:
             user = UserFactory(username=ic_user_data.username, email=ic_user_data.email, kind=kind)
             response = mock_oauth_dance(self.client, UserKind.PRESCRIBER, assert_redirects=False)
             response = self.client.get(response.url, follow=True)
@@ -444,7 +479,7 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
     def test_callback_redirect_siae_staff_on_too_many_kind_exception(self):
         ic_user_data = InclusionConnectSiaeStaffData.from_user_info(OIDC_USERINFO)
 
-        for kind in [UserKind.JOB_SEEKER, UserKind.PRESCRIBER, UserKind.LABOR_INSPECTOR]:
+        for kind in [UserKind.JOB_SEEKER, UserKind.LABOR_INSPECTOR]:
             user = UserFactory(username=ic_user_data.username, email=ic_user_data.email, kind=kind)
             # Don't check redirection as the user isn't an siae member yet, so it won't work.
             response = mock_oauth_dance(self.client, UserKind.SIAE_STAFF, assert_redirects=False)
