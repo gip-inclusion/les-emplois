@@ -1,4 +1,4 @@
-from django.contrib.messages import get_messages
+from django.contrib import messages
 from django.urls import reverse
 
 from itou.approvals import enums as approvals_enums
@@ -10,7 +10,7 @@ from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.factories import SiaeFactory, SiaeMembershipFactory
 from itou.users.factories import JobSeekerFactory
 from itou.users.models import User
-from itou.utils.test import TestCase
+from itou.utils.test import TestCase, assertMessages
 
 
 class PoleEmploiApprovalSearchTest(TestCase):
@@ -247,10 +247,9 @@ class PoleEmploiApprovalCreateTest(TestCase):
 
         assert response.status_code == 302
         assert Approval.objects.count() == initial_approval_count + 1
-        messages = list(get_messages(response.wsgi_request))
-        assert (
-            messages[-1].message
-            == "L'agrément a bien été importé, vous pouvez désormais le prolonger ou le suspendre."
+        assertMessages(
+            response,
+            [(messages.SUCCESS, "L'agrément a bien été importé, vous pouvez désormais le prolonger ou le suspendre.")],
         )
 
         converted_approval = job_seeker.approvals.get()
@@ -277,8 +276,7 @@ class PoleEmploiApprovalCreateTest(TestCase):
 
         assert response.status_code == 302
         assert Approval.objects.count() == initial_approval_count
-        messages = list(get_messages(response.wsgi_request))
-        assert messages[-1].message == "Cet agrément a déjà été importé."
+        assertMessages(response, [(messages.INFO, "Cet agrément a déjà été importé.")])
 
     def test_from_existing_user_with_approval(self):
         """
@@ -298,5 +296,6 @@ class PoleEmploiApprovalCreateTest(TestCase):
         assert response.status_code == 302
         next_url = reverse("approvals:pe_approval_search_user", kwargs={"pe_approval_id": self.pe_approval.id})
         assert response.url == next_url
-        messages = list(get_messages(response.wsgi_request))
-        assert messages[-1].message == "Le candidat associé à cette adresse e-mail a déjà un PASS IAE valide."
+        assertMessages(
+            response, [(messages.ERROR, "Le candidat associé à cette adresse e-mail a déjà un PASS IAE valide.")]
+        )

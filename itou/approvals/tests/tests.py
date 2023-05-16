@@ -5,9 +5,9 @@ from unittest import mock
 
 import pytest
 from dateutil.relativedelta import relativedelta
+from django.contrib import messages
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.messages import get_messages
 from django.core import mail
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import IntegrityError, transaction
@@ -33,7 +33,7 @@ from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory
 from itou.users.factories import ItouStaffFactory, JobSeekerFactory
 from itou.utils import constants as global_constants
-from itou.utils.test import TestCase
+from itou.utils.test import TestCase, assertMessages
 
 
 class CommonApprovalQuerySetTest(TestCase):
@@ -902,10 +902,14 @@ class CustomApprovalAdminViewsTest(TestCase):
         job_application.eligibility_diagnosis = None
         job_application.save()
         response = self.client.get(url, follow=True)
-        messages = list(get_messages(response.wsgi_request))
-        assert (
-            messages[0].message
-            == "Impossible de créer un PASS IAE car la candidature n'a pas de diagnostique d'éligibilité."
+        assertMessages(
+            response,
+            [
+                (
+                    messages.ERROR,
+                    "Impossible de créer un PASS IAE car la candidature n'a pas de diagnostique d'éligibilité.",
+                )
+            ],
         )
 
         # Put back the eligibility diangosis

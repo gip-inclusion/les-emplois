@@ -3,8 +3,7 @@ from unittest import mock
 import httpx
 import respx
 from django.conf import settings
-from django.contrib import auth
-from django.contrib.messages import get_messages
+from django.contrib import auth, messages
 from django.core import mail
 from django.test import override_settings
 from django.urls import reverse
@@ -28,6 +27,7 @@ from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
+from itou.utils.test import assertMessages
 from itou.www.signup.forms import PrescriberChooseKindForm
 
 
@@ -911,10 +911,18 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
         assert response.wsgi_request.path == signup_url
         self.assertTemplateNotUsed(response, "welcoming_tour/prescriber.html")
         self.assertContains(response, "logo-inclusion-connect-one-line.svg")
-        messages = list(get_messages(response.wsgi_request))
-        assert len(messages) == 1
-        error_message = "Un compte employeur existe déjà avec cette adresse e-mail"
-        assert error_message in messages[0].message
+        assertMessages(
+            response,
+            [
+                (
+                    messages.ERROR,
+                    "Un compte employeur existe déjà avec cette adresse e-mail. Vous devez créer un compte "
+                    "Inclusion Connect avec une autre adresse e-mail pour devenir prescripteur sur la plateforme. "
+                    "Besoin d'aide ? <a href='https://communaute.inclusion.beta.gouv.fr/aide/emplois/#support' "
+                    "target='_blank'>Contactez-nous</a>.",
+                )
+            ],
+        )
 
         user = User.objects.get(email=OIDC_USERINFO["email"])
         assert user.first_name != OIDC_USERINFO["given_name"]
@@ -968,9 +976,17 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
         # Response should contain elements available only to prescribers on the welcoming tour.
         self.assertTemplateNotUsed(response, "welcoming_tour/prescriber.html")
         self.assertContains(response, "logo-inclusion-connect-one-line.svg")
-        messages = list(get_messages(response.wsgi_request))
-        assert len(messages) == 1
-        assert "est différente de celle que vous avez indiquée précédemment" in messages[0].message
+        assertMessages(
+            response,
+            [
+                (
+                    messages.ERROR,
+                    "L’adresse e-mail que vous avez utilisée pour vous connecter avec "
+                    "Inclusion Connect (athos@touspourun.com) est différente de celle que vous avez "
+                    "indiquée précédemment (athos@pole-emploi.fr).",
+                )
+            ],
+        )
 
         # Organization
         assert not self.client.session.get(global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY)

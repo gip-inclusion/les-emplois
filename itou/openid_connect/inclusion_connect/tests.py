@@ -11,9 +11,8 @@ import respx
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
-from django.contrib import auth
+from django.contrib import auth, messages
 from django.contrib.auth import get_user
-from django.contrib.messages import get_messages
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
@@ -35,6 +34,7 @@ from itou.users.factories import (
     UserFactory,
 )
 from itou.users.models import User
+from itou.utils.test import assertMessages
 
 from ..constants import OIDC_STATE_CLEANUP
 from ..models import InvalidKindException
@@ -352,9 +352,7 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
         url = f"{reverse('inclusion_connect:resume_registration')}"
         response = self.client.get(url)
         self.assertRedirects(response, reverse("home:hp"))
-        [message] = list(get_messages(response.wsgi_request))
-        assert message.tags == "error"
-        assert message.message == "Impossible de reprendre la création de compte."
+        assertMessages(response, [(messages.ERROR, "Impossible de reprendre la création de compte.")])
 
     @respx.mock
     def test_resume_endpoint_with_already_finished_registration(self):
@@ -362,9 +360,7 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
         url = f"{reverse('inclusion_connect:resume_registration')}"
         response = self.client.get(url)
         self.assertRedirects(response, reverse("home:hp"))
-        [message] = list(get_messages(response.wsgi_request))
-        assert message.tags == "error"
-        assert message.message == "Impossible de reprendre la création de compte."
+        assertMessages(response, [(messages.ERROR, "Impossible de reprendre la création de compte.")])
 
     def test_resume_endpoint(self):
         # Fill up session with authorize view
@@ -509,14 +505,17 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
             self.client, UserKind.PRESCRIBER, assert_redirects=False, next_url=reverse("dashboard:edit_user_info")
         )
         response = self.client.get(response.url, follow=True)
-        messages = list(get_messages(response.wsgi_request))
-        assert len(messages) == 1
-        assert (
-            messages[0].message
-            == "Vous avez modifié votre e-mail sur Inclusion Connect, mais celui-ci est déjà associé à un compte "
-            "sur la plateforme. Nous n'avons donc pas pu mettre à jour random@email.com en "
-            f"{OIDC_USERINFO['email']}. Veuillez vous rapprocher du support pour débloquer la situation "
-            "en suivant <a href='https://communaute.inclusion.beta.gouv.fr/aide/emplois/#support'>ce lien</a>."
+        assertMessages(
+            response,
+            [
+                (
+                    messages.ERROR,
+                    "Vous avez modifié votre e-mail sur Inclusion Connect, mais celui-ci est déjà associé à un compte "
+                    "sur la plateforme. Nous n'avons donc pas pu mettre à jour random@email.com en "
+                    f"{OIDC_USERINFO['email']}. Veuillez vous rapprocher du support pour débloquer la situation en "
+                    "suivant <a href='https://communaute.inclusion.beta.gouv.fr/aide/emplois/#support'>ce lien</a>.",
+                )
+            ],
         )
 
 

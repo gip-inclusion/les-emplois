@@ -11,9 +11,13 @@ from django.core.cache import cache
 from django.db import connection
 from factory import Faker
 
-from itou.utils import faker_providers
-from itou.utils.htmx.test import HtmxClient
-from itou.utils.test import NoInlineClient
+
+# Rewrite before importing itou code.
+pytest.register_assert_rewrite("itou.utils.test")
+
+from itou.utils import faker_providers  # noqa: E402
+from itou.utils.htmx.test import HtmxClient  # noqa: E402
+from itou.utils.test import NoInlineClient  # noqa: E402
 
 
 @pytest.hookimpl(tryfirst=True)
