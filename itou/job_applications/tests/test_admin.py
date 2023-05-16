@@ -3,6 +3,7 @@ from django.contrib.admin import helpers
 from django.urls import reverse
 
 from itou.employee_record import factories as employee_record_factories, models as employee_record_models
+from itou.utils.test import assertMessages
 
 from .. import factories, models
 
@@ -25,11 +26,7 @@ def test_create_employee_record(admin_client):
     assert employee_record.job_application == job_application
 
     url = reverse("admin:employee_record_employeerecord_change", args=[employee_record.pk])
-    assert list(messages.get_messages(response.wsgi_request)) == [
-        messages.storage.base.Message(
-            messages.SUCCESS, f'1 fiche salarié créée : <a href="{url}">{employee_record.pk}</a>'
-        ),
-    ]
+    assertMessages(response, [(messages.SUCCESS, f'1 fiche salarié créée : <a href="{url}">{employee_record.pk}</a>')])
 
 
 def test_create_employee_record_when_it_already_exists(admin_client):
@@ -45,8 +42,4 @@ def test_create_employee_record_when_it_already_exists(admin_client):
     )
 
     url = reverse("admin:job_applications_jobapplication_change", args=[job_application.pk])
-    assert list(messages.get_messages(response.wsgi_request)) == [
-        messages.storage.base.Message(
-            messages.WARNING, f'1 candidature ignorée : <a href="{url}">{job_application.pk}</a>'
-        ),
-    ]
+    assertMessages(response, [(messages.WARNING, f'1 candidature ignorée : <a href="{url}">{job_application.pk}</a>')])

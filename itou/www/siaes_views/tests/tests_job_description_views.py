@@ -1,6 +1,6 @@
 import pytest
+from django.contrib import messages
 from django.contrib.gis.geos import Point
-from django.contrib.messages import get_messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
 
@@ -11,7 +11,7 @@ from itou.prescribers.factories import PrescriberOrganizationWithMembershipFacto
 from itou.siaes.enums import ContractType, SiaeKind
 from itou.siaes.factories import SiaeFactory, SiaeJobDescriptionFactory
 from itou.siaes.models import SiaeJobDescription
-from itou.utils.test import TestCase
+from itou.utils.test import TestCase, assertMessages
 from itou.www.siaes_views.views import ITOU_SESSION_CURRENT_PAGE_KEY, ITOU_SESSION_JOB_DESCRIPTION_KEY
 
 
@@ -140,17 +140,13 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
 
         self.assertRedirects(response, self.url)
         assert job_description.is_active
-        messages = list(get_messages(response.wsgi_request))
-        assert len(messages) == 1
-        assert "Le recrutement est maintenant ouvert" in messages[0].message
+        assertMessages(response, [(messages.SUCCESS, "Le recrutement est maintenant ouvert.")])
 
         # Check that we do not crash on unexisting job description
         job_description.delete()
         response = self.client.post(self.url + "?action=toggle_active", data=post_data)
         self.assertRedirects(response, self.url)
-        messages = list(get_messages(response.wsgi_request))
-        assert len(messages) == 1
-        assert "La fiche de poste que vous souhaitiez modifier n'existe plus." in messages[0].message
+        assertMessages(response, [(messages.ERROR, "La fiche de poste que vous souhaitiez modifier n'existe plus.")])
 
         # Trying to update job description from an other SIAE does nothing
         other_siae_job_description = SiaeJobDescriptionFactory(is_active=False)
@@ -162,9 +158,7 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
             },
         )
         self.assertRedirects(response, self.url)
-        messages = list(get_messages(response.wsgi_request))
-        assert len(messages) == 1
-        assert "La fiche de poste que vous souhaitiez modifier n'existe plus." in messages[0].message
+        assertMessages(response, [(messages.ERROR, "La fiche de poste que vous souhaitiez modifier n'existe plus.")])
         other_siae_job_description.refresh_from_db()
         assert not other_siae_job_description.is_active
 
@@ -179,9 +173,7 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
         }
         response = self.client.post(self.url + "?action=delete", data=post_data)
         self.assertRedirects(response, self.url)
-        messages = list(get_messages(response.wsgi_request))
-        assert len(messages) == 1
-        assert "La fiche de poste a été supprimée" in messages[0].message
+        assertMessages(response, [(messages.SUCCESS, "La fiche de poste a été supprimée.")])
 
         with pytest.raises(ObjectDoesNotExist):
             SiaeJobDescription.objects.get(pk=job_description.id)
@@ -189,9 +181,7 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
         # Second delete does not crash (and simply does nothing)
         response = self.client.post(self.url + "?action=delete", data=post_data)
         self.assertRedirects(response, self.url)
-        messages = list(get_messages(response.wsgi_request))
-        assert len(messages) == 1
-        assert "La fiche de poste que vous souhaitez supprimer n'existe plus" in messages[0].message
+        assertMessages(response, [(messages.WARNING, "La fiche de poste que vous souhaitez supprimer n'existe plus.")])
 
         # Trying to delete job description from an other SIAE does nothing
         other_siae_job_description = SiaeJobDescriptionFactory()
@@ -202,9 +192,7 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
             },
         )
         self.assertRedirects(response, self.url)
-        messages = list(get_messages(response.wsgi_request))
-        assert len(messages) == 1
-        assert "La fiche de poste que vous souhaitez supprimer n'existe plus" in messages[0].message
+        assertMessages(response, [(messages.WARNING, "La fiche de poste que vous souhaitez supprimer n'existe plus.")])
         assert SiaeJobDescription.objects.filter(pk=other_siae_job_description.pk).exists()
 
 

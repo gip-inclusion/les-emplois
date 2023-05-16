@@ -1,7 +1,7 @@
 from urllib.parse import urlencode
 
 import respx
-from django.contrib.messages import get_messages
+from django.contrib import messages
 from django.test import override_settings
 from django.test.client import RequestFactory
 from django.urls import reverse
@@ -20,7 +20,7 @@ from itou.users.factories import (
     PrescriberFactory,
     SiaeStaffFactory,
 )
-from itou.utils.test import TestCase, reload_module
+from itou.utils.test import TestCase, assertMessages, reload_module
 from itou.utils.urls import add_url_params
 from itou.www.login.forms import ItouLoginForm
 
@@ -225,13 +225,17 @@ class JopbSeekerLoginTest(TestCase):
 
         # Temporary NIR is not stored with user information.
         response = mock_oauth_dance(self.client, expected_route="login:job_seeker")
-        messages = list(get_messages(response.wsgi_request))
-        assert len(messages) == 1
-        assert (
-            messages[0].message
-            == "Vous avez deux comptes sur la plateforme et nous détectons un conflit d'email : seconde@email.com "
-            "et wossewodda-3728@yopmail.com. Veuillez vous rapprocher du support pour débloquer la situation "
-            "en suivant <a href='https://communaute.inclusion.beta.gouv.fr/aide/emplois/#support'>ce lien</a>."
+        assertMessages(
+            response,
+            [
+                (
+                    messages.ERROR,
+                    "Vous avez deux comptes sur la plateforme et nous détectons un conflit d'email : "
+                    "seconde@email.com et wossewodda-3728@yopmail.com. Veuillez vous rapprocher du support pour "
+                    "débloquer la situation en suivant "
+                    "<a href='https://communaute.inclusion.beta.gouv.fr/aide/emplois/#support'>ce lien</a>.",
+                )
+            ],
         )
 
 

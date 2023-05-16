@@ -4,7 +4,7 @@ from unittest import mock
 
 import faker
 from dateutil.relativedelta import relativedelta
-from django.contrib.messages import get_messages
+from django.contrib import messages
 from django.urls import resolve, reverse
 from django.utils import timezone
 from pytest_django.asserts import assertContains, assertRedirects
@@ -37,7 +37,7 @@ from itou.utils.models import InclusiveDateRange
 from itou.utils.session import SessionNamespace
 from itou.utils.storage.s3 import S3Upload
 from itou.utils.storage.test import S3AccessingTestCase
-from itou.utils.test import TestCase
+from itou.utils.test import TestCase, assertMessages
 
 
 fake = faker.Faker(locale="fr_FR")
@@ -1161,9 +1161,9 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
         other_job_seeker = JobSeekerFactory(nir=dummy_job_seeker_profile.user.nir)
 
         response = self.client.post(next_url)
-        [message] = list(get_messages(response.wsgi_request))
-        assert message.tags == "error"
-        assert message.message == "Ce numéro de sécurité sociale est déjà associé à un autre utilisateur."
+        assertMessages(
+            response, [(messages.ERROR, "Ce numéro de sécurité sociale est déjà associé à un autre utilisateur.")]
+        )
         self.assertRedirects(response, reverse("dashboard:index"))
 
         # Remove that extra job seeker and proceed with "normal" flow

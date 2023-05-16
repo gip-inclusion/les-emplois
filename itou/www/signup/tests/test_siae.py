@@ -3,7 +3,7 @@ from unittest import mock
 import httpx
 import respx
 from django.conf import settings
-from django.contrib.messages import get_messages
+from django.contrib import messages
 from django.core import mail
 from django.test import override_settings
 from django.urls import reverse
@@ -22,7 +22,7 @@ from itou.users.models import User
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.templatetags.format_filters import format_siret
-from itou.utils.test import TestCase
+from itou.utils.test import TestCase, assertMessages
 from itou.utils.urls import get_tally_form_url
 from itou.www.test import NUM_CSRF_SESSION_REQUESTS
 
@@ -286,9 +286,7 @@ class SiaeSignupViewsExceptionsTest(TestCase):
         url = reverse("signup:siae_join", args=(siae.pk, token))
 
         response = self.client.get(url)
-        messages = list(get_messages(response.wsgi_request))
-        assert len(messages) == 1
-        assert "Vous ne pouvez pas rejoindre une SIAE avec ce compte." == messages[0].message
+        assertMessages(response, [(messages.ERROR, "Vous ne pouvez pas rejoindre une SIAE avec ce compte.")])
         self.assertRedirects(response, reverse("home:hp"))
 
         # Check `User` state.

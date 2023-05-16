@@ -4,7 +4,7 @@ from urllib.parse import urlencode
 import respx
 from allauth.account.models import EmailAddress
 from django.conf import settings
-from django.contrib.messages import get_messages
+from django.contrib import messages
 from django.core import mail
 from django.shortcuts import reverse
 from django.utils.html import escape
@@ -21,7 +21,7 @@ from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberF
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.perms.prescriber import get_current_org_or_404
-from itou.utils.test import TestCase
+from itou.utils.test import TestCase, assertMessages
 
 
 POST_DATA = {
@@ -251,10 +251,17 @@ class TestAcceptPrescriberWithOrgInvitation(InclusionConnectBaseTestCase):
         # Follow the redirection.
         response = self.client.get(response.url, follow=True)
         # Signup should have failed : as the email used in IC isn't the one from the invitation
-        messages = list(get_messages(response.wsgi_request))
-        assert len(messages) == 1
-        assert "ne correspond pas à l’adresse e-mail de l’invitation" in messages[0].message
-        assert response.wsgi_request.get_full_path() == previous_url
+        assertMessages(
+            response,
+            [
+                (
+                    messages.ERROR,
+                    "L’adresse e-mail que vous avez utilisée pour vous connecter avec "
+                    "Inclusion Connect (michel@lestontons.fr) ne correspond pas à "
+                    f"l’adresse e-mail de l’invitation ({invitation.email}).",
+                )
+            ],
+        )
         assert not User.objects.filter(email=invitation.email).exists()
 
         # Singup works on Inclusion Connect with the correct email

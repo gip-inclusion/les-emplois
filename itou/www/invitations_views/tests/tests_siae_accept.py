@@ -2,7 +2,7 @@ from urllib.parse import urlencode
 
 import respx
 from django.conf import settings
-from django.contrib.messages import get_messages
+from django.contrib import messages
 from django.core import mail
 from django.shortcuts import reverse
 from django.utils.html import escape
@@ -16,6 +16,7 @@ from itou.users.enums import KIND_SIAE_STAFF, UserKind
 from itou.users.factories import SiaeStaffFactory
 from itou.users.models import User
 from itou.utils.perms.siae import get_current_siae_or_404
+from itou.utils.test import assertMessages
 
 
 class TestAcceptInvitation(InclusionConnectBaseTestCase):
@@ -195,9 +196,17 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         # Follow the redirection.
         response = self.client.get(response.url, follow=True)
         # Signup should have failed : as the email used in IC isn't the one from the invitation
-        messages = list(get_messages(response.wsgi_request))
-        assert len(messages) == 1
-        assert "ne correspond pas à l’adresse e-mail de l’invitation" in messages[0].message
+        assertMessages(
+            response,
+            [
+                (
+                    messages.ERROR,
+                    "L’adresse e-mail que vous avez utilisée pour vous connecter avec "
+                    "Inclusion Connect (michel@lestontons.fr) ne correspond pas à "
+                    f"l’adresse e-mail de l’invitation ({invitation.email}).",
+                )
+            ],
+        )
         assert response.wsgi_request.get_full_path() == previous_url
         assert not User.objects.filter(email=invitation.email).exists()
 

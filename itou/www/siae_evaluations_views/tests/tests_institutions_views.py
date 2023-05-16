@@ -4,7 +4,6 @@ import html5lib
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
-from django.contrib.messages.storage.base import Message
 from django.core import mail
 from django.urls import reverse
 from django.utils import dateformat, timezone
@@ -32,7 +31,7 @@ from itou.users.enums import KIND_SIAE_STAFF
 from itou.users.factories import JobSeekerFactory
 from itou.utils.perms.user import UserInfo
 from itou.utils.templatetags.format_filters import format_approval_number
-from itou.utils.test import TestCase
+from itou.utils.test import TestCase, assertMessages
 from itou.utils.types import InclusiveDateRange
 from itou.www.siae_evaluations_views.forms import LaborExplanationForm, SetChosenPercentForm
 
@@ -3633,7 +3632,7 @@ class InstitutionEvaluatedSiaeValidationViewTest(TestCase):
         assert response.url == redirect_url
         self.evaluated_siae.refresh_from_db()
         assert self.evaluated_siae.reviewed_at is None
-        assert list(messages.get_messages(response.wsgi_request)) == []
+        assertMessages(response, [])
 
         # accepted
         EvaluatedAdministrativeCriteria.objects.filter(
@@ -3642,14 +3641,17 @@ class InstitutionEvaluatedSiaeValidationViewTest(TestCase):
         response = self.client.post(url)
         self.evaluated_siae.refresh_from_db()
         assert self.evaluated_siae.reviewed_at is not None
-        assert list(messages.get_messages(response.wsgi_request)) == [
-            Message(
-                messages.SUCCESS,
-                "<b>Résultats transmis !</b><br>"
-                "Merci d'avoir pris le temps de contrôler les pièces justificatives. "
-                "Nous notifions par mail l'administrateur de la SIAE.",
-            )
-        ]
+        assertMessages(
+            response,
+            [
+                (
+                    messages.SUCCESS,
+                    "<b>Résultats transmis !</b><br>"
+                    "Merci d'avoir pris le temps de contrôler les pièces justificatives. "
+                    "Nous notifions par mail l'administrateur de la SIAE.",
+                )
+            ],
+        )
         self.assertRedirects(response, redirect_url)
 
         # refused
@@ -3663,14 +3665,17 @@ class InstitutionEvaluatedSiaeValidationViewTest(TestCase):
         response = self.client.post(url)
         self.evaluated_siae.refresh_from_db()
         assert self.evaluated_siae.reviewed_at is not None
-        assert list(messages.get_messages(response.wsgi_request)) == [
-            Message(
-                messages.SUCCESS,
-                "<b>Résultats transmis !</b><br>"
-                "Merci d'avoir pris le temps de contrôler les pièces justificatives. "
-                "Nous notifions par mail l'administrateur de la SIAE.",
-            )
-        ]
+        assertMessages(
+            response,
+            [
+                (
+                    messages.SUCCESS,
+                    "<b>Résultats transmis !</b><br>"
+                    "Merci d'avoir pris le temps de contrôler les pièces justificatives. "
+                    "Nous notifions par mail l'administrateur de la SIAE.",
+                )
+            ],
+        )
         self.assertRedirects(response, redirect_url)
 
         # cannot validate twice
@@ -3679,7 +3684,7 @@ class InstitutionEvaluatedSiaeValidationViewTest(TestCase):
         assert response.status_code == 302
         self.evaluated_siae.refresh_from_db()
         assert timestamp == self.evaluated_siae.reviewed_at
-        assert list(messages.get_messages(response.wsgi_request)) == []
+        assertMessages(response, [])
 
     def test_accepted(self):
         evaluated_siae = EvaluatedSiaeFactory.create(
