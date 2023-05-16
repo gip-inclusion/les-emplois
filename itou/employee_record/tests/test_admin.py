@@ -3,6 +3,9 @@ from django.contrib import messages
 from django.contrib.admin import helpers
 from django.contrib.messages import storage
 from django.urls import reverse
+from pytest_django.asserts import assertContains
+
+from itou.users.factories import JobSeekerProfileFactory
 
 from .. import factories, models
 
@@ -66,3 +69,23 @@ def test_schedule_approval_update_notification_when_other_than_new_notification_
     assert list(messages.get_messages(response.wsgi_request)) == [
         storage.base.Message(messages.SUCCESS, "1 notification planifiée"),
     ]
+
+
+def test_job_seeker_profile_from_employee_record(admin_client):
+    er = factories.EmployeeRecordFactory()
+    job_seeker = er.job_application.job_seeker
+    employee_record_view_url = reverse("admin:employee_record_employeerecord_change", args=[er.pk])
+    add_jobseeker_profile_url = f"{reverse('admin:users_jobseekerprofile_add')}?user={job_seeker.pk}"
+
+    response = admin_client.get(employee_record_view_url)
+    assertContains(response, "Ajouter un profil")
+    assertContains(response, add_jobseeker_profile_url)
+
+    response = admin_client.get(add_jobseeker_profile_url)
+    assertContains(response, "Demandeur d&#x27;emploi")
+    assertContains(response, job_seeker.first_name)
+
+    JobSeekerProfileFactory(user=job_seeker)
+    response = admin_client.get(employee_record_view_url)
+    assertContains(response, "Profil salarié")
+    assertContains(response, job_seeker.jobseeker_profile.pk)

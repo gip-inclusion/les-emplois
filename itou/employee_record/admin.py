@@ -1,7 +1,11 @@
 from django.contrib import admin, messages
+from django.urls import reverse
 from django.utils import timezone
+from django.utils.html import format_html
 
 import itou.employee_record.models as models
+from itou.users.models import JobSeekerProfile
+from itou.utils.urls import add_url_params
 
 from ..utils.admin import get_admin_view_link
 from ..utils.templatetags.str_filters import pluralizefr
@@ -146,8 +150,14 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
         return "-"
 
     def job_seeker_profile_link(self, obj):
-        job_seeker_profile = obj.job_application.job_seeker.jobseeker_profile
-        return get_admin_view_link(job_seeker_profile, content=f"Profil salarié ID:{job_seeker_profile.pk}")
+        try:
+            job_seeker_profile = obj.job_application.job_seeker.jobseeker_profile
+            return get_admin_view_link(job_seeker_profile, content=f"Profil salarié ID:{job_seeker_profile.pk}")
+        except JobSeekerProfile.DoesNotExist:
+            url = add_url_params(
+                reverse("admin:users_jobseekerprofile_add"), {"user": obj.job_application.job_seeker.pk}
+            )
+            return format_html('<a href="{}">{}</a>', url, "Ajouter un profil")
 
     def asp_processing_type(self, obj):
         if obj.processed_as_duplicate:
