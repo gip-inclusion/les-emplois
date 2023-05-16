@@ -12,12 +12,12 @@
                         <li class="d-flex justify-content-between align-items-center mb-3">
                             {% if active_campaign.evaluations_asked_at %}
                                 <a href="{% url 'siae_evaluations_views:institution_evaluated_siae_list' active_campaign.pk %}" class="btn-link btn-ico">
-                                    <i class="ri-file-copy-2-line ri-lg font-weight-normal"></i>
+                                    <i class="ri-list-check-3 ri-lg font-weight-normal"></i>
                                     <span>Campagne en cours</span>
                                 </a>
                             {% else %}
                                 <a href="{% url 'siae_evaluations_views:samples_selection' %}" class="btn-link btn-ico">
-                                    <i class="ri-line-chart-line ri-lg font-weight-normal"></i>
+                                    <i class="ri-list-check-3 ri-lg font-weight-normal"></i>
                                     <span>Campagne en cours</span>
                                 </a>
                             {% endif %}
