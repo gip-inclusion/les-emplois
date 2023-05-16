@@ -2,6 +2,7 @@ import datetime
 from unittest import mock
 
 import pytest
+from django.contrib.messages import get_messages
 from django.urls import reverse
 
 from itou.asp.factories import CommuneFactory, CountryFranceFactory, CountryOutsideEuropeFactory
@@ -633,12 +634,16 @@ class CreateEmployeeRecordStep5Test(AbstractCreateEmployeeRecordTest):
 
         previous_last_checked_at = employee_record.job_application.job_seeker.last_checked_at
         # Validation of create process
-        self.client.post(self.url)
+        response = self.client.post(self.url)
 
         employee_record.refresh_from_db()
         assert employee_record.status == Status.READY
-
         assert employee_record.job_application.job_seeker.last_checked_at > previous_last_checked_at
+        self.assertRedirects(
+            response, reverse("employee_record_views:list") + "?status=NEW", fetch_redirect_response=False
+        )
+        [message] = list(get_messages(response.wsgi_request))
+        assert message == self.snapshot
 
     def test_retrieved_employee_record_is_the_most_recent_one(self):
         older_employee_record = EmployeeRecordFactory(

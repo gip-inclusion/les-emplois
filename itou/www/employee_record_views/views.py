@@ -351,8 +351,18 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
     employee_record = job_application.employee_record.full_fetch().exclude(status=Status.DISABLED).latest("created_at")
 
     if request.method == "POST":
+        back_url = f'{reverse("employee_record_views:list")}?status={employee_record.status}'
         employee_record.update_as_ready()
-        return HttpResponseRedirect(reverse("employee_record_views:create_step_5", args=(job_application.pk,)))
+        toast_title, toast_message = (
+            "La création de cette fiche salariée est terminée",
+            "Vous pouvez suivre l'avancement de son traitement par l'ASP en sélectionnant les différents statuts.",
+        )
+        messages.success(
+            request,
+            "||".join([toast_title, toast_message]),
+            extra_tags="toast",
+        )
+        return HttpResponseRedirect(back_url)
 
     context = {
         "employee_record": employee_record,
