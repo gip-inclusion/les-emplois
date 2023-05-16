@@ -5,6 +5,8 @@ from django.test import override_settings
 from django.urls import reverse
 from pytest_django.asserts import assertRedirects
 
+from itou.employee_record import enums as employee_record_enums
+from itou.employee_record.factories import EmployeeRecordFactory
 from itou.users.enums import IdentityProvider
 from itou.users.factories import (
     ItouStaffFactory,
@@ -14,6 +16,8 @@ from itou.users.factories import (
     SiaeStaffFactory,
 )
 from itou.utils.test import TestCase
+
+from . import employee_record
 
 
 class UserHijackPermTestCase(TestCase):
@@ -120,3 +124,30 @@ def test_redirect_to_ic_activation_view(client, user_factory, identity_provider,
         assertRedirects(response, reverse("dashboard:activate_ic_account"))
     else:
         assert response.status_code == 200
+
+
+class TestEmployeeRecord:
+    @pytest.mark.parametrize(
+        "status",
+        [
+            employee_record_enums.Status.NEW,
+            employee_record_enums.Status.REJECTED,
+            employee_record_enums.Status.DISABLED,
+        ],
+    )
+    def test_tunnel_step_is_allowed_with_valid_status(self, status):
+        job_application = EmployeeRecordFactory(status=status).job_application
+        assert employee_record.tunnel_step_is_allowed(job_application) is True
+
+    @pytest.mark.parametrize(
+        "status",
+        [
+            employee_record_enums.Status.READY,
+            employee_record_enums.Status.SENT,
+            employee_record_enums.Status.PROCESSED,
+            employee_record_enums.Status.ARCHIVED,
+        ],
+    )
+    def test_tunnel_step_is_allowed_with_invalid_status(self, status):
+        job_application = EmployeeRecordFactory(status=status).job_application
+        assert employee_record.tunnel_step_is_allowed(job_application) is False

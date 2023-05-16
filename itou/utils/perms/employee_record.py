@@ -22,7 +22,6 @@ def tunnel_step_is_allowed(job_application):
 
     return employee_record.status in [
         Status.NEW,
-        Status.READY,
         Status.REJECTED,
         Status.DISABLED,
     ]
@@ -46,7 +45,7 @@ def can_create_employee_record(request, job_application_id) -> JobApplication:
 
     # SIAE is eligible to employee record ?
     if not siae.can_use_employee_record:
-        raise PermissionDenied("Cette stucture ne peut pas utiliser la gestion des fiches salarié'.")
+        raise PermissionDenied("Cette structure ne peut pas utiliser la gestion des fiches salarié'.")
 
     # We want to reuse a job application in view, but first check that all is ok
     job_application = get_object_or_404(
