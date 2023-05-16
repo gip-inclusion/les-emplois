@@ -99,7 +99,7 @@ def job_description_list(request, template_name="siaes/job_description_list.html
 
         if action == "delete":
             job_description_id = request.POST.get("job_description_id")
-            job_description = SiaeJobDescription.objects.filter(pk=job_description_id).first()
+            job_description = SiaeJobDescription.objects.filter(siae_id=siae.pk, pk=job_description_id).first()
             if job_description is not None:
                 job_description.delete()
                 messages.success(request, "La fiche de poste a été supprimée.")
@@ -108,7 +108,7 @@ def job_description_list(request, template_name="siaes/job_description_list.html
         elif action == "toggle_active":
             job_description_id = request.POST.get("job_description_id")
             is_active = bool(request.POST.get("job_description_is_active", False))
-            job_description = SiaeJobDescription.objects.filter(pk=job_description_id).first()
+            job_description = SiaeJobDescription.objects.filter(siae_id=siae.pk, pk=job_description_id).first()
             if job_description is not None:
                 job_description.is_active = is_active
                 job_description.save(update_fields=["is_active"])

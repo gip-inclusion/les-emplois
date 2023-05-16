@@ -9,7 +9,7 @@ from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.enums import ContractType, SiaeKind
-from itou.siaes.factories import SiaeFactory
+from itou.siaes.factories import SiaeFactory, SiaeJobDescriptionFactory
 from itou.siaes.models import SiaeJobDescription
 from itou.utils.test import TestCase
 from itou.www.siaes_views.views import ITOU_SESSION_CURRENT_PAGE_KEY, ITOU_SESSION_JOB_DESCRIPTION_KEY
@@ -152,6 +152,22 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
         assert len(messages) == 1
         assert "La fiche de poste que vous souhaitiez modifier n'existe plus." in messages[0].message
 
+        # Trying to update job description from an other SIAE does nothing
+        other_siae_job_description = SiaeJobDescriptionFactory(is_active=False)
+        response = self.client.post(
+            self.url + "?action=toggle_active",
+            data={
+                "job_description_id": other_siae_job_description.pk,
+                "job_description_is_active": "on",
+            },
+        )
+        self.assertRedirects(response, self.url)
+        messages = list(get_messages(response.wsgi_request))
+        assert len(messages) == 1
+        assert "La fiche de poste que vous souhaitiez modifier n'existe plus." in messages[0].message
+        other_siae_job_description.refresh_from_db()
+        assert not other_siae_job_description.is_active
+
     def test_delete_job_descriptions(self):
         response = self._login(self.user)
 
@@ -176,6 +192,20 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
         messages = list(get_messages(response.wsgi_request))
         assert len(messages) == 1
         assert "La fiche de poste que vous souhaitez supprimer n'existe plus" in messages[0].message
+
+        # Trying to delete job description from an other SIAE does nothing
+        other_siae_job_description = SiaeJobDescriptionFactory()
+        response = self.client.post(
+            self.url + "?action=delete",
+            data={
+                "job_description_id": other_siae_job_description.pk,
+            },
+        )
+        self.assertRedirects(response, self.url)
+        messages = list(get_messages(response.wsgi_request))
+        assert len(messages) == 1
+        assert "La fiche de poste que vous souhaitez supprimer n'existe plus" in messages[0].message
+        assert SiaeJobDescription.objects.filter(pk=other_siae_job_description.pk).exists()
 
 
 class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
