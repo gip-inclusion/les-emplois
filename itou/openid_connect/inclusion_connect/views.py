@@ -47,6 +47,7 @@ class InclusionConnectSession:
     channel: str = None
     # Tells us where did the user came from so that we can adapt
     # error messages in the callback view.
+    is_login: bool = False  # Used to skip kind check and allow login through the wrong user kind
 
     def asdict(self):
         return dataclasses.asdict(self)
@@ -100,10 +101,13 @@ def inclusion_connect_authorize(request):
     user_kind = request.GET.get("user_kind")
     previous_url = request.GET.get("previous_url", reverse("home:hp"))
     next_url = request.GET.get("next_url")
+    register = request.GET.get("register")
     if not user_kind:
         return _redirect_to_login_page_on_error(error_msg="User kind missing.")
 
-    ic_session = InclusionConnectSession(user_kind=user_kind, previous_url=previous_url, next_url=next_url)
+    ic_session = InclusionConnectSession(
+        user_kind=user_kind, previous_url=previous_url, next_url=next_url, is_login=not register
+    )
     request = ic_session.bind_to_request(request)
     ic_session = request.session[constants.INCLUSION_CONNECT_SESSION_KEY]
 
@@ -118,7 +122,7 @@ def inclusion_connect_authorize(request):
 
     data = _generate_inclusion_params_from_session(ic_session)
 
-    if request.GET.get("register"):
+    if register:
         base_url = constants.INCLUSION_CONNECT_ENDPOINT_REGISTER
     else:
         base_url = constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE
@@ -267,7 +271,7 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
         is_successful = False
 
     try:
-        user, _ = ic_user_data.create_or_update_user()
+        user, _ = ic_user_data.create_or_update_user(is_login=ic_session.get("is_login"))
     except InvalidKindException:
         existing_user = User.objects.get(email=user_data["email"])
         _add_user_kind_error_message(request, existing_user, user_kind)

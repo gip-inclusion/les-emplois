@@ -100,7 +100,7 @@ class OIDConnectUserData:
     identity_provider: IdentityProvider
     kind: str
 
-    def create_or_update_user(self):
+    def create_or_update_user(self, is_login=False):
         """
         Create or update a user managed by another identity provider.
          - If there is already a user with this username (user_info_dict["sub"])
@@ -139,11 +139,15 @@ class OIDConnectUserData:
                 # This happens when the user tried to update its email with one already used by another account.
                 raise MultipleUsersFoundException([user, other_user])
 
-        if user.kind != user_data_dict["kind"]:
+        if user.kind != user_data_dict["kind"] and not is_login:
             raise InvalidKindException(user)
 
         if not created:
             for key, value in user_data_dict.items():
+                # Don't update kind on login, it allows prescribers to log through siae staff form
+                # which happens a lot...
+                if is_login and key == "kind":
+                    continue
                 setattr(user, key, value)
 
         for key, value in user_data_dict.items():
