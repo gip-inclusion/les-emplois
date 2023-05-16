@@ -99,15 +99,22 @@ def job_description_list(request, template_name="siaes/job_description_list.html
 
         if action == "delete":
             job_description_id = request.POST.get("job_description_id")
-            SiaeJobDescription.objects.get(pk=job_description_id).delete()
-            messages.success(request, "La fiche de poste a été supprimée.")
+            job_description = SiaeJobDescription.objects.filter(pk=job_description_id).first()
+            if job_description is not None:
+                job_description.delete()
+                messages.success(request, "La fiche de poste a été supprimée.")
+            else:
+                messages.warning(request, "La fiche de poste que vous souhaitez supprimer n'existe plus.")
         elif action == "toggle_active":
             job_description_id = request.POST.get("job_description_id")
             is_active = bool(request.POST.get("job_description_is_active", False))
-            job_description = SiaeJobDescription.objects.get(pk=job_description_id)
-            job_description.is_active = is_active
-            job_description.save(update_fields=["is_active"])
-            messages.success(request, f"Le recrutement est maintenant {'ouvert' if is_active else 'fermé'}.")
+            job_description = SiaeJobDescription.objects.filter(pk=job_description_id).first()
+            if job_description is not None:
+                job_description.is_active = is_active
+                job_description.save(update_fields=["is_active"])
+                messages.success(request, f"Le recrutement est maintenant {'ouvert' if is_active else 'fermé'}.")
+            else:
+                messages.error(request, "La fiche de poste que vous souhaitiez modifier n'existe plus.")
         elif form.is_valid():
             siae = form.save()
             messages.success(

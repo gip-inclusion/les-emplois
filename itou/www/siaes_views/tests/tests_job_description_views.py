@@ -1,5 +1,6 @@
 import pytest
 from django.contrib.gis.geos import Point
+from django.contrib.messages import get_messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
 
@@ -139,6 +140,17 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
 
         self.assertRedirects(response, self.url)
         assert job_description.is_active
+        messages = list(get_messages(response.wsgi_request))
+        assert len(messages) == 1
+        assert "Le recrutement est maintenant ouvert" in messages[0].message
+
+        # Check that we do not crash on unexisting job description
+        job_description.delete()
+        response = self.client.post(self.url + "?action=toggle_active", data=post_data)
+        self.assertRedirects(response, self.url)
+        messages = list(get_messages(response.wsgi_request))
+        assert len(messages) == 1
+        assert "La fiche de poste que vous souhaitiez modifier n'existe plus." in messages[0].message
 
     def test_delete_job_descriptions(self):
         response = self._login(self.user)
@@ -151,9 +163,19 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
         }
         response = self.client.post(self.url + "?action=delete", data=post_data)
         self.assertRedirects(response, self.url)
+        messages = list(get_messages(response.wsgi_request))
+        assert len(messages) == 1
+        assert "La fiche de poste a été supprimée" in messages[0].message
 
         with pytest.raises(ObjectDoesNotExist):
             SiaeJobDescription.objects.get(pk=job_description.id)
+
+        # Second delete does not crash (and simply does nothing)
+        response = self.client.post(self.url + "?action=delete", data=post_data)
+        self.assertRedirects(response, self.url)
+        messages = list(get_messages(response.wsgi_request))
+        assert len(messages) == 1
+        assert "La fiche de poste que vous souhaitez supprimer n'existe plus" in messages[0].message
 
 
 class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
