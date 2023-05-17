@@ -42,7 +42,6 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
         for employee_record in queryset:
             _, created = models.EmployeeRecordUpdateNotification.objects.update_or_create(
                 employee_record=employee_record,
-                notification_type=models.NotificationType.APPROVAL,
                 status=Status.NEW,
                 defaults={"updated_at": timezone.now},
             )
@@ -177,15 +176,11 @@ class EmployeeRecordUpdateNotificationAdmin(admin.ModelAdmin):
         "pk",
         "created_at",
         "updated_at",
-        "notification_type",
         "asp_processing_code",
         "status",
     )
 
-    list_filter = (
-        "status",
-        "notification_type",
-    )
+    list_filter = ("status",)
 
     raw_id_fields = ("employee_record",)
 

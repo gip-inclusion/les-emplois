@@ -4,7 +4,7 @@ import freezegun
 import pytest
 from django.test.utils import override_settings
 
-from itou.employee_record.enums import NotificationType, Status
+from itou.employee_record.enums import Status
 from itou.employee_record.mocks.transfer_employee_records import (
     SFTPAllDupsConnectionMock,
     SFTPBadConnectionMock,
@@ -185,7 +185,6 @@ class EmployeeRecordManagementCommandTest(ManagementCommandTestCase):
         self.employee_record.refresh_from_db()
 
         assert self.employee_record.update_notifications.count() == 1
-        assert self.employee_record.update_notifications.first().notification_type == NotificationType.APPROVAL
 
     @mock.patch("pysftp.Connection", SFTPAllDupsConnectionMock)
     @mock.patch(
@@ -201,4 +200,3 @@ class EmployeeRecordManagementCommandTest(ManagementCommandTestCase):
         self.employee_record.refresh_from_db()
 
         assert self.employee_record.update_notifications.count() == 1
-        assert self.employee_record.update_notifications.first().notification_type == NotificationType.APPROVAL

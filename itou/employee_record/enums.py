@@ -26,15 +26,6 @@ class NotificationStatus(models.TextChoices):
     REJECTED = "REJECTED", "En erreur"
 
 
-class NotificationType(models.TextChoices):
-    """
-    Add a new type for each new employee record update notification.
-    """
-
-    APPROVAL = "APPROVAL", "Modification du PASS IAE"
-    JOB_SEEKER = "JOB_SEEKER", "Modification de l'employé"
-
-
 class MovementType(models.TextChoices):
     CREATION = "C", "Création"
     UPDATE = "M", "Modification"

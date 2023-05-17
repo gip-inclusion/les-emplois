@@ -18,7 +18,7 @@ from itou.siaes.models import Siae, SiaeFinancialAnnex
 from itou.users.models import JobSeekerProfile
 from itou.utils.validators import validate_siret
 
-from .enums import MovementType, NotificationStatus, NotificationType, Status
+from .enums import MovementType, NotificationStatus, Status
 from .exceptions import CloningError, DuplicateCloningError, InvalidStatusError
 
 
@@ -717,10 +717,8 @@ class EmployeeRecordUpdateNotification(ASPExchangeInformation):
     """
     Notification of PROCESSED employee record updates.
 
-    `NotificationType` details the part of the employee record that is monitored.
-    At the moment, only approval updates (start and end dates) are tracked.
-
-    Monitoring of approvals is done via a Postgres trigger (defined in `Approval` app migrations).
+    Monitoring of approvals is done via a Postgres trigger (defined in `Approval` app migrations),
+    at the moment, only the start and end dates are tracked.
     """
 
     ASP_MOVEMENT_TYPE = MovementType.UPDATE
@@ -743,7 +741,8 @@ class EmployeeRecordUpdateNotification(ASPExchangeInformation):
     notification_type = models.CharField(
         verbose_name="Type de notification",
         max_length=20,
-        choices=NotificationType.choices,
+        null=True,
+        blank=True,
     )
 
     employee_record = models.ForeignKey(
@@ -758,6 +757,14 @@ class EmployeeRecordUpdateNotification(ASPExchangeInformation):
     class Meta(ASPExchangeInformation.Meta):
         verbose_name = "Notification de changement de la fiche salarié"
         verbose_name_plural = "Notifications de changement de la fiche salarié"
+        constraints = ASPExchangeInformation.Meta.constraints + [
+            # Only allow 1 NEW notification, this is used by the trigger's INSERT ON CONFLICT
+            models.UniqueConstraint(
+                fields=["employee_record"],
+                name="unique_new_employee_record",
+                condition=Q(status=NotificationStatus.NEW),
+            )
+        ]
 
     def __repr__(self):
         return f"<{type(self).__name__} pk={self.pk}>"
