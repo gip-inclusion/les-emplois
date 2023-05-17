@@ -13,6 +13,7 @@ urlpatterns = [
     path("edit_user_info", views.edit_user_info, name="edit_user_info"),
     path("edit_user_notifications", views.edit_user_notifications, name="edit_user_notifications"),
     path("edit_job_seeker_info/<uuid:job_application_id>", views.edit_job_seeker_info, name="edit_job_seeker_info"),
+    path("edit_job_seeker_info/<int:job_seeker_pk>", views.edit_job_seeker_info, name="edit_job_seeker_info"),
     path("switch_siae", views.switch_siae, name="switch_siae"),
     path(
         "switch_prescriber_organization", views.switch_prescriber_organization, name="switch_prescriber_organization"
