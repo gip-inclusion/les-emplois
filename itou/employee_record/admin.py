@@ -132,11 +132,11 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
             "Traitement ASP",
             {
                 "fields": (
+                    "asp_processing_type",
                     "asp_batch_file",
                     "asp_batch_line_number",
                     "asp_processing_code",
                     "asp_processing_label",
-                    "asp_processing_type",
                     "archived_json",
                 )
             },
@@ -161,12 +161,12 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
 
     def asp_processing_type(self, obj):
         if obj.processed_as_duplicate:
-            return "Intégrée automatiquement par script (doublon ASP)"
-        if obj.asp_processing_code:
-            return "Intégration ASP normale"
+            return "Intégrée par les emplois suite à une erreur 3436 (doublon PASS IAE/SIRET)"
+        if obj.asp_processing_code == obj.ASP_PROCESSING_SUCCESS_CODE:
+            return "Intégrée par l'ASP"
         return "-"
 
-    asp_processing_type.short_description = "Type d'intégration"
+    asp_processing_type.short_description = "Type de traitement"
     job_seeker_link.short_description = "Salarié"
     job_seeker_profile_link.short_description = "Profil du salarié"
 
