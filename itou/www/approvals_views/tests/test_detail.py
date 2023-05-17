@@ -1,4 +1,5 @@
 from dateutil.relativedelta import relativedelta
+from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
@@ -274,18 +275,20 @@ class TestApprovalDetailView:
         response = client.get(url)
         assertNotContains(response, reverse("approvals:declare_prolongation", kwargs={"approval_id": approval.id}))
 
+    @override_settings(TALLY_URL="https://tally.so")
     def test_edit_user_info_button(self, client):
         approval = ApprovalFactory(with_jobapplication=True)
         job_application = approval.jobapplication_set.get()
         siae_member = job_application.to_siae.members.first()
         client.force_login(siae_member)
+        url = reverse("approvals:detail", kwargs={"pk": approval.pk})
 
         user_info_edit_url = reverse(
-            "dashboard:edit_job_seeker_info", kwargs={"job_application_id": job_application.pk}
+            "dashboard:edit_job_seeker_info", kwargs={"job_seeker_pk": job_application.job_seeker_id}
         )
+        user_info_edit_url = f"{user_info_edit_url}?back_url={url}&from_application={job_application.pk}"
         user_info_not_allowed = "Vous ne pouvez pas modifier ses informations"
 
-        url = reverse("approvals:detail", kwargs={"pk": approval.pk})
         response = client.get(url)
         assertNotContains(response, user_info_edit_url)
         assertContains(response, user_info_not_allowed)
@@ -295,3 +298,14 @@ class TestApprovalDetailView:
         response = client.get(url)
         assertContains(response, user_info_edit_url)
         assertNotContains(response, user_info_not_allowed)
+
+        # Check that the edit user link correctly displays the Tally link (thanks to from_application= parameter)
+        response = client.get(user_info_edit_url)
+        assertContains(
+            response,
+            (
+                f'<a href="https://tally.so/r/wzxQlg?jobapplication={job_application.pk}" target="_blank" '
+                f'rel="noopener">Demander la correction du numéro de sécurité sociale</a>'
+            ),
+            html=True,
+        )

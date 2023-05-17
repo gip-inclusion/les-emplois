@@ -27,7 +27,8 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.siae_evaluations.constants import CAMPAIGN_VIEWABLE_DURATION
 from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
 from itou.siaes.models import Siae, SiaeFinancialAnnex
-from itou.users.enums import IdentityProvider
+from itou.users.enums import IdentityProvider, UserKind
+from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
@@ -247,18 +248,30 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
 
 
 @login_required
-def edit_job_seeker_info(request, job_application_id, template_name="dashboard/edit_job_seeker_info.html"):
-    job_application = get_object_or_404(JobApplication.objects.select_related("job_seeker"), pk=job_application_id)
-    if not request.user.can_edit_personal_information(job_application.job_seeker):
+def edit_job_seeker_info(
+    request, job_application_id=None, job_seeker_pk=None, template_name="dashboard/edit_job_seeker_info.html"
+):
+    if job_application_id:
+        # TODO(xafer): remove support for this url pattern in a week
+        job_application = get_object_or_404(JobApplication.objects.select_related("job_seeker"), pk=job_application_id)
+        job_seeker = job_application.job_seeker
+        tally_form_query = f"jobapplication={job_application.pk}"
+    elif job_seeker_pk:
+        job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), pk=job_seeker_pk)
+        from_application_uuid = request.GET.get("from_application")
+        tally_form_query = from_application_uuid and f"jobapplication={from_application_uuid}"
+    else:
+        raise RuntimeError("We need either job_application_id or job_seeker_pk here")
+    if not request.user.can_edit_personal_information(job_seeker):
         raise PermissionDenied
 
     dashboard_url = reverse_lazy("dashboard:index")
     back_url = get_safe_url(request, "back_url", fallback_url=dashboard_url)
     form = EditJobSeekerInfoForm(
-        instance=job_application.job_seeker,
+        instance=job_seeker,
         editor=request.user,
         data=request.POST or None,
-        tally_form_query=f"jobapplication={job_application.pk}",
+        tally_form_query=tally_form_query,
     )
 
     if request.method == "POST" and form.is_valid():
@@ -268,7 +281,7 @@ def edit_job_seeker_info(request, job_application_id, template_name="dashboard/e
 
     context = {
         "form": form,
-        "job_application": job_application,
+        "job_seeker": job_seeker,
         "prev_url": back_url,
         "matomo_custom_title": "Informations personnelles du candidat",
     }

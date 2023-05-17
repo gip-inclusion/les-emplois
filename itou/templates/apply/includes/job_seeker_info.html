@@ -63,7 +63,7 @@
     {% endif %}
 </ul>
 <p>
-    <a href="{% if can_edit_personal_information %}{% url 'dashboard:edit_job_seeker_info' job_application_id=job_application.pk %}?back_url={{ request.get_full_path|urlencode }}{% endif %}"
+    <a href="{% if can_edit_personal_information %}{% url 'dashboard:edit_job_seeker_info' job_seeker_pk=job_application.job_seeker_id %}?back_url={{ request.get_full_path|urlencode }}&from_application={{ job_application.pk }}{% endif %}"
        class="btn btn-outline-primary{% if with_matomo_event %} matomo-event{% endif %}{% if not can_edit_personal_information %} disabled{% endif %}"
        {% if with_matomo_event %}data-matomo-category="salaries" data-matomo-action="clic" data-matomo-option="modfifier-les-informations-personnelles"{% endif %}
        aria-label="Modifier les informations personnelles de {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}">
