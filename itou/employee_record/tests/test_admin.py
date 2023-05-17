@@ -22,7 +22,6 @@ def test_schedule_approval_update_notification_when_notification_do_not_exists(a
     )
     notification = models.EmployeeRecordUpdateNotification.objects.latest("created_at")
     assert notification.employee_record == employee_record
-    assert notification.notification_type == models.NotificationType.APPROVAL
     assert notification.status == models.Status.NEW
     assert list(messages.get_messages(response.wsgi_request)) == [
         storage.base.Message(messages.SUCCESS, "1 notification planifiée"),
@@ -64,7 +63,6 @@ def test_schedule_approval_update_notification_when_other_than_new_notification_
     created_notification = models.EmployeeRecordUpdateNotification.objects.latest("created_at")
     assert created_notification != notification
     assert created_notification.employee_record == notification.employee_record
-    assert created_notification.notification_type == notification.notification_type
     assert created_notification.status == models.Status.NEW
     assert list(messages.get_messages(response.wsgi_request)) == [
         storage.base.Message(messages.SUCCESS, "1 notification planifiée"),

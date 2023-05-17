@@ -6,7 +6,7 @@ from django.db.models.functions import Greatest
 from django.utils import timezone
 
 from itou.approvals.models import Approval
-from itou.employee_record.enums import NotificationType, Status
+from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification
 
 
@@ -196,7 +196,6 @@ class Command(BaseCommand):
             for employee_record in employee_record_with_missing_notification:
                 _, created = EmployeeRecordUpdateNotification.objects.update_or_create(
                     employee_record=employee_record,
-                    notification_type=NotificationType.APPROVAL,
                     status=Status.NEW,
                     defaults={"updated_at": timezone.now},
                 )

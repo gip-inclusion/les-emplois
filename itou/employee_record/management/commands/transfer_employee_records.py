@@ -8,7 +8,7 @@ from sentry_sdk.crons import monitor
 
 from itou.approvals.models import Approval
 from itou.employee_record import constants
-from itou.employee_record.enums import MovementType, NotificationType, Status
+from itou.employee_record.enums import MovementType, Status
 from itou.employee_record.exceptions import SerializationError
 from itou.employee_record.mocks.fake_serializers import TestEmployeeRecordBatchSerializer
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, EmployeeRecordUpdateNotification
@@ -176,7 +176,6 @@ class Command(EmployeeRecordTransferCommand):
                                 # Mimic the SQL function "create_employee_record_approval_notification()"
                                 EmployeeRecordUpdateNotification.objects.update_or_create(
                                     employee_record=employee_record,
-                                    notification_type=NotificationType.APPROVAL,
                                     defaults={"updated_at": timezone.now},
                                 )
 
