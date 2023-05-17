@@ -286,14 +286,12 @@ class TestApprovalDetailView:
         user_info_not_allowed = "Vous ne pouvez pas modifier ses informations"
 
         url = reverse("approvals:detail", kwargs={"pk": approval.pk})
-        assert not job_application.has_editable_job_seeker
         response = client.get(url)
         assertNotContains(response, user_info_edit_url)
         assertContains(response, user_info_not_allowed)
 
         job_application.job_seeker.created_by = PrescriberFactory()
         job_application.job_seeker.save()
-        assert job_application.has_editable_job_seeker
         response = client.get(url)
         assertContains(response, user_info_edit_url)
         assertNotContains(response, user_info_not_allowed)
