@@ -1,3 +1,4 @@
+import datetime
 from unittest import mock
 
 import pytest
@@ -598,7 +599,7 @@ class CreateEmployeeRecordStep4Test(AbstractCreateEmployeeRecordTest):
         older_employee_record = EmployeeRecordFactory(
             orphan=True,
             job_application=self.job_application,
-            created_at=self.faker.date_time(end_datetime="-1d"),
+            created_at=self.faker.date_time(end_datetime="-1d", tzinfo=datetime.UTC),
         )
         recent_employee_record = EmployeeRecord.objects.latest("created_at")
         assert recent_employee_record != older_employee_record
@@ -643,7 +644,7 @@ class CreateEmployeeRecordStep5Test(AbstractCreateEmployeeRecordTest):
         older_employee_record = EmployeeRecordFactory(
             orphan=True,
             job_application=self.job_application,
-            created_at=self.faker.date_time(end_datetime="-1d"),
+            created_at=self.faker.date_time(end_datetime="-1d", tzinfo=datetime.UTC),
         )
         recent_employee_record = EmployeeRecord.objects.latest("created_at")
         assert recent_employee_record != older_employee_record

@@ -1,3 +1,4 @@
+import datetime
 import io
 
 import pytest
@@ -121,23 +122,23 @@ def test_missed_notifications(command, faker):
     # Approval() created after the last employee record snapshot are also what we want
     employee_record_before_approval_creation = factories.EmployeeRecordFactory(
         status=models.Status.ARCHIVED,
-        job_application__approval__created_at=faker.future_datetime(),  # So it pass the date filter
+        job_application__approval__created_at=faker.future_datetime(tzinfo=datetime.UTC),  # So it pass the date filter
     )
 
     # Prolongation() before the last employee record snapshot are ignored
     approvals_factories.ProlongationFactory(
         approval=factories.EmployeeRecordFactory(
             status=models.Status.ARCHIVED,
-            job_application__approval__created_at=faker.date_time_between(end_date="-1y"),
+            job_application__approval__created_at=faker.date_time_between(end_date="-1y", tzinfo=datetime.UTC),
         ).job_application.approval,
-        created_at=faker.date_time_between(start_date="-1y", end_date="-1d"),
+        created_at=faker.date_time_between(start_date="-1y", end_date="-1d", tzinfo=datetime.UTC),
     )
 
     # Approval() that can no longer be prolonged are ignored
     factories.EmployeeRecordFactory(
         status=models.Status.ARCHIVED,
         job_application__approval__expired=True,
-        job_application__approval__created_at=faker.future_datetime(),
+        job_application__approval__created_at=faker.future_datetime(tzinfo=datetime.UTC),
     )
 
     # All Suspension() are ignored
@@ -148,8 +149,10 @@ def test_missed_notifications(command, faker):
     # EmployeeRecordUpdateNotification() should be taken into account
     factories.EmployeeRecordUpdateNotificationFactory(
         employee_record__status=models.Status.ARCHIVED,
-        employee_record__job_application__approval__created_at=faker.future_datetime(end_date="+1d"),
-        created_at=faker.date_time_between(start_date="+1d", end_date="+30d"),
+        employee_record__job_application__approval__created_at=faker.future_datetime(
+            end_date="+1d", tzinfo=datetime.UTC
+        ),
+        created_at=faker.date_time_between(start_date="+1d", end_date="+30d", tzinfo=datetime.UTC),
     )
 
     # Various cases are now set up, finally check the behavior
