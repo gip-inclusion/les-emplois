@@ -379,11 +379,8 @@ def summary(request, employee_record_id, template_name="employee_record/summary.
     if not siae_is_allowed(job_application, siae):
         raise PermissionDenied
 
-    status = request.GET.get("status")
-
     context = {
         "employee_record": employee_record,
-        "status": status,
         "matomo_custom_title": "Détail fiche salarié ASP",
     }
 
@@ -404,9 +401,7 @@ def disable(request, employee_record_id, template_name="employee_record/disable.
     if not siae_is_allowed(job_application, siae):
         raise PermissionDenied
 
-    status = request.GET.get("status")
-    list_url = reverse("employee_record_views:list")
-    back_url = f"{ list_url }?status={ status }"
+    back_url = f'{reverse("employee_record_views:list")}?status={employee_record.status}'
 
     if not employee_record.can_be_disabled:
         messages.error(request, EmployeeRecord.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
@@ -419,7 +414,6 @@ def disable(request, employee_record_id, template_name="employee_record/disable.
 
     context = {
         "employee_record": employee_record,
-        "back_url": back_url,
         "matomo_custom_title": "Désactiver la fiche salarié ASP",
     }
     return render(request, template_name, context)
@@ -439,8 +433,7 @@ def reactivate(request, employee_record_id, template_name="employee_record/react
     if not siae_is_allowed(job_application, siae):
         raise PermissionDenied
 
-    list_url = reverse("employee_record_views:list")
-    back_url = f"{ list_url }?status={ Status.DISABLED }"
+    back_url = f'{reverse("employee_record_views:list")}?status={employee_record.status}'
 
     if employee_record.status != Status.DISABLED:
         messages.error(request, EmployeeRecord.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
@@ -459,7 +452,6 @@ def reactivate(request, employee_record_id, template_name="employee_record/react
 
     context = {
         "employee_record": employee_record,
-        "back_url": back_url,
         "matomo_custom_title": "Réactiver la fiche salarié ASP",
     }
     return render(request, template_name, context)
