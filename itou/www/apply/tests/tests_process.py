@@ -103,7 +103,6 @@ class ProcessViewsTest(TestCase):
 
         url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
-        assert not job_application.has_editable_job_seeker
         self.assertContains(response, "Ce candidat a pris le contrôle de son compte utilisateur.")
         self.assertContains(response, format_nir(job_application.job_seeker.nir))
         self.assertContains(response, job_application.job_seeker.pole_emploi_id)
@@ -118,7 +117,6 @@ class ProcessViewsTest(TestCase):
 
         url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
-        assert job_application.has_editable_job_seeker
         self.assertContains(response, "Modifier les informations")
         self.assertContains(response, "Adresse : <span>Non renseignée</span>", html=True)
         self.assertContains(response, "Téléphone : <span>Non renseigné</span>", html=True)

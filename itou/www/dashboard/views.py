@@ -245,26 +245,10 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
     return render(request, template_name, context)
 
 
-def user_can_edit_job_seeker_info(user, job_application, current_siae_pk=None):
-    return (
-        # Only when the information is not managed by job seekers themselves
-        job_application.has_editable_job_seeker
-        and (
-            # Same sender (no SQL)
-            job_application.sender_id == user.id
-            # Member of the SIAE that offers the job application
-            or (current_siae_pk and current_siae_pk == job_application.to_siae_id)
-            # Member of the authorized prescriber organization who propose the candidate to the job application
-            or user.is_prescriber_of_authorized_organization(job_application.sender_prescriber_organization_id)
-        )
-    )
-
-
 @login_required
 def edit_job_seeker_info(request, job_application_id, template_name="dashboard/edit_job_seeker_info.html"):
     job_application = get_object_or_404(JobApplication.objects.select_related("job_seeker"), pk=job_application_id)
-    current_siae_pk = request.session.get(global_constants.ITOU_SESSION_CURRENT_SIAE_KEY)
-    if not user_can_edit_job_seeker_info(request.user, job_application, current_siae_pk):
+    if not request.user.can_edit_personal_information(job_application.job_seeker):
         raise PermissionDenied
 
     dashboard_url = reverse_lazy("dashboard:index")

@@ -103,6 +103,7 @@ def details_for_siae(request, job_application_id, template_name="apply/process_d
 
     context = {
         "can_view_personal_information": True,  # SIAE members have access to personal info
+        "can_edit_personal_information": request.user.can_edit_personal_information(job_application.job_seeker),
         "eligibility_diagnosis": job_application.get_eligibility_diagnosis(),
         "expired_eligibility_diagnosis": expired_eligibility_diagnosis,
         "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
@@ -162,6 +163,7 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
 
     context = {
         "can_view_personal_information": request.user.can_view_personal_information(job_application.job_seeker),
+        "can_edit_personal_information": request.user.can_edit_personal_information(job_application.job_seeker),
         "eligibility_diagnosis": job_application.get_eligibility_diagnosis(),
         "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
         "job_application": job_application,
