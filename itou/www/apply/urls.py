@@ -22,6 +22,11 @@ urlpatterns = [
         name="check_email_for_sender",
     ),
     path(
+        "<int:siae_pk>/sender/search-by-email/<uuid:session_uuid>",
+        submit_views.SearchByEmailForSenderView.as_view(),
+        name="search_by_email_for_sender",
+    ),
+    path(
         "<int:siae_pk>/sender/create_job_seeker/<uuid:session_uuid>/1",
         submit_views.CreateJobSeekerStep1ForSenderView.as_view(),
         name="create_job_seeker_step_1_for_sender",
