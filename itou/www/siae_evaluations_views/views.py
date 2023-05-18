@@ -73,6 +73,21 @@ def samples_selection(request, template_name="siae_evaluations/samples_selection
 
 
 @login_required
+def campaign_calendar(request, evaluation_campaign_pk, template_name="siae_evaluations/campaign_calendar.html"):
+    evaluation_campaign = get_object_or_404(
+        EvaluationCampaign,
+        pk=evaluation_campaign_pk,
+    )
+
+    back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
+    context = {
+        "campaign_calendar_html": evaluation_campaign.calendar,
+        "back_url": back_url,
+    }
+    return render(request, template_name, context)
+
+
+@login_required
 def institution_evaluated_siae_list(
     request, evaluation_campaign_pk, template_name="siae_evaluations/institution_evaluated_siae_list.html"
 ):
