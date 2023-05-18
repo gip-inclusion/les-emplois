@@ -19,9 +19,19 @@ def before_ended_at(**kwargs):
     return inner
 
 
+class CalendarFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.Calendar
+
+    html = "<span>I'm valid HTML</span>"
+
+
 class EvaluationCampaignFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.EvaluationCampaign
+
+    class Params:
+        with_calendar = factory.Trait(calendar=factory.SubFactory(CalendarFactory))
 
     name = factory.fuzzy.FuzzyText(length=10)
     institution = factory.SubFactory(InstitutionFactory, department="14")
