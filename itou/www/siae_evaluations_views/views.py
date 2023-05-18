@@ -81,7 +81,7 @@ def campaign_calendar(request, evaluation_campaign_pk, template_name="siae_evalu
 
     back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
     context = {
-        "campaign_calendar_html": evaluation_campaign.calendar,
+        "campaign_calendar_html": evaluation_campaign.calendar.html,
         "back_url": back_url,
     }
     return render(request, template_name, context)

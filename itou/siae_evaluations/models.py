@@ -60,6 +60,7 @@ def create_campaigns(evaluated_period_start_at, evaluated_period_end_at, institu
         f"au {evaluated_period_end_at.strftime('%d/%m/%Y')}"
     )
 
+    # TODO(cms): add Calendar pk.
     institutions = Institution.objects.filter(kind=InstitutionKind.DDETS_IAE)
     if institution_ids:
         institutions = institutions.filter(pk__in=institution_ids)
@@ -86,6 +87,22 @@ def create_campaigns(evaluated_period_start_at, evaluated_period_end_at, institu
 
 class CampaignAlreadyPopulatedException(Exception):
     pass
+
+
+class Calendar(models.Model):
+    """
+    Campaigns taking place at the same time share the same calendar.
+    """
+
+    # TODO(cms): create a Calendar and add its pk to active campaigns.
+    name = models.CharField(verbose_name="Nom", max_length=100, null=True)
+    html = models.TextField(verbose_name="Contenu")
+
+    class Meta:
+        verbose_name = "Calendrier"
+
+    def __str__(self):
+        return f"{self.name}"
 
 
 class EvaluationCampaignQuerySet(models.QuerySet):
@@ -149,10 +166,12 @@ class EvaluationCampaign(models.Model):
             MaxValueValidator(evaluation_enums.EvaluationChosenPercent.MAX),
         ],
     )
-    # CMS: this assumes calendar is the same for institutions and employers.
-    # Another way to do it would be to create a Calendar object with a column for each user type.
-    # For the moment, only institutions can view the calendar, so let's stick to a minimalist version.
-    calendar = models.TextField(verbose_name="Calendrier de la campagne", null=True)
+    calendar = models.ForeignKey(
+        Calendar,
+        on_delete=models.SET_NULL,
+        verbose_name="Calendrier",
+        null=True,
+    )
 
     objects = EvaluationCampaignQuerySet.as_manager()
 

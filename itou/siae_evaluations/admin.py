@@ -7,6 +7,9 @@ from itou.utils.admin import get_admin_view_link
 from itou.utils.export import to_streaming_response
 
 
+admin.site.register(models.Calendar)
+
+
 class EvaluatedSiaesInline(admin.TabularInline):
     model = models.EvaluatedSiae
     fields = ("id_link", "reviewed_at", "state")
@@ -184,6 +187,7 @@ class EvaluationCampaignAdmin(admin.ModelAdmin):
         "ended_at",
     )
     list_display_links = ("name",)
+    raw_id_fields = ("calendar",)
     readonly_fields = (
         "institution",
         "evaluated_period_start_at",
