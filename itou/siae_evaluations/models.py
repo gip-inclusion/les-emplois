@@ -149,6 +149,10 @@ class EvaluationCampaign(models.Model):
             MaxValueValidator(evaluation_enums.EvaluationChosenPercent.MAX),
         ],
     )
+    # CMS: this assumes calendar is the same for institutions and employers.
+    # Another way to do it would be to create a Calendar object with a column for each user type.
+    # For the moment, only institutions can view the calendar, so let's stick to a minimalist version.
+    calendar = models.TextField(verbose_name="Calendrier de la campagne", null=True)
 
     objects = EvaluationCampaignQuerySet.as_manager()
 

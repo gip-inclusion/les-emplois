@@ -9,31 +9,28 @@ from django.urls import reverse
 from django.utils import dateformat, timezone
 from freezegun import freeze_time
 
-from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
+from itou.eligibility.models import (AdministrativeCriteria,
+                                     EligibilityDiagnosis)
 from itou.institutions.factories import InstitutionMembershipFactory
 from itou.job_applications.factories import JobApplicationFactory
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.constants import CAMPAIGN_VIEWABLE_DURATION
 from itou.siae_evaluations.factories import (
-    EvaluatedAdministrativeCriteriaFactory,
-    EvaluatedJobApplicationFactory,
-    EvaluatedSiaeFactory,
-    EvaluationCampaignFactory,
-)
-from itou.siae_evaluations.models import (
-    EvaluatedAdministrativeCriteria,
-    EvaluatedJobApplication,
-    EvaluationCampaign,
-    Sanctions,
-)
+    EvaluatedAdministrativeCriteriaFactory, EvaluatedJobApplicationFactory,
+    EvaluatedSiaeFactory, EvaluationCampaignFactory)
+from itou.siae_evaluations.models import (EvaluatedAdministrativeCriteria,
+                                          EvaluatedJobApplication,
+                                          EvaluationCampaign, Sanctions)
 from itou.siaes.factories import SiaeFactory, SiaeMembershipFactory
 from itou.users.enums import KIND_SIAE_STAFF
 from itou.users.factories import JobSeekerFactory
 from itou.utils.perms.user import UserInfo
 from itou.utils.templatetags.format_filters import format_approval_number
-from itou.utils.test import BASE_NUM_QUERIES, TestCase, assertMessages, parse_response_to_soup
+from itou.utils.test import (BASE_NUM_QUERIES, TestCase, assertMessages,
+                             parse_response_to_soup)
 from itou.utils.types import InclusiveDateRange
-from itou.www.siae_evaluations_views.forms import LaborExplanationForm, SetChosenPercentForm
+from itou.www.siae_evaluations_views.forms import (LaborExplanationForm,
+                                                   SetChosenPercentForm)
 
 
 # fixme vincentporte : convert this method into factory
@@ -4053,3 +4050,44 @@ class InstitutionEvaluatedSiaeValidationViewTest(TestCase):
             ),
         )
         assert mail.outbox == []
+
+
+class InstitutionCalendarViewTest(TestCase):
+    def setUp(self):
+        membership = InstitutionMembershipFactory(institution__name="DDETS Ille et Vilaine")
+        self.user = membership.user
+        self.institution = membership.institution
+
+    def test_active_campaign_calendar(self):
+        calendar_html = """
+            <table class="table">
+                <thead class="thead-light">
+                    <tr>
+                        <th></th>
+                        <th scope="col">Dates</th>
+                        <th scope="col">Acteurs</th>
+                        <th scope="col">Actions attendues</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">Phase 1</th>
+                        <td>Du 15 mai 2023 au 11 juin 2023</td>
+
+                        <td>DDETS</td>
+                        <td>Sélection du taux de SIAE</td>
+                    </tr>
+                </tbody>
+            </table>
+        """
+        evaluation_campaign = EvaluationCampaignFactory(institution=self.institution, calendar=calendar_html)
+        calendar_url = reverse("siae_evaluations_views:campaign_calendar", args=[evaluation_campaign.pk])
+
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("dashboard:index"))
+        assert response.status_code == 200
+        self.assertContains(response, calendar_url)
+
+        response = self.client.get(calendar_url)
+        assert response.status_code == 200
+        self.assertContains(response, calendar_html)

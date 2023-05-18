@@ -9,6 +9,11 @@ app_name = "siae_evaluations_views"
 urlpatterns = [
     path("samples_selection", views.samples_selection, name="samples_selection"),
     path(
+        "<int:evaluation_campaign_pk>/calendar/",
+        views.campaign_calendar,
+        name="campaign_calendar",
+    ),
+    path(
         "institution_evaluated_siae_list/<int:evaluation_campaign_pk>/",
         views.institution_evaluated_siae_list,
         name="institution_evaluated_siae_list",
