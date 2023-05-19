@@ -1,5 +1,28 @@
 # Journal des modifications
 
+## [63] - 2023-05-22
+
+### Ajouté
+
+- « Extranet EA 2 » est ajouté dans une bannière d’info présente lors de l’inscription des employeurs.
+- GEIQ - Embauche : Ajout du nombre de jours d’accompagnement avant contrat.
+- Candidature : ajout des informations de NIR dans les parcours de création ou mise à jour des profils de demandeur d'emploi.
+- Django admin : permettre d'ajouter un profil candidat à partir d'une fiche salarié.
+- Ajout d'un texte explicatif avant le formulaire d'inscription des facilitateurs.
+
+### Modifié
+
+- Les prescripteurs habilités peuvent accéder au diagnostic à partir de la page dédiée à la situation administrative du candidat.
+- Controle a posteriori: ouverture de la phase 1
+- import_geiq/ea_eatt: les SIAE créées par des utilisateurs ne sont plus supprimées automatiquement.
+- Boost UX / UI : diverses modifications de formulations et de positionnements.
+- Diverses améliorations d'accessibilité.
+- Carte PASS IAE : mise à jour de l'affichage de la date de fin prévisionnelle des PASS IAE.
+- inclusion_connect: autoriser les prescripteurs de se connecter depuis la page des employeurs (et reciproquement).
+- Exclusion des membres inactifs des exports CTA.
+
+
+
 ## [62] - 2023-05-08
 
 ### Ajouté
