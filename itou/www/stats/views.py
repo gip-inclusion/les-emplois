@@ -33,6 +33,7 @@ from itou.utils.apis.metabase import (
     ASP_SIAE_FILTER_KEY,
     C1_SIAE_FILTER_KEY,
     DEPARTMENT_FILTER_KEY,
+    IAE_NETWORK_FILTER_KEY,
     METABASE_DASHBOARDS,
     REGION_FILTER_KEY,
     get_view_name,
@@ -50,9 +51,9 @@ def get_stats_siae_etp_current_org(request):
     return current_org
 
 
-def get_stats_siae_hiring_current_org(request):
+def get_stats_siae_current_org(request):
     current_org = get_current_siae_or_404(request)
-    if not request.user.can_view_stats_siae_hiring(current_org=current_org):
+    if not request.user.can_view_stats_siae(current_org=current_org):
         raise PermissionDenied
     return current_org
 
@@ -199,16 +200,15 @@ def stats_siae_etp(request):
     )
 
 
-@login_required
-def stats_siae_hiring(request):
+def render_stats_siae(request, page_title):
     """
     SIAE stats shown only to their own members.
     Employers can see stats for all their SIAEs at once, not just the one currently being worked on.
-    These stats are about hiring and are built directly from C1 data.
+    These stats are built directly from C1 data.
     """
-    current_org = get_stats_siae_hiring_current_org(request)
+    current_org = get_stats_siae_current_org(request)
     context = {
-        "page_title": "Données de candidatures de mes structures",
+        "page_title": page_title,
         "department": current_org.department,
         "matomo_custom_url_suffix": format_region_and_department_for_matomo(current_org.department),
     }
@@ -221,6 +221,21 @@ def stats_siae_hiring(request):
             ]
         },
     )
+
+
+@login_required
+def stats_siae_hiring(request):
+    return render_stats_siae(request=request, page_title="Données de candidatures de mes structures")
+
+
+@login_required
+def stats_siae_auto_prescription(request):
+    return render_stats_siae(request=request, page_title="Focus auto-prescription")
+
+
+@login_required
+def stats_siae_follow_siae_evaluation(request):
+    return render_stats_siae(request=request, page_title="Suivi du contrôle a posteriori")
 
 
 @login_required
@@ -358,7 +373,7 @@ def stats_ddets_auto_prescription(request):
 
 @login_required
 def stats_ddets_follow_siae_evaluation(request):
-    return render_stats_ddets(request=request, page_title="Suivre le contrôle à posteriori")
+    return render_stats_ddets(request=request, page_title="Suivi du contrôle à posteriori")
 
 
 @login_required
@@ -403,7 +418,7 @@ def stats_dreets_auto_prescription(request):
 
 @login_required
 def stats_dreets_follow_siae_evaluation(request):
-    return render_stats_dreets(request=request, page_title="Suivre le contrôle à posteriori")
+    return render_stats_dreets(request=request, page_title="Suivi du contrôle à posteriori")
 
 
 @login_required
@@ -443,7 +458,7 @@ def stats_dgefp_auto_prescription(request):
 @login_required
 def stats_dgefp_follow_siae_evaluation(request):
     return render_stats_dgefp(
-        request=request, page_title="Suivre le contrôle à posteriori", extra_params=get_params_for_whole_country()
+        request=request, page_title="Suivi du contrôle à posteriori", extra_params=get_params_for_whole_country()
     )
 
 
@@ -478,3 +493,18 @@ def stats_dihal_state(request):
         "page_title": "Suivi des prescriptions des AHI",
     }
     return render_stats(request=request, context=context, params={})
+
+
+@login_required
+def stats_iae_network_hiring(request):
+    current_org = get_current_institution_or_404(request)
+    if not request.user.can_view_stats_iae_network(current_org=current_org):
+        raise PermissionDenied
+    context = {
+        "page_title": "Données de candidatures des adhérents de mon réseau IAE",
+    }
+    return render_stats(
+        request=request,
+        context=context,
+        params={IAE_NETWORK_FILTER_KEY: current_org.id},
+    )

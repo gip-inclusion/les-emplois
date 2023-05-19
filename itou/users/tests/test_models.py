@@ -700,21 +700,21 @@ class ModelTest(TestCase):
                 else:
                     assert user.can_create_siae_antenna(siae) == siae.should_have_convention
 
-    def test_can_view_stats_siae_hiring(self):
+    def test_can_view_stats_siae(self):
         # An employer can only view hiring stats of their own SIAE.
         siae1 = SiaeFactory(with_membership=True)
         user1 = siae1.members.get()
         siae2 = SiaeFactory()
 
         assert siae1.has_member(user1)
-        assert user1.can_view_stats_siae_hiring(current_org=siae1)
+        assert user1.can_view_stats_siae(current_org=siae1)
         assert not siae2.has_member(user1)
-        assert not user1.can_view_stats_siae_hiring(current_org=siae2)
+        assert not user1.can_view_stats_siae(current_org=siae2)
 
         # Even non admin members can view their SIAE stats.
         siae3 = SiaeFactory(with_membership=True, membership__is_admin=False)
         user3 = siae3.members.get()
-        assert user3.can_view_stats_siae_hiring(current_org=siae3)
+        assert user3.can_view_stats_siae(current_org=siae3)
 
     def test_can_view_stats_cd(self):
         """

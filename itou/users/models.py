@@ -693,21 +693,20 @@ class User(AbstractUser, AddressMixin):
         It should be displayed if one or more stats sections are available for the user.
         """
         return (
-            self.can_view_stats_siae_etp(current_org=current_org)
-            or self.can_view_stats_siae_hiring(current_org=current_org)
+            self.can_view_stats_siae(current_org=current_org)
             or self.can_view_stats_cd(current_org=current_org)
             or self.can_view_stats_pe(current_org=current_org)
             or self.can_view_stats_ddets(current_org=current_org)
             or self.can_view_stats_dreets(current_org=current_org)
             or self.can_view_stats_dgefp(current_org=current_org)
             or self.can_view_stats_dihal(current_org=current_org)
+            or self.can_view_stats_iae_network(current_org=current_org)
         )
 
-    def _can_view_stats_siae(self, current_org):
+    def can_view_stats_siae(self, current_org):
         """
+        General access rights for most SIAE stats.
         Users of a SIAE can view their SIAE data and only theirs.
-        This internal method is not supposed to be called directly and is only used to share code between
-        actual callable methods `can_view_stats_siae_*`.
         """
         return (
             self.is_siae_staff
@@ -720,10 +719,10 @@ class User(AbstractUser, AddressMixin):
         )
 
     def can_view_stats_siae_etp(self, current_org):
-        return self._can_view_stats_siae(current_org) and self.pk in settings.STATS_SIAE_USER_PK_WHITELIST
-
-    def can_view_stats_siae_hiring(self, current_org):
-        return self._can_view_stats_siae(current_org)
+        """
+        Non official SIAE stats with very specific access rights.
+        """
+        return self.can_view_stats_siae(current_org) and self.pk in settings.STATS_SIAE_USER_PK_WHITELIST
 
     def can_view_stats_cd(self, current_org):
         """
@@ -833,6 +832,13 @@ class User(AbstractUser, AddressMixin):
             self.is_labor_inspector
             and isinstance(current_org, Institution)
             and current_org.kind == InstitutionKind.DIHAL
+        )
+
+    def can_view_stats_iae_network(self, current_org):
+        return (
+            self.is_labor_inspector
+            and isinstance(current_org, Institution)
+            and current_org.kind == InstitutionKind.IAE_NETWORK
         )
 
     def update_external_data_source_history_field(self, provider, field, value) -> bool:

@@ -263,6 +263,13 @@ class DashboardViewTest(TestCase):
         self.assertContains(response, "Suivre les prescriptions des AHI")
         self.assertContains(response, reverse("stats:stats_dihal_state"))
 
+    def test_dashboard_iae_network_institution_access(self):
+        membershipfactory = InstitutionMembershipFactory(institution__kind=InstitutionKind.IAE_NETWORK)
+        self.client.force_login(membershipfactory.user)
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertContains(response, "Voir les données de candidatures des adhérents de mon réseau IAE")
+        self.assertContains(response, reverse("stats:stats_iae_network_hiring"))
+
     def test_dashboard_siae_evaluations_institution_access(self):
         IN_PROGRESS_LINK = "Campagne en cours"
         membershipfactory = InstitutionMembershipFactory()
