@@ -6,6 +6,7 @@ from django.conf import settings
 
 ASP_SIAE_FILTER_KEY = "identifiant_de_la_structure"
 C1_SIAE_FILTER_KEY = "identifiant_de_la_structure_(c1)"
+IAE_NETWORK_FILTER_KEY = "id_r%C3%A9seau"
 DEPARTMENT_FILTER_KEY = "d%C3%A9partement"
 REGION_FILTER_KEY = "r%C3%A9gion"
 
@@ -25,6 +26,12 @@ METABASE_DASHBOARDS = {
         "dashboard_id": 185,
         "tally_popup_form_id": "waQPkB",
         "tally_embed_form_id": "nG6J62",
+    },
+    "stats_siae_auto_prescription": {
+        "dashboard_id": 295,
+    },
+    "stats_siae_follow_siae_evaluation": {
+        "dashboard_id": 298,
     },
     #
     # Prescriber stats - CD.
@@ -136,6 +143,12 @@ METABASE_DASHBOARDS = {
     #
     "stats_dihal_state": {
         "dashboard_id": 235,
+    },
+    #
+    # Institution stats - IAE Network - nation level.
+    #
+    "stats_iae_network_hiring": {
+        "dashboard_id": 301,
     },
 }
 

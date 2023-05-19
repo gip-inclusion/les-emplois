@@ -12,6 +12,12 @@ urlpatterns = [
     # Employer stats.
     path("siae/etp", views.stats_siae_etp, name="stats_siae_etp"),
     path("siae/hiring", views.stats_siae_hiring, name="stats_siae_hiring"),
+    path("siae/auto_prescription", views.stats_siae_auto_prescription, name="stats_siae_auto_prescription"),
+    path(
+        "siae/follow_siae_evaluation",
+        views.stats_siae_follow_siae_evaluation,
+        name="stats_siae_follow_siae_evaluation",
+    ),
     # Prescriber stats.
     path("cd", views.stats_cd, name="stats_cd"),
     path("pe/delay/main", views.stats_pe_delay_main, name="stats_pe_delay_main"),
@@ -52,4 +58,6 @@ urlpatterns = [
     path("dgefp/af", views.stats_dgefp_af, name="stats_dgefp_af"),
     # Institution stats - DIHAL - nation level.
     path("dihal/state", views.stats_dihal_state, name="stats_dihal_state"),
+    # Institution stats - IAE Network - nation level.
+    path("iae_network/hiring", views.stats_iae_network_hiring, name="stats_iae_network_hiring"),
 ]
