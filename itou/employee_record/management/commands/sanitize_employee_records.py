@@ -75,14 +75,12 @@ class Command(BaseCommand):
 
     def _check_jobseeker_profiles(self, dry_run):
         # Check incoherence in user profile leading to validation errors at processing time.
-        # Employee records in this case are switched back to status NEW for further processing by end-user.
+        # Employee records in this case are switched back to status DISABLED for further processing by end-user.
         # Most frequent error cases are:
         # - no HEXA address
         # - no profile at all (?)
 
-        profile_selected = EmployeeRecord.objects.filter(
-            status__in=EmployeeRecord.CAN_BE_DISABLED_STATES
-        ).select_related(
+        profile_selected = EmployeeRecord.objects.filter(status=Status.PROCESSED).select_related(
             "job_application",
             "job_application__job_seeker__jobseeker_profile",
             "job_application__job_seeker__jobseeker_profile__hexa_commune",

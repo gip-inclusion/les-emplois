@@ -77,7 +77,7 @@ def test_profile_errors_check(command):
     # Check for profile errors during sanitize_employee_records
 
     # This factory does not define a profile
-    employee_record = factories.EmployeeRecordFactory()
+    employee_record = factories.EmployeeRecordFactory(status=models.Status.PROCESSED)
 
     command._check_jobseeker_profiles(dry_run=False)
 
