@@ -923,9 +923,9 @@ pytest-timeout==2.1.0 \
     --hash=sha256:c07ca07404c612f8abbe22294b23c368e2e5104b521c1790195561f37e1ac3d9 \
     --hash=sha256:f6f50101443ce70ad325ceb4473c4255e9d74e3c7cd0ef827309dfa4c0d975c6
     # via -r requirements/dev.in
-pytest-xdist==3.3.0 \
-    --hash=sha256:76f7683d4f993eaff91c9cb0882de0465c4af9c6dd3debc903833484041edc1a \
-    --hash=sha256:d42c9efb388da35480878ef4b2993704c6cea800c8bafbe85a8cdc461baf0748
+pytest-xdist==3.3.1 \
+    --hash=sha256:d5ee0520eb1b7bcca50a60a518ab7a7707992812c578198f8b44fdfac78e8c93 \
+    --hash=sha256:ff9daa7793569e6a68544850fd3927cd257cc03a7ef76c95e86915355e82b5f2
     # via -r requirements/dev.in
 python-dateutil==2.8.2 \
     --hash=sha256:0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86 \
