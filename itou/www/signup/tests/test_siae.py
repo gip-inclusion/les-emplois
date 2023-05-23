@@ -268,7 +268,9 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         ):
             response = self.client.get(url, {"siren": "402191662"})
         assert response.status_code == 200
-        self.assertContains(response, "EI", count=5)
+        self.assertContains(response, "402191662", count=6)  # 1 input + 5 results
+        for siae in siaes:
+            self.assertContains(response, siae.siret_nic, count=1)
 
 
 class SiaeSignupViewsExceptionsTest(TestCase):
