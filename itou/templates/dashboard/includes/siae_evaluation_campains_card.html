@@ -1,12 +1,12 @@
 <div class="col mb-3 mb-md-5">
-    <div class="card c-card h-100 w-100 has-links-inside">
-        <div class="card-header bg-light pb-3 d-flex">
+    <div class="c-box p-0 h-100">
+        <div class="d-flex p-3 p-lg-4">
             <div class="flex-grow-1">
                 <span class="h4 m-0">Contrôle a posteriori</span>
             </div>
         </div>
-        <div class="card-body">
-            <ul class="list-unstyled">
+        <div class="px-3 px-lg-4">
+            <ul class="list-unstyled mb-lg-5">
                 {% for evaluated_siae in active_campaigns %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'siae_evaluations_views:siae_job_applications_list' evaluated_siae.pk %}" class="btn-link btn-ico">
