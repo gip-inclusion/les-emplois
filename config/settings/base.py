@@ -586,6 +586,8 @@ CSP_FRAME_SRC = [
     "https://pilotage.inclusion.beta.gouv.fr",
     "https://communaute.inclusion.beta.gouv.fr",
     "https://inclusion.beta.gouv.fr",
+    "blob:",  # For downloading Metabase questions as CSV/XSLX/JSON on Firefox etc
+    "data:",  # For downloading Metabase questions as PNG on Firefox etc
 ]
 CSP_FRAME_ANCESTORS = [
     "https://pilotage.inclusion.beta.gouv.fr",
