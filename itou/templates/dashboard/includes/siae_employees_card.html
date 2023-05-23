@@ -1,12 +1,10 @@
 <div class="col mb-3 mb-md-5">
-    <div class="card c-card h-100 w-100 has-links-inside">
-        <div class="card-header bg-light pb-3 d-flex">
-            <div class="flex-grow-1">
-                <span class="h4 m-0">Salariés</span>
-            </div>
+    <div class="c-box p-0 h-100">
+        <div class="p-3 p-lg-4">
+            <span class="h4 m-0">Salariés</span>
         </div>
-        <div class="card-body">
-            <ul class="list-unstyled">
+        <div class="px-3 px-lg-4">
+            <ul class="list-unstyled mb-lg-5">
                 {% comment %}
                 NOTE(vperron):
                 We currently do not allow OPCS users to apply for an offer.
@@ -17,12 +15,12 @@
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         {% if suspension %}
                             <span class="btn-link btn-ico" data-toggle="tooltip" data-placement="top" title="Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle a posteriori. {{ suspension }}">
-                                <i class="ri-login-box-line ri-lg font-weight-normal disabled"></i>
+                                <i class="ri-user-follow-line ri-lg font-weight-normal disabled"></i>
                                 <span class="disabled">Déclarer une embauche</span>
                             </span>
                         {% else %}
                             <a href="{% url 'apply:start' siae_pk=current_siae.pk %}" class="btn-link btn-ico">
-                                <i class="ri-login-box-line ri-lg font-weight-normal"></i>
+                                <i class="ri-user-follow-line ri-lg font-weight-normal"></i>
                                 <span>Déclarer une embauche</span>
                             </a>
                         {% endif %}
@@ -30,14 +28,14 @@
                 {% endwith %}
                 <li class="d-flex justify-content-between align-items-center mb-3">
                     <a href="{% url 'approvals:list' %}" data-matomo-category="salaries" data-matomo-action="clic" data-matomo-option="gestion-des-salaries-et-pass-iae" class="matomo-event btn-link btn-ico">
-                        <i class="ri-contacts-book-line ri-lg font-weight-normal"></i>
-                        <span>Gestion des salariés et PASS IAE</span>
+                        <i class="ri-user-settings-line ri-lg font-weight-normal"></i>
+                        <span>Gérer les salariés et PASS IAE</span>
                     </a>
                 </li>
                 {% if can_show_employee_records %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'employee_record_views:list' %}?status=NEW" class="btn-link btn-ico">
-                            <i class="ri-article-line ri-lg font-weight-normal"></i>
+                            <i class="ri-briefcase-line ri-lg font-weight-normal"></i>
                             <span>Gérer mes fiches salarié (ASP)</span>
                         </a>
                         {% if num_rejected_employee_records %}
@@ -47,7 +45,7 @@
                 {% endif %}
                 <li class="d-flex justify-content-between align-items-center mb-3">
                     <a href="{% url 'approvals:pe_approval_search' %}" class="btn-link btn-ico">
-                        <i class="ri-time-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                        <i class="ri-arrow-left-right-line ri-lg font-weight-normal align-self-start mt-1"></i>
                         <span>Prolonger/suspendre un agrément émis par Pôle emploi</span>
                     </a>
                 </li>

@@ -564,3 +564,23 @@ Usage:
 .s-banner-01.s-banner-01--ic .s-banner-01__col > div::before {
     display: none;
 }
+
+/* Dashboard
+--------------------------------------------------------------------------- */
+.c-box__header--dora {
+    background-image: url('../img/dashboard/card-header-bg-dora.png');
+    background-repeat: no-repeat;
+    background-position: center right;
+    background-size: 100%  auto;
+    border-top-left-radius: .5rem;
+    border-top-right-radius: .5rem;
+}
+
+.c-box__header--pilotage {
+    background-image: url('../img/dashboard/card-header-bg-pilotage.png');
+    background-repeat: no-repeat;
+    background-position: center right;
+    background-size: 100%  auto;
+    border-top-left-radius: .5rem;
+    border-top-right-radius: .5rem;
+}

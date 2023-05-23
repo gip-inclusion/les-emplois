@@ -1,6 +1,6 @@
 <div class="col mb-3 mb-md-5">
-    <div class="card c-card h-100 w-100 has-links-inside">
-        <div class="card-header bg-light pb-3 d-flex">
+    <div class="c-box p-0 h-100">
+        <div class="d-flex p-3 p-lg-4">
             <div class="flex-grow-1">
                 <span class="h4 m-0">Organisation</span>
             </div>
@@ -8,7 +8,7 @@
                 <span class="badge badge-pill badge-sm badge-primary">ID {{ current_prescriber_organization.id }}</span>
             </div>
         </div>
-        <div class="card-body">
+        <div class="px-3 px-lg-4">
             <ul class="list-unstyled">
                 {% with card_url=current_prescriber_organization.get_card_url %}
                     {% if user_is_prescriber_org_admin %}
@@ -45,7 +45,7 @@
             </ul>
             {% if current_prescriber_organization.is_authorized %}
                 <hr>
-                <ul class="list-unstyled">
+                <ul class="list-unstyled mb-lg-5">
                     <li class="mb-2">
                         <span class="fs-sm">
                             <i class="ri-award-line ri-lg ri-lg font-weight-normal mr-1"></i>

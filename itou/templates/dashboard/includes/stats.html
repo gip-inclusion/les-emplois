@@ -1,14 +1,14 @@
 <div class="col mb-3 mb-md-5">
-    <div class="card c-card h-100 w-100 has-links-inside">
-        <div class="card-header bg-light pb-3">
-            <span class="h4">Statistiques et pilotage</span>
+    <div class="c-box p-0 h-100">
+        <div class="c-box__header--pilotage p-3 p-lg-4">
+            <span class="h4">Pilotage de l'inclusion</span>
         </div>
-        <div class="card-body">
-            <ul class="list-unstyled">
+        <div class="px-3 px-lg-4 pt-3 pt-lg-4">
+            <ul class="list-unstyled mb-lg-5">
                 {% if can_view_stats_siae_etp %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_siae_etp' %}" class="btn-link btn-ico">
-                            <i class="ri-line-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                            <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
                             <span>Voir les données de ma structure (extranet ASP)</span>
                         </a>
                     </li>
@@ -16,7 +16,7 @@
                 {% if can_view_stats_siae %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_siae_hiring' %}" class="btn-link btn-ico">
-                            <i class="ri-line-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                            <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
                             <span>Voir les données de candidatures de mes structures</span>
                         </a>
                     </li>
@@ -38,7 +38,7 @@
                 {% if can_view_stats_cd %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_cd' %}" class="btn-link btn-ico">
-                            <i class="ri-line-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                            <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
                             <span>Voir les données IAE de mon département</span>
                         </a>
                     </li>
@@ -56,25 +56,25 @@
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_pe_state_main' %}" class="btn-link btn-ico">
-                            <i class="ri-line-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                            <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
                             <span>Voir les données de l’état des candidatures orientées</span>
                         </a>
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_pe_conversion_main' %}" class="btn-link btn-ico">
-                            <i class="ri-line-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                            <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
                             <span>Voir les données du taux de transformation</span>
                         </a>
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_pe_tension' %}" class="btn-link btn-ico">
-                            <i class="ri-line-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                            <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
                             <span>Voir les données des fiches de poste en tension</span>
                         </a>
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_pe_delay_main' %}" class="btn-link btn-ico">
-                            <i class="ri-line-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                            <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
                             <span>Voir les données du délai d'entrée en IAE</span>
                         </a>
                     </li>
@@ -82,25 +82,25 @@
                 {% if can_view_stats_ddets %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_ddets_auto_prescription' %}" class="btn-link btn-ico">
-                            <i class="ri-line-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                            <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
                             <span>Focus auto-prescription</span>
                         </a>
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_ddets_follow_siae_evaluation' %}" class="btn-link btn-ico">
-                            <i class="ri-line-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                            <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
                             <span>Suivre le contrôle à posteriori</span>
                         </a>
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_ddets_iae' %}" class="btn-link btn-ico">
-                            <i class="ri-line-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                            <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
                             <span>Voir les données IAE de mon département</span>
                         </a>
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_ddets_hiring' %}" class="btn-link btn-ico">
-                            <i class="ri-line-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                            <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
                             <span>Voir les données facilitation de l'embauche</span>
                         </a>
                     </li>
@@ -108,25 +108,25 @@
                 {% if can_view_stats_dreets %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_dreets_auto_prescription' %}" class="btn-link btn-ico">
-                            <i class="ri-line-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                            <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
                             <span>Focus auto-prescription</span>
                         </a>
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_dreets_follow_siae_evaluation' %}" class="btn-link btn-ico">
-                            <i class="ri-line-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                            <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
                             <span>Suivre le contrôle à posteriori</span>
                         </a>
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_dreets_iae' %}" class="btn-link btn-ico">
-                            <i class="ri-line-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                            <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
                             <span>Voir les données IAE de ma région</span>
                         </a>
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_dreets_hiring' %}" class="btn-link btn-ico">
-                            <i class="ri-line-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                            <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
                             <span>Voir les données facilitation de l'embauche</span>
                         </a>
                     </li>
@@ -134,25 +134,25 @@
                 {% if can_view_stats_dgefp %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_dgefp_auto_prescription' %}" class="btn-link btn-ico">
-                            <i class="ri-line-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                            <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
                             <span>Focus auto-prescription</span>
                         </a>
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_dgefp_follow_siae_evaluation' %}" class="btn-link btn-ico">
-                            <i class="ri-line-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                            <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
                             <span>Suivre le contrôle à posteriori</span>
                         </a>
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_dgefp_iae' %}" class="btn-link btn-ico">
-                            <i class="ri-line-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                            <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
                             <span>Voir les données IAE France entière</span>
                         </a>
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_dgefp_siae_evaluation' %}" class="btn-link btn-ico">
-                            <i class="ri-line-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                            <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
                             <span>Voir les données du contrôle a posteriori (version bêta)</span>
                         </a>
                     </li>
@@ -160,7 +160,7 @@
                 {% if can_view_stats_dihal %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_dihal_state' %}" class="btn-link btn-ico">
-                            <i class="ri-line-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
+                            <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start mt-1"></i>
                             <span>Suivre les prescriptions des AHI</span>
                         </a>
                     </li>
@@ -178,7 +178,6 @@
                     <a href="{{ ITOU_PILOTAGE_URL }}/tableaux-de-bord" rel="noopener" target="_blank" aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico">
                         <i class="ri-dashboard-line ri-lg font-weight-normal align-self-start mt-1"></i>
                         <span>Accéder aux tableaux de bord publics</span>
-                        <i class="ri-external-link-line ri-lg font-weight-normal ml-2 align-self-start mt-1"></i>
                     </a>
                 </li>
             </ul>

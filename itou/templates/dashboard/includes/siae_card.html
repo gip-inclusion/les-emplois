@@ -1,6 +1,6 @@
 <div class="col mb-3 mb-md-5">
-    <div class="card c-card h-100 w-100 has-links-inside">
-        <div class="card-header bg-light pb-3 d-flex">
+    <div class="c-box p-0 h-100">
+        <div class="d-flex p-3 p-lg-4">
             <div class="flex-grow-1">
                 <span class="h4 m-0">Structure</span>
             </div>
@@ -8,8 +8,8 @@
                 <span class="badge badge-pill badge-sm badge-primary">{{ current_siae.kind }} - ID {{ current_siae.id }}</span>
             </div>
         </div>
-        <div class="card-body">
-            <ul class="list-unstyled">
+        <div class="px-3 px-lg-4">
+            <ul class="list-unstyled mb-lg-5">
                 <li class="d-flex justify-content-between align-items-center mb-3">
                     <a href="{{ current_siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}" class="btn-link btn-ico">
                         <i class="ri-eye-line ri-lg font-weight-normal"></i>
@@ -19,7 +19,7 @@
                 {% if user_is_siae_admin %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'siaes_views:edit_siae_step_contact_infos' %}" class="btn-link btn-ico">
-                            <i class="ri-settings-5-line ri-lg font-weight-normal"></i>
+                            <i class="ri-pencil-line ri-lg font-weight-normal"></i>
                             <span>Modifier les informations</span>
                         </a>
                     </li>
@@ -33,7 +33,7 @@
                 {% if current_siae.is_active %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'siaes_views:members' %}" class="btn-link btn-ico">
-                            <i class="ri-team-line ri-lg font-weight-normal"></i>
+                            <i class="ri-group-line ri-lg font-weight-normal"></i>
                             <span>Gérer des collaborateurs</span>
                         </a>
                     </li>
@@ -41,7 +41,7 @@
                 {% if can_create_siae_antenna %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'siaes_views:create_siae' %}" class="btn-link btn-ico">
-                            <i class="ri-add-box-line ri-lg font-weight-normal"></i>
+                            <i class="ri-add-line ri-lg font-weight-normal"></i>
                             <span>Créer/rejoindre une autre structure</span>
                         </a>
                     </li>
