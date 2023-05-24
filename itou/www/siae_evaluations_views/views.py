@@ -524,7 +524,7 @@ def siae_job_applications_list(
     context = {
         "evaluated_siae": evaluated_siae,
         "evaluated_job_applications": evaluated_job_applications,
-        "is_submittable": evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.SUBMITTABLE,
+        "is_submittable": evaluated_siae.can_submit,
         "back_url": back_url,
     }
     return render(request, template_name, context)
@@ -659,7 +659,10 @@ def siae_submit_proofs(request, evaluated_siae_pk):
         evaluation_campaign__evaluations_asked_at__isnull=False,
         evaluation_campaign__ended_at=None,
     )
-    if evaluated_siae.state != evaluation_enums.EvaluatedSiaeState.SUBMITTABLE:
+    if not evaluated_siae.can_submit:
+        # This should not happen since the form to POST here only appear if can_submit is True
+        # but if someone manages to POST it, tell the user it didn't work
+        messages.error(request, "Impossible de soumettre les documents.")
         return HttpResponseRedirect(
             reverse(
                 "siae_evaluations_views:siae_job_applications_list",
@@ -667,10 +670,14 @@ def siae_submit_proofs(request, evaluated_siae_pk):
             )
         )
 
+    now = timezone.now()
     EvaluatedAdministrativeCriteria.objects.filter(
         evaluated_job_application__evaluated_siae=evaluated_siae,
         review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING,
-    ).update(submitted_at=timezone.now())
+    ).update(submitted_at=now)
+    # Freeze submission until next phase (or until campaign end)
+    evaluated_siae.submission_freezed_at = now
+    evaluated_siae.save(update_fields=("submission_freezed_at",))
 
     back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
 

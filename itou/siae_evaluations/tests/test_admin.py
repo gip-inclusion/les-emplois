@@ -13,7 +13,7 @@ from itou.siae_evaluations.factories import (
 )
 from itou.siaes.factories import SiaeMembershipFactory
 from itou.users.factories import ItouStaffFactory
-from itou.utils.test import BASE_NUM_QUERIES, get_rows_from_streaming_response
+from itou.utils.test import BASE_NUM_QUERIES, assertMessages, get_rows_from_streaming_response
 
 
 class TestEvaluationCampaignAdmin:
@@ -185,3 +185,46 @@ class TestEvaluationCampaignAdmin:
                 "Phase amiable",
             ],
         ]
+
+    def test_freeze(self, client):
+        campaign1 = EvaluationCampaignFactory()
+        campaign1_siae = EvaluatedSiaeFactory(
+            evaluation_campaign=campaign1,
+            submission_freezed_at=timezone.now() - relativedelta(days=1),
+        )
+        campaign2 = EvaluationCampaignFactory()
+        campaign2_siae = EvaluatedSiaeFactory(
+            evaluation_campaign=campaign2,
+        )
+        admin_user = ItouStaffFactory(is_superuser=True)
+        client.force_login(admin_user)
+        with assertNumQueries(
+            BASE_NUM_QUERIES
+            + 1  # Load Django session
+            + 1  # Load user
+            + 1  # Count the filtered results (paginator)
+            + 1  # Count the full results
+            + 1  # Fetch selected evaluation_campaigns
+            + 2  # Update EvaluatedSiae for each selected campaign
+        ):
+            response = client.post(
+                reverse("admin:siae_evaluations_evaluationcampaign_changelist"),
+                {
+                    "action": "freeze",
+                    "select_across": "0",
+                    "index": "0",
+                    "_selected_action": [
+                        campaign1.pk,
+                        campaign2.pk,
+                    ],
+                },
+            )
+        assert response.status_code == 302
+        assertMessages(
+            response,
+            [("SUCCESS", "Les soumissions des SIAEs sont maintenant bloquées pour les campagnes sélectionnées.")],
+        )
+        campaign1_siae.refresh_from_db()
+        assert campaign1_siae.submission_freezed_at is not None
+        campaign2_siae.refresh_from_db()
+        assert campaign2_siae.submission_freezed_at is not None

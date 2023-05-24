@@ -762,6 +762,28 @@ class EvaluationCampaignManagerTest(TestCase):
         # No new mail.
         assert len(mail.outbox) == 2
 
+    def test_freeze(self):
+        campaign = EvaluationCampaignFactory()
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign=campaign,
+        )
+        assert evaluated_siae.submission_freezed_at is None
+
+        # Freeze in phase 2
+        campaign.freeze(timezone.now())
+        evaluated_siae.refresh_from_db()
+        assert evaluated_siae.submission_freezed_at is not None
+
+        # Unfreeze via transition_to_adversarial_phase
+        campaign.transition_to_adversarial_phase()
+        evaluated_siae.refresh_from_db()
+        assert evaluated_siae.submission_freezed_at is None
+
+        # Freeze in phase 3
+        campaign.freeze(timezone.now())
+        evaluated_siae.refresh_from_db()
+        assert evaluated_siae.submission_freezed_at is not None
+
 
 class EvaluatedSiaeQuerySetTest(TestCase):
     def test_for_siae(self):
