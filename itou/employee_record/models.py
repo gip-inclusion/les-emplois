@@ -738,13 +738,6 @@ class EmployeeRecordUpdateNotification(ASPExchangeInformation):
         default=NotificationStatus.NEW,
     )
 
-    notification_type = models.CharField(
-        verbose_name="Type de notification",
-        max_length=20,
-        null=True,
-        blank=True,
-    )
-
     employee_record = models.ForeignKey(
         EmployeeRecord,
         related_name="update_notifications",
