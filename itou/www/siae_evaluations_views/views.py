@@ -549,6 +549,11 @@ def siae_select_criteria(
         evaluated_siae__siae=siae,
         evaluated_siae__evaluation_campaign__ended_at__isnull=True,
     )
+    if (
+        evaluated_job_application.should_select_criteria
+        == evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.NOTEDITABLE
+    ):
+        return HttpResponseForbidden()
     initial_data = {
         eval_criterion.administrative_criteria.key: True
         for eval_criterion in evaluated_job_application.evaluated_administrative_criteria.all()
