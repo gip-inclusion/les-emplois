@@ -223,6 +223,9 @@ class SiaeJobApplicationListViewTest(S3AccessingTestCase):
         # Once the criteria has been submitted, you can't reupload it anymore
         response = self.client.get(upload_proof)
         assert response.status_code == 403
+        # and you can't change or add criteria
+        response = self.client.get(select_criteria)
+        assert response.status_code == 403
 
 
 class SiaeSelectCriteriaViewTest(TestCase):
