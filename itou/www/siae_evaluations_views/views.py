@@ -668,50 +668,35 @@ def siae_submit_proofs(request, evaluated_siae_pk):
         evaluation_campaign__evaluations_asked_at__isnull=False,
         evaluation_campaign__ended_at=None,
     )
-
-    evaluated_job_applications = EvaluatedJobApplication.objects.filter(
-        evaluated_siae=evaluated_siae
-    ).prefetch_related("evaluated_administrative_criteria")
-
-    # if at least one of those job applications is uploaded but not yet transmitted, or accepted, let's submit.
-    if evaluated_job_applications and any(
-        (
-            evaluated_job_application.compute_state()
-            in (
-                evaluation_enums.EvaluatedJobApplicationsState.UPLOADED,
-                evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED,
+    if evaluated_siae.state != evaluation_enums.EvaluatedSiaeState.SUBMITTABLE:
+        return HttpResponseRedirect(
+            reverse(
+                "siae_evaluations_views:siae_job_applications_list",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
-        for evaluated_job_application in evaluated_job_applications
-    ):
-        EvaluatedAdministrativeCriteria.objects.filter(
-            evaluated_job_application__in=evaluated_job_applications,
-            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING,
-        ).update(submitted_at=timezone.now())
 
-        back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
+    EvaluatedAdministrativeCriteria.objects.filter(
+        evaluated_job_application__evaluated_siae=evaluated_siae,
+        review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING,
+    ).update(submitted_at=timezone.now())
 
-        # note vincentporte : misconception. This view should be called with one evaluated_siae
-        # check this impact when calling this view with evaluated_siae.pk in params
-        send_email_messages([InstitutionEmailFactory(evaluated_siae).submitted_by_siae()])
+    back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
 
-        messages.success(
-            request,
-            mark_safe(
-                "<b>Justificatifs transmis !</b><br>"
-                "Merci d'avoir pris le temps de transmettre vos pièces justificatives.<br>"
-                "Le contrôle de celles-ci est à la charge de votre DDETS maintenant, vous serez notifié du résultat "
-                "(qu'il soit positif ou négatif) par mail lorsque celui-ci sera finalisé."
-            ),
-        )
-        return HttpResponseRedirect(back_url)
+    # note vincentporte : misconception. This view should be called with one evaluated_siae
+    # check this impact when calling this view with evaluated_siae.pk in params
+    send_email_messages([InstitutionEmailFactory(evaluated_siae).submitted_by_siae()])
 
-    return HttpResponseRedirect(
-        reverse(
-            "siae_evaluations_views:siae_job_applications_list",
-            kwargs={"evaluated_siae_pk": evaluated_siae.pk},
-        )
+    messages.success(
+        request,
+        mark_safe(
+            "<b>Justificatifs transmis !</b><br>"
+            "Merci d'avoir pris le temps de transmettre vos pièces justificatives.<br>"
+            "Le contrôle de celles-ci est à la charge de votre DDETS maintenant, vous serez notifié du résultat "
+            "(qu'il soit positif ou négatif) par mail lorsque celui-ci sera finalisé."
+        ),
     )
+    return HttpResponseRedirect(back_url)
 
 
 def sanctions_helper_view(request):
