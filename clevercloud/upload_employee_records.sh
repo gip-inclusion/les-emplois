@@ -8,8 +8,7 @@ if [[ "$EMPLOYEE_RECORD_CRON_ENABLED" != "1" ]]; then
 fi
 
 # About clever cloud cronjobs:
-# https://www.clever-cloud.com/doc/tools/crons/
-
+# https://www.clever-cloud.com/doc/administrate/cron/#deduplicating-crons
 if [[ "$INSTANCE_NUMBER" != "0" ]]; then
     echo "Instance number is ${INSTANCE_NUMBER}. Stop here."
     exit 0
