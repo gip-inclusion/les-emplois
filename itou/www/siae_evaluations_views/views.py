@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
 from django.db.models import Min, Q
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_list_or_404, get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
@@ -619,6 +619,9 @@ def siae_upload_doc(
         evaluated_job_application__evaluated_siae__siae=get_current_siae_or_404(request),
         evaluated_job_application__evaluated_siae__evaluation_campaign__ended_at__isnull=True,
     )
+
+    if not evaluated_administrative_criteria.can_upload():
+        return HttpResponseForbidden()
 
     form = SubmitEvaluatedAdministrativeCriteriaProofForm(
         instance=evaluated_administrative_criteria, data=request.POST or None

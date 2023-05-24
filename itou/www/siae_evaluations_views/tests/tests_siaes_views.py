@@ -220,6 +220,10 @@ class SiaeJobApplicationListViewTest(S3AccessingTestCase):
         self.assertNotContains(response, select_criteria)
         self.assertNotContains(response, upload_proof)
 
+        # Once the criteria has been submitted, you can't reupload it anymore
+        response = self.client.get(upload_proof)
+        assert response.status_code == 403
+
 
 class SiaeSelectCriteriaViewTest(TestCase):
     def setUp(self):
@@ -484,7 +488,6 @@ class SiaeUploadDocsViewTest(S3AccessingTestCase):
             evaluated_job_application=evaluated_job_application,
             administrative_criteria=criterion.administrative_criteria,
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
-            submitted_at=fake_now - relativedelta(days=1),
             uploaded_at=fake_now - relativedelta(days=1),
         )
         url = reverse(
