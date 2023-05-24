@@ -242,7 +242,6 @@ class EmployeeRecord(ASPExchangeInformation):
             models.UniqueConstraint(
                 fields=["asp_id", "approval_number"],
                 name="unique_asp_id_approval_number",
-                condition=~Q(status=Status.DISABLED),
             )
         ]
 

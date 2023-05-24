@@ -285,15 +285,6 @@ def test_clone_for_orphan_employee_record(status):
         assert employee_record.status == Status.DISABLED
 
 
-def test_clone_for_disabled_employee_record():
-    employee_record = EmployeeRecordFactory(status=Status.DISABLED)
-
-    clone = employee_record.clone()
-    assert clone.pk != employee_record.pk
-    # Cloned employee record should be DISABLED
-    assert employee_record.status == Status.DISABLED
-
-
 def test_clone_when_a_duplicate_exists():
     employee_record = EmployeeRecordFactory()
     with pytest.raises(DuplicateCloningError, match=r"The clone is a duplicate of"):
