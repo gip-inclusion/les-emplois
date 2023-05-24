@@ -4,7 +4,7 @@ if [[ "$CRON_ENABLED" != "1" ]]; then
     exit 0
 fi
 
-cd "$APP_HOME" || exit 1
+cd "$APP_HOME" || exit
 
 set -o pipefail
 set -o errexit

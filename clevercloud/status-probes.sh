@@ -9,6 +9,6 @@ if [[ "$INSTANCE_NUMBER" != "0" ]]; then
     exit 0
 fi
 
-cd "$APP_HOME" || exit 1
+cd "$APP_HOME" || exit
 
 django-admin run_status_probes
