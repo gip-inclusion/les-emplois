@@ -27,7 +27,7 @@
                                 Ajouter un justificatif
                             {% endif %}
                         </a>
-                    {% else %}
+                    {% elif evaluated_administrative_criteria.proof_url %}
                         <a href="{{ evaluated_administrative_criteria.proof_url }}" target="_blank" class="btn btn-outline-primary float-right">Visualiser le justificatif soumis</a>
                     {% endif %}
                 </div>

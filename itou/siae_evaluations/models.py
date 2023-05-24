@@ -236,6 +236,11 @@ class EvaluationCampaign(models.Model):
             emails += [CampaignEmailFactory(self).selected_siae()]
             send_email_messages(emails)
 
+    def freeze(self, freeze_at):
+        EvaluatedSiae.objects.filter(evaluation_campaign=self, submission_freezed_at__isnull=True).update(
+            submission_freezed_at=freeze_at
+        )
+
     def transition_to_adversarial_phase(self):
         now = timezone.now()
         siaes_not_reviewed = (
@@ -272,6 +277,10 @@ class EvaluationCampaign(models.Model):
         EvaluatedSiae.objects.bulk_update(
             accept_by_default + transition_to_adversarial_stage,
             ["reviewed_at", "final_reviewed_at"],
+        )
+        # Unfreeze all SIAEs to start adversarial stage
+        EvaluatedSiae.objects.filter(evaluation_campaign=self, submission_freezed_at__isnull=False).update(
+            submission_freezed_at=None
         )
 
     def close(self):
@@ -350,6 +359,12 @@ class EvaluatedSiae(models.Model):
     # refusal is final (phase contradictoire).
     final_reviewed_at = models.DateTimeField(verbose_name="Contrôle définitif le", blank=True, null=True)
 
+    # At the end of each phase ("amiable" and "contradictoire"), the institutions have 2 weeks
+    # during which the employers cannot submit new documents
+    submission_freezed_at = models.DateTimeField(
+        verbose_name="Transmission bloquée pour la SIAE le", blank=True, null=True
+    )
+
     # After a refused evaluation, the SIAE is notified of sanctions.
     notified_at = models.DateTimeField(verbose_name="notifiée le", blank=True, null=True)
     notification_reason = models.CharField(
@@ -390,6 +405,10 @@ class EvaluatedSiae(models.Model):
                 ).exists()
             )
         return False
+
+    @property
+    def can_submit(self):
+        return not self.submission_freezed_at and self.state == evaluation_enums.EvaluatedSiaeState.SUBMITTABLE
 
     def review(self):
         ACCEPTED = evaluation_enums.EvaluatedSiaeState.ACCEPTED
@@ -572,15 +591,16 @@ class EvaluatedJobApplication(models.Model):
 
     @property
     def should_select_criteria(self):
-        state = self.compute_state()
-        if state == evaluation_enums.EvaluatedJobApplicationsState.PENDING:
-            return evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.PENDING
+        if not self.evaluated_siae.submission_freezed_at:
+            state = self.compute_state()
+            if state == evaluation_enums.EvaluatedJobApplicationsState.PENDING:
+                return evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.PENDING
 
-        if not self.evaluated_siae.reviewed_at and state in [
-            evaluation_enums.EvaluatedJobApplicationsState.PROCESSING,
-            evaluation_enums.EvaluatedJobApplicationsState.UPLOADED,
-        ]:
-            return evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.EDITABLE
+            if not self.evaluated_siae.reviewed_at and state in [
+                evaluation_enums.EvaluatedJobApplicationsState.PROCESSING,
+                evaluation_enums.EvaluatedJobApplicationsState.UPLOADED,
+            ]:
+                return evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.EDITABLE
 
         return evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.NOTEDITABLE
 
@@ -655,6 +675,8 @@ class EvaluatedAdministrativeCriteria(models.Model):
         return f"{self.evaluated_job_application} - {self.administrative_criteria}"
 
     def can_upload(self):
+        if self.evaluated_job_application.evaluated_siae.submission_freezed_at:
+            return False
         if self.submitted_at is None:
             return True
 

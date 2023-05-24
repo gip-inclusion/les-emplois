@@ -1,4 +1,5 @@
 from django.contrib import admin, messages
+from django.utils import timezone
 from django.utils.safestring import mark_safe
 
 from itou.siae_evaluations import models
@@ -160,7 +161,18 @@ class EvaluationCampaignAdmin(admin.ModelAdmin):
             ("Les campagnes sélectionnées sont closes."),
         )
 
-    actions = [export_siaes, transition_to_adversarial_phase, close]
+    @admin.action(description="Bloquer les soumissions des SIAEs")
+    def freeze(self, request, queryset):
+        now = timezone.now()
+        for campaign in queryset:
+            campaign.freeze(now)
+
+        messages.success(
+            request,
+            "Les soumissions des SIAEs sont maintenant bloquées pour les campagnes sélectionnées.",
+        )
+
+    actions = [export_siaes, transition_to_adversarial_phase, freeze, close]
     list_display = (
         "name",
         "institution",
@@ -201,6 +213,7 @@ class EvaluatedSiaeAdmin(admin.ModelAdmin):
         "siae",
         "reviewed_at",
         "final_reviewed_at",
+        "submission_freezed_at",
         "state",
         "notified_at",
         "notification_reason",

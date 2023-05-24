@@ -22,7 +22,7 @@ from itou.users.factories import JobSeekerFactory
 from itou.utils.perms.user import UserInfo
 from itou.utils.storage.s3 import S3Upload
 from itou.utils.storage.test import S3AccessingTestCase
-from itou.utils.test import BASE_NUM_QUERIES, TestCase
+from itou.utils.test import BASE_NUM_QUERIES, TestCase, assertMessages
 
 
 # fixme vincentporte : convert this method into factory
@@ -141,28 +141,92 @@ class SiaeJobApplicationListViewTest(S3AccessingTestCase):
             ),
         )
 
+    def test_redirection_with_submission_freezed_at(self):
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign__evaluations_asked_at=timezone.now(),
+            siae=self.siae,
+            submission_freezed_at=timezone.now(),
+        )
+        evaluated_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+
+        self.client.force_login(self.user)
+
+        # no criterion selected
+        assert (
+            evaluated_job_application.should_select_criteria
+            == evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.NOTEDITABLE
+        )
+        response = self.client.get(self.url(evaluated_siae))
+        siae_select_criteria_url = reverse(
+            "siae_evaluations_views:siae_select_criteria",
+            kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
+        )
+        self.assertNotContains(
+            response,
+            siae_select_criteria_url,
+        )
+        response = self.client.get(siae_select_criteria_url)
+        assert response.status_code == 403
+
+        # at least one criterion selected
+        evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_application,
+            proof_url="",
+        )
+        assert not evaluated_administrative_criteria.can_upload()
+        response = self.client.get(self.url(evaluated_siae))
+        siae_upload_doc_url = reverse(
+            "siae_evaluations_views:siae_upload_doc",
+            kwargs={"evaluated_administrative_criteria_pk": evaluated_administrative_criteria.pk},
+        )
+        self.assertNotContains(
+            response,
+            siae_upload_doc_url,
+        )
+        SHOW_PROOF_URL_LABEL = "Visualiser le justificatif soumis"
+        self.assertNotContains(response, SHOW_PROOF_URL_LABEL)
+        response = self.client.get(siae_upload_doc_url)
+        assert response.status_code == 403
+
+        # If the criteria had a proof_url, it should be present
+        evaluated_administrative_criteria.proof_url = "http://example.com/fake_one.pdf"
+        evaluated_administrative_criteria.save(update_fields=("proof_url",))
+        response = self.client.get(self.url(evaluated_siae))
+        self.assertContains(response, SHOW_PROOF_URL_LABEL)
+        self.assertContains(response, evaluated_administrative_criteria.proof_url)
+
     def test_content_with_selected_criteria(self):
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
         evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
             evaluated_job_application=evaluated_job_application, proof_url=""
         )
         self.client.force_login(self.user)
+
+        siae_select_criteria_url = reverse(
+            "siae_evaluations_views:siae_select_criteria",
+            kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
+        )
+
+        siae_upload_doc_url = reverse(
+            "siae_evaluations_views:siae_upload_doc",
+            kwargs={"evaluated_administrative_criteria_pk": evaluated_administrative_criteria.pk},
+        )
         response = self.client.get(self.url(evaluated_job_application.evaluated_siae))
+        self.assertContains(response, siae_select_criteria_url)
         self.assertContains(
-            response,
-            reverse(
-                "siae_evaluations_views:siae_select_criteria",
-                kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
-            ),
+            response, f"<h3>{evaluated_administrative_criteria.administrative_criteria.name}</h3>", html=True
         )
-        self.assertContains(response, evaluated_administrative_criteria.administrative_criteria.name, html=True)
+        self.assertContains(response, siae_upload_doc_url)
+
+        # Freeze submission
+        evaluated_job_application.evaluated_siae.evaluation_campaign.freeze(timezone.now())
+
+        response = self.client.get(self.url(evaluated_job_application.evaluated_siae))
+        self.assertNotContains(response, siae_select_criteria_url)
         self.assertContains(
-            response,
-            reverse(
-                "siae_evaluations_views:siae_upload_doc",
-                kwargs={"evaluated_administrative_criteria_pk": evaluated_administrative_criteria.pk},
-            ),
+            response, f"<h3>{evaluated_administrative_criteria.administrative_criteria.name}</h3>", html=True
         )
+        self.assertNotContains(response, siae_upload_doc_url)
 
     def test_post_buttons_state(self):
         fake_now = timezone.now()
@@ -220,6 +284,57 @@ class SiaeJobApplicationListViewTest(S3AccessingTestCase):
         self.assertNotContains(response, upload_proof)
 
         # Once the criteria has been submitted, you can't reupload it anymore
+        response = self.client.get(upload_proof)
+        assert response.status_code == 403
+        # and you can't change or add criteria
+        response = self.client.get(select_criteria)
+        assert response.status_code == 403
+
+    def test_post_buttons_state_with_submission_freezed(self):
+        timezone.now()
+        evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
+
+        submit_disabled = """
+            <button class="btn btn-outline-primary disabled float-right">
+                Soumettre à validation
+            </button>
+        """
+        submit_active = """
+            <button class="btn btn-primary float-right">
+                Soumettre à validation
+            </button>
+        """
+        select_criteria = reverse(
+            "siae_evaluations_views:siae_select_criteria",
+            kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
+        )
+
+        self.client.force_login(self.user)
+
+        # criterion selected with uploaded proof
+        evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_application, proof_url="https://server.com/rocky-balboa.pdf"
+        )
+        upload_proof = reverse(
+            "siae_evaluations_views:siae_upload_doc",
+            kwargs={"evaluated_administrative_criteria_pk": evaluated_administrative_criteria.pk},
+        )
+
+        response = self.client.get(self.url(evaluated_job_application.evaluated_siae))
+        self.assertContains(response, submit_active, html=True, count=2)
+        self.assertContains(response, select_criteria)
+        self.assertContains(response, upload_proof)
+
+        # submission freezed
+        evaluated_job_application.evaluated_siae.evaluation_campaign.freeze(timezone.now())
+
+        response = self.client.get(self.url(evaluated_job_application.evaluated_siae))
+        self.assertContains(response, submit_disabled, html=True, count=1)
+        self.assertNotContains(response, submit_active)
+        self.assertNotContains(response, select_criteria)
+        self.assertNotContains(response, upload_proof)
+
+        # Once the submission has been freezed, you can't reupload it anymore
         response = self.client.get(upload_proof)
         assert response.status_code == 403
         # and you can't change or add criteria
@@ -337,6 +452,26 @@ class SiaeSelectCriteriaViewTest(TestCase):
             criterion.administrative_criteria
             == EvaluatedAdministrativeCriteria.objects.first().administrative_criteria
         )
+
+    def test_post_with_submission_freezed_at(self):
+        evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
+        criterion = (
+            evaluated_job_application.job_application.eligibility_diagnosis.selectedadministrativecriteria_set.first()
+        )
+        # Freeze submission
+        evaluated_job_application.evaluated_siae.evaluation_campaign.freeze(timezone.now())
+
+        url = reverse(
+            "siae_evaluations_views:siae_select_criteria",
+            kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
+        )
+
+        self.client.force_login(self.user)
+
+        post_data = {criterion.administrative_criteria.key: "on"}
+        response = self.client.post(url, data=post_data)
+        assert response.status_code == 403
+        assert evaluated_job_application.evaluated_administrative_criteria.count() == 0
 
     def test_initial_data_form(self):
         # no preselected criteria
@@ -532,6 +667,38 @@ class SiaeUploadDocsViewTest(S3AccessingTestCase):
             == evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
         )
 
+    def test_post_with_submission_freezed_at(self):
+        fake_now = timezone.now()
+        self.client.force_login(self.user)
+
+        evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
+        criterion = (
+            evaluated_job_application.job_application.eligibility_diagnosis.selectedadministrativecriteria_set.first()
+        )
+        evaluated_administrative_criteria = EvaluatedAdministrativeCriteria.objects.create(
+            evaluated_job_application=evaluated_job_application,
+            administrative_criteria=criterion.administrative_criteria,
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING,
+            uploaded_at=fake_now - relativedelta(days=1),
+            proof_url="https://example.com",
+        )
+        # Freeze submission
+        evaluated_job_application.evaluated_siae.evaluation_campaign.freeze(timezone.now())
+
+        url = reverse(
+            "siae_evaluations_views:siae_upload_doc",
+            kwargs={"evaluated_administrative_criteria_pk": evaluated_administrative_criteria.pk},
+        )
+
+        post_data = {
+            "proof_url": "https://server.com/rocky-balboa.pdf",
+        }
+        response = self.client.post(url, data=post_data)
+        assert response.status_code == 403
+        evaluated_administrative_criteria.refresh_from_db()
+        assert evaluated_administrative_criteria.uploaded_at == fake_now - relativedelta(days=1)
+        assert evaluated_administrative_criteria.proof_url == "https://example.com"
+
 
 class SiaeSubmitProofsViewTest(TestCase):
     def setUp(self):
@@ -561,6 +728,7 @@ class SiaeSubmitProofsViewTest(TestCase):
             + 2  # fetch siae infos
             + 3  # fetch evaluatedsiae, evaluatedjobapplication and evaluatedadministrativecriteria
             + 1  # update evaluatedadministrativecriteria
+            + 1  # update evaluatedsiae submission_freezed_at
             + 4  # fetch evaluationcampaign, institution, siae and siae members for email notification
             + 3  # savepoint, update session, release savepoint
         ):
@@ -635,6 +803,38 @@ class SiaeSubmitProofsViewTest(TestCase):
         response = self.client.post(self.url(submitted_job_application.evaluated_siae))
         assert response.status_code == 302
         assert response.url == "/dashboard/"
+
+    def test_is_not_submittable_with_submission_freezed(self):
+        evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
+        evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_application
+        )
+        # Freeze submission
+        evaluated_job_application.evaluated_siae.evaluation_campaign.freeze(timezone.now())
+
+        self.client.force_login(self.user)
+
+        with self.assertNumQueries(
+            BASE_NUM_QUERIES
+            + 1  # fetch django session
+            + 1  # fetch user
+            + 1  # fetch siae membership
+            + 2  # fetch siae infos
+            + 1  # fetch evaluatedsiae and see that submission is freezed, abort
+            + 3  # savepoint, update session, release savepoint
+        ):
+            response = self.client.post(self.url(evaluated_job_application.evaluated_siae))
+
+        self.assertRedirects(
+            response,
+            reverse(
+                "siae_evaluations_views:siae_job_applications_list",
+                kwargs={"evaluated_siae_pk": evaluated_job_application.evaluated_siae_id},
+            ),
+        )
+        assertMessages(response, [("ERROR", "Impossible de soumettre les documents.")])
+        evaluated_administrative_criteria.refresh_from_db()
+        assert evaluated_administrative_criteria.submitted_at is None
 
     def test_submitted_email(self):
         institution_membership = InstitutionMembershipFactory()
