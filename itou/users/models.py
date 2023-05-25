@@ -110,11 +110,9 @@ class ItouUserManager(UserManager):
         pe_id_to_remove = []
 
         for pe_id, duplicates in result.items():
-
             same_birthdate = all(user.birthdate == duplicates[0].birthdate for user in duplicates)
 
             if not same_birthdate:
-
                 # Two users with the same `pole_emploi_id` but a different
                 # `birthdate` are not guaranteed to be duplicates.
                 if len(duplicates) == 2:
@@ -298,8 +296,6 @@ class User(AbstractUser, AddressMixin):
         verbose_name="Information sur la source des champs",
         blank=True,
         null=True,
-        # TODO(alaurent) We could create a custom encode/decoder to store and read enums instead of strings.
-        # It would also allow to have real datetimes when reading the field value.
         encoder=DjangoJSONEncoder,
     )
 
