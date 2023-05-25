@@ -16,7 +16,7 @@ from django.db import Error, transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.utils.http import urlencode, urlsafe_base64_decode
+from django.utils.http import urlencode
 from django.views.decorators.http import require_GET
 from django.views.generic import TemplateView, View
 
@@ -221,18 +221,10 @@ class SiaeBaseView(View):
         super().setup(request, *args, **kwargs)
 
     def dispatch(self, request, *args, siae_id, **kwargs):
-        # TODO(FF): After a week on production (magic link validity), remove
-        # fallback logic to decode the siae_id and specify the parameter as
-        # siae_id:int in the urls.
         try:
-            siae_id = int(siae_id)
-        except ValueError:
-            siae_id = urlsafe_base64_decode(siae_id)
-            try:
-                siae_id = int(siae_id)
-            except ValueError:
-                siae_id = None
-        self.siae = None if siae_id is None else Siae.objects.active().filter(pk=siae_id).get()
+            self.siae = Siae.objects.active().get(pk=siae_id)
+        except Siae.DoesNotExist:
+            self.siae = None
         if self.siae is None or not siae_signup_token_generator.check_token(siae=self.siae, token=self.token):
             messages.warning(
                 request,

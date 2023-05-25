@@ -154,6 +154,38 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         assert 1 == siae.members.count()
         assert 2 == user.siae_set.count()
 
+    def test_user_invalid_siae_id(self):
+        siae = SiaeFactory(kind=SiaeKind.ETTI)
+        response = self.client.get(reverse("signup:siae_user", kwargs={"siae_id": "0", "token": siae.get_token()}))
+        self.assertRedirects(response, reverse("signup:siae_select"))
+        assertMessages(
+            response,
+            [
+                (
+                    messages.WARNING,
+                    "Ce lien d'inscription est invalide ou a expiré. Veuillez procéder à une nouvelle inscription.",
+                )
+            ],
+        )
+
+    def test_join_invalid_siae_id(self):
+        user = SiaeStaffFactory(with_siae=True)
+        self.client.force_login(user)
+        siae = SiaeFactory(kind=SiaeKind.ETTI)
+        response = self.client.get(
+            reverse("signup:siae_join", kwargs={"siae_id": "0", "token": siae.get_token()}), follow=True
+        )
+        self.assertRedirects(response, reverse("signup:siae_select"))
+        assertMessages(
+            response,
+            [
+                (
+                    messages.WARNING,
+                    "Ce lien d'inscription est invalide ou a expiré. Veuillez procéder à une nouvelle inscription.",
+                )
+            ],
+        )
+
     @respx.mock
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
     @override_settings(
