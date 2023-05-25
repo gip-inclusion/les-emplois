@@ -313,15 +313,15 @@ class TestSyncPermsTestCase(TestCase):
 def test_shorten_active_sessions():
     expired_session = Session.objects.create(
         session_key="expired",
-        expire_date=datetime.datetime(2023, 3, 6, tzinfo=datetime.timezone.utc),
+        expire_date=datetime.datetime(2023, 3, 6, tzinfo=datetime.UTC),
     )
     almost_expired_session = Session.objects.create(
         session_key="almost_expired",
-        expire_date=datetime.datetime(2023, 3, 6, 12, tzinfo=datetime.timezone.utc),
+        expire_date=datetime.datetime(2023, 3, 6, 12, tzinfo=datetime.UTC),
     )
     Session.objects.create(
         session_key="active",
-        expire_date=datetime.datetime(2023, 3, 7, tzinfo=datetime.timezone.utc),
+        expire_date=datetime.datetime(2023, 3, 7, tzinfo=datetime.UTC),
     )
 
     call_command("shorten_active_sessions")
@@ -348,7 +348,7 @@ class TestCommandNewUsersToMailJet:
         EmailAddress.objects.create(user=not_primary, email=not_primary.email, primary=False, verified=True)
         # Past users are ignored.
         SiaeMembershipFactory(
-            user__date_joined=datetime.datetime(2023, 1, 12, tzinfo=datetime.timezone.utc),
+            user__date_joined=datetime.datetime(2023, 1, 12, tzinfo=datetime.UTC),
             user__with_verified_email=True,
             siae__kind=SiaeKind.EI,
         )
@@ -494,7 +494,7 @@ class TestCommandNewUsersToMailJet:
             EmailAddress.objects.create(user=not_primary, email=not_primary.email, primary=False, verified=True)
             # Past users are ignored.
             PrescriberMembershipFactory(
-                user__date_joined=datetime.datetime(2023, 1, 12, tzinfo=datetime.timezone.utc),
+                user__date_joined=datetime.datetime(2023, 1, 12, tzinfo=datetime.UTC),
                 user__with_verified_email=True,
                 organization=organization,
             )
@@ -614,14 +614,12 @@ class TestCommandNewUsersToMailJet:
         )
         timmy = PrescriberMembershipFactory(user=timmy, organization__kind=PrescriberOrganizationKind.OTHER)
         # Past users are ignored.
-        PrescriberFactory(
-            with_verified_email=True, date_joined=datetime.datetime(2023, 1, 12, tzinfo=datetime.timezone.utc)
-        )
+        PrescriberFactory(with_verified_email=True, date_joined=datetime.datetime(2023, 1, 12, tzinfo=datetime.UTC))
         # Inactive users are ignored.
         PrescriberFactory(
             with_verified_email=True,
             is_active=False,
-            date_joined=datetime.datetime(2023, 1, 12, tzinfo=datetime.timezone.utc),
+            date_joined=datetime.datetime(2023, 1, 12, tzinfo=datetime.UTC),
         )
         # Ignored, email is not the primary email.
         not_primary = PrescriberFactory()
@@ -849,7 +847,7 @@ class TestCommandNewUsersToMailJet:
 
         # Past users are ignored.
         SiaeMembershipFactory(
-            user__date_joined=datetime.datetime(2025, 5, 1, tzinfo=datetime.timezone.utc),
+            user__date_joined=datetime.datetime(2025, 5, 1, tzinfo=datetime.UTC),
             user__with_verified_email=True,
             siae__kind=SiaeKind.EI,
         )
@@ -899,7 +897,7 @@ def test_update_job_seeker_coords(settings, capsys, respx_mock):
 
     js3.refresh_from_db()
     assert js3.ban_api_resolved_address == "9 avenue Delorme 92220 Boulogne"
-    assert js3.geocoding_updated_at == datetime.datetime(2023, 5, 1, 0, 0, tzinfo=datetime.timezone.utc)
+    assert js3.geocoding_updated_at == datetime.datetime(2023, 5, 1, 0, 0, tzinfo=datetime.UTC)
     assert js3.geocoding_score == 0.83
     assert js3.coords.x == 13.13
     assert js3.coords.y == 42.42

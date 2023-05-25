@@ -46,7 +46,7 @@ def _fill_approval_eligibility_diagnoses(apps, schema_editor):
             and ja.eligibility_diagnosis is not None
             and ja.eligibility_diagnosis.created_at <= approval.created_at < ja.eligibility_diagnosis.expires_at
         ]
-        eligibility_diagnoses = list(set(ja.eligibility_diagnosis for ja in accepted_job_app_with_diag))
+        eligibility_diagnoses = list({ja.eligibility_diagnosis for ja in accepted_job_app_with_diag})
         if len(eligibility_diagnoses) == 1:
             approval.eligibility_diagnosis = eligibility_diagnoses[0]
             approval.save()

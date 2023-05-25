@@ -164,7 +164,7 @@ def test_populate_job_seekers():
     )
     job_application_3 = JobApplicationFactory(
         job_seeker=user_3,
-        created_at=datetime.datetime(2023, 1, 1, tzinfo=datetime.timezone.utc),
+        created_at=datetime.datetime(2023, 1, 1, tzinfo=datetime.UTC),
         with_approval=True,
         eligibility_diagnosis__author_kind="siae_staff",
         eligibility_diagnosis__author_prescriber_organization=None,
@@ -178,12 +178,12 @@ def test_populate_job_seekers():
         with_approval=True,
         approval=job_application_3.approval,
         eligibility_diagnosis=None,
-        created_at=datetime.datetime(2022, 1, 1, tzinfo=datetime.timezone.utc),
+        created_at=datetime.datetime(2022, 1, 1, tzinfo=datetime.UTC),
     )
 
     EligibilityDiagnosisFactory(
         job_seeker=user_3,
-        created_at=datetime.datetime(2020, 1, 1, tzinfo=datetime.timezone.utc),
+        created_at=datetime.datetime(2020, 1, 1, tzinfo=datetime.UTC),
     )
 
     num_queries = 1  # Get administrative criteria

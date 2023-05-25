@@ -1,6 +1,6 @@
 import importlib
 import io
-from typing import List, NamedTuple
+from typing import NamedTuple
 
 import openpyxl
 from bs4 import BeautifulSoup
@@ -18,7 +18,7 @@ class Message(NamedTuple):
 LEVEL_TO_NAME = {intlevel: name for name, intlevel in DEFAULT_LEVELS.items()}
 
 
-def assertMessages(response: HttpResponse, expected_messages: List[Message]):
+def assertMessages(response: HttpResponse, expected_messages: list[Message]):
     request_messages = get_messages(response.wsgi_request)
     for message, (expected_level, expected_msg) in zip(request_messages, expected_messages, strict=True):
         msg_levelname = LEVEL_TO_NAME.get(message.level, message.level)

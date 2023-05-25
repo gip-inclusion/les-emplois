@@ -469,11 +469,9 @@ class EvaluationCampaignManagerTest(TestCase):
         # Transitioned to ACCEPTED, the DDETS did not review the documents
         # submitted by SIAE before the transition.
         evaluated_siae_submitted.refresh_from_db()
-        assert evaluated_siae_submitted.reviewed_at == datetime.datetime(
-            2023, 1, 2, 11, 11, 11, tzinfo=datetime.timezone.utc
-        )
+        assert evaluated_siae_submitted.reviewed_at == datetime.datetime(2023, 1, 2, 11, 11, 11, tzinfo=datetime.UTC)
         assert evaluated_siae_submitted.final_reviewed_at == datetime.datetime(
-            2023, 1, 2, 11, 11, 11, tzinfo=datetime.timezone.utc
+            2023, 1, 2, 11, 11, 11, tzinfo=datetime.UTC
         )
         assert evaluated_siae_submitted.state == evaluation_enums.EvaluatedSiaeState.ACCEPTED
 
@@ -661,11 +659,9 @@ class EvaluationCampaignManagerTest(TestCase):
         # Transitioned to ACCEPTED, the DDETS did not review the documents
         # submitted by SIAE before the transition.
         evaluated_siae_submitted.refresh_from_db()
-        assert evaluated_siae_submitted.reviewed_at == datetime.datetime(
-            2023, 1, 2, 11, 11, 11, tzinfo=datetime.timezone.utc
-        )
+        assert evaluated_siae_submitted.reviewed_at == datetime.datetime(2023, 1, 2, 11, 11, 11, tzinfo=datetime.UTC)
         assert evaluated_siae_submitted.final_reviewed_at == datetime.datetime(
-            2023, 1, 2, 11, 11, 11, tzinfo=datetime.timezone.utc
+            2023, 1, 2, 11, 11, 11, tzinfo=datetime.UTC
         )
         assert evaluated_siae_submitted.state == evaluation_enums.EvaluatedSiaeState.ACCEPTED
 

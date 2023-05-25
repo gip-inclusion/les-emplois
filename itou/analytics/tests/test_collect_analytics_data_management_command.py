@@ -77,7 +77,7 @@ def test_show_data(command):
 def test_save_data(command):
     command.save_data(
         {CodeTest.CODE_001: 42, CodeTest.CODE_002: 21},
-        datetime.datetime(2022, 1, 1, tzinfo=datetime.timezone.utc),
+        datetime.datetime(2022, 1, 1, tzinfo=datetime.UTC),
     )
 
     objects = Datum.objects.order_by("code").all()
@@ -99,7 +99,7 @@ def test_save_data_with_an_integrity_error(command):
 
     command.save_data(
         {CodeTest.CODE_001: 42, CodeTest.CODE_002: 21},
-        datetime.datetime(2022, 1, 1, tzinfo=datetime.timezone.utc),
+        datetime.datetime(2022, 1, 1, tzinfo=datetime.UTC),
     )
 
     objects = Datum.objects.order_by("code").all()

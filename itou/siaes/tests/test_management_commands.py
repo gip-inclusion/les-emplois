@@ -141,7 +141,7 @@ def test_update_siae_coords(settings, capsys, respx_mock):
 
     siae3.refresh_from_db()
     assert siae3.ban_api_resolved_address == "9 avenue Delorme 92220 Boulogne"
-    assert siae3.geocoding_updated_at == datetime.datetime(2023, 5, 1, 0, 0, tzinfo=datetime.timezone.utc)
+    assert siae3.geocoding_updated_at == datetime.datetime(2023, 5, 1, 0, 0, tzinfo=datetime.UTC)
     assert siae3.geocoding_score == 0.83
     assert siae3.coords.x == 13.13
     assert siae3.coords.y == 42.42
