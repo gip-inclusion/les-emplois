@@ -131,14 +131,6 @@ class ApprovalPrintableDisplay(ApprovalBaseViewMixin, TemplateView):
             raise Http404("Nous sommes au regret de vous informer que vous ne pouvez pas afficher cet agrément.")
 
         diagnosis = approval.eligibility_diagnosis
-
-        # TODO(alaurent) remove once last approvals were manually fixed
-        if not diagnosis:
-            job_application = self.get_job_application(approval)
-            if not job_application:
-                raise Http404("Nous sommes au regret de vous informer que vous ne pouvez pas afficher cet agrément.")
-            diagnosis = job_application.get_eligibility_diagnosis()
-
         diagnosis_author = None
         diagnosis_author_org = None
         diagnosis_author_org_name = None
@@ -148,23 +140,6 @@ class ApprovalPrintableDisplay(ApprovalBaseViewMixin, TemplateView):
             diagnosis_author_org = diagnosis.author_prescriber_organization or diagnosis.author_siae
             if diagnosis_author_org:
                 diagnosis_author_org_name = diagnosis_author_org.display_name
-
-        # TODO(alaurent): remove once all approvals were fixed
-        if (
-            not diagnosis
-            and approval.origin in [approvals_enums.Origin.ADMIN, approvals_enums.Origin.DEFAULT]
-            and job_application.origin != Origin.AI_STOCK
-        ):
-            # On November 30th, 2021, AI were delivered a PASS IAE
-            # without a diagnosis for all of their employees.
-            # We want to raise an error if the approval of the pass originates from our side, but
-            # is not from the AI stock, as it should not happen.
-            # We may have to add conditions there in case of new mass imports.
-            raise Exception(
-                f"Approval={approval.pk} cannot be rendered because "
-                f"JobApplication={job_application.pk} "
-                "had no eligibility diagnosis and also was not mass-imported."
-            )
 
         context.update(
             {
