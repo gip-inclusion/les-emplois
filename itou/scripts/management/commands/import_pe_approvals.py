@@ -186,7 +186,7 @@ class Command(BaseCommand):
                     f for f in FIELDS if getattr(existing_approval, f, None) != getattr(pe_approval, f, None)
                 ]
                 if not diffing_fields:
-                    self.stderr.write("> canceled update for number=%s (no changes), skipping..." % NUM_AGR_DEC)
+                    self.stderr.write(f"> canceled update for number={NUM_AGR_DEC} (no changes), skipping...")
                     count_skip += 1
                 else:
                     self.stdout.write(

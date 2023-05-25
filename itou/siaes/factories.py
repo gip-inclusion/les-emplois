@@ -66,7 +66,7 @@ def _create_job_from_rome_code(self, create, extracted, **kwargs):
 def _create_fake_postcode():
     postcode = random.choice(list(DEPARTMENTS))
     # add 3 numbers
-    postcode += "%03d" % random.randint(0, 999)
+    postcode += f"{int(random.randint(0, 999)):03}"
     # trunc to keep only 5 numbers, in case the department was 3 number long
     return postcode[:5]
 

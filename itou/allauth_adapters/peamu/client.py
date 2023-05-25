@@ -51,5 +51,5 @@ class PEAMUOAuth2Client(OAuth2Client):
             else:
                 access_token = dict(parse_qsl(resp.text))
         if not access_token or "access_token" not in access_token:
-            raise OAuth2Error("Error retrieving access token: %s" % resp.content)
+            raise OAuth2Error(f"Error retrieving access token: {resp.content}")
         return access_token

@@ -55,7 +55,7 @@ class Command(BaseCommand):
                     end_at=pe_approval.end_at,
                 )
                 merged_approval.save()
-                self.stdout.write("merging approvals number=%s" % number)
+                self.stdout.write(f"merging approvals number={number}")
 
     def get_count_non_merged_approvals(self):
         nb_non_merged_peapproval_sql = (

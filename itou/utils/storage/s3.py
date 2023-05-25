@@ -10,7 +10,7 @@ from django.conf import settings
 def s3_client():
     return boto3.client(
         "s3",
-        endpoint_url="https://%s" % settings.S3_STORAGE_ENDPOINT_DOMAIN,
+        endpoint_url=f"https://{settings.S3_STORAGE_ENDPOINT_DOMAIN}",
         aws_access_key_id=settings.S3_STORAGE_ACCESS_KEY_ID,
         aws_secret_access_key=settings.S3_STORAGE_SECRET_ACCESS_KEY,
         region_name=settings.S3_STORAGE_BUCKET_REGION,

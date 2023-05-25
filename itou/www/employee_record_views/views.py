@@ -359,7 +359,7 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
         )
         messages.success(
             request,
-            "||".join([toast_title, toast_message]),
+            f"{toast_title}||{toast_message}",
             extra_tags="toast",
         )
         return HttpResponseRedirect(back_url)
