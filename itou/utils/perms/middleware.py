@@ -39,7 +39,6 @@ class ItouCurrentOrganizationMiddleware:
             return self.get_response(request)
 
         if user.is_authenticated:
-            # FIXME(alaurent) move to a dedicated Middleware ?
             # Force Inclusion Connect
             if (
                 user.identity_provider != IdentityProvider.INCLUSION_CONNECT

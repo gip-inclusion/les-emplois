@@ -54,7 +54,6 @@
         <h2>Informations du salarié</h2>
         <hr>
         <h3>Informations personnelles</h3>
-        {# TODO(alaurent) It would be great to remove the use for job_application here #}
         {% include "apply/includes/job_seeker_info.html" with with_matomo_event=True %}
         {# Eligibility ------------------------------------------------------------------------- #}
         {% include "apply/includes/eligibility_diagnosis.html" with eligibility_diagnosis=eligibility_diagnosis job_application=job_application %}

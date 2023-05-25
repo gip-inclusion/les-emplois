@@ -43,7 +43,6 @@ class ApprovalBaseViewMixin(LoginRequiredMixin):
         context["siae"] = self.siae
         return context
 
-    # TODO(alaurent) : An Employee model linked to the siae, Approval and JobSeeker would make things easier here
     def get_job_application(self, approval):
         return (
             JobApplication.objects.filter(
@@ -197,7 +196,6 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
     form = DeclareProlongationForm(approval=approval, siae=siae, data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
-
         prolongation = form.save(commit=False)
         prolongation.created_by = request.user
         prolongation.declared_by = request.user
@@ -241,7 +239,6 @@ def suspend(request, approval_id, template_name="approvals/suspend.html"):
     form = SuspensionForm(approval=approval, siae=siae, data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
-
         suspension = form.save(commit=False)
         suspension.created_by = request.user
 
@@ -426,7 +423,6 @@ def pe_approval_create(request, pe_approval_id):
         return HttpResponseRedirect(next_url)
 
     with transaction.atomic():
-
         # Then we create an Approval based on the PoleEmploiApproval data
         approval_from_pe = Approval(
             start_at=pe_approval.start_at,

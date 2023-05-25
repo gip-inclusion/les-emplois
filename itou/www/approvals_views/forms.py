@@ -33,7 +33,6 @@ class ApprovalForm(forms.Form):
         )
 
     def _get_choices_for_job_seekers(self):
-        # TODO(alaurent) : An Employee model linked to the siae, Approval and JobSeeker would make things easier here
         approvals_qs = Approval.objects.filter(self._get_approvals_qs_filter())
         users_qs = User.objects.filter(kind=UserKind.JOB_SEEKER, approvals__in=approvals_qs)
         return [
@@ -46,7 +45,6 @@ class ApprovalForm(forms.Form):
         return len(self.data)
 
     def get_qs_filters(self):
-        # TODO(alaurent) : An Employee model linked to the siae, Approval and JobSeeker would make things easier here
         qs_filters_list = [self._get_approvals_qs_filter()]
         data = self.cleaned_data
 
@@ -272,7 +270,6 @@ class SuspensionForm(forms.ModelForm):
 
 
 class PoleEmploiApprovalSearchForm(forms.Form):
-
     number = forms.CharField(
         label="Numéro",
         required=True,
