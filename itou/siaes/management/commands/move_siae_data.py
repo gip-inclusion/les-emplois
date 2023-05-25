@@ -78,21 +78,21 @@ class Command(BaseCommand):
 
     def handle(self, from_id, to_id, *, wet_run, only_job_applications, preserve_to_siae_data, **options):
         if from_id == to_id:
-            self.stderr.write("Unable to use the same siae as source and destination (ID %s)\n" % from_id)
+            self.stderr.write(f"Unable to use the same siae as source and destination (ID {from_id})\n")
             return
 
         from_siae_qs = siaes_models.Siae.objects.filter(pk=from_id)
         try:
             from_siae = from_siae_qs.get()
         except siaes_models.Siae.DoesNotExist:
-            self.stderr.write("Unable to find the siae ID %s\n" % from_id)
+            self.stderr.write(f"Unable to find the siae ID {from_id}\n")
             return
 
         to_siae_qs = siaes_models.Siae.objects.filter(pk=to_id)
         try:
             to_siae = to_siae_qs.get()
         except siaes_models.Siae.DoesNotExist:
-            self.stderr.write("Unable to find the siae ID %s\n" % to_id)
+            self.stderr.write(f"Unable to find the siae ID {to_id}\n")
             return
 
         # Intermediate variable for better readability
@@ -110,10 +110,10 @@ class Command(BaseCommand):
         )
 
         job_applications_sent = job_applications_models.JobApplication.objects.filter(sender_siae_id=from_id)
-        self.stdout.write("| Job applications sent: %s" % job_applications_sent.count())
+        self.stdout.write(f"| Job applications sent: {job_applications_sent.count()}")
 
         job_applications_received = job_applications_models.JobApplication.objects.filter(to_siae_id=from_id)
-        self.stdout.write("| Job applications received: %s" % job_applications_received.count())
+        self.stdout.write(f"| Job applications received: {job_applications_received.count()}")
 
         employee_records_created_count = EmployeeRecord.objects.filter(job_application__to_siae_id=from_id).count()
         self.stdout.write(f"| Employee records created: {employee_records_created_count}")
@@ -129,22 +129,22 @@ class Command(BaseCommand):
             job_descriptions = siaes_models.SiaeJobDescription.objects.filter(siae_id=from_id).exclude(
                 Exists(appellation_subquery)
             )
-            self.stdout.write("| Job descriptions: %s\n" % job_descriptions.count())
+            self.stdout.write(f"| Job descriptions: {job_descriptions.count()}\n")
 
             # Move users not already present in siae destination
             members = siaes_models.SiaeMembership.objects.filter(siae_id=from_id).exclude(
                 user__in=users_models.User.objects.filter(siaemembership__siae_id=to_id)
             )
-            self.stdout.write("| Members: %s\n" % members.count())
+            self.stdout.write(f"| Members: {members.count()}\n")
 
             diagnoses = eligibility_models.EligibilityDiagnosis.objects.filter(author_siae_id=from_id)
-            self.stdout.write("| Diagnoses: %s\n" % diagnoses.count())
+            self.stdout.write(f"| Diagnoses: {diagnoses.count()}\n")
 
             prolongations = approvals_models.Prolongation.objects.filter(declared_by_siae_id=from_id)
-            self.stdout.write("| Prolongations: %s\n" % prolongations.count())
+            self.stdout.write(f"| Prolongations: {prolongations.count()}\n")
 
             suspensions = approvals_models.Suspension.objects.filter(siae_id=from_id)
-            self.stdout.write("| Suspensions: %s\n" % suspensions.count())
+            self.stdout.write(f"| Suspensions: {suspensions.count()}\n")
 
             # Don't move invitations for existing members
             # The goal is to keep information about the original information
@@ -153,18 +153,18 @@ class Command(BaseCommand):
                     "email", flat=True
                 )
             )
-            self.stdout.write("| Invitations: %s\n" % invitations.count())
+            self.stdout.write(f"| Invitations: {invitations.count()}\n")
 
             evaluated_siaes = EvaluatedSiae.objects.filter(siae_id=from_id)
-            self.stdout.write("| Evaluated siaes: %s\n" % evaluated_siaes.count())
+            self.stdout.write(f"| Evaluated siaes: {evaluated_siaes.count()}\n")
 
         self.stdout.write(f"INTO siae.id={to_siae.pk} - {to_siae.kind} {to_siae.siret} - {to_siae.display_name}\n")
 
         dest_siae_job_applications_sent = job_applications_models.JobApplication.objects.filter(sender_siae_id=to_id)
-        self.stdout.write("| Job applications sent: %s\n" % dest_siae_job_applications_sent.count())
+        self.stdout.write(f"| Job applications sent: {dest_siae_job_applications_sent.count()}\n")
 
         dest_siae_job_applications_received = job_applications_models.JobApplication.objects.filter(to_siae_id=to_id)
-        self.stdout.write("| Job applications received: %s\n" % dest_siae_job_applications_received.count())
+        self.stdout.write(f"| Job applications received: {dest_siae_job_applications_received.count()}\n")
 
         dest_employee_records_created_count = EmployeeRecord.objects.filter(job_application__to_siae_id=to_id).count()
         self.stdout.write(f"| Employee records created: {dest_employee_records_created_count}")
@@ -269,21 +269,21 @@ class Command(BaseCommand):
             )
         )
         orig_job_applications_sent = job_applications_models.JobApplication.objects.filter(sender_siae_id=from_id)
-        self.stdout.write("| Job applications sent: %s\n" % orig_job_applications_sent.count())
+        self.stdout.write(f"| Job applications sent: {orig_job_applications_sent.count()}\n")
 
         orig_job_applications_received = job_applications_models.JobApplication.objects.filter(to_siae_id=from_id)
-        self.stdout.write("| Job applications received: %s\n" % orig_job_applications_received.count())
+        self.stdout.write(f"| Job applications received: {orig_job_applications_received.count()}\n")
 
         orig_employee_records = EmployeeRecord.objects.filter(job_application__to_siae_id=from_id)
         self.stdout.write(f"| Employee records created: {orig_employee_records.count()}")
 
-        self.stdout.write("INTO siae.id=%s\n" % to_siae.pk)
+        self.stdout.write(f"INTO siae.id={to_siae.pk}\n")
 
         dest_siae_job_applications_sent = job_applications_models.JobApplication.objects.filter(sender_siae_id=to_id)
-        self.stdout.write("| Job applications sent: %s\n" % dest_siae_job_applications_sent.count())
+        self.stdout.write(f"| Job applications sent: {dest_siae_job_applications_sent.count()}\n")
 
         dest_siae_job_applications_received = job_applications_models.JobApplication.objects.filter(to_siae_id=to_id)
-        self.stdout.write("| Job applications received: %s\n" % dest_siae_job_applications_received.count())
+        self.stdout.write(f"| Job applications received: {dest_siae_job_applications_received.count()}\n")
 
         dest_employee_records = EmployeeRecord.objects.filter(job_application__to_siae_id=to_id)
         self.stdout.write(f"| Employee records created: {dest_employee_records.count()}")
