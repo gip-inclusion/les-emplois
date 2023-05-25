@@ -1,7 +1,7 @@
 import json
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Callable
 
 from django.db.models import Model, QuerySet
 

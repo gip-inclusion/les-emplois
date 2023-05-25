@@ -1066,7 +1066,7 @@ class JSONTest(TestCase):
         (datetime.date(2001, 1, 1), '{"__type__": "datetime.date", "value": "2001-01-01"}'),
         (datetime.datetime(2001, 1, 1), '{"__type__": "datetime.datetime", "value": "2001-01-01T00:00:00"}'),
         (
-            datetime.datetime(2001, 1, 1, tzinfo=datetime.timezone.utc),
+            datetime.datetime(2001, 1, 1, tzinfo=datetime.UTC),
             '{"__type__": "datetime.datetime", "value": "2001-01-01T00:00:00+00:00"}',
         ),
         (datetime.timedelta(), '{"__type__": "datetime.timedelta", "value": "P0DT00H00M00S"}'),
