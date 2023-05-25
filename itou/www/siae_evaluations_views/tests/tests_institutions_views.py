@@ -801,7 +801,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             evaluated_job_application=evaluated_job_app,
             uploaded_at=timezone.now() - relativedelta(days=2),
             submitted_at=timezone.now() - relativedelta(days=1),
-            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2,
         )
 
         self.client.force_login(self.user)
