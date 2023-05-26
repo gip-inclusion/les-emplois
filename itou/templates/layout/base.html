@@ -98,8 +98,8 @@
                 });
             });
         </script>
-        <script nonce="{{ CSP_NONCE }}">
 
+        <script nonce="{{ CSP_NONCE }}">
             // Tarteaucitron's language is set according to the browser configuration
             // but a lot of users don't know how to change it.
             // This can be forced only by using a global `var` statement.
@@ -107,14 +107,18 @@
             var tarteaucitronForceLanguage = "fr";
 
             tarteaucitron.init({
+                "privacyUrl": "", /* Privacy policy url */
+                "bodyPosition": "bottom", /* or top to bring it as first element for accessibility */
                 "hashtag": "#tarteaucitron", /* Open the panel with this hashtag */
                 "cookieName": "tarteaucitron", /* Cookie name */
-                "orientation": "top", /* Banner position (top - bottom) */
+                "orientation": "bottom", /* Banner position (top - bottom) */
                 "groupServices": false, /* Group services by category */
+                "serviceDefaultState": "wait", /* Default state (true - wait - false) */
                 "showAlertSmall": false, /* Show the small banner on bottom right */
                 "cookieslist": false, /* Show the cookie list */
                 "closePopup": false, /* Show a close X on the banner */
                 "showIcon": true, /* Show cookie icon to manage cookies */
+                //"iconSrc": "", /* Optionnal: URL or base64 encoded image */
                 "iconPosition": "BottomLeft", /* BottomRight, BottomLeft, TopRight and TopLeft */
                 "adblocker": false, /* Show a Warning if an adblocker is detected */
                 "DenyAllCta" : true, /* Show the deny all button */
@@ -125,8 +129,10 @@
                 "moreInfoLink": true, /* Show more info link */
                 "useExternalCss": true, /* If false, the tarteaucitron.css file will be loaded */
                 "useExternalJs": false, /* If false, the tarteaucitron.js file will be loaded */
-                "readmoreLink": '{% url 'legal-privacy' %}', /* Change the default readmore link */
+                //"cookieDomain": ".my-multisite-domaine.fr", /* Shared cookie for multisite */
+                "readmoreLink": "{% url 'legal-privacy' %}#cookies", /* Change the default readmore link */
                 "mandatory": true, /* Show a message about mandatory cookies */
+                "mandatoryCta": true /* Show the disabled accept button when mandatory on */
             });
 
             // Hotjar.

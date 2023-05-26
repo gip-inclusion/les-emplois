@@ -1,0 +1,178 @@
+{% load redirection_fields %}
+
+<ul>
+    <li>
+        <a href="{{ ITOU_COMMUNITY_URL }}/aide/emplois/" class="btn btn-link {% if is_mobile %}mh-auto p-0{% endif %}" target="_blank" aria-label="Accéder à l'espace de documentation (nouvel onglet)">Besoin d'aide ?</a>
+    </li>
+    {% if user.is_authenticated %}
+        {% if user.is_siae_staff and user_siaes|length > 1 %}
+            <li class="dropdown">
+                <button type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown{% if is_mobile %}Mobile{% endif %}" aria-expanded="false">
+                    ({{ current_siae.kind }}) {{ current_siae.display_name|truncatechars:50 }}
+                </button>
+                <div class="dropdown-menu" id="switchUserDropdown{% if is_mobile %}Mobile{% endif %}">
+                    <form action="{% url 'dashboard:switch_siae' %}" method="post">
+                        {% csrf_token %}
+                        <ul class="list-unstyled">
+                            {% for s in user_siaes %}
+                                {% if s.pk != current_siae.pk %}
+                                    <li>
+                                        <button class="dropdown-item font-weight-bold" type="submit" name="siae_id" value="{{ s.pk }}">
+                                            <span class="badge badge-pill badge-xs badge-primary mr-1">{{ s.kind }}</span>
+                                            {{ s.display_name|truncatechars:50 }}
+                                        </button>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </form>
+                </div>
+            </li>
+        {% endif %}
+        {% if user.is_prescriber and user_prescriberorganizations|length > 1 %}
+            <li class="dropdown">
+                <button type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown{% if is_mobile %}Mobile{% endif %}" aria-expanded="false">
+                    ({{ current_prescriber_organization.kind }}) {{ current_prescriber_organization.display_name|truncatechars:50 }}
+                </button>
+                <div class="dropdown-menu" id="switchUserDropdown{% if is_mobile %}Mobile{% endif %}">
+                    <form action="{% url 'dashboard:switch_prescriber_organization' %}" method="post">
+                        {% csrf_token %}
+                        <ul class="list-unstyled">
+                            {% for po in user_prescriberorganizations %}
+                                {% if po.pk != current_prescriber_organization.pk %}
+                                    <li>
+                                        <button class="dropdown-item font-weight-bold" type="submit" name="prescriber_organization_id" value="{{ po.pk }}">
+                                            <span class="badge badge-pill badge-xs badge-primary mr-1">{{ po.kind }}</span>
+                                            {{ po.display_name|truncatechars:50 }}
+                                        </button>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </form>
+                </div>
+            </li>
+        {% endif %}
+
+        {% if user.is_labor_inspector and user_institutions|length > 1 %}
+            <li class="dropdown">
+                <button type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown{% if is_mobile %}Mobile{% endif %}" aria-expanded="false">
+                    ({{ current_institution.kind }}) {{ current_institution.display_name|truncatechars:50 }}
+                </button>
+                <div class="dropdown-menu" id="switchUserDropdown{% if is_mobile %}Mobile{% endif %}">
+                    <form action="{% url 'dashboard:switch_institution' %}" method="post">
+                        {% csrf_token %}
+                        <ul class="list-unstyled">
+                            {% for i in user_institutions %}
+                                {% if i.pk != current_institution.pk %}
+                                    <li>
+                                        <button class="dropdown-item font-weight-bold" type="submit" name="institution_id" value="{{ i.pk }}">
+                                            <span class="badge badge-xs badge-pill badge-primary mr-1">{{ i.kind }}</span>
+                                            {{ i.display_name|truncatechars:50 }}
+                                        </button>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </form>
+                </div>
+            </li>
+        {% endif %}
+
+        <li class="dropdown">
+            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="dashboardUserDropdown{% if is_mobile %}Mobile{% endif %}" aria-expanded="false">
+                Mon espace
+            </button>
+            <div class="dropdown-menu" id="dashboardUserDropdown{% if is_mobile %}Mobile{% endif %}">
+                <ul class="list-unstyled">
+                    <li>
+                        <div class="dropdown-item">
+                            <div class="media align-items-center">
+                                <span class="mr-2"><i class="ri-user-line ri-2x"></i></span>
+                                <div class="media-body">
+                                    {% if user.get_full_name %}
+                                        <span>{{ user.get_full_name }}</span>
+                                        <br>
+                                    {% endif %}
+                                    <span class="fs-sm lh-sm text-muted">{{ user.email }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="dropdown-divider"></div>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="{% url 'dashboard:index' %}">Tableau de bord</a>
+                    </li>
+                    {% if user.is_siae_staff %}
+                        <li>
+                            <a class="dropdown-item" href="{% url 'dashboard:edit_user_notifications' %}">Mes notifications</a>
+                        </li>
+                    {% endif %}
+                    <li>
+                        <div class="dropdown-divider"></div>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="{% url 'dashboard:edit_user_info' %}">Modifier mon profil</a>
+                    </li>
+                    {% if not user.has_sso_provider %}
+                        <li>
+                            <a class="dropdown-item" href="{% url 'account_change_password' %}">Modifier mon mot de passe</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'dashboard:edit_user_email' %}">Modifier mon adresse e-mail</a>
+                        </li>
+                    {% endif %}
+                    <li>
+                        <div class="dropdown-divider"></div>
+                    </li>
+                    {% if user_is_siae_admin %}
+                        <li>
+                            <a class="dropdown-item text-primary" href="{% url 'dashboard:api_token' %}">Accès aux APIs</a>
+                        </li>
+                        <li>
+                            <div class="dropdown-divider"></div>
+                        </li>
+                    {% endif %}
+                    <li>
+                        <form method="post" action="{% url 'account_logout' %}">
+                            {% csrf_token %}
+                            <button class="dropdown-item text-danger">Déconnexion</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </li>
+    {% else %}
+        <li class="dropdown">
+            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="loginUserDropdown{% if is_mobile %}Mobile{% endif %}" aria-expanded="false">
+                Se connecter | S'inscrire
+            </button>
+            <div class="dropdown-menu" id="loginUserDropdown{% if is_mobile %}Mobile{% endif %}">
+                <ul class="list-unstyled">
+                    <li>
+                        <a class="dropdown-item" href="{% url 'login:job_seeker' %}{% redirection_url name=redirect_field_name value=redirect_field_value %}">
+                            Candidat
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="{% url 'login:prescriber' %}{% redirection_url name=redirect_field_name value=redirect_field_value %}">
+                            Prescripteur
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="{% url 'login:siae_staff' %}{% redirection_url name=redirect_field_name value=redirect_field_value %}">
+                            Employeur solidaire
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="{% url 'login:labor_inspector' %}{% redirection_url name=redirect_field_name value=redirect_field_value %}">
+                            Institution partenaire
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+    {% endif %}
+</ul>

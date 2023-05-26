@@ -1,171 +1,48 @@
 {% load static %}
 
 {% load theme_inclusion %}
-{# NOTE: Keep sticky header height in check with itou.css scroll-margin-top #}
-<header class="s-header s-header--emploi sticky-top" role="banner" id="header">
-    <section class="s-header__container container">
-        <div class="s-header__row row">
-            <div class="s-header__col s-header__col--logo col-auto d-flex align-items-center pr-0 pr-md-3">
-                <a href="{% url 'home:hp' %}" class="s-header__logo-ministere">
-                    <img src="{% static_theme_images 'logo-ministere-emploi.svg' %}" alt="Ministère du travail, du plein emploi et de l'insertion" />
-                </a>
+
+<header role="banner" id="header">
+    <section class="s-header">
+        <div class="s-header__container container">
+            <div class="s-header__row row">
+                <div class="s-header__col s-header__col--logo-ministere col col-md-auto d-flex align-items-center pr-0">
+                    <a href="{% url 'home:hp' %}" class="s-header__logo-ministere">
+                        <img src="{% static_theme_images 'logo-republique-francaise.svg' %}" alt="Rébublique Française">
+                    </a>
+                </div>
+                <div class="s-header__col s-header__col--logo-service col-auto d-flex align-items-center px-0">
+                    <a href="{% url 'home:hp' %}">
+                        <img src="{% static_theme_images 'logo-emploi-inclusion.svg' %}" alt="Les emplois de l'inclusion" />
+                    </a>
+                </div>
+                <div class="s-header__col s-header__col--nav col d-none d-xl-inline-flex d-xl-flex align-items-center justify-content-end">
+                    <nav role="navigation" id="nav-primary" aria-label="Navigation principale">
+                        {% include 'layout/_header_nav_primary_items.html' %}
+                    </nav>
+                </div>
+                <div class="s-header__col s-header__col--burger col d-flex align-items-center justify-content-end d-xl-none" data-toggle="burger">
+                    <i class="ri-menu-line" id="open" role="button" tabindex="0" aria-label="Ouverture du menu de navigation principale pour mobile"></i>
+                    <i class="ri-close-line" id="close" role="button" tabindex="0" aria-label="Fermeture du menu de navigation principale pour mobile"></i>
+                </div>
+                <div id="burgerNav">
+                    <nav role="navigation" aria-label="Navigation principale pour mobile">
+                        {% include 'layout/_header_nav_primary_items.html' with is_mobile=True %}
+                        {% include 'layout/_header_nav_secondary_items.html' %}
+                    </nav>
+                </div>
             </div>
-            <div class="s-header__col s-header__col--logo col-auto d-flex align-items-center px-0 px-md-3">
-                <a href="{% url 'home:hp' %}">
-                    <img src="{% static_theme_images 'logo-emploi-inclusion.svg' %}" alt="Les emplois de l'inclusion" />
-                </a>
-            </div>
-            <div class="s-header__col s-header__col--nav col d-none d-xl-inline-flex d-xl-flex align-items-center justify-content-end">
-                <nav role="navigation" id="nav-primary" aria-label="Navigation principale">
-                    <ul class="list-inline">
-                        {% include 'layout/_nav_btn_items.html' %}
-                    </ul>
-                </nav>
-            </div>
-            <div class="s-header__col s-header__col--burger col d-flex align-items-center justify-content-end d-xl-none" data-toggle="burger" aria-controls="burgerNav" tabindex="0">
-                <span id="burger">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="51" viewBox="0 0 36 51" role="img" aria-labelledby="title_burger">
-                        <g fill="none" fill-rule="evenodd">
-                        <g
-                        fill="#000638"
-                        fill-rule="nonzero"
-                        transform="translate(2)"
-                        >
-                        <rect width="32" height="4" rx="2"></rect>
-                        <rect
-                        width="32"
-                        height="4"
-                        y="12"
-                        rx="2"
-                        ></rect>
-                        <rect
-                        width="32"
-                        height="4"
-                        y="24"
-                        rx="2"
-                        ></rect>
-                        </g>
-                        <text
-                        fill="#000638"
-                        font-family="Roboto"
-                        font-size="13"
-                        font-weight="400"
-                        >
-                        <tspan x="2" y="45" id="title_burger">
-                        Menu
-                        </tspan>
-                        </text>
-                        </g>
-                    </svg>
-                </span>
-                <span id="close">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="44" height="45" viewBox="0 0 44 45" role="img" aria-labelledby="title_close">
-                        <g
-                        fill="none"
-                        fill-rule="evenodd"
-                        transform="translate(-1 -2)"
-                        >
-                        <g
-                        fill="#000638"
-                        fill-rule="nonzero"
-                        transform="translate(10 1)"
-                        >
-                        <rect
-                        width="32"
-                        height="4"
-                        x="-3"
-                        y="11"
-                        rx="2"
-                        transform="rotate(45 13 13)"
-                        ></rect>
-                        <rect
-                        width="32"
-                        height="4"
-                        x="-3"
-                        y="11"
-                        rx="2"
-                        transform="rotate(-45 13 13)"
-                        ></rect>
-                        </g>
-                        <text
-                        fill="#000638"
-                        font-family="Roboto"
-                        font-size="13"
-                        font-weight="400"
-                        >
-                        <tspan x="3" y="45" id="title_close">
-                        Fermer
-                        </tspan>
-                        </text>
-                        </g>
-                    </svg>
-                </span>
-            </div>
-            <div id="burgerNav">
-                <nav role="navigation">
-                    <ul>
-                        {% if user.is_authenticated %}
-                            <li>
-                                <a class="{% if request.path == '/dashboard/' %}font-weight-bold{% endif %}" href="{% url 'dashboard:index' %}">
-                                    <span>Tableau de bord</span>
-                                </a>
-                            </li>
-                        {% endif %}
-                        <li>
-                            <a class="{% if request.path == '/' or '/search/employers' in request.path %}font-weight-bold{% endif %}" href="{% url 'home:hp' %}">
-                                <span>Rechercher des employeurs</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="{% if '/search/prescribers' in request.path %}font-weight-bold{% endif %}" href="{% url 'search:prescribers_home' %}">
-                                <span>Rechercher des prescripteurs habilités</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ ITOU_COMMUNITY_URL }}/aide/emplois/" rel="noopener" target="_blank" aria-label="Accéder à l'espace de documentation (nouvel onglet)">
-                                <span>Documentation</span>
-                                <i class="ri-arrow-right-up-line ri-lg"></i>
-                            </a>
-                        </li>
-                        {% include 'layout/_nav_btn_items.html' with button_size='btn-sm' mobile_id='Mobile' %}
-                    </ul>
-                </nav>
+        </div>
+    </section>
+    <section class="s-postheader d-none d-xl-block">
+        <div class="s-postheader__container container">
+            <div class="s-postheader__row row">
+                <div class="s-postheader__col col-12 d-flex align-items-center">
+                    <nav role="navigation" aria-label="Navigation secondaire">
+                        {% include 'layout/_header_nav_secondary_items.html' %}
+                    </nav>
+                </div>
             </div>
         </div>
     </section>
 </header>
-<section class="s-postheader d-none d-xl-block">
-    <div class="container s-postheader__container">
-        <div class="row">
-            <div class="col-12 s-postheader__col s-postheader__col--nav d-flex align-items-center">
-                <nav role="navigation">
-                    <ul>
-                        {% if user.is_authenticated %}
-                            <li>
-                                <a class="{% if request.path == '/dashboard/' %}font-weight-bold{% endif %}" href="{% url 'dashboard:index' %}">
-                                    <span>Tableau de bord</span>
-                                </a>
-                            </li>
-                        {% endif %}
-                        <li>
-                            <a class="{% if request.path == '/' or '/search/employers' in request.path %}font-weight-bold{% endif %}" href="{% url 'home:hp' %}">
-                                <span>Rechercher un emploi inclusif</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="{% if '/search/prescribers' in request.path %}font-weight-bold{% endif %}" href="{% url 'search:prescribers_home' %}">
-                                <span>Rechercher des prescripteurs habilités</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ ITOU_COMMUNITY_URL }}/aide/emplois/" rel="noopener" target="_blank" aria-label="Accéder à l'espace de documentation (nouvel onglet)">
-                                <span>Documentation</span>
-                                <i class="ri-arrow-right-up-line ri-lg"></i>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-        </div>
-    </div>
-</section>

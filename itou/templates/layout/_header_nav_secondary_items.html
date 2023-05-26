@@ -1,0 +1,25 @@
+<ul>
+    {% if user.is_authenticated %}
+        <li>
+            <a class="{% if request.path == '/dashboard/' %}is-active{% endif %}" href="{% url 'dashboard:index' %}">
+                <span>Tableau de bord</span>
+            </a>
+        </li>
+    {% else %}
+        <li>
+            <a class="{% if request.path == '/' %}is-active{% endif %}" href="{% url 'home:hp' %}">
+                <span>Accueil</span>
+            </a>
+        </li>
+    {% endif %}
+    <li>
+        <a class="{% if '/search/employers' in request.path %}is-active{% endif %}" href="{% url 'home:hp' %}">
+            <span>Rechercher un emploi inclusif</span>
+        </a>
+    </li>
+    <li>
+        <a class="{% if '/search/prescribers' in request.path %}is-active{% endif %}" href="{% url 'search:prescribers_home' %}">
+            <span>Rechercher des prescripteurs habilités</span>
+        </a>
+    </li>
+</ul>
