@@ -576,10 +576,7 @@ class EvaluatedJobApplication(models.Model):
         if state == evaluation_enums.EvaluatedJobApplicationsState.PENDING:
             return evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.PENDING
 
-        if self.evaluated_siae.reviewed_at:
-            return evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.NOTEDITABLE
-
-        if state in [
+        if not self.evaluated_siae.reviewed_at and state in [
             evaluation_enums.EvaluatedJobApplicationsState.PROCESSING,
             evaluation_enums.EvaluatedJobApplicationsState.UPLOADED,
         ]:
