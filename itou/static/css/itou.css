@@ -1,8 +1,3 @@
-/* Scroll past the sticky header when navigating to a fragment. */
-[id] {
-    scroll-margin-top: 120px;
-}
-
 .container-search {
     background-position: top left, top right;
     background-repeat: no-repeat;
@@ -357,11 +352,6 @@ Usage:
     background-color: transparent;
 }
 
-.s-postheader__col .nav-link.active {
-    /* .font-weight-bold */
-    font-weight: 700;
-}
-
 .font-size-hat {
     font-size: 1.25rem;
 }
@@ -419,10 +409,6 @@ Usage:
 
 .itou-france-connect:hover {
     background-image: url(../img/franceconnect-bouton-hover.svg);
-}
-
-.s-postheader {
-    z-index: 10;
 }
 
 .job-appellation-nb_open_positions {
