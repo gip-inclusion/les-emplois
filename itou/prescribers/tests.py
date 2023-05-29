@@ -212,7 +212,7 @@ class PrescriberOrganizationModelTest(TestCase):
     @respx.mock
     @override_settings(
         API_INSEE_BASE_URL="https://insee.fake",
-        API_ENTREPRISE_BASE_URL="https://entreprise.fake",
+        API_INSEE_SIRENE_BASE_URL="https://entreprise.fake",
         API_INSEE_CONSUMER_KEY="foo",
         API_INSEE_CONSUMER_SECRET="bar",
     )
@@ -224,7 +224,7 @@ class PrescriberOrganizationModelTest(TestCase):
         siret = ETABLISSEMENT_API_RESULT_MOCK["etablissement"]["siret"]
         organization = PrescriberOrganizationFactory(siret=siret, is_head_office=False)
 
-        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/siret/{siret}").mock(
+        respx.get(f"{settings.API_INSEE_SIRENE_BASE_URL}/siret/{siret}").mock(
             return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
         )
 

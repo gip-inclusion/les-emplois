@@ -370,12 +370,12 @@ API_BAN_BASE_URL = os.getenv("API_BAN_BASE_URL")
 # https://api.gouv.fr/api/api-geo.html#doc_tech
 API_GEO_BASE_URL = os.getenv("API_GEO_BASE_URL")
 
+# https://api.insee.fr/catalogue/site/pages/list-apis.jag
 API_INSEE_BASE_URL = os.getenv("API_INSEE_BASE_URL")
 API_INSEE_CONSUMER_KEY = os.getenv("API_INSEE_CONSUMER_KEY")
 API_INSEE_CONSUMER_SECRET = os.getenv("API_INSEE_CONSUMER_SECRET")
-
-# https://api.gouv.fr/documentation/sirene_v3
-API_ENTREPRISE_BASE_URL = f"{API_INSEE_BASE_URL}/entreprises/sirene/V3"
+# https://api.insee.fr/catalogue/site/themes/wso2/subthemes/insee/pages/item-info.jag?name=Sirene&version=V3&provider=insee
+API_INSEE_SIRENE_BASE_URL = f"{API_INSEE_BASE_URL}/entreprises/sirene/V3"
 
 # Pôle emploi's Emploi Store Dev aka ESD. There is a production AND a recette environment.
 # Key and secrets are stored on pole-emploi.io (prod and recette) accounts, the values are not the
