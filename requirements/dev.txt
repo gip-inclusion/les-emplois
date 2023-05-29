@@ -365,9 +365,9 @@ django-filter==23.2 \
     --hash=sha256:2fe15f78108475eda525692813205fa6f9e8c1caf1ae65daa5862d403c6dbf00 \
     --hash=sha256:d12d8e0fc6d3eb26641e553e5d53b191eb8cec611427d4bdce0becb1f7c172b5
     # via -r requirements/base.txt
-django-hijack==3.3.0 \
-    --hash=sha256:795cd0087596a21c9bf641fa5cf1787f4edf144e16a423014afbcf2838e8e124 \
-    --hash=sha256:976ae3bc7e9db0bcb5f5b85a58fba98f5ff1d7a6e92e1b65854289cc79a351d4
+django-hijack==3.4.1 \
+    --hash=sha256:2bdd7ffa42198637f49c195468b8330ea51dc36b7c2bee0f3c220c9d7de78764 \
+    --hash=sha256:d49b4b6426f4c4694ee0c7591990f9ccb91a7910ba22a8f10e11e0b1f3e0b5b4
     # via -r requirements/base.txt
 django-htmx==1.14.0 \
     --hash=sha256:393e2a4a963aff691b3973c898dbca1363139d7c7bf2e8cc4c605e2ad808a779 \
