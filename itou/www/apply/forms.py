@@ -486,7 +486,9 @@ class AcceptForm(forms.ModelForm):
                 self.fields["contract_type_details"].widget.attrs.update({"rows": 2})
                 self.initial["prehiring_guidance_days"] = 0
                 self.initial["planned_training_days"] = 0
-                self.fields["hiring_start_at"].help_text = "Au format JJ/MM/AAAA, par exemple  %(date)s."
+                self.fields["hiring_start_at"].help_text = "Au format JJ/MM/AAAA, par exemple  {}.".format(
+                    datetime.date.today().strftime("%d/%m/%Y"),
+                )
                 # Dynamic selection of qualification level
                 self.fields["qualification_type"].widget.attrs.update(
                     {
