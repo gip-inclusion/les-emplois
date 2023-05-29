@@ -42,7 +42,7 @@ class PeBeneficiaire:
 
 class Command(BaseCommand):
     """
-    ./manage.py update_pe_approvals_from_asp_data --file-path="./imports/Date-debut et date-fin absent_rappro.csv" --dry-run # noqa
+    ./manage.py update_pe_approvals_from_asp_data --dry-run
 
     Ajoute le NIR ou le NIA/NTT dans les objets PoleEmploiApproval à partir de l’export fourni par l’ASP.
     Croise les infos à partir du numéro de pass.

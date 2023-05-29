@@ -685,7 +685,6 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
 
 class CreateSiaeViewTest(TestCase):
     def test_create_non_preexisting_siae_outside_of_siren_fails(self):
-
         siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
 
@@ -724,7 +723,6 @@ class CreateSiaeViewTest(TestCase):
         assert not Siae.objects.filter(siret=post_data["siret"]).exists()
 
     def test_create_preexisting_siae_outside_of_siren_fails(self):
-
         siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
 
@@ -763,7 +761,6 @@ class CreateSiaeViewTest(TestCase):
         assert Siae.objects.filter(siret=post_data["siret"]).count() == 1
 
     def test_cannot_create_siae_with_same_siret_and_same_kind(self):
-
         siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
 
@@ -929,7 +926,6 @@ class CreateSiaeViewTest(TestCase):
 class EditSiaeViewTest(TestCase):
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
     def test_edit(self, _unused_mock):
-
         siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
 
@@ -1040,7 +1036,6 @@ class EditSiaeViewTest(TestCase):
 class EditSiaeViewWithWrongAddressTest(TestCase):
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_NO_RESULT_MOCK)
     def test_edit(self, _unused_mock):
-
         siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
 
@@ -1119,7 +1114,7 @@ class UserMembershipDeactivationTest(TestCase):
         guest = siae.members.filter(siaemembership__is_admin=False).first()
 
         membership = guest.siaemembership_set.first()
-        assert not (guest in siae.active_admin_members)
+        assert guest not in siae.active_admin_members
         assert admin in siae.active_admin_members
 
         self.client.force_login(admin)
@@ -1266,7 +1261,7 @@ class SIAEAdminMembersManagementTest(TestCase):
         assert response.status_code == 302
 
         siae.refresh_from_db()
-        assert not (guest in siae.active_admin_members)
+        assert guest not in siae.active_admin_members
 
         # The admin should receive a valid email
         assert len(mail.outbox) == 1

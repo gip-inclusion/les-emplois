@@ -146,7 +146,6 @@ class CheckJobSeekerInfoForm(forms.ModelForm):
 
 
 class CreateOrUpdateJobSeekerStep1Form(JobSeekerNIRUpdateMixin, forms.ModelForm):
-
     REQUIRED_FIELDS = [
         "title",
         "first_name",
@@ -210,7 +209,6 @@ class CreateOrUpdateJobSeekerStep2Form(MandatoryAddressFormMixin, forms.ModelFor
 
 
 class CreateOrUpdateJobSeekerStep3Form(forms.ModelForm):
-
     # A set of transient checkboxes used to collapse optional blocks
     pole_emploi = forms.BooleanField(required=False, label="Inscrit à Pôle emploi")
     unemployed = forms.BooleanField(required=False, label="Sans emploi")
@@ -861,7 +859,7 @@ class SiaePrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
     def _get_choices_for(self, users):
         users = [user for user in users if user.get_full_name()]
         users = [(user.id, user.get_full_name().title()) for user in users]
-        return sorted(users, key=lambda l: l[1])
+        return sorted(users, key=lambda user: user[1])
 
     def _get_choices_for_administrativecriteria(self):
         return [(c.pk, c.name) for c in AdministrativeCriteria.objects.all()]
@@ -872,14 +870,14 @@ class SiaePrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
             for user in job_seekers
             if user.department in DEPARTMENTS
         }
-        return sorted(departments, key=lambda l: l[1])
+        return sorted(departments, key=lambda dpts: dpts[1])
 
     def _get_choices_for_jobs(self):
         jobs = set()
         for job_application in self.job_applications_qs.prefetch_related("selected_jobs__appellation"):
             for job in job_application.selected_jobs.all():
                 jobs.add((job.appellation.code, job.appellation.name))
-        return sorted(jobs, key=lambda l: l[1])
+        return sorted(jobs, key=lambda job: job[1])
 
     def get_qs_filters(self):
         qs_list = super().get_qs_filters()
@@ -937,7 +935,7 @@ class SiaeFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsForm):
         sender_orgs = self.job_applications_qs.get_unique_fk_objects("sender_prescriber_organization")
         sender_orgs = [sender for sender in sender_orgs if sender.display_name]
         sender_orgs = [(sender.id, sender.display_name.title()) for sender in sender_orgs]
-        return sorted(sender_orgs, key=lambda l: l[1])
+        return sorted(sender_orgs, key=lambda org: org[0])
 
 
 class PrescriberFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsForm):
@@ -966,7 +964,7 @@ class PrescriberFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsFor
         to_siaes = self.job_applications_qs.get_unique_fk_objects("to_siae")
         to_siaes = [siae for siae in to_siaes if siae.display_name]
         to_siaes = [(siae.id, siae.display_name.title()) for siae in to_siaes]
-        return sorted(to_siaes, key=lambda l: l[1])
+        return sorted(to_siaes, key=lambda siae: siae[1])
 
 
 class CheckJobSeekerGEIQEligibilityForm(forms.Form):

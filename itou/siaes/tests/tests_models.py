@@ -61,7 +61,6 @@ class SiaeFactoriesTest(TestCase):
 
 class SiaeModelTest(TestCase):
     def test_accept_survey_url(self):
-
         siae = SiaeFactory(kind=SiaeKind.EI, department="57")
         url = siae.accept_survey_url
         assert url.startswith(f"{settings.TALLY_URL}/r/")
@@ -161,11 +160,9 @@ class SiaeModelTest(TestCase):
         assert not siae_2.has_admin(siae_1_admin_user)
 
     def test_new_signup_activation_email_to_official_contact(self):
-
         siae = SiaeFactory(with_membership=True)
         token = siae.get_token()
         with mock.patch("itou.utils.tokens.SiaeSignupTokenGenerator.make_token", return_value=token):
-
             factory = RequestFactory()
             request = factory.get("/")
 
@@ -232,11 +229,11 @@ class SiaeModelTest(TestCase):
         siae2 = SiaeWith2MembershipsFactory()
         siae2.members.add(user)
 
-        assert not (user in siae1.active_members)
+        assert user not in siae1.active_members
         assert siae1.members.count() == 2
         assert siae1.active_members.count() == 1
         assert user in siae1.deactivated_members
-        assert not (user in siae1.active_members)
+        assert user not in siae1.active_members
         assert siae2.members.count() == 3
         assert siae2.active_members.count() == 3
 

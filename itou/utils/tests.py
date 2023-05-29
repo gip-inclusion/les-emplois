@@ -993,7 +993,7 @@ class SessionNamespaceTest(TestCase):
         # __contains__ + __repr__
         for value_to_test in [{}, [], (), set()]:
             session[ns_name] = value_to_test
-            assert not ("unknown" in ns)
+            assert "unknown" not in ns
             assert repr(ns) == f"<SessionNamespace({value_to_test!r})>"
 
         for value_to_test in [{"value": "42"}, ["value"], ("value",), {"value"}]:

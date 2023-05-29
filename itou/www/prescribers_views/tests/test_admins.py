@@ -62,7 +62,7 @@ class PrescribersOrganizationAdminMembersManagementTest(TestCase):
         assert response.status_code == 302
 
         organization.refresh_from_db()
-        assert not (guest in organization.active_admin_members)
+        assert guest not in organization.active_admin_members
 
         # The admin should receive a valid email
         assert len(mail.outbox) == 1
