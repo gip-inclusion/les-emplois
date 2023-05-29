@@ -99,8 +99,7 @@ class Command(BaseCommand):
         move_all_data = not only_job_applications
 
         self.stdout.write(
-            "MOVE %s OF siae.id=%s - %s %s - %s\n"
-            % (
+            "MOVE {} OF siae.id={} - {} {} - {}\n".format(
                 "DATA" if move_all_data else "JOB APPLICATIONS AND EMPLOYEE RECORDS",
                 from_siae.pk,
                 from_siae.kind,

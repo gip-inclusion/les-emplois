@@ -541,14 +541,14 @@ class AcceptForm(forms.ModelForm):
         help_texts = {
             # Make it clear to employers that `hiring_start_at` has an impact on the start of the
             # "parcours IAE" and the payment of the "aide au poste".
-            "hiring_start_at": "Au format JJ/MM/AAAA, par exemple  %(date)s. "
-            "Il n'est pas possible d'antidater un contrat." % {"date": datetime.date.today().strftime("%d/%m/%Y")},
-            "hiring_end_at": "Au format JJ/MM/AAAA, par exemple  %(date)s."
-            % {
-                "date": (datetime.date.today() + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)).strftime(
-                    "%d/%m/%Y"
+            "hiring_start_at": (
+                "Au format JJ/MM/AAAA, par exemple  {}. Il n'est pas possible d'antidater un contrat.".format(
+                    datetime.date.today().strftime("%d/%m/%Y")
                 )
-            },
+            ),
+            "hiring_end_at": "Au format JJ/MM/AAAA, par exemple  {}.".format(
+                (datetime.date.today() + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)).strftime("%d/%m/%Y")
+            ),
             "prehiring_guidance_days": """Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche""",
             "planned_training_days": """Laissez "0" si vous n'avez pas prévu de jours de formation pour le candidat""",
             "contract_type_details": (

@@ -190,8 +190,7 @@ class Command(BaseCommand):
                     count_skip += 1
                 else:
                     self.stdout.write(
-                        "- will update number=%s last_name=%s diff_fields=%s"
-                        % (NUM_AGR_DEC, NOM_USAGE_BENE, diffing_fields)
+                        f"- will update number={NUM_AGR_DEC} last_name={NOM_USAGE_BENE} diff_fields={diffing_fields}"
                     )
                     count_update += 1
             else:

@@ -6,7 +6,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.safestring import mark_safe
+from django.utils.html import format_html
 
 from itou.cities.models import City
 from itou.common_apps.address.departments import department_from_postcode
@@ -518,9 +518,9 @@ def edit_siae_step_preview(request, template_name="siaes/edit_siae_preview.html"
         except GeocodingDataError:
             messages.error(
                 request,
-                mark_safe(
-                    'L\'adresse semble erronée. Veuillez la <a href="%s">corriger</a> avant de pouvoir « Publier ».'
-                    % reverse("siaes_views:edit_siae_step_contact_infos")
+                format_html(
+                    'L\'adresse semble erronée. Veuillez la <a href="{}">corriger</a> avant de pouvoir « Publier ».',
+                    reverse("siaes_views:edit_siae_step_contact_infos"),
                 ),
             )
 
