@@ -67,7 +67,7 @@ class GeoApiProbe(HttpProbe):
 class EntrepriseApiProbe(HttpProbe):
     name = "api.entreprise"
     verbose_name = "Entreprise API"
-    url = settings.API_ENTREPRISE_BASE_URL
+    url = settings.API_INSEE_SIRENE_BASE_URL
 
 
 class EmploiStoreDevAuthApiProbe(HttpProbe):

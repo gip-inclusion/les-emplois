@@ -1,8 +1,3 @@
-"""
-Result for a call to:
-https://entreprise.api.gouv.fr/v2/etablissements/26570134200148
-"""
-
 API_RECHERCHE_RESULT_KNOWN = {
     "idNationalDE": "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ",
     "codeSortie": "S001",

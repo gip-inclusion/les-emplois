@@ -190,7 +190,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
     @override_settings(
         API_INSEE_BASE_URL="https://insee.fake",
-        API_ENTREPRISE_BASE_URL="https://entreprise.fake",
+        API_INSEE_SIRENE_BASE_URL="https://entreprise.fake",
         API_INSEE_CONSUMER_KEY="foo",
         API_INSEE_CONSUMER_SECRET="bar",
     )
@@ -207,7 +207,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         }
 
         # Mocks an invalid answer from the server
-        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/siret/{FAKE_SIRET}").mock(
+        respx.get(f"{settings.API_INSEE_SIRENE_BASE_URL}/siret/{FAKE_SIRET}").mock(
             return_value=httpx.Response(404, json={})
         )
         response = self.client.post(url, data=post_data)
@@ -215,7 +215,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         self.assertContains(response, f"SIRET « {FAKE_SIRET} » non reconnu.")
 
         # Mock a valid answer from the server
-        respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/siret/{FAKE_SIRET}").mock(
+        respx.get(f"{settings.API_INSEE_SIRENE_BASE_URL}/siret/{FAKE_SIRET}").mock(
             return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
         )
         response = self.client.post(url, data=post_data)

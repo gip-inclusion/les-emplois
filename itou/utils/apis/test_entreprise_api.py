@@ -51,7 +51,7 @@ class INSEEApiTest(SimpleTestCase):
 
 @override_settings(
     API_INSEE_BASE_URL="https://fake.insee.url",
-    API_ENTREPRISE_BASE_URL="https://api.entreprise.fake.com",
+    API_INSEE_SIRENE_BASE_URL="https://api.entreprise.fake.com",
     API_INSEE_CONSUMER_KEY="foo",
     API_INSEE_CONSUMER_SECRET="bar",
 )
@@ -64,7 +64,7 @@ class ApiEntrepriseTest(SimpleTestCase):
             json=INSEE_API_RESULT_MOCK,
         )
 
-        self.siret_endpoint = respx.get(f"{settings.API_ENTREPRISE_BASE_URL}/siret/26570134200148")
+        self.siret_endpoint = respx.get(f"{settings.API_INSEE_SIRENE_BASE_URL}/siret/26570134200148")
 
     @respx.mock
     def test_etablissement_get_or_error(self):

@@ -43,14 +43,14 @@ def get_access_token():
 def etablissement_get_or_error(siret):
     """
     Return a tuple (etablissement, error) where error is None on success.
-    https://api.gouv.fr/documentation/sirene_v3
+    https://www.sirene.fr/static-resources/htm/siret_unitaire_variables_reponse.html
     """
 
     access_token = get_access_token()
     if not access_token:
         return None, "Problème de connexion à la base Sirene. Essayez ultérieurement."
 
-    url = f"{settings.API_ENTREPRISE_BASE_URL}/siret/{siret}"
+    url = f"{settings.API_INSEE_SIRENE_BASE_URL}/siret/{siret}"
     try:
         r = httpx.get(
             url,
