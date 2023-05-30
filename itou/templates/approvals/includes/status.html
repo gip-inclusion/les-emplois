@@ -64,7 +64,7 @@ Arguments:
                 </li>
             {% endif %}
 
-            {% if not job_application.is_pending and not user.is_job_seeker %}
+            {% if not job_application.is_pending %}
                 <li class="pb-2">
                     Date de fin prévisionnelle : {{ common_approval.end_at|date:"d/m/Y" }}
                     <i class="ri-information-line ri-xl" data-toggle="tooltip" title="Cette date de fin est susceptible d'évoluer avec les éventuelles suspensions et prolongations du PASS IAE."></i>
