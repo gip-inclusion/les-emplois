@@ -11,6 +11,7 @@ from itou.job_applications.enums import SenderKind
 from itou.job_applications.factories import JobApplicationFactory, JobApplicationSentByPrescriberOrganizationFactory
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.factories import PrescriberFactory, PrescriberOrganizationFactory
+from itou.siaes.factories import SiaeFactory
 from itou.utils.templatetags.format_filters import format_approval_number
 from itou.utils.test import parse_response_to_soup
 
@@ -64,6 +65,22 @@ class TestApprovalDetailView:
         )
         assertContains(response, '<i class="ri-group-line mr-2" aria-hidden="true"></i>Prescripteur habilité', count=1)
         assertContains(response, '<i class="ri-group-line mr-2" aria-hidden="true"></i>Orienteur', count=1)
+
+    def test_detail_view_no_job_application(self, client):
+        siae = SiaeFactory(with_membership=True)
+        siae_member = siae.members.first()
+        # Make sure the job seeker infos can be edited by the siae member
+        approval = ApprovalFactory(user__created_by=siae_member)
+        EligibilityDiagnosisFactory(job_seeker=approval.user, author_siae=siae)
+
+        client.force_login(siae_member)
+
+        url = reverse("approvals:detail", kwargs={"pk": approval.pk})
+        response = client.get(url)
+        # Check that the page didn't crash
+        assertContains(response, "Numéro de PASS IAE")
+        assertContains(response, "Informations du salarié")
+        assertContains(response, "Candidatures de ce salarié")
 
     @freeze_time("2023-04-26")
     def test_approval_status_includes(self, client, snapshot):
