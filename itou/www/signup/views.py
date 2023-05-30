@@ -72,7 +72,6 @@ def signup(request, template_name="signup/signup.html", redirect_field_name=REDI
 
 
 class JobSeekerSignupView(SignupView):
-
     form_class = forms.JobSeekerSignupForm
     template_name = "signup/job_seeker_signup.html"
 
@@ -264,7 +263,9 @@ class SiaeJoinView(LoginRequiredMixin, SiaeBaseView):
     def get(self, request, *args, **kwargs):
         if not request.user.is_siae_staff:
             logger.error("A non staff user tried to join a SIAE")
-            messages.error(request, "Vous ne pouvez pas rejoindre une SIAE avec ce compte.")
+            messages.error(
+                request, "Vous ne pouvez pas rejoindre une SIAE avec ce compte car vous n'êtes pas employeur."
+            )
             return HttpResponseRedirect(reverse("home:hp"))
 
         SiaeMembership.objects.create(
@@ -366,7 +367,6 @@ def prescriber_check_already_exists(request, template_name="signup/prescriber_ch
 @valid_prescriber_signup_session_required
 @push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_request_invitation(request, membership_id, template_name="signup/prescriber_request_invitation.html"):
-
     prescriber_membership = get_object_or_404(
         PrescriberMembership.objects.select_related("organization", "user"), pk=membership_id
     )
@@ -456,7 +456,6 @@ def prescriber_choose_kind(request, template_name="signup/prescriber_choose_kind
     form = forms.PrescriberChooseKindForm(data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
-
         prescriber_kind = form.cleaned_data["kind"]
         authorization_status = None
         kind = None
@@ -695,6 +694,12 @@ def prescriber_join_org(request):
     User is redirected here after a successful oauth signup.
     This is the last step of the signup path.
     """
+    if not request.user.is_prescriber:
+        logger.error("A non prescriber user tried to join a Organisation")
+        messages.error(
+            request, "Vous ne pouvez pas rejoindre une organisation avec ce compte car vous n'êtes pas prescripteur."
+        )
+        return HttpResponseRedirect(reverse("home:hp"))
 
     # Get useful information from session.
     session_data = request.session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]

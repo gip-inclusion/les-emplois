@@ -318,7 +318,10 @@ class SiaeSignupViewsExceptionsTest(TestCase):
         url = reverse("signup:siae_join", args=(siae.pk, token))
 
         response = self.client.get(url)
-        assertMessages(response, [(messages.ERROR, "Vous ne pouvez pas rejoindre une SIAE avec ce compte.")])
+        assertMessages(
+            response,
+            [(messages.ERROR, "Vous ne pouvez pas rejoindre une SIAE avec ce compte car vous n'êtes pas employeur.")],
+        )
         self.assertRedirects(response, reverse("home:hp"))
 
         # Check `User` state.
