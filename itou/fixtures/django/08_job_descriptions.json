@@ -102,7 +102,7 @@
       "source_kind": null,
       "source_url": null,
       "ui_rank": 32767,
-      "updated_at": null
+      "updated_at": "2020-04-14T16:09:20Z"
     },
     "model": "siaes.siaejobdescription",
     "pk": 4
@@ -129,7 +129,7 @@
       "source_kind": null,
       "source_url": null,
       "ui_rank": 32767,
-      "updated_at": null
+      "updated_at": "2020-12-01T10:31:05Z"
     },
     "model": "siaes.siaejobdescription",
     "pk": 5
@@ -156,7 +156,7 @@
       "source_kind": null,
       "source_url": null,
       "ui_rank": 32767,
-      "updated_at": null
+      "updated_at": "2020-12-01T10:30:23Z"
     },
     "model": "siaes.siaejobdescription",
     "pk": 6
@@ -291,7 +291,7 @@
       "source_kind": null,
       "source_url": null,
       "ui_rank": 32767,
-      "updated_at": null
+      "updated_at": "2021-02-22T14:54:17Z"
     },
     "model": "siaes.siaejobdescription",
     "pk": 11
@@ -318,7 +318,7 @@
       "source_kind": null,
       "source_url": null,
       "ui_rank": 32767,
-      "updated_at": null
+      "updated_at": "2021-11-23T16:18:42.985Z"
     },
     "model": "siaes.siaejobdescription",
     "pk": 12

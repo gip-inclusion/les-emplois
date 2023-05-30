@@ -723,14 +723,8 @@ class EmployeeRecordUpdateNotification(ASPExchangeInformation):
 
     ASP_MOVEMENT_TYPE = MovementType.UPDATE
 
-    created_at = models.DateTimeField(
-        verbose_name="Date de création",
-        default=timezone.now,
-    )
-    updated_at = models.DateTimeField(
-        verbose_name="Date de modification",
-        auto_now=True,
-    )
+    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
+    updated_at = models.DateTimeField(verbose_name="Date de modification", auto_now=True)
     status = models.CharField(
         verbose_name="Statut",
         max_length=10,

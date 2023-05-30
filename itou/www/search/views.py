@@ -213,7 +213,7 @@ class JobDescriptionSearchView(EmployerSearchBaseView):
 
     def get_results_page(self, _siaes, job_descriptions):
         job_descriptions = job_descriptions.with_annotation_is_popular().order_by(
-            F("source_kind").asc(nulls_first=True), F("updated_at").asc(nulls_last=True), "-created_at"
+            F("source_kind").asc(nulls_first=True), "-updated_at", "-created_at"
         )
 
         return pager(job_descriptions, self.request.GET.get("page"), items_per_page=10)

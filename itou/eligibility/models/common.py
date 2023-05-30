@@ -52,7 +52,7 @@ class AbstractEligibilityDiagnosisModel(models.Model):
         on_delete=models.CASCADE,
     )
     created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now, db_index=True)
-    updated_at = models.DateTimeField(verbose_name="Date de modification", blank=True, null=True, db_index=True)
+    updated_at = models.DateTimeField(verbose_name="Date de modification", auto_now=True, db_index=True)
     expires_at = models.DateTimeField(verbose_name="Date d'expiration", db_index=True)
 
     class Meta:
@@ -62,7 +62,6 @@ class AbstractEligibilityDiagnosisModel(models.Model):
         return str(self.pk)
 
     def save(self, *args, **kwargs):
-        self.updated_at = timezone.now()
         if not self.expires_at:
             self.expires_at = self.created_at + relativedelta(months=self.EXPIRATION_DELAY_MONTHS)
         return super().save(*args, **kwargs)

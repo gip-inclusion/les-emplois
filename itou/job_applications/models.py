@@ -606,7 +606,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     )
 
     created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now, db_index=True)
-    updated_at = models.DateTimeField(verbose_name="Date de modification", blank=True, null=True, db_index=True)
+    # FIXME(rsebille): Remove the null=True. But beware, it will force PG to rewrite almost all the rows.
+    updated_at = models.DateTimeField(verbose_name="Date de modification", auto_now=True, db_index=True, null=True)
 
     # GEIQ only
     prehiring_guidance_days = models.PositiveSmallIntegerField(
@@ -713,7 +714,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 raise ValidationError("Le nombre d'heures par semaine ne peut être saisi que pour un GEIQ")
 
     def save(self, *args, **kwargs):
-        self.updated_at = timezone.now()
         self.full_clean()
         return super().save(*args, **kwargs)
 

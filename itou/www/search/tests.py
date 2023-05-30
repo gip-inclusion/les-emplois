@@ -351,7 +351,7 @@ class JobDescriptionSearchViewTest(TestCase):
         job1.save()
         response = self.client.get(self.url, {"city": guerande.slug})
         siaes_results = response.context["results_page"]
-        assert list(siaes_results) == [job2, job1, job3]
+        assert list(siaes_results) == [job1, job2, job3]
 
     def test_is_popular(self):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
