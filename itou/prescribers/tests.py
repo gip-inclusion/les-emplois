@@ -217,37 +217,28 @@ class PrescriberOrganizationModelTest(TestCase):
         API_INSEE_CONSUMER_SECRET="bar",
     )
     def test_update_prescriber_with_api_entreprise(self):
+        siret = ETABLISSEMENT_API_RESULT_MOCK["etablissement"]["siret"]
         respx.post(f"{settings.API_INSEE_BASE_URL}/token").mock(
             return_value=httpx.Response(200, json=INSEE_API_RESULT_MOCK)
         )
-
-        siret = ETABLISSEMENT_API_RESULT_MOCK["etablissement"]["siret"]
-        organization = PrescriberOrganizationFactory(siret=siret, is_head_office=False)
-
         respx.get(f"{settings.API_INSEE_SIRENE_BASE_URL}/siret/{siret}").mock(
             return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
         )
 
-        # updated_at is empty, an update is required
-        assert organization.updated_at is None
-        call_command("update_prescriber_organizations_with_api_entreprise", verbosity=0, days=7)
-        organization.refresh_from_db()
-        assert organization.updated_at is not None
-        assert organization.is_head_office
-
+        organization = PrescriberOrganizationFactory(siret=siret, is_head_office=False)
         old_updated_at = organization.updated_at
 
         # No update required
         call_command("update_prescriber_organizations_with_api_entreprise", verbosity=0, days=7)
         organization.refresh_from_db()
-        assert old_updated_at == organization.updated_at
-        assert organization.is_head_office
+        assert organization.updated_at == old_updated_at
+        assert organization.is_head_office is False
 
         # Force updated of latest records
         call_command("update_prescriber_organizations_with_api_entreprise", verbosity=0, days=0)
         organization.refresh_from_db()
-        assert old_updated_at != organization.updated_at
-        assert organization.is_head_office
+        assert organization.updated_at > old_updated_at
+        assert organization.is_head_office is True
 
 
 class PrescriberOrganizationAdminTest(TestCase):

@@ -726,7 +726,8 @@ class Suspension(models.Model):
         on_delete=models.SET_NULL,
         related_name="approvals_suspended_set",
     )
-    updated_at = models.DateTimeField(verbose_name="Date de modification", blank=True, null=True)
+    # FIXME(rsebille): Remove the null=True. But beware, it will force PG to rewrite almost all the rows.
+    updated_at = models.DateTimeField(verbose_name="Date de modification", auto_now=True, null=True)
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="Mis à jour par",
@@ -760,15 +761,6 @@ class Suspension(models.Model):
 
     def __str__(self):
         return f"{self.pk} {self.start_at.strftime('%d/%m/%Y')} - {self.end_at.strftime('%d/%m/%Y')}"
-
-    def save(self, *args, **kwargs):
-        """
-        The related Approval's end date is automatically pushed back/forth
-        with a PostgreSQL trigger: `trigger_update_approval_end_at`.
-        """
-        if self.pk:
-            self.updated_at = timezone.now()
-        super().save(*args, **kwargs)
 
     def clean(self):
         if self.reason == self.Reason.FORCE_MAJEURE and not self.reason_explanation:
@@ -1034,7 +1026,7 @@ class Prolongation(models.Model):
         on_delete=models.SET_NULL,
         related_name="approvals_prolongations_created_set",
     )
-    updated_at = models.DateTimeField(verbose_name="Date de modification", blank=True, null=True)
+    updated_at = models.DateTimeField(verbose_name="Date de modification", auto_now=True)
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="Mis à jour par",
@@ -1070,15 +1062,6 @@ class Prolongation(models.Model):
 
     def __str__(self):
         return f"{self.pk} {self.start_at.strftime('%d/%m/%Y')} - {self.end_at.strftime('%d/%m/%Y')}"
-
-    def save(self, *args, **kwargs):
-        """
-        The related Approval's end date is automatically pushed back/forth with
-        a PostgreSQL trigger: `trigger_update_approval_end_at_for_prolongation`.
-        """
-        if self.pk:
-            self.updated_at = timezone.now()
-        super().save(*args, **kwargs)
 
     def clean(self):
 

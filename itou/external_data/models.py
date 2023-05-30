@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib.postgres.fields import CIEmailField
 from django.db import models
-from django.utils.timezone import now
+from django.utils import timezone
 
 
 class ExternalDataImportQuerySet(models.QuerySet):
@@ -42,7 +42,7 @@ class ExternalDataImport(models.Model):
     )
 
     status = models.CharField(max_length=10, choices=STATUS_CHOICES)
-    created_at = models.DateTimeField(verbose_name="Date de création", default=now)
+    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
     source = models.CharField(
         max_length=20, verbose_name="Origine des données", choices=DATA_SOURCE_CHOICES, default=DATA_SOURCE_UNKNOWN
     )
@@ -71,7 +71,7 @@ class JobSeekerExternalData(models.Model):
         verbose_name = "Données externes pour un chercheur d'emploi"
         verbose_name_plural = "Données externes pour un chercheur d'emploi"
 
-    created_at = models.DateTimeField(default=now, verbose_name="Date de création")
+    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
 
     data_import = models.ForeignKey(ExternalDataImport, on_delete=models.CASCADE)
 
@@ -129,6 +129,6 @@ class RejectedEmailEventData(models.Model):
         (REASON_OTHER, "Non précisé par l’ESP"),
     )
 
-    created_at = models.DateTimeField(default=now, verbose_name="Date de création")
+    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
     recipient = CIEmailField("Adresse e-mail du destinataire", blank=True, db_index=True)
     reason = models.CharField("La raison du refus de l’envoi d’email", max_length=12, choices=REASON_CHOICES)

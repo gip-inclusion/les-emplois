@@ -30,7 +30,7 @@ class OIDConnectQuerySet(models.QuerySet):
 
 
 class OIDConnectState(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now, db_index=True)
     used_at = models.DateTimeField(verbose_name="Date d'utilisation", null=True)
     # Length used in call to get_random_string()
     csrf = models.CharField(max_length=12, unique=True)

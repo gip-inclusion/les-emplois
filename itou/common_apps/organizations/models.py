@@ -30,7 +30,7 @@ class OrganizationAbstract(models.Model):
 
     name = models.CharField(verbose_name="Nom", max_length=255)
     created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
-    updated_at = models.DateTimeField(verbose_name="Date de modification", blank=True, null=True)
+    updated_at = models.DateTimeField(verbose_name="Date de modification", auto_now=True)
 
     # This unique ID is supposed to used as a globally unique reference and should never be changed,
     # if the organization is supposed to be the same (even in the case of a change of address or SIRET)
@@ -50,11 +50,6 @@ class OrganizationAbstract(models.Model):
 
     class Meta:
         abstract = True
-
-    def save(self, *args, **kwargs):
-        if self.pk:
-            self.updated_at = timezone.now()
-        return super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.name}"
@@ -211,17 +206,12 @@ class MembershipAbstract(models.Model):
     is_admin = models.BooleanField(verbose_name="Administrateur", default=False)
     is_active = models.BooleanField("Rattachement actif", default=True)
     created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
-    updated_at = models.DateTimeField(verbose_name="Date de modification", null=True)
+    updated_at = models.DateTimeField(verbose_name="Date de modification", auto_now=True)
 
     objects = MembershipQuerySet.as_manager()
 
     class Meta:
         abstract = True
-
-    def save(self, *args, **kwargs):
-        if self.pk:
-            self.updated_at = timezone.now()
-        return super().save(*args, **kwargs)
 
     def deactivate_membership_by_user(self, updated_by):
         """

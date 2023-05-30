@@ -1719,7 +1719,6 @@ class JobApplicationAdminFormTest(TestCase):
             "transferred_by",
             "transferred_from",
             "created_at",
-            "updated_at",
             "prehiring_guidance_days",
             "contract_type",
             "nb_hours_per_week",

@@ -254,7 +254,7 @@ class DataInclusionPrescriberStructureTest(APITestCase):
                 "longitude": orga.longitude,
                 "latitude": orga.latitude,
                 "source": "",
-                "date_maj": _str_with_tz(orga.created_at),
+                "date_maj": _str_with_tz(orga.updated_at),
                 "antenne": False,
                 "lien_source": f"http://testserver{reverse('prescribers_views:card', kwargs={'org_id': orga.pk})}",
                 "horaires_ouverture": "",
@@ -276,7 +276,7 @@ class DataInclusionPrescriberStructureTest(APITestCase):
 
         assert response.status_code == 200
         structure_data = response.json()["results"][0]
-        assert structure_data["date_maj"] == _str_with_tz(orga.created_at)
+        assert structure_data["date_maj"] == _str_with_tz(orga.updated_at)
 
         orga.description = "lorem ipsum"
         orga.save()

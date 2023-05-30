@@ -569,7 +569,7 @@ class SiaeJobDescription(models.Model):
     appellation = models.ForeignKey("jobs.Appellation", on_delete=models.CASCADE)
     siae = models.ForeignKey(Siae, on_delete=models.CASCADE, related_name="job_description_through")
     created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
-    updated_at = models.DateTimeField(verbose_name="Date de modification", blank=True, null=True, db_index=True)
+    updated_at = models.DateTimeField(verbose_name="Date de modification", auto_now=True, db_index=True)
     is_active = models.BooleanField(verbose_name="Recrutement ouvert", default=True)
     custom_name = models.CharField(verbose_name="Nom personnalisé", blank=True, max_length=255)
     description = models.TextField(verbose_name="Description", blank=True)
@@ -635,11 +635,6 @@ class SiaeJobDescription(models.Model):
                     "other_contract_type": "Veuillez préciser le type de contrat.",
                 }
             )
-
-    def save(self, *args, **kwargs):
-        if self.pk:
-            self.updated_at = timezone.now()
-        return super().save(*args, **kwargs)
 
     @property
     def display_name(self):
@@ -794,7 +789,7 @@ class SiaeConvention(models.Model):
     )
 
     created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
-    updated_at = models.DateTimeField(verbose_name="Date de modification", blank=True, null=True)
+    updated_at = models.DateTimeField(verbose_name="Date de modification", auto_now=True)
 
     class Meta:
         verbose_name = "Convention"
@@ -806,11 +801,6 @@ class SiaeConvention(models.Model):
             # It is the only exception. Both structures are active.
             # ("siret_signature", "kind"),
         )
-
-    def save(self, *args, **kwargs):
-        if self.pk:
-            self.updated_at = timezone.now()
-        return super().save(*args, **kwargs)
 
     @property
     def siren_signature(self):
@@ -875,7 +865,7 @@ class SiaeFinancialAnnex(models.Model):
     end_at = models.DateTimeField(verbose_name="Date de fin d'effet")
 
     created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
-    updated_at = models.DateTimeField(verbose_name="Date de modification", blank=True, null=True)
+    updated_at = models.DateTimeField(verbose_name="Date de modification", auto_now=True)
 
     # A financial annex cannot exist without a convention, and
     # deleting a convention will delete all its financial annexes.
@@ -888,11 +878,6 @@ class SiaeFinancialAnnex(models.Model):
     class Meta:
         verbose_name = "Annexe financière"
         verbose_name_plural = "Annexes financières"
-
-    def save(self, *args, **kwargs):
-        if self.pk:
-            self.updated_at = timezone.now()
-        return super().save(*args, **kwargs)
 
     def __str__(self):
         return self.number
