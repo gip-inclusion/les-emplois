@@ -7,7 +7,7 @@ from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects, assertTemplateUsed
 
 from itou.approvals.factories import PoleEmploiApprovalFactory, SuspensionFactory
 from itou.approvals.models import Approval, Suspension
@@ -1921,3 +1921,17 @@ def test_details_for_siae_with_prior_action(client, with_geiq_diagnosis):
     # Check that a full reload gets us an equivalent HTML
     response = client.get(details_url)
     assertSoupEqual(parse_response_to_soup(response, selector="#main"), simulated_page)
+
+
+def test_precriber_details_with_older_valid_approval(client, faker):
+    # Ensure that the approval details are displayed for a prescriber
+    # when the job seeker has a valid approval created on an older approval
+    old_job_application = JobApplicationFactory(with_approval=True, hiring_start_at=faker.past_date(start_date="-3m"))
+    new_job_application = JobApplicationSentByPrescriberOrganizationFactory(job_seeker=old_job_application.job_seeker)
+    po_member = new_job_application.sender_prescriber_organization.members.first()
+    client.force_login(po_member)
+    response = client.get(
+        reverse("apply:details_for_prescriber", kwargs={"job_application_id": new_job_application.pk})
+    )
+    # Must display approval status template (tested in many other places)
+    assertTemplateUsed(response, template_name="approvals/includes/status.html")
