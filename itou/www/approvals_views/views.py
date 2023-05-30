@@ -69,14 +69,12 @@ class ApprovalDetailView(ApprovalBaseViewMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["can_view_personal_information"] = True  # SIAE members have access to personal info
+        context["can_edit_personal_information"] = self.request.user.can_edit_personal_information(self.object.user)
         context["approval_can_be_suspended_by_siae"] = self.object.can_be_suspended_by_siae(self.siae)
         context["hire_by_other_siae"] = not self.object.user.last_hire_was_made_by_siae(self.siae)
         context["approval_can_be_prolonged_by_siae"] = self.object.can_be_prolonged_by_siae(self.siae)
         job_application = self.get_job_application(self.object)
         context["job_application"] = job_application
-        context["can_edit_personal_information"] = job_application and self.request.user.can_edit_personal_information(
-            self.object.user
-        )
         context["matomo_custom_title"] = "Profil salarié"
         if job_application:
             context["eligibility_diagnosis"] = job_application.get_eligibility_diagnosis()
