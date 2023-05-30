@@ -851,6 +851,83 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
         assert not user.prescriberorganization_set.exists()
 
     @respx.mock
+    def test_non_prescriber_cant_join_organisation(self):
+        """
+        The organization creation didn't work.
+        The user is still created and can try again.
+        """
+        org = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.OTHER)
+        SiaeStaffFactory(email=OIDC_USERINFO["email"], with_siae=True)
+
+        response = self.client.get(reverse("signup:prescriber_check_already_exists"))
+        assert response.status_code == 200
+
+        session_signup_data = self.client.session.get(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+        # Jump over the last step to avoid double-testing each one
+        # as they are already tested on prescriber's signup views.
+        # Prescriber's signup process heavily relies on session data.
+        # Override only what's needed for our test.
+        # PrescriberOrganizationFactoy does not contain any address field
+        # so we can't use it.
+        prescriber_org_data = {
+            "siret": org.siret,
+            "is_head_office": True,
+            "name": org.name,
+            "address_line_1": "17 RUE JEAN DE LA FONTAINE",
+            "address_line_2": "",
+            "post_code": "13150",
+            "city": "TARASCON",
+            "department": "13",
+            "longitude": 4.660572,
+            "latitude": 43.805661,
+            "geocoding_score": 0.8178357293868921,
+        }
+        # Try creating an organization with same siret and same kind
+        # (it won't work because of the psql uniqueness constraint).
+        session_signup_data = session_signup_data | {
+            "authorization_status": "NOT_SET",
+            "kind": org.kind,
+            "prescriber_org_data": prescriber_org_data,
+        }
+
+        client_session = self.client.session
+        client_session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = session_signup_data
+        client_session.save()
+        signup_url = reverse("signup:prescriber_user")
+
+        response = self.client.get(signup_url)
+        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
+
+        # Connect with Inclusion Connect.
+        previous_url = signup_url
+        next_url = reverse("signup:prescriber_join_org")
+        response = mock_oauth_dance(
+            self.client,
+            KIND_PRESCRIBER,
+            assert_redirects=False,
+            previous_url=previous_url,
+            next_url=next_url,
+            register=False,
+        )
+        # Follow the redirection.
+        response = self.client.get(response.url, follow=True)
+        self.assertTemplateNotUsed(response, "welcoming_tour/prescriber.html")
+
+        # The user should be redirected to home page with a warning, the session isn't flushed
+        assert self.client.session.get(INCLUSION_CONNECT_SESSION_KEY)
+        assert auth.get_user(self.client).is_authenticated
+        self.assertRedirects(response, reverse("home:hp"))
+        assertMessages(
+            response,
+            [
+                (
+                    messages.ERROR,
+                    "Vous ne pouvez pas rejoindre une organisation avec ce compte car vous n'êtes pas prescripteur.",
+                )
+            ],
+        )
+
+    @respx.mock
     def test_employer_already_exists(self):
         """
         User is already a member of an SIAE.
