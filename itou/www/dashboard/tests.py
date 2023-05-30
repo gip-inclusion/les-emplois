@@ -585,6 +585,7 @@ class DashboardViewTest(TestCase):
         self.assertContains(response, format_approval_number(approval))
         self.assertContains(response, "Date de début : 21/06/2022")
         self.assertContains(response, "Nombre de jours restants sur le PASS IAE : 82 jours")
+        self.assertContains(response, "Date de fin prévisionnelle : 06/12/2022")
 
     @override_settings(TALLY_URL="http://tally.fake")
     def test_prescriber_with_authorization_pending_dashboard_must_contain_tally_link(self):
