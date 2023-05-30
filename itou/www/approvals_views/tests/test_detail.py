@@ -169,14 +169,38 @@ class TestApprovalDetailView:
         )
 
         url = reverse("approvals:detail", kwargs={"pk": approval.pk})
-        # FIXME(cms)
-        # There is a problem with queries numbers in this view but I was unable to resolve it quickly.
-        # The problem seems to be in templates/apply/includes/eligibility_diagnosis.html.
-        expected_num_queries += (
-            4  # `eligibility_diagnosis.considered_to_expire_at`
+        expected_num_queries = (
+            1  # fetch django session
+            + 1  # fetch authenticated user
+            + 1  # verify user is active (middleware)
+            + 1  # fetch siae infos (middleware)
+            + 1  # get approval infos (get_object)
+            # get_context_data
+            + 1  # approval.suspension_set.end_at >= today >= approval.suspension_set.start_at (.can_be_suspended)
+            + 1  # job_application.with_accepted_at annotation coming from (.last_hire_was_made_by_siae)
+            + 1  # siae infos (.last_hire_was_made_by_siae)
+            + 1  # user approvals (.is_last_for_user)
+            + 1  # get_job_application
+            + 1  # siae infos (job_application.get_eligibility_diagnosis())
+            # context processors
+            + 1  # siae membership (get_context_siae)
+            # template: approvals/includes/status.html
+            + 1  # template: approval.remainder fetches approval suspensions to compute remaining days
+            + 1  # template: approval.suspensions_for_status_card lists approval suspensions
+            + 1  # template: approval.prolongations_for_status_card
+            # template: apply/includes/job_seeker_info.html
+            + 1  # get job_seeker information (job_application.job_seeker)
+            # template: eligibility_diagnosis.html
+            + 1  # prescribers_prescriberorganization (job_application.is_sent_by_authorized_prescriber)
+            + 1  # get user infos (eligibility_diagnosis.author.get_full_name)
             + 1  # eligibility_diagnosis.administrative_criteria.all
-            + 1  # ?
+            + 3  # approval: eligibility_diagnosis.considered_to_expire_at/has_valid_common_approval
+            # template: approvals/detail.html
+            + 2  # all_job_applications with prefetch selected_jobs
+            # template: approvals/includes/job_description_list.html
+            + 1  # prescriberorganization: job_application.sender_prescriber_organization
         )
+
         with assertNumQueries(expected_num_queries):  # pylint: disable=not-context-manager
             response = client.get(url)
 
