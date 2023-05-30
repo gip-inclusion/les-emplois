@@ -54,7 +54,6 @@ class ApplyTest(TestCase):
     def test_we_raise_a_permission_denied_on_missing_session(self):
         routes = {
             "apply:check_nir_for_sender",
-            "apply:check_email_for_sender",
             "apply:check_nir_for_job_seeker",
             "apply:step_check_job_seeker_info",
             "apply:step_check_prev_applications",
@@ -64,7 +63,6 @@ class ApplyTest(TestCase):
         }
         routes_without_job_seeker_pk = {
             "apply:check_nir_for_sender",
-            "apply:check_email_for_sender",
             "apply:check_nir_for_job_seeker",
         }
         user = JobSeekerFactory()

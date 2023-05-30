@@ -17,11 +17,6 @@ urlpatterns = [
     ),
     path("<int:siae_pk>/sender/check_nir", submit_views.CheckNIRForSenderView.as_view(), name="check_nir_for_sender"),
     path(
-        "<int:siae_pk>/sender/check_email",
-        submit_views.CheckEmailForSenderView.as_view(),
-        name="check_email_for_sender",
-    ),
-    path(
         "<int:siae_pk>/sender/search-by-email/<uuid:session_uuid>",
         submit_views.SearchByEmailForSenderView.as_view(),
         name="search_by_email_for_sender",
