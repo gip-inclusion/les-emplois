@@ -47,7 +47,8 @@ class JobApplicationInline(admin.StackedInline):
     @admin.display(description="SIAE destinataire")
     def to_siae_link(self, obj):
         return mark_safe(
-            get_admin_view_link(obj.to_siae, content=obj.to_siae.display_name) + f" — SIRET : {obj.to_siae.siret}"
+            get_admin_view_link(obj.to_siae, content=obj.to_siae.display_name)
+            + f" — SIRET : {obj.to_siae.siret} ({obj.to_siae.kind})"
         )
 
     # Custom read-only fields as workaround :
