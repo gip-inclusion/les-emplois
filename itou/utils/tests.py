@@ -60,6 +60,7 @@ from itou.utils.validators import (
     validate_af_number,
     validate_birthdate,
     validate_code_safir,
+    validate_html,
     validate_naf,
     validate_nir,
     validate_pole_emploi_id,
@@ -390,6 +391,14 @@ class UtilsValidatorsTest(TestCase):
         validate_af_number("AI088160001A1M1")
         validate_af_number("ETTI080180002A1M1")
         validate_af_number("ETTI59L181001A1M1")
+
+    def test_validate_html(self):
+        validate_html("<h1>I'm valid!</h1>")
+        with pytest.raises(ValidationError):
+            validate_html("<div>Oops! Someone forgot to close me...")
+
+        with pytest.raises(ValidationError):
+            validate_html("<script>$('.green');</script>")
 
 
 class UtilsTemplateTagsTestCase(TestCase):

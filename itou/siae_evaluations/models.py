@@ -17,6 +17,7 @@ from itou.siaes.models import Siae
 from itou.users.enums import KIND_SIAE_STAFF
 from itou.utils.emails import send_email_messages
 from itou.utils.models import InclusiveDateRangeField
+from itou.utils.validators import validate_html
 
 from .constants import CAMPAIGN_VIEWABLE_DURATION
 
@@ -169,6 +170,9 @@ class EvaluationCampaign(models.Model):
     calendar = models.ForeignKey(
         Calendar,
         on_delete=models.SET_NULL,
+        validators=[
+            validate_html,
+        ],
         verbose_name="Calendrier",
         null=True,
     )
