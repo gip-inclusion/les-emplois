@@ -4093,3 +4093,9 @@ class InstitutionCalendarViewTest(TestCase):
         response = self.client.get(calendar_url)
         assert response.status_code == 200
         self.assertContains(response, calendar_html)
+
+        # Old campaigns don't have a calendar.
+        evaluation_campaign.calendar.delete()
+        response = self.client.get(reverse("dashboard:index"))
+        assert response.status_code == 200
+        self.assertNotContains(response, calendar_url)
