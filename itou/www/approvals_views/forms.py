@@ -104,7 +104,7 @@ class DeclareProlongationForm(forms.ModelForm):
         if not self.instance.pk:
             self.instance.declared_by_siae = self.siae
             # `start_at` should begin just after the approval. It cannot be set by the user.
-            self.instance.start_at = Prolongation.get_start_at(self.approval)
+            self.instance.start_at = self.approval.end_at
             self.instance.end_at = None
             # `approval` must be set before model validation to avoid violating a not-null constraint.
             self.instance.approval = self.approval

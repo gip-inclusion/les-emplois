@@ -59,7 +59,7 @@ class ApprovalProlongationTest(S3AccessingTestCase):
         # is triggered from within the form validation step with the right data.
         assert form.instance.declared_by_siae == self.siae
         assert form.instance.approval == self.approval
-        assert form.instance.start_at == Prolongation.get_start_at(self.approval)
+        assert form.instance.start_at == self.approval.end_at
 
     def test_prolong_approval_view(self):
         """

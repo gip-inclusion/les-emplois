@@ -1172,7 +1172,7 @@ class Prolongation(models.Model):
             raise ValidationError("Cet utilisateur n'est pas un prescripteur habilité.")
 
         # Avoid blocking updates in admin by limiting this check to only new instances.
-        if not self.pk and self.start_at != self.get_start_at(self.approval):
+        if not self.pk and self.start_at != self.approval.end_at:
             raise ValidationError(
                 "La date de début doit être la même que la date de fin du PASS IAE "
                 f"« {self.approval.end_at.strftime('%d/%m/%Y')} »."
@@ -1234,13 +1234,6 @@ class Prolongation(models.Model):
             "approval": self.approval,
         }
         return self._meta.model.objects.exclude(pk=self.pk).filter(**filter_args)
-
-    @staticmethod
-    def get_start_at(approval):
-        """
-        Returns the start date of the prolongation.
-        """
-        return approval.end_at
 
     @staticmethod
     def get_max_end_at(start_at, reason=None):

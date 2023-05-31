@@ -1505,15 +1505,6 @@ class ProlongationModelTest(TestCase):
         with pytest.raises(ValidationError, match="La date de fin de prolongation est obligatoire."):
             prolongation.clean()
 
-    def test_get_start_at(self):
-
-        end_at = datetime.date(2021, 2, 1)
-        start_at = end_at - relativedelta(years=2)
-        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-
-        prolongation_start_at = Prolongation.get_start_at(approval)
-        assert prolongation_start_at == end_at
-
     def test_get_max_end_at(self):
 
         start_at = datetime.date(2021, 2, 1)
