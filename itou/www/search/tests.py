@@ -12,7 +12,7 @@ from itou.prescribers.factories import PrescriberOrganizationFactory
 from itou.siaes.enums import POLE_EMPLOI_SIRET, ContractNature, ContractType, JobSource, SiaeKind
 from itou.siaes.factories import SiaeFactory, SiaeJobDescriptionFactory
 from itou.siaes.models import Siae
-from itou.utils.test import TestCase
+from itou.utils.test import BASE_NUM_QUERIES, TestCase
 from itou.www.test import NUM_CSRF_SESSION_REQUESTS
 
 
@@ -45,7 +45,8 @@ class SearchSiaeTest(TestCase):
 
         # Filter on city
         with self.assertNumQueries(
-            1  # select the city
+            BASE_NUM_QUERIES
+            + 1  # select the city
             + 1  # fetch initial SIAES (to extract the filters afterwards)
             + 2  # two counts for the tab headers
             + 1  # actual select of the SIAEs, with related objects and annotated distance
@@ -150,7 +151,8 @@ class SearchSiaeTest(TestCase):
         created_siaes.append(siae)
 
         with self.assertNumQueries(
-            1  # find city
+            BASE_NUM_QUERIES
+            + 1  # find city
             + 1  # find siaes
             + 1  # count siaes
             + 1  # count job descriptions
@@ -235,7 +237,8 @@ class JobDescriptionSearchViewTest(TestCase):
 
         # Filter on city
         with self.assertNumQueries(
-            1  # select the city
+            BASE_NUM_QUERIES
+            + 1  # select the city
             + 1  # fetch initial job descriptions to add to the form fields
             + 2  # count the number of results for siaes & job descriptions
             + 1  # select the job descriptions for the page

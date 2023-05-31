@@ -31,7 +31,7 @@ from itou.users.enums import KIND_SIAE_STAFF
 from itou.users.factories import JobSeekerFactory
 from itou.utils.perms.user import UserInfo
 from itou.utils.templatetags.format_filters import format_approval_number
-from itou.utils.test import TestCase, assertMessages
+from itou.utils.test import BASE_NUM_QUERIES, TestCase, assertMessages
 from itou.utils.types import InclusiveDateRange
 from itou.www.siae_evaluations_views.forms import LaborExplanationForm, SetChosenPercentForm
 
@@ -88,7 +88,6 @@ class SamplesSelectionViewTest(TestCase):
         self.url = reverse("siae_evaluations_views:samples_selection")
 
     def test_access(self):
-
         response = self.client.get(self.url)
         assert response.status_code == 302
 
@@ -558,7 +557,8 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         )
 
         with self.assertNumQueries(
-            1  # django session
+            BASE_NUM_QUERIES
+            + 1  # django session
             + 1  # fetch user
             + 3  # fetch institution membership & institution x 2 !should be fixed!
             + 1  # fetch evaluation campaign
@@ -1461,7 +1461,8 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
 
         with self.assertNumQueries(
-            1  # django session
+            BASE_NUM_QUERIES
+            + 1  # django session
             + 1  # fetch user
             + 3  # fetch institution membership & institution x 2 !should be fixed!
             + 6  # fetch evaluated_siae and its prefetch_related
@@ -1715,7 +1716,8 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
         evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=campaign, siae=siae)
         self.login(evaluated_siae)
         with self.assertNumQueries(
-            1  # Load session
+            BASE_NUM_QUERIES
+            + 1  # Load session
             + 4  # Check user, membership, institution & institution membership (!)
             + 1  # Load evaluated siae infos
             + 1  # Load evaluated job applications
@@ -3371,7 +3373,8 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
             kwargs={"evaluated_job_application_pk": evaluated_administrative_criteria.evaluated_job_application.pk},
         )
         with self.assertNumQueries(
-            1  # django session
+            BASE_NUM_QUERIES
+            + 1  # django session
             + 1  # fetch user
             + 3  # fetch institution membership & institution x 2 !should be fixed!
             + 5  # fetch evaluated_siae and its prefetch_related (evalcriteria, admincriteria, jobapp, approval)

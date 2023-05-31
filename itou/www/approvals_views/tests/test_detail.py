@@ -101,9 +101,11 @@ class TestApprovalDetailView:
             + 1  # fetch authenticated user
             + 1  # verify user is active (middleware)
             + 2  # fetch siae membership and siae infos (middleware)
+            + 1  # place savepoint right after the middlewares
             + 1  # job_seeker.approval
             + 1  # approval.suspension_set.end_at >= today
             + 1  # job_application.with_accepted_at annotation coming from next query
+            + 1  # release savepoint before the template rendering
             + 1  # template: Suspension.can_be_handled_by_siae >> User.last_accepted_job_application
             + 1  # template: job_application.get_eligibility_diagnosis => Siae.is_subject_to_eligibility_rules
             + 1  # template: approval.remainder fetches approval suspensions to compute remaining days.
@@ -174,6 +176,7 @@ class TestApprovalDetailView:
             + 1  # fetch authenticated user
             + 1  # verify user is active (middleware)
             + 1  # fetch siae infos (middleware)
+            + 1  # place savepoint right after the middlewares
             + 1  # get approval infos (get_object)
             # get_context_data
             + 1  # approval.suspension_set.end_at >= today >= approval.suspension_set.start_at (.can_be_suspended)
@@ -184,6 +187,7 @@ class TestApprovalDetailView:
             + 1  # siae infos (job_application.get_eligibility_diagnosis())
             # context processors
             + 1  # siae membership (get_context_siae)
+            + 1  # release savepoint before the template rendering
             # template: approvals/includes/status.html
             + 1  # template: approval.remainder fetches approval suspensions to compute remaining days
             + 1  # template: approval.suspensions_for_status_card lists approval suspensions
