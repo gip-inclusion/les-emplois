@@ -54,6 +54,8 @@ RUN apt-get update && apt-get install -y \
     gettext \
     git \
     postgresql-client-$PG_MAJOR \
+    jq \
+    moreutils \
     --no-install-recommends
 
 # Requirements are installed here to ensure they will be cached.
