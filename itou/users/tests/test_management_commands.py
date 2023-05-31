@@ -248,6 +248,7 @@ class TestSyncPermsTestCase(TestCase):
             "add_prescriberorganization",
             "change_prescriberorganization",
             "view_prescriberorganization",
+            "view_calendar",
             "view_evaluatedadministrativecriteria",
             "view_evaluatedjobapplication",
             "view_evaluatedsiae",
