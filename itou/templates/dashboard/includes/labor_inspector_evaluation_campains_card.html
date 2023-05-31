@@ -22,13 +22,15 @@
                                 </a>
                             {% endif %}
                         </li>
-                        <li class="d-flex justify-content-between align-items-center mb-3">
-                            <a href="{% url 'siae_evaluations_views:campaign_calendar' active_campaign.pk %}" class="btn-link btn-ico">
-                                {% comment %} TODO(cms): change icon {% endcomment %}
-                                <i class="ri-list-check-3 ri-lg font-weight-normal"></i>
-                                <span>Calendrier</span>
-                            </a>
-                        </li>
+                        {% if active_campaign.calendar %}
+                            <li class="d-flex justify-content-between align-items-center mb-3">
+                                <a href="{% url 'siae_evaluations_views:campaign_calendar' active_campaign.pk %}" class="btn-link btn-ico">
+                                    {% comment %} TODO(cms): change icon {% endcomment %}
+                                    <i class="ri-list-check-3 ri-lg font-weight-normal"></i>
+                                    <span>Calendrier</span>
+                                </a>
+                            </li>
+                        {% endif %}
                     {% endfor %}
                 </ul>
             {% endif %}
