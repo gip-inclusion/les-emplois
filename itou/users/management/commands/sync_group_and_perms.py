@@ -64,6 +64,7 @@ def get_permissions_dict():
             siaes_models.SiaeFinancialAnnex: PERMS_READ,
             siaes_models.SiaeJobDescription: PERMS_ALL,
             siaes_models.SiaeMembership: PERMS_ALL,
+            siae_evaluations_models.Calendar: PERMS_READ,
             siae_evaluations_models.EvaluationCampaign: PERMS_READ,
             siae_evaluations_models.EvaluatedSiae: PERMS_READ,
             siae_evaluations_models.EvaluatedJobApplication: PERMS_READ,
