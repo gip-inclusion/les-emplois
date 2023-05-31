@@ -1,6 +1,7 @@
 import datetime
 import re
 
+import html5lib
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
@@ -112,3 +113,13 @@ def validate_af_number(af_number):
     prefix = af_number[:-4]  # all but last 4 characters
     if not any([re.match(r, prefix) for r in AF_NUMBER_PREFIX_REGEXPS]):
         raise ValidationError("Préfixe de numéro d'AF incorrect.")
+
+
+def validate_html(html):
+    if "<script" in html:
+        raise ValidationError("Balise script interdite.")
+
+    try:
+        html5lib.HTMLParser(strict=True).parseFragment(html)
+    except html5lib.html5parser.ParseError as exc:
+        raise ValidationError("HTML invalide.") from exc
