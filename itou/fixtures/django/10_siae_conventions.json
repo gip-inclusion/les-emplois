@@ -23042,7 +23042,7 @@
   {
     "fields": {
       "asp_id": 1537,
-      "created_at": "2020-12-18T10:39:06.000Z",
+      "created_at": "2020-12-18T10:39:06Z",
       "deactivated_at": null,
       "is_active": true,
       "kind": "AI",
@@ -35537,7 +35537,7 @@
   {
     "fields": {
       "asp_id": 2370,
-      "created_at": "2020-12-18T10:39:34.000Z",
+      "created_at": "2020-12-18T10:39:34Z",
       "deactivated_at": null,
       "is_active": true,
       "kind": "EI",
@@ -48917,7 +48917,7 @@
   {
     "fields": {
       "asp_id": 3262,
-      "created_at": "2020-12-18T10:40:03.000Z",
+      "created_at": "2020-12-18T10:40:03Z",
       "deactivated_at": null,
       "is_active": true,
       "kind": "ETTI",

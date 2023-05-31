@@ -6,7 +6,7 @@
       "name": "AIN",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 1
   },
   {
@@ -16,7 +16,7 @@
       "name": "AISNE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 2
   },
   {
@@ -26,7 +26,7 @@
       "name": "ALLIER",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 3
   },
   {
@@ -36,7 +36,7 @@
       "name": "ALPES-DE-HAUTE-PROVENCE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 4
   },
   {
@@ -46,7 +46,7 @@
       "name": "HAUTES-ALPES",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 5
   },
   {
@@ -56,7 +56,7 @@
       "name": "ALPES-MARITIMES",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 6
   },
   {
@@ -66,7 +66,7 @@
       "name": "ARDECHE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 7
   },
   {
@@ -76,7 +76,7 @@
       "name": "ARDENNES",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 8
   },
   {
@@ -86,7 +86,7 @@
       "name": "ARIEGE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 9
   },
   {
@@ -96,7 +96,7 @@
       "name": "AUBE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 10
   },
   {
@@ -106,7 +106,7 @@
       "name": "AUDE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 11
   },
   {
@@ -116,7 +116,7 @@
       "name": "AVEYRON",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 12
   },
   {
@@ -126,7 +126,7 @@
       "name": "BOUCHES-DU-RHONE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 13
   },
   {
@@ -136,7 +136,7 @@
       "name": "CALVADOS",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 14
   },
   {
@@ -146,7 +146,7 @@
       "name": "CANTAL",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 15
   },
   {
@@ -156,7 +156,7 @@
       "name": "CHARENTE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 16
   },
   {
@@ -166,7 +166,7 @@
       "name": "CHARENTE-MARITIME",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 17
   },
   {
@@ -176,7 +176,7 @@
       "name": "CHER",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 18
   },
   {
@@ -186,7 +186,7 @@
       "name": "CORREZE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 19
   },
   {
@@ -196,7 +196,7 @@
       "name": "CORSE-DU-SUD",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 20
   },
   {
@@ -206,7 +206,7 @@
       "name": "HAUTE-CORSE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 21
   },
   {
@@ -216,7 +216,7 @@
       "name": "CORSE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 22
   },
   {
@@ -226,7 +226,7 @@
       "name": "COTE-D'OR",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 23
   },
   {
@@ -236,7 +236,7 @@
       "name": "COTES-D'ARMOR",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 24
   },
   {
@@ -246,7 +246,7 @@
       "name": "CREUSE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 25
   },
   {
@@ -256,7 +256,7 @@
       "name": "DORDOGNE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 26
   },
   {
@@ -266,7 +266,7 @@
       "name": "DOUBS",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 27
   },
   {
@@ -276,7 +276,7 @@
       "name": "DROME",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 28
   },
   {
@@ -286,7 +286,7 @@
       "name": "EURE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 29
   },
   {
@@ -296,7 +296,7 @@
       "name": "EURE-ET-LOIR",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 30
   },
   {
@@ -306,7 +306,7 @@
       "name": "FINISTERE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 31
   },
   {
@@ -316,7 +316,7 @@
       "name": "GARD",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 32
   },
   {
@@ -326,7 +326,7 @@
       "name": "HAUTE-GARONNE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 33
   },
   {
@@ -336,7 +336,7 @@
       "name": "GERS",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 34
   },
   {
@@ -346,7 +346,7 @@
       "name": "GIRONDE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 35
   },
   {
@@ -356,7 +356,7 @@
       "name": "HERAULT",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 36
   },
   {
@@ -366,7 +366,7 @@
       "name": "ILLE-ET-VILAINE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 37
   },
   {
@@ -376,7 +376,7 @@
       "name": "INDRE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 38
   },
   {
@@ -386,7 +386,7 @@
       "name": "INDRE-ET-LOIRE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 39
   },
   {
@@ -396,7 +396,7 @@
       "name": "ISERE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 40
   },
   {
@@ -406,7 +406,7 @@
       "name": "JURA",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 41
   },
   {
@@ -416,7 +416,7 @@
       "name": "LANDES",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 42
   },
   {
@@ -426,7 +426,7 @@
       "name": "LOIR-ET-CHER",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 43
   },
   {
@@ -436,7 +436,7 @@
       "name": "LOIRE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 44
   },
   {
@@ -446,7 +446,7 @@
       "name": "HAUTE-LOIRE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 45
   },
   {
@@ -456,7 +456,7 @@
       "name": "LOIRE-ATLANTIQUE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 46
   },
   {
@@ -466,7 +466,7 @@
       "name": "LOIRET",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 47
   },
   {
@@ -476,7 +476,7 @@
       "name": "LOT",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 48
   },
   {
@@ -486,7 +486,7 @@
       "name": "LOT-ET-GARONNE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 49
   },
   {
@@ -496,7 +496,7 @@
       "name": "LOZERE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 50
   },
   {
@@ -506,7 +506,7 @@
       "name": "MAINE-ET-LOIRE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 51
   },
   {
@@ -516,7 +516,7 @@
       "name": "MANCHE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 52
   },
   {
@@ -526,7 +526,7 @@
       "name": "MARNE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 53
   },
   {
@@ -536,7 +536,7 @@
       "name": "HAUTE-MARNE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 54
   },
   {
@@ -546,7 +546,7 @@
       "name": "MAYENNE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 55
   },
   {
@@ -556,7 +556,7 @@
       "name": "MEURTHE-ET-MOSELLE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 56
   },
   {
@@ -566,7 +566,7 @@
       "name": "MEUSE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 57
   },
   {
@@ -576,7 +576,7 @@
       "name": "MORBIHAN",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 58
   },
   {
@@ -586,7 +586,7 @@
       "name": "MOSELLE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 59
   },
   {
@@ -596,7 +596,7 @@
       "name": "NIEVRE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 60
   },
   {
@@ -606,7 +606,7 @@
       "name": "NORD",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 61
   },
   {
@@ -616,7 +616,7 @@
       "name": "OISE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 62
   },
   {
@@ -626,7 +626,7 @@
       "name": "ORNE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 63
   },
   {
@@ -636,7 +636,7 @@
       "name": "PAS-DE-CALAIS",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 64
   },
   {
@@ -646,7 +646,7 @@
       "name": "PUY-DE-DOME",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 65
   },
   {
@@ -656,7 +656,7 @@
       "name": "PYRENEES-ATLANTIQUES",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 66
   },
   {
@@ -666,7 +666,7 @@
       "name": "HAUTES-PYRENEES",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 67
   },
   {
@@ -676,7 +676,7 @@
       "name": "PYRENEES-ORIENTALES",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 68
   },
   {
@@ -686,7 +686,7 @@
       "name": "BAS-RHIN",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 69
   },
   {
@@ -696,7 +696,7 @@
       "name": "HAUT-RHIN",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 70
   },
   {
@@ -706,7 +706,7 @@
       "name": "RHONE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 71
   },
   {
@@ -716,7 +716,7 @@
       "name": "HAUTE-SAONE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 72
   },
   {
@@ -726,7 +726,7 @@
       "name": "SAONE-ET-LOIRE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 73
   },
   {
@@ -736,7 +736,7 @@
       "name": "SARTHE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 74
   },
   {
@@ -746,7 +746,7 @@
       "name": "SAVOIE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 75
   },
   {
@@ -756,7 +756,7 @@
       "name": "HAUTE-SAVOIE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 76
   },
   {
@@ -766,7 +766,7 @@
       "name": "PARIS",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 77
   },
   {
@@ -776,7 +776,7 @@
       "name": "SEINE-MARITIME",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 78
   },
   {
@@ -786,7 +786,7 @@
       "name": "SEINE-ET-MARNE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 79
   },
   {
@@ -796,7 +796,7 @@
       "name": "YVELINES",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 80
   },
   {
@@ -806,7 +806,7 @@
       "name": "DEUX-SEVRES",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 81
   },
   {
@@ -816,7 +816,7 @@
       "name": "SOMME",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 82
   },
   {
@@ -826,7 +826,7 @@
       "name": "TARN",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 83
   },
   {
@@ -836,7 +836,7 @@
       "name": "TARN-ET-GARONNE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 84
   },
   {
@@ -846,7 +846,7 @@
       "name": "VAR",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 85
   },
   {
@@ -856,7 +856,7 @@
       "name": "VAUCLUSE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 86
   },
   {
@@ -866,7 +866,7 @@
       "name": "VENDEE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 87
   },
   {
@@ -876,7 +876,7 @@
       "name": "VIENNE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 88
   },
   {
@@ -886,7 +886,7 @@
       "name": "HAUTE-VIENNE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 89
   },
   {
@@ -896,7 +896,7 @@
       "name": "VOSGES",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 90
   },
   {
@@ -906,7 +906,7 @@
       "name": "YONNE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 91
   },
   {
@@ -916,7 +916,7 @@
       "name": "TERRITOIRE DE BELFORT",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 92
   },
   {
@@ -926,7 +926,7 @@
       "name": "ESSONNE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 93
   },
   {
@@ -936,7 +936,7 @@
       "name": "HAUTS-DE-SEINE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 94
   },
   {
@@ -946,7 +946,7 @@
       "name": "SEINE-SAINT-DENIS",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 95
   },
   {
@@ -956,7 +956,7 @@
       "name": "VAL-DE-MARNE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 96
   },
   {
@@ -966,7 +966,7 @@
       "name": "VAL-D'OISE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 97
   },
   {
@@ -976,7 +976,7 @@
       "name": "TOM",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 98
   },
   {
@@ -986,7 +986,7 @@
       "name": "ETRANGER",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 99
   },
   {
@@ -996,7 +996,7 @@
       "name": "GUADELOUPE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 100
   },
   {
@@ -1006,7 +1006,7 @@
       "name": "MARTINIQUE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 101
   },
   {
@@ -1016,7 +1016,7 @@
       "name": "GUYANE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 102
   },
   {
@@ -1026,7 +1026,7 @@
       "name": "REUNION",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 103
   },
   {
@@ -1036,7 +1036,7 @@
       "name": "SAINT-PIERRE-ET-MIQUELON",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 104
   },
   {
@@ -1046,7 +1046,7 @@
       "name": "MAYOTTE",
       "start_date": "1900-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 105
   },
   {
@@ -1056,7 +1056,7 @@
       "name": "SAINT-BARTHELEMY",
       "start_date": "2007-02-27"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 106
   },
   {
@@ -1066,7 +1066,7 @@
       "name": "SAINT-MARTIN",
       "start_date": "2007-02-27"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 107
   },
   {
@@ -1076,7 +1076,7 @@
       "name": "TERRES AUSTRALES ET ANTARCTIQUES FRANÇAISES",
       "start_date": "1985-03-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 108
   },
   {
@@ -1086,7 +1086,7 @@
       "name": "NOUVELLE-CALEDONIE",
       "start_date": "1982-03-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 109
   },
   {
@@ -1096,7 +1096,7 @@
       "name": "ILE DE CLIPPERTON",
       "start_date": "2008-01-01"
     },
-    "model": "asp.Department",
+    "model": "asp.department",
     "pk": 110
   }
 ]
