@@ -2167,7 +2167,6 @@ class UpdateJobSeekerViewTestCase(TestCase):
         }
         assert self.client.session[self.job_seeker_session_key] == expected_job_seeker_session
         self.job_seeker.refresh_from_db()
-        assert not self.job_seeker.has_jobseeker_profile
 
         # If you go back to step 3, new data is shown
         response = self.client.get(self.step_3_url)
@@ -2264,7 +2263,6 @@ class UpdateJobSeekerViewTestCase(TestCase):
         }
         assert self.client.session[self.job_seeker_session_key] == expected_job_seeker_session
         self.job_seeker.refresh_from_db()
-        assert not self.job_seeker.has_jobseeker_profile
 
         # If you go back to step 3, new data is shown
         response = self.client.get(self.step_3_url)
@@ -2384,8 +2382,7 @@ class UpdateJobSeekerViewTestCase(TestCase):
 class UpdateJobSeekerStep3ViewTestCase(TestCase):
     def test_job_seeker_with_profile_has_check_boxes_ticked_in_step3(self):
         siae = SiaeFactory(subject_to_eligibility=True, with_membership=True)
-        job_seeker = JobSeekerFactory()
-        JobSeekerProfileFactory(user=job_seeker, ass_allocation_since=AllocationDuration.FROM_6_TO_11_MONTHS)
+        job_seeker = JobSeekerFactory(jobseeker_profile__ass_allocation_since=AllocationDuration.FROM_6_TO_11_MONTHS)
 
         self.client.force_login(siae.members.first())
         apply_session = SessionNamespace(self.client.session, f"job_application-{siae.pk}")

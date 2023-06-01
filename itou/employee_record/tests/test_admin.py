@@ -64,7 +64,7 @@ def test_schedule_approval_update_notification_when_other_than_new_notification_
 
 
 def test_job_seeker_profile_from_employee_record(admin_client):
-    er = factories.EmployeeRecordFactory()
+    er = factories.EmployeeRecordFactory(job_application__job_seeker__jobseeker_profile=False)
     job_seeker = er.job_application.job_seeker
     employee_record_view_url = reverse("admin:employee_record_employeerecord_change", args=[er.pk])
     add_jobseeker_profile_url = f"{reverse('admin:users_jobseekerprofile_add')}?user={job_seeker.pk}"

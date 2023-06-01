@@ -33,7 +33,6 @@ from itou.job_applications.factories import (
     JobApplicationSentByPrescriberOrganizationFactory,
     JobApplicationSentBySiaeFactory,
     JobApplicationWithApprovalNotCancellableFactory,
-    JobApplicationWithJobSeekerProfileFactory,
     JobApplicationWithoutApprovalFactory,
 )
 from itou.job_applications.models import JobApplication, JobApplicationTransitionLog, JobApplicationWorkflow
@@ -498,7 +497,7 @@ class JobApplicationQuerySetTest(TestCase):
         assert job_app in JobApplication.objects.eligible_as_employee_record(job_app.to_siae)
 
         # After employee record creation
-        job_app = JobApplicationWithJobSeekerProfileFactory()
+        job_app = JobApplicationWithApprovalNotCancellableFactory()
         employee_record = EmployeeRecordFactory(
             job_application=job_app,
             asp_id=job_app.to_siae.convention.asp_id,

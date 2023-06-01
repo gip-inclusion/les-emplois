@@ -117,6 +117,7 @@ class JobSeekerSignupTest(TestCase):
         job_seeker = User.objects.get(email=post_data["email"])
         assert nir == job_seeker.nir
         assert job_seeker.title == "M"
+        assert job_seeker.has_jobseeker_profile
 
     def test_job_seeker_temporary_nir(self):
         """
@@ -171,6 +172,7 @@ class JobSeekerSignupTest(TestCase):
         job_seeker = User.objects.get(email=post_data["email"])
         assert job_seeker.nir == ""
         assert job_seeker.title == "M"
+        assert job_seeker.has_jobseeker_profile
 
     def test_job_seeker_signup(self):
         """Job-seeker signup."""
@@ -212,6 +214,7 @@ class JobSeekerSignupTest(TestCase):
         assert user.username == uuid.UUID(user.username, version=4).hex
         assert user.kind == UserKind.JOB_SEEKER
         assert user.title == "M"
+        assert user.has_jobseeker_profile
 
         # Check `EmailAddress` state.
         assert user.emailaddress_set.count() == 1
@@ -290,6 +293,7 @@ class JobSeekerSignupTest(TestCase):
         mock_oauth_dance(self.client)
         job_seeker = User.objects.get(email=FC_USERINFO["email"])
         assert nir == job_seeker.nir
+        assert job_seeker.has_jobseeker_profile
 
     @respx.mock
     @override_settings(
@@ -314,3 +318,4 @@ class JobSeekerSignupTest(TestCase):
         mock_oauth_dance(self.client)
         job_seeker = User.objects.get(email=FC_USERINFO["email"])
         assert not job_seeker.nir
+        assert job_seeker.has_jobseeker_profile

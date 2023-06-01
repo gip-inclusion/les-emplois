@@ -638,7 +638,9 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
             messages.error(request, " ".join(e.messages))
             url = reverse("dashboard:index")
         else:
-            profile = JobSeekerProfile(user=user, **self._get_profile_data_from_session())
+            profile = user.jobseeker_profile
+            for k, v in self._get_profile_data_from_session().items():
+                setattr(profile, k, v)
             profile.save()
 
             try:

@@ -19,7 +19,6 @@ from itou.siaes.factories import SiaeFactory
 from itou.siaes.models import SiaeJobDescription
 from itou.users.factories import (
     JobSeekerFactory,
-    JobSeekerProfileFactory,
     JobSeekerProfileWithHexaAddressFactory,
     JobSeekerWithMockedAddressFactory,
     PrescriberFactory,
@@ -181,21 +180,6 @@ class JobApplicationWithApprovalNotCancellableFactory(JobApplicationFactory):
     hiring_end_at = factory.LazyFunction(lambda: datetime.now(timezone.utc).date() + relativedelta(years=2, days=-5))
 
 
-class JobApplicationWithJobSeekerProfileFactory(JobApplicationWithApprovalNotCancellableFactory):
-    """
-    This job application has a jobseeker with an EMPTY job seeker profile
-
-    Suitable for employee records tests
-    """
-
-    @factory.post_generation
-    def set_job_seeker_profile(self, create, extracted, **kwargs):
-        if not create:
-            # Simple build, do nothing.
-            return
-        JobSeekerProfileFactory(user=self.job_seeker).save()
-
-
 class JobApplicationWithCompleteJobSeekerProfileFactory(JobApplicationWithApprovalNotCancellableFactory):
     """
     This job application has a jobseeker with a COMPLETE job seeker profile
@@ -203,7 +187,7 @@ class JobApplicationWithCompleteJobSeekerProfileFactory(JobApplicationWithApprov
     Suitable for employee records tests
     """
 
-    job_seeker = factory.SubFactory(JobSeekerWithMockedAddressFactory)
+    job_seeker = factory.SubFactory(JobSeekerWithMockedAddressFactory, jobseeker_profile=False)
     sender_prescriber_organization = factory.SubFactory(PrescriberOrganizationWithMembershipFactory)
 
     @factory.post_generation
@@ -213,4 +197,4 @@ class JobApplicationWithCompleteJobSeekerProfileFactory(JobApplicationWithApprov
             return
         # Create a profile for current user
         # JobSeekerProfileWithHexaAddressFactory.build(user=self.job_seeker).save()
-        JobSeekerProfileWithHexaAddressFactory(user=self.job_seeker)
+        self.job_seeker.jobseeker_profile = JobSeekerProfileWithHexaAddressFactory(user=self.job_seeker)
