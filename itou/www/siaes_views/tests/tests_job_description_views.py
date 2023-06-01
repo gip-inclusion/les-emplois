@@ -481,3 +481,25 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
             response = self.client.get(self.url)
 
         self.assertContains(response, "Postuler")
+
+    def test_display_placeholder_for_empty_fields(self):
+        response = self._login(self.user)
+        response = self.client.get(self.url)
+
+        # Job description created in setup has empty description fields
+        self.assertContains(response, "La structure n'a pas encore renseigné cette rubrique", count=2)
+
+        self.job_description.description = "a job description"
+        self.job_description.save()
+        response = self.client.get(self.url)
+
+        self.assertContains(response, "a job description")
+        self.assertContains(response, "La structure n'a pas encore renseigné cette rubrique")
+
+        self.job_description.profile_description = "a profile description"
+        self.job_description.save()
+        response = self.client.get(self.url)
+
+        self.assertContains(response, "a job description")
+        self.assertContains(response, "a profile description")
+        self.assertNotContains(response, "La structure n'a pas encore renseigné cette rubrique")
