@@ -9,54 +9,15 @@ from rest_framework.test import APIClient, APITestCase
 from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordWithProfileFactory
 from itou.employee_record.models import EmployeeRecord
-from itou.job_applications.factories import JobApplicationFactory, JobApplicationWithCompleteJobSeekerProfileFactory
-from itou.siaes.factories import SiaeFactory
-from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, SiaeStaffFactory
+from itou.job_applications.factories import JobApplicationWithCompleteJobSeekerProfileFactory
+from itou.users.factories import DEFAULT_PASSWORD, SiaeStaffFactory
 from itou.utils.mocks.address_format import mock_get_geocoding_data
 
 
 ENDPOINT_URL = reverse("v1:employee-records-list")
 
 
-class DummyEmployeeRecordAPITest(APITestCase):
-    def setUp(self):
-        self.client = APIClient()
-
-    def test_happy_path(self):
-        user = SiaeStaffFactory()
-        siae = SiaeFactory()
-        job_seeker = JobSeekerFactory()
-        # Create enough fake job applications so that the dummy endpoint returns the first 25 of them.
-        JobApplicationFactory.create_batch(30, job_seeker=job_seeker, to_siae=siae)
-
-        url = reverse("v1:token-auth")
-        data = {"username": user.email, "password": DEFAULT_PASSWORD}
-        response = self.client.post(url, data, format="json")
-        assert response.status_code == 200
-
-        token = response.json()["token"]
-
-        url = reverse("v1:dummy-employee-records-list")
-        self.client.credentials(HTTP_AUTHORIZATION=f"Token {token}")
-        response = self.client.get(url, format="json")
-        assert response.status_code == 200
-
-        # The dummy endpoint always returns 25 records, first page is 20 of them.
-        assert response.json()["count"] == 25
-        assert len(response.json()["results"]) == 20
-
-        employee_record_json = response.json()["results"][0]
-        assert "mesure" in employee_record_json
-        assert "siret" in employee_record_json
-        assert "numeroAnnexe" in employee_record_json
-        assert "personnePhysique" in employee_record_json
-        assert "passIae" in employee_record_json["personnePhysique"]
-        assert "adresse" in employee_record_json
-        assert "situationSalarie" in employee_record_json
-
-
 class EmployeeRecordAPIPermissionsTest(APITestCase):
-
     token_url = reverse("v1:token-auth")
 
     def setUp(self):
@@ -252,7 +213,6 @@ class EmployeeRecordAPIParametersTest(APITestCase):
         side_effect=mock_get_geocoding_data,
     )
     def test_status_parameter(self, _mock):
-
         job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
         employee_record = EmployeeRecord.from_job_application(job_application)
         employee_record.update_as_ready()
@@ -278,7 +238,6 @@ class EmployeeRecordAPIParametersTest(APITestCase):
         side_effect=mock_get_geocoding_data,
     )
     def test_status_array_parameter(self, _mock):
-
         job_application_1 = JobApplicationWithCompleteJobSeekerProfileFactory()
         employee_record = EmployeeRecord.from_job_application(job_application_1)
         employee_record.update_as_ready()
