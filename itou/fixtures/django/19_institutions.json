@@ -1,19 +1,19 @@
 [
-{
-   "model": "institutions.institution",
-   "pk": 1,
-   "fields": {
+  {
+    "fields": {
       "address_line_1": "23 rue Borde",
       "address_line_2": "CS 10009",
-      "post_code": "13285",
       "city": "Marseille",
-      "department": "13",
       "coords": null,
+      "created_at": "2021-07-13T15:32:02.061Z",
+      "department": "13",
       "geocoding_score": null,
       "kind": "DREETS",
       "name": "DREETS Provence-Alpes-Côte d’Azur",
-      "created_at": "2021-07-13T15:32:02.061Z",
+      "post_code": "13285",
       "updated_at": "2021-07-13T15:34:17.765Z"
-   }
-}
+    },
+    "model": "institutions.institution",
+    "pk": 1
+  }
 ]

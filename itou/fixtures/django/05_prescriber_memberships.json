@@ -1,100 +1,100 @@
 [
-{
-   "model": "prescribers.prescribermembership",
-   "pk": 2,
-   "fields": {
-      "user": 3,
-      "organization": 115,
-      "joined_at": "2020-04-09T13:46:54Z",
-      "is_admin": true,
-      "is_active": true,
+  {
+    "fields": {
       "created_at": "2020-12-01T10:08:03.594Z",
-      "updated_at": null,
-      "updated_by": null
-   }
-},
-{
-   "model": "prescribers.prescribermembership",
-   "pk": 3,
-   "fields": {
-      "user": 7,
-      "organization": 121,
-      "joined_at": "2020-04-09T13:49:51Z",
-      "is_admin": true,
       "is_active": true,
+      "is_admin": true,
+      "joined_at": "2020-04-09T13:46:54Z",
+      "organization": 115,
+      "updated_at": null,
+      "updated_by": null,
+      "user": 3
+    },
+    "model": "prescribers.prescribermembership",
+    "pk": 2
+  },
+  {
+    "fields": {
       "created_at": "2020-12-01T10:08:03.595Z",
-      "updated_at": null,
-      "updated_by": null
-   }
-},
-{
-   "model": "prescribers.prescribermembership",
-   "pk": 4,
-   "fields": {
-      "user": 10,
-      "organization": 999,
-      "joined_at": "2020-12-01T10:50:58Z",
+      "is_active": true,
       "is_admin": true,
-      "is_active": true,
-      "created_at": "2020-12-01T10:52:38.385Z",
+      "joined_at": "2020-04-09T13:49:51Z",
+      "organization": 121,
       "updated_at": null,
-      "updated_by": null
-   }
-},
-{
-   "model": "prescribers.prescribermembership",
-   "pk": 5,
-   "fields": {
-      "user": 11,
-      "organization": 999,
-      "joined_at": "2020-12-01T10:50:58Z",
+      "updated_by": null,
+      "user": 7
+    },
+    "model": "prescribers.prescribermembership",
+    "pk": 3
+  },
+  {
+    "fields": {
+      "created_at": "2020-12-01T10:52:38.385Z",
+      "is_active": true,
       "is_admin": true,
-      "is_active": true,
+      "joined_at": "2020-12-01T10:50:58Z",
+      "organization": 999,
+      "updated_at": null,
+      "updated_by": null,
+      "user": 10
+    },
+    "model": "prescribers.prescribermembership",
+    "pk": 4
+  },
+  {
+    "fields": {
       "created_at": "2020-12-01T10:52:38.385Z",
-      "updated_at": null,
-      "updated_by": null
-   }
-},
-{
-   "model": "prescribers.prescribermembership",
-   "pk": 6,
-   "fields": {
-      "user": 12,
-      "organization": 999,
-      "joined_at": "2020-12-01T10:50:58Z",
-      "is_admin": false,
       "is_active": true,
+      "is_admin": true,
+      "joined_at": "2020-12-01T10:50:58Z",
+      "organization": 999,
+      "updated_at": null,
+      "updated_by": null,
+      "user": 11
+    },
+    "model": "prescribers.prescribermembership",
+    "pk": 5
+  },
+  {
+    "fields": {
       "created_at": "2020-12-01T10:52:38.386Z",
-      "updated_at": null,
-      "updated_by": null
-   }
-},
-{
-   "model": "prescribers.prescribermembership",
-   "pk": 7,
-   "fields": {
-      "user": 13,
-      "organization": 999,
-      "joined_at": "2020-12-01T10:50:58Z",
-      "is_admin": false,
       "is_active": true,
+      "is_admin": false,
+      "joined_at": "2020-12-01T10:50:58Z",
+      "organization": 999,
+      "updated_at": null,
+      "updated_by": null,
+      "user": 12
+    },
+    "model": "prescribers.prescribermembership",
+    "pk": 6
+  },
+  {
+    "fields": {
       "created_at": "2020-12-01T10:52:38.386Z",
-      "updated_at": null,
-      "updated_by": null
-   }
-},
-{
-   "model": "prescribers.prescribermembership",
-   "pk": 8,
-   "fields": {
-      "user": 14,
-      "organization": 999,
-      "joined_at": "2020-12-01T10:50:58Z",
-      "is_admin": false,
       "is_active": true,
+      "is_admin": false,
+      "joined_at": "2020-12-01T10:50:58Z",
+      "organization": 999,
+      "updated_at": null,
+      "updated_by": null,
+      "user": 13
+    },
+    "model": "prescribers.prescribermembership",
+    "pk": 7
+  },
+  {
+    "fields": {
       "created_at": "2020-12-01T10:52:38.387Z",
+      "is_active": true,
+      "is_admin": false,
+      "joined_at": "2020-12-01T10:50:58Z",
+      "organization": 999,
       "updated_at": null,
-      "updated_by": null
-   }
-}
+      "updated_by": null,
+      "user": 14
+    },
+    "model": "prescribers.prescribermembership",
+    "pk": 8
+  }
 ]

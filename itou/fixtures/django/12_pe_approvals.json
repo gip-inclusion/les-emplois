@@ -1,18 +1,18 @@
 [
-{
-   "model": "approvals.poleemploiapproval",
-   "pk": 1,
-   "fields": {
-      "start_at": "2022-02-02",
-      "end_at": "2024-02-01",
+  {
+    "fields": {
+      "birth_name": "Henry",
+      "birthdate": "1990-03-13",
       "created_at": "2022-02-02T10:34:22Z",
-      "pe_structure_code": "13150",
-      "number": "490052010146",
-      "pole_emploi_id": "7654321A",
+      "end_at": "2024-02-01",
       "first_name": "Jacques",
       "last_name": "Henry",
-      "birth_name": "Henry",
-      "birthdate": "1990-03-13"
-   }
-}
+      "number": "490052010146",
+      "pe_structure_code": "13150",
+      "pole_emploi_id": "7654321A",
+      "start_at": "2022-02-02"
+    },
+    "model": "approvals.poleemploiapproval",
+    "pk": 1
+  }
 ]

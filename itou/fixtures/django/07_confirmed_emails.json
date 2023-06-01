@@ -1,192 +1,192 @@
 [
-{
-   "model": "account.emailaddress",
-   "pk": 1,
-   "fields": {
-      "user": 1,
+  {
+    "fields": {
       "email": "admin@test.com",
-      "verified": true,
-      "primary": true
-   }
-},
-{
-   "model": "account.emailaddress",
-   "pk": 2,
-   "fields": {
-      "user": 2,
+      "primary": true,
+      "user": 1,
+      "verified": true
+    },
+    "model": "account.emailaddress",
+    "pk": 1
+  },
+  {
+    "fields": {
       "email": "test+de@inclusion.beta.gouv.fr",
-      "verified": true,
-      "primary": true
-   }
-},
-{
-   "model": "account.emailaddress",
-   "pk": 3,
-   "fields": {
-      "user": 3,
+      "primary": true,
+      "user": 2,
+      "verified": true
+    },
+    "model": "account.emailaddress",
+    "pk": 2
+  },
+  {
+    "fields": {
       "email": "test+prescripteur@inclusion.beta.gouv.fr",
-      "verified": true,
-      "primary": true
-   }
-},
-{
-   "model": "account.emailaddress",
-   "pk": 4,
-   "fields": {
-      "user": 4,
+      "primary": true,
+      "user": 3,
+      "verified": true
+    },
+    "model": "account.emailaddress",
+    "pk": 3
+  },
+  {
+    "fields": {
       "email": "test+etti@inclusion.beta.gouv.fr",
-      "verified": true,
-      "primary": true
-   }
-},
-{
-   "model": "account.emailaddress",
-   "pk": 5,
-   "fields": {
-      "user": 5,
+      "primary": true,
+      "user": 4,
+      "verified": true
+    },
+    "model": "account.emailaddress",
+    "pk": 4
+  },
+  {
+    "fields": {
       "email": "test+orienteur-solo@inclusion.beta.gouv.fr",
-      "verified": true,
-      "primary": true
-   }
-},
-{
-   "model": "account.emailaddress",
-   "pk": 6,
-   "fields": {
-      "user": 6,
+      "primary": true,
+      "user": 5,
+      "verified": true
+    },
+    "model": "account.emailaddress",
+    "pk": 5
+  },
+  {
+    "fields": {
       "email": "test+ei@inclusion.beta.gouv.fr",
-      "verified": true,
-      "primary": true
-   }
-},
-{
-   "model": "account.emailaddress",
-   "pk": 7,
-   "fields": {
-      "user": 7,
+      "primary": true,
+      "user": 6,
+      "verified": true
+    },
+    "model": "account.emailaddress",
+    "pk": 6
+  },
+  {
+    "fields": {
       "email": "test+orienteur@inclusion.beta.gouv.fr",
-      "verified": true,
-      "primary": true
-   }
-},
-{
-   "model": "account.emailaddress",
-   "pk": 8,
-   "fields": {
-      "user": 8,
+      "primary": true,
+      "user": 7,
+      "verified": true
+    },
+    "model": "account.emailaddress",
+    "pk": 7
+  },
+  {
+    "fields": {
       "email": "test+de-proxy@inclusion.beta.gouv.fr",
-      "verified": true,
-      "primary": true
-   }
-},
-{
-   "model": "account.emailaddress",
-   "pk": 9,
-   "fields": {
-      "user": 9,
+      "primary": true,
+      "user": 8,
+      "verified": true
+    },
+    "model": "account.emailaddress",
+    "pk": 8
+  },
+  {
+    "fields": {
       "email": "test+geiq@inclusion.beta.gouv.fr",
-      "verified": true,
-      "primary": true
-   }
-},
-{
-   "model": "account.emailaddress",
-   "pk": 10,
-   "fields": {
-      "user": 10,
+      "primary": true,
+      "user": 9,
+      "verified": true
+    },
+    "model": "account.emailaddress",
+    "pk": 9
+  },
+  {
+    "fields": {
       "email": "z.hadji01+milo@gmail.com",
-      "verified": true,
-      "primary": true
-   }
-},
-{
-   "model": "account.emailaddress",
-   "pk": 11,
-   "fields": {
-      "user": 11,
+      "primary": true,
+      "user": 10,
+      "verified": true
+    },
+    "model": "account.emailaddress",
+    "pk": 10
+  },
+  {
+    "fields": {
       "email": "z.hadji01+milo1@gmail.com",
-      "verified": true,
-      "primary": true
-   }
-},
-{
-   "model": "account.emailaddress",
-   "pk": 12,
-   "fields": {
-      "user": 12,
+      "primary": true,
+      "user": 11,
+      "verified": true
+    },
+    "model": "account.emailaddress",
+    "pk": 11
+  },
+  {
+    "fields": {
       "email": "z.hadji02+milo1@gmail.com",
-      "verified": true,
-      "primary": true
-   }
-},
-{
-   "model": "account.emailaddress",
-   "pk": 13,
-   "fields": {
-      "user": 13,
+      "primary": true,
+      "user": 12,
+      "verified": true
+    },
+    "model": "account.emailaddress",
+    "pk": 12
+  },
+  {
+    "fields": {
       "email": "z.hadji03+milo1@gmail.com",
-      "verified": true,
-      "primary": true
-   }
-},
-{
-   "model": "account.emailaddress",
-   "pk": 14,
-   "fields": {
-      "user": 14,
+      "primary": true,
+      "user": 13,
+      "verified": true
+    },
+    "model": "account.emailaddress",
+    "pk": 13
+  },
+  {
+    "fields": {
       "email": "z.hadji02+milo4@gmail.com",
-      "verified": true,
-      "primary": true
-   }
-},
-{
-   "model": "account.emailaddress",
-   "pk": 15,
-   "fields": {
-      "user": 15,
+      "primary": true,
+      "user": 14,
+      "verified": true
+    },
+    "model": "account.emailaddress",
+    "pk": 14
+  },
+  {
+    "fields": {
       "email": "adrien.monk@faux123.com",
-      "verified": true,
-      "primary": true
-   }
-},
-{
-   "model": "account.emailaddress",
-   "pk": 16,
-   "fields": {
-      "user": 16,
+      "primary": true,
+      "user": 15,
+      "verified": true
+    },
+    "model": "account.emailaddress",
+    "pk": 15
+  },
+  {
+    "fields": {
       "email": "test+ea@inclusion.beta.gouv.fr",
-      "verified": true,
-      "primary": true
-   }
-},
-{
-   "model": "account.emailaddress",
-   "pk": 17,
-   "fields": {
-      "user": 24,
+      "primary": true,
+      "user": 16,
+      "verified": true
+    },
+    "model": "account.emailaddress",
+    "pk": 16
+  },
+  {
+    "fields": {
       "email": "test+dreets@inclusion.beta.gouv.fr",
-      "verified": true,
-      "primary": true
-   }
-},
-{
-   "model": "account.emailaddress",
-   "pk": 18,
-   "fields": {
-      "user": 25,
+      "primary": true,
+      "user": 24,
+      "verified": true
+    },
+    "model": "account.emailaddress",
+    "pk": 17
+  },
+  {
+    "fields": {
       "email": "test+ai@inclusion.beta.gouv.fr",
-      "verified": true,
-      "primary": true
-   }
-},
-{
-   "model": "account.emailaddress",
-   "pk": 19,
-   "fields": {
-      "user": 26,
+      "primary": true,
+      "user": 25,
+      "verified": true
+    },
+    "model": "account.emailaddress",
+    "pk": 18
+  },
+  {
+    "fields": {
       "email": "vchevallier-benoit@example.org",
-      "verified": true,
-      "primary": true
-   }
-}
+      "primary": true,
+      "user": 26,
+      "verified": true
+    },
+    "model": "account.emailaddress",
+    "pk": 19
+  }
 ]
