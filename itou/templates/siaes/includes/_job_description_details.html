@@ -29,11 +29,13 @@
     <div class="mb-4">{{ job.market_context_description|linebreaks }}</div>
 {% endif %}
 
-<h3>Description du poste</h3>
-{% if job.description %}<div class="mb-4">{{ job.description|linebreaks }}</div>{% endif %}
+{% with no_content_message="La structure n'a pas encore renseigné cette rubrique" %}
+    <h3>Description du poste</h3>
+    <div class="mb-4">{{ job.description|default:no_content_message|linebreaks }}</div>
 
-<h3>Profil recherché et prérequis</h3>
-{% if job.profile_description %}<div class="mb-4">{{ job.profile_description|linebreaks }}</div>{% endif %}
+    <h3>Profil recherché et prérequis</h3>
+    <div class="mb-4">{{ job.profile_description|default:no_content_message|linebreaks }}</div>
+{% endwith %}
 
 {% if job.is_resume_mandatory %}
     <div class="alert alert-warning mb-4">
