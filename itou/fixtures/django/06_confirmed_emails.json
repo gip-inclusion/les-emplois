@@ -188,5 +188,15 @@
     },
     "model": "account.emailaddress",
     "pk": 19
+  },
+  {
+    "fields": {
+      "email": "test+ddets@inclusion.beta.gouv.fr",
+      "primary": true,
+      "user": 27,
+      "verified": true
+    },
+    "model": "account.emailaddress",
+    "pk": 20
   }
 ]

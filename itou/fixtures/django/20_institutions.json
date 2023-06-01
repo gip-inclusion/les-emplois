@@ -18,5 +18,25 @@
     },
     "model": "institutions.institution",
     "pk": 1
+  },
+  {
+    "fields": {
+      "address_line_1": "",
+      "address_line_2": "",
+      "ban_api_resolved_address": null,
+      "city": "",
+      "coords": null,
+      "created_at": "2023-06-02T09:35:44.546Z",
+      "department": "30",
+      "geocoding_score": null,
+      "geocoding_updated_at": null,
+      "kind": "DDETS IAE",
+      "name": "DDETS de Nîmes",
+      "post_code": "30972",
+      "uid": "02c9b4ed-110c-4639-8445-aa5ab9937d2c",
+      "updated_at": "2023-06-02T09:35:44.546Z"
+    },
+    "model": "institutions.institution",
+    "pk": 2
   }
 ]
