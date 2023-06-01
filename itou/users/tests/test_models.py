@@ -1427,3 +1427,18 @@ def test_user_invalid_kind():
         match="Le type d’utilisateur est incorrect.",
     ):
         UserFactory(kind="")
+
+
+@pytest.mark.parametrize(
+    "user_kind,profile_expected",
+    [
+        (UserKind.JOB_SEEKER, True),
+        (UserKind.PRESCRIBER, False),
+        (UserKind.SIAE_STAFF, False),
+        (UserKind.LABOR_INSPECTOR, False),
+    ],
+)
+def test_save_creates_a_job_seeker_profile(user_kind, profile_expected):
+    user = User(kind=user_kind)
+    user.save()
+    assert hasattr(user, "jobseeker_profile") == profile_expected

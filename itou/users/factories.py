@@ -113,7 +113,6 @@ class JobSeekerFactory(UserFactory):
             with_birth_place=True,
             birth_country=factory.SubFactory(CountryFranceFactory),
         )
-        with_profile = factory.Trait(profile=factory.RelatedFactory("itou.users.factories.JobSeekerProfileFactory"))
 
     @factory.lazy_attribute
     def nir(self):
@@ -133,6 +132,20 @@ class JobSeekerFactory(UserFactory):
         nir = f"{incomplete_nir}{control_key}"
         validate_nir(nir)
         return nir
+
+    @factory.post_generation
+    def jobseeker_profile(obj, create, extracted, **kwargs):
+        for k, v in kwargs.items():
+            if "__" in k:
+                raise ValueError("This is not a factory: __xxx are not supported")
+            setattr(obj.jobseeker_profile, k, v)
+
+        if create:
+            if extracted is False:
+                obj.jobseeker_profile.delete()
+                obj.jobseeker_profile = None
+            else:
+                obj.jobseeker_profile.save(update_fields=kwargs.keys())
 
 
 class JobSeekerWithAddressFactory(JobSeekerFactory):
@@ -210,7 +223,7 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.JobSeekerProfile
 
-    user = factory.SubFactory(JobSeekerWithAddressFactory)
+    user = factory.SubFactory(JobSeekerWithAddressFactory, jobseeker_profile=False)
     education_level = random.choice(EducationLevel.values)
     # JobSeeker are created with a Pôle emploi ID
     pole_emploi_since = AllocationDuration.MORE_THAN_24_MONTHS

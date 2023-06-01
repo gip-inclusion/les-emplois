@@ -76,8 +76,9 @@ def test_orphans_check(command):
 def test_profile_errors_check(command):
     # Check for profile errors during sanitize_employee_records
 
-    # This factory does not define a profile
-    employee_record = factories.EmployeeRecordFactory(status=models.Status.PROCESSED)
+    employee_record = factories.EmployeeRecordFactory(
+        status=models.Status.PROCESSED, job_application__job_seeker__jobseeker_profile=False
+    )
 
     command._check_jobseeker_profiles(dry_run=False)
 

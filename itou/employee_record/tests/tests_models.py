@@ -21,7 +21,6 @@ from itou.job_applications.factories import (
     JobApplicationFactory,
     JobApplicationWithApprovalNotCancellableFactory,
     JobApplicationWithCompleteJobSeekerProfileFactory,
-    JobApplicationWithJobSeekerProfileFactory,
     JobApplicationWithoutApprovalFactory,
 )
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
@@ -41,7 +40,7 @@ class EmployeeRecordModelTest(TestCase):
         with pytest.raises(ValidationError):
             # If the job seeker has no title (optional by default),
             # Then the job seeker profile must not be valid
-            job_application = JobApplicationWithJobSeekerProfileFactory()
+            job_application = JobApplicationWithApprovalNotCancellableFactory()
             job_application.job_seeker.title = None
             EmployeeRecord.from_job_application(job_application)
 
@@ -79,7 +78,7 @@ class EmployeeRecordModelTest(TestCase):
     def test_creation_without_jobseeker_profile(self):
         # Job seeker has no existing profile (must be filled before creation)
         with self.assertRaisesMessage(ValidationError, EmployeeRecord.ERROR_JOB_SEEKER_HAS_NO_PROFILE):
-            job_application = JobApplicationWithApprovalNotCancellableFactory()
+            job_application = JobApplicationWithApprovalNotCancellableFactory(job_seeker__jobseeker_profile=False)
             EmployeeRecord.from_job_application(job_application)
 
     def test_creation_from_job_application(self):
@@ -124,7 +123,7 @@ class EmployeeRecordModelTest(TestCase):
         - geoloc issues (no API mock on this test)
         """
         # Complete profile, but geoloc API not reachable
-        job_application = JobApplicationWithJobSeekerProfileFactory()
+        job_application = JobApplicationWithApprovalNotCancellableFactory()
 
         with pytest.raises(ValidationError):
             employee_record = EmployeeRecord.from_job_application(job_application)
