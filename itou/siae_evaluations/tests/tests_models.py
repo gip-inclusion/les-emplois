@@ -12,30 +12,28 @@ from freezegun import freeze_time
 from itou.approvals.factories import ApprovalFactory
 from itou.eligibility.enums import AdministrativeCriteriaLevel, AuthorKind
 from itou.eligibility.factories import EligibilityDiagnosisFactory
-from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
+from itou.eligibility.models import (AdministrativeCriteria,
+                                     EligibilityDiagnosis)
 from itou.institutions.enums import InstitutionKind
-from itou.institutions.factories import InstitutionFactory, InstitutionWith2MembershipFactory
+from itou.institutions.factories import (InstitutionFactory,
+                                         InstitutionWith2MembershipFactory)
 from itou.job_applications.factories import JobApplicationFactory
-from itou.job_applications.models import JobApplication, JobApplicationQuerySet, JobApplicationWorkflow
+from itou.job_applications.models import (JobApplication,
+                                          JobApplicationQuerySet,
+                                          JobApplicationWorkflow)
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.factories import (
-    EvaluatedAdministrativeCriteriaFactory,
-    EvaluatedJobApplicationFactory,
-    EvaluatedSiaeFactory,
-    EvaluationCampaignFactory,
-)
-from itou.siae_evaluations.models import (
-    Calendar,
-    CampaignAlreadyPopulatedException,
-    EvaluatedAdministrativeCriteria,
-    EvaluatedJobApplication,
-    EvaluatedSiae,
-    EvaluationCampaign,
-    Sanctions,
-    create_campaigns,
-    select_min_max_job_applications,
-    validate_institution,
-)
+    EvaluatedAdministrativeCriteriaFactory, EvaluatedJobApplicationFactory,
+    EvaluatedSiaeFactory, EvaluationCampaignFactory)
+from itou.siae_evaluations.models import (Calendar,
+                                          CampaignAlreadyPopulatedException,
+                                          EvaluatedAdministrativeCriteria,
+                                          EvaluatedJobApplication,
+                                          EvaluatedSiae, EvaluationCampaign,
+                                          Sanctions,
+                                          create_campaigns_and_calendar,
+                                          select_min_max_job_applications,
+                                          validate_institution)
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory, SiaeWith2MembershipsFactory
 from itou.users.enums import KIND_SIAE_STAFF
@@ -251,7 +249,7 @@ class EvaluationCampaignManagerTest(TestCase):
         with pytest.raises(ValidationError):
             evaluation_campaign.clean()
 
-    def test_create_campaigns(self):
+    def test_create_campaigns_and_calendar(self):
         evaluated_period_start_at = timezone.now() - relativedelta(months=2)
         evaluated_period_end_at = timezone.now() - relativedelta(months=1)
 
@@ -259,14 +257,14 @@ class EvaluationCampaignManagerTest(TestCase):
         for kind in [k for k in InstitutionKind if k != InstitutionKind.DDETS_IAE]:
             with self.subTest(kind=kind):
                 InstitutionFactory(kind=kind)
-                assert 0 == create_campaigns(evaluated_period_start_at, evaluated_period_end_at)
+                assert 0 == create_campaigns_and_calendar(evaluated_period_start_at, evaluated_period_end_at)
                 assert 0 == EvaluationCampaign.objects.all().count()
                 assert 1 == Calendar.objects.all().count()
                 assert len(mail.outbox) == 0
 
         # institution DDETS IAE
         InstitutionWith2MembershipFactory.create_batch(2, kind=InstitutionKind.DDETS_IAE)
-        assert 2 == create_campaigns(evaluated_period_start_at, evaluated_period_end_at)
+        assert 2 == create_campaigns_and_calendar(evaluated_period_start_at, evaluated_period_end_at)
         assert 2 == EvaluationCampaign.objects.all().count()
         assert 1 == Calendar.objects.all().count()
 
@@ -277,12 +275,11 @@ class EvaluationCampaignManagerTest(TestCase):
         email = mail.outbox[1]
         assert len(email.to) == 2
 
-    def test_create_campaigns_on_specific_DDETS_IAE(self):
+    def test_create_campaigns_and_calendar_on_specific_DDETS_IAE(self):
         evaluated_period_start_at = timezone.now() - relativedelta(months=2)
         evaluated_period_end_at = timezone.now() - relativedelta(months=1)
-
         institution_ids = InstitutionWith2MembershipFactory.create_batch(2, kind=InstitutionKind.DDETS_IAE)
-        assert 1 == create_campaigns(
+        assert 1 == create_campaigns_and_calendar(
             evaluated_period_start_at,
             evaluated_period_end_at,
             institution_ids=[institution_ids[0].pk],
