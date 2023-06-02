@@ -50,7 +50,7 @@ def validate_institution(institution_id):
         raise ValidationError(f"Sélectionnez une institution de type {InstitutionKind.DDETS_IAE}")
 
 
-def create_campaigns(evaluated_period_start_at, evaluated_period_end_at, institution_ids=None):
+def create_campaigns_and_calendar(evaluated_period_start_at, evaluated_period_end_at, institution_ids=None):
     """
     Create a campaign for each institution whose kind is DDETS IAE (possibly limited by institution_ids).
     This method is intented to be executed manually, until it will be automised.
