@@ -34,6 +34,10 @@ class PoleEmploiAPIBadResponse(Exception):
         return f"PoleEmploiAPIBadResponse(code={self.response_code})"
 
 
+class PoleEmploiRateLimitException(PoleEmploiAPIException):
+    pass
+
+
 API_CLIENT_EMPTY_NIR_BAD_RESPONSE = "empty_nir"
 
 
@@ -121,6 +125,8 @@ class PoleEmploiApiClient:
             )
             if response.status_code == 204:
                 return None
+            if response.status_code == 429:
+                raise PoleEmploiRateLimitException(429)
             if response.status_code not in (200, 206):
                 raise PoleEmploiAPIException(response.status_code)
             data = response.json()

@@ -13,6 +13,7 @@ from itou.utils.apis.pole_emploi import (
     PoleEmploiAPIBadResponse,
     PoleEmploiApiClient,
     PoleEmploiAPIException,
+    PoleEmploiRateLimitException,
 )
 from itou.utils.mocks import pole_emploi as pole_emploi_api_mocks
 from itou.utils.test import TestCase
@@ -91,6 +92,12 @@ class PoleEmploiAPIClientTest(TestCase):
             )
         assert ctx.value.error_code == 401
 
+        respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(429, json="")
+        with pytest.raises(PoleEmploiRateLimitException) as ctx:
+            self.api_client.recherche_individu_certifie(
+                job_seeker.first_name, job_seeker.last_name, job_seeker.birthdate, job_seeker.nir
+            )
+
         job_seeker = JobSeekerFactory()
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").mock(
             side_effect=httpx.ConnectTimeout
@@ -129,6 +136,10 @@ class PoleEmploiAPIClientTest(TestCase):
         with pytest.raises(PoleEmploiAPIException) as ctx:
             self.api_client.mise_a_jour_pass_iae(job_application.approval, "foo", "bar", 42, "DEAD")
         assert ctx.value.error_code == "http_error"
+
+        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(429, json={})
+        with pytest.raises(PoleEmploiRateLimitException):
+            self.api_client.mise_a_jour_pass_iae(job_application.approval, "foo", "bar", 42, "DEAD")
 
         # auth failed
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(401, json={})
