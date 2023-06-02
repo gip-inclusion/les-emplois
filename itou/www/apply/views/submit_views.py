@@ -220,7 +220,6 @@ class StartView(ApplyStepBaseView):
         self.apply_session.init(
             {
                 "back_url": self._coalesce_back_url(),
-                "nir": None,
                 "selected_jobs": [request.GET["job_description_id"]] if "job_description_id" in request.GET else [],
             }
         )

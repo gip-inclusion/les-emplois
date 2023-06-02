@@ -148,7 +148,6 @@ def test_check_nir_job_seeker_with_lack_of_nir_reason(client):
     session_data = client.session[f"job_application-{siae.pk}"]
     assert session_data == {
         "back_url": "/",
-        "nir": None,
         "selected_jobs": [],
     }
 
@@ -177,7 +176,6 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
     def default_session_data(self):
         return {
             "back_url": "/",
-            "nir": None,
             "selected_jobs": [],
         }
 
@@ -426,7 +424,6 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
     def default_session_data(self):
         return {
             "back_url": "/",
-            "nir": None,
             "selected_jobs": [],
         }
 
@@ -978,7 +975,6 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
     def default_session_data(self):
         return {
             "back_url": "/",
-            "nir": None,
             "selected_jobs": [],
         }
 
@@ -1446,7 +1442,6 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
     def default_session_data(self):
         return {
             "back_url": "/",
-            "nir": None,
             "selected_jobs": [],
         }
 
@@ -2423,7 +2418,6 @@ def test_detect_existing_job_seeker(client):
 
     default_session_data = {
         "back_url": "/",
-        "nir": None,
         "selected_jobs": [],
     }
 
