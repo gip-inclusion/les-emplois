@@ -1395,10 +1395,7 @@ class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
                 self.first_name, self.last_name, self.birthdate, self.nir
             )
         except PoleEmploiAPIException:
-            logger.info(
-                "! notify_pole_emploi pe_approval=%s got a recoverable error in recherche_individu",
-                self,
-            )
+            logger.info("! notify_pole_emploi pe_approval=%s got a recoverable error in recherche_individu", self)
             self.pe_save_should_retry(at)
             return
         except PoleEmploiAPIBadResponse as exc:
