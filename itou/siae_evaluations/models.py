@@ -66,12 +66,14 @@ def create_campaigns(evaluated_period_start_at, evaluated_period_end_at, institu
     if institution_ids:
         institutions = institutions.filter(pk__in=institution_ids)
 
+    calendar, _ = Calendar.objects.get_or_create(name=name)
     evaluation_campaign_list = EvaluationCampaign.objects.bulk_create(
         EvaluationCampaign(
-            name=name,
+            calendar=calendar,
             evaluated_period_start_at=evaluated_period_start_at,
             evaluated_period_end_at=evaluated_period_end_at,
             institution=institution,
+            name=name,
         )
         for institution in institutions
     )
@@ -95,7 +97,6 @@ class Calendar(models.Model):
     Campaigns taking place at the same time share the same calendar.
     """
 
-    # TODO(cms): create a Calendar and add its pk to active campaigns.
     name = models.CharField(verbose_name="Nom", max_length=100, null=True)
     html = models.TextField(verbose_name="Contenu")
 

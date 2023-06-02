@@ -25,6 +25,7 @@ from itou.siae_evaluations.factories import (
     EvaluationCampaignFactory,
 )
 from itou.siae_evaluations.models import (
+    Calendar,
     CampaignAlreadyPopulatedException,
     EvaluatedAdministrativeCriteria,
     EvaluatedJobApplication,
@@ -260,12 +261,14 @@ class EvaluationCampaignManagerTest(TestCase):
                 InstitutionFactory(kind=kind)
                 assert 0 == create_campaigns(evaluated_period_start_at, evaluated_period_end_at)
                 assert 0 == EvaluationCampaign.objects.all().count()
+                assert 1 == Calendar.objects.all().count()
                 assert len(mail.outbox) == 0
 
         # institution DDETS IAE
         InstitutionWith2MembershipFactory.create_batch(2, kind=InstitutionKind.DDETS_IAE)
         assert 2 == create_campaigns(evaluated_period_start_at, evaluated_period_end_at)
         assert 2 == EvaluationCampaign.objects.all().count()
+        assert 1 == Calendar.objects.all().count()
 
         # An email should have been sent to the institution members.
         assert len(mail.outbox) == 2
