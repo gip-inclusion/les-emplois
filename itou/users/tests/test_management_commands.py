@@ -35,6 +35,7 @@ from itou.users.management.commands.new_users_to_mailjet import (
     NEW_SIAE_LISTID,
 )
 from itou.users.models import User
+from itou.utils.mocks.pole_emploi import API_RECHERCHE_ERROR, API_RECHERCHE_RESULT_KNOWN
 from itou.utils.test import TestCase
 
 
@@ -901,3 +902,108 @@ def test_update_job_seeker_coords(settings, capsys, respx_mock):
     assert js3.geocoding_score == 0.83
     assert js3.coords.x == 13.13
     assert js3.coords.y == 42.42
+
+
+@freeze_time("2022-09-13")
+def test_pe_certify_users(settings, respx_mock, capsys, snapshot):
+    user = JobSeekerFactory(
+        pk=424242,
+        first_name="Yoder",
+        last_name="Olson",
+        birthdate=datetime.date(1994, 2, 22),
+        nir="194022734304328",
+    )
+    settings.API_ESD = {
+        "BASE_URL": "https://pe.fake",
+        "AUTH_BASE_URL": "https://auth.fr",
+        "KEY": "foobar",
+        "SECRET": "pe-secret",
+    }
+    respx_mock.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").respond(
+        200, json={"token_type": "foo", "access_token": "batman", "expires_in": 3600}
+    )
+
+    # user not found at all
+    respx_mock.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
+        200, json=API_RECHERCHE_ERROR
+    )
+    call_command("pe_certify_users", wet_run=True)
+    stdout, stderr = capsys.readouterr()
+    assert stderr == ""
+    assert stdout == snapshot()
+
+    user.jobseeker_profile.refresh_from_db()
+    assert user.jobseeker_profile.pe_last_certification_attempt_at == datetime.datetime(
+        2022, 9, 13, 0, 0, tzinfo=datetime.UTC
+    )
+    assert user.jobseeker_profile.pe_obfuscated_nir is None
+
+    # reset the jobseeker profile
+    user.jobseeker_profile.pe_last_certification_attempt_at = None
+    user.jobseeker_profile.save(update_fields=["pe_last_certification_attempt_at"])
+
+    # user found immediately
+    respx_mock.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
+        200, json=API_RECHERCHE_RESULT_KNOWN
+    )
+    call_command("pe_certify_users", wet_run=True)
+    stdout, stderr = capsys.readouterr()
+    assert stderr == ""
+    assert stdout.splitlines() == snapshot()
+
+    user.jobseeker_profile.refresh_from_db()
+    assert user.jobseeker_profile.pe_last_certification_attempt_at == datetime.datetime(
+        2022, 9, 13, 0, 0, tzinfo=datetime.UTC
+    )
+    assert user.jobseeker_profile.pe_obfuscated_nir == "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ"
+
+
+@freeze_time("2022-09-13")
+def test_pe_certify_users_with_swap(settings, respx_mock, capsys, snapshot):
+    user = JobSeekerFactory(
+        pk=424243,
+        first_name="Balthazar",
+        last_name="Durand",
+        birthdate=datetime.date(1987, 6, 21),
+        nir="187062112345678",
+    )
+    settings.API_ESD = {
+        "BASE_URL": "https://pe.fake",
+        "AUTH_BASE_URL": "https://auth.fr",
+        "KEY": "foobar",
+        "SECRET": "pe-secret",
+    }
+    respx_mock.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").respond(
+        200, json={"token_type": "foo", "access_token": "batman", "expires_in": 3600}
+    )
+    respx_mock.post(
+        "https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie",
+        json={
+            "dateNaissance": "1987-06-21",
+            "nirCertifie": "1870621123456",
+            "nomNaissance": "DURAND",
+            "prenom": "BALTHAZAR",
+        },
+    ).respond(200, json=API_RECHERCHE_ERROR)
+    respx_mock.post(
+        "https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie",
+        json={
+            "dateNaissance": "1987-06-21",
+            "nirCertifie": "1870621123456",
+            "nomNaissance": "BALTHAZAR",
+            "prenom": "DURAND",
+        },
+    ).respond(200, json=API_RECHERCHE_RESULT_KNOWN)
+    call_command("pe_certify_users", wet_run=True)
+    stdout, stderr = capsys.readouterr()
+    assert stderr == ""
+    assert stdout.splitlines() == snapshot()
+    user.jobseeker_profile.refresh_from_db()
+    assert user.jobseeker_profile.pe_last_certification_attempt_at == datetime.datetime(
+        2022, 9, 13, 0, 0, tzinfo=datetime.UTC
+    )
+    assert user.jobseeker_profile.pe_obfuscated_nir == "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ"
+
+    user.refresh_from_db()
+    assert user.first_name == "Durand"
+    assert user.last_name == "Balthazar"
