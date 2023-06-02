@@ -91,6 +91,7 @@ endif
 
 populate_db: populate_db_with_cities
 	$(EXEC_CMD) bash -c "ls -d itou/fixtures/django/*.json | xargs ./manage.py loaddata"
+	$(EXEC_CMD) bash -c "python itou/siae_evaluations/fixtures.py"
 
 populate_db_minimal: populate_db_with_cities
 	# Load reference data used by ASP-related code
