@@ -24,3 +24,4 @@ PGPASSWORD=$POSTGRESQL_ADDON_PASSWORD \
 # does not have execution rights on the $APP_HOME directory.
 echo "Loading fixtures"
 find "$APP_HOME"/itou/fixtures/django/ -name '*.json' | sort | xargs django-admin loaddata
+python "$APP_HOME"/itou/siae_evaluations/fixtures.py
