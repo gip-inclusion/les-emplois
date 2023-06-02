@@ -90,7 +90,6 @@ class SiaeJobApplicationListViewTest(S3AccessingTestCase):
             + 2  # fetch siae membership and siae infos
             + 1  # fetch evaluated siae
             + 2  # fetch evaluatedjobapplication and its prefetched evaluatedadministrativecriteria
-            + 1  # aggregate min evaluation_campaign notification date
             + 1  # weird fetch siae membership
             # NOTE(vperron): the prefecth is necessary to check the SUBMITTABLE state of the evaluated siae
             # We do those requests "two times" but at least it's now accurate information, and we get
@@ -102,7 +101,6 @@ class SiaeJobApplicationListViewTest(S3AccessingTestCase):
         ):
             response = self.client.get(self.url(evaluated_siae))
 
-        assert evaluated_siae.evaluation_campaign.evaluations_asked_at == response.context["evaluations_asked_at"]
         assert evaluated_job_application == response.context["evaluated_job_applications"][0]
         assert reverse("dashboard:index") == response.context["back_url"]
 

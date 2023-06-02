@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
-from django.db.models import Min, Q
+from django.db.models import Q
 from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_list_or_404, get_object_or_404, render
 from django.urls import reverse
@@ -522,16 +522,11 @@ def siae_job_applications_list(
         .prefetch_related("evaluated_administrative_criteria")
     )
 
-    evaluations_asked_at = evaluated_job_applications.aggregate(
-        date=Min("evaluated_siae__evaluation_campaign__evaluations_asked_at")
-    ).get("date")
-
     back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
 
     context = {
         "evaluated_siae": evaluated_siae,
         "evaluated_job_applications": evaluated_job_applications,
-        "evaluations_asked_at": evaluations_asked_at,
         "is_submittable": evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.SUBMITTABLE,
         "back_url": back_url,
     }
