@@ -629,7 +629,6 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
             **self._get_profile_data_from_session(),
         )
 
-    @transaction.atomic
     def post(self, request, *args, **kwargs):
         try:
             user = User.create_job_seeker_by_proxy(self.sender, **self._get_user_data_from_session())

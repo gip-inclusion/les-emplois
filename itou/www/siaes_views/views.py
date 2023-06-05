@@ -1,7 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -78,7 +77,6 @@ def job_description_card(request, job_description_id, template_name="siaes/job_d
 
 
 @login_required
-@transaction.atomic
 def job_description_list(request, template_name="siaes/job_description_list.html"):
     siae = get_current_siae_or_404(request, with_job_descriptions=True)
     job_descriptions = (
@@ -242,7 +240,6 @@ def edit_job_description_details(request, template_name="siaes/edit_job_descript
 
 
 @login_required
-@transaction.atomic
 def edit_job_description_preview(request, template_name="siaes/edit_job_description_preview.html"):
     siae = get_current_siae_or_404(request)
     session_data = request.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
@@ -411,7 +408,6 @@ def card(request, siae_id, template_name="siaes/card.html"):
 
 
 @login_required
-@transaction.atomic
 def create_siae(request, template_name="siaes/create_siae.html"):
     current_siae = get_current_siae_or_404(request)
     if not request.user.can_create_siae_antenna(parent_siae=current_siae):
@@ -425,7 +421,6 @@ def create_siae(request, template_name="siaes/create_siae.html"):
     )
 
     if request.method == "POST" and form.is_valid():
-
         try:
             siae = form.save()
             request.session[global_constants.ITOU_SESSION_CURRENT_SIAE_KEY] = siae.pk
@@ -485,7 +480,6 @@ def edit_siae_step_description(request, template_name="siaes/edit_siae_descripti
 
 
 @login_required
-@transaction.atomic
 def edit_siae_step_preview(request, template_name="siaes/edit_siae_preview.html"):
     if ITOU_SESSION_EDIT_SIAE_KEY not in request.session:
         return HttpResponseRedirect(reverse("siaes_views:edit_siae_step_contact_infos"))

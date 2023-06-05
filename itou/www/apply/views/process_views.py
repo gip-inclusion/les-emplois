@@ -690,11 +690,10 @@ def delete_prior_action(request, job_application_id, prior_action_id):
     prior_action = get_object_or_404(PriorAction.objects.filter(job_application=job_application), pk=prior_action_id)
 
     state_changed = False
-    with transaction.atomic():
-        prior_action.delete()
-        if job_application.state.is_prior_to_hire and not job_application.prior_actions.exists():
-            job_application.cancel_prior_to_hire(user=request.user)
-            state_changed = True
+    prior_action.delete()
+    if job_application.state.is_prior_to_hire and not job_application.prior_actions.exists():
+        job_application.cancel_prior_to_hire(user=request.user)
+        state_changed = True
 
     content = (
         loader.render_to_string(
@@ -761,13 +760,12 @@ def add_or_modify_prior_action(request, job_application_id, prior_action_id=None
                     del form.errors[field]
         elif form.is_valid():
             state_update = False
-            with transaction.atomic():
-                if prior_action is None:
-                    form.instance.job_application = job_application
-                    if not job_application.state.is_prior_to_hire:
-                        job_application.move_to_prior_to_hire(user=request.user)
-                        state_update = True
-                form.save()
+            if prior_action is None:
+                form.instance.job_application = job_application
+                if not job_application.state.is_prior_to_hire:
+                    job_application.move_to_prior_to_hire(user=request.user)
+                    state_update = True
+            form.save()
             geiq_eligibility_diagnosis = None
             if state_update and job_application.to_siae.kind == SiaeKind.GEIQ:
                 geiq_eligibility_diagnosis = _get_geiq_eligibility_diagnosis_for_siae(job_application)

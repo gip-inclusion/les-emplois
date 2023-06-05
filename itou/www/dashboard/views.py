@@ -5,7 +5,6 @@ from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
-from django.db import transaction
 from django.db.models import Q
 from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -179,10 +178,9 @@ def edit_user_email(request, template_name="dashboard/edit_user_email.html"):
         return HttpResponseForbidden()
     form = EditUserEmailForm(data=request.POST or None, user_email=request.user.email)
     if request.method == "POST" and form.is_valid():
-        with transaction.atomic():
-            request.user.email = form.cleaned_data["email"]
-            request.user.save()
-            request.user.emailaddress_set.all().delete()
+        request.user.email = form.cleaned_data["email"]
+        request.user.save()
+        request.user.emailaddress_set.all().delete()
         auth.logout(request)
         return HttpResponseRedirect(reverse("account_logout"))
 
