@@ -5,7 +5,6 @@ pip-tools  # https://github.com/jazzband/pip-tools/
 # Utils
 # ------------------------------------------------------------------------------
 beautifulsoup4  # https://code.launchpad.net/beautifulsoup
-html5lib  # https://github.com/html5lib/html5lib-python
 ipdb  # https://github.com/gotcha/ipdb
 
 # Code quality
