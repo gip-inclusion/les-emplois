@@ -11,9 +11,9 @@
             <strong class="mr-2">{{ job_application.sender_siae.display_name }}</strong>
             {% if request.user.is_siae_staff %}
                 {% if job_application.origin == JobApplicationOrigin.PE_APPROVAL %}
-                    <i class="ri-hotel-line mr-2" aria-hidden="true"></i>Employeur (Import agrément Pôle emploi)
+                    <i class="ri-community-line mr-2" aria-hidden="true"></i>Employeur (Import agrément Pôle emploi)
                 {% else %}
-                    <i class="ri-hotel-line mr-2" aria-hidden="true"></i>Employeur (Auto-prescription)
+                    <i class="ri-community-line mr-2" aria-hidden="true"></i>Employeur (Auto-prescription)
                 {% endif %}
             {% endif %}
         {% elif job_application.sender_kind == SenderKind.PRESCRIBER %}
