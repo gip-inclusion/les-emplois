@@ -5,7 +5,7 @@ import respx
 from django.conf import settings
 from django.contrib import messages
 from django.core import mail
-from django.test import override_settings
+from django.test import Client, override_settings
 from django.urls import reverse
 from django.utils.html import escape
 from django.utils.http import urlencode
@@ -144,6 +144,50 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
             next_url=next_url,
         )
         response = self.client.get(response.url)
+        # Check user is redirected to the dashboard
+        self.assertRedirects(response, reverse("dashboard:index"))
+
+        # Check `User` state.
+        assert siae.has_admin(user)
+        assert 1 == siae.members.count()
+        assert 2 == user.siae_set.count()
+
+    @freeze_time("2022-09-15 15:53:54")
+    @respx.mock
+    def test_join_an_siae_without_members_as_an_existing_siae_staff_returns_on_other_browser(self):
+        """
+        A user joins an SIAE without members.
+        """
+        siae = SiaeFactory(kind=SiaeKind.ETTI)
+
+        user = SiaeStaffFactory(email=OIDC_USERINFO["email"], has_completed_welcoming_tour=True)
+        SiaeMembershipFactory(user=user)
+
+        magic_link = siae.signup_magic_link
+        response = self.client.get(magic_link)
+        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
+
+        # Check IC will redirect to the correct url
+        token = siae.get_token()
+        previous_url = reverse("signup:siae_user", args=(siae.pk, token))
+        next_url = reverse("signup:siae_join", args=(siae.pk, token))
+        params = {
+            "user_kind": KIND_SIAE_STAFF,
+            "previous_url": previous_url,
+            "next_url": next_url,
+        }
+        url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
+        self.assertContains(response, url + '"')
+
+        other_client = Client()
+        response = mock_oauth_dance(
+            self.client,
+            KIND_SIAE_STAFF,
+            previous_url=previous_url,
+            next_url=next_url,
+            other_client=other_client,
+        )
+        response = other_client.get(response.url)
         # Check user is redirected to the dashboard
         self.assertRedirects(response, reverse("dashboard:index"))
 

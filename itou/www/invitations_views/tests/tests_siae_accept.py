@@ -5,6 +5,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.core import mail
 from django.shortcuts import reverse
+from django.test import Client
 from django.utils.html import escape
 
 from itou.invitations.factories import ExpiredSiaeStaffInvitationFactory, SentSiaeStaffInvitationFactory
@@ -73,6 +74,48 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
             next_url=next_url,
         )
         response = self.client.get(response.url, follow=True)
+        # Check user is redirected to the welcoming tour
+        last_url, _status_code = response.redirect_chain[-1]
+        assert last_url == reverse("welcoming_tour:index")
+
+        total_users_after = User.objects.count()
+        assert (total_users_before + 1) == total_users_after
+
+        user = User.objects.get(email=invitation.email)
+        self.assert_accepted_invitation(response, invitation, user)
+
+    @respx.mock
+    def test_accept_invitation_signup_returns_on_other_browser(self):
+        invitation = SentSiaeStaffInvitationFactory(email=OIDC_USERINFO["email"])
+        response = self.client.get(invitation.acceptance_link, follow=True)
+        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
+
+        # We don't put the full path with the FQDN in the parameters
+        previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
+        next_url = reverse("invitations_views:join_siae", args=(invitation.pk,))
+        params = {
+            "user_kind": KIND_SIAE_STAFF,
+            "user_email": invitation.email,
+            "channel": "invitation",
+            "previous_url": previous_url,
+            "next_url": next_url,
+        }
+        url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
+        self.assertContains(response, url + '"')
+
+        total_users_before = User.objects.count()
+
+        other_client = Client()
+        response = mock_oauth_dance(
+            self.client,
+            KIND_SIAE_STAFF,
+            user_email=invitation.email,
+            channel="invitation",
+            previous_url=previous_url,
+            next_url=next_url,
+            other_client=other_client,
+        )
+        response = other_client.get(response.url, follow=True)
         # Check user is redirected to the welcoming tour
         last_url, _status_code = response.redirect_chain[-1]
         assert last_url == reverse("welcoming_tour:index")

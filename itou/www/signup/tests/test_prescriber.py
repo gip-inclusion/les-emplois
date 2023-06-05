@@ -5,7 +5,7 @@ import respx
 from django.conf import settings
 from django.contrib import auth, messages
 from django.core import mail
-from django.test import override_settings
+from django.test import Client, override_settings
 from django.urls import reverse
 from django.utils.html import escape
 from django.utils.http import urlencode
@@ -135,6 +135,77 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         assert user.prescribermembership_set.count() == 1
         assert user.prescribermembership_set.get().organization_id == organization.pk
         assert user.siae_set.count() == 0
+
+    @respx.mock
+    @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
+    def test_create_user_prescriber_with_authorized_org_returns_on_other_browser(self, mock_call_ban_geocoding_api):
+        siret = "26570134200148"
+
+        # Step 1: search organizations with SIRET
+        url = reverse("signup:prescriber_check_already_exists")
+        post_data = {
+            "siret": siret,
+            "department": "67",
+        }
+        response = self.client.post(url, data=post_data)
+
+        # Step 2: ask the user to choose the organization he's working for in a pre-existing list.
+        url = reverse("signup:prescriber_choose_org", kwargs={"siret": siret})
+        self.assertRedirects(response, url)
+        post_data = {
+            "kind": PrescriberOrganizationKind.CAP_EMPLOI.value,
+        }
+        response = self.client.post(url, data=post_data)
+        mock_call_ban_geocoding_api.assert_called_once()
+
+        # Step 3: Inclusion Connect button
+        url = reverse("signup:prescriber_user")
+        self.assertRedirects(response, url)
+        response = self.client.get(url)
+        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
+        # Check IC will redirect to the correct url
+        previous_url = reverse("signup:prescriber_user")
+        next_url = reverse("signup:prescriber_join_org")
+        params = {
+            "user_kind": KIND_PRESCRIBER,
+            "previous_url": previous_url,
+            "next_url": next_url,
+        }
+        url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
+        self.assertContains(response, url + '"')
+
+        other_client = Client()
+        response = mock_oauth_dance(
+            self.client,
+            KIND_PRESCRIBER,
+            previous_url=previous_url,
+            next_url=next_url,
+            other_client=other_client,
+        )
+        # Follow the redirection.
+        response = other_client.get(response.url, follow=True)
+        self.assertTemplateUsed(response, "welcoming_tour/prescriber.html")
+
+        # Check `User` state.
+        user = User.objects.get(email=OIDC_USERINFO["email"])
+        assert user.kind == UserKind.PRESCRIBER
+
+        # Check `EmailAddress` state.
+        user_emails = user.emailaddress_set.all()
+        # Emails are not checked in Django anymore.
+        # Make sure no confirmation email is sent.
+        assert len(user_emails) == 0
+
+        # Check organization.
+        org = PrescriberOrganization.objects.get(siret=siret)
+        assert not org.is_authorized
+        assert org.authorization_status == PrescriberAuthorizationStatus.NOT_SET
+
+        # Check membership.
+        assert 1 == user.prescriberorganization_set.count()
+        assert user.prescribermembership_set.count() == 1
+        membership = user.prescribermembership_set.get(organization=org)
+        assert membership.is_admin
 
     @respx.mock
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)

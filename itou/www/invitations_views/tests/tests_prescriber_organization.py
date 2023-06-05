@@ -7,6 +7,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.core import mail
 from django.shortcuts import reverse
+from django.test import Client
 from django.utils.html import escape
 
 from itou.invitations.factories import PrescriberWithOrgSentInvitationFactory
@@ -278,6 +279,44 @@ class TestAcceptPrescriberWithOrgInvitation(InclusionConnectBaseTestCase):
         )
         # Follow the redirection.
         response = self.client.get(response.url, follow=True)
+        self.assertTemplateUsed(response, "welcoming_tour/prescriber.html")
+
+        user = User.objects.get(email=invitation.email)
+        self.assert_invitation_is_accepted(response, user, invitation)
+
+    @respx.mock
+    def test_accept_prescriber_org_invitation_returns_on_other_browser(self):
+        invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
+        response = self.client.get(invitation.acceptance_link)
+        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
+
+        # We don't put the full path with the FQDN in the parameters
+        previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
+        next_url = reverse("invitations_views:join_prescriber_organization", args=(invitation.pk,))
+        params = {
+            "user_kind": UserKind.PRESCRIBER,
+            "user_email": invitation.email,
+            "channel": "invitation",
+            "previous_url": previous_url,
+            "next_url": next_url,
+        }
+        url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
+        self.assertContains(response, url + '"')
+
+        other_client = Client()
+        invitation.email = OIDC_USERINFO["email"]
+        invitation.save()
+        response = mock_oauth_dance(
+            self.client,
+            UserKind.PRESCRIBER,
+            user_email=invitation.email,
+            channel="invitation",
+            previous_url=previous_url,
+            next_url=next_url,
+            other_client=other_client,
+        )
+        # Follow the redirection.
+        response = other_client.get(response.url, follow=True)
         self.assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
         user = User.objects.get(email=invitation.email)
