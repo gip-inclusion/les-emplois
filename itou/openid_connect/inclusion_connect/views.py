@@ -13,6 +13,7 @@ from django.utils.safestring import mark_safe
 
 from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF, IdentityProvider, UserKind
 from itou.users.models import User
+from itou.utils import constants as global_constants
 from itou.utils.constants import ITOU_ASSISTANCE_URL
 from itou.utils.urls import add_url_params, get_absolute_url
 
@@ -43,6 +44,7 @@ class InclusionConnectStateData:
     # Tells us where did the user came from so that we can adapt
     # error messages in the callback view.
     is_login: bool = False  # Used to skip kind check and allow login through the wrong user kind
+    prescriber_session_data: dict = None
 
     def asdict(self):
         return dataclasses.asdict(self)
@@ -120,6 +122,9 @@ def inclusion_connect_authorize(request):
         ic_data.user_firstname = request.GET.get("user_firstname")
         ic_data.user_lastname = request.GET.get("user_lastname")
 
+    if session_data := request.session.get(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY):
+        ic_data.prescriber_session_data = {global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY: session_data}
+
     data = _generate_inclusion_params_from_session(ic_data.asdict())
     # Store the state in session to allow the user to use resume registration view
     ic_session = InclusionConnectSession(state=data["state"])
@@ -132,6 +137,7 @@ def inclusion_connect_authorize(request):
     return HttpResponseRedirect(f"{base_url}?{urlencode(data)}")
 
 
+# TODO(alaurent) Remove a few days after IC django is Live
 def inclusion_connect_resume_registration(request):
     """
     Used for users that didn't received the validation e-mail from Inclusion Connect.
@@ -319,6 +325,11 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
     # Because we have more than one Authentication backend in our settings, we need to specify
     # the one we want to use in login
     login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+
+    # reattach prescriber session
+    if prescriber_session_data := ic_state.data.get("prescriber_session_data"):
+        request.session.update(prescriber_session_data)
+
     next_url = ic_state.data["next_url"] or get_adapter(request).get_login_redirect_url(request)
     return HttpResponseRedirect(next_url)
 

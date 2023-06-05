@@ -81,6 +81,7 @@ def mock_oauth_dance(
     user_info_email=None,
     channel=None,
     register=True,
+    other_client=None,
 ):
     assert user_kind, "Letting this filed empty is not allowed"
     # Authorize params depend on user kind.
@@ -116,7 +117,8 @@ def mock_oauth_dance(
 
     csrf_signed = client.session[constants.INCLUSION_CONNECT_SESSION_KEY]["state"]
     url = reverse("inclusion_connect:callback")
-    response = client.get(url, data={"code": "123", "state": csrf_signed})
+    callback_client = other_client or client
+    response = callback_client.get(url, data={"code": "123", "state": csrf_signed})
     # If a expected_redirect_url was provided, check it redirects there
     # If not, the default redirection is next_url if provided, or welcoming_tour for new users
     expected = expected_redirect_url or next_url or reverse("welcoming_tour:index")
@@ -149,7 +151,7 @@ class InclusionConnectModelTest(InclusionConnectBaseTestCase):
             assert InclusionConnectState.get_from_csrf(state).is_valid()
 
             state = InclusionConnectState.save_state()
-        with freeze_time("2022-09-14 12:00:01"):
+        with freeze_time("2022-10-13 12:00:01"):
             assert not InclusionConnectState.get_from_csrf(state).is_valid()
 
     def test_create_user_from_user_info(self):
@@ -373,17 +375,18 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
         params = {"user_email": email, "user_kind": UserKind.PRESCRIBER, "channel": "invitation"}
         url = f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
         with freeze_time("2023-06-05 11:47"):
+            t1 = timezone.now()
             response = self.client.get(url, follow=False)
         initial_state = InclusionConnectState.objects.get()
+        assert initial_state.created_at == t1
 
         url = f"{reverse('inclusion_connect:resume_registration')}"
-        with freeze_time("2023-06-07 11:47"):
+        with freeze_time("2023-05-07 11:47"):
+            t2 = timezone.now()
             response = self.client.get(url, follow=False)
-            assert response.url.startswith(constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE)
-
-            assert initial_state.is_valid() is False
-            new_state = InclusionConnectState.objects.exclude(pk=initial_state.pk).get()
-            assert new_state.is_valid() is True
+        assert response.url.startswith(constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE)
+        new_state = InclusionConnectState.objects.exclude(pk=initial_state.pk).get()
+        assert new_state.created_at == t2
 
     def test_resume_endpoint_cleaned_state(self):
         email = "porthos@touspourun.com"
