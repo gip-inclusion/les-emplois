@@ -27,7 +27,7 @@ def _create_active_campaigns_calendar(apps, _):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("siae_evaluations", "0006_alter_evaluationcampaign_calendar"),
+        ("siae_evaluations", "0006_evaluationcampaign_calendar"),
     ]
 
     operations = [
