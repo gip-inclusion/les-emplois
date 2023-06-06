@@ -44,3 +44,9 @@ class ProlongationReason(models.TextChoices):
 
         empty = [(None, cls.__empty__)] if hasattr(cls, "__empty__") else []
         return empty + [(enum.value, enum.label) for enum in enums]
+
+
+class ProlongationRequestStatus(models.TextChoices):
+    PENDING = "PENDING", "A traiter"
+    GRANTED = "GRANTED", "Acceptée"
+    DENIED = "DENIED", "Refusée"

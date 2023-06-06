@@ -37,6 +37,7 @@ def _model_sanity_check():
         "members",
         "prescribermembership",
         "prolongation",
+        "prolongationrequest",
     }
     if relation_fields != expected_fields:
         raise RuntimeError(
@@ -108,6 +109,8 @@ def organization_merge_into(from_id, to_id, *, wet_run):
     # for validation concerns on some specific prolongation reasons
     prolongations = approvals_models.Prolongation.objects.filter(prescriber_organization_id=from_id)
     logger.info("| Prolongations: %s", prolongations.count())
+    prolongation_requests = approvals_models.ProlongationRequest.objects.filter(prescriber_organization_id=from_id)
+    logger.info("| Prolongation Requests: %s", prolongation_requests.count())
 
     if wet_run:
         with transaction.atomic():
@@ -117,6 +120,7 @@ def organization_merge_into(from_id, to_id, *, wet_run):
             geiq_diagnoses.update(author_prescriber_organization_id=to_id)
             invitations.update(organization_id=to_id)
             prolongations.update(prescriber_organization_id=to_id)
+            prolongation_requests.update(prescriber_organization_id=to_id)
             from_organization.delete()
     else:
         logger.info("Nothing to do in dry run mode.")

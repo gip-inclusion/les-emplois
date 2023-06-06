@@ -120,6 +120,10 @@ class ProlongationInline(admin.TabularInline):
         return False
 
 
+class ProlongationRequestInline(ProlongationInline):
+    model = models.ProlongationRequest
+
+
 class IsValidFilter(admin.SimpleListFilter):
     title = "En cours de validité"
     parameter_name = "is_valid"
@@ -197,6 +201,7 @@ class ApprovalAdmin(admin.ModelAdmin):
     inlines = (
         SuspensionInline,
         ProlongationInline,
+        ProlongationRequestInline,
         JobApplicationInline,
         PkSupportRemarkInline,
     )
@@ -344,8 +349,7 @@ class SuspensionAdmin(admin.ModelAdmin):
         super().save_model(request, obj, form, change)
 
 
-@admin.register(models.Prolongation)
-class ProlongationAdmin(admin.ModelAdmin):
+class ProlongationCommonAdmin(admin.ModelAdmin):
     list_display = (
         "pk",
         "approval",
@@ -361,6 +365,7 @@ class ProlongationAdmin(admin.ModelAdmin):
         "approval",
         "declared_by",
         "declared_by_siae",
+        "prescriber_organization",
         "validated_by",
         "prescriber_organization",
         "created_by",
@@ -394,7 +399,7 @@ class ProlongationAdmin(admin.ModelAdmin):
     report_file_link.short_description = "Lien du fichier bilan"
 
     def get_queryset(self, request):
-        # Speed up the list display view by fecthing related objects.
+        # Speed up the list display view by fetching related objects.
         return super().get_queryset(request).select_related("approval", "declared_by", "validated_by")
 
     def save_model(self, request, obj, form, change):
@@ -403,6 +408,16 @@ class ProlongationAdmin(admin.ModelAdmin):
         else:
             obj.created_by = request.user
         super().save_model(request, obj, form, change)
+
+
+@admin.register(models.ProlongationRequest)
+class ProlongationRequestAdmin(ProlongationCommonAdmin):
+    readonly_fields = ProlongationCommonAdmin.readonly_fields + ("processed_at", "processed_by")
+
+
+@admin.register(models.Prolongation)
+class ProlongationCommonAdmin(ProlongationCommonAdmin):
+    raw_id_fields = ProlongationCommonAdmin.raw_id_fields + ("request",)
 
 
 @admin.register(models.PoleEmploiApproval)
