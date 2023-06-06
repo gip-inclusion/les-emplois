@@ -246,6 +246,7 @@ class EvaluationCampaign(models.Model):
         emails = []
         accept_by_default = []
         transition_to_adversarial_stage = []
+        auto_validation = []
         for evaluated_siae in siaes_not_reviewed:
             state = evaluated_siae.state
             if state in [
@@ -260,6 +261,23 @@ class EvaluationCampaign(models.Model):
                 evaluated_siae.final_reviewed_at = now
                 accept_by_default.append(evaluated_siae)
                 emails.append(SIAEEmailFactory(evaluated_siae).force_accepted())
+            else:
+                # evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE needs a reviewed_at
+                # evaluation_enums.EvaluatedSiaeState.NOTIFICATION_PENDING needs evaluation_is_final
+                assert state in (
+                    evaluation_enums.EvaluatedSiaeState.ACCEPTED,
+                    evaluation_enums.EvaluatedSiaeState.REFUSED,
+                ), state
+                # The DDETS set the review_state on all documents but forgot to submit its review
+                # The validation is automatically triggered by this transition to adversarial phase
+                auto_validation.append(evaluated_siae)
+                evaluated_siae.reviewed_at = now
+                if state == evaluation_enums.EvaluatedSiaeState.ACCEPTED:
+                    emails.append(SIAEEmailFactory(evaluated_siae).reviewed(adversarial=False))
+                    evaluated_siae.final_reviewed_at = now
+                else:
+                    emails.append(SIAEEmailFactory(evaluated_siae).adversarial_stage())
+
         if transition_to_adversarial_stage or accept_by_default:
             transition_to_adversarial_stage.sort(key=lambda evaluated_siae: evaluated_siae.siae.name)
             accept_by_default.sort(key=lambda evaluated_siae: evaluated_siae.siae.name)
@@ -268,9 +286,9 @@ class EvaluationCampaign(models.Model):
                 accept_by_default,
             )
             emails.append(summary_email)
-            send_email_messages(emails)
+        send_email_messages(emails)
         EvaluatedSiae.objects.bulk_update(
-            accept_by_default + transition_to_adversarial_stage,
+            accept_by_default + transition_to_adversarial_stage + auto_validation,
             ["reviewed_at", "final_reviewed_at"],
         )
 

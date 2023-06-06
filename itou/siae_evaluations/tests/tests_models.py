@@ -223,6 +223,7 @@ class TestEvaluationCampaignManagerEligibleJobApplication:
         assert [] == list(evaluation_campaign.eligible_job_applications())
 
 
+@pytest.mark.usefixtures("unittest_compatibility")
 class EvaluationCampaignManagerTest(TestCase):
     def test_validate_institution(self):
 
@@ -695,6 +696,63 @@ class EvaluationCampaignManagerTest(TestCase):
             "Les emplois de l'inclusion\n"
             "http://127.0.0.1:8000"
         )
+
+    @freeze_time("2023-01-02 11:11:11")
+    def test_transition_to_adversarial_phase_accepted_but_not_reviewed(self):
+        campaign = EvaluationCampaignFactory(institution__name="DDETS 1")
+        evaluated_siae_submitted = EvaluatedSiaeFactory(
+            evaluation_campaign=campaign, siae__name="Prim’vert", siae__pk=1234
+        )
+        evaluated_jobapp_submitted = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_submitted)
+
+        assert evaluated_siae_submitted.reviewed_at is None
+        # The DDETS set the review_state to ACCEPTED but forgot to validate its review (hence the None reviewed_at)
+        EvaluatedAdministrativeCriteriaFactory(
+            submitted_at=timezone.now() - relativedelta(days=6),
+            evaluated_job_application=evaluated_jobapp_submitted,
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+        )
+
+        campaign.transition_to_adversarial_phase()
+
+        # Transitioned to ACCEPTED, the DDETS review was automatically validated
+        evaluated_siae_submitted.refresh_from_db()
+        assert evaluated_siae_submitted.reviewed_at == datetime.datetime(2023, 1, 2, 11, 11, 11, tzinfo=datetime.UTC)
+        assert evaluated_siae_submitted.final_reviewed_at == datetime.datetime(
+            2023, 1, 2, 11, 11, 11, tzinfo=datetime.UTC
+        )
+        assert evaluated_siae_submitted.state == evaluation_enums.EvaluatedSiaeState.ACCEPTED
+
+        [siae_email] = mail.outbox
+        assert siae_email.subject == f"Résultat du contrôle - EI Prim’vert ID-{evaluated_siae_submitted.siae_id}"
+        assert siae_email.body == self.snapshot(name="positive review email body")
+
+    @freeze_time("2023-01-02 11:11:11")
+    def test_transition_to_adversarial_phase_refused_but_not_reviewed(self):
+        campaign = EvaluationCampaignFactory(institution__name="DDETS 1")
+        evaluated_siae_submitted = EvaluatedSiaeFactory(
+            evaluation_campaign=campaign, siae__name="Prim’vert", siae__pk=1234
+        )
+        evaluated_jobapp_submitted = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_submitted)
+
+        assert evaluated_siae_submitted.reviewed_at is None
+        # The DDETS set the review_state to REFUSED but forgot to validate its review (hence the None reviewed_at)
+        EvaluatedAdministrativeCriteriaFactory(
+            submitted_at=timezone.now() - relativedelta(days=6),
+            evaluated_job_application=evaluated_jobapp_submitted,
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
+        )
+
+        campaign.transition_to_adversarial_phase()
+
+        # Transitioned to REFUSED, the DDETS review was automatically validated
+        evaluated_siae_submitted.refresh_from_db()
+        assert evaluated_siae_submitted.reviewed_at == datetime.datetime(2023, 1, 2, 11, 11, 11, tzinfo=datetime.UTC)
+        assert evaluated_siae_submitted.state == evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE
+
+        [siae_email] = mail.outbox
+        assert siae_email.subject == f"Résultat du contrôle - EI Prim’vert ID-{evaluated_siae_submitted.siae_id}"
+        assert siae_email.body == self.snapshot(name="negative review email body")
 
     def test_close(self):
         evaluation_campaign = EvaluationCampaignFactory(
