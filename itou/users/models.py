@@ -238,6 +238,7 @@ class User(AbstractUser, AddressMixin):
         validators=[validate_nir],
         blank=True,
     )
+
     lack_of_nir_reason = models.CharField(
         verbose_name="Pas de NIR ?",
         help_text=mark_safe("Indiquez la raison de l'absence de NIR."),
@@ -1163,6 +1164,24 @@ class JobSeekerProfile(models.Model):
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
+    )
+
+    pe_obfuscated_nir = models.CharField(
+        verbose_name="Identifiant PE chiffré",
+        null=True,
+        blank=True,
+        max_length=48,
+        help_text=(
+            "Identifiant PE chiffré, utilisé dans la communication à PE. Son existence implique "
+            "que le nom, prénom, date de naissance et NIR de ce candidat sont connus et valides "
+            "du point de vue de Pôle Emploi.",
+        ),
+    )
+
+    pe_last_certification_attempt_at = models.DateTimeField(
+        verbose_name="Date de la dernière tentative de certification",
+        null=True,
+        help_text="Date à laquelle nous avons tenté pour la dernière fois de certifier ce candidat",
     )
 
     class Meta:
