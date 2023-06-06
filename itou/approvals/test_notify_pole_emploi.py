@@ -8,6 +8,7 @@ import respx
 from django.core import management
 from django.test import override_settings
 from django.utils import timezone
+from freezegun import freeze_time
 
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.approvals.models import Approval
@@ -69,6 +70,7 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         assert approval.pe_notification_exit_code == "NO_JOB_APPLICATION"
 
     @respx.mock
+    @freeze_time("2021-06-21")
     def test_notification_accepted_nominal(self):
         now = timezone.now()
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
@@ -79,6 +81,39 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
             with_jobapplication=True,
             with_jobapplication__to_siae__kind=SiaeKind.ACI,
         )
+        approval.notify_pole_emploi(at=now)
+        approval.refresh_from_db()
+        payload = json.loads(respx.calls.last.request.content)
+        assert payload == {
+            "dateDebutPassIAE": approval.start_at.isoformat(),
+            "dateFinPassIAE": approval.end_at.isoformat(),
+            "idNational": "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ",
+            "numPassIAE": approval.number,
+            "numSIRETsiae": approval.jobapplication_set.first().to_siae.siret,
+            "origineCandidature": "PRES",
+            "statutReponsePassIAE": "A",
+            "typeSIAE": 836,
+        }
+        assert approval.pe_notification_status == "notification_success"
+        assert approval.pe_notification_time == now
+        assert approval.pe_notification_endpoint is None
+        assert approval.pe_notification_exit_code is None
+        approval.user.jobseeker_profile.refresh_from_db()
+        assert approval.user.jobseeker_profile.pe_obfuscated_nir == "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ"
+        assert approval.user.jobseeker_profile.pe_last_certification_attempt_at == datetime.datetime(
+            2021, 6, 21, 0, 0, 0, tzinfo=timezone.utc
+        )
+
+    @respx.mock
+    def test_notification_accepted_with_id_national(self):
+        now = timezone.now()
+        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
+        approval = ApprovalFactory(
+            with_jobapplication=True,
+            with_jobapplication__to_siae__kind=SiaeKind.ACI,
+        )
+        approval.user.jobseeker_profile.pe_obfuscated_nir = "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ"
+        approval.user.jobseeker_profile.save()
         approval.notify_pole_emploi(at=now)
         approval.refresh_from_db()
         payload = json.loads(respx.calls.last.request.content)

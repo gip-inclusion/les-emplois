@@ -577,27 +577,24 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
 
         pe_client = pole_emploi_api_client()
 
-        try:
-            encrypted_nir = pe_client.recherche_individu_certifie(
-                self.user.first_name,
-                self.user.last_name,
-                self.user.birthdate,
-                self.user.nir,
-            )
-        except PoleEmploiAPIException:
-            logger.info(
-                "! notify_pole_emploi approval=%s got a recoverable error in recherche_individu",
-                self,
-            )
-            self.pe_save_should_retry(at)
-            return
-        except PoleEmploiAPIBadResponse as exc:
-            logger.info(
-                "! notify_pole_emploi approval=%s got an unrecoverable error in recherche_individu",
-                self,
-            )
-            self.pe_save_error(api_enums.PEApiEndpoint.RECHERCHE_INDIVIDU, exc.response_code, at)
-            return
+        if not self.user.jobseeker_profile.pe_obfuscated_nir:
+            try:
+                self.user.jobseeker_profile.pe_obfuscated_nir = pe_client.recherche_individu_certifie(
+                    self.user.first_name, self.user.last_name, self.user.birthdate, self.user.nir
+                )
+            except PoleEmploiAPIException:
+                logger.info("! notify_pole_emploi approval=%s got a recoverable error in recherche_individu", self)
+                self.pe_save_should_retry(at)
+                return
+            except PoleEmploiAPIBadResponse as exc:
+                logger.info("! notify_pole_emploi approval=%s got an unrecoverable error in recherche_individu", self)
+                self.pe_save_error(api_enums.PEApiEndpoint.RECHERCHE_INDIVIDU, exc.response_code, at)
+                return
+            else:
+                self.user.jobseeker_profile.pe_last_certification_attempt_at = timezone.now()
+                self.user.jobseeker_profile.save(
+                    update_fields=["pe_obfuscated_nir", "pe_last_certification_attempt_at"]
+                )
 
         typologie_prescripteur = None
         if prescriber_org := job_application.sender_prescriber_organization:
@@ -608,7 +605,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         try:
             pe_client.mise_a_jour_pass_iae(
                 self,
-                encrypted_nir,
+                self.user.jobseeker_profile.pe_obfuscated_nir,
                 siae.siret,
                 type_siae,
                 origine_candidature=job_application_enums.sender_kind_to_pe_origine_candidature(
@@ -1140,7 +1137,6 @@ class Prolongation(models.Model):
         return f"{self.pk} {self.start_at.strftime('%d/%m/%Y')} - {self.end_at.strftime('%d/%m/%Y')}"
 
     def clean(self):
-
         # Min duration == 1 day.
         if self.end_at <= self.start_at:
             raise ValidationError({"end_at": "La durée minimale doit être d'au moins un jour."})
