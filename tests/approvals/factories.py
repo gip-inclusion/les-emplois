@@ -6,10 +6,11 @@ from dateutil.relativedelta import relativedelta
 from faker import Faker
 
 from itou.approvals.enums import Origin, ProlongationReason
-from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, Suspension
+from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, ProlongationRequest, Suspension
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.enums import SiaeKind
 from tests.eligibility.factories import EligibilityDiagnosisFactory
+from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.siaes.factories import SiaeFactory
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
 
@@ -59,11 +60,9 @@ class SuspensionFactory(factory.django.DjangoModelFactory):
     siae = factory.SubFactory(SiaeFactory)
 
 
-class ProlongationFactory(factory.django.DjangoModelFactory):
-    """Generate a Prolongation() object for unit tests."""
-
+class BaseProlongationFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = Prolongation
+        abstract = True
 
     approval = factory.SubFactory(ApprovalFactory)
     start_at = factory.Faker("date_between", start_date=factory.SelfAttribute("..approval.start_at"))
@@ -74,6 +73,24 @@ class ProlongationFactory(factory.django.DjangoModelFactory):
     declared_by_siae = factory.SubFactory(SiaeFactory, with_membership=True)
     validated_by = factory.SubFactory(PrescriberFactory, membership__organization__authorized=True)
     created_by = factory.SelfAttribute("declared_by")
+
+
+class ProlongationRequestFactory(BaseProlongationFactory):
+    prescriber_organization = factory.SubFactory(
+        PrescriberOrganizationFactory,
+        authorized=True,
+    )
+    validated_by = factory.SubFactory(
+        PrescriberFactory, membership__organization=factory.SelfAttribute("...prescriber_organization")
+    )
+
+    class Meta:
+        model = ProlongationRequest
+
+
+class ProlongationFactory(BaseProlongationFactory):
+    class Meta:
+        model = Prolongation
 
 
 class PoleEmploiApprovalFactory(factory.django.DjangoModelFactory):

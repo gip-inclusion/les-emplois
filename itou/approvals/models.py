@@ -9,7 +9,7 @@ from django.contrib.postgres.constraints import ExclusionConstraint
 from django.contrib.postgres.fields import RangeBoundary, RangeOperators
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Case, Count, Q, When
 from django.db.models.functions import Now, TruncDate
 from django.utils import timezone
@@ -911,41 +911,9 @@ class Suspension(models.Model):
         return start_at
 
 
-class ProlongationQuerySet(models.QuerySet):
-    @property
-    def in_progress_lookup(self):
-        now = timezone.now().date()
-        return models.Q(start_at__lte=now, end_at__gte=now)
-
-    def in_progress(self):
-        return self.filter(self.in_progress_lookup)
-
-    def not_in_progress(self):
-        return self.exclude(self.in_progress_lookup)
-
-
-class ProlongationManager(models.Manager):
-    def get_cumulative_duration_for(self, approval, reason=None):
-        """
-        Returns the total duration of all prolongations of the given approval
-        for the given reason (if any).
-        """
-        kwargs = {"approval": approval}
-        if reason:
-            kwargs["reason"] = reason
-        duration = datetime.timedelta(0)
-        for prolongation in self.filter(**kwargs):
-            duration += prolongation.duration
-        return duration
-
-
-class Prolongation(models.Model):
+class CommonProlongation(models.Model):
     """
     Stores a prolongation made by an SIAE for a PASS IAE.
-
-    It is assumed that an authorized prescriber has validated the prolongation
-    beforehand because a self-validated prolongation made by an SIAE would
-    increase the risk of staying on insertion for a candidate.
 
     When a prolongation is saved/edited/deleted, the end date of its approval
     is automatically pushed back or forth with a PostgreSQL trigger:
@@ -1031,7 +999,7 @@ class Prolongation(models.Model):
         on_delete=models.SET_NULL,
     )
 
-    # `created_at` can be different from `validated_by` when created in admin.
+    # `created_by` can be different from `declared_by` when created in admin.
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -1050,6 +1018,8 @@ class Prolongation(models.Model):
         related_name="%(class)ss_updated",
     )
 
+    # FIXME(rsebille): Those fields should only be used in ProlongationRequest(), but they are currently used by
+    #  Prolongation() so keeping them here (while we move to the new process) to not break everything.
     # Optional fields needed for specific `reason` field values
     report_file = models.OneToOneField(
         File,
@@ -1073,43 +1043,16 @@ class Prolongation(models.Model):
         blank=True,
     )
 
-    objects = ProlongationManager.from_queryset(ProlongationQuerySet)()
-
     class Meta:
-        verbose_name = "prolongation"
-        ordering = ["-start_at"]
-        # Use an exclusion constraint to prevent overlapping date ranges.
-        # This requires the btree_gist extension on PostgreSQL.
-        # See "Tip of the Week" https://postgresweekly.com/issues/289
-        # https://docs.djangoproject.com/en/3.1/ref/contrib/postgres/constraints/
+        abstract = True
         constraints = [
-            ExclusionConstraint(
-                name="exclude_%(class)s_overlapping_dates",
-                expressions=(
-                    (
-                        # [start_at, end_at) (inclusive start, exclusive end).
-                        # For prolongations: upper bound of preceding interval is the lower bound of the next.
-                        DateRange(
-                            "start_at",
-                            "end_at",
-                            RangeBoundary(inclusive_lower=True, inclusive_upper=False),
-                        ),
-                        RangeOperators.OVERLAPS,
-                    ),
-                    ("approval", RangeOperators.EQUAL),
-                ),
-                violation_error_message="La période chevauche une prolongation existante pour ce PASS IAE.",
-            ),
             # Report file is not yet defined as mandatory for these reasons. May change though
             models.CheckConstraint(
                 name="check_%(class)s_reason_and_report_file_coherence",
                 violation_error_message="Incohérence entre le fichier de bilan et la raison de prolongation",
                 # Must keep compatibility with old prolongations without report file
-                check=models.Q(report_file=None)
-                | models.Q(report_file__isnull=False, reason__in=PROLONGATION_REPORT_FILE_REASONS),
+                check=Q(report_file=None) | Q(report_file__isnull=False, reason__in=PROLONGATION_REPORT_FILE_REASONS),
             ),
-            # No constraints for contact fields as current data set would not satisfy
-            # contact email and phone to be null: see validation in `clean()`
         ]
 
     def __str__(self):
@@ -1170,6 +1113,9 @@ class Prolongation(models.Model):
         elif any([self.require_phone_interview, self.contact_email, self.contact_phone]):
             raise ValidationError("L'adresse email et le numéro de téléphone ne peuvent être saisis pour ce motif")
 
+    def notify_authorized_prescriber(self):
+        pass  # NOOP
+
     @property
     def duration(self):
         return self.end_at - self.start_at
@@ -1177,9 +1123,6 @@ class Prolongation(models.Model):
     @property
     def is_in_progress(self):
         return self.start_at <= timezone.now().date() <= self.end_at
-
-    def notify_authorized_prescriber(self):
-        NewProlongationToAuthorizedPrescriberNotification(self).send()
 
     def has_reached_max_cumulative_duration(self, additional_duration=None):
         if self.reason not in [
@@ -1206,6 +1149,160 @@ class Prolongation(models.Model):
         elif reason in Prolongation.MAX_CUMULATIVE_DURATION:
             max_duration = Prolongation.MAX_CUMULATIVE_DURATION[reason]["duration"]
         return start_at + max_duration - relativedelta(days=1)
+
+
+class ProlongationRequest(CommonProlongation):
+    status = models.CharField(
+        verbose_name="statut",
+        choices=enums.ProlongationRequestStatus.choices,
+        default=enums.ProlongationRequestStatus.PENDING,
+        max_length=32,
+    )
+
+    processed_at = models.DateTimeField(verbose_name="date de traitement", null=True, blank=True)
+    processed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="traité par",
+        on_delete=models.SET_NULL,
+        related_name="%(class)s_processed",
+        null=True,
+        blank=True,
+    )
+
+    class Meta(CommonProlongation.Meta):
+        verbose_name = "demande de prolongation"
+        verbose_name_plural = "demandes de prolongation"
+        ordering = ["-created_at"]
+        constraints = CommonProlongation.Meta.constraints + [
+            # Phone and email are mandatory when the interview is required
+            models.CheckConstraint(
+                name="check_%(class)s_require_phone_interview",
+                check=Q(require_phone_interview=False) | Q(~Q(contact_email=""), ~Q(contact_phone="")),
+            ),
+            # Approvals can only have 1 PENDING request
+            models.UniqueConstraint(
+                name="unique_%(class)s_approval_for_pending",
+                fields=["approval"],
+                condition=Q(status=enums.ProlongationRequestStatus.PENDING),
+                violation_error_message="Une demande de prolongation à traiter existe déjà pour ce PASS IAE",
+            ),
+        ]
+
+    def grant(self, user):
+        self.status = enums.ProlongationRequestStatus.GRANTED
+        self.processed_by = user
+        self.processed_at = timezone.now()
+        self.updated_by = user
+        prolongation = Prolongation.from_prolongation_request(self)
+
+        with transaction.atomic():  # Not relying on global settings as those two objects *must* be saved together.
+            prolongation.save()
+            self.save()
+
+        return prolongation
+
+    def deny(self, user):
+        self.status = enums.ProlongationRequestStatus.DENIED
+        self.processed_by = user
+        self.processed_at = timezone.now()
+        self.updated_by = user
+        self.save()
+
+
+class ProlongationQuerySet(models.QuerySet):
+    @property
+    def in_progress_lookup(self):
+        now = timezone.now().date()
+        return models.Q(start_at__lte=now, end_at__gte=now)
+
+    def in_progress(self):
+        return self.filter(self.in_progress_lookup)
+
+    def not_in_progress(self):
+        return self.exclude(self.in_progress_lookup)
+
+
+class ProlongationManager(models.Manager):
+    def get_cumulative_duration_for(self, approval, reason=None):
+        """
+        Returns the total duration of all prolongations of the given approval
+        for the given reason (if any).
+        """
+        kwargs = {"approval": approval}
+        if reason:
+            kwargs["reason"] = reason
+        duration = datetime.timedelta(0)
+        for prolongation in self.filter(**kwargs):
+            duration += prolongation.duration
+        return duration
+
+
+class Prolongation(CommonProlongation):
+    request = models.OneToOneField(
+        ProlongationRequest,
+        verbose_name="demande de prolongation",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
+
+    objects = ProlongationManager.from_queryset(ProlongationQuerySet)()
+
+    class Meta(CommonProlongation.Meta):
+        verbose_name = "prolongation"
+        ordering = ["-start_at"]
+        constraints = CommonProlongation.Meta.constraints + [
+            # Use an exclusion constraint to prevent overlapping date ranges.
+            # This requires the btree_gist extension on PostgreSQL.
+            # See "Tip of the Week" https://postgresweekly.com/issues/289
+            # https://docs.djangoproject.com/en/3.1/ref/contrib/postgres/constraints/
+            ExclusionConstraint(
+                name="exclude_%(class)s_overlapping_dates",
+                expressions=(
+                    (
+                        # [start_at, end_at) (inclusive start, exclusive end).
+                        # For prolongations: upper bound of preceding interval is the lower bound of the next.
+                        DateRange(
+                            "start_at",
+                            "end_at",
+                            RangeBoundary(inclusive_lower=True, inclusive_upper=False),
+                        ),
+                        RangeOperators.OVERLAPS,
+                    ),
+                    ("approval", RangeOperators.EQUAL),
+                ),
+                violation_error_message="La période chevauche une prolongation existante pour ce PASS IAE.",
+            ),
+        ]
+
+    @classmethod
+    def from_prolongation_request(cls, prolongation_request):
+        fields_to_copy = {
+            "approval",
+            "start_at",
+            "end_at",
+            "reason",
+            "reason_explanation",
+            "declared_by",
+            "declared_by_siae",
+            "prescriber_organization",
+            "created_by",
+            "report_file",
+            "require_phone_interview",
+            "contact_email",
+            "contact_phone",
+        }
+
+        obj = cls()
+        for field in fields_to_copy:
+            setattr(obj, field, getattr(prolongation_request, field))
+        # The used granting the request can be different than the one that was ask to
+        obj.validated_by = prolongation_request.processed_by
+
+        return obj
+
+    def notify_authorized_prescriber(self):
+        NewProlongationToAuthorizedPrescriberNotification(self).send()
 
 
 class PoleEmploiApprovalManager(models.Manager):
