@@ -2,8 +2,8 @@
 var breakpointMD = getComputedStyle(document.documentElement).getPropertyValue("--breakpoint-md");
 $(window).on("load resize", function() {
     if (window.matchMedia("(min-width: "+breakpointMD+")").matches) {
-        $("job-aside-filters-form").collapse("show");
+        $("#job-aside-filters-form").collapse("show");
     } else {
-        $("job-aside-filters-form").collapse("hide");
+        $("#job-aside-filters-form").collapse("hide");
     }
 });

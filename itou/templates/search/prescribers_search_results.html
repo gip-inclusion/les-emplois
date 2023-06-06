@@ -1,4 +1,5 @@
 {% extends BASE_TEMPLATE %}
+{% load str_filters %}
 
 {% block title %}
     {% with request.GET.city_name as city and request.GET.distance as distance %}
@@ -10,78 +11,92 @@
 {% block script %}
     {{ block.super }}
     <script nonce="{{ CSP_NONCE }}">
+        // Show or Hide the search-filter-form sidebar based on responsive breakpoint
+        var breakpointMD = getComputedStyle(document.documentElement).getPropertyValue("--breakpoint-md");
+        $(window).on("load resize", function() {
+            if (window.matchMedia("(min-width: "+breakpointMD+")").matches) {
+                $("#search-filter-form").collapse("show");
+            } else {
+                $("#search-filter-form").collapse("hide");
+            }
+        });
         $("#search-filter-form :input").change(function() {
             $("#search-form").submit();
         });
-        // If the Filtres button is present, the associated card should be collapsed on display.
-        if ($("#js-search-filter-button").is(":visible")) {
-            // The button should be always visible now (on windows resize)
-            $("#js-search-filter-button").removeClass("d-md-none");
-            $('#search-filter-form').collapse();
-        }
     </script>
 {% endblock %}
 
 {% block content %}
-    <section class="s-section">
-        <div class="s-section__container container">
-            <div class="row">
-                <div class="col-12">
-                    <h2 class="h1">Rechercher des prescripteurs habilités</h2>
-
-                    <form id="search-form" method="get" class="d-block mb-5">
-                        {% include "search/includes/prescribers_search_form.html" with form=form %}
-
-                        {% if form.is_valid %}
-                            <h3 class="h2">
-                                Prescripteurs à <b>{{ distance }} km</b> du centre de <b>{{ city }}</b>
-                            </h3>
-                        {% endif %}
-
-                        <p class="font-weight-bold text-muted">
-                            {% with prescriber_orgs_page.number as current_page and prescriber_orgs_page.paginator.num_pages as total_pages and prescriber_orgs_page.paginator.count as counter %}
-                                <b>{{ counter }}</b> résultat{{ counter|pluralize }}
-                                {% if prescriber_orgs_page.paginator.num_pages > 1 %}- Page <b>{{ current_page }}</b>/{{ total_pages }}{% endif %}
-                            {% endwith %}
-                        </p>
-
-                        <div class="row">
-                            <div class="col-12 col-md-4">{% include "search/includes/prescribers_search_filters.html" with form=form %}</div>
-                            <div class="col-12 col-md-8">
-                                {% for prescriber_org in prescriber_orgs_page %}
-                                    <div class="card my-4">
-                                        <div class="card-body">
-                                            <h3 class="h2 card-title">
-                                                <a href="{{ prescriber_org.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">
-                                                    {{ prescriber_org.name }}
-                                                </a>
-                                            </h3>
-                                            <h4 class="h5 card-subtitle mb-2 text-muted">
-                                                {{ prescriber_org.get_kind_display }}
-                                                {% if prescriber_org.is_brsa %}(conventionné par le Département pour le suivi des BRSA){% endif %}
-                                            </h4>
-                                            <hr>
-                                            <h4 class="h5 card-subtitle mb-2 text-muted">{{ prescriber_org.address_on_one_line }}</h4>
-                                            <p class="small mb-0 card-text">
-                                                <span class="badge badge-pill badge-info">{{ prescriber_org.distance.km|floatformat:"-1" }} km</span>
-                                                de votre lieu de recherche
-                                            </p>
-                                        </div>
-                                    </div>
-                                {% empty %}
-                                    <div class="card my-4">
-                                        <div class="card-body">
-                                            <p class="font-weight-normal text-muted">Aucun résultat avec les filtres actuels.</p>
-                                        </div>
-                                    </div>
-                                {% endfor %}
-
-                                {% include "includes/pagination.html" with page=prescriber_orgs_page %}
-                            </div>
-                        </div>
-                    </form>
+    <section class="s-title-01">
+        <div class="s-title-01__container container">
+            <div class="s-title-01__row row">
+                <div class="s-title-01__col col-12">
+                    <h1 class="s-title-01__title h1-hero-c1">Rechercher des prescripteurs habilités</h1>
                 </div>
             </div>
         </div>
     </section>
+
+    <form id="search-form" method="get" class="d-block w-100">
+        <section class="s-section mb-0">
+            <div class="s-section__container container">
+                <div class="row">
+                    <div class="col-12">
+                        {% include "search/includes/prescribers_search_form.html" with form=form %}
+                        {% if form.is_valid %}
+                            <h2 class="h3 mt-2">
+                                Prescripteurs à <b>{{ distance }} km</b> du centre de <b>{{ city }}</b>
+                            </h2>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="s-box mt-3">
+            <div class="s-box__container container">
+                <div class="s-box__row row">
+                    <div class="col-12 col-md-4">{% include "search/includes/prescribers_search_filters.html" with form=form %}</div>
+                    <div class="col-12 col-md-8">
+                        <div class="mb-3 mb-md-4">
+                            <h3 class="h4 mb-0">
+                                {% with prescriber_orgs_page.number as current_page and prescriber_orgs_page.paginator.num_pages as total_pages and prescriber_orgs_page.paginator.count as counter %}
+                                    {{ counter }} résultat{{ counter|pluralizefr }}
+                                    {% if total_pages > 1 %}- Page <b>{{ current_page }}</b>/{{ total_pages }}{% endif %}
+                                {% endwith %}
+                            </h3>
+                        </div>
+                        {% for prescriber_org in prescriber_orgs_page %}
+                            <div class="card c-card has-links-inside mb-3 mb-md-4">
+                                <div class="card-body">
+                                    <h3 class="mb-2">
+                                        <a href="{{ prescriber_org.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">
+                                            {{ prescriber_org.name }}
+                                        </a>
+                                    </h3>
+                                    <p class="mb-2">
+                                        <b>{{ prescriber_org.get_kind_display }}</b>
+                                        {% if prescriber_org.is_brsa %}(conventionné par le Département pour le suivi des BRSA){% endif %}
+                                    </p>
+                                    <p class="mb-2 text-muted">{{ prescriber_org.address_on_one_line }}</p>
+                                    <p class="mb-0">
+                                        <span class="badge badge-sm badge-pill badge-primary">{{ prescriber_org.distance.km|floatformat:"-1" }} km</span>
+                                        <span class="text-muted fs-sm ml-1">de votre lieu de recherche</span>
+                                    </p>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="c-card card mb-3 mb-md-4">
+                                <div class="card-body">
+                                    <p>Aucun résultat avec les filtres actuels.</p>
+                                </div>
+                            </div>
+                        {% endfor %}
+
+                        {% include "includes/pagination.html" with page=prescriber_orgs_page %}
+                    </div>
+                </div>
+            </div>
+        </section>
+    </form>
 {% endblock %}

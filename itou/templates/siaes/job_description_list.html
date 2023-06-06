@@ -1,6 +1,7 @@
 {% extends BASE_TEMPLATE %}
 {% load static %}
 {% load bootstrap4 %}
+{% load str_filters %}
 
 {% block title %}Vos fiches de postes {{ block.super }}{% endblock %}
 
@@ -25,7 +26,7 @@
                     <div class="c-box">
                         <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between">
                             <h3 class="h4 mb-0">
-                                {{ job_pager.paginator.count }} métier{{ job_pager.paginator.count|pluralize }} exercé{{ job_pager.paginator.count|pluralize }}
+                                {{ job_pager.paginator.count }} métier{{ job_pager.paginator.count|pluralizefr }} exercé{{ job_pager.paginator.count|pluralizefr }}
                             </h3>
                             <div class="flex-column flex-md-row btn-group btn-group-sm btn-group-action" role="group" aria-label="Actions sur les candidatures">
                                 {% if job_pager %}

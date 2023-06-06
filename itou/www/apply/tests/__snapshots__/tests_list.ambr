@@ -280,8 +280,8 @@
                               <div>
                                   
       
-          <a aria-label="Exporter la liste de candidatures" class="btn btn-ico btn-link pl-0" href="/apply/prescriber/list/exports">
-              <i class="ri-download-2-fill"></i>
+          <a aria-label="Exporter la liste de candidatures" class="btn btn-ico btn-secondary mt-3 mt-md-0" href="/apply/prescriber/list/exports">
+              <i aria-hidden="true" class="ri-download-2-fill"></i>
               <span>Exporter</span>
           </a>
       
@@ -510,17 +510,17 @@
 # name: TestListForSiae.test_warns_about_long_awaiting_applications[SIAE - warnings for 2222 and 3333]
   '''
   <section aria-labelledby="results">
-                          <div class="d-flex flex-column flex-sm-row align-items-sm-center">
-                              <h2 class="mb-0 flex-grow-1" id="results">
+                          <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
+                              <h3 class="h4 mb-0" id="results">
                                   
                                       3 <strong>résultats</strong>
                                   
-                              </h2>
-                              <div>
+                              </h3>
+                              <div aria-label="Actions sur les candidatures" class="flex-column flex-md-row btn-group btn-group-sm btn-group-action" role="group">
                                   
       
-          <a aria-label="Exporter la liste de candidatures" class="btn btn-ico btn-link pl-0" href="/apply/siae/list/exports">
-              <i class="ri-download-2-fill"></i>
+          <a aria-label="Exporter la liste de candidatures" class="btn btn-ico btn-secondary mt-3 mt-md-0" href="/apply/siae/list/exports">
+              <i aria-hidden="true" class="ri-download-2-fill"></i>
               <span>Exporter</span>
           </a>
       
@@ -532,7 +532,7 @@
   
                           
                               
-                                  <div class="c-card card my-4 has-links-inside">
+                                  <div class="c-card card my-3 my-md-4 has-links-inside">
                                       
   
   <div class="card-body">
@@ -590,7 +590,7 @@
                                   
                                       
   
-  <div class="card my-4 px-4 alert-dismissible-once d-none container rounded-lg border-important bg-important-lightest" id="rdvi-promo">
+  <div class="card my-3 my-md-4 px-4 alert-dismissible-once d-none container rounded border-important bg-important-lightest" id="rdvi-promo">
       <div class="row">
           <div class="d-none d-md-block col-md-auto align-self-center">
               <img alt="" class="m-auto" height="90" loading="lazy" src="/static/img/logo_rdv_insertion.svg"/>
@@ -621,7 +621,7 @@
                                   
   
                               
-                                  <div class="c-card card my-4 has-links-inside">
+                                  <div class="c-card card my-3 my-md-4 has-links-inside">
                                       
   
   <div class="card-body">
@@ -684,7 +684,7 @@
                                   
   
                               
-                                  <div class="c-card card my-4 has-links-inside">
+                                  <div class="c-card card my-3 my-md-4 has-links-inside">
                                       
   
   <div class="card-body">
