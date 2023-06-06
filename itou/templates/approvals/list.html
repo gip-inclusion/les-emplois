@@ -20,9 +20,9 @@
         </div>
     </section>
 
-    <section class="s-section">
-        <div class="s-section__container container">
-            <div class="row">
+    <section class="s-box">
+        <div class="s-box__container container">
+            <div class="s-box__row row">
                 <div class="col-12 col-md-4 mb-3 mb-md-5">
                     <aside class="c-aside-filters">
                         <button class="c-aside-filters__btn__collapse" data-toggle="collapse" data-target="#job-aside-filters-form" aria-expanded="false" aria-controls="job-aside-filters-form">
@@ -43,21 +43,20 @@
                         </div>
                     </aside>
                 </div>
-
                 <div class="col-12 col-md-8">
-                    <div class="d-flex flex-column flex-sm-row align-items-sm-center">
-                        <h2 class="h2 mb-0 flex-grow-1">
+                    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
+                        <h3 class="h4 mb-0">
                             {% with paginator.count as counter %}<strong>{{ counter }} résultat{{ counter|pluralizefr }}</strong>{% endwith %}
-                        </h2>
-                        <div>
-                            {% if filters_counter > 0 %}
-                                <a href="{% url 'approvals:list' %}" class="btn btn-link btn-ico pl-0">
-                                    <i class="ri-close-fill"></i>
+                        </h3>
+                        {% if filters_counter > 0 %}
+                            <div class="flex-column flex-md-row btn-group btn-group-sm btn-group-action" role="group" aria-label="Actions sur les filtres de PASS IAE">
+                                <a href="{% url 'approvals:list' %}" class="btn btn-secondary btn-ico">
+                                    <i class="ri-arrow-go-back-line" aria-hidden="true"></i>
                                     <span>Réinitialiser les filtres ({{ filters_counter }})</span>
                                 </a>
-                            {% endif %}
-                        </div>
-                    </div>
+                            </div>
+                        {% endif %}
+                      </div>
                     {% if not approval_list %}
                         <p class="my-3 my-md-4">Aucun salarié pour le moment.</p>
                     {% else %}
