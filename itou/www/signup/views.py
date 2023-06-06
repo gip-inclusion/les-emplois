@@ -700,35 +700,35 @@ def prescriber_join_org(request):
     session_data = request.session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
 
     try:
-        if session_data["kind"] == "PE":
-            # Organization creation is not allowed for PE.
-            pole_emploi_org_pk = session_data.get("pole_emploi_org_pk")
-            # We should not have errors here since we have a PE organization pk from the database.
-            prescriber_org = PrescriberOrganization.objects.get(
-                pk=pole_emploi_org_pk, kind=PrescriberOrganizationKind.PE.value
-            )
-        else:
-            org_attributes = {
-                "siret": session_data["prescriber_org_data"]["siret"],
-                "name": session_data["prescriber_org_data"]["name"],
-                "address_line_1": session_data["prescriber_org_data"]["address_line_1"] or "",
-                "address_line_2": session_data["prescriber_org_data"]["address_line_2"] or "",
-                "post_code": session_data["prescriber_org_data"]["post_code"],
-                "city": session_data["prescriber_org_data"]["city"],
-                "department": session_data["prescriber_org_data"]["department"],
-                "coords": lat_lon_to_coords(
-                    session_data["prescriber_org_data"]["latitude"],
-                    session_data["prescriber_org_data"]["longitude"],
-                ),
-                "geocoding_score": session_data["prescriber_org_data"]["geocoding_score"],
-                "kind": session_data["kind"],
-                "authorization_status": session_data["authorization_status"],
-                "created_by": request.user,
-            }
-            with transaction.atomic():
+        with transaction.atomic():
+            if session_data["kind"] == "PE":
+                # Organization creation is not allowed for PE.
+                pole_emploi_org_pk = session_data.get("pole_emploi_org_pk")
+                # We should not have errors here since we have a PE organization pk from the database.
+                prescriber_org = PrescriberOrganization.objects.get(
+                    pk=pole_emploi_org_pk, kind=PrescriberOrganizationKind.PE.value
+                )
+            else:
+                org_attributes = {
+                    "siret": session_data["prescriber_org_data"]["siret"],
+                    "name": session_data["prescriber_org_data"]["name"],
+                    "address_line_1": session_data["prescriber_org_data"]["address_line_1"] or "",
+                    "address_line_2": session_data["prescriber_org_data"]["address_line_2"] or "",
+                    "post_code": session_data["prescriber_org_data"]["post_code"],
+                    "city": session_data["prescriber_org_data"]["city"],
+                    "department": session_data["prescriber_org_data"]["department"],
+                    "coords": lat_lon_to_coords(
+                        session_data["prescriber_org_data"]["latitude"],
+                        session_data["prescriber_org_data"]["longitude"],
+                    ),
+                    "geocoding_score": session_data["prescriber_org_data"]["geocoding_score"],
+                    "kind": session_data["kind"],
+                    "authorization_status": session_data["authorization_status"],
+                    "created_by": request.user,
+                }
                 prescriber_org = PrescriberOrganization.objects.create_organization(attributes=org_attributes)
 
-        prescriber_org.add_member(user=request.user)
+            prescriber_org.add_member(user=request.user)
 
     except Error:
         messages.error(request, "L'organisation n'a pas pu être créée")
