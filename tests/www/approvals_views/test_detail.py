@@ -223,7 +223,7 @@ class TestApprovalDetailView:
         ## Display prolongations
         default_kwargs = {
             "declared_by": PrescriberFactory(first_name="Milady", last_name="de Winter", email="milady@dewinter.com"),
-            "set_validated_by": False,
+            "validated_by": None,
             "approval": approval,
         }
         # Valid
