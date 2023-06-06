@@ -187,7 +187,7 @@ class JobApplicationWithCompleteJobSeekerProfileFactory(JobApplicationWithApprov
     Suitable for employee records tests
     """
 
-    job_seeker = factory.SubFactory(JobSeekerWithMockedAddressFactory, jobseeker_profile=False)
+    job_seeker = factory.SubFactory(JobSeekerWithMockedAddressFactory)
     sender_prescriber_organization = factory.SubFactory(PrescriberOrganizationWithMembershipFactory)
 
     @factory.post_generation
@@ -196,4 +196,8 @@ class JobApplicationWithCompleteJobSeekerProfileFactory(JobApplicationWithApprov
             # Simple build, do nothing.
             return
         # Create a profile for current user
+        # NOTE(vperron): We have to remove the profile after its creation because our new behaviour in User.save()
+        # forces us to have a JobSeekerProfile ready, immediately. We don't want to adapt the save() to handle a
+        # case that can only happen in tests though.
+        self.job_seeker.jobseeker_profile.delete()
         self.job_seeker.jobseeker_profile = JobSeekerProfileWithHexaAddressFactory(user=self.job_seeker)

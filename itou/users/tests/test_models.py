@@ -1421,3 +1421,54 @@ def test_save_creates_a_job_seeker_profile(user_kind, profile_expected):
     user = User(kind=user_kind)
     user.save()
     assert hasattr(user, "jobseeker_profile") == profile_expected
+
+
+@freezegun.freeze_time("2022-08-10")
+def test_save_erases_pe_obfuscated_nir_if_details_change():
+    UserFactory(
+        email="foobar@truc.com",
+        kind=UserKind.JOB_SEEKER,
+    )
+
+    # trigger the .from_db() method, otherwise the factory would not...
+    user = User.objects.get(email="foobar@truc.com")
+
+    def reset_profile_and_save_user():
+        user.jobseeker_profile.pe_last_certification_attempt_at = timezone.now()
+        user.jobseeker_profile.pe_obfuscated_nir = "XXX_1234567890123_YYY"
+        user.jobseeker_profile.save(update_fields=["pe_obfuscated_nir", "pe_last_certification_attempt_at"])
+        user.save()  # triggers an eventual change in the profile
+        user.jobseeker_profile.refresh_from_db()
+
+    user.nir = "1234567890123"
+    reset_profile_and_save_user()
+    assert user.jobseeker_profile.pe_obfuscated_nir is None
+    assert user.jobseeker_profile.pe_last_certification_attempt_at is None
+
+    user.birthdate = datetime.date(2018, 8, 22)
+    reset_profile_and_save_user()
+    assert user.jobseeker_profile.pe_obfuscated_nir is None
+    assert user.jobseeker_profile.pe_last_certification_attempt_at is None
+
+    user.first_name = "Wazzzzaaaa"
+    reset_profile_and_save_user()
+    assert user.jobseeker_profile.pe_obfuscated_nir is None
+    assert user.jobseeker_profile.pe_last_certification_attempt_at is None
+
+    user.last_name = "Heyyyyyyyyy"
+    reset_profile_and_save_user()
+    assert user.jobseeker_profile.pe_obfuscated_nir is None
+    assert user.jobseeker_profile.pe_last_certification_attempt_at is None
+
+    # then reload the user, and don't change anything in the monitored fields
+    user = User.objects.get(email="foobar@truc.com")
+    user.first_name = "Wazzzzaaaa"
+    user.last_name = "Heyyyyyyyyy"
+    user.nir = "1234567890123"
+    user.birthdate = datetime.date(2018, 8, 22)
+    user.email = "brutal@toto.at"  # change the email though
+    reset_profile_and_save_user()
+    assert user.jobseeker_profile.pe_obfuscated_nir == "XXX_1234567890123_YYY"
+    assert user.jobseeker_profile.pe_last_certification_attempt_at == datetime.datetime(
+        2022, 8, 10, 0, 0, 0, 0, tzinfo=timezone.utc
+    )
