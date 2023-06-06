@@ -28,8 +28,11 @@
                                    data-matomo-action="clic"
                                    data-matomo-option="clic-onglet-employeur"
                                    href="{% url "search:siaes_results" %}?{{ filters_query_string }}">
-                                    <i class="ri-community-line ri-xl font-weight-normal mr-1"></i>
-                                    <span>{{ siaes_count }} employeur{{ siaes_count|pluralize }}</span>
+                                    <i class="ri-hotel-line ri-xl font-weight-normal mr-1"></i>
+                                    <span>
+                                        Employeur{{ siaes_count|pluralize }}
+                                        <span class="badge badge-sm badge-pill badge-info-lighter text-info">{{ siaes_count }}</span>
+                                    </span>
                                 </a>
                             </li>
                             <li class="nav-item" role="presentation">
@@ -38,9 +41,15 @@
                                    data-matomo-action="clic"
                                    data-matomo-option="clic-onglet-fichesdeposte"
                                    href="{% url "search:job_descriptions_results" %}?{{ filters_query_string }}">
-                                    <i class="ri-briefcase-line ri-xl font-weight-normal mr-1"></i>
-                                    <span class="d-inline d-lg-none">{{ job_descriptions_count }} poste{{ job_descriptions_count|pluralize }}</span>
-                                    <span class="d-none d-lg-inline">{{ job_descriptions_count }} poste{{ job_descriptions_count|pluralize }} ouvert{{ job_descriptions_count|pluralize }} au recrutement</span>
+                                    <i class="ri-briefcase-4-line ri-xl font-weight-normal mr-1"></i>
+                                    <span class="d-inline d-lg-none">
+                                        Poste{{ job_descriptions_count|pluralize }}
+                                        <span class="badge badge-sm badge-pill badge-info-lighter text-info">{{ job_descriptions_count }}</span>
+                                    </span>
+                                    <span class="d-none d-lg-inline">
+                                        Poste{{ job_descriptions_count|pluralize }} ouvert{{ job_descriptions_count|pluralize }} au recrutement
+                                        <span class="badge badge-sm badge-pill badge-info-lighter text-info">{{ job_descriptions_count }}</span>
+                                    </span>
                                 </a>
                             </li>
                             <li class="nav-item-dropdown dropdown">
@@ -53,6 +62,15 @@
                                 <div class="row">
                                     <div class="col-12 col-md-4">{% include "search/includes/siaes_search_filters.html" with form=form %}</div>
                                     <div class="col-12 col-md-8">
+                                        <div class="mb-3 mb-md-4">
+                                            <h3 class="h4 mb-0">
+                                                {% if request.resolver_match.view_name == "search:siaes_results" %}
+                                                    {{ siaes_count }} résultats
+                                                {% else %}
+                                                    {{ job_descriptions_count }} résultats
+                                                {% endif %}
+                                            </h3>
+                                        </div>
                                         {% for item in results_page %}
                                             {% if request.resolver_match.view_name == "search:siaes_results" %}
                                                 {% include "siaes/includes/_card_siae.html" with siae=item %}
