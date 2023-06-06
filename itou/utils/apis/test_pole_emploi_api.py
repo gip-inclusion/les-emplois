@@ -143,9 +143,9 @@ class PoleEmploiAPIClientTest(TestCase):
 
         # auth failed
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(401, json={})
-        with pytest.raises(PoleEmploiAPIException):
+        with pytest.raises(PoleEmploiAPIException) as ctx:
             self.api_client.mise_a_jour_pass_iae(job_application.approval, "foo", "bar", 42, "DEAD")
-        assert ctx.value.error_code == "http_error"
+        assert ctx.value.error_code == 401
 
     @respx.mock
     def test_referentiel(self):
