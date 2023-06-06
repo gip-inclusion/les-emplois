@@ -1,4 +1,5 @@
 {% extends BASE_TEMPLATE %}
+{% load str_filters %}
 
 {% block title %}
     {% if form.is_valid %}
@@ -10,18 +11,28 @@
 {% endblock %}
 
 {% block content %}
+    <section class="s-title-01">
+        <div class="s-title-01__container container">
+            <div class="s-title-01__row row">
+                <div class="s-title-01__col col-12">
+                    <h1 class="s-title-01__title h1-hero-c1">Rechercher des employeurs solidaires</h1>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section class="s-tabs-01">
         <div class="s-tabs-01__container container">
             <div class="s-tabs-01__row row">
                 <div class="s-tabs-01__col col-12">
-                    <form id="search-form" method="get" class="d-block w-100 mb-3 mb-md-5">
+                    <form id="search-form" method="get" class="d-block w-100">
                         {% include "search/includes/siaes_search_form.html" with form=form %}
                         {% if form.is_valid %}
-                            <h1 class="h2">
+                            <h2 class="h3 mt-2">
                                 Emplois inclusifs à <strong>{{ distance }} km</strong> du centre de <strong>{{ city }}</strong>
-                            </h1>
+                            </h2>
                         {% endif %}
-                        <ul class="s-tabs-01__nav nav nav-tabs">
+                        <ul class="s-tabs-01__nav nav nav-tabs mt-3 mt-md-5">
                             <li class="nav-item" role="presentation">
                                 <a class="matomo-event nav-link {% if request.resolver_match.view_name == "search:siaes_results" %}active{% endif %}"
                                    data-matomo-category="candidature"
@@ -30,8 +41,7 @@
                                    href="{% url "search:siaes_results" %}?{{ filters_query_string }}">
                                     <i class="ri-hotel-line ri-xl font-weight-normal mr-1"></i>
                                     <span>
-                                        Employeur{{ siaes_count|pluralize }}
-                                        <span class="badge badge-sm badge-pill badge-info-lighter text-info">{{ siaes_count }}</span>
+                                        Employeur{{ siaes_count|pluralizefr }} <span class="badge badge-sm badge-pill badge-info-lighter text-info">{{ siaes_count }}</span>
                                     </span>
                                 </a>
                             </li>
@@ -43,11 +53,11 @@
                                    href="{% url "search:job_descriptions_results" %}?{{ filters_query_string }}">
                                     <i class="ri-briefcase-4-line ri-xl font-weight-normal mr-1"></i>
                                     <span class="d-inline d-lg-none">
-                                        Poste{{ job_descriptions_count|pluralize }}
+                                        Poste{{ job_descriptions_count|pluralizefr }}
                                         <span class="badge badge-sm badge-pill badge-info-lighter text-info">{{ job_descriptions_count }}</span>
                                     </span>
                                     <span class="d-none d-lg-inline">
-                                        Poste{{ job_descriptions_count|pluralize }} ouvert{{ job_descriptions_count|pluralize }} au recrutement
+                                        Poste{{ job_descriptions_count|pluralizefr }} ouvert{{ job_descriptions_count|pluralizefr }} au recrutement
                                         <span class="badge badge-sm badge-pill badge-info-lighter text-info">{{ job_descriptions_count }}</span>
                                     </span>
                                 </a>
@@ -65,9 +75,9 @@
                                         <div class="mb-3 mb-md-4">
                                             <h3 class="h4 mb-0">
                                                 {% if request.resolver_match.view_name == "search:siaes_results" %}
-                                                    {{ siaes_count }} résultats
+                                                    {{ siaes_count }} résultat{{ siaes_count|pluralizefr }}
                                                 {% else %}
-                                                    {{ job_descriptions_count }} résultats
+                                                    {{ job_descriptions_count }} résultat{{ job_descriptions_count|pluralizefr }}
                                                 {% endif %}
                                             </h3>
                                         </div>
