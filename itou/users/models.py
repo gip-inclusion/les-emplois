@@ -350,6 +350,24 @@ class User(AbstractUser, AddressMixin):
     def __str__(self):
         return f"{self.get_full_name()} — {self.email}"
 
+    @classmethod
+    def from_db(cls, db, field_names, values):
+        instance = super().from_db(db, field_names, values)
+        instance._old_values = dict(zip(field_names, values))
+        return instance
+
+    def has_data_changed(self, fields):
+        if hasattr(self, "_old_values"):
+            if not self.pk or not self._old_values:
+                return True
+
+            for field in fields:
+                if getattr(self, field) != self._old_values[field]:
+                    return True
+            return False
+
+        return True
+
     def clean(self):
         """
         Validation for FS
@@ -399,6 +417,11 @@ class User(AbstractUser, AddressMixin):
                 super().save(update_fields=["asp_uid"])
             if must_create_profile:
                 JobSeekerProfile.objects.create(user=self)
+
+            if self.has_data_changed(["nir", "birthdate", "last_name", "first_name"]):
+                self.jobseeker_profile.pe_obfuscated_nir = None
+                self.jobseeker_profile.pe_last_certification_attempt_at = None
+                self.jobseeker_profile.save(update_fields=["pe_obfuscated_nir", "pe_last_certification_attempt_at"])
 
     @property
     def is_job_seeker(self):
