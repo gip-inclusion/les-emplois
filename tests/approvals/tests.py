@@ -1468,7 +1468,6 @@ class ProlongationModelTest(TestCase):
         """
 
         approval = ApprovalFactory()
-        siae = SiaeFactory(with_membership=True)
 
         start_at = approval.end_at - relativedelta(days=2)
         end_at = start_at + relativedelta(months=1)
@@ -1476,7 +1475,13 @@ class ProlongationModelTest(TestCase):
         # We need an object without `pk` to test `clean()`, so we use `build`
         # which provides a local object without saving it to the database.
         prolongation = ProlongationFactory.build(
-            start_at=start_at, end_at=end_at, approval=approval, declared_by_siae=siae
+            start_at=start_at,
+            end_at=end_at,
+            approval=approval,
+            # Force unneeded dependant fields to None as we are using .build()
+            declared_by=None,
+            declared_by_siae=None,
+            validated_by=None,
         )
 
         with pytest.raises(ValidationError) as error:

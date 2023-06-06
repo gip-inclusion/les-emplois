@@ -3,7 +3,6 @@ import functools
 import random
 import string
 
-import factory
 import factory.fuzzy
 from allauth.account import models as allauth_models
 from django.contrib.auth.hashers import make_password
@@ -69,6 +68,16 @@ class ItouStaffFactory(UserFactory):
 class PrescriberFactory(UserFactory):
     kind = UserKind.PRESCRIBER
     identity_provider = IdentityProvider.INCLUSION_CONNECT
+
+    @factory.post_generation
+    def membership(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted or kwargs:
+            from tests.prescribers.factories import PrescriberMembershipFactory
+
+            PrescriberMembershipFactory(user=self, **kwargs)
 
 
 class SiaeStaffFactory(UserFactory):

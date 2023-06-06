@@ -1,7 +1,6 @@
 import datetime
 import string
 
-import factory
 import factory.fuzzy
 from dateutil.relativedelta import relativedelta
 from faker import Faker
@@ -11,9 +10,8 @@ from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, Su
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.enums import SiaeKind
 from tests.eligibility.factories import EligibilityDiagnosisFactory
-from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.siaes.factories import SiaeFactory
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerFactory, PrescriberFactory
 
 
 fake = Faker("fr_FR")
@@ -74,19 +72,8 @@ class ProlongationFactory(factory.django.DjangoModelFactory):
     reason_explanation = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
     declared_by = factory.LazyAttribute(lambda obj: obj.declared_by_siae.members.first())
     declared_by_siae = factory.SubFactory(SiaeFactory, with_membership=True)
+    validated_by = factory.SubFactory(PrescriberFactory, membership__organization__authorized=True)
     created_by = factory.SelfAttribute("declared_by")
-
-    @factory.post_generation
-    def set_validated_by(self, create, extracted, **kwargs):
-        if not create:
-            return
-        # Ignore setting validated_by:
-        # ProlongationFactory(set_validated_by=False)
-        if extracted is False:
-            return
-
-        authorized_prescriber_org = PrescriberOrganizationWithMembershipFactory(authorized=True)
-        self.validated_by = authorized_prescriber_org.members.first()
 
 
 class PoleEmploiApprovalFactory(factory.django.DjangoModelFactory):
