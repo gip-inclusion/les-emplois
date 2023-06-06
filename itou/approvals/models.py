@@ -1386,9 +1386,6 @@ class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
         return f"{self.number[:5]} {self.number[5:7]} {self.number[7:]}"
 
     def notify_pole_emploi(self, at=None):
-        """FIXME(vperron): All this code and tests can probably be removed whenever the notifications
-        have ended and we sent everything to Pole Emploi (no more pending or should retry)
-        """
         pe_client = pole_emploi_api_client()
         try:
             encrypted_nir = pe_client.recherche_individu_certifie(
