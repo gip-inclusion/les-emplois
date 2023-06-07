@@ -55,7 +55,6 @@ class InclusionConnectSession:
     def bind_to_request(self, request):
         request.session[self.key] = dataclasses.asdict(self)
         request.session.has_changed = True
-        return request
 
 
 def _redirect_to_login_page_on_error(error_msg=None, request=None):
@@ -108,7 +107,7 @@ def inclusion_connect_authorize(request):
     ic_session = InclusionConnectSession(
         user_kind=user_kind, previous_url=previous_url, next_url=next_url, is_login=not register
     )
-    request = ic_session.bind_to_request(request)
+    ic_session.bind_to_request(request)
     ic_session = request.session[constants.INCLUSION_CONNECT_SESSION_KEY]
 
     user_email = request.GET.get("user_email")
