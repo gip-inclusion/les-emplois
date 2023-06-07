@@ -584,7 +584,7 @@ class InclusionConnectSessionTest(InclusionConnectBaseTestCase):
         middleware = SessionMiddleware(lambda x: x)
         middleware.process_request(request)
         request.session.save()
-        request = ic_session.bind_to_request(request=request)
+        ic_session.bind_to_request(request)
         assert request.session.get(constants.INCLUSION_CONNECT_SESSION_KEY)
 
 
