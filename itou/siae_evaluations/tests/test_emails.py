@@ -23,16 +23,12 @@ class TestInstitutionEmailFactory:
         institution = InstitutionWith2MembershipFactory()
         evaluation_campaign = EvaluationCampaignFactory(institution=institution)
 
-        date = timezone.localdate()
-        email = CampaignEmailFactory(evaluation_campaign).ratio_to_select(date)
+        email = CampaignEmailFactory(evaluation_campaign).ratio_to_select()
 
         assert email.to == list(u.email for u in institution.active_members)
         assert reverse("dashboard:index") in email.body
-        assert (
-            f"Le choix du taux de SIAE à contrôler est possible jusqu’au {dateformat.format(date, 'd E Y')}"
-            in email.body
-        )
-        assert f"avant le {dateformat.format(date, 'd E Y')}" in email.subject
+        assert "Vous disposez de 4 semaines pour choisir votre taux de SIAE à contrôler." in email.body
+        assert "Vous disposez de 4 semaines pour sélectionner votre échantillon." in email.subject
 
     def test_selected(self):
         siae = SiaeWith2MembershipsFactory()
@@ -48,7 +44,6 @@ class TestInstitutionEmailFactory:
         assert siae.name in email.body
         assert siae.kind in email.body
         assert siae.convention.siret_signature in email.body
-        assert dateformat.format(timezone.now() + relativedelta(weeks=6), "d E Y") in email.body
 
     def test_selected_siae(self):
         fake_now = timezone.now()
@@ -57,7 +52,6 @@ class TestInstitutionEmailFactory:
 
         email = CampaignEmailFactory(evaluation_campaign).selected_siae()
         assert email.to == list(u.email for u in institution.active_members)
-        assert dateformat.format(fake_now + relativedelta(weeks=6), "d E Y") in email.body
         assert dateformat.format(evaluation_campaign.evaluated_period_start_at, "d E Y") in email.body
         assert dateformat.format(evaluation_campaign.evaluated_period_end_at, "d E Y") in email.body
 

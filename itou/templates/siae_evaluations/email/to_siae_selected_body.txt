@@ -7,15 +7,14 @@ Votre structure {{ siae.kind }} ID {{siae.id}} {{ siae.name }} (SIRET : {{ siae.
 
 Vous devrez fournir les justificatifs des critères administratifs d’éligibilité IAE que vous aviez enregistrés lors de ces embauches.
 
-Vous avez jusqu’au {{ end_date|date:"d E Y" }} (6 semaines) pour transmettre les justificatifs à votre DDETS.
+Vous disposez de 6 semaines pour transmettre vos justificatifs à votre DDETS.
 
 Comment ça marche ?
 
 
 1- Visualiser la liste des embauches concernées par la procédure de contrôle :
+Depuis le tableau de bord de votre structure à la rubrique “Contrôle a posteriori” cliquez sur “Campagne en cours”
 
-Depuis le tableau de bord de votre structure à la rubrique “ Contrôle a posteriori”
-cliquez sur “Justifier mes auto-prescriptions”.
 La liste des embauches concernées par la procédure est affichée.
 
 Accès direct à votre liste d’auto-prescriptions : {{ url }}

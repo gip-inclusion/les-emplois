@@ -1,3 +1,5 @@
+import urllib.parse
+
 from django.urls import reverse
 
 from itou.utils import constants as global_constants
@@ -10,9 +12,8 @@ class CampaignEmailFactory:
         self.evaluation_campaign = evaluation_campaign
         self.recipients = evaluation_campaign.institution.active_members.values_list("email", flat=True)
 
-    def ratio_to_select(self, ratio_selection_end_at):
+    def ratio_to_select(self):
         context = {
-            "ratio_selection_end_at": ratio_selection_end_at,
             "dashboard_url": get_absolute_url(reverse("dashboard:index")),
         }
         subject = "siae_evaluations/email/to_institution_ratio_to_select_subject.txt"
@@ -21,9 +22,12 @@ class CampaignEmailFactory:
 
     def selected_siae(self):
         context = {
-            "end_date": self.evaluation_campaign.adversarial_stage_start_date,
             "evaluated_period_start_at": self.evaluation_campaign.evaluated_period_start_at,
             "evaluated_period_end_at": self.evaluation_campaign.evaluated_period_end_at,
+            "ddets_evaluation_handbook_url": urllib.parse.urljoin(
+                global_constants.ITOU_DOCS_URL,
+                "/doc/emplois/mode-demploi-sur-le-controle-a-posteriori-pour-les-ddets/",
+            ),
         }
         subject = "siae_evaluations/email/to_institution_selected_siae_subject.txt"
         body = "siae_evaluations/email/to_institution_selected_siae_body.txt"
@@ -80,7 +84,6 @@ class SIAEEmailFactory:
         context = {
             "campaign": self.evaluated_siae.evaluation_campaign,
             "siae": self.evaluated_siae.siae,
-            "end_date": self.evaluated_siae.evaluation_campaign.adversarial_stage_start_date,
             "url": get_absolute_url(evaluated_siae_url),
         }
         subject = "siae_evaluations/email/to_siae_selected_subject.txt"
@@ -139,6 +142,10 @@ class SIAEEmailFactory:
             "evaluation_campaign": self.evaluated_siae.evaluation_campaign,
             "siae": self.evaluated_siae.siae,
             "auto_prescription_url": get_absolute_url(auto_prescription_url),
+            "siae_evaluation_handbook_url": urllib.parse.urljoin(
+                global_constants.ITOU_DOCS_URL,
+                "/doc/emplois/controle-a-posteriori-pour-les-siae/",
+            ),
         }
         subject = "siae_evaluations/email/to_siae_forced_to_adversarial_stage_subject.txt"
         body = "siae_evaluations/email/to_siae_forced_to_adversarial_stage_body.txt"

@@ -1,6 +1,6 @@
 {% extends "layout/base_email_text_subject.txt" %}
 {% block subject %}
 
-Lancement du contrôle a posteriori : Sélectionnez votre échantillon avant le {{ratio_selection_end_at|date:"d E Y"}}
+Lancement du contrôle a posteriori : Vous disposez de 4 semaines pour sélectionner votre échantillon.
 
 {% endblock %}

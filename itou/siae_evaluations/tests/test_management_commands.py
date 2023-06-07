@@ -383,11 +383,7 @@ class TestManagementCommand:
             "Vous devrez fournir les justificatifs des critères administratifs d’éligibilité IAE que vous aviez "
             "enregistrés lors de ces embauches.\n"
             "Nous vous rappelons que ce contrôle des DDETS doit être réalisé dans un délai de 6 semaines à compter du "
-            "19 décembre 2022.\n\n"
-            "Ce délai comprend la transmission de vos justificatifs ET le contrôle effectué par votre DDETS.\n"
-            "Attention : si vous transmettez vos justificatifs en dernière minute, la DDETS risque de ne pas avoir le "
-            "temps de valider ou invalider vos justificatifs ; auquel cas, le contrôle sera automatiquement clôturé "
-            "avec un résultat négatif.\n\n" in mail1.body
+            "19 décembre 2022.\n\n" in mail1.body
         )
         assert (
             f"http://127.0.0.1:8000/siae_evaluation/siae_job_applications_list/{evaluated_siae_no_answer.pk}/"
@@ -405,11 +401,7 @@ class TestManagementCommand:
             "Vous devrez fournir les justificatifs des critères administratifs d’éligibilité IAE que vous aviez "
             "enregistrés lors de ces embauches.\n"
             "Nous vous rappelons que ce contrôle des DDETS doit être réalisé dans un délai de 6 semaines à compter du "
-            "19 décembre 2022.\n\n"
-            "Ce délai comprend la transmission de vos justificatifs ET le contrôle effectué par votre DDETS.\n"
-            "Attention : si vous transmettez vos justificatifs en dernière minute, la DDETS risque de ne pas avoir le "
-            "temps de valider ou invalider vos justificatifs ; auquel cas, le contrôle sera automatiquement clôturé "
-            "avec un résultat négatif.\n\n" in mail2.body
+            "19 décembre 2022.\n\n" in mail2.body
         )
         assert (
             f"http://127.0.0.1:8000/siae_evaluation/siae_job_applications_list/{evaluated_siae_reviewed_quickly.pk}/"

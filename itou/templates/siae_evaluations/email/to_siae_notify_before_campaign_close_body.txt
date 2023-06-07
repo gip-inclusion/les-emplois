@@ -9,11 +9,9 @@ Nous vous rappelons que votre structure {{ siae.kind }} {{ siae.name }} ID-{{ si
 Vous devrez fournir les justificatifs des critères administratifs d’éligibilité IAE que vous aviez enregistrés lors de ces embauches.
 Nous vous rappelons que ce contrôle des DDETS doit être réalisé dans un délai de 6 semaines à compter du {{ adversarial_stage_start|date }}.
 
-Ce délai comprend la transmission de vos justificatifs ET le contrôle effectué par votre DDETS.
-Attention : si vous transmettez vos justificatifs en dernière minute, la DDETS risque de ne pas avoir le temps de valider ou invalider vos justificatifs ; auquel cas, le contrôle sera automatiquement clôturé avec un résultat négatif.
+Pour transmettre les justificatifs demandés : RDV dans votre tableau de bord à la rubrique “Contrôle a posteriori” puis cliquez sur “Campagne en cours”.
 
-Pour transmettre les justificatifs demandés : RDV dans votre tableau de bord à la rubrique “Contrôle a posteriori” puis cliquez sur “Justifier mes auto-prescriptions”.
-{{ evaluated_job_app_list_url }}
+Accès direct à votre liste d'auto-prescriptions : {{ evaluated_job_app_list_url }}
 
 Voir le mode d’emploi : {{ itou_community_url }}/doc/emplois/controle-a-posteriori-pour-les-siae/
 

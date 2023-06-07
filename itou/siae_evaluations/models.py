@@ -49,7 +49,7 @@ def validate_institution(institution_id):
         raise ValidationError(f"Sélectionnez une institution de type {InstitutionKind.DDETS}")
 
 
-def create_campaigns(evaluated_period_start_at, evaluated_period_end_at, ratio_selection_end_at, institution_ids=None):
+def create_campaigns(evaluated_period_start_at, evaluated_period_end_at, institution_ids=None):
     """
     Create a campaign for each institution whose kind is DDETS (possibly limited by institution_ids).
     This method is intented to be executed manually, until it will be automised.
@@ -77,7 +77,7 @@ def create_campaigns(evaluated_period_start_at, evaluated_period_end_at, ratio_s
     # Send notification.
     if evaluation_campaign_list:
         send_email_messages(
-            CampaignEmailFactory(evaluation_campaign).ratio_to_select(ratio_selection_end_at)
+            CampaignEmailFactory(evaluation_campaign).ratio_to_select()
             for evaluation_campaign in evaluation_campaign_list
         )
 
@@ -374,7 +374,6 @@ class EvaluatedSiaeQuerySet(models.QuerySet):
 
 
 class EvaluatedSiae(models.Model):
-
     evaluation_campaign = models.ForeignKey(
         EvaluationCampaign,
         verbose_name="Contrôle",
@@ -471,7 +470,6 @@ class EvaluatedSiae(models.Model):
     # fixme vincentporte : rsebille suggests to replace cached_property with prefetch_related
     @cached_property
     def state(self):
-
         # assuming the EvaluatedSiae instance is fully hydrated with its evaluated_job_applications
         # and evaluated_administrative_criteria before being called,
         # to prevent tons of additional queries in db.
@@ -558,7 +556,6 @@ class EvaluatedJobApplicationQuerySet(models.QuerySet):
 
 
 class EvaluatedJobApplication(models.Model):
-
     job_application = models.ForeignKey(
         "job_applications.JobApplication",
         verbose_name="Candidature",
@@ -638,7 +635,6 @@ class EvaluatedJobApplication(models.Model):
         #    It contains new AND removed choices.
 
         with transaction.atomic():
-
             EvaluatedAdministrativeCriteria.objects.filter(
                 pk__in=(
                     eval_criterion.pk
@@ -663,7 +659,6 @@ class EvaluatedAdministrativeCriteriaQuerySet(models.QuerySet):
 
 
 class EvaluatedAdministrativeCriteria(models.Model):
-
     administrative_criteria = models.ForeignKey(
         "eligibility.AdministrativeCriteria",
         verbose_name="Critère administratif",

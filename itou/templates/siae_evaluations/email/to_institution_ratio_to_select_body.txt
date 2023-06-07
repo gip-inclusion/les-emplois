@@ -9,7 +9,7 @@ Vous trouverez dans votre tableau de bord ({{ dashboard_url }}), la liste de tou
 
 Vous pouvez consulter cette liste et ensuite choisir le taux de SIAE à contrôler.
 
-Le choix du taux de SIAE à contrôler est possible jusqu’au {{ratio_selection_end_at|date:"d E Y"}}. Passé ce délai, le taux de 30% sera appliqué par défaut.
+Vous disposez de 4 semaines pour choisir votre taux de SIAE à contrôler. Passé ce délai, le taux de 30% sera appliqué par défaut.
 
 Cordialement,
 

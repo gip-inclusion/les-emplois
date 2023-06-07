@@ -226,7 +226,6 @@ class TestEvaluationCampaignManagerEligibleJobApplication:
 @pytest.mark.usefixtures("unittest_compatibility")
 class EvaluationCampaignManagerTest(TestCase):
     def test_validate_institution(self):
-
         with pytest.raises(ValidationError):
             validate_institution(0)
 
@@ -254,21 +253,18 @@ class EvaluationCampaignManagerTest(TestCase):
     def test_create_campaigns(self):
         evaluated_period_start_at = timezone.now() - relativedelta(months=2)
         evaluated_period_end_at = timezone.now() - relativedelta(months=1)
-        ratio_selection_end_at = timezone.now() + relativedelta(months=1)
 
         # not DDETS
         for kind in [k for k in InstitutionKind if k != InstitutionKind.DDETS]:
             with self.subTest(kind=kind):
                 InstitutionFactory(kind=kind)
-                assert 0 == create_campaigns(
-                    evaluated_period_start_at, evaluated_period_end_at, ratio_selection_end_at
-                )
+                assert 0 == create_campaigns(evaluated_period_start_at, evaluated_period_end_at)
                 assert 0 == EvaluationCampaign.objects.all().count()
                 assert len(mail.outbox) == 0
 
         # institution DDETS
         InstitutionWith2MembershipFactory.create_batch(2, kind=InstitutionKind.DDETS)
-        assert 2 == create_campaigns(evaluated_period_start_at, evaluated_period_end_at, ratio_selection_end_at)
+        assert 2 == create_campaigns(evaluated_period_start_at, evaluated_period_end_at)
         assert 2 == EvaluationCampaign.objects.all().count()
 
         # An email should have been sent to the institution members.
@@ -281,19 +277,16 @@ class EvaluationCampaignManagerTest(TestCase):
     def test_create_campaigns_on_specific_DDETS(self):
         evaluated_period_start_at = timezone.now() - relativedelta(months=2)
         evaluated_period_end_at = timezone.now() - relativedelta(months=1)
-        ratio_selection_end_at = timezone.now() + relativedelta(months=1)
 
         institution_ids = InstitutionWith2MembershipFactory.create_batch(2, kind=InstitutionKind.DDETS)
         assert 1 == create_campaigns(
             evaluated_period_start_at,
             evaluated_period_end_at,
-            ratio_selection_end_at,
             institution_ids=[institution_ids[0].pk],
         )
         assert 1 == EvaluationCampaign.objects.all().count()
 
     def test_eligible_siaes(self):
-
         evaluation_campaign = EvaluationCampaignFactory()
 
         # siae1 got 1 job application

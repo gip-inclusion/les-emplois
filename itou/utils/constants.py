@@ -1,5 +1,6 @@
 ITOU_ASSISTANCE_URL = "https://communaute.inclusion.beta.gouv.fr/aide/emplois"
 ITOU_COMMUNITY_URL = "https://communaute.inclusion.beta.gouv.fr"
+ITOU_DOCS_URL = "https://documentation.inclusion.beta.gouv.fr"
 ITOU_EMAIL_PROLONGATION = "prolongation@inclusion.beta.gouv.fr"
 PILOTAGE_ASSISTANCE_URL = "https://communaute.inclusion.beta.gouv.fr/aide/pilotage"
 PILOTAGE_SITE_URL = "https://pilotage.inclusion.beta.gouv.fr"

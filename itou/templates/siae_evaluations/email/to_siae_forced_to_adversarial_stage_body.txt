@@ -6,10 +6,11 @@ Sauf erreur de notre part, vous n’avez pas transmis les justificatifs dans le 
 
 La {{ evaluation_campaign.institution }} ne peut donc pas faire de contrôle, par conséquent vous entrez dans une phase dite contradictoire de 6 semaines (durant laquelle il vous faut transmettre les justificatifs demandés) et qui se clôturera sur une décision (validation ou sanction pouvant aller jusqu’à un retrait d’aide au poste) conformément à l’instruction N° DGEFP/SDPAE/MIP/2022/83 du 5 avril 2022 relative à la mise en œuvre opérationnelle du contrôle a posteriori des recrutements en auto-prescription prévu par les articles R. 5132-1-12 à R. 5132-1-17 du code du travail.
 
-Pour transmettre les justificatifs, rendez-vous sur le tableau de bord de {{ siae.kind }} {{ siae.name }} ID-{{ siae.pk }} à la rubrique “Justifier mes auto-prescriptions”.
-{{ auto_prescription_url }}
+Pour transmettre les justificatifs, rendez-vous sur le tableau de bord de {{ siae.kind }} {{ siae.name }} ID-{{ siae.pk }} à la rubrique “Contrôle a posteriori > Campagne en cours”.
 
-En cas de besoin, vous pouvez consulter ce mode d’emploi.
+Accès direct à votre liste d’auto-prescriptions : {{ auto_prescription_url }}
+
+En cas de besoin, vous pouvez consulter ce mode d’emploi : {{ siae_evaluation_handbook_url }}
 
 Cordialement,
 {% endblock %}
