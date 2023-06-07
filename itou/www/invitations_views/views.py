@@ -5,7 +5,6 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.db import transaction
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import formats, safestring
@@ -179,10 +178,9 @@ def join_prescriber_organization(request, invitation_id):
         raise PermissionDenied()
 
     if invitation.can_be_accepted:
-        with transaction.atomic():
-            invitation.add_invited_user_to_organization()
-            # Send an email after the model changes
-            invitation.accept()
+        invitation.add_invited_user_to_organization()
+        # Send an email after the model changes
+        invitation.accept()
         messages.success(
             request, f"Vous êtes désormais membre de l'organisation {invitation.organization.display_name}."
         )
@@ -244,9 +242,8 @@ def join_siae(request, invitation_id):
     if not invitation.siae.is_active:
         messages.error(request, "Cette structure n'est plus active.")
     elif invitation.can_be_accepted:
-        with transaction.atomic():
-            invitation.add_invited_user_to_siae()
-            invitation.accept()
+        invitation.add_invited_user_to_siae()
+        invitation.accept()
         messages.success(request, f"Vous êtes désormais membre de la structure {invitation.siae.display_name}.")
     else:
         messages.error(request, "Cette invitation n'est plus valide.")
@@ -304,9 +301,8 @@ def join_institution(request, invitation_id):
         raise PermissionDenied()
 
     if invitation.can_be_accepted:
-        with transaction.atomic():
-            invitation.add_invited_user_to_institution()
-            invitation.accept()
+        invitation.add_invited_user_to_institution()
+        invitation.accept()
         messages.success(
             request, f"Vous êtes désormais membre de l'organisation {invitation.institution.display_name}."
         )

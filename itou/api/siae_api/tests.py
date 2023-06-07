@@ -7,6 +7,7 @@ from itou.cities.factories import create_city_guerande, create_city_saint_andre
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory
 from itou.users.factories import SiaeStaffFactory
+from itou.utils.test import BASE_NUM_QUERIES
 
 
 ENDPOINT_URL = reverse("v1:siaes-list")
@@ -26,7 +27,8 @@ class SiaeAPIFetchListTest(APITestCase):
         )
 
     def test_performances(self):
-        num_queries = 1  # Get city with insee_code
+        num_queries = BASE_NUM_QUERIES
+        num_queries += 1  # Get city with insee_code
         num_queries += 1  # Count siaes
         num_queries += 1  # Select sias
         num_queries += 1  # prefetch job_description_through

@@ -86,11 +86,6 @@ class JobSeekerSignupView(SignupView):
         kwargs["nir"] = self.request.session.get(global_constants.ITOU_SESSION_NIR_KEY)
         return kwargs
 
-    @transaction.atomic
-    def post(self, request, *args, **kwargs):
-        """Enforce atomicity."""
-        return super().post(request, *args, **kwargs)
-
 
 def job_seeker_situation(
     request, template_name="signup/job_seeker_situation.html", redirect_field_name=REDIRECT_FIELD_NAME
@@ -824,7 +819,6 @@ class FacilitatorUserView(FacilitatorBaseMixin, TemplateView):
 
 
 class FacilitatorJoinView(FacilitatorBaseMixin, View):
-    @transaction.atomic()
     def get(self, request, *args, **kwargs):
         self.siae_to_create.auth_email = request.user.email
         self.siae_to_create.created_by = request.user

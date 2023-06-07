@@ -1,5 +1,4 @@
 from django.contrib import admin, messages
-from django.db import transaction
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
@@ -165,7 +164,6 @@ class JobApplicationAdmin(admin.ModelAdmin):
     search_fields = ("pk", "to_siae__siret", "job_seeker__email", "sender__email")
 
     @admin.action(description="Créer une fiche salarié pour les candidatures sélectionnées")
-    @transaction.atomic()
     def create_employee_record(self, request, queryset):
         created, ignored = [], []
 

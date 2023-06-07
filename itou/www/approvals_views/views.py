@@ -2,7 +2,6 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
-from django.db import transaction
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -397,30 +396,29 @@ def pe_approval_create(request, pe_approval_id):
         next_url = reverse("approvals:pe_approval_search_user", kwargs={"pe_approval_id": pe_approval_id})
         return HttpResponseRedirect(next_url)
 
-    with transaction.atomic():
-        # Then we create an Approval based on the PoleEmploiApproval data
-        approval_from_pe = Approval(
-            start_at=pe_approval.start_at,
-            end_at=pe_approval.end_at,
-            user=job_seeker,
-            # Only store 12 chars numbers.
-            number=pe_approval.number,
-            origin=approvals_enums.Origin.PE_APPROVAL,
-        )
-        approval_from_pe.save()
+    # Then we create an Approval based on the PoleEmploiApproval data
+    approval_from_pe = Approval(
+        start_at=pe_approval.start_at,
+        end_at=pe_approval.end_at,
+        user=job_seeker,
+        # Only store 12 chars numbers.
+        number=pe_approval.number,
+        origin=approvals_enums.Origin.PE_APPROVAL,
+    )
+    approval_from_pe.save()
 
-        # Then we create the necessary JobApplication for redirection
-        job_application = JobApplication(
-            job_seeker=job_seeker,
-            to_siae=siae,
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
-            approval=approval_from_pe,
-            origin=Origin.PE_APPROVAL,  # This origin is specific to this process.
-            sender=request.user,
-            sender_kind=SenderKind.SIAE_STAFF,
-            sender_siae=siae,
-        )
-        job_application.save()
+    # Then we create the necessary JobApplication for redirection
+    job_application = JobApplication(
+        job_seeker=job_seeker,
+        to_siae=siae,
+        state=JobApplicationWorkflow.STATE_ACCEPTED,
+        approval=approval_from_pe,
+        origin=Origin.PE_APPROVAL,  # This origin is specific to this process.
+        sender=request.user,
+        sender_kind=SenderKind.SIAE_STAFF,
+        sender_siae=siae,
+    )
+    job_application.save()
 
     messages.success(request, "L'agrément a bien été importé, vous pouvez désormais le prolonger ou le suspendre.")
     next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})

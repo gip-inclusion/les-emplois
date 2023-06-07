@@ -28,7 +28,7 @@ from itou.job_applications.enums import (
     SenderKind,
 )
 from itou.job_applications.tasks import huey_notify_pole_emploi
-from itou.siaes.enums import ContractType, SiaeKind
+from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS, ContractType, SiaeKind
 from itou.siaes.models import Siae
 from itou.users.enums import UserKind
 from itou.utils.emails import get_email_message, send_email_messages
@@ -817,6 +817,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             not self.sender_prescriber_organization or not self.sender_prescriber_organization.is_authorized
         ):
             return "Orienteur"
+        elif self.sender_kind == SenderKind.SIAE_STAFF and self.to_siae.kind not in SIAE_WITH_CONVENTION_KINDS:
+            # Not an SIAE per se
+            return "Employeur"
         else:
             return SenderKind(self.sender_kind).label
 

@@ -10,6 +10,10 @@ from django.test import Client, TestCase as BaseTestCase
 from django.test.utils import TestContextDecorator
 
 
+# SAVEPOINT + RELEASE from the ATOMIC_REQUESTS transaction
+BASE_NUM_QUERIES = 2
+
+
 class Message(NamedTuple):
     level: int
     message: str

@@ -22,7 +22,7 @@ from itou.users.models import User
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.templatetags.format_filters import format_siret
-from itou.utils.test import TestCase, assertMessages
+from itou.utils.test import BASE_NUM_QUERIES, TestCase, assertMessages
 from itou.utils.urls import get_tally_form_url
 from itou.www.test import NUM_CSRF_SESSION_REQUESTS
 
@@ -292,7 +292,8 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         # same SIREN. Before, this request was issuing 3*N slow requests, N being the
         # number of SIAEs.
         with self.assertNumQueries(
-            1  # SELECT siaes with active admins
+            BASE_NUM_QUERIES
+            + 1  # SELECT siaes with active admins
             + 1  # SELECT the conventions for those siaes
             + 1  # prefetch memberships
             + 1  # prefetch users associated with those memberships

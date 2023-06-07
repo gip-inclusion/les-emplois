@@ -177,12 +177,17 @@ class JobApplicationModelTest(TestCase):
         assert not job_application2.candidate_has_employee_record
 
     def test_get_sender_kind_display(self):
+        non_siae_items = [
+            (JobApplicationSentBySiaeFactory(to_siae__kind=kind), "Employeur")
+            for kind in [SiaeKind.EA, SiaeKind.EATT, SiaeKind.GEIQ, SiaeKind.OPCS]
+        ]
         items = [
             [JobApplicationFactory(sent_by_authorized_prescriber_organisation=True), "Prescripteur"],
             [JobApplicationSentByPrescriberOrganizationFactory(), "Orienteur"],
             [JobApplicationSentBySiaeFactory(), "Employeur (SIAE)"],
             [JobApplicationSentByJobSeekerFactory(), "Demandeur d'emploi"],
-        ]
+        ] + non_siae_items
+
         for job_application, sender_kind_display in items:
             with self.subTest(sender_kind_display):
                 assert job_application.get_sender_kind_display() == sender_kind_display

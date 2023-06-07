@@ -11,7 +11,7 @@ from itou.job_applications.factories import JobApplicationWithApprovalNotCancell
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
 from itou.users.enums import LackOfNIRReason
 from itou.utils.templatetags import format_filters
-from itou.utils.test import TestCase
+from itou.utils.test import BASE_NUM_QUERIES, TestCase
 
 
 @pytest.mark.usefixtures("unittest_compatibility")
@@ -264,7 +264,8 @@ class ListEmployeeRecordsTest(TestCase):
         self._check_employee_record_order(self.url + "?order=-name", job_applicationZ, job_applicationA)
 
         # Count queries
-        num_queries = 1  # Get django session
+        num_queries = BASE_NUM_QUERIES
+        num_queries += 1  # Get django session
         num_queries += 3  # Get current user and siae
         num_queries += 1  # Select job seeker for filters
         num_queries += 1  # Select employee_records status count

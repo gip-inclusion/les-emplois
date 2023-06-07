@@ -170,6 +170,7 @@ FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 # Note how we use Clever Cloud environment variables here. No way for now to alias them :/
 DATABASES = {
     "default": {
+        "ATOMIC_REQUESTS": True,
         "ENGINE": "django.contrib.gis.db.backends.postgis",
         "NAME": os.getenv("POSTGRESQL_ADDON_DB"),
         # FIXME(vperron): We should get rid of those Clever Cloud proprietary values in our code
