@@ -483,9 +483,8 @@ def institution_evaluated_siae_validation(request, evaluated_siae_pk):
         messages.success(
             request,
             mark_safe(
-                "<b>Résultats transmis !</b><br>"
-                "Merci d'avoir pris le temps de contrôler les pièces justificatives. "
-                "Nous notifions par mail l'administrateur de la SIAE."
+                "<b>Résultats enregistrés !</b><br>"
+                "Merci d'avoir pris le temps de contrôler les pièces justificatives."
             ),
         )
 

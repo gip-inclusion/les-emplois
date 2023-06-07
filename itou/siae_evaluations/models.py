@@ -1,5 +1,3 @@
-import functools
-
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -243,45 +241,52 @@ class EvaluationCampaign(models.Model):
 
     def transition_to_adversarial_phase(self):
         now = timezone.now()
-        siaes_not_reviewed = (
-            EvaluatedSiae.objects.filter(evaluation_campaign=self, reviewed_at__isnull=True)
-            .select_related("evaluation_campaign__institution", "siae")
-            .prefetch_related("evaluated_job_applications__evaluated_administrative_criteria")
-        )
         emails = []
         accept_by_default = []
         transition_to_adversarial_stage = []
         auto_validation = []
-        for evaluated_siae in siaes_not_reviewed:
+        for evaluated_siae in self.evaluated_siaes.select_related(
+            "evaluation_campaign__institution", "siae"
+        ).prefetch_related("evaluated_job_applications__evaluated_administrative_criteria"):
             state = evaluated_siae.state
-            if state in [
-                evaluation_enums.EvaluatedSiaeState.PENDING,
-                evaluation_enums.EvaluatedSiaeState.SUBMITTABLE,
-            ]:
-                evaluated_siae.reviewed_at = now
-                transition_to_adversarial_stage.append(evaluated_siae)
-                emails.append(SIAEEmailFactory(evaluated_siae).forced_to_adversarial_stage())
-            elif state == evaluation_enums.EvaluatedSiaeState.SUBMITTED:
-                evaluated_siae.reviewed_at = now
-                evaluated_siae.final_reviewed_at = now
-                accept_by_default.append(evaluated_siae)
-                emails.append(SIAEEmailFactory(evaluated_siae).force_accepted())
-            else:
-                # evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE needs a reviewed_at
-                # evaluation_enums.EvaluatedSiaeState.NOTIFICATION_PENDING needs evaluation_is_final
-                assert state in (
-                    evaluation_enums.EvaluatedSiaeState.ACCEPTED,
-                    evaluation_enums.EvaluatedSiaeState.REFUSED,
-                ), state
-                # The DDETS set the review_state on all documents but forgot to submit its review
-                # The validation is automatically triggered by this transition to adversarial phase
-                auto_validation.append(evaluated_siae)
-                evaluated_siae.reviewed_at = now
+            email_factory = SIAEEmailFactory(evaluated_siae)
+            if evaluated_siae.reviewed_at is not None:
                 if state == evaluation_enums.EvaluatedSiaeState.ACCEPTED:
-                    emails.append(SIAEEmailFactory(evaluated_siae).reviewed(adversarial=False))
-                    evaluated_siae.final_reviewed_at = now
+                    emails.append(email_factory.reviewed(adversarial=False))
+                elif state == evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE:
+                    emails.append(email_factory.adversarial_stage())
                 else:
-                    emails.append(SIAEEmailFactory(evaluated_siae).adversarial_stage())
+                    # This shouldn't happen
+                    raise ValueError(f"Unexpected {state=} for {evaluated_siae=} in transition_to_adversarial_stage()")
+            else:
+                if state in [
+                    evaluation_enums.EvaluatedSiaeState.PENDING,
+                    evaluation_enums.EvaluatedSiaeState.SUBMITTABLE,
+                ]:
+                    evaluated_siae.reviewed_at = now
+                    transition_to_adversarial_stage.append(evaluated_siae)
+                    emails.append(email_factory.forced_to_adversarial_stage())
+                elif state == evaluation_enums.EvaluatedSiaeState.SUBMITTED:
+                    evaluated_siae.reviewed_at = now
+                    evaluated_siae.final_reviewed_at = now
+                    accept_by_default.append(evaluated_siae)
+                    emails.append(email_factory.force_accepted())
+                else:
+                    # evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE needs a reviewed_at
+                    # evaluation_enums.EvaluatedSiaeState.NOTIFICATION_PENDING needs evaluation_is_final
+                    assert state in (
+                        evaluation_enums.EvaluatedSiaeState.ACCEPTED,
+                        evaluation_enums.EvaluatedSiaeState.REFUSED,
+                    ), state
+                    # The DDETS set the review_state on all documents but forgot to submit its review
+                    # The validation is automatically triggered by this transition to adversarial phase
+                    auto_validation.append(evaluated_siae)
+                    evaluated_siae.reviewed_at = now
+                    if state == evaluation_enums.EvaluatedSiaeState.ACCEPTED:
+                        emails.append(email_factory.reviewed(adversarial=False))
+                        evaluated_siae.final_reviewed_at = now
+                    else:
+                        emails.append(email_factory.adversarial_stage())
 
         if transition_to_adversarial_stage or accept_by_default:
             transition_to_adversarial_stage.sort(key=lambda evaluated_siae: evaluated_siae.siae.name)
@@ -312,6 +317,7 @@ class EvaluationCampaign(models.Model):
             )
             has_siae_to_notify = False
             siae_without_proofs = []
+            emails = []
             for evaluated_siae in evaluated_siaes:
                 # Computing the state is costly, avoid it when possible.
                 if not has_siae_to_notify:
@@ -327,7 +333,17 @@ class EvaluationCampaign(models.Model):
                     if len(criterias) == 0 or any(crit.submitted_at is None for crit in criterias):
                         siae_without_proofs.append(evaluated_siae)
                         has_siae_to_notify = True
-            emails = [SIAEEmailFactory(evaluated_siae).refused_no_proofs() for evaluated_siae in siae_without_proofs]
+                elif evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.NOTIFICATION_PENDING:
+                    emails.append(SIAEEmailFactory(evaluated_siae).refused())
+                elif evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.ACCEPTED:
+                    if evaluated_siae.reviewed_at != evaluated_siae.final_reviewed_at:
+                        # This check ensures that the acceptance happened in the adversarial stage
+                        # and not the amicable one
+                        emails.append(SIAEEmailFactory(evaluated_siae).reviewed(adversarial=True))
+
+            emails.extend(
+                SIAEEmailFactory(evaluated_siae).refused_no_proofs() for evaluated_siae in siae_without_proofs
+            )
             if has_siae_to_notify:
                 emails.append(CampaignEmailFactory(self).close())
             send_email_messages(emails)
@@ -432,30 +448,21 @@ class EvaluatedSiae(models.Model):
         ACCEPTED = evaluation_enums.EvaluatedSiaeState.ACCEPTED
         REFUSED = evaluation_enums.EvaluatedSiaeState.REFUSED
         ADVERSARIAL_STAGE = evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE
-        NOTIFICATION_PENDING = evaluation_enums.EvaluatedSiaeState.NOTIFICATION_PENDING
-        from_adversarial_stage = bool(self.reviewed_at)
-        previous_state = self.state
+        current_state = self.state
 
         now = timezone.now()
-        if previous_state == ACCEPTED:
+        if current_state == ACCEPTED:
             self.reviewed_at = now
             self.final_reviewed_at = now
-        elif previous_state == REFUSED:
+        elif current_state == REFUSED:
             self.reviewed_at = now
-        elif previous_state == ADVERSARIAL_STAGE:
+        elif current_state == ADVERSARIAL_STAGE:
             self.final_reviewed_at = now
         else:
             raise TypeError(f"Cannot review an “{self.__class__.__name__}” with status “{self.state}”.")
         self.save()
         # Invalidate the cache, a review changes the state of the evaluation.
         del self.state
-        email = {
-            (ACCEPTED, True): functools.partial(SIAEEmailFactory(self).reviewed, adversarial=True),
-            (ACCEPTED, False): functools.partial(SIAEEmailFactory(self).reviewed, adversarial=False),
-            (ADVERSARIAL_STAGE, False): SIAEEmailFactory(self).adversarial_stage,
-            (NOTIFICATION_PENDING, True): SIAEEmailFactory(self).refused,
-        }[(self.state, from_adversarial_stage)]()
-        send_email_messages([email])
 
     @property
     def evaluation_is_final(self):
