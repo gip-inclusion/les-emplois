@@ -53,7 +53,6 @@ class InclusionConnectSession:
 
     def bind_to_request(self, request):
         request.session[self.key] = dataclasses.asdict(self)
-        request.session.has_changed = True
 
 
 def _redirect_to_login_page_on_error(error_msg=None, request=None):
