@@ -24,7 +24,7 @@ from itou.prescribers.factories import PrescriberMembershipFactory, PrescriberOr
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory, SiaeJobDescriptionFactory
 from itou.users.factories import JobSeekerFactory, PrescriberFactory
-from itou.utils.test import TestCase, parse_response_to_soup
+from itou.utils.test import BASE_NUM_QUERIES, TestCase, parse_response_to_soup
 from itou.utils.widgets import DuetDatePickerWidget
 
 
@@ -203,7 +203,8 @@ class ProcessListSiaeTest(ProcessListTest):
 
         self.client.force_login(self.eddie_hit_pit)
         with self.assertNumQueries(
-            1  # fetch django session
+            BASE_NUM_QUERIES
+            + 1  # fetch django session
             + 1  # fetch user
             + 3  # check for membership & infos
             #
@@ -824,7 +825,8 @@ def test_list_for_unauthorized_prescriber_view(client):
     client.force_login(prescriber)
     url = reverse("apply:list_for_prescriber")
     with assertNumQueries(
-        1  # fetch django session
+        BASE_NUM_QUERIES
+        + 1  # fetch django session
         + 1  # fetch user
         + 1  # check for membeship
         + 1  # get list of senders (distinct sender_id)

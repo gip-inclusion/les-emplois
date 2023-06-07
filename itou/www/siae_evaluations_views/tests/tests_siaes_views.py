@@ -22,7 +22,7 @@ from itou.users.factories import JobSeekerFactory
 from itou.utils.perms.user import UserInfo
 from itou.utils.storage.s3 import S3Upload
 from itou.utils.storage.test import S3AccessingTestCase
-from itou.utils.test import TestCase
+from itou.utils.test import BASE_NUM_QUERIES, TestCase
 
 
 # fixme vincentporte : convert this method into factory
@@ -84,14 +84,15 @@ class SiaeJobApplicationListViewTest(S3AccessingTestCase):
 
         self.client.force_login(self.user)
         with self.assertNumQueries(
-            1  # fetch django session
+            BASE_NUM_QUERIES
+            + 1  # fetch django session
             + 1  # fetch user
             + 1  # verify user is active (middleware)
             + 2  # fetch siae membership and siae infos
             + 1  # fetch evaluated siae
             + 2  # fetch evaluatedjobapplication and its prefetched evaluatedadministrativecriteria
             + 1  # weird fetch siae membership
-            # NOTE(vperron): the prefecth is necessary to check the SUBMITTABLE state of the evaluated siae
+            # NOTE(vperron): the prefetch is necessary to check the SUBMITTABLE state of the evaluated siae
             # We do those requests "two times" but at least it's now accurate information, and we get
             # the EvaluatedJobApplication list another way so that we can select_related on them.
             + 2  # prefetch evaluated job applications and criteria
@@ -338,7 +339,6 @@ class SiaeSelectCriteriaViewTest(TestCase):
         )
 
     def test_initial_data_form(self):
-
         # no preselected criteria
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
         url = reverse(
@@ -554,7 +554,8 @@ class SiaeSubmitProofsViewTest(TestCase):
         self.client.force_login(self.user)
 
         with self.assertNumQueries(
-            1  # fetch django session
+            BASE_NUM_QUERIES
+            + 1  # fetch django session
             + 1  # fetch user
             + 1  # fetch siae membership
             + 2  # fetch siae infos
@@ -563,7 +564,6 @@ class SiaeSubmitProofsViewTest(TestCase):
             + 4  # fetch evaluationcampaign, institution, siae and siae members for email notification
             + 3  # savepoint, update session, release savepoint
         ):
-
             response = self.client.post(self.url(evaluated_job_application.evaluated_siae))
 
         assert response.status_code == 302

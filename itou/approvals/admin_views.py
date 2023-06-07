@@ -10,7 +10,6 @@ https://github.com/django/django/blob/master/django/contrib/admin/templates/admi
 from django.contrib import admin, messages
 from django.contrib.auth import get_permission_codename
 from django.core.exceptions import PermissionDenied
-from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -70,10 +69,9 @@ def manually_add_approval(
     adminForm = admin.helpers.AdminForm(form, fieldsets, {})
 
     if request.method == "POST" and form.is_valid():
-        with transaction.atomic():
-            approval = form.save()
-            job_application.approval = approval
-            job_application.manually_deliver_approval(delivered_by=request.user)
+        approval = form.save()
+        job_application.approval = approval
+        job_application.manually_deliver_approval(delivered_by=request.user)
         messages.success(request, f"Le PASS IAE {approval.number_with_spaces} a bien été créé et envoyé par e-mail.")
         return HttpResponseRedirect(reverse("admin:approvals_approval_changelist"))
 
@@ -121,9 +119,7 @@ def manually_refuse_approval(
     )
 
     if request.method == "POST" and request.POST.get("confirm") == "yes":
-        with transaction.atomic():
-            # Rollback on failure of email delivery
-            job_application.manually_refuse_approval(refused_by=request.user)
+        job_application.manually_refuse_approval(refused_by=request.user)
         messages.success(request, "Délivrance du PASS IAE refusée.")
         return HttpResponseRedirect(reverse("admin:approvals_approval_changelist"))
 

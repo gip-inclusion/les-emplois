@@ -13,7 +13,7 @@ from itou.siae_evaluations.factories import (
 )
 from itou.siaes.factories import SiaeMembershipFactory
 from itou.users.factories import ItouStaffFactory
-from itou.utils.test import get_rows_from_streaming_response
+from itou.utils.test import BASE_NUM_QUERIES, get_rows_from_streaming_response
 
 
 class TestEvaluationCampaignAdmin:
@@ -81,7 +81,8 @@ class TestEvaluationCampaignAdmin:
         admin_user = ItouStaffFactory(is_superuser=True)
         client.force_login(admin_user)
         with assertNumQueries(
-            1  # Load Django session
+            BASE_NUM_QUERIES
+            + 1  # Load Django session
             + 1  # Load user
             + 1  # Count the filtered results (paginator)
             + 1  # Count the full results

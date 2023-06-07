@@ -3,7 +3,6 @@ import datetime
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db import transaction
 from django.db.models import Q
 from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_list_or_404, get_object_or_404, render
@@ -317,9 +316,8 @@ class InstitutionEvaluatedSiaeNotifyStep3View(InstitutionEvaluatedSiaeNotifyMixi
             no_sanction_reason=form.cleaned_data.get("no_sanction_reason", ""),
         )
         evaluated_siae.notified_at = timezone.now()
-        with transaction.atomic():
-            sanctions.save()
-            evaluated_siae.save(update_fields=["notified_at"])
+        sanctions.save()
+        evaluated_siae.save(update_fields=["notified_at"])
         del self.request.session[self.sessionkey]
         messages.success(self.request, f"{evaluated_siae} a bien été notifiée de la sanction.")
         if sanctions.no_sanction_reason:
@@ -481,8 +479,7 @@ def institution_evaluated_siae_validation(request, evaluated_siae_pk):
     )
 
     if evaluated_siae.can_review:
-        with transaction.atomic():
-            evaluated_siae.review()
+        evaluated_siae.review()
         messages.success(
             request,
             mark_safe(
@@ -612,7 +609,6 @@ def siae_select_criteria(
 def siae_upload_doc(
     request, evaluated_administrative_criteria_pk, template_name="siae_evaluations/siae_upload_doc.html"
 ):
-
     evaluated_administrative_criteria = get_object_or_404(
         EvaluatedAdministrativeCriteria.objects.select_related("evaluated_job_application"),
         pk=evaluated_administrative_criteria_pk,

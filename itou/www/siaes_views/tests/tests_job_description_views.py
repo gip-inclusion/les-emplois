@@ -11,7 +11,7 @@ from itou.prescribers.factories import PrescriberOrganizationWithMembershipFacto
 from itou.siaes.enums import ContractType, SiaeKind
 from itou.siaes.factories import SiaeFactory, SiaeJobDescriptionFactory
 from itou.siaes.models import SiaeJobDescription
-from itou.utils.test import TestCase, assertMessages
+from itou.utils.test import BASE_NUM_QUERIES, TestCase, assertMessages
 from itou.www.siaes_views.views import ITOU_SESSION_CURRENT_PAGE_KEY, ITOU_SESSION_JOB_DESCRIPTION_KEY
 
 
@@ -468,7 +468,8 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
         assert response.status_code == 200
 
         with self.assertNumQueries(
-            1  # fetch django session
+            BASE_NUM_QUERIES
+            + 1  # fetch django session
             + 1  # fetch user
             + 1  # check user is active
             + 1  # fetch siaes_siaejobdescription

@@ -6,7 +6,6 @@ from itou.api.data_inclusion_api.views import DataInclusionStructureView
 
 from .applicants_api.views import ApplicantsView
 from .employee_record_api.viewsets import (
-    DummyEmployeeRecordViewSet,
     EmployeeRecordUpdateNotificationViewSet,
     EmployeeRecordViewSet,
 )
@@ -26,7 +25,6 @@ router.register(
     EmployeeRecordUpdateNotificationViewSet,
     basename="employee-record-notifications",
 )
-router.register(r"dummy-employee-records", DummyEmployeeRecordViewSet, basename="dummy-employee-records")
 router.register(r"siaes", SiaeViewSet, basename="siaes")
 
 urlpatterns = [

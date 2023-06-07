@@ -8,10 +8,9 @@ from rest_framework.throttling import UserRateThrottle
 
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification, Status
 from itou.employee_record.serializers import EmployeeRecordUpdateNotificationSerializer
-from itou.job_applications.models import JobApplication
 
 from .perms import EmployeeRecordAPIPermission
-from .serializers import DummyEmployeeRecordSerializer, EmployeeRecordAPISerializer
+from .serializers import EmployeeRecordAPISerializer
 
 
 logger = logging.getLogger("api_drf")
@@ -28,32 +27,7 @@ class EmployeeRecordRateThrottle(UserRateThrottle):
     rate = f"{EMPLOYEE_RECORD_API_REQUESTS_NUMBER}/min"
 
 
-class DummyEmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    # API fiches salarié (FAKE)
-
-    Cette API retourne des données de fiches salarié factices et identiques
-    à des fins de test pour les éditeurs de logiciels.
-    """
-
-    # Above doc section is in french for Swagger / OAS auto doc generation
-
-    serializer_class = DummyEmployeeRecordSerializer
-    authentication_classes = [TokenAuthentication, SessionAuthentication]
-    # By default, permission class is IsAuthenticated
-
-    def get_queryset(self):
-        """
-        Return the same 25 job applications whatever the user.
-        The DummyEmployeeRecordSerializer will replace these objects with raw randomized jsons.
-        25 is slightly more than the default page size (20) so that pagination can be tested.
-        Order by pk to solve pagination warning.
-        """
-        return JobApplication.objects.order_by("pk")[:25]
-
-
 class AbstractEmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
-
     # Every employee record endpoint is now throttled
     throttle_classes = [EmployeeRecordRateThrottle]
 

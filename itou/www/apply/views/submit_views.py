@@ -220,7 +220,6 @@ class StartView(ApplyStepBaseView):
         self.apply_session.init(
             {
                 "back_url": self._coalesce_back_url(),
-                "nir": None,
                 "selected_jobs": [request.GET["job_description_id"]] if "job_description_id" in request.GET else [],
             }
         )
@@ -630,7 +629,6 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
             **self._get_profile_data_from_session(),
         )
 
-    @transaction.atomic
     def post(self, request, *args, **kwargs):
         try:
             user = User.create_job_seeker_by_proxy(self.sender, **self._get_user_data_from_session())
