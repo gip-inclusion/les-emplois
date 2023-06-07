@@ -68,7 +68,7 @@ class TestInstitutionEmailFactory:
     def test_close_notifies_when_siae_has_negative_result(self, mailoutbox):
         institution = InstitutionWith2MembershipFactory(name="DDETS 01")
         campaign = EvaluationCampaignFactory(pk=1, institution=institution)
-        siae = SiaeWith2MembershipsFactory(name="les petits jardins")
+        siae = SiaeWith2MembershipsFactory(pk=1000, name="les petits jardins")
         evaluated_siae = EvaluatedSiaeFactory(
             siae=siae,
             evaluation_campaign=campaign,
@@ -85,11 +85,14 @@ class TestInstitutionEmailFactory:
 
         campaign.close()
 
-        [institution_email] = mailoutbox
+        [siae_refused_email, institution_email] = mailoutbox
 
         assert sorted(institution_email.to) == sorted(institution.active_members.values_list("email", flat=True))
         assert institution_email.subject == "[Contrôle a posteriori] Notification des sanctions"
         assert institution_email.body == self.snapshot(name="sanction notification email")
+
+        assert siae_refused_email.subject == "Résultat du contrôle - EI les petits jardins ID-1000"
+        assert siae_refused_email.body == self.snapshot(name="refused result email")
 
     def test_close_does_not_notify_when_siae_has_been_notified(self, mailoutbox):
         institution = InstitutionWith2MembershipFactory(name="DDETS 01")
@@ -114,10 +117,11 @@ class TestInstitutionEmailFactory:
 
         assert [] == mailoutbox
 
-    def test_close_does_not_notify_when_siae_has_positive_result(self, mailoutbox):
+    @freeze_time("2023-06-07")
+    def test_close_notify_when_siae_has_positive_result_in_adversarial_phase(self, mailoutbox):
         institution = InstitutionWith2MembershipFactory(name="DDETS 01")
         campaign = EvaluationCampaignFactory(institution=institution)
-        siae = SiaeWith2MembershipsFactory(name="les petits jardins")
+        siae = SiaeWith2MembershipsFactory(pk=1000, name="les petits jardins")
         evaluated_siae = EvaluatedSiaeFactory(
             siae=siae,
             evaluation_campaign=campaign,
@@ -134,7 +138,31 @@ class TestInstitutionEmailFactory:
 
         campaign.close()
 
-        assert [] == mailoutbox
+        [siae_accepted_email] = mailoutbox
+        assert siae_accepted_email.subject == "Résultat du contrôle - EI les petits jardins ID-1000"
+        assert siae_accepted_email.body == self.snapshot(name="accepted result email")
+
+    def test_close_does_not_notify_when_siae_has_positive_result_in_amicable_phase(self, mailoutbox):
+        institution = InstitutionWith2MembershipFactory(name="DDETS 01")
+        campaign = EvaluationCampaignFactory(institution=institution)
+        siae = SiaeWith2MembershipsFactory(pk=1000, name="les petits jardins")
+        reviewed_at = timezone.now() - relativedelta(days=50)
+        evaluated_siae = EvaluatedSiaeFactory(
+            siae=siae,
+            evaluation_campaign=campaign,
+            reviewed_at=reviewed_at,
+            final_reviewed_at=reviewed_at,
+        )
+        evaluated_jobapp = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_jobapp,
+            uploaded_at=timezone.now() - relativedelta(days=51, minutes=1),
+            submitted_at=timezone.now() - relativedelta(days=51),
+            review_state=EvaluatedAdministrativeCriteriaState.ACCEPTED,
+        )
+
+        campaign.close()
+        assert mailoutbox == []
 
     def test_submitted_by_siae(self):
         institution = InstitutionWith2MembershipFactory()

@@ -445,7 +445,7 @@ class EvaluationCampaignManagerTest(TestCase):
         evaluated_siae_accepted = EvaluatedSiaeFactory(
             pk=1004,
             evaluation_campaign=campaign,
-            siae__name="Geo",
+            siae__name="Geo accepted",
             siae__pk=2004,
             reviewed_at=accepted_ts,
             final_reviewed_at=accepted_ts,
@@ -460,7 +460,7 @@ class EvaluationCampaignManagerTest(TestCase):
         evaluated_siae_refused = EvaluatedSiaeFactory(
             pk=1005,
             evaluation_campaign=campaign,
-            siae__name="Geo",
+            siae__name="Geo refused",
             siae__pk=2005,
             reviewed_at=refused_ts,
         )
@@ -494,9 +494,25 @@ class EvaluationCampaignManagerTest(TestCase):
         assert evaluated_siae_refused.reviewed_at == refused_ts
         assert evaluated_siae_refused.final_reviewed_at is None
 
-        [siae_no_response_email, siae_no_docs_email, siae_force_accepted, institution_email] = sorted(
-            mail.outbox, key=lambda mail: mail.subject
+        [
+            siae_accepted_email,
+            siae_refused_email,
+            siae_no_response_email,
+            siae_no_docs_email,
+            siae_force_accepted,
+            institution_email,
+        ] = sorted(mail.outbox, key=lambda mail: mail.subject)
+        assert (
+            siae_refused_email.subject == f"Résultat du contrôle - EI Geo refused ID-{evaluated_siae_refused.siae_id}"
         )
+        assert siae_refused_email.body == self.snapshot(name="refused review email body")
+
+        assert (
+            siae_accepted_email.subject
+            == f"Résultat du contrôle - EI Geo accepted ID-{evaluated_siae_accepted.siae_id}"
+        )
+        assert siae_accepted_email.body == self.snapshot(name="accepted review email body")
+
         assert (
             siae_no_response_email.subject
             == f"Résultat du contrôle - EI Les grands jardins ID-{evaluated_siae_no_response.siae_id}"

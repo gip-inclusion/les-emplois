@@ -3649,9 +3649,8 @@ class InstitutionEvaluatedSiaeValidationViewTest(TestCase):
             [
                 (
                     messages.SUCCESS,
-                    "<b>Résultats transmis !</b><br>"
-                    "Merci d'avoir pris le temps de contrôler les pièces justificatives. "
-                    "Nous notifions par mail l'administrateur de la SIAE.",
+                    "<b>Résultats enregistrés !</b><br>"
+                    "Merci d'avoir pris le temps de contrôler les pièces justificatives.",
                 )
             ],
         )
@@ -3673,9 +3672,8 @@ class InstitutionEvaluatedSiaeValidationViewTest(TestCase):
             [
                 (
                     messages.SUCCESS,
-                    "<b>Résultats transmis !</b><br>"
-                    "Merci d'avoir pris le temps de contrôler les pièces justificatives. "
-                    "Nous notifions par mail l'administrateur de la SIAE.",
+                    "<b>Résultats enregistrés !</b><br>"
+                    "Merci d'avoir pris le temps de contrôler les pièces justificatives.",
                 )
             ],
         )
@@ -3716,9 +3714,7 @@ class InstitutionEvaluatedSiaeValidationViewTest(TestCase):
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             ),
         )
-        [email] = mail.outbox
-        assert f"Résultat du contrôle - EI Les petits jardins ID-{evaluated_siae.siae_id}" == email.subject
-        assert "a validé la conformité des justificatifs" in email.body
+        assert mail.outbox == []
 
     def test_accepted_after_adversarial(self):
         evaluated_siae = EvaluatedSiaeFactory.create(
@@ -3748,9 +3744,7 @@ class InstitutionEvaluatedSiaeValidationViewTest(TestCase):
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             ),
         )
-        [email] = mail.outbox
-        assert f"Résultat du contrôle - EI Les petits jardins ID-{evaluated_siae.siae_id}" == email.subject
-        assert "a validé la conformité des nouveaux justificatifs" in email.body
+        assert mail.outbox == []
 
     def test_refused(self):
         evaluated_siae = EvaluatedSiaeFactory.create(
@@ -3779,9 +3773,7 @@ class InstitutionEvaluatedSiaeValidationViewTest(TestCase):
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             ),
         )
-        [email] = mail.outbox
-        assert f"Résultat du contrôle - EI Les petits jardins ID-{evaluated_siae.siae_id}" == email.subject
-        assert "un ou plusieurs justificatifs sont attendus" in email.body
+        assert mail.outbox == []
 
     def test_refused_after_adversarial(self):
         evaluated_siae = EvaluatedSiaeFactory.create(
@@ -3811,6 +3803,4 @@ class InstitutionEvaluatedSiaeValidationViewTest(TestCase):
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             ),
         )
-        [email] = mail.outbox
-        assert f"Résultat du contrôle - EI Les petits jardins ID-{evaluated_siae.siae_id}" == email.subject
-        assert "plusieurs de vos justificatifs n’ont pas été validés" in email.body
+        assert mail.outbox == []
