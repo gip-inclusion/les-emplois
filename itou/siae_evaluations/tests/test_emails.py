@@ -1,3 +1,4 @@
+import pytest
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.urls import reverse
@@ -16,6 +17,7 @@ from itou.siae_evaluations.factories import (
 from itou.siaes.factories import SiaeFactory, SiaeWith2MembershipsFactory
 
 
+@pytest.mark.usefixtures("unittest_compatibility")
 class TestInstitutionEmailFactory:
     def test_ratio_to_select(self):
         institution = InstitutionWith2MembershipFactory()
@@ -65,7 +67,7 @@ class TestInstitutionEmailFactory:
     @freeze_time("2023-01-23")
     def test_close_notifies_when_siae_has_negative_result(self, mailoutbox):
         institution = InstitutionWith2MembershipFactory(name="DDETS 01")
-        campaign = EvaluationCampaignFactory(institution=institution)
+        campaign = EvaluationCampaignFactory(pk=1, institution=institution)
         siae = SiaeWith2MembershipsFactory(name="les petits jardins")
         evaluated_siae = EvaluatedSiaeFactory(
             siae=siae,
@@ -87,21 +89,7 @@ class TestInstitutionEmailFactory:
 
         assert sorted(institution_email.to) == sorted(institution.active_members.values_list("email", flat=True))
         assert institution_email.subject == "[Contrôle a posteriori] Notification des sanctions"
-        assert institution_email.body == (
-            "Bonjour,\n\n"
-            "Suite au dernier contrôle a posteriori, une ou plusieurs SIAE de votre département ont obtenu un "
-            "résultat négatif.\n"
-            "Conformément au  Décret n° 2021-1128 du 30 août 2021 relatif à l'insertion par l'activité économique, "
-            "les manquements constatés ainsi que les sanctions envisagées doivent être notifiés aux SIAE.\n\n"
-            "Veuillez vous connecter sur votre espace des emplois de l’inclusion afin d’effectuer cette démarche.\n"
-            f"http://127.0.0.1:8000/siae_evaluation/institution_evaluated_siae_list/{campaign.pk}/\n\n"
-            "Cordialement,\n\n"
-            "---\n"
-            "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
-            "merci de ne pas en tenir compte [DEV]\n"
-            "Les emplois de l'inclusion\n"
-            "http://127.0.0.1:8000"
-        )
+        assert institution_email.body == self.snapshot(name="sanction notification email")
 
     def test_close_does_not_notify_when_siae_has_been_notified(self, mailoutbox):
         institution = InstitutionWith2MembershipFactory(name="DDETS 01")
