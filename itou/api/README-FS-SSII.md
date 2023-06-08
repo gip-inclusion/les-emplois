@@ -157,7 +157,7 @@ Tous les référentiels utiles mentionnés dans le JSON ci-dessous sont [disponi
         "codepostalcedex": "34000"
     },
     "situationSalarie": {
-        # Doit faire partie de ref_orienteur_v4.csv
+        # Doit faire partie de ref_orienteur_v5.csv
         # Ce référentiel est encore incomplet, à résoudre.
         "orienteur": "01",
         # Doit faire partie de ref_niveau_formation_v3.csv
