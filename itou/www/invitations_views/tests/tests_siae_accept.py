@@ -17,6 +17,7 @@ from itou.users.factories import SiaeStaffFactory
 from itou.users.models import User
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.test import assertMessages
+from itou.utils.urls import add_url_params
 
 
 class TestAcceptInvitation(InclusionConnectBaseTestCase):
@@ -66,7 +67,6 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         response = mock_oauth_dance(
             self.client,
             KIND_SIAE_STAFF,
-            assert_redirects=False,
             user_email=invitation.email,
             channel="invitation",
             previous_url=previous_url,
@@ -107,7 +107,6 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         response = mock_oauth_dance(
             self.client,
             KIND_SIAE_STAFF,
-            assert_redirects=False,
             # Using the same email with a different case should not fail
             user_email=invitation.email.lower(),
             channel="invitation",
@@ -142,7 +141,6 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         response = mock_oauth_dance(
             self.client,
             UserKind.SIAE_STAFF,
-            assert_redirects=False,
             user_email=user.email,
             channel="invitation",
             previous_url=previous_url,
@@ -186,14 +184,14 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         response = mock_oauth_dance(
             self.client,
             KIND_SIAE_STAFF,
-            assert_redirects=False,
             # the login hint is different from OIDC_USERINFO["email"] which is used to create the IC account
             user_email=invitation.email,
             channel="invitation",
             previous_url=previous_url,
             next_url=next_url,
+            expected_redirect_url=add_url_params(reverse("inclusion_connect:logout"), {"redirect_url": previous_url}),
         )
-        # Inclusion connect redirects to previous_url
+        # After logout, Inclusion connect redirects to previous_url (see redirect_url param in expected_redirect_url)
         response = self.client.get(previous_url, follow=True)
         # Signup should have failed : as the email used in IC isn't the one from the invitation
         assertMessages(
@@ -290,7 +288,6 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         response = mock_oauth_dance(
             self.client,
             KIND_SIAE_STAFF,
-            assert_redirects=False,
             user_email=invitation.email,
             channel="invitation",
             previous_url=previous_url,

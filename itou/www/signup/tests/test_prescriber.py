@@ -103,7 +103,6 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         response = mock_oauth_dance(
             self.client,
             KIND_PRESCRIBER,
-            assert_redirects=False,
             user_email=email,
             channel="pole_emploi",
             user_info_email=email,
@@ -182,7 +181,6 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         response = mock_oauth_dance(
             self.client,
             KIND_PRESCRIBER,
-            assert_redirects=False,
             previous_url=previous_url,
             next_url=next_url,
         )
@@ -273,7 +271,6 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         response = mock_oauth_dance(
             self.client,
             KIND_PRESCRIBER,
-            assert_redirects=False,
             previous_url=previous_url,
             next_url=next_url,
         )
@@ -360,7 +357,6 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         response = mock_oauth_dance(
             self.client,
             KIND_PRESCRIBER,
-            assert_redirects=False,
             previous_url=previous_url,
             next_url=next_url,
         )
@@ -502,7 +498,6 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         response = mock_oauth_dance(
             self.client,
             KIND_PRESCRIBER,
-            assert_redirects=False,
             previous_url=previous_url,
         )
         # Follow the redirection.
@@ -580,7 +575,6 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         response = mock_oauth_dance(
             self.client,
             KIND_PRESCRIBER,
-            assert_redirects=False,
             previous_url=previous_url,
             next_url=next_url,
         )
@@ -688,7 +682,6 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         response = mock_oauth_dance(
             self.client,
             KIND_PRESCRIBER,
-            assert_redirects=False,
             previous_url=previous_url,
         )
         # Follow the redirection.
@@ -757,7 +750,6 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         response = mock_oauth_dance(
             self.client,
             KIND_PRESCRIBER,
-            assert_redirects=False,
             previous_url=previous_url,
             next_url=next_url,
         )
@@ -834,7 +826,6 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
         response = mock_oauth_dance(
             self.client,
             KIND_PRESCRIBER,
-            assert_redirects=False,
             previous_url=previous_url,
             next_url=next_url,
         )
@@ -908,7 +899,6 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
         response = mock_oauth_dance(
             self.client,
             KIND_PRESCRIBER,
-            assert_redirects=False,
             previous_url=previous_url,
             next_url=next_url,
             register=False,
@@ -981,14 +971,9 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
         response = mock_oauth_dance(
             self.client,
             KIND_PRESCRIBER,
-            assert_redirects=False,
             previous_url=previous_url,
             next_url=next_url,
-        )
-        self.assertRedirects(
-            response,
-            add_url_params(reverse("inclusion_connect:logout"), {"redirect_url": previous_url}),
-            fetch_redirect_response=False,
+            expected_redirect_url=add_url_params(reverse("inclusion_connect:logout"), {"redirect_url": previous_url}),
         )
 
         # IC logout redirects to previous_url
@@ -1048,15 +1033,10 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
             KIND_PRESCRIBER,
             user_email=pe_email,
             channel="pole_emploi",
-            assert_redirects=False,
             previous_url=previous_url,
             next_url=next_url,
             user_info_email=wrong_email,
-        )
-        self.assertRedirects(
-            response,
-            add_url_params(reverse("inclusion_connect:logout"), {"redirect_url": previous_url}),
-            fetch_redirect_response=False,
+            expected_redirect_url=add_url_params(reverse("inclusion_connect:logout"), {"redirect_url": previous_url}),
         )
 
         # IC logout redirects to previous_url

@@ -69,7 +69,7 @@ class WelcomingTourTest(InclusionConnectBaseTestCase):
         session = self.client.session
         session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = {"url_history": []}
         session.save()
-        response = mock_oauth_dance(self.client, KIND_PRESCRIBER, assert_redirects=False)
+        response = mock_oauth_dance(self.client, KIND_PRESCRIBER)
         response = self.client.get(response.url, follow=True)
 
         # User should be redirected to the welcoming tour as he just signed up
@@ -77,9 +77,8 @@ class WelcomingTourTest(InclusionConnectBaseTestCase):
         self.assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
         self.client.logout()
-        response = mock_oauth_dance(self.client, KIND_PRESCRIBER, assert_redirects=False)
+        response = mock_oauth_dance(self.client, KIND_PRESCRIBER, expected_redirect_url=reverse("dashboard:index"))
         response = self.client.get(response.url, follow=True)
-        assert response.wsgi_request.path != reverse("welcoming_tour:index")
         self.assertContains(response, "Revoir le message")
 
     @respx.mock
@@ -91,7 +90,6 @@ class WelcomingTourTest(InclusionConnectBaseTestCase):
         response = mock_oauth_dance(
             self.client,
             KIND_SIAE_STAFF,
-            assert_redirects=False,
             previous_url=previous_url,
             next_url=next_url,
         )
@@ -102,9 +100,8 @@ class WelcomingTourTest(InclusionConnectBaseTestCase):
         self.assertTemplateUsed(response, "welcoming_tour/siae_staff.html")
 
         self.client.logout()
-        response = mock_oauth_dance(self.client, KIND_SIAE_STAFF, assert_redirects=False)
+        response = mock_oauth_dance(self.client, KIND_SIAE_STAFF, expected_redirect_url=reverse("dashboard:index"))
         response = self.client.get(response.url, follow=True)
-        assert response.wsgi_request.path != reverse("welcoming_tour:index")
         self.assertContains(response, "Revoir le message")
 
 

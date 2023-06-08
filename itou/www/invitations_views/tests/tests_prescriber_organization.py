@@ -22,6 +22,7 @@ from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.test import TestCase, assertMessages
+from itou.utils.urls import add_url_params
 
 
 POST_DATA = {
@@ -242,11 +243,11 @@ class TestAcceptPrescriberWithOrgInvitation(InclusionConnectBaseTestCase):
         response = mock_oauth_dance(
             self.client,
             UserKind.PRESCRIBER,
-            assert_redirects=False,
             user_email=invitation.email,
             channel="invitation",
             previous_url=previous_url,
             next_url=next_url,
+            expected_redirect_url=add_url_params(reverse("inclusion_connect:logout"), {"redirect_url": previous_url}),
         )
         # Inclusion connect redirects to previous_url
         response = self.client.get(previous_url, follow=True)
@@ -270,7 +271,6 @@ class TestAcceptPrescriberWithOrgInvitation(InclusionConnectBaseTestCase):
         response = mock_oauth_dance(
             self.client,
             UserKind.PRESCRIBER,
-            assert_redirects=False,
             user_email=invitation.email,
             channel="invitation",
             previous_url=previous_url,
@@ -355,7 +355,6 @@ class TestAcceptPrescriberWithOrgInvitation(InclusionConnectBaseTestCase):
         response = mock_oauth_dance(
             self.client,
             UserKind.PRESCRIBER,
-            assert_redirects=False,
             user_email=user.email,
             channel="invitation",
             previous_url=previous_url,
