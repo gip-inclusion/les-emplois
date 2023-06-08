@@ -731,12 +731,12 @@ class EvaluatedSiaeModelTest(TestCase):
         ## unit tests
         # no evaluated_job_application
         assert evaluation_enums.EvaluatedSiaeState.PENDING == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
         # no evaluated_administrative_criterion
         evaluated_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
         assert evaluation_enums.EvaluatedSiaeState.PENDING == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
         # one evaluated_administrative_criterion
         # empty : proof_url and submitted_at empty)
@@ -744,31 +744,31 @@ class EvaluatedSiaeModelTest(TestCase):
             evaluated_job_application=evaluated_job_application, proof_url=""
         )
         assert evaluation_enums.EvaluatedSiaeState.PENDING == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
         # with proof_url
         evaluated_administrative_criteria0.proof_url = "https://server.com/rocky-balboa.pdf"
         evaluated_administrative_criteria0.save(update_fields=["proof_url"])
         assert evaluation_enums.EvaluatedSiaeState.SUBMITTABLE == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
         # PENDING + submitted_at without review
         evaluated_administrative_criteria0.submitted_at = fake_now
         evaluated_administrative_criteria0.save(update_fields=["submitted_at"])
         assert evaluation_enums.EvaluatedSiaeState.SUBMITTED == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
         # PENDING + submitted_at before review: we still consider that the DDETS IAE can validate the documents
         evaluated_siae.reviewed_at = fake_now + relativedelta(days=1)
         evaluated_siae.save(update_fields=["reviewed_at"])
         assert evaluation_enums.EvaluatedSiaeState.SUBMITTED == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
         # PENDING + submitted_at after review
         evaluated_siae.reviewed_at = fake_now - relativedelta(days=1)
         evaluated_siae.save(update_fields=["reviewed_at"])
         assert evaluation_enums.EvaluatedSiaeState.SUBMITTED == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
         # with review_state REFUSED, not reviewed : removed, should not exist in real life
 
@@ -779,14 +779,14 @@ class EvaluatedSiaeModelTest(TestCase):
         evaluated_siae.save(update_fields=["reviewed_at"])
         assert evaluated_administrative_criteria0.submitted_at <= evaluated_siae.reviewed_at
         assert evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
         # with review_state REFUSED, reviewed, submitted_at after reviewed_at
         evaluated_siae.reviewed_at = fake_now - relativedelta(days=1)
         evaluated_siae.save(update_fields=["reviewed_at"])
         assert evaluated_administrative_criteria0.submitted_at > evaluated_siae.reviewed_at
         assert evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
         # with review_state REFUSED_2, reviewed, submitted_at after reviewed_at
         evaluated_administrative_criteria0.review_state = (
@@ -796,13 +796,13 @@ class EvaluatedSiaeModelTest(TestCase):
         evaluated_siae.reviewed_at = fake_now - relativedelta(days=1)
         evaluated_siae.save(update_fields=["reviewed_at"])
         assert evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
         # with review_state REFUSED_2, reviewed, submitted_at after reviewed_at, with final_reviewed_at
         evaluated_siae.final_reviewed_at = fake_now
         evaluated_siae.save(update_fields=["final_reviewed_at"])
         assert evaluation_enums.EvaluatedSiaeState.NOTIFICATION_PENDING == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
         # with review_state REFUSED_2, reviewed, submitted_at after
         # reviewed_at, with final_reviewed_at, with notified_at
@@ -811,7 +811,7 @@ class EvaluatedSiaeModelTest(TestCase):
         evaluated_siae.notification_text = "Le document n’a pas été transmis."
         evaluated_siae.save(update_fields=["notified_at", "notification_reason", "notification_text"])
         assert evaluation_enums.EvaluatedSiaeState.REFUSED == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
         # with review_state REFUSED_2, reviewed, submitted_at before reviewed_at :
         # removed, should never happen in real life
@@ -843,7 +843,7 @@ class EvaluatedSiaeModelTest(TestCase):
         )
         assert evaluated_administrative_criteria0.submitted_at > evaluated_siae.reviewed_at
         assert evaluation_enums.EvaluatedSiaeState.ACCEPTED == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
     def test_state_integration(self):
         fake_now = timezone.now()
@@ -866,7 +866,7 @@ class EvaluatedSiaeModelTest(TestCase):
         ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria[2].save(update_fields=["review_state"])
         assert evaluation_enums.EvaluatedSiaeState.SUBMITTED == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
         # one Refused, two Accepted
         evaluated_siae.reviewed_at = fake_now
@@ -876,7 +876,7 @@ class EvaluatedSiaeModelTest(TestCase):
         ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria[0].save(update_fields=["review_state"])
         assert evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
         # three Accepted
         evaluated_siae.final_reviewed_at = fake_now
@@ -886,7 +886,7 @@ class EvaluatedSiaeModelTest(TestCase):
         ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria[1].save(update_fields=["review_state"])
         assert evaluation_enums.EvaluatedSiaeState.ACCEPTED == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
         evaluated_siae.final_reviewed_at = None
         evaluated_siae.save(update_fields=["final_reviewed_at"])
 
@@ -908,7 +908,7 @@ class EvaluatedSiaeModelTest(TestCase):
         ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria[2].save(update_fields=["review_state"])
         assert evaluation_enums.EvaluatedSiaeState.SUBMITTED == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
         # one Refused, two Accepted
         evaluated_administrative_criteria[
@@ -916,7 +916,7 @@ class EvaluatedSiaeModelTest(TestCase):
         ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria[0].save(update_fields=["review_state"])
         assert evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
         # three Accepted
         evaluated_siae.final_reviewed_at = fake_now
@@ -926,7 +926,7 @@ class EvaluatedSiaeModelTest(TestCase):
         ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria[1].save(update_fields=["review_state"])
         assert evaluation_enums.EvaluatedSiaeState.ACCEPTED == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
         evaluated_siae.final_reviewed_at = None
         evaluated_siae.save(update_fields=["final_reviewed_at"])
 
@@ -948,7 +948,7 @@ class EvaluatedSiaeModelTest(TestCase):
         ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria[2].save(update_fields=["review_state"])
         assert evaluation_enums.EvaluatedSiaeState.SUBMITTED == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
         # one Refused, two Accepted
         evaluated_administrative_criteria[
@@ -956,7 +956,7 @@ class EvaluatedSiaeModelTest(TestCase):
         ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria[0].save(update_fields=["review_state"])
         assert evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
         # three Accepted
         evaluated_siae.final_reviewed_at = fake_now
@@ -966,7 +966,7 @@ class EvaluatedSiaeModelTest(TestCase):
         ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria[1].save(update_fields=["review_state"])
         assert evaluation_enums.EvaluatedSiaeState.ACCEPTED == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
     def test_state_on_closed_campaign_no_criteria(self):
         evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__ended_at=timezone.now())
@@ -1126,8 +1126,8 @@ class EvaluatedSiaeModelTest(TestCase):
 def test_should_display_pending_action_warning(state, frozen, should_display_pending_action_warning):
     evaluated_siae = EvaluatedSiaeFactory(submission_freezed_at=timezone.now() if frozen else None)
     # Override state property for faster tests
-    setattr(evaluated_siae, "state", state)
-    assert evaluated_siae.should_display_pending_action_warning == should_display_pending_action_warning
+    with mock.patch.object(EvaluatedSiae, "state", state):
+        assert evaluated_siae.should_display_pending_action_warning == should_display_pending_action_warning
 
 
 class EvaluatedJobApplicationModelTest(TestCase):

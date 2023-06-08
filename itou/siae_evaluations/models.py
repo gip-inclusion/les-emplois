@@ -473,7 +473,7 @@ class EvaluatedSiae(models.Model):
             raise TypeError(f"Cannot review an “{self.__class__.__name__}” with status “{self.state}”.")
         self.save()
         # Invalidate the cache, a review changes the state of the evaluation.
-        del self.state
+        del self.state_from_applications
 
     @property
     def evaluation_is_final(self):
@@ -481,16 +481,10 @@ class EvaluatedSiae(models.Model):
 
     # fixme vincentporte : rsebille suggests to replace cached_property with prefetch_related
     @cached_property
-    def state(self):
+    def state_from_applications(self):
         # assuming the EvaluatedSiae instance is fully hydrated with its evaluated_job_applications
         # and evaluated_administrative_criteria before being called,
         # to prevent tons of additional queries in db.
-
-        NOTIFICATION_PENDING_OR_REFUSED = (
-            evaluation_enums.EvaluatedSiaeState.REFUSED
-            if self.notified_at
-            else evaluation_enums.EvaluatedSiaeState.NOTIFICATION_PENDING
-        )
 
         STATES_PRIORITY = [
             # Low priority: all applications must have this state for the siae to have it
@@ -514,10 +508,20 @@ class EvaluatedSiae(models.Model):
                 evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED: evaluation_enums.EvaluatedSiaeState.ACCEPTED,
             }[application.compute_state()]
 
-        state_from_applications = max(
+        return max(
             (state_from(eval_job_app) for eval_job_app in self.evaluated_job_applications.all()),
             key=STATES_PRIORITY.index,
             default=evaluation_enums.EvaluatedSiaeState.PENDING,
+        )
+
+    @property
+    def state(self):
+        state_from_applications = self.state_from_applications
+
+        NOTIFICATION_PENDING_OR_REFUSED = (
+            evaluation_enums.EvaluatedSiaeState.REFUSED
+            if self.notified_at
+            else evaluation_enums.EvaluatedSiaeState.NOTIFICATION_PENDING
         )
 
         if state_from_applications in {
