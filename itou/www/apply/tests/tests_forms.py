@@ -103,7 +103,7 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
             "hiring_end_at",
             "hiring_start_at",
             "nb_hours_per_week",
-            "planned_training_days",
+            "planned_training_hours",
             "prehiring_guidance_days",
             "qualification_level",
             "qualification_type",
@@ -120,7 +120,7 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
             "hiring_end_at",
             "hiring_start_at",
             "nb_hours_per_week",
-            "planned_training_days",
+            "planned_training_hours",
             "prehiring_guidance_days",
             "qualification_level",
             "qualification_type",
@@ -135,7 +135,7 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
         assert sorted_errors == {
             "contract_type": ["Ce champ est obligatoire."],
             "nb_hours_per_week": ["Ce champ est obligatoire."],
-            "planned_training_days": ["Ce champ est obligatoire."],
+            "planned_training_hours": ["Ce champ est obligatoire."],
             "prehiring_guidance_days": ["Ce champ est obligatoire."],
             "qualification_level": ["Ce champ est obligatoire."],
             "qualification_type": ["Ce champ est obligatoire."],
@@ -147,7 +147,7 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
         assert sorted_errors == {
             "contract_type": ["Ce champ est obligatoire."],
             "nb_hours_per_week": ["Ce champ est obligatoire."],
-            "planned_training_days": ["Ce champ est obligatoire."],
+            "planned_training_hours": ["Ce champ est obligatoire."],
             "qualification_level": ["Ce champ est obligatoire."],
             "qualification_type": ["Ce champ est obligatoire."],
         }
@@ -157,7 +157,7 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
         sorted_errors = dict(sorted(form.errors.items()))
         assert sorted_errors == {
             "nb_hours_per_week": ["Ce champ est obligatoire."],
-            "planned_training_days": ["Ce champ est obligatoire."],
+            "planned_training_hours": ["Ce champ est obligatoire."],
             "qualification_level": ["Ce champ est obligatoire."],
             "qualification_type": ["Ce champ est obligatoire."],
         }
@@ -166,7 +166,7 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
             "nb_hours_per_week": 35,
             "qualification_type": QualificationType.CCN,
             "qualification_level": QualificationLevel.LEVEL_4,
-            "planned_training_days": self.faker.pyint(),
+            "planned_training_hours": self.faker.pyint(),
         }
         form = apply_forms.AcceptForm(instance=job_application, data=post_data)
         assert form.is_valid()
@@ -184,7 +184,7 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
 
         assert form.errors == {
             "contract_type_details": ["Les précisions sont nécessaires pour ce type de contrat"],
-            "planned_training_days": ["Ce champ est obligatoire."],
+            "planned_training_hours": ["Ce champ est obligatoire."],
             "qualification_level": ["Ce champ est obligatoire."],
             "qualification_type": ["Ce champ est obligatoire."],
         }
@@ -197,7 +197,7 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
                 "contract_type_details": "foo",
                 "qualification_type": QualificationType.CQP,
                 "qualification_level": QualificationLevel.LEVEL_3,
-                "planned_training_days": self.faker.pyint(),
+                "planned_training_hours": self.faker.pyint(),
             },
         )
         assert form.is_valid()
@@ -210,7 +210,7 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
                 "contract_type": ContractType.APPRENTICESHIP,
                 "qualification_type": QualificationType.CCN,
                 "qualification_level": QualificationLevel.LEVEL_4,
-                "planned_training_days": self.faker.pyint(),
+                "planned_training_hours": self.faker.pyint(),
                 "nb_of_hours_per_week": self.faker.pyint(),
             },
         )
@@ -224,7 +224,7 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
                 "contract_type": ContractType.PROFESSIONAL_TRAINING,
                 "qualification_type": QualificationType.CCN,
                 "qualification_level": QualificationLevel.NOT_RELEVANT,
-                "planned_training_days": self.faker.pyint(),
+                "planned_training_hours": self.faker.pyint(),
                 "nb_of_hours_per_week": self.faker.pyint(),
             },
         )
@@ -249,7 +249,7 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
             "contract_type": str(ContractType.OTHER),
             "qualification_type": QualificationType.CCN,
             "qualification_level": QualificationLevel.NOT_RELEVANT,
-            "planned_training_days": self.faker.pyint(),
+            "planned_training_hours": self.faker.pyint(),
             "answer": "foo",
             "confirmed": "True",
         }
@@ -289,7 +289,7 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
             "contract_type": str(ContractType.OTHER),
             "qualification_type": QualificationType.CCN,
             "qualification_level": QualificationLevel.LEVEL_4,
-            "planned_training_days": self.faker.pyint(),
+            "planned_training_hours": self.faker.pyint(),
             "answer": "foobar",
             "confirmed": "True",
         }

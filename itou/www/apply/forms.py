@@ -448,7 +448,7 @@ class AcceptForm(forms.ModelForm):
         "nb_hours_per_week",
         "qualification_type",
         "qualification_level",
-        "planned_training_days",
+        "planned_training_hours",
     )
 
     # Choices are dynamically set on HTMX reload
@@ -483,7 +483,7 @@ class AcceptForm(forms.ModelForm):
                 # Change default size (too large)
                 self.fields["contract_type_details"].widget.attrs.update({"rows": 2})
                 self.initial["prehiring_guidance_days"] = 0
-                self.initial["planned_training_days"] = 0
+                self.initial["planned_training_hours"] = 0
                 self.fields["hiring_start_at"].help_text = "Au format JJ/MM/AAAA, par exemple  {}.".format(
                     datetime.date.today().strftime("%d/%m/%Y"),
                 )
@@ -532,7 +532,7 @@ class AcceptForm(forms.ModelForm):
             "nb_hours_per_week",
             "hiring_start_at",
             "qualification_type",
-            "planned_training_days",
+            "planned_training_hours",
             "hiring_end_at",
             "answer",
         ]
@@ -548,7 +548,6 @@ class AcceptForm(forms.ModelForm):
                 (datetime.date.today() + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)).strftime("%d/%m/%Y")
             ),
             "prehiring_guidance_days": """Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche""",
-            "planned_training_days": """Laissez "0" si vous n'avez pas prévu de jours de formation pour le candidat""",
             "contract_type_details": (
                 "Si vous avez choisi un autre type de contrat, merci de bien vouloir fournir plus de précisions"
             ),
