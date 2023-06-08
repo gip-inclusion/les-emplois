@@ -316,16 +316,32 @@ class PrescriberType(models.TextChoices):
 
     Similar to EmployerType above, and with the same padding issue
 
-    Translation of ASP ref file: ref_orienteur_v4.csv
+    Translation of ASP ref file: ref_orienteur_v5.csv
     """
 
     ML = "01", "Mission locale"
     CAP_EMPLOI = "02", "Cap emploi"
     PE = "03", "Pôle emploi"
-    PLIE = "04", "Plan local pour l'insertion et l'emploi"
-    DEPT = "05", "Service départementaux"
-    AUTHORIZED_PRESCRIBERS = "06", "Prescripteurs habilités"
+    PLIE = "04", "PLIE - Plan local pour l'insertion et l'emploi"
+    DEPT = "05", "Service social du conseil départemental"
+    AUTHORIZED_PRESCRIBERS = "06", "Autre prescripteurs habilité"
     SPONTANEOUS_APPLICATION = "07", "Candidature spontanée"
+    PRESCRIBERS = "08", "Orienteur (prescripteur non habilité)"
+    SPIP = "09", "SPIP - Service pénitentiaire d'insertion et de probation"
+    PJJ = "10", "PJJ - Protection judiciaire de la jeunesse"
+    CCAS = "11", "CCAS - Centre (inter)communal d'action sociale"
+    CHRS = "12", "CHRA - Centre d'hébergement et de réinsertion sociale"
+    CIDFF = "13", "CIDFF - Centre d'information sur les droits des femmes et des familles"
+    PREVENTION = "14", "Service ou club de prévention"
+    AFPA = "15", "AFPA - Agence nationale pour la formation professionnelle des adultes"
+    PIJ_BIJ = "16", "PIJ-BIJ - Point/Bureau information jeunesse"
+    CAF = "17", "CAF - Caisse d'allocations familiales"
+    CADA = "18", "CADA - Centre d'accueil de demandeurs d'asile"
+    ASE = "19", "ASE - Aide sociale à l'enfance"
+    CAVA = "20", "CAVA - Centre d'adaptation à la vie active"
+    CPH = "21", "CPH - Centre provisoire d'hébergement"
+    CHU = "22", "CHU - Centre d'hébergement d'urgence"
+    OACAS = "23", "OACAS - Organisme d'accueil communautaire et d'activité solidaire"
     UNKNOWN = "99", "Non connu"
 
     @classmethod
