@@ -121,10 +121,8 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         user = User.objects.get(email=email)
         assert user.kind == UserKind.PRESCRIBER
 
-        user_emails = user.emailaddress_set.all()
         # Emails are not checked in Django anymore.
-        # Make sure no confirmation email is sent.
-        assert len(user_emails) == 0
+        assert not user.emailaddress_set.exists()
 
         # Check organization.
         assert organization.is_authorized
@@ -135,6 +133,9 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         assert user.prescribermembership_set.count() == 1
         assert user.prescribermembership_set.get().organization_id == organization.pk
         assert user.siae_set.count() == 0
+
+        # No email has been sent to support (validation/refusal of authorisation not needed).
+        assert len(mail.outbox) == 0
 
     @respx.mock
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
@@ -190,11 +191,8 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         user = User.objects.get(email=OIDC_USERINFO["email"])
         assert user.kind == UserKind.PRESCRIBER
 
-        # Check `EmailAddress` state.
-        user_emails = user.emailaddress_set.all()
         # Emails are not checked in Django anymore.
-        # Make sure no confirmation email is sent.
-        assert len(user_emails) == 0
+        assert not user.emailaddress_set.exists()
 
         # Check organization.
         org = PrescriberOrganization.objects.get(siret=siret)
@@ -206,6 +204,11 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         assert user.prescribermembership_set.count() == 1
         membership = user.prescribermembership_set.get(organization=org)
         assert membership.is_admin
+
+        # Check email has been sent to support (validation/refusal of authorisation needed).
+        assert len(mail.outbox) == 1
+        subject = mail.outbox[0].subject
+        assert "Vérification de l'habilitation d'une nouvelle organisation" in subject
 
     @respx.mock
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
@@ -263,11 +266,8 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         user = User.objects.get(email=OIDC_USERINFO["email"])
         assert user.kind == UserKind.PRESCRIBER
 
-        # Check `EmailAddress` state.
-        user_emails = user.emailaddress_set.all()
         # Emails are not checked in Django anymore.
-        # Make sure no confirmation email is sent.
-        assert len(user_emails) == 0
+        assert not user.emailaddress_set.exists()
 
         # Check organization.
         org = PrescriberOrganization.objects.get(siret=siret)
@@ -279,6 +279,11 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         assert user.prescribermembership_set.count() == 1
         membership = user.prescribermembership_set.get(organization=org)
         assert membership.is_admin
+
+        # Check email has been sent to support (validation/refusal of authorisation needed).
+        assert len(mail.outbox) == 1
+        subject = mail.outbox[0].subject
+        assert "Vérification de l'habilitation d'une nouvelle organisation" in subject
 
     @respx.mock
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
@@ -353,11 +358,8 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         user = User.objects.get(email=OIDC_USERINFO["email"])
         assert user.kind == UserKind.PRESCRIBER
 
-        # Check `EmailAddress` state.
-        user_emails = user.emailaddress_set.all()
         # Emails are not checked in Django anymore.
-        # Make sure no confirmation email is sent.
-        assert len(user_emails) == 0
+        assert not user.emailaddress_set.exists()
 
         # Check organization.
         org = PrescriberOrganization.objects.get(siret=siret)
@@ -439,11 +441,8 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         user = User.objects.get(email=OIDC_USERINFO["email"])
         assert user.kind == UserKind.PRESCRIBER
 
-        # Check `EmailAddress` state.
-        user_emails = user.emailaddress_set.all()
         # Emails are not checked in Django anymore.
-        # Make sure no confirmation email is sent.
-        assert len(user_emails) == 0
+        assert not user.emailaddress_set.exists()
 
         # Check organization.
         org = PrescriberOrganization.objects.get(siret=siret)
@@ -579,11 +578,8 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         user = User.objects.get(email=OIDC_USERINFO["email"])
         assert user.kind == UserKind.PRESCRIBER
 
-        # Check `EmailAddress` state.
-        user_emails = user.emailaddress_set.all()
         # Emails are not checked in Django anymore.
-        # Make sure no confirmation email is sent.
-        assert len(user_emails) == 0
+        assert not user.emailaddress_set.exists()
 
         # Check membership.
         assert 0 == user.prescriberorganization_set.count()
