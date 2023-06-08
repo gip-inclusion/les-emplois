@@ -79,53 +79,53 @@
                         </a>
                     </li>
                 {% endif %}
-                {% if can_view_stats_ddets %}
+                {% if can_view_stats_ddets_iae %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
-                        <a href="{% url 'stats:stats_ddets_auto_prescription' %}" class="btn-link btn-ico">
+                        <a href="{% url 'stats:stats_ddets_iae_auto_prescription' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                             <span>Focus auto-prescription</span>
                         </a>
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
-                        <a href="{% url 'stats:stats_ddets_follow_siae_evaluation' %}" class="btn-link btn-ico">
+                        <a href="{% url 'stats:stats_ddets_iae_follow_siae_evaluation' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                             <span>Suivre le contrôle à posteriori</span>
                         </a>
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
-                        <a href="{% url 'stats:stats_ddets_iae' %}" class="btn-link btn-ico">
+                        <a href="{% url 'stats:stats_ddets_iae_iae' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                             <span>Voir les données IAE de mon département</span>
                         </a>
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
-                        <a href="{% url 'stats:stats_ddets_hiring' %}" class="btn-link btn-ico">
+                        <a href="{% url 'stats:stats_ddets_iae_hiring' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                             <span>Voir les données facilitation de l'embauche</span>
                         </a>
                     </li>
                 {% endif %}
-                {% if can_view_stats_dreets %}
+                {% if can_view_stats_dreets_iae %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
-                        <a href="{% url 'stats:stats_dreets_auto_prescription' %}" class="btn-link btn-ico">
+                        <a href="{% url 'stats:stats_dreets_iae_auto_prescription' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                             <span>Focus auto-prescription</span>
                         </a>
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
-                        <a href="{% url 'stats:stats_dreets_follow_siae_evaluation' %}" class="btn-link btn-ico">
+                        <a href="{% url 'stats:stats_dreets_iae_follow_siae_evaluation' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                             <span>Suivre le contrôle à posteriori</span>
                         </a>
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
-                        <a href="{% url 'stats:stats_dreets_iae' %}" class="btn-link btn-ico">
+                        <a href="{% url 'stats:stats_dreets_iae_iae' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                             <span>Voir les données IAE de ma région</span>
                         </a>
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
-                        <a href="{% url 'stats:stats_dreets_hiring' %}" class="btn-link btn-ico">
+                        <a href="{% url 'stats:stats_dreets_iae_hiring' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                             <span>Voir les données facilitation de l'embauche</span>
                         </a>

@@ -6,7 +6,6 @@ The first member is imported from a CSV file. Joining an institution is possible
 an invitation from one of its members.
 
 For the moment, only labor inspectors (User.kind == labor_inspector) can be members.
-They belong to a DDETS, a DREETS or a DGEFP.
 """
 
 from django.conf import settings

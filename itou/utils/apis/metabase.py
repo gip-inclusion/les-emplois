@@ -72,46 +72,46 @@ METABASE_DASHBOARDS = {
         "tally_embed_form_id": "3EKJ5q",
     },
     #
-    # Institution stats - DDETS - department level.
+    # Institution stats - DDETS IAE - department level.
     #
-    "stats_ddets_auto_prescription": {
+    "stats_ddets_iae_auto_prescription": {
         "dashboard_id": 267,
         "tally_popup_form_id": "3qLpE2",
         "tally_embed_form_id": "nG6gBj",
     },
-    "stats_ddets_follow_siae_evaluation": {
+    "stats_ddets_iae_follow_siae_evaluation": {
         "dashboard_id": 265,
         "tally_popup_form_id": "w2XZxV",
         "tally_embed_form_id": "n9Ba6G",
     },
-    "stats_ddets_iae": {
+    "stats_ddets_iae_iae": {
         "dashboard_id": 117,
     },
-    "stats_ddets_siae_evaluation": {
+    "stats_ddets_iae_siae_evaluation": {
         "dashboard_id": 144,
     },
-    "stats_ddets_hiring": {
+    "stats_ddets_iae_hiring": {
         "dashboard_id": 160,
         "tally_popup_form_id": "mVLBXv",
         "tally_embed_form_id": "nPpXpQ",
     },
     #
-    # Institution stats - DREETS - region level.
+    # Institution stats - DREETS IAE - region level.
     #
-    "stats_dreets_auto_prescription": {
+    "stats_dreets_iae_auto_prescription": {
         "dashboard_id": 267,
         "tally_popup_form_id": "3qLpE2",
         "tally_embed_form_id": "nG6gBj",
     },
-    "stats_dreets_follow_siae_evaluation": {
+    "stats_dreets_iae_follow_siae_evaluation": {
         "dashboard_id": 265,
         "tally_popup_form_id": "w2XZxV",
         "tally_embed_form_id": "n9Ba6G",
     },
-    "stats_dreets_iae": {
+    "stats_dreets_iae_iae": {
         "dashboard_id": 117,
     },
-    "stats_dreets_hiring": {
+    "stats_dreets_iae_hiring": {
         "dashboard_id": 160,
         "tally_popup_form_id": "mVLBXv",
         "tally_embed_form_id": "nPpXpQ",

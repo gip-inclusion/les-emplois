@@ -13,7 +13,7 @@ class InstitutionFactory(factory.django.DjangoModelFactory):
         model = Institution
 
     name = factory.Faker("name", locale="fr_FR")
-    kind = InstitutionKind.DDETS
+    kind = InstitutionKind.DDETS_IAE
     department = factory.fuzzy.FuzzyChoice(DEPARTMENTS.keys())
 
 

@@ -45,13 +45,13 @@ def validate_institution(institution_id):
     except Institution.DoesNotExist as exception:
         raise ValidationError("L'institution sélectionnée n'existe pas.") from exception
 
-    if institution.kind != InstitutionKind.DDETS:
-        raise ValidationError(f"Sélectionnez une institution de type {InstitutionKind.DDETS}")
+    if institution.kind != InstitutionKind.DDETS_IAE:
+        raise ValidationError(f"Sélectionnez une institution de type {InstitutionKind.DDETS_IAE}")
 
 
 def create_campaigns(evaluated_period_start_at, evaluated_period_end_at, institution_ids=None):
     """
-    Create a campaign for each institution whose kind is DDETS (possibly limited by institution_ids).
+    Create a campaign for each institution whose kind is DDETS IAE (possibly limited by institution_ids).
     This method is intented to be executed manually, until it will be automised.
     """
 
@@ -60,7 +60,7 @@ def create_campaigns(evaluated_period_start_at, evaluated_period_end_at, institu
         f"au {evaluated_period_end_at.strftime('%d/%m/%Y')}"
     )
 
-    institutions = Institution.objects.filter(kind=InstitutionKind.DDETS)
+    institutions = Institution.objects.filter(kind=InstitutionKind.DDETS_IAE)
     if institution_ids:
         institutions = institutions.filter(pk__in=institution_ids)
 
@@ -105,7 +105,7 @@ class EvaluationCampaignQuerySet(models.QuerySet):
 class EvaluationCampaign(models.Model):
     """
     A campaign of evaluation
-    - is run by one institution which kind is DDETS,
+    - is run by one institution which kind is DDETS IAE,
     - According to a control agenda (ie : from 01.04.2022 to 30.06.2022)
     - on self-approvals made by siaes in the department of the institution (ie : departement 14),
     - during the evaluated period (ie : from 01.01.2021 to 31.12.2021).
@@ -137,7 +137,7 @@ class EvaluationCampaign(models.Model):
         "institutions.Institution",
         on_delete=models.CASCADE,
         related_name="evaluation_campaigns",
-        verbose_name="DDETS responsable du contrôle",
+        verbose_name="DDETS IAE responsable du contrôle",
         validators=[validate_institution],
     )
 
@@ -278,7 +278,7 @@ class EvaluationCampaign(models.Model):
                         evaluation_enums.EvaluatedSiaeState.ACCEPTED,
                         evaluation_enums.EvaluatedSiaeState.REFUSED,
                     ), state
-                    # The DDETS set the review_state on all documents but forgot to submit its review
+                    # The DDETS IAE set the review_state on all documents but forgot to submit its review
                     # The validation is automatically triggered by this transition to adversarial phase
                     auto_validation.append(evaluated_siae)
                     evaluated_siae.reviewed_at = now
@@ -528,7 +528,7 @@ class EvaluatedSiae(models.Model):
             return NOTIFICATION_PENDING_OR_REFUSED if self.evaluation_is_final else state_from_applications
 
         if state_from_applications == evaluation_enums.EvaluatedSiaeState.SUBMITTED:
-            # if DDETS did not review proof, accept them
+            # if DDETS IAE did not review proof, accept them
             return (
                 evaluation_enums.EvaluatedSiaeState.ACCEPTED if self.evaluation_is_final else state_from_applications
             )

@@ -419,7 +419,6 @@ class User(AbstractUser, AddressMixin):
 
     @property
     def is_labor_inspector(self):
-        # Members of DDETS, DREETS or DGEFP institution have their own dashboard.
         return self.kind == UserKind.LABOR_INSPECTOR
 
     def can_edit_email(self, user):
@@ -697,8 +696,8 @@ class User(AbstractUser, AddressMixin):
             self.can_view_stats_siae(current_org=current_org)
             or self.can_view_stats_cd(current_org=current_org)
             or self.can_view_stats_pe(current_org=current_org)
-            or self.can_view_stats_ddets(current_org=current_org)
-            or self.can_view_stats_dreets(current_org=current_org)
+            or self.can_view_stats_ddets_iae(current_org=current_org)
+            or self.can_view_stats_dreets_iae(current_org=current_org)
             or self.can_view_stats_dgefp(current_org=current_org)
             or self.can_view_stats_dihal(current_org=current_org)
             or self.can_view_stats_iae_network(current_org=current_org)
@@ -778,43 +777,39 @@ class User(AbstractUser, AddressMixin):
             return [current_org.department] if departments is None else departments
         return [current_org.department]
 
-    def can_view_stats_ddets(self, current_org):
+    def can_view_stats_ddets_iae(self, current_org):
         """
-        Users of a DDETS can view the confidential DDETS stats of their department only.
-        DDETS as in "Directions départementales de l’emploi, du travail et des solidarités".
+        Users of a DDETS IAE can view the confidential DDETS IAE stats of their department only.
         """
         return (
             self.is_labor_inspector
             and isinstance(current_org, Institution)
-            and current_org.kind == InstitutionKind.DDETS
+            and current_org.kind == InstitutionKind.DDETS_IAE
         )
 
-    def get_stats_ddets_department(self, current_org):
+    def get_stats_ddets_iae_department(self, current_org):
         """
-        Get department that the user has the permission to view for the DDETS stats page.
-        DDETS as in "Directions départementales de l’emploi, du travail et des solidarités".
+        Get department that the user has the permission to view for the DDETS IAE stats page.
         """
-        if not self.can_view_stats_ddets(current_org=current_org):
+        if not self.can_view_stats_ddets_iae(current_org=current_org):
             raise PermissionDenied
         return current_org.department
 
-    def can_view_stats_dreets(self, current_org):
+    def can_view_stats_dreets_iae(self, current_org):
         """
-        Users of a DREETS can view the confidential DREETS stats of their region only.
-        DREETS as in "Directions régionales de l’économie, de l’emploi, du travail et des solidarités".
+        Users of a DREETS IAE can view the confidential DREETS IAE stats of their region only.
         """
         return (
             self.is_labor_inspector
             and isinstance(current_org, Institution)
-            and current_org.kind == InstitutionKind.DREETS
+            and current_org.kind == InstitutionKind.DREETS_IAE
         )
 
-    def get_stats_dreets_region(self, current_org):
+    def get_stats_dreets_iae_region(self, current_org):
         """
-        Get region that the user has the permission to view for the DREETS stats page.
-        DREETS as in "Directions régionales de l’économie, de l’emploi, du travail et des solidarités".
+        Get region that the user has the permission to view for the DREETS IAE stats page.
         """
-        if not self.can_view_stats_dreets(current_org=current_org):
+        if not self.can_view_stats_dreets_iae(current_org=current_org):
             raise PermissionDenied
         return current_org.region
 

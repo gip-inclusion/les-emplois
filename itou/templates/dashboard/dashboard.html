@@ -311,7 +311,7 @@
                 {% endif %}
                 {# end of if user.is_labor_inspector #}
 
-                {% if can_view_stats_ddets and active_campaigns or can_view_stats_ddets and closed_campaigns %}
+                {% if can_view_stats_ddets_iae and active_campaigns or can_view_stats_ddets_iae and closed_campaigns %}
                     {% include "dashboard/includes/labor_inspector_evaluation_campains_card.html" %}
                 {% endif %}
             </div>

@@ -8,6 +8,7 @@ from pytest_django.asserts import assertQuerysetEqual
 
 from itou.analytics.models import StatsDashboardVisit
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION
+from itou.institutions.enums import InstitutionKind
 from itou.institutions.factories import InstitutionWithMembershipFactory
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory
@@ -82,7 +83,7 @@ def assert_stats_dashboard_equal(values):
         "stats_pe_tension",
     ],
 )
-def test_prescriber_stats_log_visit(client, view_name):
+def test_stats_prescriber_log_visit(client, view_name):
     prescriber_org = PrescriberOrganizationWithMembershipFactory(authorized=True)
     user = prescriber_org.members.get()
     client.force_login(user)
@@ -116,7 +117,7 @@ def test_prescriber_stats_log_visit(client, view_name):
         "stats_siae_hiring",
     ],
 )
-def test_siae_stats_log_visit(client, view_name, settings):
+def test_stats_siae_log_visit(client, view_name, settings):
     siae = SiaeFactory(name="El garaje de la esperanza", with_membership=True)
     user = siae.members.get()
 
@@ -152,15 +153,15 @@ def test_siae_stats_log_visit(client, view_name, settings):
 @pytest.mark.parametrize(
     "view_name",
     [
-        "stats_ddets_auto_prescription",
-        "stats_ddets_follow_siae_evaluation",
-        "stats_ddets_iae",
-        "stats_ddets_siae_evaluation",
-        "stats_ddets_hiring",
+        "stats_ddets_iae_auto_prescription",
+        "stats_ddets_iae_follow_siae_evaluation",
+        "stats_ddets_iae_iae",
+        "stats_ddets_iae_siae_evaluation",
+        "stats_ddets_iae_hiring",
     ],
 )
-def test_ddets_stats_log_visit(client, view_name):
-    institution = InstitutionWithMembershipFactory(kind="DDETS", department="22")
+def test_stats_ddets_iae_log_visit(client, view_name):
+    institution = InstitutionWithMembershipFactory(kind=InstitutionKind.DDETS_IAE, department="22")
     user = institution.members.get()
     client.force_login(user)
 
@@ -193,14 +194,14 @@ def test_ddets_stats_log_visit(client, view_name):
 @pytest.mark.parametrize(
     "view_name",
     [
-        "stats_dreets_auto_prescription",
-        "stats_dreets_follow_siae_evaluation",
-        "stats_dreets_iae",
-        "stats_dreets_hiring",
+        "stats_dreets_iae_auto_prescription",
+        "stats_dreets_iae_follow_siae_evaluation",
+        "stats_dreets_iae_iae",
+        "stats_dreets_iae_hiring",
     ],
 )
-def test_dreets_stats_log_visit(client, view_name):
-    institution = InstitutionWithMembershipFactory(kind="DREETS")
+def test_stats_dreets_iae_log_visit(client, view_name):
+    institution = InstitutionWithMembershipFactory(kind="DREETS IAE")
     user = institution.members.get()
     client.force_login(user)
 
@@ -237,7 +238,7 @@ def test_dreets_stats_log_visit(client, view_name):
         "stats_dgefp_af",
     ],
 )
-def test_dgefp_stats_log_visit(client, view_name):
+def test_stats_dgefp_log_visit(client, view_name):
     institution = InstitutionWithMembershipFactory(kind="DGEFP")
     user = institution.members.get()
     client.force_login(user)

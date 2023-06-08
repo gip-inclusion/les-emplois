@@ -12,7 +12,7 @@ from itou.institutions.models import InstitutionMembership
 
 class Command(BaseCommand):
     """
-    Extract all C2 users to CSV files, one file per category (DDETS, DREET).
+    Extract all C2 users to CSV files, one file per category (DDETS IAE, DREETS IAE).
 
     To see how many records would be extracted without actually extracting them:
         django-admin extract_c2_users --no-csv
@@ -63,8 +63,8 @@ class Command(BaseCommand):
 
         self.stdout.write("Starting. Luck not needed, this script never fails.")
 
-        ddets_csv_rows = []
-        dreets_csv_rows = []
+        ddets_iae_csv_rows = []
+        dreets_iae_csv_rows = []
 
         institution_memberships = InstitutionMembership.objects.select_related("user", "institution").filter(
             is_active=True
@@ -74,16 +74,16 @@ class Command(BaseCommand):
             org = membership.institution
             row = self.get_basic_row(membership=membership, org=org)
 
-            if org.kind == InstitutionKind.DDETS:
-                ddets_csv_rows.append(row)
+            if org.kind == InstitutionKind.DDETS_IAE:
+                ddets_iae_csv_rows.append(row)
 
-            if org.kind == InstitutionKind.DREETS:
-                # Departement does not make sense for DREETS, as there is one per region.
+            if org.kind == InstitutionKind.DREETS_IAE:
+                # Departement does not make sense for DREETS_IAE, as there is one per region.
                 del row["Département"]
-                dreets_csv_rows.append(row)
+                dreets_iae_csv_rows.append(row)
 
         self.stdout.write("-" * 80)
-        self.to_csv("ddets", ddets_csv_rows, "DDETS memberships")
-        self.to_csv("dreets", dreets_csv_rows, "DREETS memberships")
+        self.to_csv("ddets_iae", ddets_iae_csv_rows, "DDETS IAE memberships")
+        self.to_csv("dreets_iae", dreets_iae_csv_rows, "DREETS IAE memberships")
         self.stdout.write("-" * 80)
         self.stdout.write("Done!")

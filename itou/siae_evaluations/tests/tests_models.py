@@ -229,7 +229,7 @@ class EvaluationCampaignManagerTest(TestCase):
         with pytest.raises(ValidationError):
             validate_institution(0)
 
-        for kind in [k for k in InstitutionKind if k != InstitutionKind.DDETS]:
+        for kind in [k for k in InstitutionKind if k != InstitutionKind.DDETS_IAE]:
             with self.subTest(kind=kind):
                 institution = InstitutionFactory(kind=kind)
                 with pytest.raises(ValidationError):
@@ -254,16 +254,16 @@ class EvaluationCampaignManagerTest(TestCase):
         evaluated_period_start_at = timezone.now() - relativedelta(months=2)
         evaluated_period_end_at = timezone.now() - relativedelta(months=1)
 
-        # not DDETS
-        for kind in [k for k in InstitutionKind if k != InstitutionKind.DDETS]:
+        # not DDETS IAE
+        for kind in [k for k in InstitutionKind if k != InstitutionKind.DDETS_IAE]:
             with self.subTest(kind=kind):
                 InstitutionFactory(kind=kind)
                 assert 0 == create_campaigns(evaluated_period_start_at, evaluated_period_end_at)
                 assert 0 == EvaluationCampaign.objects.all().count()
                 assert len(mail.outbox) == 0
 
-        # institution DDETS
-        InstitutionWith2MembershipFactory.create_batch(2, kind=InstitutionKind.DDETS)
+        # institution DDETS IAE
+        InstitutionWith2MembershipFactory.create_batch(2, kind=InstitutionKind.DDETS_IAE)
         assert 2 == create_campaigns(evaluated_period_start_at, evaluated_period_end_at)
         assert 2 == EvaluationCampaign.objects.all().count()
 
@@ -274,11 +274,11 @@ class EvaluationCampaignManagerTest(TestCase):
         email = mail.outbox[1]
         assert len(email.to) == 2
 
-    def test_create_campaigns_on_specific_DDETS(self):
+    def test_create_campaigns_on_specific_DDETS_IAE(self):
         evaluated_period_start_at = timezone.now() - relativedelta(months=2)
         evaluated_period_end_at = timezone.now() - relativedelta(months=1)
 
-        institution_ids = InstitutionWith2MembershipFactory.create_batch(2, kind=InstitutionKind.DDETS)
+        institution_ids = InstitutionWith2MembershipFactory.create_batch(2, kind=InstitutionKind.DDETS_IAE)
         assert 1 == create_campaigns(
             evaluated_period_start_at,
             evaluated_period_end_at,
@@ -468,7 +468,7 @@ class EvaluationCampaignManagerTest(TestCase):
 
         assert ignored_siae == EvaluatedSiae.objects.get(reviewed_at__isnull=True)
 
-        # Transitioned to ACCEPTED, the DDETS did not review the documents
+        # Transitioned to ACCEPTED, the DDETS IAE did not review the documents
         # submitted by SIAE before the transition.
         evaluated_siae_submitted.refresh_from_db()
         assert evaluated_siae_submitted.reviewed_at == datetime.datetime(2023, 1, 2, 11, 11, 11, tzinfo=datetime.UTC)
@@ -567,7 +567,7 @@ class EvaluationCampaignManagerTest(TestCase):
 
         campaign.transition_to_adversarial_phase()
 
-        # Transitioned to ACCEPTED, the DDETS did not review the documents
+        # Transitioned to ACCEPTED, the DDETS IAE did not review the documents
         # submitted by SIAE before the transition.
         evaluated_siae_submitted.refresh_from_db()
         assert evaluated_siae_submitted.reviewed_at == datetime.datetime(2023, 1, 2, 11, 11, 11, tzinfo=datetime.UTC)
@@ -591,7 +591,7 @@ class EvaluationCampaignManagerTest(TestCase):
         evaluated_jobapp_submitted = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_submitted)
 
         assert evaluated_siae_submitted.reviewed_at is None
-        # The DDETS set the review_state to ACCEPTED but forgot to validate its review (hence the None reviewed_at)
+        # The DDETS IAE set the review_state to ACCEPTED but forgot to validate its review (hence the None reviewed_at)
         EvaluatedAdministrativeCriteriaFactory(
             submitted_at=timezone.now() - relativedelta(days=6),
             evaluated_job_application=evaluated_jobapp_submitted,
@@ -600,7 +600,7 @@ class EvaluationCampaignManagerTest(TestCase):
 
         campaign.transition_to_adversarial_phase()
 
-        # Transitioned to ACCEPTED, the DDETS review was automatically validated
+        # Transitioned to ACCEPTED, the DDETS IAE review was automatically validated
         evaluated_siae_submitted.refresh_from_db()
         assert evaluated_siae_submitted.reviewed_at == datetime.datetime(2023, 1, 2, 11, 11, 11, tzinfo=datetime.UTC)
         assert evaluated_siae_submitted.final_reviewed_at == datetime.datetime(
@@ -621,7 +621,7 @@ class EvaluationCampaignManagerTest(TestCase):
         evaluated_jobapp_submitted = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_submitted)
 
         assert evaluated_siae_submitted.reviewed_at is None
-        # The DDETS set the review_state to REFUSED but forgot to validate its review (hence the None reviewed_at)
+        # The DDETS IAE set the review_state to REFUSED but forgot to validate its review (hence the None reviewed_at)
         EvaluatedAdministrativeCriteriaFactory(
             submitted_at=timezone.now() - relativedelta(days=6),
             evaluated_job_application=evaluated_jobapp_submitted,
@@ -630,7 +630,7 @@ class EvaluationCampaignManagerTest(TestCase):
 
         campaign.transition_to_adversarial_phase()
 
-        # Transitioned to REFUSED, the DDETS review was automatically validated
+        # Transitioned to REFUSED, the DDETS IAE review was automatically validated
         evaluated_siae_submitted.refresh_from_db()
         assert evaluated_siae_submitted.reviewed_at == datetime.datetime(2023, 1, 2, 11, 11, 11, tzinfo=datetime.UTC)
         assert evaluated_siae_submitted.state == evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE
@@ -758,7 +758,7 @@ class EvaluatedSiaeModelTest(TestCase):
         assert evaluation_enums.EvaluatedSiaeState.SUBMITTED == evaluated_siae.state
         del evaluated_siae.state
 
-        # PENDING + submitted_at before review: we still consider that the DDETS can validate the documents
+        # PENDING + submitted_at before review: we still consider that the DDETS IAE can validate the documents
         evaluated_siae.reviewed_at = fake_now + relativedelta(days=1)
         evaluated_siae.save(update_fields=["reviewed_at"])
         assert evaluation_enums.EvaluatedSiaeState.SUBMITTED == evaluated_siae.state

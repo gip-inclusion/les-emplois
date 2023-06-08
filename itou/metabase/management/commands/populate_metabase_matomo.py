@@ -75,10 +75,10 @@ PRIVATE_STATIC_DASHBOARDS = {
 
 PRIVATE_DEPARTMENT_DASHBOARDS = {
     "stats/cd/{}": "tb 118 - Données IAE CD",
-    "stats/ddets/auto_prescription/{}": "tb 267 - Focus auto-prescription DREETS/DDETS",
-    "stats/ddets/follow_siae_evaluation/{}": "tb 265 - Suivi CAP DREETS/DDETS",
-    "stats/ddets/hiring/{}": "tb 160 - Facilitation de l'embauche DREETS/DDETS",
-    "stats/ddets/iae/{}": "tb 117 - Données IAE DREETS/DDETS",
+    "stats/ddets_iae/auto_prescription/{}": "tb 267 - Focus auto-prescription DREETS/DDETS IAE",
+    "stats/ddets_iae/follow_siae_evaluation/{}": "tb 265 - Suivi CAP DREETS/DDETS IAE",
+    "stats/ddets_iae/hiring/{}": "tb 160 - Facilitation de l'embauche DREETS/DDETS IAE",
+    "stats/ddets_iae/iae/{}": "tb 117 - Données IAE DREETS/DDETS",
     "stats/pe/conversion/main/{}": "tb 169 - Taux de transformation PE",
     "stats/pe/delay/main/{}": "tb 168 - Délai d'entrée en IAE",
     "stats/pe/state/main/{}": "tb 149 - Candidatures orientées PE",
@@ -87,10 +87,10 @@ PRIVATE_DEPARTMENT_DASHBOARDS = {
 }
 
 PRIVATE_REGION_DASHBOARDS = {
-    "stats/dreets/auto_prescription/{}": "tb 267 - Focus auto-prescription DREETS/DDETS",
-    "stats/dreets/follow_siae_evaluation/{}": "tb 265 - Suivi CAP DREETS/DDETS",
-    "stats/dreets/hiring/{}": "tb 160 - Facilitation de l'embauche DREETS/DDETS",
-    "stats/dreets/iae/{}": "tb 117 - Données IAE DREETS/DDETS",
+    "stats/dreets_iae/auto_prescription/{}": "tb 267 - Focus auto-prescription DREETS/DDETS IAE",
+    "stats/dreets_iae/follow_siae_evaluation/{}": "tb 265 - Suivi CAP DREETS/DDETS IAE",
+    "stats/dreets_iae/hiring/{}": "tb 160 - Facilitation de l'embauche DREETS/DDETS IAE",
+    "stats/dreets_iae/iae/{}": "tb 117 - Données IAE DREETS/DDETS",
     "stats/pe/conversion/main/{}/drpe": "tb 169 - Taux de transformation PE",
     "stats/pe/delay/main/{}/drpe": "tb 168 - Délai d'entrée en IAE",
     "stats/pe/state/main/{}/drpe": "tb 149 - Candidatures orientées PE",

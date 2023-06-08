@@ -27,25 +27,33 @@ urlpatterns = [
     path("pe/state/main", views.stats_pe_state_main, name="stats_pe_state_main"),
     path("pe/state/raw", views.stats_pe_state_raw, name="stats_pe_state_raw"),
     path("pe/tension", views.stats_pe_tension, name="stats_pe_tension"),
-    # Institution stats - DDETS - department level.
-    path("ddets/auto_prescription", views.stats_ddets_auto_prescription, name="stats_ddets_auto_prescription"),
+    # Institution stats - DDETS IAE - department level.
     path(
-        "ddets/follow_siae_evaluation",
-        views.stats_ddets_follow_siae_evaluation,
-        name="stats_ddets_follow_siae_evaluation",
+        "ddets_iae/auto_prescription",
+        views.stats_ddets_iae_auto_prescription,
+        name="stats_ddets_iae_auto_prescription",
     ),
-    path("ddets/iae", views.stats_ddets_iae, name="stats_ddets_iae"),
-    path("ddets/siae_evaluation", views.stats_ddets_siae_evaluation, name="stats_ddets_siae_evaluation"),
-    path("ddets/hiring", views.stats_ddets_hiring, name="stats_ddets_hiring"),
-    # Institution stats - DREETS - region level.
-    path("dreets/auto_prescription", views.stats_dreets_auto_prescription, name="stats_dreets_auto_prescription"),
     path(
-        "dreets/follow_siae_evaluation",
-        views.stats_dreets_follow_siae_evaluation,
-        name="stats_dreets_follow_siae_evaluation",
+        "ddets_iae/follow_siae_evaluation",
+        views.stats_ddets_iae_follow_siae_evaluation,
+        name="stats_ddets_iae_follow_siae_evaluation",
     ),
-    path("dreets/iae", views.stats_dreets_iae, name="stats_dreets_iae"),
-    path("dreets/hiring", views.stats_dreets_hiring, name="stats_dreets_hiring"),
+    path("ddets_iae/iae", views.stats_ddets_iae_iae, name="stats_ddets_iae_iae"),
+    path("ddets_iae/siae_evaluation", views.stats_ddets_iae_siae_evaluation, name="stats_ddets_iae_siae_evaluation"),
+    path("ddets_iae/hiring", views.stats_ddets_iae_hiring, name="stats_ddets_iae_hiring"),
+    # Institution stats - DREETS IAE - region level.
+    path(
+        "dreets_iae/auto_prescription",
+        views.stats_dreets_iae_auto_prescription,
+        name="stats_dreets_iae_auto_prescription",
+    ),
+    path(
+        "dreets_iae/follow_siae_evaluation",
+        views.stats_dreets_iae_follow_siae_evaluation,
+        name="stats_dreets_iae_follow_siae_evaluation",
+    ),
+    path("dreets_iae/iae", views.stats_dreets_iae_iae, name="stats_dreets_iae_iae"),
+    path("dreets_iae/hiring", views.stats_dreets_iae_hiring, name="stats_dreets_iae_hiring"),
     # Institution stats - DGEFP - nation level.
     path("dgefp/auto_prescription", views.stats_dgefp_auto_prescription, name="stats_dgefp_auto_prescription"),
     path(

@@ -58,19 +58,19 @@ def get_stats_siae_current_org(request):
     return current_org
 
 
-def get_stats_ddets_department(request):
+def get_stats_ddets_iae_department(request):
     current_org = get_current_institution_or_404(request)
-    if not request.user.can_view_stats_ddets(current_org=current_org):
+    if not request.user.can_view_stats_ddets_iae(current_org=current_org):
         raise PermissionDenied
-    department = request.user.get_stats_ddets_department(current_org=current_org)
+    department = request.user.get_stats_ddets_iae_department(current_org=current_org)
     return department
 
 
-def get_stats_dreets_region(request):
+def get_stats_dreets_iae_region(request):
     current_org = get_current_institution_or_404(request)
-    if not request.user.can_view_stats_dreets(current_org=current_org):
+    if not request.user.can_view_stats_dreets_iae(current_org=current_org):
         raise PermissionDenied
-    region = request.user.get_stats_dreets_region(current_org=current_org)
+    region = request.user.get_stats_dreets_iae_region(current_org=current_org)
     return region
 
 
@@ -354,8 +354,8 @@ def stats_pe_tension(request):
     )
 
 
-def render_stats_ddets(request, page_title, extra_context={}):
-    department = get_stats_ddets_department(request)
+def render_stats_ddets_iae(request, page_title, extra_context={}):
+    department = get_stats_ddets_iae_department(request)
     params = get_params_for_departement(department)
     context = {
         "page_title": f"{page_title} ({DEPARTMENTS[department]})",
@@ -367,41 +367,41 @@ def render_stats_ddets(request, page_title, extra_context={}):
 
 
 @login_required
-def stats_ddets_auto_prescription(request):
-    return render_stats_ddets(request=request, page_title="Focus auto-prescription")
+def stats_ddets_iae_auto_prescription(request):
+    return render_stats_ddets_iae(request=request, page_title="Focus auto-prescription")
 
 
 @login_required
-def stats_ddets_follow_siae_evaluation(request):
-    return render_stats_ddets(request=request, page_title="Suivi du contrôle à posteriori")
+def stats_ddets_iae_follow_siae_evaluation(request):
+    return render_stats_ddets_iae(request=request, page_title="Suivi du contrôle à posteriori")
 
 
 @login_required
-def stats_ddets_iae(request):
-    return render_stats_ddets(request=request, page_title="Données IAE de mon département")
+def stats_ddets_iae_iae(request):
+    return render_stats_ddets_iae(request=request, page_title="Données IAE de mon département")
 
 
 @login_required
-def stats_ddets_siae_evaluation(request):
+def stats_ddets_iae_siae_evaluation(request):
     extra_context = {
         "back_url": reverse("siae_evaluations_views:samples_selection"),
         "show_siae_evaluation_message": True,
     }
-    return render_stats_ddets(
+    return render_stats_ddets_iae(
         request=request, page_title="Données du contrôle a posteriori", extra_context=extra_context
     )
 
 
 @login_required
-def stats_ddets_hiring(request):
-    return render_stats_ddets(
+def stats_ddets_iae_hiring(request):
+    return render_stats_ddets_iae(
         request=request,
         page_title="Données facilitation de l'embauche de mon département",
     )
 
 
-def render_stats_dreets(request, page_title):
-    region = get_stats_dreets_region(request)
+def render_stats_dreets_iae(request, page_title):
+    region = get_stats_dreets_iae_region(request)
     params = get_params_for_region(region)
     context = {
         "page_title": f"{page_title} ({region})",
@@ -412,26 +412,26 @@ def render_stats_dreets(request, page_title):
 
 
 @login_required
-def stats_dreets_auto_prescription(request):
-    return render_stats_dreets(request=request, page_title="Focus auto-prescription")
+def stats_dreets_iae_auto_prescription(request):
+    return render_stats_dreets_iae(request=request, page_title="Focus auto-prescription")
 
 
 @login_required
-def stats_dreets_follow_siae_evaluation(request):
-    return render_stats_dreets(request=request, page_title="Suivi du contrôle à posteriori")
+def stats_dreets_iae_follow_siae_evaluation(request):
+    return render_stats_dreets_iae(request=request, page_title="Suivi du contrôle à posteriori")
 
 
 @login_required
-def stats_dreets_iae(request):
-    return render_stats_dreets(
+def stats_dreets_iae_iae(request):
+    return render_stats_dreets_iae(
         request=request,
         page_title="Données IAE de ma région",
     )
 
 
 @login_required
-def stats_dreets_hiring(request):
-    return render_stats_dreets(
+def stats_dreets_iae_hiring(request):
+    return render_stats_dreets_iae(
         request=request,
         page_title="Données facilitation de l'embauche de ma région",
     )
