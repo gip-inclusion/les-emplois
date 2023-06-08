@@ -44,7 +44,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         assert current_siae in user.siae_set.all()
 
     @respx.mock
-    def test_accept_invitation_signup_(self):
+    def test_accept_invitation_signup(self):
         invitation = SentSiaeStaffInvitationFactory(email=OIDC_USERINFO["email"])
         response = self.client.get(invitation.acceptance_link, follow=True)
         self.assertContains(response, "logo-inclusion-connect-one-line.svg")
