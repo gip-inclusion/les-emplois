@@ -644,8 +644,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         choices=QualificationLevel.choices,
         blank=True,
     )
-    planned_training_days = models.PositiveSmallIntegerField(
-        verbose_name="Nombre de jours de formation prévus",
+
+    planned_training_hours = models.PositiveSmallIntegerField(
+        verbose_name="Nombre d'heures de formation prévues",
         blank=True,
         null=True,
     )

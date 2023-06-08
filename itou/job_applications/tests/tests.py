@@ -1725,7 +1725,7 @@ class JobApplicationAdminFormTest(TestCase):
             "contract_type_details",
             "qualification_type",
             "qualification_level",
-            "planned_training_days",
+            "planned_training_hours",
         ]
         form = JobApplicationAdminForm()
         assert list(form.fields.keys()) == form_fields_list
