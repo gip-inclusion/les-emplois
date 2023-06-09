@@ -697,9 +697,9 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         self.assertNotContains(response, self.control_text)
         self.assertNotContains(response, self.submit_text)
-        # Was not reviewed by the institution, assume valid (following rules in
-        # most administrations).
-        self.assertContains(response, self.forced_positive_text, html=True, count=1)
+        # The institution reviewed but forgot to validate
+        # auto-validation kicked in and the final result is refused
+        self.assertNotContains(response, self.forced_positive_text, html=True)
         self.assertNotContains(response, self.forced_positive_text_transition_to_adversarial_stage, html=True)
         self.assertNotContains(response, self.forced_negative_text, html=True)
 

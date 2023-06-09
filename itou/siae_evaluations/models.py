@@ -307,8 +307,9 @@ class EvaluationCampaign(models.Model):
         )
 
     def close(self):
+        now = timezone.now()
         if not self.ended_at:
-            self.ended_at = timezone.now()
+            self.ended_at = now
             self.save(update_fields=["ended_at"])
             evaluated_siaes = (
                 EvaluatedSiae.objects.filter(evaluation_campaign=self)
@@ -319,11 +320,6 @@ class EvaluationCampaign(models.Model):
             siae_without_proofs = []
             emails = []
             for evaluated_siae in evaluated_siaes:
-                # Computing the state is costly, avoid it when possible.
-                if not has_siae_to_notify:
-                    has_siae_to_notify |= (
-                        evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.NOTIFICATION_PENDING
-                    )
                 if evaluated_siae.final_reviewed_at is None:
                     criterias = [
                         crit
@@ -333,6 +329,19 @@ class EvaluationCampaign(models.Model):
                     if len(criterias) == 0 or any(crit.submitted_at is None for crit in criterias):
                         siae_without_proofs.append(evaluated_siae)
                         has_siae_to_notify = True
+
+                    if evaluated_siae.state_from_applications in (
+                        evaluation_enums.EvaluatedSiaeState.ACCEPTED,
+                        evaluation_enums.EvaluatedSiaeState.REFUSED,
+                    ):
+                        # The DDETS set the review_state on all documents but forgot to submit its review
+                        # The validation is automatically triggered by this transition
+                        evaluated_siae.final_reviewed_at = now
+                        evaluated_siae.save(update_fields=["final_reviewed_at"])
+                        if evaluated_siae.state_from_applications == evaluation_enums.EvaluatedSiaeState.ACCEPTED:
+                            emails.append(SIAEEmailFactory(evaluated_siae).accepted(adversarial=True))
+                        else:
+                            emails.append(SIAEEmailFactory(evaluated_siae).refused())
                 elif evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.NOTIFICATION_PENDING:
                     emails.append(SIAEEmailFactory(evaluated_siae).refused())
                 elif evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.ACCEPTED:
@@ -340,6 +349,11 @@ class EvaluationCampaign(models.Model):
                         # This check ensures that the acceptance happened in the adversarial stage
                         # and not the amicable one
                         emails.append(SIAEEmailFactory(evaluated_siae).accepted(adversarial=True))
+                # Computing the state is costly, avoid it when possible.
+                if not has_siae_to_notify:
+                    has_siae_to_notify |= (
+                        evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.NOTIFICATION_PENDING
+                    )
 
             emails.extend(
                 SIAEEmailFactory(evaluated_siae).refused_no_proofs() for evaluated_siae in siae_without_proofs
