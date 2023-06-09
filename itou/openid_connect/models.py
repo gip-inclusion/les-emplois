@@ -34,7 +34,6 @@ class OIDConnectState(models.Model):
     used_at = models.DateTimeField(verbose_name="Date d'utilisation", null=True)
     # Length used in call to get_random_string()
     csrf = models.CharField(max_length=12, unique=True)
-    data = models.JSONField(verbose_name="données de session", default=dict, blank=True)
 
     objects = OIDConnectQuerySet.as_manager()
 
@@ -50,10 +49,14 @@ class OIDConnectState(models.Model):
         Create and sign a new CSRF token to protect requests to identity providers.
         """
         token = crypto.get_random_string(length=12)
-        cls.objects.create(csrf=token, data=data or {})
-
         signer = signing.Signer()
         signed_token = signer.sign(token)
+        return token, signed_token
+
+    @classmethod
+    def save_state(cls, **state):
+        token, signed_token = cls.create_signed_csrf_token()
+        cls.objects.create(csrf=token, **state)
         return signed_token
 
     @classmethod

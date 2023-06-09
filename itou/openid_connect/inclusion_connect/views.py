@@ -71,13 +71,13 @@ def _redirect_to_login_page_on_error(error_msg=None, request=None):
 
 def _generate_inclusion_params_from_session(ic_data):
     redirect_uri = get_absolute_url(reverse("inclusion_connect:callback"))
-    signed_csrf = InclusionConnectState.create_signed_csrf_token(data=ic_data)
+    state = InclusionConnectState.save_state(data=ic_data)
     data = {
         "response_type": "code",
         "client_id": constants.INCLUSION_CONNECT_CLIENT_ID,
         "redirect_uri": redirect_uri,
         "scope": constants.INCLUSION_CONNECT_SCOPES,
-        "state": signed_csrf,
+        "state": state,
         "nonce": crypto.get_random_string(length=12),
     }
     if (user_email := ic_data.get("user_email")) is not None:
