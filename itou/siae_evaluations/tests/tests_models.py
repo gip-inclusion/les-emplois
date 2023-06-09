@@ -639,7 +639,7 @@ class EvaluationCampaignManagerTest(TestCase):
         assert siae_email.subject == f"Résultat du contrôle - EI Prim’vert ID-{evaluated_siae_submitted.siae_id}"
         assert siae_email.body == self.snapshot(name="negative review email body")
 
-    def test_close(self):
+    def test_close_no_response(self):
         evaluation_campaign = EvaluationCampaignFactory(
             pk=1000,
             institution__name="DDETS 01",
@@ -648,7 +648,7 @@ class EvaluationCampaignManagerTest(TestCase):
         )
         evaluated_siae = EvaluatedSiaeFactory(
             siae__name="Les petits jardins",
-            siae__pk=1000,
+            siae__pk=2000,
             evaluation_campaign=evaluation_campaign,
         )
         assert evaluation_campaign.ended_at is None
@@ -664,6 +664,95 @@ class EvaluationCampaignManagerTest(TestCase):
             f"Absence de réponse de la structure EI Les petits jardins ID-{evaluated_siae.siae_id}"
         )
         assert siae_email.body == self.snapshot(name="no docs email body")
+        assert sorted(institution_email.to) == sorted(
+            evaluation_campaign.institution.active_members.values_list("email", flat=True)
+        )
+        assert institution_email.subject == "[Contrôle a posteriori] Notification des sanctions"
+        assert institution_email.body == self.snapshot(name="sanction notification email body")
+
+        evaluation_campaign.close()
+        assert ended_at == evaluation_campaign.ended_at
+        # No new mail.
+        assert len(mail.outbox) == 2
+
+    def test_close_accepted_but_not_reviewed(self):
+        evaluation_campaign = EvaluationCampaignFactory(
+            institution__name="DDETS 01",
+            evaluated_period_start_at=datetime.date(2022, 1, 1),
+            evaluated_period_end_at=datetime.date(2022, 9, 30),
+        )
+        evaluated_siae = EvaluatedSiaeFactory(
+            siae__name="Les petits jardins",
+            siae__pk=2000,
+            evaluation_campaign=evaluation_campaign,
+            reviewed_at=timezone.now() - datetime.timedelta(days=2),
+        )
+        evaluated_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory(
+            submitted_at=timezone.now() - relativedelta(days=1),
+            evaluated_job_application=evaluated_job_application,
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+        )
+        # DDETS accepted the document but forgot to validate
+        assert evaluated_siae.final_reviewed_at is None
+        assert evaluation_campaign.ended_at is None
+
+        evaluation_campaign.close()
+        assert evaluation_campaign.ended_at is not None
+        # DDETS review was automatically validated
+        evaluated_siae.refresh_from_db()
+        assert evaluated_siae.final_reviewed_at is not None
+        ended_at = evaluation_campaign.ended_at
+
+        [accepted_siae_email] = mail.outbox
+        assert accepted_siae_email.to == list(evaluated_siae.siae.active_admin_members.values_list("email", flat=True))
+        assert (
+            accepted_siae_email.subject == f"Résultat du contrôle - EI Les petits jardins ID-{evaluated_siae.siae_id}"
+        )
+        assert accepted_siae_email.body == self.snapshot(name="accepted email body")
+
+        evaluation_campaign.close()
+        assert ended_at == evaluation_campaign.ended_at
+        # No new mail.
+        assert len(mail.outbox) == 1
+
+    def test_close_refused_but_not_reviewed(self):
+        evaluation_campaign = EvaluationCampaignFactory(
+            pk=1000,
+            institution__name="DDETS 01",
+            evaluated_period_start_at=datetime.date(2022, 1, 1),
+            evaluated_period_end_at=datetime.date(2022, 9, 30),
+        )
+        evaluated_siae = EvaluatedSiaeFactory(
+            siae__name="Les petits jardins",
+            siae__pk=2000,
+            evaluation_campaign=evaluation_campaign,
+            reviewed_at=timezone.now() - datetime.timedelta(days=2),
+        )
+        evaluated_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory(
+            submitted_at=timezone.now() - relativedelta(days=1),
+            evaluated_job_application=evaluated_job_application,
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2,
+        )
+        # DDETS refused the document but forgot to validate
+        assert evaluated_siae.final_reviewed_at is None
+        assert evaluation_campaign.ended_at is None
+
+        evaluation_campaign.close()
+        assert evaluation_campaign.ended_at is not None
+        # DDETS review was automatically validated
+        evaluated_siae.refresh_from_db()
+        assert evaluated_siae.final_reviewed_at is not None
+        ended_at = evaluation_campaign.ended_at
+
+        [refused_siae_email, institution_email] = mail.outbox
+        assert refused_siae_email.to == list(evaluated_siae.siae.active_admin_members.values_list("email", flat=True))
+        assert (
+            refused_siae_email.subject == f"Résultat du contrôle - EI Les petits jardins ID-{evaluated_siae.siae_id}"
+        )
+        assert refused_siae_email.body == self.snapshot(name="refused email body")
+
         assert sorted(institution_email.to) == sorted(
             evaluation_campaign.institution.active_members.values_list("email", flat=True)
         )
