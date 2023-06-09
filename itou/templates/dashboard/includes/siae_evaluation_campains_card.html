@@ -14,8 +14,9 @@
                                 <i class="ri-list-check-3 ri-lg font-weight-normal"></i>
                                 <span>Campagne en cours</span>
                             </a>
-                            {# note vincentporte: static icon, will be displayed dynamically later.#}
-                            <i class="ri-error-warning-fill ri-lg ml-1 text-danger font-weight-normal"></i>
+                            {% if evaluated_siae.should_display_pending_action_warning %}
+                                <span class="badge badge-xs badge-pill badge-warning-lighter text-warning"><i class="ri-error-warning-line" aria-hidden="true"></i>Action à faire</span>
+                            {% endif %}
                         </li>
                     {% endfor %}
                 </ul>

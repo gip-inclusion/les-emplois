@@ -443,6 +443,18 @@ class EvaluatedSiae(models.Model):
     def can_submit(self):
         return not self.submission_freezed_at and self.state == evaluation_enums.EvaluatedSiaeState.SUBMITTABLE
 
+    @property
+    def should_display_pending_action_warning(self):
+        return not self.submission_freezed_at and self.state in (
+            evaluation_enums.EvaluatedSiaeState.PENDING,
+            evaluation_enums.EvaluatedSiaeState.SUBMITTABLE,
+            evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE,
+        )
+        # if SUBMITTED, the SIAE cannot do anything until the DDETS reviews the documents
+        # if ACCEPTED, it is either because the DDETS is currently reviewing or because it is fully acccepted
+        # if NOTIFICATION_PENDING, the evaluation is final
+        # if REFUSED, it is either because the DDETS is currently reviewing
+
     def review(self):
         ACCEPTED = evaluation_enums.EvaluatedSiaeState.ACCEPTED
         REFUSED = evaluation_enums.EvaluatedSiaeState.REFUSED

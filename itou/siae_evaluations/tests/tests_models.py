@@ -1104,6 +1104,32 @@ class EvaluatedSiaeModelTest(TestCase):
         assert evaluated_job_app.evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.ACCEPTED
 
 
+@pytest.mark.parametrize(
+    "state,frozen,should_display_pending_action_warning",
+    [
+        (evaluation_enums.EvaluatedSiaeState.PENDING, True, False),
+        (evaluation_enums.EvaluatedSiaeState.SUBMITTABLE, True, False),
+        (evaluation_enums.EvaluatedSiaeState.SUBMITTED, True, False),
+        (evaluation_enums.EvaluatedSiaeState.ACCEPTED, True, False),
+        (evaluation_enums.EvaluatedSiaeState.REFUSED, True, False),
+        (evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE, True, False),
+        (evaluation_enums.EvaluatedSiaeState.NOTIFICATION_PENDING, True, False),
+        (evaluation_enums.EvaluatedSiaeState.PENDING, False, True),
+        (evaluation_enums.EvaluatedSiaeState.SUBMITTABLE, False, True),
+        (evaluation_enums.EvaluatedSiaeState.SUBMITTED, False, False),
+        (evaluation_enums.EvaluatedSiaeState.ACCEPTED, False, False),
+        (evaluation_enums.EvaluatedSiaeState.REFUSED, False, False),
+        (evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE, False, True),
+        (evaluation_enums.EvaluatedSiaeState.NOTIFICATION_PENDING, False, False),
+    ],
+)
+def test_should_display_pending_action_warning(state, frozen, should_display_pending_action_warning):
+    evaluated_siae = EvaluatedSiaeFactory(submission_freezed_at=timezone.now() if frozen else None)
+    # Override state property for faster tests
+    setattr(evaluated_siae, "state", state)
+    assert evaluated_siae.should_display_pending_action_warning == should_display_pending_action_warning
+
+
 class EvaluatedJobApplicationModelTest(TestCase):
     def test_unicity_constraint(self):
         evaluated_job_application = EvaluatedJobApplicationFactory()
