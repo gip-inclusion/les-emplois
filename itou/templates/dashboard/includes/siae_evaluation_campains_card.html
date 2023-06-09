@@ -5,27 +5,43 @@
                 <span class="h4 m-0">Contrôle a posteriori</span>
             </div>
         </div>
-        <div class="px-3 px-lg-4">
-            <ul class="list-unstyled mb-lg-5">
-                {% for evaluated_siae in active_campaigns %}
-                    <li class="d-flex justify-content-between align-items-center mb-3">
-                        <a href="{% url 'siae_evaluations_views:siae_job_applications_list' evaluated_siae.pk %}" class="btn-link btn-ico">
-                            <i class="ri-list-check-3 ri-lg font-weight-normal"></i>
-                            <span>Justifier mes auto-prescriptions</span>
-                        </a>
-                        {# note vincentporte: static icon, will be displayed dynamically later.#}
-                        <i class="ri-error-warning-fill ri-lg ml-1 text-danger font-weight-normal"></i>
-                    </li>
-                {% endfor %}
-                {% for evaluated_siae in evaluated_siae_notifications %}
-                    <li class="d-flex justify-content-between align-items-center mb-3">
-                        <a href="{% url "siae_evaluations_views:siae_sanction" evaluated_siae.pk %}" class="btn-link btn-ico">
-                            <i class="ri-eye-line ri-lg font-weight-normal"></i>
-                            <span>Voir le résultat du contrôle “{{ evaluated_siae.evaluation_campaign.name }}”</span>
-                        </a>
-                    </li>
-                {% endfor %}
-            </ul>
+        <div class="px-3 px-lg-4 pb-3 pb-lg-5">
+            {% if active_campaigns %}
+                <ul class="list-unstyled">
+                    {% for evaluated_siae in active_campaigns %}
+                        <li class="d-flex justify-content-between align-items-center mb-3">
+                            <a href="{% url 'siae_evaluations_views:siae_job_applications_list' evaluated_siae.pk %}" class="btn-link btn-ico">
+                                <i class="ri-list-check-3 ri-lg font-weight-normal"></i>
+                                <span>Campagne en cours</span>
+                            </a>
+                            {# note vincentporte: static icon, will be displayed dynamically later.#}
+                            <i class="ri-error-warning-fill ri-lg ml-1 text-danger font-weight-normal"></i>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% if evaluated_siae_notifications %}
+                <button class="btn btn-link btn-ico p-0" type="button" data-toggle="collapse" data-target="#closed_campaigns" aria-expanded="false" aria-controls="closed_campaigns">
+                    <i class="ri-history-line ri-lg font-weight-normal"></i>
+                    <span>Historique</span>
+                    <i class="ri-arrow-drop-down-line ri-lg font-weight-normal"></i>
+                </button>
+                <ul class="collapse" id="closed_campaigns">
+                    {% for evaluated_siae in evaluated_siae_notifications %}
+                        <li class="d-flex justify-content-between align-items-center mb-3">
+                            <a href="{% url "siae_evaluations_views:siae_sanction" evaluated_siae.pk %}" class="btn-link btn-ico">
+                                <i class="ri-file-copy-2-line ri-lg font-weight-normal"></i>
+                                <span>{{ evaluated_siae.evaluation_campaign.name }}</span>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            <hr>
+            <a href="https://www.legifrance.gouv.fr/download/pdf/circ?id=45319" class="btn-link btn-ico" rel="noopener" target="_blank">
+                <span>Contexte législatif</span>
+                <i class="ri-external-link-line ri-lg font-weight-normal ml-2 mt-1"></i>
+            </a>
         </div>
     </div>
 </div>

@@ -409,8 +409,8 @@ class DashboardViewTest(TestCase):
             f"""
             <a href="/siae_evaluation/evaluated_siae_sanction/{evaluated_siae_with_final_decision.pk}/"
              class="btn-link btn-ico">
-                <i class="ri-eye-line ri-lg font-weight-normal"></i>
-                <span>Voir le résultat du contrôle “Final decision reached”</span>
+                <i class="ri-file-copy-2-line ri-lg font-weight-normal"></i>
+                <span>Final decision reached</span>
             </a>
             """,
             html=True,
@@ -421,8 +421,8 @@ class DashboardViewTest(TestCase):
             f"""
             <a href="/siae_evaluation/evaluated_siae_sanction/{evaluated_siae_campaign_closed.pk}/"
              class="btn-link btn-ico">
-                <i class="ri-eye-line ri-lg font-weight-normal"></i>
-                <span>Voir le résultat du contrôle “Just closed”</span>
+                <i class="ri-file-copy-2-line ri-lg font-weight-normal"></i>
+                <span>Just closed</span>
             </a>
             """,
             html=True,
