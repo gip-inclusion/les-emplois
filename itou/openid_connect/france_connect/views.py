@@ -41,13 +41,13 @@ def get_callback_redirect_uri(request) -> str:
 
 def france_connect_authorize(request):
     redirect_uri = get_callback_redirect_uri(request)
-    signed_csrf = FranceConnectState.create_signed_csrf_token()
+    state = FranceConnectState.save_state()
     data = {
         "response_type": "code",
         "client_id": settings.FRANCE_CONNECT_CLIENT_ID,
         "redirect_uri": redirect_uri,
         "scope": constants.FRANCE_CONNECT_SCOPES,
-        "state": signed_csrf,
+        "state": state,
         "nonce": crypto.get_random_string(length=12),
         "acr_values": "eidas1",
     }

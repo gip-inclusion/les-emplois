@@ -53,9 +53,9 @@ def mock_oauth_dance(client, expected_route="dashboard:index"):
     user_info = FC_USERINFO.copy()
     respx.get(constants.FRANCE_CONNECT_ENDPOINT_USERINFO).mock(return_value=httpx.Response(200, json=user_info))
 
-    csrf_signed = FranceConnectState.create_signed_csrf_token()
+    state = FranceConnectState.save_state()
     url = reverse("france_connect:callback")
-    response = client.get(url, data={"code": "123", "state": csrf_signed})
+    response = client.get(url, data={"code": "123", "state": state})
     assertRedirects(response, reverse(expected_route))
     return response
 
@@ -85,18 +85,18 @@ class FranceConnectTest(TestCase):
             state.refresh_from_db()
 
     def test_state_verification(self):
-        csrf_signed = FranceConnectState.create_signed_csrf_token()
-        assert FranceConnectState.get_from_csrf(csrf_signed).is_valid()
+        state = FranceConnectState.save_state()
+        assert FranceConnectState.get_from_csrf(state).is_valid()
 
     def test_state_is_valid(self):
         with freeze_time("2022-09-13 12:00:01"):
-            csrf_signed = FranceConnectState.create_signed_csrf_token()
-            assert isinstance(csrf_signed, str)
-            assert FranceConnectState.get_from_csrf(csrf_signed).is_valid()
+            state = FranceConnectState.save_state()
+            assert isinstance(state, str)
+            assert FranceConnectState.get_from_csrf(state).is_valid()
 
-            csrf_signed = FranceConnectState.create_signed_csrf_token()
+            state = FranceConnectState.save_state()
         with freeze_time("2022-09-14 12:00:01"):
-            assert not FranceConnectState.get_from_csrf(csrf_signed).is_valid()
+            assert not FranceConnectState.get_from_csrf(state).is_valid()
 
     def test_authorize(self):
         url = reverse("france_connect:authorize")

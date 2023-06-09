@@ -144,13 +144,13 @@ class InclusionConnectModelTest(InclusionConnectBaseTestCase):
 
     def test_state_is_valid(self):
         with freeze_time("2022-09-13 12:00:01"):
-            csrf_signed = InclusionConnectState.create_signed_csrf_token()
-            assert isinstance(csrf_signed, str)
-            assert InclusionConnectState.get_from_csrf(csrf_signed).is_valid()
+            state = InclusionConnectState.save_state()
+            assert isinstance(state, str)
+            assert InclusionConnectState.get_from_csrf(state).is_valid()
 
-            csrf_signed = InclusionConnectState.create_signed_csrf_token()
+            state = InclusionConnectState.save_state()
         with freeze_time("2022-09-14 12:00:01"):
-            assert not InclusionConnectState.get_from_csrf(csrf_signed).is_valid()
+            assert not InclusionConnectState.get_from_csrf(state).is_valid()
 
     def test_create_user_from_user_info(self):
         """
@@ -440,9 +440,9 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
         respx.get(constants.INCLUSION_CONNECT_ENDPOINT_USERINFO).mock(
             return_value=httpx.Response(200, json=OIDC_USERINFO)
         )
-        csrf_signed = InclusionConnectState.create_signed_csrf_token()
+        state = InclusionConnectState.save_state()
         url = reverse("inclusion_connect:callback")
-        self.client.get(url, data={"code": "123", "state": csrf_signed})
+        self.client.get(url, data={"code": "123", "state": state})
 
         # User was created
         self.assertEqual(User.objects.count(), 1)
