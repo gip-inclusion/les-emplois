@@ -153,7 +153,7 @@ def inclusion_connect_resume_registration(request):
         messages.error(request, "Impossible de reprendre la création de compte.")
         return HttpResponseRedirect(reverse("home:hp"))
 
-    ic_state = InclusionConnectState.get_from_csrf(ic_session["state"])
+    ic_state = InclusionConnectState.get_from_state(ic_session["state"])
 
     # TODO(alaurent) Remove after a few days (until all users asking for help could follow this link)
     # Backward compatibility:
@@ -248,7 +248,7 @@ def inclusion_connect_callback(request):  # pylint: disable=too-many-return-stat
         return _redirect_to_login_page_on_error(error_msg="Access token field missing.", request=request)
 
     # Check if state is valid and session exists
-    ic_state = InclusionConnectState.get_from_csrf(state)
+    ic_state = InclusionConnectState.get_from_state(state)
     if ic_state is None or not ic_state.is_valid():
         return _redirect_to_login_page_on_error(request=request)
     ic_session = request.session.get(constants.INCLUSION_CONNECT_SESSION_KEY)

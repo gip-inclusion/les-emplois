@@ -3,6 +3,7 @@ import datetime
 import httpx
 import pytest
 import respx
+from django.core import signing
 from django.core.exceptions import ValidationError
 from django.test import override_settings
 from django.urls import reverse
@@ -68,7 +69,7 @@ def mock_oauth_dance(client, expected_route="dashboard:index"):
 @reload_module(constants)
 class FranceConnectTest(TestCase):
     def test_state_delete(self):
-        state = FranceConnectState.objects.create(csrf="foo")
+        state = FranceConnectState.objects.create(state="foo")
 
         FranceConnectState.objects.cleanup()
 
@@ -84,19 +85,27 @@ class FranceConnectTest(TestCase):
         with pytest.raises(FranceConnectState.DoesNotExist):
             state.refresh_from_db()
 
+    def test_transition_from_csrf_to_state(self):
+        state = "1234567890ab"
+        FranceConnectState.objects.create(csrf=state)
+        signer = signing.Signer()
+        signed_state = signer.sign(state)
+        state_from_db = FranceConnectState.get_from_state(signed_state)
+        assert state_from_db is not None
+
     def test_state_verification(self):
         state = FranceConnectState.save_state()
-        assert FranceConnectState.get_from_csrf(state).is_valid()
+        assert FranceConnectState.get_from_state(state).is_valid()
 
     def test_state_is_valid(self):
         with freeze_time("2022-09-13 12:00:01"):
             state = FranceConnectState.save_state()
             assert isinstance(state, str)
-            assert FranceConnectState.get_from_csrf(state).is_valid()
+            assert FranceConnectState.get_from_state(state).is_valid()
 
             state = FranceConnectState.save_state()
         with freeze_time("2022-10-13 12:00:01"):
-            assert not FranceConnectState.get_from_csrf(state).is_valid()
+            assert not FranceConnectState.get_from_state(state).is_valid()
 
     def test_authorize(self):
         url = reverse("france_connect:authorize")
