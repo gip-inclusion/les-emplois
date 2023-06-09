@@ -33,7 +33,12 @@ from itou.prescribers import factories as prescribers_factories
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.constants import CAMPAIGN_VIEWABLE_DURATION
-from itou.siae_evaluations.factories import EvaluatedSiaeFactory, EvaluationCampaignFactory
+from itou.siae_evaluations.factories import (
+    EvaluatedAdministrativeCriteriaFactory,
+    EvaluatedJobApplicationFactory,
+    EvaluatedSiaeFactory,
+    EvaluationCampaignFactory,
+)
 from itou.siae_evaluations.models import Sanctions
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import (
@@ -442,9 +447,45 @@ class DashboardViewTest(TestCase):
         self.assertNotContains(response, "Contrôle a posteriori")
 
         fake_now = timezone.now()
-        EvaluatedSiaeFactory(siae=siae, evaluation_campaign__evaluations_asked_at=fake_now)
+        evaluated_siae = EvaluatedSiaeFactory(siae=siae, evaluation_campaign__evaluations_asked_at=fake_now)
         response = self.client.get(reverse("dashboard:index"))
         self.assertContains(response, "Contrôle a posteriori")
+        TODO_BADGE = (
+            '<span class="badge badge-xs badge-pill badge-warning-lighter text-warning">'
+            '<i class="ri-error-warning-line" aria-hidden="true"></i>'
+            "Action à faire</span>"
+        )
+        self.assertContains(
+            response,
+            reverse(
+                "siae_evaluations_views:siae_job_applications_list",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            ),
+        )
+        self.assertContains(response, TODO_BADGE, html=True)
+
+        # Check that the badge disappears when frozen
+        evaluated_siae.evaluation_campaign.freeze(timezone.now())
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertContains(
+            response,
+            reverse(
+                "siae_evaluations_views:siae_job_applications_list",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+            ),
+        )
+        self.assertNotContains(response, TODO_BADGE, html=True)
+
+        # Unfreeze but submit
+        evaluated_siae.submission_freezed_at = None
+        evaluated_siae.save(update_fields=("submission_freezed_at",))
+        evaluated_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_application,
+            submitted_at=timezone.now(),
+        )
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertNotContains(response, TODO_BADGE, html=True)
 
     def test_dashboard_siae_convention_without_financial_annex(self):
         siae = SiaeFactory(with_membership=True)
