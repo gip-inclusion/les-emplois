@@ -34,84 +34,77 @@
     </script>
 {% endblock %}
 
-
-{% block content %}
-    <section class="s-title-01">
-        <div class="s-title-01__container container">
-            <div class="s-title-01__row row">
-                <div class="s-title-01__col col-12">
-                    <h1 class="h1">Fiches salarié ASP - {{ current_siae.display_name }}</h1>
-                    <h2 class="h3">Nous transférons vos fiches salarié à l'ASP afin de vous faire gagner du temps</h2>
-                    <p>Une fois envoyées et validées, vous retrouverez directement vos données sur l'extranet de l'ASP.</p>
-                    <ul>
-                        <li>
-                            Ne sont présentes dans cette liste que les candidatures acceptées (embauches) à partir du <b>{{ feature_availability_date|date }}</b>.
-                        </li>
-                        <li>
-                            Vous devez avoir une annexe financière valide dans l'extranet de l'ASP pour pouvoir déclarer une fiche salarié dans les emplois.
-                        </li>
-                    </ul>
-                    {% if form.status.value == "NEW" %}
-                        <p>
-                            Vous trouverez ici les candidatures validées <b>à partir desquelles vous devez créer de nouvelles fiches salarié</b>.
-                        </p>
-                    {% elif form.status.value == "READY" %}
-                        <p class="mb-0">
-                            Vous trouverez ici les fiches salarié complétées
-                            <b>en attente d’envoi à l’ASP, qui a lieu automatiquement à intervalles réguliers</b>.
-                        </p>
-                        <p class="mb-0">
-                            À ce stade, seule la visualisation des informations de la fiche est
-                            possible.
-                        </p>
-                        <p>Merci de votre patience.</p>
-                    {% elif form.status.value == "SENT" %}
-                        <p class="mb-0">Vous trouverez ici les fiches salarié complétées et envoyées à l'ASP.</p>
-                        <p>
-                            À ce stade, et en attendant un retour de l'ASP, seule la visualisation des informations de
-                            la fiche est possible.
-                        </p>
-                    {% elif form.status.value == "REJECTED" %}
-                        <p class="mb-0">
-                            Vous trouverez ici les fiches salarié envoyées à l'ASP et retournées avec une
-                            erreur.
-                        </p>
-                        <p class="mb-0">Vous pouvez modifier les fiches en erreur et les envoyer à nouveau.</p>
-                    {% elif form.status.value == "PROCESSED" %}
-                        <p class="mb-0">Vous trouverez ici les fiches salarié envoyées et validées par l'ASP.</p>
-                        <p>
-                            Aucune action ultérieure n'est possible à ce stade, mais vous pouvez consulter le détail de
-                            la fiche salarié.
-                        </p>
-                    {% elif form.status.value == "DISABLED" %}
-                        <p class="mb-0">Vous trouverez ici les fiches salarié que vous avez désactivées.</p>
-                        <p>
-                            En cas de besoin vous pouvez réactiver une fiche, elle sera transférée dans la catégorie
-                            "Nouvelle".
-                        </p>
-                    {% endif %}
-                    {% if need_manual_regularization %}
-                        <div class="alert alert-warning">
-                            <div class="row">
-                                <div class="col-auto pr-0">
-                                    <i class="ri-error-warning-line ri-xl text-danger"></i>
-                                </div>
-                                <div class="col">
-                                    <p class="mb-0">
-                                        <strong>Une action de votre part est nécessaire</strong>
-                                    </p>
-                                    <p class="mb-0">
-                                        Attention, nous avons détecté une ou plusieurs fiches salarié qui nécessitent une régularisation manuelle de votre part.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
+{% block content_title %}
+    <h1 class="h1">Fiches salarié ASP - {{ current_siae.display_name }}</h1>
+    <h2 class="h3">Nous transférons vos fiches salarié à l'ASP afin de vous faire gagner du temps</h2>
+    <p>Une fois envoyées et validées, vous retrouverez directement vos données sur l'extranet de l'ASP.</p>
+    <ul>
+        <li>
+            Ne sont présentes dans cette liste que les candidatures acceptées (embauches) à partir du <b>{{ feature_availability_date|date }}</b>.
+        </li>
+        <li>
+            Vous devez avoir une annexe financière valide dans l'extranet de l'ASP pour pouvoir déclarer une fiche salarié dans les emplois.
+        </li>
+    </ul>
+    {% if form.status.value == "NEW" %}
+        <p>
+            Vous trouverez ici les candidatures validées <b>à partir desquelles vous devez créer de nouvelles fiches salarié</b>.
+        </p>
+    {% elif form.status.value == "READY" %}
+        <p class="mb-0">
+            Vous trouverez ici les fiches salarié complétées
+            <b>en attente d’envoi à l’ASP, qui a lieu automatiquement à intervalles réguliers</b>.
+        </p>
+        <p class="mb-0">
+            À ce stade, seule la visualisation des informations de la fiche est
+            possible.
+        </p>
+        <p>Merci de votre patience.</p>
+    {% elif form.status.value == "SENT" %}
+        <p class="mb-0">Vous trouverez ici les fiches salarié complétées et envoyées à l'ASP.</p>
+        <p>
+            À ce stade, et en attendant un retour de l'ASP, seule la visualisation des informations de
+            la fiche est possible.
+        </p>
+    {% elif form.status.value == "REJECTED" %}
+        <p class="mb-0">
+            Vous trouverez ici les fiches salarié envoyées à l'ASP et retournées avec une
+            erreur.
+        </p>
+        <p class="mb-0">Vous pouvez modifier les fiches en erreur et les envoyer à nouveau.</p>
+    {% elif form.status.value == "PROCESSED" %}
+        <p class="mb-0">Vous trouverez ici les fiches salarié envoyées et validées par l'ASP.</p>
+        <p>
+            Aucune action ultérieure n'est possible à ce stade, mais vous pouvez consulter le détail de
+            la fiche salarié.
+        </p>
+    {% elif form.status.value == "DISABLED" %}
+        <p class="mb-0">Vous trouverez ici les fiches salarié que vous avez désactivées.</p>
+        <p>
+            En cas de besoin vous pouvez réactiver une fiche, elle sera transférée dans la catégorie
+            "Nouvelle".
+        </p>
+    {% endif %}
+    {% if need_manual_regularization %}
+        <div class="alert alert-warning">
+            <div class="row">
+                <div class="col-auto pr-0">
+                    <i class="ri-error-warning-line ri-xl text-danger"></i>
+                </div>
+                <div class="col">
+                    <p class="mb-0">
+                        <strong>Une action de votre part est nécessaire</strong>
+                    </p>
+                    <p class="mb-0">
+                        Attention, nous avons détecté une ou plusieurs fiches salarié qui nécessitent une régularisation manuelle de votre part.
+                    </p>
                 </div>
             </div>
         </div>
-    </section>
+    {% endif %}
+{% endblock %}
 
+{% block content %}
     <section class="s-section">
         <div class="s-section__container container">
             <div class="row">

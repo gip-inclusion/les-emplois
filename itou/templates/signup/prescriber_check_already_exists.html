@@ -4,24 +4,18 @@
 
 {% block title %}Prescripteur/Orienteur - Inscription {{ block.super }}{% endblock %}
 
-{% block content %}
-    <section class="s-title-01">
-        <div class="s-title-01__container container">
-            <div class="s-title-01__row row">
-                <div class="s-title-01__col col-12">
-                    <h1 class="s-title-01__title h1">
-                        Inscription
-                        <small class="text-muted">Prescripteur/Orienteur</small>
-                    </h1>
-                    <h2>Votre organisation est-elle déjà inscrite ?</h2>
-                    <p>
-                        <a href="{% url 'signup:prescriber_pole_emploi_safir_code' %}">Je travaille pour Pôle emploi</a>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
+{% block content_title %}
+    <h1 class="s-title-01__title h1">
+        Inscription
+        <small class="text-muted">Prescripteur/Orienteur</small>
+    </h1>
+    <h2>Votre organisation est-elle déjà inscrite ?</h2>
+    <p>
+        <a href="{% url 'signup:prescriber_pole_emploi_safir_code' %}">Je travaille pour Pôle emploi</a>
+    </p>
+{% endblock %}
 
+{% block content %}
     <section class="s-section">
         <div class="s-section__container container">
             <div class="row">

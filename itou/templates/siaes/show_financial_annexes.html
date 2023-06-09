@@ -35,14 +35,16 @@
     {% endif %}
 {% endblock %}
 
+{% block content_title %}
+    <h1 class="h1">Mes annexes financières</h1>
+    <h2 class="h2 text-muted">{{ siae.display_name }}</h2>
+{% endblock %}
+
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12">
-                    <h1 class="h1-hero-c1">Mes annexes financières</h1>
-                    <h2 class="h1 text-muted">{{ siae.display_name }}</h2>
-
                     <div class="table-responsive">
                         <table class="table table-striped table-bordered">
                             <caption>Liste des annexes financières</caption>

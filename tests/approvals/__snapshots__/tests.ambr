@@ -1,4 +1,0 @@
-# serializer version: 1
-# name: CustomApprovalAdminViewsTest.test_employee_record_status_with_multiple_employee_records
-  '<a href="/admin/employee_record/employeerecord/42/change/"><b>Désactivée (ID: 42)</b></a>, <a href="/admin/employee_record/employeerecord/21/change/"><b>Nouvelle (ID: 21)</b></a>'
-# ---

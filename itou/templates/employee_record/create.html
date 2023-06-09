@@ -8,17 +8,11 @@
     Nouvelle fiche salarié ASP - étape {{ step }} - {{ current_siae.display_name }} {{ block.super }}
 {% endblock %}
 
-{% block content %}
-    <section class="s-title-01">
-        <div class="s-title-01__container container">
-            <div class="s-title-01__row row">
-                <div class="s-title-01__col col-12">
-                    <h1 class="h1">Fiches salarié ASP : {{ job_application.job_seeker.get_full_name|title }}</h1>
-                </div>
-            </div>
-        </div>
-    </section>
+{% block content_title %}
+    <h1 class="h1">Fiches salarié ASP : {{ job_application.job_seeker.get_full_name|title }}</h1>
+{% endblock %}
 
+{% block content %}
     <section class="s-section">
         <div class="s-section__container container">
             <div class="s-section__row row mb-3 mb-md-5">

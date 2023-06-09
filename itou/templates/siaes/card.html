@@ -5,20 +5,14 @@
 
 {% block title %}{{ siae.display_name }} {{ block.super }}{% endblock %}
 
-{% block content %}
-    <section class="s-title-01">
-        <div class="s-title-01__container container">
-            <div class="s-title-01__row row">
-                <div class="s-title-01__col col-12">
-                    <h1 class="s-title-01__title h1">
-                        <strong>{{ siae.display_name }}</strong>
-                    </h1>
-                    <h2 class="h5">{{ siae.get_kind_display }}</h2>
-                </div>
-            </div>
-        </div>
-    </section>
+{% block content_title %}
+    <h1 class="s-title-01__title h1">
+        <strong>{{ siae.display_name }}</strong>
+    </h1>
+    <h2 class="h5">{{ siae.get_kind_display }}</h2>
+{% endblock %}
 
+{% block content %}
     <section class="s-section">
         <div class="s-section__container container">
             <div class="row">

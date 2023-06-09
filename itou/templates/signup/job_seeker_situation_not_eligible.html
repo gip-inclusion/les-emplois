@@ -3,21 +3,13 @@
 
 {% block title %}Inscription {{ block.super }}{% endblock %}
 
-{% block content %}
-    <section class="s-title-01">
-        <div class="s-title-01__container container">
-            <div class="s-title-01__row row">
-                <div class="s-title-01__col col-12">
-                    <h1 class="s-title-01__title h1">
-                        Inscription
-                        <small class="text-muted">Candidat</small>
-                    </h1>
-                    <p>
-                        <strong>Vous ne pouvez pas vous inscrire</strong>, veuillez vous rapprocher d’un prescripteur habilité (Pôle emploi, Mission Locale, Cap emploi…)
-                        pour vous accompagner dans vos démarches. <a href="{% url 'search:prescribers_home' %}">Trouver un prescripteur habilité</a>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
+{% block content_title %}
+    <h1 class="s-title-01__title h1">
+        Inscription
+        <small class="text-muted">Candidat</small>
+    </h1>
+    <p>
+        <strong>Vous ne pouvez pas vous inscrire</strong>, veuillez vous rapprocher d’un prescripteur habilité (Pôle emploi, Mission Locale, Cap emploi…)
+        pour vous accompagner dans vos démarches. <a href="{% url 'search:prescribers_home' %}">Trouver un prescripteur habilité</a>
+    </p>
 {% endblock %}

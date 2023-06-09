@@ -5,15 +5,17 @@
 
 {% block title %}Réactiver la fiche salarié ASP - {{ current_siae.display_name }} {{ block.super }}{% endblock %}
 
+{% block content_title %}
+    <h1 class="h1-hero-c1">Réactiver la fiche salarié ASP</h1>
+    <h2 class="h1 text-muted">{{ employee_record.job_seeker.get_full_name|title }}</h2>
+{% endblock %}
+
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12">
                     <div class="content-small mb-3">
-                        <h1 class="h1-hero-c1">Réactiver la fiche salarié ASP</h1>
-                        <h2 class="h1 text-muted">{{ employee_record.job_seeker.get_full_name|title }}</h2>
-
                         <div class="card bg-gray-400 p-3 mb-3">
                             <div class="card-body p-1">
                                 <div class="row">

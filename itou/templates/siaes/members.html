@@ -2,25 +2,19 @@
 
 {% block title %}Collaborateurs {{ block.super }}{% endblock %}
 
-{% block content %}
-    <section class="s-title-01">
-        <div class="s-title-01__container container">
-            <div class="s-title-01__row row">
-                <div class="s-title-01__col col-12">
-                    <h1 class="s-title-01__title h1">
-                        <strong>Collaborateurs</strong>
-                    </h1>
-                    <h2 class="h2">{{ siae.display_name }}</h2>
-                    <div class="alert alert-info">
-                        <p class="mb-0">
-                            Vous êtes connecté(e) en tant que <b>{{ user.get_full_name|title }}</b> ({{ user.email }})
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+{% block content_title %}
+    <h1 class="s-title-01__title h1">
+        <strong>Collaborateurs</strong>
+    </h1>
+    <h2 class="h2">{{ siae.display_name }}</h2>
+    <div class="alert alert-info">
+        <p class="mb-0">
+            Vous êtes connecté(e) en tant que <b>{{ user.get_full_name|title }}</b> ({{ user.email }})
+        </p>
+    </div>
+{% endblock %}
 
+{% block content %}
     <section class="s-section">
         <div class="s-section__container container">
             <div class="row">

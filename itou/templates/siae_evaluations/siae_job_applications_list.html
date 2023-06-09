@@ -9,23 +9,24 @@
     {% bootstrap_messages %}
 {% endblock %}
 
+{% block content_title %}
+    <h1 class="h1">Justifier mes auto-prescriptions</h1>
+
+    <div class="alert alert-info" role="status">
+        <p class="font-weight-bold">Précision</p>
+        <p>
+            On entend par auto-prescription toutes les embauches pour lesquelles vous avez validé vous-mêmes
+            les critères administratifs d'éligibilité IAE.
+        </p>
+    </div>
+{% endblock %}
+
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
             <div class="row justify-content-center">
                 <div class="col-8">
-
-                    <h1 class="h1">Justifier mes auto-prescriptions</h1>
-
-                    <div class="alert alert-info" role="status">
-                        <p class="font-weight-bold">Précision</p>
-                        <p>
-                            On entend par auto-prescription toutes les embauches pour lesquelles vous avez validé vous-mêmes
-                            les critères administratifs d'éligibilité IAE.
-                        </p>
-                    </div>
-
-                    <div class="row mt-3">
+                    <div class="row">
                         <div class="col-12">
                             <p class="h2">Liste de mes auto-prescriptions à justifier</p>
                             <p>Contrôle initié le {{ evaluated_siae.evaluation_campaign.evaluations_asked_at|date:"d F Y" }}</p>
