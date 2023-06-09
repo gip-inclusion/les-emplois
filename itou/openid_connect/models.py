@@ -34,46 +34,44 @@ class OIDConnectState(models.Model):
     used_at = models.DateTimeField(verbose_name="Date d'utilisation", null=True)
     # Length used in call to get_random_string()
     csrf = models.CharField(max_length=12, unique=True)
+    state = models.CharField(max_length=12, unique=True, null=True)
 
     objects = OIDConnectQuerySet.as_manager()
 
     class Meta:
         abstract = True
 
-    def __str__(self):
-        return f"{self.csrf} created_at={self.created_at} used_at={self.used_at}"
+    # TODO: Remove this property when the csrf column is dropped.
+    @property
+    def state_with_fallback(self):
+        return self.state or self.csrf
 
-    @classmethod
-    def create_signed_csrf_token(cls, data=None):
-        """
-        Create and sign a new CSRF token to protect requests to identity providers.
-        """
-        token = crypto.get_random_string(length=12)
-        signer = signing.Signer()
-        signed_token = signer.sign(token)
-        return token, signed_token
+    def __str__(self):
+        return f"{self.state_with_fallback} created_at={self.created_at} used_at={self.used_at}"
 
     @classmethod
     def save_state(cls, **state):
-        token, signed_token = cls.create_signed_csrf_token()
-        cls.objects.create(csrf=token, **state)
+        token = crypto.get_random_string(length=12)
+        signer = signing.Signer()
+        signed_token = signer.sign(token)
+        cls.objects.create(csrf=token, state=token, **state)
         return signed_token
 
     @classmethod
-    def get_from_csrf(cls, signed_csrf):
+    def get_from_state(cls, signed_state):
         # Cleanup old states if any.
         cls.objects.cleanup()
 
-        if not signed_csrf:
+        if not signed_state:
             return None
 
         signer = signing.Signer()
         try:
-            csrf = signer.unsign(unquote(signed_csrf))
+            state = signer.unsign(unquote(signed_state))
         except signing.BadSignature:
             return None
 
-        return cls.objects.filter(csrf=csrf).first()
+        return cls.objects.filter(models.Q(state=state) | models.Q(csrf=state)).first()
 
     @property
     def expired_at(self):

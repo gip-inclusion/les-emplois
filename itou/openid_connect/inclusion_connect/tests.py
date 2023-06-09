@@ -14,6 +14,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from django.contrib import auth, messages
 from django.contrib.auth import get_user
 from django.contrib.sessions.middleware import SessionMiddleware
+from django.core import signing
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.test import RequestFactory
@@ -115,10 +116,10 @@ def mock_oauth_dance(
         user_info["email"] = user_info_email
     respx.get(constants.INCLUSION_CONNECT_ENDPOINT_USERINFO).mock(return_value=httpx.Response(200, json=user_info))
 
-    csrf_signed = client.session[constants.INCLUSION_CONNECT_SESSION_KEY]["state"]
+    state = client.session[constants.INCLUSION_CONNECT_SESSION_KEY]["state"]
     url = reverse("inclusion_connect:callback")
     callback_client = other_client or client
-    response = callback_client.get(url, data={"code": "123", "state": csrf_signed})
+    response = callback_client.get(url, data={"code": "123", "state": state})
     # If a expected_redirect_url was provided, check it redirects there
     # If not, the default redirection is next_url if provided, or welcoming_tour for new users
     expected = expected_redirect_url or next_url or reverse("welcoming_tour:index")
@@ -128,7 +129,7 @@ def mock_oauth_dance(
 
 class InclusionConnectModelTest(InclusionConnectBaseTestCase):
     def test_state_delete(self):
-        state = InclusionConnectState.objects.create(csrf="foo")
+        state = InclusionConnectState.objects.create(state="foo")
 
         InclusionConnectState.objects.cleanup()
 
@@ -144,15 +145,23 @@ class InclusionConnectModelTest(InclusionConnectBaseTestCase):
         with pytest.raises(InclusionConnectState.DoesNotExist):
             state.refresh_from_db()
 
+    def test_transition_from_csrf_to_state(self):
+        state = "1234567890ab"
+        InclusionConnectState.objects.create(csrf=state)
+        signer = signing.Signer()
+        signed_state = signer.sign(state)
+        state_from_db = InclusionConnectState.get_from_state(signed_state)
+        assert state_from_db is not None
+
     def test_state_is_valid(self):
         with freeze_time("2022-09-13 12:00:01"):
             state = InclusionConnectState.save_state()
             assert isinstance(state, str)
-            assert InclusionConnectState.get_from_csrf(state).is_valid()
+            assert InclusionConnectState.get_from_state(state).is_valid()
 
             state = InclusionConnectState.save_state()
         with freeze_time("2022-10-13 12:00:01"):
-            assert not InclusionConnectState.get_from_csrf(state).is_valid()
+            assert not InclusionConnectState.get_from_state(state).is_valid()
 
     def test_create_user_from_user_info(self):
         """
@@ -330,7 +339,7 @@ class InclusionConnectAuthorizeViewTest(InclusionConnectBaseTestCase):
         url = f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
         response = self.client.get(url, follow=False)
         assert f"login_hint={quote(email)}" in response.url
-        ic_state = InclusionConnectState.get_from_csrf(
+        ic_state = InclusionConnectState.get_from_state(
             self.client.session[constants.INCLUSION_CONNECT_SESSION_KEY]["state"]
         )
         assert ic_state.data["user_email"] == email
