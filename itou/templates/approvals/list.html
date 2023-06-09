@@ -7,19 +7,13 @@
 
 {% block extra_head %}{{ filters_form.media.css }}{% endblock %}
 
-{% block content %}
-    <section class="s-title-01">
-        <div class="s-title-01__container container">
-            <div class="s-title-01__row row">
-                <div class="s-title-01__col col-12">
-                    <h1 class="s-title-01__title h1-hero-c1">
-                        <strong>Gestion des salariés et PASS IAE</strong>
-                    </h1>
-                </div>
-            </div>
-        </div>
-    </section>
+{% block content_title %}
+    <h1 class="s-title-01__title h1-hero-c1">
+        <strong>Gestion des salariés et PASS IAE</strong>
+    </h1>
+{% endblock %}
 
+{% block content %}
     <section class="s-box">
         <div class="s-box__container container">
             <div class="s-box__row row">

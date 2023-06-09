@@ -68,7 +68,6 @@
                             La version de votre navigateur n'est plus supportée. Veuillez utiliser une version plus récente pour améliorer votre expérience sur notre site.
                         </p>
                     </div>
-
                 {% endblock %}
             </div>
 
@@ -76,8 +75,23 @@
                 {% block breadcrumbs %}{% endblock %}
             </div>
 
-            {% block content %}{% endblock %}
+            {% comment %}
+            Si les templates enfants n'ont pas besoin d'une section <section .s-title-01>, penser à mettre le {% block content_title_wrapper %}{% endblock %} vide dans ces templates surcharger le code ci-dessous
+            Si les templates enfants ont besoin d'une section <section .s-title-01>, penser à mettre le contenu dans le {% block content_title %}{% endblock %}
+            {% endcomment %}
+            {% block content_title_wrapper %}
+                <section class="s-title-01">
+                    <div class="s-title-01__container container">
+                        <div class="s-title-01__row row">
+                            <div class="s-title-01__col col-12">
+                                {% block content_title %}{% endblock %}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            {% endblock %}
 
+            {% block content %}{% endblock %}
         </main>
 
         {% include "layout/_footer.html" %}

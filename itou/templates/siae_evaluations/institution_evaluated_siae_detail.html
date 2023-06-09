@@ -5,6 +5,38 @@
 
 {% block title %}Contrôler les pièces justificatives {{ block.super }}{% endblock %}
 
+{% block content_title %}
+    <h1 class="h1">
+        {% if evaluated_siae.evaluation_is_final %}
+            Pièces justificatives
+        {% else %}
+            Contrôler les pièces justificatives
+        {% endif %}
+    </h1>
+    {% if campaign_closed_before_final_evaluation %}
+        {% if evaluated_siae.state == "ACCEPTED" %}
+            <div class="alert alert-warning">
+                {{ evaluated_siae|capfirst }} a soumis des justificatifs, mais leur contrôle n’a pas été
+                validé avant la fin de la campagne “{{ evaluated_siae.evaluation_campaign.name }}”, le
+                résultat du contrôle est <b class="text-success">positif</b>.
+            </div>
+        {% else %}
+            {# REFUSED #}
+            <div class="alert alert-warning">
+                {{ evaluated_siae|capfirst }} n’a pas soumis de justificatifs avant la fin de la
+                campagne “{{ evaluated_siae.evaluation_campaign.name }}”, le résultat du contrôle est
+                <b class="text-danger">négatif</b>.
+            </div>
+        {% endif %}
+    {% elif accepted_by_default %}
+        <div class="alert alert-warning">
+            {{ evaluated_siae|capfirst }} a soumis des justificatifs, mais leur contrôle n’a pas été
+            validé avant la fin de la phase amiable, le résultat du contrôle est
+            <b class="text-success">positif</b>.
+        </div>
+    {% endif %}
+{% endblock %}
+
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
@@ -12,38 +44,6 @@
                 <div class="col-lg-8 col-12">
                     <div class="row mt-3">
                         <div class="col-12">
-
-                            <h1 class="h1">
-                                {% if evaluated_siae.evaluation_is_final %}
-                                    Pièces justificatives
-                                {% else %}
-                                    Contrôler les pièces justificatives
-                                {% endif %}
-                            </h1>
-
-                            {% if campaign_closed_before_final_evaluation %}
-                                {% if evaluated_siae.state == "ACCEPTED" %}
-                                    <div class="alert alert-warning">
-                                        {{ evaluated_siae|capfirst }} a soumis des justificatifs, mais leur contrôle n’a pas été
-                                        validé avant la fin de la campagne “{{ evaluated_siae.evaluation_campaign.name }}”, le
-                                        résultat du contrôle est <b class="text-success">positif</b>.
-                                    </div>
-                                {% else %}
-                                    {# REFUSED #}
-                                    <div class="alert alert-warning">
-                                        {{ evaluated_siae|capfirst }} n’a pas soumis de justificatifs avant la fin de la
-                                        campagne “{{ evaluated_siae.evaluation_campaign.name }}”, le résultat du contrôle est
-                                        <b class="text-danger">négatif</b>.
-                                    </div>
-                                {% endif %}
-                            {% elif accepted_by_default %}
-                                <div class="alert alert-warning">
-                                    {{ evaluated_siae|capfirst }} a soumis des justificatifs, mais leur contrôle n’a pas été
-                                    validé avant la fin de la phase amiable, le résultat du contrôle est
-                                    <b class="text-success">positif</b>.
-                                </div>
-                            {% endif %}
-
                             <h3 class="h3">
                                 Liste des auto-prescriptions de <span class="text-muted">{{ evaluated_siae }}</span>
                             </h3>

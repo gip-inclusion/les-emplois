@@ -3,48 +3,42 @@
 
 {% block title %}Export des suivis de candidatures {{ block.super }}{% endblock %}
 
-{% block content %}
-    <section class="s-title-01">
-        <div class="s-title-01__container container">
-            <div class="s-title-01__row row">
-                <div class="s-title-01__col col-12">
-                    {% if export_for == "siae" %}
-                        <h1 class="s-title-01__title h1">Export des candidatures reçues</h1>
-                        <h2 class="h2">{{ siae.display_name }}</h2>
-                    {% else %}
-                        <h1 class="s-title-01__title h1">Export des candidatures</h1>
-                    {% endif %}
+{% block content_title %}
+    {% if export_for == "siae" %}
+        <h1 class="s-title-01__title h1">Export des candidatures reçues</h1>
+        <h2 class="h2">{{ siae.display_name }}</h2>
+    {% else %}
+        <h1 class="s-title-01__title h1">Export des candidatures</h1>
+    {% endif %}
 
-                    {% if export_for == "siae" or can_view_stats_pe %}
-                        <div class="alert alert-info mt-3" id="besoin-dun-chiffre">
-                            <p class="mb-0">
-                                <i class="ri-information-line mr-1" aria-hidden="true"></i>
-                                <b>Besoin d'un chiffre ?</b>
-                            </p>
-                            {% if export_for == "siae" %}
-                                <p class="mb-0">
-                                    Accédez aux <a href="{% url 'stats:stats_siae_hiring' %}"  target="_blank" rel="noopener">données de recrutement de votre structure</a> (non nominatives) compilées, calculées et mises à jour quotidiennement.
-                                </p>
-                            {% elif export_for == "prescriber" and can_view_stats_pe %}
-                                <p class="mb-0">
-                                    Accédez aux données de votre agence (non nominatives) compilées, calculées et mises à jour quotidiennement :
-                                </p>
-                                <ul>
-                                    <li>
-                                        <a href="{% url 'stats:stats_pe_state_main' %}"  target="_blank" rel="noopener">Voir les données de l'ensemble de l'état des candidatures orientées</a>
-                                    </li>
-                                    <li>
-                                        <a href="{% url 'stats:stats_pe_conversion_main' %}"  target="_blank" rel="noopener">Voir les données du taux de transformation des candidatures</a>
-                                    </li>
-                                </ul>
-                            {% endif %}
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
+    {% if export_for == "siae" or can_view_stats_pe %}
+        <div class="alert alert-info mt-3" id="besoin-dun-chiffre">
+            <p class="mb-0">
+                <i class="ri-information-line mr-1" aria-hidden="true"></i>
+                <b>Besoin d'un chiffre ?</b>
+            </p>
+            {% if export_for == "siae" %}
+                <p class="mb-0">
+                    Accédez aux <a href="{% url 'stats:stats_siae_hiring' %}"  target="_blank" rel="noopener">données de recrutement de votre structure</a> (non nominatives) compilées, calculées et mises à jour quotidiennement.
+                </p>
+            {% elif export_for == "prescriber" and can_view_stats_pe %}
+                <p class="mb-0">
+                    Accédez aux données de votre agence (non nominatives) compilées, calculées et mises à jour quotidiennement :
+                </p>
+                <ul>
+                    <li>
+                        <a href="{% url 'stats:stats_pe_state_main' %}"  target="_blank" rel="noopener">Voir les données de l'ensemble de l'état des candidatures orientées</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'stats:stats_pe_conversion_main' %}"  target="_blank" rel="noopener">Voir les données du taux de transformation des candidatures</a>
+                    </li>
+                </ul>
+            {% endif %}
         </div>
-    </section>
+    {% endif %}
+{% endblock %}
 
+{% block content %}
     <section class="s-section">
         <div class="s-section__container container">
             <div class="row">

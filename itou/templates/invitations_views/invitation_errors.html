@@ -3,22 +3,14 @@
 
 {% block title %}Invitation {{ block.super }}{% endblock %}
 
-{% block content %}
-    <section class="s-title-01">
-        <div class="s-title-01__container container">
-            <div class="s-title-01__row row">
-                <div class="s-title-01__col col-12">
-                    {% if invitation.has_expired %}
-                        <h1 class="s-title-01__title h1">Invitation expirée</h1>
-                        <p>
-                            Cette invitation est expirée. Merci de contacter la personne qui vous a invité(e) afin d'en recevoir une nouvelle.
-                        </p>
-                    {% elif invitation.accepted %}
-                        <h1 class="s-title-01__title h1">Invitation acceptée</h1>
-                        <p>Cette invitation a déjà été acceptée.</p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </section>
+{% block content_title %}
+    {% if invitation.has_expired %}
+        <h1 class="s-title-01__title h1">Invitation expirée</h1>
+        <p>
+            Cette invitation est expirée. Merci de contacter la personne qui vous a invité(e) afin d'en recevoir une nouvelle.
+        </p>
+    {% elif invitation.accepted %}
+        <h1 class="s-title-01__title h1">Invitation acceptée</h1>
+        <p>Cette invitation a déjà été acceptée.</p>
+    {% endif %}
 {% endblock %}

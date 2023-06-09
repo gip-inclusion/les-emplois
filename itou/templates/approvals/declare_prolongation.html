@@ -10,21 +10,15 @@
     <link rel="stylesheet" type="text/css" href='{% static "vendor/dropzone/dropzone.min.css" %}' />
 {% endblock extra_head %}
 
-{% block content %}
-    <section class="s-title-01">
-        <div class="s-title-01__container container">
-            <div class="s-title-01__row row">
-                <div class="s-title-01__col col-12">
-                    <h1 class="s-title-01__title h1">
-                        Déclarer une prolongation de PASS IAE
-                        <br>
-                        <span class="text-muted">{{ approval.user.get_full_name|title }}</span>
-                    </h1>
-                </div>
-            </div>
-        </div>
-    </section>
+{% block content_title %}
+    <h1 class="s-title-01__title h1">
+        Déclarer une prolongation de PASS IAE
+        <br>
+        <span class="text-muted">{{ approval.user.get_full_name|title }}</span>
+    </h1>
+{% endblock %}
 
+{% block content %}
     <section class="s-section">
         <div class="s-section__container container">
             <div class="row">

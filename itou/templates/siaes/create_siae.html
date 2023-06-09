@@ -3,29 +3,23 @@
 
 {% block title %}Créer une nouvelle structure {{ block.super }}{% endblock %}
 
-{% block content %}
-    <section class="s-title-01">
-        <div class="s-title-01__container container">
-            <div class="s-title-01__row row">
-                <div class="s-title-01__col col-12">
-                    <h1 class="s-title-01__title h1">Créer/rejoindre une nouvelle structure</h1>
-                    <div class="alert alert-info">
-                        <p>Vous souhaitez rejoindre une structure :</p>
-                        <ul>
-                            <li>
-                                ayant déjà un ou plusieurs membres, <b>demandez à l’un de ces membres de vous inviter depuis son tableau de bord</b>
-                            </li>
-                            <li>
-                                connue des services des emplois de l'inclusion mais n’ayant pas encore de membre : <a href="{% url 'signup:siae_select' %}">utilisez ce formulaire</a>
-                            </li>
-                        </ul>
-                        <p class="mb-0">Dans les autres cas, complétez le formulaire ci-dessous.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+{% block content_title %}
+    <h1 class="s-title-01__title h1">Créer/rejoindre une nouvelle structure</h1>
+    <div class="alert alert-info">
+        <p>Vous souhaitez rejoindre une structure :</p>
+        <ul>
+            <li>
+                ayant déjà un ou plusieurs membres, <b>demandez à l’un de ces membres de vous inviter depuis son tableau de bord</b>
+            </li>
+            <li>
+                connue des services des emplois de l'inclusion mais n’ayant pas encore de membre : <a href="{% url 'signup:siae_select' %}">utilisez ce formulaire</a>
+            </li>
+        </ul>
+        <p class="mb-0">Dans les autres cas, complétez le formulaire ci-dessous.</p>
+    </div>
+{% endblock %}
 
+{% block content %}
     <section class="s-section">
         <div class="s-section__container container">
             <div class="row">

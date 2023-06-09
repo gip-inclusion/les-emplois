@@ -2,15 +2,7 @@
 
 {% block title %}Erreur 404 {{ block.super }}{% endblock %}
 
-{% block content %}
-    <section class="s-title-01">
-        <div class="s-title-01__container container">
-            <div class="s-title-01__row row">
-                <div class="s-title-01__col col-12">
-                    <h1 class="s-title-01__title h1">Erreur 404</h1>
-                    <p>La page que vous avez demandée n'a pas pu être trouvée.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+{% block content_title %}
+    <h1 class="s-title-01__title h1">Erreur 404</h1>
+    <p>La page que vous avez demandée n'a pas pu être trouvée.</p>
 {% endblock %}

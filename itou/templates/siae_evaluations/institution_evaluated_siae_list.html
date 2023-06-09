@@ -5,30 +5,27 @@
 
 {% block title %}Contrôler les pièces justificatives {{ block.super }}{% endblock %}
 
+{% block content_title %}
+    <h1 class="h1">Contrôler les pièces justificatives</h1>
+    <h2 class="h3">
+        Liste des Siae
+        {% if evaluation_campaign.ended_at %}
+            contrôlées
+        {% else %}
+            à contrôler
+        {% endif %}
+    </h2>
+    <p>
+        Contrôle initié le {{ evaluation_campaign.evaluations_asked_at|date:"d F Y" }}
+        {% if evaluation_campaign.ended_at %}, clôturé le {{ evaluation_campaign.ended_at|date:"d F Y" }}{% endif %}
+    </p>
+{% endblock %}
+
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
             <div class="row justify-content-center">
                 <div class="col-lg-8 col-12">
-                    <div class="row mt-3">
-                        <div class="col-12">
-
-                            <h1 class="h1">Contrôler les pièces justificatives</h1>
-                            <h3 class="h3">
-                                Liste des Siae
-                                {% if evaluation_campaign.ended_at %}
-                                    contrôlées
-                                {% else %}
-                                    à contrôler
-                                {% endif %}
-                            </h3>
-                            <p>
-                                Contrôle initié le {{ evaluation_campaign.evaluations_asked_at|date:"d F Y" }}
-                                {% if evaluation_campaign.ended_at %}, clôturé le {{ evaluation_campaign.ended_at|date:"d F Y" }}{% endif %}
-                            </p>
-                        </div>
-                    </div>
-
                     {% for evaluated_siae in evaluated_siaes %}
                         <div class="row mt-3">
                             <div class="col-12">

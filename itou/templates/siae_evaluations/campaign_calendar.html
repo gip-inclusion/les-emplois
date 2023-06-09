@@ -6,22 +6,22 @@
     {% include "layout/breadcrumbs_from_dashboard.html" %}
 {% endblock %}
 
+{% block content_title %}
+    <h1 class="s-title-01__title h1">Calendrier</h1>
+    <span class="d-block badge badge-base badge-pill badge-emploi-light text-primary">Contrôle a posteriori</span>
+{% endblock %}
+
 {% block content %}
-    <section class="s-title-01">
-        <div class="s-title-01__container container">
-            <div class="s-title-01__row row">
-                <div class="s-title-01__col col-12">
-                    <h1 class="s-title-01__title h1">Calendrier</h1>
-                    <span class="d-block badge badge-base badge-pill badge-emploi-light text-primary">Contrôle a posteriori</span>
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12">
+                    {{ campaign_calendar_html|safe }}
+                    <p class="my-4">
+                        <a href="{{ back_url }}">Retour</a>
+                    </p>
                 </div>
             </div>
         </div>
-    </section>
-
-    <section class="container">
-        {{ campaign_calendar_html|safe }}
-        <p class="my-4">
-            <a href="{{ back_url }}">Retour</a>
-        </p>
     </section>
 {% endblock %}

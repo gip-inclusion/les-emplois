@@ -10,20 +10,12 @@
 
 {% block title %}Erreur inattendue à la connexion {{ block.super }}{% endblock %}
 
-{% block content %}
-    <section class="s-title-01">
-        <div class="s-title-01__container container">
-            <div class="s-title-01__row row">
-                <div class="s-title-01__col col-12">
-                    <h1 class="s-title-01__title h1">Erreur inattendue à la connexion</h1>
-                    <p>Une erreur inattendue s'est produite. Essayez à nouveau de vous connecter.</p>
-                    <ul class="list-unstyled">
-                        <li>Code de l'erreur : {{ auth_error.code }}</li>
-                        <li>Nature de l'erreur : {{ auth_error.exception }}</li>
-                        <li>Détails : {{ auth_error }}</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
+{% block content_title %}
+    <h1 class="s-title-01__title h1">Erreur inattendue à la connexion</h1>
+    <p>Une erreur inattendue s'est produite. Essayez à nouveau de vous connecter.</p>
+    <ul class="list-unstyled">
+        <li>Code de l'erreur : {{ auth_error.code }}</li>
+        <li>Nature de l'erreur : {{ auth_error.exception }}</li>
+        <li>Détails : {{ auth_error }}</li>
+    </ul>
 {% endblock %}

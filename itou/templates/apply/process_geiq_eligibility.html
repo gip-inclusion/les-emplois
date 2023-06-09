@@ -4,17 +4,16 @@
 
 {% block title %}Embauche - Eligibilité GEIQ {{ block.super }}{% endblock %}
 
+{% block content_title %}
+    <h1 class="h1-hero-c1">
+        Candidature de
+        <span class="text-muted">{{ job_application.job_seeker.get_full_name|title|mask_unless:can_view_personal_information }}</span>
+    </h1>
+{% endblock %}
+
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
-            <div class="row">
-                <div class="col-12 mt-5">
-                    <h1 class="h1-hero-c1">
-                        Candidature de
-                        <span class="text-muted">{{ job_application.job_seeker.get_full_name|title|mask_unless:can_view_personal_information }}</span>
-                    </h1>
-                </div>
-            </div>
             <div class="row">
                 <div class="col-12 col-lg-8">
                     <div class="c-stepper col-12">
