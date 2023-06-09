@@ -109,6 +109,8 @@ def inclusion_connect_authorize(request):
     register = request.GET.get("register")
     if not user_kind:
         return _redirect_to_login_page_on_error(error_msg="User kind missing.")
+    if user_kind not in USER_DATA_CLASSES:
+        return _redirect_to_login_page_on_error(error_msg="Wrong user kind.")
 
     ic_data = InclusionConnectStateData(
         user_kind=user_kind, previous_url=previous_url, next_url=next_url, is_login=not register
