@@ -333,6 +333,14 @@ class InclusionConnectAuthorizeViewTest(InclusionConnectBaseTestCase):
         )
         assert ic_state.data["user_email"] == email
 
+    def test_authorize_check_user_kind(self):
+        forbidden_user_kinds = [UserKind.ITOU_STAFF, UserKind.LABOR_INSPECTOR, UserKind.JOB_SEEKER]
+        for kind in forbidden_user_kinds:
+            with self.subTest(kind=kind):
+                url = f"{reverse('inclusion_connect:authorize')}?user_kind={kind}"
+                response = self.client.get(url)
+                self.assertRedirects(response, reverse("home:hp"))
+
 
 class InclusionConnectResumeRegistrationViewTest(InclusionConnectBaseTestCase):
     def test_resume_endpoint_no_session(self):
