@@ -4,17 +4,23 @@
     </div>
     <div class="col-lg-3 col-md-3 col-4">
         {% if evaluated_siae.evaluation_is_final %}
-            <p class="badge badge-pill{% if evaluated_siae.state == "ACCEPTED" %} badge-success{% elif evaluated_siae.state == "NOTIFICATION_PENDING" %} badge-accent-03 text-primary{% else %} badge-danger{% endif %} float-right">
-                {% if evaluated_siae.state == "ACCEPTED" %}
+            {% if evaluated_siae.state == "ACCEPTED" %}
+                <p class="badge badge-pill badge-success float-right">
                     <i class="ri-checkbox-circle-line mr-1"></i> Résultat positif
-                {% elif evaluated_siae.state == "REFUSED" %}
-                    <i class="ri-close-circle-line mr-1"></i> Résultat négatif
-                {% elif evaluated_siae.state == "NOTIFICATION_PENDING" %}
+                </p>
+            {% elif evaluated_siae.state == "NOTIFICATION_PENDING" %}
+                <p class="badge badge-pill badge-accent-03 text-primary float-right">
                     <i class="ri-arrow-right-circle-line mr-1"></i> Notification à faire
-                {% else %}
-                    Non contrôlée
-                {% endif %}
-            </p>
+                </p>
+            {% else %}
+                <p class="badge badge-pill badge-danger float-right">
+                    {% if evaluated_siae.state == "REFUSED" %}
+                        <i class="ri-close-circle-line mr-1"></i> Résultat négatif
+                    {% else %}
+                        Non contrôlée
+                    {% endif %}
+                </p>
+            {% endif %}
         {% else %}
             {% if evaluated_siae.state == "SUBMITTED" %}
                 <p class="badge badge-pill badge-pilotage float-right">
