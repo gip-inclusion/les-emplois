@@ -90,14 +90,14 @@ class SIAEEmailFactory:
         body = "siae_evaluations/email/to_siae_selected_body.txt"
         return get_email_message(self.recipients, context, subject, body)
 
-    def reviewed(self, adversarial=False):
+    def accepted(self, adversarial=False):
         context = {
             "evaluation_campaign": self.evaluated_siae.evaluation_campaign,
             "siae": self.evaluated_siae.siae,
             "adversarial": adversarial,
         }
-        subject = "siae_evaluations/email/to_siae_reviewed_subject.txt"
-        body = "siae_evaluations/email/to_siae_reviewed_body.txt"
+        subject = "siae_evaluations/email/to_siae_accepted_subject.txt"
+        body = "siae_evaluations/email/to_siae_accepted_body.txt"
         return get_email_message(self.recipients, context, subject, body)
 
     def force_accepted(self):
