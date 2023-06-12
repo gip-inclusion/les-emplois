@@ -4,6 +4,7 @@ import logging
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
+from itou.approvals import models as approvals_models
 from itou.eligibility import models as eligibility_models
 from itou.invitations import models as invitations_models
 from itou.job_applications import models as job_applications_models
@@ -35,6 +36,7 @@ def _model_sanity_check():
         "jobapplication",
         "members",
         "prescribermembership",
+        "prolongation",
     }
     if relation_fields != expected_fields:
         raise RuntimeError(
@@ -102,6 +104,11 @@ def organization_merge_into(from_id, to_id, *, wet_run):
         to_organization.name,
     )
 
+    # Prolongations have links (fks) on a prescriber and a prescriber organization
+    # for validation concerns on some specific prolongation reasons
+    prolongations = approvals_models.Prolongation.objects.filter(prescriber_organization_id=from_id)
+    logger.info("| Prolongations: %s", prolongations.count())
+
     if wet_run:
         with transaction.atomic():
             job_applications.update(sender_prescriber_organization_id=to_id)
@@ -109,6 +116,7 @@ def organization_merge_into(from_id, to_id, *, wet_run):
             diagnoses.update(author_prescriber_organization_id=to_id)
             geiq_diagnoses.update(author_prescriber_organization_id=to_id)
             invitations.update(organization_id=to_id)
+            prolongations.update(prescriber_organization_id=to_id)
             from_organization.delete()
     else:
         logger.info("Nothing to do in dry run mode.")
