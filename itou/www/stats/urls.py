@@ -29,31 +29,31 @@ urlpatterns = [
     path("pe/tension", views.stats_pe_tension, name="stats_pe_tension"),
     # Institution stats - DDETS IAE - department level.
     path(
-        "ddets_iae/auto_prescription",
+        "ddets/auto_prescription",
         views.stats_ddets_iae_auto_prescription,
         name="stats_ddets_iae_auto_prescription",
     ),
     path(
-        "ddets_iae/follow_siae_evaluation",
+        "ddets/follow_siae_evaluation",
         views.stats_ddets_iae_follow_siae_evaluation,
         name="stats_ddets_iae_follow_siae_evaluation",
     ),
-    path("ddets_iae/iae", views.stats_ddets_iae_iae, name="stats_ddets_iae_iae"),
-    path("ddets_iae/siae_evaluation", views.stats_ddets_iae_siae_evaluation, name="stats_ddets_iae_siae_evaluation"),
-    path("ddets_iae/hiring", views.stats_ddets_iae_hiring, name="stats_ddets_iae_hiring"),
+    path("ddets/iae", views.stats_ddets_iae_iae, name="stats_ddets_iae_iae"),
+    path("ddets/siae_evaluation", views.stats_ddets_iae_siae_evaluation, name="stats_ddets_iae_siae_evaluation"),
+    path("ddets/hiring", views.stats_ddets_iae_hiring, name="stats_ddets_iae_hiring"),
     # Institution stats - DREETS IAE - region level.
     path(
-        "dreets_iae/auto_prescription",
+        "dreets/auto_prescription",
         views.stats_dreets_iae_auto_prescription,
         name="stats_dreets_iae_auto_prescription",
     ),
     path(
-        "dreets_iae/follow_siae_evaluation",
+        "dreets/follow_siae_evaluation",
         views.stats_dreets_iae_follow_siae_evaluation,
         name="stats_dreets_iae_follow_siae_evaluation",
     ),
-    path("dreets_iae/iae", views.stats_dreets_iae_iae, name="stats_dreets_iae_iae"),
-    path("dreets_iae/hiring", views.stats_dreets_iae_hiring, name="stats_dreets_iae_hiring"),
+    path("dreets/iae", views.stats_dreets_iae_iae, name="stats_dreets_iae_iae"),
+    path("dreets/hiring", views.stats_dreets_iae_hiring, name="stats_dreets_iae_hiring"),
     # Institution stats - DGEFP - nation level.
     path("dgefp/auto_prescription", views.stats_dgefp_auto_prescription, name="stats_dgefp_auto_prescription"),
     path(
