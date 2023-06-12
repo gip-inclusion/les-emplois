@@ -3,20 +3,23 @@
 from django.db import migrations
 
 from itou.institutions.enums import InstitutionKind
-from itou.institutions.models import Institution, InstitutionMembership
-from itou.users.models import User
+from itou.users.enums import UserKind
 
 
 PILOTAGE_INSTITUTION_SHARED_USER_ID = 322971
 
 
 def create_all_ddets_log(apps, _schema_editor):
+    User = apps.get_model("users", "User")
     pilotage_user = User.objects.filter(pk=PILOTAGE_INSTITUTION_SHARED_USER_ID).first()
     if pilotage_user is None:
         return
-    if not pilotage_user.is_labor_inspector:
+    # `pilotage_user.is_labor_inspector` does not work here ¯\_(ツ)_/¯
+    if pilotage_user.kind != UserKind.LABOR_INSPECTOR:
         return
 
+    Institution = apps.get_model("institutions", "Institution")
+    InstitutionMembership = apps.get_model("institutions", "InstitutionMembership")
     for ddets_iae in Institution.objects.filter(kind=InstitutionKind.DDETS_IAE):
         if Institution.objects.filter(kind=InstitutionKind.DDETS_LOG, department=ddets_iae.department).exists():
             continue
@@ -26,12 +29,14 @@ def create_all_ddets_log(apps, _schema_editor):
             name=ddets_iae.name,
         )
         ddets_log.save()
-        # `ddets_log.members.add(pilotage_user)` sets is_admin to False ¯\_(ツ)_/¯
+        # `ddets_log.members.add(pilotage_user)` does not work here ¯\_(ツ)_/¯
+        # And anyway it sets is_admin to False so we need to create the membership directly.
         membership = InstitutionMembership(institution=ddets_log, user=pilotage_user, is_admin=True)
         membership.save()
 
 
 def delete_all_ddets_log(apps, _schema_editor):
+    Institution = apps.get_model("institutions", "Institution")
     Institution.objects.filter(kind=InstitutionKind.DDETS_LOG).delete()
 
 
