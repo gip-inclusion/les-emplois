@@ -3,7 +3,6 @@ import datetime
 import httpx
 import pytest
 import respx
-from django.core import signing
 from django.core.exceptions import ValidationError
 from django.test import override_settings
 from django.urls import reverse
@@ -84,14 +83,6 @@ class FranceConnectTest(TestCase):
 
         with pytest.raises(FranceConnectState.DoesNotExist):
             state.refresh_from_db()
-
-    def test_transition_from_csrf_to_state(self):
-        state = "1234567890ab"
-        FranceConnectState.objects.create(csrf=state)
-        signer = signing.Signer()
-        signed_state = signer.sign(state)
-        state_from_db = FranceConnectState.get_from_state(signed_state)
-        assert state_from_db is not None
 
     def test_state_verification(self):
         state = FranceConnectState.save_state()

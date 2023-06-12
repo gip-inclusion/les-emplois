@@ -33,28 +33,23 @@ class OIDConnectState(models.Model):
     created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now, db_index=True)
     used_at = models.DateTimeField(verbose_name="Date d'utilisation", null=True)
     # Length used in call to get_random_string()
-    csrf = models.CharField(max_length=12, unique=True)
-    state = models.CharField(max_length=12, unique=True, null=True)
+    csrf = models.CharField(max_length=12, null=True)
+    state = models.CharField(max_length=12, unique=True)
 
     objects = OIDConnectQuerySet.as_manager()
 
     class Meta:
         abstract = True
 
-    # TODO: Remove this property when the csrf column is dropped.
-    @property
-    def state_with_fallback(self):
-        return self.state or self.csrf
-
     def __str__(self):
-        return f"{self.state_with_fallback} created_at={self.created_at} used_at={self.used_at}"
+        return f"{self.state} created_at={self.created_at} used_at={self.used_at}"
 
     @classmethod
     def save_state(cls, **state):
         token = crypto.get_random_string(length=12)
         signer = signing.Signer()
         signed_token = signer.sign(token)
-        cls.objects.create(csrf=token, state=token, **state)
+        cls.objects.create(state=token, **state)
         return signed_token
 
     @classmethod
@@ -71,7 +66,7 @@ class OIDConnectState(models.Model):
         except signing.BadSignature:
             return None
 
-        return cls.objects.filter(models.Q(state=state) | models.Q(csrf=state)).first()
+        return cls.objects.filter(state=state).first()
 
     @property
     def expired_at(self):
