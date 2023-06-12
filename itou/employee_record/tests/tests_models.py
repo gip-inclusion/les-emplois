@@ -19,6 +19,10 @@ from itou.employee_record.factories import (
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, validate_asp_batch_filename
 from itou.job_applications.factories import (
     JobApplicationFactory,
+    JobApplicationSentByJobSeekerFactory,
+    JobApplicationSentByPrescriberFactory,
+    JobApplicationSentByPrescriberOrganizationFactory,
+    JobApplicationSentBySiaeFactory,
     JobApplicationWithApprovalNotCancellableFactory,
     JobApplicationWithCompleteJobSeekerProfileFactory,
     JobApplicationWithoutApprovalFactory,
@@ -181,6 +185,66 @@ class EmployeeRecordModelTest(TestCase):
 
         archivable_employee_record = EmployeeRecordFactory(job_application__approval__expired=True)
         assert list(EmployeeRecord.objects.archivable()) == [archivable_employee_record]
+
+
+@pytest.mark.parametrize(
+    "factory,expected",
+    [
+        (JobApplicationSentByJobSeekerFactory, "07"),
+        (JobApplicationSentBySiaeFactory, "07"),
+        (JobApplicationSentByPrescriberFactory, "08"),
+        (JobApplicationSentByPrescriberOrganizationFactory, "08"),
+    ],
+)
+def test_asp_prescriber_type_for_other_sender(factory, expected):
+    employee_record = EmployeeRecordFactory(
+        job_application=factory(with_approval=True),
+    )
+    assert employee_record.asp_prescriber_type == expected
+
+
+@pytest.mark.parametrize(
+    "kind,expected",
+    [
+        ("CAP_EMPLOI", "02"),
+        ("ML", "01"),
+        ("OIL", "06"),
+        ("ODC", "06"),
+        ("PENSION", "06"),
+        ("PE", "03"),
+        ("RS_FJT", "06"),
+        ("PREVENTION", "14"),
+        ("DEPT", "05"),
+        ("AFPA", "15"),
+        ("ASE", "19"),
+        ("CAARUD", "06"),
+        ("CADA", "18"),
+        ("CAF", "17"),
+        ("CAVA", "20"),
+        ("CCAS", "11"),
+        ("CHRS", "12"),
+        ("CHU", "22"),
+        ("CIDFF", "13"),
+        ("CPH", "21"),
+        ("CSAPA", "06"),
+        ("E2C", "06"),
+        ("EPIDE", "06"),
+        ("HUDA", "06"),
+        ("MSA", "06"),
+        ("OACAS", "23"),
+        ("PIJ_BIJ", "16"),
+        ("PJJ", "10"),
+        ("PLIE", "04"),
+        ("SPIP", "09"),
+        ("OTHER", "06"),
+    ],
+)
+def test_asp_prescriber_type_for_authorized_organization(kind, expected):
+    employee_record = EmployeeRecordFactory(
+        job_application__sent_by_authorized_prescriber_organisation=True,
+        job_application__sender_prescriber_organization__kind=kind,
+    )
+    assert employee_record.asp_prescriber_type == expected
 
 
 @pytest.mark.parametrize("status", list(Status))

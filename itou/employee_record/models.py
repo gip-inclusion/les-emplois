@@ -516,11 +516,6 @@ class EmployeeRecord(ASPExchangeInformation):
             return EmployerType.from_itou_siae_kind(self.job_application.to_siae.kind)
         return None
 
-    # FIXME:
-    # This property is currently *never* accepted in production
-    # This has to be fixed with ASP (or not)
-    # In the meantime the serializer will use a fixed value for this field
-    # (see `tmp_prescriber_type` property)
     @property
     def asp_prescriber_type(self):
         """
@@ -530,27 +525,21 @@ class EmployeeRecord(ASPExchangeInformation):
         sender_kind = self.job_application.sender_kind
 
         if sender_kind == SenderKind.JOB_SEEKER:
-            # the job seeker applied directly
+            # the jobseeker applied directly
             return PrescriberType.SPONTANEOUS_APPLICATION
-        elif sender_kind == SenderKind.SIAE_STAFF:
-            # an SIAE applied
-            # Notify ASP : UNKNOWN code does not work for SIAE
-            # FIXME return PrescriberType.UNKNOWN
+
+        if sender_kind == SenderKind.SIAE_STAFF:
+            # SIAE applications also fall into the SPONTANEOUS_APPLICATION type
             return PrescriberType.SPONTANEOUS_APPLICATION
 
         prescriber_organization = self.job_application.sender_prescriber_organization
+        if not prescriber_organization or not prescriber_organization.is_authorized:
+            return PrescriberType.PRESCRIBERS
 
-        # This workaround is under investigation (systematically fails if UNKNOW is chosen)
-        return (
-            PrescriberType.from_itou_prescriber_kind(prescriber_organization.kind).value
-            if prescriber_organization
-            else PrescriberType.AUTHORIZED_PRESCRIBERS
-        )
+        if prescriber_organization.kind in PrescriberType.names:
+            return PrescriberType[prescriber_organization.kind]
 
-    @property
-    def tmp_asp_prescriber_type(self):
-        # this is temporary (read above)
-        return PrescriberType.SPONTANEOUS_APPLICATION
+        return PrescriberType.OTHER_AUTHORIZED_PRESCRIBERS
 
     @property
     def asp_siae_type(self):
