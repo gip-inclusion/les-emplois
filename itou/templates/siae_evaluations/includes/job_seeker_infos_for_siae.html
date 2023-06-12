@@ -14,7 +14,7 @@
             {% if state == "ACCEPTED" %}
                 <p class="badge badge-pill badge-success float-right">validé</p>
             {% elif state == "UPLOADED" %}
-                <p class="badge badge-pill badge-success float-right">traité</p>
+                <p class="badge badge-pill badge-success float-right">justificatifs téléversés</p>
             {% elif state == "SUBMITTED" %}
                 <p class="badge badge-pill badge-communaute-light float-right">transmis</p>
             {% else %}
@@ -27,7 +27,7 @@
             {% elif state == "PROCESSING" %}
                 <p class="badge badge-pill badge-pilotage float-right">en cours</p>
             {% elif state == "UPLOADED" %}
-                <p class="badge badge-pill badge-success float-right">traité</p>
+                <p class="badge badge-pill badge-success float-right">justificatifs téléversés</p>
             {% elif state == "SUBMITTED" or state == "REFUSED" or state == "ACCEPTED" %}
                 <p class="badge badge-pill badge-communaute-light float-right">transmis</p>
             {% endif %}
