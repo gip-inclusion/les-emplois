@@ -324,7 +324,7 @@ class PrescriberType(models.TextChoices):
     PE = "03", "Pôle emploi"
     PLIE = "04", "PLIE - Plan local pour l'insertion et l'emploi"
     DEPT = "05", "Service social du conseil départemental"
-    AUTHORIZED_PRESCRIBERS = "06", "Autre prescripteurs habilité"
+    OTHER_AUTHORIZED_PRESCRIBERS = "06", "Autre prescripteurs habilité"
     SPONTANEOUS_APPLICATION = "07", "Candidature spontanée"
     PRESCRIBERS = "08", "Orienteur (prescripteur non habilité)"
     SPIP = "09", "SPIP - Service pénitentiaire d'insertion et de probation"
@@ -343,18 +343,6 @@ class PrescriberType(models.TextChoices):
     CHU = "22", "CHU - Centre d'hébergement d'urgence"
     OACAS = "23", "OACAS - Organisme d'accueil communautaire et d'activité solidaire"
     UNKNOWN = "99", "Non connu"
-
-    @classmethod
-    def from_itou_prescriber_kind(cls, prescriber_kind):
-        kinds = {
-            "ML": cls.ML,
-            "CAP_EMPLOI": cls.CAP_EMPLOI,
-            "PE": cls.PE,
-            "PLIE": cls.PLIE,
-            "DEPT": cls.DEPT,
-        }
-
-        return kinds.get(prescriber_kind, cls.UNKNOWN)
 
 
 class CommuneQuerySet(PeriodQuerySet):

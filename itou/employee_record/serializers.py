@@ -163,7 +163,7 @@ class _SituationSerializer(serializers.Serializer):
     # There is a clear lack of knowledge of ASP business rules on this point.
     # Without any satisfactory answer, it has been decided to obfuscate / mock these fields.
     salarieTypeEmployeur = serializers.CharField(source="asp_employer_type", required=False)
-    orienteur = serializers.CharField(source="tmp_asp_prescriber_type", required=False)
+    orienteur = serializers.CharField(source="asp_prescriber_type", required=False)
 
 
 class _BaseEmployeeRecordSerializer(serializers.Serializer):
