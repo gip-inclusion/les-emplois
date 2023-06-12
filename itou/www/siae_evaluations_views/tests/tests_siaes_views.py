@@ -274,6 +274,9 @@ class SiaeJobApplicationListViewTest(S3AccessingTestCase):
         self.assertContains(response, submit_active, html=True, count=2)
         self.assertContains(response, select_criteria)
         self.assertContains(response, upload_proof)
+        self.assertContains(
+            response, '<p class="badge badge-pill badge-success float-right">justificatifs téléversés</p>'
+        )
 
         # criterion submitted
         evaluated_administrative_criteria.submitted_at = fake_now
