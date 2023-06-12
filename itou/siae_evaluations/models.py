@@ -560,18 +560,6 @@ class EvaluatedSiae(models.Model):
         if self.reviewed_at and not self.evaluation_is_final:
             return evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE
 
-        if (
-            self.final_reviewed_at is None
-            and self.evaluation_campaign.ended_at
-            # reviewed_at is always set during the campaign.
-            and any(
-                eval_admin_crit.submitted_at > self.reviewed_at
-                for eval_job_app in self.evaluated_job_applications.all()
-                for eval_admin_crit in eval_job_app.evaluated_administrative_criteria.all()
-            )
-        ):
-            return evaluation_enums.EvaluatedSiaeState.ACCEPTED
-
         if state_from_applications == evaluation_enums.EvaluatedSiaeState.REFUSED:
             if self.evaluation_is_final:
                 return NOTIFICATION_PENDING_OR_REFUSED
