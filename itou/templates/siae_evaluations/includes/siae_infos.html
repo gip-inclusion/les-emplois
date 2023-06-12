@@ -4,6 +4,7 @@
     </div>
     <div class="col-lg-3 col-md-3 col-4">
         {% if evaluated_siae.evaluation_is_final %}
+            {# Only 3 states are possible when evaluation_is_final: ACCEPTED, NOTIFICATION_PENDING and REFUSED #}
             {% if evaluated_siae.state == "ACCEPTED" %}
                 <p class="badge badge-pill badge-success float-right">
                     <i class="ri-checkbox-circle-line mr-1"></i> Résultat positif
@@ -12,13 +13,9 @@
                 <p class="badge badge-pill badge-accent-03 text-primary float-right">
                     <i class="ri-arrow-right-circle-line mr-1"></i> Notification à faire
                 </p>
-            {% else %}
+            {% elif evaluated_siae.state == "REFUSED" %}
                 <p class="badge badge-pill badge-danger float-right">
-                    {% if evaluated_siae.state == "REFUSED" %}
-                        <i class="ri-close-circle-line mr-1"></i> Résultat négatif
-                    {% else %}
-                        Non contrôlée
-                    {% endif %}
+                    <i class="ri-close-circle-line mr-1"></i> Résultat négatif
                 </p>
             {% endif %}
         {% else %}
