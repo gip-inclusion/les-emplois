@@ -172,10 +172,10 @@ class TestInstitutionEmailFactory:
 
 
 class TestSIAEEmails:
-    def test_reviewed(self):
+    def test_accepted(self):
         siae = SiaeFactory(with_membership=True)
         evaluated_siae = EvaluatedSiaeFactory(siae=siae)
-        email = SIAEEmailFactory(evaluated_siae).reviewed()
+        email = SIAEEmailFactory(evaluated_siae).accepted()
 
         assert email.from_email == settings.DEFAULT_FROM_EMAIL
         assert len(email.to) == len(evaluated_siae.siae.active_admin_members)
@@ -191,7 +191,7 @@ class TestSIAEEmails:
         assert dateformat.format(evaluated_siae.evaluation_campaign.evaluated_period_end_at, "d E Y") in email.body
         assert "la conformité des justificatifs que vous avez" in email.body
 
-        email = SIAEEmailFactory(evaluated_siae).reviewed(adversarial=True)
+        email = SIAEEmailFactory(evaluated_siae).accepted(adversarial=True)
         assert "la conformité des nouveaux justificatifs que vous avez" in email.body
 
     def test_refused(self):

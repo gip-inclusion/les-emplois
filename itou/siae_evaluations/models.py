@@ -252,7 +252,7 @@ class EvaluationCampaign(models.Model):
             email_factory = SIAEEmailFactory(evaluated_siae)
             if evaluated_siae.reviewed_at is not None:
                 if state == evaluation_enums.EvaluatedSiaeState.ACCEPTED:
-                    emails.append(email_factory.reviewed(adversarial=False))
+                    emails.append(email_factory.accepted(adversarial=False))
                 elif state == evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE:
                     emails.append(email_factory.adversarial_stage())
                 else:
@@ -283,7 +283,7 @@ class EvaluationCampaign(models.Model):
                     auto_validation.append(evaluated_siae)
                     evaluated_siae.reviewed_at = now
                     if state == evaluation_enums.EvaluatedSiaeState.ACCEPTED:
-                        emails.append(email_factory.reviewed(adversarial=False))
+                        emails.append(email_factory.accepted(adversarial=False))
                         evaluated_siae.final_reviewed_at = now
                     else:
                         emails.append(email_factory.adversarial_stage())
@@ -339,7 +339,7 @@ class EvaluationCampaign(models.Model):
                     if evaluated_siae.reviewed_at != evaluated_siae.final_reviewed_at:
                         # This check ensures that the acceptance happened in the adversarial stage
                         # and not the amicable one
-                        emails.append(SIAEEmailFactory(evaluated_siae).reviewed(adversarial=True))
+                        emails.append(SIAEEmailFactory(evaluated_siae).accepted(adversarial=True))
 
             emails.extend(
                 SIAEEmailFactory(evaluated_siae).refused_no_proofs() for evaluated_siae in siae_without_proofs
