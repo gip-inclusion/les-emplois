@@ -666,7 +666,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluation_campaign = EvaluationCampaignFactory(
             institution=self.institution,
             evaluations_asked_at=timezone.now() - relativedelta(weeks=6),
-            ended_at=timezone.now(),
             name="Contrôle Test",
         )
         evaluated_siae = EvaluatedSiaeFactory(
@@ -681,6 +680,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             submitted_at=timezone.now() - relativedelta(days=1),
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2,
         )
+        evaluation_campaign.close()
 
         self.client.force_login(self.user)
         response = self.client.get(
@@ -787,7 +787,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluation_campaign = EvaluationCampaignFactory(
             institution=self.institution,
             evaluations_asked_at=timezone.now() - relativedelta(weeks=6),
-            ended_at=timezone.now(),
             name="Contrôle Test",
         )
         evaluated_siae = EvaluatedSiaeFactory(
@@ -801,8 +800,8 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             evaluated_job_application=evaluated_job_app,
             uploaded_at=timezone.now() - relativedelta(days=2),
             submitted_at=timezone.now() - relativedelta(days=1),
-            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2,
         )
+        evaluation_campaign.close()
 
         self.client.force_login(self.user)
         response = self.client.get(
@@ -813,7 +812,11 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         self.assertContains(
             response,
-            '<p class="badge badge-pill badge-danger float-right">Problème constaté</p>',
+            """
+            <p class="badge badge-pill badge-info-light text-primary float-right">
+             Justificatifs non contrôlés
+            </p>
+            """,
             html=True,
             count=1,
         )
