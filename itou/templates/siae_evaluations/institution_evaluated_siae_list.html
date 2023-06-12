@@ -54,7 +54,7 @@
                                                     {% endif %}
                                                 {% endif %}
                                             </a>
-                                            {% if evaluated_siae.state == "NOTIFICATION_PENDING" %}
+                                            {% if evaluated_siae.state == "REFUSED" and not evaluated_siae.notified_at and evaluated_siae.evaluation_is_final %}
                                                 <a class="btn btn-primary btn-sm ml-1" href="{% url "siae_evaluations_views:institution_evaluated_siae_notify_step1" evaluated_siae.pk %}">
                                                     <i class="ri-notification-4-line"></i> Notifier la sanction
                                                 </a>

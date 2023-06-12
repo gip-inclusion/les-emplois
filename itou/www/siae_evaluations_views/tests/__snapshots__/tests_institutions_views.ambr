@@ -5,9 +5,11 @@
           
               
               
-                  <p class="badge badge-pill badge-accent-03 text-primary float-right">
-                      <i class="ri-arrow-right-circle-line mr-1"></i> Notification à faire
-                  </p>
+                  
+                      <p class="badge badge-pill badge-accent-03 text-primary float-right">
+                          <i class="ri-arrow-right-circle-line mr-1"></i> Notification à faire
+                      </p>
+                  
               
           
       </div>
@@ -36,9 +38,11 @@
           
               
               
-                  <p class="badge badge-pill badge-danger float-right">
-                      <i class="ri-close-circle-line mr-1"></i> Résultat négatif
-                  </p>
+                  
+                      <p class="badge badge-pill badge-danger float-right">
+                          <i class="ri-close-circle-line mr-1"></i> Résultat négatif
+                      </p>
+                  
               
           
       </div>
@@ -64,9 +68,11 @@
           
               
               
-                  <p class="badge badge-pill badge-accent-03 text-primary float-right">
-                      <i class="ri-arrow-right-circle-line mr-1"></i> Notification à faire
-                  </p>
+                  
+                      <p class="badge badge-pill badge-accent-03 text-primary float-right">
+                          <i class="ri-arrow-right-circle-line mr-1"></i> Notification à faire
+                      </p>
+                  
               
           
       </div>
@@ -78,9 +84,11 @@
           
               
               
-                  <p class="badge badge-pill badge-accent-03 text-primary float-right">
-                      <i class="ri-arrow-right-circle-line mr-1"></i> Notification à faire
-                  </p>
+                  
+                      <p class="badge badge-pill badge-accent-03 text-primary float-right">
+                          <i class="ri-arrow-right-circle-line mr-1"></i> Notification à faire
+                      </p>
+                  
               
           
       </div>
@@ -232,9 +240,11 @@
           
               
               
-                  <p class="badge badge-pill badge-accent-03 text-primary float-right">
-                      <i class="ri-arrow-right-circle-line mr-1"></i> Notification à faire
-                  </p>
+                  
+                      <p class="badge badge-pill badge-accent-03 text-primary float-right">
+                          <i class="ri-arrow-right-circle-line mr-1"></i> Notification à faire
+                      </p>
+                  
               
           
       </div>
