@@ -303,27 +303,7 @@ class InclusionConnectModelTest(InclusionConnectBaseTestCase):
             user.delete()
 
 
-class InclusionConnectViewTest(InclusionConnectBaseTestCase):
-    @respx.mock
-    def test_callback_invalid_state(self):
-        access_token = generate_access_token(OIDC_USERINFO)
-        token_json = {"access_token": access_token, "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
-        respx.post(constants.INCLUSION_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
-
-        url = reverse("inclusion_connect:callback")
-        response = self.client.get(url, data={"code": "123", "state": "000"})
-        assert response.status_code == 302
-
-    def test_callback_no_state(self):
-        url = reverse("inclusion_connect:callback")
-        response = self.client.get(url, data={"code": "123"})
-        assert response.status_code == 302
-
-    def test_callback_no_code(self):
-        url = reverse("inclusion_connect:callback")
-        response = self.client.get(url)
-        assert response.status_code == 302
-
+class InclusionConnectAuthorizeViewTest(InclusionConnectBaseTestCase):
     def test_authorize_endpoint(self):
         url = reverse("inclusion_connect:authorize")
         response = self.client.get(url, follow=False)
@@ -355,6 +335,8 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
         )
         assert ic_state.data["user_email"] == email
 
+
+class InclusionConnectResumeRegistrationViewTest(InclusionConnectBaseTestCase):
     def test_resume_endpoint_no_session(self):
         url = f"{reverse('inclusion_connect:resume_registration')}"
         response = self.client.get(url)
@@ -419,9 +401,28 @@ class InclusionConnectViewTest(InclusionConnectBaseTestCase):
         self.assertTrue(response.url.startswith(constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE))
         self.assertEqual(InclusionConnectState.objects.count(), 1)
 
-    ####################################
-    ######### Callback tests ###########
-    ####################################
+
+class InclusionConnectCallbackViewTest(InclusionConnectBaseTestCase):
+    @respx.mock
+    def test_callback_invalid_state(self):
+        access_token = generate_access_token(OIDC_USERINFO)
+        token_json = {"access_token": access_token, "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
+        respx.post(constants.INCLUSION_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
+
+        url = reverse("inclusion_connect:callback")
+        response = self.client.get(url, data={"code": "123", "state": "000"})
+        assert response.status_code == 302
+
+    def test_callback_no_state(self):
+        url = reverse("inclusion_connect:callback")
+        response = self.client.get(url, data={"code": "123"})
+        assert response.status_code == 302
+
+    def test_callback_no_code(self):
+        url = reverse("inclusion_connect:callback")
+        response = self.client.get(url)
+        assert response.status_code == 302
+
     @respx.mock
     def test_callback_backward_compatibility(self):
         # Fill up session with authorize view
