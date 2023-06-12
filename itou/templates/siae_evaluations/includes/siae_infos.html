@@ -4,19 +4,21 @@
     </div>
     <div id="state_of_evaluated_siae-{{ evaluated_siae.pk }}" class="col-lg-3 col-md-3 col-4">
         {% if evaluated_siae.evaluation_is_final %}
-            {# Only 3 states are possible when evaluation_is_final: ACCEPTED, NOTIFICATION_PENDING and REFUSED #}
+            {# Only 2 states are possible when evaluation_is_final: ACCEPTED and REFUSED #}
             {% if evaluated_siae.state == "ACCEPTED" %}
                 <p class="badge badge-pill badge-success float-right">
                     <i class="ri-checkbox-circle-line mr-1"></i> Résultat positif
                 </p>
-            {% elif evaluated_siae.state == "NOTIFICATION_PENDING" %}
-                <p class="badge badge-pill badge-accent-03 text-primary float-right">
-                    <i class="ri-arrow-right-circle-line mr-1"></i> Notification à faire
-                </p>
             {% elif evaluated_siae.state == "REFUSED" %}
-                <p class="badge badge-pill badge-danger float-right">
-                    <i class="ri-close-circle-line mr-1"></i> Résultat négatif
-                </p>
+                {% if evaluated_siae.notified_at %}
+                    <p class="badge badge-pill badge-danger float-right">
+                        <i class="ri-close-circle-line mr-1"></i> Résultat négatif
+                    </p>
+                {% else %}
+                    <p class="badge badge-pill badge-accent-03 text-primary float-right">
+                        <i class="ri-arrow-right-circle-line mr-1"></i> Notification à faire
+                    </p>
+                {% endif %}
             {% endif %}
         {% else %}
             {% if evaluated_siae.state == "SUBMITTED" %}

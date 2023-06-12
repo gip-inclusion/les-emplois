@@ -890,7 +890,7 @@ class EvaluatedSiaeModelTest(TestCase):
         # with review_state REFUSED_2, reviewed, submitted_at after reviewed_at, with final_reviewed_at
         evaluated_siae.final_reviewed_at = fake_now
         evaluated_siae.save(update_fields=["final_reviewed_at"])
-        assert evaluation_enums.EvaluatedSiaeState.NOTIFICATION_PENDING == evaluated_siae.state
+        assert evaluation_enums.EvaluatedSiaeState.REFUSED == evaluated_siae.state
         del evaluated_siae.state_from_applications
 
         # with review_state REFUSED_2, reviewed, submitted_at after
@@ -1059,7 +1059,7 @@ class EvaluatedSiaeModelTest(TestCase):
 
     def test_state_on_closed_campaign_no_criteria(self):
         evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__ended_at=timezone.now())
-        assert evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.NOTIFICATION_PENDING
+        assert evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.REFUSED
 
     def test_state_on_closed_campaign_no_criteria_notified(self):
         evaluated_siae = EvaluatedSiaeFactory(
@@ -1078,7 +1078,7 @@ class EvaluatedSiaeModelTest(TestCase):
             evaluated_job_application=evaluated_job_app,
             uploaded_at=timezone.now() - relativedelta(days=1),
         )
-        assert evaluated_job_app.evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.NOTIFICATION_PENDING
+        assert evaluated_job_app.evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.REFUSED
 
     def test_state_on_closed_campaign_criteria_not_submitted_notified(self):
         evaluated_job_app = EvaluatedJobApplicationFactory(
@@ -1146,7 +1146,7 @@ class EvaluatedSiaeModelTest(TestCase):
             submitted_at=timezone.now() - relativedelta(days=1),
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
         )
-        assert evaluated_job_app.evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.NOTIFICATION_PENDING
+        assert evaluated_job_app.evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.REFUSED
 
     def test_state_on_closed_campaign_criteria_refused_review_validated_notified(self):
         evaluated_job_app = EvaluatedJobApplicationFactory(
@@ -1187,14 +1187,12 @@ class EvaluatedSiaeModelTest(TestCase):
         (evaluation_enums.EvaluatedSiaeState.ACCEPTED, True, False),
         (evaluation_enums.EvaluatedSiaeState.REFUSED, True, False),
         (evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE, True, False),
-        (evaluation_enums.EvaluatedSiaeState.NOTIFICATION_PENDING, True, False),
         (evaluation_enums.EvaluatedSiaeState.PENDING, False, True),
         (evaluation_enums.EvaluatedSiaeState.SUBMITTABLE, False, True),
         (evaluation_enums.EvaluatedSiaeState.SUBMITTED, False, False),
         (evaluation_enums.EvaluatedSiaeState.ACCEPTED, False, False),
         (evaluation_enums.EvaluatedSiaeState.REFUSED, False, False),
         (evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE, False, True),
-        (evaluation_enums.EvaluatedSiaeState.NOTIFICATION_PENDING, False, False),
     ],
 )
 def test_should_display_pending_action_warning(state, frozen, should_display_pending_action_warning):

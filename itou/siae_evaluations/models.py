@@ -273,7 +273,6 @@ class EvaluationCampaign(models.Model):
                     emails.append(email_factory.force_accepted())
                 else:
                     # evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE needs a reviewed_at
-                    # evaluation_enums.EvaluatedSiaeState.NOTIFICATION_PENDING needs evaluation_is_final
                     assert state in (
                         evaluation_enums.EvaluatedSiaeState.ACCEPTED,
                         evaluation_enums.EvaluatedSiaeState.REFUSED,
@@ -342,7 +341,7 @@ class EvaluationCampaign(models.Model):
                             emails.append(SIAEEmailFactory(evaluated_siae).accepted(adversarial=True))
                         else:
                             emails.append(SIAEEmailFactory(evaluated_siae).refused())
-                elif evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.NOTIFICATION_PENDING:
+                elif evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.REFUSED:
                     emails.append(SIAEEmailFactory(evaluated_siae).refused())
                 elif evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.ACCEPTED:
                     if evaluated_siae.reviewed_at != evaluated_siae.final_reviewed_at:
@@ -351,9 +350,7 @@ class EvaluationCampaign(models.Model):
                         emails.append(SIAEEmailFactory(evaluated_siae).accepted(adversarial=True))
                 # Computing the state is costly, avoid it when possible.
                 if not has_siae_to_notify:
-                    has_siae_to_notify |= (
-                        evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.NOTIFICATION_PENDING
-                    )
+                    has_siae_to_notify |= evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.REFUSED
 
             emails.extend(
                 SIAEEmailFactory(evaluated_siae).refused_no_proofs() for evaluated_siae in siae_without_proofs
@@ -466,8 +463,7 @@ class EvaluatedSiae(models.Model):
         )
         # if SUBMITTED, the SIAE cannot do anything until the DDETS reviews the documents
         # if ACCEPTED, it is either because the DDETS is currently reviewing or because it is fully acccepted
-        # if NOTIFICATION_PENDING, the evaluation is final
-        # if REFUSED, it is either because the DDETS is currently reviewing
+        # if REFUSED, it is either because the DDETS is currently reviewing or because it is fully refused
 
     def review(self):
         ACCEPTED = evaluation_enums.EvaluatedSiaeState.ACCEPTED
@@ -532,18 +528,12 @@ class EvaluatedSiae(models.Model):
     def state(self):
         state_from_applications = self.state_from_applications
 
-        NOTIFICATION_PENDING_OR_REFUSED = (
-            evaluation_enums.EvaluatedSiaeState.REFUSED
-            if self.notified_at
-            else evaluation_enums.EvaluatedSiaeState.NOTIFICATION_PENDING
-        )
-
         if state_from_applications in {
             evaluation_enums.EvaluatedSiaeState.PENDING,
             evaluation_enums.EvaluatedSiaeState.SUBMITTABLE,
         }:
             # SIAE did not submit proof
-            return NOTIFICATION_PENDING_OR_REFUSED if self.evaluation_is_final else state_from_applications
+            return evaluation_enums.EvaluatedSiaeState.REFUSED if self.evaluation_is_final else state_from_applications
 
         if state_from_applications == evaluation_enums.EvaluatedSiaeState.SUBMITTED:
             # if DDETS IAE did not review proof, accept them
@@ -560,11 +550,7 @@ class EvaluatedSiae(models.Model):
         if self.reviewed_at and not self.evaluation_is_final:
             return evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE
 
-        if state_from_applications == evaluation_enums.EvaluatedSiaeState.REFUSED:
-            if self.evaluation_is_final:
-                return NOTIFICATION_PENDING_OR_REFUSED
-            return evaluation_enums.EvaluatedSiaeState.REFUSED
-        return evaluation_enums.EvaluatedSiaeState.ACCEPTED
+        return state_from_applications
 
 
 class EvaluatedJobApplicationQuerySet(models.QuerySet):

@@ -50,7 +50,6 @@ class EvaluatedSiaeState(models.TextChoices):
     ACCEPTED = "ACCEPTED"
     REFUSED = "REFUSED"
     ADVERSARIAL_STAGE = "ADVERSARIAL_STAGE"
-    NOTIFICATION_PENDING = "NOTIFICATION_PENDING"
 
 
 class EvaluatedSiaeNotificationReason(models.TextChoices):
