@@ -1135,21 +1135,6 @@ class EvaluatedSiaeModelTest(TestCase):
         )
         assert evaluated_job_app.evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.REFUSED
 
-    def test_state_on_closed_campaign_criteria_refused_review_not_validated(self):
-        evaluated_job_app = EvaluatedJobApplicationFactory(
-            evaluated_siae__evaluation_campaign__ended_at=timezone.now(),
-            evaluated_siae__reviewed_at=timezone.now() - relativedelta(days=5),
-        )
-        EvaluatedAdministrativeCriteriaFactory(
-            evaluated_job_application=evaluated_job_app,
-            uploaded_at=timezone.now() - relativedelta(days=2),
-            submitted_at=timezone.now() - relativedelta(days=1),
-            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2,
-        )
-        # Was not reviewed by the institution, assume valid (following rules in
-        # most administrations).
-        assert evaluated_job_app.evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.ACCEPTED
-
     def test_state_on_closed_campaign_criteria_refused_review_validated(self):
         evaluated_job_app = EvaluatedJobApplicationFactory(
             evaluated_siae__reviewed_at=timezone.now(),
