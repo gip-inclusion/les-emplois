@@ -1,6 +1,7 @@
 import datetime
 import itertools
 import json
+import random
 import uuid
 from unittest import mock
 
@@ -16,7 +17,7 @@ from django.utils import timezone
 import itou.asp.factories as asp
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.approvals.models import Approval
-from itou.asp.models import AllocationDuration, EmployerType
+from itou.asp.models import AllocationDuration, EducationLevel, EmployerType
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
 from itou.institutions.enums import InstitutionKind
@@ -36,7 +37,7 @@ from itou.users.enums import IdentityProvider, LackOfNIRReason, Title, UserKind
 from itou.users.factories import (
     ItouStaffFactory,
     JobSeekerFactory,
-    JobSeekerProfileFactory,
+    JobSeekerWithAddressFactory,
     LaborInspectorFactory,
     PrescriberFactory,
     SiaeStaffFactory,
@@ -49,7 +50,6 @@ from itou.utils.test import TestCase
 
 class ManagerTest(TestCase):
     def test_get_duplicated_pole_emploi_ids(self):
-
         # Unique user.
         JobSeekerFactory(pole_emploi_id="5555555A")
 
@@ -68,7 +68,6 @@ class ManagerTest(TestCase):
         self.assertCountEqual(duplicated_pole_emploi_ids, expected_result)
 
     def test_get_duplicates_by_pole_emploi_id(self):
-
         # 2 users using the same `pole_emploi_id` and different birthdates.
         JobSeekerFactory(pole_emploi_id="6666666B", birthdate=datetime.date(1988, 2, 2))
         JobSeekerFactory(pole_emploi_id="6666666B", birthdate=datetime.date(2001, 12, 12))
@@ -128,7 +127,6 @@ class ModelTest(TestCase):
         assert unique_username == uuid.UUID(unique_username, version=4).hex
 
     def test_create_job_seeker_by_proxy(self):
-
         proxy_user = PrescriberFactory()
 
         user_data = {
@@ -160,7 +158,6 @@ class ModelTest(TestCase):
             User.create_job_seeker_by_proxy(proxy_user, **user_data)
 
     def test_clean_pole_emploi_fields(self):
-
         # Both fields cannot be empty.
         job_seeker = JobSeekerFactory(pole_emploi_id="", lack_of_pole_emploi_id_reason="")
         cleaned_data = {
@@ -951,23 +948,16 @@ def mock_get_geocoding_data(address, post_code=None, limit=1):
 
 
 class JobSeekerProfileModelTest(TestCase):
-    """
-    Model test for JobSeekerProfile
-
-    Job seeker profile is extra-data from the ASP and EmployeeRecord domains
-    """
-
     def setUp(self):
-        self.profile = JobSeekerProfileFactory()
-        user = self.profile.user
-        user.title = None
-
-        data = BAN_GEOCODING_API_RESULTS_MOCK[0]
-
-        user.address_line_1 = data.get("address_line_1")
+        self.user = JobSeekerWithAddressFactory(
+            address_line_1=BAN_GEOCODING_API_RESULTS_MOCK[0]["address_line_1"],
+            jobseeker_profile__education_level=random.choice(EducationLevel.values),
+            jobseeker_profile__pole_emploi_since=AllocationDuration.MORE_THAN_24_MONTHS,
+        )
+        self.profile = self.user.jobseeker_profile
 
     def test_job_seeker_details(self):
-        # No title on User
+        self.user.title = None
         with pytest.raises(ValidationError):
             self.profile.clean_model()
 
@@ -1115,7 +1105,6 @@ def user_with_approval_in_waiting_period():
 class LatestApprovalTestCase(TestCase):
     @freezegun.freeze_time("2022-08-10")
     def test_merge_approvals_timeline_case1(self):
-
         user = JobSeekerFactory()
 
         ApprovalFactory(
@@ -1149,7 +1138,6 @@ class LatestApprovalTestCase(TestCase):
 
     @freezegun.freeze_time("2022-08-10")
     def test_merge_approvals_timeline_case2(self):
-
         user = JobSeekerFactory()
 
         # PoleEmploiApproval 1.

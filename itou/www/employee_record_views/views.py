@@ -13,7 +13,6 @@ from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
 from itou.users.enums import LackOfNIRReason
-from itou.users.models import JobSeekerProfile
 from itou.utils.pagination import pager
 from itou.utils.perms.employee_record import can_create_employee_record, siae_is_allowed
 from itou.utils.perms.siae import get_current_siae_or_404
@@ -204,7 +203,7 @@ def create_step_2(request, job_application_id, template_name="employee_record/cr
     """
     job_application = can_create_employee_record(request, job_application_id)
     job_seeker = job_application.job_seeker
-    profile, _ = JobSeekerProfile.objects.get_or_create(user=job_seeker)
+    profile = job_seeker.jobseeker_profile
     address_filled = job_seeker.post_code and job_seeker.address_line_1
     form = NewEmployeeRecordStep2Form(data=request.POST or None, instance=profile)
 

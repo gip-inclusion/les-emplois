@@ -142,6 +142,10 @@ class JobSeekerFactory(UserFactory):
 
         if create:
             if extracted is False:
+                # Note: we should never use this lightly. This is only kept for backward compatibility
+                # with JobApplicationWithCompleteJobSeekerProfileFactory that needs the creation of a specific
+                # profile, that can not easily be created from a test (because notably of Faker) and would
+                # make a lot of code less DRY.
                 obj.jobseeker_profile.delete()
                 obj.jobseeker_profile = None
             else:
@@ -219,17 +223,13 @@ class JobSeekerWithMockedAddressFactory(JobSeekerFactory):
         self.birth_country = CountryFranceFactory.build()
 
 
-class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
+class JobSeekerProfileWithHexaAddressFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.JobSeekerProfile
 
-    user = factory.SubFactory(JobSeekerWithAddressFactory, jobseeker_profile=False)
     education_level = random.choice(EducationLevel.values)
     # JobSeeker are created with a Pôle emploi ID
     pole_emploi_since = AllocationDuration.MORE_THAN_24_MONTHS
-
-
-class JobSeekerProfileWithHexaAddressFactory(JobSeekerProfileFactory):
     # Adding a minimum profile with all mandatory fields
     # will avoid many mocks and convolutions during testing.
     hexa_lane_type = random.choice(LaneType.values)

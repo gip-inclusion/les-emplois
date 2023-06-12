@@ -52,7 +52,6 @@ class AbstractCreateEmployeeRecordTest(TestCase):
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
             to_siae=self.siae,
             job_seeker_with_address=True,
-            job_seeker__jobseeker_profile=False,
         )
 
         self.job_seeker = self.job_application.job_seeker
@@ -79,6 +78,7 @@ class AbstractCreateEmployeeRecordTest(TestCase):
         url = reverse("employee_record_views:create_step_2", args=(self.job_application.id,))
         self.client.get(url)
 
+        self.job_seeker.jobseeker_profile.refresh_from_db()
         assert self.job_seeker.jobseeker_profile.hexa_address_filled
 
         url = reverse("employee_record_views:create_step_3", args=(self.job_application.id,))
@@ -289,11 +289,9 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
         # Job seeker has an address filled but can't be geolocated
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
             to_siae=self.siae,
-            job_seeker=JobSeekerWithAddressFactory(jobseeker_profile=False),
+            job_seeker=JobSeekerWithAddressFactory(),
         )
         self.job_seeker = self.job_application.job_seeker
-
-        assert not self.job_seeker.has_jobseeker_profile
 
         # Changed job application: new URL
         self.url = reverse("employee_record_views:create_step_2", args=(self.job_application.pk,))
@@ -421,7 +419,7 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
         super().setUp()
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
             to_siae=self.siae,
-            job_seeker=JobSeekerWithMockedAddressFactory(jobseeker_profile=False),
+            job_seeker=JobSeekerWithMockedAddressFactory(),
         )
         self.job_seeker = self.job_application.job_seeker
         self.url = reverse("employee_record_views:create_step_3", args=(self.job_application.id,))
@@ -590,7 +588,7 @@ class CreateEmployeeRecordStep4Test(AbstractCreateEmployeeRecordTest):
         super().setUp()
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
             to_siae=self.siae,
-            job_seeker=JobSeekerWithMockedAddressFactory(jobseeker_profile=False),
+            job_seeker=JobSeekerWithMockedAddressFactory(),
         )
         self.job_seeker = self.job_application.job_seeker
         self.url = reverse("employee_record_views:create_step_4", args=(self.job_application.id,))
@@ -620,7 +618,7 @@ class CreateEmployeeRecordStep5Test(AbstractCreateEmployeeRecordTest):
         super().setUp()
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
             to_siae=self.siae,
-            job_seeker=JobSeekerWithMockedAddressFactory(jobseeker_profile=False),
+            job_seeker=JobSeekerWithMockedAddressFactory(),
         )
         self.job_seeker = self.job_application.job_seeker
         self.url = reverse("employee_record_views:create_step_5", args=(self.job_application.id,))
@@ -668,7 +666,7 @@ class UpdateRejectedEmployeeRecordTest(AbstractCreateEmployeeRecordTest):
         super().setUp()
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
             to_siae=self.siae,
-            job_seeker=JobSeekerWithMockedAddressFactory(jobseeker_profile=False),
+            job_seeker=JobSeekerWithMockedAddressFactory(),
         )
         self.job_seeker = self.job_application.job_seeker
         self.url = reverse("employee_record_views:create_step_5", args=(self.job_application.id,))

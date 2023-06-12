@@ -196,5 +196,4 @@ class JobApplicationWithCompleteJobSeekerProfileFactory(JobApplicationWithApprov
             # Simple build, do nothing.
             return
         # Create a profile for current user
-        # JobSeekerProfileWithHexaAddressFactory.build(user=self.job_seeker).save()
         self.job_seeker.jobseeker_profile = JobSeekerProfileWithHexaAddressFactory(user=self.job_seeker)
