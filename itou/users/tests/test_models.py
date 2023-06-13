@@ -724,7 +724,6 @@ class ModelTest(TestCase):
         user = org.members.get()
         assert user.can_view_stats_cd(current_org=org)
         assert user.can_view_stats_dashboard_widget(current_org=org)
-        assert user.get_stats_cd_department(current_org=org) == org.department
 
         # Non admin prescriber can access as well.
         org = PrescriberOrganizationWithMembershipFactory(
@@ -837,7 +836,6 @@ class ModelTest(TestCase):
         user = institution.members.get()
         assert user.can_view_stats_ddets_iae(current_org=institution)
         assert user.can_view_stats_dashboard_widget(current_org=institution)
-        assert user.get_stats_ddets_iae_department(current_org=institution) == institution.department
 
         # Non admin member of DDETS IAE can access as well.
         institution = InstitutionWithMembershipFactory(
@@ -846,7 +844,6 @@ class ModelTest(TestCase):
         user = institution.members.get()
         assert user.can_view_stats_ddets_iae(current_org=institution)
         assert user.can_view_stats_dashboard_widget(current_org=institution)
-        assert user.get_stats_ddets_iae_department(current_org=institution) == institution.department
 
         # Member of institution of wrong kind cannot access.
         institution = InstitutionWithMembershipFactory(kind=InstitutionKind.OTHER, department="93")
@@ -860,7 +857,6 @@ class ModelTest(TestCase):
         user = institution.members.get()
         assert user.can_view_stats_dreets_iae(current_org=institution)
         assert user.can_view_stats_dashboard_widget(current_org=institution)
-        assert user.get_stats_dreets_iae_region(current_org=institution) == institution.region
 
         # Non admin member of DREETS IAE can access as well.
         institution = InstitutionWithMembershipFactory(
@@ -869,7 +865,6 @@ class ModelTest(TestCase):
         user = institution.members.get()
         assert user.can_view_stats_dreets_iae(current_org=institution)
         assert user.can_view_stats_dashboard_widget(current_org=institution)
-        assert user.get_stats_dreets_iae_region(current_org=institution) == institution.region
 
         # Member of institution of wrong kind cannot access.
         institution = InstitutionWithMembershipFactory(kind=InstitutionKind.OTHER, department="93")

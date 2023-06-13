@@ -62,16 +62,14 @@ def get_stats_ddets_iae_department(request):
     current_org = get_current_institution_or_404(request)
     if not request.user.can_view_stats_ddets_iae(current_org=current_org):
         raise PermissionDenied
-    department = request.user.get_stats_ddets_iae_department(current_org=current_org)
-    return department
+    return current_org.department
 
 
 def get_stats_dreets_iae_region(request):
     current_org = get_current_institution_or_404(request)
     if not request.user.can_view_stats_dreets_iae(current_org=current_org):
         raise PermissionDenied
-    region = request.user.get_stats_dreets_iae_region(current_org=current_org)
-    return region
+    return current_org.region
 
 
 def ensure_stats_dgefp_permission(request):
@@ -247,7 +245,7 @@ def stats_cd(request):
     current_org = get_current_org_or_404(request)
     if not request.user.can_view_stats_cd(current_org=current_org):
         raise PermissionDenied
-    department = request.user.get_stats_cd_department(current_org=current_org)
+    department = current_org.department
     params = get_params_for_departement(department)
     context = {
         "page_title": f"Données de mon département : {DEPARTMENTS[department]}",

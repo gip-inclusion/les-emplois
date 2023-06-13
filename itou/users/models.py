@@ -771,15 +771,6 @@ class User(AbstractUser, AddressMixin):
             and not current_org.is_brsa
         )
 
-    def get_stats_cd_department(self, current_org):
-        """
-        Get department that the user has the permission to view for the CD stats page.
-        CD as in "Conseil Départemental".
-        """
-        if not self.can_view_stats_cd(current_org=current_org):
-            raise PermissionDenied
-        return current_org.department
-
     def can_view_stats_pe(self, current_org):
         return (
             self.is_prescriber
@@ -811,14 +802,6 @@ class User(AbstractUser, AddressMixin):
             and current_org.kind == InstitutionKind.DDETS_IAE
         )
 
-    def get_stats_ddets_iae_department(self, current_org):
-        """
-        Get department that the user has the permission to view for the DDETS IAE stats page.
-        """
-        if not self.can_view_stats_ddets_iae(current_org=current_org):
-            raise PermissionDenied
-        return current_org.department
-
     def can_view_stats_dreets_iae(self, current_org):
         """
         Users of a DREETS IAE can view the confidential DREETS IAE stats of their region only.
@@ -828,14 +811,6 @@ class User(AbstractUser, AddressMixin):
             and isinstance(current_org, Institution)
             and current_org.kind == InstitutionKind.DREETS_IAE
         )
-
-    def get_stats_dreets_iae_region(self, current_org):
-        """
-        Get region that the user has the permission to view for the DREETS IAE stats page.
-        """
-        if not self.can_view_stats_dreets_iae(current_org=current_org):
-            raise PermissionDenied
-        return current_org.region
 
     def can_view_stats_dgefp(self, current_org):
         """
