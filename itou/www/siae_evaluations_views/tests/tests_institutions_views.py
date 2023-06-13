@@ -1225,6 +1225,134 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             count=1,
         )
 
+    def test_content_with_submission_freezed_at(self):
+        self.client.force_login(self.user)
+        evaluation_campaign = EvaluationCampaignFactory(
+            institution=self.institution, evaluations_asked_at=timezone.now()
+        )
+        evaluated_siae = create_evaluated_siae_consistent_datas(evaluation_campaign)
+        evaluated_job_application = evaluated_siae.evaluated_job_applications.first()
+        evaluation_campaign.freeze(timezone.now())
+
+        evaluated_job_application_url = reverse(
+            "siae_evaluations_views:institution_evaluated_job_application",
+            kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
+        )
+        url = reverse(
+            "siae_evaluations_views:institution_evaluated_siae_detail",
+            kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+        )
+        validation_url = reverse(
+            "siae_evaluations_views:institution_evaluated_siae_validation",
+            kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+        )
+        validation_button_disabled = f"""
+            <button class="btn btn-outline-primary disabled btn-sm float-right">
+                {self.submit_text}
+            </button>"""
+        back_url = reverse(
+            "siae_evaluations_views:institution_evaluated_siae_list",
+            kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
+        )
+
+        # EvaluatedAdministrativeCriteria not yet submitted
+        not_transmitted_status = "Justificatifs non transmis"
+        response = self.client.get(url)
+        self.assertContains(response, evaluated_siae)
+        formatted_number = format_approval_number(evaluated_job_application.job_application.approval.number)
+        self.assertContains(response, formatted_number, html=True, count=1)
+        self.assertContains(response, evaluated_job_application.job_application.job_seeker.last_name)
+        assert response.context["back_url"] == reverse(
+            "siae_evaluations_views:institution_evaluated_siae_list",
+            kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
+        )
+        self.assertNotContains(response, evaluated_job_application_url)
+        self.assertContains(response, back_url)
+        self.assertContains(response, validation_url)
+        self.assertContains(response, self.control_text)
+        self.assertContains(
+            response,
+            f"""
+            <p class="badge badge-pill badge-danger float-right">
+             {not_transmitted_status}
+            </p>
+            """,
+            html=True,
+            count=1,
+        )
+
+        # EvaluatedAdministrativeCriteria uploaded
+        evaluated_administrative_criteria = evaluated_job_application.evaluated_administrative_criteria.first()
+        evaluated_administrative_criteria.proof_url = "https://server.com/rocky-balboa.pdf"
+        evaluated_administrative_criteria.save(update_fields=["proof_url"])
+        response = self.client.get(url)
+        self.assertContains(response, back_url)
+        self.assertContains(
+            response,
+            f"""
+            <p class="badge badge-pill badge-danger float-right">
+             {not_transmitted_status}
+            </p>
+            """,
+            html=True,
+            count=1,
+        )
+        self.assertContains(response, validation_button_disabled, html=True, count=1)
+        self.assertContains(response, self.control_text)
+
+        # EvaluatedAdministrativeCriteria submitted
+        submitted_status = "À traiter"
+        adversarial_submitted_status = "Nouveaux justificatifs à traiter"
+        evaluated_administrative_criteria.submitted_at = timezone.now()
+        evaluated_administrative_criteria.save(update_fields=["submitted_at"])
+        response = self.client.get(url)
+        self.assertContains(response, evaluated_job_application_url)
+        self.assertContains(response, back_url)
+        self.assertNotContains(response, not_transmitted_status)
+        self.assertNotContains(response, adversarial_submitted_status)
+        self.assertContains(response, validation_button_disabled, html=True, count=1)
+        self.assertContains(response, self.control_text)
+        self.assertContains(
+            response,
+            f"""
+            <p class="badge badge-pill badge-pilotage float-right">
+             {submitted_status}
+            </p>
+            """,
+            html=True,
+            count=1,
+        )
+
+        # Adversarial phase (but still frozen)
+        evaluated_siae.reviewed_at = timezone.now()
+        evaluated_siae.save(update_fields=["reviewed_at"])
+
+        # EvaluatedAdministrativeCriteriaState.UPLOADED (again)
+        evaluated_administrative_criteria.proof_url = "https://server.com/rocky-balboa.pdf"
+        evaluated_administrative_criteria.uploaded_at = timezone.now()
+        evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
+        evaluated_administrative_criteria.submitted_at = None
+        evaluated_administrative_criteria.save(
+            update_fields=["proof_url", "review_state", "submitted_at", "uploaded_at"]
+        )
+        response = self.client.get(url)
+        self.assertContains(response, validation_button_disabled, html=True, count=1)
+        self.assertContains(response, back_url)
+        self.assertContains(response, evaluated_job_application_url)
+        self.assertContains(response, not_transmitted_status)
+        self.assertContains(response, self.control_text)
+
+        # EvaluatedAdministrativeCriteriaState.SUBMITTED (again)
+        evaluated_administrative_criteria.submitted_at = timezone.now()
+        evaluated_administrative_criteria.save(update_fields=["submitted_at"])
+        response = self.client.get(url)
+        self.assertContains(response, evaluated_job_application_url)
+        self.assertContains(response, back_url)
+        self.assertNotContains(response, not_transmitted_status)
+        self.assertContains(response, adversarial_submitted_status)
+        self.assertContains(response, validation_button_disabled, html=True, count=1)
+        self.assertContains(response, self.control_text)
+
     def test_job_app_status_evaluation_is_final_pending(self):
         evaluation_campaign = EvaluationCampaignFactory(
             institution=self.institution,
@@ -1469,7 +1597,62 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         # submitted by Siae
         EvaluatedAdministrativeCriteria.objects.filter(
             evaluated_job_application__evaluated_siae=evaluated_siae
-        ).update(submitted_at=timezone.now(), proof_url="https://server.com/rocky-balboa.pdf")
+        ).update(submitted_at=timezone.now())
+
+        response = self.client.get(url)
+        self.assertContains(response, a_traiter)
+
+        # refused
+        EvaluatedAdministrativeCriteria.objects.filter(
+            evaluated_job_application__evaluated_siae=evaluated_siae
+        ).update(review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED)
+
+        response = self.client.get(url)
+        self.assertContains(response, refuse)
+
+        # accepted
+        EvaluatedAdministrativeCriteria.objects.filter(
+            evaluated_job_application__evaluated_siae=evaluated_siae
+        ).update(review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED)
+
+        response = self.client.get(url)
+        self.assertContains(response, valide)
+
+    def test_job_seeker_infos_for_institution_state_submission_freezed_at(self):
+        not_transmitted = "Justificatifs non transmis"
+        a_traiter = "À traiter"
+        refuse = "Problème constaté"
+        valide = "Validé"
+
+        evaluation_campaign = EvaluationCampaignFactory(
+            institution=self.institution, evaluations_asked_at=timezone.now()
+        )
+        evaluated_siae = create_evaluated_siae_consistent_datas(evaluation_campaign)
+        evaluation_campaign.freeze(timezone.now())
+
+        url = reverse(
+            "siae_evaluations_views:institution_evaluated_siae_detail",
+            kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+        )
+
+        self.client.force_login(self.user)
+
+        # not yet submitted by Siae
+        response = self.client.get(url)
+        self.assertContains(response, not_transmitted)
+
+        # submittable by SIAE
+        EvaluatedAdministrativeCriteria.objects.filter(
+            evaluated_job_application__evaluated_siae=evaluated_siae
+        ).update(proof_url="https://server.com/rocky-balboa.pdf")
+
+        response = self.client.get(url)
+        self.assertContains(response, not_transmitted)
+
+        # submitted by Siae
+        EvaluatedAdministrativeCriteria.objects.filter(
+            evaluated_job_application__evaluated_siae=evaluated_siae
+        ).update(submitted_at=timezone.now())
 
         response = self.client.get(url)
         self.assertContains(response, a_traiter)
