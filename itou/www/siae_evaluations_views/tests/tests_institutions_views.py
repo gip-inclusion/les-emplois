@@ -1437,6 +1437,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
 
     def test_job_seeker_infos_for_institution_state(self):
         en_attente = "En attente"
+        uploaded = "Justificatifs téléversés"
         a_traiter = "À traiter"
         refuse = "Problème constaté"
         valide = "Validé"
@@ -1456,6 +1457,14 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         # not yet submitted by Siae
         response = self.client.get(url)
         self.assertContains(response, en_attente)
+
+        # submittable by SIAE
+        EvaluatedAdministrativeCriteria.objects.filter(
+            evaluated_job_application__evaluated_siae=evaluated_siae
+        ).update(proof_url="https://server.com/rocky-balboa.pdf")
+
+        response = self.client.get(url)
+        self.assertContains(response, uploaded)
 
         # submitted by Siae
         EvaluatedAdministrativeCriteria.objects.filter(
