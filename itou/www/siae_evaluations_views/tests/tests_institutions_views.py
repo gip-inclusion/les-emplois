@@ -31,13 +31,13 @@ from itou.users.enums import KIND_SIAE_STAFF
 from itou.users.factories import JobSeekerFactory
 from itou.utils.perms.user import UserInfo
 from itou.utils.templatetags.format_filters import format_approval_number
-from itou.utils.test import BASE_NUM_QUERIES, TestCase, assertMessages
+from itou.utils.test import BASE_NUM_QUERIES, TestCase, assertMessages, parse_response_to_soup
 from itou.utils.types import InclusiveDateRange
 from itou.www.siae_evaluations_views.forms import LaborExplanationForm, SetChosenPercentForm
 
 
 # fixme vincentporte : convert this method into factory
-def create_evaluated_siae_consistent_datas(evaluation_campaign):
+def create_evaluated_siae_consistent_datas(evaluation_campaign, extra_evaluated_siae_kwargs=None):
     membership = SiaeMembershipFactory(siae__department=evaluation_campaign.institution.department)
     user = membership.user
     siae = membership.siae
@@ -61,7 +61,9 @@ def create_evaluated_siae_consistent_datas(evaluation_campaign):
         hiring_start_at=timezone.now() - relativedelta(months=2),
     )
 
-    evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign, siae=siae)
+    evaluated_siae = EvaluatedSiaeFactory(
+        evaluation_campaign=evaluation_campaign, siae=siae, **(extra_evaluated_siae_kwargs or {})
+    )
     evaluated_job_application = EvaluatedJobApplicationFactory(
         job_application=job_application, evaluated_siae=evaluated_siae
     )
@@ -167,6 +169,7 @@ class SamplesSelectionViewTest(TestCase):
         assert updated_evaluation_campaign.chosen_percent == post_data["chosen_percent"]
 
 
+@pytest.mark.usefixtures("unittest_compatibility")
 class InstitutionEvaluatedSiaeListViewTest(TestCase):
     def setUp(self):
         membership = InstitutionMembershipFactory()
@@ -187,7 +190,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
 
         # institution with evaluation_campaign in "institution sets its ratio" phase
         evaluation_campaign = EvaluationCampaignFactory(institution=self.institution)
-        EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign)
+        evaluated_siae = EvaluatedSiaeFactory(pk=1000, evaluation_campaign=evaluation_campaign)
         response = self.client.get(
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_list",
@@ -206,6 +209,8 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             )
         )
         self.assertContains(response, "Liste des Siae à contrôler", html=True, count=1)
+        state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
+        assert str(state_div) == self.snapshot(name="waiting state")
 
         # institution with ended evaluation_campaign
         evaluation_campaign.ended_at = timezone.now()
@@ -217,9 +222,12 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             )
         )
         self.assertContains(response, "Liste des Siae contrôlées", html=True, count=1)
+        state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
+        assert str(state_div) == self.snapshot(name="notification pending state")
 
     def test_recently_closed_campaign(self):
         evaluated_siae = EvaluatedSiaeFactory(
+            pk=1000,
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED,
             evaluation_campaign__institution=self.institution,
@@ -246,9 +254,12 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             count=1,
         )
         self.assertContains(response, "Liste des Siae contrôlées", html=True, count=1)
+        state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
+        assert str(state_div) == self.snapshot(name="final accepted state")
 
     def test_siae_refused_can_be_notified(self):
         evaluated_siae = EvaluatedSiaeFactory(
+            pk=1000,
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
             evaluation_campaign__institution=self.institution,
@@ -261,16 +272,8 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             )
         )
         self.assertContains(response, "Liste des Siae contrôlées", html=True, count=1)
-        self.assertContains(
-            response,
-            """
-            <p class="badge badge-pill badge-accent-03 text-primary float-right">
-                <i class="ri-arrow-right-circle-line mr-1"></i> Notification à faire
-            </p>
-            """,
-            html=True,
-            count=1,
-        )
+        state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
+        assert str(state_div) == self.snapshot(name="notification pending state")
         notify_url = reverse(
             "siae_evaluations_views:institution_evaluated_siae_notify_step1",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
@@ -298,6 +301,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
 
     def test_siae_incomplete_refused_can_be_notified(self):
         evaluated_siae = EvaluatedSiaeFactory(
+            pk=1000,
             evaluation_campaign__institution=self.institution,
             evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(weeks=10),
             evaluation_campaign__ended_at=timezone.now(),
@@ -310,16 +314,8 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             )
         )
         self.assertContains(response, "Liste des Siae contrôlées", html=True, count=1)
-        self.assertContains(
-            response,
-            """
-            <p class="badge badge-pill badge-accent-03 text-primary float-right">
-                <i class="ri-arrow-right-circle-line mr-1"></i> Notification à faire
-            </p>
-            """,
-            html=True,
-            count=1,
-        )
+        state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
+        assert str(state_div) == self.snapshot(name="notification pending state")
         notify_url = reverse(
             "siae_evaluations_views:institution_evaluated_siae_notify_step1",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
@@ -347,6 +343,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
 
     def test_siae_incomplete_refused_can_be_notified_after_review(self):
         evaluated_siae = EvaluatedSiaeFactory(
+            pk=1000,
             evaluation_campaign__institution=self.institution,
             evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(weeks=10),
             evaluation_campaign__ended_at=timezone.now(),
@@ -360,16 +357,8 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             )
         )
         self.assertContains(response, "Liste des Siae contrôlées", html=True, count=1)
-        self.assertContains(
-            response,
-            """
-            <p class="badge badge-pill badge-accent-03 text-primary float-right">
-                <i class="ri-arrow-right-circle-line mr-1"></i> Notification à faire
-            </p>
-            """,
-            html=True,
-            count=1,
-        )
+        state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
+        assert str(state_div) == self.snapshot(name="notification pending state")
         notify_url = reverse(
             "siae_evaluations_views:institution_evaluated_siae_notify_step1",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
@@ -397,6 +386,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
 
     def test_notified_siae(self):
         evaluated_siae = EvaluatedSiaeFactory(
+            pk=1000,
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
             evaluation_campaign__institution=self.institution,
@@ -412,16 +402,8 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             )
         )
         self.assertContains(response, "Liste des Siae contrôlées", html=True, count=1)
-        self.assertContains(
-            response,
-            """
-            <p class="badge badge-pill badge-danger float-right">
-                <i class="ri-close-circle-line mr-1"></i> Résultat négatif
-            </p>
-            """,
-            html=True,
-            count=1,
-        )
+        state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
+        assert str(state_div) == self.snapshot(name="final refused state")
         sanction_url = reverse(
             "siae_evaluations_views:institution_evaluated_siae_sanction",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
@@ -476,17 +458,13 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         self.assertContains(response, dateformat.format(evaluation_campaign.evaluations_asked_at, "d F Y"))
 
     def test_siae_infos(self):
-        en_attente = "En attente"
-        a_traiter = "À traiter"
-        en_cours = "En cours"
-        resultat_positif = "Résultat positif"
-        phase_contradictoire = "Phase contradictoire"
-
         self.client.force_login(self.user)
         evaluation_campaign = EvaluationCampaignFactory(
             institution=self.institution, evaluations_asked_at=timezone.now()
         )
-        evaluated_siae = create_evaluated_siae_consistent_datas(evaluation_campaign)
+        evaluated_siae = create_evaluated_siae_consistent_datas(
+            evaluation_campaign, extra_evaluated_siae_kwargs={"pk": 1000}
+        )
         url = reverse(
             "siae_evaluations_views:institution_evaluated_siae_list",
             kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
@@ -494,7 +472,8 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
 
         response = self.client.get(url)
         self.assertContains(response, evaluated_siae)
-        self.assertContains(response, en_attente)
+        state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
+        assert str(state_div) == self.snapshot(name="waiting state")
         self.assertContains(
             response,
             reverse(
@@ -507,42 +486,78 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             submitted_at=timezone.now(), proof_url="https://server.com/rocky-balboa.pdf"
         )
         response = self.client.get(url)
-        self.assertContains(response, a_traiter)
-
-        EvaluatedAdministrativeCriteria.objects.filter(
-            evaluated_job_application__evaluated_siae=evaluated_siae
-        ).update(review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED)
-
-        response = self.client.get(url)
-        self.assertContains(response, en_cours)
+        state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
+        assert str(state_div) == self.snapshot(name="to process state")
 
         EvaluatedAdministrativeCriteria.objects.filter(
             evaluated_job_application__evaluated_siae=evaluated_siae
         ).update(review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED)
 
         response = self.client.get(url)
-        self.assertContains(response, en_cours)
+        state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
+        assert str(state_div) == self.snapshot(name="in progress state")
+
+        EvaluatedAdministrativeCriteria.objects.filter(
+            evaluated_job_application__evaluated_siae=evaluated_siae
+        ).update(review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED)
+
+        response = self.client.get(url)
+        state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
+        assert str(state_div) == self.snapshot(name="in progress state")
 
         # REVIEWED
         review_time = timezone.now()
         evaluated_siae.reviewed_at = review_time
         evaluated_siae.save(update_fields=["reviewed_at"])
 
+        response = self.client.get(url)
+        state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
+        assert str(state_div) == self.snapshot(name="adversarial stage state")
+
+        # Upload new proof
+        EvaluatedAdministrativeCriteria.objects.filter(
+            evaluated_job_application__evaluated_siae=evaluated_siae,
+        ).update(
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING,
+            proof_url="https://server.com/rocky-balboa-v2.pdf",
+            submitted_at=None,
+        )
+
+        response = self.client.get(url)
+        state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
+        assert str(state_div) == self.snapshot(name="adversarial waiting state")
+
+        # Submit new proof
+        EvaluatedAdministrativeCriteria.objects.update(submitted_at=timezone.now())
+
+        response = self.client.get(url)
+        state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
+        assert str(state_div) == self.snapshot(name="adversarial to process state")
+
+        # DDETS sets to refused
         EvaluatedAdministrativeCriteria.objects.filter(
             evaluated_job_application__evaluated_siae=evaluated_siae
         ).update(review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED)
 
         response = self.client.get(url)
-        self.assertContains(response, phase_contradictoire)
+        state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
+        assert str(state_div) == self.snapshot(name="adversarial in progress state")
 
+        # DDETS sets to accepted
         EvaluatedAdministrativeCriteria.objects.filter(
             evaluated_job_application__evaluated_siae=evaluated_siae
         ).update(review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED)
 
+        response = self.client.get(url)
+        state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
+        assert str(state_div) == self.snapshot(name="adversarial in progress state")
+
+        # DDETS validates its final review
         evaluated_siae.final_reviewed_at = review_time
         evaluated_siae.save(update_fields=["final_reviewed_at"])
         response = self.client.get(url)
-        self.assertContains(response, resultat_positif)
+        state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
+        assert str(state_div) == self.snapshot(name="final accepted state")
 
     def test_num_queries(self):
         self.client.force_login(self.user)
