@@ -25,10 +25,7 @@
                     À traiter
                 </p>
             {% elif evaluated_siae.state == "REFUSED" or evaluated_siae.state == "ACCEPTED" %}
-                <p class="badge badge-pill badge-pilotage float-right">
-                    {% if evaluated_siae.reviewed_at %}Phase contradictoire -{% endif %}
-                    En cours
-                </p>
+                <p class="badge badge-pill badge-pilotage float-right">En cours</p>
             {% elif evaluated_siae.state == "ADVERSARIAL_STAGE" %}
                 <p class="badge badge-pill badge-marche-light float-right">Phase contradictoire</p>
             {% else %}
