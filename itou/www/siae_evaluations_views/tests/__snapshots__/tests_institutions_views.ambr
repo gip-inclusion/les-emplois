@@ -1,0 +1,205 @@
+# serializer version: 1
+# name: InstitutionEvaluatedSiaeListViewTest.test_access[notification pending state]
+  '''
+  <div class="col-lg-3 col-md-3 col-4" id="state_of_evaluated_siae-1000">
+          
+              
+              
+                  <p class="badge badge-pill badge-accent-03 text-primary float-right">
+                      <i class="ri-arrow-right-circle-line mr-1"></i> Notification à faire
+                  </p>
+              
+          
+      </div>
+  '''
+# ---
+# name: InstitutionEvaluatedSiaeListViewTest.test_access[waiting state]
+  '''
+  <div class="col-lg-3 col-md-3 col-4" id="state_of_evaluated_siae-1000">
+          
+              
+                  <p class="badge badge-pill badge-emploi float-right">
+                      
+                      En attente
+                  </p>
+              
+          
+      </div>
+  '''
+# ---
+# name: InstitutionEvaluatedSiaeListViewTest.test_notified_siae[final refused state]
+  '''
+  <div class="col-lg-3 col-md-3 col-4" id="state_of_evaluated_siae-1000">
+          
+              
+              
+                  <p class="badge badge-pill badge-danger float-right">
+                      <i class="ri-close-circle-line mr-1"></i> Résultat négatif
+                  </p>
+              
+          
+      </div>
+  '''
+# ---
+# name: InstitutionEvaluatedSiaeListViewTest.test_recently_closed_campaign[final accepted state]
+  '''
+  <div class="col-lg-3 col-md-3 col-4" id="state_of_evaluated_siae-1000">
+          
+              
+              
+                  <p class="badge badge-pill badge-success float-right">
+                      <i class="ri-checkbox-circle-line mr-1"></i> Résultat positif
+                  </p>
+              
+          
+      </div>
+  '''
+# ---
+# name: InstitutionEvaluatedSiaeListViewTest.test_siae_incomplete_refused_can_be_notified[notification pending state]
+  '''
+  <div class="col-lg-3 col-md-3 col-4" id="state_of_evaluated_siae-1000">
+          
+              
+              
+                  <p class="badge badge-pill badge-accent-03 text-primary float-right">
+                      <i class="ri-arrow-right-circle-line mr-1"></i> Notification à faire
+                  </p>
+              
+          
+      </div>
+  '''
+# ---
+# name: InstitutionEvaluatedSiaeListViewTest.test_siae_incomplete_refused_can_be_notified_after_review[notification pending state]
+  '''
+  <div class="col-lg-3 col-md-3 col-4" id="state_of_evaluated_siae-1000">
+          
+              
+              
+                  <p class="badge badge-pill badge-accent-03 text-primary float-right">
+                      <i class="ri-arrow-right-circle-line mr-1"></i> Notification à faire
+                  </p>
+              
+          
+      </div>
+  '''
+# ---
+# name: InstitutionEvaluatedSiaeListViewTest.test_siae_infos[adversarial in progress state]
+  '''
+  <div class="col-lg-3 col-md-3 col-4" id="state_of_evaluated_siae-1000">
+          
+              
+                  <p class="badge badge-pill badge-marche-light float-right">Phase contradictoire</p>
+              
+          
+      </div>
+  '''
+# ---
+# name: InstitutionEvaluatedSiaeListViewTest.test_siae_infos[adversarial stage state]
+  '''
+  <div class="col-lg-3 col-md-3 col-4" id="state_of_evaluated_siae-1000">
+          
+              
+                  <p class="badge badge-pill badge-marche-light float-right">Phase contradictoire</p>
+              
+          
+      </div>
+  '''
+# ---
+# name: InstitutionEvaluatedSiaeListViewTest.test_siae_infos[adversarial to process state]
+  '''
+  <div class="col-lg-3 col-md-3 col-4" id="state_of_evaluated_siae-1000">
+          
+              
+                  <p class="badge badge-pill badge-pilotage float-right">
+                      Phase contradictoire -
+                      À traiter
+                  </p>
+              
+          
+      </div>
+  '''
+# ---
+# name: InstitutionEvaluatedSiaeListViewTest.test_siae_infos[adversarial waiting state]
+  '''
+  <div class="col-lg-3 col-md-3 col-4" id="state_of_evaluated_siae-1000">
+          
+              
+                  <p class="badge badge-pill badge-emploi float-right">
+                      Phase contradictoire -
+                      En attente
+                  </p>
+              
+          
+      </div>
+  '''
+# ---
+# name: InstitutionEvaluatedSiaeListViewTest.test_siae_infos[final accepted state]
+  '''
+  <div class="col-lg-3 col-md-3 col-4" id="state_of_evaluated_siae-1000">
+          
+              
+              
+                  <p class="badge badge-pill badge-success float-right">
+                      <i class="ri-checkbox-circle-line mr-1"></i> Résultat positif
+                  </p>
+              
+          
+      </div>
+  '''
+# ---
+# name: InstitutionEvaluatedSiaeListViewTest.test_siae_infos[in progress state]
+  '''
+  <div class="col-lg-3 col-md-3 col-4" id="state_of_evaluated_siae-1000">
+          
+              
+                  <p class="badge badge-pill badge-pilotage float-right">
+                      
+                      En cours
+                  </p>
+              
+          
+      </div>
+  '''
+# ---
+# name: InstitutionEvaluatedSiaeListViewTest.test_siae_infos[to process state]
+  '''
+  <div class="col-lg-3 col-md-3 col-4" id="state_of_evaluated_siae-1000">
+          
+              
+                  <p class="badge badge-pill badge-pilotage float-right">
+                      
+                      À traiter
+                  </p>
+              
+          
+      </div>
+  '''
+# ---
+# name: InstitutionEvaluatedSiaeListViewTest.test_siae_infos[waiting state]
+  '''
+  <div class="col-lg-3 col-md-3 col-4" id="state_of_evaluated_siae-1000">
+          
+              
+                  <p class="badge badge-pill badge-emploi float-right">
+                      
+                      En attente
+                  </p>
+              
+          
+      </div>
+  '''
+# ---
+# name: InstitutionEvaluatedSiaeListViewTest.test_siae_refused_can_be_notified[notification pending state]
+  '''
+  <div class="col-lg-3 col-md-3 col-4" id="state_of_evaluated_siae-1000">
+          
+              
+              
+                  <p class="badge badge-pill badge-accent-03 text-primary float-right">
+                      <i class="ri-arrow-right-circle-line mr-1"></i> Notification à faire
+                  </p>
+              
+          
+      </div>
+  '''
+# ---
