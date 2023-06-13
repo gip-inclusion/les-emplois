@@ -559,6 +559,45 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
         assert str(state_div) == self.snapshot(name="final accepted state")
 
+    def test_siae_infos_with_submission_freezed_at(self):
+        self.client.force_login(self.user)
+        evaluation_campaign = EvaluationCampaignFactory(
+            institution=self.institution, evaluations_asked_at=timezone.now()
+        )
+        evaluated_siae = create_evaluated_siae_consistent_datas(
+            evaluation_campaign, extra_evaluated_siae_kwargs={"pk": 1000}
+        )
+        url = reverse(
+            "siae_evaluations_views:institution_evaluated_siae_list",
+            kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
+        )
+        submission_time = timezone.now()  # Will be used for SUBMITTED state
+        evaluation_campaign.freeze(timezone.now())
+
+        assert evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.PENDING
+        response = self.client.get(url)
+        self.assertContains(response, evaluated_siae)
+        state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
+        assert str(state_div) == self.snapshot(name="identified issue state")
+
+        # Simulate the SUBMITTABLE state
+        del evaluated_siae.state_from_applications
+        EvaluatedAdministrativeCriteria.objects.update(proof_url="https://server.com/rocky-balboa.pdf")
+        assert evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.SUBMITTABLE
+        response = self.client.get(url)
+        self.assertContains(response, evaluated_siae)
+        state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
+        assert str(state_div) == self.snapshot(name="identified issue state")
+
+        # Simulate the SUBMITTED state
+        del evaluated_siae.state_from_applications
+        EvaluatedAdministrativeCriteria.objects.update(submitted_at=submission_time)
+        assert evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.SUBMITTED
+        response = self.client.get(url)
+        self.assertContains(response, evaluated_siae)
+        state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
+        assert str(state_div) == self.snapshot(name="to process state")
+
     def test_num_queries(self):
         self.client.force_login(self.user)
         evaluation_campaign = EvaluationCampaignFactory(

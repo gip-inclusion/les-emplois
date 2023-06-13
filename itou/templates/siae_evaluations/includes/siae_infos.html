@@ -29,10 +29,18 @@
             {% elif evaluated_siae.state == "ADVERSARIAL_STAGE" %}
                 <p class="badge badge-pill badge-marche-light float-right">Phase contradictoire</p>
             {% else %}
-                <p class="badge badge-pill badge-emploi float-right">
-                    {% if evaluated_siae.reviewed_at %}Phase contradictoire -{% endif %}
-                    En attente
-                </p>
+                {# PENDING or SUBMITTABLE (NOTIFICATION_PENDING impossible without evaluation_is_final) #}
+                {% if evaluated_siae.submission_freezed_at %}
+                    <p class="badge badge-pill badge-danger float-right">
+                        {% if evaluated_siae.reviewed_at %}Phase contradictoire -{% endif %}
+                        Problème constaté
+                    </p>
+                {% else %}
+                    <p class="badge badge-pill badge-emploi float-right">
+                        {% if evaluated_siae.reviewed_at %}Phase contradictoire -{% endif %}
+                        En attente
+                    </p>
+                {% endif %}
             {% endif %}
         {% endif %}
     </div>
