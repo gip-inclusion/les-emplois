@@ -639,7 +639,7 @@ class EvaluationCampaignManagerTest(TestCase):
         assert siae_email.subject == f"Résultat du contrôle - EI Prim’vert ID-{evaluated_siae_submitted.siae_id}"
         assert siae_email.body == self.snapshot(name="negative review email body")
 
-    def test_close(self):
+    def test_close_no_response(self):
         evaluation_campaign = EvaluationCampaignFactory(
             pk=1000,
             institution__name="DDETS 01",
@@ -648,7 +648,7 @@ class EvaluationCampaignManagerTest(TestCase):
         )
         evaluated_siae = EvaluatedSiaeFactory(
             siae__name="Les petits jardins",
-            siae__pk=1000,
+            siae__pk=2000,
             evaluation_campaign=evaluation_campaign,
         )
         assert evaluation_campaign.ended_at is None
@@ -664,6 +664,95 @@ class EvaluationCampaignManagerTest(TestCase):
             f"Absence de réponse de la structure EI Les petits jardins ID-{evaluated_siae.siae_id}"
         )
         assert siae_email.body == self.snapshot(name="no docs email body")
+        assert sorted(institution_email.to) == sorted(
+            evaluation_campaign.institution.active_members.values_list("email", flat=True)
+        )
+        assert institution_email.subject == "[Contrôle a posteriori] Notification des sanctions"
+        assert institution_email.body == self.snapshot(name="sanction notification email body")
+
+        evaluation_campaign.close()
+        assert ended_at == evaluation_campaign.ended_at
+        # No new mail.
+        assert len(mail.outbox) == 2
+
+    def test_close_accepted_but_not_reviewed(self):
+        evaluation_campaign = EvaluationCampaignFactory(
+            institution__name="DDETS 01",
+            evaluated_period_start_at=datetime.date(2022, 1, 1),
+            evaluated_period_end_at=datetime.date(2022, 9, 30),
+        )
+        evaluated_siae = EvaluatedSiaeFactory(
+            siae__name="Les petits jardins",
+            siae__pk=2000,
+            evaluation_campaign=evaluation_campaign,
+            reviewed_at=timezone.now() - datetime.timedelta(days=2),
+        )
+        evaluated_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory(
+            submitted_at=timezone.now() - relativedelta(days=1),
+            evaluated_job_application=evaluated_job_application,
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+        )
+        # DDETS accepted the document but forgot to validate
+        assert evaluated_siae.final_reviewed_at is None
+        assert evaluation_campaign.ended_at is None
+
+        evaluation_campaign.close()
+        assert evaluation_campaign.ended_at is not None
+        # DDETS review was automatically validated
+        evaluated_siae.refresh_from_db()
+        assert evaluated_siae.final_reviewed_at is not None
+        ended_at = evaluation_campaign.ended_at
+
+        [accepted_siae_email] = mail.outbox
+        assert accepted_siae_email.to == list(evaluated_siae.siae.active_admin_members.values_list("email", flat=True))
+        assert (
+            accepted_siae_email.subject == f"Résultat du contrôle - EI Les petits jardins ID-{evaluated_siae.siae_id}"
+        )
+        assert accepted_siae_email.body == self.snapshot(name="accepted email body")
+
+        evaluation_campaign.close()
+        assert ended_at == evaluation_campaign.ended_at
+        # No new mail.
+        assert len(mail.outbox) == 1
+
+    def test_close_refused_but_not_reviewed(self):
+        evaluation_campaign = EvaluationCampaignFactory(
+            pk=1000,
+            institution__name="DDETS 01",
+            evaluated_period_start_at=datetime.date(2022, 1, 1),
+            evaluated_period_end_at=datetime.date(2022, 9, 30),
+        )
+        evaluated_siae = EvaluatedSiaeFactory(
+            siae__name="Les petits jardins",
+            siae__pk=2000,
+            evaluation_campaign=evaluation_campaign,
+            reviewed_at=timezone.now() - datetime.timedelta(days=2),
+        )
+        evaluated_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory(
+            submitted_at=timezone.now() - relativedelta(days=1),
+            evaluated_job_application=evaluated_job_application,
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2,
+        )
+        # DDETS refused the document but forgot to validate
+        assert evaluated_siae.final_reviewed_at is None
+        assert evaluation_campaign.ended_at is None
+
+        evaluation_campaign.close()
+        assert evaluation_campaign.ended_at is not None
+        # DDETS review was automatically validated
+        evaluated_siae.refresh_from_db()
+        assert evaluated_siae.final_reviewed_at is not None
+        ended_at = evaluation_campaign.ended_at
+
+        [refused_siae_email, institution_email] = mail.outbox
+        assert refused_siae_email.to == list(evaluated_siae.siae.active_admin_members.values_list("email", flat=True))
+        assert (
+            refused_siae_email.subject == f"Résultat du contrôle - EI Les petits jardins ID-{evaluated_siae.siae_id}"
+        )
+        assert refused_siae_email.body == self.snapshot(name="refused email body")
+
         assert sorted(institution_email.to) == sorted(
             evaluation_campaign.institution.active_members.values_list("email", flat=True)
         )
@@ -731,12 +820,12 @@ class EvaluatedSiaeModelTest(TestCase):
         ## unit tests
         # no evaluated_job_application
         assert evaluation_enums.EvaluatedSiaeState.PENDING == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
         # no evaluated_administrative_criterion
         evaluated_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
         assert evaluation_enums.EvaluatedSiaeState.PENDING == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
         # one evaluated_administrative_criterion
         # empty : proof_url and submitted_at empty)
@@ -744,31 +833,31 @@ class EvaluatedSiaeModelTest(TestCase):
             evaluated_job_application=evaluated_job_application, proof_url=""
         )
         assert evaluation_enums.EvaluatedSiaeState.PENDING == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
         # with proof_url
         evaluated_administrative_criteria0.proof_url = "https://server.com/rocky-balboa.pdf"
         evaluated_administrative_criteria0.save(update_fields=["proof_url"])
         assert evaluation_enums.EvaluatedSiaeState.SUBMITTABLE == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
         # PENDING + submitted_at without review
         evaluated_administrative_criteria0.submitted_at = fake_now
         evaluated_administrative_criteria0.save(update_fields=["submitted_at"])
         assert evaluation_enums.EvaluatedSiaeState.SUBMITTED == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
         # PENDING + submitted_at before review: we still consider that the DDETS IAE can validate the documents
         evaluated_siae.reviewed_at = fake_now + relativedelta(days=1)
         evaluated_siae.save(update_fields=["reviewed_at"])
         assert evaluation_enums.EvaluatedSiaeState.SUBMITTED == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
         # PENDING + submitted_at after review
         evaluated_siae.reviewed_at = fake_now - relativedelta(days=1)
         evaluated_siae.save(update_fields=["reviewed_at"])
         assert evaluation_enums.EvaluatedSiaeState.SUBMITTED == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
         # with review_state REFUSED, not reviewed : removed, should not exist in real life
 
@@ -779,14 +868,14 @@ class EvaluatedSiaeModelTest(TestCase):
         evaluated_siae.save(update_fields=["reviewed_at"])
         assert evaluated_administrative_criteria0.submitted_at <= evaluated_siae.reviewed_at
         assert evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
         # with review_state REFUSED, reviewed, submitted_at after reviewed_at
         evaluated_siae.reviewed_at = fake_now - relativedelta(days=1)
         evaluated_siae.save(update_fields=["reviewed_at"])
         assert evaluated_administrative_criteria0.submitted_at > evaluated_siae.reviewed_at
         assert evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
         # with review_state REFUSED_2, reviewed, submitted_at after reviewed_at
         evaluated_administrative_criteria0.review_state = (
@@ -796,13 +885,13 @@ class EvaluatedSiaeModelTest(TestCase):
         evaluated_siae.reviewed_at = fake_now - relativedelta(days=1)
         evaluated_siae.save(update_fields=["reviewed_at"])
         assert evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
         # with review_state REFUSED_2, reviewed, submitted_at after reviewed_at, with final_reviewed_at
         evaluated_siae.final_reviewed_at = fake_now
         evaluated_siae.save(update_fields=["final_reviewed_at"])
         assert evaluation_enums.EvaluatedSiaeState.NOTIFICATION_PENDING == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
         # with review_state REFUSED_2, reviewed, submitted_at after
         # reviewed_at, with final_reviewed_at, with notified_at
@@ -811,7 +900,7 @@ class EvaluatedSiaeModelTest(TestCase):
         evaluated_siae.notification_text = "Le document n’a pas été transmis."
         evaluated_siae.save(update_fields=["notified_at", "notification_reason", "notification_text"])
         assert evaluation_enums.EvaluatedSiaeState.REFUSED == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
         # with review_state REFUSED_2, reviewed, submitted_at before reviewed_at :
         # removed, should never happen in real life
@@ -843,7 +932,7 @@ class EvaluatedSiaeModelTest(TestCase):
         )
         assert evaluated_administrative_criteria0.submitted_at > evaluated_siae.reviewed_at
         assert evaluation_enums.EvaluatedSiaeState.ACCEPTED == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
     def test_state_integration(self):
         fake_now = timezone.now()
@@ -866,7 +955,7 @@ class EvaluatedSiaeModelTest(TestCase):
         ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria[2].save(update_fields=["review_state"])
         assert evaluation_enums.EvaluatedSiaeState.SUBMITTED == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
         # one Refused, two Accepted
         evaluated_siae.reviewed_at = fake_now
@@ -876,7 +965,7 @@ class EvaluatedSiaeModelTest(TestCase):
         ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria[0].save(update_fields=["review_state"])
         assert evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
         # three Accepted
         evaluated_siae.final_reviewed_at = fake_now
@@ -886,7 +975,7 @@ class EvaluatedSiaeModelTest(TestCase):
         ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria[1].save(update_fields=["review_state"])
         assert evaluation_enums.EvaluatedSiaeState.ACCEPTED == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
         evaluated_siae.final_reviewed_at = None
         evaluated_siae.save(update_fields=["final_reviewed_at"])
 
@@ -908,7 +997,7 @@ class EvaluatedSiaeModelTest(TestCase):
         ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria[2].save(update_fields=["review_state"])
         assert evaluation_enums.EvaluatedSiaeState.SUBMITTED == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
         # one Refused, two Accepted
         evaluated_administrative_criteria[
@@ -916,7 +1005,7 @@ class EvaluatedSiaeModelTest(TestCase):
         ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria[0].save(update_fields=["review_state"])
         assert evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
         # three Accepted
         evaluated_siae.final_reviewed_at = fake_now
@@ -926,7 +1015,7 @@ class EvaluatedSiaeModelTest(TestCase):
         ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria[1].save(update_fields=["review_state"])
         assert evaluation_enums.EvaluatedSiaeState.ACCEPTED == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
         evaluated_siae.final_reviewed_at = None
         evaluated_siae.save(update_fields=["final_reviewed_at"])
 
@@ -948,7 +1037,7 @@ class EvaluatedSiaeModelTest(TestCase):
         ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria[2].save(update_fields=["review_state"])
         assert evaluation_enums.EvaluatedSiaeState.SUBMITTED == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
         # one Refused, two Accepted
         evaluated_administrative_criteria[
@@ -956,7 +1045,7 @@ class EvaluatedSiaeModelTest(TestCase):
         ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria[0].save(update_fields=["review_state"])
         assert evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
         # three Accepted
         evaluated_siae.final_reviewed_at = fake_now
@@ -966,7 +1055,7 @@ class EvaluatedSiaeModelTest(TestCase):
         ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria[1].save(update_fields=["review_state"])
         assert evaluation_enums.EvaluatedSiaeState.ACCEPTED == evaluated_siae.state
-        del evaluated_siae.state
+        del evaluated_siae.state_from_applications
 
     def test_state_on_closed_campaign_no_criteria(self):
         evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__ended_at=timezone.now())
@@ -1046,21 +1135,6 @@ class EvaluatedSiaeModelTest(TestCase):
         )
         assert evaluated_job_app.evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.REFUSED
 
-    def test_state_on_closed_campaign_criteria_refused_review_not_validated(self):
-        evaluated_job_app = EvaluatedJobApplicationFactory(
-            evaluated_siae__evaluation_campaign__ended_at=timezone.now(),
-            evaluated_siae__reviewed_at=timezone.now() - relativedelta(days=5),
-        )
-        EvaluatedAdministrativeCriteriaFactory(
-            evaluated_job_application=evaluated_job_app,
-            uploaded_at=timezone.now() - relativedelta(days=2),
-            submitted_at=timezone.now() - relativedelta(days=1),
-            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2,
-        )
-        # Was not reviewed by the institution, assume valid (following rules in
-        # most administrations).
-        assert evaluated_job_app.evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.ACCEPTED
-
     def test_state_on_closed_campaign_criteria_refused_review_validated(self):
         evaluated_job_app = EvaluatedJobApplicationFactory(
             evaluated_siae__reviewed_at=timezone.now(),
@@ -1126,8 +1200,8 @@ class EvaluatedSiaeModelTest(TestCase):
 def test_should_display_pending_action_warning(state, frozen, should_display_pending_action_warning):
     evaluated_siae = EvaluatedSiaeFactory(submission_freezed_at=timezone.now() if frozen else None)
     # Override state property for faster tests
-    setattr(evaluated_siae, "state", state)
-    assert evaluated_siae.should_display_pending_action_warning == should_display_pending_action_warning
+    with mock.patch.object(EvaluatedSiae, "state", state):
+        assert evaluated_siae.should_display_pending_action_warning == should_display_pending_action_warning
 
 
 class EvaluatedJobApplicationModelTest(TestCase):

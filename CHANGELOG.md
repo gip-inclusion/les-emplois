@@ -1,5 +1,22 @@
 # Journal des modifications
 
+## [64] - 2023-06-05
+
+### Ajouté
+
+- N'autoriser que des prescripteurs à rejoindre des organisations 
+- Création automatique d'un profil à la création d'un demandeur d'emploi
+- Gestion des salariés et PASS IAE : modification des infos personnelles d'un candidat même sans candidature
+- GEIQ: ajout de champs à la candidature relatifs à la qualification et la formation
+
+### Modifié
+
+- Modifications diverses de l'affichage du détail de candidature
+- Suppression des mentions de l'API Entreprise de `api.gouv.fr`
+- MaJ du thème itou vers la v0.6.8, de l'entête et de tarte au citron
+- MaJ de l'UI des "cards" du dashboard
+
+
 ## [63] - 2023-05-22
 
 ### Ajouté

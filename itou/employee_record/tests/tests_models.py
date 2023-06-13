@@ -75,12 +75,6 @@ class EmployeeRecordModelTest(TestCase):
             # Must not
             EmployeeRecord.from_job_application(job_application)
 
-    def test_creation_without_jobseeker_profile(self):
-        # Job seeker has no existing profile (must be filled before creation)
-        with self.assertRaisesMessage(ValidationError, EmployeeRecord.ERROR_JOB_SEEKER_HAS_NO_PROFILE):
-            job_application = JobApplicationWithApprovalNotCancellableFactory(job_seeker__jobseeker_profile=False)
-            EmployeeRecord.from_job_application(job_application)
-
     def test_creation_from_job_application(self):
         """
         Employee record objects are created from a job application giving them access to:

@@ -323,6 +323,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
             SiaeWithMembershipAndJobsFactory(siret="40219166200003"),
             SiaeWithMembershipAndJobsFactory(siret="40219166200004"),
             SiaeWithMembershipAndJobsFactory(siret="40219166200005"),
+            SiaeWithMembershipAndJobsFactory(siret="40219166200005", kind=SiaeKind.AI),
         )
         # Add more than one member to all SIAE to test prefetch and distinct
         for siae in siaes:
@@ -342,9 +343,12 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         ):
             response = self.client.get(url, {"siren": "402191662"})
         assert response.status_code == 200
-        self.assertContains(response, "402191662", count=6)  # 1 input + 5 results
-        for siae in siaes:
-            self.assertContains(response, siae.siret_nic, count=1)
+        self.assertContains(response, "402191662", count=7)  # 1 input + 6 results
+        self.assertContains(response, "00001", count=1)
+        self.assertContains(response, "00002", count=1)
+        self.assertContains(response, "00003", count=1)
+        self.assertContains(response, "00004", count=1)
+        self.assertContains(response, "00005", count=2)
 
 
 class SiaeSignupViewsExceptionsTest(TestCase):

@@ -78,7 +78,6 @@ class Command(BaseCommand):
         # Employee records in this case are switched back to status DISABLED for further processing by end-user.
         # Most frequent error cases are:
         # - no HEXA address
-        # - no profile at all (?)
 
         profile_selected = EmployeeRecord.objects.filter(status=Status.PROCESSED).select_related(
             "job_application",
@@ -89,8 +88,6 @@ class Command(BaseCommand):
             job_application__job_seeker__jobseeker_profile__hexa_commune__isnull=True
         )
         count_no_hexa_address = no_hexa_address.count()
-        no_job_seeker_profile = profile_selected.filter(job_application__job_seeker__jobseeker_profile__isnull=True)
-        count_no_job_seeker_profile = no_job_seeker_profile.count()
 
         self.stdout.write("* Checking employee records job seeker profile:")
 
@@ -107,22 +104,6 @@ class Command(BaseCommand):
             with transaction.atomic():
                 for without_address in no_hexa_address:
                     without_address.update_as_disabled()
-
-            self.stdout.write(" - done!")
-
-        if count_no_job_seeker_profile == 0:
-            self.stdout.write(" - no empty job seeker profile found (great!)")
-        else:
-            self.stdout.write(f" - found {count_no_job_seeker_profile} empty job seeker profile(s)")
-
-            if dry_run:
-                return
-
-            self.stdout.write(" - fixing missing jobseeker profiles: switching status to DISABLED")
-
-            with transaction.atomic():
-                for without_profile in no_job_seeker_profile:
-                    without_profile.update_as_disabled()
 
             self.stdout.write(" - done!")
 

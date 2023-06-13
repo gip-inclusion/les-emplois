@@ -76,9 +76,7 @@ def test_orphans_check(command):
 def test_profile_errors_check(command):
     # Check for profile errors during sanitize_employee_records
 
-    employee_record = factories.EmployeeRecordFactory(
-        status=models.Status.PROCESSED, job_application__job_seeker__jobseeker_profile=False
-    )
+    employee_record = factories.EmployeeRecordFactory(status=models.Status.PROCESSED)
 
     command._check_jobseeker_profiles(dry_run=False)
 
@@ -88,9 +86,6 @@ def test_profile_errors_check(command):
         "* Checking employee records job seeker profile:",
         " - found 1 job seeker profile(s) without HEXA address",
         " - fixing missing address in profiles: switching status to DISABLED",
-        " - done!",
-        " - found 1 empty job seeker profile(s)",
-        " - fixing missing jobseeker profiles: switching status to DISABLED",
         " - done!",
         "",
     ]
