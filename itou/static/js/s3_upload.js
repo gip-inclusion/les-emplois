@@ -15,6 +15,7 @@ window.s3UploadInit = function s3UploadInit({
   s3UploadConfigId = "s3-upload-config",
   sentryInternalUrl = "",
   sentryCsrfToken = "",
+  returnPath = false,
 } = {}) {
   const formValues = JSON.parse(
     document.getElementById(s3FormValuesId).textContent
@@ -71,7 +72,13 @@ window.s3UploadInit = function s3UploadInit({
   // Turn off this behavior to control all the aspects "manually".
   Dropzone.autoDiscover = false;
 
-  const dropzone = new Dropzone(dropzoneSelector, dropzoneConfig);
+  // Can't attach a dropzone more than once (HTMX reloads)
+  var myDropzoneElement = document.querySelector(dropzoneSelector);
+  var existingDropzone = Dropzone.instances.find(function(instance) {
+    return instance.element === myDropzoneElement;
+  });
+
+  const dropzone = existingDropzone ? existingDropzone : new Dropzone(dropzoneSelector, dropzoneConfig);
 
   // Events
   dropzone.on("addedfile", function (file) {
@@ -95,7 +102,9 @@ window.s3UploadInit = function s3UploadInit({
   });
 
   dropzone.on("success", function (file, xhr, formData) {
-    const location = `${formUrl}/${file.upload.filename}`;
+    // returnPath: config parameter
+    // File URI can be constructed only from path, if needed (prolongation reports) 
+    const location = returnPath ? file.upload.filename : `${formUrl}/${file.upload.filename}`;
     // Prevent a selector mistake from being silent.
     if ($(callbackLocationSelector).length === 0) {
       this._handleUploadError(
@@ -153,4 +162,7 @@ window.s3UploadInit = function s3UploadInit({
       });
     }
   });
+  
+  // Useful for registering events
+  return dropzone;
 };
