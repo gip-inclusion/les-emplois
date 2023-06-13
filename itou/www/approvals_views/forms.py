@@ -1,12 +1,16 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db.models import Exists, OuterRef, Q
+from django.shortcuts import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django_select2.forms import Select2MultipleWidget
 
+from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
+from itou.approvals.enums import ProlongationReason
 from itou.approvals.models import Approval, Prolongation, Suspension
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.enums import SiaeKind
 from itou.users.enums import UserKind
 from itou.users.models import User
@@ -28,7 +32,9 @@ class ApprovalForm(forms.Form):
     def _get_approvals_qs_filter(self):
         return Exists(
             JobApplication.objects.filter(
-                approval=OuterRef("pk"), to_siae_id=self.siae_pk, state=JobApplicationWorkflow.STATE_ACCEPTED
+                approval=OuterRef("pk"),
+                to_siae_id=self.siae_pk,
+                state=JobApplicationWorkflow.STATE_ACCEPTED,
             )
         )
 
@@ -78,68 +84,173 @@ class DeclareProlongationForm(forms.ModelForm):
     Prolongation.clean() will handle the validation.
     """
 
+    report_file_path = forms.CharField(required=False, widget=forms.HiddenInput())
+    uploaded_file_name = forms.CharField(required=False, widget=forms.HiddenInput())
+    email = forms.EmailField(
+        required=False,
+        label="E-mail du prescripteur habilité sollicité pour cette prolongation",
+        help_text=(
+            "Attention : l'adresse e-mail doit correspondre à un compte utilisateur de type prescripteur habilité"
+        ),
+    )
+
     def __init__(self, *args, **kwargs):
         self.approval = kwargs.pop("approval")
         self.siae = kwargs.pop("siae")
         self.validated_by = None
         self.reasons_not_need_prescriber_opinion = Prolongation.REASONS_NOT_NEED_PRESCRIBER_OPINION
+
         super().__init__(*args, **kwargs)
 
         if not self.instance.pk:
             self.instance.declared_by_siae = self.siae
             # `start_at` should begin just after the approval. It cannot be set by the user.
             self.instance.start_at = Prolongation.get_start_at(self.approval)
+            self.instance.end_at = None
             # `approval` must be set before model validation to avoid violating a not-null constraint.
             self.instance.approval = self.approval
             self.fields["reason"].initial = None  # Uncheck radio buttons.
 
-        self.reasons_max_duration_labels = {
-            k: {"l": v["label"], "d": str(Prolongation.get_max_end_at(self.instance.start_at, k))}
-            for (k, v) in Prolongation.MAX_CUMULATIVE_DURATION.items()
-            if k != Prolongation.Reason.HEALTH_CONTEXT.value
-        }
-
         # Since December 1, 2021, health context reason can no longer be used
         self.fields["reason"].choices = [
-            item for item in self.fields["reason"].choices if item[0] != Prolongation.Reason.HEALTH_CONTEXT
+            item for item in self.fields["reason"].choices if item[0] != ProlongationReason.HEALTH_CONTEXT
         ]
 
         # `PARTICULAR_DIFFICULTIES` is allowed only for AI and ACI.
         if self.siae.kind not in [SiaeKind.AI, SiaeKind.ACI]:
             self.fields["reason"].choices = [
-                item
-                for item in self.fields["reason"].choices
-                if item[0] != Prolongation.Reason.PARTICULAR_DIFFICULTIES
+                item for item in self.fields["reason"].choices if item[0] != ProlongationReason.PARTICULAR_DIFFICULTIES
             ]
 
-        self.fields["reason_explanation"].required = True  # Optional in admin but required for SIAEs.
+        self.fields["reason"].widget.attrs.update(
+            {
+                "hx-post": reverse("approvals:toggle_upload_panel", kwargs={"approval_id": self.instance.approval_id}),
+                "hx-target": "#upload_panel",
+                "hx-select": "#upload_panel",
+            }
+        )
 
+        self.fields["end_at"].initial = None
         self.fields["end_at"].widget = DuetDatePickerWidget(
-            {"min": self.instance.start_at, "max": Prolongation.get_max_end_at(self.instance.start_at)}
+            {
+                "min": self.instance.start_at,
+                "max": Prolongation.get_max_end_at(self.instance.start_at),
+            }
         )
         self.fields["end_at"].label = f'Du {self.instance.start_at.strftime("%d/%m/%Y")} au'
 
-    email = forms.EmailField(
-        required=False,
-        label="E-mail du prescripteur habilité qui a autorisé cette prolongation",
-        help_text=(
-            "Attention : l'adresse e-mail doit correspondre à un compte utilisateur de type prescripteur habilité"
-        ),
-    )
+        if self.data and self.data.get("reason"):
+            prolongation_duration = Prolongation.MAX_CUMULATIVE_DURATION[self.data.get("reason")]["label"]
+            self.fields["end_at"].help_text = mark_safe(
+                f"Date jusqu'à laquelle le PASS IAE doit être prolongé "
+                f"<strong>(Durée maximum de 1 an renouvelable jusqu'à { prolongation_duration })</strong>."
+                f"<br>"
+                f"Au format JJ/MM/AAAA, par exemple 20/12/1978."
+            )
 
-    def clean_email(self):
-        email = self.cleaned_data["email"]
-        if self.cleaned_data.get("reason") in self.reasons_not_need_prescriber_opinion:
-            email = None
-        else:
-            self.validated_by = User.objects.filter(email=email).first()
-            if not self.validated_by or not self.validated_by.is_prescriber_with_authorized_org:
-                error = (
-                    "Ce prescripteur n'a pas de compte sur les emplois de l'inclusion. "
-                    "Merci de renseigner l'e-mail d'un conseiller inscrit sur le service."
+        self.fields["email"].widget.attrs.update({"placeholder": "E-mail du prescripteur habilité"})
+
+        # Dynamic : contact fields
+        self.fields["require_phone_interview"].widget = forms.CheckboxInput(
+            attrs={
+                "hx-post": reverse(
+                    "approvals:check_contact_details", kwargs={"approval_id": self.instance.approval_id}
+                ),
+                "hx-target": "#check_contact_details",
+                "hx-select": "#check_contact_details",
+            }
+        )
+        self.fields[
+            "require_phone_interview"
+        ].label = "Demande d'entretien téléphonique pour apporter des explications supplémentaires"
+        self.fields["require_phone_interview"].required = False
+
+        # There must be something better : review
+        contact_fields_disabled = self.data.get("require_phone_interview", False) not in ("True", "true", "1", "on")
+
+        self.fields["contact_email"].label = "Votre e-mail"
+        self.fields["contact_email"].required = False
+        self.fields["contact_email"].disabled = contact_fields_disabled
+        self.fields["contact_email"].widget.attrs.update({"placeholder": "employeur@email.fr"})
+        self.fields["contact_phone"].label = "Votre numéro de téléphone"
+        self.fields["contact_phone"].required = False
+        self.fields["contact_phone"].disabled = contact_fields_disabled
+        self.fields["contact_phone"].widget.attrs.update({"placeholder": "Merci de privilégier votre ligne directe"})
+
+        self.fields["prescriber_organization"].queryset = PrescriberOrganization.objects.none()
+        self.fields["prescriber_organization"].label = ""
+        self.fields["prescriber_organization"].empty_label = "Sélectionnez l'organisation du prescripteur habilité"
+        self.fields["prescriber_organization"].disabled = True
+        self.fields["prescriber_organization"].widget.attrs.update(
+            {
+                "hx-post": reverse(
+                    "approvals:check_prescriber_email", kwargs={"approval_id": self.instance.approval_id}
+                ),
+                "hx-target": "#check_prescriber_email",
+                "hx-select": "#check_prescriber_email",
+            }
+        )
+
+        # Dynamic : checking prescriber email
+        if kwargs.get("data"):
+            if email := kwargs.get("data", {}).get("email"):
+                orgs = PrescriberOrganization.objects.filter(
+                    members__email=email,
+                    members__is_active=True,
+                    is_authorized=True,
                 )
-                raise forms.ValidationError(error)
-        return email
+                self.fields["prescriber_organization"].queryset = orgs
+                self.fields["prescriber_organization"].disabled = not orgs
+                if orgs.count() == 1:
+                    # UI choice : display the select box with a unique selected choice
+                    # IMO a simple label would have done the job
+                    choices = list(self.fields["prescriber_organization"].widget.choices)
+                    choices.pop(0)
+                    self.fields["prescriber_organization"].widget.choices = choices
+
+    def clean_prescriber_organization(self):
+        prescriber_organization = self.cleaned_data.get("prescriber_organization")
+        member_of = self.fields["prescriber_organization"].queryset
+
+        if not prescriber_organization and member_of.count() > 1:
+            self.add_error(
+                "prescriber_organization",
+                "Le prescripteur selectionné fait partie de plusieurs organisations." " Veuillez en sélectionner une.",
+            )
+
+        return prescriber_organization
+
+    def clean(self):
+        email = self.cleaned_data.get("email")
+
+        if email:
+            self.validated_by = User.objects.filter(email=email).first()
+            is_authorized_prescriber = self.validated_by and self.validated_by.is_prescriber_with_authorized_org
+
+            if not is_authorized_prescriber:
+                # Either does not exists or is not an authorized prescriber
+                self.add_error(
+                    "email",
+                    "Ce prescripteur n'a pas de compte sur les emplois de l'inclusion. "
+                    "Merci de renseigner l'e-mail d'un conseiller inscrit sur le service.",
+                )
+
+        if self.cleaned_data.get("reason") not in self.reasons_not_need_prescriber_opinion:
+            if not email:
+                # Prescriber e-mail is mandatory in these cases
+                self.add_error("email", "Vous devez choisir un prescripteur habilité")
+
+        if self.cleaned_data.get("require_phone_interview"):
+            if not self.cleaned_data.get("contact_email"):
+                self.add_error("contact_email", "Veuillez saisir une adresse e-mail de contact")
+            if not self.cleaned_data.get("contact_phone"):
+                self.add_error("contact_phone", "Veuillez saisir un numéro de téléphone de contact")
+
+        # Prolongation report is only mandatory for these reasons:
+        if self.cleaned_data.get("reason") in PROLONGATION_REPORT_FILE_REASONS:
+            if not self.cleaned_data.get("report_file_path") or not self.cleaned_data.get("uploaded_file_name"):
+                # No visible field for this form field
+                raise ValidationError("Vous devez fournir un fichier de bilan renseigné")
 
     class Meta:
         model = Prolongation
@@ -147,8 +258,10 @@ class DeclareProlongationForm(forms.ModelForm):
             # Order is important for the template.
             "reason",
             "end_at",
-            "reason_explanation",
-            "email",
+            "require_phone_interview",
+            "contact_email",
+            "contact_phone",
+            "prescriber_organization",
         ]
         widgets = {
             "end_at": DuetDatePickerWidget(),
@@ -156,7 +269,7 @@ class DeclareProlongationForm(forms.ModelForm):
         }
         help_texts = {
             "end_at": mark_safe(
-                'Date jusqu\'à laquelle le PASS IAE doit être prolongé<strong id="js-duration-label"></strong>.'
+                "Date jusqu'à laquelle le PASS IAE doit être prolongé."
                 "<br>"
                 "Au format JJ/MM/AAAA, par exemple 20/12/1978."
             ),

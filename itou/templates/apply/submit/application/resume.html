@@ -5,7 +5,7 @@
 {% block extra_head %}
     {{ block.super }}
     <!-- Dropzone -->
-    <link rel="stylesheet" type="text/css" href='{% static "vendor/dropzone/dropzone.min.css" %}'>
+    <link rel="stylesheet" type="text/css" href='{% static "vendor/dropzone/dropzone.min.css" %}'/>
 {% endblock extra_head %}
 
 {% block progress_title %}{{ block.super }} - Message & CV{% endblock %}
@@ -226,7 +226,6 @@
         </div>
     </div>
 {% endblock %}
-
 
 {% block script %}
     {{ block.super }}

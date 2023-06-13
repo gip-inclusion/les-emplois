@@ -1,0 +1,16 @@
+{% load bootstrap4 %}
+<div id="check_contact_details">
+    <hr>
+
+    <h4>Explications supplémentaires</h4>
+ 
+    <p>
+        Au besoin, vous pouvez demander un entretien téléphonique avec le prescripteur habilité pour lui apporter des explications supplémentaires.
+    </p>
+    <p>Merci de cocher la case ci-dessous et renseigner vos coordonnées pour qu’il puisse revenir vers vous.</p>
+
+    {% bootstrap_field form.require_phone_interview %}
+    {% bootstrap_field form.contact_email %}
+    {% bootstrap_field form.contact_phone %}
+    <hr/>
+</div>

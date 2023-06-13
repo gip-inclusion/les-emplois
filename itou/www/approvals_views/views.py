@@ -5,16 +5,20 @@ from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.utils import timezone
 from django.views.generic import DetailView, ListView, TemplateView
 
 from itou.approvals import enums as approvals_enums
+from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
 from itou.approvals.models import Approval, PoleEmploiApproval, Suspension
+from itou.files.models import File
 from itou.job_applications.enums import Origin, SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.pagination import ItouPaginator
 from itou.utils.perms.siae import get_current_siae_or_404
+from itou.utils.storage.s3 import S3Upload
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import UserExistsForm
 from itou.www.approvals_views.forms import (
@@ -168,6 +172,7 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
     preview = False
 
     form = DeclareProlongationForm(approval=approval, siae=siae, data=request.POST or None)
+    s3_upload = S3Upload(kind="prolongation_report")
 
     if request.method == "POST" and form.is_valid():
         prolongation = form.save(commit=False)
@@ -181,6 +186,11 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
         if request.POST.get("preview"):
             preview = True
         elif request.POST.get("save"):
+            if key := form.cleaned_data.get("report_file_path"):
+                file = File(key, timezone.now())
+                prolongation.report_file = file
+                file.save()
+
             prolongation.save()
 
             if form.cleaned_data.get("email"):
@@ -195,8 +205,89 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
         "back_url": back_url,
         "form": form,
         "preview": preview,
+        "s3_upload": s3_upload,
+        "unfold_details": form.data.get("reason") in PROLONGATION_REPORT_FILE_REASONS,
     }
+
     return render(request, template_name, context)
+
+
+class DeclareProlongationHTMXFragmentView(TemplateView):
+    """
+    HTMX interactions on dynamic parts of the prolongation declaration form
+    """
+
+    # Sometimes validation errors don't have to be displayed after loading of an HTMX fragment
+    # and we only want to display them after a "main" validation action (final validation of form)
+    clear_errors_after_loading = True
+
+    # if 'clear_errors_after_loading' is true, select form errors to be cleared
+    clear_errors = []
+
+    def _clear_errors(self):
+        # Clear given form errors if validation is not needed (but triggered)
+        for error_key in self.clear_errors:
+            self.form.errors.pop(error_key, None)
+
+    def setup(self, request, approval_id, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        if request.user.is_authenticated:
+            self.siae = get_current_siae_or_404(request)
+            self.approval = get_object_or_404(Approval, pk=approval_id)
+
+        if not self.approval.can_be_prolonged_by_siae(self.siae):
+            raise PermissionDenied()
+
+        self.form = DeclareProlongationForm(approval=self.approval, siae=self.siae, data=request.POST or None)
+        self.s3_upload = S3Upload(kind="prolongation_report")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context |= {
+            "approval": self.approval,
+            "form": self.form,
+            "s3_upload": self.s3_upload,
+        }
+        return context
+
+    def post(self, request, *args, **kwargs):
+        if self.clear_errors_after_loading:
+            try:
+                self.form.is_valid()
+            except TypeError:
+                # django-bootstrap4 does a validation of form when rendering template by calling 'form.errors':
+                # - the first logical action on the form does an HTMX reload, and a partial rendering
+                # - thus triggering a 'fullclean()' on a yet incomplete form 'Prolongation' instance,
+                # - even if *not* asked to do so (form has not yet been explicitly validated)
+                # - leading to a TypeError (date validation processing in 'Prolongation.clean()')
+                #
+                # If anybody knows how to disable this behavior of bootstrap4 (if possible)...
+                pass
+            self._clear_errors()
+
+        return render(request, self.template_name, self.get_context_data())
+
+
+class CheckPrescriberEmailView(DeclareProlongationHTMXFragmentView):
+    template_name = "approvals/includes/declaration_prescriber_email.html"
+
+
+class CheckContactDetailsView(DeclareProlongationHTMXFragmentView):
+    template_name = "approvals/includes/declaration_contact_details.html"
+    clear_errors = ("contact_email", "contact_phone")
+
+
+class ToggledUploadPanelView(DeclareProlongationHTMXFragmentView):
+    template_name = "approvals/includes/declaration_upload_panel.html"
+    clear_errors = ("email",)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context |= {
+            "unfold_details": self.form.data.get("reason") in PROLONGATION_REPORT_FILE_REASONS,
+        }
+        return context
 
 
 @login_required
@@ -248,7 +339,12 @@ def suspension_update(request, suspension_id, template_name="approvals/suspensio
 
     back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
 
-    form = SuspensionForm(approval=suspension.approval, siae=siae, instance=suspension, data=request.POST or None)
+    form = SuspensionForm(
+        approval=suspension.approval,
+        siae=siae,
+        instance=suspension,
+        data=request.POST or None,
+    )
 
     if request.method == "POST" and form.is_valid():
         suspension = form.save(commit=False)
@@ -319,7 +415,8 @@ def pe_approval_search(request, template_name="approvals/pe_approval_search.html
             if job_application and job_application.to_siae == siae:
                 # Suspensions and prolongations links are available in the job application details page.
                 application_details_url = reverse(
-                    "apply:details_for_siae", kwargs={"job_application_id": job_application.pk}
+                    "apply:details_for_siae",
+                    kwargs={"job_application_id": job_application.pk},
                 )
                 return HttpResponseRedirect(application_details_url)
             # The employer cannot handle the PASS as it's already used by another one.
@@ -373,7 +470,10 @@ def pe_approval_create(request, pe_approval_id):
 
     form = UserExistsForm(data=request.POST or None)
     if request.method != "POST" or not form.is_valid():
-        next_url = reverse("approvals:pe_approval_search_user", kwargs={"pe_approval_id": pe_approval_id})
+        next_url = reverse(
+            "approvals:pe_approval_search_user",
+            kwargs={"pe_approval_id": pe_approval_id},
+        )
         return HttpResponseRedirect(next_url)
 
     # If there already is a user with this email, we take it, otherwise we create one
@@ -392,8 +492,14 @@ def pe_approval_create(request, pe_approval_id):
 
     # It is not possible to attach an approval to a job seeker that already has a valid approval.
     if job_seeker.latest_approval and job_seeker.latest_approval.is_valid():
-        messages.error(request, "Le candidat associé à cette adresse e-mail a déjà un PASS IAE valide.")
-        next_url = reverse("approvals:pe_approval_search_user", kwargs={"pe_approval_id": pe_approval_id})
+        messages.error(
+            request,
+            "Le candidat associé à cette adresse e-mail a déjà un PASS IAE valide.",
+        )
+        next_url = reverse(
+            "approvals:pe_approval_search_user",
+            kwargs={"pe_approval_id": pe_approval_id},
+        )
         return HttpResponseRedirect(next_url)
 
     # Then we create an Approval based on the PoleEmploiApproval data
@@ -420,6 +526,9 @@ def pe_approval_create(request, pe_approval_id):
     )
     job_application.save()
 
-    messages.success(request, "L'agrément a bien été importé, vous pouvez désormais le prolonger ou le suspendre.")
+    messages.success(
+        request,
+        "L'agrément a bien été importé, vous pouvez désormais le prolonger ou le suspendre.",
+    )
     next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
     return HttpResponseRedirect(next_url)
