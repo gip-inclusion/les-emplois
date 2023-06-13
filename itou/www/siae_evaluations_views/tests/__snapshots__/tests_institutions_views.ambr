@@ -18,10 +18,13 @@
   <div class="col-lg-3 col-md-3 col-4" id="state_of_evaluated_siae-1000">
           
               
-                  <p class="badge badge-pill badge-emploi float-right">
-                      
-                      En attente
-                  </p>
+                  
+                  
+                      <p class="badge badge-pill badge-emploi float-right">
+                          
+                          En attente
+                      </p>
+                  
               
           
       </div>
@@ -124,10 +127,13 @@
   <div class="col-lg-3 col-md-3 col-4" id="state_of_evaluated_siae-1000">
           
               
-                  <p class="badge badge-pill badge-emploi float-right">
-                      Phase contradictoire -
-                      En attente
-                  </p>
+                  
+                  
+                      <p class="badge badge-pill badge-emploi float-right">
+                          Phase contradictoire -
+                          En attente
+                      </p>
+                  
               
           
       </div>
@@ -177,9 +183,43 @@
   <div class="col-lg-3 col-md-3 col-4" id="state_of_evaluated_siae-1000">
           
               
-                  <p class="badge badge-pill badge-emploi float-right">
+                  
+                  
+                      <p class="badge badge-pill badge-emploi float-right">
+                          
+                          En attente
+                      </p>
+                  
+              
+          
+      </div>
+  '''
+# ---
+# name: InstitutionEvaluatedSiaeListViewTest.test_siae_infos_with_submission_freezed_at[identified issue state]
+  '''
+  <div class="col-lg-3 col-md-3 col-4" id="state_of_evaluated_siae-1000">
+          
+              
+                  
+                  
+                      <p class="badge badge-pill badge-danger float-right">
+                          
+                          Problème constaté
+                      </p>
+                  
+              
+          
+      </div>
+  '''
+# ---
+# name: InstitutionEvaluatedSiaeListViewTest.test_siae_infos_with_submission_freezed_at[to process state]
+  '''
+  <div class="col-lg-3 col-md-3 col-4" id="state_of_evaluated_siae-1000">
+          
+              
+                  <p class="badge badge-pill badge-pilotage float-right">
                       
-                      En attente
+                      À traiter
                   </p>
               
           
