@@ -1,6 +1,7 @@
 import datetime
 import threading
 import time
+import uuid
 from unittest import mock
 
 import pytest
@@ -20,13 +21,15 @@ from freezegun import freeze_time
 
 from itou.approvals.admin import JobApplicationInline
 from itou.approvals.admin_forms import ApprovalAdminForm
-from itou.approvals.enums import ApprovalStatus, Origin
+from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
+from itou.approvals.enums import ApprovalStatus, Origin, ProlongationReason
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory, ProlongationFactory, SuspensionFactory
 from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, Suspension
 from itou.approvals.notifications import NewProlongationToAuthorizedPrescriberNotification
 from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordFactory
+from itou.files.models import File
 from itou.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.enums import SiaeKind
@@ -317,7 +320,9 @@ class ApprovalModelTest(TestCase):
 
         user = JobSeekerFactory()
         valid_pe_approval = PoleEmploiApprovalFactory(
-            pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate, number="625741810182"
+            pole_emploi_id=user.pole_emploi_id,
+            birthdate=user.birthdate,
+            number="625741810182",
         )
         approval = user.get_or_create_approval()
 
@@ -423,7 +428,10 @@ class ApprovalModelTest(TestCase):
             with self.subTest(f"reason={reason} expects end_at={suspension_expected_end_date}"):
                 approval = ApprovalFactory(start_at=approval_start_at)
                 suspension = SuspensionFactory(
-                    approval=approval, reason=reason, start_at=suspension_start_date, end_at=suspension_end_date
+                    approval=approval,
+                    reason=reason,
+                    start_at=suspension_start_date,
+                    end_at=suspension_end_date,
                 )
                 approval.unsuspend(hiring_start_at=today)
                 suspension.refresh_from_db()
@@ -449,7 +457,10 @@ class ApprovalModelTest(TestCase):
             with self.subTest(f"reason={reason} expects end_at={suspension_end_date}"):
                 approval = ApprovalFactory(start_at=approval_start_at)
                 suspension = SuspensionFactory(
-                    approval=approval, reason=reason, start_at=suspension_start_date, end_at=suspension_end_date
+                    approval=approval,
+                    reason=reason,
+                    start_at=suspension_start_date,
+                    end_at=suspension_end_date,
                 )
                 approval.unsuspend(hiring_start_at=today)
                 suspension.refresh_from_db()
@@ -499,7 +510,9 @@ class ApprovalModelTest(TestCase):
         assert future_approval.get_state_display() == "Valide (non démarré)"
 
         self.assertQuerysetEqual(
-            Approval.objects.valid().starts_in_the_past(), [valid_approval, suspended_approval], ordered=False
+            Approval.objects.valid().starts_in_the_past(),
+            [valid_approval, suspended_approval],
+            ordered=False,
         )
         assert valid_approval.state == ApprovalStatus.VALID
         assert valid_approval.get_state_display() == "Valide"
@@ -770,7 +783,8 @@ class AutomaticApprovalAdminViewsTest(TestCase):
         user = ItouStaffFactory()
         user.user_permissions.add(
             Permission.objects.get(
-                content_type=ContentType.objects.get_for_model(Approval), codename="change_approval"
+                content_type=ContentType.objects.get_for_model(Approval),
+                codename="change_approval",
             )
         )
         self.client.force_login(user)
@@ -781,7 +795,15 @@ class AutomaticApprovalAdminViewsTest(TestCase):
         response = self.client.post(
             reverse("admin:approvals_approval_change", args=[approval.pk]),
             data=model_to_dict(
-                approval, fields={"start_at", "end_at", "user", "number", "origin", "eligibility_diagnosis"}
+                approval,
+                fields={
+                    "start_at",
+                    "end_at",
+                    "user",
+                    "number",
+                    "origin",
+                    "eligibility_diagnosis",
+                },
             ),
             follow=True,
         )
@@ -859,7 +881,9 @@ class CustomApprovalAdminViewsTest(TestCase):
         # When a Pôle emploi ID has been forgotten and the user has no NIR, an approval must be delivered
         # with a manual verification.
         job_seeker = JobSeekerFactory(
-            nir="", pole_emploi_id="", lack_of_pole_emploi_id_reason=JobSeekerFactory._meta.model.REASON_FORGOTTEN
+            nir="",
+            pole_emploi_id="",
+            lack_of_pole_emploi_id_reason=JobSeekerFactory._meta.model.REASON_FORGOTTEN,
         )
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker,
@@ -1284,7 +1308,7 @@ class ProlongationManagerTest(TestCase):
             approval=approval,
             start_at=approval.end_at,
             end_at=approval.end_at + relativedelta(days=prolongation1_days),
-            reason=Prolongation.Reason.COMPLETE_TRAINING.value,
+            reason=ProlongationReason.COMPLETE_TRAINING.value,
         )
 
         prolongation2_days = 14
@@ -1293,7 +1317,7 @@ class ProlongationManagerTest(TestCase):
             approval=approval,
             start_at=prolongation1.end_at,
             end_at=prolongation1.end_at + relativedelta(days=prolongation2_days),
-            reason=Prolongation.Reason.RQTH.value,
+            reason=ProlongationReason.RQTH.value,
         )
 
         expected_duration = datetime.timedelta(days=prolongation1_days + prolongation2_days)
@@ -1313,7 +1337,7 @@ class ProlongationManagerTest(TestCase):
             approval=approval,
             start_at=approval.end_at,
             end_at=approval.end_at + relativedelta(days=prolongation1_days),
-            reason=Prolongation.Reason.COMPLETE_TRAINING.value,
+            reason=ProlongationReason.COMPLETE_TRAINING.value,
         )
 
         prolongation2_days = 14
@@ -1322,7 +1346,7 @@ class ProlongationManagerTest(TestCase):
             approval=approval,
             start_at=prolongation1.end_at,
             end_at=prolongation1.end_at + relativedelta(days=prolongation2_days),
-            reason=Prolongation.Reason.RQTH.value,
+            reason=ProlongationReason.RQTH.value,
         )
 
         prolongation3_days = 60
@@ -1331,12 +1355,12 @@ class ProlongationManagerTest(TestCase):
             approval=approval,
             start_at=prolongation2.end_at,
             end_at=prolongation2.end_at + relativedelta(days=prolongation3_days),
-            reason=Prolongation.Reason.RQTH.value,
+            reason=ProlongationReason.RQTH.value,
         )
 
         expected_duration = datetime.timedelta(days=prolongation2_days + prolongation3_days)
         assert expected_duration == Prolongation.objects.get_cumulative_duration_for(
-            approval, reason=Prolongation.Reason.RQTH.value
+            approval, reason=ProlongationReason.RQTH.value
         )
 
 
@@ -1433,6 +1457,7 @@ class ProlongationModelTestConstraint(TestCase):
             )
 
 
+@pytest.mark.usefixtures("unittest_compatibility")
 class ProlongationModelTest(TestCase):
     def test_clean_with_wrong_start_at(self):
         """
@@ -1469,32 +1494,32 @@ class ProlongationModelTest(TestCase):
 
         start_at = datetime.date(2021, 2, 1)
 
-        reason = Prolongation.Reason.SENIOR_CDI.value
+        reason = ProlongationReason.SENIOR_CDI
         expected_max_end_at = datetime.date(2031, 1, 31)  # 10 years.
         max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
         assert max_end_at == expected_max_end_at
 
-        reason = Prolongation.Reason.COMPLETE_TRAINING.value
+        reason = ProlongationReason.COMPLETE_TRAINING
         expected_max_end_at = datetime.date(2023, 1, 31)  # 2 years.
         max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
         assert max_end_at == expected_max_end_at
 
-        reason = Prolongation.Reason.RQTH.value
+        reason = ProlongationReason.RQTH
         expected_max_end_at = datetime.date(2024, 1, 31)  # 3 years.
         max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
         assert max_end_at == expected_max_end_at
 
-        reason = Prolongation.Reason.SENIOR.value
+        reason = ProlongationReason.SENIOR
         expected_max_end_at = datetime.date(2026, 1, 31)  # 5 years.
         max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
         assert max_end_at == expected_max_end_at
 
-        reason = Prolongation.Reason.PARTICULAR_DIFFICULTIES.value
+        reason = ProlongationReason.PARTICULAR_DIFFICULTIES
         expected_max_end_at = datetime.date(2022, 1, 31)  # 3 years.
         max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
         assert max_end_at == expected_max_end_at
 
-        reason = Prolongation.Reason.HEALTH_CONTEXT.value
+        reason = ProlongationReason.HEALTH_CONTEXT
         expected_max_end_at = datetime.date(2022, 1, 31)  # 1 year.
         max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
         assert max_end_at == expected_max_end_at
@@ -1523,7 +1548,7 @@ class ProlongationModelTest(TestCase):
             approval=approval,
             start_at=approval.end_at,
             end_at=expected_end_at,
-            reason=Prolongation.Reason.COMPLETE_TRAINING.value,
+            reason=ProlongationReason.COMPLETE_TRAINING.value,
         )
 
         approval.refresh_from_db()
@@ -1538,7 +1563,7 @@ class ProlongationModelTest(TestCase):
             approval=approval,
             start_at=prolongation1.end_at,
             end_at=expected_end_at,
-            reason=Prolongation.Reason.COMPLETE_TRAINING.value,
+            reason=ProlongationReason.COMPLETE_TRAINING.value,
         )
 
         approval.refresh_from_db()
@@ -1572,13 +1597,13 @@ class ProlongationModelTest(TestCase):
 
         approval = ApprovalFactory()
 
-        duration = Prolongation.MAX_CUMULATIVE_DURATION[Prolongation.Reason.COMPLETE_TRAINING.value]["duration"]
+        duration = Prolongation.MAX_CUMULATIVE_DURATION[ProlongationReason.COMPLETE_TRAINING.value]["duration"]
 
         prolongation = ProlongationFactory(
             approval=approval,
             start_at=approval.end_at,
             end_at=approval.end_at + duration,
-            reason=Prolongation.Reason.COMPLETE_TRAINING.value,
+            reason=ProlongationReason.COMPLETE_TRAINING.value,
         )
 
         assert not prolongation.has_reached_max_cumulative_duration()
@@ -1592,7 +1617,7 @@ class ProlongationModelTest(TestCase):
             approval=approval,
             start_at=approval.end_at,
             end_at=approval.end_at + datetime.timedelta(days=365 * 2),  # 2 years
-            reason=Prolongation.Reason.PARTICULAR_DIFFICULTIES.value,
+            reason=ProlongationReason.PARTICULAR_DIFFICULTIES.value,
         )
 
         assert not prolongation1.has_reached_max_cumulative_duration()
@@ -1601,7 +1626,7 @@ class ProlongationModelTest(TestCase):
             approval=approval,
             start_at=prolongation1.end_at,
             end_at=prolongation1.end_at + datetime.timedelta(days=365),  # 1 year,
-            reason=Prolongation.Reason.PARTICULAR_DIFFICULTIES.value,
+            reason=ProlongationReason.PARTICULAR_DIFFICULTIES.value,
         )
 
         assert not prolongation2.has_reached_max_cumulative_duration()
@@ -1630,6 +1655,7 @@ class ProlongationNotificationsTest(TestCase):
         assert prolongation.approval.number in email.body
         assert title(prolongation.approval.user.first_name) in email.body
         assert title(prolongation.approval.user.last_name) in email.body
+        assert prolongation.approval.user.birthdate.strftime("%d/%m/%Y") in email.body
         assert global_constants.ITOU_EMAIL_PROLONGATION in email.body
 
 
@@ -1680,7 +1706,9 @@ class ApprovalConcurrentModelTest(TransactionTestCase):
             nonlocal approval
             with transaction.atomic():
                 approval = ApprovalFactory.build(
-                    user=user1, number=Approval.get_next_number(), eligibility_diagnosis=None
+                    user=user1,
+                    number=Approval.get_next_number(),
+                    eligibility_diagnosis=None,
                 )
                 time.sleep(0.2)  # sleep long enough for the concurrent request to start
                 approval.save()
@@ -1690,7 +1718,9 @@ class ApprovalConcurrentModelTest(TransactionTestCase):
             with transaction.atomic():
                 time.sleep(0.1)  # ensure we are not the first to take the lock
                 approval2 = ApprovalFactory.build(
-                    user=user2, number=Approval.get_next_number(), eligibility_diagnosis=None
+                    user=user2,
+                    number=Approval.get_next_number(),
+                    eligibility_diagnosis=None,
                 )
                 time.sleep(0.2)  # sleep long enough to save() after the first request's save()
                 approval2.save()
@@ -1743,3 +1773,85 @@ class PENotificationMixinTestCase(TestCase):
         assert approval.pe_notification_time == now
         assert approval.pe_notification_endpoint is None
         assert approval.pe_notification_exit_code is None
+
+
+# Pytest
+
+
+@pytest.mark.django_db(transaction=True)
+def test_prologation_report_file_constraint_ok():
+    # PASS: valid reasons + report file
+    for reason in (
+        ProlongationReason.PARTICULAR_DIFFICULTIES,
+        ProlongationReason.SENIOR,
+        ProlongationReason.RQTH,
+    ):
+        report_file = File(key="random/" + str(uuid.uuid4()), last_modified=timezone.now())
+        report_file.save()
+        ProlongationFactory(reason=reason)
+
+
+@pytest.mark.django_db(transaction=True)
+def test_prologation_report_file_constraint_ko():
+    # FAIL: invalid reasons + report file
+    report_file = File(key="random/" + str(uuid.uuid4()), last_modified=timezone.now())
+    report_file.save()
+
+    for reason in (
+        ProlongationReason.COMPLETE_TRAINING,
+        ProlongationReason.SENIOR_CDI,
+        ProlongationReason.HEALTH_CONTEXT,
+    ):
+        with pytest.raises(IntegrityError):
+            ProlongationFactory(reason=reason, report_file=report_file).build()
+
+    # Check message on clean() / validate_constraints()
+    with pytest.raises(ValidationError, match="Incohérence entre le fichier de bilan et la raison de prolongation"):
+        Prolongation(report_file=File(), require_phone_interview=True).validate_constraints()
+
+
+@pytest.mark.parametrize("reason", PROLONGATION_REPORT_FILE_REASONS)
+def test_mandatory_contact_fields_validation(reason, faker):
+    # Contact details are mandatory for these reasons
+    prolongation = ProlongationFactory(
+        reason=reason, declared_by_siae__kind=SiaeKind.ACI, require_phone_interview=True
+    )
+
+    for phone, email in [
+        ([phone, email])
+        for phone in (None, faker.phone_number())
+        for email in (None, faker.email())
+        if not (phone and email)
+    ]:
+        prolongation.contact_email = email
+        prolongation.contact_phone = phone
+        with pytest.raises(
+            ValidationError,
+            match="L'adresse email et le numéro de téléphone sont obligatoires pour ce motif",
+        ):
+            prolongation.clean()
+
+    # Must pass with both contact fields filled
+    prolongation.contact_email = faker.email()
+    prolongation.contact_phone = faker.phone_number()
+    prolongation.clean()
+
+
+@pytest.mark.parametrize("reason", (ProlongationReason.SENIOR_CDI, ProlongationReason.HEALTH_CONTEXT))
+def test_optional_contact_fields_validation(reason, faker):
+    # ProlongationReason.COMPLETE_TRAINING is a specific case
+    prolongation = ProlongationFactory(
+        reason=reason, declared_by_siae__kind=SiaeKind.ACI, require_phone_interview=False
+    )
+    prolongation.clean()
+
+    for phone, email in [
+        ([phone, email]) for phone in (None, faker.phone_number()) for email in (None, faker.email()) if phone or email
+    ]:
+        prolongation.contact_email = email
+        prolongation.contact_phone = phone
+        with pytest.raises(
+            ValidationError,
+            match="L'addresse email et le numéro de téléphone ne peuvent être saisis pour ce motif",
+        ):
+            prolongation.clean()
