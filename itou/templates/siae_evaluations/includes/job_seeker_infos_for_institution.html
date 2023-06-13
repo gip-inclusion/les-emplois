@@ -26,9 +26,17 @@
             {% endif %}
         {% else %}
             {% if state == "PENDING" or state == "PROCESSING" %}
-                <p class="badge badge-pill badge-emploi float-right">En attente</p>
+                {% if evaluated_siae.submission_freezed_at %}
+                    <p class="badge badge-pill badge-danger float-right">Justificatifs non transmis</p>
+                {% else %}
+                    <p class="badge badge-pill badge-emploi float-right">En attente</p>
+                {% endif %}
             {% elif state == "UPLOADED" %}
-                <p class="badge badge-pill badge-pilotage float-right">Justificatifs téléversés</p>
+                {% if evaluated_siae.submission_freezed_at %}
+                    <p class="badge badge-pill badge-danger float-right">Justificatifs non transmis</p>
+                {% else %}
+                    <p class="badge badge-pill badge-pilotage float-right">Justificatifs téléversés</p>
+                {% endif %}
             {% elif state == "SUBMITTED" %}
                 <p class="badge badge-pill badge-pilotage float-right">
                     {% if reviewed_at %}
