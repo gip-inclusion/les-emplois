@@ -14,8 +14,10 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 from unidecode import unidecode
 
+from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
 from itou.approvals.enums import Origin
 from itou.approvals.notifications import NewProlongationToAuthorizedPrescriberNotification
+from itou.files.models import File
 from itou.job_applications import enums as job_application_enums
 from itou.prescribers import enums as prescribers_enums
 from itou.siaes import enums as siae_enums
@@ -266,10 +268,17 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         unique=True,
     )
     created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, verbose_name="Créé par", null=True, blank=True, on_delete=models.SET_NULL
+        settings.AUTH_USER_MODEL,
+        verbose_name="Créé par",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
     )
     origin = models.CharField(
-        verbose_name="Origine du pass", max_length=30, choices=Origin.choices, default=Origin.DEFAULT
+        verbose_name="Origine du pass",
+        max_length=30,
+        choices=Origin.choices,
+        default=Origin.DEFAULT,
     )
     # The job seeker's eligibility diagnosis used for the job application
     # that created this Approval
@@ -553,7 +562,10 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             ]
         ):
             logger.info(
-                "! notify_pole_emploi approval=%s had an invalid user=%s nir=%s", self, self.user, self.user.nir
+                "! notify_pole_emploi approval=%s had an invalid user=%s nir=%s",
+                self,
+                self.user,
+                self.user.nir,
             )
             # we save those as pending since the cron will ignore those cases anyway and thus has
             # no chance to block itself.
@@ -567,14 +579,23 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
 
         try:
             encrypted_nir = pe_client.recherche_individu_certifie(
-                self.user.first_name, self.user.last_name, self.user.birthdate, self.user.nir
+                self.user.first_name,
+                self.user.last_name,
+                self.user.birthdate,
+                self.user.nir,
             )
         except PoleEmploiAPIException:
-            logger.info("! notify_pole_emploi approval=%s got a recoverable error in recherche_individu", self)
+            logger.info(
+                "! notify_pole_emploi approval=%s got a recoverable error in recherche_individu",
+                self,
+            )
             self.pe_save_should_retry(at)
             return
         except PoleEmploiAPIBadResponse as exc:
-            logger.info("! notify_pole_emploi approval=%s got an unrecoverable error in recherche_individu", self)
+            logger.info(
+                "! notify_pole_emploi approval=%s got an unrecoverable error in recherche_individu",
+                self,
+            )
             self.pe_save_error(api_enums.PEApiEndpoint.RECHERCHE_INDIVIDU, exc.response_code, at)
             return
 
@@ -596,7 +617,10 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
                 typologie_prescripteur=typologie_prescripteur,
             )
         except PoleEmploiAPIException:
-            logger.info("! notify_pole_emploi approval=%s got a recoverable error in maj_pass_iae", self)
+            logger.info(
+                "! notify_pole_emploi approval=%s got a recoverable error in maj_pass_iae",
+                self,
+            )
             self.pe_save_should_retry(at)
             return
         except PoleEmploiAPIBadResponse as exc:
@@ -649,7 +673,10 @@ class Suspension(models.Model):
 
     class Reason(models.TextChoices):
         # Displayed choices
-        SUSPENDED_CONTRACT = "CONTRACT_SUSPENDED", "Contrat de travail suspendu depuis plus de 15 jours"
+        SUSPENDED_CONTRACT = (
+            "CONTRACT_SUSPENDED",
+            "Contrat de travail suspendu depuis plus de 15 jours",
+        )
         BROKEN_CONTRACT = "CONTRACT_BROKEN", "Contrat de travail rompu"
         FINISHED_CONTRACT = "FINISHED_CONTRACT", "Contrat de travail terminé"
         APPROVAL_BETWEEN_CTA_MEMBERS = (
@@ -715,7 +742,10 @@ class Suspension(models.Model):
         related_name="approvals_suspended",
     )
     reason = models.CharField(
-        verbose_name="Motif", max_length=30, choices=Reason.choices, default=Reason.SUSPENDED_CONTRACT
+        verbose_name="Motif",
+        max_length=30,
+        choices=Reason.choices,
+        default=Reason.SUSPENDED_CONTRACT,
     )
     reason_explanation = models.TextField(verbose_name="Explications supplémentaires", blank=True)
     created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
@@ -751,7 +781,11 @@ class Suspension(models.Model):
                 name="exclude_overlapping_suspensions",
                 expressions=(
                     (
-                        DateRange("start_at", "end_at", RangeBoundary(inclusive_lower=True, inclusive_upper=True)),
+                        DateRange(
+                            "start_at",
+                            "end_at",
+                            RangeBoundary(inclusive_lower=True, inclusive_upper=True),
+                        ),
                         RangeOperators.OVERLAPS,
                     ),
                     ("approval", RangeOperators.EQUAL),
@@ -868,7 +902,12 @@ class Suspension(models.Model):
         return start_at + relativedelta(months=Suspension.MAX_DURATION_MONTHS) - relativedelta(days=1)
 
     @staticmethod
-    def next_min_start_at(approval, pk_suspension=None, referent_date=None, with_retroactivity_limitation=True):
+    def next_min_start_at(
+        approval,
+        pk_suspension=None,
+        referent_date=None,
+        with_retroactivity_limitation=True,
+    ):
         """
         Returns the minimum date on which a suspension can begin.
         """
@@ -942,54 +981,46 @@ class Prolongation(models.Model):
     # The addition of 0.25 day per year makes it possible to better manage leap years.
     MAX_DURATION = datetime.timedelta(days=365.25 * 10)
 
-    class Reason(models.TextChoices):
-        SENIOR_CDI = "SENIOR_CDI", "CDI conclu avec une personne de plus de 57 ans"
-        COMPLETE_TRAINING = "COMPLETE_TRAINING", "Fin d'une formation"
-        RQTH = "RQTH", "RQTH"
-        SENIOR = "SENIOR", "50 ans et plus"
-        PARTICULAR_DIFFICULTIES = (
-            "PARTICULAR_DIFFICULTIES",
-            "Difficultés particulières qui font obstacle à l'insertion durable dans l’emploi",
-        )
-        HEALTH_CONTEXT = "HEALTH_CONTEXT", "Contexte sanitaire"
-
     MAX_CUMULATIVE_DURATION = {
-        Reason.SENIOR_CDI.value: {
+        enums.ProlongationReason.SENIOR_CDI: {
             "duration": datetime.timedelta(days=365.25 * 10),  # 10 years
             "label": "10 ans",
         },
-        Reason.COMPLETE_TRAINING.value: {
+        enums.ProlongationReason.COMPLETE_TRAINING: {
             "duration": datetime.timedelta(days=365.25 * 2),  # 2 years
             "label": "2 ans",
         },
-        Reason.RQTH.value: {
+        enums.ProlongationReason.RQTH: {
             "duration": datetime.timedelta(days=365.25 * 3),  # 3 years
             "label": "3 ans",
         },
-        Reason.SENIOR.value: {
+        enums.ProlongationReason.SENIOR: {
             "duration": datetime.timedelta(days=365.25 * 5),  # 5 years
             "label": "5 ans",
         },
-        Reason.PARTICULAR_DIFFICULTIES.value: {
+        enums.ProlongationReason.PARTICULAR_DIFFICULTIES: {
             "duration": datetime.timedelta(days=365.25 * 3),  # 3 years
             "label": "12 mois, reconductibles dans la limite de 5 ans de parcours",
         },
-        Reason.HEALTH_CONTEXT.value: {
+        enums.ProlongationReason.HEALTH_CONTEXT: {
             "duration": datetime.timedelta(days=365),  # one year
             "label": "12 mois",
         },
     }
 
     REASONS_NOT_NEED_PRESCRIBER_OPINION = (
-        Reason.SENIOR_CDI,
-        Reason.COMPLETE_TRAINING,
+        enums.ProlongationReason.SENIOR_CDI,
+        enums.ProlongationReason.COMPLETE_TRAINING,
     )
 
     approval = models.ForeignKey(Approval, verbose_name="PASS IAE", on_delete=models.CASCADE)
     start_at = models.DateField(verbose_name="Date de début", default=timezone.localdate, db_index=True)
     end_at = models.DateField(verbose_name="Date de fin", default=timezone.localdate, db_index=True)
     reason = models.CharField(
-        verbose_name="Motif", max_length=30, choices=Reason.choices, default=Reason.COMPLETE_TRAINING
+        verbose_name="Motif",
+        max_length=30,
+        choices=enums.ProlongationReason.choices,
+        default=enums.ProlongationReason.COMPLETE_TRAINING,
     )
     reason_explanation = models.TextField(verbose_name="Explications supplémentaires", blank=True)
 
@@ -1017,6 +1048,14 @@ class Prolongation(models.Model):
         related_name="approvals_prolongations_validated_set",
     )
 
+    prescriber_organization = models.ForeignKey(
+        "prescribers.PrescriberOrganization",
+        verbose_name="Organisation du prescripteur habilité",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+
     # `created_at` can be different from `validated_by` when created in admin.
     created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
     created_by = models.ForeignKey(
@@ -1033,6 +1072,29 @@ class Prolongation(models.Model):
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
+    )
+
+    # Optional fields needed for specific `reason` field values
+    report_file = models.OneToOneField(
+        File,
+        verbose_name="Fichier bilan",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+    require_phone_interview = models.BooleanField(
+        verbose_name="Demande d'entretien téléphonique",
+        default=False,
+        blank=True,
+    )
+    contact_email = models.EmailField(
+        verbose_name="E-mail de contact",
+        blank=True,
+    )
+    contact_phone = models.CharField(
+        verbose_name="Numéro de téléphone de contact",
+        max_length=20,
+        blank=True,
     )
 
     objects = ProlongationManager.from_queryset(ProlongationQuerySet)()
@@ -1052,12 +1114,26 @@ class Prolongation(models.Model):
                     (
                         # [start_at, end_at) (inclusive start, exclusive end).
                         # For prolongations: upper bound of preceding interval is the lower bound of the next.
-                        DateRange("start_at", "end_at", RangeBoundary(inclusive_lower=True, inclusive_upper=False)),
+                        DateRange(
+                            "start_at",
+                            "end_at",
+                            RangeBoundary(inclusive_lower=True, inclusive_upper=False),
+                        ),
                         RangeOperators.OVERLAPS,
                     ),
                     ("approval", RangeOperators.EQUAL),
                 ),
             ),
+            # Report file is not yet defined as mandatory for these reasons. May change though
+            models.CheckConstraint(
+                name="reason_report_file_coherence",
+                violation_error_message="Incohérence entre le fichier de bilan et la raison de prolongation",
+                # Must keep compatibility with old prolongations without report file
+                check=models.Q(report_file=None)
+                | models.Q(report_file__isnull=False, reason__in=PROLONGATION_REPORT_FILE_REASONS),
+            ),
+            # No constraints for contact fields as current data set would not satisfy
+            # contact email and phone to be null: see validation in `clean()`
         ]
 
     def __str__(self):
@@ -1081,7 +1157,7 @@ class Prolongation(models.Model):
                 }
             )
 
-        if self.reason == self.Reason.PARTICULAR_DIFFICULTIES.value:
+        if self.reason == enums.ProlongationReason.PARTICULAR_DIFFICULTIES.value:
             if not self.declared_by_siae or self.declared_by_siae.kind not in [
                 siae_enums.SiaeKind.AI,
                 siae_enums.SiaeKind.ACI,
@@ -1120,6 +1196,13 @@ class Prolongation(models.Model):
                 f'pour le motif "{self.get_reason_display()}".'
             )
 
+        # Contact fields coherence: can't use constraints on these ones
+        if self.reason in PROLONGATION_REPORT_FILE_REASONS:
+            if self.require_phone_interview and not (self.contact_email and self.contact_phone):
+                raise ValidationError("L'adresse email et le numéro de téléphone sont obligatoires pour ce motif")
+        elif any([self.require_phone_interview, self.contact_email, self.contact_phone]):
+            raise ValidationError("L'adresse email et le numéro de téléphone ne peuvent être saisis pour ce motif")
+
     @property
     def duration(self):
         return self.end_at - self.start_at
@@ -1132,7 +1215,10 @@ class Prolongation(models.Model):
         NewProlongationToAuthorizedPrescriberNotification(self).send()
 
     def has_reached_max_cumulative_duration(self, additional_duration=None):
-        if self.reason not in [self.Reason.COMPLETE_TRAINING.value, self.Reason.PARTICULAR_DIFFICULTIES.value]:
+        if self.reason not in [
+            enums.ProlongationReason.COMPLETE_TRAINING.value,
+            enums.ProlongationReason.PARTICULAR_DIFFICULTIES.value,
+        ]:
             return False
 
         cumulative_duration = Prolongation.objects.get_cumulative_duration_for(self.approval, reason=self.reason)
@@ -1162,7 +1248,7 @@ class Prolongation(models.Model):
         Returns the maximum date on which a prolongation can end.
         """
         max_duration = Prolongation.MAX_DURATION
-        if reason == Prolongation.Reason.PARTICULAR_DIFFICULTIES.value:
+        if reason == enums.ProlongationReason.PARTICULAR_DIFFICULTIES.value:
             # 12 months renewable up to 3 years for this reason
             max_duration = relativedelta(months=12)
         elif reason in Prolongation.MAX_CUMULATIVE_DURATION:
@@ -1313,7 +1399,10 @@ class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
                 self.first_name, self.last_name, self.birthdate, self.nir
             )
         except PoleEmploiAPIException:
-            logger.info("! notify_pole_emploi pe_approval=%s got a recoverable error in recherche_individu", self)
+            logger.info(
+                "! notify_pole_emploi pe_approval=%s got a recoverable error in recherche_individu",
+                self,
+            )
             self.pe_save_should_retry(at)
             return
         except PoleEmploiAPIBadResponse as exc:
@@ -1353,7 +1442,10 @@ class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
                 typologie_prescripteur=prescribers_enums.PrescriberOrganizationKind.PE,
             )
         except PoleEmploiAPIException:
-            logger.info("! notify_pole_emploi pe_approval=%s got a recoverable error in maj_pass_iae", self)
+            logger.info(
+                "! notify_pole_emploi pe_approval=%s got a recoverable error in maj_pass_iae",
+                self,
+            )
             self.pe_save_should_retry(at)
             return
         except PoleEmploiAPIBadResponse as exc:
@@ -1434,4 +1526,9 @@ class OriginalPoleEmploiApproval(CommonApprovalMixin):
         verbose_name = "Agrément Pôle emploi original"
         verbose_name_plural = "Agréments Pôle emploi originaux"
         ordering = ["-start_at"]
-        indexes = [models.Index(fields=["pole_emploi_id", "birthdate"], name="merged_pe_id_and_birthdate_idx")]
+        indexes = [
+            models.Index(
+                fields=["pole_emploi_id", "birthdate"],
+                name="merged_pe_id_and_birthdate_idx",
+            )
+        ]

@@ -6,6 +6,7 @@ import factory.fuzzy
 from dateutil.relativedelta import relativedelta
 from faker import Faker
 
+from itou.approvals.enums import ProlongationReason
 from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, Suspension
 from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.job_applications.models import JobApplicationWorkflow
@@ -69,7 +70,7 @@ class ProlongationFactory(factory.django.DjangoModelFactory):
     approval = factory.SubFactory(ApprovalFactory)
     start_at = factory.LazyAttribute(lambda obj: obj.approval.start_at)
     end_at = factory.LazyAttribute(lambda obj: Prolongation.get_max_end_at(obj.start_at, reason=obj.reason))
-    reason = Prolongation.Reason.COMPLETE_TRAINING.value
+    reason = ProlongationReason.COMPLETE_TRAINING.value
     reason_explanation = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
     declared_by = factory.LazyAttribute(lambda obj: obj.declared_by_siae.members.first())
     declared_by_siae = factory.SubFactory(SiaeFactory, with_membership=True)
