@@ -721,6 +721,7 @@ class User(AbstractUser, AddressMixin):
             or self.can_view_stats_cd(current_org=current_org)
             or self.can_view_stats_pe(current_org=current_org)
             or self.can_view_stats_ddets_iae(current_org=current_org)
+            or self.can_view_stats_ddets_log(current_org=current_org)
             or self.can_view_stats_dreets_iae(current_org=current_org)
             or self.can_view_stats_dgefp(current_org=current_org)
             or self.can_view_stats_dihal(current_org=current_org)
@@ -800,6 +801,13 @@ class User(AbstractUser, AddressMixin):
             self.is_labor_inspector
             and isinstance(current_org, Institution)
             and current_org.kind == InstitutionKind.DDETS_IAE
+        )
+
+    def can_view_stats_ddets_log(self, current_org):
+        return (
+            self.is_labor_inspector
+            and isinstance(current_org, Institution)
+            and current_org.kind == InstitutionKind.DDETS_LOG
         )
 
     def can_view_stats_dreets_iae(self, current_org):

@@ -398,6 +398,27 @@ def stats_ddets_iae_hiring(request):
     )
 
 
+@login_required
+def stats_ddets_log_state(request):
+    current_org = get_current_institution_or_404(request)
+    if not request.user.can_view_stats_ddets_log(current_org=current_org):
+        raise PermissionDenied
+    department = current_org.department
+    region = current_org.region
+    context = {
+        "page_title": f"Suivi des prescriptions des AHI de ma région ({region})",
+        # Tracking is based on ddets_log department even if we show stats for the whole region.
+        "department": department,
+        "matomo_custom_url_suffix": format_region_and_department_for_matomo(department),
+    }
+    params = get_params_for_region(region)
+    return render_stats(
+        request=request,
+        context=context,
+        params=params,
+    )
+
+
 def render_stats_dreets_iae(request, page_title):
     region = get_stats_dreets_iae_region(request)
     params = get_params_for_region(region)

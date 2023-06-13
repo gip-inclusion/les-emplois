@@ -140,6 +140,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "can_view_stats_cd": request.user.can_view_stats_cd(current_org=current_org),
         "can_view_stats_pe": request.user.can_view_stats_pe(current_org=current_org),
         "can_view_stats_ddets_iae": request.user.can_view_stats_ddets_iae(current_org=current_org),
+        "can_view_stats_ddets_log": request.user.can_view_stats_ddets_log(current_org=current_org),
         "can_view_stats_dreets_iae": request.user.can_view_stats_dreets_iae(current_org=current_org),
         "can_view_stats_dgefp": request.user.can_view_stats_dgefp(current_org=current_org),
         "can_view_stats_dihal": request.user.can_view_stats_dihal(current_org=current_org),

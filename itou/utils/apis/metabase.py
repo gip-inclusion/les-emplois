@@ -96,6 +96,12 @@ METABASE_DASHBOARDS = {
         "tally_embed_form_id": "nPpXpQ",
     },
     #
+    # Institution stats - DDETS LOG - department level.
+    #
+    "stats_ddets_log_state": {
+        "dashboard_id": 310,
+    },
+    #
     # Institution stats - DREETS IAE - region level.
     #
     "stats_dreets_iae_auto_prescription": {

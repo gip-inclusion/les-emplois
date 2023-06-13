@@ -275,6 +275,13 @@ class DashboardViewTest(TestCase):
         self.assertNotContains(response, "Voir les données de ma structure (extranet ASP)")
         self.assertNotContains(response, reverse("stats:stats_siae_etp"))
 
+    def test_dashboard_ddets_log_institution_stats(self):
+        membershipfactory = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_LOG)
+        self.client.force_login(membershipfactory.user)
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertContains(response, "Suivre les prescriptions des AHI de ma région")
+        self.assertContains(response, reverse("stats:stats_ddets_log_state"))
+
     def test_dashboard_dihal_institution_stats(self):
         membershipfactory = InstitutionMembershipFactory(institution__kind=InstitutionKind.DIHAL)
         self.client.force_login(membershipfactory.user)
