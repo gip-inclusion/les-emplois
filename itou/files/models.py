@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 
 
@@ -11,3 +12,7 @@ class File(models.Model):
 
     class Meta:
         verbose_name = "fichier"
+
+    @property
+    def link(self):
+        return f"https://{settings.S3_STORAGE_ENDPOINT_DOMAIN}/{settings.S3_STORAGE_BUCKET_NAME}/{self.key}"
