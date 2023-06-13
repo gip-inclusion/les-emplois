@@ -6,7 +6,6 @@ from itou.job_applications.enums import Origin
 
 
 class ApprovalFormMixin:
-
     ADDITIONAL_HELP_TEXT_NUMBER = " Laissez le champ vide pour générer automatiquement un numéro de PASS IAE."
     ERROR_NUMBER = (
         f"Les numéros préfixés par {Approval.ASP_ITOU_PREFIX} sont attribués automatiquement. "
@@ -47,6 +46,14 @@ class ApprovalAdminForm(ApprovalFormMixin, forms.ModelForm):
         if "number" in self.fields:
             self.fields["number"].required = False
             self.fields["number"].help_text += self.ADDITIONAL_HELP_TEXT_NUMBER
+
+        if self.instance.pk and (self.instance.suspension_set.exists() or self.instance.prolongation_set.exists()):
+            obnoxious_warning = (
+                '<ul class="messagelist"><li class="warning">En cas de modification, '
+                "vérifier la cohérence avec les périodes de suspension et de prolongation.</li></ul>"
+            )
+            self.fields["start_at"].help_text = obnoxious_warning
+            self.fields["end_at"].help_text = obnoxious_warning
 
     def get_origin(self):
         if self.instance.pk:
