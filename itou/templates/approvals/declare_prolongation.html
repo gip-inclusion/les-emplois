@@ -1,8 +1,14 @@
 {% extends BASE_TEMPLATE %}
 {% load js_filters %}
 {% load bootstrap4 %}
+{% load static %}
 
 {% block title %}Déclarer une prolongation de PASS IAE {{ block.super }}{% endblock %}
+
+{% block extra_head %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href='{% static "vendor/dropzone/dropzone.min.css" %}'/>
+{% endblock extra_head %}
 
 {% block content %}
     <section class="s-title-01">
@@ -25,91 +31,87 @@
                 <div class="col-12 col-lg-8">
                     {% if not preview %}
                         {# Edit mode. #}
-
                         {% include "approvals/includes/card.html" with common_approval=approval %}
+                        <div class="c-box my-4">
+                            {% block htmx %}
+                                <form id="mainForm" method="post" action="" class="js-prevent-multiple-submit">
+                                    {% csrf_token %}
 
-                        <form method="post" class="js-prevent-multiple-submit">
-
-                            {% csrf_token %}
-
-                            {% bootstrap_form_errors form type="all" %}
-
-                            {% bootstrap_field form.reason %}
-
-                            {% bootstrap_field form.end_at %}
-
-                            {% bootstrap_field form.reason_explanation %}
-
-                            <div id="js-field-email">
-                                {% bootstrap_field form.email %}
-
-                                <p>
-                                    Pour enregistrer une prolongation avec ce motif, vous devez obtenir l'accord préalable d'un prescripteur habilité.
-                                </p>
-
-                                <p>
-                                    <a href="{% url 'search:prescribers_home' %}" rel="noopener" target="_blank" aria-label="Rechercher des prescripteurs (ouverture dans une nouvelle fenêtre)">Rechercher des prescripteurs</a> <i class="ri-external-link-line ml-1"></i>
-                                </p>
-                            </div>
-
-                            <hr>
-
-                            {% buttons %}
-                                <a class="btn btn-outline-primary" href="{{ back_url }}">Retour</a>
-                                {# Enable preview mode: preview=1. #}
-                                <button type="submit" name="preview" value="1" class="btn btn-primary">Valider la déclaration</button>
-                            {% endbuttons %}
-
-                        </form>
-
-                    {% else %}
-                        {# Preview mode: ask for confirmation before committing to DB. #}
-
-                        <form method="post" class="js-prevent-multiple-submit">
-
-                            {% csrf_token %}
-
-                            {# Hide all form fields. #}
-                            {% for field in form %}<input type="hidden" name="{{ field.name }}" value="{{ field.value }}">{% endfor %}
-
-                            {# Show the user a preview of the prolongation. #}
-                            <div class="card my-3 text-center">
-                                <div class="card-body">
-                                    <h5 class="h4 card-title">
-                                        Vous êtes sur le point de déclarer une prolongation de PASS IAE pour la raison suivante :
-                                    </h5>
-                                    <p class="card-text">{{ form.instance.get_reason_display }}</p>
-                                    <p class="card-text text-success">
-                                        À partir du
-                                        <span class="badge badge-pill badge-success">{{ form.instance.start_at|date:"d/m/Y" }}</span>
-                                        jusqu'au
-                                        <span class="badge badge-pill badge-success">{{ form.instance.end_at|date:"d/m/Y" }}</span>
-                                    </p>
-                                    {% if form.instance.validated_by.email %}
-                                        <p class="card-text">
-                                            Un e-mail sera envoyé au prescripteur habilité ayant autorisé la prolongation :
-                                            <b>{{ form.instance.validated_by.get_full_name|title }}</b>
-                                            ({{ form.instance.validated_by.email }})
-                                        </p>
+                                    {% if not request.htmx %}
+                                        {# Skip validation display on HTMX reloads #}
+                                        {% bootstrap_form_errors form type="non_fields" %}
                                     {% endif %}
+
+                                    {% bootstrap_field form.reason %}
+                                    {% bootstrap_field form.end_at %}
+
+                                    {# HTMX: optional report file upload #}
+                                    {% include "approvals/includes/declaration_upload_panel.html" %}
+
+                                    <hr/>
+
+                                    {% buttons %}
+                                        <div class="text-right">
+                                            <a class="btn btn-outline-primary" href="{{ back_url }}">Retour</a>
+                                            {# Enable preview mode: preview=1. #}
+                                            <button type="submit" name="preview" value="1" class="btn btn-primary">Valider la déclaration</button>
+                                        </div>
+                                    {% endbuttons %}
+
+                                </form>
+                            {% endblock %}
+
+                        {% else %}
+                            {# Preview mode: ask for confirmation before committing to DB. #}
+
+                            <form method="post" action="" class="js-prevent-multiple-submit">
+
+                                {% csrf_token %}
+
+                                {# Hide all form fields. #}
+                                {% for field in form %}
+                                    {% if field.value %}<input type="hidden" name="{{ field.name }}" value="{{ field.value }}"/>{% endif %}
+                                {% endfor %}
+
+                                {# Show the user a preview of the prolongation. #}
+                                <div class="card my-3 text-center">
+                                    <div class="card-body">
+                                        <h5 class="h4 card-title">
+                                            Vous êtes sur le point de déclarer une prolongation de PASS IAE pour la raison suivante :
+                                        </h5>
+                                        <p class="card-text">{{ form.instance.get_reason_display }}</p>
+                                        <p class="card-text text-success">
+                                            À partir du
+                                            <span class="badge badge-pill badge-success">{{ form.instance.start_at|date:"d/m/Y" }}</span>
+                                            jusqu'au
+                                            <span class="badge badge-pill badge-success">{{ form.instance.end_at|date:"d/m/Y" }}</span>
+                                        </p>
+                                        {% if form.instance.validated_by.email %}
+                                            <p class="card-text">
+                                                Un e-mail sera envoyé au prescripteur habilité désigné pour autoriser la prolongation :
+                                                <b>{{ form.instance.validated_by.get_full_name|title }}</b>
+                                                ({{ form.instance.validated_by.email }})
+                                            </p>
+                                        {% endif %}
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="alert alert-warning" role="status">
-                                <p>
-                                    En confirmant cette déclaration je certifie sur l'honneur que le motif de prolongation choisi correspond à la situation du salarié.
-                                </p>
-                                {% buttons %}
-                                    {# Allow the user to modify the prolongation: edit=1. #}
-                                    <button type="submit" name="edit" value="1" class="btn btn-secondary">Annuler</button>
-                                    {# Create a prolongation: save=1. #}
-                                    <button type="submit" name="save" value="1" class="btn btn-primary">Confirmer la déclaration</button>
-                                {% endbuttons %}
-                            </div>
+                                <div class="alert alert-warning" role="status">
+                                    <p>
+                                        En confirmant cette déclaration je certifie sur l'honneur que le motif de prolongation choisi correspond à la situation du salarié.
+                                    </p>
+                                    {% buttons %}
+                                        {# Allow the user to modify the prolongation: edit=1. #}
+                                        <button type="submit" name="edit" value="1" class="btn btn-secondary">Annuler</button>
+                                        {# Create a prolongation: save=1. #}
+                                        <button type="submit" name="save" value="1" class="btn btn-primary">Confirmer la déclaration</button>
+                                    {% endbuttons %}
+                                </div>
 
-                        </form>
+                            </form>
 
-                    {% endif %}
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
@@ -118,31 +120,46 @@
 
 {% block script %}
     {{ block.super }}
-
-    {# Clicking on a reason that does not require the opinion of a prescriber hide email field  #}
+    <!-- Dropzone -->
+    <script src='{% static "vendor/dropzone/dropzone.min.js" %}'></script>
+    <script src='{% static "js/s3_upload.js" %}'></script>
+    {{ s3_upload.form_values|json_script:"s3-form-values" }}
+    {{ s3_upload.config|json_script:"s3-upload-config" }}
     <script nonce="{{ CSP_NONCE }}">
-        $(document).ready(() => {
-            var reasons_max_durations = {{ form.reasons_max_duration_labels|js }};
-            var reasons_not_need_prescriber_opinion = {{ form.reasons_not_need_prescriber_opinion|js }};
-            $('#js-field-email').css("display", "none");
-
-            function ajust_form_according_reason() {
-                const value = $('input[name="reason"]:checked').val();
-                if (reasons_not_need_prescriber_opinion.includes(value)) {
-                    $('#js-field-email').hide({}).find('.form-group').removeClass("form-group-required");
-                } else {
-                    $('#js-field-email').show({}).find('.form-group').addClass("form-group-required");
-                }
-
-                if (value in reasons_max_durations) {
-                    $('#js-duration-label').text(" (jusqu'à " + reasons_max_durations[value]['l'] + " maximum)").show();
-                    $('duet-date-picker').attr('max', reasons_max_durations[value]['d']);
-                } else {
-                    $('#js-duration-label').text("").hide();
-                }
+        function _onLoad(target) {
+            if (!$("#report_file_form", target).length) {
+                // Upload form is not there, no dropzone init needed
+                return;
             }
-            $('#id_reason input').on('change', ajust_form_according_reason);
-            ajust_form_according_reason();
-        });
+
+            dropzone = s3UploadInit({
+                dropzoneSelector: "#report_file_form",
+                callbackLocationSelector: "#{{ form.report_file_path.id_for_label }}",
+                s3FormValuesId: "s3-form-values",
+                s3UploadConfigId: "s3-upload-config",
+                sentryInternalUrl: "{% url 'home:sentry_debug' %}",
+                sentryCsrfToken: "{{ csrf_token }}",
+                returnPath: true,
+            });
+
+            // Listening on hidden fields change does not work, so:
+            const uploadedFileName = $("#{{ form.uploaded_file_name.id_for_label }}");
+            const uploadedFileNameDisplay = $("#uploaded_file_name_display");
+            const resetFileName = file => {
+                uploadedFileName.val("");
+                uploadedFileNameDisplay.text("Aucun");
+            };
+            dropzone.on("success", file => {
+                uploadedFileName.val(file.name);
+                uploadedFileNameDisplay.text(file.name);
+            });
+            dropzone.on("error", resetFileName);
+            dropzone.on("removedfile", resetFileName);
+        }
+
+        htmx.onLoad(_onLoad);
+        // or, on regular loading:
+        _onLoad()
+
     </script>
 {% endblock %}

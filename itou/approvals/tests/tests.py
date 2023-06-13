@@ -1778,8 +1778,7 @@ class PENotificationMixinTestCase(TestCase):
 # Pytest
 
 
-@pytest.mark.django_db(transaction=True)
-def test_prologation_report_file_constraint_ok():
+def test_prolongation_report_file_constraint_ok():
     # PASS: valid reasons + report file
     for reason in (
         ProlongationReason.PARTICULAR_DIFFICULTIES,
@@ -1792,7 +1791,7 @@ def test_prologation_report_file_constraint_ok():
 
 
 @pytest.mark.django_db(transaction=True)
-def test_prologation_report_file_constraint_ko():
+def test_prolongation_report_file_constraint_invalid_reasons_ko():
     # FAIL: invalid reasons + report file
     report_file = File(key="random/" + str(uuid.uuid4()), last_modified=timezone.now())
     report_file.save()
@@ -1803,11 +1802,11 @@ def test_prologation_report_file_constraint_ko():
         ProlongationReason.HEALTH_CONTEXT,
     ):
         with pytest.raises(IntegrityError):
-            ProlongationFactory(reason=reason, report_file=report_file).build()
+            ProlongationFactory(reason=reason, report_file=report_file)
 
     # Check message on clean() / validate_constraints()
     with pytest.raises(ValidationError, match="Incohérence entre le fichier de bilan et la raison de prolongation"):
-        Prolongation(report_file=File(), require_phone_interview=True).validate_constraints()
+        Prolongation(report_file=File()).validate_constraints()
 
 
 @pytest.mark.parametrize("reason", PROLONGATION_REPORT_FILE_REASONS)
@@ -1852,6 +1851,6 @@ def test_optional_contact_fields_validation(reason, faker):
         prolongation.contact_phone = phone
         with pytest.raises(
             ValidationError,
-            match="L'addresse email et le numéro de téléphone ne peuvent être saisis pour ce motif",
+            match="L'adresse email et le numéro de téléphone ne peuvent être saisis pour ce motif",
         ):
             prolongation.clean()
