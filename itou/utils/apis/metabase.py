@@ -17,6 +17,7 @@ METABASE_DASHBOARDS = {
     "stats_public": {
         "dashboard_id": 119,
     },
+    #
     # Employer stats.
     #
     "stats_siae_etp": {
@@ -148,7 +149,7 @@ METABASE_DASHBOARDS = {
     # Institution stats - DIHAL - nation level.
     #
     "stats_dihal_state": {
-        "dashboard_id": 235,
+        "dashboard_id": 310,
     },
     #
     # Institution stats - IAE Network - nation level.
