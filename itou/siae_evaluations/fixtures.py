@@ -59,94 +59,89 @@ def generate_approval_number():
     return f"{Approval.ASP_ITOU_PREFIX}" + f"{random.randint(1000, 9999999)}".zfill(7)
 
 
-with override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend"):
-    now = timezone.now()
-    evaluated_period_start_at = now - relativedelta(months=3)
-    evaluated_period_end_at = now - relativedelta(months=1)
-    datetime_within_period_range = evaluated_period_end_at - relativedelta(weeks=2)
-    created_job_applications_pks = []
-    controlled_siae = Siae.objects.get(pk=2653)  # has an active convention
-    siae_first_member = controlled_siae.members.first()
-    total_administrative_criteria = AdministrativeCriteria.objects.count()
-    level_to_criteria_pks = dict(
-        AdministrativeCriteria.objects.values("level").annotate(pks=ArrayAgg("pk")).values_list("level", "pks")
-    )
+now = timezone.now()
+evaluated_period_start_at = now - relativedelta(months=3)
+evaluated_period_end_at = now - relativedelta(months=1)
+datetime_within_period_range = evaluated_period_end_at - relativedelta(weeks=2)
+created_job_applications_pks = []
+controlled_siae = Siae.objects.get(pk=2653)  # has an active convention
+siae_first_member = controlled_siae.members.first()
+total_administrative_criteria = AdministrativeCriteria.objects.count()
+level_to_criteria_pks = dict(
+    AdministrativeCriteria.objects.values("level").annotate(pks=ArrayAgg("pk")).values_list("level", "pks")
+)
 
-    users = User.objects.filter(
-        username__in=[f"siae_evaluations_{i}" for i in range(1, total_administrative_criteria)]
-    )
+users = User.objects.filter(username__in=[f"siae_evaluations_{i}" for i in range(1, total_administrative_criteria)])
+with transaction.atomic():
+    users.delete()
+    EvaluationCampaign.objects.all().delete()
+
+# We can't use factories here because FactoryBoy is not installed in Review app and Demo environments.
+for i in range(1, total_administrative_criteria):
     with transaction.atomic():
-        users.delete()
-        EvaluationCampaign.objects.all().delete()
-
-    # We can't use factories here because FactoryBoy is not installed in Review app and Demo environments.
-    for i in range(1, total_administrative_criteria):
-        with transaction.atomic():
-            first_name, last_name, nir, pe_id = NAMES[i - 1]
-            job_seeker = User.objects.create(
-                first_name=first_name,
-                last_name=last_name,
-                username=f"siae_evaluations_{i}",
-                kind=users_enums.KIND_JOB_SEEKER,
-                nir=nir,
-                pole_emploi_id=pe_id,
-                title=random.choice(users_enums.Title.values),
-            )
-            level = str((i % 2) + 1)
-            # For ETTI and AI: 1 criterion level 1 OR 2 level 2 criteria.
-            # See AdministrativeCriteriaForm
-            min_selected_criteria = 1 if level == AdministrativeCriteriaLevel.LEVEL_1 else 2
-            pks_list = random.sample(level_to_criteria_pks[level], k=random.randint(min_selected_criteria, 4))
-
-            criteria = AdministrativeCriteria.objects.filter(pk__in=pks_list)
-            eligibility_diagnosis = EligibilityDiagnosis.objects.create(
-                author=siae_first_member,
-                author_kind=users_enums.KIND_SIAE_STAFF,
-                author_siae=controlled_siae,
-                job_seeker=job_seeker,
-                created_at=datetime_within_period_range,
-            )
-            for criterion_pk in pks_list:
-                eligibility_diagnosis.administrative_criteria.add(criterion_pk)
-            approval = Approval.objects.create(
-                user=job_seeker,
-                number=generate_approval_number(),
-                start_at=datetime_within_period_range.date(),
-                end_at=Approval.get_default_end_date(datetime_within_period_range.date()),
-                eligibility_diagnosis=eligibility_diagnosis,
-                created_at=datetime_within_period_range,
-            )
-            created_job_applications_pks += [
-                JobApplication.objects.create(
-                    approval=approval,
-                    eligibility_diagnosis=eligibility_diagnosis,
-                    hiring_start_at=datetime_within_period_range.date(),
-                    created_at=datetime_within_period_range,
-                    job_seeker=job_seeker,
-                    sender_siae=controlled_siae,
-                    sender=siae_first_member,
-                    sender_kind=users_enums.KIND_SIAE_STAFF,
-                    state=JobApplicationWorkflow.STATE_ACCEPTED,
-                    to_siae=controlled_siae,
-                ).id
-            ]
-
-    institution = Institution.objects.get(pk=2)
-    job_applications = JobApplication.objects.filter(pk__in=created_job_applications_pks)
-
-    with transaction.atomic():
-        evaluation_campaign = EvaluationCampaign.objects.create(
-            name="Campagne de contrôle a posteriori",
-            institution=institution,
-            evaluated_period_start_at=evaluated_period_start_at,
-            evaluated_period_end_at=evaluated_period_end_at,
-            chosen_percent=evaluation_enums.EvaluationChosenPercent.MAX,
+        first_name, last_name, nir, pe_id = NAMES[i - 1]
+        job_seeker = User.objects.create(
+            first_name=first_name,
+            last_name=last_name,
+            username=f"siae_evaluations_{i}",
+            kind=users_enums.KIND_JOB_SEEKER,
+            nir=nir,
+            pole_emploi_id=pe_id,
+            title=random.choice(users_enums.Title.values),
         )
+        level = str((i % 2) + 1)
+        # For ETTI and AI: 1 criterion level 1 OR 2 level 2 criteria.
+        # See AdministrativeCriteriaForm
+        min_selected_criteria = 1 if level == AdministrativeCriteriaLevel.LEVEL_1 else 2
+        pks_list = random.sample(level_to_criteria_pks[level], k=random.randint(min_selected_criteria, 4))
 
-        # eligible_job_applications must return a queryset, not a list.
-        with mock.patch(
-            "itou.siae_evaluations.models.EvaluationCampaign.eligible_job_applications", return_value=job_applications
-        ), mock.patch(
-            "itou.siae_evaluations.enums.EvaluationJobApplicationsBoundariesNumber.SELECTION_PERCENTAGE", 100
-        ):
-            evaluation_campaign.populate(timezone.now())
+        criteria = AdministrativeCriteria.objects.filter(pk__in=pks_list)
+        eligibility_diagnosis = EligibilityDiagnosis.objects.create(
+            author=siae_first_member,
+            author_kind=users_enums.KIND_SIAE_STAFF,
+            author_siae=controlled_siae,
+            job_seeker=job_seeker,
+            created_at=datetime_within_period_range,
+        )
+        for criterion_pk in pks_list:
+            eligibility_diagnosis.administrative_criteria.add(criterion_pk)
+        approval = Approval.objects.create(
+            user=job_seeker,
+            number=generate_approval_number(),
+            start_at=datetime_within_period_range.date(),
+            end_at=Approval.get_default_end_date(datetime_within_period_range.date()),
+            eligibility_diagnosis=eligibility_diagnosis,
+            created_at=datetime_within_period_range,
+        )
+        created_job_applications_pks += [
+            JobApplication.objects.create(
+                approval=approval,
+                eligibility_diagnosis=eligibility_diagnosis,
+                hiring_start_at=datetime_within_period_range.date(),
+                created_at=datetime_within_period_range,
+                job_seeker=job_seeker,
+                sender_siae=controlled_siae,
+                sender=siae_first_member,
+                sender_kind=users_enums.KIND_SIAE_STAFF,
+                state=JobApplicationWorkflow.STATE_ACCEPTED,
+                to_siae=controlled_siae,
+            ).id
+        ]
+
+institution = Institution.objects.get(pk=2)
+job_applications = JobApplication.objects.filter(pk__in=created_job_applications_pks)
+
+with override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend"), transaction.atomic():
+    evaluation_campaign = EvaluationCampaign.objects.create(
+        name="Campagne de contrôle a posteriori",
+        institution=institution,
+        evaluated_period_start_at=evaluated_period_start_at,
+        evaluated_period_end_at=evaluated_period_end_at,
+        chosen_percent=evaluation_enums.EvaluationChosenPercent.MAX,
+    )
+
+    # eligible_job_applications must return a queryset, not a list.
+    with mock.patch(
+        "itou.siae_evaluations.models.EvaluationCampaign.eligible_job_applications", return_value=job_applications
+    ), mock.patch("itou.siae_evaluations.enums.EvaluationJobApplicationsBoundariesNumber.SELECTION_PERCENTAGE", 100):
+        evaluation_campaign.populate(timezone.now())
