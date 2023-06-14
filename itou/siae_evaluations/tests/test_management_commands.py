@@ -92,7 +92,7 @@ class TestManagementCommand:
             "Nous vous rappelons que ce contrôle des DDETS doit être réalisé dans un délai de 6 semaines à compter du "
             "7 novembre 2022.\n\n" in mail1.body
         )
-        assert f"http://127.0.0.1:8000/siae_evaluation/siae_job_applications_list/{evaluated_siae1.pk}/" in mail1.body
+        assert f"http://localhost:8000/siae_evaluation/siae_job_applications_list/{evaluated_siae1.pk}/" in mail1.body
         assert mail2.subject == (
             "Contrôle a posteriori des auto-prescriptions : "
             "Plus que quelques jours pour transmettre vos justificatifs à la DDETS 02"
@@ -106,7 +106,7 @@ class TestManagementCommand:
             "Nous vous rappelons que ce contrôle des DDETS doit être réalisé dans un délai de 6 semaines à compter du "
             "7 novembre 2022.\n\n" in mail2.body
         )
-        assert f"http://127.0.0.1:8000/siae_evaluation/siae_job_applications_list/{evaluated_siae2.pk}/" in mail2.body
+        assert f"http://localhost:8000/siae_evaluation/siae_job_applications_list/{evaluated_siae2.pk}/" in mail2.body
         assert mail3.subject == (
             "Contrôle a posteriori des auto-prescriptions : "
             "Plus que quelques jours pour transmettre vos justificatifs à la DDETS 02"
@@ -120,7 +120,7 @@ class TestManagementCommand:
             "Nous vous rappelons que ce contrôle des DDETS doit être réalisé dans un délai de 6 semaines à compter du "
             "7 novembre 2022.\n\n" in mail3.body
         )
-        assert f"http://127.0.0.1:8000/siae_evaluation/siae_job_applications_list/{evaluated_siae3.pk}/" in mail3.body
+        assert f"http://localhost:8000/siae_evaluation/siae_job_applications_list/{evaluated_siae3.pk}/" in mail3.body
 
     @freeze_time("2022-12-07 11:11:11")
     def test_notify_fallback(self, capsys, mailoutbox):
@@ -157,7 +157,7 @@ class TestManagementCommand:
             "Nous vous rappelons que ce contrôle des DDETS doit être réalisé dans un délai de 6 semaines à compter du "
             "6 novembre 2022.\n\n" in mail.body
         )
-        assert f"http://127.0.0.1:8000/siae_evaluation/siae_job_applications_list/{evaluated_siae.pk}/" in mail.body
+        assert f"http://localhost:8000/siae_evaluation/siae_job_applications_list/{evaluated_siae.pk}/" in mail.body
 
     @freeze_time("2022-12-07 11:11:11")
     def test_does_not_notify_twice(self, capsys, mailoutbox):
@@ -289,7 +289,7 @@ class TestManagementCommand:
             "7 novembre 2022.\n\n" in mail1.body
         )
         assert (
-            f"http://127.0.0.1:8000/siae_evaluation/siae_job_applications_list/{evaluated_siae_no_proof.pk}/"
+            f"http://localhost:8000/siae_evaluation/siae_job_applications_list/{evaluated_siae_no_proof.pk}/"
             in mail1.body
         )
         assert mail2.subject == (
@@ -306,7 +306,7 @@ class TestManagementCommand:
             "7 novembre 2022.\n\n" in mail2.body
         )
         assert (
-            f"http://127.0.0.1:8000/siae_evaluation/siae_job_applications_list/{evaluated_siae_not_submitted.pk}/"
+            f"http://localhost:8000/siae_evaluation/siae_job_applications_list/{evaluated_siae_not_submitted.pk}/"
             in mail2.body
         )
 
@@ -386,7 +386,7 @@ class TestManagementCommand:
             "19 décembre 2022.\n\n" in mail1.body
         )
         assert (
-            f"http://127.0.0.1:8000/siae_evaluation/siae_job_applications_list/{evaluated_siae_no_answer.pk}/"
+            f"http://localhost:8000/siae_evaluation/siae_job_applications_list/{evaluated_siae_no_answer.pk}/"
             in mail1.body
         )
         assert mail2.subject == (
@@ -404,7 +404,7 @@ class TestManagementCommand:
             "19 décembre 2022.\n\n" in mail2.body
         )
         assert (
-            f"http://127.0.0.1:8000/siae_evaluation/siae_job_applications_list/{evaluated_siae_reviewed_quickly.pk}/"
+            f"http://localhost:8000/siae_evaluation/siae_job_applications_list/{evaluated_siae_reviewed_quickly.pk}/"
             in mail2.body
         )
 

@@ -14,7 +14,7 @@
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
-  http://127.0.0.1:8000
+  http://localhost:8000
   '''
 # ---
 # name: TestInstitutionEmailFactory.test_close_notifies_when_siae_has_negative_result[sanction notification email]
@@ -25,14 +25,14 @@
   Conformément au  Décret n° 2021-1128 du 30 août 2021 relatif à l'insertion par l'activité économique, les manquements constatés ainsi que les sanctions envisagées doivent être notifiés aux SIAE.
   
   Veuillez vous connecter sur votre espace des emplois de l’inclusion afin d’effectuer cette démarche.
-  http://127.0.0.1:8000/siae_evaluation/institution_evaluated_siae_list/1/
+  http://localhost:8000/siae_evaluation/institution_evaluated_siae_list/1/
   
   Cordialement,
   
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
-  http://127.0.0.1:8000
+  http://localhost:8000
   '''
 # ---
 # name: TestInstitutionEmailFactory.test_close_notify_when_siae_has_positive_result_in_adversarial_phase[accepted result email]
@@ -48,6 +48,6 @@
   ---
   [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
   Les emplois de l'inclusion
-  http://127.0.0.1:8000
+  http://localhost:8000
   '''
 # ---
