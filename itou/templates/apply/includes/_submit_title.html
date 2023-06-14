@@ -1,15 +1,15 @@
 {% load str_filters %}
 
 {% if request.user.is_siae_staff %}
-    {% if current_siae.kind == SiaeKind.GEIQ %}
-        Enregistrer une candidature
-        {% if job_seeker %}pour {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}{% endif %}
-    {% else %}
+    {% if hire_process %}
         {% if job_seeker %}
             Déclarer l’embauche de {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}
         {% else %}
             Déclarer une embauche
         {% endif %}
+    {% else %}
+        Enregistrer une candidature
+        {% if job_seeker %}pour {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}{% endif %}
     {% endif %}
 {% elif request.user.is_prescriber %}
     Postuler

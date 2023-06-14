@@ -14,6 +14,7 @@ from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.utils import geiq_allowance_amount
 from itou.siaes.enums import ContractType, SiaeKind
+from itou.users.enums import UserKind
 from itou.users.models import ApprovalAlreadyExistsError
 from itou.utils import constants as global_constants
 from itou.utils.htmx import hx_trigger_modal_control
@@ -36,6 +37,7 @@ def _accept(request, siae, job_seeker, error_url, back_url, template_name, extra
     # This will ensure a smooth Approval delivery.
     form_personal_data = None
     form_user_address = None
+    creating = job_application is None
 
     if siae.is_subject_to_eligibility_rules:
         # Info that will be used to search for an existing Pôle emploi approval.
@@ -63,6 +65,7 @@ def _accept(request, siae, job_seeker, error_url, back_url, template_name, extra
         "job_seeker": job_seeker,
         "siae": siae,
         "back_url": back_url,
+        "hire_process": job_application is None,
     } | extra_context
 
     if request.method == "POST" and all([form.is_valid() for form in forms]):
@@ -83,6 +86,13 @@ def _accept(request, siae, job_seeker, error_url, back_url, template_name, extra
                 # After each successful transition, a save() is performed by django-xworkflows,
                 # so use `commit=False` to avoid a double save.
                 job_application = form_accept.save(commit=False)
+                if creating:
+                    job_application.job_seeker = job_seeker
+                    job_application.to_siae = siae
+                    job_application.sender = request.user
+                    job_application.sender_kind = UserKind.SIAE_STAFF
+                    job_application.sender_siae = siae
+                    job_application.process(user=request.user)
                 job_application.accept(user=request.user)
 
                 # Mark job seeker's infos as up-to-date
@@ -176,9 +186,12 @@ def _accept(request, siae, job_seeker, error_url, back_url, template_name, extra
             mark_safe(f"Êtes-vous satisfait des emplois de l'inclusion ? {external_link}"),
         )
 
-        return HttpResponseClientRedirect(
-            reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
-        )
+        if creating and siae.is_subject_to_eligibility_rules and job_application.approval:
+            final_url = reverse("approvals:detail", kwargs={"pk": job_application.approval.pk})
+        else:
+            final_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+
+        return HttpResponseClientRedirect(final_url)
 
     return render(request, template_name, {**context, "has_form_error": any(form.errors for form in forms)})
 
