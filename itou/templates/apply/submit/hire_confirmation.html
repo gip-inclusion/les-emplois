@@ -1,0 +1,48 @@
+{% extends "apply/submit_base.html" %}
+{% load bootstrap4 %}
+{% load static %}
+
+{% block content_title %}
+    {{ block.super }}
+    <div>{% include 'apply/includes/eligibility_badge.html' %}</div>
+{% endblock %}
+
+{% block content_extend %}
+    <div class="c-box my-4">
+        <h2>Candidat</h2>
+        <hr>
+        <h3>Informations personnelles</h3>
+        {% include "apply/includes/job_seeker_info.html" %}
+
+        {% include "apply/includes/eligibility_diagnosis.html" with job_seeker=job_seeker siae=siae eligibility_diagnosis=eligibility_diagnosis is_sent_by_authorized_prescriber=False %}
+
+    </div>
+    {% include "apply/includes/accept_section.html" %}
+{% endblock %}
+
+{% block script %}
+    {# XXX: should this also be an include ? #}
+    {{ block.super }}
+
+    <script src="{% static 'js/split_nir.js' %}"></script>
+
+    <!-- Needed to use the Datepicker JS widget. -->
+    {{ form_accept.media }}
+    {% if form_personal_data %}{{ form_personal_data.media }}{% endif %}
+
+    {# HTMX: dynamic contract type details field, must be reloaded at each DOM swap (otherwise invalidated) #}
+    <script nonce="{{ CSP_NONCE }}">
+        htmx.onLoad(function() {
+            var contractType = $("#id_contract_type");
+            var contractTypeDetails = $("#contractTypeDetails");
+            contractType.change(function() {
+                if (contractType.val() == '{{ hide_value }}') {
+                    contractTypeDetails.removeClass("d-none");
+                } else {
+                    $("#id_contract_type_details").val('');
+                    contractTypeDetails.addClass("d-none");
+                }
+            });
+        });
+    </script>
+{% endblock %}

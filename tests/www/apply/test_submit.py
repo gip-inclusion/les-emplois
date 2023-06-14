@@ -9,16 +9,23 @@ from django.utils import timezone
 from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.asp.models import AllocationDuration, EducationLevel, RSAAllocation
-from itou.eligibility.models import EligibilityDiagnosis
-from itou.job_applications.enums import SenderKind
+from itou.eligibility.models import (
+    AdministrativeCriteria,
+    EligibilityDiagnosis,
+    GEIQAdministrativeCriteria,
+    GEIQEligibilityDiagnosis,
+)
+from itou.job_applications.enums import QualificationLevel, QualificationType, SenderKind
 from itou.job_applications.models import JobApplication
 from itou.siae_evaluations.models import Sanctions
-from itou.siaes.enums import SiaeKind
+from itou.siaes.enums import ContractType, SiaeKind
 from itou.users.enums import LackOfNIRReason
 from itou.users.models import User
 from itou.utils.models import InclusiveDateRange
 from itou.utils.session import SessionNamespace
 from itou.utils.storage.s3 import S3Upload
+from itou.utils.urls import add_url_params
+from itou.utils.widgets import DuetDatePickerWidget
 from tests.approvals.factories import PoleEmploiApprovalFactory
 from tests.cities.factories import create_city_in_zrr, create_test_cities
 from tests.eligibility.factories import EligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory
@@ -204,6 +211,85 @@ class ApplyTest(S3AccessingTestCase):
             response,
             reverse("apply:application_end", kwargs={"siae_pk": siae.pk, "application_pk": job_application.pk}),
         )
+
+
+class HireTest(TestCase):
+    def test_anonymous_access(self):
+        siae = SiaeFactory(with_jobs=True, with_membership=True)
+        url = reverse("apply:check_nir_for_hire", kwargs={"siae_pk": siae.pk})
+        response = self.client.get(url)
+        self.assertRedirects(response, reverse("account_login") + f"?next={url}")
+
+        job_seeker = JobSeekerFactory()
+        for viewname in (
+            "apply:check_job_seeker_info_for_hire",
+            "apply:check_prev_applications_for_hire",
+            "apply:eligibility_for_hire",
+            "apply:geiq_eligibility_for_hire",
+            "apply:geiq_eligibility_criteria_for_hire",
+            "apply:hire_confirmation",
+        ):
+            url = reverse(viewname, kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk})
+            response = self.client.get(url)
+            self.assertRedirects(response, reverse("account_login") + f"?next={url}")
+
+    def test_we_raise_a_permission_denied_on_missing_session(self):
+        user = JobSeekerFactory()
+        siae = SiaeFactory(with_jobs=True)
+
+        self.client.force_login(user)
+        response = self.client.get(
+            reverse("apply:search_by_email_for_hire", kwargs={"siae_pk": siae.pk, "session_uuid": str(uuid.uuid4())})
+        )
+        assert response.status_code == 403
+        assert response.context["exception"] == "A session namespace doesn't exist."
+
+    def test_we_raise_a_permission_denied_on_missing_temporary_session_for_create_job_seeker(self):
+        routes = {
+            "apply:create_job_seeker_step_1_for_hire",
+            "apply:create_job_seeker_step_2_for_hire",
+            "apply:create_job_seeker_step_3_for_hire",
+            "apply:create_job_seeker_step_end_for_hire",
+        }
+        user = JobSeekerFactory()
+        siae = SiaeFactory(with_jobs=True)
+
+        self.client.force_login(user)
+        for route in routes:
+            with self.subTest(route=route):
+                response = self.client.get(reverse(route, kwargs={"siae_pk": siae.pk, "session_uuid": uuid.uuid4()}))
+                assert response.status_code == 403
+                assert response.context["exception"] == "A session namespace doesn't exist."
+
+    def test_403_when_trying_to_update_a_prescriber(self):
+        siae = SiaeFactory(with_jobs=True, with_membership=True)
+        prescriber = PrescriberFactory()
+        self.client.force_login(siae.members.first())
+        for viewname in (
+            "apply:update_job_seeker_step_1_for_hire",
+            "apply:update_job_seeker_step_2_for_hire",
+            "apply:update_job_seeker_step_3_for_hire",
+            "apply:update_job_seeker_step_end_for_hire",
+        ):
+            url = reverse(viewname, kwargs={"siae_pk": siae.pk, "job_seeker_pk": prescriber.pk})
+            response = self.client.get(url)
+            assert response.status_code == 403
+
+    def test_404_when_trying_to_hire_a_prescriber(self):
+        siae = SiaeFactory(with_jobs=True, with_membership=True)
+        prescriber = PrescriberFactory()
+        self.client.force_login(siae.members.first())
+        for viewname in (
+            "apply:check_job_seeker_info_for_hire",
+            "apply:check_prev_applications_for_hire",
+            "apply:eligibility_for_hire",
+            "apply:geiq_eligibility_for_hire",
+            "apply:geiq_eligibility_criteria_for_hire",
+            "apply:hire_confirmation",
+        ):
+            url = reverse(viewname, kwargs={"siae_pk": siae.pk, "job_seeker_pk": prescriber.pk})
+            response = self.client.get(url)
+            assert response.status_code == 404
 
 
 def test_check_nir_job_seeker_with_lack_of_nir_reason(client):
@@ -1676,6 +1762,399 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
         assert response.status_code == 200
 
 
+class DirectHireFullProcessTest(TestCase):
+    def setUp(self):
+        [self.city] = create_test_cities(["67"], num_per_department=1)
+
+    def test_perms_for_siae(self):
+        """An SIAE can hire only for itself."""
+        siae1 = SiaeFactory(with_membership=True)
+        siae2 = SiaeFactory(with_membership=True)
+
+        user = siae1.members.first()
+        self.client.force_login(user)
+
+        response = self.client.get(reverse("apply:check_nir_for_hire", kwargs={"siae_pk": siae2.pk}))
+        assert response.status_code == 403
+
+    def test_hire_as_siae_with_suspension_sanction(self):
+        siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+        Sanctions.objects.create(
+            evaluated_siae=EvaluatedSiaeFactory(siae=siae),
+            suspension_dates=InclusiveDateRange(timezone.localdate() - relativedelta(days=1)),
+        )
+
+        user = siae.members.first()
+        self.client.force_login(user)
+
+        response = self.client.get(
+            reverse("apply:eligibility_for_hire", kwargs={"siae_pk": siae.pk, "job_seeker_pk": JobSeekerFactory().pk})
+        )
+        self.assertContains(
+            response,
+            "suite aux mesures prises dans le cadre du contrôle a posteriori",
+            status_code=403,
+        )
+
+    def test_hire_as_siae(self):
+        """Apply as SIAE (and create new job seeker)"""
+
+        siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+
+        user = siae.members.first()
+        self.client.force_login(user)
+
+        dummy_job_seeker = JobSeekerWithAddressFactory.build()
+        dummy_job_seeker.jobseeker_profile = JobSeekerProfileWithHexaAddressFactory.build()
+
+        # Step determine the job seeker with a NIR.
+        # ----------------------------------------------------------------------
+
+        check_nir_url = reverse("apply:check_nir_for_hire", kwargs={"siae_pk": siae.pk})
+        response = self.client.get(check_nir_url)
+        assert response.status_code == 200
+
+        response = self.client.post(check_nir_url, data={"nir": dummy_job_seeker.nir, "preview": 1})
+        assert response.status_code == 302
+
+        job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
+        next_url = reverse(
+            "apply:search_by_email_for_hire", kwargs={"siae_pk": siae.pk, "session_uuid": job_seeker_session_name}
+        )
+        assert response.url == next_url
+
+        # Step get job seeker e-mail.
+        # ----------------------------------------------------------------------
+
+        response = self.client.get(next_url)
+        assert response.status_code == 200
+
+        response = self.client.post(next_url, data={"email": dummy_job_seeker.email, "confirm": "1"})
+        assert response.status_code == 302
+
+        expected_job_seeker_session = {
+            "user": {
+                "email": dummy_job_seeker.email,
+                "nir": dummy_job_seeker.nir,
+            }
+        }
+        assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
+
+        next_url = reverse(
+            "apply:create_job_seeker_step_1_for_hire",
+            kwargs={"siae_pk": siae.pk, "session_uuid": job_seeker_session_name},
+        )
+        assert response.url == next_url
+
+        # Step create a job seeker.
+        # ----------------------------------------------------------------------
+
+        response = self.client.get(next_url)
+        # The NIR is prefilled
+        self.assertContains(response, dummy_job_seeker.nir)
+        # Check that the back url is correct
+        self.assertContains(
+            response,
+            reverse(
+                "apply:search_by_email_for_hire",
+                kwargs={"siae_pk": siae.pk, "session_uuid": job_seeker_session_name},
+            ),
+        )
+
+        post_data = {
+            "title": dummy_job_seeker.title,
+            "first_name": dummy_job_seeker.first_name,
+            "last_name": dummy_job_seeker.last_name,
+            "birthdate": dummy_job_seeker.birthdate,
+            "lack_of_nir": False,
+            "lack_of_nir_reason": "",
+        }
+        response = self.client.post(next_url, data=post_data)
+        assert response.status_code == 302
+        expected_job_seeker_session["user"] |= post_data
+        assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
+
+        next_url = reverse(
+            "apply:create_job_seeker_step_2_for_hire",
+            kwargs={"siae_pk": siae.pk, "session_uuid": job_seeker_session_name},
+        )
+        assert response.url == next_url
+
+        response = self.client.get(next_url)
+        assert response.status_code == 200
+
+        post_data = {
+            "address_line_1": dummy_job_seeker.address_line_1,
+            "post_code": self.city.post_codes[0],
+            "city_slug": self.city.slug,
+            "city": self.city.name,
+            "phone": dummy_job_seeker.phone,
+        }
+        response = self.client.post(next_url, data=post_data)
+        assert response.status_code == 302
+        expected_job_seeker_session["user"] |= post_data | {"department": "67", "address_line_2": ""}
+        assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
+
+        next_url = reverse(
+            "apply:create_job_seeker_step_3_for_hire",
+            kwargs={"siae_pk": siae.pk, "session_uuid": job_seeker_session_name},
+        )
+        assert response.url == next_url
+
+        response = self.client.get(next_url)
+        assert response.status_code == 200
+
+        post_data = {
+            "education_level": dummy_job_seeker.jobseeker_profile.education_level,
+        }
+        response = self.client.post(next_url, data=post_data)
+        assert response.status_code == 302
+        expected_job_seeker_session["profile"] = post_data | {
+            "resourceless": False,
+            "rqth_employee": False,
+            "oeth_employee": False,
+            "pole_emploi": False,
+            "pole_emploi_id_forgotten": "",
+            "pole_emploi_since": "",
+            "unemployed": False,
+            "unemployed_since": "",
+            "rsa_allocation": False,
+            "has_rsa_allocation": RSAAllocation.NO.value,
+            "rsa_allocation_since": "",
+            "ass_allocation": False,
+            "ass_allocation_since": "",
+            "aah_allocation": False,
+            "aah_allocation_since": "",
+        }
+        expected_job_seeker_session["user"] |= {
+            "pole_emploi_id": "",
+            "lack_of_pole_emploi_id_reason": User.REASON_NOT_REGISTERED,
+        }
+        assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
+
+        next_url = reverse(
+            "apply:create_job_seeker_step_end_for_hire",
+            kwargs={"siae_pk": siae.pk, "session_uuid": job_seeker_session_name},
+        )
+        assert response.url == next_url
+
+        response = self.client.get(next_url)
+        assert response.status_code == 200
+
+        response = self.client.post(next_url)
+        assert response.status_code == 302
+
+        assert job_seeker_session_name not in self.client.session
+        new_job_seeker = User.objects.get(email=dummy_job_seeker.email)
+
+        next_url = reverse(
+            "apply:eligibility_for_hire", kwargs={"siae_pk": siae.pk, "job_seeker_pk": new_job_seeker.pk}
+        )
+        assert response.url == next_url
+
+        # Step eligibility diagnosis
+        # ----------------------------------------------------------------------
+
+        response = self.client.get(next_url)
+        assert response.status_code == 200
+
+        criterion1 = AdministrativeCriteria.objects.level1().get(pk=1)
+        criterion2 = AdministrativeCriteria.objects.level2().get(pk=5)
+        criterion3 = AdministrativeCriteria.objects.level2().get(pk=15)
+        response = self.client.post(
+            next_url,
+            data={
+                # Administrative criteria level 1.
+                f"{criterion1.key}": "on",
+                # Administrative criteria level 2.
+                f"{criterion2.key}": "on",
+                f"{criterion3.key}": "on",
+            },
+        )
+        assert response.status_code == 302
+
+        next_url = reverse("apply:hire_confirmation", kwargs={"siae_pk": siae.pk, "job_seeker_pk": new_job_seeker.pk})
+        assert response.url == next_url
+
+        # Hire confirmation
+        # ----------------------------------------------------------------------
+        response = self.client.get(next_url)
+        self.assertContains(response, "Valider l’embauche")
+
+        hiring_start_at = timezone.localdate()
+        post_data = {
+            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": "",
+            "pole_emploi_id": new_job_seeker.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": new_job_seeker.lack_of_pole_emploi_id_reason,
+            "answer": "",
+            "address_line_1": new_job_seeker.address_line_1,
+            "post_code": new_job_seeker.post_code,
+            "city": self.city.name,
+            "city_slug": self.city.slug,
+        }
+        response = self.client.post(
+            next_url,
+            data=post_data,
+            headers={"hx-request": "true"},
+        )
+        assert response.status_code == 200
+        assert (
+            response.headers.get("HX-Trigger") == '{"modalControl": {"id": "js-confirmation-modal", "action": "show"}}'
+        )
+        post_data = post_data | {"confirmed": "True"}
+        response = self.client.post(next_url, headers={"hx-request": "true"}, data=post_data)
+
+        job_application = JobApplication.objects.get(sender=user, to_siae=siae)
+        next_url = reverse("approvals:detail", kwargs={"pk": job_application.approval.pk})
+        self.assertRedirects(response, next_url, status_code=200, fetch_redirect_response=False)
+
+        assert job_application.job_seeker == new_job_seeker
+        assert job_application.sender_kind == SenderKind.SIAE_STAFF
+        assert job_application.sender_siae == siae
+        assert job_application.sender_prescriber_organization is None
+        assert job_application.state == job_application.state.workflow.STATE_ACCEPTED
+        assert job_application.message == ""
+        assert list(job_application.selected_jobs.all()) == []
+        assert job_application.resume_link == ""
+
+        # Get application detail
+        # ----------------------------------------------------------------------
+        response = self.client.get(next_url)
+        assert response.status_code == 200
+
+    def test_hire_as_geiq(self):
+        """Apply as GEIQ with pre-existing job seeker without previous application"""
+        siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"), kind=SiaeKind.GEIQ)
+        job_seeker = JobSeekerFactory()
+
+        user = siae.members.first()
+        self.client.force_login(user)
+
+        # Step determine the job seeker with a NIR.
+        # ----------------------------------------------------------------------
+
+        check_nir_url = reverse("apply:check_nir_for_hire", kwargs={"siae_pk": siae.pk})
+        response = self.client.get(check_nir_url)
+        assert response.status_code == 200
+
+        response = self.client.post(check_nir_url, data={"nir": job_seeker.nir, "confirm": 1})
+        check_infos_url = reverse(
+            "apply:check_job_seeker_info_for_hire", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk}
+        )
+        self.assertRedirects(response, check_infos_url, fetch_redirect_response=False)
+
+        # Step check job seeker infos
+        # ----------------------------------------------------------------------
+
+        response = self.client.get(check_infos_url)
+        assert response.status_code == 200
+
+        prev_applicaitons_url = reverse(
+            "apply:check_prev_applications_for_hire", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk}
+        )
+        self.assertContains(response, prev_applicaitons_url)
+        self.assertContains(response, "Éligibilité GEIQ non confirmée")
+
+        # Step check previous applications
+        # ----------------------------------------------------------------------
+
+        response = self.client.get(prev_applicaitons_url)
+        geiq_eligibility_url = reverse(
+            "apply:geiq_eligibility_for_hire", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk}
+        )
+        self.assertRedirects(response, geiq_eligibility_url, fetch_redirect_response=False)
+
+        # Step GEIQ eligibility
+        # ----------------------------------------------------------------------
+        geiq_criteria_url = reverse(
+            "apply:geiq_eligibility_criteria_for_hire", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk}
+        )
+        confirmation_url = reverse(
+            "apply:hire_confirmation", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk}
+        )
+
+        response = self.client.get(geiq_eligibility_url)
+        assert response.status_code == 200
+        response = self.client.post(
+            geiq_eligibility_url,
+            data={"choice": "True"},
+            headers={"hx-request": "true"},
+        )
+        self.assertRedirects(
+            response,
+            add_url_params(geiq_criteria_url, {"back_url": check_infos_url, "next_url": confirmation_url}),
+            fetch_redirect_response=False,
+        )
+        htmx_response = self.client.get(geiq_criteria_url, headers={"hx-request": "true"})
+        assert htmx_response.status_code == 200
+
+        response = self.client.post(
+            add_url_params(geiq_criteria_url, {"back_url": check_infos_url, "next_url": confirmation_url}),
+            data={
+                "jeune_26_ans": "on",
+                "jeune_de_moins_de_26_ans_sans_qualification": "on",
+                "proof_of_eligibility": "on",
+            },
+        )
+        self.assertRedirects(response, confirmation_url)
+
+        # Hire confirmation
+        # ----------------------------------------------------------------------
+        response = self.client.get(confirmation_url)
+        self.assertContains(response, "Valider l’embauche")
+
+        hiring_start_at = timezone.localdate()
+        post_data = {
+            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": "",
+            "pole_emploi_id": job_seeker.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": job_seeker.lack_of_pole_emploi_id_reason,
+            "answer": "",
+            "address_line_1": job_seeker.address_line_1,
+            "post_code": job_seeker.post_code,
+            "city": self.city.name,
+            "city_slug": self.city.slug,
+            "prehiring_guidance_days": 3,
+            "nb_hours_per_week": 4,
+            "planned_training_hours": 5,
+            "contract_type": ContractType.APPRENTICESHIP,
+            "qualification_type": QualificationType.STATE_DIPLOMA,
+            "qualification_level": QualificationLevel.LEVEL_4,
+        }
+        response = self.client.post(
+            confirmation_url,
+            data=post_data,
+            headers={"hx-request": "true"},
+        )
+        assert response.status_code == 200
+        assert (
+            response.headers.get("HX-Trigger") == '{"modalControl": {"id": "js-confirmation-modal", "action": "show"}}'
+        )
+        post_data = post_data | {"confirmed": "True"}
+        response = self.client.post(confirmation_url, headers={"hx-request": "true"}, data=post_data)
+
+        job_application = JobApplication.objects.get(sender=user, to_siae=siae)
+        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        self.assertRedirects(response, next_url, status_code=200, fetch_redirect_response=False)
+
+        assert job_application.job_seeker == job_seeker
+        assert job_application.sender_kind == SenderKind.SIAE_STAFF
+        assert job_application.sender_siae == siae
+        assert job_application.sender_prescriber_organization is None
+        assert job_application.state == job_application.state.workflow.STATE_ACCEPTED
+        assert job_application.message == ""
+        assert list(job_application.selected_jobs.all()) == []
+        assert job_application.resume_link == ""
+        assert job_application.qualification_type == QualificationType.STATE_DIPLOMA
+        assert job_application.qualification_level == QualificationLevel.LEVEL_4
+
+        # Get application detail
+        # ----------------------------------------------------------------------
+        response = self.client.get(next_url)
+        assert response.status_code == 200
+
+
 class ApplyAsOtherTest(TestCase):
     ROUTES = [
         "apply:start",
@@ -2306,6 +2785,111 @@ class UpdateJobSeekerTestCase(UpdateJobSeekerBaseTestCase):
         self._check_that_last_step_doesnt_crash_with_direct_access(self.siae.members.first())
 
 
+class UpdateJobSeekerForHireTestCase(UpdateJobSeekerBaseTestCase):
+    STEP_1_VIEW_NAME = "apply:update_job_seeker_step_1_for_hire"
+    STEP_2_VIEW_NAME = "apply:update_job_seeker_step_2_for_hire"
+    STEP_3_VIEW_NAME = "apply:update_job_seeker_step_3_for_hire"
+    STEP_END_VIEW_NAME = "apply:update_job_seeker_step_end_for_hire"
+    FINAL_REDIRECT_VIEW_NAME = "apply:check_job_seeker_info_for_hire"
+
+    def test_anonymous_step_1(self):
+        response = self.client.get(self.step_1_url)
+        self.assertRedirects(response, reverse("account_login") + f"?next={self.step_1_url}")
+
+    def test_anonymous_step_2(self):
+        response = self.client.get(self.step_2_url)
+        assert response.status_code == 403
+
+    def test_anonymous_step_3(self):
+        response = self.client.get(self.step_3_url)
+        assert response.status_code == 403
+
+    def test_anonymous_step_end(self):
+        response = self.client.get(self.step_end_url)
+        assert response.status_code == 403
+
+    def test_as_job_seeker(self):
+        self._check_nothing_permitted(self.job_seeker)
+
+    def test_as_unauthorized_prescriber(self):
+        prescriber = PrescriberOrganizationWithMembershipFactory(authorized=False).members.first()
+        self._check_nothing_permitted(prescriber)
+
+    def test_as_unauthorized_prescriber_that_created_proxied_job_seeker(self):
+        prescriber = PrescriberOrganizationWithMembershipFactory(authorized=False).members.first()
+        self.job_seeker.created_by = prescriber
+        self.job_seeker.last_login = None
+        self.job_seeker.save(update_fields=["created_by", "last_login"])
+        self._check_nothing_permitted(prescriber)
+
+    def test_as_unauthorized_prescriber_that_created_the_non_proxied_job_seeker(self):
+        prescriber = PrescriberOrganizationWithMembershipFactory(authorized=False).members.first()
+        self.job_seeker.created_by = prescriber
+        # Make sure the job seeker does manage its own account
+        self.job_seeker.last_login = timezone.now() - relativedelta(months=1)
+        self.job_seeker.save(update_fields=["created_by", "last_login"])
+        self._check_nothing_permitted(prescriber)
+
+    def test_as_authorized_prescriber_with_proxied_job_seeker(self):
+        # Make sure the job seeker does not manage its own account
+        self.job_seeker.created_by = PrescriberFactory()
+        self.job_seeker.last_login = None
+        self.job_seeker.save(update_fields=["created_by", "last_login"])
+        authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
+        self._check_nothing_permitted(authorized_prescriber)
+
+    def test_as_authorized_prescriber_with_non_proxied_job_seeker(self):
+        # Make sure the job seeker does manage its own account
+        self.job_seeker.last_login = timezone.now() - relativedelta(months=1)
+        self.job_seeker.save(update_fields=["last_login"])
+        authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
+        self._check_nothing_permitted(authorized_prescriber)
+
+    def test_as_siae_with_proxied_job_seeker(self):
+        # Make sure the job seeker does not manage its own account
+        self.job_seeker.created_by = SiaeStaffFactory()
+        self.job_seeker.last_login = None
+        self.job_seeker.save(update_fields=["created_by", "last_login"])
+        self._check_everything_allowed(self.siae.members.first())
+
+    def test_as_siae_with_non_proxied_job_seeker(self):
+        # Make sure the job seeker does manage its own account
+        self.job_seeker.last_login = timezone.now() - relativedelta(months=1)
+        self.job_seeker.save(update_fields=["last_login"])
+        self._check_only_administrative_allowed(self.siae.members.first())
+
+    def test_without_job_seeker_session(self):
+        self.client.force_login(self.siae.members.first())
+        for url in [
+            self.step_2_url,
+            self.step_3_url,
+            self.step_end_url,
+        ]:
+            response = self.client.get(url)
+            assert response.status_code == 403
+
+    def test_with_job_seeker_without_nir(self):
+        # Make sure the job seeker does not manage its own account (and has no nir)
+        self.job_seeker.nir = ""
+        self.job_seeker.lack_of_nir_reason = ""
+        self.job_seeker.created_by = SiaeStaffFactory()
+        self.job_seeker.last_login = None
+        self.job_seeker.save(update_fields=["created_by", "last_login", "nir", "lack_of_nir_reason"])
+        self._check_everything_allowed(
+            self.siae.members.first(),
+            extra_post_data_1={"nir": "", "lack_of_nir": True, "lack_of_nir_reason": LackOfNIRReason.TEMPORARY_NUMBER},
+        )
+        # Check that we could update its NIR infos
+        assert self.job_seeker.lack_of_nir_reason == LackOfNIRReason.TEMPORARY_NUMBER
+
+    def test_as_siae_that_last_step_doesnt_crash_with_direct_access(self):
+        # Make sure the job seeker does not manage its own account
+        self.job_seeker.created_by = SiaeStaffFactory()
+        self.job_seeker.last_login = None
+        self.job_seeker.save(update_fields=["created_by", "last_login"])
+        self._check_that_last_step_doesnt_crash_with_direct_access(self.siae.members.first())
+
+
 class UpdateJobSeekerStep3ViewTestCase(TestCase):
     def test_job_seeker_with_profile_has_check_boxes_ticked_in_step3(self):
         siae = SiaeFactory(subject_to_eligibility=True, with_membership=True)
@@ -2777,3 +3361,420 @@ class CheckPreviousApplicationsViewTestCase(TestCase):
         response = self.client.get(self.application_jobs_url)
         self.assertNotContains(response, self.check_infos_url)
         self.assertContains(response, self.check_prev_applications_url)
+
+
+class FindJobSeekerForHireViewTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.siae = SiaeFactory(with_membership=True)
+        cls.check_nir_url = reverse("apply:check_nir_for_hire", kwargs={"siae_pk": cls.siae.pk})
+
+    def test_job_seeker_found_with_nir(self):
+        user = self.siae.members.first()
+        self.client.force_login(user)
+
+        job_seeker = JobSeekerFactory(first_name="Sylvie", last_name="Martin")
+
+        response = self.client.get(self.check_nir_url)
+        self.assertContains(response, "Déclarer une embauche")
+
+        response = self.client.post(self.check_nir_url, data={"nir": job_seeker.nir, "preview": 1})
+        self.assertContains(response, "Sylvie MARTIN")
+        # Confirmation modal is shown
+        assert response.context["preview_mode"] is True
+
+        response = self.client.post(self.check_nir_url, data={"nir": job_seeker.nir, "confirm": 1})
+        self.assertRedirects(
+            response,
+            reverse(
+                "apply:check_job_seeker_info_for_hire",
+                kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": job_seeker.pk},
+            ),
+        )
+
+    def test_job_seeker_found_with_email(self):
+        user = self.siae.members.first()
+        self.client.force_login(user)
+
+        job_seeker = JobSeekerFactory(first_name="Sylvie", last_name="Martin")
+        INVALID_NIR = "123456"
+
+        response = self.client.get(self.check_nir_url)
+        self.assertContains(response, "Déclarer une embauche")
+
+        response = self.client.post(self.check_nir_url, data={"nir": INVALID_NIR, "preview": 1})
+        self.assertContains(response, "Le numéro de sécurité sociale est trop court")
+        response = self.client.post(self.check_nir_url, data={"nir": INVALID_NIR, "skip": 1})
+        assert response.status_code == 302
+
+        job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
+        search_by_email_url = reverse(
+            "apply:search_by_email_for_hire", kwargs={"siae_pk": self.siae.pk, "session_uuid": job_seeker_session_name}
+        )
+        assert response.url == search_by_email_url
+
+        response = self.client.get(search_by_email_url)
+        self.assertContains(response, "Déclarer une embauche")  # Check page title
+        self.assertContains(response, self.check_nir_url)  # Check back button URL
+        self.assertNotContains(response, INVALID_NIR)
+
+        response = self.client.post(search_by_email_url, data={"email": job_seeker.email, "preview": 1})
+        self.assertContains(response, "Sylvie MARTIN")
+        # Confirmation modal is shown
+        assert response.context["preview_mode"] is True
+
+        response = self.client.post(search_by_email_url, data={"email": job_seeker.email, "confirm": 1})
+        self.assertRedirects(
+            response,
+            reverse(
+                "apply:check_job_seeker_info_for_hire",
+                kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": job_seeker.pk},
+            ),
+        )
+
+    def test_no_job_seeker_redirect_to_create(self):
+        user = self.siae.members.first()
+        self.client.force_login(user)
+
+        dummy_job_seeker = JobSeekerWithAddressFactory.build()
+        dummy_job_seeker.jobseeker_profile = JobSeekerProfileWithHexaAddressFactory.build()
+
+        response = self.client.get(self.check_nir_url)
+        self.assertContains(response, "Déclarer une embauche")
+
+        response = self.client.post(self.check_nir_url, data={"nir": dummy_job_seeker.nir, "preview": 1})
+        assert response.status_code == 302
+
+        job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
+        search_by_email_url = reverse(
+            "apply:search_by_email_for_hire", kwargs={"siae_pk": self.siae.pk, "session_uuid": job_seeker_session_name}
+        )
+        assert response.url == search_by_email_url
+
+        response = self.client.get(search_by_email_url)
+        self.assertContains(response, "Déclarer une embauche")  # Check page title
+        self.assertContains(response, self.check_nir_url)  # Check back button URL
+        self.assertContains(response, dummy_job_seeker.nir)
+
+        response = self.client.post(search_by_email_url, data={"email": dummy_job_seeker.email})
+        self.assertRedirects(
+            response,
+            reverse(
+                "apply:create_job_seeker_step_1_for_hire",
+                kwargs={"siae_pk": self.siae.pk, "session_uuid": job_seeker_session_name},
+            ),
+        )
+
+        expected_job_seeker_session = {
+            "user": {
+                "email": dummy_job_seeker.email,
+                "nir": dummy_job_seeker.nir,
+            }
+        }
+        assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
+
+
+class CheckJobSeekerInformationsForHireTestCase(TestCase):
+    def test_siae(self):
+        siae = SiaeFactory(subject_to_eligibility=True, with_membership=True)
+        job_seeker = JobSeekerFactory(
+            first_name="Son prénom",
+            last_name="Son nom de famille",
+            nir="",
+            lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
+        )
+        self.client.force_login(siae.members.first())
+        response = self.client.get(
+            reverse(
+                "apply:check_job_seeker_info_for_hire",
+                kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk},
+            )
+        )
+        self.assertContains(
+            response,
+            '<h1>Informations personnelles de <span class="text-muted">Son Prénom Son Nom De Famille</span></h1>',
+            html=True,
+        )
+        self.assertContains(response, "Éligibilité IAE à valider")
+        self.assertContains(
+            response,
+            reverse(
+                "apply:update_job_seeker_step_1_for_hire", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk}
+            ),
+        )
+        self.assertContains(
+            response,
+            reverse(
+                "apply:check_prev_applications_for_hire", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk}
+            ),
+        )
+        self.assertContains(response, reverse("dashboard:index"))
+
+
+class CheckPreviousApplicationsForHireViewTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.job_seeker = JobSeekerFactory()
+
+    def _reverse(self, view_name):
+        return reverse(view_name, kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk})
+
+    def test_no_previous_as_siae_staff(self):
+        self.siae = SiaeFactory(subject_to_eligibility=True, with_membership=True)
+        self.client.force_login(self.siae.members.first())
+
+        response = self.client.get(self._reverse("apply:check_prev_applications_for_hire"))
+        self.assertRedirects(response, self._reverse("apply:eligibility_for_hire"))
+
+    def test_with_previous_as_siae_staff(self):
+        self.siae = SiaeFactory(subject_to_eligibility=True, with_membership=True)
+        JobApplicationFactory(job_seeker=self.job_seeker, to_siae=self.siae, eligibility_diagnosis=None)
+        self.client.force_login(self.siae.members.first())
+
+        response = self.client.get(self._reverse("apply:check_prev_applications_for_hire"))
+        self.assertContains(response, "Le candidat a déjà postulé chez cet employeur le")
+        response = self.client.post(
+            self._reverse("apply:check_prev_applications_for_hire"), data={"force_new_application": "force"}
+        )
+        self.assertRedirects(response, self._reverse("apply:eligibility_for_hire"))
+
+    def test_no_previous_as_geiq_staff(self):
+        self.siae = SiaeFactory(kind=SiaeKind.GEIQ, with_membership=True)
+        self.client.force_login(self.siae.members.first())
+
+        response = self.client.get(self._reverse("apply:check_prev_applications_for_hire"))
+        self.assertRedirects(response, self._reverse("apply:geiq_eligibility_for_hire"))
+
+    def test_with_previous_as_geiq_staff(self):
+        self.siae = SiaeFactory(kind=SiaeKind.GEIQ, with_membership=True)
+        JobApplicationFactory(job_seeker=self.job_seeker, to_siae=self.siae, eligibility_diagnosis=None)
+        self.client.force_login(self.siae.members.first())
+
+        response = self.client.get(self._reverse("apply:check_prev_applications_for_hire"))
+        self.assertContains(response, "Le candidat a déjà postulé chez cet employeur le")
+        response = self.client.post(
+            self._reverse("apply:check_prev_applications_for_hire"), data={"force_new_application": "force"}
+        )
+        self.assertRedirects(response, self._reverse("apply:geiq_eligibility_for_hire"))
+
+
+class EligibilityForHireTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.job_seeker = JobSeekerFactory(first_name="Ellie", last_name="Gibilitay")
+
+    def _reverse(self, view_name):
+        return reverse(view_name, kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk})
+
+    def test_not_subject_to_eligibility(self):
+        self.siae = SiaeFactory(not_subject_to_eligibility=True, with_membership=True)
+        self.client.force_login(self.siae.members.first())
+        response = self.client.get(self._reverse("apply:eligibility_for_hire"))
+        self.assertRedirects(response, self._reverse("apply:hire_confirmation"))
+
+    def test_job_seeker_with_valid_diagnosis(self):
+        self.siae = SiaeFactory(subject_to_eligibility=True, with_membership=True)
+        EligibilityDiagnosisFactory(job_seeker=self.job_seeker)
+        self.client.force_login(self.siae.members.first())
+        response = self.client.get(self._reverse("apply:eligibility_for_hire"))
+        self.assertRedirects(response, self._reverse("apply:hire_confirmation"))
+
+    def test_job_seeker_without_valid_diagnosis(self):
+        self.siae = SiaeFactory(subject_to_eligibility=True, with_membership=True)
+        assert not self.job_seeker.has_valid_diagnosis(for_siae=self.siae)
+        self.client.force_login(self.siae.members.first())
+        response = self.client.get(self._reverse("apply:eligibility_for_hire"))
+        self.assertContains(response, "Déclarer l’embauche de Ellie GIBILITAY")
+        self.assertContains(response, "Valider l'éligibilité IAE")
+        self.assertContains(response, self._reverse("apply:check_job_seeker_info_for_hire"))  # cancel button
+
+        criterion1 = AdministrativeCriteria.objects.level1().get(pk=1)
+        criterion2 = AdministrativeCriteria.objects.level2().get(pk=5)
+        criterion3 = AdministrativeCriteria.objects.level2().get(pk=15)
+        response = self.client.post(
+            self._reverse("apply:eligibility_for_hire"),
+            data={
+                # Administrative criteria level 1.
+                f"{criterion1.key}": "on",
+                # Administrative criteria level 2.
+                f"{criterion2.key}": "on",
+                f"{criterion3.key}": "on",
+            },
+        )
+        self.assertRedirects(response, self._reverse("apply:hire_confirmation"))
+        assert self.job_seeker.has_valid_diagnosis(for_siae=self.siae)
+
+
+class GEIQEligibilityForHireTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.job_seeker = JobSeekerFactory(first_name="Ellie", last_name="Gibilitay")
+
+    def _reverse(self, view_name):
+        return reverse(view_name, kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk})
+
+    def test_not_geiq(self):
+        self.siae = SiaeFactory(subject_to_eligibility=True, with_membership=True)
+        self.client.force_login(self.siae.members.first())
+        response = self.client.get(self._reverse("apply:geiq_eligibility_for_hire"))
+        assert response.status_code == 404
+
+    def test_job_seeker_with_valid_diagnosis(self):
+        diagnosis = GEIQEligibilityDiagnosisFactory(job_seeker=self.job_seeker, with_geiq=True)
+        diagnosis.administrative_criteria.add(GEIQAdministrativeCriteria.objects.get(pk=19))
+        self.siae = diagnosis.author_geiq
+        self.client.force_login(self.siae.members.first())
+        response = self.client.get(self._reverse("apply:eligibility_for_hire"))
+        self.assertRedirects(response, self._reverse("apply:hire_confirmation"))
+
+    def test_job_seeker_without_valid_diagnosis(self):
+        self.siae = SiaeFactory(kind=SiaeKind.GEIQ, with_membership=True)
+        assert not GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(self.job_seeker, self.siae).exists()
+        self.client.force_login(self.siae.members.first())
+        response = self.client.get(self._reverse("apply:geiq_eligibility_for_hire"))
+        self.assertContains(response, "Déclarer l’embauche de Ellie GIBILITAY")
+        self.assertContains(response, "Eligibilité GEIQ")
+        self.assertContains(response, self._reverse("apply:check_job_seeker_info_for_hire"))  # cancel button
+
+        response = self.client.post(
+            self._reverse("apply:geiq_eligibility_for_hire"),
+            data={"choice": "True"},
+            headers={"hx-request": "true"},
+        )
+        criteria_url = add_url_params(
+            self._reverse("apply:geiq_eligibility_criteria_for_hire"),
+            {
+                "back_url": self._reverse("apply:check_job_seeker_info_for_hire"),
+                "next_url": self._reverse("apply:hire_confirmation"),
+            },
+        )
+        self.assertRedirects(
+            response,
+            criteria_url,
+            fetch_redirect_response=False,
+        )
+        htmx_response = self.client.get(criteria_url, headers={"hx-request": "true"})
+        assert htmx_response.status_code == 200
+
+        response = self.client.post(
+            criteria_url,
+            data={
+                "jeune_26_ans": "on",
+                "jeune_de_moins_de_26_ans_sans_qualification": "on",
+                "proof_of_eligibility": "on",
+            },
+        )
+        self.assertRedirects(response, self._reverse("apply:hire_confirmation"))
+        assert GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(self.job_seeker, self.siae).exists()
+
+
+class HireConfirmationTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.job_seeker = JobSeekerWithAddressFactory(first_name="Clara", last_name="Sion")
+        [cls.city] = create_test_cities(["67"], num_per_department=1)
+
+    def _reverse(self, view_name):
+        return reverse(view_name, kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk})
+
+    def test_as_siae(self):
+        self.siae = SiaeFactory(subject_to_eligibility=True, with_membership=True)
+        EligibilityDiagnosisFactory(job_seeker=self.job_seeker)
+        self.client.force_login(self.siae.members.first())
+        response = self.client.get(self._reverse("apply:hire_confirmation"))
+        self.assertContains(response, "Déclarer l’embauche de Clara SION")
+        self.assertContains(response, "Éligible à l’IAE")
+
+        hiring_start_at = timezone.localdate()
+        post_data = {
+            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": "",
+            "pole_emploi_id": self.job_seeker.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": self.job_seeker.lack_of_pole_emploi_id_reason,
+            "answer": "",
+            "address_line_1": self.job_seeker.address_line_1,
+            "post_code": self.job_seeker.post_code,
+            "city": self.city.name,
+            "city_slug": self.city.slug,
+        }
+        response = self.client.post(
+            self._reverse("apply:hire_confirmation"),
+            data=post_data,
+            headers={"hx-request": "true"},
+        )
+        assert response.status_code == 200
+        assert (
+            response.headers.get("HX-Trigger") == '{"modalControl": {"id": "js-confirmation-modal", "action": "show"}}'
+        )
+        post_data = post_data | {"confirmed": "True"}
+        response = self.client.post(
+            self._reverse("apply:hire_confirmation"), headers={"hx-request": "true"}, data=post_data
+        )
+
+        job_application = JobApplication.objects.get(sender=self.siae.members.first(), to_siae=self.siae)
+        next_url = reverse("approvals:detail", kwargs={"pk": job_application.approval.pk})
+        self.assertRedirects(response, next_url, status_code=200)
+
+        assert job_application.job_seeker == self.job_seeker
+        assert job_application.sender_kind == SenderKind.SIAE_STAFF
+        assert job_application.sender_siae == self.siae
+        assert job_application.sender_prescriber_organization is None
+        assert job_application.state == job_application.state.workflow.STATE_ACCEPTED
+        assert job_application.message == ""
+        assert list(job_application.selected_jobs.all()) == []
+        assert job_application.resume_link == ""
+
+    def test_as_geiq(self):
+        diagnosis = GEIQEligibilityDiagnosisFactory(job_seeker=self.job_seeker, with_geiq=True)
+        diagnosis.administrative_criteria.add(GEIQAdministrativeCriteria.objects.get(pk=19))
+        self.siae = diagnosis.author_geiq
+        self.client.force_login(self.siae.members.first())
+        response = self.client.get(self._reverse("apply:hire_confirmation"))
+        self.assertContains(response, "Déclarer l’embauche de Clara SION")
+        self.assertContains(response, "Éligibilité GEIQ confirmée")
+
+        hiring_start_at = timezone.localdate()
+        post_data = {
+            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": "",
+            "pole_emploi_id": self.job_seeker.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": self.job_seeker.lack_of_pole_emploi_id_reason,
+            "answer": "",
+            "address_line_1": "1, Adress Line",
+            "post_code": "Post code",
+            "city": self.city.name,
+            "city_slug": self.city.slug,
+            # GEIQ specific fields
+            "prehiring_guidance_days": 3,
+            "nb_hours_per_week": 4,
+            "planned_training_hours": 5,
+            "contract_type": ContractType.APPRENTICESHIP,
+            "qualification_type": QualificationType.STATE_DIPLOMA,
+            "qualification_level": QualificationLevel.LEVEL_4,
+        }
+        response = self.client.post(
+            self._reverse("apply:hire_confirmation"),
+            data=post_data,
+            headers={"hx-request": "true"},
+        )
+        assert response.status_code == 200
+        assert (
+            response.headers.get("HX-Trigger") == '{"modalControl": {"id": "js-confirmation-modal", "action": "show"}}'
+        )
+        post_data = post_data | {"confirmed": "True"}
+        response = self.client.post(
+            self._reverse("apply:hire_confirmation"), headers={"hx-request": "true"}, data=post_data
+        )
+
+        job_application = JobApplication.objects.get(sender=self.siae.members.first(), to_siae=self.siae)
+        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        self.assertRedirects(response, next_url, status_code=200)
+
+        assert job_application.job_seeker == self.job_seeker
+        assert job_application.sender_kind == SenderKind.SIAE_STAFF
+        assert job_application.sender_siae == self.siae
+        assert job_application.sender_prescriber_organization is None
+        assert job_application.state == job_application.state.workflow.STATE_ACCEPTED
+        assert job_application.message == ""
+        assert list(job_application.selected_jobs.all()) == []
+        assert job_application.resume_link == ""

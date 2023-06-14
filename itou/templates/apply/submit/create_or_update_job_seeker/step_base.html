@@ -55,7 +55,7 @@
                                             <strong>Informations modifiables par le candidat uniquement</strong>
                                         </p>
                                         <p>Le candidat s’étant connecté à son compte utilisateur, vous ne pouvez modifier que sa situation administrative.</p>
-                                        <a class="btn btn-link" href="{% url "apply:update_job_seeker_step_3" siae_pk=siae.pk job_seeker_pk=job_seeker.pk %}">Voir la situation administrative</a>
+                                        <a class="btn btn-link" href="{{ step_3_url }}">Voir la situation administrative</a>
                                     </div>
                                 </div>
                             </div>
