@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -104,6 +106,13 @@ class Calendar(models.Model):
 
     def __str__(self):
         return f"{self.name}"
+
+    def save(self, *args, **kwargs):
+        if not self.html:
+            file_path = Path(settings.APPS_DIR) / "templates" / "siae_evaluations" / "default_calendar_html.html"
+            with open(file_path, encoding="utf-8") as file:
+                self.html = file.read()
+        super().save(*args, **kwargs)
 
 
 class EvaluationCampaignQuerySet(models.QuerySet):
