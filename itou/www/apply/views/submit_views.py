@@ -285,7 +285,6 @@ class CheckNIRForJobSeekerView(ApplyStepForJobSeekerBaseView):
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "form": self.form,
-            "form_action": reverse("apply:check_nir_for_job_seeker", kwargs={"siae_pk": self.siae.pk}),
         }
 
 
@@ -348,7 +347,6 @@ class CheckNIRForSenderView(ApplyStepForSenderBaseView):
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "form": self.form,
-            "form_action": reverse("apply:check_nir_for_sender", kwargs={"siae_pk": self.siae.pk}),
         }
 
 
