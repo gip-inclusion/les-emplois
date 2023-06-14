@@ -12,28 +12,30 @@ from freezegun import freeze_time
 from itou.approvals.factories import ApprovalFactory
 from itou.eligibility.enums import AdministrativeCriteriaLevel, AuthorKind
 from itou.eligibility.factories import EligibilityDiagnosisFactory
-from itou.eligibility.models import (AdministrativeCriteria,
-                                     EligibilityDiagnosis)
+from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.institutions.enums import InstitutionKind
-from itou.institutions.factories import (InstitutionFactory,
-                                         InstitutionWith2MembershipFactory)
+from itou.institutions.factories import InstitutionFactory, InstitutionWith2MembershipFactory
 from itou.job_applications.factories import JobApplicationFactory
-from itou.job_applications.models import (JobApplication,
-                                          JobApplicationQuerySet,
-                                          JobApplicationWorkflow)
+from itou.job_applications.models import JobApplication, JobApplicationQuerySet, JobApplicationWorkflow
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.factories import (
-    EvaluatedAdministrativeCriteriaFactory, EvaluatedJobApplicationFactory,
-    EvaluatedSiaeFactory, EvaluationCampaignFactory)
-from itou.siae_evaluations.models import (Calendar,
-                                          CampaignAlreadyPopulatedException,
-                                          EvaluatedAdministrativeCriteria,
-                                          EvaluatedJobApplication,
-                                          EvaluatedSiae, EvaluationCampaign,
-                                          Sanctions,
-                                          create_campaigns_and_calendar,
-                                          select_min_max_job_applications,
-                                          validate_institution)
+    EvaluatedAdministrativeCriteriaFactory,
+    EvaluatedJobApplicationFactory,
+    EvaluatedSiaeFactory,
+    EvaluationCampaignFactory,
+)
+from itou.siae_evaluations.models import (
+    Calendar,
+    CampaignAlreadyPopulatedException,
+    EvaluatedAdministrativeCriteria,
+    EvaluatedJobApplication,
+    EvaluatedSiae,
+    EvaluationCampaign,
+    Sanctions,
+    create_campaigns_and_calendar,
+    select_min_max_job_applications,
+    validate_institution,
+)
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory, SiaeWith2MembershipsFactory
 from itou.users.enums import KIND_SIAE_STAFF
