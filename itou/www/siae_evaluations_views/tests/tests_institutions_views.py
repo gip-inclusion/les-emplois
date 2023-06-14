@@ -9,28 +9,31 @@ from django.urls import reverse
 from django.utils import dateformat, timezone
 from freezegun import freeze_time
 
-from itou.eligibility.models import (AdministrativeCriteria,
-                                     EligibilityDiagnosis)
+from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.institutions.factories import InstitutionMembershipFactory
 from itou.job_applications.factories import JobApplicationFactory
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.constants import CAMPAIGN_VIEWABLE_DURATION
 from itou.siae_evaluations.factories import (
-    EvaluatedAdministrativeCriteriaFactory, EvaluatedJobApplicationFactory,
-    EvaluatedSiaeFactory, EvaluationCampaignFactory)
-from itou.siae_evaluations.models import (EvaluatedAdministrativeCriteria,
-                                          EvaluatedJobApplication,
-                                          EvaluationCampaign, Sanctions)
+    EvaluatedAdministrativeCriteriaFactory,
+    EvaluatedJobApplicationFactory,
+    EvaluatedSiaeFactory,
+    EvaluationCampaignFactory,
+)
+from itou.siae_evaluations.models import (
+    EvaluatedAdministrativeCriteria,
+    EvaluatedJobApplication,
+    EvaluationCampaign,
+    Sanctions,
+)
 from itou.siaes.factories import SiaeFactory, SiaeMembershipFactory
 from itou.users.enums import KIND_SIAE_STAFF
 from itou.users.factories import JobSeekerFactory
 from itou.utils.perms.user import UserInfo
 from itou.utils.templatetags.format_filters import format_approval_number
-from itou.utils.test import (BASE_NUM_QUERIES, TestCase, assertMessages,
-                             parse_response_to_soup)
+from itou.utils.test import BASE_NUM_QUERIES, TestCase, assertMessages, parse_response_to_soup
 from itou.utils.types import InclusiveDateRange
-from itou.www.siae_evaluations_views.forms import (LaborExplanationForm,
-                                                   SetChosenPercentForm)
+from itou.www.siae_evaluations_views.forms import LaborExplanationForm, SetChosenPercentForm
 
 
 # fixme vincentporte : convert this method into factory
