@@ -71,7 +71,7 @@ level_to_criteria_pks = dict(
     AdministrativeCriteria.objects.values("level").annotate(pks=ArrayAgg("pk")).values_list("level", "pks")
 )
 
-users = User.objects.filter(username__in=[f"siae_evaluations_{i}" for i in range(1, total_administrative_criteria)])
+users = User.objects.filter(username__startswith="siae_evaluations_")
 with transaction.atomic():
     users.delete()
     EvaluationCampaign.objects.all().delete()
