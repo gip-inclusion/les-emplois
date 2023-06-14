@@ -26,7 +26,7 @@ from itou.eligibility.models import AdministrativeCriteria
 from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.institutions.models import Institution
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
-from itou.siae_evaluations.models import (EvaluationCampaign,
+from itou.siae_evaluations.models import (Calendar, EvaluationCampaign,
                                           create_campaigns_and_calendar)
 from itou.users.models import User
 
@@ -75,6 +75,7 @@ users = User.objects.filter(username__startswith="siae_evaluations_")
 with transaction.atomic():
     users.delete()
     EvaluationCampaign.objects.all().delete()
+    Calendar.objects.all().delete()
 
 # We can't use factories here because FactoryBoy is not installed in Review app and Demo environments.
 for i in range(1, total_administrative_criteria):
