@@ -1,4 +1,4 @@
-from itou.employee_record.mocks.asp_test_siaes import asp_to_siret_from_fixtures
+from itou.employee_record.mocks.asp_test_siaes import get_staging_siret_from_kind
 from itou.employee_record.serializers import (
     EmployeeRecordBatchSerializer,
     EmployeeRecordSerializer,
@@ -15,13 +15,8 @@ class TestEmployeeRecordSerializer(EmployeeRecordSerializer):
         """
 
         result = super().to_representation(instance)
-
         # Map test fields / values
-
-        test_data = asp_to_siret_from_fixtures(instance.asp_id)
-
-        result["mesure"] = test_data["mesure"]
-        result["siret"] = test_data["siret"]
+        result["siret"] = get_staging_siret_from_kind(instance.job_application.to_siae.kind, instance.siret)
 
         return result
 
@@ -42,11 +37,9 @@ class TestEmployeeRecordUpdateNotificationSerializer(EmployeeRecordUpdateNotific
         result = super().to_representation(instance)
 
         # Map test fields / values
-
-        test_data = asp_to_siret_from_fixtures(instance.employee_record.asp_id)
-
-        result["mesure"] = test_data["mesure"]
-        result["siret"] = test_data["siret"]
+        result["siret"] = get_staging_siret_from_kind(
+            instance.employee_record.job_application.to_siae.kind, instance.siret
+        )
 
         return result
 
