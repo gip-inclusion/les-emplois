@@ -17,10 +17,8 @@ from django.db import transaction
 from django.test import override_settings
 from django.utils import timezone
 
-
 django.setup()
 
-import itou.siae_evaluations.enums as evaluation_enums
 import itou.users.enums as users_enums
 from itou.approvals.models import Approval
 from itou.eligibility.enums import AdministrativeCriteriaLevel
@@ -28,9 +26,9 @@ from itou.eligibility.models import AdministrativeCriteria
 from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.institutions.models import Institution
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
-from itou.siae_evaluations.models import EvaluationCampaign
+from itou.siae_evaluations.models import (EvaluationCampaign,
+                                          create_campaigns_and_calendar)
 from itou.users.models import User
-
 
 NAMES = [
     ("Gustave", "Loiseau", "187104712403340", "703059J"),
@@ -135,13 +133,8 @@ institution = Institution.objects.get(pk=2)
 job_applications = JobApplication.objects.filter(pk__in=created_job_applications_pks)
 
 with override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend"), transaction.atomic():
-    evaluation_campaign = EvaluationCampaign.objects.create(
-        name="Campagne de contrôle a posteriori",
-        institution=institution,
-        evaluated_period_start_at=evaluated_period_start_at,
-        evaluated_period_end_at=evaluated_period_end_at,
-        chosen_percent=evaluation_enums.EvaluationChosenPercent.MAX,
-    )
+    create_campaigns_and_calendar(evaluated_period_start_at, evaluated_period_end_at)
+    evaluation_campaign = EvaluationCampaign.objects.get(institution=institution)
 
     # eligible_job_applications must return a queryset, not a list.
     with mock.patch(
