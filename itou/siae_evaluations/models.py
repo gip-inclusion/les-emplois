@@ -61,7 +61,6 @@ def create_campaigns_and_calendar(evaluated_period_start_at, evaluated_period_en
         f"au {evaluated_period_end_at.strftime('%d/%m/%Y')}"
     )
 
-    # TODO(cms): add Calendar pk.
     institutions = Institution.objects.filter(kind=InstitutionKind.DDETS_IAE)
     if institution_ids:
         institutions = institutions.filter(pk__in=institution_ids)
