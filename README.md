@@ -97,7 +97,7 @@ $ docker compose run --service-ports django
 ### Accéder au serveur de développement
 
 Une fois votre serveur de développement lancé, vous pouvez accéder au frontend à
-l'adresse http://127.0.0.1:8000/.
+l'adresse http://localhost:8000/.
 
 ### Peupler la base de données
 

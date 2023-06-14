@@ -66,7 +66,7 @@ REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] += [  # noqa: F405
 ASP_ITOU_PREFIX = "XXXXX"  # same as in our fixtures
 
 ITOU_PROTOCOL = "http"
-ITOU_FQDN = "127.0.0.1:8000"
+ITOU_FQDN = "localhost:8000"
 
 DATABASES["default"]["HOST"] = os.getenv("PGHOST", "127.0.0.1")  # noqa: F405
 DATABASES["default"]["PORT"] = os.getenv("PGPORT", "5432")  # noqa: F405

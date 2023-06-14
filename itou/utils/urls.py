@@ -13,7 +13,7 @@ def get_safe_url(request, param_name=None, fallback_url=None, url=None):
 
     if url:
         if settings.DEBUG:
-            # In DEBUG mode the network location part `127.0.0.1:8000` contains
+            # In DEBUG mode the network location part `localhost:8000` contains
             # a port and fails the validation of `url_has_allowed_host_and_scheme`
             # since it's not a member of `allowed_hosts`:
             # https://github.com/django/django/blob/525274f/django/utils/http.py#L413
@@ -57,10 +57,10 @@ def add_url_params(url: str, params: dict[str, str]) -> str:
     :param params: dict containing requested params to be added
     :return: string with updated URL
 
-    >> url = 'http://127.0.0.1:8000/login/activate_siae_staff_account?next_url=%2Finvitations
+    >> url = 'http://localhost:8000/login/activate_siae_staff_account?next_url=%2Finvitations
     >> new_params = {'test': 'value' }
     >> add_url_params(url, new_params)
-    'http://127.0.0.1:8000/login/activate_siae_staff_account?next_url=%2Finvitations&test=value
+    'http://localhost:8000/login/activate_siae_staff_account?next_url=%2Finvitations&test=value
     """
 
     # Remove params with None values
