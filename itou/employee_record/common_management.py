@@ -26,6 +26,18 @@ class EmployeeRecordTransferCommand(BaseCommand):
     def add_arguments(self, parser):
         """Subclasses have a preflight option to check for serialization errors."""
         parser.add_argument(
+            "--download", dest="download", action="store_true", help="Download employee record processing feedback"
+        )
+        parser.add_argument(
+            "--upload", dest="upload", action="store_true", help="Upload employee records ready for processing"
+        )
+        parser.add_argument(
+            "--test",
+            dest="asp_test",
+            action="store_true",
+            help="Update employee records with *test* SIRET and financial annex number provided by ASP",
+        )
+        parser.add_argument(
             "--preflight",
             dest="preflight",
             action="store_true",
