@@ -721,13 +721,12 @@ class CheckPreviousApplications(ApplicationBaseView):
 
         self.previous_applications = self.job_seeker.job_applications.filter(to_siae=self.siae)
 
+    def get_next_url(self):
+        return reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk})
+
     def get(self, request, *args, **kwargs):
         if not self.previous_applications.exists():
-            return HttpResponseRedirect(
-                reverse(
-                    "apply:application_jobs", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk}
-                )
-            )
+            return HttpResponseRedirect(self.get_next_url())
 
         # Limit the possibility of applying to the same SIAE for 24 hours.
         if not request.user.is_siae_staff and self.previous_applications.created_in_past(hours=24).exists():
@@ -743,11 +742,7 @@ class CheckPreviousApplications(ApplicationBaseView):
         # At this point we know that the candidate is applying to an SIAE where he or she has already applied.
         # Allow a new job application if the user confirm it despite the duplication warning.
         if request.POST.get("force_new_application") == "force":
-            return HttpResponseRedirect(
-                reverse(
-                    "apply:application_jobs", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk}
-                )
-            )
+            return HttpResponseRedirect(self.get_next_url())
 
         return self.render_to_response(self.get_context_data(**kwargs))
 
@@ -820,6 +815,11 @@ class ApplicationEligibilityView(ApplicationBaseView):
             data=request.POST or None,
         )
 
+    def get_next_url(self):
+        return reverse(
+            "apply:application_resume", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk}
+        )
+
     def dispatch(self, request, *args, **kwargs):
         bypass_eligibility_conditions = [
             # Don't perform an eligibility diagnosis is the SIAE doesn't need it,
@@ -830,11 +830,7 @@ class ApplicationEligibilityView(ApplicationBaseView):
             self.job_seeker.has_valid_common_approval,
         ]
         if any(bypass_eligibility_conditions):
-            return HttpResponseRedirect(
-                reverse(
-                    "apply:application_resume", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk}
-                )
-            )
+            return HttpResponseRedirect(self.get_next_url())
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -845,11 +841,7 @@ class ApplicationEligibilityView(ApplicationBaseView):
                 EligibilityDiagnosis.create_diagnosis(self.job_seeker, user_info, self.form.cleaned_data)
             elif self.eligibility_diagnosis and not self.form.data.get("shrouded"):
                 EligibilityDiagnosis.update_diagnosis(self.eligibility_diagnosis, user_info, self.form.cleaned_data)
-            return HttpResponseRedirect(
-                reverse(
-                    "apply:application_resume", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk}
-                )
-            )
+            return HttpResponseRedirect(self.get_next_url())
 
         return self.render_to_response(self.get_context_data(**kwargs))
 
@@ -894,14 +886,15 @@ class ApplicationGEIQEligibilityView(ApplicationBaseView):
             data=request.POST or None,
         )
 
+    def get_next_url(self):
+        return reverse(
+            "apply:application_resume", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk}
+        )
+
     def dispatch(self, request, *args, **kwargs):
         # GEIQ eligibility form during job application process is only available to authorized prescribers
         if not request.user.is_prescriber_with_authorized_org:
-            return HttpResponseRedirect(
-                reverse(
-                    "apply:application_resume", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk}
-                )
-            )
+            return HttpResponseRedirect(self.get_next_url())
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -938,11 +931,7 @@ class ApplicationGEIQEligibilityView(ApplicationBaseView):
                         self.geiq_eligibility_diagnosis, request.user, self.form.cleaned_data
                     )
 
-            return HttpResponseRedirect(
-                reverse(
-                    "apply:application_resume", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk}
-                )
-            )
+            return HttpResponseRedirect(self.get_next_url())
 
         return self.render_to_response(self.get_context_data(**kwargs))
 
