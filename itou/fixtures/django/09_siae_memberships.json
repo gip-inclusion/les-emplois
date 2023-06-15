@@ -163,5 +163,80 @@
     },
     "model": "siaes.siaemembership",
     "pk": 12
+  },
+  {
+    "fields": {
+      "created_at": "2023-06-21T14:01:40.371Z",
+      "is_active": true,
+      "is_admin": false,
+      "joined_at": "2023-06-21T14:01:40.371Z",
+      "notifications": {},
+      "siae": 2653,
+      "updated_at": "2023-06-21T14:01:40.372Z",
+      "updated_by": null,
+      "user": 28
+    },
+    "model": "siaes.siaemembership",
+    "pk": 23
+  },
+  {
+    "fields": {
+      "created_at": "2023-06-21T14:19:59.669Z",
+      "is_active": true,
+      "is_admin": true,
+      "joined_at": "2023-06-21T14:19:59.669Z",
+      "notifications": {},
+      "siae": 7,
+      "updated_at": "2023-06-21T14:19:59.670Z",
+      "updated_by": null,
+      "user": 28
+    },
+    "model": "siaes.siaemembership",
+    "pk": 24
+  },
+  {
+    "fields": {
+      "created_at": "2023-06-21T14:19:59.676Z",
+      "is_active": true,
+      "is_admin": true,
+      "joined_at": "2023-06-21T14:19:59.676Z",
+      "notifications": {},
+      "siae": 184,
+      "updated_at": "2023-06-21T14:19:59.676Z",
+      "updated_by": null,
+      "user": 28
+    },
+    "model": "siaes.siaemembership",
+    "pk": 25
+  },
+  {
+    "fields": {
+      "created_at": "2023-06-21T14:19:59.681Z",
+      "is_active": true,
+      "is_admin": true,
+      "joined_at": "2023-06-21T14:19:59.681Z",
+      "notifications": {},
+      "siae": 249,
+      "updated_at": "2023-06-21T14:19:59.682Z",
+      "updated_by": null,
+      "user": 28
+    },
+    "model": "siaes.siaemembership",
+    "pk": 26
+  },
+  {
+    "fields": {
+      "created_at": "2023-06-21T14:19:59.686Z",
+      "is_active": true,
+      "is_admin": true,
+      "joined_at": "2023-06-21T14:19:59.686Z",
+      "notifications": {},
+      "siae": 250,
+      "updated_at": "2023-06-21T14:19:59.687Z",
+      "updated_by": null,
+      "user": 28
+    },
+    "model": "siaes.siaemembership",
+    "pk": 27
   }
 ]
