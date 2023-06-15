@@ -15,13 +15,6 @@ from ...common_management import EmployeeRecordTransferCommand
 
 
 class Command(EmployeeRecordTransferCommand):
-    def add_arguments(self, parser):
-        super().add_arguments(parser)
-
-        parser.add_argument(
-            "--dry-run", dest="dry_run", action="store_true", help="Do not perform real SFTP transfer operations"
-        )
-
     def _upload_batch_file(self, conn, employee_records, dry_run):
         """
         Render a list of employee records in JSON format then send it to SFTP upload folder
@@ -191,7 +184,7 @@ class Command(EmployeeRecordTransferCommand):
         for batch in chunks(ready_employee_records, EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS):
             self._upload_batch_file(sftp, batch, dry_run)
 
-    def handle(self, *, upload, download, preflight, dry_run, asp_test, **options):
+    def handle(self, *, upload, download, preflight, wet_run, asp_test, **options):
         if preflight:
             self.stdout.write("Preflight activated, checking for possible serialization errors...")
             self.preflight(EmployeeRecord)
@@ -210,11 +203,11 @@ class Command(EmployeeRecordTransferCommand):
 
                 # Send files to ASP
                 if upload:
-                    self.upload(sftp, dry_run)
+                    self.upload(sftp, not wet_run)
 
                 # Fetch result files from ASP
                 if download:
-                    self.download(sftp, dry_run)
+                    self.download(sftp, not wet_run)
 
             self.stdout.write("Employee records processing done!")
         else:

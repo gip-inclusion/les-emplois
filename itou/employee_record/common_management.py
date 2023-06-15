@@ -33,6 +33,9 @@ class EmployeeRecordTransferCommand(BaseCommand):
             "--upload", dest="upload", action="store_true", help="Upload employee records ready for processing"
         )
         parser.add_argument(
+            "--wet-run", dest="wet_run", action="store_true", help="Perform *real* SFTP transfer operations"
+        )
+        parser.add_argument(
             "--test",
             dest="asp_test",
             action="store_true",
