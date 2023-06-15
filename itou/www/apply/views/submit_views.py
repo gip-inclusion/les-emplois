@@ -1109,9 +1109,23 @@ class UpdateJobSeekerBaseView(ApplyStepBaseView):
         for field in self.form:
             field.field.disabled = True
 
+    def get_back_url(self):
+        return reverse(
+            self.previous_apply_url,
+            kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
+        )
+
+    def get_next_url(self):
+        return reverse(
+            self.next_apply_url,
+            kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
+        )
+
 
 class UpdateJobSeekerStep1View(UpdateJobSeekerBaseView):
     template_name = "apply/submit/create_or_update_job_seeker/step_1.html"
+    previous_apply_url = "apply:application_jobs"
+    next_apply_url = "apply:update_job_seeker_step_2"
 
     def __init__(self):
         super().__init__()
@@ -1132,20 +1146,10 @@ class UpdateJobSeekerStep1View(UpdateJobSeekerBaseView):
 
     def post(self, request, *args, **kwargs):
         if not self.request.user.can_edit_personal_information(self.job_seeker):
-            return HttpResponseRedirect(
-                reverse(
-                    "apply:update_job_seeker_step_2",
-                    kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
-                )
-            )
+            return HttpResponseRedirect(self.get_next_url())
         if self.form.is_valid():
             self.job_seeker_session.set("user", self.job_seeker_session.get("user", {}) | self.form.cleaned_data)
-            return HttpResponseRedirect(
-                reverse(
-                    "apply:update_job_seeker_step_2",
-                    kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
-                )
-            )
+            return HttpResponseRedirect(self.get_next_url())
 
         return self.render_to_response(self.get_context_data(**kwargs))
 
@@ -1160,6 +1164,9 @@ class UpdateJobSeekerStep1View(UpdateJobSeekerBaseView):
 class UpdateJobSeekerStep2View(UpdateJobSeekerBaseView):
     template_name = "apply/submit/create_or_update_job_seeker/step_2.html"
     required_session_namespaces = ["job_seeker_session"] + UpdateJobSeekerBaseView.required_session_namespaces
+
+    previous_apply_url = "apply:update_job_seeker_step_1"
+    next_apply_url = "apply:update_job_seeker_step_3"
 
     def __init__(self):
         super().__init__()
@@ -1177,20 +1184,10 @@ class UpdateJobSeekerStep2View(UpdateJobSeekerBaseView):
 
     def post(self, request, *args, **kwargs):
         if not self.request.user.can_edit_personal_information(self.job_seeker):
-            return HttpResponseRedirect(
-                reverse(
-                    "apply:update_job_seeker_step_3",
-                    kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
-                )
-            )
+            return HttpResponseRedirect(self.get_next_url())
         if self.form.is_valid():
             self.job_seeker_session.set("user", self.job_seeker_session.get("user") | self.form.cleaned_data)
-            return HttpResponseRedirect(
-                reverse(
-                    "apply:update_job_seeker_step_3",
-                    kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
-                )
-            )
+            return HttpResponseRedirect(self.get_next_url())
 
         return self.render_to_response(self.get_context_data(**kwargs))
 
@@ -1199,16 +1196,15 @@ class UpdateJobSeekerStep2View(UpdateJobSeekerBaseView):
             "form": self.form,
             "readonly_form": not self.request.user.can_edit_personal_information(self.job_seeker),
             "progress": "40",
-            "back_url": reverse(
-                "apply:update_job_seeker_step_1",
-                kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
-            ),
         }
 
 
 class UpdateJobSeekerStep3View(UpdateJobSeekerBaseView):
     template_name = "apply/submit/create_or_update_job_seeker/step_3.html"
     required_session_namespaces = ["job_seeker_session"] + UpdateJobSeekerBaseView.required_session_namespaces
+
+    previous_apply_url = "apply:update_job_seeker_step_2"
+    next_apply_url = "apply:update_job_seeker_step_end"
 
     def __init__(self):
         super().__init__()
@@ -1253,12 +1249,7 @@ class UpdateJobSeekerStep3View(UpdateJobSeekerBaseView):
                     "lack_of_pole_emploi_id_reason": self.form.cleaned_data.get("lack_of_pole_emploi_id_reason"),
                 },
             )
-            return HttpResponseRedirect(
-                reverse(
-                    "apply:update_job_seeker_step_end",
-                    kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
-                )
-            )
+            return HttpResponseRedirect(self.get_next_url())
 
         return self.render_to_response(self.get_context_data(**kwargs))
 
@@ -1266,16 +1257,15 @@ class UpdateJobSeekerStep3View(UpdateJobSeekerBaseView):
         return super().get_context_data(**kwargs) | {
             "form": self.form,
             "progress": "60",
-            "back_url": reverse(
-                "apply:update_job_seeker_step_2",
-                kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
-            ),
         }
 
 
 class UpdateJobSeekerStepEndView(UpdateJobSeekerBaseView):
     template_name = "apply/submit/create_or_update_job_seeker/step_end.html"
     required_session_namespaces = ["job_seeker_session"] + UpdateJobSeekerBaseView.required_session_namespaces
+
+    previous_apply_url = "apply:update_job_seeker_step_3"
+    next_apply_url = "apply:application_jobs"
 
     def __init__(self):
         super().__init__()
@@ -1343,17 +1333,11 @@ class UpdateJobSeekerStepEndView(UpdateJobSeekerBaseView):
         else:
             self.profile.save()
             self.job_seeker_session.delete()
-            url = reverse(
-                "apply:application_jobs", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk}
-            )
+            url = self.get_next_url()
         return HttpResponseRedirect(url)
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "profile": self.profile,
             "progress": "80",
-            "back_url": reverse(
-                "apply:update_job_seeker_step_3",
-                kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
-            ),
         }
