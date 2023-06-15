@@ -428,6 +428,16 @@ class EvaluatedSiae(models.Model):
         verbose_name = "Entreprise"
         verbose_name_plural = "Entreprises"
         unique_together = ("evaluation_campaign", "siae")
+        constraints = [
+            models.CheckConstraint(
+                name="final_reviewed_at_only_after_reviewed_at",
+                violation_error_message=(
+                    "Impossible d'avoir une date de contrôle définitif sans une date de premier contrôle antérieure"
+                ),
+                check=models.Q(final_reviewed_at__isnull=True)
+                | models.Q(reviewed_at__isnull=False, final_reviewed_at__gte=F("reviewed_at")),
+            ),
+        ]
 
     def __str__(self):
         return f"{self.siae}"

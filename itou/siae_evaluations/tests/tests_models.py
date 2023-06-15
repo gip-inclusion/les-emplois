@@ -5,7 +5,7 @@ import pytest
 from dateutil.relativedelta import relativedelta
 from django.core import mail
 from django.core.exceptions import ValidationError
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.utils import timezone
 from freezegun import freeze_time
 
@@ -1008,7 +1008,7 @@ class EvaluatedSiaeModelTest(TestCase):
         del evaluated_siae.state_from_applications
 
         # three Accepted
-        evaluated_siae.final_reviewed_at = fake_now
+        evaluated_siae.final_reviewed_at = evaluated_siae.reviewed_at + relativedelta(days=1)
         evaluated_siae.save(update_fields=["final_reviewed_at"])
         evaluated_administrative_criteria[
             1
@@ -1448,3 +1448,22 @@ def test_siae_get_active_suspension_functions():
     explanation = siae.get_active_suspension_text_with_dates()
     assert "retrait définitif" in explanation
     assert f"est effectif depuis le {final_suspension.lower:%d/%m/%Y}." in explanation
+
+
+def test_final_reviewed_at_after_reviewed_at():
+    evaluated_siae = EvaluatedSiaeFactory()
+
+    # final_reviewed_at WITHOUT reviewed_at
+    assert evaluated_siae.reviewed_at is None
+    evaluated_siae.final_reviewed_at = timezone.now() - datetime.timedelta(days=1)
+    # Avoid crashing the database connection because of the IntegrityError
+    with transaction.atomic():
+        with pytest.raises(IntegrityError):
+            evaluated_siae.save()
+
+    # reviewed_at AFTER final_reviewed_at
+    evaluated_siae.reviewed_at = timezone.now()
+    # Avoid crashing the database connection because of the IntegrityError
+    with transaction.atomic():
+        with pytest.raises(IntegrityError):
+            evaluated_siae.save()
