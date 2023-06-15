@@ -50,12 +50,15 @@ class CheckJobSeekerNirFormTest(TestCase):
 
     def test_form_not_valid(self):
         # Application sent by a job seeker whose NIR is already used by another account.
-        existing_account = JobSeekerFactory()
+        existing_account = JobSeekerFactory(email="unlikely@random.tld")
         user = JobSeekerFactory()
         form_data = {"nir": existing_account.nir}
         form = apply_forms.CheckJobSeekerNirForm(job_seeker=user, data=form_data)
         assert not form.is_valid()
-        assert "Ce numéro de sécurité sociale est déjà utilisé par un autre compte." in form.errors["nir"][0]
+        error_msg = form.errors["nir"][0]
+        assert "Ce numéro de sécurité sociale est déjà utilisé par un autre compte." in error_msg
+        assert existing_account.email not in error_msg
+        assert "u*******@r*****.t**" in error_msg
 
         existing_account = PrescriberFactory(nir=JobSeekerFactory.build().nir)
         form_data = {"nir": existing_account.nir}
