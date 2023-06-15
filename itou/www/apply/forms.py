@@ -26,6 +26,7 @@ from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS, ContractType, SiaeKind
 from itou.users.enums import UserKind
 from itou.users.models import JobSeekerProfile, User
 from itou.utils import constants as global_constants
+from itou.utils.emails import redact_email_address
 from itou.utils.types import InclusiveDateRange
 from itou.utils.validators import validate_nir, validate_pole_emploi_id
 from itou.utils.widgets import DuetDatePickerWidget
@@ -91,8 +92,8 @@ class CheckJobSeekerNirForm(forms.Form):
         if self.job_seeker:
             if existing_account:
                 error_message = (
-                    "Ce numéro de sécurité sociale est déjà utilisé par un autre compte. "
-                    f"Merci de vous reconnecter avec l'adresse e-mail <b>{existing_account.email}</b>. "
+                    "Ce numéro de sécurité sociale est déjà utilisé par un autre compte. Merci de vous "
+                    f"reconnecter avec l'adresse e-mail <b>{redact_email_address(existing_account.email)}</b>. "
                     "Si vous ne vous souvenez plus de votre mot de passe, vous pourrez "
                     "cliquer sur « mot de passe oublié ». "
                     f'En cas de souci, vous pouvez <a href="{global_constants.ITOU_ASSISTANCE_URL}" rel="noopener" '
