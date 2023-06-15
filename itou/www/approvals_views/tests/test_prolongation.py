@@ -12,6 +12,7 @@ from itou.job_applications.factories import JobApplicationFactory
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.utils.storage.s3 import S3Upload
 from itou.utils.storage.test import S3AccessingTestCase
+from itou.utils.test import parse_response_to_soup
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.approvals_views.forms import DeclareProlongationForm
 
@@ -271,3 +272,82 @@ class ApprovalProlongationTest(S3AccessingTestCase):
         prolongation = self.approval.prolongation_set.first()
 
         assert prolongation.report_file.link in email.body
+
+    def test_check_single_prescriber_organization(self):
+        self.client.force_login(self.siae_user)
+        url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
+        self.client.get(url)
+
+        reason = ProlongationReason.SENIOR
+        end_at = Prolongation.get_max_end_at(self.approval.end_at, reason=reason)
+
+        post_data = {
+            "end_at": end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "reason": reason,
+            "email": self.prescriber.email,
+            "contact_email": self.faker.email(),
+            "contact_phone": self.faker.phone_number(),
+            "report_file_path": "prolongation_report/memento-mori.xslx",
+            "uploaded_file_name": "report_file.xlsx",
+            "edit": "1",
+        }
+        response = self.client.post(url, data=post_data)
+
+        self.assertContains(response, self.prescriber_organization)
+        self.assertNotContains(response, "Sélectionnez l'organisation du prescripteur habilité")
+
+    def test_check_multiple_prescriber_organization(self):
+        # Link prescriber to another prescriber organization
+        other_prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
+        other_prescriber_organization.members.add(self.prescriber)
+
+        self.client.force_login(self.siae_user)
+        url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
+        self.client.get(url)
+
+        reason = ProlongationReason.SENIOR
+        end_at = Prolongation.get_max_end_at(self.approval.end_at, reason=reason)
+
+        post_data = {
+            "end_at": end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "reason": reason,
+            "email": self.prescriber.email,
+            "contact_email": self.faker.email(),
+            "contact_phone": self.faker.phone_number(),
+            "report_file_path": "prolongation_report/memento-mori.xslx",
+            "uploaded_file_name": "report_file.xlsx",
+            "edit": "1",
+        }
+        response = self.client.post(url, data=post_data)
+
+        self.assertContains(response, self.prescriber_organization)
+        self.assertContains(response, other_prescriber_organization)
+
+        error_msg = parse_response_to_soup(response, selector="div#check_prescriber_email .invalid-feedback")
+        assert str(error_msg) == self.snapshot(name="prescriber is member of many organizations")
+
+    def test_check_invalid_prescriber(self):
+        unauthorized_prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=False)
+        prescriber = unauthorized_prescriber_organization.members.first()
+
+        self.client.force_login(self.siae_user)
+        url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
+        self.client.get(url)
+
+        reason = ProlongationReason.SENIOR
+        end_at = Prolongation.get_max_end_at(self.approval.end_at, reason=reason)
+
+        post_data = {
+            "end_at": end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "reason": reason,
+            "email": prescriber.email,
+            "contact_email": self.faker.email(),
+            "contact_phone": self.faker.phone_number(),
+            "report_file_path": "prolongation_report/memento-mori.xslx",
+            "uploaded_file_name": "report_file.xlsx",
+            "edit": "1",
+        }
+        response = self.client.post(url, data=post_data)
+
+        error_msg = parse_response_to_soup(response, selector="div#check_prescriber_email .invalid-feedback")
+        assert str(error_msg) == self.snapshot(name="unknown authorized prescriber")
