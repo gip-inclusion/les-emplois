@@ -21,7 +21,7 @@ cd "$APP_HOME" || exit
 django-admin sanitize_employee_records
 
 # Upload employee records 
-django-admin transfer_employee_records --upload
+django-admin transfer_employee_records --upload --wet-run
 
 # Upload update notifications 
 django-admin transfer_employee_records_updates --upload --wet-run

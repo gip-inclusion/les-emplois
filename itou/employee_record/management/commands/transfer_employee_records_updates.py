@@ -20,13 +20,6 @@ class Command(EmployeeRecordTransferCommand):
     - download feedback files of previous upload operations,
     """
 
-    def add_arguments(self, parser):
-        super().add_arguments(parser)
-
-        parser.add_argument(
-            "--wet-run", dest="wet_run", action="store_true", help="Perform *real* SFTP transfer operations"
-        )
-
     def _upload_batch_file(
         self, conn: pysftp.Connection, notifications: list[EmployeeRecordUpdateNotification], dry_run: bool
     ):

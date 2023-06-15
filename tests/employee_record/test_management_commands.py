@@ -48,13 +48,13 @@ class EmployeeRecordManagementCommandTest(ManagementCommandTestCase):
     @mock.patch("pysftp.Connection", SFTPConnectionMock)
     def test_smoke_upload(self):
         with freezegun.freeze_time("2021-09-27"):
-            out, _ = self.call_command(upload=True)
+            out, _ = self.call_command(upload=True, wet_run=True)
         assert out == self.snapshot
 
     @mock.patch("pysftp.Connection", SFTPConnectionMock)
     def test_smoke_download_and_upload(self):
         with freezegun.freeze_time("2021-09-27"):
-            out, _ = self.call_command(upload=True, download=True)
+            out, _ = self.call_command(upload=True, download=True, wet_run=True)
         assert out == self.snapshot
 
     @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
@@ -63,7 +63,7 @@ class EmployeeRecordManagementCommandTest(ManagementCommandTestCase):
         side_effect=mock_get_geocoding_data,
     )
     def test_dry_run_upload_and_download(self, _mock):
-        self.call_command(upload=True, download=True, dry_run=True)
+        self.call_command(upload=True, download=True, wet_run=False)
 
         self.employee_record.refresh_from_db()
         assert self.employee_record.status == Status.READY
@@ -71,7 +71,7 @@ class EmployeeRecordManagementCommandTest(ManagementCommandTestCase):
     @mock.patch("pysftp.Connection", SFTPBadConnectionMock)
     def test_upload_failure(self):
         with pytest.raises(Exception):
-            self.call_command(upload=True)
+            self.call_command(upload=True, wet_run=True)
 
         self.employee_record.refresh_from_db()
         assert self.employee_record.status == Status.READY
@@ -120,7 +120,7 @@ class EmployeeRecordManagementCommandTest(ManagementCommandTestCase):
         employee_record = self.employee_record
 
         with freezegun.freeze_time("2021-09-27"):
-            out, _ = self.call_command(upload=True)
+            out, _ = self.call_command(upload=True, wet_run=True)
         assert out == self.snapshot(name="upload")
 
         employee_record.refresh_from_db()
@@ -128,7 +128,7 @@ class EmployeeRecordManagementCommandTest(ManagementCommandTestCase):
         assert employee_record.asp_batch_line_number == 1
         assert employee_record.asp_batch_file is not None
 
-        out, _ = self.call_command(download=True)
+        out, _ = self.call_command(download=True, wet_run=True)
         assert out == self.snapshot(name="download")
 
         employee_record.refresh_from_db()
@@ -159,7 +159,7 @@ class EmployeeRecordManagementCommandTest(ManagementCommandTestCase):
         # are auto-magically converted as PROCESSED employee records
 
         # Don't forget to make a complete upload / download cycle
-        self.call_command(upload=True, download=True)
+        self.call_command(upload=True, download=True, wet_run=True)
 
         self.employee_record.refresh_from_db()
 
@@ -176,7 +176,7 @@ class EmployeeRecordManagementCommandTest(ManagementCommandTestCase):
         SuspensionFactory(approval=self.employee_record.job_application.approval)
 
         # Don't forget to make a complete upload / download cycle
-        self.call_command(upload=True, download=True)
+        self.call_command(upload=True, download=True, wet_run=True)
 
         self.employee_record.refresh_from_db()
 
@@ -191,7 +191,7 @@ class EmployeeRecordManagementCommandTest(ManagementCommandTestCase):
         ProlongationFactory(approval=self.employee_record.job_application.approval)
 
         # Don't forget to make a complete upload / download cycle
-        self.call_command(upload=True, download=True)
+        self.call_command(upload=True, download=True, wet_run=True)
 
         self.employee_record.refresh_from_db()
 
