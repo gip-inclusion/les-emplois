@@ -5,7 +5,7 @@
   Connected to "foobar.com" as "django_tests"
   Current remote dir is "PWD"
   Starting DOWNLOAD of feedback files
-  No feedback files found
+  Successfully parsed 0/0 files
   Employee record notifications processing done!
   
   '''
@@ -16,8 +16,9 @@
   Current remote dir is "PWD"
   Starting DOWNLOAD of feedback files
   Fetching file: RIAE_FS_20210927000000_FichierRetour.json
-  Parsed 1/1 files
+  Successfully processed 'RIAE_FS_20210927000000_FichierRetour.json', it can be deleted.
   Deleting 'RIAE_FS_20210927000000_FichierRetour.json' from SFTP server
+  Successfully parsed 1/1 files
   Employee record notifications processing done!
   
   '''
@@ -37,7 +38,7 @@
   Connected to "foobar.com" as "django_tests"
   Current remote dir is "PWD"
   Starting DOWNLOAD of feedback files
-  No feedback files found
+  Successfully parsed 0/0 files
   Employee record notifications processing done!
   
   '''

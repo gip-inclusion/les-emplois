@@ -103,58 +103,40 @@ class EmployeeRecordTransferCommand(BaseCommand):
     def download_json_file(self, conn, dry_run):
         self.stdout.write("Starting DOWNLOAD of feedback files")
 
-        parser = JSONParser()
-        count = 0
-        total_errors = 0
-        files_to_delete = []
-
-        # Get into the download folder
+        successfully_parsed_files = 0
         with conn.cd(constants.ASP_FS_REMOTE_DOWNLOAD_DIR):
-            result_files = conn.listdir()
+            # Get the available feedback files
+            result_files = list(conn.listdir())
 
-            if len(result_files) == 0:
-                self.stdout.write("No feedback files found")
-                return
+            parser = JSONParser()
+            for filename in result_files:
+                errors_in_file = 0  # Number of errors per file
+                with BytesIO() as result_stream:
+                    self.stdout.write(f"Fetching file: {filename}")
 
-            for result_file in result_files:
-                # Number of errors per file
-                nb_file_errors = 0
-                try:
-                    with BytesIO() as result_stream:
-                        self.stdout.write(f"Fetching file: {result_file}")
-
-                        conn.getfo(result_file, result_stream)
-                        # Rewind stream
-                        result_stream.seek(0)
-
+                    conn.getfo(filename, result_stream)
+                    result_stream.seek(0)  # Rewind stream
+                    try:
                         # Parse and update employee records with feedback
-                        nb_file_errors = self._parse_feedback_file(result_file, parser.parse(result_stream), dry_run)
+                        errors_in_file = self._parse_feedback_file(filename, parser.parse(result_stream), dry_run)
+                    except Exception as ex:
+                        errors_in_file += 1
+                        self.stdout.write(f"Error while parsing file {filename}: {ex}")
+                    else:
+                        successfully_parsed_files += 1
 
-                        count += 1
-                except Exception as ex:
-                    nb_file_errors += 1
-                    self.stdout.write(f"Error while parsing file {result_file}: {ex}")
-
-                self.stdout.write(f"Parsed {count}/{len(result_files)} files")
-
-                # There were errors: do not delete file
-                if nb_file_errors > 0:
-                    self.stdout.write(f"Will not delete file '{result_file}' because of errors.")
-                    total_errors += nb_file_errors
+                # There were errors, don't delete the file
+                if errors_in_file:
+                    self.stdout.write(f"Will not delete file '{filename}' because of errors.")
                     continue
 
-                # Everything was fine, will remove file after main loop
-                files_to_delete.append(result_file)
+                # Everything was fine, we can delete feedback file from server
+                self.stdout.write(f"Successfully processed '{filename}', it can be deleted.")
+                if not dry_run:
+                    self.stdout.write(f"Deleting '{filename}' from SFTP server")
+                    conn.remove(filename)
 
-            for file in files_to_delete:
-                # All employee records processed, we can delete feedback file from server
-                if dry_run:
-                    self.stdout.write(f"DRY-RUN: Removing file '{file}'")
-                    continue
-
-                self.stdout.write(f"Deleting '{file}' from SFTP server")
-
-                conn.remove(file)
+        self.stdout.write(f"Successfully parsed {successfully_parsed_files}/{len(result_files)} files")
 
     def preflight(self, object_class):
         """Parse new notifications or employee records and attempt to tackle serialization errors.
