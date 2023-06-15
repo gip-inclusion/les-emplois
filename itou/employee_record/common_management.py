@@ -5,6 +5,7 @@ import pysftp
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.utils import timezone
+from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
 
 from itou.employee_record import constants
@@ -96,9 +97,64 @@ class EmployeeRecordTransferCommand(BaseCommand):
 
         return remote_path
 
-    def download_json_file(self):
-        # FIXME
-        pass
+    def _parse_feedback_file(self, feedback_file: str, batch: dict, dry_run: bool) -> int:
+        raise NotImplementedError()
+
+    def download_json_file(self, conn, dry_run):
+        self.stdout.write("Starting DOWNLOAD of feedback files")
+
+        parser = JSONParser()
+        count = 0
+        total_errors = 0
+        files_to_delete = []
+
+        # Get into the download folder
+        with conn.cd(constants.ASP_FS_REMOTE_DOWNLOAD_DIR):
+            result_files = conn.listdir()
+
+            if len(result_files) == 0:
+                self.stdout.write("No feedback files found")
+                return
+
+            for result_file in result_files:
+                # Number of errors per file
+                nb_file_errors = 0
+                try:
+                    with BytesIO() as result_stream:
+                        self.stdout.write(f"Fetching file: {result_file}")
+
+                        conn.getfo(result_file, result_stream)
+                        # Rewind stream
+                        result_stream.seek(0)
+
+                        # Parse and update employee records with feedback
+                        nb_file_errors = self._parse_feedback_file(result_file, parser.parse(result_stream), dry_run)
+
+                        count += 1
+                except Exception as ex:
+                    nb_file_errors += 1
+                    self.stdout.write(f"Error while parsing file {result_file}: {ex}")
+
+                self.stdout.write(f"Parsed {count}/{len(result_files)} files")
+
+                # There were errors: do not delete file
+                if nb_file_errors > 0:
+                    self.stdout.write(f"Will not delete file '{result_file}' because of errors.")
+                    total_errors += nb_file_errors
+                    continue
+
+                # Everything was fine, will remove file after main loop
+                files_to_delete.append(result_file)
+
+            for file in files_to_delete:
+                # All employee records processed, we can delete feedback file from server
+                if dry_run:
+                    self.stdout.write(f"DRY-RUN: Removing file '{file}'")
+                    continue
+
+                self.stdout.write(f"Deleting '{file}' from SFTP server")
+
+                conn.remove(file)
 
     def preflight(self, object_class):
         """Parse new notifications or employee records and attempt to tackle serialization errors.

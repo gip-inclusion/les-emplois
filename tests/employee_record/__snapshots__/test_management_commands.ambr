@@ -4,7 +4,7 @@
   Using *TEST* JSON serializers (SIRET number mapping)
   Connected to "foobar.com" as "django_tests"
   Current remote dir is "PWD"
-  Starting DOWNLOAD of employee records
+  Starting DOWNLOAD of feedback files
   No feedback files found
   Employee records processing done!
   
@@ -14,7 +14,7 @@
   '''
   Connected to "foobar.com" as "django_tests"
   Current remote dir is "PWD"
-  Starting DOWNLOAD of employee records
+  Starting DOWNLOAD of feedback files
   No feedback files found
   Employee records processing done!
   
@@ -26,8 +26,8 @@
   Current remote dir is "PWD"
   Starting UPLOAD of employee records
   Successfully uploaded: RIAE_FS_20210927000000.json
-  Starting DOWNLOAD of employee records
-  Fetching file: result_file='RIAE_FS_20210927000000_FichierRetour.json'
+  Starting DOWNLOAD of feedback files
+  Fetching file: RIAE_FS_20210927000000_FichierRetour.json
   Record: line_number=1, processing_code=None, processing_label=None
   Parsed 1/1 files
   Deleting 'RIAE_FS_20210927000000_FichierRetour.json' from SFTP server
@@ -49,8 +49,8 @@
   '''
   Connected to "foobar.com" as "django_tests"
   Current remote dir is "PWD"
-  Starting DOWNLOAD of employee records
-  Fetching file: result_file='RIAE_FS_20210927000000_FichierRetour.json'
+  Starting DOWNLOAD of feedback files
+  Fetching file: RIAE_FS_20210927000000_FichierRetour.json
   Record: line_number=1, processing_code='0000', processing_label='La ligne de la fiche salarié a été enregistrée avec succès.'
   Parsed 1/1 files
   Deleting 'RIAE_FS_20210927000000_FichierRetour.json' from SFTP server

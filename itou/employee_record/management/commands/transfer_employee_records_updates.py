@@ -1,12 +1,8 @@
-from io import BytesIO
-
 import pysftp
 from django.conf import settings
-from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
 from sentry_sdk.crons import monitor
 
-from itou.employee_record import constants
 from itou.employee_record.enums import MovementType, NotificationStatus, Status
 from itou.employee_record.exceptions import SerializationError
 from itou.employee_record.mocks.fake_serializers import TestEmployeeRecordUpdateNotificationBatchSerializer
@@ -146,56 +142,8 @@ class Command(EmployeeRecordTransferCommand):
 
     @monitor(monitor_slug="transfer-employee-records-updates-download")
     def download(self, conn: pysftp.Connection, dry_run: bool):
-        parser = JSONParser()
-        count = 0
-        total_errors = 0
-        files_to_delete = []
-
-        self.stdout.write("Starting DOWNLOAD of employee record notifications")
-
-        with conn.cd(constants.ASP_FS_REMOTE_DOWNLOAD_DIR):
-            result_files = conn.listdir()
-
-            if len(result_files) == 0:
-                self.stdout.write("No new feedback file found")
-                return
-
-            for result_file in result_files:
-                # Number of errors per file
-                nb_file_errors = 0
-                try:
-                    with BytesIO() as result_stream:
-                        self.stdout.write(f"Fetching file: {result_file}")
-
-                        conn.getfo(result_file, result_stream)
-                        result_stream.seek(0)
-
-                        nb_file_errors = self._parse_feedback_file(result_file, parser.parse(result_stream), dry_run)
-                        count += 1
-                except Exception as ex:
-                    nb_file_errors += 1
-                    self.stdout.write(f"Error while parsing file {result_file}: {ex=}")
-
-                self.stdout.write(f"Parsed {count}/{len(result_files)} files")
-
-                # There were errors do not delete file
-                if nb_file_errors > 0:
-                    self.stdout.write(f"Will not delete file '{result_file}' because of errors")
-                    total_errors += nb_file_errors
-                    continue
-
-                # Everything was fine, will remove file after main loop
-                files_to_delete.append(result_file)
-
-            for file in files_to_delete:
-                # All employee record notifications processed , we can delete feedback file from server
-                if dry_run:
-                    self.stdout.write(f"DRY-RUN: Deleting file '{file}'")
-                    continue
-
-                self.stdout.write(f"Deleting '{file}' from SFTP server")
-
-                conn.remove(file)
+        """Fetch and process feedback ASP files for employee record notifications"""
+        self.download_json_file(conn, dry_run)
 
     @monitor(monitor_slug="transfer-employee-records-updates-upload")
     def upload(self, conn: pysftp.Connection, dry_run: bool):

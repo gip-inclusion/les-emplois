@@ -1,13 +1,9 @@
-from io import BytesIO
-
 from django.conf import settings
 from django.utils import timezone
-from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
 from sentry_sdk.crons import monitor
 
 from itou.approvals.models import Approval
-from itou.employee_record import constants
 from itou.employee_record.enums import MovementType, Status
 from itou.employee_record.exceptions import SerializationError
 from itou.employee_record.mocks.fake_serializers import TestEmployeeRecordBatchSerializer
@@ -68,7 +64,7 @@ class Command(EmployeeRecordTransferCommand):
                     remote_path, idx, renderer.render(batch_data["lignesTelechargement"][idx - 1])
                 )
 
-    def _parse_feedback_file(self, feedback_file, batch, dry_run) -> int:
+    def _parse_feedback_file(self, feedback_file: str, batch: dict, dry_run: bool) -> int:
         """
         - Parse ASP response file,
         - Update status of employee records,
@@ -182,64 +178,8 @@ class Command(EmployeeRecordTransferCommand):
 
     @monitor(monitor_slug="transfer-employee-records-download")
     def download(self, conn, dry_run):
-        """
-        Fetch remote ASP file containing the results of the processing
-        of a batch of employee records
-        """
-        self.stdout.write("Starting DOWNLOAD of employee records")
-
-        parser = JSONParser()
-        count = 0
-        total_errors = 0
-        files_to_delete = []
-
-        # Get into the download folder
-        with conn.cd(constants.ASP_FS_REMOTE_DOWNLOAD_DIR):
-            result_files = conn.listdir()
-
-            if len(result_files) == 0:
-                self.stdout.write("No feedback files found")
-                return
-
-            for result_file in result_files:
-                # Number of errors per file
-                nb_file_errors = 0
-                try:
-                    with BytesIO() as result_stream:
-                        self.stdout.write(f"Fetching file: {result_file=}")
-
-                        conn.getfo(result_file, result_stream)
-                        # Rewind stream
-                        result_stream.seek(0)
-
-                        # Parse and update employee records with feedback
-                        nb_file_errors = self._parse_feedback_file(result_file, parser.parse(result_stream), dry_run)
-
-                        count += 1
-                except Exception as ex:
-                    nb_file_errors += 1
-                    self.stdout.write(f"Error while parsing file {result_file=}, {ex=}")
-
-                self.stdout.write(f"Parsed {count}/{len(result_files)} files")
-
-                # There were errors: do not delete file
-                if nb_file_errors > 0:
-                    self.stdout.write(f"Will not delete file '{result_file}' because of errors.")
-                    total_errors += nb_file_errors
-                    continue
-
-                # Everything was fine, will remove file after main loop
-                files_to_delete.append(result_file)
-
-            for file in files_to_delete:
-                # All employee records processed, we can delete feedback file from server
-                if dry_run:
-                    self.stdout.write(f"DRY-RUN: Removing file '{file}'")
-                    continue
-
-                self.stdout.write(f"Deleting '{file}' from SFTP server")
-
-                conn.remove(file)
+        """Fetch and process feedback ASP files for employee records"""
+        self.download_json_file(conn, dry_run)
 
     @monitor(monitor_slug="transfer-employee-records-upload")
     def upload(self, sftp, dry_run):
