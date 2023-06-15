@@ -63,9 +63,11 @@ now = timezone.now()
 evaluated_period_start_at = now - relativedelta(months=3)
 evaluated_period_end_at = now - relativedelta(months=1)
 datetime_within_period_range = evaluated_period_end_at - relativedelta(weeks=2)
+
 created_job_applications_pks = []
-controlled_siae = Siae.objects.get(pk=2653)  # has an active convention
-siae_first_member = controlled_siae.members.first()
+
+controlled_siaes = Siae.objects.filter(pk__in=[2653, 7, 184, 249, 250])
+employer = User.objects.get(email="test+cap@inclusion.beta.gouv.fr")
 total_administrative_criteria = AdministrativeCriteria.objects.count()
 level_to_criteria_pks = dict(
     AdministrativeCriteria.objects.values("level").annotate(pks=ArrayAgg("pk")).values_list("level", "pks")
@@ -76,8 +78,11 @@ with transaction.atomic():
     users.delete()
     EvaluationCampaign.objects.all().delete()
 
+siae_index = 0
 # We can't use factories here because FactoryBoy is not installed in Review app and Demo environments.
 for i in range(1, total_administrative_criteria):
+    siae_index += 1 if i % 4 == 0 else 0
+    controlled_siae = controlled_siaes[siae_index]
     with transaction.atomic():
         first_name, last_name, nir, pe_id = NAMES[i - 1]
         job_seeker = User.objects.create(
@@ -97,7 +102,7 @@ for i in range(1, total_administrative_criteria):
 
         criteria = AdministrativeCriteria.objects.filter(pk__in=pks_list)
         eligibility_diagnosis = EligibilityDiagnosis.objects.create(
-            author=siae_first_member,
+            author=employer,
             author_kind=users_enums.KIND_SIAE_STAFF,
             author_siae=controlled_siae,
             job_seeker=job_seeker,
@@ -121,7 +126,7 @@ for i in range(1, total_administrative_criteria):
                 created_at=datetime_within_period_range,
                 job_seeker=job_seeker,
                 sender_siae=controlled_siae,
-                sender=siae_first_member,
+                sender=employer,
                 sender_kind=users_enums.KIND_SIAE_STAFF,
                 state=JobApplicationWorkflow.STATE_ACCEPTED,
                 to_siae=controlled_siae,
@@ -143,5 +148,10 @@ with override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBack
     # eligible_job_applications must return a queryset, not a list.
     with mock.patch(
         "itou.siae_evaluations.models.EvaluationCampaign.eligible_job_applications", return_value=job_applications
-    ), mock.patch("itou.siae_evaluations.enums.EvaluationJobApplicationsBoundariesNumber.SELECTION_PERCENTAGE", 100):
+    ), mock.patch(
+        "itou.siae_evaluations.enums.EvaluationJobApplicationsBoundariesNumber.SELECTION_PERCENTAGE", 100
+    ), mock.patch(
+        "itou.siae_evaluations.models.EvaluationCampaign.number_of_siaes_to_select",
+        return_value=controlled_siaes.count(),
+    ):
         evaluation_campaign.populate(timezone.now())
