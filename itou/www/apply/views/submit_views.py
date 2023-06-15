@@ -450,9 +450,23 @@ class CreateJobSeekerForSenderBaseView(ApplyStepForSenderBaseView):
         self.job_seeker_session = SessionNamespace(request.session, kwargs["session_uuid"])
         super().setup(request, *args, **kwargs)
 
+    def get_back_url(self):
+        return reverse(
+            self.previous_apply_url,
+            kwargs={"siae_pk": self.siae.pk, "session_uuid": self.job_seeker_session.name},
+        )
+
+    def get_next_url(self):
+        return reverse(
+            self.next_apply_url,
+            kwargs={"siae_pk": self.siae.pk, "session_uuid": self.job_seeker_session.name},
+        )
+
 
 class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
     template_name = "apply/submit/create_or_update_job_seeker/step_1.html"
+    previous_apply_url = "apply:search_by_email_for_sender"
+    next_apply_url = "apply:create_job_seeker_step_2_for_sender"
 
     def __init__(self):
         super().__init__()
@@ -482,12 +496,7 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
 
             if not context["confirmation_needed"]:
                 self.job_seeker_session.set("user", self.job_seeker_session.get("user", {}) | self.form.cleaned_data)
-                return HttpResponseRedirect(
-                    reverse(
-                        "apply:create_job_seeker_step_2_for_sender",
-                        kwargs={"siae_pk": self.siae.pk, "session_uuid": self.job_seeker_session.name},
-                    )
-                )
+                return HttpResponseRedirect(self.get_next_url())
 
         return self.render_to_response(context)
 
@@ -495,15 +504,13 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
         return super().get_context_data(**kwargs) | {
             "form": self.form,
             "progress": "20",
-            "back_url": reverse(
-                "apply:search_by_email_for_sender",
-                kwargs={"siae_pk": self.siae.pk, "session_uuid": self.job_seeker_session.name},
-            ),
         }
 
 
 class CreateJobSeekerStep2ForSenderView(CreateJobSeekerForSenderBaseView):
     template_name = "apply/submit/create_or_update_job_seeker/step_2.html"
+    previous_apply_url = "apply:create_job_seeker_step_1_for_sender"
+    next_apply_url = "apply:create_job_seeker_step_3_for_sender"
 
     def __init__(self):
         super().__init__()
@@ -518,12 +525,7 @@ class CreateJobSeekerStep2ForSenderView(CreateJobSeekerForSenderBaseView):
     def post(self, request, *args, **kwargs):
         if self.form.is_valid():
             self.job_seeker_session.set("user", self.job_seeker_session.get("user") | self.form.cleaned_data)
-            return HttpResponseRedirect(
-                reverse(
-                    "apply:create_job_seeker_step_3_for_sender",
-                    kwargs={"siae_pk": self.siae.pk, "session_uuid": self.job_seeker_session.name},
-                )
-            )
+            return HttpResponseRedirect(self.get_next_url())
 
         return self.render_to_response(self.get_context_data(**kwargs))
 
@@ -531,15 +533,13 @@ class CreateJobSeekerStep2ForSenderView(CreateJobSeekerForSenderBaseView):
         return super().get_context_data(**kwargs) | {
             "form": self.form,
             "progress": "40",
-            "back_url": reverse(
-                "apply:create_job_seeker_step_1_for_sender",
-                kwargs={"siae_pk": self.siae.pk, "session_uuid": self.job_seeker_session.name},
-            ),
         }
 
 
 class CreateJobSeekerStep3ForSenderView(CreateJobSeekerForSenderBaseView):
     template_name = "apply/submit/create_or_update_job_seeker/step_3.html"
+    previous_apply_url = "apply:create_job_seeker_step_2_for_sender"
+    next_apply_url = "apply:create_job_seeker_step_end_for_sender"
 
     def __init__(self):
         super().__init__()
@@ -577,12 +577,7 @@ class CreateJobSeekerStep3ForSenderView(CreateJobSeekerForSenderBaseView):
                     "lack_of_pole_emploi_id_reason": self.form.cleaned_data.get("lack_of_pole_emploi_id_reason"),
                 },
             )
-            return HttpResponseRedirect(
-                reverse(
-                    "apply:create_job_seeker_step_end_for_sender",
-                    kwargs={"siae_pk": self.siae.pk, "session_uuid": self.job_seeker_session.name},
-                )
-            )
+            return HttpResponseRedirect(self.get_next_url())
 
         return self.render_to_response(self.get_context_data(**kwargs))
 
@@ -590,15 +585,13 @@ class CreateJobSeekerStep3ForSenderView(CreateJobSeekerForSenderBaseView):
         return super().get_context_data(**kwargs) | {
             "form": self.form,
             "progress": "60",
-            "back_url": reverse(
-                "apply:create_job_seeker_step_2_for_sender",
-                kwargs={"siae_pk": self.siae.pk, "session_uuid": self.job_seeker_session.name},
-            ),
         }
 
 
 class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
     template_name = "apply/submit/create_or_update_job_seeker/step_end.html"
+    previous_apply_url = "apply:create_job_seeker_step_3_for_sender"
+    next_apply_url = "apply:application_jobs"
 
     def __init__(self):
         super().__init__()
@@ -627,6 +620,9 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
             **self._get_profile_data_from_session(),
         )
 
+    def get_next_url(self):
+        return reverse(self.next_apply_url, kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.profile.user.pk})
+
     def post(self, request, *args, **kwargs):
         try:
             user = User.create_job_seeker_by_proxy(self.sender, **self._get_user_data_from_session())
@@ -634,10 +630,10 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
             messages.error(request, " ".join(e.messages))
             url = reverse("dashboard:index")
         else:
-            profile = user.jobseeker_profile
+            self.profile = user.jobseeker_profile
             for k, v in self._get_profile_data_from_session().items():
-                setattr(profile, k, v)
-            profile.save()
+                setattr(self.profile, k, v)
+            self.profile.save()
 
             try:
                 user.set_coords(user.address_line_1, user.post_code)
@@ -648,17 +644,13 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
                 user.save()
 
             self.job_seeker_session.delete()
-            url = reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": profile.user.pk})
+            url = self.get_next_url()
         return HttpResponseRedirect(url)
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "profile": self.profile,
             "progress": "80",
-            "back_url": reverse(
-                "apply:create_job_seeker_step_3_for_sender",
-                kwargs={"siae_pk": self.siae.pk, "session_uuid": self.job_seeker_session.name},
-            ),
         }
 
 
