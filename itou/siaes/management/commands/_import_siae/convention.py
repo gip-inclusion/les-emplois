@@ -12,12 +12,7 @@ from itou.siaes.management.commands._import_siae.vue_structure import ASP_ID_TO_
 from itou.siaes.models import Siae, SiaeConvention
 
 
-# TODO @dejafait manually rollback to normal value 200 no sooner than 2023/05/31 once we got human confirmation
-# from the ASP that we should resume convention deactivations.
-# 199 SIAE were deactivated on 2023/04/24 but per ASP's orders we have to keep them artifically alive
-# until at least 2023/05/31.
-# See https://github.com/betagouv/itou/pull/2445 and https://github.com/betagouv/itou/pull/2498
-CONVENTION_DEACTIVATION_THRESHOLD = 1
+CONVENTION_DEACTIVATION_THRESHOLD = 200
 
 
 def update_existing_conventions():
