@@ -52,8 +52,10 @@ class ApprovalAdminForm(ApprovalFormMixin, forms.ModelForm):
                 '<ul class="messagelist"><li class="warning">En cas de modification, '
                 "vérifier la cohérence avec les périodes de suspension et de prolongation.</li></ul>"
             )
-            self.fields["start_at"].help_text = obnoxious_warning
-            self.fields["end_at"].help_text = obnoxious_warning
+            if "start_at" in self.fields:
+                self.fields["start_at"].help_text = obnoxious_warning
+            if "end_at" in self.fields:
+                self.fields["end_at"].help_text = obnoxious_warning
 
     def get_origin(self):
         if self.instance.pk:
