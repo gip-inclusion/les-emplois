@@ -1,3 +1,6 @@
+import datetime
+
+import pytest
 from dateutil.relativedelta import relativedelta
 from django.test import override_settings
 from django.urls import reverse
@@ -11,7 +14,8 @@ from itou.job_applications.enums import SenderKind
 from itou.job_applications.factories import JobApplicationFactory, JobApplicationSentByPrescriberOrganizationFactory
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.factories import PrescriberFactory, PrescriberOrganizationFactory
-from itou.siaes.factories import SiaeFactory
+from itou.siaes.factories import SiaeFactory, SiaeMembershipFactory
+from itou.users.factories import JobSeekerFactory
 from itou.utils.templatetags.format_filters import format_approval_number
 from itou.utils.test import parse_response_to_soup
 
@@ -105,6 +109,7 @@ class TestApprovalDetailView:
             + 1  # job_seeker.approval
             + 1  # approval.suspension_set.end_at >= today
             + 1  # job_application.with_accepted_at annotation coming from next query
+            + 1  # select all latest suspensions to check their end date
             + 1  # release savepoint before the template rendering
             + 1  # template: Suspension.can_be_handled_by_siae >> User.last_accepted_job_application
             + 1  # template: job_application.get_eligibility_diagnosis => Siae.is_subject_to_eligibility_rules
@@ -180,6 +185,7 @@ class TestApprovalDetailView:
             + 1  # get approval infos (get_object)
             # get_context_data
             + 1  # approval.suspension_set.end_at >= today >= approval.suspension_set.start_at (.can_be_suspended)
+            + 1  # select all latest suspensions to check their end date
             + 1  # job_application.with_accepted_at annotation coming from (.last_hire_was_made_by_siae)
             + 1  # siae infos (.last_hire_was_made_by_siae)
             + 1  # user approvals (.is_last_for_user)
@@ -352,3 +358,40 @@ class TestApprovalDetailView:
             ),
             html=True,
         )
+
+    @freeze_time("2023-04-26")
+    @pytest.mark.usefixtures("unittest_compatibility")
+    @override_settings(TALLY_URL="https://tally.so")
+    def test_remove_approval_button(self, client):
+        membership = SiaeMembershipFactory(
+            user__id=123456,
+            user__email="oph@dewinter.com",
+            user__first_name="Milady",
+            user__last_name="de Winter",
+            siae__id=999999,
+            siae__name="ACI de la Rochelle",
+        )
+        job_application = JobApplicationFactory(
+            hiring_start_at=datetime.date(2021, 3, 1),
+            to_siae=membership.siae,
+            job_seeker=JobSeekerFactory(last_name="John", first_name="Doe"),
+            with_approval=True,
+            approval__number="999991234568",
+        )
+
+        client.force_login(membership.user)
+
+        # suspension still active, more than 1 year old, starting after the accepted job application
+        suspension = SuspensionFactory(approval=job_application.approval, start_at=datetime.date(2022, 4, 8))
+        response = client.get(reverse("approvals:detail", kwargs={"pk": job_application.approval.pk}))
+
+        delete_button = parse_response_to_soup(response, selector="#approval-deletion-link")
+        assert str(delete_button) == self.snapshot(name="bouton de suppression d'un PASS IAE")
+
+        # suspension now is inactive
+        suspension.end_at = datetime.date(2023, 4, 10)  # more than 12 months but ended
+        suspension.save(update_fields=["end_at"])
+        response = client.get(reverse("approvals:detail", kwargs={"pk": job_application.approval.pk}))
+
+        delete_button = parse_response_to_soup(response, selector="#approval-deletion-link")
+        assert str(delete_button) == self.snapshot(name="bouton de suppression d'un PASS IAE")

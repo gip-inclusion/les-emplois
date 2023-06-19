@@ -1,3 +1,6 @@
+import urllib.parse
+from datetime import timedelta
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -27,6 +30,9 @@ from itou.www.approvals_views.forms import (
     PoleEmploiApprovalSearchForm,
     SuspensionForm,
 )
+
+
+SUSPENSION_DURATION_BEFORE_APPROVAL_DELETABLE = timedelta(days=365)
 
 
 class ApprovalBaseViewMixin(LoginRequiredMixin):
@@ -71,20 +77,45 @@ class ApprovalDetailView(ApprovalBaseViewMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["can_view_personal_information"] = True  # SIAE members have access to personal info
-        context["can_edit_personal_information"] = self.request.user.can_edit_personal_information(self.object.user)
-        context["approval_can_be_suspended_by_siae"] = self.object.can_be_suspended_by_siae(self.siae)
-        context["hire_by_other_siae"] = not self.object.user.last_hire_was_made_by_siae(self.siae)
-        context["approval_can_be_prolonged_by_siae"] = self.object.can_be_prolonged_by_siae(self.siae)
+        approval = self.object
         job_application = self.get_job_application(self.object)
+
+        context["can_view_personal_information"] = True  # SIAE members have access to personal info
+        context["can_edit_personal_information"] = self.request.user.can_edit_personal_information(approval.user)
+        context["approval_can_be_suspended_by_siae"] = approval.can_be_suspended_by_siae(self.siae)
+        context["hire_by_other_siae"] = not approval.user.last_hire_was_made_by_siae(self.siae)
+        context["approval_can_be_prolonged_by_siae"] = approval.can_be_prolonged_by_siae(self.siae)
         context["job_application"] = job_application
         context["matomo_custom_title"] = "Profil salarié"
         if job_application:
             context["eligibility_diagnosis"] = job_application.get_eligibility_diagnosis()
 
+        if approval.is_in_progress:
+            for suspension in approval.suspensions_by_start_date_asc:
+                if (
+                    suspension.duration > SUSPENSION_DURATION_BEFORE_APPROVAL_DELETABLE
+                    and not approval.jobapplication_set.accepted()
+                    .filter(hiring_start_at__gte=suspension.end_at)
+                    .exists()
+                ):
+                    context["approval_deletion_form_url"] = "https://tally.so/r/3je84Q?" + urllib.parse.urlencode(
+                        {
+                            "siaeID": self.siae.pk,
+                            "nomSIAE": self.siae.display_name,
+                            "prenomemployeur": self.request.user.first_name,
+                            "nomemployeur": self.request.user.last_name,
+                            "emailemployeur": self.request.user.email,
+                            "userID": self.request.user.pk,
+                            "numPASS": approval.number_with_spaces,
+                            "prenomsalarie": approval.user.first_name,
+                            "nomsalarie": approval.user.last_name,
+                        }
+                    )
+                    break
+
         context["all_job_applications"] = (
             JobApplication.objects.filter(
-                job_seeker=self.object.user,
+                job_seeker=approval.user,
                 to_siae=self.siae,
             )
             .select_related("sender")
