@@ -772,12 +772,10 @@ pandas==1.5.3 \
     --hash=sha256:e474390e60ed609cec869b0da796ad94f420bb057d86784191eefc62b65819ae \
     --hash=sha256:f76d097d12c82a535fda9dfe5e8dd4127952b45fea9b0276cb30cca5ea313fbc
     # via -r requirements/test.txt
-paramiko==2.8.1 \
-    --hash=sha256:7b5910f5815a00405af55da7abcc8a9e0d9657f57fcdd9a89894fdbba1c6b8a8 \
-    --hash=sha256:85b1245054e5d7592b9088cc6d08da22445417912d3a3e48138675c7a8616438
-    # via
-    #   -r requirements/test.txt
-    #   pysftp
+paramiko==3.2.0 \
+    --hash=sha256:93cdce625a8a1dc12204439d45033f3261bdb2c201648cfcdc06f9fd0f94ec29 \
+    --hash=sha256:df0f9dd8903bc50f2e10580af687f3015bf592a377cd438d2ec9546467a14eb8
+    # via -r requirements/test.txt
 parso==0.8.3 \
     --hash=sha256:8c07be290bb59f03588915921e29e8a50002acaf2cdc5fa0e0114f91709fafa0 \
     --hash=sha256:c001d4636cd3aecdaf33cbb40aebb59b094be2a74c556778ef5576c175e19e75
@@ -881,9 +879,6 @@ pyproject-hooks==1.0.0 \
     # via
     #   -r requirements/test.txt
     #   build
-pysftp==0.2.9 \
-    --hash=sha256:fbf55a802e74d663673400acd92d5373c1c7ee94d765b428d9f977567ac4854a
-    # via -r requirements/test.txt
 pytest==7.4.0 \
     --hash=sha256:78bf16451a2eb8c7a2ea98e32dc119fd2aa758f1d5d66dbf0a59d69a3969df32 \
     --hash=sha256:b4bf8c45bd59934ed84001ad51e11b4ee40d40a1229d2c79f9c592b0a3f6bd8a

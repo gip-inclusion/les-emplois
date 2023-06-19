@@ -76,10 +76,8 @@ PyJWT  # https://github.com/jpadilla/pyjwt
 # Requests alternative including a default time out
 httpx  # https://github.com/encode/httpx/
 
-# SFTP file transfer for ASP (don't upgrade)
-# Paramiko is explicitly defined to solve an "issue" (RSA order) of 2.9.x versions
-paramiko==2.8.1  # https://github.com/paramiko/paramiko
-pysftp==0.2.9  # https://bitbucket.org/dundeemt/pysftp/src/master/
+# SFTP file transfer for ASP
+paramiko  # https://github.com/paramiko/paramiko
 
 # Stream XLSX files
 xlsx_streaming  # https://github.com/Polyconseil/xlsx_streaming

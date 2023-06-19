@@ -1,4 +1,4 @@
-import pysftp
+import paramiko
 from django.conf import settings
 from rest_framework.renderers import JSONRenderer
 from sentry_sdk.crons import monitor
@@ -21,7 +21,7 @@ class Command(EmployeeRecordTransferCommand):
     """
 
     def _upload_batch_file(
-        self, conn: pysftp.Connection, notifications: list[EmployeeRecordUpdateNotification], dry_run: bool
+        self, sftp: paramiko.SFTPClient, notifications: list[EmployeeRecordUpdateNotification], dry_run: bool
     ):
         """
         - render the list of employee record notifications in JSON
@@ -36,7 +36,7 @@ class Command(EmployeeRecordTransferCommand):
 
         try:
             # accessing .data triggers serialization
-            remote_path = self.upload_json_file(batch_data, conn, dry_run)
+            remote_path = self.upload_json_file(batch_data, sftp, dry_run)
         except SerializationError as ex:
             self.stdout.write(
                 f"Employee records serialization error during upload, can't process.\n"
@@ -134,12 +134,12 @@ class Command(EmployeeRecordTransferCommand):
         return record_errors
 
     @monitor(monitor_slug="transfer-employee-records-updates-download")
-    def download(self, conn: pysftp.Connection, dry_run: bool):
+    def download(self, sftp: paramiko.SFTPClient, dry_run: bool):
         """Fetch and process feedback ASP files for employee record notifications"""
-        self.download_json_file(conn, dry_run)
+        self.download_json_file(sftp, dry_run)
 
     @monitor(monitor_slug="transfer-employee-records-updates-upload")
-    def upload(self, conn: pysftp.Connection, dry_run: bool):
+    def upload(self, sftp: paramiko.SFTPClient, dry_run: bool):
         new_notifications = EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW)
 
         if len(new_notifications) > 0:
@@ -148,9 +148,9 @@ class Command(EmployeeRecordTransferCommand):
             self.stdout.write("No new employee record notification found")
 
         for batch in chunks(new_notifications, EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS):
-            self._upload_batch_file(conn, batch, dry_run)
+            self._upload_batch_file(sftp, batch, dry_run)
 
-    def handle(self, *, upload, download, preflight, wet_run, asp_test, **options):
+    def handle(self, *, upload, download, preflight, wet_run, asp_test=False, debug=False, **options):
         if preflight:
             self.stdout.write("Preflight activated, checking for possible serialization errors...")
             self.preflight(EmployeeRecordUpdateNotification)
@@ -163,9 +163,9 @@ class Command(EmployeeRecordTransferCommand):
             if asp_test:
                 self.stdout.write("Using *TEST* JSON serializers (SIRET number mapping)")
 
-            with self.get_sftp_connection() as sftp:
+            with self.get_sftp_connection(debug=debug) as sftp:
                 self.stdout.write(f'Connected to "{settings.ASP_FS_SFTP_HOST}" as "{settings.ASP_FS_SFTP_USER}"')
-                self.stdout.write(f'Current remote dir is "{sftp.pwd}"')
+                self.stdout.write(f'''Current remote dir is "{sftp.normalize('.')}"''')
 
                 # Send files to ASP
                 if upload:

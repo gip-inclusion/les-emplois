@@ -1,3 +1,4 @@
+import paramiko
 from django.conf import settings
 from django.utils import timezone
 from rest_framework.renderers import JSONRenderer
@@ -15,7 +16,7 @@ from ...common_management import EmployeeRecordTransferCommand
 
 
 class Command(EmployeeRecordTransferCommand):
-    def _upload_batch_file(self, conn, employee_records, dry_run):
+    def _upload_batch_file(self, sftp: paramiko.SFTPClient, employee_records: list[EmployeeRecord], dry_run: bool):
         """
         Render a list of employee records in JSON format then send it to SFTP upload folder
         """
@@ -27,7 +28,7 @@ class Command(EmployeeRecordTransferCommand):
             batch_data = EmployeeRecordBatchSerializer(raw_batch).data
 
         try:
-            remote_path = self.upload_json_file(batch_data, conn, dry_run)
+            remote_path = self.upload_json_file(batch_data, sftp, dry_run)
         except SerializationError as ex:
             self.stdout.write(
                 f"Employee records serialization error during upload, can't process.\n"
@@ -170,12 +171,12 @@ class Command(EmployeeRecordTransferCommand):
         return record_errors
 
     @monitor(monitor_slug="transfer-employee-records-download")
-    def download(self, conn, dry_run):
+    def download(self, sftp: paramiko.SFTPClient, dry_run: bool):
         """Fetch and process feedback ASP files for employee records"""
-        self.download_json_file(conn, dry_run)
+        self.download_json_file(sftp, dry_run)
 
     @monitor(monitor_slug="transfer-employee-records-upload")
-    def upload(self, sftp, dry_run):
+    def upload(self, sftp: paramiko.SFTPClient, dry_run: bool):
         """
         Upload a file composed of all ready employee records
         """
@@ -184,7 +185,7 @@ class Command(EmployeeRecordTransferCommand):
         for batch in chunks(ready_employee_records, EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS):
             self._upload_batch_file(sftp, batch, dry_run)
 
-    def handle(self, *, upload, download, preflight, wet_run, asp_test, **options):
+    def handle(self, *, upload, download, preflight, wet_run, asp_test=False, debug=False, **options):
         if preflight:
             self.stdout.write("Preflight activated, checking for possible serialization errors...")
             self.preflight(EmployeeRecord)
@@ -197,9 +198,9 @@ class Command(EmployeeRecordTransferCommand):
             if asp_test:
                 self.stdout.write("Using *TEST* JSON serializers (SIRET number mapping)")
 
-            with self.get_sftp_connection() as sftp:
+            with self.get_sftp_connection(debug=debug) as sftp:
                 self.stdout.write(f'Connected to "{settings.ASP_FS_SFTP_HOST}" as "{settings.ASP_FS_SFTP_USER}"')
-                self.stdout.write(f'Current remote dir is "{sftp.pwd}"')
+                self.stdout.write(f'''Current remote dir is "{sftp.normalize('.')}"''')
 
                 # Send files to ASP
                 if upload:
