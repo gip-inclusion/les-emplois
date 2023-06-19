@@ -1,5 +1,25 @@
 # Journal des modifications
 
+## [64] - 2023-06-19
+
+### Ajouté
+- Contrôle a posteriori : validation automatique des revues complètes de la DDETS au passage en phase contradictoire et à la clôture de la campagne
+- Fiches de poste : ajout de valeurs par défaut sur certains champs pour faciliter la lisibilité
+- Inclusion Connect : permettre le parcours d'inscription à travers plusieurs navigateurs
+
+### Modifié
+- Candidatures : le champ "nombre de jours de formation" devient "nombre d'heures de formation"
+- Contrôle a posteriori : différer la transmission du mail de résultat
+- Contrôle a posteriori : modification du tableau de bord pour les SIAEs
+- Contrôle a posteriori : modifications de wording dans les emails et statuts dans certaines phases
+- Employeurs : correction d'une régression qui empêchait la sélection de SIAES du même SIRET
+- Inclusion Connect : disponible uniquement pour prescripteurs et employeurs
+- Inclusion Connect : rendre la déconnexion compatible OIDC
+- Le fichier bilan pour les prescripteurs habilités est téléchargeable au format XLSX
+- Parcours d'embauche :	ne pas afficher les GEIQ, EA, EATT et OPCS comme des SIAE.
+
+
+
 ## [64] - 2023-06-05
 
 ### Ajouté
