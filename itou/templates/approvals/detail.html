@@ -41,6 +41,11 @@
                                         Prolonger
                                     </a>
                                 {% endif %}
+                                {% if approval_deletion_form_url %}
+                                    <a href="{{ approval_deletion_form_url }}" id="approval-deletion-link" class="btn btn-outline-warning" target="_blank" aria-label="Mettre fin au PASS IAE de {{ approval.user.get_full_name }}">
+                                        Clôturer
+                                    </a>
+                                {% endif %}
                                 <a class="btn btn-primary matomo-event"
                                    data-matomo-action="telechargement-pdf"
                                    data-matomo-category="agrement"
