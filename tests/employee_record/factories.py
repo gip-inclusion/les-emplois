@@ -2,7 +2,7 @@ import datetime
 
 import factory
 
-from itou.employee_record.enums import NotificationStatus
+from itou.employee_record.enums import NotificationStatus, Status
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification
 from tests.job_applications.factories import (
     JobApplicationWithApprovalNotCancellableFactory,
@@ -41,6 +41,13 @@ class EmployeeRecordFactory(BareEmployeeRecordFactory):
         with_batch_information = factory.Trait(
             asp_batch_file=factory.Faker("asp_batch_filename"), asp_batch_line_number=factory.Sequence(int)
         )
+        ready_for_transfer = factory.Trait(
+            status=Status.READY,
+            job_application=factory.SubFactory(
+                JobApplicationWithCompleteJobSeekerProfileFactory,
+                to_siae__use_employee_record=True,
+            ),
+        )
 
 
 class EmployeeRecordWithProfileFactory(EmployeeRecordFactory):
@@ -61,3 +68,6 @@ class BareEmployeeRecordUpdateNotificationFactory(factory.django.DjangoModelFact
 
 class EmployeeRecordUpdateNotificationFactory(BareEmployeeRecordUpdateNotificationFactory):
     employee_record = factory.SubFactory(EmployeeRecordWithProfileFactory)
+
+    class Params:
+        ready_for_transfer = factory.Trait(status=Status.NEW)

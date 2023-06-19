@@ -1,7 +1,7 @@
+import logging
 from io import BytesIO
-from os import path
 
-import pysftp
+import paramiko
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.utils import timezone
@@ -13,14 +13,6 @@ from itou.employee_record.enums import NotificationStatus
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, EmployeeRecordUpdateNotification, Status
 from itou.employee_record.serializers import EmployeeRecordSerializer, EmployeeRecordUpdateNotificationSerializer
 from itou.utils.iterators import chunks
-
-
-# Global SFTP connection options
-
-connection_options = None
-
-if settings.ASP_FS_KNOWN_HOSTS and path.exists(settings.ASP_FS_KNOWN_HOSTS):
-    connection_options = pysftp.CnOpts(knownhosts=settings.ASP_FS_KNOWN_HOSTS)
 
 
 class EmployeeRecordTransferCommand(BaseCommand):
@@ -47,32 +39,38 @@ class EmployeeRecordTransferCommand(BaseCommand):
             action="store_true",
             help="Check JSON serialisation of employee records or notifications ready for processing",
         )
+        parser.add_argument("--debug", dest="debug", action="store_true")
 
-    def get_sftp_connection(self) -> pysftp.Connection:
-        """
-        Get a new SFTP connection to remote server.
-        """
-        return pysftp.Connection(
-            host=settings.ASP_FS_SFTP_HOST,
-            port=settings.ASP_FS_SFTP_PORT,  # default setting is None, pysftp would then default to 22
+    def get_sftp_connection(self, debug=False) -> paramiko.SFTPClient:
+        if debug:
+            logging.basicConfig(level=logging.DEBUG)
+
+        client = paramiko.SSHClient()
+        if settings.ASP_FS_KNOWN_HOSTS:
+            client.load_host_keys(settings.ASP_FS_KNOWN_HOSTS)
+
+        client.connect(
+            hostname=settings.ASP_FS_SFTP_HOST,
+            port=settings.ASP_FS_SFTP_PORT,
             username=settings.ASP_FS_SFTP_USER,
-            private_key=settings.ASP_FS_SFTP_PRIVATE_KEY_PATH,
-            cnopts=connection_options,
+            key_filename=settings.ASP_FS_SFTP_PRIVATE_KEY_PATH,
+            disabled_algorithms={
+                "pubkeys": ["rsa-sha2-512", "rsa-sha2-256"],  # We want ssh-rsa
+            },
+            allow_agent=False,  # No need to try other keys if the one we have failed
+            look_for_keys=False,  # No need to try other keys if the one we have failed
+            timeout=10,
         )
+        return client.open_sftp()
 
-    def upload_json_file(self, json_data, conn: pysftp.Connection, dry_run=False) -> str | None:
+    def upload_json_file(self, json_data, sftp: paramiko.SFTPClient, dry_run=False) -> str | None:
         """
         Upload `json_data` (as byte array) to given SFTP connection `conn`.
         Returns uploaded filename if ok, `None` otherwise.
         """
         # JSONRenderer produces *byte array* not strings
         json_bytes = JSONRenderer().render(json_data)
-        now = timezone.now()
-
-        # Using FileIO objects allows to use them as files
-        # Cool side effect: no temporary file needed
-        json_stream = BytesIO(json_bytes)
-        remote_path = f"RIAE_FS_{now:%Y%m%d%H%M%S}.json"
+        remote_path = f"RIAE_FS_{timezone.now():%Y%m%d%H%M%S}.json"
 
         if dry_run:
             self.stdout.write(f"DRY-RUN: (not) sending '{remote_path}' ({len(json_bytes)} bytes)")
@@ -80,64 +78,68 @@ class EmployeeRecordTransferCommand(BaseCommand):
 
             return remote_path
 
-        # There are specific folders for upload and download on the SFTP server
-        with conn.cd(constants.ASP_FS_REMOTE_UPLOAD_DIR):
-            # After creating a FileIO object, internal pointer is at the end of the buffer
-            # It must be set back to 0 (rewind) otherwise an empty file is sent
-            json_stream.seek(0)
+        # Using BytesIO objects allows to use them as files
+        # Cool side effect: no temporary file needed
+        json_stream = BytesIO(json_bytes)
+        # After creating a FileIO object, internal pointer is at the end of the buffer
+        # It must be set back to 0 (rewind) otherwise an empty file is sent
+        json_stream.seek(0)
 
-            # ASP SFTP server does not return a proper list of transmitted files
-            # Whether it's a bug or a paranoid security parameter
-            # we must assert that there is no verification of the remote file existence
-            # This is the meaning of `confirm=False`
-            try:
-                conn.putfo(json_stream, remote_path, file_size=len(json_bytes), confirm=False)
-
-                self.stdout.write(f"Successfully uploaded: {remote_path}")
-            except Exception as ex:
-                self.stdout.write(f"Could not upload file: {remote_path}, reason: {ex}")
-                return
+        # ASP SFTP server does not return a proper list of transmitted files
+        # Whether it's a bug or a paranoid security parameter
+        # we must assert that there is no verification of the remote file existence
+        # This is the meaning of `confirm=False`
+        try:
+            sftp.putfo(
+                json_stream,
+                f"{constants.ASP_FS_REMOTE_UPLOAD_DIR}/{remote_path}",
+                file_size=len(json_bytes),
+                confirm=False,
+            )
+        except Exception as ex:
+            self.stdout.write(f"Could not upload file: {remote_path}, reason: {ex}")
+            return
+        self.stdout.write(f"Successfully uploaded: {remote_path}")
 
         return remote_path
 
     def _parse_feedback_file(self, feedback_file: str, batch: dict, dry_run: bool) -> int:
         raise NotImplementedError()
 
-    def download_json_file(self, conn, dry_run):
+    def download_json_file(self, sftp: paramiko.SFTPClient, dry_run: bool):
         self.stdout.write("Starting DOWNLOAD of feedback files")
 
+        # Get into the download folder
+        sftp.chdir(constants.ASP_FS_REMOTE_DOWNLOAD_DIR)
+
+        # Get the available feedback files
+        result_files = sftp.listdir()
+
+        parser = JSONParser()
         successfully_parsed_files = 0
-        with conn.cd(constants.ASP_FS_REMOTE_DOWNLOAD_DIR):
-            # Get the available feedback files
-            result_files = list(conn.listdir())
+        for filename in result_files:
+            errors_in_file = 0  # Number of errors per file
+            self.stdout.write(f"Fetching file: {filename}")
+            try:
+                with sftp.file(filename, mode="r") as result_file:
+                    # Parse and update employee records with feedback
+                    errors_in_file = self._parse_feedback_file(filename, parser.parse(result_file), dry_run)
+            except Exception as ex:
+                errors_in_file += 1
+                self.stdout.write(f"Error while parsing file {filename}: {ex=}")
+            else:
+                successfully_parsed_files += 1
 
-            parser = JSONParser()
-            for filename in result_files:
-                errors_in_file = 0  # Number of errors per file
-                with BytesIO() as result_stream:
-                    self.stdout.write(f"Fetching file: {filename}")
+            # There were errors, don't delete the file
+            if errors_in_file:
+                self.stdout.write(f"Will not delete file '{filename}' because of errors.")
+                continue
 
-                    conn.getfo(filename, result_stream)
-                    result_stream.seek(0)  # Rewind stream
-                    try:
-                        # Parse and update employee records with feedback
-                        errors_in_file = self._parse_feedback_file(filename, parser.parse(result_stream), dry_run)
-                    except Exception as ex:
-                        errors_in_file += 1
-                        self.stdout.write(f"Error while parsing file {filename}: {ex}")
-                    else:
-                        successfully_parsed_files += 1
-
-                # There were errors, don't delete the file
-                if errors_in_file:
-                    self.stdout.write(f"Will not delete file '{filename}' because of errors.")
-                    continue
-
-                # Everything was fine, we can delete feedback file from server
-                self.stdout.write(f"Successfully processed '{filename}', it can be deleted.")
-                if not dry_run:
-                    self.stdout.write(f"Deleting '{filename}' from SFTP server")
-                    conn.remove(filename)
+            # Everything was fine, we can delete feedback file from server
+            self.stdout.write(f"Successfully processed '{filename}', it can be deleted.")
+            if not dry_run:
+                self.stdout.write(f"Deleting '{filename}' from SFTP server")
+                sftp.remove(filename)
 
         self.stdout.write(f"Successfully parsed {successfully_parsed_files}/{len(result_files)} files")
 
