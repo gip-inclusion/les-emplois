@@ -170,10 +170,16 @@ class AbstractAdministrativeCriteriaAdmin(admin.ModelAdmin):
     readonly_fields = ("created_at",)
     search_fields = ("name", "desc")
 
-    def save_model(self, request, obj, form, change):
-        if not change:
-            obj.created_by = request.user
-        super().save_model(request, obj, form, change)
+    # Administrative criteria are updated via fixtures
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
 
 
 @admin.register(models.AdministrativeCriteria)
