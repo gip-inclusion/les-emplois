@@ -26,6 +26,8 @@ class ExportPEApiRejectionsTestCase(TestCase):
             user__first_name='Jul"ie',
             with_jobapplication=True,
             with_jobapplication__to_siae__department=42,
+            with_jobapplication__to_siae__kind="EI",
+            with_jobapplication__to_siae__name="Ma petite entreprise",
         )
         stdout = io.StringIO()
         management.call_command("export_pe_api_rejections", stdout=stdout, stderr=io.StringIO())
@@ -40,6 +42,8 @@ class ExportPEApiRejectionsTestCase(TestCase):
                 "nom_naissance",
                 "prenom",
                 "date_naissance",
+                "siae_type",
+                "siae_raison_sociale",
                 "siae_departement",
             ],
             [
@@ -51,6 +55,8 @@ class ExportPEApiRejectionsTestCase(TestCase):
                 "Pers,e",
                 'Jul"ie',
                 str(approval.user.birthdate),
+                "EI",
+                "Ma petite entreprise",
                 "42",
             ],
         ]

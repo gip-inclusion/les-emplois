@@ -45,6 +45,8 @@ class Command(XlsxExportMixin, BaseCommand):
                     approval.user.last_name,
                     approval.user.first_name,
                     approval.user.birthdate.isoformat(),
+                    siae.kind,
+                    siae.name,
                     siae.department,
                 ]
             )
@@ -58,6 +60,8 @@ class Command(XlsxExportMixin, BaseCommand):
             "nom_naissance",
             "prenom",
             "date_naissance",
+            "siae_type",
+            "siae_raison_sociale",
             "siae_departement",
         ]
 
