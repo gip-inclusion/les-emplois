@@ -542,18 +542,6 @@ class EmployeeRecord(ASPExchangeInformation):
         return SiaeKind.from_siae_kind(self.job_application.to_siae.kind)
 
     @property
-    def batch_line_number(self):
-        """
-        This transient field is updated at runtime for JSON serialization.
-
-        It is the batch line number of the employee record.
-        """
-        if not hasattr(self, "_batch_line_number"):
-            self._batch_line_number = 1
-
-        return self._batch_line_number
-
-    @property
     def is_orphan(self):
         """Orphan employee records have different stored and actual `asp_id` fields."""
         return self.job_application.to_siae.convention.asp_id != self.asp_id
