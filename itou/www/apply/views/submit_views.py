@@ -152,6 +152,10 @@ class ApplicationBaseView(ApplyStepBaseView):
             ),
         }
 
+    def get_previous_applications_queryset(self):
+        # Useful in CheckPreviousApplications and ApplicationJobsView
+        return self.job_seeker.job_applications.filter(to_siae=self.siae)
+
 
 class ApplyStepForJobSeekerBaseView(ApplyStepBaseView):
     required_session_namespaces = ["apply_session"]
@@ -719,7 +723,7 @@ class CheckPreviousApplications(ApplicationBaseView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
-        self.previous_applications = self.job_seeker.job_applications.filter(to_siae=self.siae)
+        self.previous_applications = self.get_previous_applications_queryset()
 
     def get_next_url(self):
         return reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk})
@@ -790,6 +794,17 @@ class ApplicationJobsView(ApplicationBaseView):
             "progress": 25,
             "full_content_width": bool(job_descriptions_by_pk),
         }
+
+    def get_back_url(self):
+        if self.get_previous_applications_queryset().exists():
+            return reverse(
+                "apply:step_check_prev_applications",
+                kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
+            )
+
+        return reverse(
+            "apply:step_check_job_seeker_info", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk}
+        )
 
 
 class ApplicationEligibilityView(ApplicationBaseView):

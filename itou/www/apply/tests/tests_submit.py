@@ -270,7 +270,11 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
         # ----------------------------------------------------------------------
 
         response = self.client.get(next_url)
-        assert response.status_code == 200
+        # Check back_url is present
+        self.assertContains(
+            response,
+            reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk, "job_seeker_pk": user.pk}),
+        )
 
         response = self.client.post(next_url, data={"selected_jobs": [siae.job_description_through.first().pk]})
         assert response.status_code == 302
@@ -2729,3 +2733,118 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
                 self.assertContains(response, "Incohérence dans les critères")
 
         # TODO: more coherence tests asked to business ...
+
+
+class CheckPreviousApplicationsViewTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.siae = SiaeFactory(subject_to_eligibility=True, with_membership=True)
+        cls.job_seeker = JobSeekerFactory()
+        cls.check_infos_url = reverse(
+            "apply:step_check_job_seeker_info", kwargs={"siae_pk": cls.siae.pk, "job_seeker_pk": cls.job_seeker.pk}
+        )
+        cls.check_prev_applications_url = reverse(
+            "apply:step_check_prev_applications", kwargs={"siae_pk": cls.siae.pk, "job_seeker_pk": cls.job_seeker.pk}
+        )
+        cls.application_jobs_url = reverse(
+            "apply:application_jobs", kwargs={"siae_pk": cls.siae.pk, "job_seeker_pk": cls.job_seeker.pk}
+        )
+
+    def _login_and_setup_session(self, user):
+        self.client.force_login(user)
+        apply_session = SessionNamespace(self.client.session, f"job_application-{self.siae.pk}")
+        apply_session.init(
+            {
+                "selected_jobs": [],
+            }
+        )
+        apply_session.save()
+
+    def test_no_previous_as_job_seeker(self):
+        self._login_and_setup_session(self.job_seeker)
+        response = self.client.get(self.check_prev_applications_url)
+        self.assertRedirects(response, self.application_jobs_url)
+
+        response = self.client.get(self.application_jobs_url)
+        self.assertContains(response, self.check_infos_url)
+        self.assertNotContains(response, self.check_prev_applications_url)
+
+    def test_with_previous_as_job_seeker(self):
+        self._login_and_setup_session(self.job_seeker)
+
+        # Create a very recent application
+        job_application = JobApplicationFactory(job_seeker=self.job_seeker, to_siae=self.siae)
+        response = self.client.get(self.check_prev_applications_url)
+        self.assertContains(
+            response, "Vous avez déjà postulé chez cet employeur durant les dernières 24 heures.", status_code=403
+        )
+
+        # Make it less recent to avoid the 403
+        job_application.created_at = timezone.now() - datetime.timedelta(days=2)
+        job_application.save(update_fields=("created_at",))
+        response = self.client.get(self.check_prev_applications_url)
+        self.assertContains(response, "Vous avez déjà postulé chez cet employeur le")
+        response = self.client.post(self.check_prev_applications_url, data={"force_new_application": "force"})
+        self.assertRedirects(response, self.application_jobs_url)
+
+        # Check that the back URL is correct
+        response = self.client.get(self.application_jobs_url)
+        self.assertNotContains(response, self.check_infos_url)
+        self.assertContains(response, self.check_prev_applications_url)
+
+    def test_no_previous_as_authorized_prescriber(self):
+        authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
+        self._login_and_setup_session(authorized_prescriber)
+        response = self.client.get(self.check_prev_applications_url)
+        self.assertRedirects(response, self.application_jobs_url)
+
+        response = self.client.get(self.application_jobs_url)
+        self.assertContains(response, self.check_infos_url)
+        self.assertNotContains(response, self.check_prev_applications_url)
+
+    def test_with_previous_as_authorized_prescriber(self):
+        authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
+        self._login_and_setup_session(authorized_prescriber)
+
+        # Create a very recent application
+        job_application = JobApplicationFactory(job_seeker=self.job_seeker, to_siae=self.siae)
+        response = self.client.get(self.check_prev_applications_url)
+        self.assertContains(
+            response, "Ce candidat a déjà postulé chez cet employeur durant les dernières 24 heures.", status_code=403
+        )
+        # Make it less recent to avoid the 403
+        job_application.created_at = timezone.now() - datetime.timedelta(days=2)
+        job_application.save(update_fields=("created_at",))
+        response = self.client.get(self.check_prev_applications_url)
+        self.assertContains(response, "Le candidat a déjà postulé chez cet employeur le")
+        response = self.client.post(self.check_prev_applications_url, data={"force_new_application": "force"})
+        self.assertRedirects(response, self.application_jobs_url)
+
+        # Check that the back URL is correct
+        response = self.client.get(self.application_jobs_url)
+        self.assertNotContains(response, self.check_infos_url)
+        self.assertContains(response, self.check_prev_applications_url)
+
+    def test_no_previous_as_siae_staff(self):
+        self._login_and_setup_session(self.siae.members.first())
+
+        response = self.client.get(self.check_prev_applications_url)
+        self.assertRedirects(response, self.application_jobs_url)
+
+        response = self.client.get(self.application_jobs_url)
+        self.assertContains(response, self.check_infos_url)
+        self.assertNotContains(response, self.check_prev_applications_url)
+
+    def test_with_previous_as_siae_staff(self):
+        JobApplicationFactory(job_seeker=self.job_seeker, to_siae=self.siae)
+        self._login_and_setup_session(self.siae.members.first())
+
+        response = self.client.get(self.check_prev_applications_url)
+        self.assertContains(response, "Le candidat a déjà postulé chez cet employeur le")
+        response = self.client.post(self.check_prev_applications_url, data={"force_new_application": "force"})
+        self.assertRedirects(response, self.application_jobs_url)
+
+        # Check that the back URL is correct
+        response = self.client.get(self.application_jobs_url)
+        self.assertNotContains(response, self.check_infos_url)
+        self.assertContains(response, self.check_prev_applications_url)
