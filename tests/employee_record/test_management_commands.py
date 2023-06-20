@@ -128,7 +128,7 @@ class EmployeeRecordManagementCommandTest(ManagementCommandTestCase):
 
         employee_record.refresh_from_db()
         assert employee_record.status == Status.SENT
-        assert employee_record.batch_line_number == 1
+        assert employee_record.asp_batch_line_number == 1
         assert employee_record.asp_batch_file is not None
 
         out, _ = self.call_command(download=True)
