@@ -550,7 +550,7 @@ class DashboardViewTest(TestCase):
         self.assertNotContains(response, "Donnez de la visibilité à votre offre d’insertion")
 
     def test_dora_banner_is_shown_for_siae(self):
-        for department in ["08", "60", "91", "974"]:
+        for department in ["91", "26", "74", "30"]:
             with self.subTest(department=department):
                 siae = SiaeFactory(
                     with_membership=True,
@@ -563,7 +563,7 @@ class DashboardViewTest(TestCase):
                 self.assertContains(response, "Donnez de la visibilité à votre offre d’insertion")
 
     def test_dora_banner_is_shown_for_prescriber(self):
-        for department in ["08", "60", "91", "974"]:
+        for department in ["91", "26", "74", "30"]:
             with self.subTest(department=department):
                 prescriber_organization = prescribers_factories.PrescriberOrganizationWithMembershipFactory(
                     department=department,

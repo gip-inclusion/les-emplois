@@ -155,7 +155,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "show_dora_banner": (
             any([request.user.is_siae_staff, request.user.is_prescriber])
             and current_org
-            and current_org.department in ["08", "60", "91", "974"]
+            and current_org.department in ["91", "26", "74", "30"]
         ),
     }
 
