@@ -8,6 +8,7 @@ from django.core.exceptions import ValidationError
 from django.test import RequestFactory, override_settings
 from django.urls import reverse
 from django.utils import timezone
+from freezegun import freeze_time
 
 from itou.job_applications.factories import JobApplicationFactory
 from itou.job_applications.models import JobApplicationWorkflow
@@ -450,3 +451,60 @@ class SiaeContractTypeTest(TestCase):
         expected.remove(("FIXED_TERM_I_CVG", "CDD-I Convergence"))
         result = ContractType.choices_for_siae(siae=SiaeFactory(kind="NEW"))
         assert result == expected
+
+
+@freeze_time("2020-06-21T08:29:34")
+def test_siaejobdescription_is_active_field_history():
+    create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
+    job = SiaeJobDescriptionFactory(is_active=False)
+    # trigger the first .from_db() call and populate _old_is_active.
+    # please note that .refresh_from_db() would call .from_db() but _old_is_active
+    # would not be populated since the instances in memory would be different.
+    job = SiaeJobDescription.objects.get(pk=job.pk)
+    assert job._old_is_active is False
+    assert job.field_history == []
+
+    # modify the field
+    job.is_active = True
+    job.save(update_fields=["is_active"])
+    job = SiaeJobDescription.objects.get(pk=job.pk)
+    assert job.field_history == [
+        {
+            "field": "is_active",
+            "from": False,
+            "to": True,
+            "at": "2020-06-21T08:29:34Z",
+        }
+    ]
+
+    # non-modifying "change"
+    job.is_active = True
+    job.save(update_fields=["is_active"])
+    job = SiaeJobDescription.objects.get(pk=job.pk)
+    assert job.field_history == [
+        {
+            "field": "is_active",
+            "from": False,
+            "to": True,
+            "at": "2020-06-21T08:29:34Z",
+        }
+    ]
+
+    # modify again
+    job.is_active = False
+    job.save()
+    job = SiaeJobDescription.objects.get(pk=job.pk)
+    assert job.field_history == [
+        {
+            "field": "is_active",
+            "from": False,
+            "to": True,
+            "at": "2020-06-21T08:29:34Z",
+        },
+        {
+            "field": "is_active",
+            "from": True,
+            "to": False,
+            "at": "2020-06-21T08:29:34Z",
+        },
+    ]
