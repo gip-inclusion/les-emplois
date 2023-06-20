@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.gis.measure import D
 from django.core.exceptions import ValidationError
+from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MaxValueValidator
 from django.db import models
 from django.db.models import BooleanField, Case, Count, Exists, F, OuterRef, Prefetch, Q, Subquery, When
@@ -610,6 +611,12 @@ class SiaeJobDescription(models.Model):
         null=True,
     )
     source_url = models.URLField(verbose_name="URL source de l'offre", max_length=512, null=True, blank=True)
+    field_history = models.JSONField(
+        verbose_name="Historique des champs modifiés sur le modèle",
+        null=True,
+        encoder=DjangoJSONEncoder,
+        default=list,
+    )
 
     objects = SiaeJobDescriptionQuerySet.as_manager()
 
@@ -635,6 +642,29 @@ class SiaeJobDescription(models.Model):
                     "other_contract_type": "Veuillez préciser le type de contrat.",
                 }
             )
+
+    @classmethod
+    def from_db(cls, db, field_names, values):
+        # this is close to the code we have in itou.users.User.from_db() but we
+        # don't want full genericity yet. We could be DRYer by using a mixin later,
+        # but we'd need to handle some extra edge cases.
+        instance = super().from_db(db, field_names, values)
+        setattr(instance, "_old_is_active", instance.is_active)
+        return instance
+
+    def save(self, *args, **kwargs):
+        if hasattr(self, "_old_is_active") and self._old_is_active != self.is_active:
+            self.field_history.append(
+                {
+                    "field": "is_active",
+                    "from": self._old_is_active,
+                    "to": self.is_active,
+                    "at": timezone.now(),
+                }
+            )
+            if "update_fields" in kwargs:
+                kwargs["update_fields"].append("field_history")
+        super().save(*args, **kwargs)
 
     @property
     def display_name(self):
