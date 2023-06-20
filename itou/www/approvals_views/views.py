@@ -67,6 +67,7 @@ class ApprovalBaseViewMixin(LoginRequiredMixin):
                 "eligibility_diagnosis__author_siae",
                 "eligibility_diagnosis__author_prescriber_organization",
                 "eligibility_diagnosis__job_seeker",
+                "sender_prescriber_organization",
             )
             .first()
         )
