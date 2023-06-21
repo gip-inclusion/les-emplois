@@ -12,7 +12,7 @@
         Date de fin : <b>{{ prior_action.dates.upper }}</b>
     </div>
     {% if job_application.can_change_prior_actions %}
-        <div class="my-3 text-right">
+        <div class="my-3">
             {# Delete button with its confirmation modal #}
             <button class="btn btn-link" data-toggle="modal" data-target="#delete_prior_action_{{ prior_action.pk }}_modal">
                 Supprimer
@@ -29,9 +29,6 @@
                         </div>
                         <div class="modal-body">
                             <div class="row">
-                                <div class="col-auto">
-                                    <i class="ri-information-fill ri-lg text-danger"></i>
-                                </div>
                                 <div class="col">
                                     <p>Voulez-vous supprimer cette action préalable ?</p>
                                 </div>
