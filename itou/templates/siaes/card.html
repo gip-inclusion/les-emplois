@@ -57,9 +57,7 @@
                     <div class="c-card card rounded-lg mb-3 mb-lg-5">
                         <div class="card-body">
                             {% if not siae.block_job_applications %}
-                                <a class="btn btn-primary btn-block btn-ico justify-content-center"
-                                   href="{% url 'apply:start' siae_pk=siae.pk %}{% if back_url %}?back_url={{ back_url }}{% endif %}"
-                                   aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
+                                <a class="btn btn-primary btn-block btn-ico justify-content-center" href="{% url 'apply:start' siae_pk=siae.pk %}" aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
                                     <i class="ri-draft-line"></i>
                                     <span>Postuler</span>
                                 </a>
@@ -161,9 +159,7 @@
                         {% endif %}
                         {% if not siae.block_job_applications %}
                             <div class="d-flex justify-content-end mt-3">
-                                <a class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0"
-                                   href="{% url 'apply:start' siae_pk=siae.pk %}{% if back_url %}?back_url={{ back_url }}{% endif %}"
-                                   aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
+                                <a class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0" href="{% url 'apply:start' siae_pk=siae.pk %}" aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
                                     <i class="ri-draft-line"></i>
                                     <span>Postuler</span>
                                 </a>
