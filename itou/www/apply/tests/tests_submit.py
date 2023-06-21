@@ -2500,7 +2500,7 @@ def test_detect_existing_job_seeker(client):
     assertContains(response, "wrong-email@example.com")
 
 
-class ApplicationGEIQEligibilityViewTest(TestCase):
+class ApplicationGEIQEligibilityViewTest(S3AccessingTestCase):
     @classmethod
     def setUpTestData(cls):
         cls.geiq = SiaeFactory(with_membership=True, with_jobs=True, kind=SiaeKind.GEIQ)
@@ -2598,14 +2598,22 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
         self.client.force_login(self.prescriber_org.members.first())
         self._setup_session()
 
-        response = self.client.get(
-            reverse(
-                "apply:application_geiq_eligibility", kwargs={"siae_pk": self.geiq.pk, "job_seeker_pk": job_seeker.pk}
-            )
+        geiq_eligibility_url = reverse(
+            "apply:application_geiq_eligibility", kwargs={"siae_pk": self.geiq.pk, "job_seeker_pk": job_seeker.pk}
         )
+        response = self.client.get(geiq_eligibility_url)
 
         assert response.status_code == 200
         self.assertTemplateUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
+
+        # Check back_url in next step
+        response = self.client.get(
+            reverse(
+                "apply:application_resume",
+                kwargs={"siae_pk": self.geiq.pk, "job_seeker_pk": job_seeker.pk},
+            ),
+        )
+        self.assertContains(response, geiq_eligibility_url)
 
     def test_geiq_eligibility_badge(self):
         self.client.force_login(self.prescriber_org.members.first())

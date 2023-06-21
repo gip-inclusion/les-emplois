@@ -1015,15 +1015,28 @@ class ApplicationResumeView(ApplicationBaseView):
                 )
         return self.render_to_response(self.get_context_data(**kwargs))
 
+    def get_back_url(self):
+        view_name = "apply:application_jobs"
+        if self.siae.kind == SiaeKind.GEIQ and self.request.user.is_prescriber_with_authorized_org:
+            view_name = "apply:application_geiq_eligibility"
+        elif self.siae.kind != SiaeKind.GEIQ:
+            bypass_eligibility_conditions = [
+                # Don't perform an eligibility diagnosis is the SIAE doesn't need it,
+                not self.siae.is_subject_to_eligibility_rules,
+                # Only "authorized prescribers" can perform an eligibility diagnosis.
+                not get_user_info(self.request).is_authorized_prescriber,
+                # No need for eligibility diagnosis if the job seeker already have a PASS IAE
+                self.job_seeker.has_valid_common_approval,
+            ]
+            if not any(bypass_eligibility_conditions):
+                view_name = "apply:application_eligibility"
+
+        return reverse(
+            view_name,
+            kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
+        )
+
     def get_context_data(self, **kwargs):
-        bypass_eligibility_conditions = [
-            # Don't perform an eligibility diagnosis is the SIAE doesn't need it,
-            not self.siae.is_subject_to_eligibility_rules,
-            # Only "authorized prescribers" can perform an eligibility diagnosis.
-            not get_user_info(self.request).is_authorized_prescriber,
-            # No need for eligibility diagnosis if the job seeker already have a PASS IAE
-            self.job_seeker.has_valid_common_approval,
-        ]
         return super().get_context_data(**kwargs) | {
             "form": self.form,
             "s3_upload": self.s3_upload,
@@ -1031,10 +1044,6 @@ class ApplicationResumeView(ApplicationBaseView):
                 SiaeJobDescription.objects.filter(pk__in=self.apply_session.get("selected_jobs", [])).values_list(
                     "is_resume_mandatory", flat=True
                 )
-            ),
-            "back_url": reverse(
-                f"apply:application_{'jobs' if any(bypass_eligibility_conditions) else 'eligibility'}",
-                kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
             ),
             "progress": 75,
             "full_content_width": True,
