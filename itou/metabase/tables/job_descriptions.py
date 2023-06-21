@@ -1,4 +1,9 @@
-from itou.metabase.tables.utils import MetabaseTable, get_department_and_region_columns
+from itou.metabase.tables.utils import MetabaseTable, get_column_from_field, get_department_and_region_columns
+from itou.siaes.models import SiaeJobDescription
+
+
+def get_field(name):
+    return SiaeJobDescription._meta.get_field(name)
 
 
 TABLE = MetabaseTable(name="fiches_de_poste")
@@ -33,6 +38,7 @@ TABLE.add_columns(
             "comment": "Nom employeur",
             "fn": lambda o: o.siae.display_name,
         },
+        get_column_from_field(get_field("field_history"), name="mises_a_jour_champs"),
     ]
 )
 
