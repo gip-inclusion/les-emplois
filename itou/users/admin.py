@@ -413,6 +413,22 @@ class ItouUserAdmin(UserAdmin):
         return tuple(inlines)
 
 
+class IsPECertifiedFilter(admin.SimpleListFilter):
+    title = "Certifié par Pôle Emploi"
+    parameter_name = "is_pe_certified"
+
+    def lookups(self, request, model_admin):
+        return (("yes", "Oui"), ("no", "Non"))
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value == "yes":
+            return queryset.exclude(pe_obfuscated_nir=None)
+        if value == "no":
+            return queryset.filter(pe_obfuscated_nir=None)
+        return queryset
+
+
 @admin.register(models.JobSeekerProfile)
 class JobSeekerProfileAdmin(admin.ModelAdmin):
     """
@@ -426,10 +442,17 @@ class JobSeekerProfileAdmin(admin.ModelAdmin):
 
     list_display = (
         "pk",
-        "user",
+        "user_link",
         "username",
+        "birthdate",
+        "nir",
         "pole_emploi_id",
+        "is_pe_certified",
     )
+
+    list_filter = (IsPECertifiedFilter,)
+
+    list_select_related = ("user",)
 
     search_fields = (
         "user__first_name",
@@ -438,10 +461,14 @@ class JobSeekerProfileAdmin(admin.ModelAdmin):
     )
 
     readonly_fields = (
+        "nir",
         "pole_emploi_id",
         "hexa_lane_type",
         "hexa_post_code",
         "hexa_commune",
+        "pe_obfuscated_nir",
+        "pe_last_certification_attempt_at",
+        "is_pe_certified",
     )
 
     fieldsets = (
@@ -451,12 +478,16 @@ class JobSeekerProfileAdmin(admin.ModelAdmin):
                 "fields": (
                     "user",
                     "education_level",
+                    "nir",
                     "pole_emploi_id",
                     "pole_emploi_since",
                     "unemployed_since",
                     "resourceless",
                     "rqth_employee",
                     "oeth_employee",
+                    "is_pe_certified",
+                    "pe_obfuscated_nir",
+                    "pe_last_certification_attempt_at",
                 )
             },
         ),
@@ -491,14 +522,36 @@ class JobSeekerProfileAdmin(admin.ModelAdmin):
 
     inlines = (PkSupportRemarkInline,)
 
+    def birthdate(self, obj):
+        return obj.user.birthdate
+
+    birthdate.short_description = "Date de naissance"
+
+    def nir(self, obj):
+        return obj.user.nir or "-"
+
+    nir.short_description = "NIR"
+
     def username(self, obj):
         return f"{obj.user.first_name} {obj.user.last_name}"
+
+    username.short_description = "Nom complet"
 
     def pole_emploi_id(self, obj):
         return obj.user.pole_emploi_id or "-"
 
-    username.short_description = "Nom complet"
     pole_emploi_id.short_description = "Identifiant Pôle emploi"
+
+    def is_pe_certified(self, obj):
+        return obj.pe_obfuscated_nir is not None
+
+    is_pe_certified.short_description = "Profil certifié par Pôle emploi"
+    is_pe_certified.boolean = True
+
+    def user_link(self, obj):
+        return get_admin_view_link(obj.user, content=f"🔗 {obj.user.email}")
+
+    user_link.short_description = "Utilisateur"
 
 
 class EmailAddressWithRemarkAdmin(EmailAddressAdmin):
