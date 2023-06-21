@@ -3,6 +3,7 @@ import hashlib
 from operator import attrgetter
 
 from django.conf import settings
+from django.db.models import JSONField
 from django.db.models.fields import AutoField, CharField, DateField, PositiveIntegerField, UUIDField
 from django.db.models.fields.related import ForeignKey
 from django.utils import timezone
@@ -48,6 +49,8 @@ def get_field_type_from_field(field):
     if isinstance(field, ForeignKey):
         related_pk_field = field.related_model._meta.pk
         return get_field_type_from_field(related_pk_field)
+    if isinstance(field, JSONField):
+        return "jsonb"
     raise ValueError("Unexpected field type")
 
 
