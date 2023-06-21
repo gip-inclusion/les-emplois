@@ -52,7 +52,7 @@
                                     </div>
                                     {% if job.is_active and not siae.block_job_applications %}
                                         <div class="col-auto text-right">
-                                            <a href="{% url "apply:start" siae_pk=siae.pk %}?job_description_id={{ job.pk }}&back_url={{ request.get_full_path|urlencode }}"
+                                            <a href="{% url "apply:start" siae_pk=siae.pk %}?job_description_id={{ job.pk }}"
                                                class="matomo-event btn btn-sm btn-primary"
                                                data-matomo-category="candidature"
                                                data-matomo-action="clic"
