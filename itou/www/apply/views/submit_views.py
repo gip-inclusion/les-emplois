@@ -30,7 +30,6 @@ from itou.utils.emails import redact_email_address
 from itou.utils.perms.user import get_user_info
 from itou.utils.session import SessionNamespace, SessionNamespaceRequiredMixin
 from itou.utils.storage.s3 import S3Upload
-from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
     ApplicationJobsForm,
     CheckJobSeekerInfoForm,
@@ -98,11 +97,6 @@ class ApplyStepBaseView(LoginRequiredMixin, SessionNamespaceRequiredMixin, Templ
         return super().dispatch(request, *args, **kwargs)
 
     def get_back_url(self):
-        if not self.apply_session.exists():
-            return None
-
-        if session_back_url := self.apply_session.get("back_url"):
-            return get_safe_url(request=self.request, url=session_back_url)
         return None
 
     def get_context_data(self, **kwargs):
@@ -197,13 +191,6 @@ class ApplyStepForSenderBaseView(ApplyStepBaseView):
 
 
 class StartView(ApplyStepBaseView):
-    def _coalesce_back_url(self):
-        if "back_url" in self.request.GET:
-            return get_safe_url(self.request, "back_url")
-        if job_description_id := self.request.GET.get("job_description_id"):
-            return reverse("siaes_views:job_description_card", kwargs={"job_description_id": job_description_id})
-        return reverse("siaes_views:card", kwargs={"siae_id": self.siae.pk})
-
     def get(self, request, *args, **kwargs):
         # SIAE members can only submit a job application to their SIAE
         if request.user.is_siae_staff:
@@ -223,7 +210,6 @@ class StartView(ApplyStepBaseView):
         user_info = get_user_info(request)
         self.apply_session.init(
             {
-                "back_url": self._coalesce_back_url(),
                 "selected_jobs": [request.GET["job_description_id"]] if "job_description_id" in request.GET else [],
             }
         )

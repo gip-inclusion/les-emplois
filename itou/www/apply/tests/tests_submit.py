@@ -105,32 +105,6 @@ class ApplyTest(TestCase):
                 assert response.status_code == 403
                 assert response.context["exception"] == "A session namespace doesn't exist."
 
-    def test_start_coalesce_back_url(self):
-        siae = SiaeFactory(with_membership=True)
-        self.client.force_login(siae.members.first())
-
-        # Default / Fallback
-        self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}))
-        assert self.client.session[f"job_application-{siae.pk}"]["back_url"] == reverse(
-            "siaes_views:card", kwargs={"siae_id": siae.pk}
-        )
-
-        # With a job description
-        self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"job_description_id": 42})
-        assert self.client.session[f"job_application-{siae.pk}"]["back_url"] == reverse(
-            "siaes_views:job_description_card", kwargs={"job_description_id": 42}
-        )
-
-        # With an already present back url
-        self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"})
-        assert self.client.session[f"job_application-{siae.pk}"]["back_url"] == "/"
-
-        # With both
-        self.client.get(
-            reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"job_description_id": 42, "back_url": "/"}
-        )
-        assert self.client.session[f"job_application-{siae.pk}"]["back_url"] == "/"
-
 
 def test_check_nir_job_seeker_with_lack_of_nir_reason(client):
     """Apply as jobseeker."""
@@ -143,12 +117,11 @@ def test_check_nir_job_seeker_with_lack_of_nir_reason(client):
     # Entry point.
     # ----------------------------------------------------------------------
 
-    response = client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"})
+    response = client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}))
     assert response.status_code == 302
 
     session_data = client.session[f"job_application-{siae.pk}"]
     assert session_data == {
-        "back_url": "/",
         "selected_jobs": [],
     }
 
@@ -176,7 +149,6 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
     @property
     def default_session_data(self):
         return {
-            "back_url": "/",
             "selected_jobs": [],
         }
 
@@ -190,7 +162,7 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
         user = JobSeekerFactory(birthdate=None, nir="")
         self.client.force_login(user)
 
-        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"})
+        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}))
         # The suspension does not prevent access to the process
         self.assertRedirects(
             response, expected_url=reverse("apply:check_nir_for_job_seeker", kwargs={"siae_pk": siae.pk})
@@ -207,7 +179,7 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
         # Entry point.
         # ----------------------------------------------------------------------
 
-        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"})
+        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}))
         assert response.status_code == 302
 
         session_data = self.client.session[f"job_application-{siae.pk}"]
@@ -353,7 +325,7 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
         # Entry point.
         # ----------------------------------------------------------------------
 
-        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"}, follow=True)
+        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), follow=True)
         assert response.status_code == 200
 
         # Follow all redirections until NIR.
@@ -393,9 +365,7 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
             self.client.force_login(user)
 
             # Follow all redirections…
-            response = self.client.get(
-                reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"}, follow=True
-            )
+            response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), follow=True)
 
             # …until the expected 403.
             assert response.status_code == 403
@@ -415,7 +385,7 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
         assert response.status_code == 403
 
         # With a session namespace
-        self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"})  # Init the session
+        self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}))  # Init the session
         response = self.client.get(reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk}))
         assert response.status_code == 302
         assert response.url == reverse("apply:start", kwargs={"siae_pk": siae.pk})
@@ -428,7 +398,6 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
     @property
     def default_session_data(self):
         return {
-            "back_url": "/",
             "selected_jobs": [],
         }
 
@@ -447,7 +416,7 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
         # Entry point.
         # ----------------------------------------------------------------------
 
-        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"})
+        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}))
         assert response.status_code == 302
 
         session = self.client.session
@@ -701,7 +670,7 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
         # Entry point.
         # ----------------------------------------------------------------------
 
-        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"})
+        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}))
         assert response.status_code == 302
 
         session_data = self.client.session[f"job_application-{siae.pk}"]
@@ -952,7 +921,7 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
         self.client.force_login(user)
 
         # Follow all redirections…
-        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"}, follow=True)
+        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), follow=True)
 
         # …until a job seeker has to be determined…
         assert response.status_code == 200
@@ -979,7 +948,6 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
     @property
     def default_session_data(self):
         return {
-            "back_url": "/",
             "selected_jobs": [],
         }
 
@@ -993,7 +961,7 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
         user = PrescriberFactory()
         self.client.force_login(user)
 
-        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"})
+        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}))
         # The suspension does not prevent the access to the process
         self.assertRedirects(response, expected_url=reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk}))
 
@@ -1009,7 +977,7 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
         # Entry point.
         # ----------------------------------------------------------------------
 
-        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"})
+        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}))
         assert response.status_code == 302
 
         session_data = self.client.session[f"job_application-{siae.pk}"]
@@ -1266,7 +1234,7 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
         self.client.force_login(user)
 
         # Follow all redirections…
-        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"}, follow=True)
+        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), follow=True)
 
         # …until a job seeker has to be determined…
         assert response.status_code == 200
@@ -1295,9 +1263,7 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
         assert response.status_code == 403
 
         # With a session namespace
-        self.client.get(
-            reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"}
-        )  # Use that view to init the session
+        self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}))  # Use that view to init the session
         response = self.client.get(reverse("apply:check_nir_for_job_seeker", kwargs={"siae_pk": siae.pk}))
         assert response.status_code == 302
         assert response.url == reverse("apply:start", kwargs={"siae_pk": siae.pk})
@@ -1337,7 +1303,7 @@ class ApplyAsPrescriberNirExceptionsTest(S3AccessingTestCase):
         self.client.force_login(user)
 
         # Follow all redirections…
-        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"}, follow=True)
+        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), follow=True)
 
         # …until a job seeker has to be determined.
         assert response.status_code == 200
@@ -1399,7 +1365,7 @@ class ApplyAsPrescriberNirExceptionsTest(S3AccessingTestCase):
         self.client.force_login(user)
 
         # Follow all redirections…
-        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"}, follow=True)
+        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), follow=True)
 
         # …until a job seeker has to be determined.
         assert response.status_code == 200
@@ -1447,7 +1413,6 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
     @property
     def default_session_data(self):
         return {
-            "back_url": "/",
             "selected_jobs": [],
         }
 
@@ -1459,7 +1424,7 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
         user = siae1.members.first()
         self.client.force_login(user)
 
-        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae2.pk}), {"back_url": "/"})
+        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae2.pk}))
         assert response.status_code == 403
 
     def test_apply_as_siae_with_suspension_sanction(self):
@@ -1472,7 +1437,7 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
         user = siae.members.first()
         self.client.force_login(user)
 
-        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"})
+        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}))
         self.assertContains(
             response,
             "suite aux mesures prises dans le cadre du contrôle a posteriori",
@@ -1493,7 +1458,7 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
         # Entry point.
         # ----------------------------------------------------------------------
 
-        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"})
+        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}))
         assert response.status_code == 302
 
         session_data = self.client.session[f"job_application-{siae.pk}"]
@@ -1736,7 +1701,7 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
         self.client.force_login(user)
 
         # Follow all redirections…
-        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"}, follow=True)
+        response = self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), follow=True)
 
         # …until a job seeker has to be determined…
         assert response.status_code == 200
@@ -2422,14 +2387,13 @@ def test_detect_existing_job_seeker(client):
     job_seeker = JobSeekerWithAddressFactory(nir="", first_name="Jérémy", email="jeremy@example.com")
 
     default_session_data = {
-        "back_url": "/",
         "selected_jobs": [],
     }
 
     # Entry point.
     # ----------------------------------------------------------------------
 
-    response = client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}), {"back_url": "/"})
+    response = client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}))
     assert response.status_code == 302
 
     session_data = client.session[f"job_application-{siae.pk}"]
