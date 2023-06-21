@@ -31,6 +31,7 @@ from itou.openid_connect.inclusion_connect.test import (
 from itou.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
 from itou.prescribers import factories as prescribers_factories
 from itou.prescribers.enums import PrescriberOrganizationKind
+from itou.prescribers.models import PrescriberOrganization
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.constants import CAMPAIGN_VIEWABLE_DURATION
 from itou.siae_evaluations.factories import (
@@ -59,6 +60,12 @@ from itou.www.dashboard.forms import EditUserEmailForm
 
 
 class DashboardViewTest(TestCase):
+    NO_PRESCRIBER_ORG_MSG = "Votre compte utilisateur n’est rattaché à aucune organisation."
+    NO_PRESCRIBER_ORG_FOR_PE_MSG = (
+        "Votre compte utilisateur n’est rattaché à aucune agence Pôle emploi, "
+        "par conséquent vous ne pouvez pas bénéficier du statut de prescripteur habilité."
+    )
+
     def test_dashboard(self):
         siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
@@ -588,6 +595,41 @@ class DashboardViewTest(TestCase):
 
         response = self.client.get(reverse("dashboard:index"))
         self.assertNotContains(response, "Consultez l’offre de service de vos partenaires")
+
+    def test_dashboard_prescriber_without_organization_message(self):
+        # An orienter is a prescriber without prescriber organization
+        orienter = PrescriberFactory()
+        self.client.force_login(orienter)
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertContains(response, self.NO_PRESCRIBER_ORG_MSG)
+        self.assertNotContains(response, self.NO_PRESCRIBER_ORG_FOR_PE_MSG)
+        self.assertContains(response, reverse("signup:prescriber_check_already_exists"))
+
+    def test_dashboard_pole_emploi_prescriber_without_organization_message(self):
+        # Pôle emploi employees can sometimes be orienters
+        pe_orienter = PrescriberFactory(email="john.doe@pole-emploi.fr")
+        self.client.force_login(pe_orienter)
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertContains(response, self.NO_PRESCRIBER_ORG_FOR_PE_MSG)
+        self.assertNotContains(response, self.NO_PRESCRIBER_ORG_MSG)
+        self.assertContains(response, reverse("signup:prescriber_pole_emploi_safir_code"))
+
+    def test_dashboard_delete_one_of_multiple_prescriber_orgs_while_logged_in(self):
+        org_1 = prescribers_factories.PrescriberOrganizationWithMembershipFactory()
+        org_2 = prescribers_factories.PrescriberOrganizationWithMembershipFactory()
+        prescriber = org_1.members.first()
+        org_2.members.add(prescriber)
+
+        self.client.force_login(prescriber)
+        response = self.client.get(reverse("dashboard:index"))
+        assert org_1 == PrescriberOrganization.objects.get(
+            pk=self.client.session.get(global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY)
+        )
+        self.assertNotContains(response, "Votre compte utilisateur n’est rattaché à aucune organisation.")
+
+        org_1.members.remove(prescriber)
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertNotContains(response, "Votre compte utilisateur n’est rattaché à aucune organisation.")
 
     def test_dashboard_prescriber_suspend_link(self):
         user = JobSeekerFactory()
