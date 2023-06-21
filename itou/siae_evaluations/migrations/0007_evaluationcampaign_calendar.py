@@ -9,7 +9,7 @@ import itou.utils.validators
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("siae_evaluations", "0005_alter_evaluationcampaign_institution"),
+        ("siae_evaluations", "0006_evaluatedsiae_final_reviewed_at_only_after_reviewed_at"),
     ]
 
     operations = [
