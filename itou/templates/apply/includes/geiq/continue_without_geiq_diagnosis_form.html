@@ -1,14 +1,14 @@
 {% load bootstrap4 %}
 
-{% include "apply/includes/geiq/progress_bar.html" %}
+{% include "apply/includes/geiq/progress_bar.html" with progress=progress only %}
 
 <hr>
 
 <div class="my-4 text-right">
-    <a href="{{ back_url }}" class="btn btn-link">Annuler</a>
+    <a href="" class="btn btn-link">Annuler</a>
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirm_no_allowance_modal">
         Continuer sans valider les critères GEIQ
     </button>
 </div>
 
-{% include "apply/includes/geiq/no_allowance_modal.html" %}
+{% include "apply/includes/geiq/no_allowance_modal.html" with next_url=next_url only %}
