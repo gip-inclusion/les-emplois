@@ -969,13 +969,9 @@ class PrescriberFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsFor
 
 class CheckJobSeekerGEIQEligibilityForm(forms.Form):
     choice = forms.BooleanField(required=False, widget=forms.RadioSelect(choices=((True, "Oui"), (False, "Non"))))
-    back_url = forms.CharField(widget=forms.HiddenInput)
-    next_url = forms.CharField(widget=forms.HiddenInput)
 
-    def __init__(self, job_application, back_url, next_url, *args, **kwargs):
+    def __init__(self, job_application, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["choice"].widget.attrs.update(
             {"hx-post": reverse("apply:geiq_eligibility", kwargs={"job_application_id": job_application.pk})}
         )
-        self.fields["back_url"].initial = back_url
-        self.fields["next_url"].initial = next_url
