@@ -612,13 +612,11 @@ def geiq_eligibility(request, job_application_id, template_name="apply/process_g
 @login_required
 @require_safe
 def continue_without_geiq_diagnosis(
-    request, job_application_id, template_name="apply/includes/geiq/continue_without_geiq_diagnosis_form.html"
+    request, _job_application_id, template_name="apply/includes/geiq/continue_without_geiq_diagnosis_form.html"
 ):
-    job_application = get_object_or_404(JobApplication, pk=job_application_id)
     next_url = request.session.get("next_url")
 
     context = {
-        "job_application": job_application,
         "next_url": next_url,
         "progress": 66,
     }
