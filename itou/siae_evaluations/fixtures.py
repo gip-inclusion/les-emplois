@@ -2,8 +2,7 @@
 """
 Generate fake data based on global Itou's fixtures.
 You can use it with the quick login accounts located on the header banner.
-Enterprise: "ETTI Une nouvelle chance" (in Beaucaire, Gard — let's travel out of Tarascon for once!)
-Employer's account: test+etti@inclusion.beta.gouv.fr
+Employer's account: test+cap@inclusion.beta.gouv.fr
 Labor inspector's account: test+ddets@inclusion.beta.gouv.fr
 """
 
