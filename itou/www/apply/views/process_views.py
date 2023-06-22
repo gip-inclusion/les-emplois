@@ -12,7 +12,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_POST
 from django_htmx.http import HttpResponseClientRedirect
 from django_xworkflows import models as xwf_models
 
@@ -176,7 +176,7 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
 
 
 @login_required
-@require_http_methods(["POST"])
+@require_POST
 def process(request, job_application_id):
     queryset = JobApplication.objects.siae_member_required(request.user)
     job_application = get_object_or_404(queryset, id=job_application_id)
@@ -458,7 +458,7 @@ def cancel(request, job_application_id, template_name="apply/process_cancel.html
     return render(request, template_name, context)
 
 
-@require_http_methods(["POST"])
+@require_POST
 @login_required
 def archive(request, job_application_id):
     """
@@ -677,7 +677,7 @@ def geiq_eligibility_criteria(
     return render(request, template_name, context)
 
 
-@require_http_methods(["POST"])
+@require_POST
 def delete_prior_action(request, job_application_id, prior_action_id):
     queryset = JobApplication.objects.siae_member_required(request.user)
     job_application = get_object_or_404(
