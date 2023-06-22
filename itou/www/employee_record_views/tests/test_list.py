@@ -113,7 +113,7 @@ class ListEmployeeRecordsTest(TestCase):
         response = self.client.get(self.url + "?status=NEW")
 
         self.assertContains(response, "Une action de votre part est nécessaire")
-        self.assertContains(response, "Attention, nous avons détecté une ou plusieurs fiches salariés")
+        self.assertContains(response, "Attention, nous avons détecté une ou plusieurs fiches salarié")
         self.assertContains(
             response, "Une mise à jour manuelle est nécessaire même si ce salarié a déjà quitté la structure."
         )
@@ -129,7 +129,7 @@ class ListEmployeeRecordsTest(TestCase):
         response = self.client.get(self.url + "?status=NEW")
 
         self.assertContains(response, "Une action de votre part est nécessaire")
-        self.assertContains(response, "Attention, nous avons détecté une ou plusieurs fiches salariés")
+        self.assertContains(response, "Attention, nous avons détecté une ou plusieurs fiches salarié")
         self.assertContains(
             response, "Une mise à jour manuelle est nécessaire même si ce salarié a déjà quitté la structure."
         )
@@ -155,7 +155,7 @@ class ListEmployeeRecordsTest(TestCase):
 
         self.assertContains(response, format_filters.format_approval_number(self.job_application.approval.number))
         self.assertContains(response, "Une action de votre part est nécessaire")
-        self.assertContains(response, "Attention, nous avons détecté une ou plusieurs fiches salariés")
+        self.assertContains(response, "Attention, nous avons détecté une ou plusieurs fiches salarié")
         self.assertContains(response, "demander la régularisation du numéro de sécurité sociale")
         self.assertContains(response, f'href="https://tally.so/r/wzxQlg?jobapplication={ self.job_application.pk }"')
         self.assertNotContains(response, "Mettre à jour")
@@ -172,7 +172,7 @@ class ListEmployeeRecordsTest(TestCase):
 
         self.assertContains(response, format_filters.format_approval_number(self.job_application.approval.number))
         self.assertContains(response, "Une action de votre part est nécessaire")
-        self.assertContains(response, "Attention, nous avons détecté une ou plusieurs fiches salariés")
+        self.assertContains(response, "Attention, nous avons détecté une ou plusieurs fiches salarié")
         self.assertContains(response, "demander la régularisation du numéro de sécurité sociale")
         self.assertContains(response, f'href="https://tally.so/r/wzxQlg?employeerecord={ new_er.pk }"')
         self.assertNotContains(response, "Désactiver la fiche salarié")

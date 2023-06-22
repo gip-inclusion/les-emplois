@@ -78,7 +78,7 @@ class EmployeeRecordViewSet(AbstractEmployeeRecordViewSet):
     - utilisables en paramètres de requête (query string),
     - chainables : il est possible de préciser un ou plusieurs de ces paramètres pour affiner la recherche.
 
-    Sans paramètre fourni, la liste de résultats contient les fiches salariés en l'état
+    Sans paramètre fourni, la liste de résultats contient les fiches salarié en l'état
 
     - `PROCESSED` (integrées par l'ASP).
 

@@ -1021,7 +1021,7 @@ class CustomApprovalAdminViewsTest(TestCase):
                 job_application = JobApplicationFactory(with_approval=True, to_siae__kind=kind)
                 msg = JobApplicationInline.employee_record_status(job_application)
                 if not job_application.to_siae.can_use_employee_record:
-                    assert msg == "La SIAE n'utilise pas les fiches salariés"
+                    assert msg == "La SIAE n'utilise pas les fiches salarié"
                 else:
                     assert msg == "En attente de création"
 

@@ -66,7 +66,7 @@ class JobApplicationInline(admin.StackedInline):
             )
 
         if not obj.to_siae.can_use_employee_record:
-            return "La SIAE n'utilise pas les fiches salariés"
+            return "La SIAE n'utilise pas les fiches salarié"
 
         if not obj.create_employee_record:
             return "Création désactivée"
