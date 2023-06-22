@@ -29,7 +29,6 @@ from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.institutions.models import Institution
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siae_evaluations.models import EvaluationCampaign
-from itou.siaes.models import Siae
 from itou.users.models import User
 
 
@@ -66,8 +65,9 @@ datetime_within_period_range = evaluated_period_end_at - relativedelta(weeks=2)
 
 created_job_applications_pks = []
 
-controlled_siaes = Siae.objects.filter(pk__in=[2653, 7, 184, 249, 250])
 employer = User.objects.get(email="test+cap@inclusion.beta.gouv.fr")
+controlled_siaes = employer.siae_set.all()
+assert controlled_siaes.count() == 5
 total_administrative_criteria = AdministrativeCriteria.objects.count()
 level_to_criteria_pks = dict(
     AdministrativeCriteria.objects.values("level").annotate(pks=ArrayAgg("pk")).values_list("level", "pks")
