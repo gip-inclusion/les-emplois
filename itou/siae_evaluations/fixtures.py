@@ -78,11 +78,9 @@ with transaction.atomic():
     users.delete()
     EvaluationCampaign.objects.all().delete()
 
-siae_index = 0
 # We can't use factories here because FactoryBoy is not installed in Review app and Demo environments.
 for i in range(1, total_administrative_criteria):
-    siae_index += 1 if i % 4 == 0 else 0
-    controlled_siae = controlled_siaes[siae_index]
+    controlled_siae = controlled_siaes[i // 4]
     with transaction.atomic():
         first_name, last_name, nir, pe_id = NAMES[i - 1]
         job_seeker = User.objects.create(
