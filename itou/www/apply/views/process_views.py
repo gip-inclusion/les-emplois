@@ -12,7 +12,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
-from django.views.decorators.http import require_POST, require_safe
+from django.views.decorators.http import require_POST
 from django_htmx.http import HttpResponseClientRedirect
 from django_xworkflows import models as xwf_models
 
@@ -586,9 +586,13 @@ def geiq_eligibility(request, job_application_id, template_name="apply/process_g
                 reverse("apply:geiq_eligibility_criteria", kwargs={"job_application_id": job_application.pk})
             )
         else:
-            return HttpResponseRedirect(
-                reverse("apply:continue_without_geiq_diagnosis", kwargs={"job_application_id": job_application.pk})
-                + f"?next_url={request.session.get('next_url')}"
+            return render(
+                request,
+                "apply/includes/geiq/continue_without_geiq_diagnosis_form.html",
+                context={
+                    "next_url": request.session.get("next_url"),  # set previously by the GET request
+                    "progress": 66,
+                },
             )
 
     navigation = {"next_url": next_url, "back_url": back_url}
@@ -607,21 +611,6 @@ def geiq_eligibility(request, job_application_id, template_name="apply/process_g
 
 
 # HTMX fragments
-
-
-@login_required
-@require_safe
-def continue_without_geiq_diagnosis(
-    request, _job_application_id, template_name="apply/includes/geiq/continue_without_geiq_diagnosis_form.html"
-):
-    next_url = request.session.get("next_url")
-
-    context = {
-        "next_url": next_url,
-        "progress": 66,
-    }
-
-    return render(request, template_name, context)
 
 
 @login_required

@@ -145,11 +145,6 @@ urlpatterns = [
         process_views.geiq_eligibility_criteria,
         name="geiq_eligibility_criteria",
     ),
-    path(
-        "<uuid:job_application_id>/siae/continue_without_geiq_diagnosis",
-        process_views.continue_without_geiq_diagnosis,
-        name="continue_without_geiq_diagnosis",
-    ),
     path("<uuid:job_application_id>/siae/refuse", process_views.refuse, name="refuse"),
     path("<uuid:job_application_id>/siae/postpone", process_views.postpone, name="postpone"),
     path("<uuid:job_application_id>/siae/accept", process_views.accept, name="accept"),
