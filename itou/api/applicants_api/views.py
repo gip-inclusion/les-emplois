@@ -22,7 +22,7 @@ class ApplicantsView(generics.ListAPIView):
 
     Pour l'obtention d'un jeton, veuillez utiliser **les identifiants d'un compte administrateur de la structure.**
 
-    Voir le endpoint `token-auth` pour obtenir un jeton.
+    Voir l'entrée d'API `token-auth` pour obtenir un jeton.
 
     Ce compte ne doit être *uniquement membre* de la structure dont on souhaite récupérer la liste de candidats.
 

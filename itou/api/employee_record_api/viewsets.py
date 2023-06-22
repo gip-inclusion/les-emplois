@@ -33,7 +33,7 @@ class AbstractEmployeeRecordViewSet(viewsets.ReadOnlyModelViewSet):
 
     # Possible authentication frameworks:
     # - token auth: for external access / real world use case
-    # - session auth: for dev context and browseable API
+    # - session auth: for dev context and browsable API
     authentication_classes = [TokenAuthentication, SessionAuthentication]
 
     # Additional / custom permission classes:
@@ -80,7 +80,7 @@ class EmployeeRecordViewSet(AbstractEmployeeRecordViewSet):
 
     Sans paramètre fourni, la liste de résultats contient les fiches salarié en l'état
 
-    - `PROCESSED` (integrées par l'ASP).
+    - `PROCESSED` (intégrées par l'ASP).
 
     ## `status` : par statut des fiches salarié
     Ce paramètre est un tableau permettant de filtrer les fiches retournées par leur statut
@@ -105,9 +105,9 @@ class EmployeeRecordViewSet(AbstractEmployeeRecordViewSet):
 
     """
 
-    # Above doc section is in french for Swagger / OAS auto doc generation
+    # Above doc section is in French for Swagger / OAS auto doc generation
 
-    # If no queryset class parameter is given (f.i. overidding)
+    # If no queryset class parameter is given (f.i. overriding)
     # a `basename` parameter must be set on the router (see local `urls.py` file)
     # See: https://www.django-rest-framework.org/api-guide/routers/
 

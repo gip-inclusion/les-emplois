@@ -17,7 +17,7 @@ from .token_auth.views import ObtainAuthToken
 # https://docs.djangoproject.com/en/dev/topics/http/urls/#url-namespaces-and-included-urlconfs
 app_name = "itou.api"
 
-# Using DRF router with viewsets means automatic definition of utl patterns
+# Using DRF router with viewsets means automatic definition of URL patterns
 router = routers.DefaultRouter()
 router.register(r"employee-records", EmployeeRecordViewSet, basename="employee-records")
 router.register(
@@ -30,7 +30,7 @@ router.register(r"siaes", SiaeViewSet, basename="siaes")
 urlpatterns = [
     # TokenAuthentication endpoint to get token from login/password.
     path("token-auth/", ObtainAuthToken.as_view(), name="token-auth"),
-    # Needed for Browseable API (dev)
+    # Needed for Browsable API (dev)
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     # OpenAPI
     # See: https://www.django-rest-framework.org/topics/documenting-your-api/
