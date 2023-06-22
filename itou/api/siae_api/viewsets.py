@@ -44,7 +44,7 @@ class SiaeViewSet(viewsets.ReadOnlyModelViewSet):
     La plateforme renvoie une liste de SIAE à proximité d’une ville (déterminée par son code INSEE)
     et dans un rayon de recherche en kilomètres autour du centre de cette ville.
 
-    Les coordonnées des centre villes sont issus de [https://geo.api.gouv.fr](https://geo.api.gouv.fr/)
+    Les coordonnées des centres-villes sont issus de [https://geo.api.gouv.fr](https://geo.api.gouv.fr/)
 
 
     Chaque SIAE est accompagnée d’un certain nombre de métadonnées :
