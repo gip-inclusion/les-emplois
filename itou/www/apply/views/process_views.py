@@ -12,7 +12,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_safe
 from django_htmx.http import HttpResponseClientRedirect
 from django_xworkflows import models as xwf_models
 
@@ -610,15 +610,12 @@ def geiq_eligibility(request, job_application_id, template_name="apply/process_g
 
 
 @login_required
+@require_safe
 def continue_without_geiq_diagnosis(
     request, job_application_id, template_name="apply/includes/geiq/continue_without_geiq_diagnosis_form.html"
 ):
     job_application = get_object_or_404(JobApplication, pk=job_application_id)
     next_url = request.session.get("next_url")
-
-    if request.method == "POST":
-        del request.session["next_url"]
-        return HttpResponseRedirect(next_url)
 
     context = {
         "job_application": job_application,
