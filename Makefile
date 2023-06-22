@@ -91,7 +91,7 @@ endif
 
 populate_db: populate_db_with_cities
 	$(EXEC_CMD) bash -c "./manage.py loaddata_bulk itou/fixtures/django/*.json"
-	$(EXEC_CMD) bash -c "python itou/siae_evaluations/fixtures.py"
+	$(EXEC_CMD) python manage.py shell -c 'from itou.siae_evaluations import fixtures;fixtures.load_data()'
 
 populate_db_minimal: populate_db_with_cities
 	# Load reference data used by ASP-related code
