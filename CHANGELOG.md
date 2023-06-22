@@ -105,12 +105,12 @@
 ### Ajouté
 
 - API : Possibilité de créer son token d’accès
-- Fiches salariés : Ajout du filtre par nom du candidat à la liste des fiches salarié
+- Fiches salarié : Ajout du filtre par nom du candidat à la liste des fiches salarié
 - GEIQ : Ajout d'actions préalables à l'embauche
 
 ### Modifié
 
-- Fiches salariés : Précision du message d’erreur lors de la création quand lorsqu’une fiche archivée existe
+- Fiches salarié : Précision du message d’erreur lors de la création quand lorsqu’une fiche archivée existe
 - Liste des candidatures : Légère correction en cas de multiples diagnostiques d’éligibilité
 - Liste des candidatures : Refonte et affichage de la localisation des postes pour les employeurs
 - Liste des métiers d’une SIAE : Afficher le nombre de métiers
@@ -177,18 +177,18 @@
 ### Ajouté
 
 - Automatisation : Mise à jour des villes
-- Fiches salariés : ajout d'un bandeau d'information pour les SIAEs ayant une convention active sans annexe financière
-- Fiches salariés : ajout des informations d'horodatage ASP
+- Fiches salarié : ajout d'un bandeau d'information pour les SIAEs ayant une convention active sans annexe financière
+- Fiches salarié : ajout des informations d'horodatage ASP
 - Parcours d'embauche : Possibilité de renseigner le numéro de sécurité sociale ou la raison de son absence
 - UI : Ajout d'un bandeau de promotion de DORA dans le tableau de bord
 
 ### Modifié
 
 - Admin : cacher les boutons de validation/refus des habilitations au support externe
-- Admin : plus de granularité sur certains messages des PASS IAE et des fiches salariés
+- Admin : plus de granularité sur certains messages des PASS IAE et des fiches salarié
 - Contrôle a posteriori : Exclusion des SIAE dont le controle est terminé du rappel en phase contradictoire
 - Contrôle a posteriori : Notifier les DDETS quand les SIAE attendent les sanctions
-- Fiches salariés : Correction pour le message d'information d'actualisation
+- Fiches salarié : Correction pour le message d'information d'actualisation
 - Matomo : améliorations de stabilisation
 - Metabase : améliorations et corrections diverses
 - Recherche de postes : suppression du badge du nombre de postes ouverts si le recrutement est fermé
@@ -298,7 +298,7 @@
 - Candidatures : ajout du motif de refus "dupliqué"
 - Contrôle a posteriori : Ajout du parcours de sanctions
 - Contrôle a posteriori : Mode lecture seule pour les campagnes terminées
-- Fiches salariés : Transmission de la date de fin pour les PASS IAE sans fiches salariés
+- Fiches salarié : Transmission de la date de fin pour les PASS IAE sans fiches salarié
 - Technique : ajout de HTMX
 
 ### Modifié
@@ -322,11 +322,11 @@
 - Contrôle a posteriori : Nouvelle option pour se retirer de la campagne
 - Contrôle a posteriori : Autorise la modification des justificatifs pendant la revue de la phase contradictoire
 - Contrôle a posteriori : Mode lecture seule pour les campagnes terminées
-- Fiches salariés : Transmission de la date de fin pour les PASS IAE sans fiches salariés
+- Fiches salarié : Transmission de la date de fin pour les PASS IAE sans fiches salarié
 - API : Exposition d'un lien vers la page de la structure sur les emplois pour l'API data.inclusion
 
 ### Modifié
-- Fiches salariés : La géolocalisation est réalisée à l'étape 2 au lieu de l'étape 1 du parcours
+- Fiches salarié : La géolocalisation est réalisée à l'étape 2 au lieu de l'étape 1 du parcours
 - Correction du formatage du NIR lors du dépôt de candidature
 - UI : Ajustement du bandeau Dora dans le tableau de bord
 - Inscription : Gestion de l'erreur en cas de changement d'email sur France Connect qui rentre en conflit sur les emplois
@@ -475,7 +475,7 @@
 ## [47] - 2022-07-29
 
 ### Ajouté
-- Affichage (puis suppression une semaine plus tard) d'un message informatif concernant l'indisponibilité des fiches salariés.
+- Affichage (puis suppression une semaine plus tard) d'un message informatif concernant l'indisponibilité des fiches salarié.
 - Ajout d'un message d'alerte lors d'une suspension pour indiquer la possibilité qu'elle soit levée.
 - Ajout d'une option de « preflight » pour les _management commands_ des fiches salarié.
 - Ajout du lien vers le formulaire de suspension pour les prescripteurs habilités.
@@ -560,7 +560,7 @@
 - Contrôle a posteriori : laisser le formulaire de saisie du commentaire modifiable après la revue par les DDETS
 - Controle a posteriori : afficher la date du Pass IAE
 - Controle a posteriori : email d'information aux siaes de la campagne 2021 partie 2
-- Gérer mes fiches salariés : rendre visible les fiches à l'état 'nouvelle'
+- Gérer mes fiches salarié : rendre visible les fiches à l'état 'nouvelle'
 - Correctif pour débloquer les prescripteurs n'ayant pas la possibilité de mettre à jour le NIR
 - En tant qu’employeur je veux valider l’embauche d’un candidat dans le tableau de bord de la bonne structure. Ajout d'une modale de confirmation contenant la carte de la structure lors de l’embauche.
 - Contextualiser les contrats proposés lors de l’enregistrement d’une fiche de poste
@@ -587,7 +587,7 @@
 - Nouvelle interface pour les résultats de recherche employeurs
 - Contrôle a posteriori, Pack SIAE : Rattrapage des SIAE ayant réalisé entre 2 et 9 autoprescriptions
 - Plus de mention du PASS IAE dans les emails reçus par les employeurs non soumis aux règles d’éligibilité IAE
-- Mise à jour des scripts de transfert des fiches salariés
+- Mise à jour des scripts de transfert des fiches salarié
 - Mise à jour du theme itou vers la v0.3.9
 - Pilotage : Parmi les fiches de poste en difficulté de recrutement, calculer le nombre de fiches de poste n'ayant jamais reçu de candidatures
 - Pilotage : Ajout d'informations afin d'avoir des filtres à l'échelle locale
@@ -961,9 +961,9 @@ Technique:
 ### Ajouté
 
 - Nouveau motif de refus de candidature : « Candidature pas assez renseignée ».
-- Ajout du champ `create_employee_record` sur `Approval` (PASS IAE) afin d'empêcher la création automatique de fiches salariés. Non visible dans l'admin Django.
+- Ajout du champ `create_employee_record` sur `Approval` (PASS IAE) afin d'empêcher la création automatique de fiches salarié. Non visible dans l'admin Django.
 - Nouvelle page de statistiques chargée dans une iframe.
-- Ajout des champs e-mail et téléphone dans l'API fiches salariés.
+- Ajout des champs e-mail et téléphone dans l'API fiches salarié.
 
 ### Modifié
 
@@ -972,8 +972,8 @@ Technique:
 - Réparation : les employeurs peuvent ajouter deux métiers identiques à leur SIAE.
 - Réactivation du script d'import des EA dans celui qui est lancé hebdomadairement par Supportix.
 - Les durées maximales des prolongations (différentes selon le motif) ont été modifiées.
-- Corrections d'erreurs diverses liées aux fiches salariés.
-- Pendant l'enregistrement des fiches salariés, la sélection d'une annexe financière est désormais optionnelle.
+- Corrections d'erreurs diverses liées aux fiches salarié.
+- Pendant l'enregistrement des fiches salarié, la sélection d'une annexe financière est désormais optionnelle.
 - Mise à jour de l'URL du portail assistance : il pointe désormais vers la Communauté.
 - Prise en compte du NIR dans le script de déduplication des candidats.
 - Gestion plus propre des logs des doublons avec export en CSV pour faciliter la vie de Supportix.
@@ -1070,7 +1070,7 @@ Technique:
     - Simplification des paramètres de `user.can_view_stats_*`
     - Restriction des stats DDETS aux 4 départements d'expérimentation
 - Correctif pour `make test` qui ne permettait plus de spécifier la série spécifique de tests à réaliser
-- Affichage d’un texte à destination des SIAE concernant les fiches salariés
+- Affichage d’un texte à destination des SIAE concernant les fiches salarié
 - Affichage d’un texte pour préciser la fonction de l’import prolongation/suspension
 
 ### Supprimé
@@ -1278,7 +1278,7 @@ Technique:
 ### Modifié
 
  - Mise à jour vers Django 3.2.5
- - Écrans fiches salariés
+ - Écrans fiches salarié
  - Tri des résultats de recherche employeur par score (et non plus de manière aléatoire)
  - Les demandeurs d'emploi ne doivent pas pouvoir changer leur adresse mail dans la modification de leur profil
  - Correctif pour pouvoir modifier une prolongation dans l'admin
