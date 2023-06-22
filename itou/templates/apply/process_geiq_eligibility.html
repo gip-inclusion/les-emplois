@@ -47,8 +47,6 @@
                                 <form id="check_geiq_eligibility" hx-target="#geiq_form">
                                     {% csrf_token %}
                                     {% bootstrap_field form.choice form_check_class="form-check-inline mr-4" show_label=False %}
-                                    {% bootstrap_field form.back_url %}
-                                    {% bootstrap_field form.next_url %}
                                 </form>
                             </div>
                             <div class="col">{% include "apply/includes/geiq/legislative_text_link.html" %}</div>
