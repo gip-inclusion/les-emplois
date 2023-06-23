@@ -125,8 +125,5 @@
         });
 
         $("#siae-number-results").focus();
-        // FIXME(vperron): Remove this after March 2023; especially it might break the display if the number
-        // or order of the contract types filter changes.
-        $("#id_contract_types > div:nth-child(12) > label:nth-child(1)").append('<span class="badge badge-xs badge-pill badge-important ml-2 text-white">Nouveau</span>');
     </script>
 {% endblock %}
