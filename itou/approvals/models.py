@@ -472,6 +472,8 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         return self.is_last_for_user and self.is_open_to_prolongation and not self.is_suspended
 
     def can_be_prolonged_by_siae(self, siae):
+        # TODO: this method is *currently* unused and will maybe be *deprecated*:
+        # any SIAE can prolong an approval (if it can be prolonged)
         return self.user.last_hire_was_made_by_siae(siae) and self.can_be_prolonged
 
     @staticmethod

@@ -109,6 +109,7 @@ class TestApprovalDetailView:
             + 1  # job_seeker.approval
             + 1  # approval.suspension_set.end_at >= today
             + 1  # job_application.with_accepted_at annotation coming from next query
+            + 1  # select latest approval for user (can_be_prolonged)
             + 1  # select all latest suspensions to check their end date
             + 1  # release savepoint before the template rendering
             + 1  # template: Suspension.can_be_handled_by_siae >> User.last_accepted_job_application
@@ -304,6 +305,8 @@ class TestApprovalDetailView:
         assertNotContains(response, reverse("approvals:suspend", kwargs={"approval_id": approval.id}))
 
     def test_prolongation_button(self, client):
+        # approval.can_be_prolonged_by_siae() is currently unused
+        # any SIAE can prolong an approval (if it can be prolonged)
         approval = ApprovalFactory(
             with_jobapplication=True,
             start_at=timezone.localdate() - relativedelta(months=12),
@@ -315,7 +318,7 @@ class TestApprovalDetailView:
         client.force_login(siae_member)
 
         url = reverse("approvals:detail", kwargs={"pk": approval.pk})
-        assert approval.can_be_prolonged_by_siae(siae)
+        assert approval.can_be_prolonged
         response = client.get(url)
         assertContains(response, reverse("approvals:declare_prolongation", kwargs={"approval_id": approval.id}))
 
@@ -323,7 +326,7 @@ class TestApprovalDetailView:
         approval.save()
         # Clear cached property
         del approval.can_be_prolonged
-        assert not approval.can_be_prolonged_by_siae(siae)
+        assert not approval.can_be_prolonged
         response = client.get(url)
         assertNotContains(response, reverse("approvals:declare_prolongation", kwargs={"approval_id": approval.id}))
 
