@@ -6,12 +6,14 @@
         <div class="px-3 px-lg-4 pt-3 pt-lg-4">
             <ul class="list-unstyled mb-lg-5">
                 {% if can_view_stats_siae_etp %}
-                    <li class="d-flex justify-content-between align-items-center mb-3">
-                        <a href="{% url 'stats:stats_siae_etp' %}" class="btn-link btn-ico">
-                            <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Voir les données de ma structure (extranet ASP)</span>
-                        </a>
-                    </li>
+                    <!-- Stats temporarily suspensed until we stabilize them
+                        <li class="d-flex justify-content-between align-items-center mb-3">
+                            <a href="{% url 'stats:stats_siae_etp' %}" class="btn-link btn-ico">
+                                <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
+                                <span>Voir les données de ma structure (extranet ASP)</span>
+                            </a>
+                        </li>
+                    -->
                 {% endif %}
                 {% if can_view_stats_siae %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
@@ -36,12 +38,14 @@
                     </li>
                 {% endif %}
                 {% if can_view_stats_cd %}
-                    <li class="d-flex justify-content-between align-items-center mb-3">
-                        <a href="{% url 'stats:stats_cd' %}" class="btn-link btn-ico">
-                            <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Voir les données IAE de mon département</span>
-                        </a>
-                    </li>
+                    <!-- Stats temporarily suspensed until we stabilize them
+                        <li class="d-flex justify-content-between align-items-center mb-3">
+                            <a href="{% url 'stats:stats_cd' %}" class="btn-link btn-ico">
+                                <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
+                                <span>Voir les données IAE de mon département</span>
+                            </a>
+                        </li>
+                    -->
                 {% endif %}
                 {% if can_view_stats_pe %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
@@ -92,12 +96,14 @@
                             <span>Suivre le contrôle à posteriori</span>
                         </a>
                     </li>
-                    <li class="d-flex justify-content-between align-items-center mb-3">
-                        <a href="{% url 'stats:stats_ddets_iae_iae' %}" class="btn-link btn-ico">
-                            <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Voir les données IAE de mon département</span>
-                        </a>
-                    </li>
+                    <!-- Stats temporarily suspensed until we stabilize them
+                        <li class="d-flex justify-content-between align-items-center mb-3">
+                            <a href="{% url 'stats:stats_ddets_iae_iae' %}" class="btn-link btn-ico">
+                                <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
+                                <span>Voir les données IAE de mon département</span>
+                            </a>
+                        </li>
+                    -->
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_ddets_iae_hiring' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
@@ -126,12 +132,14 @@
                             <span>Suivre le contrôle à posteriori</span>
                         </a>
                     </li>
-                    <li class="d-flex justify-content-between align-items-center mb-3">
-                        <a href="{% url 'stats:stats_dreets_iae_iae' %}" class="btn-link btn-ico">
-                            <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Voir les données IAE de ma région</span>
-                        </a>
-                    </li>
+                    <!-- Stats temporarily suspensed until we stabilize them
+                        <li class="d-flex justify-content-between align-items-center mb-3">
+                            <a href="{% url 'stats:stats_dreets_iae_iae' %}" class="btn-link btn-ico">
+                                <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
+                                <span>Voir les données IAE de ma région</span>
+                            </a>
+                        </li>
+                    -->
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_dreets_iae_hiring' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
