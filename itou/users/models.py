@@ -358,15 +358,10 @@ class User(AbstractUser, AddressMixin):
 
     def has_data_changed(self, fields):
         if hasattr(self, "_old_values"):
-            if not self.pk or not self._old_values:
-                return True
-
             for field in fields:
                 if getattr(self, field) != self._old_values[field]:
                     return True
-            return False
-
-        return True
+        return False
 
     def clean(self):
         """

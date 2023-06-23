@@ -43,7 +43,7 @@ from itou.users.factories import (
     SiaeStaffFactory,
     UserFactory,
 )
-from itou.users.models import User
+from itou.users.models import JobSeekerProfile, User
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, RESULTS_BY_ADDRESS
 from itou.utils.test import TestCase
 
@@ -1467,3 +1467,12 @@ def test_save_erases_pe_obfuscated_nir_if_details_change():
     assert user.jobseeker_profile.pe_last_certification_attempt_at == datetime.datetime(
         2022, 8, 10, 0, 0, 0, 0, tzinfo=timezone.utc
     )
+
+
+def test_jobseeker_factory_works_alongside_user_has_data_changed():
+    js = JobSeekerFactory(jobseeker_profile__pe_obfuscated_nir="JAIME_LES_CHATS")
+    assert js._saved_obfuscated_nir == "JAIME_LES_CHATS"
+    assert js.jobseeker_profile.pe_obfuscated_nir == "JAIME_LES_CHATS"
+    profile = JobSeekerProfile.objects.get(user=js)
+    assert profile.pe_obfuscated_nir == "JAIME_LES_CHATS"
+    assert profile.pk == js.jobseeker_profile.pk
