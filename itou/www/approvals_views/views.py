@@ -84,7 +84,7 @@ class ApprovalDetailView(ApprovalBaseViewMixin, DetailView):
         context["can_edit_personal_information"] = self.request.user.can_edit_personal_information(approval.user)
         context["approval_can_be_suspended_by_siae"] = approval.can_be_suspended_by_siae(self.siae)
         context["hire_by_other_siae"] = not approval.user.last_hire_was_made_by_siae(self.siae)
-        context["approval_can_be_prolonged_by_siae"] = approval.can_be_prolonged_by_siae(self.siae)
+        context["approval_can_be_prolonged"] = approval.can_be_prolonged
         context["job_application"] = job_application
         context["matomo_custom_title"] = "Profil salarié"
         if job_application:
@@ -203,7 +203,7 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
     siae = get_current_siae_or_404(request)
     approval = get_object_or_404(Approval, pk=approval_id)
 
-    if not approval.can_be_prolonged_by_siae(siae):
+    if not approval.can_be_prolonged:
         raise PermissionDenied()
 
     back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
@@ -274,7 +274,7 @@ class DeclareProlongationHTMXFragmentView(TemplateView):
             self.siae = get_current_siae_or_404(request)
             self.approval = get_object_or_404(Approval, pk=approval_id)
 
-        if not self.approval.can_be_prolonged_by_siae(self.siae):
+        if not self.approval.can_be_prolonged:
             raise PermissionDenied()
 
         self.form = DeclareProlongationForm(approval=self.approval, siae=self.siae, data=request.POST or None)
