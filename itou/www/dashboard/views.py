@@ -26,7 +26,7 @@ from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.siae_evaluations.constants import CAMPAIGN_VIEWABLE_DURATION
 from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
-from itou.siaes.models import Siae, SiaeFinancialAnnex
+from itou.siaes.models import Siae
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
@@ -51,7 +51,6 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
     active_campaigns = []
     closed_campaigns = []
     evaluated_siae_notifications = EvaluatedSiae.objects.none()
-    show_previous_year_financial_annex_info = False
 
     # `current_org` can be a Siae, a PrescriberOrganization or an Institution.
     current_org = None
@@ -99,20 +98,6 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         num_rejected_employee_records = (
             EmployeeRecord.objects.for_siae(current_org).filter(status=Status.REJECTED).count()
         )
-        if (
-            current_org.can_use_employee_record
-            and current_org.convention
-            and current_org.convention.is_active
-            and not current_org.convention.financial_annexes.filter(
-                state__in=SiaeFinancialAnnex.STATES_ACTIVE, end_at__gt=timezone.now()
-            ).exists()
-        ):
-            # We have a SIAE that uses employee record, has an active convention
-            # but is missing its financial annex:
-            # the ASP data is certainly late, like at every beginning of the year
-            # Let's inform our user that they can still use their employee record
-            # to avoid support tickets.
-            show_previous_year_financial_annex_info = True
 
     if request.user.is_prescriber:
         try:
@@ -180,7 +165,6 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "evaluated_siae_notifications": evaluated_siae_notifications,
         "precriber_kind_pe": PrescriberOrganizationKind.PE,
         "precriber_kind_dept": PrescriberOrganizationKind.DEPT,
-        "show_previous_year_financial_annex_info": show_previous_year_financial_annex_info,
         "show_dora_banner": (
             any([request.user.is_siae_staff, request.user.is_prescriber])
             and current_org
