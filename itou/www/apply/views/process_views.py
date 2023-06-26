@@ -416,7 +416,6 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
 def reload_qualification_fields(
     request, job_application_id, template_name="apply/includes/geiq/geiq_qualification_fields.html"
 ):
-    # This is an HTMX part
     queryset = JobApplication.objects.siae_member_required(request.user)
     job_application = get_object_or_404(queryset, id=job_application_id)
     form_accept = AcceptForm(instance=job_application, data=request.POST or None)
@@ -424,6 +423,10 @@ def reload_qualification_fields(
         "form_accept": form_accept,
         "job_application": job_application,
     }
+
+    # we don't want to display error on this field for an HTMX reload:
+    form_accept.errors.pop("qualification_level", None)
+
     return render(request, template_name, ctx)
 
 
