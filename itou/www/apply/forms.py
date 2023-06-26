@@ -494,7 +494,7 @@ class AcceptForm(forms.ModelForm):
                         "hx-post": reverse(
                             "apply:reload_qualification_fields", kwargs={"job_application_id": job_application.pk}
                         ),
-                        "hx-swap": "outerHTML show:#id_qualification_type:top",
+                        "hx-swap": "outerHTML",
                         "hx-target": "#geiq_qualification_fields_block",
                     },
                 )
