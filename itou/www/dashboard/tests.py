@@ -501,26 +501,6 @@ class DashboardViewTest(TestCase):
         response = self.client.get(reverse("dashboard:index"))
         self.assertNotContains(response, TODO_BADGE, html=True)
 
-    def test_dashboard_siae_convention_without_financial_annex(self):
-        siae = SiaeFactory(with_membership=True)
-        user = siae.members.first()
-        self.client.force_login(user)
-
-        response = self.client.get(reverse("dashboard:index"))
-        self.assertNotContains(response, "La fin de validité des annexes financières")
-
-        # Remove active annexes
-        siae.convention.financial_annexes.all().delete()
-
-        response = self.client.get(reverse("dashboard:index"))
-        self.assertContains(response, "La fin de validité des annexes financières")
-
-        siae.kind = SiaeKind.EITI  # This kind cannot use employee records
-        siae.save()
-
-        response = self.client.get(reverse("dashboard:index"))
-        self.assertNotContains(response, "La fin de validité des annexes financières")
-
     def test_dora_card_is_not_shown_for_job_seeker(self):
         user = JobSeekerFactory()
         self.client.force_login(user)

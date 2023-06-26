@@ -34,16 +34,6 @@
         </div>
     {% endif %}
 
-    {# Information pour les employeurs en cas d'absence d'annexe financière #}
-    {% if show_previous_year_financial_annex_info %}
-        <div class="alert alert-info">
-            <p class="mb-0">
-                La fin de validité des annexes financières de l'année précédente n'a pas d'incidence sur l'envoi de vos fiches salarié vers l'ASP.
-            </p>
-            <p class="mb-0">Vous pouvez donc continuer à recruter et générer vos fiches, il n'y a pas de blocage.</p>
-        </div>
-    {% endif %}
-
     {# Alerte pour les prescripteurs en cas d'absence ou de mauvais score de geocoding. #}
     {# Seuls les prescripteurs habilités apparaissent dans le moteur de recherche. #}
     {% if current_prescriber_organization and current_prescriber_organization.is_authorized and not current_prescriber_organization.has_reliable_coords_legacy %}
