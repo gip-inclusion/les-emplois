@@ -185,7 +185,8 @@ class TestApprovalDetailView:
             + 1  # get approval infos (get_object)
             # get_context_data
             + 1  # approval.suspension_set.end_at >= today >= approval.suspension_set.start_at (.can_be_suspended)
-            + 1  # select all latest suspensions to check their end date
+            + 1  # select all latest suspensions to check their end date (with prefetch)
+            + 1  # for every *active* suspension, check if there is an accepted job application after it
             + 1  # job_application.with_accepted_at annotation coming from (.last_hire_was_made_by_siae)
             + 1  # siae infos (.last_hire_was_made_by_siae)
             + 1  # user approvals (.is_last_for_user)
@@ -254,7 +255,9 @@ class TestApprovalDetailView:
         )
 
         url = reverse("approvals:detail", kwargs={"pk": approval.pk})
-        with assertNumQueries(expected_num_queries):  # pylint: disable=not-context-manager
+        # 1 query less to be executed: no more suspensions so no more need to check if there
+        # is an accepted job application
+        with assertNumQueries(expected_num_queries - 1):  # pylint: disable=not-context-manager
             response = client.get(url)
 
         prolongations_section = parse_response_to_soup(response, selector="#prolongations-list")

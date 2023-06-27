@@ -1,5 +1,5 @@
 import urllib.parse
-from datetime import timedelta
+from datetime import date, timedelta
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -72,7 +72,7 @@ class ApprovalBaseViewMixin(LoginRequiredMixin):
 
 class ApprovalDetailView(ApprovalBaseViewMixin, DetailView):
     model = Approval
-    queryset = Approval.objects.select_related("user")
+    queryset = Approval.objects.select_related("user").prefetch_related("suspension_set")
     template_name = "approvals/detail.html"
 
     def get_context_data(self, **kwargs):
@@ -92,11 +92,18 @@ class ApprovalDetailView(ApprovalBaseViewMixin, DetailView):
 
         if approval.is_in_progress:
             for suspension in approval.suspensions_by_start_date_asc:
+                if suspension.is_in_progress:
+                    suspension_duration = date.today() - suspension.start_at
+                    has_hirings_after_suspension = False
+                else:
+                    suspension_duration = suspension.duration
+                    has_hirings_after_suspension = (
+                        approval.jobapplication_set.accepted().filter(hiring_start_at__gte=suspension.end_at).exists()
+                    )
+
                 if (
-                    suspension.duration > SUSPENSION_DURATION_BEFORE_APPROVAL_DELETABLE
-                    and not approval.jobapplication_set.accepted()
-                    .filter(hiring_start_at__gte=suspension.end_at)
-                    .exists()
+                    suspension_duration > SUSPENSION_DURATION_BEFORE_APPROVAL_DELETABLE
+                    and not has_hirings_after_suspension
                 ):
                     context["approval_deletion_form_url"] = "https://tally.so/r/3je84Q?" + urllib.parse.urlencode(
                         {
