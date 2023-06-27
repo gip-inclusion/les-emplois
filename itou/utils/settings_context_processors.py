@@ -34,5 +34,5 @@ def expose_settings(request):
         "ITOU_PROTOCOL": settings.ITOU_PROTOCOL,
         "MATOMO_BASE_URL": settings.MATOMO_BASE_URL,
         "MATOMO_SITE_ID": global_constants.MATOMO_SITE_EMPLOIS_ID,
-        "SHOW_TEST_ACCOUNTS_BANNER": settings.SHOW_TEST_ACCOUNTS_BANNER,
+        "SHOW_DEMO_ACCOUNTS_BANNER": settings.SHOW_DEMO_ACCOUNTS_BANNER,
     }

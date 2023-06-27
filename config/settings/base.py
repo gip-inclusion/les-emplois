@@ -363,7 +363,7 @@ DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "noreply@inclusion.beta.gou
 SENTRY_DSN = os.getenv("SENTRY_DSN")
 sentry_init()
 
-SHOW_TEST_ACCOUNTS_BANNER = ITOU_ENVIRONMENT in ("DEMO", "REVIEW-APP")
+SHOW_DEMO_ACCOUNTS_BANNER = ITOU_ENVIRONMENT in ("DEMO", "REVIEW-APP")
 
 # https://adresse.data.gouv.fr/faq
 API_BAN_BASE_URL = os.getenv("API_BAN_BASE_URL")
