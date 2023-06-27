@@ -7,6 +7,7 @@
 # Global tasks.
 # =============================================================================
 PYTHON_VERSION := python3.11
+LINTER_CHECKED_DIRS := config itou tests
 PGDATABASE ?= itou
 ifeq ($(shell uname -s),Linux)
 	REQUIREMENTS_PATH := requirements/dev.txt
@@ -51,21 +52,21 @@ cdsitepackages:
 	docker exec -ti -w /usr/local/lib/$(PYTHON_VERSION)/site-packages itou_django /bin/bash
 
 quality: $(VIRTUAL_ENV)
-	black --check config/ itou/
-	ruff check config/ itou/
+	black --check $(LINTER_CHECKED_DIRS)
+	ruff check $(LINTER_CHECKED_DIRS)
 	djlint --lint --check itou
 	find * -type f -name '*.sh' -exec shellcheck --external-sources {} +
 
 fix: $(VIRTUAL_ENV)
-	black config itou
-	ruff check --fix config/ itou/
+	black $(LINTER_CHECKED_DIRS)
+	ruff check --fix $(LINTER_CHECKED_DIRS)
 	djlint --reformat itou
 	# Use || true because `git apply` exit with an error ("error: unrecognized input") when the pipe is empty,
 	# this happens when there is nothing to fix or shellcheck can't propose a fix.
 	find * -type f -name '*.sh' -exec shellcheck --external-sources --format=diff {} + | git apply || true
 
 pylint: $(VIRTUAL_ENV)
-	pylint config itou
+	pylint $(LINTER_CHECKED_DIRS)
 
 # Django.
 # =============================================================================
