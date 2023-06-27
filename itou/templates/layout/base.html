@@ -145,10 +145,12 @@
             {% if ITOU_ENVIRONMENT == "DEMO" %}tarteaucitron.user.hotjarId = 1861487;{% endif %}
             tarteaucitron.user.HotjarSv = 6;
 
+            {% if MATOMO_BASE_URL %}
             // Matomo :
             tarteaucitron.user.matomoId = {{ MATOMO_SITE_ID }};
             tarteaucitron.user.matomoHost = '{{ MATOMO_BASE_URL }}';
             (tarteaucitron.job = tarteaucitron.job || []).push('matomo');
+            {% endif %}
 
             // livestorm
             const tablet_width = 750;
