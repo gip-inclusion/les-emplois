@@ -90,12 +90,12 @@ populate_db_with_cities:
 endif
 
 populate_db: populate_db_with_cities
-	$(EXEC_CMD) bash -c "./manage.py loaddata itou/fixtures/django/*.json"
+	$(EXEC_CMD) bash -c "./manage.py loaddata_bulk itou/fixtures/django/*.json"
 	$(EXEC_CMD) bash -c "python itou/siae_evaluations/fixtures.py"
 
 populate_db_minimal: populate_db_with_cities
 	# Load reference data used by ASP-related code
-	$(EXEC_CMD) bash -c "./manage.py loaddata itou/fixtures/django/*asp_INSEE*.json"
+	$(EXEC_CMD) bash -c "./manage.py loaddata_bulk itou/fixtures/django/*asp_INSEE*.json"
 
 COMMAND_GRAPH_MODELS := graph_models --group-models \
 	approvals \
