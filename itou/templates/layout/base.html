@@ -52,7 +52,7 @@
             </ul>
         </nav>
 
-        {% include "includes/test_accounts.html" %}
+        {% include "includes/demo_accounts.html" %}
         {% include "layout/_header.html" %}
 
         <main id="main" role="main" class="s-main bg-gray-400">
@@ -205,8 +205,8 @@
             <script src="{% static "js/prevent_multiple_submit.js" %}"></script>
             <script src="{% static 'js/utils.js'%}"></script>
             <script src="{% static "js/duet_date_picker_widget.js" %}"></script>
-            {% if SHOW_TEST_ACCOUNTS_BANNER %}
-                <script src="{% static 'js/test_accounts.js'%}"></script>
+            {% if SHOW_DEMO_ACCOUNTS_BANNER %}
+                <script src="{% static 'js/demo_accounts.js'%}"></script>
             {% endif %}
         {% endblock %}
 

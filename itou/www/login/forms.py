@@ -22,7 +22,7 @@ class ItouLoginForm(LoginForm):
             user
             and user.has_sso_provider
             # Bypass sso login error if we show the test account banner and the form received the hidden field value
-            and not (self.cleaned_data.get("demo_banner_account") and settings.SHOW_TEST_ACCOUNTS_BANNER)
+            and not (self.cleaned_data.get("demo_banner_account") and settings.SHOW_DEMO_ACCOUNTS_BANNER)
         ):
             identity_provider = user.get_identity_provider_display()
             error_message = f"Votre compte est relié à {identity_provider}. Merci de vous connecter avec ce service."
