@@ -10,18 +10,11 @@ if [ "$SKIP_FIXTURES" = true ] ; then
     exit
 fi
 
-echo "Loading cities"
+echo "Loading data"
+USE_VENV=1 \
 PGPASSWORD=$POSTGRESQL_ADDON_PASSWORD \
-    psql \
-    --dbname "$POSTGRESQL_ADDON_DB" \
-    --host "$POSTGRESQL_ADDON_HOST" \
-    --port "$POSTGRESQL_ADDON_PORT" \
-    --username "$POSTGRESQL_ADDON_USER" \
-    --file "$APP_HOME"/itou/fixtures/postgres/cities.sql \
-    --quiet
-
-# `ls $APP_HOME` does not work as the current user
-# does not have execution rights on the $APP_HOME directory.
-echo "Loading fixtures"
-find "$APP_HOME"/itou/fixtures/django/ -name '*.json' | sort | xargs django-admin loaddata
-python "$APP_HOME"/itou/siae_evaluations/fixtures.py
+PGDATABASE=$POSTGRESQL_ADDON_DB \
+PGHOST=$POSTGRESQL_ADDON_HOST \
+PGPORT=$POSTGRESQL_ADDON_PORT \
+PGUSER="$POSTGRESQL_ADDON_USER" \
+make --directory "$APP_HOME" populate_db
