@@ -133,15 +133,6 @@ class SiaeAdmin(ItouGISMixin, ExportActionMixin, OrganizationAdmin):
     list_display = ("pk", "siret", "kind", "name", "department", "geocoding_score", "member_count", "created_at")
     list_filter = (HasMembersFilter, "kind", "block_job_applications", "source", "department")
     raw_id_fields = ("created_by", "convention")
-    readonly_fields = (
-        "pk",
-        "source",
-        "created_by",
-        "created_at",
-        "updated_at",
-        "job_applications_blocked_at",
-        "geocoding_score",
-    )
     fieldsets = (
         (
             "SIAE",
@@ -190,6 +181,20 @@ class SiaeAdmin(ItouGISMixin, ExportActionMixin, OrganizationAdmin):
 
     def get_export_filename(self, request, queryset, file_format):
         return f"Entreprises-{now().strftime('%Y-%m-%d')}.{file_format.get_extension()}"
+
+    def get_readonly_fields(self, request, obj=None):
+        readonly_fields = [
+            "pk",
+            "source",
+            "created_by",
+            "created_at",
+            "updated_at",
+            "job_applications_blocked_at",
+            "geocoding_score",
+        ]
+        if obj:
+            readonly_fields.append("kind")
+        return readonly_fields
 
     def save_model(self, request, obj, form, change):
         if not change:
