@@ -1,8 +1,13 @@
+from io import BytesIO
+
 import pytest
 from django.urls import reverse
-from pytest_django.asserts import assertNotContains
+from django.utils import timezone
+from pytest_django.asserts import assertContains, assertNotContains
 
+from itou.approvals.enums import ProlongationReason
 from itou.approvals.factories import ApprovalFactory, ProlongationFactory, SuspensionFactory
+from itou.files.models import File
 from itou.job_applications.factories import JobApplicationFactory
 from itou.users.factories import ItouStaffFactory
 from itou.utils.test import parse_response_to_soup
@@ -38,3 +43,22 @@ def test_approval_form_has_warnings_if_suspension_or_prolongation(admin_client, 
     response = admin_client.get(reverse("admin:approvals_approval_change", kwargs={"object_id": approval.pk}))
     field_helptext = parse_response_to_soup(response, selector=f"#id_{field}_helptext")
     assert str(field_helptext) == snapshot(name="obnoxious start_at and end_at warning")
+
+
+def test_prolongation_report_file_filter(admin_client):
+    with BytesIO(b"foo") as file:
+        report_file = File(file, last_modified=timezone.now())
+        report_file.save()
+    prolongation = ProlongationFactory(report_file=report_file, reason=ProlongationReason.SENIOR)
+
+    response = admin_client.get(reverse("admin:approvals_prolongation_changelist"), follow=True)
+    assertContains(response, prolongation.approval.number)
+    assertContains(response, prolongation.declared_by)
+
+    response = admin_client.get(reverse("admin:approvals_prolongation_changelist") + "?report_file=yes", follow=True)
+    assertContains(response, prolongation.approval.number)
+    assertContains(response, prolongation.declared_by)
+
+    response = admin_client.get(reverse("admin:approvals_prolongation_changelist") + "?report_file=no", follow=True)
+    assertNotContains(response, prolongation.approval.number)
+    assertNotContains(response, prolongation.declared_by)

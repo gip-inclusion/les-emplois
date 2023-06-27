@@ -287,6 +287,22 @@ class IsInProgressFilter(admin.SimpleListFilter):
         return queryset
 
 
+class HasReportFile(admin.SimpleListFilter):
+    title = "fichier bilan téléversé"
+    parameter_name = "report_file"
+
+    def lookups(self, request, model_admin):
+        return (("yes", "Oui"), ("no", "Non"))
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value == "yes":
+            return queryset.exclude(report_file=None)
+        if value == "no":
+            return queryset.filter(report_file=None)
+        return queryset
+
+
 @admin.register(models.Suspension)
 class SuspensionAdmin(admin.ModelAdmin):
     list_display = (
@@ -347,6 +363,7 @@ class ProlongationAdmin(admin.ModelAdmin):
     exclude = ("report_file",)
     list_filter = (
         IsInProgressFilter,
+        HasReportFile,
         "reason",
     )
     date_hierarchy = "start_at"
