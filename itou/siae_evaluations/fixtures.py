@@ -17,6 +17,7 @@ from django.db import transaction
 from django.test import override_settings
 from django.utils import timezone
 
+
 django.setup()
 
 import itou.users.enums as users_enums
@@ -26,9 +27,9 @@ from itou.eligibility.models import AdministrativeCriteria
 from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.institutions.models import Institution
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
-from itou.siae_evaluations.models import (Calendar, EvaluationCampaign,
-                                          create_campaigns_and_calendar)
+from itou.siae_evaluations.models import Calendar, EvaluationCampaign, create_campaigns_and_calendar
 from itou.users.models import User
+
 
 NAMES = [
     ("Gustave", "Loiseau", "187104712403340", "703059J"),
