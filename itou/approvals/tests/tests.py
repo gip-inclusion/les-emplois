@@ -1481,6 +1481,22 @@ class ProlongationModelTest(TestCase):
             prolongation.clean()
         assert "La date de début doit être la même que la date de fin du PASS IAE" in error.value.message
 
+    def test_clean_with_no_end_at(self):
+        """
+        Checking `end_at` emptyness is now in clean model method, and not in forms anymore
+        to ensure single validation message (and more robust / cleaner btw).
+        """
+        approval = ApprovalFactory()
+        siae = SiaeFactory(with_membership=True)
+        start_at = approval.end_at - relativedelta(days=2)
+
+        # build: no need to save the prolongation
+        prolongation = ProlongationFactory.build(
+            start_at=start_at, end_at=None, approval=approval, declared_by_siae=siae
+        )
+        with pytest.raises(ValidationError, match="La date de fin de prolongation est obligatoire."):
+            prolongation.clean()
+
     def test_get_start_at(self):
 
         end_at = datetime.date(2021, 2, 1)
