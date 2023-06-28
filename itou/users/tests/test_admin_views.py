@@ -1,6 +1,7 @@
+from django.contrib.auth.models import Permission
 from django.urls import reverse
 from django.utils import timezone
-from pytest_django.asserts import assertRedirects
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.users.enums import UserKind
 from itou.users.factories import ItouStaffFactory, JobSeekerFactory
@@ -66,3 +67,22 @@ def test_no_email_sent(client):
     assert user_refreshed.date_joined == now
     assert user_refreshed.last_checked_at == now
     assert user_refreshed.identity_provider == IdentityProvider.INCLUSION_CONNECT
+
+
+def test_hijack_button(client):
+    user = JobSeekerFactory()
+    hijack_url = reverse("hijack:acquire")
+
+    # Basic staff users don't have access to the button
+    admin_user = ItouStaffFactory()
+    perms = Permission.objects.filter(codename__in=("change_user", "view_user"))
+    admin_user.user_permissions.add(*perms)
+    client.force_login(admin_user)
+    response = client.get(reverse("admin:users_user_change", kwargs={"object_id": user.pk}))
+    assertNotContains(response, hijack_url)
+
+    # Superusers (and those matching has_hijack_perm) can
+    admin_user.is_superuser = True
+    admin_user.save(update_fields=("is_superuser",))
+    response = client.get(reverse("admin:users_user_change", kwargs={"object_id": user.pk}))
+    assertContains(response, hijack_url)
