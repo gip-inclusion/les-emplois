@@ -58,6 +58,7 @@ PUBLIC_DASHBOARDS = {
     "femmes-iae": "tb 216 - Les femmes dans l'IAE",
     "suivi-pass-iae": "tb 217 - Suivi pass IAE",
     "cartographies-iae": "tb 218 - Cartographie de l'IAE",
+    "suivi-controle-a-posteriori": "tb 144 - Contrôle à posteriori",
     # Note: keep those commented for reference. They're not used anymore but if we ever
     # need to regenerate values for the Q1 2022 or before, they're going to be required.
     # "recrutement": "tb 116 - Recrutement",
@@ -71,6 +72,9 @@ PRIVATE_STATIC_DASHBOARDS = {
     "stats/dgefp/follow_siae_evaluation/": "TB DGEFP CAP",
     "stats/dgefp/iae/": "TB DGEFP IAE",
     "stats/dihal/state/": "TB DIHAL",
+    "stats/siae/follow_siae_evaluation/": "TB Suivi CAP SIAE",
+    "stats/siae/auto_prescription/": "TB Suivi Auto Prescription SIAE",
+    "stats/iae_network/hiring/": "TB Suivi Recrutement par réseau",
 }
 
 PRIVATE_DEPARTMENT_DASHBOARDS = {
@@ -206,7 +210,6 @@ def multiget_matomo_dashboards(at: datetime.datetime, dashboard_options: list[Ma
 
 
 class Command(BaseCommand):
-
     help = "Fetches dashboards from matomo and inserts them monday by monday in Metabase in its raw version"
 
     def __init__(self, *args, **kwargs):
