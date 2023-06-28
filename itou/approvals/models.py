@@ -1137,6 +1137,9 @@ class Prolongation(models.Model):
         return f"{self.pk} {self.start_at.strftime('%d/%m/%Y')} - {self.end_at.strftime('%d/%m/%Y')}"
 
     def clean(self):
+        if not self.end_at:
+            raise ValidationError({"end_at": "La date de fin de prolongation est obligatoire."})
+
         # Min duration == 1 day.
         if self.end_at <= self.start_at:
             raise ValidationError({"end_at": "La durée minimale doit être d'au moins un jour."})

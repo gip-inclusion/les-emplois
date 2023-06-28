@@ -131,6 +131,8 @@ class DeclareProlongationForm(forms.ModelForm):
         )
 
         self.fields["end_at"].initial = None
+        # Checked by model clean(), avoid double validation message
+        self.fields["end_at"].required = False
         self.fields["end_at"].widget = DuetDatePickerWidget(
             {
                 "min": self.instance.start_at,
