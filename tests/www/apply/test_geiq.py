@@ -289,3 +289,21 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis(TestCase):
 
         self.assertTemplateUsed(response, "apply/includes/known_criteria.html")
         self.assertContains(response, "Résident en ZRR")
+
+    def test_jobseeker_cannot_create_geiq_diagnosis(self):
+        job_application = JobApplicationFactory(job_seeker=self.job_seeker, to_siae=self.geiq)
+        self.client.force_login(self.job_seeker)
+        # Needed to setup session
+        response = self.client.get(
+            reverse("apply:geiq_eligibility", kwargs={"job_application_id": job_application.pk})
+        )
+        assert response.status_code == 404
+        response = self.client.post(
+            reverse("apply:geiq_eligibility_criteria", kwargs={"job_application_id": job_application.pk}),
+            data={
+                "jeune_26_ans": "on",
+                "sortant_ase": "on",
+            },
+        )
+        assert not self.job_seeker.geiq_eligibility_diagnoses.exists()
+        assert response.status_code == 404

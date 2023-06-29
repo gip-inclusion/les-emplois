@@ -30,7 +30,7 @@ from itou.siae_evaluations.models import Sanctions
 from itou.siaes.enums import SiaeKind
 from itou.siaes.factories import SiaeFactory
 from itou.users.enums import LackOfNIRReason, UserKind
-from itou.users.factories import JobSeekerWithAddressFactory, PrescriberFactory
+from itou.users.factories import JobSeekerFactory, JobSeekerWithAddressFactory, PrescriberFactory
 from itou.users.models import User
 from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.format_filters import format_nir
@@ -1502,6 +1502,22 @@ class ProcessTransferJobApplicationTest(TestCase):
         assert messages
         assert len(messages) == 1
         assert f"transférée à la SIAE <b>{other_siae.display_name}</b>" in str(messages[0])
+
+    def test_job_application_transfer_without_rights(self):
+        siae = SiaeFactory()
+        other_siae = SiaeFactory()
+        user = JobSeekerFactory()
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
+            to_siae=siae,
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+        )
+        # Forge query
+        self.client.force_login(user)
+        post_data = {"target_siae_id": other_siae.pk}
+        transfer_url = reverse("apply:transfer", kwargs={"job_application_id": job_application.pk})
+        response = self.client.post(transfer_url, data=post_data)
+        assert response.status_code == 404
 
 
 @pytest.mark.parametrize("reason", ["prevent_objectives", "non_eligible"])

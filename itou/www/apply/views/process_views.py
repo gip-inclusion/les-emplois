@@ -500,7 +500,8 @@ def archive(request, job_application_id):
 
 @login_required
 def transfer(request, job_application_id):
-    job_application = get_object_or_404(JobApplication.objects, pk=job_application_id)
+    queryset = JobApplication.objects.siae_member_required(request.user)
+    job_application = get_object_or_404(queryset, pk=job_application_id)
     target_siae = get_object_or_404(Siae.objects, pk=request.POST.get("target_siae_id"))
     back_url = request.POST.get("back_url", reverse("apply:list_for_siae"))
 
@@ -572,8 +573,9 @@ def eligibility(request, job_application_id, template_name="apply/process_eligib
 
 @login_required
 def geiq_eligibility(request, job_application_id, template_name="apply/process_geiq_eligibility.html"):
+    queryset = JobApplication.objects.siae_member_required(request.user)
     # Check GEIQ eligibility during job application process
-    job_application = get_object_or_404(JobApplication, pk=job_application_id)
+    job_application = get_object_or_404(queryset, pk=job_application_id)
     back_url = request.GET.get("back_url") or reverse(
         "apply:details_for_siae", kwargs={"job_application_id": job_application.pk}
     )
@@ -619,7 +621,8 @@ def geiq_eligibility_criteria(
 ):
     """Dynamic GEIQ eligibility criteria form (HTMX)"""
 
-    job_application = get_object_or_404(JobApplication, pk=job_application_id)
+    queryset = JobApplication.objects.siae_member_required(request.user)
+    job_application = get_object_or_404(queryset, pk=job_application_id)
     diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
         job_application.job_seeker, job_application.to_siae
     ).first()
