@@ -1,6 +1,23 @@
 # Journal des modifications
 
-## [64] - 2023-06-19
+## [66] - 2023-07-03
+
+### Ajouté
+- Contrôle a posteriori : affichage du calendrier de la campagne en cours
+- Employeurs : proposer la clôture d'un PASS IAE suite à 12 mois consécutifs de suspension
+- Fiches de poste : suivre leur statut d'activation dans le temps
+- Fichier des rejets Pole Emploi : ajout de la raison sociale et du type de SIAE
+- Profils demandeur d'emploi : afficher le statut de certification Pôle Emploi dans l'admin
+
+### Modifié
+- Améliorations d'interfaces, de formulations et de rendus divers
+- Candidatures : cacher les adresses e-mail aux candidats
+- Candidatures : proposer des pages de retour plus intuitives
+- Critères administratifs : ne peuvent être ajoutés ou modifiés dans l'admin
+
+
+
+## [65] - 2023-06-19
 
 ### Ajouté
 - Contrôle a posteriori : validation automatique des revues complètes de la DDETS au passage en phase contradictoire et à la clôture de la campagne
