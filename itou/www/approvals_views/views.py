@@ -17,6 +17,7 @@ from itou.approvals.models import Approval, PoleEmploiApproval, Suspension
 from itou.files.models import File
 from itou.job_applications.enums import Origin, SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.siaes import enums as enums_siae
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.pagination import ItouPaginator
@@ -210,7 +211,6 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
     preview = False
 
     form = DeclareProlongationForm(approval=approval, siae=siae, data=request.POST or None)
-    s3_upload = S3Upload(kind="prolongation_report")
 
     if request.method == "POST" and form.is_valid():
         prolongation = form.save(commit=False)
@@ -224,10 +224,12 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
         if request.POST.get("preview"):
             preview = True
         elif request.POST.get("save"):
-            if key := form.cleaned_data.get("report_file_path"):
-                file = File(key, timezone.now())
-                prolongation.report_file = file
-                file.save()
+
+            if siae.kind == enums_siae.SiaeKind.AI:
+                if key := form.cleaned_data.get("report_file_path"):
+                    file = File(key, timezone.now())
+                    prolongation.report_file = file
+                    file.save()
 
             prolongation.save()
 
@@ -243,9 +245,12 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
         "back_url": back_url,
         "form": form,
         "preview": preview,
-        "s3_upload": s3_upload,
         "unfold_details": form.data.get("reason") in PROLONGATION_REPORT_FILE_REASONS,
+        "can_upload_prolongation_report": siae.can_upload_prolongation_report,
     }
+
+    if siae.can_upload_prolongation_report:
+        context |= {"s3_upload": S3Upload(kind="prolongation_report")}
 
     return render(request, template_name, context)
 
@@ -278,15 +283,17 @@ class DeclareProlongationHTMXFragmentView(TemplateView):
             raise PermissionDenied()
 
         self.form = DeclareProlongationForm(approval=self.approval, siae=self.siae, data=request.POST or None)
-        self.s3_upload = S3Upload(kind="prolongation_report")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context |= {
             "approval": self.approval,
             "form": self.form,
-            "s3_upload": self.s3_upload,
         }
+
+        if self.siae.kind == enums_siae.SiaeKind.AI:
+            context |= {"s3_upload": S3Upload(kind="prolongation_report")}
+
         return context
 
     def post(self, request, *args, **kwargs):

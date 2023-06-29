@@ -19,7 +19,7 @@ L'employeur souhaite vous apporter des explications supplémentaires par télép
 - Début de la prolongation : {{ prolongation.start_at|date:"d/m/Y" }}
 - Fin de la prolongation : {{ prolongation.end_at|date:"d/m/Y" }}
 - Motif de prolongation : {{ prolongation.get_reason_display }}
-- Fiche bilan : {{ prolongation.report_file.link }}
+{% if prolongation.report_file %}- Fiche bilan : {{ prolongation.report_file.link }}{% endif %}
 
 Pour valider ou refuser cette prolongation, merci de nous transférer ce message à l'adresse suivante : {{ itou_email_prolongation }}
 

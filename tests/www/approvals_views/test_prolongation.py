@@ -8,6 +8,7 @@ from django.utils.http import urlencode
 
 from itou.approvals.enums import ProlongationReason
 from itou.approvals.models import Prolongation
+from itou.siaes.enums import SiaeKind
 from itou.utils.storage.s3 import S3Upload
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.approvals_views.forms import DeclareProlongationForm
@@ -19,6 +20,8 @@ from tests.utils.test import parse_response_to_soup
 
 @pytest.mark.usefixtures("unittest_compatibility")
 class ApprovalProlongationTest(S3AccessingTestCase):
+    PROLONGATION_EMAIL_REPORT_TEXT = "- Fiche bilan :"
+
     def setUp(self):
         """
         Create test objects.
@@ -27,6 +30,9 @@ class ApprovalProlongationTest(S3AccessingTestCase):
         self.prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
         self.prescriber = self.prescriber_organization.members.first()
 
+        self._setup_with_siae_kind(SiaeKind.EI)
+
+    def _setup_with_siae_kind(self, siae_kind: SiaeKind):
         today = timezone.localdate()
         self.job_application = JobApplicationFactory(
             with_approval=True,
@@ -34,6 +40,7 @@ class ApprovalProlongationTest(S3AccessingTestCase):
             hiring_start_at=today - relativedelta(days=1),
             approval__start_at=today - relativedelta(months=12),
             approval__end_at=today + relativedelta(months=2),
+            to_siae__kind=siae_kind,
         )
         self.siae = self.job_application.to_siae
         self.siae_user = self.job_application.to_siae.members.first()
@@ -182,6 +189,7 @@ class ApprovalProlongationTest(S3AccessingTestCase):
     def test_prolongation_report_file_fields(self):
         # Check S3 parameters / hidden fields mandatory for report file upload
 
+        self._setup_with_siae_kind(SiaeKind.AI)
         self.client.force_login(self.siae_user)
         url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
         response = self.client.get(url)
@@ -208,6 +216,7 @@ class ApprovalProlongationTest(S3AccessingTestCase):
         # Check that report file object is saved and linked to prolongation
         # Bad reason types are checked by UI (JS) and ultimately by DB constraints
 
+        self._setup_with_siae_kind(SiaeKind.AI)
         self.client.force_login(self.siae_user)
         url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
         response = self.client.get(url)
@@ -239,6 +248,7 @@ class ApprovalProlongationTest(S3AccessingTestCase):
         # Check that report file object is saved and linked to prolongation
         # Bad reason types are checked by UI (JS) and ultimately by DB constraints
 
+        self._setup_with_siae_kind(SiaeKind.AI)
         self.client.force_login(self.siae_user)
         url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
         response = self.client.get(url)
@@ -272,6 +282,7 @@ class ApprovalProlongationTest(S3AccessingTestCase):
         prolongation = self.approval.prolongation_set.first()
 
         assert prolongation.report_file.link in email.body
+        assert self.PROLONGATION_EMAIL_REPORT_TEXT in email.body
 
     def test_check_single_prescriber_organization(self):
         self.client.force_login(self.siae_user)
@@ -351,3 +362,38 @@ class ApprovalProlongationTest(S3AccessingTestCase):
 
         error_msg = parse_response_to_soup(response, selector="div#check_prescriber_email .invalid-feedback")
         assert str(error_msg) == self.snapshot(name="unknown authorized prescriber")
+
+    def test_prolongation_without_report_file(self):
+        # Check with default setup kind: EI
+        self.client.force_login(self.siae_user)
+        url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
+        response = self.client.get(url)
+
+        reason = ProlongationReason.SENIOR
+        end_at = Prolongation.get_max_end_at(self.approval.end_at, reason=reason)
+
+        post_data = {
+            "end_at": end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "reason": reason,
+            "email": self.prescriber.email,
+            "contact_email": self.faker.email(),
+            "contact_phone": self.faker.phone_number(),
+            "prescriber_organization": self.prescriber_organization.pk,
+            "save": "1",
+        }
+
+        response = self.client.post(url, data=post_data)
+
+        assert response.status_code == 302
+        assert len(mail.outbox) == 1
+
+        email = mail.outbox[0]
+
+        assert len(email.to) == 1
+        assert email.to[0] == post_data["email"]
+        assert email.subject == f"Demande de prolongation du PASS IAE de {self.approval.user.get_full_name()}"
+
+        prolongation = self.approval.prolongation_set.first()
+
+        assert not prolongation.report_file
+        assert self.PROLONGATION_EMAIL_REPORT_TEXT not in email.body

@@ -193,6 +193,8 @@ class DeclareProlongationForm(forms.ModelForm):
             }
         )
 
+        self.fields["report_file_path"].disabled = not self.siae.can_upload_prolongation_report
+
         # Dynamic : checking prescriber email
         if kwargs.get("data"):
             if email := kwargs.get("data", {}).get("email"):
@@ -248,8 +250,13 @@ class DeclareProlongationForm(forms.ModelForm):
             if not self.cleaned_data.get("contact_phone"):
                 self.add_error("contact_phone", "Veuillez saisir un numéro de téléphone de contact")
 
-        # Prolongation report is only mandatory for these reasons:
-        if self.cleaned_data.get("reason") in PROLONGATION_REPORT_FILE_REASONS:
+        # Prolongation report :
+        # - is only mandatory for these reasons
+        # - is temporarily limited to AI kind
+        if (
+            self.cleaned_data.get("reason") in PROLONGATION_REPORT_FILE_REASONS
+            and self.siae.can_upload_prolongation_report
+        ):
             if not self.cleaned_data.get("report_file_path") or not self.cleaned_data.get("uploaded_file_name"):
                 # No visible field for this form field
                 raise ValidationError("Vous devez fournir un fichier de bilan renseigné")
