@@ -1,4 +1,5 @@
 {% extends "admin/base.html" %}
+{% load static %}
 
 {% block title %}{{ title }} | Les emplois de l'inclusion{% endblock %}
 
@@ -79,4 +80,5 @@
             outline-style: auto;
         }
     </style>
+    <script src="{% static "js/admin.js" %}" defer></script>
 {% endblock %}
