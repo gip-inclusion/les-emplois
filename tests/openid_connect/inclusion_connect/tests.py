@@ -5,12 +5,8 @@ from unittest import mock
 from urllib.parse import quote, urlencode
 
 import httpx
-import jwt
 import pytest
 import respx
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import rsa
 from django.contrib import auth, messages
 from django.contrib.auth import get_user
 from django.contrib.sessions.middleware import SessionMiddleware
@@ -56,23 +52,6 @@ OIDC_USERINFO = {
 }
 
 
-def generate_access_token(data):
-    private_key = (
-        rsa.generate_private_key(
-            public_exponent=65537,
-            key_size=512,
-            backend=default_backend(),
-        )
-        .private_bytes(
-            encoding=serialization.Encoding.PEM,
-            format=serialization.PrivateFormat.TraditionalOpenSSL,
-            encryption_algorithm=serialization.NoEncryption(),
-        )
-        .decode()
-    )
-    return jwt.encode(OIDC_USERINFO, private_key, algorithm="RS256")
-
-
 # Make sure this decorator is before test definition, not here.
 # @respx.mock
 def mock_oauth_dance(
@@ -110,8 +89,7 @@ def mock_oauth_dance(
     # User is logged out from IC when an error happens during the oauth dance.
     respx.get(constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(200)
 
-    access_token = generate_access_token(OIDC_USERINFO)
-    token_json = {"access_token": access_token, "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
+    token_json = {"access_token": "access_token", "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
     respx.post(constants.INCLUSION_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
 
     user_info = OIDC_USERINFO.copy()
@@ -403,8 +381,7 @@ class InclusionConnectResumeRegistrationViewTest(InclusionConnectBaseTestCase):
 class InclusionConnectCallbackViewTest(InclusionConnectBaseTestCase):
     @respx.mock
     def test_callback_invalid_state(self):
-        access_token = generate_access_token(OIDC_USERINFO)
-        token_json = {"access_token": access_token, "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
+        token_json = {"access_token": "access_token", "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
         respx.post(constants.INCLUSION_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
 
         url = reverse("inclusion_connect:callback")
