@@ -241,7 +241,7 @@ class CreatedByProxyFilter(admin.SimpleListFilter):
 @admin.register(models.User)
 class ItouUserAdmin(UserAdmin):
     add_form = ItouUserCreationForm
-    change_form_template = "admin/users/change_form.html"
+    change_form_template = "admin/users/change_user_form.html"
     form = UserAdminForm
     list_display = (
         "pk",
