@@ -86,3 +86,14 @@ def test_hijack_button(client):
     admin_user.save(update_fields=("is_superuser",))
     response = client.get(reverse("admin:users_user_change", kwargs={"object_id": user.pk}))
     assertContains(response, hijack_url)
+
+
+def test_app_model_change_url(admin_client):
+    user = JobSeekerFactory()
+    # Check that the page does not crash
+    response = admin_client.get(reverse("admin:users_user_change", kwargs={"object_id": user.pk}))
+    assert response.status_code == 200
+    response = admin_client.get(
+        reverse("admin:users_jobseekerprofile_change", kwargs={"object_id": user.jobseeker_profile.pk})
+    )
+    assert response.status_code == 200
