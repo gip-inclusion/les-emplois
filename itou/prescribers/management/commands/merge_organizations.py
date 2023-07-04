@@ -40,7 +40,7 @@ def _model_sanity_check():
     }
     if relation_fields != expected_fields:
         raise RuntimeError(
-            f"Extra relations found, please update this script to handle: {relation_fields - expected_fields}"
+            f"Extra relations found, please update this script to handle: {relation_fields ^ expected_fields}"
         )
 
 
