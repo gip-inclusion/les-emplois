@@ -1,10 +1,11 @@
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from django.utils import timezone
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import assertContains, assertNotContains, assertNumQueries, assertRedirects
 
 from itou.approvals.factories import ApprovalFactory, SuspensionFactory
 from itou.siaes.factories import SiaeFactory
+from tests.utils.test import BASE_NUM_QUERIES
 
 
 class TestApprovalsListView:
@@ -82,7 +83,21 @@ class TestApprovalsListView:
         client.force_login(siae_member)
 
         url = reverse("approvals:list")
-        response = client.get(url)
+        with assertNumQueries(
+            BASE_NUM_QUERIES
+            + 1  # fetch django session
+            + 1  # fetch user
+            + 1  # fetch siae membership
+            + 1  # fetch siae infos
+            + 1  # fetch SIAE (get_current_siae_or_404)
+            + 1  # fetch job seekers (ApprovalForm._get_choices_for_job_seekers)
+            + 1  # count (from paginator)
+            + 1  # fetch siae membership (from context processor)
+            + 1  # fetch approvals
+            + 2  # check if in progress suspensions exist for each approval (Approval.is_suspended)
+            + 3  # savepoint, update session, release savepoint
+        ):
+            response = client.get(url)
         assertContains(response, "2 résultats")
         assertContains(response, reverse("approvals:detail", kwargs={"pk": approval.pk}))
         assertContains(response, reverse("approvals:detail", kwargs={"pk": approval_same_siae.pk}))
