@@ -115,7 +115,7 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
         approval.end_at = timezone.localdate() + timedelta(days=2)
         approval.save()
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW),
             [employee_record_1.pk, employee_record_2.pk],
             transform=lambda notif: notif.employee_record_id,

@@ -4,7 +4,7 @@ import pytest
 from django.test import override_settings
 from django.urls import reverse
 from freezegun import freeze_time
-from pytest_django.asserts import assertQuerysetEqual
+from pytest_django.asserts import assertQuerySetEqual
 
 from itou.analytics.models import StatsDashboardVisit
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION
@@ -49,7 +49,7 @@ class StatsViewTest(TestCase):
 
 
 def assert_stats_dashboard_equal(values):
-    assertQuerysetEqual(
+    assertQuerySetEqual(
         StatsDashboardVisit.objects.all(),
         [
             values,
@@ -88,7 +88,7 @@ def test_stats_prescriber_log_visit(client, view_name):
     user = prescriber_org.members.get()
     client.force_login(user)
 
-    assertQuerysetEqual(StatsDashboardVisit.objects.all(), [])
+    assertQuerySetEqual(StatsDashboardVisit.objects.all(), [])
 
     response = client.get(reverse(f"stats:{view_name}"))
     assert response.status_code == 200
@@ -127,7 +127,7 @@ def test_stats_siae_log_visit(client, view_name, settings):
 
     client.force_login(user)
 
-    assertQuerysetEqual(StatsDashboardVisit.objects.all(), [])
+    assertQuerySetEqual(StatsDashboardVisit.objects.all(), [])
 
     response = client.get(reverse(f"stats:{view_name}"))
     assert response.status_code == 200
@@ -165,7 +165,7 @@ def test_stats_ddets_iae_log_visit(client, view_name):
     user = institution.members.get()
     client.force_login(user)
 
-    assertQuerysetEqual(StatsDashboardVisit.objects.all(), [])
+    assertQuerySetEqual(StatsDashboardVisit.objects.all(), [])
 
     url = reverse(f"stats:{view_name}")
     response = client.get(url)
@@ -205,7 +205,7 @@ def test_stats_dreets_iae_log_visit(client, view_name):
     user = institution.members.get()
     client.force_login(user)
 
-    assertQuerysetEqual(StatsDashboardVisit.objects.all(), [])
+    assertQuerySetEqual(StatsDashboardVisit.objects.all(), [])
 
     response = client.get(reverse(f"stats:{view_name}"))
     assert response.status_code == 200
@@ -243,7 +243,7 @@ def test_stats_dgefp_log_visit(client, view_name):
     user = institution.members.get()
     client.force_login(user)
 
-    assertQuerysetEqual(StatsDashboardVisit.objects.all(), [])
+    assertQuerySetEqual(StatsDashboardVisit.objects.all(), [])
 
     response = client.get(reverse(f"stats:{view_name}"))
     assert response.status_code == 200

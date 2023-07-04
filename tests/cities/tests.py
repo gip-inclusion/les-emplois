@@ -1,6 +1,6 @@
 from django.contrib.gis.geos import Point
 from django.core import management
-from pytest_django.asserts import assertQuerysetEqual
+from pytest_django.asserts import assertQuerySetEqual
 
 from itou.cities.factories import create_city_guerande, create_test_cities
 from itou.cities.models import City, EditionModeChoices
@@ -156,7 +156,7 @@ def test_sync_cities(settings, capsys, respx_mock):
         "> successfully updated count=0 cities",  # no update to post codes
     ]
 
-    assertQuerysetEqual(
+    assertQuerySetEqual(
         City.objects.all().order_by("code_insee"),
         [
             (
