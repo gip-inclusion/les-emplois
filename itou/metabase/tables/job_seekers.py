@@ -49,7 +49,7 @@ def get_latest_diagnosis(job_seeker):
     assert job_seeker.is_job_seeker
     if job_seeker.eligibility_diagnoses_count == 0:
         return None
-    return job_seeker.sorted_eligibility_diagnoses[0]
+    return job_seeker.last_eligibility_diagnosis[0]
 
 
 def get_latest_diagnosis_author_sub_kind(job_seeker):

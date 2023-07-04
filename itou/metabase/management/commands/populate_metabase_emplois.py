@@ -260,7 +260,8 @@ class Command(BaseCommand):
                         EligibilityDiagnosis.objects.select_related(
                             "author_prescriber_organization",
                             "author_siae",
-                        ).annotate(
+                        )
+                        .annotate(
                             level_1_count=Count(
                                 "administrative_criteria",
                                 filter=Q(administrative_criteria__level=AdministrativeCriteriaLevel.LEVEL_1),
@@ -271,11 +272,9 @@ class Command(BaseCommand):
                             ),
                             criteria_ids=ArrayAgg("administrative_criteria__pk"),
                         )
-                        # TODO Django in 4.2 : Slice here with [:1]
-                        .order_by("-created_at")
+                        .order_by("-created_at")[:1]
                     ),
-                    # TODO Django in 4.2 : rename to last_eligibility_diagnosis
-                    to_attr="sorted_eligibility_diagnoses",
+                    to_attr="last_eligibility_diagnosis",
                 ),
                 Prefetch(
                     "job_applications",
