@@ -73,7 +73,7 @@ class ProcessViewsTest(TestCase):
                 "city_slug": city.slug,
             }
 
-        response = self.client.post(url_accept, HTTP_HX_REQUEST="true", data=post_data)
+        response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
         if assert_successful:
             assert (
                 response.headers.get("HX-Trigger")
@@ -83,7 +83,7 @@ class ProcessViewsTest(TestCase):
             assert response.headers.get("HX-Trigger") is None
 
         post_data = post_data | {"confirmed": "True"}
-        response = self.client.post(url_accept, HTTP_HX_REQUEST="true", data=post_data)
+        response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
         # django-htmx triggers a client side redirect when it receives a response with the HX-Redirect header.
         # It renders an HttpResponseRedirect subclass which, unfortunately, responds with a 200 status code.
@@ -784,11 +784,11 @@ class ProcessViewsTest(TestCase):
             ),
             "answer": "",
         }
-        response = self.client.post(url_accept, HTTP_HX_REQUEST="true", data=post_data)
+        response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
         self.assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
 
         post_data["nir"] = "1234"
-        response = self.client.post(url_accept, HTTP_HX_REQUEST="true", data=post_data)
+        response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
         self.assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
         self.assertFormError(
             response.context["form_personal_data"],
@@ -833,7 +833,7 @@ class ProcessViewsTest(TestCase):
             ),
             "answer": "",
         }
-        response = self.client.post(url_accept, HTTP_HX_REQUEST="true", data=post_data)
+        response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
         self.assertContains(
             response, "Le numéro de sécurité sociale est déjà associé à un autre utilisateur", html=True
         )
@@ -871,12 +871,12 @@ class ProcessViewsTest(TestCase):
             ),
             "answer": "",
         }
-        response = self.client.post(url_accept, HTTP_HX_REQUEST="true", data=post_data)
+        response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
         self.assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
 
         # Check the box
         post_data["lack_of_nir"] = True
-        response = self.client.post(url_accept, HTTP_HX_REQUEST="true", data=post_data)
+        response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
         self.assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
         self.assertContains(response, "Veuillez sélectionner un motif pour continuer", html=True)
 

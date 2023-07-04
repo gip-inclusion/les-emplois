@@ -257,7 +257,7 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
             "confirmed": "True",
         }
 
-        response = self.client.post(url_accept, HTTP_HX_REQUEST=True, data=post_data, follow=True)
+        response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data, follow=True)
 
         # See https://django-htmx.readthedocs.io/en/latest/http.html#django_htmx.http.HttpResponseClientRedirect # noqa
         assert response.status_code == 200
@@ -297,7 +297,7 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
             "confirmed": "True",
         }
 
-        response = self.client.post(url_accept, HTTP_HX_REQUEST=True, data=post_data, follow=True)
+        response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data, follow=True)
 
         assert response.status_code == 200
         assertContains(response, "Il n'est pas possible d'antidater un contrat.")
@@ -309,7 +309,7 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
         job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, state="processing")
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
         self.client.force_login(job_application.to_siae.members.first())
-        response = self.client.post(url_accept, HTTP_HX_REQUEST=True, data=post_data, follow=True)
+        response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data, follow=True)
 
         assert response.status_code == 200
         assertNotContains(response, "Il n'est pas possible d'antidater un contrat.")
