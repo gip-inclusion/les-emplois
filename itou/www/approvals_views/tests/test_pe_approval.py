@@ -161,12 +161,10 @@ class PoleEmploiApprovalSearchTest(TestCase):
 
 
 class PoleEmploiApprovalSearchUserTest(TestCase):
-    def setUp(self):
-        self.job_application = JobApplicationFactory(with_approval=True)
-        self.siae = self.job_application.to_siae
-        self.siae_user = self.job_application.to_siae.members.first()
-        self.approval = self.job_application.approval
-        self.pe_approval = PoleEmploiApprovalFactory()
+    @classmethod
+    def setUpTestData(cls):
+        cls.job_application = JobApplicationFactory(with_approval=True)
+        cls.siae_user = cls.job_application.to_siae.members.first()
 
     def test_nominal(self):
         """
@@ -174,18 +172,15 @@ class PoleEmploiApprovalSearchUserTest(TestCase):
         number matches a PASS IAE attached to a job_application
         """
         self.client.force_login(self.siae_user)
+        pe_approval = PoleEmploiApprovalFactory()
 
-        url = reverse("approvals:pe_approval_search_user", kwargs={"pe_approval_id": self.pe_approval.id})
+        url = reverse("approvals:pe_approval_search_user", kwargs={"pe_approval_id": pe_approval.id})
 
         response = self.client.get(url)
-        self.assertContains(response, self.pe_approval.last_name.title())
-        self.assertContains(response, self.pe_approval.first_name.title())
+        self.assertContains(response, pe_approval.last_name.title())
+        self.assertContains(response, pe_approval.first_name.title())
 
     def test_invalid_pe_approval(self):
-        """
-        The search for PE approval screen should redirect to the matching job application details screen if the
-        number matches a PASS IAE attached to a job_application
-        """
         self.client.force_login(self.siae_user)
 
         url = reverse("approvals:pe_approval_search_user", kwargs={"pe_approval_id": 123})
