@@ -4,6 +4,7 @@ import openpyxl
 import xlsx_streaming
 from django import http
 from django.utils import timezone
+from django.utils.http import content_disposition_header
 
 
 def generate_excel_sheet(headers, rows):
@@ -41,5 +42,5 @@ def to_streaming_response(queryset, filename, headers, serializer, with_time=Fal
     if with_time:
         now = timezone.now().isoformat(timespec="seconds").replace(":", "-")
         filename = f"{filename}-{now}"
-    response["Content-Disposition"] = f'attachment; filename="{filename}.xlsx"'
+    response["Content-Disposition"] = content_disposition_header(as_attachment=True, filename=f"{filename}.xlsx")
     return response
