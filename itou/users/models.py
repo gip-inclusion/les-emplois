@@ -911,12 +911,7 @@ class User(AbstractUser, AddressMixin):
         username = cls.generate_unique_username()
         fields["kind"] = UserKind.JOB_SEEKER
         fields["created_by"] = proxy_user
-        user = cls.objects.create_user(
-            username,
-            email=fields.pop("email"),
-            password=cls.objects.make_random_password(),
-            **fields,
-        )
+        user = cls.objects.create_user(username, email=fields.pop("email"), **fields)
         return user
 
     @classmethod
