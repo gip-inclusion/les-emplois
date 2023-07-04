@@ -55,6 +55,7 @@ class ManualApprovalDeliveryRequiredFilter(admin.SimpleListFilter):
 class JobApplicationAdmin(admin.ModelAdmin):
     form = JobApplicationAdminForm
     list_display = ("pk", "job_seeker", "state", "sender_kind", "created_at")
+    show_full_result_count = False
     raw_id_fields = (
         "job_seeker",
         "eligibility_diagnosis",
