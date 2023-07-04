@@ -14,7 +14,7 @@ tenacity  # https://github.com/jd/tenacity
 # Django
 # ------------------------------------------------------------------------------
 
-django==4.1.*  # https://www.djangoproject.com/
+django==4.2.*  # https://www.djangoproject.com/
 
 # django-allauth
 # Pinned until https://github.com/pennersr/django-allauth/pull/3230 is resolved.
