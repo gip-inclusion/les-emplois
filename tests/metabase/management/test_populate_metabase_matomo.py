@@ -54,7 +54,7 @@ def test_matomo_retry(monkeypatch, respx_mock, capsys, snapshot):
         content=f"{MATOMO_HEADERS}\n{MATOMO_ONLINE_CONTENT}".encode("utf-16"),
     )
     with pytest.raises(tenacity.RetryError):
-        management.call_command("populate_metabase_matomo", wet_run=True, mode="public")
+        management.call_command("populate_metabase_matomo", wet_run=True)
     stdout, _ = capsys.readouterr()
     # sort the output because it's random (ThreadPoolExecutor)
     assert sorted(stdout.splitlines()) == snapshot(name="retry output")
@@ -70,35 +70,12 @@ def test_matomo_populate_public(respx_mock, snapshot):
         200,
         content=f"{MATOMO_HEADERS}\n{MATOMO_ONLINE_CONTENT}".encode("utf-16"),
     )
-    management.call_command("populate_metabase_matomo", wet_run=True, mode="public")
+    management.call_command("populate_metabase_matomo", wet_run=True)
     with connection.cursor() as cursor:
         cursor.execute("SELECT * FROM suivi_visiteurs_tb_publics_v1")
         rows = cursor.fetchall()
     assert len(rows) == 14
     assert rows == snapshot(name="exported rows")
-
-
-@override_settings(MATOMO_BASE_URL="https://mato.mo")
-@pytest.mark.django_db(transaction=True)
-@pytest.mark.respx(base_url="https://mato.mo")
-@pytest.mark.usefixtures("metabase")
-@freeze_time("2022-06-21")
-def test_matomo_populate_private(monkeypatch, respx_mock, snapshot):
-    # lazy import, if we import at the root the metabase fixture won't work.
-    from itou.metabase.management.commands import populate_metabase_matomo
-
-    # rewrite the REGIONS import or the test, even with mocked HTTP calls, is several minutes
-    monkeypatch.setattr(populate_metabase_matomo, "REGIONS", {"Bretagne": ["75", "31"]})
-    respx_mock.get("/index.php").respond(
-        200,
-        content=f"{MATOMO_HEADERS}\n{MATOMO_ONLINE_CONTENT}".encode("utf-16"),
-    )
-    management.call_command("populate_metabase_matomo", wet_run=True, mode="private")
-    with connection.cursor() as cursor:
-        cursor.execute("SELECT * FROM suivi_visiteurs_tb_prives_v1")
-        rows = cursor.fetchall()
-    assert len(rows) == 35
-    assert rows == snapshot(name="exported private rows")
 
 
 @override_settings(MATOMO_BASE_URL="https://mato.mo", MATOMO_AUTH_TOKEN="foobar")
@@ -112,7 +89,7 @@ def test_matomo_empty_output(respx_mock, capsys, snapshot):
         200,
         content=f"{MATOMO_HEADERS}\n{MATOMO_ONLINE_EMPTY_CONTENT}".encode("utf-16"),
     )
-    management.call_command("populate_metabase_matomo", wet_run=True, mode="public")
+    management.call_command("populate_metabase_matomo", wet_run=True)
     stdout, _ = capsys.readouterr()
     # sort the output because it's random (ThreadPoolExecutor)
     assert sorted(stdout.splitlines()) == snapshot(name="empty output")
