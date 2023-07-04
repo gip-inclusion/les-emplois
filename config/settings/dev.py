@@ -35,7 +35,11 @@ INSTALLED_APPS.extend(  # noqa: F405
 INTERNAL_IPS = ["127.0.0.1"]
 
 # `ManifestStaticFilesStorage` (used in base settings) requires `collectstatic` to be run.
-STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
 
 # Enable django-debug-toolbar with Docker.
 # Hack is coming from https://stackoverflow.com/a/45624773
