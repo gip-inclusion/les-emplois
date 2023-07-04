@@ -501,15 +501,15 @@ class ApprovalModelTest(TestCase):
             end_at=now + relativedelta(days=1),
         )
 
-        self.assertQuerysetEqual(Approval.objects.invalid(), [expired_approval])
+        self.assertQuerySetEqual(Approval.objects.invalid(), [expired_approval])
         assert expired_approval.state == ApprovalStatus.EXPIRED
         assert expired_approval.get_state_display() == "Expiré"
 
-        self.assertQuerysetEqual(Approval.objects.starts_in_the_future(), [future_approval])
+        self.assertQuerySetEqual(Approval.objects.starts_in_the_future(), [future_approval])
         assert future_approval.state == ApprovalStatus.FUTURE
         assert future_approval.get_state_display() == "Valide (non démarré)"
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Approval.objects.valid().starts_in_the_past(),
             [valid_approval, suspended_approval],
             ordered=False,
