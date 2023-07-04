@@ -188,6 +188,8 @@ def test_populate_job_seekers():
 
     num_queries = 1  # Get administrative criteria
     num_queries += 1  # Count rows
+    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
+    num_queries += 1  # COMMIT Create table
     num_queries += 1  # Select all elements ids (chunked_queryset)
     num_queries += 1  # Select last pk for current chunck
     num_queries += 1  # Select job seekers chunck (with annotations)
@@ -196,6 +198,10 @@ def test_populate_job_seekers():
     num_queries += 1  # Prefetch created_by Users
     num_queries += 1  # Get QPV users
     num_queries += 1  # Select AI stock approvals pks
+    num_queries += 1  # COMMIT (inject_chunk)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
     with assertNumQueries(num_queries):
         management.call_command("populate_metabase_emplois", mode="job_seekers")
 
@@ -368,9 +374,15 @@ def test_populate_job_seekers():
 @pytest.mark.usefixtures("metabase")
 def test_populate_criteria():
     num_queries = 1  # Count criteria
+    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
+    num_queries += 1  # COMMIT Create table
     num_queries += 1  # Select criteria IDs
     num_queries += 1  # Select one chunk of criteria IDs
     num_queries += 1  # Select criteria with columns
+    num_queries += 1  # COMMIT (inject_chunk)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
     with assertNumQueries(num_queries):
         management.call_command("populate_metabase_emplois", mode="criteria")
 
@@ -390,16 +402,23 @@ def test_populate_approvals():
 
     num_queries = 1  # Count approvals
     num_queries += 1  # Count PE approvals
+    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
+    num_queries += 1  # COMMIT Create table
     num_queries += 1  # Select approval IDs
     num_queries += 1  # Select approvals IDs, chunk by 1000
     num_queries += 1  # Select approvals with columns
     num_queries += 1  # Prefetch users
     num_queries += 1  # Prefetch JobApplications
+    num_queries += 1  # COMMIT (inject_chunk)
 
     num_queries += 1  # Select PE approval IDs
     num_queries += 1  # Select PE approvals IDs, chunk by 1000
     num_queries += 1  # Select PE approvals with columns
     num_queries += 1  # Select prescriber organizations
+    num_queries += 1  # COMMIT (inject_chunk)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
     with assertNumQueries(num_queries):
         management.call_command("populate_metabase_emplois", mode="approvals")
 
@@ -453,9 +472,15 @@ def test_populate_institutions():
     institution = InstitutionFactory(department="14")
 
     num_queries = 1  # Count institutions
+    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
+    num_queries += 1  # COMMIT Create table
     num_queries += 1  # Select institution IDs
     num_queries += 1  # Select one chunk of institution IDs
     num_queries += 1  # Select institutions with columns
+    num_queries += 1  # COMMIT (inject_chunk)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
     with assertNumQueries(num_queries):
         management.call_command("populate_metabase_emplois", mode="institutions")
 
@@ -482,9 +507,15 @@ def test_populate_evaluation_campaigns():
     evaluation_campaign = EvaluationCampaignFactory()
 
     num_queries = 1  # Count campaigns
+    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
+    num_queries += 1  # COMMIT Create table
     num_queries += 1  # Select campaign IDs
     num_queries += 1  # Select one chunk of campaign IDs
     num_queries += 1  # Select campaigns with columns
+    num_queries += 1  # COMMIT (inject_chunk)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
     with assertNumQueries(num_queries):
         management.call_command("populate_metabase_emplois", mode="evaluation_campaigns")
 
@@ -511,11 +542,17 @@ def test_populate_evaluated_siaes():
     evaluated_siae = EvaluatedSiaeFactory()
 
     num_queries = 1  # Count evaluated siaes
+    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
+    num_queries += 1  # COMMIT Create table
     num_queries += 1  # Select evaluated siae IDs
     num_queries += 1  # Select one chunk of evaluated siae IDs
     num_queries += 1  # Select evaluated siaes with columns
     num_queries += 1  # Select related evaluated job applications
     num_queries += 1  # Select related campaigns
+    num_queries += 1  # COMMIT (inject_chunk)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
     with assertNumQueries(num_queries):
         management.call_command("populate_metabase_emplois", mode="evaluated_siaes")
 
@@ -542,10 +579,16 @@ def test_populate_evaluated_job_applications():
     evaluated_job_application = EvaluatedJobApplicationFactory()
 
     num_queries = 1  # Count evaluated job applications
+    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
+    num_queries += 1  # COMMIT Create table
     num_queries += 1  # Select evaluated job application IDs
     num_queries += 1  # Select one chunk of evaluated job application IDs
     num_queries += 1  # Select evaluated job applications with columns
     num_queries += 1  # Select related evaluated siaes
+    num_queries += 1  # COMMIT (inject_chunk)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
     with assertNumQueries(num_queries):
         management.call_command("populate_metabase_emplois", mode="evaluated_job_applications")
 
@@ -571,9 +614,15 @@ def test_populate_evaluated_criteria():
     evaluated_criteria = EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_application)
 
     num_queries = 1  # Count evaluated criteria
+    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
+    num_queries += 1  # COMMIT Create table
     num_queries += 1  # Select evaluated criteria IDs
     num_queries += 1  # Select one chunk of evaluated criteria IDs
     num_queries += 1  # Select evaluated criteria with columns
+    num_queries += 1  # COMMIT (inject_chunk)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
     with assertNumQueries(num_queries):
         management.call_command("populate_metabase_emplois", mode="evaluated_criteria")
 
@@ -616,9 +665,15 @@ def test_populate_users():
     pro_user = SiaeStaffFactory()
 
     num_queries = 1  # Count users
+    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
+    num_queries += 1  # COMMIT Create table
     num_queries += 1  # Select user IDs
     num_queries += 1  # Select one chunk of user IDs
     num_queries += 1  # Select users with columns
+    num_queries += 1  # COMMIT (inject_chunk)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
     with assertNumQueries(num_queries):
         management.call_command("populate_metabase_emplois", mode="users")
 
