@@ -996,7 +996,7 @@ class Prolongation(models.Model):
         verbose_name="Déclarée par",
         null=True,
         on_delete=models.SET_NULL,
-        related_name="approvals_prolongation_declared_set",
+        related_name="%(class)ss_declared",
     )
     declared_by_siae = models.ForeignKey(
         "siaes.Siae",
@@ -1012,7 +1012,7 @@ class Prolongation(models.Model):
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-        related_name="approvals_prolongations_validated_set",
+        related_name="%(class)ss_validated",
     )
 
     prescriber_organization = models.ForeignKey(
@@ -1030,15 +1030,16 @@ class Prolongation(models.Model):
         verbose_name="Créé par",
         null=True,
         on_delete=models.SET_NULL,
-        related_name="approvals_prolongations_created_set",
+        related_name="%(class)ss_created",
     )
     updated_at = models.DateTimeField(verbose_name="Date de modification", auto_now=True)
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name="Mis à jour par",
+        verbose_name="Modifié par",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
+        related_name="%(class)ss_updated",
     )
 
     # Optional fields needed for specific `reason` field values
@@ -1076,7 +1077,7 @@ class Prolongation(models.Model):
         # https://docs.djangoproject.com/en/3.1/ref/contrib/postgres/constraints/
         constraints = [
             ExclusionConstraint(
-                name="exclude_overlapping_prolongations",
+                name="exclude_%(class)s_overlapping_dates",
                 expressions=(
                     (
                         # [start_at, end_at) (inclusive start, exclusive end).
@@ -1094,7 +1095,7 @@ class Prolongation(models.Model):
             ),
             # Report file is not yet defined as mandatory for these reasons. May change though
             models.CheckConstraint(
-                name="reason_report_file_coherence",
+                name="check_%(class)s_reason_and_report_file_coherence",
                 violation_error_message="Incohérence entre le fichier de bilan et la raison de prolongation",
                 # Must keep compatibility with old prolongations without report file
                 check=models.Q(report_file=None)
