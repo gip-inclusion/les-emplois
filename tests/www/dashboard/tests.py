@@ -1,3 +1,4 @@
+from collections import namedtuple
 from datetime import datetime
 from urllib.parse import urlencode
 
@@ -18,7 +19,7 @@ from itou.approvals.factories import ApprovalFactory
 from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordFactory
 from itou.institutions.enums import InstitutionKind
-from itou.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
+from itou.institutions.factories import InstitutionFactory, InstitutionMembershipFactory, LaborInspectorFactory
 from itou.job_applications.factories import JobApplicationFactory, JobApplicationSentByPrescriberFactory
 from itou.job_applications.notifications import (
     NewQualifiedJobAppEmployersNotification,
@@ -49,6 +50,8 @@ from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberF
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.models import InclusiveDateRange
+from itou.utils.perms.institution import get_current_institution_or_404
+from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.templatetags.format_filters import format_approval_number, format_siret
 from itou.www.dashboard.forms import EditUserEmailForm
 from tests.openid_connect.inclusion_connect.test import (
@@ -1587,6 +1590,9 @@ class EditUserPreferencesExceptionsTest(TestCase):
         assert response.status_code == 403
 
 
+FakeRequest = namedtuple("FakeRequest", ("user", "session"))
+
+
 class SwitchOrganizationTest(TestCase):
     def test_not_allowed_user(self):
         organization = prescribers_factories.PrescriberOrganizationFactory()
@@ -1599,6 +1605,22 @@ class SwitchOrganizationTest(TestCase):
             url = reverse("dashboard:switch_prescriber_organization")
             response = self.client.post(url, data={"prescriber_organization_id": organization.pk})
             assert response.status_code == 404
+
+    def test_usual_case(self):
+        url = reverse("dashboard:switch_prescriber_organization")
+
+        user = PrescriberFactory()
+        orga1 = prescribers_factories.PrescriberMembershipFactory(user=user).organization
+        orga2 = prescribers_factories.PrescriberMembershipFactory(user=user).organization
+        self.client.force_login(user)
+
+        response = self.client.post(url, data={"prescriber_organization_id": orga1.pk})
+        assert response.status_code == 302
+        assert get_current_org_or_404(FakeRequest(user, self.client.session)) == orga1
+
+        response = self.client.post(url, data={"prescriber_organization_id": orga2.pk})
+        assert response.status_code == 302
+        assert get_current_org_or_404(FakeRequest(user, self.client.session)) == orga2
 
 
 class SwitchInstitutionTest(TestCase):
@@ -1615,6 +1637,22 @@ class SwitchInstitutionTest(TestCase):
             url = reverse("dashboard:switch_institution")
             response = self.client.post(url, data={"institution_id": institution.pk})
             assert response.status_code == 404
+
+    def test_usual_case(self):
+        url = reverse("dashboard:switch_institution")
+
+        user = LaborInspectorFactory()
+        institution1 = InstitutionMembershipFactory(user=user).institution
+        institution2 = InstitutionMembershipFactory(user=user).institution
+        self.client.force_login(user)
+
+        response = self.client.post(url, data={"institution_id": institution1.pk})
+        assert response.status_code == 302
+        assert get_current_institution_or_404(FakeRequest(user, self.client.session)) == institution1
+
+        response = self.client.post(url, data={"institution_id": institution2.pk})
+        assert response.status_code == 302
+        assert get_current_institution_or_404(FakeRequest(user, self.client.session)) == institution2
 
 
 TOKEN_MENU_STR = "Accès aux APIs"
