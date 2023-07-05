@@ -387,8 +387,9 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
         # With a session namespace
         self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}))  # Init the session
         response = self.client.get(reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk}))
-        assert response.status_code == 302
-        assert response.url == reverse("apply:start", kwargs={"siae_pk": siae.pk})
+        self.assertRedirects(
+            response, reverse("apply:start", kwargs={"siae_pk": siae.pk}), fetch_redirect_response=False
+        )
 
 
 class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
@@ -1265,8 +1266,9 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
         # With a session namespace
         self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}))  # Use that view to init the session
         response = self.client.get(reverse("apply:check_nir_for_job_seeker", kwargs={"siae_pk": siae.pk}))
-        assert response.status_code == 302
-        assert response.url == reverse("apply:start", kwargs={"siae_pk": siae.pk})
+        self.assertRedirects(
+            response, reverse("apply:start", kwargs={"siae_pk": siae.pk}), fetch_redirect_response=False
+        )
 
 
 class ApplyAsPrescriberNirExceptionsTest(S3AccessingTestCase):
