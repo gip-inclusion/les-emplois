@@ -18,7 +18,7 @@ from itou.approvals.factories import ApprovalFactory
 from itou.employee_record.enums import Status
 from itou.employee_record.factories import EmployeeRecordFactory
 from itou.institutions.enums import InstitutionKind
-from itou.institutions.factories import InstitutionMembershipFactory
+from itou.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
 from itou.job_applications.factories import JobApplicationFactory, JobApplicationSentByPrescriberFactory
 from itou.job_applications.notifications import (
     NewQualifiedJobAppEmployersNotification,
@@ -1585,6 +1585,36 @@ class EditUserPreferencesExceptionsTest(TestCase):
         url = reverse("dashboard:edit_user_notifications")
         response = self.client.get(url)
         assert response.status_code == 403
+
+
+class SwitchOrganizationTest(TestCase):
+    def test_not_allowed_user(self):
+        organization = prescribers_factories.PrescriberOrganizationFactory()
+
+        for user in (
+            JobSeekerFactory(),
+            PrescriberFactory(),
+        ):
+            self.client.force_login(user)
+            url = reverse("dashboard:switch_prescriber_organization")
+            response = self.client.post(url, data={"prescriber_organization_id": organization.pk})
+            assert response.status_code == 404
+
+
+class SwitchInstitutionTest(TestCase):
+    def test_not_allowed_user(self):
+        institution = InstitutionFactory()
+
+        for user in (
+            JobSeekerFactory(),
+            # Create a user with other membership
+            # (otherwise the middleware intercepts labor inspector without any membership)
+            InstitutionMembershipFactory().user,
+        ):
+            self.client.force_login(user)
+            url = reverse("dashboard:switch_institution")
+            response = self.client.post(url, data={"institution_id": institution.pk})
+            assert response.status_code == 404
 
 
 TOKEN_MENU_STR = "Accès aux APIs"

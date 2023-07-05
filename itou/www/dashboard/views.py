@@ -326,7 +326,7 @@ def switch_prescriber_organization(request):
     dashboard_url = reverse_lazy("dashboard:index")
 
     pk = request.POST["prescriber_organization_id"]
-    queryset = PrescriberOrganization.objects
+    queryset = PrescriberOrganization.objects.member_required(request.user)
     prescriber_organization = get_object_or_404(queryset, pk=pk)
     request.session[global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY] = prescriber_organization.pk
 
@@ -342,7 +342,7 @@ def switch_institution(request):
     dashboard_url = reverse_lazy("dashboard:index")
 
     pk = request.POST["institution_id"]
-    queryset = Institution.objects
+    queryset = Institution.objects.member_required(request.user)
     institution = get_object_or_404(queryset, pk=pk)
     request.session[global_constants.ITOU_SESSION_CURRENT_INSTITUTION_KEY] = institution.pk
 
