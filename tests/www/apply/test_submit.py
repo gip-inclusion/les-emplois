@@ -47,10 +47,28 @@ fake = faker.Faker(locale="fr_FR")
 class ApplyTest(TestCase):
     def test_anonymous_access(self):
         siae = SiaeFactory(with_jobs=True)
+        for viewname in (
+            "apply:start",
+            "apply:pending_authorization_for_sender",
+            "apply:check_nir_for_sender",
+            "apply:check_nir_for_job_seeker",
+        ):
+            url = reverse(viewname, kwargs={"siae_pk": siae.pk})
+            response = self.client.get(url)
+            self.assertRedirects(response, reverse("account_login") + f"?next={url}")
+
         job_seeker = JobSeekerFactory()
-        url = reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk})
-        response = self.client.get(url)
-        self.assertRedirects(response, reverse("account_login") + f"?next={url}")
+        for viewname in (
+            "apply:step_check_job_seeker_info",
+            "apply:step_check_prev_applications",
+            "apply:application_jobs",
+            "apply:application_eligibility",
+            "apply:application_geiq_eligibility",
+            "apply:application_resume",
+        ):
+            url = reverse(viewname, kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk})
+            response = self.client.get(url)
+            self.assertRedirects(response, reverse("account_login") + f"?next={url}")
 
     def test_we_raise_a_permission_denied_on_missing_session(self):
         user = JobSeekerFactory()
