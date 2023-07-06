@@ -50,38 +50,13 @@ class ApplyTest(TestCase):
         job_seeker = JobSeekerFactory()
         url = reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk})
         response = self.client.get(url)
-        assert response.status_code == 403
+        self.assertRedirects(response, reverse("account_login") + f"?next={url}")
 
     def test_we_raise_a_permission_denied_on_missing_session(self):
-        routes = {
-            "apply:check_nir_for_sender",
-            "apply:check_nir_for_job_seeker",
-            "apply:step_check_job_seeker_info",
-            "apply:step_check_prev_applications",
-            "apply:application_jobs",
-            "apply:application_eligibility",
-            "apply:application_resume",
-        }
-        routes_without_job_seeker_pk = {
-            "apply:check_nir_for_sender",
-            "apply:check_nir_for_job_seeker",
-        }
         user = JobSeekerFactory()
         siae = SiaeFactory(with_jobs=True)
 
         self.client.force_login(user)
-        for route in routes:
-            with self.subTest(route=route):
-                if route not in routes_without_job_seeker_pk:
-                    response = self.client.get(reverse(route, kwargs={"siae_pk": siae.pk, "job_seeker_pk": user.pk}))
-                    assert response.status_code == 403
-                    assert response.context["exception"] == "A session namespace doesn't exist."
-                else:
-                    response = self.client.get(reverse(route, kwargs={"siae_pk": siae.pk}))
-                    assert response.status_code == 403
-                    assert response.context["exception"] == "A session namespace doesn't exist."
-
-        # apply:search_by_email_for_sender
         response = self.client.get(
             reverse("apply:search_by_email_for_sender", kwargs={"siae_pk": siae.pk, "session_uuid": str(uuid.uuid4())})
         )
@@ -380,11 +355,6 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
         user = JobSeekerFactory()
         self.client.force_login(user)
 
-        # Without a session namespace
-        response = self.client.get(reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk}))
-        assert response.status_code == 403
-
-        # With a session namespace
         self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}))  # Init the session
         response = self.client.get(reverse("apply:check_nir_for_sender", kwargs={"siae_pk": siae.pk}))
         self.assertRedirects(
@@ -1259,11 +1229,6 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
         user = PrescriberFactory()
         self.client.force_login(user)
 
-        # Without a session namespace
-        response = self.client.get(reverse("apply:check_nir_for_job_seeker", kwargs={"siae_pk": siae.pk}))
-        assert response.status_code == 403
-
-        # With a session namespace
         self.client.get(reverse("apply:start", kwargs={"siae_pk": siae.pk}))  # Use that view to init the session
         response = self.client.get(reverse("apply:check_nir_for_job_seeker", kwargs={"siae_pk": siae.pk}))
         self.assertRedirects(
@@ -2258,7 +2223,7 @@ class UpdateJobSeekerViewTestCase(TestCase):
 
     def test_anonymous_step_1(self):
         response = self.client.get(self.step_1_url)
-        assert response.status_code == 403
+        self.assertRedirects(response, reverse("account_login") + f"?next={self.step_1_url}")
 
     def test_anonymous_step_2(self):
         response = self.client.get(self.step_2_url)
@@ -2322,10 +2287,9 @@ class UpdateJobSeekerViewTestCase(TestCase):
         self.job_seeker.save(update_fields=["last_login"])
         self._check_only_administrative_allowed(self.siae.members.first())
 
-    def test_without_apply_session(self):
+    def test_without_job_seeker_session(self):
         self.client.force_login(self.siae.members.first())
         for url in [
-            self.step_1_url,
             self.step_2_url,
             self.step_3_url,
             self.step_end_url,
