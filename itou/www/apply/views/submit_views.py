@@ -162,7 +162,7 @@ class ApplyStepForJobSeekerBaseView(ApplyStepBaseView):
         self.job_seeker = request.user
 
     def dispatch(self, request, *args, **kwargs):
-        if not self.job_seeker.is_job_seeker:
+        if request.user.is_authenticated and not self.job_seeker.is_job_seeker:
             return HttpResponseRedirect(reverse("apply:start", kwargs={"siae_pk": self.siae.pk}))
         return super().dispatch(request, *args, **kwargs)
 
@@ -182,7 +182,7 @@ class ApplyStepForSenderBaseView(ApplyStepBaseView):
         self.sender = request.user
 
     def dispatch(self, request, *args, **kwargs):
-        if self.sender.kind not in [UserKind.PRESCRIBER, UserKind.SIAE_STAFF]:
+        if self.sender.is_authenticated and self.sender.kind not in [UserKind.PRESCRIBER, UserKind.SIAE_STAFF]:
             return HttpResponseRedirect(reverse("apply:start", kwargs={"siae_pk": self.siae.pk}))
         return super().dispatch(request, *args, **kwargs)
 
@@ -706,7 +706,9 @@ class CheckPreviousApplications(ApplicationBaseView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
-        self.previous_applications = self.get_previous_applications_queryset()
+        if request.user.is_authenticated:
+            # Otherwise LoginRequiredMixin will raise in dispatch()
+            self.previous_applications = self.get_previous_applications_queryset()
 
     def get_next_url(self):
         return reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk})
@@ -822,16 +824,18 @@ class ApplicationEligibilityView(ApplicationBaseView):
         )
 
     def dispatch(self, request, *args, **kwargs):
-        bypass_eligibility_conditions = [
-            # Don't perform an eligibility diagnosis is the SIAE doesn't need it,
-            not self.siae.is_subject_to_eligibility_rules,
-            # Only "authorized prescribers" can perform an eligibility diagnosis.
-            not get_user_info(request).is_authorized_prescriber,
-            # No need for eligibility diagnosis if the job seeker already have a PASS IAE
-            self.job_seeker.has_valid_common_approval,
-        ]
-        if any(bypass_eligibility_conditions):
-            return HttpResponseRedirect(self.get_next_url())
+        if request.user.is_authenticated:
+            # Otherwise LoginRequiredMixin will raise in dispatch()
+            bypass_eligibility_conditions = [
+                # Don't perform an eligibility diagnosis is the SIAE doesn't need it,
+                not self.siae.is_subject_to_eligibility_rules,
+                # Only "authorized prescribers" can perform an eligibility diagnosis.
+                not get_user_info(request).is_authorized_prescriber,
+                # No need for eligibility diagnosis if the job seeker already have a PASS IAE
+                self.job_seeker.has_valid_common_approval,
+            ]
+            if any(bypass_eligibility_conditions):
+                return HttpResponseRedirect(self.get_next_url())
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -872,6 +876,9 @@ class ApplicationGEIQEligibilityView(ApplicationBaseView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
+        if not request.user.is_authenticated:
+            # Do nothing, LoginRequiredMixin will raise in dispatch()
+            return
 
         self.form = GEIQAdministrativeCriteriaForm(
             siae=self.siae,
@@ -894,7 +901,7 @@ class ApplicationGEIQEligibilityView(ApplicationBaseView):
 
     def dispatch(self, request, *args, **kwargs):
         # GEIQ eligibility form during job application process is only available to authorized prescribers
-        if not request.user.is_prescriber_with_authorized_org:
+        if request.user.is_authenticated and not request.user.is_prescriber_with_authorized_org:
             return HttpResponseRedirect(self.get_next_url())
 
         return super().dispatch(request, *args, **kwargs)
@@ -948,6 +955,10 @@ class ApplicationResumeView(ApplicationBaseView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
+
+        if not request.user.is_authenticated:
+            # Do nothing, LoginRequiredMixin will raise in dispatch()
+            return
 
         if not self.apply_session.exists():
             self.apply_session.init({})
