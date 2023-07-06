@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.template import loader
 from django.template.response import TemplateResponse
@@ -20,7 +20,6 @@ from django_xworkflows import models as xwf_models
 
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
-from itou.eligibility.utils import geiq_allowance_amount
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow, PriorAction
 from itou.siaes.enums import ContractType, SiaeKind
 from itou.siaes.models import Siae
@@ -28,20 +27,16 @@ from itou.users.models import ApprovalAlreadyExistsError
 from itou.utils import constants as global_constants
 from itou.utils.htmx import hx_trigger_modal_control
 from itou.utils.perms.prescriber import get_all_available_job_applications_as_prescriber
-from itou.utils.perms.user import get_user_info
-from itou.utils.urls import add_url_params, get_external_link_markup, get_safe_url
+from itou.utils.urls import get_external_link_markup, get_safe_url
 from itou.www.apply.forms import (
     AcceptForm,
     AnswerForm,
-    CheckJobSeekerGEIQEligibilityForm,
     JobSeekerPersonalDataForm,
     PriorActionForm,
     RefusalForm,
     UserAddressForm,
 )
-from itou.www.apply.views import constants as apply_view_constants
-from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
-from itou.www.geiq_eligibility_views.forms import GEIQAdministrativeCriteriaForGEIQForm
+from itou.www.apply.views import common as common_views, constants as apply_view_constants
 
 
 def check_waiting_period(job_application):
@@ -576,36 +571,15 @@ def eligibility(request, job_application_id, template_name="apply/process_eligib
         id=job_application_id,
         state__in=JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES,
     )
-
-    if not job_application.to_siae.is_subject_to_eligibility_rules:
-        raise Http404()
-
-    if suspension_explanation := job_application.to_siae.get_active_suspension_text_with_dates():
-        raise PermissionDenied(
-            "Vous ne pouvez pas valider les critères d'éligibilité suite aux mesures prises dans le cadre "
-            "du contrôle a posteriori. " + suspension_explanation
-        )
-
-    form_administrative_criteria = AdministrativeCriteriaForm(
-        request.user, siae=job_application.to_siae, data=request.POST or None
+    return common_views._eligibility(
+        request,
+        job_application.to_siae,
+        job_application.job_seeker,
+        cancel_url=reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id}),
+        next_url=reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id}),
+        template_name=template_name,
+        extra_context={"job_application": job_application},
     )
-    if request.method == "POST" and form_administrative_criteria.is_valid():
-        user_info = get_user_info(request)
-        EligibilityDiagnosis.create_diagnosis(
-            job_application.job_seeker, user_info, administrative_criteria=form_administrative_criteria.cleaned_data
-        )
-        messages.success(request, "Éligibilité confirmée !")
-        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
-        return HttpResponseRedirect(next_url)
-
-    context = {
-        "job_application": job_application,
-        "can_view_personal_information": True,  # SIAE members have access to personal info
-        "form_administrative_criteria": form_administrative_criteria,
-        "job_seeker": job_application.job_seeker,
-        "matomo_custom_title": "Evaluation de la candidature",
-    }
-    return render(request, template_name, context)
 
 
 @login_required
@@ -617,41 +591,18 @@ def geiq_eligibility(request, job_application_id, template_name="apply/process_g
         "apply:details_for_siae", kwargs={"job_application_id": job_application.pk}
     )
     next_url = request.GET.get("next_url")
-    # Pass get_full_path to keep back/next_url query params
-    form = CheckJobSeekerGEIQEligibilityForm(hx_post_url=request.get_full_path(), data=request.POST or None)
-    geiq_criteria_form_url = add_url_params(
-        reverse("apply:geiq_eligibility_criteria", kwargs={"job_application_id": job_application.pk}),
-        {
-            "back_url": back_url,
-            "next_url": next_url,
-        },
+    return common_views._geiq_eligibility(
+        request,
+        job_application.to_siae,
+        job_application.job_seeker,
+        back_url=back_url,
+        next_url=next_url,
+        geiq_eligibility_criteria_url=reverse(
+            "apply:geiq_eligibility_criteria", kwargs={"job_application_id": job_application.pk}
+        ),
+        template_name=template_name,
+        extra_context={},
     )
-
-    if request.method == "POST" and form.is_valid() and request.htmx:
-        if form.cleaned_data["choice"]:
-            return HttpResponseRedirect(geiq_criteria_form_url)
-        else:
-            return render(
-                request,
-                "apply/includes/geiq/continue_without_geiq_diagnosis_form.html",
-                context={
-                    "next_url": next_url,
-                    "progress": 66,
-                },
-            )
-
-    context = {
-        "progress": 33,
-        "can_view_personal_information": True,
-        "job_application": job_application,
-        "job_seeker": job_application.job_seeker,
-        "form": form,
-        "back_url": back_url,
-        "next_url": next_url,
-        "geiq_criteria_form_url": geiq_criteria_form_url,
-    }
-
-    return render(request, template_name, context)
 
 
 # HTMX fragments
@@ -665,43 +616,7 @@ def geiq_eligibility_criteria(
 
     queryset = JobApplication.objects.siae_member_required(request.user)
     job_application = get_object_or_404(queryset, pk=job_application_id)
-    diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
-        job_application.job_seeker, job_application.to_siae
-    ).first()
-    form = GEIQAdministrativeCriteriaForGEIQForm(
-        job_application.to_siae,
-        diagnosis.administrative_criteria.all() if diagnosis else [],
-        # Pass get_full_path to keep back/next_url query params
-        request.get_full_path(),
-        data=request.POST or None,
-    )
-    next_url = request.GET.get("next_url")
-    allowance_amount = None
-
-    if request.method == "POST" and form.is_valid():
-        criteria = form.cleaned_data
-        if request.htmx:
-            allowance_amount = geiq_allowance_amount(request.user.is_prescriber_with_authorized_org, criteria)
-        else:
-            if diagnosis:
-                GEIQEligibilityDiagnosis.update_eligibility_diagnosis(diagnosis, request.user, criteria)
-            else:
-                GEIQEligibilityDiagnosis.create_eligibility_diagnosis(
-                    job_application.job_seeker, request.user, job_application.to_siae, criteria
-                )
-
-            return HttpResponseRedirect(next_url)
-
-    context = {
-        "form": form,
-        "allowance_amount": allowance_amount,
-        "progress": 66,
-    }
-
-    if job_application.job_seeker.address_in_qpv or job_application.job_seeker.zrr_city_name:
-        context |= {"geo_criteria_detected": True, "job_seeker": job_application.job_seeker}
-
-    return render(request, template_name, context)
+    return common_views._geiq_eligibility_criteria(request, job_application.to_siae, job_application.job_seeker)
 
 
 @require_POST

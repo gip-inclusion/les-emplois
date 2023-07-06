@@ -7,66 +7,10 @@
 {% block content_title %}
     <h1>
         Candidature de
-        <span class="text-muted">{{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}</span>
+        <span class="text-muted">{{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</span>
     </h1>
 {% endblock %}
 
 {% block content %}
-    <section class="s-section">
-        <div class="s-section__container container">
-            <div class="row">
-                <div class="col-12 col-lg-8">
-                    <div class="c-stepper col-12">
-                        <div class="progress progress--emploi mb-2">{% include "apply/includes/geiq/progress_bar.html" %}</div>
-                        <span>Embauche - Eligibilité GEIQ</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="s-section">
-        <div class="s-section__container container">
-            <div class="c-box">
-                <div class="col-12 pl-lg-0">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-7 pt-4">
-                                {% block siae_card %}
-                                    {% include "apply/includes/siae_card.html" with siae=job_application.to_siae %}
-                                {% endblock %}
-                            </div>
-                        </div>
-                        <div class="row pt-4">
-                            <div class="col-7">
-                                <h2>Souhaitez-vous préciser la situation administrative du candidat ?</h2>
-                                <p>
-                                    Si vous souhaitez bénéficier de l’aide à l’accompagnement, veuillez renseigner les critères du candidat ci-dessous et vous assurer de pouvoir fournir les justificatifs associés.
-                                </p>
-                                <form id="check_geiq_eligibility" hx-target="#geiq_form">
-                                    {% csrf_token %}
-                                    {% bootstrap_field form.choice form_check_class="form-check-inline mr-4" show_label=False %}
-                                </form>
-                            </div>
-                            <div class="col">{% include "apply/includes/geiq/legislative_text_link.html" %}</div>
-                        </div>
-                        <div class="row">
-                            <div class="col-7">
-                                <div id="form_errors"></div>
-                                <form action="{{ geiq_criteria_form_url }}" method="post" hx-target="#geiq_form">
-                                    {% csrf_token %}
-                                    <div id="geiq_form">
-                                        <hr>
-                                        <div class="text-right">
-                                            <a href="{{ back_url }}" class="btn btn-link mb-2">Annuler</a>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    {% include "apply/includes/geiq_eligibility_section.html" %}
 {% endblock %}
