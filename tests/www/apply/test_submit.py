@@ -98,6 +98,22 @@ class ApplyTest(TestCase):
                 assert response.status_code == 403
                 assert response.context["exception"] == "A session namespace doesn't exist."
 
+    def test_404_when_trying_to_apply_for_a_prescriber(self):
+        siae = SiaeFactory(with_jobs=True)
+        prescriber = PrescriberFactory()
+        self.client.force_login(prescriber)
+        for viewname in (
+            "apply:step_check_job_seeker_info",
+            "apply:step_check_prev_applications",
+            "apply:application_jobs",
+            "apply:application_eligibility",
+            "apply:application_geiq_eligibility",
+            "apply:application_resume",
+        ):
+            url = reverse(viewname, kwargs={"siae_pk": siae.pk, "job_seeker_pk": prescriber.pk})
+            response = self.client.get(url)
+            assert response.status_code == 404
+
 
 def test_check_nir_job_seeker_with_lack_of_nir_reason(client):
     """Apply as jobseeker."""
