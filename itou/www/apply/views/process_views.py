@@ -580,7 +580,7 @@ def geiq_eligibility(request, job_application_id, template_name="apply/process_g
         "apply:details_for_siae", kwargs={"job_application_id": job_application.pk}
     )
     next_url = request.GET.get("next_url")
-    form = CheckJobSeekerGEIQEligibilityForm(job_application, data=request.POST or None)
+    form = CheckJobSeekerGEIQEligibilityForm(hx_post_url=request.path, data=request.POST or None)
 
     if request.method == "POST" and form.is_valid() and request.htmx:
         if form.cleaned_data["choice"]:
