@@ -259,7 +259,6 @@ class CheckNIRForJobSeekerView(ApplyStepBaseView):
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "form": self.form,
-            "job_seeker": self.job_seeker,
         }
 
 
