@@ -119,7 +119,7 @@ class ApplicationBaseView(ApplyStepBaseView):
         if not request.user.is_authenticated:
             # Do nothing, LoginRequiredMixin will raise in dispatch()
             return
-        self.job_seeker = get_object_or_404(User, pk=kwargs["job_seeker_pk"])
+        self.job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), pk=kwargs["job_seeker_pk"])
         _check_job_seeker_approval(request, self.job_seeker, self.siae)
         if self.siae.kind == SiaeKind.GEIQ:
             self.geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
