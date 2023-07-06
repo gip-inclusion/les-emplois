@@ -152,26 +152,6 @@ class ApplicationBaseView(ApplyStepBaseView):
         return self.job_seeker.job_applications.filter(to_siae=self.siae)
 
 
-class ApplyStepForJobSeekerBaseView(ApplyStepBaseView):
-    def __init__(self):
-        super().__init__()
-        self.job_seeker = None
-
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.job_seeker = request.user
-
-    def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated and not self.job_seeker.is_job_seeker:
-            return HttpResponseRedirect(reverse("apply:start", kwargs={"siae_pk": self.siae.pk}))
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        return super().get_context_data(**kwargs) | {
-            "job_seeker": self.job_seeker,
-        }
-
-
 class ApplyStepForSenderBaseView(ApplyStepBaseView):
     def __init__(self):
         super().__init__()
@@ -224,16 +204,23 @@ class PendingAuthorizationForSender(ApplyStepForSenderBaseView):
     template_name = "apply/submit_step_pending_authorization.html"
 
 
-class CheckNIRForJobSeekerView(ApplyStepForJobSeekerBaseView):
+class CheckNIRForJobSeekerView(ApplyStepBaseView):
     template_name = "apply/submit_step_check_job_seeker_nir.html"
 
     def __init__(self):
         super().__init__()
+        self.job_seeker = None
         self.form = None
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
+        self.job_seeker = request.user
         self.form = CheckJobSeekerNirForm(job_seeker=self.job_seeker, data=request.POST or None)
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated and not self.job_seeker.is_job_seeker:
+            return HttpResponseRedirect(reverse("apply:start", kwargs={"siae_pk": self.siae.pk}))
+        return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
         # The NIR already exists, go to next step
@@ -272,6 +259,7 @@ class CheckNIRForJobSeekerView(ApplyStepForJobSeekerBaseView):
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "form": self.form,
+            "job_seeker": self.job_seeker,
         }
 
 
