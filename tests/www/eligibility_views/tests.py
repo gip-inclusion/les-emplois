@@ -3,14 +3,14 @@ from django.utils import timezone
 
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
-from itou.job_applications.factories import JobApplicationFactory
-from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.enums import SiaeKind
-from itou.siaes.factories import SiaeFactory
 from itou.users.enums import KIND_SIAE_STAFF
-from itou.users.factories import JobSeekerFactory, PrescriberFactory
 from itou.utils.perms.user import UserInfo
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm, AdministrativeCriteriaOfJobApplicationForm
+from tests.job_applications.factories import JobApplicationFactory
+from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.siaes.factories import SiaeFactory
+from tests.users.factories import JobSeekerFactory, PrescriberFactory
 from tests.utils.test import TestCase
 
 

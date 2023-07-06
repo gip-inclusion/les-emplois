@@ -3,17 +3,17 @@ from django.core import mail
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
-from itou.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
 from itou.eligibility.models import EligibilityDiagnosis
-from itou.job_applications.factories import (
+from itou.job_applications.models import JobApplicationWorkflow
+from itou.users.enums import UserKind
+from tests.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
+from tests.job_applications.factories import (
     JobApplicationFactory,
     JobApplicationSentByPrescriberFactory,
     JobApplicationSentBySiaeFactory,
 )
-from itou.job_applications.models import JobApplicationWorkflow
-from itou.siaes.factories import SiaeFactory, SiaeWith2MembershipsFactory
-from itou.users.enums import UserKind
-from itou.users.factories import JobSeekerFactory
+from tests.siaes.factories import SiaeFactory, SiaeWith2MembershipsFactory
+from tests.users.factories import JobSeekerFactory
 from tests.utils.test import TestCase
 
 

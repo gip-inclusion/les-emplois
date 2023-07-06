@@ -3,10 +3,10 @@ from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 
 from itou.eligibility.models import AdministrativeCriteria
-from itou.institutions.factories import InstitutionFactory
-from itou.job_applications.factories import JobApplicationFactory
 from itou.siae_evaluations import models
-from itou.siaes.factories import SiaeFactory
+from tests.institutions.factories import InstitutionFactory
+from tests.job_applications.factories import JobApplicationFactory
+from tests.siaes.factories import SiaeFactory
 
 
 def before_ended_at(**kwargs):
@@ -51,7 +51,7 @@ class EvaluatedSiaeFactory(factory.django.DjangoModelFactory):
                 ended_at=factory.LazyFunction(lambda: timezone.now() - relativedelta(days=1)),
             ),
             job_app=factory.RelatedFactory(
-                "itou.siae_evaluations.factories.EvaluatedJobApplicationFactory",
+                "tests.siae_evaluations.factories.EvaluatedJobApplicationFactory",
                 factory_related_name="evaluated_siae",
                 complete=True,
             ),
@@ -70,7 +70,7 @@ class EvaluatedJobApplicationFactory(factory.django.DjangoModelFactory):
     class Params:
         complete = factory.Trait(
             criteria=factory.RelatedFactory(
-                "itou.siae_evaluations.factories.EvaluatedAdministrativeCriteriaFactory",
+                "tests.siae_evaluations.factories.EvaluatedAdministrativeCriteriaFactory",
                 factory_related_name="evaluated_job_application",
                 uploaded_at=factory.LazyAttribute(
                     lambda siae: siae.factory_parent.evaluated_siae.evaluation_campaign.ended_at

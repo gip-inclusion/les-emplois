@@ -14,27 +14,29 @@ from django.db import IntegrityError, transaction
 from django.test import override_settings
 from django.utils import timezone
 
-import itou.asp.factories as asp
-from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
+import tests.asp.factories as asp
 from itou.approvals.models import Approval
 from itou.asp.models import AllocationDuration, EducationLevel, EmployerType
 from itou.common_apps.address.departments import DEPARTMENTS
-from itou.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
 from itou.institutions.enums import InstitutionKind
-from itou.institutions.factories import InstitutionWithMembershipFactory
 from itou.job_applications.enums import Origin
-from itou.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.enums import PrescriberOrganizationKind
-from itou.prescribers.factories import (
+from itou.siaes.enums import SiaeKind
+from itou.users.enums import IdentityProvider, LackOfNIRReason, Title, UserKind
+from itou.users.models import JobSeekerProfile, User
+from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, RESULTS_BY_ADDRESS
+from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
+from tests.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
+from tests.institutions.factories import InstitutionWithMembershipFactory
+from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
+from tests.prescribers.factories import (
     PrescriberMembershipFactory,
     PrescriberOrganizationFactory,
     PrescriberOrganizationWithMembershipFactory,
 )
-from itou.siaes.enums import SiaeKind
-from itou.siaes.factories import SiaeFactory
-from itou.users.enums import IdentityProvider, LackOfNIRReason, Title, UserKind
-from itou.users.factories import (
+from tests.siaes.factories import SiaeFactory
+from tests.users.factories import (
     ItouStaffFactory,
     JobSeekerFactory,
     JobSeekerWithAddressFactory,
@@ -43,8 +45,6 @@ from itou.users.factories import (
     SiaeStaffFactory,
     UserFactory,
 )
-from itou.users.models import JobSeekerProfile, User
-from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, RESULTS_BY_ADDRESS
 from tests.utils.test import TestCase
 
 

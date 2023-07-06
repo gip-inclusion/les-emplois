@@ -4,11 +4,11 @@ from django.test.client import RequestFactory
 from django.utils.html import escape
 
 from itou.job_applications.enums import Origin
-from itou.job_applications.factories import JobApplicationSentByJobSeekerFactory, JobApplicationSentBySiaeFactory
-from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
-from itou.users.factories import JobSeekerWithAddressFactory, SiaeStaffFactory
 from itou.utils.context_processors import expose_enums
+from tests.job_applications.factories import JobApplicationSentByJobSeekerFactory, JobApplicationSentBySiaeFactory
+from tests.jobs.factories import create_test_romes_and_appellations
+from tests.users.factories import JobSeekerWithAddressFactory, SiaeStaffFactory
 
 
 def load_template(path):

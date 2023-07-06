@@ -8,25 +8,25 @@ from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertNumQueries
 
-from itou.analytics.factories import DatumFactory, StatsDashboardVisitFactory
 from itou.approvals.enums import Origin
-from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
-from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.eligibility.models import AdministrativeCriteria
-from itou.geo.factories import QPVFactory
 from itou.geo.utils import coords_to_geometry
-from itou.institutions.factories import InstitutionFactory
-from itou.job_applications.factories import JobApplicationFactory
 from itou.metabase.tables.utils import hash_content
-from itou.siae_evaluations.factories import (
+from itou.users.enums import IdentityProvider
+from tests.analytics.factories import DatumFactory, StatsDashboardVisitFactory
+from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
+from tests.eligibility.factories import EligibilityDiagnosisFactory
+from tests.geo.factories import QPVFactory
+from tests.institutions.factories import InstitutionFactory
+from tests.job_applications.factories import JobApplicationFactory
+from tests.siae_evaluations.factories import (
     EvaluatedAdministrativeCriteriaFactory,
     EvaluatedJobApplicationFactory,
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
 )
-from itou.siaes.factories import SiaeFactory
-from itou.users.enums import IdentityProvider
-from itou.users.factories import JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
+from tests.siaes.factories import SiaeFactory
+from tests.users.factories import JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
 
 
 @freeze_time("2023-03-10")

@@ -2,12 +2,11 @@ import factory
 from django.utils import timezone
 
 from itou.eligibility import models
-from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from itou.eligibility.enums import AuthorKind
 from itou.siaes.enums import SiaeKind
-from itou.siaes.factories import SiaeFactory, SiaeWith2MembershipsFactory
-from itou.users.factories import JobSeekerFactory
-
-from .enums import AuthorKind
+from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.siaes.factories import SiaeFactory, SiaeWith2MembershipsFactory
+from tests.users.factories import JobSeekerFactory
 
 
 class GEIQEligibilityDiagnosisFactory(factory.django.DjangoModelFactory):

@@ -3,8 +3,8 @@ import pytest
 
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
 from itou.siaes.enums import SiaeKind
-from itou.siaes.factories import SiaeFactory
 from itou.www.geiq_eligibility_views.forms import GEIQAdministrativeCriteriaForGEIQForm, GEIQAdministrativeCriteriaForm
+from tests.siaes.factories import SiaeFactory
 
 
 _FAKER = faker.Faker()

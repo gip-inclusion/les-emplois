@@ -1,5 +1,5 @@
-from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation, Rome
+from tests.jobs.factories import create_test_romes_and_appellations
 from tests.utils.test import TestCase
 
 

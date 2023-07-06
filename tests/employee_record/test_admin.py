@@ -4,7 +4,8 @@ from django.contrib.admin import helpers
 from django.urls import reverse
 from pytest_django.asserts import assertContains
 
-from itou.employee_record import factories, models
+from itou.employee_record import models
+from tests.employee_record import factories
 from tests.utils.test import assertMessages
 
 

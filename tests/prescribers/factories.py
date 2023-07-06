@@ -6,7 +6,7 @@ import factory.fuzzy
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
-from itou.users.factories import PrescriberFactory
+from tests.users.factories import PrescriberFactory
 
 
 class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):

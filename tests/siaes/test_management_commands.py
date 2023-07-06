@@ -4,12 +4,12 @@ import io
 from django.core import management
 from freezegun import freeze_time
 
-from itou.employee_record.factories import EmployeeRecordFactory
 from itou.employee_record.models import EmployeeRecord
-from itou.job_applications.factories import JobApplicationFactory
-from itou.siae_evaluations.factories import EvaluatedSiaeFactory
-from itou.siaes import factories as siaes_factories
 from itou.siaes.enums import SiaeKind
+from tests.employee_record.factories import EmployeeRecordFactory
+from tests.job_applications.factories import JobApplicationFactory
+from tests.siae_evaluations.factories import EvaluatedSiaeFactory
+from tests.siaes import factories as siaes_factories
 from tests.utils.test import TestCase
 
 

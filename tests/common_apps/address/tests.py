@@ -4,15 +4,15 @@ import pytest
 from django import forms
 from django.contrib.gis.geos import Point
 
-from itou.cities.factories import create_test_cities
 from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.address.forms import MandatoryAddressFormMixin, OptionalAddressFormMixin
 from itou.common_apps.address.models import lat_lon_to_coords
 from itou.prescribers.models import PrescriberOrganization
-from itou.users.factories import JobSeekerFactory
 from itou.users.models import User
 from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_NO_RESULT_MOCK, BAN_GEOCODING_API_RESULT_MOCK
+from tests.cities.factories import create_test_cities
+from tests.users.factories import JobSeekerFactory
 from tests.utils.test import TestCase
 
 

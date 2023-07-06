@@ -1,8 +1,8 @@
 import pytest
 
-from itou.cities.factories import create_city_vannes
 from itou.metabase.tables.siaes import TABLE
-from itou.siaes.factories import SiaeFactory
+from tests.cities.factories import create_city_vannes
+from tests.siaes.factories import SiaeFactory
 
 
 @pytest.mark.django_db

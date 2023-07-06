@@ -4,13 +4,13 @@ from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 
-from itou.approvals import factories as approvals_factories
-from itou.employee_record import factories as employee_record_factories
 from itou.employee_record.enums import Status
-from itou.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
-from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
 from itou.users.enums import LackOfNIRReason
 from itou.utils.templatetags import format_filters
+from tests.approvals import factories as approvals_factories
+from tests.employee_record import factories as employee_record_factories
+from tests.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
+from tests.siaes.factories import SiaeWithMembershipAndJobsFactory
 from tests.utils.test import BASE_NUM_QUERIES, TestCase
 
 

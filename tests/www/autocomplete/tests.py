@@ -1,9 +1,9 @@
 from django.urls import reverse
 
-from itou.cities.factories import create_test_cities
-from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
-from itou.siaes.factories import SiaeFactory
+from tests.cities.factories import create_test_cities
+from tests.jobs.factories import create_test_romes_and_appellations
+from tests.siaes.factories import SiaeFactory
 from tests.utils.test import TestCase
 
 

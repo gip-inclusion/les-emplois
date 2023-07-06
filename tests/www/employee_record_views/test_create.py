@@ -5,16 +5,16 @@ import pytest
 from django.contrib.messages import get_messages
 from django.urls import reverse
 
-from itou.asp.factories import CommuneFactory, CountryFranceFactory, CountryOutsideEuropeFactory
 from itou.employee_record.enums import Status
-from itou.employee_record.factories import EmployeeRecordFactory
 from itou.employee_record.models import EmployeeRecord
-from itou.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
-from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
 from itou.users.enums import LackOfNIRReason
-from itou.users.factories import JobSeekerWithAddressFactory, JobSeekerWithMockedAddressFactory
 from itou.utils.mocks.address_format import mock_get_geocoding_data
 from itou.utils.widgets import DuetDatePickerWidget
+from tests.asp.factories import CommuneFactory, CountryFranceFactory, CountryOutsideEuropeFactory
+from tests.employee_record.factories import EmployeeRecordFactory
+from tests.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
+from tests.siaes.factories import SiaeWithMembershipAndJobsFactory
+from tests.users.factories import JobSeekerWithAddressFactory, JobSeekerWithMockedAddressFactory
 from tests.utils.test import TestCase
 
 

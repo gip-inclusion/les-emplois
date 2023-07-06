@@ -5,8 +5,8 @@ from unittest.mock import patch
 from django.core import management
 from django.test import TransactionTestCase
 
-from itou.approvals.factories import PoleEmploiApprovalFactory
 from itou.approvals.models import PoleEmploiApproval
+from tests.approvals.factories import PoleEmploiApprovalFactory
 from tests.utils.test import TestCase
 
 

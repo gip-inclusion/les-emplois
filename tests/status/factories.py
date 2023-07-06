@@ -1,7 +1,7 @@
 import factory
 from django.utils import timezone
 
-from . import models
+from itou.status import models
 
 
 class ProbeStatusFactory(factory.django.DjangoModelFactory):

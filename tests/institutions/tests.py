@@ -1,8 +1,8 @@
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertRedirects
 
-from itou.institutions.factories import InstitutionWith2MembershipFactory, InstitutionWithMembershipFactory
-from itou.users.factories import ItouStaffFactory
+from tests.institutions.factories import InstitutionWith2MembershipFactory, InstitutionWithMembershipFactory
+from tests.users.factories import ItouStaffFactory
 from tests.utils.test import TestCase
 
 

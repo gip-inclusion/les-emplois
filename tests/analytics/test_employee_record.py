@@ -4,7 +4,7 @@ import pytest
 from django.utils import timezone
 
 from itou.analytics import employee_record, models
-from itou.employee_record import factories as employee_record_factories
+from tests.employee_record import factories as employee_record_factories
 
 
 def test_datum_name_value():

@@ -5,7 +5,7 @@
 
 import logging
 
-from itou.users.factories import JobSeekerFactory, JobSeekerWithAddressFactory
+from tests.users.factories import JobSeekerFactory, JobSeekerWithAddressFactory
 
 
 def test_simple_address():

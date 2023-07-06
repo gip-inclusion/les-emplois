@@ -3,9 +3,10 @@ import io
 
 import pytest
 
-from itou.approvals import factories as approvals_factories
-from itou.employee_record import factories, models
+from itou.employee_record import models
 from itou.employee_record.management.commands import sanitize_employee_records
+from tests.approvals import factories as approvals_factories
+from tests.employee_record import factories
 
 
 @pytest.fixture(name="command")

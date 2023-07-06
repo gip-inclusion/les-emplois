@@ -2,14 +2,14 @@ from django.contrib import messages
 from django.urls import reverse
 
 from itou.approvals import enums as approvals_enums
-from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.approvals.models import Approval
 from itou.job_applications import enums as job_applications_enums
-from itou.job_applications.factories import JobApplicationFactory
 from itou.job_applications.models import JobApplicationWorkflow
-from itou.siaes.factories import SiaeFactory, SiaeMembershipFactory
-from itou.users.factories import JobSeekerFactory
 from itou.users.models import User
+from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
+from tests.job_applications.factories import JobApplicationFactory
+from tests.siaes.factories import SiaeFactory, SiaeMembershipFactory
+from tests.users.factories import JobSeekerFactory
 from tests.utils.test import TestCase, assertMessages
 
 

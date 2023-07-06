@@ -6,7 +6,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 
 from itou.siae_evaluations import enums as evaluation_enums
-from itou.siae_evaluations.factories import (
+from tests.siae_evaluations.factories import (
     EvaluatedAdministrativeCriteriaFactory,
     EvaluatedJobApplicationFactory,
     EvaluatedSiaeFactory,

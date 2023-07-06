@@ -3,9 +3,9 @@ import io
 import pytest
 from django.core.management import call_command
 
-from itou.employee_record import factories
 from itou.employee_record.management.commands import clone_orphan_employee_records
 from itou.siaes import enums as siaes_enums, models as siaes_models
+from tests.employee_record import factories
 
 
 @pytest.fixture(name="command")

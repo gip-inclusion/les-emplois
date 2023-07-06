@@ -6,25 +6,25 @@ from django.utils.http import urlencode
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNumQueries
 
-from itou.approvals.factories import SuspensionFactory
-from itou.cities.factories import create_city_saint_andre
 from itou.eligibility.enums import AdministrativeCriteriaLevel
-from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.eligibility.models import AdministrativeCriteria
 from itou.job_applications.enums import SenderKind
-from itou.job_applications.factories import (
+from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.jobs.models import Appellation
+from itou.siaes.enums import SiaeKind
+from itou.utils.widgets import DuetDatePickerWidget
+from tests.approvals.factories import SuspensionFactory
+from tests.cities.factories import create_city_saint_andre
+from tests.eligibility.factories import EligibilityDiagnosisFactory
+from tests.job_applications.factories import (
     JobApplicationFactory,
     JobApplicationSentByJobSeekerFactory,
     JobApplicationSentByPrescriberFactory,
 )
-from itou.job_applications.models import JobApplication, JobApplicationWorkflow
-from itou.jobs.factories import create_test_romes_and_appellations
-from itou.jobs.models import Appellation
-from itou.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationWithMembershipFactory
-from itou.siaes.enums import SiaeKind
-from itou.siaes.factories import SiaeFactory, SiaeJobDescriptionFactory
-from itou.users.factories import JobSeekerFactory, PrescriberFactory
-from itou.utils.widgets import DuetDatePickerWidget
+from tests.jobs.factories import create_test_romes_and_appellations
+from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationWithMembershipFactory
+from tests.siaes.factories import SiaeFactory, SiaeJobDescriptionFactory
+from tests.users.factories import JobSeekerFactory, PrescriberFactory
 from tests.utils.test import BASE_NUM_QUERIES, TestCase, parse_response_to_soup
 
 

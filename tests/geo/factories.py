@@ -2,10 +2,9 @@ from random import sample
 
 import factory
 
+from itou.geo.enums import ZRRStatus
+from itou.geo.models import QPV, ZRR
 from itou.geo.utils import multipolygon_to_geometry
-
-from .enums import ZRRStatus
-from .models import QPV, ZRR
 
 
 ZRRS = [

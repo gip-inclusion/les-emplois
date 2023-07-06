@@ -3,13 +3,13 @@ from datetime import timedelta
 from django.utils import timezone
 
 from itou.employee_record.enums import NotificationStatus, Status
-from itou.employee_record.factories import EmployeeRecordWithProfileFactory
 from itou.employee_record.models import EmployeeRecordBatch, EmployeeRecordUpdateNotification
 from itou.employee_record.serializers import (
     EmployeeRecordUpdateNotificationBatchSerializer,
     EmployeeRecordUpdateNotificationSerializer,
     _AddressSerializer,
 )
+from tests.employee_record.factories import EmployeeRecordWithProfileFactory
 from tests.utils.test import TestCase
 
 

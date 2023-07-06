@@ -6,16 +6,16 @@ from django.urls import reverse
 from pytest_django.asserts import assertRedirects
 
 from itou.employee_record import enums as employee_record_enums
-from itou.employee_record.factories import EmployeeRecordFactory
 from itou.users.enums import IdentityProvider
-from itou.users.factories import (
+from itou.utils.perms import employee_record
+from tests.employee_record.factories import EmployeeRecordFactory
+from tests.users.factories import (
     ItouStaffFactory,
     JobSeekerFactory,
     LaborInspectorFactory,
     PrescriberFactory,
     SiaeStaffFactory,
 )
-from itou.utils.perms import employee_record
 from tests.utils.test import TestCase
 
 

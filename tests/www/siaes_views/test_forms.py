@@ -1,8 +1,8 @@
-from itou.cities.factories import create_city_guerande
-from itou.jobs.factories import create_test_romes_and_appellations
 from itou.siaes.enums import ContractType, SiaeKind
-from itou.siaes.factories import SiaeFactory
 from itou.www.siaes_views.forms import EditJobDescriptionDetailsForm, EditJobDescriptionForm
+from tests.cities.factories import create_city_guerande
+from tests.jobs.factories import create_test_romes_and_appellations
+from tests.siaes.factories import SiaeFactory
 from tests.utils.test import TestCase
 
 

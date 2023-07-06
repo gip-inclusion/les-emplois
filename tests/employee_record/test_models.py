@@ -7,17 +7,19 @@ import pytest
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
-from itou.approvals.factories import ApprovalFactory
 from itou.employee_record.enums import Status
 from itou.employee_record.exceptions import CloningError, DuplicateCloningError, InvalidStatusError
-from itou.employee_record.factories import (
+from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, validate_asp_batch_filename
+from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.utils.mocks.address_format import mock_get_geocoding_data
+from tests.approvals.factories import ApprovalFactory
+from tests.employee_record.factories import (
     BareEmployeeRecordFactory,
     BareEmployeeRecordUpdateNotificationFactory,
     EmployeeRecordFactory,
     EmployeeRecordWithProfileFactory,
 )
-from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, validate_asp_batch_filename
-from itou.job_applications.factories import (
+from tests.job_applications.factories import (
     JobApplicationFactory,
     JobApplicationSentByJobSeekerFactory,
     JobApplicationSentByPrescriberFactory,
@@ -27,9 +29,7 @@ from itou.job_applications.factories import (
     JobApplicationWithCompleteJobSeekerProfileFactory,
     JobApplicationWithoutApprovalFactory,
 )
-from itou.job_applications.models import JobApplication, JobApplicationWorkflow
-from itou.siaes.factories import SiaeFactory
-from itou.utils.mocks.address_format import mock_get_geocoding_data
+from tests.siaes.factories import SiaeFactory
 from tests.utils.test import TestCase
 
 

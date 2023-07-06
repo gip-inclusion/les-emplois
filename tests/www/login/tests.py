@@ -11,17 +11,17 @@ from pytest_django.asserts import assertContains
 from itou.openid_connect.france_connect import constants as fc_constants
 from itou.users import enums as users_enums
 from itou.users.enums import IdentityProvider, UserKind
-from itou.users.factories import (
+from itou.utils.urls import add_url_params
+from itou.www.login.forms import ItouLoginForm
+from tests.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance
+from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
+from tests.users.factories import (
     DEFAULT_PASSWORD,
     JobSeekerFactory,
     LaborInspectorFactory,
     PrescriberFactory,
     SiaeStaffFactory,
 )
-from itou.utils.urls import add_url_params
-from itou.www.login.forms import ItouLoginForm
-from tests.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance
-from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
 from tests.utils.test import TestCase, assertMessages, reload_module
 
 

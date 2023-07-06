@@ -8,16 +8,16 @@ from django.shortcuts import reverse
 from django.test import Client
 from django.utils.html import escape
 
-from itou.invitations.factories import ExpiredSiaeStaffInvitationFactory, SentSiaeStaffInvitationFactory
-from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from itou.siaes.factories import SiaeFactory
 from itou.users.enums import KIND_SIAE_STAFF, UserKind
-from itou.users.factories import SiaeStaffFactory
 from itou.users.models import User
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import add_url_params
+from tests.invitations.factories import ExpiredSiaeStaffInvitationFactory, SentSiaeStaffInvitationFactory
 from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
 from tests.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
+from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.siaes.factories import SiaeFactory
+from tests.users.factories import SiaeStaffFactory
 from tests.utils.test import assertMessages
 
 

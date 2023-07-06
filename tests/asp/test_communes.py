@@ -1,7 +1,7 @@
 import datetime
 
 from itou.asp.models import Commune
-from itou.users.factories import ItouStaffFactory
+from tests.users.factories import ItouStaffFactory
 from tests.utils.test import TestCase
 
 

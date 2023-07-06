@@ -9,23 +9,27 @@ from django.urls import resolve, reverse
 from django.utils import timezone
 from pytest_django.asserts import assertContains, assertRedirects
 
-from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.asp.models import AllocationDuration, EducationLevel, RSAAllocation
-from itou.cities.factories import create_city_in_zrr, create_test_cities
-from itou.eligibility.factories import EligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory
 from itou.eligibility.models import EligibilityDiagnosis
-from itou.geo.factories import ZRRFactory
-from itou.institutions.factories import InstitutionWithMembershipFactory
 from itou.job_applications.enums import SenderKind
-from itou.job_applications.factories import JobApplicationFactory
 from itou.job_applications.models import JobApplication
-from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from itou.siae_evaluations.factories import EvaluatedSiaeFactory
 from itou.siae_evaluations.models import Sanctions
 from itou.siaes.enums import SiaeKind
-from itou.siaes.factories import SiaeFactory, SiaeWithMembershipAndJobsFactory
 from itou.users.enums import LackOfNIRReason
-from itou.users.factories import (
+from itou.users.models import User
+from itou.utils.models import InclusiveDateRange
+from itou.utils.session import SessionNamespace
+from itou.utils.storage.s3 import S3Upload
+from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
+from tests.cities.factories import create_city_in_zrr, create_test_cities
+from tests.eligibility.factories import EligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory
+from tests.geo.factories import ZRRFactory
+from tests.institutions.factories import InstitutionWithMembershipFactory
+from tests.job_applications.factories import JobApplicationFactory
+from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.siae_evaluations.factories import EvaluatedSiaeFactory
+from tests.siaes.factories import SiaeFactory, SiaeWithMembershipAndJobsFactory
+from tests.users.factories import (
     ItouStaffFactory,
     JobSeekerFactory,
     JobSeekerProfileWithHexaAddressFactory,
@@ -33,10 +37,6 @@ from itou.users.factories import (
     PrescriberFactory,
     SiaeStaffFactory,
 )
-from itou.users.models import User
-from itou.utils.models import InclusiveDateRange
-from itou.utils.session import SessionNamespace
-from itou.utils.storage.s3 import S3Upload
 from tests.utils.storage.test import S3AccessingTestCase
 from tests.utils.test import TestCase, assertMessages
 

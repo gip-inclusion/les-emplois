@@ -8,11 +8,11 @@ from django.utils.http import urlencode
 
 from itou.approvals.enums import ProlongationReason
 from itou.approvals.models import Prolongation
-from itou.job_applications.factories import JobApplicationFactory
-from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.utils.storage.s3 import S3Upload
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.approvals_views.forms import DeclareProlongationForm
+from tests.job_applications.factories import JobApplicationFactory
+from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.utils.storage.test import S3AccessingTestCase
 from tests.utils.test import parse_response_to_soup
 

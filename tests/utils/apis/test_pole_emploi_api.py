@@ -6,8 +6,6 @@ import respx
 from django.core.cache import cache
 from freezegun import freeze_time
 
-from itou.job_applications.factories import JobApplicationFactory
-from itou.users.factories import JobSeekerFactory
 from itou.utils.apis.pole_emploi import (
     CACHE_API_TOKEN_KEY,
     PoleEmploiAPIBadResponse,
@@ -16,6 +14,8 @@ from itou.utils.apis.pole_emploi import (
     PoleEmploiRateLimitException,
 )
 from itou.utils.mocks import pole_emploi as pole_emploi_api_mocks
+from tests.job_applications.factories import JobApplicationFactory
+from tests.users.factories import JobSeekerFactory
 from tests.utils.test import TestCase
 
 

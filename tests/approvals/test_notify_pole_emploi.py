@@ -10,20 +10,20 @@ from django.test import override_settings
 from django.utils import timezone
 from freezegun import freeze_time
 
-from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.approvals.models import Approval
-from itou.job_applications.factories import JobApplicationFactory
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.siaes.enums import SiaeKind, siae_kind_to_pe_type_siae
-from itou.siaes.factories import SiaeFactory
-from itou.users.factories import JobSeekerFactory
 from itou.utils.mocks.pole_emploi import (
     API_MAJPASS_RESULT_ERROR,
     API_MAJPASS_RESULT_OK,
     API_RECHERCHE_MANY_RESULTS,
     API_RECHERCHE_RESULT_KNOWN,
 )
+from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
+from tests.job_applications.factories import JobApplicationFactory
+from tests.siaes.factories import SiaeFactory
+from tests.users.factories import JobSeekerFactory
 from tests.utils.test import TestCase
 
 

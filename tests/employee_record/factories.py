@@ -2,7 +2,7 @@ import factory
 
 from itou.employee_record.enums import NotificationStatus
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification
-from itou.job_applications.factories import (
+from tests.job_applications.factories import (
     JobApplicationWithApprovalNotCancellableFactory,
     JobApplicationWithCompleteJobSeekerProfileFactory,
 )

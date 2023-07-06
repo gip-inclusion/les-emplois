@@ -7,14 +7,14 @@ from django.core import mail
 from django.test import override_settings
 from django.urls import reverse
 
-from itou.cities.factories import create_test_cities
 from itou.openid_connect.france_connect import constants as fc_constants
 from itou.users.enums import UserKind
-from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.www.signup.forms import JobSeekerSituationForm
+from tests.cities.factories import create_test_cities
 from tests.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance
+from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from tests.utils.test import TestCase, reload_module
 
 

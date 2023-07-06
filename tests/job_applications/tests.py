@@ -17,16 +17,28 @@ from django.urls import reverse
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
 
-from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory, ProlongationFactory, SuspensionFactory
 from itou.eligibility.enums import AdministrativeCriteriaLevel
-from itou.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.employee_record.enums import Status
-from itou.employee_record.factories import BareEmployeeRecordFactory, EmployeeRecordFactory
 from itou.job_applications.admin_forms import JobApplicationAdminForm
 from itou.job_applications.enums import Origin, QualificationLevel, QualificationType, RefusalReason, SenderKind
 from itou.job_applications.export import JOB_APPLICATION_CSV_HEADERS, stream_xlsx_export
-from itou.job_applications.factories import (
+from itou.job_applications.models import JobApplication, JobApplicationTransitionLog, JobApplicationWorkflow
+from itou.job_applications.notifications import NewQualifiedJobAppEmployersNotification
+from itou.jobs.models import Appellation
+from itou.siaes.enums import ContractType, SiaeKind
+from itou.users.models import User
+from itou.utils import constants as global_constants
+from itou.utils.templatetags import format_filters
+from tests.approvals.factories import (
+    ApprovalFactory,
+    PoleEmploiApprovalFactory,
+    ProlongationFactory,
+    SuspensionFactory,
+)
+from tests.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
+from tests.employee_record.factories import BareEmployeeRecordFactory, EmployeeRecordFactory
+from tests.job_applications.factories import (
     JobApplicationFactory,
     JobApplicationSentByJobSeekerFactory,
     JobApplicationSentByPrescriberFactory,
@@ -35,16 +47,9 @@ from itou.job_applications.factories import (
     JobApplicationWithApprovalNotCancellableFactory,
     JobApplicationWithoutApprovalFactory,
 )
-from itou.job_applications.models import JobApplication, JobApplicationTransitionLog, JobApplicationWorkflow
-from itou.job_applications.notifications import NewQualifiedJobAppEmployersNotification
-from itou.jobs.factories import create_test_romes_and_appellations
-from itou.jobs.models import Appellation
-from itou.siaes.enums import ContractType, SiaeKind
-from itou.siaes.factories import SiaeFactory, SiaeWithMembershipAndJobsFactory
-from itou.users.factories import ItouStaffFactory, JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
-from itou.users.models import User
-from itou.utils import constants as global_constants
-from itou.utils.templatetags import format_filters
+from tests.jobs.factories import create_test_romes_and_appellations
+from tests.siaes.factories import SiaeFactory, SiaeWithMembershipAndJobsFactory
+from tests.users.factories import ItouStaffFactory, JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
 from tests.utils.test import TestCase, get_rows_from_streaming_response
 
 

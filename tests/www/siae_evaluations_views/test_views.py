@@ -3,12 +3,12 @@ import datetime
 from django.urls import reverse
 from django.utils import timezone
 
-from itou.institutions.factories import InstitutionMembershipFactory
 from itou.siae_evaluations import enums as evaluation_enums
-from itou.siae_evaluations.factories import EvaluatedSiaeFactory
 from itou.siae_evaluations.models import Sanctions
-from itou.siaes.factories import SiaeMembershipFactory
 from itou.utils.types import InclusiveDateRange
+from tests.institutions.factories import InstitutionMembershipFactory
+from tests.siae_evaluations.factories import EvaluatedSiaeFactory
+from tests.siaes.factories import SiaeMembershipFactory
 from tests.utils.test import TestCase
 
 

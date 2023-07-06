@@ -16,9 +16,9 @@ from django.urls import reverse
 from freezegun import freeze_time
 
 from itou.siaes.enums import SiaeKind
-from itou.siaes.factories import SiaeConventionFactory, SiaeFactory, SiaeWith2MembershipsFactory
 from itou.siaes.management.commands._import_siae.utils import anonymize_fluxiae_df
 from itou.siaes.models import Siae
+from tests.siaes.factories import SiaeConventionFactory, SiaeFactory, SiaeWith2MembershipsFactory
 
 
 def lazy_import_siae_command():

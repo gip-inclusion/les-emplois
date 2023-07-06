@@ -6,10 +6,10 @@ from django.utils import timezone
 from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.approvals.enums import ProlongationReason
-from itou.approvals.factories import ApprovalFactory, ProlongationFactory, SuspensionFactory
 from itou.files.models import File
-from itou.job_applications.factories import JobApplicationFactory
-from itou.users.factories import ItouStaffFactory
+from tests.approvals.factories import ApprovalFactory, ProlongationFactory, SuspensionFactory
+from tests.job_applications.factories import JobApplicationFactory
+from tests.users.factories import ItouStaffFactory
 from tests.utils.test import parse_response_to_soup
 
 

@@ -5,13 +5,13 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
 
 from itou.cities.models import City
-from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
-from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.enums import ContractType, SiaeKind
-from itou.siaes.factories import SiaeFactory, SiaeJobDescriptionFactory
 from itou.siaes.models import SiaeJobDescription
 from itou.www.siaes_views.views import ITOU_SESSION_CURRENT_PAGE_KEY, ITOU_SESSION_JOB_DESCRIPTION_KEY
+from tests.jobs.factories import create_test_romes_and_appellations
+from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.siaes.factories import SiaeFactory, SiaeJobDescriptionFactory
 from tests.utils.test import BASE_NUM_QUERIES, TestCase, assertMessages
 
 

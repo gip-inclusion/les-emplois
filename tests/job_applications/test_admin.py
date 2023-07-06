@@ -2,8 +2,10 @@ from django.contrib import messages
 from django.contrib.admin import helpers
 from django.urls import reverse
 
-from itou.employee_record import factories as employee_record_factories, models as employee_record_models
-from itou.job_applications import factories, models
+from itou.employee_record import models as employee_record_models
+from itou.job_applications import models
+from tests.employee_record import factories as employee_record_factories
+from tests.job_applications import factories
 from tests.utils.test import assertMessages
 
 

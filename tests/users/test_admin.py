@@ -1,6 +1,6 @@
 from itou.users import admin
-from itou.users.factories import JobSeekerFactory
 from itou.users.models import JobSeekerProfile
+from tests.users.factories import JobSeekerFactory
 
 
 def test_filter():

@@ -3,9 +3,9 @@ from dataclasses import dataclass
 import django.contrib.gis.geos as gis_geos
 import pytest
 
-from itou.geo.factories import QPVFactory
 from itou.geo.models import QPV
 from itou.geo.utils import coords_to_geometry
+from tests.geo.factories import QPVFactory
 from tests.utils.test import TestCase
 
 

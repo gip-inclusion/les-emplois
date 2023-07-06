@@ -4,7 +4,6 @@ import freezegun
 import pytest
 from django.test.utils import override_settings
 
-from itou.approvals.factories import ProlongationFactory, SuspensionFactory
 from itou.employee_record.enums import Status
 from itou.employee_record.mocks.transfer_employee_records import (
     SFTPAllDupsConnectionMock,
@@ -14,9 +13,10 @@ from itou.employee_record.mocks.transfer_employee_records import (
     SFTPGoodConnectionMock,
 )
 from itou.employee_record.models import EmployeeRecord
-from itou.job_applications.factories import JobApplicationWithCompleteJobSeekerProfileFactory
 from itou.utils.mocks.address_format import mock_get_geocoding_data
+from tests.approvals.factories import ProlongationFactory, SuspensionFactory
 from tests.employee_record.common import ManagementCommandTestCase
+from tests.job_applications.factories import JobApplicationWithCompleteJobSeekerProfileFactory
 
 
 # There is no need to create 700 employee records for a single batch

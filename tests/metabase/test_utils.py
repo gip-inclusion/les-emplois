@@ -1,7 +1,7 @@
-from itou.geo.factories import QPVFactory, ZRRFactory
 from itou.geo.utils import coords_to_geometry
 from itou.metabase.tables.utils import get_qpv_job_seeker_pks, get_zrr_status_for_insee_code
-from itou.users.factories import JobSeekerFactory
+from tests.geo.factories import QPVFactory, ZRRFactory
+from tests.users.factories import JobSeekerFactory
 
 
 def test_get_qpv_job_seeker_pks():

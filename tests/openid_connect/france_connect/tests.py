@@ -15,8 +15,8 @@ from itou.openid_connect.france_connect import constants
 from itou.openid_connect.france_connect.models import FranceConnectState, FranceConnectUserData
 from itou.openid_connect.models import InvalidKindException
 from itou.users.enums import IdentityProvider, UserKind
-from itou.users.factories import JobSeekerFactory, UserFactory
 from itou.users.models import User
+from tests.users.factories import JobSeekerFactory, UserFactory
 from tests.utils.test import TestCase, reload_module
 
 

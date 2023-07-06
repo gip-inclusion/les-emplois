@@ -3,10 +3,10 @@ import json
 from django.urls import reverse
 from rest_framework.test import APIClient, APITestCase
 
-from itou.cities.factories import create_city_guerande, create_city_saint_andre
 from itou.siaes.enums import SiaeKind
-from itou.siaes.factories import SiaeFactory
-from itou.users.factories import SiaeStaffFactory
+from tests.cities.factories import create_city_guerande, create_city_saint_andre
+from tests.siaes.factories import SiaeFactory
+from tests.users.factories import SiaeStaffFactory
 from tests.utils.test import BASE_NUM_QUERIES
 
 

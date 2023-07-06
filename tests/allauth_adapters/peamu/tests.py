@@ -13,9 +13,9 @@ from django.urls import reverse
 
 from itou.allauth_adapters.peamu.provider import PEAMUProvider
 from itou.users import enums as users_enums
-from itou.users.factories import JobSeekerFactory
 from itou.users.models import User
 from itou.utils import constants as global_constants
+from tests.users.factories import JobSeekerFactory
 from tests.utils.test import TestCase
 
 

@@ -2,8 +2,8 @@ from django.contrib.gis.geos import Point
 from django.core import management
 from pytest_django.asserts import assertQuerySetEqual
 
-from itou.cities.factories import create_city_guerande, create_test_cities
 from itou.cities.models import City, EditionModeChoices
+from tests.cities.factories import create_city_guerande, create_test_cities
 
 
 def test_create_test_cities():

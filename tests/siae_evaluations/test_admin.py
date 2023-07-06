@@ -5,14 +5,14 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertNumQueries
 
 from itou.siae_evaluations import enums as evaluation_enums
-from itou.siae_evaluations.factories import (
+from tests.siae_evaluations.factories import (
     EvaluatedAdministrativeCriteriaFactory,
     EvaluatedJobApplicationFactory,
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
 )
-from itou.siaes.factories import SiaeMembershipFactory
-from itou.users.factories import ItouStaffFactory
+from tests.siaes.factories import SiaeMembershipFactory
+from tests.users.factories import ItouStaffFactory
 from tests.utils.test import BASE_NUM_QUERIES, assertMessages, get_rows_from_streaming_response
 
 

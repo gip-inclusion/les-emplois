@@ -5,16 +5,16 @@ from django.urls import reverse
 from django.utils import dateformat, timezone
 from freezegun import freeze_time
 
-from itou.institutions.factories import InstitutionWith2MembershipFactory
 from itou.siae_evaluations.emails import CampaignEmailFactory, InstitutionEmailFactory, SIAEEmailFactory
 from itou.siae_evaluations.enums import EvaluatedAdministrativeCriteriaState
-from itou.siae_evaluations.factories import (
+from tests.institutions.factories import InstitutionWith2MembershipFactory
+from tests.siae_evaluations.factories import (
     EvaluatedAdministrativeCriteriaFactory,
     EvaluatedJobApplicationFactory,
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
 )
-from itou.siaes.factories import SiaeFactory, SiaeWith2MembershipsFactory
+from tests.siaes.factories import SiaeFactory, SiaeWith2MembershipsFactory
 
 
 @pytest.mark.usefixtures("unittest_compatibility")

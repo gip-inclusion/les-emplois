@@ -13,20 +13,10 @@ from django.core.management import call_command
 from django.utils import timezone
 from freezegun import freeze_time
 
-from itou.approvals.factories import ApprovalFactory
 from itou.eligibility.models import EligibilityDiagnosis
-from itou.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
 from itou.job_applications.models import JobApplication
 from itou.prescribers.enums import PrescriberOrganizationKind
-from itou.prescribers.factories import (
-    PrescriberFactory,
-    PrescriberMembershipFactory,
-    PrescriberOrganizationFactory,
-    PrescriberPoleEmploiFactory,
-)
 from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS, SiaeKind
-from itou.siaes.factories import SiaeMembershipFactory
-from itou.users.factories import JobSeekerFactory, JobSeekerWithAddressFactory, SiaeStaffFactory
 from itou.users.management.commands.new_users_to_mailjet import (
     MAILJET_API_URL,
     NEW_ORIENTEURS_LISTID,
@@ -36,6 +26,16 @@ from itou.users.management.commands.new_users_to_mailjet import (
 )
 from itou.users.models import User
 from itou.utils.mocks.pole_emploi import API_RECHERCHE_ERROR, API_RECHERCHE_RESULT_KNOWN
+from tests.approvals.factories import ApprovalFactory
+from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
+from tests.prescribers.factories import (
+    PrescriberFactory,
+    PrescriberMembershipFactory,
+    PrescriberOrganizationFactory,
+    PrescriberPoleEmploiFactory,
+)
+from tests.siaes.factories import SiaeMembershipFactory
+from tests.users.factories import JobSeekerFactory, JobSeekerWithAddressFactory, SiaeStaffFactory
 from tests.utils.test import TestCase
 
 

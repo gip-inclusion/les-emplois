@@ -8,15 +8,15 @@ from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertNumQueries, assertRedirects
 
-from itou.approvals.factories import ApprovalFactory, ProlongationFactory, SuspensionFactory
-from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.job_applications.enums import SenderKind
-from itou.job_applications.factories import JobApplicationFactory, JobApplicationSentByPrescriberOrganizationFactory
 from itou.job_applications.models import JobApplicationWorkflow
-from itou.prescribers.factories import PrescriberFactory, PrescriberOrganizationFactory
-from itou.siaes.factories import SiaeFactory, SiaeMembershipFactory
-from itou.users.factories import JobSeekerFactory
 from itou.utils.templatetags.format_filters import format_approval_number
+from tests.approvals.factories import ApprovalFactory, ProlongationFactory, SuspensionFactory
+from tests.eligibility.factories import EligibilityDiagnosisFactory
+from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByPrescriberOrganizationFactory
+from tests.prescribers.factories import PrescriberFactory, PrescriberOrganizationFactory
+from tests.siaes.factories import SiaeFactory, SiaeMembershipFactory
+from tests.users.factories import JobSeekerFactory
 from tests.utils.test import parse_response_to_soup
 
 
