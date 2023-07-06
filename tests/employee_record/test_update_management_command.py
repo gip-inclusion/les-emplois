@@ -4,10 +4,10 @@ import freezegun
 from django.test import override_settings
 
 import itou.employee_record.enums as er_enums
-from itou.employee_record.factories import EmployeeRecordUpdateNotificationFactory
 from itou.employee_record.mocks.transfer_employee_records import SFTPGoodConnectionMock
 from itou.employee_record.models import EmployeeRecordUpdateNotification
 from tests.employee_record.common import ManagementCommandTestCase
+from tests.employee_record.factories import EmployeeRecordUpdateNotificationFactory
 
 
 @override_settings(ASP_FS_SFTP_HOST="foobar.com", ASP_FS_SFTP_USER="django_tests")

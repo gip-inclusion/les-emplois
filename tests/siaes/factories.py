@@ -7,11 +7,11 @@ from django.utils import timezone
 
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS, department_from_postcode
-from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
 from itou.siaes import models
 from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS, ContractType, SiaeKind
-from itou.users.factories import SiaeStaffFactory
+from tests.jobs.factories import create_test_romes_and_appellations
+from tests.users.factories import SiaeStaffFactory
 
 
 NAF_CODES = ["9522Z", "7820Z", "6312Z", "8130Z", "1071A", "5510Z"]
@@ -93,7 +93,7 @@ class SiaeFactory(factory.django.DjangoModelFactory):
         )
         use_employee_record = factory.Trait(kind=factory.fuzzy.FuzzyChoice(models.Siae.ASP_EMPLOYEE_RECORD_KINDS))
         with_membership = factory.Trait(
-            membership=factory.RelatedFactory("itou.siaes.factories.SiaeMembershipFactory", "siae"),
+            membership=factory.RelatedFactory("tests.siaes.factories.SiaeMembershipFactory", "siae"),
         )
         with_jobs = factory.Trait(romes=factory.PostGeneration(_create_job_from_rome_code))
 

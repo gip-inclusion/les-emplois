@@ -1,9 +1,9 @@
 from django.forms.models import model_to_dict
 
-from itou.approvals.factories import ApprovalFactory
 from itou.users.admin_forms import UserAdminForm
 from itou.users.enums import IdentityProvider, UserKind
-from itou.users.factories import JobSeekerFactory
+from tests.approvals.factories import ApprovalFactory
+from tests.users.factories import JobSeekerFactory
 from tests.utils.test import TestCase
 
 

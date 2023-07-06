@@ -4,13 +4,13 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 from itou.eligibility.enums import AdministrativeCriteriaAnnex, AdministrativeCriteriaLevel
-from itou.eligibility.factories import GEIQEligibilityDiagnosisFactory
 from itou.eligibility.models import GEIQAdministrativeCriteria, GEIQEligibilityDiagnosis
-from itou.job_applications.factories import JobApplicationFactory
-from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.enums import SiaeKind
-from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
-from itou.users.factories import ItouStaffFactory, JobSeekerFactory
+from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory
+from tests.job_applications.factories import JobApplicationFactory
+from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.siaes.factories import SiaeWithMembershipAndJobsFactory
+from tests.users.factories import ItouStaffFactory, JobSeekerFactory
 
 
 @pytest.fixture

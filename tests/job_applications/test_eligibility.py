@@ -3,10 +3,10 @@ from django.utils.timezone import timedelta
 import itou.employee_record.enums as er_enums
 import itou.siaes.enums as siae_enums
 from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
-from itou.employee_record.factories import EmployeeRecordWithProfileFactory
-from itou.job_applications.factories import JobApplicationFactory, JobApplicationWithoutApprovalFactory
 from itou.job_applications.models import JobApplication
-from itou.siaes.factories import SiaeFactory
+from tests.employee_record.factories import EmployeeRecordWithProfileFactory
+from tests.job_applications.factories import JobApplicationFactory, JobApplicationWithoutApprovalFactory
+from tests.siaes.factories import SiaeFactory
 from tests.utils.test import TestCase
 
 

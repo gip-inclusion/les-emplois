@@ -2,10 +2,10 @@ from datetime import timedelta
 
 from django.utils import timezone
 
-from itou.approvals.factories import ApprovalFactory, ProlongationFactory, SuspensionFactory
 from itou.employee_record.enums import NotificationStatus, Status
-from itou.employee_record.factories import EmployeeRecordFactory
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification
+from tests.approvals.factories import ApprovalFactory, ProlongationFactory, SuspensionFactory
+from tests.employee_record.factories import EmployeeRecordFactory
 from tests.utils.test import TestCase
 
 

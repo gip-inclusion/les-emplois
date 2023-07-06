@@ -23,19 +23,24 @@ from itou.approvals.admin import JobApplicationInline
 from itou.approvals.admin_forms import ApprovalAdminForm
 from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
 from itou.approvals.enums import ApprovalStatus, Origin, ProlongationReason
-from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory, ProlongationFactory, SuspensionFactory
 from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, Suspension
 from itou.approvals.notifications import NewProlongationToAuthorizedPrescriberNotification
-from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.employee_record.enums import Status
-from itou.employee_record.factories import EmployeeRecordFactory
 from itou.files.models import File
-from itou.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.enums import SiaeKind
-from itou.siaes.factories import SiaeFactory
-from itou.users.factories import ItouStaffFactory, JobSeekerFactory
 from itou.utils import constants as global_constants
+from tests.approvals.factories import (
+    ApprovalFactory,
+    PoleEmploiApprovalFactory,
+    ProlongationFactory,
+    SuspensionFactory,
+)
+from tests.eligibility.factories import EligibilityDiagnosisFactory
+from tests.employee_record.factories import EmployeeRecordFactory
+from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
+from tests.siaes.factories import SiaeFactory
+from tests.users.factories import ItouStaffFactory, JobSeekerFactory
 from tests.utils.test import TestCase, assertMessages
 
 

@@ -1,7 +1,7 @@
 from django.urls import reverse
 from rest_framework.authtoken.models import Token
 
-from itou.users.factories import DEFAULT_PASSWORD, SiaeStaffFactory
+from tests.users.factories import DEFAULT_PASSWORD, SiaeStaffFactory
 
 
 def test_token_auth_with_login_password(client):

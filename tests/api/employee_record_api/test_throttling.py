@@ -4,8 +4,8 @@ from django.urls import reverse
 from rest_framework.test import APIClient, APITestCase
 
 from itou.api.employee_record_api.viewsets import EmployeeRecordRateThrottle
-from itou.siaes.factories import SiaeFactory
-from itou.users.factories import DEFAULT_PASSWORD
+from tests.siaes.factories import SiaeFactory
+from tests.users.factories import DEFAULT_PASSWORD
 
 
 ENDPOINT_URL = reverse("v1:employee-records-list")

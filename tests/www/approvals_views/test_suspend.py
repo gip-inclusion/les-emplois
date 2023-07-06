@@ -3,13 +3,13 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
 
-from itou.approvals.factories import SuspensionFactory
 from itou.approvals.models import Suspension
 from itou.employee_record.enums import Status
-from itou.employee_record.factories import EmployeeRecordFactory
-from itou.job_applications.factories import JobApplicationFactory
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.approvals_views.forms import SuspensionForm
+from tests.approvals.factories import SuspensionFactory
+from tests.employee_record.factories import EmployeeRecordFactory
+from tests.job_applications.factories import JobApplicationFactory
 from tests.utils.test import TestCase
 
 

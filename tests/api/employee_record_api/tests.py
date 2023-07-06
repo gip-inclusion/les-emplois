@@ -7,11 +7,11 @@ from django.utils import timezone
 from rest_framework.test import APIClient, APITestCase
 
 from itou.employee_record.enums import Status
-from itou.employee_record.factories import EmployeeRecordWithProfileFactory
 from itou.employee_record.models import EmployeeRecord
-from itou.job_applications.factories import JobApplicationWithCompleteJobSeekerProfileFactory
-from itou.users.factories import DEFAULT_PASSWORD, SiaeStaffFactory
 from itou.utils.mocks.address_format import mock_get_geocoding_data
+from tests.employee_record.factories import EmployeeRecordWithProfileFactory
+from tests.job_applications.factories import JobApplicationWithCompleteJobSeekerProfileFactory
+from tests.users.factories import DEFAULT_PASSWORD, SiaeStaffFactory
 
 
 ENDPOINT_URL = reverse("v1:employee-records-list")

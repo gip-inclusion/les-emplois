@@ -10,7 +10,7 @@ from itou.external_data.apis.pe_connect import import_user_pe_data
 from itou.external_data.models import ExternalDataImport, RejectedEmailEventData
 from itou.external_data.signals import store_rejected_email_event
 from itou.users.enums import IdentityProvider
-from itou.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerFactory
 from tests.utils.test import TestCase
 
 

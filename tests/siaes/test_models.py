@@ -10,11 +10,12 @@ from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
 
-from itou.job_applications.factories import JobApplicationFactory
 from itou.job_applications.models import JobApplicationWorkflow
-from itou.jobs.factories import create_test_romes_and_appellations
 from itou.siaes.enums import ContractType, SiaeKind
-from itou.siaes.factories import (
+from itou.siaes.models import Siae, SiaeJobDescription
+from tests.job_applications.factories import JobApplicationFactory
+from tests.jobs.factories import create_test_romes_and_appellations
+from tests.siaes.factories import (
     SiaeAfterGracePeriodFactory,
     SiaeFactory,
     SiaeJobDescriptionFactory,
@@ -23,8 +24,7 @@ from itou.siaes.factories import (
     SiaeWith4MembershipsFactory,
     SiaeWithMembershipAndJobsFactory,
 )
-from itou.siaes.models import Siae, SiaeJobDescription
-from itou.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerFactory
 from tests.utils.test import TestCase
 
 

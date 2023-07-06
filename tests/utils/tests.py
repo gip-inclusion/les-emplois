@@ -25,17 +25,11 @@ from faker import Faker as fk
 
 import itou.utils.json
 import itou.utils.session
-from itou.approvals.factories import SuspensionFactory
 from itou.approvals.models import Suspension
 from itou.common_apps.resume.forms import ResumeFormMixin
-from itou.institutions.factories import InstitutionFactory, InstitutionWithMembershipFactory
-from itou.job_applications.factories import JobApplicationFactory
 from itou.job_applications.models import JobApplicationWorkflow
-from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from itou.siaes.factories import SiaeFactory
 from itou.siaes.models import Siae, SiaeMembership
 from itou.users.enums import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF, UserKind
-from itou.users.factories import ItouStaffFactory, JobSeekerFactory, PrescriberFactory
 from itou.users.models import User
 from itou.utils import constants as global_constants, pagination
 from itou.utils.emails import redact_email_address
@@ -67,6 +61,12 @@ from itou.utils.validators import (
     validate_siren,
     validate_siret,
 )
+from tests.approvals.factories import SuspensionFactory
+from tests.institutions.factories import InstitutionFactory, InstitutionWithMembershipFactory
+from tests.job_applications.factories import JobApplicationFactory
+from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.siaes.factories import SiaeFactory
+from tests.users.factories import ItouStaffFactory, JobSeekerFactory, PrescriberFactory
 from tests.utils.test import TestCase, parse_response_to_soup
 
 

@@ -2,11 +2,11 @@ from django.urls import reverse
 from django.utils import timezone
 from rest_framework.test import APIClient, APITestCase
 
-from itou.prescribers.factories import PrescriberOrganizationFactory
 from itou.siaes.enums import SiaeKind
-from itou.siaes.factories import SiaeConventionFactory, SiaeFactory
 from itou.siaes.models import Siae
-from itou.users.factories import PrescriberFactory, SiaeStaffFactory
+from tests.prescribers.factories import PrescriberOrganizationFactory
+from tests.siaes.factories import SiaeConventionFactory, SiaeFactory
+from tests.users.factories import PrescriberFactory, SiaeStaffFactory
 
 
 def _str_with_tz(dt):

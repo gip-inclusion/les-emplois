@@ -4,11 +4,11 @@ from django.utils import timezone
 from django.utils.html import escape
 
 from itou.invitations.models import SiaeStaffInvitation
-from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from itou.siaes.factories import SiaeFactory, SiaeMembershipFactory
 from itou.users.enums import UserKind
-from itou.users.factories import JobSeekerFactory, SiaeStaffFactory
 from itou.www.invitations_views.forms import SiaeStaffInvitationForm
+from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.siaes.factories import SiaeFactory, SiaeMembershipFactory
+from tests.users.factories import JobSeekerFactory, SiaeStaffFactory
 from tests.utils.test import TestCase
 
 

@@ -8,8 +8,9 @@ from django.core import management
 from django.utils import timezone
 from faker import Faker
 
-from itou.status import factories, models, probes
+from itou.status import models, probes
 from itou.status.management.commands import run_status_probes
+from tests.status import factories
 from tests.utils.test import TestCase
 
 

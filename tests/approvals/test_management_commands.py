@@ -5,7 +5,7 @@ import openpyxl
 from django.core import management
 from freezegun import freeze_time
 
-from itou.approvals.factories import ApprovalFactory
+from tests.approvals.factories import ApprovalFactory
 from tests.utils.test import TestCase
 
 

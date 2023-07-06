@@ -2,7 +2,7 @@ from django.conf import settings
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains
 
-from itou.users.factories import ItouStaffFactory
+from tests.users.factories import ItouStaffFactory
 
 
 def test_as_superuser(client):

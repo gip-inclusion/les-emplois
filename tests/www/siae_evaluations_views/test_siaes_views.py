@@ -6,21 +6,21 @@ from freezegun import freeze_time
 
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
-from itou.institutions.factories import InstitutionMembershipFactory
-from itou.job_applications.factories import JobApplicationFactory
 from itou.siae_evaluations import enums as evaluation_enums
-from itou.siae_evaluations.factories import (
+from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria
+from itou.users.enums import KIND_SIAE_STAFF
+from itou.utils.perms.user import UserInfo
+from itou.utils.storage.s3 import S3Upload
+from tests.institutions.factories import InstitutionMembershipFactory
+from tests.job_applications.factories import JobApplicationFactory
+from tests.siae_evaluations.factories import (
     EvaluatedAdministrativeCriteriaFactory,
     EvaluatedJobApplicationFactory,
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
 )
-from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria
-from itou.siaes.factories import SiaeMembershipFactory
-from itou.users.enums import KIND_SIAE_STAFF
-from itou.users.factories import JobSeekerFactory
-from itou.utils.perms.user import UserInfo
-from itou.utils.storage.s3 import S3Upload
+from tests.siaes.factories import SiaeMembershipFactory
+from tests.users.factories import JobSeekerFactory
 from tests.utils.storage.test import S3AccessingTestCase
 from tests.utils.test import BASE_NUM_QUERIES, TestCase, assertMessages
 

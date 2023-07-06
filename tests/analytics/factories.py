@@ -1,10 +1,9 @@
 import factory
 import factory.fuzzy
 
+from itou.analytics.models import Datum, StatsDashboardVisit
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.users.enums import UserKind
-
-from .models import Datum, StatsDashboardVisit
 
 
 class DatumFactory(factory.django.DjangoModelFactory):

@@ -4,9 +4,9 @@ import factory
 from django.utils import timezone
 
 from itou.invitations import models
-from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from itou.siaes.factories import SiaeFactory
-from itou.users.factories import PrescriberFactory, SiaeStaffFactory
+from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.siaes.factories import SiaeFactory
+from tests.users.factories import PrescriberFactory, SiaeStaffFactory
 
 
 class SiaeStaffInvitationFactory(factory.django.DjangoModelFactory):

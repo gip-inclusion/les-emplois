@@ -2,10 +2,10 @@ from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from django.utils import timezone
 
-from itou.job_applications.factories import JobApplicationFactory
 from itou.job_applications.models import JobApplication
-from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
 from itou.utils.widgets import DuetDatePickerWidget
+from tests.job_applications.factories import JobApplicationFactory
+from tests.siaes.factories import SiaeWithMembershipAndJobsFactory
 from tests.utils.test import TestCase
 
 

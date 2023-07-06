@@ -33,7 +33,10 @@ from itou.openid_connect.inclusion_connect.views import InclusionConnectSession
 from itou.openid_connect.models import InvalidKindException
 from itou.users import enums as users_enums
 from itou.users.enums import IdentityProvider, UserKind
-from itou.users.factories import (
+from itou.users.models import User
+from itou.utils.urls import add_url_params, get_absolute_url
+from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
+from tests.users.factories import (
     DEFAULT_PASSWORD,
     JobSeekerFactory,
     LaborInspectorFactory,
@@ -41,9 +44,6 @@ from itou.users.factories import (
     SiaeStaffFactory,
     UserFactory,
 )
-from itou.users.models import User
-from itou.utils.urls import add_url_params, get_absolute_url
-from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
 from tests.utils.test import assertMessages
 
 

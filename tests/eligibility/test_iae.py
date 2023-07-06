@@ -3,21 +3,21 @@ import datetime
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 
-from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.eligibility.enums import AdministrativeCriteriaLevel, AuthorKind
-from itou.eligibility.factories import (
+from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
+from itou.eligibility.models.common import AdministrativeCriteriaQuerySet
+from itou.utils.perms.user import UserInfo
+from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
+from tests.eligibility.factories import (
     EligibilityDiagnosisFactory,
     EligibilityDiagnosisMadeBySiaeFactory,
     ExpiredEligibilityDiagnosisFactory,
     ExpiredEligibilityDiagnosisMadeBySiaeFactory,
 )
-from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
-from itou.eligibility.models.common import AdministrativeCriteriaQuerySet
-from itou.job_applications.factories import JobApplicationFactory
-from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from itou.siaes.factories import SiaeFactory
-from itou.users.factories import JobSeekerFactory
-from itou.utils.perms.user import UserInfo
+from tests.job_applications.factories import JobApplicationFactory
+from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.siaes.factories import SiaeFactory
+from tests.users.factories import JobSeekerFactory
 from tests.utils.test import TestCase
 
 

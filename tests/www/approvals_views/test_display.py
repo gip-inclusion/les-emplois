@@ -4,11 +4,11 @@ from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from freezegun import freeze_time
 
-from itou.approvals.factories import ApprovalFactory
-from itou.job_applications.factories import JobApplicationFactory
 from itou.job_applications.models import JobApplication
-from itou.siaes.factories import SiaeMembershipFactory
 from itou.utils import constants as global_constants
+from tests.approvals.factories import ApprovalFactory
+from tests.job_applications.factories import JobApplicationFactory
+from tests.siaes.factories import SiaeMembershipFactory
 from tests.utils.test import TestCase
 
 

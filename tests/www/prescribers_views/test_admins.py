@@ -3,7 +3,7 @@ from django.core import mail
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 
-from itou.prescribers.factories import PrescriberOrganizationWith2MembershipFactory
+from tests.prescribers.factories import PrescriberOrganizationWith2MembershipFactory
 from tests.utils.test import TestCase
 
 

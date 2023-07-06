@@ -6,16 +6,16 @@ from faker import Faker
 from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.job_applications.enums import QualificationLevel, QualificationType
-from itou.job_applications.factories import (
+from itou.job_applications.models import JobApplicationWorkflow
+from itou.siaes.enums import ContractType, SiaeKind
+from itou.www.apply import forms as apply_forms
+from tests.job_applications.factories import (
     JobApplicationFactory,
     JobApplicationSentByJobSeekerFactory,
     JobApplicationSentByPrescriberFactory,
     JobApplicationSentBySiaeFactory,
 )
-from itou.job_applications.models import JobApplicationWorkflow
-from itou.siaes.enums import ContractType, SiaeKind
-from itou.users.factories import JobSeekerFactory, PrescriberFactory
-from itou.www.apply import forms as apply_forms
+from tests.users.factories import JobSeekerFactory, PrescriberFactory
 from tests.utils.test import TestCase
 
 

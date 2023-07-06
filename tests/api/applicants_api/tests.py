@@ -1,12 +1,12 @@
 from django.urls import reverse
 from rest_framework.test import APIClient, APITestCase
 
-from itou.asp.factories import CommuneFactory, CountryFactory
-from itou.institutions.factories import InstitutionWithMembershipFactory
-from itou.job_applications.factories import JobApplicationFactory
-from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from itou.siaes.factories import SiaeFactory
-from itou.users.factories import JobSeekerFactory
+from tests.asp.factories import CommuneFactory, CountryFactory
+from tests.institutions.factories import InstitutionWithMembershipFactory
+from tests.job_applications.factories import JobApplicationFactory
+from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.siaes.factories import SiaeFactory
+from tests.users.factories import JobSeekerFactory
 
 
 class ApplicantsAPITest(APITestCase):

@@ -3,11 +3,11 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import dateformat, timezone
 
-from itou.eligibility.factories import GEIQEligibilityDiagnosisFactory
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
-from itou.job_applications.factories import JobApplicationFactory
 from itou.siaes.enums import SiaeKind
-from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
+from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory
+from tests.job_applications.factories import JobApplicationFactory
+from tests.siaes.factories import SiaeWithMembershipAndJobsFactory
 
 
 class JobApplicationGEIQEligibilityDetailsTest(TestCase):

@@ -2,8 +2,8 @@ from django.conf import settings
 from django.utils import timezone
 
 from itou.approvals.enums import ProlongationReason
-from itou.approvals.factories import ProlongationFactory
 from itou.files.models import File
+from tests.approvals.factories import ProlongationFactory
 
 
 def test_report_file_link():

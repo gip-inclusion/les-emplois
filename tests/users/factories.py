@@ -8,15 +8,15 @@ import factory.fuzzy
 from allauth.account import models as allauth_models
 from django.contrib.auth.hashers import make_password
 
-from itou.asp.factories import CommuneFactory, CountryFactory, CountryFranceFactory
 from itou.asp.models import AllocationDuration, EducationLevel, LaneType
-from itou.cities.factories import create_city_in_zrr, create_city_partially_in_zrr
 from itou.common_apps.address.departments import DEPARTMENTS
-from itou.geo.factories import QPVFactory, ZRRFactory
 from itou.users import models
 from itou.users.enums import IdentityProvider, Title, UserKind
 from itou.utils.mocks.address_format import get_random_geocoding_api_result
 from itou.utils.validators import validate_nir
+from tests.asp.factories import CommuneFactory, CountryFactory, CountryFranceFactory
+from tests.cities.factories import create_city_in_zrr, create_city_partially_in_zrr
+from tests.geo.factories import QPVFactory, ZRRFactory
 
 
 DEFAULT_PASSWORD = "P4ssw0rd!***"
@@ -77,7 +77,7 @@ class SiaeStaffFactory(UserFactory):
 
     @factory.post_generation
     def with_siae(self, created, extracted, **kwargs):
-        from itou.siaes.factories import SiaeMembershipFactory
+        from tests.siaes.factories import SiaeMembershipFactory
 
         if created and extracted is True:
             SiaeMembershipFactory(user=self)

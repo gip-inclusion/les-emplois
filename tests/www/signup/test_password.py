@@ -5,7 +5,7 @@ from django.core import mail
 from django.urls import reverse
 from django.utils.http import urlencode
 
-from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
+from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from tests.utils.test import TestCase
 
 

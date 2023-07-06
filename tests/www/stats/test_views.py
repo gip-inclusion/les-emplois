@@ -9,11 +9,11 @@ from pytest_django.asserts import assertQuerySetEqual
 from itou.analytics.models import StatsDashboardVisit
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION
 from itou.institutions.enums import InstitutionKind
-from itou.institutions.factories import InstitutionWithMembershipFactory
-from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from itou.siaes.factories import SiaeFactory
-from itou.users.factories import PrescriberFactory
 from itou.utils.apis.metabase import METABASE_DASHBOARDS
+from tests.institutions.factories import InstitutionWithMembershipFactory
+from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.siaes.factories import SiaeFactory
+from tests.users.factories import PrescriberFactory
 from tests.utils.test import TestCase
 
 

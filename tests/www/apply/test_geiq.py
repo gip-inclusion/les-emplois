@@ -3,14 +3,14 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import dateformat, timezone
 
-from itou.eligibility.factories import GEIQEligibilityDiagnosisFactory
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
-from itou.job_applications.factories import JobApplicationFactory
-from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.enums import SiaeKind
-from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
-from itou.users.factories import JobSeekerFactory, JobSeekerWithAddressFactory
 from itou.utils.session import SessionNamespace
+from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory
+from tests.job_applications.factories import JobApplicationFactory
+from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.siaes.factories import SiaeWithMembershipAndJobsFactory
+from tests.users.factories import JobSeekerFactory, JobSeekerWithAddressFactory
 
 
 class JobApplicationGEIQEligibilityDetailsTest(TestCase):

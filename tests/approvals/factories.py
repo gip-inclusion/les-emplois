@@ -8,12 +8,12 @@ from faker import Faker
 
 from itou.approvals.enums import ProlongationReason
 from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, Suspension
-from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.job_applications.models import JobApplicationWorkflow
-from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.enums import SiaeKind
-from itou.siaes.factories import SiaeFactory
-from itou.users.factories import JobSeekerFactory
+from tests.eligibility.factories import EligibilityDiagnosisFactory
+from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.siaes.factories import SiaeFactory
+from tests.users.factories import JobSeekerFactory
 
 
 fake = Faker("fr_FR")
@@ -41,7 +41,7 @@ class ApprovalFactory(factory.django.DjangoModelFactory):
         if not create:
             return
         if extracted:
-            from itou.job_applications.factories import (
+            from tests.job_applications.factories import (
                 JobApplicationFactory,  # pylint: disable=import-outside-toplevel
             )
 

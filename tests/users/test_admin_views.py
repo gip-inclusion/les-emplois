@@ -4,8 +4,8 @@ from django.utils import timezone
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.users.enums import UserKind
-from itou.users.factories import ItouStaffFactory, JobSeekerFactory
 from itou.users.models import IdentityProvider, User
+from tests.users.factories import ItouStaffFactory, JobSeekerFactory
 
 
 def test_add_user(client):

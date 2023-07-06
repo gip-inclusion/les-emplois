@@ -1,10 +1,10 @@
 import pytest
 from freezegun import freeze_time
 
-from itou.jobs.factories import create_test_romes_and_appellations
 from itou.metabase.tables.job_descriptions import TABLE
-from itou.siaes.factories import SiaeJobDescriptionFactory
 from itou.siaes.models import SiaeJobDescription
+from tests.jobs.factories import create_test_romes_and_appellations
+from tests.siaes.factories import SiaeJobDescriptionFactory
 
 
 @freeze_time("2023-06-21T10:44:24.401Z")

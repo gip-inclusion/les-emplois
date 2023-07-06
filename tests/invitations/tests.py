@@ -3,16 +3,16 @@ from django.template.defaultfilters import capfirst
 from django.test import SimpleTestCase
 from django.utils import timezone
 
-from itou.invitations.factories import (
+from itou.invitations.models import InvitationAbstract, SiaeStaffInvitation
+from tests.invitations.factories import (
     ExpiredSiaeStaffInvitationFactory,
     PrescriberWithOrgSentInvitationFactory,
     SentSiaeStaffInvitationFactory,
     SiaeStaffInvitationFactory,
 )
-from itou.invitations.models import InvitationAbstract, SiaeStaffInvitation
-from itou.prescribers.factories import PrescriberMembershipFactory
-from itou.siaes.factories import SiaeMembershipFactory
-from itou.users.factories import PrescriberFactory, SiaeStaffFactory
+from tests.prescribers.factories import PrescriberMembershipFactory
+from tests.siaes.factories import SiaeMembershipFactory
+from tests.users.factories import PrescriberFactory, SiaeStaffFactory
 from tests.utils.test import TestCase
 
 

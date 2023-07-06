@@ -13,18 +13,19 @@ from django.test import override_settings
 from django.urls import reverse
 from django.utils.timezone import get_current_timezone
 
-from itou.eligibility.factories import GEIQEligibilityDiagnosisFactory
-from itou.job_applications import factories as job_applications_factories, models as job_applications_models
+from itou.job_applications import models as job_applications_models
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
-from itou.prescribers.factories import (
+from itou.prescribers.management.commands.merge_organizations import organization_merge_into
+from itou.prescribers.models import PrescriberOrganization
+from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
+from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory
+from tests.job_applications import factories as job_applications_factories
+from tests.prescribers.factories import (
     PrescriberOrganizationFactory,
     PrescriberOrganizationWith2MembershipFactory,
     PrescriberOrganizationWithMembershipFactory,
 )
-from itou.prescribers.management.commands.merge_organizations import organization_merge_into
-from itou.prescribers.models import PrescriberOrganization
-from itou.users.factories import ItouStaffFactory, PrescriberFactory
-from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
+from tests.users.factories import ItouStaffFactory, PrescriberFactory
 from tests.utils.test import TestCase
 
 

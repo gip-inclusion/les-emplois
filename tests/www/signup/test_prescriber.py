@@ -13,14 +13,8 @@ from django.utils.safestring import mark_safe
 
 from itou.openid_connect.inclusion_connect.constants import INCLUSION_CONNECT_SESSION_KEY
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
-from itou.prescribers.factories import (
-    PrescriberOrganizationFactory,
-    PrescriberOrganizationWithMembershipFactory,
-    PrescriberPoleEmploiFactory,
-)
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.users.enums import KIND_PRESCRIBER, UserKind
-from itou.users.factories import PrescriberFactory, SiaeStaffFactory
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
@@ -29,6 +23,12 @@ from itou.utils.urls import add_url_params
 from itou.www.signup.forms import PrescriberChooseKindForm
 from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
 from tests.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
+from tests.prescribers.factories import (
+    PrescriberOrganizationFactory,
+    PrescriberOrganizationWithMembershipFactory,
+    PrescriberPoleEmploiFactory,
+)
+from tests.users.factories import PrescriberFactory, SiaeStaffFactory
 from tests.utils.test import assertMessages
 
 

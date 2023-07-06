@@ -3,10 +3,10 @@ import io
 import pytest
 from django.core.management import call_command
 
-from itou.employee_record import factories
 from itou.employee_record.enums import Status
 from itou.employee_record.management.commands import archive_employee_records
 from itou.employee_record.models import EmployeeRecord
+from tests.employee_record import factories
 
 
 @pytest.fixture(name="command")

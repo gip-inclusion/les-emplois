@@ -2,10 +2,10 @@ import pytest
 from django.urls import reverse
 
 from itou.employee_record.enums import Status
-from itou.employee_record.factories import EmployeeRecordWithProfileFactory
-from itou.job_applications.factories import JobApplicationWithCompleteJobSeekerProfileFactory
-from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
 from itou.utils.templatetags import format_filters
+from tests.employee_record.factories import EmployeeRecordWithProfileFactory
+from tests.job_applications.factories import JobApplicationWithCompleteJobSeekerProfileFactory
+from tests.siaes.factories import SiaeWithMembershipAndJobsFactory
 from tests.utils.test import TestCase
 
 

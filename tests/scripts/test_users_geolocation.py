@@ -9,7 +9,7 @@ from django.core import management
 from django.test import override_settings
 from httpx import Response
 
-from itou.users.factories import JobSeekerWithAddressFactory
+from tests.users.factories import JobSeekerWithAddressFactory
 from tests.utils.test import TestCase
 
 

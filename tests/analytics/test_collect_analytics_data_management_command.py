@@ -8,9 +8,9 @@ from django.db import models
 from django.utils import timezone
 from freezegun import freeze_time
 
-from itou.analytics import factories
 from itou.analytics.management.commands import collect_analytics_data
 from itou.analytics.models import Datum, DatumCode
+from tests.analytics import factories
 
 
 class CodeTest(models.TextChoices):

@@ -3,7 +3,7 @@ import factory
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution, InstitutionMembership
-from itou.users.factories import LaborInspectorFactory
+from tests.users.factories import LaborInspectorFactory
 
 
 class InstitutionFactory(factory.django.DjangoModelFactory):

@@ -1,11 +1,11 @@
 from itou.job_applications.enums import RefusalReason
-from itou.job_applications.factories import (
+from itou.metabase.tables.job_applications import TABLE
+from itou.prescribers.enums import PrescriberOrganizationKind
+from tests.job_applications.factories import (
     JobApplicationFactory,
     JobApplicationSentByPrescriberOrganizationFactory,
     JobApplicationSentByPrescriberPoleEmploiFactory,
 )
-from itou.metabase.tables.job_applications import TABLE
-from itou.prescribers.enums import PrescriberOrganizationKind
 from tests.utils.test import TestCase
 
 

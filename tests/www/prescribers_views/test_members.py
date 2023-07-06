@@ -1,7 +1,7 @@
 from django.core import mail
 from django.urls import reverse
 
-from itou.prescribers.factories import (
+from tests.prescribers.factories import (
     PrescriberFactory,
     PrescriberOrganizationWith2MembershipFactory,
     PrescriberOrganizationWithMembershipFactory,
