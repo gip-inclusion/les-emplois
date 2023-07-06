@@ -960,7 +960,7 @@ class ApplicationResumeView(ApplicationBaseView):
         )
         self.s3_upload = S3Upload(kind="resume")
 
-    def dispatch(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         # Prevent multiple rapid clicks on the submit button to create multiple job applications.
         job_application = (
             self.job_seeker.job_applications.filter(to_siae=self.siae).created_in_past(seconds=10).first()
@@ -971,10 +971,6 @@ class ApplicationResumeView(ApplicationBaseView):
                     "apply:application_end", kwargs={"siae_pk": self.siae.pk, "application_pk": job_application.pk}
                 )
             )
-
-        return super().dispatch(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
         if self.form.is_valid():
             # Fill the job application with the required information
             job_application = self.form.save(commit=False)
