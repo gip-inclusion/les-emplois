@@ -76,7 +76,7 @@ def _check_job_seeker_approval(request, job_seeker, siae):
             raise PermissionDenied(error)
 
 
-class ApplyStepBaseView(LoginRequiredMixin, SessionNamespaceRequiredMixin, TemplateView):
+class ApplyStepBaseView(LoginRequiredMixin, TemplateView):
     def __init__(self):
         super().__init__()
         self.siae = None
@@ -107,8 +107,6 @@ class ApplyStepBaseView(LoginRequiredMixin, SessionNamespaceRequiredMixin, Templ
 
 
 class ApplicationBaseView(ApplyStepBaseView):
-    required_session_namespaces = ["apply_session"]
-
     def __init__(self):
         super().__init__()
 
@@ -118,6 +116,9 @@ class ApplicationBaseView(ApplyStepBaseView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
+        if not request.user.is_authenticated:
+            # Do nothing, LoginRequiredMixin will raise in dispatch()
+            return
         self.job_seeker = get_object_or_404(User, pk=kwargs["job_seeker_pk"])
         _check_job_seeker_approval(request, self.job_seeker, self.siae)
         if self.siae.kind == SiaeKind.GEIQ:
@@ -152,8 +153,6 @@ class ApplicationBaseView(ApplyStepBaseView):
 
 
 class ApplyStepForJobSeekerBaseView(ApplyStepBaseView):
-    required_session_namespaces = ["apply_session"]
-
     def __init__(self):
         super().__init__()
         self.job_seeker = None
@@ -174,8 +173,6 @@ class ApplyStepForJobSeekerBaseView(ApplyStepBaseView):
 
 
 class ApplyStepForSenderBaseView(ApplyStepBaseView):
-    required_session_namespaces = ["apply_session"]
-
     def __init__(self):
         super().__init__()
         self.sender = None
@@ -340,8 +337,8 @@ class CheckNIRForSenderView(ApplyStepForSenderBaseView):
         }
 
 
-class SearchByEmailForSenderView(ApplyStepForSenderBaseView):
-    required_session_namespaces = ApplyStepForSenderBaseView.required_session_namespaces + ["job_seeker_session"]
+class SearchByEmailForSenderView(SessionNamespaceRequiredMixin, ApplyStepForSenderBaseView):
+    required_session_namespaces = ["job_seeker_session"]
     template_name = "apply/submit_step_job_seeker.html"
 
     def __init__(self):
@@ -429,8 +426,8 @@ class SearchByEmailForSenderView(ApplyStepForSenderBaseView):
         }
 
 
-class CreateJobSeekerForSenderBaseView(ApplyStepForSenderBaseView):
-    required_session_namespaces = ApplyStepForSenderBaseView.required_session_namespaces + ["job_seeker_session"]
+class CreateJobSeekerForSenderBaseView(SessionNamespaceRequiredMixin, ApplyStepForSenderBaseView):
+    required_session_namespaces = ["job_seeker_session"]
 
     def __init__(self):
         super().__init__()
@@ -753,6 +750,9 @@ class ApplicationJobsView(ApplicationBaseView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
+        if not self.apply_session.exists():
+            self.apply_session.init({})
+
         self.form = ApplicationJobsForm(
             self.siae,
             initial={"selected_jobs": self.apply_session.get("selected_jobs", [])},
@@ -949,6 +949,9 @@ class ApplicationResumeView(ApplicationBaseView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
+        if not self.apply_session.exists():
+            self.apply_session.init({})
+
         self.form = SubmitJobApplicationForm(
             siae=self.siae,
             user=request.user,
@@ -1092,9 +1095,7 @@ class ApplicationEndView(ApplyStepBaseView):
         }
 
 
-class UpdateJobSeekerBaseView(ApplyStepBaseView):
-    required_session_namespaces = ["apply_session"]
-
+class UpdateJobSeekerBaseView(SessionNamespaceRequiredMixin, ApplyStepBaseView):
     def __init__(self):
         super().__init__()
         self.job_seeker_session = None
@@ -1143,6 +1144,9 @@ class UpdateJobSeekerStep1View(UpdateJobSeekerBaseView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
+        if not request.user.is_authenticated:
+            # Do nothing, LoginRequiredMixin will raise in dispatch()
+            return
         if not self.job_seeker_session.exists():
             self.job_seeker_session.init({"user": {}})
 
