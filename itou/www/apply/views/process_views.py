@@ -28,7 +28,7 @@ from itou.utils import constants as global_constants
 from itou.utils.htmx import hx_trigger_modal_control
 from itou.utils.perms.prescriber import get_all_available_job_applications_as_prescriber
 from itou.utils.perms.user import get_user_info
-from itou.utils.urls import get_external_link_markup, get_safe_url
+from itou.utils.urls import add_url_params, get_external_link_markup, get_safe_url
 from itou.www.apply.forms import (
     AcceptForm,
     AnswerForm,
@@ -604,26 +604,28 @@ def geiq_eligibility(request, job_application_id, template_name="apply/process_g
         "apply:details_for_siae", kwargs={"job_application_id": job_application.pk}
     )
     next_url = request.GET.get("next_url")
-    form = CheckJobSeekerGEIQEligibilityForm(hx_post_url=request.path, data=request.POST or None)
+    # Pass get_full_path to keep back/next_url query params
+    form = CheckJobSeekerGEIQEligibilityForm(hx_post_url=request.get_full_path(), data=request.POST or None)
+    geiq_criteria_form_url = add_url_params(
+        reverse("apply:geiq_eligibility_criteria", kwargs={"job_application_id": job_application.pk}),
+        {
+            "back_url": back_url,
+            "next_url": next_url,
+        },
+    )
 
     if request.method == "POST" and form.is_valid() and request.htmx:
         if form.cleaned_data["choice"]:
-            return HttpResponseRedirect(
-                reverse("apply:geiq_eligibility_criteria", kwargs={"job_application_id": job_application.pk})
-            )
+            return HttpResponseRedirect(geiq_criteria_form_url)
         else:
             return render(
                 request,
                 "apply/includes/geiq/continue_without_geiq_diagnosis_form.html",
                 context={
-                    "next_url": request.session.get("next_url"),  # set previously by the GET request
+                    "next_url": next_url,
                     "progress": 66,
                 },
             )
-
-    navigation = {"next_url": next_url, "back_url": back_url}
-
-    request.session.update(navigation)
 
     context = {
         "progress": 33,
@@ -631,7 +633,10 @@ def geiq_eligibility(request, job_application_id, template_name="apply/process_g
         "job_application": job_application,
         "job_seeker": job_application.job_seeker,
         "form": form,
-    } | navigation
+        "back_url": back_url,
+        "next_url": next_url,
+        "geiq_criteria_form_url": geiq_criteria_form_url,
+    }
 
     return render(request, template_name, context)
 
@@ -653,10 +658,11 @@ def geiq_eligibility_criteria(
     form = GEIQAdministrativeCriteriaForGEIQForm(
         job_application.to_siae,
         diagnosis.administrative_criteria.all() if diagnosis else [],
-        request.path,
+        # Pass get_full_path to keep back/next_url query params
+        request.get_full_path(),
         data=request.POST or None,
     )
-    next_url = request.session.get("next_url")
+    next_url = request.GET.get("next_url")
     allowance_amount = None
 
     if request.method == "POST" and form.is_valid():
@@ -670,9 +676,6 @@ def geiq_eligibility_criteria(
                 GEIQEligibilityDiagnosis.create_eligibility_diagnosis(
                     job_application.job_seeker, request.user, job_application.to_siae, criteria
                 )
-
-            del request.session["back_url"]
-            del request.session["next_url"]
 
             return HttpResponseRedirect(next_url)
 

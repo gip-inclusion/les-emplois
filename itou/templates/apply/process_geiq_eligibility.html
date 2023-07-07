@@ -53,7 +53,7 @@
                         <div class="row">
                             <div class="col-7">
                                 <div id="form_errors"></div>
-                                <form action="{% url "apply:geiq_eligibility_criteria" job_application_id=job_application.pk %}" method="post" hx-target="#geiq_form">
+                                <form action="{{ geiq_criteria_form_url }}" method="post" hx-target="#geiq_form">
                                     {% csrf_token %}
                                     <div id="geiq_form">
                                         <hr>
