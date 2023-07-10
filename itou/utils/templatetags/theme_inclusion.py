@@ -48,4 +48,7 @@ def itou_toast_title(message):
 
 @register.filter
 def itou_toast_content(message):
-    return message.message.split("||", maxsplit=1)[1]
+    try:
+        return message.message.split("||", maxsplit=1)[1]
+    except IndexError:
+        return None
