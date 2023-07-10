@@ -232,7 +232,7 @@ class DeclareProlongationForm(forms.ModelForm):
             is_authorized_prescriber = self.validated_by and self.validated_by.is_prescriber_with_authorized_org
 
             if not is_authorized_prescriber:
-                # Either does not exists or is not an authorized prescriber
+                # Either does not exist or is not an authorized prescriber
                 self.add_error(
                     "email",
                     "Ce prescripteur n'a pas de compte sur les emplois de l'inclusion. "
