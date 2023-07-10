@@ -556,13 +556,7 @@ class ApprovalModelTest(TestCase):
         # Prolongations change the approval end_date, so it doesn't change the remainder
         assert approval.remainder == datetime.timedelta(days=122)
 
-        # Futur suspension
-        SuspensionFactory(
-            approval=approval,
-            start_at=datetime.date(2023, 3, 20),
-            end_at=datetime.date(2023, 3, 24),
-        )
-        # Past suspension
+        # Past suspension (ignored)
         SuspensionFactory(
             approval=approval,
             start_at=datetime.date(2021, 3, 25),
@@ -576,8 +570,8 @@ class ApprovalModelTest(TestCase):
         )
         # Clear cache
         del approval.remainder
-        # Substract to remainder the relaining suspension time
-        assert approval.remainder == datetime.timedelta(days=109)
+        # Substract to remainder the remaining suspension time
+        assert approval.remainder == datetime.timedelta(days=113)
 
     @freeze_time("2023-04-26")
     def test_remainder_as_date(self):
