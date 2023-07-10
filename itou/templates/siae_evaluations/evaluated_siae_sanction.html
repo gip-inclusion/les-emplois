@@ -1,4 +1,5 @@
 {% extends BASE_TEMPLATE %}
+{% load str_filters %}
 
 {% block title %}Notification de sanction pour {{ evaluated_siae.siae }} {{ block.super }}{% endblock %}
 
@@ -34,7 +35,7 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <h2>Sanction{{ sanctions.count_active|pluralize }}</h2>
+                            <h2>Sanction{{ sanctions.count_active|pluralizefr }}</h2>
 
                             {% if sanctions.training_session %}
                                 <h3 class="mt-5">Participation à une session de présentation de l’auto-prescription</h3>

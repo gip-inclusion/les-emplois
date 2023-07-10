@@ -67,7 +67,7 @@ class CardViewTest(TestCase):
                  href="#recrutements-en-cours"
                  id="recrutements-en-cours-tab"
                  role="tab">
-               Recrutements en cours
+               Recrutement en cours
                <span class="badge badge-sm badge-primary badge-pill text-white ml-2">
                 0
                </span>
@@ -440,7 +440,7 @@ class CardViewTest(TestCase):
                  href="#recrutements-en-cours"
                  id="recrutements-en-cours-tab"
                  role="tab">
-               Recrutements en cours
+               Recrutement en cours
                <span class="badge badge-sm badge-primary badge-pill text-white ml-2">
                 0
                </span>
