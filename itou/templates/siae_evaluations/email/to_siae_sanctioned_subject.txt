@@ -1,4 +1,5 @@
 {% extends "layout/base_email_text_subject.txt" %}
+{% load str_filters %}
 {% block subject %}
-Notification de sanction{{ sanctions.count_active|pluralize }}
+Notification de sanction{{ sanctions.count_active|pluralizefr }}
 {% endblock %}

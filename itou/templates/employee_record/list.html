@@ -1,6 +1,7 @@
 {% extends BASE_TEMPLATE %}
 {% load static %}
 {% load format_filters %}
+{% load str_filters %}
 {% load list_filters %}
 {% load bootstrap4 %}
 
@@ -158,7 +159,7 @@
                         <div class="d-flex align-items-center">
                             <div class="flex-grow-1">
                                 {% with cnt=navigation_pages.paginator.count %}
-                                    <span class="h4 m-0">{{ cnt|default:"Aucun" }} résultat{{ cnt|pluralize }}</span>
+                                    <span class="h4 m-0">{{ cnt|default:"Aucun" }} résultat{{ cnt|pluralizefr }}</span>
                                 {% endwith %}
                             </div>
                             <div>

@@ -1,5 +1,6 @@
 {% extends BASE_TEMPLATE %}
 {% load format_filters %}
+{% load str_filters %}
 
 {% block title %}{{ job.display_name }} - {{ siae.display_name }} {{ block.super }}{% endblock %}
 
@@ -67,7 +68,7 @@
                                 {% if others_active_jobs and not siae.block_job_applications %}
                                     <hr>
                                     <h2 class="h2">
-                                        Consulter le{{ others_active_jobs|pluralize }} recrutement{{ others_active_jobs|pluralize }} en cours dans cette structure
+                                        Consulter le{{ others_active_jobs|pluralizefr }} recrutement{{ others_active_jobs|pluralizefr }} en cours dans cette structure
                                     </h2>
                                     <ul class="list-group list-group-flush mb-4">
                                         {% for other_job in others_active_jobs %}

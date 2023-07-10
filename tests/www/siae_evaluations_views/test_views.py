@@ -392,7 +392,7 @@ class EvaluatedSiaeSanctionViewTest(TestCase):
             """
             <div class="card-body">
              <h2>
-              Sanctions
+              Sanction
              </h2>
              <h3 class="mt-5">
               Ne pas sanctionner

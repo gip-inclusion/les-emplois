@@ -1,6 +1,7 @@
 {% load static %}
 {% load call_method %}
 {% load format_filters %}
+{% load str_filters %}
 {% comment %}
 
 Arguments:
@@ -52,7 +53,7 @@ Arguments:
         <p class="mb-1">Date de début : {{ common_approval.start_at|date:"d/m/Y" }}</p>
         <ul class="list-unstyled">
             <li class="h4 mt-4 mb-2">
-                Nombre de jours restants sur le PASS IAE : {{ common_approval.remainder.days }} jour{{ common_approval.remainder.days|pluralize }} 
+                Nombre de jours restants sur le PASS IAE : {{ common_approval.remainder.days }} jour{{ common_approval.remainder.days|pluralizefr }} 
                 <i class="ri-information-line ri-xl"
                    data-toggle="tooltip"
                    title="Le reliquat est calculé sur la base d'un nombre de jours calendaires. Si le PASS IAE n'est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i>
@@ -118,7 +119,7 @@ Arguments:
                     </ul>
                 {% endif %}
                 {% if suspensions.older %}
-                    <p class="mb-1">Suspension{{ suspensions.older|pluralize }} passée{{ suspensions.older|pluralize }} :</p>
+                    <p class="mb-1">Suspension{{ suspensions.older|pluralizefr }} passée{{ suspensions.older|pluralizefr }} :</p>
                     <ul class="list-unstyled">
                         {% for s in suspensions.older %}
                             <li>
@@ -141,7 +142,7 @@ Arguments:
                 {% endif %}
                 {% if prolongations.not_in_progress %}
                     <p class="mb-1">
-                        Prolongation{{ prolongations.not_in_progress|pluralize }} passée{{ prolongations.not_in_progress|pluralize }} ou à venir :
+                        Prolongation{{ prolongations.not_in_progress|pluralizefr }} passée{{ prolongations.not_in_progress|pluralizefr }} ou à venir :
                     </p>
                     {% include "approvals/includes/prolongations_list.html" with prolongations=prolongations.not_in_progress %}
                 {% endif %}

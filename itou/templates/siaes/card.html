@@ -1,5 +1,6 @@
 {% extends BASE_TEMPLATE %}
 {% load format_filters %}
+{% load str_filters %}
 {% load static %}
 
 {% block title %}{{ siae.display_name }} {{ block.super }}{% endblock %}
@@ -121,13 +122,13 @@
                     <ul class="s-tabs-01__nav nav nav-tabs" role="tablist" aria-labelledby="metiers-title">
                         <li class="nav-item" role="presentation">
                             <a id="recrutements-en-cours-tab" class="nav-link active" role="tab" href="#recrutements-en-cours" data-toggle="tab" aria-selected="true" aria-controls="recrutements-en-cours">
-                                Recrutement{{ active_jobs_descriptions|pluralize }} en cours <span class="badge badge-sm badge-primary badge-pill text-white ml-2">{{ active_jobs_descriptions|length }}</span>
+                                Recrutement{{ active_jobs_descriptions|pluralizefr }} en cours <span class="badge badge-sm badge-primary badge-pill text-white ml-2">{{ active_jobs_descriptions|length }}</span>
                             </a>
                         </li>
                         {% if other_jobs_descriptions %}
                             <li class="nav-item" role="presentation">
                                 <a id="autres-metiers-tab" class="nav-link" role="tab" href="#autres-metiers" data-toggle="tab" aria-selected="false" aria-controls="autres-metiers">
-                                    Autre{{ other_jobs_descriptions|pluralize }} métier{{ other_jobs_descriptions|pluralize }} exercé{{ other_jobs_descriptions|pluralize }} <span class="badge badge-sm badge-pill badge-info-light text-dark ml-2">{{ other_jobs_descriptions|length }}</span>
+                                    Autre{{ other_jobs_descriptions|pluralizefr }} métier{{ other_jobs_descriptions|pluralizefr }} exercé{{ other_jobs_descriptions|pluralizefr }} <span class="badge badge-sm badge-pill badge-info-light text-dark ml-2">{{ other_jobs_descriptions|length }}</span>
                                 </a>
                             </li>
                         {% endif %}

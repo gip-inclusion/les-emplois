@@ -1,7 +1,8 @@
+{% load str_filters %}
 {% comment %} takes 1 argument: jobs_descriptions=<List of SiaeJobDescription> {% endcomment %}
 
 <p class="fs-sm text-secondary">
-    <b>{{ jobs_descriptions|length }} recrutement{{ jobs_descriptions|pluralize }} en cours</b>
+    <b>{{ jobs_descriptions|length }} recrutement{{ jobs_descriptions|pluralizefr }} en cours</b>
 </p>
 
 <ul class="list-group list-group-flush">
