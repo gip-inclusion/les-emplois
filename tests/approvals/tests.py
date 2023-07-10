@@ -1193,6 +1193,7 @@ class SuspensionModelTest(TestCase):
 
 
 class SuspensionModelTestTrigger(TestCase):
+    @freeze_time("2023-04-26")
     def test_save(self):
         """
         Test `trigger_update_approval_end_at` with SQL INSERT.
@@ -1202,12 +1203,15 @@ class SuspensionModelTestTrigger(TestCase):
 
         approval = ApprovalFactory(start_at=start_at)
         initial_duration = approval.duration
+        assert approval.suspended_until is None
 
         suspension = SuspensionFactory(approval=approval, start_at=start_at)
 
         approval.refresh_from_db()
         assert approval.duration == initial_duration + suspension.duration
+        assert approval.suspended_until == datetime.date(2026, 4, 25)
 
+    @freeze_time("2023-04-26")
     def test_delete(self):
         """
         Test `trigger_update_approval_end_at` with SQL DELETE.
@@ -1217,16 +1221,20 @@ class SuspensionModelTestTrigger(TestCase):
 
         approval = ApprovalFactory(start_at=start_at)
         initial_duration = approval.duration
+        assert approval.suspended_until is None
 
         suspension = SuspensionFactory(approval=approval, start_at=start_at)
         approval.refresh_from_db()
         assert approval.duration == initial_duration + suspension.duration
+        assert approval.suspended_until == datetime.date(2026, 4, 25)
 
         suspension.delete()
 
         approval.refresh_from_db()
         assert approval.duration == initial_duration
+        assert approval.suspended_until is None
 
+    @freeze_time("2023-04-26")
     def test_save_and_edit(self):
         """
         Test `trigger_update_approval_end_at` with SQL UPDATE.
@@ -1237,11 +1245,13 @@ class SuspensionModelTestTrigger(TestCase):
 
         approval = ApprovalFactory(start_at=start_at)
         initial_duration = approval.duration
+        assert approval.suspended_until is None
 
         # New suspension.
         suspension = SuspensionFactory(approval=approval, start_at=start_at)
         suspension_duration_1 = suspension.duration
         approval.refresh_from_db()
+        assert approval.suspended_until == datetime.date(2026, 4, 25)
         approval_duration_2 = approval.duration
 
         # Edit suspension to be shorter.
@@ -1249,6 +1259,7 @@ class SuspensionModelTestTrigger(TestCase):
         suspension.save()
         suspension_duration_2 = suspension.duration
         approval.refresh_from_db()
+        assert approval.suspended_until == datetime.date(2026, 2, 25)
         approval_duration_3 = approval.duration
 
         # Check suspension duration.

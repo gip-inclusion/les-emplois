@@ -255,6 +255,9 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         "pour lui pendant la période de suspension."
     )
 
+    # This denormalized field is maintained by a TRIGGER, avoids querying the
+    # approvals.Suspension table to get the state of an Approval.
+    suspended_until = models.DateField(null=True, editable=False, verbose_name="suspendu jusqu’à")
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="demandeur d'emploi",
