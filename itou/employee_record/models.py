@@ -381,7 +381,7 @@ class EmployeeRecord(ASPExchangeInformation):
         self.save()
 
     def update_as_archived(self):
-        # We only archive an employee record when the job seeker's approval is expired and can not longer be prolonged
+        # We only archive an employee record when the job seeker's approval is expired and can no longer be prolonged
         if self.job_application.approval.is_valid() or self.job_application.approval.can_be_prolonged:
             raise InvalidStatusError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
 
