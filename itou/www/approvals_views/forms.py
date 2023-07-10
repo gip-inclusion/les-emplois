@@ -11,7 +11,6 @@ from itou.approvals.enums import ProlongationReason
 from itou.approvals.models import Approval, Prolongation, Suspension
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
-from itou.siaes.enums import SiaeKind
 from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.widgets import DuetDatePickerWidget
@@ -111,17 +110,7 @@ class DeclareProlongationForm(forms.ModelForm):
             self.instance.approval = self.approval
             self.fields["reason"].initial = None  # Uncheck radio buttons.
 
-        # Since December 1, 2021, health context reason can no longer be used
-        self.fields["reason"].choices = [
-            item for item in self.fields["reason"].choices if item[0] != ProlongationReason.HEALTH_CONTEXT
-        ]
-
-        # `PARTICULAR_DIFFICULTIES` is allowed only for AI and ACI.
-        if self.siae.kind not in [SiaeKind.AI, SiaeKind.ACI]:
-            self.fields["reason"].choices = [
-                item for item in self.fields["reason"].choices if item[0] != ProlongationReason.PARTICULAR_DIFFICULTIES
-            ]
-
+        self.fields["reason"].choices = ProlongationReason.for_siae(self.siae)
         self.fields["reason"].widget.attrs.update(
             {
                 "hx-post": reverse("approvals:toggle_upload_panel", kwargs={"approval_id": self.instance.approval_id}),
