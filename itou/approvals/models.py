@@ -1,5 +1,7 @@
 import datetime
+import functools
 import logging
+import operator
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
@@ -1296,14 +1298,17 @@ class PoleEmploiApprovalManager(models.Manager):
 
         Their input formats can be checked to limit the risk of errors.
         """
-        filter_expression = Q(pk=None)  # no match
+        filters = []
         if user.nir:
             # Allow duplicated NIR within PE approvals, but that will most probably change with the
             # ApprovalsWrapper code revamp later on. For now there is no unicity constraint on this column.
-            filter_expression |= Q(nir=user.nir)
+            filters.append(Q(nir=user.nir))
         if user.pole_emploi_id and user.birthdate:
-            filter_expression |= Q(pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate)
-        return self.filter(filter_expression).order_by("-start_at")
+            filters.append(Q(pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate))
+        if not filters:
+            return self.none()
+        or_filters = functools.reduce(operator.__or__, filters)
+        return self.filter(or_filters).order_by("-start_at")
 
 
 class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
