@@ -11,7 +11,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.db import models
 from django.db.models import Case, Count, Q, When
-from django.db.models.functions import TruncDate
+from django.db.models.functions import Now, TruncDate
 from django.utils import timezone
 from django.utils.functional import cached_property
 from unidecode import unidecode
@@ -784,6 +784,10 @@ class Suspension(models.Model):
                     ),
                     ("approval", RangeOperators.EQUAL),
                 ),
+            ),
+            models.CheckConstraint(
+                check=Q(start_at__lte=TruncDate(Now())),
+                name="%(class)s_cannot_start_in_the_future",
             ),
         ]
 
