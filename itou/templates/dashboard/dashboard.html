@@ -278,7 +278,9 @@
                     {% endif %}
 
                     {% include "dashboard/includes/prescriber_job_applications_card.html" %}
-
+                    {% if current_prescriber_organization.is_authorized %}
+                        {% include "dashboard/includes/prescriber_job_seekers_card.html" %}
+                    {% endif %}
                 {% endif %}
                 {# end of if user.is_prescriber #}
 
