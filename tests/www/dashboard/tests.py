@@ -641,7 +641,7 @@ class DashboardViewTest(TestCase):
         self.assertNotContains(response, "Suspendre un PASS IAE")
 
         prescriber_org_pe = prescribers_factories.PrescriberOrganizationWithMembershipFactory(
-            kind=PrescriberOrganizationKind.PE
+            authorized=True, kind=PrescriberOrganizationKind.PE
         )
         prescriber_pe = prescriber_org_pe.members.first()
         self.client.force_login(prescriber_pe)
