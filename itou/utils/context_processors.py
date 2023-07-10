@@ -15,10 +15,10 @@ def expose_enums(*args):
     return {
         "ApprovalOrigin": approvals_enums.Origin,
         "JobApplicationOrigin": job_applications_enums.Origin,
-        "SenderKind": job_applications_enums.SenderKind,
-        "RefusalReason": job_applications_enums.RefusalReason,
-        "SiaeKind": siaes_enums.SiaeKind,
         "PrescriberOrganizationKind": prescribers_enums.PrescriberOrganizationKind,
+        "RefusalReason": job_applications_enums.RefusalReason,
+        "SenderKind": job_applications_enums.SenderKind,
+        "SiaeKind": siaes_enums.SiaeKind,
     }
 
 
