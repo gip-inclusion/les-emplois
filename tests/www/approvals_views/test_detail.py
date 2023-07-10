@@ -104,17 +104,18 @@ class TestApprovalDetailView:
             1  # fetch django session
             + 1  # fetch authenticated user
             + 1  # verify user is active (middleware)
-            + 2  # fetch siae membership and siae infos (middleware)
+            + 1  # fetch siae membership and siae infos (middleware)
             + 1  # place savepoint right after the middlewares
+            + 1  # get_current_siae_or_404 (ApprovalBaseViewMixin.setup)
             + 1  # job_seeker.approval
-            + 1  # approval.suspension_set.end_at >= today
-            + 1  # job_application.with_accepted_at annotation coming from next query
-            + 1  # select latest approval for user (can_be_prolonged)
             + 1  # select all latest suspensions to check their end date
+            + 1  # job_application.with_accepted_at annotation coming from next query
+            + 1  # approval.suspension active today
+            + 1  # Suspension.can_be_handled_by_siae >> User.last_accepted_job_application
+            + 1  # select latest approval for user (can_be_prolonged)
+            + 1  # approval.remainder fetches approval suspensions to compute remaining days.
             + 1  # release savepoint before the template rendering
-            + 1  # template: Suspension.can_be_handled_by_siae >> User.last_accepted_job_application
             + 1  # template: job_application.get_eligibility_diagnosis => Siae.is_subject_to_eligibility_rules
-            + 1  # template: approval.remainder fetches approval suspensions to compute remaining days.
             + 1  # template: approval.suspensions_for_status_card lists approval suspensions
             + 1  # template: approval prolongations list.
             + 1  # get job_application details (view queryset)
