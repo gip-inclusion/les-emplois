@@ -10,12 +10,16 @@
                     <i class="ri-close-line" aria-hidden="true"></i>
                 </button>
             </div>
-            <div class="toast-body">
-                {{ message|itou_toast_content }}
-                <button class="btn btn-block btn-outline-primary mt-3 d-block d-sm-none" data-dismiss="toast" aria-label="Fermer">
-                    J'ai compris
-                </button>
-            </div>
+            {% with toast_message=message|itou_toast_content %}
+                {% if toast_message %}
+                    <div class="toast-body">
+                        {{ toast_message }}
+                        <button class="btn btn-block btn-outline-primary mt-3 d-block d-sm-none" data-dismiss="toast" aria-label="Fermer">
+                            J'ai compris
+                        </button>
+                    </div>
+                {% endif %}
+            {% endwith %}
         </div>
     {% endif %}
 {% endfor %}
