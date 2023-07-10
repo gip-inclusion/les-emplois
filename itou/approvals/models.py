@@ -1368,7 +1368,10 @@ class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
         verbose_name = "Agrément Pôle emploi"
         verbose_name_plural = "Agréments Pôle emploi"
         ordering = ["-start_at"]
-        indexes = [models.Index(fields=["pole_emploi_id", "birthdate"], name="pe_id_and_birthdate_idx")]
+        indexes = [
+            models.Index(fields=["nir"], name="nir_idx"),
+            models.Index(fields=["pole_emploi_id", "birthdate"], name="pe_id_and_birthdate_idx"),
+        ]
 
     def __str__(self):
         return self.number
