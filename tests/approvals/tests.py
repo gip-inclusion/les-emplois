@@ -535,34 +535,37 @@ class ApprovalModelTest(TestCase):
         )
         assert approval.remainder == datetime.timedelta(days=122)
 
-        # Futur prolongation
+        # Futur prolongation, adding 4 days to approval.end_date.
         ProlongationFactory(
             approval=approval,
             start_at=datetime.date(2023, 3, 20),
             end_at=datetime.date(2023, 3, 24),
         )
-        # Past prolongation
+        # Past prolongation, adding 5 days to approval.end_date.
         ProlongationFactory(
             approval=approval,
             start_at=datetime.date(2021, 3, 25),
             end_at=datetime.date(2021, 3, 30),
         )
-        # Ongoing prolongation
+        # Ongoing prolongation, adding 30 days to approval.end_date.
         ProlongationFactory(
             approval=approval,
             start_at=datetime.date(2021, 11, 1),
             end_at=datetime.date(2021, 12, 1),
         )
-        # Prolongations change the approval end_date, so it doesn't change the remainder
-        assert approval.remainder == datetime.timedelta(days=122)
 
-        # Past suspension (ignored)
+        del approval.remainder
+        approval.refresh_from_db()
+        prolonged_remainder = 122 + 4 + 5 + 30
+        assert approval.remainder == datetime.timedelta(days=prolonged_remainder)
+
+        # Past suspension (ignored), adding 5 days to approval.end_date.
         SuspensionFactory(
             approval=approval,
             start_at=datetime.date(2021, 3, 25),
             end_at=datetime.date(2021, 3, 30),
         )
-        # Ongoing suspension
+        # Ongoing suspension, adding 30 days to approval.end_date, but only 9 of them remain.
         SuspensionFactory(
             approval=approval,
             start_at=datetime.date(2022, 11, 1),
@@ -570,8 +573,9 @@ class ApprovalModelTest(TestCase):
         )
         # Clear cache
         del approval.remainder
+        approval.refresh_from_db()
         # Substract to remainder the remaining suspension time
-        assert approval.remainder == datetime.timedelta(days=113)
+        assert approval.remainder == datetime.timedelta(days=(prolonged_remainder + 5 + 30 - 9))
 
     @freeze_time("2023-04-26")
     def test_remainder_as_date(self):
