@@ -549,8 +549,6 @@ class ApprovalModelTest(TestCase):
             start_at=datetime.date(2021, 11, 1),
             end_at=datetime.date(2021, 12, 1),
         )
-
-        del approval.remainder
         approval.refresh_from_db()
         prolonged_remainder = 122 + 4 + 5 + 30
         assert approval.remainder == datetime.timedelta(days=prolonged_remainder)
@@ -567,8 +565,6 @@ class ApprovalModelTest(TestCase):
             start_at=datetime.date(2022, 11, 1),
             end_at=datetime.date(2022, 12, 1),
         )
-        # Clear cache
-        del approval.remainder
         approval.refresh_from_db()
         # Substract to remainder the remaining suspension time
         assert approval.remainder == datetime.timedelta(days=(prolonged_remainder + 5 + 30 - 9))
