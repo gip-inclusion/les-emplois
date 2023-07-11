@@ -56,7 +56,7 @@ class SuspensionFactory(factory.django.DjangoModelFactory):
         model = Suspension
 
     approval = factory.SubFactory(ApprovalFactory)
-    start_at = factory.SelfAttribute("approval.start_at")
+    start_at = factory.Faker("date_between", start_date=factory.SelfAttribute("..approval.start_at"))
     end_at = factory.LazyAttribute(lambda obj: Suspension.get_max_end_at(obj.start_at))
     siae = factory.SubFactory(SiaeFactory)
 
@@ -68,7 +68,7 @@ class ProlongationFactory(factory.django.DjangoModelFactory):
         model = Prolongation
 
     approval = factory.SubFactory(ApprovalFactory)
-    start_at = factory.SelfAttribute("approval.start_at")
+    start_at = factory.Faker("date_between", start_date=factory.SelfAttribute("..approval.start_at"))
     end_at = factory.LazyAttribute(lambda obj: Prolongation.get_max_end_at(obj.start_at, reason=obj.reason))
     reason = ProlongationReason.COMPLETE_TRAINING.value
     reason_explanation = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
