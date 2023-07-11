@@ -13,7 +13,6 @@ from django.core import mail
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import IntegrityError, transaction
 from django.forms import model_to_dict
-from django.template.defaultfilters import title
 from django.test import TransactionTestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -24,12 +23,10 @@ from itou.approvals.admin_forms import ApprovalAdminForm
 from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
 from itou.approvals.enums import ApprovalStatus, Origin, ProlongationReason
 from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, Suspension
-from itou.approvals.notifications import NewProlongationToAuthorizedPrescriberNotification
 from itou.employee_record.enums import Status
 from itou.files.models import File
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.enums import SiaeKind
-from itou.utils import constants as global_constants
 from tests.approvals.factories import (
     ApprovalFactory,
     PoleEmploiApprovalFactory,
@@ -1600,33 +1597,6 @@ class ProlongationModelTest(TestCase):
 
         assert not prolongation2.has_reached_max_cumulative_duration()
         assert prolongation2.has_reached_max_cumulative_duration(additional_duration=datetime.timedelta(days=1))
-
-
-class ProlongationNotificationsTest(TestCase):
-    def test_new_prolongation_to_authorized_prescriber_notification(self):
-        prolongation = ProlongationFactory()
-
-        email = NewProlongationToAuthorizedPrescriberNotification(prolongation).email
-
-        # From
-        assert email.from_email == global_constants.ITOU_EMAIL_PROLONGATION
-
-        # To.
-        assert prolongation.validated_by.email in email.to
-        assert len(email.to) == 1
-
-        # Body.
-
-        assert prolongation.start_at.strftime("%d/%m/%Y") in email.body
-        assert prolongation.end_at.strftime("%d/%m/%Y") in email.body
-        assert prolongation.get_reason_display() in email.body
-        assert title(prolongation.declared_by.get_full_name()) in email.body
-
-        assert prolongation.declared_by_siae.display_name in email.body
-        assert prolongation.approval.number in email.body
-        assert title(prolongation.approval.user.first_name) in email.body
-        assert title(prolongation.approval.user.last_name) in email.body
-        assert prolongation.approval.user.birthdate.strftime("%d/%m/%Y") in email.body
 
 
 class ApprovalConcurrentModelTest(TransactionTestCase):

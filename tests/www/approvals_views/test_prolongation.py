@@ -11,7 +11,6 @@ from itou.approvals.models import Prolongation
 from itou.siaes.enums import SiaeKind
 from itou.utils.storage.s3 import S3Upload
 from itou.utils.widgets import DuetDatePickerWidget
-from itou.www.approvals_views.forms import DeclareProlongationForm
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.utils.storage.test import S3AccessingTestCase
@@ -46,20 +45,6 @@ class ApprovalProlongationTest(S3AccessingTestCase):
         self.siae_user = self.job_application.to_siae.members.first()
         self.approval = self.job_application.approval
         assert 0 == self.approval.prolongation_set.count()
-
-    def test_form_without_pre_existing_instance(self):
-        """
-        Test the default state of `DeclareProlongationForm`.
-        """
-        form = DeclareProlongationForm(approval=self.approval, siae=self.siae, data={})
-
-        assert form.fields["reason"].initial is None
-
-        # Ensure that `form.instance` is populated so that `Prolongation.clean()`
-        # is triggered from within the form validation step with the right data.
-        assert form.instance.declared_by_siae == self.siae
-        assert form.instance.approval == self.approval
-        assert form.instance.start_at == self.approval.end_at
 
     def test_prolong_approval_view(self):
         """
@@ -120,14 +105,12 @@ class ApprovalProlongationTest(S3AccessingTestCase):
         assert response.status_code == 302
         self.assertRedirects(response, back_url)
 
-        assert 1 == self.approval.prolongation_set.count()
-
-        prolongation = self.approval.prolongation_set.first()
-        assert prolongation.created_by == self.siae_user
-        assert prolongation.declared_by == self.siae_user
-        assert prolongation.declared_by_siae == self.job_application.to_siae
-        assert prolongation.validated_by == self.prescriber
-        assert prolongation.reason == post_data["reason"]
+        prolongation_request = self.approval.prolongationrequest_set.get()
+        assert prolongation_request.created_by == self.siae_user
+        assert prolongation_request.declared_by == self.siae_user
+        assert prolongation_request.declared_by_siae == self.job_application.to_siae
+        assert prolongation_request.validated_by == self.prescriber
+        assert prolongation_request.reason == post_data["reason"]
 
         # An email should have been sent to the chosen authorized prescriber.
         assert len(mail.outbox) == 1
@@ -239,10 +222,9 @@ class ApprovalProlongationTest(S3AccessingTestCase):
         response = self.client.post(url, data=post_data)
         assert response.status_code == 302
 
-        prolongation = self.approval.prolongation_set.first()
-
-        assert prolongation.report_file
-        assert prolongation.report_file.key == "prolongation_report/memento-mori.xslx"
+        prolongation_request = self.approval.prolongationrequest_set.get()
+        assert prolongation_request.report_file
+        assert prolongation_request.report_file.key == "prolongation_report/memento-mori.xslx"
 
     def test_prolongation_notification_contains_report_link(self):
         # Check that report file object is saved and linked to prolongation
@@ -279,9 +261,8 @@ class ApprovalProlongationTest(S3AccessingTestCase):
         assert email.to[0] == post_data["email"]
         assert email.subject == f"Demande de prolongation du PASS IAE de {self.approval.user.get_full_name()}"
 
-        prolongation = self.approval.prolongation_set.first()
-
-        assert prolongation.report_file.link in email.body
+        prolongation_request = self.approval.prolongationrequest_set.get()
+        assert prolongation_request.report_file.link in email.body
         assert self.PROLONGATION_EMAIL_REPORT_TEXT in email.body
 
     def test_check_single_prescriber_organization(self):
@@ -393,7 +374,6 @@ class ApprovalProlongationTest(S3AccessingTestCase):
         assert email.to[0] == post_data["email"]
         assert email.subject == f"Demande de prolongation du PASS IAE de {self.approval.user.get_full_name()}"
 
-        prolongation = self.approval.prolongation_set.first()
-
-        assert not prolongation.report_file
+        prolongation_request = self.approval.prolongationrequest_set.get()
+        assert not prolongation_request.report_file
         assert self.PROLONGATION_EMAIL_REPORT_TEXT not in email.body

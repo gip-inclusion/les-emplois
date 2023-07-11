@@ -1,0 +1,9 @@
+{% with label=prolongation_request.get_status_display base_classes="badge badge-xs badge-pill" %}
+    {% if prolongation_request.status == ProlongationRequestStatus.PENDING %}
+        <span class="{{ base_classes }} badge-accent-03 text-primary">{{ label }}</span>
+    {% elif prolongation_request.status == ProlongationRequestStatus.GRANTED %}
+        <span class="{{ base_classes }} badge-success">{{ label }}</span>
+    {% elif prolongation_request.status == ProlongationRequestStatus.DENIED %}
+        <span class="{{ base_classes }} badge-danger">{{ label }}</span>
+    {% endif %}
+{% endwith %}

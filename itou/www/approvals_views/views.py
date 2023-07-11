@@ -13,22 +13,23 @@ from django.views.generic import DetailView, ListView, TemplateView
 
 from itou.approvals import enums as approvals_enums
 from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
-from itou.approvals.models import Approval, PoleEmploiApproval, Suspension
+from itou.approvals.models import Approval, PoleEmploiApproval, ProlongationRequest, Suspension
 from itou.files.models import File
 from itou.job_applications.enums import Origin, SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.pagination import ItouPaginator
+from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.storage.s3 import S3Upload
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import UserExistsForm
 from itou.www.approvals_views.forms import (
     ApprovalForm,
-    DeclareProlongationForm,
     PoleEmploiApprovalSearchForm,
     SuspensionForm,
+    get_prolongation_form,
 )
 
 
@@ -209,7 +210,7 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
     back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
     preview = False
 
-    form = DeclareProlongationForm(approval=approval, siae=siae, data=request.POST or None)
+    form = get_prolongation_form(approval=approval, siae=siae, data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
         prolongation = form.save(commit=False)
@@ -221,16 +222,11 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
         elif request.POST.get("save"):
             if siae.can_upload_prolongation_report:
                 if key := form.cleaned_data.get("report_file_path"):
-                    file = File(key, timezone.now())
-                    prolongation.report_file = file
-                    file.save()
+                    prolongation.report_file = File(key, timezone.now())
+                    prolongation.report_file.save()
 
             prolongation.save()
-
-            if form.cleaned_data.get("email"):
-                # Send an email w/o DB changes
-                prolongation.notify_authorized_prescriber()
-
+            prolongation.notify_authorized_prescriber()
             messages.success(request, "Déclaration de prolongation enregistrée.")
             return HttpResponseRedirect(back_url)
 
@@ -276,7 +272,7 @@ class DeclareProlongationHTMXFragmentView(TemplateView):
         if not self.approval.can_be_prolonged:
             raise PermissionDenied()
 
-        self.form = DeclareProlongationForm(approval=self.approval, siae=self.siae, data=request.POST or None)
+        self.form = get_prolongation_form(approval=self.approval, siae=self.siae, data=request.POST or None)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -329,6 +325,49 @@ class ToggledUploadPanelView(DeclareProlongationHTMXFragmentView):
             "can_upload_prolongation_report": self.siae.can_upload_prolongation_report,
         }
         return context
+
+
+@login_required
+def prolongation_requests_list(request, template_name="approvals/prolongation_requests/list.html"):
+    current_organization = get_current_org_or_404(request)
+    if not current_organization.is_authorized:
+        raise Http404()
+
+    context = {
+        "prolongation_requests": ProlongationRequest.objects.filter(prescriber_organization=current_organization),
+    }
+    return render(request, template_name, context)
+
+
+@login_required
+def prolongation_request_show(
+    request, prolongation_request_id, template_name="approvals/prolongation_requests/show.html"
+):
+    current_organization = get_current_org_or_404(request)
+    prolongation_request = get_object_or_404(
+        ProlongationRequest.objects.filter(prescriber_organization=current_organization),
+        pk=prolongation_request_id,
+    )
+
+    if request.method == "POST":
+        action = request.POST.get("action")
+        if action in ["grant", "deny"]:
+            # Call the correct method
+            getattr(prolongation_request, action)(request.user)
+            # Show a toast
+            verbose_action = "acceptée" if action == "grant" else "refusée"
+            message = (
+                f"La prolongation de {prolongation_request.approval.user.get_full_name()} a bien été {verbose_action}."
+            )
+            messages.success(request, message, extra_tags="toast")
+
+            return HttpResponseRedirect(reverse("approvals:prolongation_requests_list"))
+
+    context = {
+        "prolongation_request": prolongation_request,
+        "matomo_custom_title": "Demande de prolongation",
+    }
+    return render(request, template_name, context)
 
 
 @login_required
