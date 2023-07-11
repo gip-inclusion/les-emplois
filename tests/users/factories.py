@@ -51,6 +51,7 @@ class UserFactory(factory.django.DjangoModelFactory):
             is_active=True,
             emails=factory.PostGeneration(_verify_emails_for_user),
         )
+        for_snapshot = factory.Trait(first_name="John", last_name="Doe", birthdate=datetime.date(2000, 1, 1))
 
     username = factory.Sequence("user_name{}".format)
     first_name = factory.Faker("first_name")

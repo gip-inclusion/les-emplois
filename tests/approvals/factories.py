@@ -10,6 +10,7 @@ from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, Pr
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.enums import SiaeKind
 from tests.eligibility.factories import EligibilityDiagnosisFactory
+from tests.files.factories import FileFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.siaes.factories import SiaeFactory
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
@@ -27,6 +28,12 @@ class ApprovalFactory(factory.django.DjangoModelFactory):
         expired = factory.Trait(
             start_at=factory.Faker("date_time_between", start_date="-5y", end_date="-3y"),
             end_at=factory.Faker("date_time_between", start_date="-3y", end_date="-2y"),
+        )
+        for_snapshot = factory.Trait(
+            number="999999999999",
+            user__for_snapshot=True,
+            start_at=datetime.date(2000, 1, 1),
+            end_at=datetime.date(3000, 1, 1),
         )
 
     user = factory.SubFactory(JobSeekerFactory)
@@ -64,6 +71,18 @@ class BaseProlongationFactory(factory.django.DjangoModelFactory):
     class Meta:
         abstract = True
 
+    class Params:
+        for_snapshot = factory.Trait(
+            approval__for_snapshot=True,
+            start_at=factory.SelfAttribute("approval.start_at"),
+            declared_by_siae__for_snapshot=True,
+            reason=ProlongationReason.SENIOR.value,
+            report_file=factory.SubFactory(FileFactory, for_snapshot=True),
+            require_phone_interview=True,
+            contact_email="email@example.com",
+            contact_phone="+33123456789",
+        )
+
     approval = factory.SubFactory(ApprovalFactory)
     start_at = factory.Faker("date_between", start_date=factory.SelfAttribute("..approval.start_at"))
     end_at = factory.LazyAttribute(lambda obj: Prolongation.get_max_end_at(obj.start_at, reason=obj.reason))
@@ -86,6 +105,12 @@ class ProlongationRequestFactory(BaseProlongationFactory):
 
     class Meta:
         model = ProlongationRequest
+
+    class Params:
+        for_snapshot = factory.Trait(
+            **BaseProlongationFactory._meta.parameters["for_snapshot"].overrides,
+            prescriber_organization__for_snapshot=True,
+        )
 
 
 class ProlongationFactory(BaseProlongationFactory):

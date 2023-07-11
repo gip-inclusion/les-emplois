@@ -28,7 +28,7 @@ from itou.utils.apis.pole_emploi import PoleEmploiAPIBadResponse, PoleEmploiAPIE
 from itou.utils.models import DateRange
 from itou.utils.validators import alphanumeric, validate_siret
 
-from . import enums
+from . import enums, notifications
 
 
 logger = logging.getLogger(__name__)
@@ -1179,6 +1179,9 @@ class ProlongationRequest(CommonProlongation):
             ),
         ]
 
+    def notify_authorized_prescriber(self):
+        notifications.ProlongationRequestCreated(self).send()
+
     def grant(self, user):
         if not user.is_prescriber_of_authorized_organization(self.prescriber_organization_id):
             raise PermissionDenied()
@@ -1193,6 +1196,9 @@ class ProlongationRequest(CommonProlongation):
             prolongation.save()
             self.save()
 
+        notifications.ProlongationRequestGrantedEmployer(self).send()
+        notifications.ProlongationRequestGrantedJobSeeker(self).send()
+
         return prolongation
 
     def deny(self, user):
@@ -1204,6 +1210,9 @@ class ProlongationRequest(CommonProlongation):
         self.processed_at = timezone.now()
         self.updated_by = user
         self.save()
+
+        notifications.ProlongationRequestDeniedEmployer(self).send()
+        notifications.ProlongationRequestDeniedJobSeeker(self).send()
 
 
 class ProlongationQuerySet(models.QuerySet):
