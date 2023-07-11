@@ -60,58 +60,55 @@
 
                                 </form>
                             {% endblock %}
+                        </div>
+                    {% else %}
+                        {# Preview mode: ask for confirmation before committing to DB. #}
 
-                        {% else %}
-                            {# Preview mode: ask for confirmation before committing to DB. #}
+                        <form method="post" action="" class="js-prevent-multiple-submit">
 
-                            <form method="post" action="" class="js-prevent-multiple-submit">
+                            {% csrf_token %}
 
-                                {% csrf_token %}
+                            {# Hide all form fields. #}
+                            {% for field in form %}
+                                {% if field.value %}<input type="hidden" name="{{ field.name }}" value="{{ field.value }}"/>{% endif %}
+                            {% endfor %}
 
-                                {# Hide all form fields. #}
-                                {% for field in form %}
-                                    {% if field.value %}<input type="hidden" name="{{ field.name }}" value="{{ field.value }}"/>{% endif %}
-                                {% endfor %}
-
-                                {# Show the user a preview of the prolongation. #}
-                                <div class="card my-3 text-center">
-                                    <div class="card-body">
-                                        <h5 class="h4 card-title">
-                                            Vous êtes sur le point de déclarer une prolongation de PASS IAE pour la raison suivante :
-                                        </h5>
-                                        <p class="card-text">{{ form.instance.get_reason_display }}</p>
-                                        <p class="card-text text-success">
-                                            À partir du
-                                            <span class="badge badge-pill badge-success">{{ form.instance.start_at|date:"d/m/Y" }}</span>
-                                            jusqu'au
-                                            <span class="badge badge-pill badge-success">{{ form.instance.end_at|date:"d/m/Y" }}</span>
-                                        </p>
-                                        {% if form.instance.validated_by.email %}
-                                            <p class="card-text">
-                                                Un e-mail sera envoyé au prescripteur habilité désigné pour autoriser la prolongation :
-                                                <b>{{ form.instance.validated_by.get_full_name|title }}</b>
-                                                ({{ form.instance.validated_by.email }})
-                                            </p>
-                                        {% endif %}
-                                    </div>
-                                </div>
-
-                                <div class="alert alert-warning" role="status">
-                                    <p>
-                                        En confirmant cette déclaration je certifie sur l'honneur que le motif de prolongation choisi correspond à la situation du salarié.
+                            {# Show the user a preview of the prolongation. #}
+                            <div class="card my-3 text-center">
+                                <div class="card-body">
+                                    <h5 class="h4 card-title">
+                                        Vous êtes sur le point de déclarer une prolongation de PASS IAE pour la raison suivante :
+                                    </h5>
+                                    <p class="card-text">{{ form.instance.get_reason_display }}</p>
+                                    <p class="card-text text-success">
+                                        À partir du
+                                        <span class="badge badge-pill badge-success">{{ form.instance.start_at|date:"d/m/Y" }}</span>
+                                        jusqu'au
+                                        <span class="badge badge-pill badge-success">{{ form.instance.end_at|date:"d/m/Y" }}</span>
                                     </p>
-                                    {% buttons %}
-                                        {# Allow the user to modify the prolongation: edit=1. #}
-                                        <button type="submit" name="edit" value="1" class="btn btn-secondary">Annuler</button>
-                                        {# Create a prolongation: save=1. #}
-                                        <button type="submit" name="save" value="1" class="btn btn-primary">Confirmer la déclaration</button>
-                                    {% endbuttons %}
+                                    {% if form.instance.validated_by.email %}
+                                        <p class="card-text">
+                                            Un e-mail sera envoyé au prescripteur habilité désigné pour autoriser la prolongation :
+                                            <b>{{ form.instance.validated_by.get_full_name|title }}</b>
+                                            ({{ form.instance.validated_by.email }})
+                                        </p>
+                                    {% endif %}
                                 </div>
+                            </div>
 
-                            </form>
-
-                        {% endif %}
-                    </div>
+                            <div class="alert alert-warning" role="status">
+                                <p>
+                                    En confirmant cette déclaration je certifie sur l'honneur que le motif de prolongation choisi correspond à la situation du salarié.
+                                </p>
+                                {% buttons %}
+                                    {# Allow the user to modify the prolongation: edit=1. #}
+                                    <button type="submit" name="edit" value="1" class="btn btn-secondary">Annuler</button>
+                                    {# Create a prolongation: save=1. #}
+                                    <button type="submit" name="save" value="1" class="btn btn-primary">Confirmer la déclaration</button>
+                                {% endbuttons %}
+                            </div>
+                        </form>
+                    {% endif %}
                 </div>
             </div>
         </div>
