@@ -56,7 +56,7 @@ class SuspensionFactory(factory.django.DjangoModelFactory):
         model = Suspension
 
     approval = factory.SubFactory(ApprovalFactory)
-    start_at = factory.LazyAttribute(lambda obj: obj.approval.start_at)
+    start_at = factory.SelfAttribute("approval.start_at")
     end_at = factory.LazyAttribute(lambda obj: Suspension.get_max_end_at(obj.start_at))
     siae = factory.SubFactory(SiaeFactory)
 
@@ -68,13 +68,13 @@ class ProlongationFactory(factory.django.DjangoModelFactory):
         model = Prolongation
 
     approval = factory.SubFactory(ApprovalFactory)
-    start_at = factory.LazyAttribute(lambda obj: obj.approval.start_at)
+    start_at = factory.SelfAttribute("approval.start_at")
     end_at = factory.LazyAttribute(lambda obj: Prolongation.get_max_end_at(obj.start_at, reason=obj.reason))
     reason = ProlongationReason.COMPLETE_TRAINING.value
     reason_explanation = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
     declared_by = factory.LazyAttribute(lambda obj: obj.declared_by_siae.members.first())
     declared_by_siae = factory.SubFactory(SiaeFactory, with_membership=True)
-    created_by = factory.LazyAttribute(lambda obj: obj.declared_by)
+    created_by = factory.SelfAttribute("declared_by")
 
     @factory.post_generation
     def set_validated_by(self, create, extracted, **kwargs):
@@ -96,7 +96,7 @@ class PoleEmploiApprovalFactory(factory.django.DjangoModelFactory):
     pe_structure_code = factory.fuzzy.FuzzyText(length=5, chars=string.digits)
     pole_emploi_id = factory.fuzzy.FuzzyText(length=8, chars=string.digits)
     number = factory.fuzzy.FuzzyText(length=12, chars=string.digits)
-    birth_name = factory.LazyAttribute(lambda obj: obj.last_name)
+    birth_name = factory.SelfAttribute("last_name")
     birthdate = factory.fuzzy.FuzzyDate(datetime.date(1968, 1, 1), datetime.date(2000, 1, 1))
     start_at = factory.LazyFunction(datetime.date.today)
     end_at = factory.LazyAttribute(lambda obj: obj.start_at + relativedelta(years=2) - relativedelta(days=1))
