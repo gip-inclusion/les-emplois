@@ -474,7 +474,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         upper_bound = self.end_at + relativedelta(months=self.IS_OPEN_TO_PROLONGATION_BOUNDARIES_MONTHS_AFTER_END)
         return lower_bound <= now <= upper_bound
 
-    @cached_property
+    @property
     def can_be_prolonged(self):
         # Since it is possible to prolong even 3 months after the end of a PASS IAE,
         # it is possible that another one has been issued in the meantime. Thus we

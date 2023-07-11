@@ -320,8 +320,6 @@ class TestApprovalDetailView:
 
         approval.end_at = timezone.localdate() - relativedelta(months=4)
         approval.save()
-        # Clear cached property
-        del approval.can_be_prolonged
         assert not approval.can_be_prolonged
         response = client.get(url)
         assertNotContains(response, reverse("approvals:declare_prolongation", kwargs={"approval_id": approval.id}))
