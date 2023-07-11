@@ -362,9 +362,9 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
 
     # Suspension.
 
-    @cached_property
+    @property
     def is_suspended(self):
-        return self.suspension_set.in_progress().exists()
+        return bool(self.suspended_until and self.suspended_until >= timezone.localdate())
 
     @cached_property
     def suspensions_by_start_date_asc(self):
@@ -387,7 +387,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
     def last_old_suspension(self, exclude_pk=None):
         return self.suspensions_by_start_date_asc.exclude(pk=exclude_pk).old().last()
 
-    @cached_property
+    @property
     def can_be_suspended(self):
         return self.is_in_progress and not self.is_suspended
 
@@ -399,7 +399,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
     def last_in_progress_suspension(self):
         return self.suspension_set.in_progress().order_by("start_at").last()
 
-    @cached_property
+    @property
     def can_be_unsuspended(self):
         if self.is_suspended:
             return self.last_in_progress_suspension.reason in Suspension.REASONS_ALLOWING_UNSUSPEND

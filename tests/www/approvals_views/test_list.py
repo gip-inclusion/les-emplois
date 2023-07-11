@@ -94,7 +94,6 @@ class TestApprovalsListView:
             + 1  # count (from paginator)
             + 1  # fetch siae membership (from context processor)
             + 1  # fetch approvals
-            + 2  # check if in progress suspensions exist for each approval (Approval.is_suspended)
             + 3  # savepoint, update session, release savepoint
         ):
             response = client.get(url)

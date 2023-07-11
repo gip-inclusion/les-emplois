@@ -110,7 +110,6 @@ class TestApprovalDetailView:
             + 1  # job_seeker.approval
             + 1  # select all latest suspensions to check their end date
             + 1  # job_application.with_accepted_at annotation coming from next query
-            + 1  # approval.suspension active today
             + 1  # Suspension.can_be_handled_by_siae >> User.last_accepted_job_application
             + 1  # select latest approval for user (can_be_prolonged)
             + 1  # approval.remainder fetches approval suspensions to compute remaining days.
@@ -188,7 +187,6 @@ class TestApprovalDetailView:
             # get_context_data
             + 1  # select all latest suspensions to check their end date (with prefetch)
             + 1  # for every *active* suspension, check if there is an accepted job application after it
-            + 1  # approval.suspension_set.end_at >= today >= approval.suspension_set.start_at (.can_be_suspended)
             + 1  # job_application.with_accepted_at annotation coming from (.last_hire_was_made_by_siae)
             + 1  # siae infos (.last_hire_was_made_by_siae)
             + 1  # user approvals (.is_last_for_user)
@@ -298,9 +296,7 @@ class TestApprovalDetailView:
             start_at=timezone.localdate() - relativedelta(days=1),
             end_at=timezone.localdate() + relativedelta(days=1),
         )
-        # Clear cached property
-        del approval.can_be_suspended
-        del approval.is_suspended
+        approval.refresh_from_db()
         assert not approval.can_be_suspended_by_siae(siae)
         response = client.get(url)
         assertNotContains(response, reverse("approvals:suspend", kwargs={"approval_id": approval.id}))

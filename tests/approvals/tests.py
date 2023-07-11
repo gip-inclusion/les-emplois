@@ -354,6 +354,7 @@ class ApprovalModelTest(TestCase):
                 end_at=today + relativedelta(months=1),
                 reason=reason_to_refuse,
             )
+            approval.refresh_from_db()
             assert not approval.can_be_unsuspended
             suspension.delete()
             approval.delete()
@@ -366,7 +367,7 @@ class ApprovalModelTest(TestCase):
                 end_at=today + relativedelta(months=1),
                 reason=reason,
             )
-
+            approval.refresh_from_db()
             assert approval.can_be_unsuspended
             suspension.delete()
             approval.delete()
@@ -430,6 +431,7 @@ class ApprovalModelTest(TestCase):
                     start_at=suspension_start_date,
                     end_at=suspension_end_date,
                 )
+                approval.refresh_from_db()
                 approval.unsuspend(hiring_start_at=today)
                 suspension.refresh_from_db()
                 assert suspension.end_at == suspension_expected_end_date
@@ -459,6 +461,7 @@ class ApprovalModelTest(TestCase):
                     start_at=suspension_start_date,
                     end_at=suspension_end_date,
                 )
+                approval.refresh_from_db()
                 approval.unsuspend(hiring_start_at=today)
                 suspension.refresh_from_db()
                 assert suspension.end_at == suspension_end_date
@@ -472,6 +475,7 @@ class ApprovalModelTest(TestCase):
             end_at=today + relativedelta(months=2),
             reason=Suspension.Reason.BROKEN_CONTRACT.value,
         )
+        approval.refresh_from_db()
         approval.unsuspend(hiring_start_at=today)
         with pytest.raises(ObjectDoesNotExist):
             suspension.refresh_from_db()
