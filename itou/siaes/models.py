@@ -429,6 +429,14 @@ class Siae(AddressMixin, OrganizationAbstract):
         # No need to check if convention is active (done by middleware)
         return self.kind in self.ASP_EMPLOYEE_RECORD_KINDS
 
+    @property
+    def can_upload_prolongation_report(self):
+        """
+        Is this SIAE allowed to use / upload a prolongation report file ?
+        (temporary: limited to AI only)
+        """
+        return self.kind == SiaeKind.AI
+
     def convention_can_be_accessed_by(self, user):
         """
         Decides whether the user can show the siae convention or not.
