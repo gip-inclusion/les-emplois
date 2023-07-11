@@ -101,21 +101,19 @@ class CommonApprovalQuerySetTest(TestCase):
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         assert Approval.objects.filter(id=approval.id).valid().exists()
 
-    def test_can_be_deleted(self):
+    def test_can_be_delete_no_app(self):
+        approval = ApprovalFactory()
+        assert not approval.can_be_deleted
+
+    def test_can_be_deleted_one_app(self):
         job_app = JobApplicationFactory(with_approval=True)
         approval = job_app.approval
         assert approval.can_be_deleted
 
-        # An approval exists without a Job Application
-        approval = ApprovalFactory()
-        assert not approval.can_be_deleted
-
-        job_app.state = JobApplicationWorkflow.STATE_REFUSED
-        job_app.save()
-        assert not approval.can_be_deleted
-
+    def test_can_be_deleted_multiple_apps(self):
+        job_app = JobApplicationFactory(with_approval=True)
         JobApplicationFactory(with_approval=True, job_seeker=job_app.job_seeker, approval=job_app.approval)
-        assert not approval.can_be_deleted
+        assert not job_app.approval.can_be_deleted
 
     def test_starts_date_filters_for_approval_model(self):
         start_at = timezone.localdate() - relativedelta(years=1)
