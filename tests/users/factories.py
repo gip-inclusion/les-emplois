@@ -96,6 +96,16 @@ class SiaeStaffFactory(UserFactory):
 class LaborInspectorFactory(UserFactory):
     kind = UserKind.LABOR_INSPECTOR
 
+    @factory.post_generation
+    def membership(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted or kwargs:
+            from tests.institutions.factories import InstitutionMembershipFactory
+
+            InstitutionMembershipFactory(user=self, **kwargs)
+
 
 # `JobSeeker` and `JobSeekerProfile` factories are mainly used for employee record testing
 

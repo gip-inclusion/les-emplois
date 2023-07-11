@@ -1,0 +1,166 @@
+# serializer version: 1
+# name: test_list_view
+  '''
+  <div class="c-box">
+                          <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between">
+                              <h3 class="h4 mb-0">1 résultat</h3>
+                          </div>
+  
+                          <div class="table-responsive-lg mt-3 mt-md-4">
+                              <table class="table">
+                                  <caption class="sr-only">Liste des prolongations de PASS IAE</caption>
+                                  <thead>
+                                      <tr>
+                                          <th scope="col">#</th>
+                                          <th scope="col">Salarié</th>
+                                          <th scope="col">Numéro de PASS IAE</th>
+                                          <th scope="col">Structure</th>
+                                          <th scope="col">Demandée le</th>
+                                          <th scope="col">Statut</th>
+                                          <th scope="col">Action</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody>
+                                      
+                                          <tr>
+                                              <th scope="row">1</th>
+                                              <td class="font-weight-bold">John Doe</td>
+                                              <td><span>99999</span><span class="ml-1">99</span><span class="ml-1">99999</span></td>
+                                              <td>ACME Inc.</td>
+                                              <td>01/01/2000</td>
+                                              <td>
+      
+          <span class="badge badge-xs badge-pill badge-accent-03 text-primary">À traiter</span>
+      
+  
+  </td>
+                                              <td>
+                                                  <a class="btn btn-link btn-outline-primary btn-sm" href="/approvals/prolongation/request/666">
+                                                      
+                                                          Traiter
+                                                      
+                                                  </a>
+                                              </td>
+                                          </tr>
+                                      
+                                  </tbody>
+                              </table>
+                          </div>
+  
+                      </div>
+  '''
+# ---
+# name: test_show_view
+  '''
+  <div class="c-box mb-3 mb-lg-5">
+                          <h2>Détail de la demande</h2>
+                          <hr/>
+                          <h3>Date de fin de PASS IAE demandée : 30/12/2004</h3>
+                          <p>
+                              La prolongation est demandée pour une durée de 1825 jours.
+                          </p>
+                          <h3>Motif sélectionné par l’employeur</h3>
+                          <p>50 ans et plus</p>
+                          
+                              <h3>Bilan des actions réalisées</h3>
+                              <p>
+                                  Le bilan des actions réalisées et actions prévues avec le salarié, rempli par l’employeur est présent sur le document excel téléchargeable ci-dessous.
+                              </p>
+                              <p>
+                                  <a class="btn btn-secondary btn-ico" download="Bilan prolongation PASS IAE 999999999999 John Doe.xlsx" href="https://None/None/f0r_5n4p5h07">
+                                      <i class="ri-download-line ri-lg font-weight-normal"></i>
+                                      <span>Télécharger le bilan</span>
+                                  </a>
+                              </p>
+                          
+                          
+                              <h3>Explications supplémentaires</h3>
+                              <p>
+                                  L’employeur a fait une demande d'entretien téléphonique pour vous apporter des explications supplémentaires pour cette prolongation. Voici ses coordonnées :
+                              </p>
+                              <p>
+                                  <i class="ri-mail-line"></i>
+                                  <a class="btn-link mr-3" href="mailto:email@example.com">email@example.com</a>
+                                  <button class="btn btn-secondary btn-ico" data-copy-to-clipboard="email@example.com" id="copy-to-clipboard">
+                                      <i class="ri-file-copy-line ri-lg font-weight-normal"></i>
+                                      <span>Copier</span>
+                                  </button>
+                              </p>
+                              <p>
+                                  <i class="ri-phone-line"></i>
+                                  <a class="btn-link" href="tel:+33123456789">+33123456789</a>
+                              </p>
+                          
+                      </div>
+  '''
+# ---
+# name: test_template_status_card[DENIED]
+  '''
+  <div class="c-card card rounded-lg mb-3 mb-lg-5">
+      <div class="card-body">
+          
+              <div class="card-title">
+                  <h4>Pas de prolongation du PASS IAE</h4>
+              </div>
+              <div class="card-text">
+                  <p class="mb-2">
+                      Demande refusée le 01 janvier 2000 par John Doe
+                  </p>
+              </div>
+          
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: test_template_status_card[GRANTED]
+  '''
+  <div class="c-card card rounded-lg mb-3 mb-lg-5">
+      <div class="card-body">
+          
+              <div class="card-title">
+                  <h4>Prolongation du PASS IAE jusqu’au 30/12/2004</h4>
+              </div>
+              <div class="card-text">
+                  <p class="mb-2">
+                      Demande acceptée le 01 janvier 2000 par John Doe
+                  </p>
+              </div>
+          
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: test_template_status_card[PENDING]
+  '''
+  <div class="c-card card rounded-lg mb-3 mb-lg-5">
+      <div class="card-body">
+          
+              <div class="card-title">
+                  <h4>Prolonger le PASS IAE jusqu’au 30/12/2004</h4>
+              </div>
+              <div class="card-text">
+                  <form method="post">
+                      
+                      <button name="action" value="grant" class="btn btn-primary btn-block btn-ico justify-content-center">
+                          <i class="ri-check-line"></i>
+                          <span>Accepter</span>
+                      </button>
+                      <button name="action" value="deny" class="btn btn-outline-primary btn-block btn-ico mt-3 justify-content-center">
+                          <i class="ri-close-line"></i>
+                          <span>Refuser</span>
+                      </button>
+                  </form>
+                  <p class="font-weight-bold mt-3">Précision</p>
+                  <p class="mb-2">
+                      En cas de refus, vous êtes tenu de proposer une solution au candidat.
+                      Vous devez également motiver par écrit votre refus de prolongation auprès de la SIAE (Dans l'attente de la mise en œuvre du module spécifique).
+                  </p>
+              </div>
+          
+      </div>
+  </div>
+  
+  '''
+# ---

@@ -8,7 +8,7 @@ from django_select2.forms import Select2MultipleWidget
 
 from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
 from itou.approvals.enums import ProlongationReason
-from itou.approvals.models import Approval, Prolongation, Suspension
+from itou.approvals.models import Approval, Prolongation, ProlongationRequest, Suspension
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import UserKind
@@ -76,12 +76,22 @@ class ApprovalForm(forms.Form):
         return qs_filters_list
 
 
-class DeclareProlongationForm(forms.ModelForm):
-    """
-    Request a prolongation.
+def get_prolongation_form(**kwargs):
+    form_class = CreateProlongationForm
 
-    Prolongation.clean() will handle the validation.
-    """
+    try:
+        reason = kwargs["data"]["reason"]
+    except (KeyError, TypeError):  # "data" can be given but with a None value
+        pass
+    else:
+        if reason and reason not in ProlongationRequest.REASONS_NOT_NEED_PRESCRIBER_OPINION:
+            form_class = CreateProlongationRequestForm
+
+    return form_class(**kwargs)
+
+
+class CreateProlongationForm(forms.ModelForm):
+    """Declare a prolongation. Used when the reason doesn't need to be validated by a prescriber."""
 
     reason = forms.ChoiceField(
         choices=ProlongationReason.choices,
@@ -94,48 +104,12 @@ class DeclareProlongationForm(forms.ModelForm):
         widget=DuetDatePickerWidget(),
     )
 
-    report_file_path = forms.CharField(widget=forms.HiddenInput(), required=False, disabled=True)
-    uploaded_file_name = forms.CharField(widget=forms.HiddenInput(), required=False, disabled=True)
-    email = forms.EmailField(
-        label="E-mail du prescripteur habilité sollicité pour cette prolongation",
-        help_text=(
-            "Attention : l'adresse e-mail doit correspondre à un compte utilisateur de type prescripteur habilité"
-        ),
-        required=False,
-        error_messages={
-            "required": "Vous devez choisir un prescripteur habilité",
-        },
-    )
-    prescriber_organization = forms.ModelChoiceField(
-        queryset=PrescriberOrganization.objects.none(),
-        label="",
-        empty_label="Sélectionnez l'organisation du prescripteur habilité",
-        required=False,
-        disabled=True,
-    )
-
-    require_phone_interview = forms.BooleanField(
-        label="Demande d'entretien téléphonique pour apporter des explications supplémentaires",
-        required=False,
-    )
-    contact_email = forms.EmailField(
-        label="Votre e-mail",
-        widget=forms.EmailInput(attrs={"placeholder": "employeur@email.fr"}),
-        required=False,
-        disabled=True,
-        error_messages={
-            "required": "Veuillez saisir une adresse e-mail de contact",
-        },
-    )
-    contact_phone = forms.CharField(
-        label="Votre numéro de téléphone",
-        widget=forms.TextInput(attrs={"placeholder": "Merci de privilégier votre ligne directe"}),
-        required=False,
-        disabled=True,
-        error_messages={
-            "required": "Veuillez saisir un numéro de téléphone de contact",
-        },
-    )
+    class Meta:
+        model = Prolongation
+        fields = [
+            "reason",
+            "end_at",
+        ]
 
     def __init__(self, *args, approval, siae, **kwargs):
         super().__init__(*args, **kwargs)
@@ -177,6 +151,56 @@ class DeclareProlongationForm(forms.ModelForm):
             f"Date jusqu'à laquelle le PASS IAE doit être prolongé{end_at_extra_help_text}<br>"
             f"Au format JJ/MM/AAAA, par exemple 20/12/1978."
         )
+
+
+class CreateProlongationRequestForm(CreateProlongationForm):
+    """Request a prolongation. Used when the reason need to be validated by a prescriber."""
+
+    report_file_path = forms.CharField(required=False, disabled=True, widget=forms.HiddenInput())
+    uploaded_file_name = forms.CharField(required=False, disabled=True, widget=forms.HiddenInput())
+    email = forms.EmailField(
+        label="E-mail du prescripteur habilité sollicité pour cette prolongation",
+        help_text=(
+            "Attention : l'adresse e-mail doit correspondre à un compte utilisateur de type prescripteur habilité"
+        ),
+        required=False,
+        error_messages={
+            "required": "Vous devez choisir un prescripteur habilité",
+        },
+    )
+    prescriber_organization = forms.ModelChoiceField(
+        queryset=PrescriberOrganization.objects.none(),
+        label="",
+        empty_label="Sélectionnez l'organisation du prescripteur habilité",
+        required=False,
+        disabled=True,
+    )
+
+    require_phone_interview = forms.BooleanField(
+        label="Demande d'entretien téléphonique pour apporter des explications supplémentaires",
+        required=False,
+    )
+    contact_email = forms.EmailField(
+        label="Votre e-mail",
+        widget=forms.EmailInput(attrs={"placeholder": "employeur@email.fr"}),
+        required=False,
+        disabled=True,
+        error_messages={
+            "required": "Veuillez saisir une adresse e-mail de contact",
+        },
+    )
+    contact_phone = forms.CharField(
+        label="Votre numéro de téléphone",
+        widget=forms.TextInput(attrs={"placeholder": "Merci de privilégier votre ligne directe"}),
+        required=False,
+        disabled=True,
+        error_messages={
+            "required": "Veuillez saisir un numéro de téléphone de contact",
+        },
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
         # Customize "report_file_path" and "uploaded_file_name" field
         if (
@@ -230,6 +254,8 @@ class DeclareProlongationForm(forms.ModelForm):
             self.fields["contact_email"].required = self.fields["contact_phone"].required = True
 
     def clean(self):
+        super().clean()
+
         if email := self.cleaned_data.get("email"):
             validated_by = User.objects.filter(email=email).first()
             if validated_by and validated_by.is_prescriber_with_authorized_org:
@@ -253,11 +279,9 @@ class DeclareProlongationForm(forms.ModelForm):
                 # No visible field for this form field
                 raise ValidationError("Vous devez fournir un fichier de bilan renseigné")
 
-    class Meta:
-        model = Prolongation
-        fields = [
-            "reason",
-            "end_at",
+    class Meta(CreateProlongationForm.Meta):
+        model = ProlongationRequest
+        fields = CreateProlongationForm.Meta.fields + [
             "report_file_path",
             "uploaded_file_name",
             "email",

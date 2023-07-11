@@ -1,7 +1,9 @@
 from collections import namedtuple
 from datetime import datetime
+from functools import partial
 from urllib.parse import urlencode
 
+import pytest
 import respx
 from allauth.account.models import EmailAddress, EmailConfirmationHMAC
 from dateutil.relativedelta import relativedelta
@@ -35,7 +37,7 @@ from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.templatetags.format_filters import format_approval_number, format_siret
 from itou.www.dashboard.forms import EditUserEmailForm
-from tests.approvals.factories import ApprovalFactory
+from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory, LaborInspectorFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByPrescriberFactory
@@ -59,7 +61,7 @@ from tests.siaes.factories import (
     SiaeWithMembershipAndJobsFactory,
 )
 from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
-from tests.utils.test import TestCase
+from tests.utils.test import TestCase, parse_response_to_soup
 
 
 class DashboardViewTest(TestCase):
@@ -1750,3 +1752,41 @@ def test_siae_staff_using_django_has_to_activate_ic_account(client):
     )
     user.refresh_from_db()
     assert user.identity_provider == IdentityProvider.INCLUSION_CONNECT
+
+
+@pytest.mark.parametrize(
+    "factory,expected",
+    [
+        pytest.param(JobSeekerFactory, assertNotContains, id="JobSeeker"),
+        pytest.param(partial(SiaeStaffFactory, with_siae=True), assertNotContains, id="SiaeStaff"),
+        pytest.param(partial(LaborInspectorFactory, membership=True), assertNotContains, id="LaborInspector"),
+        pytest.param(PrescriberFactory, assertNotContains, id="PrescriberWithoutOrganization"),
+        pytest.param(
+            partial(PrescriberFactory, membership__organization__authorized=False),
+            assertNotContains,
+            id="PrescriberWithOrganization",
+        ),
+        pytest.param(
+            partial(PrescriberFactory, membership__organization__authorized=True),
+            assertContains,
+            id="AuthorizedPrescriber",
+        ),
+    ],
+)
+def test_prolongation_requests_access(client, factory, expected):
+    client.force_login(factory())
+    response = client.get(reverse("dashboard:index"))
+    expected(response, "Gérer mes prolongations de PASS IAE")
+    expected(response, reverse("approvals:prolongation_requests_list"))
+
+
+def test_prolongation_requests_badge(client):
+    prescriber = PrescriberFactory(membership__organization__authorized=True)
+    ProlongationRequestFactory.create_batch(3, prescriber_organization=prescriber.prescriberorganization_set.first())
+
+    client.force_login(prescriber)
+    soup = parse_response_to_soup(
+        client.get(reverse("dashboard:index")),
+        f"""a[href='{reverse("approvals:prolongation_requests_list")}'] + .badge""",
+    )
+    assert soup.text == "3"

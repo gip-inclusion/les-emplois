@@ -18,7 +18,6 @@ from unidecode import unidecode
 
 from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
 from itou.approvals.enums import Origin
-from itou.approvals.notifications import NewProlongationToAuthorizedPrescriberNotification
 from itou.files.models import File
 from itou.job_applications import enums as job_application_enums
 from itou.prescribers import enums as prescribers_enums
@@ -464,6 +463,13 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
 
         return {"in_progress": in_progress_prolongations, "not_in_progress": not_in_progress_prolongations}
 
+    def prolongation_requests_for_status_card(self):
+        # Don't show granted prolongation requests as they will have generated a proper prolongation
+        return self.prolongationrequest_set.exclude(status=enums.ProlongationRequestStatus.GRANTED)
+
+    def pending_prolongation_request(self):
+        return self.prolongationrequest_set.filter(status=enums.ProlongationRequestStatus.PENDING).first()
+
     @property
     def is_open_to_prolongation(self):
         now = timezone.localdate()
@@ -477,7 +483,12 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         # it is possible that another one has been issued in the meantime. Thus we
         # have to ensure that the current PASS IAE is the most recent for the user
         # before allowing a prolongation.
-        return self.is_last_for_user and self.is_open_to_prolongation and not self.is_suspended
+        return (
+            self.is_last_for_user
+            and self.is_open_to_prolongation
+            and not self.is_suspended
+            and not self.pending_prolongation_request()
+        )
 
     @staticmethod
     def get_next_number():
@@ -1309,9 +1320,6 @@ class Prolongation(CommonProlongation):
         obj.validated_by = prolongation_request.processed_by
 
         return obj
-
-    def notify_authorized_prescriber(self):
-        NewProlongationToAuthorizedPrescriberNotification(self).send()
 
 
 class PoleEmploiApprovalManager(models.Manager):

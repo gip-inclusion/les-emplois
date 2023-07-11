@@ -116,8 +116,10 @@ class TestApprovalDetailView:
             + 1  # approval.remainder fetches approval suspensions to compute remaining days.
             + 1  # release savepoint before the template rendering
             + 1  # template: job_application.get_eligibility_diagnosis => Siae.is_subject_to_eligibility_rules
+            + 1  # template: approval.pending_prolongation_request fetch the current pending prolongation request
             + 1  # template: approval.suspensions_for_status_card lists approval suspensions
             + 1  # template: approval prolongations list.
+            + 1  # template: approval.prolongation_requests_for_status_card lists not accepted prolongation requests
             + 1  # get job_application details (view queryset)
             + 1  # get prefetch job_application selected_jobs
             + 1  # get sender information (prescriber organization details)
@@ -199,8 +201,10 @@ class TestApprovalDetailView:
             # context processors
             + 1  # siae membership (get_context_siae)
             # template: approvals/includes/status.html
-            + 1  # template: approval.prolongations_for_status_card
             + 1  # template: approval.remainder fetches approval suspensions to compute remaining days
+            + 1  # template: approval.pending_prolongation_request fetch the current pending prolongation request
+            + 1  # template: approval.prolongations_for_status_card
+            + 1  # template: approval.prolongation_requests_for_status_card lists not accepted prolongation requests
             # template: eligibility_diagnosis.html
             + 1  # prescribers_prescriberorganization (job_application.is_sent_by_authorized_prescriber)
             + 1  # get user infos (eligibility_diagnosis.author.get_full_name)

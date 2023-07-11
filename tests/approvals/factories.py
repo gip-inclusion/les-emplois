@@ -3,6 +3,7 @@ import string
 
 import factory.fuzzy
 from dateutil.relativedelta import relativedelta
+from django.utils import timezone
 from faker import Faker
 
 from itou.approvals.enums import Origin, ProlongationReason
@@ -74,14 +75,17 @@ class BaseProlongationFactory(factory.django.DjangoModelFactory):
 
     class Params:
         for_snapshot = factory.Trait(
+            pk=666,
             approval__for_snapshot=True,
             start_at=factory.SelfAttribute("approval.start_at"),
             declared_by_siae__for_snapshot=True,
+            validated_by__for_snapshot=True,
             reason=ProlongationReason.SENIOR.value,
             report_file=factory.SubFactory(FileFactory, for_snapshot=True),
             require_phone_interview=True,
             contact_email="email@example.com",
             contact_phone="+33123456789",
+            created_at=datetime.datetime(2000, 1, 1, tzinfo=datetime.UTC),
         )
 
     approval = factory.SubFactory(ApprovalFactory)
@@ -108,6 +112,14 @@ class ProlongationRequestFactory(BaseProlongationFactory):
         model = ProlongationRequest
 
     class Params:
+        processed = factory.Trait(
+            processed_by=factory.SelfAttribute("validated_by"),
+            processed_at=factory.Maybe(
+                "for_snapshot",
+                datetime.datetime(2000, 1, 1, tzinfo=datetime.UTC),
+                factory.LazyFunction(timezone.now),
+            ),
+        )
         for_snapshot = factory.Trait(
             **BaseProlongationFactory._meta.parameters["for_snapshot"].overrides,
             prescriber_organization__for_snapshot=True,
