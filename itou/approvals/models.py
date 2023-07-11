@@ -333,14 +333,12 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         """
         return f"{self.number[:5]} {self.number[5:7]} {self.number[7:]}"
 
-    @cached_property
     def can_be_deleted(self):
-        state_accepted = self.jobapplication_set.model.state.STATE_ACCEPTED
-
-        job_applications = self.jobapplication_set
-        if job_applications.count() != 1:
+        JobApplication = self.jobapplication_set.model
+        try:
+            return self.jobapplication_set.get().state == JobApplication.state.STATE_ACCEPTED
+        except (JobApplication.DoesNotExist, JobApplication.MultipleObjectsReturned):
             return False
-        return self.jobapplication_set.get().state == state_accepted
 
     @cached_property
     def is_last_for_user(self):

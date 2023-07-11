@@ -1024,7 +1024,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         if not self.can_be_cancelled:
             raise xwf_models.AbortTransition("Cette candidature n'a pu être annulée.")
 
-        if self.approval and self.approval.can_be_deleted:
+        if self.approval and self.approval.can_be_deleted():
             self.approval.delete()
             self.approval = None
 

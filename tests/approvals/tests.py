@@ -103,17 +103,17 @@ class CommonApprovalQuerySetTest(TestCase):
 
     def test_can_be_delete_no_app(self):
         approval = ApprovalFactory()
-        assert not approval.can_be_deleted
+        assert not approval.can_be_deleted()
 
     def test_can_be_deleted_one_app(self):
         job_app = JobApplicationFactory(with_approval=True)
         approval = job_app.approval
-        assert approval.can_be_deleted
+        assert approval.can_be_deleted()
 
     def test_can_be_deleted_multiple_apps(self):
         job_app = JobApplicationFactory(with_approval=True)
         JobApplicationFactory(with_approval=True, job_seeker=job_app.job_seeker, approval=job_app.approval)
-        assert not job_app.approval.can_be_deleted
+        assert not job_app.approval.can_be_deleted()
 
     def test_starts_date_filters_for_approval_model(self):
         start_at = timezone.localdate() - relativedelta(years=1)
