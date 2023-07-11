@@ -1,0 +1,129 @@
+# serializer version: 1
+# name: test_prolongation_request_created[body]
+  '''
+  Bonjour,
+  
+  John Doe de la structure Acme inc. a besoin de votre accord pour prolonger un PASS IAE.
+  
+  L'employeur souhaite vous apporter des explications supplémentaires par téléphone. Vous trouverez ci-dessous ses coordonnées pour le contacter :
+  
+  - Email de l’employeur: email@example.com
+  - Numéro de téléphone de l’employeur : +33123456789
+  
+  - Numéro de PASS : 999999999999
+  - Prénom : John
+  - Nom : Doe
+  - Date de naissance : 01/01/2000
+  - Début de la prolongation : 01/01/2000
+  - Fin de la prolongation : 30/12/2004
+  - Motif de prolongation : 50 ans et plus
+  - Fiche bilan : https://None/None/f0r_5n4p5h07
+  
+  Vous pouvez valider ou refuser cette prolongation en vous connectant à votre espace prescripteur Pres. org. sur les emplois de l'inclusion, à la rubrique "Gérer mes prolongations de PASS IAE".
+  
+  Précisions en cas de refus :
+  
+  Conformément à l’article Art. R. 5132-1-8. du Décret n° 2021-1128 du 30 août 2021 relatif à l'insertion par l'activité économique, le refus de prolongation d'un prescripteur est motivé par écrit et notifié, par tout moyen donnant date certaine à la réception de cette notification, à la structure et à l'intéressé.
+  
+  * Motifs de refus et actions associées :
+  
+  1/ L’IAE ne correspond plus aux besoins / à la situation de la personne :
+  
+  Actions possibles :
+  - Accompagnement à la recherche d’emploi hors IAE et mobilisation de l’offre de services disponible au sein de votre structure ou celle d’un partenaire
+  - Orientation vers un partenaire de l’accompagnement social/professionnel
+  
+  2/ La typologie de SIAE ne correspond plus aux besoins / à la situation de la personne
+  
+  Action possible :
+  - Orientation vers un autre type de SIAE
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---
+# name: test_prolongation_request_created[subject]
+  'Demande de prolongation du PASS IAE de John Doe'
+# ---
+# name: test_prolongation_request_denied_employer[body]
+  '''
+  Bonjour,
+  
+  L’organisation Pres. org. a refusé votre demande de prolongation du PASS IAE.
+  
+  Références :
+  Numéro : 99999 99 99999
+  Bénéficiaire : John Doe
+  
+  Vous pouvez consulter la date de fin prévisionnelle du PASS IAE dans votre espace employeur sur les emplois de l’inclusion.
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---
+# name: test_prolongation_request_denied_employer[subject]
+  'Prolongation du PASS IAE de John Doe refusée'
+# ---
+# name: test_prolongation_request_denied_jobseeker[body]
+  '''
+  Bonjour,
+  
+  L’employeur Acme inc. a sollicité un prescripteur habilité de l’organisation Pres. org.  pour demander une prolongation de votre PASS IAE.
+  
+  L’organisation Pres. org. a refusé la prolongation du PASS IAE.
+  
+  Vous pouvez consulter la date de fin prévisionnelle de votre PASS IAE dans votre espace candidat sur les emplois de l’inclusion.
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---
+# name: test_prolongation_request_denied_jobseeker[subject]
+  'Prolongation de votre PASS IAE refusée'
+# ---
+# name: test_prolongation_request_granted_employer[body]
+  '''
+  Bonjour,
+  
+  L’organisation Pres. org. a accepté votre demande de prolongation du PASS IAE.
+  
+  Références :
+  Numéro : 99999 99 99999
+  Bénéficiaire : John Doe
+  
+  Vous pouvez consulter la nouvelle date de fin prévisionnelle du PASS IAE dans votre espace employeur sur les emplois de l’inclusion.
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---
+# name: test_prolongation_request_granted_employer[subject]
+  'Prolongation du PASS IAE de John Doe acceptée'
+# ---
+# name: test_prolongation_request_granted_jobseeker[body]
+  '''
+  Bonjour,
+  
+  L’employeur Acme inc. a sollicité un prescripteur habilité de l’organisation Pres. org.  pour demander une prolongation de votre PASS IAE.
+  
+  L’organisation Pres. org. a accepté la prolongation du PASS IAE.
+  
+  Vous pouvez consulter la nouvelle date de fin prévisionnelle de votre PASS IAE dans votre espace candidat sur les emplois de l’inclusion.
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---
+# name: test_prolongation_request_granted_jobseeker[subject]
+  'Prolongation de votre PASS IAE acceptée'
+# ---

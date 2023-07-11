@@ -23,6 +23,7 @@ class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
         with_pending_authorization = factory.Trait(
             authorization_status=PrescriberAuthorizationStatus.NOT_SET,
         )
+        for_snapshot = factory.Trait(name="Pres. Org.")
 
     name = factory.Faker("name", locale="fr_FR")
     # Don't start a SIRET with 0.

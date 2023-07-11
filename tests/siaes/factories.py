@@ -96,6 +96,17 @@ class SiaeFactory(factory.django.DjangoModelFactory):
             membership=factory.RelatedFactory("tests.siaes.factories.SiaeMembershipFactory", "siae"),
         )
         with_jobs = factory.Trait(romes=factory.PostGeneration(_create_job_from_rome_code))
+        for_snapshot = factory.Trait(
+            name="ACME Inc.",
+            membership=factory.Maybe(
+                "with_membership",
+                yes_declaration=factory.RelatedFactory(
+                    "tests.siaes.factories.SiaeMembershipFactory",
+                    "siae",
+                    user__for_snapshot=True,
+                ),
+            ),
+        )
 
     # Don't start a SIRET with 0.
     siret = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
