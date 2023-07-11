@@ -27,6 +27,12 @@ urlpatterns = [
         views.ToggledUploadPanelView.as_view(),
         name="toggle_upload_panel",
     ),
+    path("prolongation/requests", views.prolongation_requests_list, name="prolongation_requests_list"),
+    path(
+        "prolongation/request/<int:prolongation_request_id>",
+        views.prolongation_request_show,
+        name="prolongation_request_show",
+    ),
     path("suspend/<int:approval_id>", views.suspend, name="suspend"),
     path("suspension/<int:suspension_id>/edit", views.suspension_update, name="suspension_update"),
     path("suspension/<int:suspension_id>/delete", views.suspension_delete, name="suspension_delete"),

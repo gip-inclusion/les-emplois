@@ -1,0 +1,106 @@
+{% extends BASE_TEMPLATE %}
+{% load format_filters %}
+{% load str_filters %}
+
+{% block title %}
+    Demande de prolongation - {{ prolongation_request.approval.user.get_full_name }} {{ block.super }}
+{% endblock %}
+
+{% block content %}
+    <section class="s-title-01">
+        <div class="s-title-01__container container">
+            <div class="s-title-01__row row">
+                <div class="s-title-01__col col-12">
+                    <h1 class="s-title-01__title h1">
+                        Demande de prolongation pour {{ prolongation_request.approval.user.get_full_name|title }}
+                    </h1>
+                    {% include "approvals/prolongation_requests/_status_badge.html" %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    <div class="c-box mb-3 mb-lg-5">
+                        {# Approval status. #}
+                        <div>{% include "approvals/includes/status.html" with common_approval=prolongation_request.approval %}</div>
+                    </div>
+
+                    <div class="c-box mb-3 mb-lg-5">
+                        <h2>Détail de la demande</h2>
+                        <hr>
+                        <h3>Date de fin de PASS IAE demandée : {{ prolongation_request.end_at|date:"d/m/Y" }}</h3>
+                        <p>
+                            La prolongation est demandée pour une durée de {{ prolongation_request.duration.days }} jour{{ prolongation_request.duration.days|pluralizefr }}.
+                        </p>
+                        <h3>Motif sélectionné par l’employeur</h3>
+                        <p>{{ prolongation_request.get_reason_display }}</p>
+                        {% if prolongation_request.report_file %}
+                            <h3>Bilan des actions réalisées</h3>
+                            <p>
+                                Le bilan des actions réalisées et actions prévues avec le salarié, rempli par l’employeur est présent sur le document excel téléchargeable ci-dessous.
+                            </p>
+                            <p>
+                                <a class="btn btn-secondary btn-ico"
+                                   href="{{ prolongation_request.report_file.link }}"
+                                   download="Bilan prolongation PASS IAE {{ prolongation_request.approval.number }} {{ prolongation_request.approval.user.get_full_name }}.xlsx">
+                                    <i class="ri-download-line ri-lg font-weight-normal"></i>
+                                    <span>Télécharger le bilan</span>
+                                </a>
+                            </p>
+                        {% endif %}
+                        {% if prolongation_request.require_phone_interview %}
+                            <h3>Explications supplémentaires</h3>
+                            <p>
+                                L’employeur a fait une demande d'entretien téléphonique pour vous apporter des explications supplémentaires pour cette prolongation. Voici ses coordonnées :
+                            </p>
+                            <p>
+                                <i class="ri-mail-line"></i>
+                                <a class="btn-link mr-3" href="mailto:{{ prolongation_request.contact_email }}">{{ prolongation_request.contact_email }}</a>
+                                <button class="btn btn-secondary btn-ico" data-copy-to-clipboard="{{ prolongation_request.contact_email }}" id="copy-to-clipboard">
+                                    <i class="ri-file-copy-line ri-lg font-weight-normal"></i>
+                                    <span>Copier</span>
+                                </button>
+                            </p>
+                            <p>
+                                <i class="ri-phone-line"></i>
+                                <a class="btn-link" href="tel:{{ prolongation_request.contact_phone }}">{{ prolongation_request.contact_phone }}</a>
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-12, col-lg-4">
+                    {# Status card #}
+                    {% include "approvals/prolongation_requests/_status_card.html" %}
+                    {# SIAE card #}
+                    {% with siae=prolongation_request.declared_by_siae %}
+                        <div class="c-card card rounded-lg mb-3 mb-lg-5">
+                            <div class="card-body">
+                                <p class="fs-sm">{{ siae.kind }} - {{ siae.get_kind_display }}</p>
+                                <p class="h2">{{ siae.display_name }}</p>
+                                <address class="card-subtitle fs-sm font-weight-bold text-secondary">{{ siae.address_on_one_line }}</address>
+                                {% include "siaes/includes/_siae_details.html" with siae=siae %}
+                                <a class="btn btn-secondary btn-block justify-content-center mt-5" href="{% url 'siaes_views:card' siae_id=siae.pk %}{% if back_url %}?back_url={{ back_url }}{% endif %}">
+                                    Voir la fiche de l'entreprise
+                                </a>
+                            </div>
+                        </div>
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script nonce="{{ CSP_NONCE }}">
+        // TODO: Refactor that behavior into utils
+        document.getElementById('copy-to-clipboard').addEventListener("click", function select(event){
+            navigator.clipboard.writeText(event.currentTarget.dataset.copyToClipboard);
+        });
+    </script>
+{% endblock %}

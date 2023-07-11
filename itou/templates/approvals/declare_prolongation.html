@@ -131,7 +131,7 @@
 
             dropzone = s3UploadInit({
                 dropzoneSelector: "#report_file_form",
-                callbackLocationSelector: "#{{ form.report_file_path.id_for_label }}",
+                callbackLocationSelector: "#id_report_file_path",
                 s3FormValuesId: "s3-form-values",
                 s3UploadConfigId: "s3-upload-config",
                 sentryInternalUrl: "{% url 'home:sentry_debug' %}",
@@ -140,7 +140,7 @@
             });
 
             // Listening on hidden fields change does not work, so:
-            const uploadedFileName = $("#{{ form.uploaded_file_name.id_for_label }}");
+            const uploadedFileName = $("#id_uploaded_file_name");
             const uploadedFileNameDisplay = $("#uploaded_file_name_display");
             const resetFileName = file => {
                 uploadedFileName.val("");

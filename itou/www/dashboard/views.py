@@ -17,6 +17,8 @@ from django.views.generic import TemplateView
 from rest_framework.authtoken.models import Token
 
 from itou.api.token_auth.views import TOKEN_ID_STR
+from itou.approvals.enums import ProlongationRequestStatus
+from itou.approvals.models import ProlongationRequest
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.institutions.models import Institution
@@ -48,6 +50,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
     can_show_employee_records = False
     job_applications_categories = []
     num_rejected_employee_records = 0
+    pending_prolongation_requests = None
     active_campaigns = []
     closed_campaigns = []
     evaluated_siae_notifications = EvaluatedSiae.objects.none()
@@ -132,6 +135,12 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                         f"vous pouvez ignorer ce message."
                     ),
                 )
+        else:
+            if current_org.is_authorized:
+                pending_prolongation_requests = ProlongationRequest.objects.filter(
+                    prescriber_organization=current_org,
+                    status=ProlongationRequestStatus.PENDING,
+                ).count()
 
     if request.user.is_labor_inspector:
         current_org = get_current_institution_or_404(request)
@@ -160,6 +169,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "can_view_stats_dihal": request.user.can_view_stats_dihal(current_org=current_org),
         "can_view_stats_iae_network": request.user.can_view_stats_iae_network(current_org=current_org),
         "num_rejected_employee_records": num_rejected_employee_records,
+        "pending_prolongation_requests": pending_prolongation_requests,
         "active_campaigns": active_campaigns,
         "closed_campaigns": closed_campaigns,
         "evaluated_siae_notifications": evaluated_siae_notifications,
