@@ -305,7 +305,6 @@ class TestApprovalDetailView:
         assertNotContains(response, reverse("approvals:suspend", kwargs={"approval_id": approval.id}))
 
     def test_prolongation_button(self, client):
-        # approval.can_be_prolonged_by_siae() is currently unused
         # any SIAE can prolong an approval (if it can be prolonged)
         approval = ApprovalFactory(
             with_jobapplication=True,
