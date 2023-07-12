@@ -389,7 +389,9 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
 
     @cached_property
     def last_in_progress_suspension(self):
-        return self.suspension_set.in_progress().order_by("start_at").last()
+        if self.is_suspended:
+            return self.suspension_set.in_progress().order_by("start_at").last()
+        return None
 
     @property
     def can_be_unsuspended(self):

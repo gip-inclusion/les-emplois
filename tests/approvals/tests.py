@@ -393,6 +393,7 @@ class ApprovalModelTest(TestCase):
             end_at=today + relativedelta(months=2),
             reason=Suspension.Reason.BROKEN_CONTRACT.value,
         )
+        approval.refresh_from_db()
         assert suspension.pk == approval.last_in_progress_suspension.pk
 
     def test_last_in_progress_without_suspension_in_progress(self):
