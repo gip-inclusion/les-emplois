@@ -1136,33 +1136,6 @@ class SuspensionModelTest(TestCase):
         suspension = SuspensionFactory.build(start_at=start_at, approval__eligibility_diagnosis=None)
         assert suspension.is_in_progress
 
-    def test_get_overlapping_suspensions(self):
-        start_at = timezone.localdate() - relativedelta(days=10)
-        approval = ApprovalFactory(start_at=start_at)
-        suspension1 = SuspensionFactory(approval=approval, start_at=start_at)
-
-        # Start same day as suspension1.
-        # Build provides a local object without saving it to the database.
-        suspension2 = SuspensionFactory.build(approval=approval, siae=suspension1.siae, start_at=start_at)
-        assert suspension2.get_overlapping_suspensions().exists()
-
-        # Start at suspension1.end_at.
-        suspension2.start_at = suspension1.end_at
-        suspension2.end_at = Suspension.get_max_end_at(suspension2.start_at)
-        assert suspension2.get_overlapping_suspensions().exists()
-
-        # Cover suspension1.
-        suspension2.start_at = suspension1.start_at - relativedelta(days=1)
-        suspension2.end_at = suspension1.end_at + relativedelta(days=1)
-        assert suspension2.get_overlapping_suspensions().exists()
-
-        # End exactly before suspension1
-        # - 3 years is the maximum
-        # - add an extra day for non-flakyness/clarity of intent
-        suspension2.start_at = suspension1.start_at - relativedelta(years=3, days=1)
-        suspension2.end_at = Suspension.get_max_end_at(suspension2.start_at)
-        assert not suspension2.get_overlapping_suspensions().exists()
-
     def test_displayed_choices_for_siae(self):
         # EI and ACI kind have one more choice
         for kind in [SiaeKind.EI, SiaeKind.ACI]:
@@ -1212,6 +1185,12 @@ class SuspensionModelTest(TestCase):
         siae = SiaeFactory()
         suspension = Suspension(approval=approval, siae=siae, start_at=today, end_at=today)
         suspension.clean()
+
+    def test_overlapping_dates(self):
+        approval = ApprovalFactory()
+        SuspensionFactory(approval=approval)
+        with pytest.raises(IntegrityError):
+            SuspensionFactory(approval=approval)
 
 
 class SuspensionModelTestTrigger(TestCase):
@@ -1587,25 +1566,6 @@ class ProlongationModelTest(TestCase):
         # Check duration.
 
         assert approval.duration == initial_approval_duration + prolongation1.duration + prolongation2.duration
-
-    def test_get_overlapping_prolongations(self):
-
-        approval = ApprovalFactory()
-
-        initial_prolongation = ProlongationFactory(
-            approval=approval,
-            start_at=approval.end_at,
-        )
-
-        # A prolongation that starts the same day as initial_prolongation.
-        # Build provides a local object without saving it to the database.
-        valid_prolongation = ProlongationFactory.build(
-            approval=approval,
-            declared_by_siae=initial_prolongation.declared_by_siae,
-            start_at=approval.end_at,
-        )
-        assert valid_prolongation.get_overlapping_prolongations().exists()
-        assert initial_prolongation, valid_prolongation.get_overlapping_prolongations().exists()
 
     def test_has_reached_max_cumulative_duration_for_complete_training(self):
 

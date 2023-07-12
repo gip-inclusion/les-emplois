@@ -784,6 +784,7 @@ class Suspension(models.Model):
                     ),
                     ("approval", RangeOperators.EQUAL),
                 ),
+                violation_error_message="La période chevauche une suspension existante pour ce PASS IAE.",
             ),
             models.CheckConstraint(
                 check=Q(start_at__lte=TruncDate(Now())),
@@ -837,21 +838,6 @@ class Suspension(models.Model):
                 {"start_at": (f"La date de début minimum est : {next_min_start_at.strftime('%d/%m/%Y')}.")}
             )
 
-        # A suspension cannot overlap another one for the same SIAE.
-        # This check is enforced by a constraint at the database level but
-        # still required here to avoid a 500 server error "IntegrityError"
-        # during form validation.
-        if self.get_overlapping_suspensions().exists():
-            overlap = self.get_overlapping_suspensions().first()
-            raise ValidationError(
-                {
-                    "start_at": (
-                        f"La période chevauche une suspension déjà existante pour ce PASS IAE "
-                        f"{overlap.start_at.strftime('%d/%m/%Y')} - {overlap.end_at.strftime('%d/%m/%Y')}."
-                    )
-                }
-            )
-
     @property
     def duration(self):
         return self.end_at - self.start_at
@@ -863,14 +849,6 @@ class Suspension(models.Model):
     @property
     def start_in_approval_boundaries(self):
         return self.approval.start_at <= self.start_at <= self.approval.end_at
-
-    def get_overlapping_suspensions(self):
-        args = {
-            "end_at__gte": self.start_at,
-            "start_at__lte": self.end_at,
-            "approval": self.approval,
-        }
-        return self._meta.model.objects.exclude(pk=self.pk).filter(**args)
 
     def can_be_handled_by_siae(self, siae):
         """
@@ -1113,6 +1091,7 @@ class Prolongation(models.Model):
                     ),
                     ("approval", RangeOperators.EQUAL),
                 ),
+                violation_error_message="La période chevauche une prolongation existante pour ce PASS IAE.",
             ),
             # Report file is not yet defined as mandatory for these reasons. May change though
             models.CheckConstraint(
@@ -1170,17 +1149,6 @@ class Prolongation(models.Model):
                 f"« {self.approval.end_at.strftime('%d/%m/%Y')} »."
             )
 
-        # A prolongation cannot overlap another one for the same SIAE.
-        # This check is enforced by a constraint at the database level but
-        # still required here to avoid a 500 server error "IntegrityError"
-        # during form validation.
-        if self.get_overlapping_prolongations().exists():
-            overlap = self.get_overlapping_prolongations().first()
-            raise ValidationError(
-                f"La période chevauche une prolongation déjà existante pour ce PASS IAE "
-                f"{overlap.start_at.strftime('%d/%m/%Y')} - {overlap.end_at.strftime('%d/%m/%Y')}."
-            )
-
         if self.has_reached_max_cumulative_duration(additional_duration=self.duration):
             raise ValidationError(
                 f"Vous ne pouvez pas cumuler des prolongations pendant plus de "
@@ -1218,14 +1186,6 @@ class Prolongation(models.Model):
             cumulative_duration += additional_duration
 
         return cumulative_duration > self.MAX_CUMULATIVE_DURATION[self.reason]["duration"]
-
-    def get_overlapping_prolongations(self):
-        filter_args = {
-            "start_at__lte": self.end_at,  # Inclusive start.
-            "end_at__gt": self.start_at,  # Exclusive end.
-            "approval": self.approval,
-        }
-        return self._meta.model.objects.exclude(pk=self.pk).filter(**filter_args)
 
     @staticmethod
     def get_max_end_at(start_at, reason=None):
