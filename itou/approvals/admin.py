@@ -362,6 +362,7 @@ class ProlongationAdmin(admin.ModelAdmin):
         "declared_by",
         "declared_by_siae",
         "validated_by",
+        "prescriber_organization",
         "created_by",
         "updated_by",
     )
