@@ -328,6 +328,7 @@ class ToggledUploadPanelView(DeclareProlongationHTMXFragmentView):
         context = super().get_context_data(**kwargs)
         context |= {
             "unfold_details": self.form.data.get("reason") in PROLONGATION_REPORT_FILE_REASONS,
+            "can_upload_prolongation_report": self.siae.can_upload_prolongation_report,
         }
         return context
 
