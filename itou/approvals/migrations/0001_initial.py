@@ -463,6 +463,7 @@ class Migration(migrations.Migration):
                     ("approval", "="),
                 ),
                 name="exclude_overlapping_suspensions",
+                violation_error_message="La période chevauche une suspension existante pour ce PASS IAE.",
             ),
         ),
         migrations.CreateModel(
@@ -586,6 +587,7 @@ class Migration(migrations.Migration):
                     ("approval", "="),
                 ),
                 name="exclude_overlapping_prolongations",
+                violation_error_message="La période chevauche une prolongation existante pour ce PASS IAE.",
             ),
         ),
         migrations.CreateModel(
