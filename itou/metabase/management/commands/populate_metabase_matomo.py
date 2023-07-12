@@ -12,6 +12,7 @@ from dateutil.rrule import MO, WEEKLY, rrule
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from psycopg2 import extras as psycopg2_extras, sql
+from sentry_sdk.crons import monitor
 
 from itou.metabase.db import MetabaseDatabaseCursor, create_table
 from itou.utils import constants
@@ -173,6 +174,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--wet-run", dest="wet_run", action="store_true")
 
+    @monitor(monitor_slug="populate-metabase-matomo")
     def handle(self, *, wet_run, **options):
         today = datetime.date.today()
         max_date = datetime.date.today() - datetime.timedelta(days=today.weekday() + 1)

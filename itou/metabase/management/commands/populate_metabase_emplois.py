@@ -27,6 +27,7 @@ from django.contrib.postgres.aggregates import ArrayAgg
 from django.core.management.base import BaseCommand
 from django.db.models import Count, Max, Min, Prefetch, Q
 from django.utils import timezone
+from sentry_sdk.crons import monitor
 
 from itou.analytics.models import Datum, StatsDashboardVisit
 from itou.approvals.models import Approval, PoleEmploiApproval
@@ -78,7 +79,6 @@ def log_retry_attempt(retry_state):
 
 
 class Command(BaseCommand):
-
     help = "Populate metabase database."
 
     def __init__(self, *args, **kwargs):
@@ -459,6 +459,7 @@ class Command(BaseCommand):
         build_final_tables()
 
     @timeit
+    @monitor(monitor_slug="populate-metabase-emplois")
     @tenacity.retry(
         retry=tenacity.retry_if_not_exception_type(RuntimeError),
         stop=tenacity.stop_after_attempt(3),
