@@ -17,7 +17,6 @@ from itou.approvals.models import Approval, PoleEmploiApproval, Suspension
 from itou.files.models import File
 from itou.job_applications.enums import Origin, SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
-from itou.siaes import enums as enums_siae
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.pagination import ItouPaginator
@@ -225,7 +224,7 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
             preview = True
         elif request.POST.get("save"):
 
-            if siae.kind == enums_siae.SiaeKind.AI:
+            if siae.can_upload_prolongation_report:
                 if key := form.cleaned_data.get("report_file_path"):
                     file = File(key, timezone.now())
                     prolongation.report_file = file
@@ -291,7 +290,7 @@ class DeclareProlongationHTMXFragmentView(TemplateView):
             "form": self.form,
         }
 
-        if self.siae.kind == enums_siae.SiaeKind.AI:
+        if self.siae.can_upload_prolongation_report:
             context |= {"s3_upload": S3Upload(kind="prolongation_report")}
 
         return context
