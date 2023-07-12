@@ -277,6 +277,14 @@ class JobApplicationModelTest(TestCase):
         ):
             JobApplicationFactory(job_seeker=PrescriberFactory())
 
+    def test_inverted_vae_contract(self):
+        JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, inverted_vae_contract=True)
+        JobApplicationFactory(to_siae__kind=SiaeKind.EI, inverted_vae_contract=None)
+        with self.assertRaisesRegex(
+            ValidationError, "Un contrat associé à une VAE inversée n'est possible que pour les GEIQ"
+        ):
+            JobApplicationFactory(to_siae__kind=SiaeKind.AI, inverted_vae_contract=True)
+
 
 def test_can_be_cancelled():
     assert JobApplicationFactory().can_be_cancelled is True
@@ -1731,6 +1739,7 @@ class JobApplicationAdminFormTest(TestCase):
             "qualification_type",
             "qualification_level",
             "planned_training_hours",
+            "inverted_vae_contract",
         ]
         form = JobApplicationAdminForm()
         assert list(form.fields.keys()) == form_fields_list

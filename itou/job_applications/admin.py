@@ -148,6 +148,7 @@ class JobApplicationAdmin(admin.ModelAdmin):
                     "qualification_type",
                     "qualification_level",
                     "planned_training_hours",
+                    "inverted_vae_contract",
                 ]
             },
         ),
