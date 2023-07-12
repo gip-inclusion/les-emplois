@@ -12,14 +12,6 @@ def compose(f, g):
     return lambda *a, **kw: f(g(*a, **kw))
 
 
-def chunks(items, n):
-    """
-    Yield successive n-sized chunks from items.
-    """
-    for i in range(0, len(items), n):
-        yield items[i : i + n]
-
-
 def chunked_queryset(queryset, chunk_size=10000):
     """
     Slice a queryset into chunks. This is useful to avoid memory issues when
