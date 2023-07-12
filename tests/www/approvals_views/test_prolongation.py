@@ -360,7 +360,7 @@ class ApprovalProlongationTest(S3AccessingTestCase):
         }
         response = self.client.post(url, data=post_data)
 
-        error_msg = parse_response_to_soup(response, selector="div#check_prescriber_email .invalid-feedback")
+        error_msg = parse_response_to_soup(response, selector="input#id_email + .invalid-feedback")
         assert str(error_msg) == self.snapshot(name="unknown authorized prescriber")
 
     def test_prolongation_without_report_file(self):

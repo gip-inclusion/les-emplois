@@ -215,8 +215,6 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
         prolongation = form.save(commit=False)
         prolongation.created_by = request.user
         prolongation.declared_by = request.user
-        prolongation.declared_by_siae = form.siae
-        prolongation.validated_by = form.validated_by
 
         if request.POST.get("preview"):
             preview = True
@@ -313,6 +311,7 @@ class DeclareProlongationHTMXFragmentView(TemplateView):
 
 class CheckPrescriberEmailView(DeclareProlongationHTMXFragmentView):
     template_name = "approvals/includes/declaration_prescriber_email.html"
+    clear_errors = ("prescriber_organization",)
 
 
 class CheckContactDetailsView(DeclareProlongationHTMXFragmentView):
