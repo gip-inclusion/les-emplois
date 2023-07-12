@@ -54,10 +54,9 @@ class CommonApprovalMixin(models.Model):
     class Meta:
         abstract = True
 
-    def is_valid(self, end_at=None):
-        end_at = end_at or self.end_at
+    def is_valid(self):
         now = timezone.now().date()
-        return (self.start_at <= now <= end_at) or (self.start_at >= now)
+        return (self.start_at <= now <= self.end_at) or (self.start_at >= now)
 
     @property
     def is_in_progress(self):
@@ -1324,9 +1323,6 @@ class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
 
     def __str__(self):
         return self.number
-
-    def is_valid(self):
-        return super().is_valid(end_at=self.end_at)
 
     @staticmethod
     def format_name_as_pole_emploi(name):
