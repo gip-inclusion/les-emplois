@@ -182,25 +182,25 @@ class TestApprovalDetailView:
             1  # fetch django session
             + 1  # fetch authenticated user
             + 1  # verify user is active (middleware)
-            + 1  # fetch siae infos (middleware)
             + 1  # place savepoint right after the middlewares
+            + 1  # fetch siae infos
             + 1  # get approval infos (get_object)
             # get_context_data
-            + 1  # approval.suspension_set.end_at >= today >= approval.suspension_set.start_at (.can_be_suspended)
             + 1  # select all latest suspensions to check their end date (with prefetch)
             + 1  # for every *active* suspension, check if there is an accepted job application after it
+            + 1  # approval.suspension_set.end_at >= today >= approval.suspension_set.start_at (.can_be_suspended)
             + 1  # job_application.with_accepted_at annotation coming from (.last_hire_was_made_by_siae)
             + 1  # siae infos (.last_hire_was_made_by_siae)
             + 1  # user approvals (.is_last_for_user)
-            + 1  # get_job_application
             + 1  # siae infos (job_application.get_eligibility_diagnosis())
+            + 1  # approval.suspensions_for_status_card lists approval suspensions
+            + 1  # EXISTS accepted job application starting after today
+            + 1  # release savepoint before the template rendering
             # context processors
             + 1  # siae membership (get_context_siae)
-            + 1  # release savepoint before the template rendering
             # template: approvals/includes/status.html
-            + 1  # template: approval.remainder fetches approval suspensions to compute remaining days
-            + 1  # template: approval.suspensions_for_status_card lists approval suspensions
             + 1  # template: approval.prolongations_for_status_card
+            + 1  # template: approval.remainder fetches approval suspensions to compute remaining days
             # template: eligibility_diagnosis.html
             + 1  # prescribers_prescriberorganization (job_application.is_sent_by_authorized_prescriber)
             + 1  # get user infos (eligibility_diagnosis.author.get_full_name)
