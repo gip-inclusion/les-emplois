@@ -7,7 +7,8 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Case, Count, Exists, F, Max, OuterRef, Prefetch, Q, Subquery, When
-from django.db.models.functions import Coalesce, Greatest, TruncMonth
+from django.db.models.functions import Coalesce, Greatest, Now, TruncDate, TruncMonth
+from django.db.models.lookups import GreaterThanOrEqual
 from django.urls import reverse
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
@@ -178,8 +179,12 @@ class JobApplicationQuerySet(models.QuerySet):
         )
 
     def with_has_suspended_approval(self):
-        has_suspended_approval = Suspension.objects.filter(approval=OuterRef("approval")).in_progress()
-        return self.annotate(has_suspended_approval=Exists(has_suspended_approval))
+        return self.annotate(
+            has_suspended_approval=Case(
+                When(Q(approval__suspended_until=None), then=False),
+                default=GreaterThanOrEqual(F("approval__suspended_until"), TruncDate(Now())),
+            )
+        )
 
     # We should store this in dedicated field and update it at each model.save()
     def with_last_change(self):
