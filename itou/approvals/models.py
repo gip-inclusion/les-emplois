@@ -806,10 +806,6 @@ class Suspension(models.Model):
         if self.end_at < self.start_at:
             raise ValidationError({"end_at": "La date de fin doit être postérieure à la date de début."})
 
-        # A suspension cannot be in the future.
-        if self.start_in_future:
-            raise ValidationError({"start_at": "La suspension ne peut pas commencer dans le futur."})
-
         # A suspension cannot exceed max duration.
         max_end_at = self.get_max_end_at(self.start_at)
         if self.end_at > max_end_at:
@@ -863,10 +859,6 @@ class Suspension(models.Model):
     @property
     def is_in_progress(self):
         return self.start_at <= timezone.now().date() <= self.end_at
-
-    @property
-    def start_in_future(self):
-        return self.start_at > timezone.now().date()
 
     @property
     def start_in_approval_boundaries(self):
