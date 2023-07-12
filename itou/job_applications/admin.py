@@ -1,4 +1,7 @@
+import uuid
+
 from django.contrib import admin, messages
+from django.db.models import Q
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
@@ -6,6 +9,7 @@ from itou.employee_record import models as employee_record_models
 from itou.job_applications import models
 from itou.job_applications.admin_forms import JobApplicationAdminForm
 from itou.job_applications.enums import Origin
+from itou.users.models import User
 from itou.utils.admin import UUIDSupportRemarkInline, get_admin_view_link
 from itou.utils.templatetags.str_filters import pluralizefr
 
@@ -162,7 +166,42 @@ class JobApplicationAdmin(admin.ModelAdmin):
         ),
     ]
 
-    search_fields = ("pk", "to_siae__siret", "job_seeker__email", "sender__email")
+    def get_search_fields(self, request):
+        search_fields = []
+        search_term = request.GET.get("q", "").strip()
+        try:
+            uuid.UUID(search_term)
+        except (TypeError, ValueError):
+            pass
+        else:
+            search_fields.append("pk__exact")
+        siren_length = 9
+        siret_length = 14
+        if search_term.isdecimal() and len(search_term) in [siren_length, siret_length]:
+            search_fields.append("to_siae__siret__startswith")
+
+        # Without search_fields, the search bar is hidden.
+        # Provide a dummy value that’s quick to search, in order not to slow
+        # down relevant expensive searches that are added dynamically.
+        return search_fields or ["state__startswith"]
+
+    def get_search_results(self, request, queryset, search_term):
+        if "@" in search_term:
+            # Assume an email address is provided.
+            # Instead of joining the User table twice (sender and job seeker),
+            # lookup the user first (using the DB index), then use ForeignKey
+            # indices to retrieve the corresponding job applications faster.
+            #
+            # Specifying user__email in the search_fields adds approximately
+            # 2 seconds per field (so 4 seconds in total) to the query. This hack
+            # allows answering the question in a few ms.
+            try:
+                user = User.objects.get(email=search_term)
+            except User.DoesNotExist:
+                pass
+            else:
+                return queryset.filter(Q(job_seeker=user) | Q(sender=user)), False
+        return super().get_search_results(request, queryset, search_term)
 
     @admin.action(description="Créer une fiche salarié pour les candidatures sélectionnées")
     def create_employee_record(self, request, queryset):
