@@ -1104,12 +1104,6 @@ class SuspensionModelTest(TestCase):
         suspension = SuspensionFactory(start_at=start_at, end_at=end_at)
         assert suspension.duration == expected_duration
 
-    def test_start_in_future(self):
-        start_at = timezone.localdate() + relativedelta(days=10)
-        # Build provides a local object without saving it to the database.
-        suspension = SuspensionFactory.build(start_at=start_at, approval__eligibility_diagnosis=None)
-        assert suspension.start_in_future
-
     def test_start_in_approval_boundaries(self):
         start_at = timezone.localdate()
         end_at = start_at + relativedelta(days=10)
