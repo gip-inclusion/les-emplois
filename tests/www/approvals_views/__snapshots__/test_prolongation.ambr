@@ -3,5 +3,5 @@
   '<div class="invalid-feedback">Ce prescripteur n\'a pas de compte sur les emplois de l\'inclusion. Merci de renseigner l\'e-mail d\'un conseiller inscrit sur le service.</div>'
 # ---
 # name: ApprovalProlongationTest.test_check_multiple_prescriber_organization[prescriber is member of many organizations]
-  '<div class="invalid-feedback">Le prescripteur selectionné fait partie de plusieurs organisations. Veuillez en sélectionner une.</div>'
+  '<div class="invalid-feedback">Ce champ est obligatoire.</div>'
 # ---
