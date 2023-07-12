@@ -651,6 +651,12 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         null=True,
     )
 
+    inverted_vae_contract = models.BooleanField(
+        verbose_name="Contrat associé à une VAE inversée",
+        blank=True,
+        null=True,
+    )
+
     objects = JobApplicationQuerySet.as_manager()
 
     class Meta:
@@ -713,6 +719,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 raise ValidationError("Les précisions sur le type de contrat ne peuvent être saisies que pour un GEIQ")
             if self.nb_hours_per_week:
                 raise ValidationError("Le nombre d'heures par semaine ne peut être saisi que pour un GEIQ")
+            if self.inverted_vae_contract is not None:
+                raise ValidationError("Un contrat associé à une VAE inversée n'est possible que pour les GEIQ")
 
     def save(self, *args, **kwargs):
         self.full_clean()
