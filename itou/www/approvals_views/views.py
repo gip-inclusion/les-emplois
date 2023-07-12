@@ -218,8 +218,6 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
         prolongation.declared_by_siae = form.siae
         prolongation.validated_by = form.validated_by
 
-        if request.POST.get("edit"):
-            preview = False
         if request.POST.get("preview"):
             preview = True
         elif request.POST.get("save"):
