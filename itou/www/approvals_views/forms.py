@@ -58,7 +58,7 @@ class ApprovalForm(forms.Form):
 
         status_filters_list = []
         now = timezone.localdate()
-        suspended_qs_filter = Q(suspension__start_at__lte=now, suspension__end_at__gte=now)
+        suspended_qs_filter = Q(suspended_until__isnull=False, suspended_until__gte=now)
         if data.get("status_valid"):
             status_filters_list.append(Q(start_at__lte=now, end_at__gte=now) & ~suspended_qs_filter)
         if data.get("status_suspended"):
