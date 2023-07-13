@@ -25,7 +25,6 @@ from tests.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oau
 from tests.siaes.factories import SiaeFactory, SiaeMembershipFactory, SiaeWithMembershipAndJobsFactory
 from tests.users.factories import DEFAULT_PASSWORD, PrescriberFactory, SiaeStaffFactory
 from tests.utils.test import BASE_NUM_QUERIES, TestCase, assertMessages
-from tests.www.test import NUM_CSRF_SESSION_REQUESTS
 
 
 class SiaeSignupTest(InclusionConnectBaseTestCase):
@@ -340,7 +339,6 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
             + 1  # SELECT the conventions for those siaes
             + 1  # prefetch memberships
             + 1  # prefetch users associated with those memberships
-            + NUM_CSRF_SESSION_REQUESTS
         ):
             response = self.client.get(url, {"siren": "402191662"})
         assert response.status_code == 200

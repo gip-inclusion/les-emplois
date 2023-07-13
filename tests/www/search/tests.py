@@ -13,7 +13,6 @@ from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.siaes.factories import SiaeFactory, SiaeJobDescriptionFactory
 from tests.utils.test import BASE_NUM_QUERIES, TestCase
-from tests.www.test import NUM_CSRF_SESSION_REQUESTS
 
 
 class SearchSiaeTest(TestCase):
@@ -51,7 +50,6 @@ class SearchSiaeTest(TestCase):
             + 2  # two counts for the tab headers
             + 1  # actual select of the SIAEs, with related objects and annotated distance
             + 1  # prefetch active job descriptions
-            + NUM_CSRF_SESSION_REQUESTS
         ):
             response = self.client.get(self.url, {"city": city_slug})
 
@@ -186,7 +184,6 @@ class SearchSiaeTest(TestCase):
             + 1  # count job descriptions
             + 1  # get siaes infos
             + 1  # get job descriptions infos
-            + 4  # check & update session (select, savepoint, update, release)
         ):
             response = self.client.get(self.url, {"city": guerande.slug})
         siaes_results = response.context["results_page"]
@@ -274,7 +271,6 @@ class JobDescriptionSearchViewTest(TestCase):
             + 1  # fetch initial job descriptions to add to the form fields
             + 2  # count the number of results for siaes & job descriptions
             + 1  # select the job descriptions for the page
-            + NUM_CSRF_SESSION_REQUESTS
         ):
             response = self.client.get(self.url, {"city": city_slug})
 
