@@ -1,0 +1,23 @@
+-r base.txt
+
+pip-tools  # https://github.com/jazzband/pip-tools/
+
+# Code quality
+# ------------------------------------------------------------------------------
+black  # https://github.com/psf/black
+djlint  # https://www.djlint.com
+ruff  # https://github.com/charliermarsh/ruff
+shellcheck-py  # https://github.com/shellcheck-py/shellcheck-py
+
+# Test & Mock
+# ------------------------------------------------------------------------------
+beautifulsoup4  # https://code.launchpad.net/beautifulsoup
+factory-boy  # https://github.com/FactoryBoy/factory_boy
+freezegun  # https://github.com/spulec/freezegun
+pytest  # https://github.com/pytest-dev/pytest
+pytest-django # https://github.com/pytest-dev/pytest-django/
+pytest-mock  # https://github.com/pytest-dev/pytest-mock/
+pytest-timeout  # https://github.com/pytest-dev/pytest-timeout
+pytest-xdist  # https://pypi.org/project/pytest-xdist/
+respx  # https://lundberg.github.io/respx/
+syrupy  # https://github.com/tophat/syrupy
