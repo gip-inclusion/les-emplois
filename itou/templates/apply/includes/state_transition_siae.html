@@ -52,6 +52,15 @@
 
     {% if job_application.state.is_accepted %}
         <h3>Détails du contrat de travail</h3>
+
+        {# GEIQ only #}
+        {% if job_application.contract_type %}
+            <p class="font-italic">
+                {{ job_application.get_contract_type_display }}
+                {% if job_application.inverted_vae_contract %}associé à une VAE inversée{% endif %}
+            </p>
+        {% endif %}
+ 
         <ul>
             <li>Début : {{ job_application.hiring_start_at|date:"d F Y" }}</li>
             <li>Fin : {{ job_application.hiring_end_at|date:"d F Y"|default:"Non renseigné" }}</li>
