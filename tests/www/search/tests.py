@@ -279,7 +279,17 @@ class JobDescriptionSearchViewTest(TestCase):
             response = self.client.get(self.url, {"city": city_slug})
 
         self.assertContains(response, "Employeurs solidaires à 25 km du centre de Paris (75)")
-        self.assertContains(response, "1 poste ouvert au recrutement")
+        self.assertContains(
+            response,
+            """
+            <span class="d-none d-lg-inline">
+                Poste ouvert au recrutement
+                <span class="badge badge-sm badge-pill badge-info-lighter text-info">1</span>
+            </span>
+            """,
+            html=True,
+            count=1,
+        )
         self.assertContains(
             response,
             """Employeur <span class="badge badge-sm badge-pill badge-info-lighter text-info">1</span>""",
@@ -468,7 +478,16 @@ class JobDescriptionSearchViewTest(TestCase):
             self.url,
             {"city": city.slug},
         )
-        self.assertContains(response, "2 postes")
+        self.assertContains(
+            response,
+            """
+            <span class="d-inline d-lg-none">
+                Postes <span class="badge badge-sm badge-pill badge-info-lighter text-info">2</span>
+            </span>
+            """,
+            html=True,
+            count=1,
+        )
         self.assertContains(response, capfirst(job1.display_name), html=True)
         self.assertContains(response, capfirst(job2.display_name), html=True)
         self.assertNotContains(response, capfirst(job3.display_name), html=True)
@@ -478,7 +497,16 @@ class JobDescriptionSearchViewTest(TestCase):
             self.url,
             {"city": city.slug, "contract_types": [ContractType.APPRENTICESHIP, ContractType.BUSINESS_CREATION]},
         )
-        self.assertContains(response, "2 postes")
+        self.assertContains(
+            response,
+            """
+            <span class="d-inline d-lg-none">
+                Postes <span class="badge badge-sm badge-pill badge-info-lighter text-info">2</span>
+            </span>
+            """,
+            html=True,
+            count=1,
+        )
         self.assertContains(response, capfirst(job1.display_name), html=True)
         self.assertContains(response, capfirst(job2.display_name), html=True)
         self.assertNotContains(response, capfirst(job3.display_name), html=True)
@@ -488,7 +516,16 @@ class JobDescriptionSearchViewTest(TestCase):
             self.url,
             {"city": city.slug, "contract_types": [ContractType.APPRENTICESHIP]},
         )
-        self.assertContains(response, "1 poste")
+        self.assertContains(
+            response,
+            """
+            <span class="d-inline d-lg-none">
+                Poste <span class="badge badge-sm badge-pill badge-info-lighter text-info">1</span>
+            </span>
+            """,
+            html=True,
+            count=1,
+        )
         self.assertContains(response, capfirst(job1.display_name), html=True)
         self.assertNotContains(response, capfirst(job2.display_name), html=True)
         self.assertNotContains(response, capfirst(job3.display_name), html=True)
@@ -537,21 +574,48 @@ class JobDescriptionSearchViewTest(TestCase):
         displayed_job_name_2 = capfirst(job2.display_name)
         displayed_job_name_3 = capfirst(job3.display_name)
 
-        self.assertContains(response, "2 postes")
+        self.assertContains(
+            response,
+            """
+            <span class="d-inline d-lg-none">
+                Postes <span class="badge badge-sm badge-pill badge-info-lighter text-info">2</span>
+            </span>
+            """,
+            html=True,
+            count=1,
+        )
         self.assertContains(response, displayed_job_name_1, html=True)
         self.assertContains(response, displayed_job_name_2, html=True)
         self.assertNotContains(response, displayed_job_name_3, html=True)
 
         # pass both domains
         response = self.client.get(self.url, {"city": city.slug, "domains": ["N", "M"]})
-        self.assertContains(response, "2 postes")
+        self.assertContains(
+            response,
+            """
+            <span class="d-inline d-lg-none">
+                Postes <span class="badge badge-sm badge-pill badge-info-lighter text-info">2</span>
+            </span>
+            """,
+            html=True,
+            count=1,
+        )
         self.assertContains(response, displayed_job_name_1, html=True)
         self.assertContains(response, displayed_job_name_2, html=True)
         self.assertNotContains(response, displayed_job_name_3, html=True)
 
         # filter it down.
         response = self.client.get(self.url, {"city": city.slug, "domains": ["M"]})
-        self.assertContains(response, "1 poste")
+        self.assertContains(
+            response,
+            """
+            <span class="d-inline d-lg-none">
+                Poste <span class="badge badge-sm badge-pill badge-info-lighter text-info">1</span>
+            </span>
+            """,
+            html=True,
+            count=1,
+        )
         self.assertContains(response, displayed_job_name_1, html=True)
         self.assertNotContains(response, displayed_job_name_2, html=True)
         self.assertNotContains(response, displayed_job_name_3, html=True)
@@ -592,7 +656,16 @@ class JobDescriptionSearchViewTest(TestCase):
             {"city": city.slug},
         )
 
-        self.assertContains(response, "2 postes")
+        self.assertContains(
+            response,
+            """
+            <span class="d-inline d-lg-none">
+                Postes <span class="badge badge-sm badge-pill badge-info-lighter text-info">2</span>
+            </span>
+            """,
+            html=True,
+            count=1,
+        )
         assert list(response.context["results_page"]) == [job1, job_pec]
         self.assertContains(response, capfirst(job1.display_name))
         self.assertContains(response, capfirst(job_pec.display_name))
@@ -621,7 +694,16 @@ class JobDescriptionSearchViewTest(TestCase):
             self.url,
             {"city": city.slug, "contract_types": ["PEC_OFFER"]},
         )
-        self.assertContains(response, "1 poste")
+        self.assertContains(
+            response,
+            """
+            <span class="d-inline d-lg-none">
+                Poste <span class="badge badge-sm badge-pill badge-info-lighter text-info">1</span>
+            </span>
+            """,
+            html=True,
+            count=1,
+        )
         self.assertNotContains(response, capfirst(job1.display_name))
         self.assertContains(response, capfirst(job_pec.display_name))
 
@@ -630,7 +712,16 @@ class JobDescriptionSearchViewTest(TestCase):
             self.url,
             {"city": city.slug, "contract_types": ["PEC_OFFER", "APPRENTICESHIP"]},
         )
-        self.assertContains(response, "2 postes")
+        self.assertContains(
+            response,
+            """
+            <span class="d-inline d-lg-none">
+                Postes <span class="badge badge-sm badge-pill badge-info-lighter text-info">2</span>
+            </span>
+            """,
+            html=True,
+            count=1,
+        )
         self.assertContains(response, capfirst(job1.display_name))
         self.assertContains(response, capfirst(job_pec.display_name))
 
@@ -639,7 +730,16 @@ class JobDescriptionSearchViewTest(TestCase):
             self.url,
             {"city": city.slug, "contract_types": ["APPRENTICESHIP"]},
         )
-        self.assertContains(response, "1 poste")
+        self.assertContains(
+            response,
+            """
+            <span class="d-inline d-lg-none">
+                Poste <span class="badge badge-sm badge-pill badge-info-lighter text-info">1</span>
+            </span>
+            """,
+            html=True,
+            count=1,
+        )
         self.assertContains(response, capfirst(job1.display_name))
         self.assertNotContains(response, capfirst(job_pec.display_name))
 
@@ -648,7 +748,16 @@ class JobDescriptionSearchViewTest(TestCase):
             self.url,
             {"city": city.slug, "contract_types": ["FIXED_TERM"]},
         )
-        self.assertContains(response, "1 poste")
+        self.assertContains(
+            response,
+            """
+            <span class="d-inline d-lg-none">
+                Poste <span class="badge badge-sm badge-pill badge-info-lighter text-info">1</span>
+            </span>
+            """,
+            html=True,
+            count=1,
+        )
         self.assertNotContains(response, capfirst(job1.display_name))
         self.assertContains(response, capfirst(job_pec.display_name))
 
@@ -659,6 +768,15 @@ class JobDescriptionSearchViewTest(TestCase):
             self.url,
             {"city": city.slug},
         )
-        self.assertContains(response, "2 postes")
+        self.assertContains(
+            response,
+            """
+            <span class="d-inline d-lg-none">
+                Postes <span class="badge badge-sm badge-pill badge-info-lighter text-info">2</span>
+            </span>
+            """,
+            html=True,
+            count=1,
+        )
         self.assertContains(response, capfirst(job_pec.display_name))
         self.assertContains(response, "MaPetiteEntreprise")
