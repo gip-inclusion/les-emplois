@@ -9,7 +9,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      DJANGO_SETTINGS_MODULE: config.settings.dev
+      DJANGO_SETTINGS_MODULE: config.settings.test
       REQUIREMENTS_PATH: requirements/test.txt
       PYTHONPATH: .
     concurrency:
@@ -74,5 +74,4 @@ jobs:
     - name: 🤹 Django tests
       run: make test
       env:
-        DJANGO_DEBUG: True
         USE_VENV: 1

@@ -5,13 +5,11 @@ import socket
 ITOU_ENVIRONMENT = "DEV"
 os.environ["ITOU_ENVIRONMENT"] = ITOU_ENVIRONMENT
 
-from .base import *  # pylint: disable=wildcard-import,unused-wildcard-import,wrong-import-position # noqa: E402,F403
+from .test import *  # pylint: disable=wildcard-import,unused-wildcard-import,wrong-import-position # noqa: E402,F403
 
 
 # Django settings
 # ---------------
-SECRET_KEY = "foobar"
-
 DEBUG = True
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "192.168.0.1", "0.0.0.0"]
@@ -33,13 +31,6 @@ INSTALLED_APPS.extend(  # noqa: F405
 )
 
 INTERNAL_IPS = ["127.0.0.1"]
-
-# `ManifestStaticFilesStorage` (used in base settings) requires `collectstatic` to be run.
-STORAGES = {
-    "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-    },
-}
 
 # Enable django-debug-toolbar with Docker.
 # Hack is coming from https://stackoverflow.com/a/45624773
@@ -67,17 +58,6 @@ REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] += [  # noqa: F405
 # ITOU settings
 # -------------
 
-ASP_ITOU_PREFIX = "XXXXX"  # same as in our fixtures
-
-ITOU_PROTOCOL = "http"
-ITOU_FQDN = "localhost:8000"
-
-DATABASES["default"]["HOST"] = os.getenv("PGHOST", "127.0.0.1")  # noqa: F405
-DATABASES["default"]["PORT"] = os.getenv("PGPORT", "5432")  # noqa: F405
-DATABASES["default"]["NAME"] = os.getenv("PGDATABASE", "itou")  # noqa: F405
-DATABASES["default"]["USER"] = os.getenv("PGUSER", "postgres")  # noqa: F405
-DATABASES["default"]["PASSWORD"] = os.getenv("PGPASSWORD", "password")  # noqa: F405
-
 if SQL_DEBUG:  # noqa: F405
     LOGGING.setdefault("loggers", {})["django.db.backends"] = {  # noqa: F405
         "level": "DEBUG",
@@ -91,8 +71,5 @@ METABASE_PORT = os.getenv("PGPORT", "5432")  # noqa: F405
 METABASE_USER = os.getenv("PGUSER", "postgres")  # noqa: F405o
 METABASE_PASSWORD = os.getenv("PGPASSWORD", "password")  # noqa: F405
 METABASE_DATABASE = os.getenv("PGDATABASE", "metabase")  # noqa: F405
-
-MAILJET_API_KEY_PRINCIPAL = os.getenv("API_MAILJET_KEY_PRINCIPAL", "API_MAILJET_KEY_PRINCIPAL")
-MAILJET_SECRET_KEY_PRINCIPAL = os.getenv("API_MAILJET_SECRET_PRINCIPAL", "API_MAILJET_SECRET_PRINCIPAL")
 
 FORCE_IC_LOGIN = os.getenv("FORCE_IC_LOGIN", "True") == "True"
