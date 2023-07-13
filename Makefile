@@ -10,9 +10,9 @@ PYTHON_VERSION := python3.11
 LINTER_CHECKED_DIRS := config itou tests
 PGDATABASE ?= itou
 ifeq ($(shell uname -s),Linux)
-	REQUIREMENTS_PATH := requirements/dev.txt
+	REQUIREMENTS_PATH ?= requirements/dev.txt
 else
-	REQUIREMENTS_PATH := requirements/dev-mac.txt
+	REQUIREMENTS_PATH ?= requirements/dev-mac.txt
 endif
 
 VIRTUAL_ENV ?= .venv
@@ -43,6 +43,7 @@ venv: $(VIRTUAL_ENV)
 PIP_COMPILE_FLAGS := --allow-unsafe --generate-hashes $(PIP_COMPILE_OPTIONS)
 compile-deps: $(VIRTUAL_ENV)
 	pip-compile $(PIP_COMPILE_FLAGS) -o requirements/base.txt requirements/base.in
+	pip-compile $(PIP_COMPILE_FLAGS) -o requirements/test.txt requirements/test.in
 	pip-compile $(PIP_COMPILE_FLAGS) -o requirements/dev.txt requirements/dev.in
 
 clean:
