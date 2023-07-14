@@ -2,7 +2,7 @@
 
 <ul>
     <li>
-        <a href="{{ ITOU_ASSISTANCE_URL }}/aide/emplois/" class="btn btn-link {% if is_mobile %}mh-auto p-0{% endif %}" target="_blank" aria-label="Accéder à l'espace de documentation (nouvel onglet)">Besoin d'aide ?</a>
+        <a href="{{ ITOU_ASSISTANCE_URL }}" class="btn btn-link {% if is_mobile %}mh-auto p-0{% endif %}" target="_blank" aria-label="Accéder à l'espace de documentation (nouvel onglet)">Besoin d'aide ?</a>
     </li>
     {% if user.is_authenticated %}
         {% if user.is_siae_staff and user_siaes|length > 1 %}

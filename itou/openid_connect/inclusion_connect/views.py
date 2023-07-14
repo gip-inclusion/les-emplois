@@ -96,7 +96,7 @@ def _add_user_kind_error_message(request, existing_user, new_user_kind):
         f"Un compte {existing_user.get_kind_display()} existe déjà avec cette adresse e-mail. "
         "Vous devez créer un compte Inclusion Connect avec une autre adresse e-mail pour "
         f"devenir {UserKind(new_user_kind).label} sur la plateforme. Besoin d'aide ? "
-        f"<a href='{ITOU_ASSISTANCE_URL}/#support' target='_blank'>Contactez-nous</a>."
+        f"<a href='{ITOU_ASSISTANCE_URL}/#requests/new' target='_blank'>Contactez-nous</a>."
     )
     messages.error(request, mark_safe(error))
 
