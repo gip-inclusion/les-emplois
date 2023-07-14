@@ -1046,6 +1046,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
         # IC logout redirects to previous_url
         response = self.client.get(previous_url)
         # Show an error and don't create an organization.
+
         assertMessages(
             response,
             [
@@ -1053,7 +1054,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
                     messages.ERROR,
                     "Un compte employeur existe déjà avec cette adresse e-mail. Vous devez créer un compte "
                     "Inclusion Connect avec une autre adresse e-mail pour devenir prescripteur sur la plateforme. "
-                    "Besoin d'aide ? <a href='https://communaute.inclusion.beta.gouv.fr/aide/emplois/#support' "
+                    f"Besoin d'aide ? <a href='{global_constants.ITOU_HELP_CENTER_URL}/requests/new' "
                     "target='_blank'>Contactez-nous</a>.",
                 )
             ],
