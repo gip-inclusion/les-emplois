@@ -59,7 +59,7 @@ class EditJobSeekerInfoForm(JobSeekerNIRUpdateMixin, MandatoryAddressFormMixin, 
             # If the job seeker uses France Connect, point them to the modification process
             self.fields["email"].help_text = (
                 "Si vous souhaitez modifier votre adresse e-mail merci de "
-                f"<a href='{global_constants.ITOU_ASSISTANCE_URL}/requests/new' target='_blank'>"
+                f"<a href='{global_constants.ITOU_HELP_CENTER_URL}/requests/new' target='_blank'>"
                 "contacter notre support technique</a>"
             )
         elif editor and editor.can_edit_email(self.instance):

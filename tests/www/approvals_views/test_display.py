@@ -28,7 +28,7 @@ class TestDisplayApproval(TestCase):
         assert response.context["approval"] == job_application.approval
         assert response.context["siae"] == job_application.to_siae
         self.assertContains(response, "le 26 avril 2023")
-        self.assertContains(response, global_constants.ITOU_ASSISTANCE_URL)
+        self.assertContains(response, global_constants.ITOU_HELP_CENTER_URL)
         self.assertContains(response, "Imprimer ce PASS IAE")
         self.assertContains(response, "Astuce pour conserver cette attestation en format PDF")
         self.assertContains(response, job_application.approval.start_at.strftime("%d/%m/%Y"))
@@ -53,7 +53,7 @@ class TestDisplayApproval(TestCase):
 
         assert response.context["approval"] == job_application.approval
         assert response.context["siae"] == job_application.to_siae
-        self.assertContains(response, global_constants.ITOU_ASSISTANCE_URL)
+        self.assertContains(response, global_constants.ITOU_HELP_CENTER_URL)
         self.assertContains(response, "Imprimer ce PASS IAE")
         self.assertContains(response, "Astuce pour conserver cette attestation en format PDF")
 
@@ -83,6 +83,6 @@ class TestDisplayApproval(TestCase):
 
         assert response.context["approval"] == job_application.approval
         assert response.context["siae"] == job_application.to_siae
-        self.assertContains(response, global_constants.ITOU_ASSISTANCE_URL)
+        self.assertContains(response, global_constants.ITOU_HELP_CENTER_URL)
         self.assertContains(response, "Imprimer ce PASS IAE")
         self.assertContains(response, "Astuce pour conserver cette attestation en format PDF")

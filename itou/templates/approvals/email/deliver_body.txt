@@ -23,7 +23,7 @@ Au sein de la structure :
 {{ job_application.to_siae.address_line_2 }}{% endif %}
 {{ job_application.to_siae.post_code }} {{ job_application.to_siae.city }}
 
-Votre contact : {{ itou_assistance_url }}
+Votre contact : {{ itou_help_center_url }}
 
 Afin de nous aider à évaluer la performance de notre service, accepteriez-vous de répondre à quelques questions ?
 Prenez 30 secondes pour nous donner votre avis ! Cliquez sur : {{ siae_survey_link }}
@@ -36,7 +36,7 @@ Si le PASS IAE n'est pas suspendu, il décroit donc tous les jours (samedi, dima
 {% else %}
 Merci d'avoir confirmé l'embauche d'un candidat sur les emplois de l'inclusion.
 
-Votre contact : {{ itou_assistance_url }}
+Votre contact : {{ itou_help_center_url }}
 {% endif %}
 
 {% endblock body %}

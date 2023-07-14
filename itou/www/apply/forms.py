@@ -96,7 +96,7 @@ class CheckJobSeekerNirForm(forms.Form):
                     f"reconnecter avec l'adresse e-mail <b>{redact_email_address(existing_account.email)}</b>. "
                     "Si vous ne vous souvenez plus de votre mot de passe, vous pourrez "
                     "cliquer sur « mot de passe oublié ». "
-                    f'En cas de souci, vous pouvez <a href="{global_constants.ITOU_ASSISTANCE_URL}" rel="noopener" '
+                    f'En cas de souci, vous pouvez <a href="{global_constants.ITOU_HELP_CENTER_URL}" rel="noopener" '
                     'target="_blank" aria-label="Ouverture dans un nouvel onglet">nous contacter</a>.'
                 )
                 raise forms.ValidationError(mark_safe(error_message))

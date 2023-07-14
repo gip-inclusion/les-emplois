@@ -138,7 +138,7 @@ class SIAEEmailFactory:
             "siae": self.evaluated_siae.siae,
             "auto_prescription_url": get_absolute_url(auto_prescription_url),
             "siae_evaluation_handbook_url": urllib.parse.urljoin(
-                global_constants.ITOU_ASSISTANCE_URL,
+                global_constants.ITOU_HELP_CENTER_URL,
                 "/sections/15257969468817-Contrôle-a-posteriori-pour-les-SIAE/",
             ),
         }

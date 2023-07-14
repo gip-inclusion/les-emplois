@@ -790,7 +790,7 @@ class CreateSiaeViewTest(TestCase):
         self.assertNotContains(response, escape(expected_message))
         expected_message = "La structure à laquelle vous souhaitez vous rattacher est déjà"
         self.assertContains(response, escape(expected_message))
-        self.assertContains(response, escape(global_constants.ITOU_ASSISTANCE_URL))
+        self.assertContains(response, escape(global_constants.ITOU_HELP_CENTER_URL))
 
         assert Siae.objects.filter(siret=post_data["siret"]).count() == 1
 

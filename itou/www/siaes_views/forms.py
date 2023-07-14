@@ -65,8 +65,8 @@ class CreateSiaeForm(forms.ModelForm):
                 connue de nos services. Merci de nous contacter à l'adresse
                 """
             external_link = get_external_link_markup(
-                url=global_constants.ITOU_ASSISTANCE_URL,
-                text=global_constants.ITOU_ASSISTANCE_URL,
+                url=global_constants.ITOU_HELP_CENTER_URL,
+                text=global_constants.ITOU_HELP_CENTER_URL,
             )
             error_message_siret = (
                 "en précisant votre numéro de SIRET (si existant),"
