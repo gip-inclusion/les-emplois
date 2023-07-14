@@ -12,7 +12,7 @@ Une ou plusieurs de vos auto-prescriptions nécessitent la transmission de nouve
 
 Dans la page de chaque auto-prescription, un commentaire concernant le refus du premier justificatif peut être présent afin de vous fournir plus de précisions.
 
-En cas de besoin, vous pouvez consulter ce mode d’emploi : {{ itou_community_url }}/doc/non-knowledgebase/controle-a-posteriori-pour-les-siae/
+En cas de besoin, vous pouvez consulter ce mode d’emploi : {{ itou_assistance_url }}/sections/15257969468817-Contrôle-a-posteriori-pour-les-SIAE
 
 Cordialement,
 {% endblock %}

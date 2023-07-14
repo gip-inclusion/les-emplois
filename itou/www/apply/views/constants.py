@@ -12,7 +12,7 @@ ERROR_CANNOT_OBTAIN_NEW_FOR_USER = mark_safe(
 )
 
 _doc_link = get_external_link_markup(
-    url=f"{global_constants.ITOU_COMMUNITY_URL }/doc/emplois/derogation-au-delai-de-carence/",
+    url=f"{global_constants.ITOU_ASSISTANCE_URL }/doc/emplois/derogation-au-delai-de-carence/",
     text="En savoir plus sur la dérogation du délai de carence",
 )
 

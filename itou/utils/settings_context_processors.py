@@ -25,7 +25,6 @@ def expose_settings(request):
         "API_EMAIL_CONTACT": settings.API_EMAIL_CONTACT,
         "BASE_TEMPLATE": base_template,
         "ITOU_ASSISTANCE_URL": assistance_url,
-        "ITOU_COMMUNITY_URL": global_constants.ITOU_COMMUNITY_URL,
         "ITOU_EMAIL_CONTACT": settings.ITOU_EMAIL_CONTACT,
         "ITOU_EMAIL_PROLONGATION": global_constants.ITOU_EMAIL_PROLONGATION,
         "ITOU_ENVIRONMENT": settings.ITOU_ENVIRONMENT,

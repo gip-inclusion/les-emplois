@@ -27,7 +27,6 @@ def get_email_text_template(template, context):
             "itou_environment": settings.ITOU_ENVIRONMENT,
             "itou_fqdn": settings.ITOU_FQDN,
             "itou_protocol": settings.ITOU_PROTOCOL,
-            "itou_community_url": global_constants.ITOU_COMMUNITY_URL,
         }
     )
     return remove_extra_line_breaks(get_template(template).render(context).strip())
