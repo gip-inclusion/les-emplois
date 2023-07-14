@@ -26,9 +26,6 @@ Vous pouvez consulter les justificatifs pour chaque salarié, les accepter ou le
 3- Valider le contrôle
 Après avoir traité toutes les justificatifs d’une SIAE, vous pouvez finaliser le contrôle en cliquant sur le bouton “Valider”. La SIAE sera automatiquement notifiée.
 
-
-Vous trouverez plus d’informations dans ce mode d’emploi : {{ ddets_evaluation_handbook_url }}
-
 Cordialement,
 
 {% endblock %}
