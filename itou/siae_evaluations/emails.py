@@ -138,8 +138,8 @@ class SIAEEmailFactory:
             "siae": self.evaluated_siae.siae,
             "auto_prescription_url": get_absolute_url(auto_prescription_url),
             "siae_evaluation_handbook_url": urllib.parse.urljoin(
-                global_constants.ITOU_COMMUNITY_URL,
-                "/doc/emplois/controle-a-posteriori-pour-les-siae/",
+                global_constants.ITOU_ASSISTANCE_URL,
+                "/sections/15257969468817-Contrôle-a-posteriori-pour-les-SIAE/",
             ),
         }
         subject = "siae_evaluations/email/to_siae_forced_to_adversarial_stage_subject.txt"
