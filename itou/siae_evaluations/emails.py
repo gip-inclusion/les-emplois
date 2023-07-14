@@ -139,7 +139,7 @@ class SIAEEmailFactory:
             "siae": self.evaluated_siae.siae,
             "auto_prescription_url": get_absolute_url(auto_prescription_url),
             "siae_evaluation_handbook_url": urllib.parse.urljoin(
-                global_constants.ITOU_DOCS_URL,
+                global_constants.ITOU_COMMUNITY_URL,
                 "/doc/emplois/controle-a-posteriori-pour-les-siae/",
             ),
         }
