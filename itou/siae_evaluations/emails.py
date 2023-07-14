@@ -25,8 +25,8 @@ class CampaignEmailFactory:
             "evaluated_period_start_at": self.evaluation_campaign.evaluated_period_start_at,
             "evaluated_period_end_at": self.evaluation_campaign.evaluated_period_end_at,
             "ddets_evaluation_handbook_url": urllib.parse.urljoin(
-                global_constants.ITOU_DOCS_URL,
-                "/doc/emplois/mode-demploi-sur-le-controle-a-posteriori-pour-les-ddets/",
+                global_constants.DDETS_HELP_CENTER_URL,
+                "/categories/14785701360401-Contrôle-à-posteriori",
             ),
         }
         subject = "siae_evaluations/email/to_institution_selected_siae_subject.txt"
