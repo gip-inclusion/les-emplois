@@ -11,6 +11,7 @@ from pytest_django.asserts import assertContains
 from itou.openid_connect.france_connect import constants as fc_constants
 from itou.users import enums as users_enums
 from itou.users.enums import IdentityProvider, UserKind
+from itou.utils import constants as global_constants
 from itou.utils.urls import add_url_params
 from itou.www.login.forms import ItouLoginForm
 from tests.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance
@@ -233,7 +234,7 @@ class JopbSeekerLoginTest(TestCase):
                     "Vous avez deux comptes sur la plateforme et nous détectons un conflit d'email : "
                     "seconde@email.com et wossewodda-3728@yopmail.com. Veuillez vous rapprocher du support pour "
                     "débloquer la situation en suivant "
-                    "<a href='https://communaute.inclusion.beta.gouv.fr/aide/emplois/#support'>ce lien</a>.",
+                    f"<a href='{global_constants.ITOU_HELP_CENTER_URL}'>ce lien</a>.",
                 )
             ],
         )

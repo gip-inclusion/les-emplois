@@ -34,6 +34,7 @@ from itou.openid_connect.models import InvalidKindException
 from itou.users import enums as users_enums
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
+from itou.utils import constants as global_constants
 from itou.utils.urls import add_url_params, get_absolute_url
 from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
 from tests.users.factories import (
@@ -625,7 +626,7 @@ class InclusionConnectCallbackViewTest(InclusionConnectBaseTestCase):
                     "Vous avez modifié votre e-mail sur Inclusion Connect, mais celui-ci est déjà associé à un compte "
                     "sur la plateforme. Nous n'avons donc pas pu mettre à jour random@email.com en "
                     f"{OIDC_USERINFO['email']}. Veuillez vous rapprocher du support pour débloquer la situation en "
-                    "suivant <a href='https://communaute.inclusion.beta.gouv.fr/aide/emplois/#support'>ce lien</a>.",
+                    f"suivant <a href='{ global_constants.ITOU_HELP_CENTER_URL }'>ce lien</a>.",
                 )
             ],
         )

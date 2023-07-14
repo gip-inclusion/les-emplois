@@ -11,7 +11,7 @@ from django.utils import crypto
 from django.utils.http import urlencode
 
 from itou.users.enums import UserKind
-from itou.utils.constants import ITOU_SESSION_NIR_KEY
+from itou.utils import constants as global_constants
 from itou.utils.urls import get_absolute_url
 
 from ..models import InvalidKindException, MultipleUsersFoundException
@@ -139,11 +139,11 @@ def france_connect_callback(request):  # pylint: disable=too-many-return-stateme
             "Vous avez deux comptes sur la plateforme et nous détectons un conflit d'email : "
             f"{e.users[0].email} et {e.users[1].email}. "
             "Veuillez vous rapprocher du support pour débloquer la situation en suivant "
-            "<a href='https://communaute.inclusion.beta.gouv.fr/aide/emplois/#support'>ce lien</a>.",
+            f"<a href='{global_constants.ITOU_HELP_CENTER_URL}'>ce lien</a>.",
             request=request,
         )
 
-    nir = request.session.get(ITOU_SESSION_NIR_KEY)
+    nir = request.session.get(global_constants.ITOU_SESSION_NIR_KEY)
     if nir:
         user.nir = nir
         user.lack_of_nir_reason = ""

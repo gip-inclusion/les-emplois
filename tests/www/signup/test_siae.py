@@ -15,6 +15,7 @@ from itou.siaes.enums import SiaeKind
 from itou.siaes.models import Siae
 from itou.users.enums import KIND_SIAE_STAFF, UserKind
 from itou.users.models import User
+from itou.utils import constants as global_constants
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.templatetags.format_filters import format_siret
@@ -312,7 +313,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
     def test_facilitator_base_signup_process(self):
         url = reverse("signup:siae_select")
         response = self.client.get(url, {"siren": "111111111"})  # not existing SIREN
-        self.assertContains(response, "https://communaute.inclusion.beta.gouv.fr/aide/emplois/#support")
+        self.assertContains(response, global_constants.ITOU_HELP_CENTER_URL)
         self.assertContains(response, get_tally_form_url("wA799W"))
         self.assertContains(response, reverse("signup:facilitator_search"))
 
