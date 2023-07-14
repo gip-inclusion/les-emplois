@@ -9,14 +9,14 @@ def expose_settings(request):
     https://docs.djangoproject.com/en/4.1/ref/templates/api/#using-requestcontext
     """
 
-    assistance_url = global_constants.ITOU_ASSISTANCE_URL
+    help_center_url = global_constants.ITOU_HELP_CENTER_URL
 
     resolver_match = request.resolver_match
     if resolver_match is not None:  # resolver_match is None for some routes e.g. /robots.txt
         full_view_name = resolver_match.view_name  # e.g. "home:hp" or "stats:stats_public"
         if full_view_name.startswith("stats:"):
             # On all stats pages the help button should redirect to the C2 help page instead of the C1 help page.
-            assistance_url = global_constants.PILOTAGE_ASSISTANCE_URL
+            help_center_url = global_constants.PILOTAGE_HELP_CENTER_URL
 
     base_template = "layout/htmx/base.html" if request.htmx else "layout/base.html"
 
@@ -24,7 +24,7 @@ def expose_settings(request):
         "ALLOWED_HOSTS": settings.ALLOWED_HOSTS,
         "API_EMAIL_CONTACT": settings.API_EMAIL_CONTACT,
         "BASE_TEMPLATE": base_template,
-        "ITOU_ASSISTANCE_URL": assistance_url,
+        "ITOU_HELP_CENTER_URL": help_center_url,
         "ITOU_EMAIL_CONTACT": settings.ITOU_EMAIL_CONTACT,
         "ITOU_EMAIL_PROLONGATION": global_constants.ITOU_EMAIL_PROLONGATION,
         "ITOU_ENVIRONMENT": settings.ITOU_ENVIRONMENT,

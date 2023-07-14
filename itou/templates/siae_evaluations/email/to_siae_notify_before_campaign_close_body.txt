@@ -13,7 +13,7 @@ Pour transmettre les justificatifs demandés : RDV dans votre tableau de bord à
 
 Accès direct à votre liste d'auto-prescriptions : {{ evaluated_job_app_list_url }}
 
-Voir le mode d’emploi : {{ itou_assistance_url }}/sections/15257969468817-Contrôle-a-posteriori-pour-les-SIAE/
+Voir le mode d’emploi : {{ itou_help_center_url }}/sections/15257969468817-Contrôle-a-posteriori-pour-les-SIAE/
 
 En cas de question sur les critères ou les justificatifs vous devez vous adresser uniquement à votre DDETS.
 

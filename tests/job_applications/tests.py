@@ -901,7 +901,7 @@ class JobApplicationNotificationsTest(TestCase):
         assert job_application.to_siae.address_line_2 in email.body
         assert job_application.to_siae.post_code in email.body
         assert job_application.to_siae.city in email.body
-        assert global_constants.ITOU_ASSISTANCE_URL in email.body
+        assert global_constants.ITOU_HELP_CENTER_URL in email.body
         assert job_application.to_siae.accept_survey_url in email.body
 
     def test_email_deliver_approval_without_hiring_end_at(self):
@@ -936,7 +936,7 @@ class JobApplicationNotificationsTest(TestCase):
 
         assert "Confirmation de l'embauche" == email.subject
         assert "PASS IAE" not in email.body
-        assert global_constants.ITOU_ASSISTANCE_URL in email.body
+        assert global_constants.ITOU_HELP_CENTER_URL in email.body
 
     @patch("itou.job_applications.models.huey_notify_pole_emploi")
     def test_manually_deliver_approval(self, *args, **kwargs):

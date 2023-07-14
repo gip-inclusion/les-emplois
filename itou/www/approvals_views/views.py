@@ -185,7 +185,7 @@ class ApprovalPrintableDisplay(ApprovalBaseViewMixin, TemplateView):
         context.update(
             {
                 "approval": approval,
-                "itou_assistance_url": global_constants.ITOU_ASSISTANCE_URL,
+                "itou_help_center_url": global_constants.ITOU_HELP_CENTER_URL,
                 "diagnosis_author": diagnosis_author,
                 "diagnosis_author_org_name": diagnosis_author_org_name,
                 "matomo_custom_title": "Attestation de délivrance d'agrément",
