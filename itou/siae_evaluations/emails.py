@@ -114,7 +114,6 @@ class SIAEEmailFactory:
             "evaluation_campaign": self.evaluated_siae.evaluation_campaign,
             "siae": self.evaluated_siae.siae,
             "evaluated_job_app_list_url": get_absolute_url(job_app_list_url),
-            "itou_community_url": global_constants.ITOU_COMMUNITY_URL,
         }
         subject = "siae_evaluations/email/to_siae_notify_before_adversarial_stage_subject.txt"
         body = "siae_evaluations/email/to_siae_notify_before_adversarial_stage_body.txt"
@@ -157,7 +156,6 @@ class SIAEEmailFactory:
             "evaluation_campaign": self.evaluated_siae.evaluation_campaign,
             "siae": self.evaluated_siae.siae,
             "evaluated_job_app_list_url": get_absolute_url(job_app_list_url),
-            "itou_community_url": global_constants.ITOU_COMMUNITY_URL,
         }
         subject = "siae_evaluations/email/to_siae_notify_before_campaign_close_subject.txt"
         body = "siae_evaluations/email/to_siae_notify_before_campaign_close_body.txt"

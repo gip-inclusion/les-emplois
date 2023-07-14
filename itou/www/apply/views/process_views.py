@@ -322,7 +322,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
                 job_application.job_seeker.save(update_fields=["last_checked_at"])
         except ApprovalAlreadyExistsError:
             link_to_form = get_external_link_markup(
-                url=f"{global_constants.ITOU_COMMUNITY_URL }/aide/emplois/#support",
+                url=f"{global_constants.ITOU_ASSISTANCE_URL }/aide/emplois/#support",
                 text="ce formulaire",
             )
             messages.error(
@@ -377,7 +377,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
             elif not job_application.hiring_without_approval:
                 external_link = get_external_link_markup(
                     url=(
-                        f"{global_constants.ITOU_COMMUNITY_URL }/doc/emplois/pass-iae-comment-ca-marche/"
+                        f"{global_constants.ITOU_ASSISTANCE_URL }/doc/emplois/pass-iae-comment-ca-marche/"
                         "#verification-des-demandes-de-pass-iae"
                     ),
                     text="consulter notre espace documentation",

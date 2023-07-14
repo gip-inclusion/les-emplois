@@ -13,7 +13,7 @@ Vous avez déjà un compte employeur sur les emplois de l’inclusion ?
 - Votre collègue rejoindra le compte de la SIAE.
 - Elle pourra ensuite vous inviter à le rejoindre aussi via le bouton « gérer les collaborateurs de ma structure ».
 
-Pour en savoir plus, consultez notre mode d’emploi {{ itou_community_url }}/aide/emplois/mode-demploi-employeur-solidaire/
+Pour en savoir plus, consultez notre mode d’emploi {{ itou_assistance_url }}/categories/14722747750673--Modes-d-emploi-pour-les-SIAE/
 
 Cordialement,
 {% endblock body%}

@@ -31,7 +31,7 @@ Lorsque tous les justificatifs sont ajoutés, cliquez sur “Soumettre à valida
 
 Vous serez notifié(e) par e-mail lorsque la DDETS aura vérifié vos justificatifs.
 
-Voir le mode d’emploi : {{ itou_community_url }}/doc/emplois/controle-a-posteriori-pour-les-siae/
+Voir le mode d’emploi : {{ itou_assistance_url }}/sections/15257969468817-Contrôle-a-posteriori-pour-les-SIAE
 
 En cas de question sur les critères ou les justificatifs vous devez vous adresser uniquement à votre DDETS.
 
