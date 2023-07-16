@@ -1,5 +1,18 @@
 # Journal des modifications
 
+## [67] - 2023-07-17
+
+### Ajouté
+- Liste des PASS IAE : amélioration des performances
+- Parcours d'embauche : vérification des permissions des utilisateurs
+- Bilans de prolongation : disponibles que pour les AI
+
+
+### Modifié
+- Admin : ajout du bouton "détourner" sur la vue de détails d'un utilisateur
+- Prolongations : toutes les SIAE peuvent effectuer une prolongation (si la candidature est diponible dans leur carnet de bord)
+
+
 ## [66] - 2023-07-03
 
 ### Ajouté
