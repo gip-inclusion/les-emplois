@@ -4,8 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.http import (Http404, HttpResponse, HttpResponseForbidden,
-                         HttpResponseRedirect)
+from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.template import loader
 from django.template.response import TemplateResponse
@@ -20,25 +19,27 @@ from django_xworkflows import models as xwf_models
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.utils import geiq_allowance_amount
-from itou.job_applications.models import (JobApplication,
-                                          JobApplicationWorkflow, PriorAction)
+from itou.job_applications.models import JobApplication, JobApplicationWorkflow, PriorAction
 from itou.siaes.enums import ContractType, SiaeKind
 from itou.siaes.models import Siae
 from itou.users.models import ApprovalAlreadyExistsError
 from itou.utils import constants as global_constants
 from itou.utils.htmx import hx_trigger_modal_control
-from itou.utils.perms.prescriber import \
-    get_all_available_job_applications_as_prescriber
+from itou.utils.perms.prescriber import get_all_available_job_applications_as_prescriber
 from itou.utils.perms.user import get_user_info
 from itou.utils.urls import get_external_link_markup, get_safe_url
-from itou.www.apply.forms import (AcceptForm, AnswerForm,
-                                  CheckJobSeekerGEIQEligibilityForm,
-                                  JobSeekerPersonalDataForm, PriorActionForm,
-                                  RefusalForm, UserAddressForm)
+from itou.www.apply.forms import (
+    AcceptForm,
+    AnswerForm,
+    CheckJobSeekerGEIQEligibilityForm,
+    JobSeekerPersonalDataForm,
+    PriorActionForm,
+    RefusalForm,
+    UserAddressForm,
+)
 from itou.www.apply.views import constants as apply_view_constants
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
-from itou.www.geiq_eligibility_views.forms import \
-    GEIQAdministrativeCriteriaForGEIQForm
+from itou.www.geiq_eligibility_views.forms import GEIQAdministrativeCriteriaForGEIQForm
 
 
 def check_waiting_period(job_application):

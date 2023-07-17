@@ -2,19 +2,17 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
-from itou.common_apps.address.forms import (MandatoryAddressFormMixin,
-                                            OptionalAddressFormMixin)
+from itou.common_apps.address.forms import MandatoryAddressFormMixin, OptionalAddressFormMixin
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
 from itou.job_applications.notifications import (
     NewQualifiedJobAppEmployersNotification,
-    NewSpontaneousJobAppEmployersNotification)
+    NewSpontaneousJobAppEmployersNotification,
+)
 from itou.users.enums import IdentityProvider
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.apis.exceptions import AddressLookupError
-from itou.utils.widgets import (DuetDatePickerWidget,
-                                MultipleSwitchCheckboxWidget,
-                                SwitchCheckboxWidget)
+from itou.utils.widgets import DuetDatePickerWidget, MultipleSwitchCheckboxWidget, SwitchCheckboxWidget
 
 
 class SSOReadonlyMixin:
