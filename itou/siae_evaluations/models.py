@@ -155,6 +155,15 @@ class EvaluationCampaign(models.Model):
         verbose_name="Date de notification du contrôle aux Siaes", blank=True, null=True
     )
     ended_at = models.DateTimeField(verbose_name="Date de clôture de la campagne", blank=True, null=True)
+    # When SIAE submissions are frozen, notify institutions:
+    # - on the day submissions are frozen, and
+    # - 7 days after submissions have been frozen.
+    submission_freeze_notified_at = models.DateTimeField(
+        verbose_name="notification des DDETS après blocage des soumissions SIAE",
+        help_text="Date de dernière notification des DDETS après blocage des soumissions SIAE",
+        null=True,
+        editable=False,
+    )
 
     # dates of the evaluated period
     # to do later : add coherence controls between campaign.
@@ -342,6 +351,8 @@ class EvaluationCampaign(models.Model):
         EvaluatedSiae.objects.filter(evaluation_campaign=self, submission_freezed_at__isnull=False).update(
             submission_freezed_at=None
         )
+        self.submission_freeze_notified_at = None
+        self.save(update_fields=["submission_freeze_notified_at"])
 
     def close(self):
         now = timezone.now()

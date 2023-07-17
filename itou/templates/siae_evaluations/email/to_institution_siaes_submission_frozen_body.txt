@@ -1,0 +1,14 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% block body %}
+Bonjour,
+
+La phase de transmission des justificatifs par les SIAE est désormais terminée. Les DDETS disposent d’un délai supplémentaire* pour étudier les justificatifs et valider le contrôle de chaque SIAE.
+
+* Pour plus de détails sur la durée de chaque phase, vous pouvez consulter le calendrier disponible dans votre espace professionnel des emplois de l’inclusion.
+
+Pour chaque SIAE contrôlée vous devez :
+- accepter ou refuser l’intégralité des justificatifs soumis
+- et valider le contrôle (sans cette validation le résultat ne sera pas enregistré)
+
+Cordialement,
+{% endblock %}
