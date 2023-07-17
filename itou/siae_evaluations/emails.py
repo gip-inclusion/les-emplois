@@ -38,6 +38,17 @@ class CampaignEmailFactory:
         body = "siae_evaluations/email/to_institution_siaes_transition_to_adversarial_stage_body.txt"
         return get_email_message(self.recipients, context, subject, body)
 
+    def submission_frozen(self):
+        subject = "siae_evaluations/email/to_institution_siaes_submission_frozen_subject.txt"
+        body = "siae_evaluations/email/to_institution_siaes_submission_frozen_body.txt"
+        return get_email_message(self.recipients, {}, subject, body)
+
+    def submission_frozen_reminder(self):
+        context = {"campaign": self.evaluation_campaign.institution.name}
+        subject = "siae_evaluations/email/to_institution_siaes_submission_frozen_reminder_subject.txt"
+        body = "siae_evaluations/email/to_institution_siaes_submission_frozen_reminder_body.txt"
+        return get_email_message(self.recipients, context, subject, body)
+
     def close(self):
         context = {
             "evaluated_siaes_list_url": get_absolute_url(

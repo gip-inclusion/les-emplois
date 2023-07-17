@@ -1,5 +1,6 @@
 import datetime
 
+import pytest
 from dateutil.relativedelta import relativedelta
 from django.core.management import call_command
 from django.utils import timezone
@@ -465,6 +466,149 @@ class TestManagementCommand:
             submitted_at=timezone.now() - relativedelta(days=2),
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2,
         )
+
+        call_command("evaluation_campaign_notify")
+        stdout, stderr = capsys.readouterr()
+        assert stdout == ""
+        assert stderr == ""
+        assert mailoutbox == []
+
+    @freeze_time("2023-01-18 11:11:11")
+    def test_institution_submission_freeze_notification(self, capsys, mailoutbox):
+        campaign = EvaluationCampaignFactory(
+            evaluations_asked_at=timezone.now() - relativedelta(weeks=3),
+            institution__name="DDETS 01",
+            name="Campagne de test",
+        )
+        siae = EvaluatedSiaeFactory(evaluation_campaign=campaign)
+        EvaluatedJobApplicationFactory(evaluated_siae=siae, complete=True)
+        campaign.freeze(timezone.now())
+
+        call_command("evaluation_campaign_notify")
+        stdout, stderr = capsys.readouterr()
+        assert stdout == "Instructed “DDETS 01” to control SIAE during the submission freeze.\n"
+        assert stderr == ""
+        [email] = mailoutbox
+        assert (
+            email.subject == "[Contrôle a posteriori] Contrôle des justificatifs à réaliser avant la clôture de phase"
+        )
+
+    @freeze_time("2023-01-18 11:11:11")
+    def test_institution_submission_freeze_adversarial(self, capsys, mailoutbox):
+        campaign = EvaluationCampaignFactory(
+            evaluations_asked_at=timezone.now() - relativedelta(weeks=6),
+            calendar__adversarial_stage_start=timezone.localdate() - relativedelta(weeks=3),
+            institution__name="DDETS 01",
+            name="Campagne de test",
+        )
+        siae = EvaluatedSiaeFactory(evaluation_campaign=campaign, reviewed_at=timezone.now() - relativedelta(days=15))
+        EvaluatedJobApplicationFactory(evaluated_siae=siae, complete=True)
+        campaign.freeze(timezone.now())
+
+        call_command("evaluation_campaign_notify")
+        stdout, stderr = capsys.readouterr()
+        assert stdout == "Instructed “DDETS 01” to control SIAE during the submission freeze.\n"
+        assert stderr == ""
+        [email] = mailoutbox
+        assert (
+            email.subject == "[Contrôle a posteriori] Contrôle des justificatifs à réaliser avant la clôture de phase"
+        )
+
+    @freeze_time("2023-01-18 11:11:11")
+    def test_institution_submission_freeze_notification_ignores_already_notified(self, capsys, mailoutbox):
+        campaign = EvaluationCampaignFactory(
+            evaluations_asked_at=timezone.now() - relativedelta(weeks=3),
+            submission_freeze_notified_at=timezone.now(),
+            institution__name="DDETS 01",
+            name="Campagne de test",
+        )
+        siae = EvaluatedSiaeFactory(evaluation_campaign=campaign)
+        EvaluatedJobApplicationFactory(evaluated_siae=siae, complete=True)
+        campaign.freeze(timezone.now())
+
+        call_command("evaluation_campaign_notify")
+        stdout, stderr = capsys.readouterr()
+        assert stdout == ""
+        assert stderr == ""
+        assert mailoutbox == []
+
+    @freeze_time("2023-01-18 11:11:11")
+    @pytest.mark.parametrize("reviewed_at_offset", [relativedelta(days=-1), relativedelta(days=2)])
+    def test_institution_submission_freeze_notification_ignores_siae_evaluated(
+        self, capsys, mailoutbox, reviewed_at_offset
+    ):
+        reviewed_at = timezone.now() - reviewed_at_offset
+        campaign = EvaluationCampaignFactory(
+            evaluations_asked_at=timezone.now() - relativedelta(weeks=3),
+            institution__name="DDETS 01",
+            name="Campagne de test",
+        )
+        siae = EvaluatedSiaeFactory(evaluation_campaign=campaign, reviewed_at=reviewed_at)
+        EvaluatedJobApplicationFactory(evaluated_siae=siae, complete=True)
+        campaign.freeze(timezone.now())
+
+        call_command("evaluation_campaign_notify")
+        stdout, stderr = capsys.readouterr()
+        assert stdout == ""
+        assert stderr == ""
+        assert mailoutbox == []
+
+    @freeze_time("2023-01-18 11:11:11")
+    def test_institution_submission_freeze_reminder(self, capsys, mailoutbox, snapshot):
+        campaign = EvaluationCampaignFactory(
+            evaluations_asked_at=timezone.now() - relativedelta(weeks=3),
+            submission_freeze_notified_at=timezone.now() - relativedelta(days=7),
+            institution__name="DDETS 01",
+            name="Campagne de test",
+        )
+        siae = EvaluatedSiaeFactory(evaluation_campaign=campaign)
+        EvaluatedJobApplicationFactory(evaluated_siae=siae, complete=True)
+        campaign.freeze(timezone.now())
+
+        call_command("evaluation_campaign_notify")
+        stdout, stderr = capsys.readouterr()
+        assert stdout == "Reminded “DDETS 01” to control SIAE during the submission freeze.\n"
+        assert stderr == ""
+        [email] = mailoutbox
+        assert email.subject == "[Contrôle a posteriori] Rappel : Contrôle des justificatifs à finaliser"
+        assert email.body == snapshot()
+
+    @freeze_time("2023-01-18 11:11:11")
+    def test_institution_submission_freeze_notification_ignores_closed_campaigns(self, capsys, mailoutbox):
+        campaign = EvaluationCampaignFactory(
+            evaluations_asked_at=timezone.now() - relativedelta(weeks=6),
+            ended_at=timezone.now(),
+            institution__name="DDETS 01",
+            name="Campagne de test",
+        )
+        siae = EvaluatedSiaeFactory(evaluation_campaign=campaign)
+        EvaluatedJobApplicationFactory(evaluated_siae=siae, complete=True)
+        campaign.freeze(timezone.now())
+
+        call_command("evaluation_campaign_notify")
+        stdout, stderr = capsys.readouterr()
+        assert stdout == ""
+        assert stderr == ""
+        assert mailoutbox == []
+
+    @freeze_time("2023-01-18 11:11:11")
+    @pytest.mark.parametrize("adversarial_stage_start", [datetime.date(2023, 2, 1), datetime.date(2023, 1, 1)])
+    def test_institution_submission_freeze_ignores_final_reviewed_at(
+        self, adversarial_stage_start, capsys, mailoutbox
+    ):
+        campaign = EvaluationCampaignFactory(
+            evaluations_asked_at=timezone.now() - relativedelta(weeks=6),
+            calendar__adversarial_stage_start=adversarial_stage_start,
+            institution__name="DDETS 01",
+            name="Campagne de test",
+        )
+        siae = EvaluatedSiaeFactory(
+            evaluation_campaign=campaign,
+            reviewed_at=timezone.now() - relativedelta(days=20),
+            final_reviewed_at=timezone.now() - relativedelta(days=20),
+        )
+        EvaluatedJobApplicationFactory(evaluated_siae=siae, complete=True)
+        campaign.freeze(timezone.now())
 
         call_command("evaluation_campaign_notify")
         stdout, stderr = capsys.readouterr()

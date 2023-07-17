@@ -1,0 +1,4 @@
+{% extends "layout/base_email_text_subject.txt" %}
+{% block subject %}
+[Contrôle a posteriori] Contrôle des justificatifs à réaliser avant la clôture de phase
+{% endblock %}
