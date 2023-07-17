@@ -105,6 +105,7 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
             "contract_type_details",
             "hiring_end_at",
             "hiring_start_at",
+            "inverted_vae_contract",
             "nb_hours_per_week",
             "planned_training_hours",
             "prehiring_guidance_days",
@@ -122,6 +123,7 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
             "contract_type_details",
             "hiring_end_at",
             "hiring_start_at",
+            "inverted_vae_contract",
             "nb_hours_per_week",
             "planned_training_hours",
             "prehiring_guidance_days",
@@ -270,6 +272,39 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
         assert job_application.contract_type == post_data["contract_type"]
         assert job_application.contract_type_details == post_data["contract_type_details"]
         assert job_application.nb_hours_per_week == post_data["nb_hours_per_week"]
+        assert not job_application.inverted_vae_contract
+
+    def test_geiq_inverted_vae_fields(self):
+        job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, state="processing")
+        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+
+        self.client.force_login(job_application.to_siae.members.first())
+
+        response = self.client.get(url_accept)
+        assert response.status_code == 200
+
+        post_data = {
+            "hiring_start_at": f"{datetime.now():%Y-%m-%d}",
+            "hiring_end_at": f"{faker.future_date(end_date='+3M'):%Y-%m-%d}",
+            "prehiring_guidance_days": self.faker.pyint(),
+            "nb_hours_per_week": 4,
+            "contract_type_details": "",
+            "contract_type": str(ContractType.PROFESSIONAL_TRAINING),
+            "inverted_vae_contract": "on",
+            "qualification_type": QualificationType.CCN,
+            "qualification_level": QualificationLevel.NOT_RELEVANT,
+            "planned_training_hours": self.faker.pyint(),
+            "answer": "foo",
+            "confirmed": "True",
+        }
+
+        response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data, follow=True)
+        assert response.status_code == 200
+
+        job_application.refresh_from_db()
+        assert job_application.contract_type == post_data["contract_type"]
+        assert job_application.contract_type_details == post_data["contract_type_details"]
+        assert job_application.inverted_vae_contract
 
     def test_apply_with_past_hiring_date(self):
         # GEIQ can temporarily accept job applications with a past hiring date

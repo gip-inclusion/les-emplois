@@ -175,7 +175,12 @@ urlpatterns = [
     # HTMX fragments loading
     path(
         "<uuid:job_application_id>/accept/reload_qualification_fields",
-        process_views.reload_qualification_fields,
+        process_views.ReloadQualificationFields.as_view(),
         name="reload_qualification_fields",
+    ),
+    path(
+        "<uuid:job_application_id>/accept/reload_contract_type_and_options",
+        process_views.ReloadContractTypeAndOptions.as_view(),
+        name="reload_contract_type_and_options",
     ),
 ]

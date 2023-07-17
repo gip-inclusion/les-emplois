@@ -16,7 +16,7 @@ from itou.employee_record.enums import Status
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siae_evaluations.models import Sanctions
-from itou.siaes.enums import SiaeKind
+from itou.siaes.enums import ContractType, SiaeKind
 from itou.users.enums import LackOfNIRReason, UserKind
 from itou.users.models import User
 from itou.utils.models import InclusiveDateRange
@@ -1951,3 +1951,26 @@ def test_precriber_details_with_older_valid_approval(client, faker):
     )
     # Must display approval status template (tested in many other places)
     assertTemplateUsed(response, template_name="approvals/includes/status.html")
+
+
+@pytest.mark.parametrize(
+    "inverted_vae_contract,expected_predicate", [(True, assertContains), (False, assertNotContains)]
+)
+def test_details_for_geiq_with_inverted_vae_contract(client, inverted_vae_contract, expected_predicate):
+    # GEIQ: check that contract type is displayed in details
+    job_application = JobApplicationFactory(
+        state=JobApplicationWorkflow.STATE_ACCEPTED,
+        to_siae__kind=SiaeKind.GEIQ,
+        contract_type=ContractType.PROFESSIONAL_TRAINING,
+        inverted_vae_contract=inverted_vae_contract,
+    )
+
+    user = job_application.to_siae.members.first()
+    client.force_login(user)
+
+    response = client.get(reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk}))
+
+    inverted_vae_text = "associé à une VAE inversée"
+
+    assertContains(response, job_application.get_contract_type_display())
+    expected_predicate(response, inverted_vae_text)

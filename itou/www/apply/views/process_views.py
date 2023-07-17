@@ -13,6 +13,7 @@ from django.utils import timezone
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_POST
+from django.views.generic.base import TemplateView
 from django_htmx.http import HttpResponseClientRedirect
 from django_xworkflows import models as xwf_models
 
@@ -413,21 +414,42 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
     return render(request, template_name, {**context, "has_form_error": any(form.errors for form in forms)})
 
 
-def reload_qualification_fields(
-    request, job_application_id, template_name="apply/includes/geiq/geiq_qualification_fields.html"
-):
-    queryset = JobApplication.objects.siae_member_required(request.user)
-    job_application = get_object_or_404(queryset, id=job_application_id)
-    form_accept = AcceptForm(instance=job_application, data=request.POST or None)
-    ctx = {
-        "form_accept": form_accept,
-        "job_application": job_application,
-    }
+class AcceptHTMXFragmentView(TemplateView):
+    def setup(self, request, job_application_id, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
 
-    # we don't want to display error on this field for an HTMX reload:
-    form_accept.errors.pop("qualification_level", None)
+        queryset = JobApplication.objects.siae_member_required(request.user)
+        self.job_application = get_object_or_404(queryset, id=job_application_id)
+        self.form_accept = AcceptForm(instance=self.job_application, data=request.POST or None)
 
-    return render(request, template_name, ctx)
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "form_accept": self.form_accept,
+            "job_application": self.job_application,
+        }
+
+    def post(self, request, job_application_id, *args, **kwargs):
+        return self.render_to_response(self.get_context_data(**kwargs))
+
+
+class ReloadQualificationFields(AcceptHTMXFragmentView):
+    template_name = "apply/includes/geiq/geiq_qualification_fields.html"
+
+    def post(self, request, job_application_id, *args, **kwargs):
+        # we don't want to display error on this field for an HTMX reload:
+        self.form_accept.errors.pop("qualification_level", None)
+
+        return super().post(request, job_application_id, *args, **kwargs)
+
+
+class ReloadContractTypeAndOptions(AcceptHTMXFragmentView):
+    template_name = "apply/includes/geiq/geiq_contract_type_and_options.html"
+
+    def post(self, request, job_application_id, *args, **kwargs):
+        # we don't want to display error on this field for an HTMX reload:
+        self.form_accept.errors.pop("nb_hours_per_week", None)
+
+        return super().post(request, job_application_id, *args, **kwargs)
 
 
 @login_required

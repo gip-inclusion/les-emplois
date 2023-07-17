@@ -48,18 +48,18 @@
                                 <hr>
                                 <h2>Embauche</h2>
                                 {% bootstrap_form_errors form_accept type="non_fields" %}
+ 
+                                {# reloadable contract type and options for GEIQ #}
                                 {% if job_application.to_siae.kind == SiaeKind.GEIQ %}
-                                    {% bootstrap_field form_accept.prehiring_guidance_days %}
-                                    {% bootstrap_field form_accept.contract_type %}
-                                    <div id="contractTypeDetails" {% if not form_accept.is_bound or form_accept.contract_type.value != hide_value %}class="d-none"{% endif %}>
-                                        {% bootstrap_field form_accept.contract_type_details %}
-                                    </div>
-                                    {% bootstrap_field form_accept.nb_hours_per_week %}
+                                    {% include "apply/includes/geiq/geiq_contract_type_and_options.html" %}
                                 {% endif %}
+
                                 {% bootstrap_field form_accept.hiring_start_at %}
 
                                 {# reloadable training and qualification for GEIQ #}
-                                {% include "apply/includes/geiq/geiq_qualification_fields.html" %}
+                                {% if job_application.to_siae.kind == SiaeKind.GEIQ %}
+                                    {% include "apply/includes/geiq/geiq_qualification_fields.html" %}
+                                {% endif %}
 
                                 {% bootstrap_field form_accept.hiring_end_at %}
                                 {% bootstrap_field form_accept.answer %}
