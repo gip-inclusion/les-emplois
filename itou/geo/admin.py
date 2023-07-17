@@ -6,7 +6,6 @@ from .models import QPV, ZRR
 
 @admin.register(QPV)
 class QPVAdmin(GISModelAdmin):
-
     list_display = (
         "pk",
         "code",

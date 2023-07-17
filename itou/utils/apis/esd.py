@@ -18,7 +18,6 @@ TOKENS_CACHE = {}
 
 
 def get_access_token(scope):
-
     if scope in TOKENS_CACHE:
         token = TOKENS_CACHE[scope]
         now = datetime.datetime.now()

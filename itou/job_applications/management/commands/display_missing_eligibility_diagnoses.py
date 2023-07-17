@@ -17,7 +17,6 @@ from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS
 
 
 class Command(BaseCommand):
-
     help = "Prints the accepted job applications that do not have eligibility diagnoses for no obvious reason"
 
     def handle(self, **options):

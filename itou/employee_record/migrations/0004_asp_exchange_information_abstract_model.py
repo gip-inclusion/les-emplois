@@ -4,7 +4,6 @@ import itou.employee_record.models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("employee_record", "0003_alter_updated_at"),
     ]

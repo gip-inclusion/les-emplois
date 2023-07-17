@@ -84,7 +84,6 @@ class Command(XlsxExportMixin, DeprecatedLoggerMixin, BaseCommand):
         self.logger.debug(f"[easy] {log_info}")
 
         for user in users_to_delete:
-
             assert user.approvals.count() == 0
 
             if self.wet_run:
@@ -170,7 +169,6 @@ class Command(XlsxExportMixin, DeprecatedLoggerMixin, BaseCommand):
             self.NIR_DUPLICATES_LOGS.append(log_info)
 
     def handle(self, *, wet_run, no_xlsx, **options):
-
         self.set_logger(options.get("verbosity"))
 
         self.wet_run = wet_run
@@ -185,7 +183,6 @@ class Command(XlsxExportMixin, DeprecatedLoggerMixin, BaseCommand):
         pbar = tqdm(total=len(duplicates_dict.items()))
 
         for pe_id, duplicates in duplicates_dict.items():
-
             pbar.update(1)
 
             users_with_approval = [u for u in duplicates if u.approvals.exists()]
@@ -202,7 +199,6 @@ class Command(XlsxExportMixin, DeprecatedLoggerMixin, BaseCommand):
             # Easy cases.
             # None or 1 PASS IAE was issued for the same person with multiple accounts.
             if len(users_with_approval) <= 1:
-
                 self.EASY_DUPLICATES_COUNT += 1
                 target = None
 

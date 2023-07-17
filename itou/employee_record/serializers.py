@@ -40,7 +40,6 @@ class CodeComInsee(typing.TypedDict):
 
 
 class _PersonSerializer(serializers.Serializer):
-
     passIae = serializers.CharField(source="approval_number")
     sufPassIae = NullField()
     idItou = serializers.CharField(source="job_seeker.asp_uid")
@@ -85,7 +84,6 @@ class _PersonSerializer(serializers.Serializer):
 
 
 class _AddressSerializer(serializers.Serializer):
-
     # Source object is a job seeker
 
     adrTelephone = NullField()
@@ -125,7 +123,6 @@ class _AddressSerializer(serializers.Serializer):
 
 
 class _SituationSerializer(serializers.Serializer):
-
     niveauFormation = serializers.CharField(source="job_seeker.jobseeker_profile.education_level")
     salarieEnEmploi = serializers.BooleanField(source="job_seeker.jobseeker_profile.is_employed")
 
@@ -167,7 +164,6 @@ class _SituationSerializer(serializers.Serializer):
 
 
 class _BaseEmployeeRecordSerializer(serializers.Serializer):
-
     numLigne = serializers.IntegerField(source="asp_batch_line_number")
     typeMouvement = serializers.CharField(source="ASP_MOVEMENT_TYPE")
 
@@ -181,7 +177,6 @@ class _BaseEmployeeRecordSerializer(serializers.Serializer):
 
 
 class EmployeeRecordSerializer(serializers.Serializer):
-
     numLigne = serializers.IntegerField(source="asp_batch_line_number")
     typeMouvement = serializers.CharField(source="ASP_MOVEMENT_TYPE")
     siret = serializers.CharField()

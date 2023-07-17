@@ -7,9 +7,7 @@
             <form method="post" action="{% url "employee_record_views:create_step_3" job_application.id %}" class="js-prevent-multiple-submit">
                 {% csrf_token %}
                 <fieldset>
-                    <legend>
-                        Situation du salarié
-                    </legend>
+                    <legend>Situation du salarié</legend>
                     {% bootstrap_form_errors form type="all" %}
 
                     {% bootstrap_field form.education_level %}

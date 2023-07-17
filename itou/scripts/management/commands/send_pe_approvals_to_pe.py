@@ -9,7 +9,6 @@ from itou.utils.apis import enums as api_enums
 
 
 class Command(BaseCommand):
-
     help = "Regularly sends all 'pending' and 'should retry' PE approvals to PE"
 
     def add_arguments(self, parser):

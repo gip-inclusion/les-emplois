@@ -16,7 +16,6 @@ MAX_APPROVALS_PER_RUN = 100
 
 
 class Command(BaseCommand):
-
     help = "Regularly sends all 'pending' and 'should retry' approvals to PE"
 
     def add_arguments(self, parser):

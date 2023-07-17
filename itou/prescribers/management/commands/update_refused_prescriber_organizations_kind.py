@@ -10,7 +10,6 @@ class Command(XlsxExportMixin, BaseCommand):
     help = "Update kind of prescriber_organization with REFUSED authorization status"
 
     def show_counts(self, prescriber_orgs_refused, info):
-
         self.stdout.write(f"Number of Prescriber Organizations with REFUSED authorization status: {info}")
 
         prescriber_orgs_list_with_count = prescriber_orgs_refused.values("kind").annotate(Count("kind"))
@@ -23,7 +22,6 @@ class Command(XlsxExportMixin, BaseCommand):
         )
 
     def handle(self, **options):
-
         # Collect prescriber organizations whose authorization status is "refused".
         prescriber_orgs_refused = PrescriberOrganization.objects.filter(
             authorization_status=PrescriberAuthorizationStatus.REFUSED

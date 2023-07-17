@@ -7,7 +7,6 @@ import itou.utils.validators
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("users", "0013_user_has_kind"),
     ]

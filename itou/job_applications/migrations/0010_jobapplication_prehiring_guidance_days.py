@@ -2,7 +2,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("job_applications", "0009_alter_jobapplication_state_prioraction"),
     ]

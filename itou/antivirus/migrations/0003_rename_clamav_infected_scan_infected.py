@@ -2,7 +2,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("antivirus", "0002_scan_delete_filescanreport"),
     ]

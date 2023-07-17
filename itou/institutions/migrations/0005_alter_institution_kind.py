@@ -21,7 +21,6 @@ KIND_CHOICES = [
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("institutions", "0004_alter_institution_updated_at_and_more"),
     ]

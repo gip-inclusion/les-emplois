@@ -10,7 +10,6 @@ def forwards(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("france_connect", "0005_franceconnectstate_state"),
     ]

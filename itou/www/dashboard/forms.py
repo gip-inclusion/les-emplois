@@ -134,7 +134,6 @@ class EditUserInfoForm(OptionalAddressFormMixin, SSOReadonlyMixin, forms.ModelFo
 
 
 class EditUserEmailForm(forms.Form):
-
     email = forms.EmailField(
         label="Nouvelle adresse e-mail",
         widget=forms.EmailInput(attrs={"placeholder": "prenom.nom@example.com"}),

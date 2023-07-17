@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("inclusion_connect", "0006_oidconnect_csrf_to_state"),
     ]

@@ -7,7 +7,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     replaces = [("asp", "0007_commune_created_at_commune_created_by")]
 
     dependencies = [

@@ -6,7 +6,6 @@ from tests.utils.test import TestCase
 
 
 class CommunesFixtureTest(TestCase):
-
     # INSEE commune with a single entry (1 history entry)
     _CODES_WITHOUT_HISTORY = ["97108", "13200"]
     ## Total number of entries in the file

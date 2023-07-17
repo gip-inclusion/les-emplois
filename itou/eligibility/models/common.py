@@ -83,7 +83,6 @@ class AdministrativeCriteriaQuerySet(models.QuerySet):
 
 
 class AbstractAdministrativeCriteria(models.Model):
-
     MAX_UI_RANK = 32767
 
     level = models.CharField(

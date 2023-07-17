@@ -20,7 +20,6 @@ def _fill_approval_origin(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("approvals", "0002_approval_origin"),
     ]

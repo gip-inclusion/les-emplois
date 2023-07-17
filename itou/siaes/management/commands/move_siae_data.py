@@ -184,7 +184,6 @@ class Command(BaseCommand):
             return
 
         with transaction.atomic():
-
             # If we move the job applications without moving the job descriptions as well, we need to unlink them,
             # as job applications will be attached to siae B but job descriptions will stay attached to siae A.
             if only_job_applications:

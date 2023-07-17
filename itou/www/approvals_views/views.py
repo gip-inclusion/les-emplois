@@ -219,7 +219,6 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
         if request.POST.get("preview"):
             preview = True
         elif request.POST.get("save"):
-
             if siae.can_upload_prolongation_report:
                 if key := form.cleaned_data.get("report_file_path"):
                     file = File(key, timezone.now())

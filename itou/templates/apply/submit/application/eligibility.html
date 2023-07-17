@@ -71,9 +71,7 @@
         {% endif %}
         <div class="col-12 col-lg-7 pl-0{% if eligibility_diagnosis and not form.is_bound %} js-shroud{% endif %}">
             <fieldset>
-                <legend class="h3">
-                    Critères administratifs de niveau 1
-                </legend>
+                <legend class="h3">Critères administratifs de niveau 1</legend>
                 {% for field in form %}
                     {% if form.LEVEL_1_PREFIX in field.name %}
                         {% bootstrap_field field %}
@@ -82,9 +80,7 @@
             </fieldset>
 
             <fieldset>
-                <legend class="h3">
-                    Critères administratifs de niveau 2
-                </legend>
+                <legend class="h3">Critères administratifs de niveau 2</legend>
                 {% for field in form %}
                     {% if form.LEVEL_2_PREFIX in field.name %}
                         {% bootstrap_field field %}

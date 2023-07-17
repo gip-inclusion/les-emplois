@@ -5,7 +5,6 @@ from django.db.models import Max
 
 
 def _fill_user_last_checked_at(apps, schema_editor):
-
     # Récupération de la dernière acceptation de candidature pour chaque JobSeekerProfile
     JobApplicationTransitionLog = apps.get_model("job_applications", "JobApplicationTransitionLog")
     last_application_acceptance = dict(
@@ -43,7 +42,6 @@ def _fill_user_last_checked_at(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     atomic = False
 
     dependencies = [

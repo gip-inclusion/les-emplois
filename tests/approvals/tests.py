@@ -70,7 +70,6 @@ class CommonApprovalQuerySetTest(TestCase):
         assert 1 == Approval.objects.valid().count()
 
     def test_valid(self):
-
         # Start today, end in 2 years.
         start_at = timezone.localdate()
         end_at = start_at + relativedelta(years=2)
@@ -148,7 +147,6 @@ class CommonApprovalMixinTest(TestCase):
         assert approval.is_in_progress
 
     def test_waiting_period(self):
-
         # End is tomorrow.
         end_at = timezone.localdate() + relativedelta(days=1)
         start_at = end_at - relativedelta(years=2)
@@ -196,7 +194,6 @@ class ApprovalModelTest(TestCase):
             approval.save()
 
     def test_get_next_number(self):
-
         # No pre-existing objects.
         expected_number = f"{Approval.ASP_ITOU_PREFIX}0000001"
         next_number = Approval.get_next_number()
@@ -238,7 +235,6 @@ class ApprovalModelTest(TestCase):
         Approval.objects.all().delete()
 
     def test_is_valid(self):
-
         # Start today, end in 2 years.
         start_at = timezone.localdate()
         end_at = start_at + relativedelta(years=2)
@@ -264,13 +260,11 @@ class ApprovalModelTest(TestCase):
         assert not approval.is_valid()
 
     def test_number_with_spaces(self):
-
         approval = ApprovalFactory(number="999990000001")
         expected = "99999 00 00001"
         assert approval.number_with_spaces == expected
 
     def test_is_last_for_user(self):
-
         user = JobSeekerFactory()
 
         # Ended 1 year ago.
@@ -649,7 +643,6 @@ class PoleEmploiApprovalManagerTest(TestCase):
         assert search_results.count() == 0
 
     def test_find_for_user(self):
-
         # given a User, ensure we can find a PE approval using its pole_emploi_id and not the others.
         user = JobSeekerFactory()
         pe_approval = PoleEmploiApprovalFactory(pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate)
@@ -1415,7 +1408,6 @@ class ProlongationModelTestTrigger(TestCase):
 
 class ProlongationModelTestConstraint(TestCase):
     def test_exclusion_constraint(self):
-
         approval = ApprovalFactory()
 
         initial_prolongation = ProlongationFactory(
@@ -1478,7 +1470,6 @@ class ProlongationModelTest(TestCase):
             prolongation.clean()
 
     def test_get_max_end_at(self):
-
         start_at = datetime.date(2021, 2, 1)
 
         reason = ProlongationReason.SENIOR_CDI
@@ -1562,7 +1553,6 @@ class ProlongationModelTest(TestCase):
         assert approval.duration == initial_approval_duration + prolongation1.duration + prolongation2.duration
 
     def test_has_reached_max_cumulative_duration_for_complete_training(self):
-
         approval = ApprovalFactory()
 
         duration = Prolongation.MAX_CUMULATIVE_DURATION[ProlongationReason.COMPLETE_TRAINING.value]["duration"]
@@ -1578,7 +1568,6 @@ class ProlongationModelTest(TestCase):
         assert prolongation.has_reached_max_cumulative_duration(additional_duration=datetime.timedelta(days=1))
 
     def test_has_reached_max_cumulative_duration_for_particular_difficulties(self):
-
         approval = ApprovalFactory()
 
         prolongation1 = ProlongationFactory(
@@ -1603,7 +1592,6 @@ class ProlongationModelTest(TestCase):
 
 class ProlongationNotificationsTest(TestCase):
     def test_new_prolongation_to_authorized_prescriber_notification(self):
-
         prolongation = ProlongationFactory()
 
         email = NewProlongationToAuthorizedPrescriberNotification(prolongation).email

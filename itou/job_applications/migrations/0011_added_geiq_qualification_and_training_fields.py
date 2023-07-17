@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("job_applications", "0010_jobapplication_prehiring_guidance_days"),
     ]

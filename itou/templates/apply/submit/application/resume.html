@@ -5,7 +5,7 @@
 {% block extra_head %}
     {{ block.super }}
     <!-- Dropzone -->
-    <link rel="stylesheet" type="text/css" href='{% static "vendor/dropzone/dropzone.min.css" %}'/>
+    <link rel="stylesheet" type="text/css" href='{% static "vendor/dropzone/dropzone.min.css" %}' />
 {% endblock extra_head %}
 
 {% block progress_title %}{{ block.super }} - Message & CV{% endblock %}
@@ -249,12 +249,8 @@
 
 {% block form_submit_button %}
     {% if request.user.is_siae_staff %}
-        <button type="submit" class="btn btn-primary">
-            Enregistrer
-        </button>
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
     {% else %}
-        <button type="submit" class="btn btn-primary">
-            Envoyer la candidature
-        </button>
+        <button type="submit" class="btn btn-primary">Envoyer la candidature</button>
     {% endif %}
 {% endblock %}

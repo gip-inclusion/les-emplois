@@ -3,7 +3,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("files", "0001_initial"),
         ("antivirus", "0001_initial"),

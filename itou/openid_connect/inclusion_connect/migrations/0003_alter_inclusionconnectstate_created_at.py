@@ -3,7 +3,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("inclusion_connect", "0002_inclusionconnectstate_used_at_and_more"),
     ]

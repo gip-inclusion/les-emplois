@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("institutions", "0002_institution_geocoded_label_and_more"),
     ]

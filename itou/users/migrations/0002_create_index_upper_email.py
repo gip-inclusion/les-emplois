@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     replaces = [("users", "0025_create_index_upper_email")]
 
     dependencies = [

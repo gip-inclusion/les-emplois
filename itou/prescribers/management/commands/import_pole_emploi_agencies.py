@@ -43,7 +43,6 @@ class Command(BaseCommand):
             self.logger.setLevel(logging.DEBUG)
 
     def handle(self, path_to_file, *, dry_run, **options):
-
         self.set_logger(options.get("verbosity"))
 
         with open(path_to_file) as csvfile:
@@ -55,7 +54,6 @@ class Command(BaseCommand):
             csvfile.seek(0)
 
             for i, row in enumerate(reader):
-
                 if i == 0:
                     # Skip CSV header.
                     continue

@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("users", "0015_user_user_lack_of_nir_reason_or_nir"),
     ]

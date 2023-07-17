@@ -2,7 +2,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("siaes", "0002_siae_geocoded_label_siae_geocoding_updated_at"),
     ]

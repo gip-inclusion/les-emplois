@@ -2,7 +2,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("prescribers", "0002_prescriberorganization_geocoded_label_and_more"),
     ]

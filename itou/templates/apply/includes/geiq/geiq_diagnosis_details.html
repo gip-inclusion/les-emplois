@@ -20,9 +20,7 @@
         {% if criteria %}
             <h4>Situation administrative du candidat</h4>
             <ul>
-                {% for c in criteria|dictsort:"ui_rank" %}
-                    <li>{{ c.name }}</li>
-                {% endfor %}
+                {% for c in criteria|dictsort:"ui_rank" %}<li>{{ c.name }}</li>{% endfor %}
             </ul>
         {% endif %}
     {% endwith %}

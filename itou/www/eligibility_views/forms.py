@@ -6,7 +6,6 @@ from itou.siaes.enums import SiaeKind
 
 
 class AdministrativeCriteriaForm(forms.Form):
-
     LEVEL_1_PREFIX = eligibilty_enums.AdministrativeCriteriaLevelPrefix.LEVEL_1_PREFIX
     LEVEL_2_PREFIX = eligibilty_enums.AdministrativeCriteriaLevelPrefix.LEVEL_2_PREFIX
 
@@ -35,7 +34,6 @@ class AdministrativeCriteriaForm(forms.Form):
         return AdministrativeCriteria.objects.all()
 
     def __init__(self, user, siae, **kwargs):
-
         self.user = user
         self.siae = siae
         super().__init__(**kwargs)
@@ -89,7 +87,6 @@ class AdministrativeCriteriaOfJobApplicationForm(AdministrativeCriteriaForm):
         return AdministrativeCriteria.objects.for_job_application(self.job_application)
 
     def __init__(self, user, siae, job_application, **kwargs):
-
         self.job_application = job_application
 
         self.siae = siae

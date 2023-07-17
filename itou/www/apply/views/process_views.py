@@ -298,7 +298,6 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
         return HttpResponseRedirect(next_url)
 
     if request.method == "POST" and all([form.is_valid() for form in forms]):
-
         if request.htmx and not request.POST.get("confirmed"):
             return TemplateResponse(
                 request=request,

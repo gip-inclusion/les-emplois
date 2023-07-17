@@ -10,7 +10,6 @@ class NewDnsRedirectMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-
         host = request.get_host().partition(":")[0]
         new_host = None
 

@@ -9,7 +9,6 @@ def load_geiq_administrative_criteria(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("eligibility", "0004_added_slug_field"),
     ]

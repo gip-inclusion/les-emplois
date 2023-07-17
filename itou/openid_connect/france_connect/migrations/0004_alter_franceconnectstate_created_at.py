@@ -3,7 +3,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("france_connect", "0003_franceconnectstate_used_at_and_more"),
     ]

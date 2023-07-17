@@ -11,7 +11,6 @@ from tests.utils.test import TestCase
 
 class PasswordResetTest(TestCase):
     def test_password_reset_flow(self):
-
         user = JobSeekerFactory()
 
         # Ask for password reset.

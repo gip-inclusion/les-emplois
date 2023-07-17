@@ -102,7 +102,6 @@ class Command(EmployeeRecordTransferCommand):
             return 0
 
         for idx, employee_record in enumerate(records, 1):
-
             if employee_record.get("typeMouvement") != MovementType.UPDATE:
                 # Update notifications are sent in specific files and are not mixed
                 # with "standard" employee records (CREATE mode).
@@ -159,7 +158,6 @@ class Command(EmployeeRecordTransferCommand):
 
     @monitor(monitor_slug="transfer-employee-records-updates-download")
     def download(self, conn: pysftp.Connection, dry_run: bool):
-
         parser = JSONParser()
         count = 0
         total_errors = 0

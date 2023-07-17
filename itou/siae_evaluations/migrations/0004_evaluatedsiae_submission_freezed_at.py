@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("siae_evaluations", "0003_reset_evaluated_siae_notified_at"),
     ]

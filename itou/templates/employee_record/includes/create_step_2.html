@@ -6,9 +6,7 @@
             <form method="post" action="{% url "employee_record_views:create_step_2" job_application.id %}">
                 {% csrf_token %}
                 <fieldset>
-                    <legend class="h2">
-                        Domiciliation du salarié
-                    </legend>
+                    <legend class="h2">Domiciliation du salarié</legend>
                     <div class="row">
                         <div class="col-12 col-lg-8">
                             {% bootstrap_form_errors form type="all" %}

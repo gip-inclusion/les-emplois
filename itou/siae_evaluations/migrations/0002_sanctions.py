@@ -6,7 +6,6 @@ import itou.utils.models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("siae_evaluations", "0001_initial"),
     ]

@@ -22,7 +22,6 @@ def update_approval(row, wet_run, stdout):
 
 
 class Command(BaseCommand):
-
     help = "Merges the SIRET and KIND in PoleEmploiApprovals"
 
     def add_arguments(self, parser):

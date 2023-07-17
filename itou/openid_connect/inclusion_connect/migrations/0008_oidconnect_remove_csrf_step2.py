@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("inclusion_connect", "0007_oidconnect_remove_csrf_step1"),
     ]

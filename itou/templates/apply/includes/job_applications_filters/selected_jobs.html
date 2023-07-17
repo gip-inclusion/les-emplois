@@ -1,8 +1,6 @@
 {% if filters_form.selected_jobs %}
     <fieldset>
-        <legend>
-            Fiches de poste
-        </legend>
+        <legend>Fiches de poste</legend>
         {% if filters_form.selected_jobs|length > 0 %}
             <ul>
                 {% for choice in filters_form.selected_jobs %}

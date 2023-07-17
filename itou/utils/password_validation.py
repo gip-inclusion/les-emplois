@@ -29,7 +29,6 @@ class CnilCompositionPasswordValidator:
     )
 
     def validate(self, password, user=None):
-
         has_lower = any(char.islower() for char in password)
         has_upper = any(char.isupper() for char in password)
         has_digit = any(char.isdigit() for char in password)

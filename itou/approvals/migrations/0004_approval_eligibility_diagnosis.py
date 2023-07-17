@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("eligibility", "0002_geiq_eligibility_models"),
         ("approvals", "0003_fill_approval_origin"),

@@ -51,7 +51,6 @@ def api_city_to_db_city(data):
 
 
 class Command(BaseCommand):
-
     help = "Synchronizes cities with the GEO API"
 
     def add_arguments(self, parser):

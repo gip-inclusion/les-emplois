@@ -56,7 +56,6 @@ def _fill_approval_eligibility_diagnoses(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("approvals", "0004_approval_eligibility_diagnosis"),
         ("job_applications", "0001_initial"),

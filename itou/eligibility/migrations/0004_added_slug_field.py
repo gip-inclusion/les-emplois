@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("eligibility", "0003_criteria_with_both_annexes"),
     ]

@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("job_applications", "0004_make_jobapplication_created_from_pe_approval_nullable"),
     ]

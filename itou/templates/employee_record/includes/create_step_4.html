@@ -7,9 +7,7 @@
             <form method="post" action="{% url "employee_record_views:create_step_4" job_application.id %}" class="js-prevent-multiple-submit">
                 {% csrf_token %}
                 <fieldset>
-                    <legend>
-                        Annexe financière
-                    </legend>
+                    <legend>Annexe financière</legend>
                     <p>
                         Si vous utilisez un logiciel de gestion des salariés, veuillez sélectionner une annexe financière. Sinon, vous pouvez passer à l'étape suivante.
                     </p>

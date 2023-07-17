@@ -7,7 +7,7 @@
 
 {% block extra_head %}
     {{ block.super }}
-    <link rel="stylesheet" type="text/css" href='{% static "vendor/dropzone/dropzone.min.css" %}'/>
+    <link rel="stylesheet" type="text/css" href='{% static "vendor/dropzone/dropzone.min.css" %}' />
 {% endblock extra_head %}
 
 {% block content %}
@@ -48,7 +48,7 @@
                                     {# HTMX: optional report file upload #}
                                     {% include "approvals/includes/declaration_upload_panel.html" %}
 
-                                    <hr/>
+                                    <hr />
 
                                     {% buttons %}
                                         <div class="text-right">
@@ -70,7 +70,7 @@
 
                             {# Hide all form fields. #}
                             {% for field in form %}
-                                {% if field.value %}<input type="hidden" name="{{ field.name }}" value="{{ field.value }}"/>{% endif %}
+                                {% if field.value %}<input type="hidden" name="{{ field.name }}" value="{{ field.value }}" />{% endif %}
                             {% endfor %}
 
                             {# Show the user a preview of the prolongation. #}

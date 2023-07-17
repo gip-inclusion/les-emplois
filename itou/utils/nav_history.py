@@ -22,7 +22,6 @@ def push_url_in_history(session_key):
 
     def decorated(view):
         def wrapped(request, *args, **kwargs):
-
             session_data = request.session[session_key]
             url_history = session_data["url_history"]
 

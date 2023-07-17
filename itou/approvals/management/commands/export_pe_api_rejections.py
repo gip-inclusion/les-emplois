@@ -10,7 +10,6 @@ from itou.utils.management_commands import XlsxExportMixin
 
 class Command(XlsxExportMixin, BaseCommand):
     def handle(self, **options):
-
         first_day_of_month = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         rejected_approvals = (
             Approval.objects.filter(

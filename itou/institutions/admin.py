@@ -13,7 +13,6 @@ class InstitutionMembersInline(MembersInline):
 
 @admin.register(models.Institution)
 class InstitutionAdmin(ItouGISMixin, OrganizationAdmin):
-
     form = InstitutionAdminForm
     fieldsets = (
         (
