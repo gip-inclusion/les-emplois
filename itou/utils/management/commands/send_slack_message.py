@@ -4,7 +4,6 @@ from itou.utils.slack import send_slack_message
 
 
 class Command(BaseCommand):
-
     help = "Send a slack message to the configured webhook, thus channel."
 
     def add_arguments(self, parser):

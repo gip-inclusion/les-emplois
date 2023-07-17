@@ -9,7 +9,6 @@ import itou.siae_evaluations.models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [

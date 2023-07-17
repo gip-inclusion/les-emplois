@@ -197,8 +197,7 @@ class Command(BaseCommand):
 
         creatable_siaes = []
 
-        for (asp_id, kind) in creatable_siae_keys:
-
+        for asp_id, kind in creatable_siae_keys:
             row = ASP_ID_TO_SIAE_ROW.get(asp_id)
             siret = row.siret
 
@@ -283,7 +282,7 @@ class Command(BaseCommand):
     def create_conventions(self):
         creatable_conventions = get_creatable_conventions()
         self.stdout.write(f"will create {len(creatable_conventions)} conventions")
-        for (convention, siae) in creatable_conventions:
+        for convention, siae in creatable_conventions:
             assert not SiaeConvention.objects.filter(asp_id=convention.asp_id, kind=convention.kind).exists()
             convention.save()
             assert convention.siaes.count() == 0

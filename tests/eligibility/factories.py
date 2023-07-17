@@ -63,12 +63,10 @@ class EligibilityDiagnosisMadeBySiaeFactory(factory.django.DjangoModelFactory):
 
 
 class ExpiredEligibilityDiagnosisFactory(EligibilityDiagnosisFactory):
-
     expires_at = factory.SelfAttribute("created_at")
 
 
 class ExpiredEligibilityDiagnosisMadeBySiaeFactory(EligibilityDiagnosisMadeBySiaeFactory):
-
     expires_at = factory.SelfAttribute("created_at")
 
 

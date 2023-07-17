@@ -12,7 +12,6 @@ from tests.employee_record.factories import EmployeeRecordUpdateNotificationFact
 
 @override_settings(ASP_FS_SFTP_HOST="foobar.com", ASP_FS_SFTP_USER="django_tests")
 class TransferUpdatesManagementCommandTest(ManagementCommandTestCase):
-
     MANAGEMENT_COMMAND_NAME = "transfer_employee_records_updates"
 
     @classmethod

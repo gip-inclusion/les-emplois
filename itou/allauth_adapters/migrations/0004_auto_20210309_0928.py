@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("socialaccount", "0003_extra_data_default_dict"),
     ]

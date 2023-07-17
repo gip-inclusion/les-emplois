@@ -48,11 +48,9 @@ class Command(BaseCommand):
             self.logger.setLevel(logging.DEBUG)
 
     def handle(self, *, dry_run, **options):
-
         self.set_logger(options.get("verbosity"))
 
         with open(CSV_FILE) as csvfile:
-
             # Count lines in CSV.
             reader = csv.reader(csvfile, delimiter=",")
             row_count = sum(1 for row in reader)
@@ -61,7 +59,6 @@ class Command(BaseCommand):
             csvfile.seek(0)
 
             for i, row in enumerate(reader):
-
                 if i == 0:
                     # Skip CSV header.
                     continue
@@ -118,7 +115,6 @@ class Command(BaseCommand):
                 self.logger.debug(address_line_2)
 
                 if not dry_run:
-
                     prescriber_organization = PrescriberOrganization()
 
                     prescriber_organization.is_authorized = True

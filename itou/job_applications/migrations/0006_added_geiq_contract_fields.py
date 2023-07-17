@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("job_applications", "0005_remove_jobapplication_created_from_pe_approval"),
     ]

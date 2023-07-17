@@ -16,7 +16,6 @@ def forwards(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("siae_evaluations", "0002_sanctions"),
     ]

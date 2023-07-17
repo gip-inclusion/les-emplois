@@ -217,7 +217,6 @@ class FinancialAnnexSelectForm(forms.Form):
 
 
 class EditJobDescriptionForm(forms.ModelForm):
-
     JOBS_AUTOCOMPLETE_URL = reverse_lazy("autocomplete:jobs")
 
     # See: itou/static/js/job_autocomplete.js

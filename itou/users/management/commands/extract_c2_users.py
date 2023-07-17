@@ -58,7 +58,6 @@ class Command(BaseCommand):
         }
 
     def handle(self, *, no_csv, **options):
-
         self.no_csv = no_csv
 
         self.stdout.write("Starting. Luck not needed, this script never fails.")

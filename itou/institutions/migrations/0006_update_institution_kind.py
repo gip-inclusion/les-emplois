@@ -12,7 +12,6 @@ def update_institution_kind(apps, _schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("institutions", "0005_alter_institution_kind"),
     ]

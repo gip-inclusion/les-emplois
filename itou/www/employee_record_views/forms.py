@@ -20,7 +20,6 @@ COMMUNE_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:communes")
 
 
 class SelectEmployeeRecordStatusForm(forms.Form):
-
     # The user is only able to select a subset of the possible
     # employee record statuses.
     # The other ones are internal only.
@@ -50,7 +49,6 @@ class SelectEmployeeRecordStatusForm(forms.Form):
 
 
 class EmployeeRecordFilterForm(forms.Form):
-
     job_seekers = forms.MultipleChoiceField(
         required=False,
         label="Nom du candidat",

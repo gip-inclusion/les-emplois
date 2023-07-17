@@ -365,7 +365,6 @@ class SearchByEmailForSenderView(SessionNamespaceRequiredMixin, ApplyStepForSend
 
             # The email we found is correct
             if self.form.data.get("confirm"):
-
                 if not can_add_nir:
                     return HttpResponseRedirect(
                         reverse(

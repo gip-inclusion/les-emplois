@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("job_applications", "0012_alter_jobapplication_updated_at"),
     ]

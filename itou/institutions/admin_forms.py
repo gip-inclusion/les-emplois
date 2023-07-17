@@ -4,7 +4,6 @@ from itou.institutions.models import Institution
 
 
 class InstitutionAdminForm(forms.ModelForm):
-
     # Add a custom form field that is not part of the model in the admin.
     extra_field_refresh_geocoding = forms.BooleanField(
         label="Recalculer le geocoding",

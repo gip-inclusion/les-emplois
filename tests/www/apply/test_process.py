@@ -1403,7 +1403,6 @@ class ProcessTemplatesTest(TestCase):
 
 
 class ProcessTransferJobApplicationTest(TestCase):
-
     TRANSFER_TO_OTHER_SIAE_SENTENCE = "Transférer vers une autre structure"
 
     def test_job_application_transfer_disabled_for_lone_users(self):

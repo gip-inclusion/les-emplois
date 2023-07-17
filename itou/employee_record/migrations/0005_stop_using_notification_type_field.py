@@ -2,7 +2,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("employee_record", "0004_asp_exchange_information_abstract_model"),
     ]

@@ -254,7 +254,6 @@ class EligibilityDiagnosisModelTest(TestCase):
         assert diagnosis.administrative_criteria.count() == 0
 
     def test_create_diagnosis_with_administrative_criteria(self):
-
         job_seeker = JobSeekerFactory()
         prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
         user = prescriber_organization.members.first()
@@ -385,7 +384,6 @@ class EligibilityDiagnosisModelTest(TestCase):
 
 class AdministrativeCriteriaModelTest(TestCase):
     def test_levels_queryset(self):
-
         level1_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_1).first()
         level2_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_2).first()
 

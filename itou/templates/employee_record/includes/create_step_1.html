@@ -6,9 +6,7 @@
             <form method="post" class="js-prevent-multiple-submit">
                 {% csrf_token %}
                 <fieldset>
-                    <legend>
-                        Etat civil du salarié
-                    </legend>
+                    <legend>Etat civil du salarié</legend>
                     {% bootstrap_form_errors form type="all" %}
 
                     <div class="form-row">

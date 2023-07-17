@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("inclusion_connect", "0004_add_inclusionconnectstate_data"),
     ]

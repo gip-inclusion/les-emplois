@@ -86,14 +86,14 @@
                                                     {# Change job description status form #}
                                                     <form method="post" action="?action=toggle_active" id="toggle_job_description_form_{{ job_description.id }}" class="js-prevent-multiple-submit">
                                                         {% csrf_token %}
-                                                        <input type="hidden" name="job_description_id" value="{{ job_description.id }}"/>
+                                                        <input type="hidden" name="job_description_id" value="{{ job_description.id }}" />
                                                         <div class="custom-control custom-switch has-state-label">
                                                             <input type="checkbox"
                                                                    class="custom-control-input"
                                                                    name="job_description_is_active"
                                                                    id="job_description_is_active_{{ job_description.id }}"
-                                                                   {% if job_description.is_active %} checked{% endif %}
-                                                                   {% if siae.block_job_applications %} disabled{% endif %}/>
+                                                                   {% if job_description.is_active %}checked{% endif %}
+                                                                   {% if siae.block_job_applications %}disabled{% endif %} />
                                                             <label class="custom-control-label" for="job_description_is_active_{{ job_description.id }}" data-state-label-off="Fermé" data-state-label-on="Ouvert">
                                                             </label>
                                                         </div>
@@ -119,7 +119,7 @@
                                                                 <div class="modal-footer">
                                                                     <form method="post" action="?action=delete&page={{ page|default:1 }}" class="d-block js-prevent-multiple-submit">
                                                                         {% csrf_token %}
-                                                                        <input type="hidden" name="job_description_id" value="{{ job_description.id }}"/>
+                                                                        <input type="hidden" name="job_description_id" value="{{ job_description.id }}" />
                                                                         <button class="btn btn-outline-primary btn-sm" data-dismiss="modal" aria-label="Annuler">Annuler</button>
                                                                         <button type="submit" class="btn btn-primary btn-sm" aria-label="Supprimer">Supprimer</button>
                                                                     </form>

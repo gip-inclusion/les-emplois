@@ -6,9 +6,7 @@
                    class="font-weight-bold stretched-link order-2 order-md-1 matomo-event"
                    data-matomo-category="candidature"
                    data-matomo-action="clic"
-                   data-matomo-option="clic-metiers">
-                    {{ job.display_name }}
-                </a>
+                   data-matomo-option="clic-metiers">{{ job.display_name }}</a>
                 {% if job.is_popular %}
                     <div class="order-1 order-md-2">
                         <span class="badge badge-sm badge-pill badge-accent-03 text-primary ml-0 ml-lg-2 mt-1 mt-lg-0"><i class="ri-group-line"></i>{{ job.POPULAR_THRESHOLD }}+ candidatures</span>

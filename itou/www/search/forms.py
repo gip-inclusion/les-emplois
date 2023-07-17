@@ -9,7 +9,6 @@ from itou.siaes.enums import ContractNature, ContractType, SiaeKind
 
 
 class SiaeSearchForm(forms.Form):
-
     DISTANCES = [5, 10, 15, 25, 50, 75, 100]
     DISTANCE_CHOICES = [(i, (f"{i} km")) for i in DISTANCES]
     DISTANCE_DEFAULT = 25
@@ -93,7 +92,6 @@ class SiaeSearchForm(forms.Form):
 
 
 class JobDescriptionSearchForm(SiaeSearchForm):
-
     CONTRACT_TYPE_CHOICES = sorted(
         [(k, v) for k, v in ContractType.choices if k not in (ContractType.OTHER, ContractType.BUSINESS_CREATION)],
         key=lambda d: d[1],
@@ -121,7 +119,6 @@ class JobDescriptionSearchForm(SiaeSearchForm):
 
 
 class PrescriberSearchForm(forms.Form):
-
     DISTANCES = [5, 10, 15, 25, 50, 75, 100]
     DISTANCE_CHOICES = [(i, (f"{i} km")) for i in DISTANCES]
     DISTANCE_DEFAULT = 5

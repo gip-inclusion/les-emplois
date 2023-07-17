@@ -118,7 +118,6 @@ class JobsAutocompleteTest(TestCase):
 
 class CitiesAutocompleteTest(TestCase):
     def test_autocomplete(self):
-
         create_test_cities(["01", "75", "93"], num_per_department=20)
 
         url = reverse("autocomplete:cities")
@@ -251,7 +250,6 @@ class CitiesAutocompleteTest(TestCase):
 
 class CommunesAutocompleteTest(TestCase):
     def test_autocomplete(self):
-
         url = reverse("autocomplete:communes")
 
         response = self.client.get(url, {"term": "sai"})

@@ -54,9 +54,7 @@
                     id="prior-action-{{ prior_action.pk }}-modify-btn"
                     hx-get="{% url 'apply:modify_prior_action' job_application_id=job_application.id prior_action_id=prior_action.id %}?modify="
                     hx-target="#prior-action-{{ prior_action.pk }}"
-                    hx-swap="outerHTML">
-                Modifier les informations
-            </button>
+                    hx-swap="outerHTML">Modifier les informations</button>
         </div>
     {% endif %}
     {% if job_application.can_change_prior_actions or not hide_final_hr %}<hr>{% endif %}

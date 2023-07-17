@@ -73,7 +73,6 @@ from itou.utils.slack import send_slack_message
 
 
 class Command(BaseCommand):
-
     help = "Populate metabase database with fluxIAE data."
 
     @timeit

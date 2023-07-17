@@ -92,7 +92,6 @@ class PrescriberOrganizationManagerTest(TestCase):
 
 class PrescriberOrganizationModelTest(TestCase):
     def test_accept_survey_url(self):
-
         org = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.PE, department="57")
         url = org.accept_survey_url
         assert url.startswith(f"{settings.TALLY_URL}/r/")
@@ -131,7 +130,6 @@ class PrescriberOrganizationModelTest(TestCase):
             org.clean_code_safir_pole_emploi()
 
     def test_has_pending_authorization_proof(self):
-
         org = PrescriberOrganizationFactory(
             kind=PrescriberOrganizationKind.OTHER,
             authorization_status=PrescriberAuthorizationStatus.NOT_SET,
@@ -243,7 +241,6 @@ class PrescriberOrganizationModelTest(TestCase):
 
 
 class PrescriberOrganizationAdminTest(TestCase):
-
     ACCEPT_BUTTON_LABEL = "Valider l'habilitation"
     REFUSE_BUTTON_LABEL = "Refuser l'habilitation"
     ACCEPT_AFTER_REFUSAL_BUTTON_LABEL = "Annuler le refus et valider l'habilitation"
@@ -281,7 +278,6 @@ class PrescriberOrganizationAdminTest(TestCase):
 
         for authorization_status, is_authorized in self.rights_list:
             with self.subTest(authorization_status=authorization_status, is_authorized=is_authorized):
-
                 post_data = {
                     "id": prescriberorganization.pk,
                     "post_code": prescriberorganization.post_code,
@@ -364,7 +360,6 @@ class PrescriberOrganizationAdminTest(TestCase):
 
         for authorization_status, is_authorized in self.rights_list:
             with self.subTest(authorization_status=authorization_status, is_authorized=is_authorized):
-
                 post_data = {
                     "id": prescriberorganization.pk,
                     "post_code": prescriberorganization.post_code,
@@ -408,7 +403,6 @@ class PrescriberOrganizationAdminTest(TestCase):
 
         for authorization_status, is_authorized in self.rights_list:
             with self.subTest(authorization_status=authorization_status, is_authorized=is_authorized):
-
                 post_data = {
                     "id": prescriberorganization.pk,
                     "post_code": prescriberorganization.post_code,
@@ -542,7 +536,6 @@ class PrescriberOrganizationAdminTest(TestCase):
 
         for authorization_status, is_authorized in rights_list:
             with self.subTest(authorization_status=authorization_status, is_authorized=is_authorized):
-
                 post_data = {
                     "id": prescriberorganization.pk,
                     "post_code": prescriberorganization.post_code,

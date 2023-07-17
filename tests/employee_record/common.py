@@ -8,7 +8,6 @@ from tests.utils.test import TestCase
 
 @pytest.mark.usefixtures("unittest_compatibility")
 class ManagementCommandTestCase(TestCase):
-
     # Override as needed
     MANAGEMENT_COMMAND_NAME = None
 

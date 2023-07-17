@@ -1,8 +1,6 @@
 {% if filters_form.departments %}
     <fieldset>
-        <legend>
-            Département du candidat
-        </legend>
+        <legend>Département du candidat</legend>
         {% if filters_form.departments|length > 0 %}
             <ul>
                 {% for choice in filters_form.departments %}

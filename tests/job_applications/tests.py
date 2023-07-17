@@ -97,7 +97,6 @@ class JobApplicationModelTest(TestCase):
         notification_mock.assert_called()
 
     def test_is_sent_by_authorized_prescriber(self):
-
         job_application = JobApplicationSentByJobSeekerFactory()
         assert not job_application.is_sent_by_authorized_prescriber
         job_application = JobApplicationSentByPrescriberFactory()
@@ -137,7 +136,6 @@ class JobApplicationModelTest(TestCase):
             assert job_application.can_be_archived
 
     def test_candidate_has_employee_record(self):
-
         # test job_application has no Approval
         job_application = JobApplicationWithoutApprovalFactory()
         assert not job_application.candidate_has_employee_record
@@ -845,7 +843,6 @@ class JobApplicationNotificationsTest(TestCase):
         assert "Date de fin du contrat : Non renseigné" in email.body
 
     def test_refuse(self):
-
         # When sent by authorized prescriber.
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
@@ -1572,7 +1569,6 @@ class JobApplicationWorkflowTest(TestCase):
         assert not job_application.approval
 
     def test_cancel_do_not_delete_linked_approval(self, *args, **kwargs):
-
         # The approval is linked to two accepted job applications
         job_application = JobApplicationFactory(with_approval=True)
         approval = job_application.approval
@@ -1699,7 +1695,6 @@ class JobApplicationCsvExportTest(TestCase):
 
 class JobApplicationAdminFormTest(TestCase):
     def test_job_application_admin_form_validation(self):
-
         form_fields_list = [
             "job_seeker",
             "eligibility_diagnosis",

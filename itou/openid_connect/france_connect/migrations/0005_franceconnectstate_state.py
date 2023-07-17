@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("france_connect", "0004_alter_franceconnectstate_created_at"),
     ]

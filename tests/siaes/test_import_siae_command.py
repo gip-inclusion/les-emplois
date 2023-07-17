@@ -36,7 +36,6 @@ def lazy_import_siae_command():
 )
 @freeze_time("2022-10-10")
 class ImportSiaeManagementCommandsTest(TransactionTestCase):
-
     path_source = "./siaes/fixtures"
     app_dir_path = Path(settings.APPS_DIR)
     mod = None

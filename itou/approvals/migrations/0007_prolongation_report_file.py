@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("prescribers", "0003_alter_prescribermembership_updated_at_and_more"),
         ("files", "0001_initial"),

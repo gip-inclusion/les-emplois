@@ -171,7 +171,6 @@ class PrescriberOrganizationAdmin(ItouGISMixin, OrganizationAdmin):
         return super().get_queryset(request)
 
     def save_model(self, request, obj, form, change):
-
         if not change:
             obj.created_by = request.user
             if not obj.geocoding_score and obj.geocoding_address:

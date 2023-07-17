@@ -179,7 +179,6 @@ class UtilsOptionalAddressFormMixinTest(TestCase):
         user.city = city.name
 
         with self.assertNumQueries(1):
-
             form = DummyUserModelForm(data={}, instance=user)
 
             assert form.initial["city_slug"] == city.slug

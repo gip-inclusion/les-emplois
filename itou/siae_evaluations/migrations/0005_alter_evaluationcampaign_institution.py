@@ -7,7 +7,6 @@ import itou.siae_evaluations.models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("institutions", "0006_update_institution_kind"),
         ("siae_evaluations", "0004_evaluatedsiae_submission_freezed_at"),

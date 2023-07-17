@@ -8,7 +8,6 @@ import itou.utils.models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("job_applications", "0008_jobapplication_diagnoses_coherence"),
     ]

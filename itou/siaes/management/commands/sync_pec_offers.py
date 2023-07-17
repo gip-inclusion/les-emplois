@@ -102,7 +102,6 @@ def pe_offer_to_job_description(data):
 
 
 class Command(BaseCommand):
-
     help = "Synchronizes the list of PEC offers on a daily basis"
 
     def add_arguments(self, parser):

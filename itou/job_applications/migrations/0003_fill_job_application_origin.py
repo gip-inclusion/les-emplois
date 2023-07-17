@@ -17,7 +17,6 @@ def _fill_job_application_origin(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("job_applications", "0002_jobapplication_origin"),
     ]

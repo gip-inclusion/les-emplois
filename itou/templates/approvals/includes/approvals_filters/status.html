@@ -1,9 +1,7 @@
 {% load bootstrap4 %}
 
 <fieldset>
-    <legend>
-        Statut du PASS IAE
-    </legend>
+    <legend>Statut du PASS IAE</legend>
     <ul class="list-unstyled">
         <li>{% bootstrap_field filters_form.status_valid form_group_class="" %}</li>
         <li>{% bootstrap_field filters_form.status_suspended form_group_class="" %}</li>

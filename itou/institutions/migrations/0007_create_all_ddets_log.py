@@ -41,7 +41,6 @@ def delete_all_ddets_log(apps, _schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("institutions", "0006_update_institution_kind"),
     ]

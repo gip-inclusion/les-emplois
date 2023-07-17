@@ -18,7 +18,6 @@ from tests.utils.test import TestCase
 
 class SiaeStaffInvitationQuerySetTest(TestCase):
     def test_pending(self):
-
         # Create some non-expired invitations.
         invitation1 = SentSiaeStaffInvitationFactory()
         invitation2 = SentSiaeStaffInvitationFactory()

@@ -23,7 +23,6 @@ def fill_user_kind(apps, _schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("users", "0007_user_kind"),
     ]

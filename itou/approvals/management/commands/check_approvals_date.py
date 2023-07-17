@@ -15,7 +15,6 @@ class Command(BaseCommand):
         parser.add_argument("--wet-run", dest="wet_run", action="store_true", help="Allow to alter the data")
 
     def handle(self, *, fix, wet_run, **options):
-
         converted_approvals = Approval.objects.filter(~Q(number__startswith=Approval.ASP_ITOU_PREFIX))
 
         for approval in converted_approvals.order_by("number").select_related("created_by"):
