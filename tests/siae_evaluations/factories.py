@@ -72,12 +72,12 @@ class EvaluatedJobApplicationFactory(factory.django.DjangoModelFactory):
                 "tests.siae_evaluations.factories.EvaluatedAdministrativeCriteriaFactory",
                 factory_related_name="evaluated_job_application",
                 uploaded_at=factory.LazyAttribute(
-                    lambda siae: siae.factory_parent.evaluated_siae.evaluation_campaign.ended_at
-                    - relativedelta(days=10)
+                    lambda siae: siae.factory_parent.evaluated_siae.evaluation_campaign.evaluations_asked_at
+                    + relativedelta(days=10)
                 ),
                 submitted_at=factory.LazyAttribute(
-                    lambda siae: siae.factory_parent.evaluated_siae.evaluation_campaign.ended_at
-                    - relativedelta(days=5)
+                    lambda siae: siae.factory_parent.evaluated_siae.evaluation_campaign.evaluations_asked_at
+                    + relativedelta(days=15)
                 ),
             )
         )
