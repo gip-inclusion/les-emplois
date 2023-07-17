@@ -7,8 +7,8 @@
 
 {% if request.htmx %}
     {% comment %}
-            This fragment is also used for "normal" (non-htmx) page reload, 
-            and we only want to perform OOB swap of form errors when doing a dynamic reload. 
+            This fragment is also used for "normal" (non-htmx) page reload,
+            and we only want to perform OOB swap of form errors when doing a dynamic reload.
     {% endcomment %}
     <div id="form_errors" hx-swap-oob="true">{% bootstrap_form_errors form type="all" %}</div>
     {% include "apply/includes/geiq/progress_bar.html" %}
@@ -36,7 +36,7 @@
 <h3 class="h5">Niveau de compétences</h3>
 {% bootstrap_field form.niveau_etude_3 field_class="text-primary" %}
 {% bootstrap_field form.maitrise_de_la_langue_francaise field_class="text-primary" %}
- 
+
 <h3 class="h5">Situation professionnelle</h3>
 {% bootstrap_field form.personne_eloignee_du_marche_du_travail field_class="text-primary" %}
 {% if form.personne_eloignee_du_marche_du_travail.value %}
@@ -48,19 +48,19 @@
 {% bootstrap_field form.de_45_ans_et_plus field_class="text-primary" %}
 {% bootstrap_field form.personne_en_reconversion_professionnelle_contrainte field_class="text-primary" %}
 {% bootstrap_field form.personne_en_dispositif_insertion field_class="text-primary" %}
- 
+
 <h3 class="h5">Situation de handicap</h3>
 {% bootstrap_field form.travailleur_handicape field_class="text-primary" %}
- 
+
 <h3 class="h5">Situation d'hébergement</h3>
 {% bootstrap_field form.personne_sans_hebergement field_class="text-primary" %}
 {% bootstrap_field form.resident_zrr field_class="text-primary" %}
 {% bootstrap_field form.resident_qpv field_class="text-primary" %}
- 
+
 <h3 class="h5">Situation familiale</h3>
 {% bootstrap_field form.parent_isole field_class="text-primary" %}
 {% bootstrap_field form.sortant_ase field_class="text-primary" %}
- 
+
 <h3 class="h5">Situation juridique</h3>
 {% bootstrap_field form.sortant_de_detention_ou_personne_placee_sous_main_de_justice field_class="text-primary" %}
 {% bootstrap_field form.refugie_statutaire field_class="text-primary" %}

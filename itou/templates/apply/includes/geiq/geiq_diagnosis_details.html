@@ -26,7 +26,7 @@
             </ul>
         {% endif %}
     {% endwith %}
- 
+
     {% if diagnosis.eligibility_confirmed %}
         <p>
             <b>Durée de validité du diagnostic :</b> du {{ diagnosis.created_at|date:"d/m/Y" }} au {{ diagnosis.expires_at|date:"d/m/Y" }}.
