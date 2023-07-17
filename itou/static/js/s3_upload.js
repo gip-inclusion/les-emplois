@@ -103,7 +103,7 @@ window.s3UploadInit = function s3UploadInit({
 
   dropzone.on("success", function (file, xhr, formData) {
     // returnPath: config parameter
-    // File URI can be constructed only from path, if needed (prolongation reports) 
+    // File URI can be constructed only from path, if needed (prolongation reports)
     const location = returnPath ? file.upload.filename : `${formUrl}/${file.upload.filename}`;
     // Prevent a selector mistake from being silent.
     if ($(callbackLocationSelector).length === 0) {
@@ -162,7 +162,7 @@ window.s3UploadInit = function s3UploadInit({
       });
     }
   });
-  
+
   // Useful for registering events
   return dropzone;
 };

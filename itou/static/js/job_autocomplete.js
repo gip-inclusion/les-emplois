@@ -17,8 +17,8 @@ htmx.onLoad((target) => {
       delay: 300,
       minLength: 1,
       source: function(request, response) {
-        $.getJSON(jobAppellationSearchInput.data('autocomplete-source-url'), 
-          {term: request.term, siae_id: request.siae_id,}, 
+        $.getJSON(jobAppellationSearchInput.data('autocomplete-source-url'),
+          {term: request.term, siae_id: request.siae_id,},
           response)
       },
       autoFocus: true,

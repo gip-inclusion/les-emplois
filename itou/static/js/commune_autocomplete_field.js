@@ -24,8 +24,8 @@ htmx.onLoad((target) => {
       minLength: 1,
       // Use a callback to add custom parameter 'date':
       source: function(request, response) {
-        $.getJSON(communeSearchInput.data('autocomplete-source-url'), 
-          {term: request.term, date: periodDate.val()}, 
+        $.getJSON(communeSearchInput.data('autocomplete-source-url'),
+          {term: request.term, date: periodDate.val()},
           response)
       },
       autoFocus: true,
