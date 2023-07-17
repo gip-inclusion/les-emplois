@@ -1,8 +1,6 @@
 {% load bootstrap4 %}
-{% if job_application.to_siae.kind == SiaeKind.GEIQ %}
-    <div id="geiq_qualification_fields_block">
-        {% bootstrap_field form_accept.qualification_type %}
-        {% bootstrap_field form_accept.qualification_level %}
-        {% bootstrap_field form_accept.planned_training_hours %}
-    </div>
-{% endif %}
+<div id="geiq_qualification_fields_block">
+    {% bootstrap_field form_accept.qualification_type %}
+    {% bootstrap_field form_accept.qualification_level %}
+    {% bootstrap_field form_accept.planned_training_hours %}
+</div>

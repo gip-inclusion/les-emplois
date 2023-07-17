@@ -279,6 +279,7 @@ class JobApplicationModelTest(TestCase):
 
     def test_inverted_vae_contract(self):
         JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, inverted_vae_contract=True)
+        JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, inverted_vae_contract=False)
         JobApplicationFactory(to_siae__kind=SiaeKind.EI, inverted_vae_contract=None)
         with self.assertRaisesRegex(
             ValidationError, "Un contrat associé à une VAE inversée n'est possible que pour les GEIQ"

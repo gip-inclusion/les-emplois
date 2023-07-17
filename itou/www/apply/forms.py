@@ -450,6 +450,7 @@ class AcceptForm(forms.ModelForm):
         "qualification_type",
         "qualification_level",
         "planned_training_hours",
+        "inverted_vae_contract",
     )
 
     # Choices are dynamically set on HTMX reload
@@ -476,7 +477,10 @@ class AcceptForm(forms.ModelForm):
             for geiq_field_name in self.GEIQ_REQUIRED_FIELDS:
                 if is_geiq:
                     # Contract type details are dynamic and not required all the time
-                    self.fields[geiq_field_name].required = geiq_field_name != "contract_type_details"
+                    self.fields[geiq_field_name].required = geiq_field_name not in (
+                        "contract_type_details",
+                        "inverted_vae_contract",
+                    )
                 else:
                     self.fields.pop(geiq_field_name)
 
@@ -512,6 +516,20 @@ class AcceptForm(forms.ModelForm):
                         job_applications_enums.QualificationLevel.NOT_RELEVANT
                     )
                     self.fields["qualification_level"].choices.pop(idx)
+
+                self.fields["inverted_vae_contract"].widget = forms.CheckboxInput()
+                self.fields["inverted_vae_contract"].disabled = not (
+                    post_data and post_data.get("contract_type") == ContractType.PROFESSIONAL_TRAINING
+                )
+                self.fields["contract_type"].widget.attrs.update(
+                    {
+                        "hx-post": reverse(
+                            "apply:reload_contract_type_and_options", kwargs={"job_application_id": job_application.pk}
+                        ),
+                        "hx-swap": "outerHTML",
+                        "hx-target": "#geiq_contract_type_and_options_block",
+                    },
+                )
             else:
                 # Add specific details to help texts for IAE
                 self.fields["hiring_start_at"].help_text += (
@@ -536,6 +554,7 @@ class AcceptForm(forms.ModelForm):
             "planned_training_hours",
             "hiring_end_at",
             "answer",
+            "inverted_vae_contract",
         ]
         help_texts = {
             # Make it clear to employers that `hiring_start_at` has an impact on the start of the
@@ -583,6 +602,9 @@ class AcceptForm(forms.ModelForm):
                 raise forms.ValidationError(
                     {"contract_type_details": ["Les précisions sont nécessaires pour ce type de contrat"]}
                 )
+
+            if contract_type == ContractType.PROFESSIONAL_TRAINING:
+                cleaned_data["inverted_vae_contract"] = bool(cleaned_data.get("inverted_vae_contract"))
 
         return cleaned_data
 
