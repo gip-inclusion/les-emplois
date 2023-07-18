@@ -14,9 +14,9 @@ from itou.metabase.db import MetabaseDatabaseCursor, create_table, get_new_table
 
 PANDA_DATAFRAME_TO_PSQL_TYPES_MAPPING = {
     np.int64: "BIGINT",
-    np.object0: "TEXT",
+    np.object_: "TEXT",
     np.float64: "DOUBLE PRECISION",
-    np.bool8: "BOOLEAN",
+    np.bool_: "BOOLEAN",
 }
 
 
