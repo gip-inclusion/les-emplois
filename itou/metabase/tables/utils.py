@@ -4,7 +4,7 @@ from operator import attrgetter
 
 from django.conf import settings
 from django.db.models import JSONField
-from django.db.models.fields import AutoField, CharField, DateField, PositiveIntegerField, UUIDField
+from django.db.models.fields import AutoField, CharField, DateField, PositiveIntegerField, UUIDField, TextField
 from django.db.models.fields.related import ForeignKey
 from django.utils import timezone
 
@@ -38,6 +38,8 @@ class MetabaseTable:
 def get_field_type_from_field(field):
     if isinstance(field, CharField):
         return "varchar"
+    if isinstance(field, TextField):
+        return "text"
     if isinstance(field, PositiveIntegerField):
         return "integer"
     if isinstance(field, AutoField) and field.name == "id":
@@ -299,3 +301,18 @@ def get_qpv_job_seeker_pks():
 
 def hash_content(content):
     return hashlib.sha256(f"{content}{settings.METABASE_HASH_SALT}".encode()).hexdigest()
+
+
+def get_common_prolongation_columns(get_field_fn):
+    return [
+        get_column_from_field(get_field_fn("id"), name="id"),
+        get_column_from_field(get_field_fn("approval_id"), name="id_pass_agrément"),
+        get_column_from_field(get_field_fn("start_at"), name="date_début"),
+        get_column_from_field(get_field_fn("end_at"), name="date_fin"),
+        get_column_from_field(get_field_fn("reason"), name="motif"),
+        get_column_from_field(get_field_fn("reason_explanation"), name="motif_détaillé"),
+        get_column_from_field(get_field_fn("declared_by_id"), name="id_utilisateur_déclarant"),
+        get_column_from_field(get_field_fn("declared_by_siae_id"), name="id_structure_déclarante"),
+        get_column_from_field(get_field_fn("validated_by_id"), name="id_utilisateur_prescripteur"),
+        get_column_from_field(get_field_fn("prescriber_organization_id"), name="id_organisation_prescripteur"),
+    ]

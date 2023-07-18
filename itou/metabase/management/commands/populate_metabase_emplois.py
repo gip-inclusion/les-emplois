@@ -30,7 +30,7 @@ from django.utils import timezone
 from sentry_sdk.crons import monitor
 
 from itou.analytics.models import Datum, StatsDashboardVisit
-from itou.approvals.models import Approval, PoleEmploiApproval
+from itou.approvals.models import Approval, PoleEmploiApproval, ProlongationRequest, Prolongation
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 from itou.eligibility.enums import AdministrativeCriteriaLevel
@@ -55,6 +55,8 @@ from itou.metabase.tables import (
     job_descriptions,
     job_seekers,
     organizations,
+    prolongations,
+    prolongation_requests,
     rome_codes,
     selected_jobs,
     siaes,
@@ -93,6 +95,8 @@ class Command(BaseCommand):
             "job_applications": self.populate_job_applications,
             "selected_jobs": self.populate_selected_jobs,
             "approvals": self.populate_approvals,
+            "prolongations": self.populate_prolongations,
+            "prolongation_requests": self.populate_prolongation_requests,
             "institutions": self.populate_institutions,
             "evaluation_campaigns": self.populate_evaluation_campaigns,
             "evaluated_siaes": self.populate_evaluated_siaes,
@@ -362,6 +366,14 @@ class Command(BaseCommand):
         ).all()
 
         populate_table(approvals.TABLE, batch_size=1000, querysets=[queryset1, queryset2])
+
+    def populate_prolongations(self):
+        queryset = Prolongation.objects.all()
+        populate_table(prolongations.TABLE, batch_size=1000, querysets=[queryset])
+
+    def populate_prolongation_requests(self):
+        queryset = ProlongationRequest.objects.all()
+        populate_table(prolongation_requests.TABLE, batch_size=1000, querysets=[queryset])
 
     def populate_institutions(self):
         queryset = Institution.objects.all()

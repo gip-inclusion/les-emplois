@@ -14,7 +14,7 @@ from itou.geo.utils import coords_to_geometry
 from itou.metabase.tables.utils import hash_content
 from itou.users.enums import IdentityProvider
 from tests.analytics.factories import DatumFactory, StatsDashboardVisitFactory
-from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
+from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory, ProlongationRequestFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory
 from tests.geo.factories import QPVFactory
 from tests.institutions.factories import InstitutionFactory
@@ -460,6 +460,48 @@ def test_populate_approvals():
                 None,
                 0,
                 hash_content(pe_approval.number),
+                datetime.date(2023, 2, 1),
+            ),
+        ]
+
+
+# FIXME test prolongations as well
+
+
+@freeze_time("2023-02-02")
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.usefixtures("metabase")
+def test_populate_prolongation_requests():
+    prolongation_request = ProlongationRequestFactory()
+
+    num_queries = 1  # Count prolongation_requests
+    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
+    num_queries += 1  # COMMIT Create table
+    num_queries += 1  # Select prolongation_request IDs
+    num_queries += 1  # Select one chunk of prolongation_request IDs
+    num_queries += 1  # Select prolongation_requests with columns
+    num_queries += 1  # COMMIT (inject_chunk)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    with assertNumQueries(num_queries):
+        management.call_command("populate_metabase_emplois", mode="prolongation_requests")
+
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM demandes_de_prolongation ORDER BY id")
+        rows = cursor.fetchall()
+        assert rows == [
+            (
+                prolongation_request.id,
+                prolongation_request.approval_id,
+                prolongation_request.start_at,
+                prolongation_request.end_at,
+                prolongation_request.reason,
+                prolongation_request.reason_explanation,
+                prolongation_request.declared_by_id,
+                prolongation_request.declared_by_siae_id,
+                prolongation_request.validated_by_id,
+                prolongation_request.prescriber_organization_id,
                 datetime.date(2023, 2, 1),
             ),
         ]
