@@ -23,7 +23,6 @@ def get_email_text_template(template, context):
     context.update(
         {
             "itou_help_center_url": global_constants.ITOU_HELP_CENTER_URL,
-            "itou_email_prolongation": global_constants.ITOU_EMAIL_PROLONGATION,
             "itou_environment": settings.ITOU_ENVIRONMENT,
             "itou_fqdn": settings.ITOU_FQDN,
             "itou_protocol": settings.ITOU_PROTOCOL,
