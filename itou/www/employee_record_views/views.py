@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.decorators.http import require_safe
 
-from itou.approvals.models import Prolongation, Suspension
+from itou.approvals.models import Prolongation
 from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
@@ -98,7 +98,6 @@ def list_employee_records(request, template_name="employee_record/list.html"):
     if status == Status.NEW:
         # When showing NEW job applications, we need more infos
         eligible_job_applications = eligible_job_applications.annotate(
-            has_suspension=Exists(Suspension.objects.filter(siae=siae, approval__jobapplication__pk=OuterRef("pk"))),
             has_prolongation=Exists(
                 Prolongation.objects.filter(declared_by_siae=siae, approval__jobapplication__pk=OuterRef("pk"))
             ),
@@ -134,7 +133,7 @@ def list_employee_records(request, template_name="employee_record/list.html"):
             data = [ja for ja in data if str(ja.job_seeker_id) in job_seekers]
 
         for item in data:
-            need_manual_regularization |= item.has_suspension or item.has_prolongation
+            need_manual_regularization |= bool(item.approval.suspended_until) or item.has_prolongation
             need_manual_regularization |= item.job_seeker.lack_of_nir_reason == LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER
             item.nir_tally_params = f"?jobapplication={item.pk}"
             for e in item.employee_record.all():

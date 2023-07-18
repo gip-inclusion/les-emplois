@@ -124,7 +124,7 @@
                         </div>
                     </div>
                 </div>
-            {% elif item.has_suspension or item.has_prolongation %}
+            {% elif item.approval.suspended_until or item.has_prolongation %}
                 <div class="alert alert-warning" role="status">
                     <div class="row">
                         <div class="col-auto pr-0">
