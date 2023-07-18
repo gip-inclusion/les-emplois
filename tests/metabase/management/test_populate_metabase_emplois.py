@@ -14,7 +14,11 @@ from itou.geo.utils import coords_to_geometry
 from itou.metabase.tables.utils import hash_content
 from itou.users.enums import IdentityProvider
 from tests.analytics.factories import DatumFactory, StatsDashboardVisitFactory
-from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
+from tests.approvals.factories import (
+    ApprovalFactory,
+    PoleEmploiApprovalFactory,
+    ProlongationWithRequestFactory,
+)
 from tests.eligibility.factories import EligibilityDiagnosisFactory
 from tests.geo.factories import QPVFactory
 from tests.institutions.factories import InstitutionFactory
@@ -461,6 +465,90 @@ def test_populate_approvals():
                 None,
                 0,
                 hash_content(pe_approval.number),
+                datetime.date(2023, 2, 1),
+            ),
+        ]
+
+
+@freeze_time("2023-02-02")
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.usefixtures("metabase")
+def test_populate_prolongations():
+    prolongation = ProlongationWithRequestFactory()
+    prolongation_request = prolongation.request
+
+    num_queries = 1  # Count prolongations
+    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
+    num_queries += 1  # COMMIT Create table
+    num_queries += 1  # Select prolongation IDs
+    num_queries += 1  # Select one chunk of prolongation IDs
+    num_queries += 1  # Select prolongations with columns
+    num_queries += 1  # COMMIT (inject_chunk)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    with assertNumQueries(num_queries):
+        management.call_command("populate_metabase_emplois", mode="prolongations")
+
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM prolongations ORDER BY id")
+        rows = cursor.fetchall()
+        assert rows == [
+            (
+                prolongation.id,
+                prolongation.approval_id,
+                prolongation.start_at,
+                prolongation.end_at,
+                prolongation.get_reason_display(),
+                prolongation.declared_by_id,
+                prolongation.declared_by_siae_id,
+                prolongation.validated_by_id,
+                prolongation.prescriber_organization_id,
+                prolongation_request.pk,
+                datetime.date(2023, 2, 1),
+            ),
+        ]
+
+
+@freeze_time("2023-02-02")
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.usefixtures("metabase")
+def test_populate_prolongation_requests():
+    prolongation = ProlongationWithRequestFactory()
+    prolongation_request = prolongation.request
+
+    num_queries = 1  # Count prolongation_requests
+    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
+    num_queries += 1  # COMMIT Create table
+    num_queries += 1  # Select prolongation_request IDs
+    num_queries += 1  # Select one chunk of prolongation_request IDs
+    num_queries += 1  # Select prolongation_requests with columns
+    num_queries += 1  # COMMIT (inject_chunk)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    with assertNumQueries(num_queries):
+        management.call_command("populate_metabase_emplois", mode="prolongation_requests")
+
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM demandes_de_prolongation ORDER BY id")
+        rows = cursor.fetchall()
+        assert rows == [
+            (
+                prolongation_request.id,
+                prolongation_request.approval_id,
+                prolongation_request.start_at,
+                prolongation_request.end_at,
+                prolongation_request.get_reason_display(),
+                prolongation_request.declared_by_id,
+                prolongation_request.declared_by_siae_id,
+                prolongation_request.validated_by_id,
+                prolongation_request.prescriber_organization_id,
+                prolongation.pk,
+                prolongation_request.get_status_display(),
+                prolongation_request.processed_at,
+                prolongation_request.processed_by_id,
+                prolongation_request.reminder_sent_at,
                 datetime.date(2023, 2, 1),
             ),
         ]
