@@ -162,5 +162,3 @@ On peut spécifier la direction de tri :
                 raise NotFound(f"Pas de ville avec pour code_insee {code_insee}")
         else:
             raise ValidationError(t)
-
-        return queryset
