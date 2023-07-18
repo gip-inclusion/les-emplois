@@ -132,6 +132,10 @@ class ProlongationFactory(BaseProlongationFactory):
         model = Prolongation
 
 
+class ProlongationWithRequestFactory(ProlongationFactory):
+    request = factory.SubFactory(ProlongationRequestFactory)
+
+
 class PoleEmploiApprovalFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = PoleEmploiApproval
