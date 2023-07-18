@@ -26,7 +26,6 @@ def expose_settings(request):
         "BASE_TEMPLATE": base_template,
         "ITOU_HELP_CENTER_URL": help_center_url,
         "ITOU_EMAIL_CONTACT": settings.ITOU_EMAIL_CONTACT,
-        "ITOU_EMAIL_PROLONGATION": global_constants.ITOU_EMAIL_PROLONGATION,
         "ITOU_ENVIRONMENT": settings.ITOU_ENVIRONMENT,
         "ITOU_FQDN": settings.ITOU_FQDN,
         "ITOU_PILOTAGE_URL": global_constants.PILOTAGE_SITE_URL,

@@ -1614,6 +1614,9 @@ class ProlongationNotificationsTest(TestCase):
 
         email = NewProlongationToAuthorizedPrescriberNotification(prolongation).email
 
+        # From
+        assert email.from_email == global_constants.ITOU_EMAIL_PROLONGATION
+
         # To.
         assert prolongation.validated_by.email in email.to
         assert len(email.to) == 1
@@ -1630,7 +1633,6 @@ class ProlongationNotificationsTest(TestCase):
         assert title(prolongation.approval.user.first_name) in email.body
         assert title(prolongation.approval.user.last_name) in email.body
         assert prolongation.approval.user.birthdate.strftime("%d/%m/%Y") in email.body
-        assert global_constants.ITOU_EMAIL_PROLONGATION in email.body
 
 
 class ApprovalConcurrentModelTest(TransactionTestCase):

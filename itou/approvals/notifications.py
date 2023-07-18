@@ -1,4 +1,5 @@
 from itou.common_apps.notifications.base_class import BaseNotification
+from itou.utils import constants as base_constants
 from itou.utils.emails import get_email_message
 
 
@@ -18,4 +19,4 @@ class NewProlongationToAuthorizedPrescriberNotification(BaseNotification):
         context = {"prolongation": self.prolongation}
         subject = "approvals/email/new_prolongation_for_prescriber_subject.txt"
         body = "approvals/email/new_prolongation_for_prescriber_body.txt"
-        return get_email_message(to, context, subject, body)
+        return get_email_message(to, context, subject, body, from_email=base_constants.ITOU_EMAIL_PROLONGATION)
