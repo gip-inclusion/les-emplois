@@ -229,7 +229,7 @@ class EvaluatedSiaeAdmin(admin.ModelAdmin):
         "notification_reason",
         "evaluation_campaign__institution__department",
     )
-    search_fields = ("siae__name",)
+    search_fields = ("siae__name", "siae__siret")
     inlines = [
         EvaluatedJobApplicationsInline,
     ]
