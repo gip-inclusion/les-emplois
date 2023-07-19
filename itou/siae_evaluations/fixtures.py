@@ -55,6 +55,7 @@ def load_data():
     now = timezone.now()
     evaluated_period_start_at = now - relativedelta(months=3)
     evaluated_period_end_at = now - relativedelta(months=1)
+    adversarial_stage_start = now.date() + relativedelta(weeks=6)
     datetime_within_period_range = evaluated_period_end_at - relativedelta(weeks=2)
 
     created_job_applications_pks = []
@@ -130,7 +131,7 @@ def load_data():
     job_applications = JobApplication.objects.filter(pk__in=created_job_applications_pks)
 
     with override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend"), transaction.atomic():
-        create_campaigns_and_calendar(evaluated_period_start_at, evaluated_period_end_at)
+        create_campaigns_and_calendar(evaluated_period_start_at, evaluated_period_end_at, adversarial_stage_start)
         evaluation_campaign = EvaluationCampaign.objects.get(institution=institution)
 
         # eligible_job_applications must return a queryset, not a list.

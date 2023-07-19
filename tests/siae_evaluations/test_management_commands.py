@@ -315,6 +315,7 @@ class TestManagementCommand:
     def test_second_notification_for_siaes_without_proofs(self, capsys, mailoutbox):
         campaign = EvaluationCampaignFactory(
             evaluations_asked_at=timezone.now() - relativedelta(weeks=6, days=30),
+            calendar__adversarial_stage_start=timezone.localdate() - relativedelta(days=30),
             evaluated_period_start_at=datetime.date(2022, 1, 1),
             evaluated_period_end_at=datetime.date(2022, 9, 30),
             institution__name="DDETS 01",

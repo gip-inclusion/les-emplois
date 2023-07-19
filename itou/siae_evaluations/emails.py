@@ -152,7 +152,7 @@ class SIAEEmailFactory:
             kwargs={"evaluated_siae_pk": self.evaluated_siae.pk},
         )
         context = {
-            "adversarial_stage_start": self.evaluated_siae.evaluation_campaign.adversarial_stage_start_date,
+            "adversarial_stage_start": self.evaluated_siae.evaluation_campaign.calendar.adversarial_stage_start,
             "evaluation_campaign": self.evaluated_siae.evaluation_campaign,
             "siae": self.evaluated_siae.siae,
             "evaluated_job_app_list_url": get_absolute_url(job_app_list_url),

@@ -13,18 +13,19 @@ class Command(BaseCommand):
         today = timezone.localdate()
         campaigns = EvaluationCampaign.objects.filter(ended_at=None).select_related("institution")
         for campaign in campaigns.filter(
-            evaluations_asked_at__date__range=[
-                # Stop sending reminder after manual run of
-                # EvaluationCampaign.transition_to_adversarial_phase
-                today - EvaluationCampaign.ADVERSARIAL_STAGE_START_DELTA,
-                today - relativedelta(days=30),
-            ],
+            evaluations_asked_at__date__lte=today - relativedelta(days=30),
+            # Don’t send amicable stage notifications past the adversarial stage.
+            calendar__adversarial_stage_start__gte=today,
         ):
             emails = []
             evaluated_siaes = (
                 campaign.evaluated_siaes.did_not_send_proof()
                 .filter(reviewed_at=None, reminder_sent_at=None)
-                .select_related("evaluation_campaign__institution", "siae__convention")
+                .select_related(
+                    "evaluation_campaign__calendar",
+                    "evaluation_campaign__institution",
+                    "siae__convention",
+                )
             )
             for evaluated_siae in evaluated_siaes:
                 emails.append(SIAEEmailFactory(evaluated_siae).notify_before_adversarial_stage())
@@ -35,8 +36,7 @@ class Command(BaseCommand):
                     f"Emailed first reminders to {len(emails)} SIAE which did not submit proofs to {campaign}."
                 )
 
-        evaluations_asked_before = today - EvaluationCampaign.ADVERSARIAL_STAGE_START_DELTA - relativedelta(days=30)
-        for campaign in campaigns.filter(evaluations_asked_at__date__lte=evaluations_asked_before):
+        for campaign in campaigns.filter(calendar__adversarial_stage_start__lte=today - relativedelta(days=30)):
             emails = []
             evaluated_siaes = (
                 campaign.evaluated_siaes.filter(final_reviewed_at=None)

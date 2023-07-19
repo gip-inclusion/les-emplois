@@ -23,6 +23,7 @@ class CalendarFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Calendar
 
+    adversarial_stage_start = factory.LazyFunction(lambda: timezone.localdate() + relativedelta(weeks=6))
     html = "<span>I'm valid HTML</span>"
 
 
@@ -30,13 +31,11 @@ class EvaluationCampaignFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.EvaluationCampaign
 
-    class Params:
-        with_calendar = factory.Trait(calendar=factory.SubFactory(CalendarFactory))
-
     name = factory.fuzzy.FuzzyText(length=10)
     institution = factory.SubFactory(InstitutionFactory, department="14")
     evaluated_period_start_at = factory.LazyAttribute(before_ended_at(months=3))
     evaluated_period_end_at = factory.LazyAttribute(before_ended_at(months=1))
+    calendar = factory.SubFactory(CalendarFactory)
 
 
 class EvaluatedSiaeFactory(factory.django.DjangoModelFactory):
