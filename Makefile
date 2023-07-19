@@ -121,13 +121,10 @@ graph_models_itou:
 # Tests.
 # =============================================================================
 
-.PHONY: coverage test
+.PHONY: test
 
 test: $(VIRTUAL_ENV)
 	$(EXEC_CMD) pytest --numprocesses=logical --create-db $(TARGET)
-
-coverage:
-	$(EXEC_CMD) coverage run -m pytest
 
 # Docker shell.
 # =============================================================================
