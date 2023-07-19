@@ -345,7 +345,6 @@ django==4.2.3 \
     --hash=sha256:f7c7852a5ac5a3da5a8d5b35cc6168f31b605971441798dac845f17ca8028039
     # via
     #   -r requirements/test.txt
-    #   django-admin-logs
     #   django-allauth
     #   django-anymail
     #   django-appconf
@@ -361,10 +360,6 @@ django==4.2.3 \
     #   django-xworkflows
     #   djangorestframework
     #   drf-spectacular
-django-admin-logs==1.0.2 \
-    --hash=sha256:81753c20d372bc5562fe4a09090418bbb61b308388e851b19192873a472fa3d1 \
-    --hash=sha256:aedb5df940d32c10423d65136343bc009727df8a5a49ed0196e65241d823a890
-    # via -r requirements/dev.in
 django-allauth==0.51.0 \
     --hash=sha256:ca1622733b6faa591580ccd3984042f12d8c79ade93438212de249b7ffb6f91f
     # via -r requirements/test.txt
