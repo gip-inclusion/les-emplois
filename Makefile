@@ -57,6 +57,8 @@ quality: $(VIRTUAL_ENV)
 	ruff check $(LINTER_CHECKED_DIRS)
 	djlint --lint --check itou
 	find * -type f -name '*.sh' -exec shellcheck --external-sources {} +
+	python manage.py makemigrations --check --dry-run --noinput
+	python manage.py spectacular --validate --fail-on-warn --file /dev/null
 
 fix: $(VIRTUAL_ENV)
 	black $(LINTER_CHECKED_DIRS)
