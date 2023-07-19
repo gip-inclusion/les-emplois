@@ -10,6 +10,5 @@ pre-commit  # https://github.com/pre-commit/pre-commit
 
 # Django
 # ------------------------------------------------------------------------------
-django-admin-logs  # https://pypi.org/project/django-admin-logs/
 django-debug-toolbar  # https://github.com/jazzband/django-debug-toolbar
 django-extensions  # https://github.com/django-extensions/django-extensions
