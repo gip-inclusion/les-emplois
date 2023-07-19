@@ -606,7 +606,9 @@ CSP_FRAME_ANCESTORS = [
 CSP_IMG_SRC = [
     "'self'",
     "data:",  # Because of tarteaucitron.js
-    "*.tile.openstreetmap.org",
+    # OpenStreetMap tiles for django admin maps: both tile. and *.tile are used
+    "https://tile.openstreetmap.org",
+    "https://*.tile.openstreetmap.org",
     "*.hotjar.com",
     "https://www.gstatic.com",  # Used by google translate
     "https://translate.google.com",  # Used by google translate
