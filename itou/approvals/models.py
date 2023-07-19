@@ -1180,6 +1180,8 @@ class ProlongationRequest(CommonProlongation):
         blank=True,
     )
 
+    reminder_sent_at = models.DateTimeField(verbose_name="rappel envoyé le", null=True, editable=False)
+
     class Meta(CommonProlongation.Meta):
         verbose_name = "demande de prolongation"
         verbose_name_plural = "demandes de prolongation"
