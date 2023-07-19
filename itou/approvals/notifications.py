@@ -1,4 +1,7 @@
+from dateutil.relativedelta import relativedelta
+
 from itou.common_apps.notifications.base_class import BaseNotification
+from itou.prescribers.models import PrescriberMembership
 from itou.utils.emails import get_email_message
 
 
@@ -17,6 +20,30 @@ class ProlongationRequestCreated(BaseNotification):
         subject = "approvals/email/prolongation_request/created_subject.txt"
         body = "approvals/email/prolongation_request/created_body.txt"
         return get_email_message(to, context, subject, body)
+
+
+class ProlongationRequestCreatedReminder(BaseNotification):
+    """Notification sent to the other members of the prescriber organization"""
+
+    def __init__(self, prolongation_request):
+        self.prolongation_request = prolongation_request
+
+    @property
+    def email(self):
+        to = [self.prolongation_request.validated_by.email]
+        cc = (
+            PrescriberMembership.objects.active()
+            .filter(organization=self.prolongation_request.prescriber_organization)
+            .exclude(user=self.prolongation_request.validated_by)
+            .values_list("user__email", flat=True)
+        )
+        context = {
+            "prolongation_request": self.prolongation_request,
+            "auto_grant_date": self.prolongation_request.created_at.date() + relativedelta(days=30),
+        }
+        subject = "approvals/email/prolongation_request/created_reminder_subject.txt"
+        body = "approvals/email/prolongation_request/created_reminder_body.txt"
+        return get_email_message(to, context, subject, body, cc=cc)
 
 
 class ProlongationRequestGrantedEmployer(BaseNotification):

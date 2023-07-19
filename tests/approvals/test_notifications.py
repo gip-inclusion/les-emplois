@@ -1,5 +1,6 @@
 from itou.approvals import notifications
 
+from ..users.factories import PrescriberFactory
 from .factories import ProlongationRequestFactory
 
 
@@ -8,6 +9,19 @@ def test_prolongation_request_created(snapshot):
     email = notifications.ProlongationRequestCreated(prolongation_request).email
 
     assert email.to == [prolongation_request.validated_by.email]
+    assert email.subject == snapshot(name="subject")
+    assert email.body == snapshot(name="body")
+
+
+def test_prolongation_request_created_reminder(snapshot):
+    prolongation_request = ProlongationRequestFactory(for_snapshot=True)
+    other_prescribers = PrescriberFactory.create_batch(
+        3, membership__organization=prolongation_request.prescriber_organization
+    )
+    email = notifications.ProlongationRequestCreatedReminder(prolongation_request).email
+
+    assert email.to == [prolongation_request.validated_by.email]
+    assert email.cc == [member.email for member in other_prescribers]
     assert email.subject == snapshot(name="subject")
     assert email.body == snapshot(name="body")
 

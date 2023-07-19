@@ -1,0 +1,4 @@
+{% extends "approvals/email/prolongation_request/created_subject.txt" %}
+{% block subject %}
+Relance - {{ block.super }}
+{% endblock %}
