@@ -1,6 +1,5 @@
 from pathlib import Path
 
-from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -52,7 +51,12 @@ def validate_institution(institution_id):
         raise ValidationError(f"Sélectionnez une institution de type {InstitutionKind.DDETS_IAE}")
 
 
-def create_campaigns_and_calendar(evaluated_period_start_at, evaluated_period_end_at, institution_ids=None):
+def create_campaigns_and_calendar(
+    evaluated_period_start_at,
+    evaluated_period_end_at,
+    adversarial_stage_start_date,
+    institution_ids=None,
+):
     """
     Create a campaign for each institution whose kind is DDETS IAE (possibly limited by institution_ids).
     This method is intented to be executed manually, until it will be automised.
@@ -67,7 +71,10 @@ def create_campaigns_and_calendar(evaluated_period_start_at, evaluated_period_en
     if institution_ids:
         institutions = institutions.filter(pk__in=institution_ids)
 
-    calendar, _ = Calendar.objects.get_or_create(name=name)
+    calendar, _ = Calendar.objects.get_or_create(
+        name=name,
+        defaults={"adversarial_stage_start": adversarial_stage_start_date},
+    )
     evaluation_campaign_list = EvaluationCampaign.objects.bulk_create(
         EvaluationCampaign(
             calendar=calendar,
@@ -99,6 +106,7 @@ class Calendar(models.Model):
     """
 
     name = models.CharField(verbose_name="Nom", max_length=100, null=True)
+    adversarial_stage_start = models.DateField(verbose_name="Début de la phase contradictoire")
     html = models.TextField(verbose_name="Contenu")
 
     class Meta:
@@ -137,8 +145,6 @@ class EvaluationCampaign(models.Model):
     - on self-approvals made by siaes in the department of the institution (ie : departement 14),
     - during the evaluated period (ie : from 01.01.2021 to 31.12.2021).
     """
-
-    ADVERSARIAL_STAGE_START_DELTA = relativedelta(weeks=6)
 
     name = models.CharField(verbose_name="Nom de la campagne d'évaluation", max_length=100, blank=False, null=False)
 
@@ -199,10 +205,6 @@ class EvaluationCampaign(models.Model):
     def clean(self):
         if self.evaluated_period_end_at <= self.evaluated_period_start_at:
             raise ValidationError("La date de début de la période contrôlée doit être antérieure à sa date de fin.")
-
-    @property
-    def adversarial_stage_start_date(self):
-        return self.evaluations_asked_at.date() + EvaluationCampaign.ADVERSARIAL_STAGE_START_DELTA
 
     def eligible_job_applications(self):
         # accepted job_applications with self-approval made by hiring siae.

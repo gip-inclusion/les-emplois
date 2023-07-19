@@ -4083,9 +4083,7 @@ class InstitutionCalendarViewTest(TestCase):
                 </tbody>
             </table>
         """
-        evaluation_campaign = EvaluationCampaignFactory(
-            institution=self.institution, with_calendar=True, calendar__html=calendar_html
-        )
+        evaluation_campaign = EvaluationCampaignFactory(institution=self.institution, calendar__html=calendar_html)
         calendar_url = reverse("siae_evaluations_views:campaign_calendar", args=[evaluation_campaign.pk])
 
         self.client.force_login(self.user)

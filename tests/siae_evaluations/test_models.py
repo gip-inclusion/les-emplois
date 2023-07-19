@@ -265,19 +265,24 @@ class EvaluationCampaignManagerTest(TestCase):
     def test_create_campaigns_and_calendar(self):
         evaluated_period_start_at = timezone.now() - relativedelta(months=2)
         evaluated_period_end_at = timezone.now() - relativedelta(months=1)
+        adversarial_stage_start = timezone.localdate() + relativedelta(months=1)
 
         # not DDETS IAE
         for kind in [k for k in InstitutionKind if k != InstitutionKind.DDETS_IAE]:
             with self.subTest(kind=kind):
                 InstitutionFactory(kind=kind)
-                assert 0 == create_campaigns_and_calendar(evaluated_period_start_at, evaluated_period_end_at)
+                assert 0 == create_campaigns_and_calendar(
+                    evaluated_period_start_at, evaluated_period_end_at, adversarial_stage_start
+                )
                 assert 0 == EvaluationCampaign.objects.all().count()
                 assert 1 == Calendar.objects.all().count()
                 assert len(mail.outbox) == 0
 
         # institution DDETS IAE
         InstitutionWith2MembershipFactory.create_batch(2, kind=InstitutionKind.DDETS_IAE)
-        assert 2 == create_campaigns_and_calendar(evaluated_period_start_at, evaluated_period_end_at)
+        assert 2 == create_campaigns_and_calendar(
+            evaluated_period_start_at, evaluated_period_end_at, adversarial_stage_start
+        )
         assert 2 == EvaluationCampaign.objects.all().count()
         assert 1 == Calendar.objects.all().count()
 
@@ -291,10 +296,12 @@ class EvaluationCampaignManagerTest(TestCase):
     def test_create_campaigns_and_calendar_on_specific_DDETS_IAE(self):
         evaluated_period_start_at = timezone.now() - relativedelta(months=2)
         evaluated_period_end_at = timezone.now() - relativedelta(months=1)
+        adversarial_stage_start = timezone.localdate() + relativedelta(months=1)
         institution_ids = InstitutionWith2MembershipFactory.create_batch(2, kind=InstitutionKind.DDETS_IAE)
         assert 1 == create_campaigns_and_calendar(
             evaluated_period_start_at,
             evaluated_period_end_at,
+            adversarial_stage_start,
             institution_ids=[institution_ids[0].pk],
         )
         assert 1 == EvaluationCampaign.objects.all().count()
