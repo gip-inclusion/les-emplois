@@ -41,9 +41,7 @@ class ApprovalFactory(factory.django.DjangoModelFactory):
         if not create:
             return
         if extracted:
-            from tests.job_applications.factories import (
-                JobApplicationFactory,  # pylint: disable=import-outside-toplevel
-            )
+            from tests.job_applications.factories import JobApplicationFactory
 
             state = kwargs.pop("state", JobApplicationWorkflow.STATE_ACCEPTED)
             self.jobapplication_set.add(JobApplicationFactory(state=state, job_seeker=self.user, **kwargs))

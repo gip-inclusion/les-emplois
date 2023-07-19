@@ -31,7 +31,7 @@ class Command(BaseCommand):
         for probe in probes_classes:
             try:
                 success, info = probe().check()
-            except Exception as e:  # pylint: disable=broad-except
+            except Exception as e:
                 logger.exception("Probe %r failed", probe.name)
                 success, info = False, str(e)
 

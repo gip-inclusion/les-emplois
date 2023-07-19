@@ -46,7 +46,7 @@ class Command(BaseCommand):
         """
         handler = logging.StreamHandler(self.stdout)
 
-        self.logger = logging.getLogger(__name__)  # pylint: disable=attribute-defined-outside-init
+        self.logger = logging.getLogger(__name__)
         self.logger.propagate = False
         self.logger.addHandler(handler)
 

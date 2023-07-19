@@ -556,7 +556,6 @@ class EvaluatedSiae(models.Model):
 
         def state_from(application):
             return {
-                # pylint-disable=line-too-long
                 evaluation_enums.EvaluatedJobApplicationsState.PENDING: evaluation_enums.EvaluatedSiaeState.PENDING,
                 evaluation_enums.EvaluatedJobApplicationsState.PROCESSING: evaluation_enums.EvaluatedSiaeState.PENDING,
                 evaluation_enums.EvaluatedJobApplicationsState.UPLOADED: evaluation_enums.EvaluatedSiaeState.SUBMITTABLE,  # noqa: E501
@@ -650,7 +649,6 @@ class EvaluatedJobApplication(models.Model):
             if criteria.submitted_at is None:
                 return evaluation_enums.EvaluatedJobApplicationsState.UPLOADED
             return {
-                # pylint-disable=line-too-long
                 evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING: evaluation_enums.EvaluatedJobApplicationsState.SUBMITTED,  # noqa: E501
                 evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED: evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED,  # noqa: E501
                 evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED: evaluation_enums.EvaluatedJobApplicationsState.REFUSED,  # noqa: E501

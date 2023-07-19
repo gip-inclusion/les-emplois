@@ -1144,7 +1144,7 @@ def test_yield_sync_diff():
     # But I'm not sure that for such a simple utility function, I should really create a model
     # dedicated to it in the tests... at least lazy import it to avoid circular imports for the
     # longest possible time. Also choose a very simple model.
-    from itou.jobs.models import Rome  # pylint: disable=import-outside-toplevel
+    from itou.jobs.models import Rome
 
     # test trivial case
     items = list(

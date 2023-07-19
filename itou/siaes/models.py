@@ -529,7 +529,7 @@ class SiaeJobDescriptionQuerySet(models.QuerySet):
 
     def with_annotation_is_popular(self):
         # Avoid a circular import
-        from itou.job_applications.models import JobApplicationWorkflow  # pylint: disable=import-outside-toplevel
+        from itou.job_applications.models import JobApplicationWorkflow
 
         job_apps_filters = {"jobapplication__state__in": JobApplicationWorkflow.PENDING_STATES}
         annotation = self.with_job_applications_count(filters=job_apps_filters).annotate(

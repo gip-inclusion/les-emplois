@@ -11,7 +11,7 @@ class FranceConnectState(OIDConnectState):
 
 
 @dataclasses.dataclass
-class FranceConnectUserData(OIDConnectUserData):  # pylint: disable=too-many-instance-attributes
+class FranceConnectUserData(OIDConnectUserData):
     # Attributes are User model ones.
     # Mapping is made in self.user_info_mapping_dict.
     phone: str | None = None

@@ -1,4 +1,3 @@
-# pylint: disable=attribute-defined-outside-init
 """
 Handle multiple user types sign up with django-allauth.
 """

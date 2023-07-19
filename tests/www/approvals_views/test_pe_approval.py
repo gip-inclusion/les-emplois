@@ -18,7 +18,6 @@ class PoleEmploiApprovalSearchTest(TestCase):
         self.url = reverse("approvals:pe_approval_search")
 
     def set_up_pe_approval(self, with_job_application=True):
-        # pylint: disable=attribute-defined-outside-init
         self.pe_approval = PoleEmploiApprovalFactory()
 
         self.siae = SiaeFactory(with_membership=True)

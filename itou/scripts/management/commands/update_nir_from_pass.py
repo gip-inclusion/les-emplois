@@ -1,5 +1,4 @@
 # flake8: noqa
-# pylint: disable=[logging-fstring-interpolation, singleton-comparison]
 
 import csv
 import datetime

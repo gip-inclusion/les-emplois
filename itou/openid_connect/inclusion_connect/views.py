@@ -233,7 +233,7 @@ def _get_user_info(request, access_token):
     return response.json(), None
 
 
-def inclusion_connect_callback(request):  # pylint: disable=too-many-return-statements
+def inclusion_connect_callback(request):
     code = request.GET.get("code")
     state = request.GET.get("state")
     if code is None or state is None:

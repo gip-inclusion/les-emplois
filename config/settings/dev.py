@@ -5,7 +5,7 @@ import socket
 ITOU_ENVIRONMENT = "DEV"
 os.environ["ITOU_ENVIRONMENT"] = ITOU_ENVIRONMENT
 
-from .test import *  # pylint: disable=wildcard-import,unused-wildcard-import,wrong-import-position # noqa: E402,F403
+from .test import *  # noqa: E402,F403
 
 
 # Django settings
@@ -34,7 +34,7 @@ INTERNAL_IPS = ["127.0.0.1"]
 
 # Enable django-debug-toolbar with Docker.
 # Hack is coming from https://stackoverflow.com/a/45624773
-# inspired by https://github.com/cookiecutter/cookiecutter-django/blob/master/%7B%7Bcookiecutter.project_slug%7D%7D/config/settings/local.py#L71 # pylint: disable=line-too-long # noqa: E501
+# inspired by https://github.com/cookiecutter/cookiecutter-django/blob/master/%7B%7Bcookiecutter.project_slug%7D%7D/config/settings/local.py#L71 # # noqa: E501
 _, _, ips = socket.gethostbyname_ex(socket.gethostname())
 INTERNAL_IPS += [".".join(ip.split(".")[:-1] + ["1"]) for ip in ips]
 

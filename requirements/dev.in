@@ -8,8 +8,6 @@ ipdb  # https://github.com/gotcha/ipdb
 # ------------------------------------------------------------------------------
 coverage  # https://github.com/nedbat/coveragepy
 pre-commit  # https://github.com/pre-commit/pre-commit
-pylint  # https://github.com/PyCQA/pylint
-pylint-django  # https://github.com/PyCQA/pylint-django
 
 # Django
 # ------------------------------------------------------------------------------
