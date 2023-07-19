@@ -52,7 +52,7 @@ class PrescriberWithOrgInvitationForm(forms.ModelForm):
             self.add_error("email", error)
         return email
 
-    def save(self, *args, **kwargs):  # pylint: disable=unused-argument
+    def save(self, *args, **kwargs):
         invitation = super().save(commit=False)
         invitation.sender = self.sender
         invitation.organization = self.organization
@@ -135,7 +135,7 @@ class SiaeStaffInvitationForm(forms.ModelForm):
         self._invited_user_exists_error(email)
         return email
 
-    def save(self, *args, **kwargs):  # pylint: disable=unused-argument
+    def save(self, *args, **kwargs):
         invitation = super().save(commit=False)
         invitation.sender = self.sender
         invitation.siae = self.siae
@@ -199,7 +199,7 @@ class LaborInspectorInvitationForm(forms.ModelForm):
         self._invited_user_exists_error(email)
         return email
 
-    def save(self, *args, **kwargs):  # pylint: disable=unused-argument
+    def save(self, *args, **kwargs):
         invitation = super().save(commit=False)
         invitation.sender = self.sender
         invitation.institution = self.institution

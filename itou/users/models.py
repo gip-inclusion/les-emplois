@@ -166,7 +166,7 @@ class User(AbstractUser, AddressMixin):
     """
 
     # Used for validation of birth country / place
-    INSEE_CODE_FRANCE = Country._CODE_FRANCE  # pylint: disable=protected-access
+    INSEE_CODE_FRANCE = Country._CODE_FRANCE
 
     REASON_FORGOTTEN = "FORGOTTEN"
     REASON_NOT_REGISTERED = "NOT_REGISTERED"

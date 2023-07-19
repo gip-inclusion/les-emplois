@@ -29,7 +29,7 @@ def threadsafe_print(s):
 def log_retry_attempt(retry_state):
     try:
         outcome = retry_state.outcome.result()
-    except Exception as e:  # pylint: disable=broad-except
+    except Exception as e:
         outcome = str(e)
     threadsafe_print(f"attempt={retry_state.attempt_number} failed with outcome={outcome}")
 

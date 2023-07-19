@@ -1,5 +1,3 @@
-# pylint: disable=consider-using-f-string
-
 import argparse
 
 from django.core.management.base import BaseCommand

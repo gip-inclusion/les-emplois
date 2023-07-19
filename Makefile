@@ -24,7 +24,7 @@ else
 	EXEC_CMD := docker exec -ti itou_django
 endif
 
-.PHONY: run venv clean cdsitepackages quality fix pylint compile-deps
+.PHONY: run venv clean cdsitepackages quality fix compile-deps
 
 # Run Docker images
 run:
@@ -65,9 +65,6 @@ fix: $(VIRTUAL_ENV)
 	# Use || true because `git apply` exit with an error ("error: unrecognized input") when the pipe is empty,
 	# this happens when there is nothing to fix or shellcheck can't propose a fix.
 	find * -type f -name '*.sh' -exec shellcheck --external-sources --format=diff {} + | git apply || true
-
-pylint: $(VIRTUAL_ENV)
-	pylint $(LINTER_CHECKED_DIRS)
 
 # Django.
 # =============================================================================

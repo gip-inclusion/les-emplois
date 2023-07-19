@@ -1,4 +1,3 @@
-# pylint: disable=import-outside-toplevel
 from django.contrib.auth.models import Group, Permission
 from django.core.management.base import BaseCommand
 from django.db import transaction

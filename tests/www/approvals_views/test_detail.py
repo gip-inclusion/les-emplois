@@ -131,7 +131,7 @@ class TestApprovalDetailView:
         client.force_login(user)
 
         url = reverse("approvals:detail", kwargs={"pk": approval.pk})
-        with assertNumQueries(expected_num_queries):  # pylint: disable=not-context-manager
+        with assertNumQueries(expected_num_queries):
             response = client.get(url)
         response = client.get(url)
         assertContains(response, format_approval_number(approval))
@@ -212,7 +212,7 @@ class TestApprovalDetailView:
             + 1  # prescriberorganization: job_application.sender_prescriber_organization
         )
 
-        with assertNumQueries(expected_num_queries):  # pylint: disable=not-context-manager
+        with assertNumQueries(expected_num_queries):
             response = client.get(url)
 
         suspensions_section = parse_response_to_soup(response, selector="#suspensions-list")
@@ -259,7 +259,7 @@ class TestApprovalDetailView:
         url = reverse("approvals:detail", kwargs={"pk": approval.pk})
         # 1 query less to be executed: no more suspensions so no more need to check if there
         # is an accepted job application
-        with assertNumQueries(expected_num_queries - 1):  # pylint: disable=not-context-manager
+        with assertNumQueries(expected_num_queries - 1):
             response = client.get(url)
 
         prolongations_section = parse_response_to_soup(response, selector="#prolongations-list")

@@ -1,4 +1,3 @@
-# pylint: disable=too-many-lines
 import datetime
 import io
 import json

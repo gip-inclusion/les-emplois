@@ -56,11 +56,11 @@ def has_hijack_perm(*, hijacker, hijacked):
     return hijacker.email.lower() in settings.HIJACK_ALLOWED_USER_EMAILS
 
 
-def hijack_started_signal(sender, hijacker, hijacked, request, **kwargs):  # pylint: disable=unused-argument
+def hijack_started_signal(sender, hijacker, hijacked, request, **kwargs):
     logger.info("admin=%s has started impersonation of user=%s", hijacker, hijacked)
 
 
-def hijack_ended_signal(sender, hijacker, hijacked, request, **kwargs):  # pylint: disable=unused-argument
+def hijack_ended_signal(sender, hijacker, hijacked, request, **kwargs):
     logger.info("admin=%s has ended impersonation of user=%s", hijacker, hijacked)
 
 

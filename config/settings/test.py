@@ -4,7 +4,7 @@ import os
 ITOU_ENVIRONMENT = "DEV"
 os.environ["ITOU_ENVIRONMENT"] = ITOU_ENVIRONMENT
 
-from .base import *  # pylint: disable=wildcard-import,unused-wildcard-import,wrong-import-position # noqa: E402,F403
+from .base import *  # noqa: E402,F403
 
 
 SECRET_KEY = "foobar"

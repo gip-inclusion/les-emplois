@@ -55,7 +55,7 @@ def france_connect_authorize(request):
     return HttpResponseRedirect(f"{url}?{urlencode(data)}")
 
 
-def france_connect_callback(request):  # pylint: disable=too-many-return-statements
+def france_connect_callback(request):
     code = request.GET.get("code")
     if code is None:
         error_msg = ("France Connect n’a pas transmis le paramètre « code » nécessaire à votre authentification.",)
