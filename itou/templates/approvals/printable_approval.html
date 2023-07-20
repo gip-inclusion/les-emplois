@@ -101,8 +101,8 @@
 
 {% block script %}
     <script nonce="{{ CSP_NONCE }}">
-        document.getElementById("printButton").addEventListener("click", function print(){
-          window.print();
+        document.getElementById("printButton").addEventListener("click", function print() {
+            window.print();
         });
     </script>
 {% endblock script %}

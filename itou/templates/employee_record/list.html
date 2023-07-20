@@ -25,7 +25,7 @@
         // Show or Hide the search-filter-form sidebar based on responsive breakpoint
         var breakpointMD = getComputedStyle(document.documentElement).getPropertyValue("--breakpoint-md");
         $(window).on("load resize", function() {
-            if (window.matchMedia("(min-width: "+breakpointMD+")").matches) {
+            if (window.matchMedia("(min-width: " + breakpointMD + ")").matches) {
                 $("#status-filter-form").collapse("show");
             } else {
                 $("#status-filter-form").collapse("hide");

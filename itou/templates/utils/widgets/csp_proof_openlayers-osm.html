@@ -2,12 +2,15 @@
 This is exactly django/contrib/gis/templates/gis/openlayers-osm.html with the added 'nonce="{{ CSP_NONCE }}"'
 {% endcomment %}
 {% load i18n l10n %}
-<style type="text/css">{% block map_css %}{% get_current_language_bidi as LANGUAGE_BIDI %}
+<style type="text/css">
+    /* beautify ignore:start */
+{% block map_css %}{% get_current_language_bidi as LANGUAGE_BIDI %}
     #{{ id }}_map { width: {{ map_width }}px; height: {{ map_height }}px; }
     #{{ id }}_map .aligned label { float: inherit; }
     #{{ id }}_div_map { position: relative; vertical-align: top; float: {{ LANGUAGE_BIDI|yesno:"right,left" }}; }
     {% if not display_raw %}#{{ id }} { display: none; }{% endif %}
     {% endblock %}
+/* beautify ignore:end */
 </style>
 
 <div id="{{ id }}_div_map">
@@ -20,6 +23,7 @@ This is exactly django/contrib/gis/templates/gis/openlayers-osm.html with the ad
     {% endif %}
     <textarea id="{{ id }}" class="vSerializedField required" cols="150" rows="10" name="{{ name }}">{{ serialized }}</textarea>
     <script nonce="{{ CSP_NONCE }}">
+        /* beautify ignore:start */
         var base_layer = new ol.layer.Tile({source: new ol.source.OSM()});
         var options = {
             base_layer: base_layer,
@@ -33,5 +37,6 @@ This is exactly django/contrib/gis/templates/gis/openlayers-osm.html with the ad
         options['default_lat'] = {{ default_lat|unlocalize }};
         options['default_zoom'] = {{ default_zoom|unlocalize }};
         var {{ module }} = new MapWidget(options);
+        /* beautify ignore:end */
     </script>
 </div>

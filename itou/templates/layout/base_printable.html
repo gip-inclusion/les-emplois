@@ -14,13 +14,15 @@
         <link rel="stylesheet" href="{% static "vendor/theme-inclusion/stylesheets/app.css" %}" type="text/css">
         <link rel="stylesheet" href="{{ base_url }}{% static 'css/itou.css' %}" type="text/css">
         <style type="text/css">
-                html {
-                    background: transparent !important;
-                }
-                @page {
-                    margin: 0mm;  /* hides title and date */
-                    size: A4;
-                }
+            html {
+                background: transparent !important;
+            }
+
+            @page {
+                margin: 0mm;
+                /* hides title and date */
+                size: A4;
+            }
         </style>
         {% block extra_head %}{% endblock %}
     </head>

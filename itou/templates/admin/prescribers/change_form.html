@@ -24,7 +24,7 @@
     <script nonce="{{ CSP_NONCE }}">
         var buttons = document.getElementsByClassName("with-confirm");
         Array.prototype.forEach.call(buttons, function(button) {
-            button.addEventListener("click", function(event){
+            button.addEventListener("click", function(event) {
                 if (!confirm('Êtes vous certain ?')) {
                     event.preventDefault();
                 }

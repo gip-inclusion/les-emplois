@@ -50,8 +50,8 @@
 
 <script nonce="{{ CSP_NONCE }}">
     var links = document.getElementsByClassName('invitation-link')
-    for(var i = 0, j = links.length; i < j; i++) {
-        links[i].addEventListener("click", function select(event){
+    for (var i = 0, j = links.length; i < j; i++) {
+        links[i].addEventListener("click", function select(event) {
             var input = event.target.querySelector('input');
             input.select();
             navigator.clipboard.writeText(input.value);

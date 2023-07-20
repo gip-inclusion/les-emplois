@@ -27,3 +27,5 @@ custom_blocks="buttons,endbuttons"
 max_attribute_length=200
 preserve_blank_lines=true
 extend_exclude = "itou/templates/utils/widgets/duet_date_picker_widget.html"
+format_css = true
+format_js = true
