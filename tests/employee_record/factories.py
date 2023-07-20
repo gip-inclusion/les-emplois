@@ -1,3 +1,5 @@
+import datetime
+
 import factory
 
 from itou.employee_record.enums import NotificationStatus
@@ -31,7 +33,10 @@ class EmployeeRecordFactory(BareEmployeeRecordFactory):
     siret = factory.SelfAttribute(".job_application.to_siae.siret")
 
     class Params:
-        archivable = factory.Trait(job_application__approval__expired=True)
+        archivable = factory.Trait(
+            job_application__approval__expired=True,
+            created_at=factory.Faker("date_time_between", end_date="-6M", tzinfo=datetime.UTC),
+        )
         orphan = factory.Trait(asp_id=0)
         with_batch_information = factory.Trait(
             asp_batch_file=factory.Faker("asp_batch_filename"), asp_batch_line_number=factory.Sequence(int)
