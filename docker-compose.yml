@@ -42,7 +42,6 @@ services:
       - PGUSER=postgres
       - PGPASSWORD=password
       - PYTHONPATH=.
-      - DJANGO_SETTINGS_MODULE=config.settings.dev
       - ITOU_LOG_LEVEL=DEBUG
     depends_on:
       - postgres
