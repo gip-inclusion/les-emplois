@@ -12,8 +12,8 @@ done
 # trap : TERM INT
 # tail -f /dev/null & wait
 
-django-admin migrate
+./manage.py migrate
 
-django-admin runserver 0.0.0.0:8000
+./manage.py runserver 0.0.0.0:8000
 
 exec "$@"
