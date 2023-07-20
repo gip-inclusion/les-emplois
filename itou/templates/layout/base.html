@@ -97,7 +97,7 @@
         <script nonce="{{ CSP_NONCE }}">
             // Show any toasts that is already present in the DOM
             $(document).ready(() => {
-                $(".toast-placement-wrapper").children(".toast").each(function () {
+                $(".toast-placement-wrapper").children(".toast").each(function() {
                     $(this).toast("show");
                 });
             });
@@ -110,6 +110,7 @@
             // https://github.com/AmauriC/tarteaucitron.js/blob/98b02b0bdda670bd953752d85443c3fd77dde724/tarteaucitron.js#L5
             var tarteaucitronForceLanguage = "fr";
 
+            /* beautify ignore:start */
             tarteaucitron.init({
                 "privacyUrl": "", /* Privacy policy url */
                 "bodyPosition": "bottom", /* or top to bring it as first element for accessibility */
@@ -151,6 +152,7 @@
             tarteaucitron.user.matomoHost = '{{ MATOMO_BASE_URL }}';
             (tarteaucitron.job = tarteaucitron.job || []).push('matomo');
             {% endif %}
+            /* beautify ignore:end */
 
             // livestorm
             const tablet_width = 750;
@@ -161,13 +163,13 @@
                 "uri": "https://livestorm.co/fr/politique-confidentialite",
                 "needConsent": true,
                 "cookies": [],
-                "js": function () {
+                "js": function() {
                     "use strict";
-                    tarteaucitron.fallback(['js-tac-livestorm'], function (x) {
+                    tarteaucitron.fallback(['js-tac-livestorm'], function(x) {
                         var frame_title = tarteaucitron.fixSelfXSS(x.getAttribute("title") || 'livestorm iframe'),
-                        width = x.getAttribute("width"),
-                        height = x.getAttribute("height"),
-                        url = x.getAttribute("data-url");
+                            width = x.getAttribute("width"),
+                            height = x.getAttribute("height"),
+                            url = x.getAttribute("data-url");
 
                         // Poor attempt to make the Livestorm iframe responsive.
                         if (document.body.clientWidth > tablet_width) {
@@ -176,10 +178,10 @@
                         return '<iframe title="' + frame_title + '" src="' + url + '" style="min-height:' + height + ';" allowtransparency allowfullscreen></iframe>';
                     });
                 },
-                "fallback": function () {
+                "fallback": function() {
                     "use strict";
                     var id = 'livestorm';
-                    tarteaucitron.fallback(['js-tac-livestorm'], function (elem) {
+                    tarteaucitron.fallback(['js-tac-livestorm'], function(elem) {
                         elem.style.width = elem.getAttribute('width');
                         if (document.body.clientWidth > tablet_width) {
                             elem.style.height = "310px";
@@ -191,7 +193,6 @@
                 }
             };
             (tarteaucitron.job = tarteaucitron.job || []).push('livestorm');
-
         </script>
 
         {% block script %}
@@ -215,6 +216,7 @@
         {% if MATOMO_BASE_URL %}
             {# Matomo/Piwik open source web analytics #}
             <script id="matomo-custom-init" nonce="{{ CSP_NONCE }}">
+                /* beautify ignore:start */
                 window._paq = window._paq || [];
                 /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
 
@@ -232,6 +234,7 @@
                     const title = document.title.replace(/- Les emplois de l'inclusion/g,'').trim();
                     window._paq.push(['setDocumentTitle', title]);
                 {% endif %}
+                /* beautify ignore:end */
             </script>
             <script src="{% static "js/matomo.js" %}"></script>
         {% endif %}

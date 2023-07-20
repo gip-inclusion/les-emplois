@@ -129,7 +129,7 @@
             var contractTypeDetails = $("#contractTypeDetails");
             contractType.change(function() {
                 if (contractType.val() == '{{ hide_value }}') {
-                   contractTypeDetails.removeClass("d-none");
+                    contractTypeDetails.removeClass("d-none");
                 } else {
                     $("#id_contract_type_details").val('');
                     contractTypeDetails.addClass("d-none");

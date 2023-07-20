@@ -148,7 +148,11 @@
     {{ block.super }}
     {# For auto-submit forms #}
     <script nonce="{{ CSP_NONCE }}">
-        $("#block_job_applications_form").change(function() { this.submit(); })
-        $("form[id^= 'toggle_job_description_form_']").change(function() { this.submit(); })
+        $("#block_job_applications_form").change(function() {
+            this.submit();
+        })
+        $("form[id^= 'toggle_job_description_form_']").change(function() {
+            this.submit();
+        })
     </script>
 {% endblock %}

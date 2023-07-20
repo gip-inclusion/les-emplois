@@ -88,8 +88,8 @@
             /**
              * JS to collapse subfields
              **/
-            $(".js-collapsable-subfields").each(function () {
-                $(this).find('input[type="checkbox"]').change(function (e) {
+            $(".js-collapsable-subfields").each(function() {
+                $(this).find('input[type="checkbox"]').change(function(e) {
                     $('#subfields_' + e.target.name).collapse("toggle")
                 })
             })

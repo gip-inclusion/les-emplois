@@ -150,7 +150,7 @@
     {{ block.super }}
 
     <script nonce="{{ CSP_NONCE }}">
-        document.getElementById("stats-iframe").addEventListener("load", function(){
+        document.getElementById("stats-iframe").addEventListener("load", function() {
             iFrameResize({}, this)
         });
     </script>
@@ -163,7 +163,6 @@
     {% if tally_popup_form_id %}
         {# `defer` ensures the script runs *after* embed.js above has been loaded. #}
         <script defer nonce="{{ CSP_NONCE }}">
-
             // Any given Tally popup will not be shown more than once every `minDaysBetweenDisplays` days.
             const minDaysBetweenDisplays = 14;
             const delayBeforeShowingPopupInSeconds = 45;
@@ -174,7 +173,7 @@
             function supportsLocalStorage() {
                 try {
                     return 'localStorage' in window && window['localStorage'] !== null;
-                } catch(e){
+                } catch (e) {
                     return false;
                 }
             };

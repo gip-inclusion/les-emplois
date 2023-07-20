@@ -88,7 +88,7 @@
 {% block script %}
     {{ block.super }}
     <script nonce="{{ CSP_NONCE }}">
-        document.getElementById('job_description_link').addEventListener("click", function select(event){
+        document.getElementById('job_description_link').addEventListener("click", function select(event) {
             var input = event.target;
             input.select();
             navigator.clipboard.writeText(input.value);

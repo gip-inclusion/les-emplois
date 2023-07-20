@@ -76,8 +76,8 @@
 
     <script nonce="{{ CSP_NONCE }}">
         var copyToken = document.getElementById('copy-token')
-        copyToken.addEventListener("click", function select(event){
-            var token = document.getElementById('token') ;
+        copyToken.addEventListener("click", function select(event) {
+            var token = document.getElementById('token');
             navigator.clipboard.writeText(token.innerText);
         });
     </script>
