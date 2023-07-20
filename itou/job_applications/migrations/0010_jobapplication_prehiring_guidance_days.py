@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
             model_name="jobapplication",
             name="prehiring_guidance_days",
             field=models.PositiveSmallIntegerField(
-                blank=True, null=True, verbose_name="Nombre de jours d’accompagnement avant contrat"
+                blank=True, null=True, verbose_name="nombre de jours d’accompagnement avant contrat"
             ),
         ),
     ]

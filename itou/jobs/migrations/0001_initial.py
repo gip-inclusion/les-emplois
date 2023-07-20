@@ -15,17 +15,17 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Rome",
             fields=[
-                ("code", models.CharField(max_length=5, primary_key=True, serialize=False, verbose_name="Code ROME")),
-                ("name", models.CharField(db_index=True, max_length=255, verbose_name="Nom")),
+                ("code", models.CharField(max_length=5, primary_key=True, serialize=False, verbose_name="code ROME")),
+                ("name", models.CharField(db_index=True, max_length=255, verbose_name="nom")),
                 ("updated_at", models.DateTimeField(auto_now=True)),
             ],
-            options={"verbose_name": "ROME", "verbose_name_plural": "ROMEs"},
+            options={"verbose_name": "ROME", "verbose_name_plural": "ROME"},
         ),
         migrations.CreateModel(
             name="Appellation",
             fields=[
-                ("code", models.CharField(max_length=6, primary_key=True, serialize=False, verbose_name="Code")),
-                ("name", models.CharField(db_index=True, max_length=255, verbose_name="Nom")),
+                ("code", models.CharField(max_length=6, primary_key=True, serialize=False, verbose_name="code")),
+                ("name", models.CharField(db_index=True, max_length=255, verbose_name="nom")),
                 ("full_text", django.contrib.postgres.search.SearchVectorField(null=True)),
                 (
                     "rome",
@@ -38,7 +38,7 @@ class Migration(migrations.Migration):
                 ),
                 ("updated_at", models.DateTimeField(auto_now=True)),
             ],
-            options={"verbose_name": "Appellation", "verbose_name_plural": "Appellations", "ordering": ["name"]},
+            options={"verbose_name": "appellation", "ordering": ["name"]},
         ),
         migrations.AddIndex(
             model_name="appellation",

@@ -10,11 +10,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="employeerecord",
             name="updated_at",
-            field=models.DateTimeField(auto_now=True, verbose_name="Date de modification"),
+            field=models.DateTimeField(auto_now=True, verbose_name="date de modification"),
         ),
         migrations.AlterField(
             model_name="employeerecordupdatenotification",
             name="updated_at",
-            field=models.DateTimeField(auto_now=True, verbose_name="Date de modification"),
+            field=models.DateTimeField(auto_now=True, verbose_name="date de modification"),
         ),
     ]

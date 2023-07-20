@@ -18,11 +18,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="eligibilitydiagnosis",
             name="updated_at",
-            field=models.DateTimeField(auto_now=True, db_index=True, verbose_name="Date de modification"),
+            field=models.DateTimeField(auto_now=True, db_index=True, verbose_name="date de modification"),
         ),
         migrations.AlterField(
             model_name="geiqeligibilitydiagnosis",
             name="updated_at",
-            field=models.DateTimeField(auto_now=True, db_index=True, verbose_name="Date de modification"),
+            field=models.DateTimeField(auto_now=True, db_index=True, verbose_name="date de modification"),
         ),
     ]

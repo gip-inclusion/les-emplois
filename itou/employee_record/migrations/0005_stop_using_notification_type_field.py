@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="employeerecordupdatenotification",
             name="notification_type",
-            field=models.CharField(blank=True, max_length=20, null=True, verbose_name="Type de notification"),
+            field=models.CharField(blank=True, max_length=20, null=True, verbose_name="type de notification"),
         ),
         migrations.AddConstraint(
             model_name="employeerecordupdatenotification",

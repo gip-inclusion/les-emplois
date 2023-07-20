@@ -16,21 +16,21 @@ class City(models.Model):
 
     DEPARTMENT_CHOICES = DEPARTMENTS.items()
 
-    name = models.CharField(verbose_name="Ville", max_length=255, db_index=True)
-    slug = models.SlugField(verbose_name="Slug", max_length=255, unique=True)
-    department = models.CharField(verbose_name="Département", choices=DEPARTMENT_CHOICES, max_length=3, db_index=True)
+    name = models.CharField(verbose_name="ville", max_length=255, db_index=True)
+    slug = models.SlugField(verbose_name="slug", max_length=255, unique=True)
+    department = models.CharField(verbose_name="département", choices=DEPARTMENT_CHOICES, max_length=3, db_index=True)
 
     # Note that post codes and insee codes have a n-to-n relationship.
     # One insee code can have several post codes but the inverse is also true e.g. zip code 33360 has six insee codes.
-    post_codes = ArrayField(models.CharField(max_length=5), verbose_name="Codes postaux", blank=True)
-    code_insee = models.CharField(verbose_name="Code INSEE", max_length=5, unique=True)
+    post_codes = ArrayField(models.CharField(max_length=5), verbose_name="codes postaux", blank=True)
+    code_insee = models.CharField(verbose_name="code INSEE", max_length=5, unique=True)
 
     # Latitude and longitude coordinates.
     # https://docs.djangoproject.com/en/2.2/ref/contrib/gis/model-api/#pointfield
     coords = gis_models.PointField(geography=True, blank=True, null=True)
 
     edition_mode = models.CharField(
-        verbose_name="Mode d'édition",
+        verbose_name="mode d'édition",
         choices=EditionModeChoices.choices,
         max_length=16,
         default=EditionModeChoices.MANUAL,
@@ -39,8 +39,8 @@ class City(models.Model):
     objects = models.Manager()  # The default manager.
 
     class Meta:
-        verbose_name = "Ville française"
-        verbose_name_plural = "Villes françaises"
+        verbose_name = "ville française"
+        verbose_name_plural = "villes françaises"
         indexes = [
             # https://docs.djangoproject.com/en/dev/ref/contrib/postgres/search/#trigram-similarity
             # https://docs.djangoproject.com/en/dev/ref/contrib/postgres/indexes/#ginindex

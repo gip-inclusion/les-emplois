@@ -20,14 +20,14 @@ class Migration(migrations.Migration):
                     models.TextField(
                         blank=True,
                         verbose_name=(
-                            "Détails de la participation à une session de présentation de l’auto-prescription"
+                            "détails de la participation à une session de présentation de l’auto-prescription"
                         ),
                     ),
                 ),
                 (
                     "suspension_dates",
                     itou.utils.models.InclusiveDateRangeField(
-                        blank=True, null=True, verbose_name="Retrait de la capacité d’auto-prescription"
+                        blank=True, null=True, verbose_name="retrait de la capacité d’auto-prescription"
                     ),
                 ),
                 (
@@ -39,22 +39,22 @@ class Migration(migrations.Migration):
                             django.core.validators.MinValueValidator(1),
                             django.core.validators.MaxValueValidator(100),
                         ],
-                        verbose_name="Pourcentage de retrait de l’aide au poste",
+                        verbose_name="pourcentage de retrait de l’aide au poste",
                     ),
                 ),
                 (
                     "subsidy_cut_dates",
                     itou.utils.models.InclusiveDateRangeField(
-                        blank=True, null=True, verbose_name="Dates de retrait de l’aide au poste"
+                        blank=True, null=True, verbose_name="dates de retrait de l’aide au poste"
                     ),
                 ),
                 (
                     "deactivation_reason",
-                    models.TextField(blank=True, verbose_name="Explication du déconventionnement de la structure"),
+                    models.TextField(blank=True, verbose_name="explication du déconventionnement de la structure"),
                 ),
                 (
                     "no_sanction_reason",
-                    models.TextField(blank=True, verbose_name="Explication de l’absence de sanction"),
+                    models.TextField(blank=True, verbose_name="explication de l’absence de sanction"),
                 ),
                 (
                     "evaluated_siae",

@@ -12,6 +12,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="jobapplication",
             name="inverted_vae_contract",
-            field=models.BooleanField(blank=True, null=True, verbose_name="Contrat associé à une VAE inversée"),
+            field=models.BooleanField(blank=True, null=True, verbose_name="contrat associé à une VAE inversée"),
         ),
     ]

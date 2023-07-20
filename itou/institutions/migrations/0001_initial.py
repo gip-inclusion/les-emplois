@@ -23,14 +23,14 @@ class Migration(migrations.Migration):
             name="Institution",
             fields=[
                 ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
-                ("address_line_1", models.CharField(blank=True, max_length=255, verbose_name="Adresse")),
+                ("address_line_1", models.CharField(blank=True, max_length=255, verbose_name="adresse")),
                 (
                     "address_line_2",
                     models.CharField(
                         blank=True,
                         help_text="Appartement, suite, bloc, bâtiment, boite postale, etc.",
                         max_length=255,
-                        verbose_name="Complément d'adresse",
+                        verbose_name="complément d'adresse",
                     ),
                 ),
                 (
@@ -39,10 +39,10 @@ class Migration(migrations.Migration):
                         blank=True,
                         max_length=5,
                         validators=[itou.utils.validators.validate_post_code],
-                        verbose_name="Code Postal",
+                        verbose_name="code postal",
                     ),
                 ),
-                ("city", models.CharField(blank=True, max_length=255, verbose_name="Ville")),
+                ("city", models.CharField(blank=True, max_length=255, verbose_name="ville")),
                 (
                     "department",
                     models.CharField(
@@ -158,14 +158,14 @@ class Migration(migrations.Migration):
                         ],
                         db_index=True,
                         max_length=3,
-                        verbose_name="Département",
+                        verbose_name="département",
                     ),
                 ),
                 (
                     "coords",
                     django.contrib.gis.db.models.fields.PointField(blank=True, geography=True, null=True, srid=4326),
                 ),
-                ("geocoding_score", models.FloatField(blank=True, null=True, verbose_name="Score du geocoding")),
+                ("geocoding_score", models.FloatField(blank=True, null=True, verbose_name="score du geocoding")),
                 (
                     "kind",
                     models.CharField(
@@ -184,34 +184,34 @@ class Migration(migrations.Migration):
                         ],
                         default="Autre",
                         max_length=20,
-                        verbose_name="Type",
+                        verbose_name="type",
                     ),
                 ),
-                ("name", models.CharField(max_length=255, verbose_name="Nom")),
+                ("name", models.CharField(max_length=255, verbose_name="nom")),
                 (
                     "created_at",
-                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="Date de création"),
+                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="date de création"),
                 ),
-                ("updated_at", models.DateTimeField(blank=True, null=True, verbose_name="Date de modification")),
+                ("updated_at", models.DateTimeField(blank=True, null=True, verbose_name="date de modification")),
                 ("uid", models.UUIDField(db_index=True, default=uuid.uuid4, unique=True)),
             ],
             options={
-                "verbose_name": "Institution partenaire",
-                "verbose_name_plural": "Institutions partenaires",
+                "verbose_name": "institution partenaire",
+                "verbose_name_plural": "institutions partenaires",
             },
         ),
         migrations.CreateModel(
             name="InstitutionMembership",
             fields=[
                 ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
-                ("is_admin", models.BooleanField(default=False, verbose_name="Administrateur")),
-                ("is_active", models.BooleanField(default=True, verbose_name="Rattachement actif")),
-                ("joined_at", models.DateTimeField(default=django.utils.timezone.now, verbose_name="Date d'adhésion")),
+                ("is_admin", models.BooleanField(default=False, verbose_name="administrateur")),
+                ("is_active", models.BooleanField(default=True, verbose_name="rattachement actif")),
+                ("joined_at", models.DateTimeField(default=django.utils.timezone.now, verbose_name="date d'adhésion")),
                 (
                     "created_at",
-                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="Date de création"),
+                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="date de création"),
                 ),
-                ("updated_at", models.DateTimeField(null=True, verbose_name="Date de modification")),
+                ("updated_at", models.DateTimeField(null=True, verbose_name="date de modification")),
                 (
                     "institution",
                     models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="institutions.institution"),
@@ -223,7 +223,7 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="updated_institutionmembership_set",
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="Mis à jour par",
+                        verbose_name="mis à jour par",
                     ),
                 ),
                 ("user", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
@@ -239,7 +239,7 @@ class Migration(migrations.Migration):
                 blank=True,
                 through="institutions.InstitutionMembership",
                 to=settings.AUTH_USER_MODEL,
-                verbose_name="Membres",
+                verbose_name="membres",
             ),
         ),
     ]

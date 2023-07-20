@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
                 ("measured_at", models.DateTimeField(default=django.utils.timezone.now)),
             ],
             options={
-                "verbose_name_plural": "Data",
+                "verbose_name_plural": "data",
             },
         ),
         migrations.AddIndex(

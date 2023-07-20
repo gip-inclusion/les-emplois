@@ -42,18 +42,18 @@ class ExternalDataImport(models.Model):
     )
 
     status = models.CharField(max_length=10, choices=STATUS_CHOICES)
-    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
+    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     source = models.CharField(
-        max_length=20, verbose_name="Origine des données", choices=DATA_SOURCE_CHOICES, default=DATA_SOURCE_UNKNOWN
+        max_length=20, verbose_name="origine des données", choices=DATA_SOURCE_CHOICES, default=DATA_SOURCE_UNKNOWN
     )
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name="Utilisateur", on_delete=models.CASCADE)
-    report = models.JSONField(verbose_name="Rapport technique", default=dict)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name="utilisateur", on_delete=models.CASCADE)
+    report = models.JSONField(verbose_name="rapport technique", default=dict)
 
     objects = ExternalDataImportQuerySet.as_manager()
 
     class Meta:
-        verbose_name = "Import de données externes"
-        verbose_name_plural = "Imports de données externes"
+        verbose_name = "import de données externes"
+        verbose_name_plural = "imports de données externes"
         unique_together = ["user", "source"]
 
     def __repr__(self):
@@ -68,22 +68,22 @@ class ExternalDataImport(models.Model):
 
 class JobSeekerExternalData(models.Model):
     class Meta:
-        verbose_name = "Données externes pour un chercheur d'emploi"
-        verbose_name_plural = "Données externes pour un chercheur d'emploi"
+        verbose_name = "données externes pour un chercheur d'emploi"
+        verbose_name_plural = "données externes pour un chercheur d'emploi"
 
-    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
+    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
 
     data_import = models.ForeignKey(ExternalDataImport, on_delete=models.CASCADE)
 
     user = models.OneToOneField(
-        settings.AUTH_USER_MODEL, verbose_name="Demandeur d'emploi", on_delete=models.CASCADE, primary_key=True
+        settings.AUTH_USER_MODEL, verbose_name="demandeur d'emploi", on_delete=models.CASCADE, primary_key=True
     )
 
     # Is the user a job seeker ? (from PE perspective)
     # --
     # original field: PE / codeStatutIndividu
     is_pe_jobseeker = models.BooleanField(
-        null=True, verbose_name="L'utilisateur est inscrit comme demandeur d'emploi PE"
+        null=True, verbose_name="l'utilisateur est inscrit comme demandeur d'emploi PE"
     )
 
     # The user has open rights to **at least one** the following social helps;
@@ -96,7 +96,7 @@ class JobSeekerExternalData(models.Model):
     # --
     # original field: PE / beneficiairePrestationSolidarite
     has_minimal_social_allowance = models.BooleanField(
-        null=True, verbose_name="L'utilisateur dispose d'une prestation de minima sociaux"
+        null=True, verbose_name="l'utilisateur dispose d'une prestation de minima sociaux"
     )
 
     def __repr__(self):
@@ -108,8 +108,8 @@ class JobSeekerExternalData(models.Model):
 
 class RejectedEmailEventData(models.Model):
     class Meta:
-        verbose_name = "Donnée collectée par le webhook en cas d’erreur d’envoi d’email"
-        verbose_name_plural = "Données collectées par le webhook en cas d’erreur d’envoi d’email"
+        verbose_name = "donnée collectée par le webhook en cas d’erreur d’envoi d’email"
+        verbose_name_plural = "données collectées par le webhook en cas d’erreur d’envoi d’email"
 
     REASON_INVALID = "invalid"
     REASON_BOUNCED = "bounced"
@@ -129,6 +129,6 @@ class RejectedEmailEventData(models.Model):
         (REASON_OTHER, "Non précisé par l’ESP"),
     )
 
-    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
-    recipient = CIEmailField("Adresse e-mail du destinataire", blank=True, db_index=True)
-    reason = models.CharField("La raison du refus de l’envoi d’email", max_length=12, choices=REASON_CHOICES)
+    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
+    recipient = CIEmailField("adresse e-mail du destinataire", blank=True, db_index=True)
+    reason = models.CharField("la raison du refus de l’envoi d’email", max_length=12, choices=REASON_CHOICES)

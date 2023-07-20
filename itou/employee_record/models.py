@@ -42,22 +42,22 @@ class ASPExchangeInformation(models.Model):
     ASP_MOVEMENT_TYPE = None  # Must be specified in descendant classes
 
     # ASP processing part
-    asp_processing_code = models.CharField(max_length=4, verbose_name="Code de traitement ASP", null=True)
-    asp_processing_label = models.CharField(max_length=200, verbose_name="Libellé de traitement ASP", null=True)
+    asp_processing_code = models.CharField(max_length=4, verbose_name="code de traitement ASP", null=True)
+    asp_processing_label = models.CharField(max_length=200, verbose_name="libellé de traitement ASP", null=True)
 
     # Employee records are sent to ASP in a JSON file,
     # We keep track of the name for processing feedback
     # The format of the file name is EXACTLY: RIAE_FS_AAAAMMJJHHMMSS.json (27 chars)
     asp_batch_file = models.CharField(
         max_length=27,
-        verbose_name="Fichier de batch ASP",
+        verbose_name="fichier de batch ASP",
         null=True,
         validators=[validate_asp_batch_filename],
     )
     # Line number of the employee record in the batch file
     # Unique pair with `asp_batch_file`
     asp_batch_line_number = models.IntegerField(
-        verbose_name="Ligne correspondante dans le fichier batch ASP",
+        verbose_name="ligne correspondante dans le fichier batch ASP",
         null=True,
     )
 
@@ -67,7 +67,7 @@ class ASPExchangeInformation(models.Model):
     # The API will not use JSON serializers on a regular basis,
     # except for the archive serialization, which occurs once.
     # It will only return a list of this JSON field for archived employee records.
-    archived_json = models.JSONField(verbose_name="Archive JSON de la fiche salarié", null=True, blank=True)
+    archived_json = models.JSONField(verbose_name="archive JSON de la fiche salarié", null=True, blank=True)
 
     class Meta:
         abstract = True
@@ -186,10 +186,10 @@ class EmployeeRecord(ASPExchangeInformation):
 
     ASP_MOVEMENT_TYPE = MovementType.CREATION
 
-    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
-    updated_at = models.DateTimeField(verbose_name="Date de modification", auto_now=True)
-    processed_at = models.DateTimeField(verbose_name="Date d'intégration", null=True)
-    status = models.CharField(max_length=10, verbose_name="Statut", choices=Status.choices, default=Status.NEW)
+    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
+    updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
+    processed_at = models.DateTimeField(verbose_name="date d'intégration", null=True)
+    status = models.CharField(max_length=10, verbose_name="statut", choices=Status.choices, default=Status.NEW)
 
     # Job application has references on many mandatory parts of the E.R.:
     # - SIAE / asp id
@@ -199,7 +199,7 @@ class EmployeeRecord(ASPExchangeInformation):
         "job_applications.jobapplication",
         on_delete=models.SET_NULL,
         null=True,
-        verbose_name="Candidature / embauche",
+        verbose_name="candidature / embauche",
         related_name="employee_record",
     )
 
@@ -207,18 +207,18 @@ class EmployeeRecord(ASPExchangeInformation):
     # This field can't be automatically filled, the user will be asked
     # to select a valid one manually
     financial_annex = models.ForeignKey(
-        SiaeFinancialAnnex, verbose_name="Annexe financière", null=True, on_delete=models.SET_NULL
+        SiaeFinancialAnnex, verbose_name="annexe financière", null=True, on_delete=models.SET_NULL
     )
 
     # These fields are duplicated to act as constraint fields on DB level
-    approval_number = models.CharField(max_length=12, verbose_name="Numéro d'agrément")
-    asp_id = models.PositiveIntegerField(verbose_name="Identifiant ASP de la SIAE")
+    approval_number = models.CharField(max_length=12, verbose_name="numéro d'agrément")
+    asp_id = models.PositiveIntegerField(verbose_name="identifiant ASP de la SIAE")
 
     # If the SIAE is an "antenna",
     # we MUST provide the SIRET of the SIAE linked to the financial annex on ASP side (i.e. "parent/mother" SIAE)
     # NOT the actual SIAE (which can be fake and unrecognized by ASP).
     siret = models.CharField(
-        verbose_name="Siret structure mère", max_length=14, validators=[validate_siret], db_index=True
+        verbose_name="siret structure mère", max_length=14, validators=[validate_siret], db_index=True
     )
 
     # When an employee record is rejected with a '3436' error code by ASP, it means that:
@@ -230,14 +230,14 @@ class EmployeeRecord(ASPExchangeInformation):
     # was **forced** to `PROCESSED` (via admin or script) even if originally `REJECTED`.
     # The JSON proof is in this case not available.
     # Forcing a 'PROCESSED' status enables communication for employee record update notifications.
-    processed_as_duplicate = models.BooleanField(verbose_name="Déjà intégrée par l'ASP", default=False)
+    processed_as_duplicate = models.BooleanField(verbose_name="déjà intégrée par l'ASP", default=False)
 
     # Added typing helper: improved type checking for `objects` methods
     objects: EmployeeRecordQuerySet | Manager = EmployeeRecordQuerySet.as_manager()
 
     class Meta(ASPExchangeInformation.Meta):
-        verbose_name = "Fiche salarié"
-        verbose_name_plural = "Fiches salarié"
+        verbose_name = "fiche salarié"
+        verbose_name_plural = "fiches salarié"
         constraints = ASPExchangeInformation.Meta.constraints + [
             models.UniqueConstraint(
                 fields=["asp_id", "approval_number"],
@@ -695,10 +695,10 @@ class EmployeeRecordUpdateNotification(ASPExchangeInformation):
 
     ASP_MOVEMENT_TYPE = MovementType.UPDATE
 
-    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
-    updated_at = models.DateTimeField(verbose_name="Date de modification", auto_now=True)
+    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
+    updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
     status = models.CharField(
-        verbose_name="Statut",
+        verbose_name="statut",
         max_length=10,
         choices=NotificationStatus.choices,
         default=NotificationStatus.NEW,
@@ -707,15 +707,15 @@ class EmployeeRecordUpdateNotification(ASPExchangeInformation):
     employee_record = models.ForeignKey(
         EmployeeRecord,
         related_name="update_notifications",
-        verbose_name="Fiche salarié",
+        verbose_name="fiche salarié",
         on_delete=models.CASCADE,
     )
 
     objects = EmployeeRecordUpdateNotificationQuerySet.as_manager()
 
     class Meta(ASPExchangeInformation.Meta):
-        verbose_name = "Notification de changement de la fiche salarié"
-        verbose_name_plural = "Notifications de changement de la fiche salarié"
+        verbose_name = "notification de changement de la fiche salarié"
+        verbose_name_plural = "notifications de changement de la fiche salarié"
         constraints = ASPExchangeInformation.Meta.constraints + [
             # Only allow 1 NEW notification, this is used by the trigger's INSERT ON CONFLICT
             models.UniqueConstraint(

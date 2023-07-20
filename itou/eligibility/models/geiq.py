@@ -66,7 +66,7 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
     # Not in abstract model to avoid 'related_name' clashing
     job_seeker = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name="Demandeur d'emploi",
+        verbose_name="demandeur d'emploi",
         on_delete=models.CASCADE,
         related_name="geiq_eligibility_diagnoses",
     )
@@ -82,14 +82,14 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
     )
     administrative_criteria = models.ManyToManyField(
         "eligibility.GEIQAdministrativeCriteria",
-        verbose_name="Critères administratifs GEIQ",
+        verbose_name="critères administratifs GEIQ",
         through="GEIQSelectedAdministrativeCriteria",
         blank=True,
     )
 
     class Meta:
-        verbose_name = "Diagnostic d'éligibilité GEIQ"
-        verbose_name_plural = "Diagnostics d'éligibilité GEIQ"
+        verbose_name = "diagnostic d'éligibilité GEIQ"
+        verbose_name_plural = "diagnostics d'éligibilité GEIQ"
         constraints = [
             models.CheckConstraint(
                 name="author_kind_coherence",
@@ -233,31 +233,31 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
 class GEIQAdministrativeCriteria(AbstractAdministrativeCriteria):
     parent = models.ForeignKey(
         "self",
-        verbose_name="Critère parent",
+        verbose_name="critère parent",
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
     )
     # Some criteria do not belong to an annex or a level
     annex = models.CharField(
-        verbose_name="Annexe",
+        verbose_name="annexe",
         max_length=3,
         choices=AdministrativeCriteriaAnnex.choices,
         default=AdministrativeCriteriaAnnex.ANNEX_1,
     )
     level = models.CharField(
-        verbose_name="Niveau",
+        verbose_name="niveau",
         max_length=1,
         choices=AdministrativeCriteriaLevel.choices,
         # as opposed to IAE, level can be null (annex 1)
         null=True,
         blank=True,
     )
-    slug = models.SlugField(verbose_name="Référence courte", max_length=100, null=True, blank=True)
+    slug = models.SlugField(verbose_name="référence courte", max_length=100, null=True, blank=True)
 
     class Meta:
-        verbose_name = "Critère administratif GEIQ"
-        verbose_name_plural = "Critères administratifs GEIQ"
+        verbose_name = "critère administratif GEIQ"
+        verbose_name_plural = "critères administratifs GEIQ"
         ordering = [models.F("level").asc(nulls_last=True), "ui_rank"]
         constraints = [
             models.CheckConstraint(
@@ -292,11 +292,11 @@ class GEIQSelectedAdministrativeCriteria(models.Model):
         on_delete=models.CASCADE,
         related_name="administrative_criteria_through",
     )
-    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
+    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
 
     class Meta:
-        verbose_name = "Critère administratif GEIQ sélectionné"
-        verbose_name_plural = "Critères administratifs GEIQ sélectionnés"
+        verbose_name = "critère administratif GEIQ sélectionné"
+        verbose_name_plural = "critères administratifs GEIQ sélectionnés"
         unique_together = ("eligibility_diagnosis", "administrative_criteria")
 
     def __str__(self):

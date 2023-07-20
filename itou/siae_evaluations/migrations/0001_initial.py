@@ -23,27 +23,27 @@ class Migration(migrations.Migration):
             name="EvaluationCampaign",
             fields=[
                 ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
-                ("name", models.CharField(max_length=100, verbose_name="Nom de la campagne d'évaluation")),
+                ("name", models.CharField(max_length=100, verbose_name="nom de la campagne d'évaluation")),
                 (
                     "created_at",
-                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="Date de création"),
+                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="date de création"),
                 ),
                 (
                     "percent_set_at",
-                    models.DateTimeField(blank=True, null=True, verbose_name="Date de paramétrage de la sélection"),
+                    models.DateTimeField(blank=True, null=True, verbose_name="date de paramétrage de la sélection"),
                 ),
                 (
                     "evaluations_asked_at",
                     models.DateTimeField(
-                        blank=True, null=True, verbose_name="Date de notification du contrôle aux Siaes"
+                        blank=True, null=True, verbose_name="date de notification du contrôle aux Siaes"
                     ),
                 ),
                 (
                     "ended_at",
-                    models.DateTimeField(blank=True, null=True, verbose_name="Date de clôture de la campagne"),
+                    models.DateTimeField(blank=True, null=True, verbose_name="date de clôture de la campagne"),
                 ),
-                ("evaluated_period_start_at", models.DateField(verbose_name="Date de début de la période contrôlée")),
-                ("evaluated_period_end_at", models.DateField(verbose_name="Date de fin de la période contrôlée")),
+                ("evaluated_period_start_at", models.DateField(verbose_name="date de début de la période contrôlée")),
+                ("evaluated_period_end_at", models.DateField(verbose_name="date de fin de la période contrôlée")),
                 (
                     "chosen_percent",
                     models.PositiveIntegerField(
@@ -52,7 +52,7 @@ class Migration(migrations.Migration):
                             django.core.validators.MinValueValidator(20),
                             django.core.validators.MaxValueValidator(40),
                         ],
-                        verbose_name="Pourcentage de sélection",
+                        verbose_name="pourcentage de sélection",
                     ),
                 ),
                 (
@@ -67,8 +67,7 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={
-                "verbose_name": "Campagne",
-                "verbose_name_plural": "Campagnes",
+                "verbose_name": "campagne",
                 "ordering": ["-name", "institution__name"],
             },
         ),
@@ -82,7 +81,7 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="evaluated_siaes",
                         to="siae_evaluations.evaluationcampaign",
-                        verbose_name="Contrôle",
+                        verbose_name="contrôle",
                     ),
                 ),
                 (
@@ -94,10 +93,10 @@ class Migration(migrations.Migration):
                         verbose_name="SIAE",
                     ),
                 ),
-                ("reviewed_at", models.DateTimeField(blank=True, null=True, verbose_name="Contrôlée le")),
+                ("reviewed_at", models.DateTimeField(blank=True, null=True, verbose_name="contrôlée le")),
                 (
                     "final_reviewed_at",
-                    models.DateTimeField(blank=True, null=True, verbose_name="Contrôle définitif le"),
+                    models.DateTimeField(blank=True, null=True, verbose_name="contrôle définitif le"),
                 ),
                 (
                     "notification_reason",
@@ -119,8 +118,7 @@ class Migration(migrations.Migration):
                 ("reminder_sent_at", models.DateTimeField(blank=True, null=True, verbose_name="rappel envoyé le")),
             ],
             options={
-                "verbose_name": "Entreprise",
-                "verbose_name_plural": "Entreprises",
+                "verbose_name": "entreprise",
                 "unique_together": {("evaluation_campaign", "siae")},
             },
         ),
@@ -130,7 +128,7 @@ class Migration(migrations.Migration):
                 ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 (
                     "labor_inspector_explanation",
-                    models.TextField(blank=True, verbose_name="Commentaires de l'inspecteur du travail"),
+                    models.TextField(blank=True, verbose_name="commentaires de l'inspecteur du travail"),
                 ),
                 (
                     "evaluated_siae",
@@ -147,28 +145,25 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="evaluated_job_applications",
                         to="job_applications.jobapplication",
-                        verbose_name="Candidature",
+                        verbose_name="candidature",
                     ),
                 ),
             ],
-            options={
-                "verbose_name": "Auto-prescription",
-                "verbose_name_plural": "Auto-prescriptions",
-            },
+            options={"verbose_name": "auto-prescription"},
         ),
         migrations.CreateModel(
             name="EvaluatedAdministrativeCriteria",
             fields=[
                 ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
-                ("proof_url", models.URLField(blank=True, max_length=500, verbose_name="Lien vers le justificatif")),
-                ("uploaded_at", models.DateTimeField(blank=True, null=True, verbose_name="Téléversé le")),
+                ("proof_url", models.URLField(blank=True, max_length=500, verbose_name="lien vers le justificatif")),
+                ("uploaded_at", models.DateTimeField(blank=True, null=True, verbose_name="téléversé le")),
                 (
                     "administrative_criteria",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="evaluated_administrative_criteria",
                         to="eligibility.administrativecriteria",
-                        verbose_name="Critère administratif",
+                        verbose_name="critère administratif",
                     ),
                 ),
                 (
@@ -177,10 +172,10 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="evaluated_administrative_criteria",
                         to="siae_evaluations.evaluatedjobapplication",
-                        verbose_name="Candidature évaluée",
+                        verbose_name="candidature évaluée",
                     ),
                 ),
-                ("submitted_at", models.DateTimeField(blank=True, null=True, verbose_name="Transmis le")),
+                ("submitted_at", models.DateTimeField(blank=True, null=True, verbose_name="transmis le")),
                 (
                     "review_state",
                     models.CharField(
@@ -192,13 +187,13 @@ class Migration(migrations.Migration):
                         ],
                         default="PENDING",
                         max_length=10,
-                        verbose_name="Vérification",
+                        verbose_name="vérification",
                     ),
                 ),
             ],
             options={
-                "verbose_name": "Critère administratif",
-                "verbose_name_plural": "Critères administratifs",
+                "verbose_name": "critère administratif",
+                "verbose_name_plural": "critères administratifs",
                 "unique_together": {("administrative_criteria", "evaluated_job_application")},
                 "ordering": ["evaluated_job_application", "administrative_criteria"],
             },

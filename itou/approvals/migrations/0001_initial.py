@@ -37,24 +37,24 @@ class Migration(migrations.Migration):
                             ),
                             django.core.validators.MinLengthValidator(12),
                         ],
-                        verbose_name="Numéro",
+                        verbose_name="numéro",
                     ),
                 ),
                 (
                     "start_at",
                     models.DateField(
-                        db_index=True, default=django.utils.timezone.localdate, verbose_name="Date de début"
+                        db_index=True, default=django.utils.timezone.localdate, verbose_name="date de début"
                     ),
                 ),
                 (
                     "end_at",
                     models.DateField(
-                        db_index=True, default=django.utils.timezone.localdate, verbose_name="Date de fin"
+                        db_index=True, default=django.utils.timezone.localdate, verbose_name="date de fin"
                     ),
                 ),
                 (
                     "created_at",
-                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="Date de création"),
+                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="date de création"),
                 ),
                 (
                     "created_by",
@@ -63,7 +63,7 @@ class Migration(migrations.Migration):
                         null=True,
                         on_delete=django.db.models.deletion.SET_NULL,
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="Créé par",
+                        verbose_name="créé par",
                     ),
                 ),
                 (
@@ -72,12 +72,12 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="approvals",
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="Demandeur d'emploi",
+                        verbose_name="demandeur d'emploi",
                     ),
                 ),
                 (
                     "pe_notification_time",
-                    models.DateTimeField(blank=True, null=True, verbose_name="Date de notification à PE"),
+                    models.DateTimeField(blank=True, null=True, verbose_name="date de notification à PE"),
                 ),
                 (
                     "pe_notification_endpoint",
@@ -86,7 +86,7 @@ class Migration(migrations.Migration):
                         choices=[("rech_individu", "Recherche Individu"), ("maj_pass", "Mise A Jour Pass Iae")],
                         max_length=32,
                         null=True,
-                        verbose_name="Dernier endpoint de l'API PE contacté",
+                        verbose_name="dernier endpoint de l'API PE contacté",
                     ),
                 ),
                 (
@@ -100,7 +100,7 @@ class Migration(migrations.Migration):
                         ],
                         default="notification_pending",
                         max_length=32,
-                        verbose_name="Etat de la notification à PE",
+                        verbose_name="état de la notification à PE",
                     ),
                 ),
                 (
@@ -168,7 +168,7 @@ class Migration(migrations.Migration):
                         ],
                         max_length=64,
                         null=True,
-                        verbose_name="Dernier code de sortie constaté",
+                        verbose_name="dernier code de sortie constaté",
                     ),
                 ),
             ],
@@ -185,28 +185,28 @@ class Migration(migrations.Migration):
                 (
                     "start_at",
                     models.DateField(
-                        db_index=True, default=django.utils.timezone.localdate, verbose_name="Date de début"
+                        db_index=True, default=django.utils.timezone.localdate, verbose_name="date de début"
                     ),
                 ),
                 (
                     "end_at",
                     models.DateField(
-                        db_index=True, default=django.utils.timezone.localdate, verbose_name="Date de fin"
+                        db_index=True, default=django.utils.timezone.localdate, verbose_name="date de fin"
                     ),
                 ),
                 (
                     "created_at",
-                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="Date de création"),
+                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="date de création"),
                 ),
-                ("pe_structure_code", models.CharField(max_length=5, verbose_name="Code structure Pôle emploi")),
-                ("number", models.CharField(max_length=12, unique=True, verbose_name="Numéro")),
-                ("pole_emploi_id", models.CharField(max_length=8, verbose_name="Identifiant Pôle emploi")),
-                ("first_name", models.CharField(max_length=150, verbose_name="Prénom")),
-                ("last_name", models.CharField(max_length=150, verbose_name="Nom")),
-                ("birth_name", models.CharField(max_length=150, verbose_name="Nom de naissance")),
+                ("pe_structure_code", models.CharField(max_length=5, verbose_name="code structure Pôle emploi")),
+                ("number", models.CharField(max_length=12, unique=True, verbose_name="numéro")),
+                ("pole_emploi_id", models.CharField(max_length=8, verbose_name="identifiant Pôle emploi")),
+                ("first_name", models.CharField(max_length=150, verbose_name="prénom")),
+                ("last_name", models.CharField(max_length=150, verbose_name="nom")),
+                ("birth_name", models.CharField(max_length=150, verbose_name="nom de naissance")),
                 (
                     "birthdate",
-                    models.DateField(default=django.utils.timezone.localdate, verbose_name="Date de naissance"),
+                    models.DateField(default=django.utils.timezone.localdate, verbose_name="date de naissance"),
                 ),
                 ("nir", models.CharField(blank=True, max_length=15, null=True, verbose_name="NIR")),
                 ("ntt_nia", models.CharField(blank=True, max_length=40, null=True, verbose_name="NTT ou NIA")),
@@ -217,7 +217,7 @@ class Migration(migrations.Migration):
                         choices=[("rech_individu", "Recherche Individu"), ("maj_pass", "Mise A Jour Pass Iae")],
                         max_length=32,
                         null=True,
-                        verbose_name="Dernier endpoint de l'API PE contacté",
+                        verbose_name="dernier endpoint de l'API PE contacté",
                     ),
                 ),
                 (
@@ -231,7 +231,7 @@ class Migration(migrations.Migration):
                         ],
                         default="notification_pending",
                         max_length=32,
-                        verbose_name="Etat de la notification à PE",
+                        verbose_name="état de la notification à PE",
                     ),
                 ),
                 (
@@ -299,12 +299,12 @@ class Migration(migrations.Migration):
                         ],
                         max_length=64,
                         null=True,
-                        verbose_name="Dernier code de sortie constaté",
+                        verbose_name="dernier code de sortie constaté",
                     ),
                 ),
                 (
                     "pe_notification_time",
-                    models.DateTimeField(blank=True, null=True, verbose_name="Date de notification à PE"),
+                    models.DateTimeField(blank=True, null=True, verbose_name="date de notification à PE"),
                 ),
                 (
                     "siae_kind",
@@ -323,7 +323,7 @@ class Migration(migrations.Migration):
                         ],
                         max_length=6,
                         null=True,
-                        verbose_name="Type de la SIAE",
+                        verbose_name="type de la SIAE",
                     ),
                 ),
                 (
@@ -333,13 +333,13 @@ class Migration(migrations.Migration):
                         max_length=14,
                         null=True,
                         validators=[itou.utils.validators.validate_siret],
-                        verbose_name="Siret de la SIAE",
+                        verbose_name="siret de la SIAE",
                     ),
                 ),
             ],
             options={
-                "verbose_name": "Agrément Pôle emploi",
-                "verbose_name_plural": "Agréments Pôle emploi",
+                "verbose_name": "agrément Pôle emploi",
+                "verbose_name_plural": "agréments Pôle emploi",
                 "ordering": ["-start_at"],
             },
         ),
@@ -354,13 +354,13 @@ class Migration(migrations.Migration):
                 (
                     "start_at",
                     models.DateField(
-                        db_index=True, default=django.utils.timezone.localdate, verbose_name="Date de début"
+                        db_index=True, default=django.utils.timezone.localdate, verbose_name="date de début"
                     ),
                 ),
                 (
                     "end_at",
                     models.DateField(
-                        db_index=True, default=django.utils.timezone.localdate, verbose_name="Date de fin"
+                        db_index=True, default=django.utils.timezone.localdate, verbose_name="date de fin"
                     ),
                 ),
                 (
@@ -393,15 +393,15 @@ class Migration(migrations.Migration):
                         ],
                         default="CONTRACT_SUSPENDED",
                         max_length=30,
-                        verbose_name="Motif",
+                        verbose_name="motif",
                     ),
                 ),
-                ("reason_explanation", models.TextField(blank=True, verbose_name="Explications supplémentaires")),
+                ("reason_explanation", models.TextField(blank=True, verbose_name="explications supplémentaires")),
                 (
                     "created_at",
-                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="Date de création"),
+                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="date de création"),
                 ),
-                ("updated_at", models.DateTimeField(blank=True, null=True, verbose_name="Date de modification")),
+                ("updated_at", models.DateTimeField(blank=True, null=True, verbose_name="date de modification")),
                 (
                     "approval",
                     models.ForeignKey(
@@ -415,7 +415,7 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.SET_NULL,
                         related_name="approvals_suspended_set",
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="Créé par",
+                        verbose_name="créé par",
                     ),
                 ),
                 (
@@ -435,13 +435,12 @@ class Migration(migrations.Migration):
                         null=True,
                         on_delete=django.db.models.deletion.SET_NULL,
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="Mis à jour par",
+                        verbose_name="mis à jour par",
                     ),
                 ),
             ],
             options={
-                "verbose_name": "Suspension",
-                "verbose_name_plural": "Suspensions",
+                "verbose_name": "suspension",
                 "ordering": ["-start_at"],
             },
         ),
@@ -472,13 +471,13 @@ class Migration(migrations.Migration):
                 (
                     "start_at",
                     models.DateField(
-                        db_index=True, default=django.utils.timezone.localdate, verbose_name="Date de début"
+                        db_index=True, default=django.utils.timezone.localdate, verbose_name="date de début"
                     ),
                 ),
                 (
                     "end_at",
                     models.DateField(
-                        db_index=True, default=django.utils.timezone.localdate, verbose_name="Date de fin"
+                        db_index=True, default=django.utils.timezone.localdate, verbose_name="date de fin"
                     ),
                 ),
                 (
@@ -497,15 +496,15 @@ class Migration(migrations.Migration):
                         ],
                         default="COMPLETE_TRAINING",
                         max_length=30,
-                        verbose_name="Motif",
+                        verbose_name="motif",
                     ),
                 ),
-                ("reason_explanation", models.TextField(blank=True, verbose_name="Explications supplémentaires")),
+                ("reason_explanation", models.TextField(blank=True, verbose_name="explications supplémentaires")),
                 (
                     "created_at",
-                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="Date de création"),
+                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="date de création"),
                 ),
-                ("updated_at", models.DateTimeField(blank=True, null=True, verbose_name="Date de modification")),
+                ("updated_at", models.DateTimeField(blank=True, null=True, verbose_name="date de modification")),
                 (
                     "approval",
                     models.ForeignKey(
@@ -519,7 +518,7 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.SET_NULL,
                         related_name="approvals_prolongations_created_set",
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="Créé par",
+                        verbose_name="créé par",
                     ),
                 ),
                 (
@@ -529,7 +528,7 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.SET_NULL,
                         related_name="approvals_prolongation_declared_set",
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="Déclarée par",
+                        verbose_name="déclarée par",
                     ),
                 ),
                 (
@@ -548,7 +547,7 @@ class Migration(migrations.Migration):
                         null=True,
                         on_delete=django.db.models.deletion.SET_NULL,
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="Mis à jour par",
+                        verbose_name="mis à jour par",
                     ),
                 ),
                 (
@@ -559,13 +558,12 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.SET_NULL,
                         related_name="approvals_prolongations_validated_set",
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="Prescripteur habilité qui a autorisé cette prolongation",
+                        verbose_name="prescripteur habilité qui a autorisé cette prolongation",
                     ),
                 ),
             ],
             options={
-                "verbose_name": "Prolongation",
-                "verbose_name_plural": "Prolongations",
+                "verbose_name": "prolongation",
                 "ordering": ["-start_at"],
             },
         ),
@@ -596,28 +594,28 @@ class Migration(migrations.Migration):
                 (
                     "start_at",
                     models.DateField(
-                        db_index=True, default=django.utils.timezone.localdate, verbose_name="Date de début"
+                        db_index=True, default=django.utils.timezone.localdate, verbose_name="date de début"
                     ),
                 ),
                 (
                     "end_at",
                     models.DateField(
-                        db_index=True, default=django.utils.timezone.localdate, verbose_name="Date de fin"
+                        db_index=True, default=django.utils.timezone.localdate, verbose_name="date de fin"
                     ),
                 ),
                 (
                     "created_at",
-                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="Date de création"),
+                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="date de création"),
                 ),
-                ("pe_structure_code", models.CharField(max_length=5, verbose_name="Code structure Pôle emploi")),
-                ("number", models.CharField(max_length=15, unique=True, verbose_name="Numéro")),
-                ("pole_emploi_id", models.CharField(max_length=8, verbose_name="Identifiant Pôle emploi")),
-                ("first_name", models.CharField(max_length=150, verbose_name="Prénom")),
-                ("last_name", models.CharField(max_length=150, verbose_name="Nom")),
-                ("birth_name", models.CharField(max_length=150, verbose_name="Nom de naissance")),
+                ("pe_structure_code", models.CharField(max_length=5, verbose_name="code structure Pôle emploi")),
+                ("number", models.CharField(max_length=15, unique=True, verbose_name="numéro")),
+                ("pole_emploi_id", models.CharField(max_length=8, verbose_name="identifiant Pôle emploi")),
+                ("first_name", models.CharField(max_length=150, verbose_name="prénom")),
+                ("last_name", models.CharField(max_length=150, verbose_name="nom")),
+                ("birth_name", models.CharField(max_length=150, verbose_name="nom de naissance")),
                 (
                     "birthdate",
-                    models.DateField(default=django.utils.timezone.localdate, verbose_name="Date de naissance"),
+                    models.DateField(default=django.utils.timezone.localdate, verbose_name="date de naissance"),
                 ),
                 ("nir", models.CharField(blank=True, max_length=15, null=True, verbose_name="NIR")),
                 ("ntt_nia", models.CharField(blank=True, max_length=40, null=True, verbose_name="NTT ou NIA")),
@@ -626,8 +624,8 @@ class Migration(migrations.Migration):
             options={
                 "db_table": "merged_approvals_poleemploiapproval",
                 "ordering": ["-start_at"],
-                "verbose_name": "Agrément Pôle emploi original",
-                "verbose_name_plural": "Agréments Pôle emploi originaux",
+                "verbose_name": "agrément Pôle emploi original",
+                "verbose_name_plural": "agréments Pôle emploi originaux",
             },
         ),
         migrations.AddIndex(

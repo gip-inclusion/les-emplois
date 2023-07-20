@@ -12,8 +12,8 @@ class Migration(migrations.Migration):
         migrations.AlterModelOptions(
             name="rejectedemaileventdata",
             options={
-                "verbose_name": "Donnée collectée par le webhook en cas d’erreur d’envoi d’email",
-                "verbose_name_plural": "Données collectées par le webhook en cas d’erreur d’envoi d’email",
+                "verbose_name": "donnée collectée par le webhook en cas d’erreur d’envoi d’email",
+                "verbose_name_plural": "données collectées par le webhook en cas d’erreur d’envoi d’email",
             },
         ),
         migrations.AlterField(
@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
                     ("other", "Non précisé par l’ESP"),
                 ],
                 max_length=12,
-                verbose_name="La raison du refus de l’envoi d’email",
+                verbose_name="la raison du refus de l’envoi d’email",
             ),
         ),
     ]

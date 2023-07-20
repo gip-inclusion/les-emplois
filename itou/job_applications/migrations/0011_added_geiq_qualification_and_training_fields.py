@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
             model_name="jobapplication",
             name="planned_training_days",
             field=models.PositiveSmallIntegerField(
-                blank=True, null=True, verbose_name="Nombre de jours de formation prévus"
+                blank=True, null=True, verbose_name="nombre de jours de formation prévus"
             ),
         ),
         migrations.AddField(
@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
                     ("NOT_RELEVANT", "Non concerné"),
                 ],
                 max_length=40,
-                verbose_name="Niveau de qualification",
+                verbose_name="niveau de qualification",
             ),
         ),
         migrations.AddField(
@@ -42,7 +42,7 @@ class Migration(migrations.Migration):
                     ("CCN", "Positionnement de CCN"),
                 ],
                 max_length=20,
-                verbose_name="Type de qualification",
+                verbose_name="type de qualification",
             ),
         ),
         migrations.AddConstraint(

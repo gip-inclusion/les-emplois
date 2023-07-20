@@ -17,12 +17,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="calendar",
             name="adversarial_stage_start",
-            field=models.DateField(null=True, verbose_name="Début de la phase contradictoire"),
+            field=models.DateField(null=True, verbose_name="début de la phase contradictoire"),
         ),
         migrations.RunPython(forwards, migrations.RunPython.noop, elidable=True),
         migrations.AlterField(
             model_name="calendar",
             name="adversarial_stage_start",
-            field=models.DateField(verbose_name="Début de la phase contradictoire"),
+            field=models.DateField(verbose_name="début de la phase contradictoire"),
         ),
     ]

@@ -24,11 +24,11 @@ class Migration(migrations.Migration):
             name="PrescriberMembership",
             fields=[
                 ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
-                ("joined_at", models.DateTimeField(default=django.utils.timezone.now, verbose_name="Date d'adhésion")),
-                ("is_admin", models.BooleanField(default=False, verbose_name="Administrateur")),
+                ("joined_at", models.DateTimeField(default=django.utils.timezone.now, verbose_name="date d'adhésion")),
+                ("is_admin", models.BooleanField(default=False, verbose_name="administrateur")),
                 ("user", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-                ("is_active", models.BooleanField(default=True, verbose_name="Rattachement actif")),
-                ("updated_at", models.DateTimeField(null=True, verbose_name="Date de modification")),
+                ("is_active", models.BooleanField(default=True, verbose_name="rattachement actif")),
+                ("updated_at", models.DateTimeField(null=True, verbose_name="date de modification")),
                 (
                     "updated_by",
                     models.ForeignKey(
@@ -36,26 +36,26 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="updated_prescribermembership_set",
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="Mis à jour par",
+                        verbose_name="mis à jour par",
                     ),
                 ),
                 (
                     "created_at",
-                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="Date de création"),
+                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="date de création"),
                 ),
             ],
         ),
         migrations.CreateModel(
             name="PrescriberOrganization",
             fields=[
-                ("address_line_1", models.CharField(blank=True, max_length=255, verbose_name="Adresse")),
+                ("address_line_1", models.CharField(blank=True, max_length=255, verbose_name="adresse")),
                 (
                     "address_line_2",
                     models.CharField(
                         blank=True,
                         help_text="Appartement, suite, bloc, bâtiment, boite postale, etc.",
                         max_length=255,
-                        verbose_name="Complément d'adresse",
+                        verbose_name="complément d'adresse",
                     ),
                 ),
                 (
@@ -64,10 +64,10 @@ class Migration(migrations.Migration):
                         blank=True,
                         max_length=5,
                         validators=[itou.utils.validators.validate_post_code],
-                        verbose_name="Code Postal",
+                        verbose_name="code postal",
                     ),
                 ),
-                ("city", models.CharField(blank=True, max_length=255, verbose_name="Ville")),
+                ("city", models.CharField(blank=True, max_length=255, verbose_name="ville")),
                 (
                     "department",
                     models.CharField(
@@ -183,14 +183,14 @@ class Migration(migrations.Migration):
                         ],
                         db_index=True,
                         max_length=3,
-                        verbose_name="Département",
+                        verbose_name="département",
                     ),
                 ),
                 (
                     "coords",
                     django.contrib.gis.db.models.fields.PointField(blank=True, geography=True, null=True, srid=4326),
                 ),
-                ("geocoding_score", models.FloatField(blank=True, null=True, verbose_name="Score du geocoding")),
+                ("geocoding_score", models.FloatField(blank=True, null=True, verbose_name="score du geocoding")),
                 ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 (
                     "siret",
@@ -199,20 +199,20 @@ class Migration(migrations.Migration):
                         max_length=14,
                         null=True,
                         validators=[itou.utils.validators.validate_siret],
-                        verbose_name="Siret",
+                        verbose_name="siret",
                     ),
                 ),
-                ("name", models.CharField(max_length=255, verbose_name="Nom")),
-                ("phone", models.CharField(blank=True, max_length=20, verbose_name="Téléphone")),
-                ("email", models.EmailField(blank=True, max_length=254, verbose_name="E-mail")),
-                ("website", models.URLField(blank=True, verbose_name="Site web")),
-                ("description", models.TextField(blank=True, verbose_name="Description")),
+                ("name", models.CharField(max_length=255, verbose_name="nom")),
+                ("phone", models.CharField(blank=True, max_length=20, verbose_name="téléphone")),
+                ("email", models.EmailField(blank=True, max_length=254, verbose_name="e-mail")),
+                ("website", models.URLField(blank=True, verbose_name="site web")),
+                ("description", models.TextField(blank=True, verbose_name="description")),
                 (
                     "is_authorized",
                     models.BooleanField(
                         default=False,
                         help_text="Précise si l'organisation est habilitée par le Préfet.",
-                        verbose_name="Habilitation",
+                        verbose_name="habilitation",
                     ),
                 ),
                 (
@@ -221,7 +221,7 @@ class Migration(migrations.Migration):
                         blank=True,
                         through="prescribers.PrescriberMembership",
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="Membres",
+                        verbose_name="membres",
                     ),
                 ),
                 (
@@ -237,12 +237,12 @@ class Migration(migrations.Migration):
                                 "^[0-9]{5}$", "Le code SAFIR doit être composé de 5 chiffres."
                             )
                         ],
-                        verbose_name="Code Safir",
+                        verbose_name="code Safir",
                     ),
                 ),
                 (
                     "created_at",
-                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="Date de création"),
+                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="date de création"),
                 ),
                 (
                     "created_by",
@@ -252,7 +252,7 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.SET_NULL,
                         related_name="created_prescriber_organization_set",
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="Créé par",
+                        verbose_name="créé par",
                     ),
                 ),
                 (
@@ -304,10 +304,10 @@ class Migration(migrations.Migration):
                         ],
                         default="Autre",
                         max_length=20,
-                        verbose_name="Type",
+                        verbose_name="type",
                     ),
                 ),
-                ("updated_at", models.DateTimeField(blank=True, null=True, verbose_name="Date de modification")),
+                ("updated_at", models.DateTimeField(blank=True, null=True, verbose_name="date de modification")),
                 (
                     "authorization_status",
                     models.CharField(
@@ -319,12 +319,12 @@ class Migration(migrations.Migration):
                         ],
                         default="NOT_SET",
                         max_length=20,
-                        verbose_name="Statut de l'habilitation",
+                        verbose_name="statut de l'habilitation",
                     ),
                 ),
                 (
                     "authorization_updated_at",
-                    models.DateTimeField(null=True, verbose_name="Date de MAJ du statut de l'habilitation"),
+                    models.DateTimeField(null=True, verbose_name="date de MAJ du statut de l'habilitation"),
                 ),
                 (
                     "authorization_updated_by",
@@ -334,7 +334,7 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.SET_NULL,
                         related_name="authorization_status_set",
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="Dernière MAJ de l'habilitation par",
+                        verbose_name="dernière MAJ de l'habilitation par",
                     ),
                 ),
                 (
@@ -343,7 +343,7 @@ class Migration(migrations.Migration):
                         default=False,
                         help_text="Indique si l'organisme est conventionné par le conseil départemental pour le suivi"
                         " des BRSA.",
-                        verbose_name="Conventionné pour le suivi des BRSA",
+                        verbose_name="conventionné pour le suivi des BRSA",
                     ),
                 ),
                 (
@@ -351,14 +351,13 @@ class Migration(migrations.Migration):
                     models.BooleanField(
                         default=False,
                         help_text="Information obtenue via API Entreprise.",
-                        verbose_name="Siège de l'entreprise",
+                        verbose_name="siège de l'entreprise",
                     ),
                 ),
                 ("uid", models.UUIDField(db_index=True, default=uuid.uuid4, unique=True)),
             ],
             options={
-                "verbose_name": "Organisation",
-                "verbose_name_plural": "Organisations",
+                "verbose_name": "organisation",
                 "unique_together": {("siret", "kind")},
             },
         ),

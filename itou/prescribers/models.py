@@ -106,39 +106,39 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
     # objects with "blank" values (e.g. Pôle emploi agencies or old entries that existed
     # prior to the mandatory siret).
     # See https://docs.djangoproject.com/en/3.1/ref/models/fields/#null
-    siret = models.CharField(verbose_name="Siret", max_length=14, validators=[validate_siret], null=True, blank=True)
+    siret = models.CharField(verbose_name="siret", max_length=14, validators=[validate_siret], null=True, blank=True)
     is_head_office = models.BooleanField(
-        verbose_name="Siège de l'entreprise", default=False, help_text="Information obtenue via API Entreprise."
+        verbose_name="siège de l'entreprise", default=False, help_text="Information obtenue via API Entreprise."
     )
     kind = models.CharField(
-        verbose_name="Type",
+        verbose_name="type",
         max_length=20,
         choices=PrescriberOrganizationKind.choices,
         default=PrescriberOrganizationKind.OTHER,
     )
     is_brsa = models.BooleanField(
-        verbose_name="Conventionné pour le suivi des BRSA",
+        verbose_name="conventionné pour le suivi des BRSA",
         default=False,
         help_text="Indique si l'organisme est conventionné par le conseil départemental pour le suivi des BRSA.",
     )
-    phone = models.CharField(verbose_name="Téléphone", max_length=20, blank=True)
-    email = models.EmailField(verbose_name="E-mail", blank=True)
-    website = models.URLField(verbose_name="Site web", blank=True)
-    description = models.TextField(verbose_name="Description", blank=True)
+    phone = models.CharField(verbose_name="téléphone", max_length=20, blank=True)
+    email = models.EmailField(verbose_name="e-mail", blank=True)
+    website = models.URLField(verbose_name="site web", blank=True)
+    description = models.TextField(verbose_name="description", blank=True)
     members = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
-        verbose_name="Membres",
+        verbose_name="membres",
         through="PrescriberMembership",
         blank=True,
         through_fields=("organization", "user"),
     )
     is_authorized = models.BooleanField(
-        verbose_name="Habilitation",
+        verbose_name="habilitation",
         default=False,
         help_text="Précise si l'organisation est habilitée par le Préfet.",
     )
     code_safir_pole_emploi = models.CharField(
-        verbose_name="Code Safir",
+        verbose_name="code Safir",
         help_text="Code unique d'une agence Pole emploi.",
         validators=[validate_code_safir],
         max_length=5,
@@ -150,7 +150,7 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
     )
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name="Créé par",
+        verbose_name="créé par",
         related_name="created_prescriber_organization_set",
         null=True,
         blank=True,
@@ -158,15 +158,15 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
     )
 
     authorization_status = models.CharField(
-        verbose_name="Statut de l'habilitation",
+        verbose_name="statut de l'habilitation",
         max_length=20,
         choices=PrescriberAuthorizationStatus.choices,
         default=PrescriberAuthorizationStatus.NOT_SET,
     )
-    authorization_updated_at = models.DateTimeField(verbose_name="Date de MAJ du statut de l'habilitation", null=True)
+    authorization_updated_at = models.DateTimeField(verbose_name="date de MAJ du statut de l'habilitation", null=True)
     authorization_updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name="Dernière MAJ de l'habilitation par",
+        verbose_name="dernière MAJ de l'habilitation par",
         related_name="authorization_status_set",
         null=True,
         blank=True,
@@ -176,8 +176,7 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
     objects = PrescriberOrganizationManager.from_queryset(PrescriberOrganizationQuerySet)()
 
     class Meta:
-        verbose_name = "Organisation"
-        verbose_name_plural = "Organisations"
+        verbose_name = "organisation"
         # This DB constraint works with null fields, but not with blank ones
         # If both org1 and org2 are created:
         # OK  => org1: (kind="ML", siret=None) + org2: (kind="ML", siret=None)
@@ -313,7 +312,7 @@ class PrescriberMembership(MembershipAbstract):
         related_name="updated_prescribermembership_set",
         null=True,
         on_delete=models.CASCADE,
-        verbose_name="Mis à jour par",
+        verbose_name="mis à jour par",
     )
 
     class Meta:

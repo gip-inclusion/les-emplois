@@ -18,15 +18,15 @@ from itou.institutions.enums import InstitutionKind
 
 class Institution(AddressMixin, OrganizationAbstract):
     class Meta:
-        verbose_name = "Institution partenaire"
-        verbose_name_plural = "Institutions partenaires"
+        verbose_name = "institution partenaire"
+        verbose_name_plural = "institutions partenaires"
 
     kind = models.CharField(
-        verbose_name="Type", max_length=20, choices=InstitutionKind.choices, default=InstitutionKind.OTHER
+        verbose_name="type", max_length=20, choices=InstitutionKind.choices, default=InstitutionKind.OTHER
     )
     members = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
-        verbose_name="Membres",
+        verbose_name="membres",
         through="InstitutionMembership",
         blank=True,
         through_fields=("institution", "user"),
@@ -44,7 +44,7 @@ class InstitutionMembership(MembershipAbstract):
         related_name="updated_institutionmembership_set",
         null=True,
         on_delete=models.CASCADE,
-        verbose_name="Mis à jour par",
+        verbose_name="mis à jour par",
     )
 
     class Meta:

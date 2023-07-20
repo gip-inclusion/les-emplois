@@ -16,8 +16,8 @@ class Migration(migrations.Migration):
             name="City",
             fields=[
                 ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
-                ("name", models.CharField(db_index=True, max_length=255, verbose_name="Ville")),
-                ("slug", models.SlugField(max_length=255, unique=True, verbose_name="Slug")),
+                ("name", models.CharField(db_index=True, max_length=255, verbose_name="ville")),
+                ("slug", models.SlugField(max_length=255, unique=True, verbose_name="slug")),
                 (
                     "department",
                     models.CharField(
@@ -132,22 +132,22 @@ class Migration(migrations.Migration):
                         ],
                         db_index=True,
                         max_length=3,
-                        verbose_name="Département",
+                        verbose_name="département",
                     ),
                 ),
                 (
                     "post_codes",
                     django.contrib.postgres.fields.ArrayField(
-                        base_field=models.CharField(max_length=5), blank=True, size=None, verbose_name="Codes postaux"
+                        base_field=models.CharField(max_length=5), blank=True, size=None, verbose_name="codes postaux"
                     ),
                 ),
-                ("code_insee", models.CharField(max_length=5, unique=True, verbose_name="Code INSEE")),
+                ("code_insee", models.CharField(max_length=5, unique=True, verbose_name="code INSEE")),
                 (
                     "coords",
                     django.contrib.gis.db.models.fields.PointField(blank=True, geography=True, null=True, srid=4326),
                 ),
             ],
-            options={"verbose_name": "Ville française", "verbose_name_plural": "Villes françaises"},
+            options={"verbose_name": "ville française", "verbose_name_plural": "villes françaises"},
         ),
         migrations.AddIndex(
             model_name="city",

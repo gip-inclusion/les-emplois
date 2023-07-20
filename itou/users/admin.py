@@ -150,8 +150,8 @@ class SentJobApplicationInline(JobApplicationInline):
     fk_name = "sender"
     fields = ("pk_link", "job_seeker_link", "to_siae_link", "state")
     readonly_fields = fields
-    verbose_name = "Candidature envoyée"
-    verbose_name_plural = "Candidatures envoyées"
+    verbose_name = "candidature envoyée"
+    verbose_name_plural = "candidatures envoyées"
 
     @admin.display(description="Candidat")
     def job_seeker_link(self, obj):

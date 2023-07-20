@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
                 ],
                 default="MANUAL",
                 max_length=16,
-                verbose_name="Mode d'édition",
+                verbose_name="mode d'édition",
             ),
         ),
     ]

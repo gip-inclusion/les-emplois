@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
                 ],
                 default="1",
                 max_length=1,
-                verbose_name="Annexe",
+                verbose_name="annexe",
             ),
         ),
         migrations.AddConstraint(

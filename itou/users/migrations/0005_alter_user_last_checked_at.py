@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
             model_name="user",
             name="last_checked_at",
             field=models.DateTimeField(
-                default=django.utils.timezone.now, verbose_name="Date de dernière vérification"
+                default=django.utils.timezone.now, verbose_name="date de dernière vérification"
             ),
         ),
     ]

@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 ],
                 help_text="Indiquez la raison de l'absence de NIR.",
                 max_length=30,
-                verbose_name="Pas de NIR ?",
+                verbose_name="pas de NIR ?",
             ),
         ),
         migrations.AddConstraint(

@@ -33,7 +33,7 @@ class Migration(migrations.Migration):
                 choices=KIND_CHOICES,
                 default="Autre",
                 max_length=20,
-                verbose_name="Type",
+                verbose_name="type",
             ),
         ),
     ]

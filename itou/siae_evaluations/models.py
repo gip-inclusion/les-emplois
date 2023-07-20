@@ -105,12 +105,12 @@ class Calendar(models.Model):
     Campaigns taking place at the same time share the same calendar.
     """
 
-    name = models.CharField(verbose_name="Nom", max_length=100, null=True)
-    adversarial_stage_start = models.DateField(verbose_name="Début de la phase contradictoire")
-    html = models.TextField(verbose_name="Contenu")
+    name = models.CharField(verbose_name="nom", max_length=100, null=True)
+    adversarial_stage_start = models.DateField(verbose_name="début de la phase contradictoire")
+    html = models.TextField(verbose_name="contenu")
 
     class Meta:
-        verbose_name = "Calendrier"
+        verbose_name = "calendrier"
 
     def __str__(self):
         return f"{self.name}"
@@ -146,15 +146,15 @@ class EvaluationCampaign(models.Model):
     - during the evaluated period (ie : from 01.01.2021 to 31.12.2021).
     """
 
-    name = models.CharField(verbose_name="Nom de la campagne d'évaluation", max_length=100, blank=False, null=False)
+    name = models.CharField(verbose_name="nom de la campagne d'évaluation", max_length=100, blank=False, null=False)
 
     # dates of execution of the campaign
-    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
-    percent_set_at = models.DateTimeField(verbose_name="Date de paramétrage de la sélection", blank=True, null=True)
+    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
+    percent_set_at = models.DateTimeField(verbose_name="date de paramétrage de la sélection", blank=True, null=True)
     evaluations_asked_at = models.DateTimeField(
-        verbose_name="Date de notification du contrôle aux Siaes", blank=True, null=True
+        verbose_name="date de notification du contrôle aux Siaes", blank=True, null=True
     )
-    ended_at = models.DateTimeField(verbose_name="Date de clôture de la campagne", blank=True, null=True)
+    ended_at = models.DateTimeField(verbose_name="date de clôture de la campagne", blank=True, null=True)
     # When SIAE submissions are frozen, notify institutions:
     # - on the day submissions are frozen, and
     # - 7 days after submissions have been frozen.
@@ -169,10 +169,10 @@ class EvaluationCampaign(models.Model):
     # to do later : add coherence controls between campaign.
     # Campaign B for one institution cannot start before the end of campaign A of the same institution
     evaluated_period_start_at = models.DateField(
-        verbose_name="Date de début de la période contrôlée", blank=False, null=False
+        verbose_name="date de début de la période contrôlée", blank=False, null=False
     )
     evaluated_period_end_at = models.DateField(
-        verbose_name="Date de fin de la période contrôlée", blank=False, null=False
+        verbose_name="date de fin de la période contrôlée", blank=False, null=False
     )
 
     institution = models.ForeignKey(
@@ -184,7 +184,7 @@ class EvaluationCampaign(models.Model):
     )
 
     chosen_percent = models.PositiveIntegerField(
-        verbose_name="Pourcentage de sélection",
+        verbose_name="pourcentage de sélection",
         default=evaluation_enums.EvaluationChosenPercent.DEFAULT,
         validators=[
             MinValueValidator(evaluation_enums.EvaluationChosenPercent.MIN),
@@ -197,15 +197,14 @@ class EvaluationCampaign(models.Model):
         validators=[
             validate_html,
         ],
-        verbose_name="Calendrier",
+        verbose_name="calendrier",
         null=True,
     )
 
     objects = EvaluationCampaignQuerySet.as_manager()
 
     class Meta:
-        verbose_name = "Campagne"
-        verbose_name_plural = "Campagnes"
+        verbose_name = "campagne"
         ordering = ["-name", "institution__name"]
 
     def __str__(self):
@@ -436,7 +435,7 @@ class EvaluatedSiaeQuerySet(models.QuerySet):
 class EvaluatedSiae(models.Model):
     evaluation_campaign = models.ForeignKey(
         EvaluationCampaign,
-        verbose_name="Contrôle",
+        verbose_name="contrôle",
         on_delete=models.CASCADE,
         related_name="evaluated_siaes",
     )
@@ -447,15 +446,15 @@ class EvaluatedSiae(models.Model):
         related_name="evaluated_siaes",
     )
     # In “phase amiable” until documents have been reviewed.
-    reviewed_at = models.DateTimeField(verbose_name="Contrôlée le", blank=True, null=True)
+    reviewed_at = models.DateTimeField(verbose_name="contrôlée le", blank=True, null=True)
     # Refused documents from the phase amiable can be uploaded again, a second
     # refusal is final (phase contradictoire).
-    final_reviewed_at = models.DateTimeField(verbose_name="Contrôle définitif le", blank=True, null=True)
+    final_reviewed_at = models.DateTimeField(verbose_name="contrôle définitif le", blank=True, null=True)
 
     # At the end of each phase ("amiable" and "contradictoire"), the institutions have 2 weeks
     # during which the employers cannot submit new documents
     submission_freezed_at = models.DateTimeField(
-        verbose_name="Transmission bloquée pour la SIAE le", blank=True, null=True
+        verbose_name="transmission bloquée pour la SIAE le", blank=True, null=True
     )
 
     # After a refused evaluation, the SIAE is notified of sanctions.
@@ -474,8 +473,7 @@ class EvaluatedSiae(models.Model):
     objects = EvaluatedSiaeQuerySet.as_manager()
 
     class Meta:
-        verbose_name = "Entreprise"
-        verbose_name_plural = "Entreprises"
+        verbose_name = "entreprise"
         unique_together = ("evaluation_campaign", "siae")
         constraints = [
             models.CheckConstraint(
@@ -620,7 +618,7 @@ class EvaluatedJobApplicationQuerySet(models.QuerySet):
 class EvaluatedJobApplication(models.Model):
     job_application = models.ForeignKey(
         "job_applications.JobApplication",
-        verbose_name="Candidature",
+        verbose_name="candidature",
         on_delete=models.CASCADE,
         related_name="evaluated_job_applications",
     )
@@ -631,13 +629,12 @@ class EvaluatedJobApplication(models.Model):
         on_delete=models.CASCADE,
         related_name="evaluated_job_applications",
     )
-    labor_inspector_explanation = models.TextField(verbose_name="Commentaires de l'inspecteur du travail", blank=True)
+    labor_inspector_explanation = models.TextField(verbose_name="commentaires de l'inspecteur du travail", blank=True)
 
     objects = EvaluatedJobApplicationQuerySet.as_manager()
 
     class Meta:
-        verbose_name = "Auto-prescription"
-        verbose_name_plural = "Auto-prescriptions"
+        verbose_name = "auto-prescription"
 
     def __str__(self):
         return f"{self.job_application}"
@@ -722,23 +719,23 @@ class EvaluatedAdministrativeCriteriaQuerySet(models.QuerySet):
 class EvaluatedAdministrativeCriteria(models.Model):
     administrative_criteria = models.ForeignKey(
         "eligibility.AdministrativeCriteria",
-        verbose_name="Critère administratif",
+        verbose_name="critère administratif",
         on_delete=models.CASCADE,
         related_name="evaluated_administrative_criteria",
     )
 
     evaluated_job_application = models.ForeignKey(
         EvaluatedJobApplication,
-        verbose_name="Candidature évaluée",
+        verbose_name="candidature évaluée",
         on_delete=models.CASCADE,
         related_name="evaluated_administrative_criteria",
     )
 
-    proof_url = models.URLField(max_length=500, verbose_name="Lien vers le justificatif", blank=True)
-    uploaded_at = models.DateTimeField(verbose_name="Téléversé le", blank=True, null=True)
-    submitted_at = models.DateTimeField(verbose_name="Transmis le", blank=True, null=True)
+    proof_url = models.URLField(max_length=500, verbose_name="lien vers le justificatif", blank=True)
+    uploaded_at = models.DateTimeField(verbose_name="téléversé le", blank=True, null=True)
+    submitted_at = models.DateTimeField(verbose_name="transmis le", blank=True, null=True)
     review_state = models.CharField(
-        verbose_name="Vérification",
+        verbose_name="vérification",
         max_length=10,
         choices=evaluation_enums.EvaluatedAdministrativeCriteriaState.choices,
         default=evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING,
@@ -747,8 +744,8 @@ class EvaluatedAdministrativeCriteria(models.Model):
     objects = EvaluatedAdministrativeCriteriaQuerySet.as_manager()
 
     class Meta:
-        verbose_name = "Critère administratif"
-        verbose_name_plural = "Critères administratifs"
+        verbose_name = "critère administratif"
+        verbose_name_plural = "critères administratifs"
         unique_together = ("administrative_criteria", "evaluated_job_application")
         ordering = ["evaluated_job_application", "administrative_criteria"]
 
@@ -775,29 +772,29 @@ class Sanctions(models.Model):
     )
     training_session = models.TextField(
         blank=True,
-        verbose_name="Détails de la participation à une session de présentation de l’auto-prescription",
+        verbose_name="détails de la participation à une session de présentation de l’auto-prescription",
     )
     suspension_dates = InclusiveDateRangeField(
         blank=True,
         null=True,
-        verbose_name="Retrait de la capacité d’auto-prescription",
+        verbose_name="retrait de la capacité d’auto-prescription",
     )
     subsidy_cut_percent = models.PositiveSmallIntegerField(
         blank=True,
         null=True,
         validators=[MinValueValidator(1), MaxValueValidator(100)],
-        verbose_name="Pourcentage de retrait de l’aide au poste",
+        verbose_name="pourcentage de retrait de l’aide au poste",
     )
     subsidy_cut_dates = InclusiveDateRangeField(
         blank=True,
         null=True,
-        verbose_name="Dates de retrait de l’aide au poste",
+        verbose_name="dates de retrait de l’aide au poste",
     )
     deactivation_reason = models.TextField(
         blank=True,
-        verbose_name="Explication du déconventionnement de la structure",
+        verbose_name="explication du déconventionnement de la structure",
     )
-    no_sanction_reason = models.TextField(blank=True, verbose_name="Explication de l’absence de sanction")
+    no_sanction_reason = models.TextField(blank=True, verbose_name="explication de l’absence de sanction")
 
     class Meta:
         constraints = [

@@ -47,9 +47,9 @@ class CommonApprovalMixin(models.Model):
     # obtain a new one except from an "authorized prescriber".
     WAITING_PERIOD_YEARS = 2
 
-    start_at = models.DateField(verbose_name="Date de début", default=timezone.localdate, db_index=True)
-    end_at = models.DateField(verbose_name="Date de fin", default=timezone.localdate, db_index=True)
-    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
+    start_at = models.DateField(verbose_name="date de début", default=timezone.localdate, db_index=True)
+    end_at = models.DateField(verbose_name="date de fin", default=timezone.localdate, db_index=True)
+    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
 
     class Meta:
         abstract = True
@@ -171,14 +171,14 @@ class CommonApprovalQuerySet(models.QuerySet):
 
 class PENotificationMixin(models.Model):
     pe_notification_status = models.CharField(
-        verbose_name="Etat de la notification à PE",
+        verbose_name="état de la notification à PE",
         max_length=32,
         default=api_enums.PEApiNotificationStatus.PENDING,
         choices=api_enums.PEApiNotificationStatus.choices,
     )
-    pe_notification_time = models.DateTimeField(verbose_name="Date de notification à PE", null=True, blank=True)
+    pe_notification_time = models.DateTimeField(verbose_name="date de notification à PE", null=True, blank=True)
     pe_notification_endpoint = models.CharField(
-        verbose_name="Dernier endpoint de l'API PE contacté",
+        verbose_name="dernier endpoint de l'API PE contacté",
         max_length=32,
         choices=api_enums.PEApiEndpoint.choices,
         blank=True,
@@ -191,7 +191,7 @@ class PENotificationMixin(models.Model):
         # we don't want the app to break if PE suddenly adds a code.
         choices=list(api_enums.PEApiRechercheIndividuExitCode.choices)
         + list(api_enums.PEApiMiseAJourPassExitCode.choices),
-        verbose_name="Dernier code de sortie constaté",
+        verbose_name="dernier code de sortie constaté",
         blank=True,
         null=True,
     )
@@ -257,12 +257,12 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name="Demandeur d'emploi",
+        verbose_name="demandeur d'emploi",
         on_delete=models.CASCADE,
         related_name="approvals",
     )
     number = models.CharField(
-        verbose_name="Numéro",
+        verbose_name="numéro",
         max_length=12,
         help_text="12 caractères alphanumériques.",
         validators=[alphanumeric, MinLengthValidator(12)],
@@ -270,13 +270,13 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
     )
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name="Créé par",
+        verbose_name="créé par",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
     )
     origin = models.CharField(
-        verbose_name="Origine du pass",
+        verbose_name="origine du pass",
         max_length=30,
         choices=Origin.choices,
         default=Origin.DEFAULT,
@@ -285,7 +285,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
     # that created this Approval
     eligibility_diagnosis = models.ForeignKey(
         "eligibility.EligibilityDiagnosis",
-        verbose_name="Diagnostic d'éligibilité",
+        verbose_name="diagnostic d'éligibilité",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -734,8 +734,8 @@ class Suspension(models.Model):
     ]
 
     approval = models.ForeignKey(Approval, verbose_name="PASS IAE", on_delete=models.CASCADE)
-    start_at = models.DateField(verbose_name="Date de début", default=timezone.localdate, db_index=True)
-    end_at = models.DateField(verbose_name="Date de fin", default=timezone.localdate, db_index=True)
+    start_at = models.DateField(verbose_name="date de début", default=timezone.localdate, db_index=True)
+    end_at = models.DateField(verbose_name="date de fin", default=timezone.localdate, db_index=True)
     siae = models.ForeignKey(
         "siaes.Siae",
         verbose_name="SIAE",
@@ -744,25 +744,25 @@ class Suspension(models.Model):
         related_name="approvals_suspended",
     )
     reason = models.CharField(
-        verbose_name="Motif",
+        verbose_name="motif",
         max_length=30,
         choices=Reason.choices,
         default=Reason.SUSPENDED_CONTRACT,
     )
-    reason_explanation = models.TextField(verbose_name="Explications supplémentaires", blank=True)
-    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
+    reason_explanation = models.TextField(verbose_name="explications supplémentaires", blank=True)
+    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name="Créé par",
+        verbose_name="créé par",
         null=True,
         on_delete=models.SET_NULL,
         related_name="approvals_suspended_set",
     )
     # FIXME(rsebille): Remove the null=True. But beware, it will force PG to rewrite almost all the rows.
-    updated_at = models.DateTimeField(verbose_name="Date de modification", auto_now=True, null=True)
+    updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True, null=True)
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name="Mis à jour par",
+        verbose_name="mis à jour par",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -771,8 +771,7 @@ class Suspension(models.Model):
     objects = SuspensionQuerySet.as_manager()
 
     class Meta:
-        verbose_name = "Suspension"
-        verbose_name_plural = "Suspensions"
+        verbose_name = "suspension"
         ordering = ["-start_at"]
         # Use an exclusion constraint to prevent overlapping date ranges.
         # This requires the btree_gist extension on PostgreSQL.
@@ -990,19 +989,19 @@ class Prolongation(models.Model):
     )
 
     approval = models.ForeignKey(Approval, verbose_name="PASS IAE", on_delete=models.CASCADE)
-    start_at = models.DateField(verbose_name="Date de début", default=timezone.localdate, db_index=True)
-    end_at = models.DateField(verbose_name="Date de fin", default=timezone.localdate, db_index=True)
+    start_at = models.DateField(verbose_name="date de début", default=timezone.localdate, db_index=True)
+    end_at = models.DateField(verbose_name="date de fin", default=timezone.localdate, db_index=True)
     reason = models.CharField(
-        verbose_name="Motif",
+        verbose_name="motif",
         max_length=30,
         choices=enums.ProlongationReason.choices,
         default=enums.ProlongationReason.COMPLETE_TRAINING,
     )
-    reason_explanation = models.TextField(verbose_name="Explications supplémentaires", blank=True)
+    reason_explanation = models.TextField(verbose_name="explications supplémentaires", blank=True)
 
     declared_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name="Déclarée par",
+        verbose_name="déclarée par",
         null=True,
         on_delete=models.SET_NULL,
         related_name="approvals_prolongation_declared_set",
@@ -1017,7 +1016,7 @@ class Prolongation(models.Model):
     # It is assumed that an authorized prescriber has validated the prolongation beforehand.
     validated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name="Prescripteur habilité qui a autorisé cette prolongation",
+        verbose_name="prescripteur habilité qui a autorisé cette prolongation",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -1026,25 +1025,25 @@ class Prolongation(models.Model):
 
     prescriber_organization = models.ForeignKey(
         "prescribers.PrescriberOrganization",
-        verbose_name="Organisation du prescripteur habilité",
+        verbose_name="organisation du prescripteur habilité",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
     )
 
     # `created_at` can be different from `validated_by` when created in admin.
-    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
+    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name="Créé par",
+        verbose_name="créé par",
         null=True,
         on_delete=models.SET_NULL,
         related_name="approvals_prolongations_created_set",
     )
-    updated_at = models.DateTimeField(verbose_name="Date de modification", auto_now=True)
+    updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name="Mis à jour par",
+        verbose_name="mis à jour par",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -1053,22 +1052,22 @@ class Prolongation(models.Model):
     # Optional fields needed for specific `reason` field values
     report_file = models.OneToOneField(
         File,
-        verbose_name="Fichier bilan",
+        verbose_name="fichier bilan",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
     )
     require_phone_interview = models.BooleanField(
-        verbose_name="Demande d'entretien téléphonique",
+        verbose_name="demande d'entretien téléphonique",
         default=False,
         blank=True,
     )
     contact_email = models.EmailField(
-        verbose_name="E-mail de contact",
+        verbose_name="e-mail de contact",
         blank=True,
     )
     contact_phone = models.CharField(
-        verbose_name="Numéro de téléphone de contact",
+        verbose_name="numéro de téléphone de contact",
         max_length=20,
         blank=True,
     )
@@ -1076,8 +1075,7 @@ class Prolongation(models.Model):
     objects = ProlongationManager.from_queryset(ProlongationQuerySet)()
 
     class Meta:
-        verbose_name = "Prolongation"
-        verbose_name_plural = "Prolongations"
+        verbose_name = "prolongation"
         ordering = ["-start_at"]
         # Use an exclusion constraint to prevent overlapping date ranges.
         # This requires the btree_gist extension on PostgreSQL.
@@ -1284,20 +1282,20 @@ class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
     """
 
     # Matches prescriber_organization.code_safir_pole_emploi.
-    pe_structure_code = models.CharField("Code structure Pôle emploi", max_length=5)
+    pe_structure_code = models.CharField("code structure Pôle emploi", max_length=5)
 
     # - first 5 digits = code SAFIR of the PE agency of the consultant creating the approval
     # - next 2 digits = 2-digit year of delivery
     # - next 5 digits = decision number with autonomous increment per PE agency, e.g.: 75631 14 10001
     #     - decisions are starting with 1
     #     - decisions starting with 0 are reserved for "Reprise des décisions", e.g.: 75631 14 00001
-    number = models.CharField(verbose_name="Numéro", max_length=12, unique=True)
+    number = models.CharField(verbose_name="numéro", max_length=12, unique=True)
 
-    pole_emploi_id = models.CharField("Identifiant Pôle emploi", max_length=8)
-    first_name = models.CharField("Prénom", max_length=150)
-    last_name = models.CharField("Nom", max_length=150)
-    birth_name = models.CharField("Nom de naissance", max_length=150)
-    birthdate = models.DateField(verbose_name="Date de naissance", default=timezone.localdate)
+    pole_emploi_id = models.CharField("identifiant Pôle emploi", max_length=8)
+    first_name = models.CharField("prénom", max_length=150)
+    last_name = models.CharField("nom", max_length=150)
+    birth_name = models.CharField("nom de naissance", max_length=150)
+    birthdate = models.DateField(verbose_name="date de naissance", default=timezone.localdate)
     nir = models.CharField(verbose_name="NIR", max_length=15, null=True, blank=True)
     # Some people have no NIR. They can have a temporary NIA or NTT instead:
     # https://www.net-entreprises.fr/astuces/identification-des-salaries%E2%80%AF-nir-nia-et-ntt/
@@ -1305,14 +1303,14 @@ class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
     ntt_nia = models.CharField(verbose_name="NTT ou NIA", max_length=40, null=True, blank=True)
 
     siae_siret = models.CharField(
-        verbose_name="Siret de la SIAE",
+        verbose_name="siret de la SIAE",
         max_length=14,
         validators=[validate_siret],
         null=True,
         blank=True,
     )
     siae_kind = models.CharField(
-        verbose_name="Type de la SIAE",
+        verbose_name="type de la SIAE",
         max_length=6,
         choices=siae_enums.SiaeKind.choices,
         null=True,
@@ -1322,8 +1320,8 @@ class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
     objects = PoleEmploiApprovalManager.from_queryset(CommonApprovalQuerySet)()
 
     class Meta:
-        verbose_name = "Agrément Pôle emploi"
-        verbose_name_plural = "Agréments Pôle emploi"
+        verbose_name = "agrément Pôle emploi"
+        verbose_name_plural = "agréments Pôle emploi"
         ordering = ["-start_at"]
         indexes = [
             models.Index(fields=["nir"], name="nir_idx"),
@@ -1440,7 +1438,7 @@ class OriginalPoleEmploiApproval(CommonApprovalMixin):
         S = "suspension", "Suspension"
 
     # All those fields are copied from PoleEmploiApproval
-    pe_structure_code = models.CharField("Code structure Pôle emploi", max_length=5)
+    pe_structure_code = models.CharField("code structure Pôle emploi", max_length=5)
 
     # Parts of an "original" PE Approval number:
     #     - first 5 digits = code SAFIR of the PE agency of the consultant creating the approval
@@ -1457,13 +1455,13 @@ class OriginalPoleEmploiApproval(CommonApprovalMixin):
     #         - next 2 digits = refer to the act number (e.g. E02 = second extension)
     # An Approval number is not modifiable, there is a new entry for each new status change.
     # Suffixes are not taken into account in Itou.
-    number = models.CharField(verbose_name="Numéro", max_length=15, unique=True)
+    number = models.CharField(verbose_name="numéro", max_length=15, unique=True)
 
-    pole_emploi_id = models.CharField("Identifiant Pôle emploi", max_length=8)
-    first_name = models.CharField("Prénom", max_length=150)
-    last_name = models.CharField("Nom", max_length=150)
-    birth_name = models.CharField("Nom de naissance", max_length=150)
-    birthdate = models.DateField(verbose_name="Date de naissance", default=timezone.localdate)
+    pole_emploi_id = models.CharField("identifiant Pôle emploi", max_length=8)
+    first_name = models.CharField("prénom", max_length=150)
+    last_name = models.CharField("nom", max_length=150)
+    birth_name = models.CharField("nom de naissance", max_length=150)
+    birthdate = models.DateField(verbose_name="date de naissance", default=timezone.localdate)
     nir = models.CharField(verbose_name="NIR", max_length=15, null=True, blank=True)
     ntt_nia = models.CharField(verbose_name="NTT ou NIA", max_length=40, null=True, blank=True)
     merged = models.BooleanField()
@@ -1473,8 +1471,8 @@ class OriginalPoleEmploiApproval(CommonApprovalMixin):
         # actually, the table contains original, **unmerged** approvals (after tables were swapped
         # in production on March 18th, 2022)
         db_table = "merged_approvals_poleemploiapproval"
-        verbose_name = "Agrément Pôle emploi original"
-        verbose_name_plural = "Agréments Pôle emploi originaux"
+        verbose_name = "agrément Pôle emploi original"
+        verbose_name_plural = "agréments Pôle emploi originaux"
         ordering = ["-start_at"]
         indexes = [
             models.Index(

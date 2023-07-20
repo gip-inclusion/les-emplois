@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
             model_name="jobapplication",
             name="created_from_pe_approval",
             field=models.BooleanField(
-                default=False, null=True, verbose_name="Candidature créée lors de l'import d'un agrément Pole Emploi"
+                default=False, null=True, verbose_name="candidature créée lors de l'import d'un agrément Pole Emploi"
             ),
         ),
     ]

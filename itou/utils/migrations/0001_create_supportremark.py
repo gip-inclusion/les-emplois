@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             name="PkSupportRemark",
             fields=[
                 ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
-                ("remark", models.TextField(blank=True, verbose_name="Commentaire")),
+                ("remark", models.TextField(blank=True, verbose_name="commentaire")),
                 ("object_id", models.PositiveIntegerField()),
                 (
                     "content_type",
@@ -24,14 +24,14 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={
-                "verbose_name": "Commentaire du support",
+                "verbose_name": "commentaire du support",
             },
         ),
         migrations.CreateModel(
             name="UUIDSupportRemark",
             fields=[
                 ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
-                ("remark", models.TextField(blank=True, verbose_name="Commentaire")),
+                ("remark", models.TextField(blank=True, verbose_name="commentaire")),
                 ("object_id", models.UUIDField()),
                 (
                     "content_type",
@@ -39,7 +39,7 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={
-                "verbose_name": "Commentaire du support",
+                "verbose_name": "commentaire du support",
             },
         ),
     ]

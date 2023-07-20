@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
             field=django_xworkflows.models.StateField(
                 db_index=True,
                 max_length=16,
-                verbose_name="État",
+                verbose_name="état",
                 workflow=django_xworkflows.models._SerializedWorkflow(
                     initial_state="new",
                     name="JobApplicationWorkflow",
@@ -63,10 +63,10 @@ class Migration(migrations.Migration):
                                 ],
                             ),
                         ],
-                        verbose_name="Action",
+                        verbose_name="action",
                     ),
                 ),
-                ("dates", itou.utils.models.InclusiveDateRangeField(verbose_name="Dates")),
+                ("dates", itou.utils.models.InclusiveDateRangeField(verbose_name="dates")),
                 (
                     "job_application",
                     models.ForeignKey(

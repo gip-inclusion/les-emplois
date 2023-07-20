@@ -21,13 +21,13 @@ class Migration(migrations.Migration):
                     ("OTHER", "Autre type de contrat"),
                 ],
                 max_length=30,
-                verbose_name="Type de contrat",
+                verbose_name="type de contrat",
             ),
         ),
         migrations.AddField(
             model_name="jobapplication",
             name="contract_type_details",
-            field=models.TextField(blank=True, verbose_name="Précisions sur le type de contrat"),
+            field=models.TextField(blank=True, verbose_name="précisions sur le type de contrat"),
         ),
         migrations.AddField(
             model_name="jobapplication",
@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
                 blank=True,
                 null=True,
                 validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(48)],
-                verbose_name="Nombre d'heures par semaine",
+                verbose_name="nombre d'heures par semaine",
             ),
         ),
         migrations.AddConstraint(

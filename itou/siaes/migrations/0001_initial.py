@@ -26,14 +26,14 @@ class Migration(migrations.Migration):
             name="Siae",
             fields=[
                 ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
-                ("address_line_1", models.CharField(blank=True, max_length=255, verbose_name="Adresse")),
+                ("address_line_1", models.CharField(blank=True, max_length=255, verbose_name="adresse")),
                 (
                     "address_line_2",
                     models.CharField(
                         blank=True,
                         help_text="Appartement, suite, bloc, bâtiment, boite postale, etc.",
                         max_length=255,
-                        verbose_name="Complément d'adresse",
+                        verbose_name="complément d'adresse",
                     ),
                 ),
                 (
@@ -42,10 +42,10 @@ class Migration(migrations.Migration):
                         blank=True,
                         max_length=5,
                         validators=[itou.utils.validators.validate_post_code],
-                        verbose_name="Code Postal",
+                        verbose_name="code postal",
                     ),
                 ),
-                ("city", models.CharField(blank=True, max_length=255, verbose_name="Ville")),
+                ("city", models.CharField(blank=True, max_length=255, verbose_name="ville")),
                 (
                     "department",
                     models.CharField(
@@ -161,27 +161,27 @@ class Migration(migrations.Migration):
                         ],
                         db_index=True,
                         max_length=3,
-                        verbose_name="Département",
+                        verbose_name="département",
                     ),
                 ),
                 (
                     "coords",
                     django.contrib.gis.db.models.fields.PointField(blank=True, geography=True, null=True, srid=4326),
                 ),
-                ("geocoding_score", models.FloatField(blank=True, null=True, verbose_name="Score du geocoding")),
+                ("geocoding_score", models.FloatField(blank=True, null=True, verbose_name="score du geocoding")),
                 (
                     "siret",
                     models.CharField(
                         db_index=True,
                         max_length=14,
                         validators=[itou.utils.validators.validate_siret],
-                        verbose_name="Siret",
+                        verbose_name="siret",
                     ),
                 ),
                 (
                     "naf",
                     models.CharField(
-                        blank=True, max_length=5, validators=[itou.utils.validators.validate_naf], verbose_name="Naf"
+                        blank=True, max_length=5, validators=[itou.utils.validators.validate_naf], verbose_name="naf"
                     ),
                 ),
                 (
@@ -200,18 +200,18 @@ class Migration(migrations.Migration):
                         ],
                         default="EI",
                         max_length=8,
-                        verbose_name="Type",
+                        verbose_name="type",
                     ),
                 ),
-                ("name", models.CharField(max_length=255, verbose_name="Nom")),
-                ("brand", models.CharField(blank=True, max_length=255, verbose_name="Enseigne")),
-                ("phone", models.CharField(blank=True, max_length=20, verbose_name="Téléphone")),
-                ("email", models.EmailField(blank=True, max_length=254, verbose_name="E-mail")),
-                ("website", models.URLField(blank=True, verbose_name="Site web")),
-                ("description", models.TextField(blank=True, verbose_name="Description")),
+                ("name", models.CharField(max_length=255, verbose_name="nom")),
+                ("brand", models.CharField(blank=True, max_length=255, verbose_name="enseigne")),
+                ("phone", models.CharField(blank=True, max_length=20, verbose_name="téléphone")),
+                ("email", models.EmailField(blank=True, max_length=254, verbose_name="e-mail")),
+                ("website", models.URLField(blank=True, verbose_name="site web")),
+                ("description", models.TextField(blank=True, verbose_name="description")),
                 (
                     "created_at",
-                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="Date de création"),
+                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="date de création"),
                 ),
                 (
                     "created_by",
@@ -221,10 +221,10 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.SET_NULL,
                         related_name="created_siae_set",
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="Créé par",
+                        verbose_name="créé par",
                     ),
                 ),
-                ("updated_at", models.DateTimeField(blank=True, null=True, verbose_name="Date de modification")),
+                ("updated_at", models.DateTimeField(blank=True, null=True, verbose_name="date de modification")),
                 (
                     "source",
                     models.CharField(
@@ -237,22 +237,22 @@ class Migration(migrations.Migration):
                         ],
                         default="ASP",
                         max_length=20,
-                        verbose_name="Source de données",
+                        verbose_name="source de données",
                     ),
                 ),
-                ("provided_support", models.TextField(blank=True, verbose_name="Type d'accompagnement")),
+                ("provided_support", models.TextField(blank=True, verbose_name="type d'accompagnement")),
                 (
                     "auth_email",
-                    models.EmailField(blank=True, max_length=254, verbose_name="E-mail d'authentification"),
+                    models.EmailField(blank=True, max_length=254, verbose_name="e-mail d'authentification"),
                 ),
                 (
                     "block_job_applications",
-                    models.BooleanField(default=False, verbose_name="Blocage des candidatures"),
+                    models.BooleanField(default=False, verbose_name="blocage des candidatures"),
                 ),
                 (
                     "job_applications_blocked_at",
                     models.DateTimeField(
-                        blank=True, null=True, verbose_name="Date du dernier blocage de candidatures"
+                        blank=True, null=True, verbose_name="date du dernier blocage de candidatures"
                     ),
                 ),
                 ("uid", models.UUIDField(db_index=True, default=uuid.uuid4, unique=True)),
@@ -261,14 +261,13 @@ class Migration(migrations.Migration):
                     models.FloatField(
                         null=True,
                         verbose_name=(
-                            "Score de recommandation (ratio de candidatures récentes vs nombre d'offres d'emploi)"
+                            "score de recommandation (ratio de candidatures récentes vs nombre d'offres d'emploi)"
                         ),
                     ),
                 ),
             ],
             options={
-                "verbose_name": "Entreprise",
-                "verbose_name_plural": "Entreprises",
+                "verbose_name": "entreprise",
                 "unique_together": {("siret", "kind")},
             },
         ),
@@ -276,17 +275,17 @@ class Migration(migrations.Migration):
             name="SiaeMembership",
             fields=[
                 ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
-                ("joined_at", models.DateTimeField(default=django.utils.timezone.now, verbose_name="Date d'adhésion")),
-                ("is_admin", models.BooleanField(default=False, verbose_name="Administrateur")),
+                ("joined_at", models.DateTimeField(default=django.utils.timezone.now, verbose_name="date d'adhésion")),
+                ("is_admin", models.BooleanField(default=False, verbose_name="administrateur")),
                 ("siae", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="siaes.siae")),
                 ("user", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-                ("notifications", models.JSONField(blank=True, default=dict, verbose_name="Notifications")),
-                ("is_active", models.BooleanField(default=True, verbose_name="Rattachement actif")),
+                ("notifications", models.JSONField(blank=True, default=dict, verbose_name="notifications")),
+                ("is_active", models.BooleanField(default=True, verbose_name="rattachement actif")),
                 (
                     "created_at",
-                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="Date de création"),
+                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="date de création"),
                 ),
-                ("updated_at", models.DateTimeField(null=True, verbose_name="Date de modification")),
+                ("updated_at", models.DateTimeField(null=True, verbose_name="date de modification")),
                 (
                     "updated_by",
                     models.ForeignKey(
@@ -294,7 +293,7 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="updated_siaemembership_set",
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="Mis à jour par",
+                        verbose_name="mis à jour par",
                     ),
                 ),
             ],
@@ -306,7 +305,7 @@ class Migration(migrations.Migration):
             model_name="siae",
             name="members",
             field=models.ManyToManyField(
-                blank=True, through="siaes.SiaeMembership", to=settings.AUTH_USER_MODEL, verbose_name="Membres"
+                blank=True, through="siaes.SiaeMembership", to=settings.AUTH_USER_MODEL, verbose_name="membres"
             ),
         ),
         migrations.CreateModel(
@@ -315,11 +314,11 @@ class Migration(migrations.Migration):
                 ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 (
                     "created_at",
-                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="Date de création"),
+                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="date de création"),
                 ),
-                ("is_active", models.BooleanField(default=True, verbose_name="Recrutement ouvert")),
-                ("custom_name", models.CharField(blank=True, max_length=255, verbose_name="Nom personnalisé")),
-                ("description", models.TextField(blank=True, verbose_name="Description")),
+                ("is_active", models.BooleanField(default=True, verbose_name="recrutement ouvert")),
+                ("custom_name", models.CharField(blank=True, max_length=255, verbose_name="nom personnalisé")),
+                ("description", models.TextField(blank=True, verbose_name="description")),
                 ("ui_rank", models.PositiveSmallIntegerField(default=32767)),
                 ("appellation", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="jobs.appellation")),
                 (
@@ -332,7 +331,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "updated_at",
-                    models.DateTimeField(blank=True, db_index=True, null=True, verbose_name="Date de modification"),
+                    models.DateTimeField(blank=True, db_index=True, null=True, verbose_name="date de modification"),
                 ),
                 (
                     "source_id",
@@ -346,7 +345,7 @@ class Migration(migrations.Migration):
                         choices=[("PE_API", "API Pôle Emploi")],
                         max_length=30,
                         null=True,
-                        verbose_name="Source de la donnée",
+                        verbose_name="source de la donnée",
                     ),
                 ),
                 (
@@ -369,7 +368,7 @@ class Migration(migrations.Migration):
                             ("OTHER", "Autre type de contrat"),
                         ],
                         max_length=30,
-                        verbose_name="Type de contrat",
+                        verbose_name="type de contrat",
                     ),
                 ),
                 (
@@ -378,27 +377,27 @@ class Migration(migrations.Migration):
                         blank=True,
                         null=True,
                         validators=[django.core.validators.MaxValueValidator(48)],
-                        verbose_name="Nombre d'heures par semaine",
+                        verbose_name="nombre d'heures par semaine",
                     ),
                 ),
                 (
                     "is_qpv_mandatory",
-                    models.BooleanField(default=False, verbose_name="Une clause QPV est nécessaire pour ce poste"),
+                    models.BooleanField(default=False, verbose_name="une clause QPV est nécessaire pour ce poste"),
                 ),
                 (
                     "is_resume_mandatory",
                     models.BooleanField(default=False, verbose_name="CV nécessaire pour la candidature"),
                 ),
-                ("market_context_description", models.TextField(blank=True, verbose_name="Contexte du marché")),
+                ("market_context_description", models.TextField(blank=True, verbose_name="contexte du marché")),
                 (
                     "open_positions",
-                    models.PositiveSmallIntegerField(blank=True, default=1, verbose_name="Nombre de postes ouverts"),
+                    models.PositiveSmallIntegerField(blank=True, default=1, verbose_name="nombre de postes ouverts"),
                 ),
                 (
                     "other_contract_type",
-                    models.CharField(blank=True, max_length=255, null=True, verbose_name="Autre type de contrat"),
+                    models.CharField(blank=True, max_length=255, null=True, verbose_name="autre type de contrat"),
                 ),
-                ("profile_description", models.TextField(blank=True, verbose_name="Profil recherché et pré-requis")),
+                ("profile_description", models.TextField(blank=True, verbose_name="profil recherché et pré-requis")),
                 (
                     "location",
                     models.ForeignKey(
@@ -406,7 +405,7 @@ class Migration(migrations.Migration):
                         null=True,
                         on_delete=django.db.models.deletion.SET_NULL,
                         to="cities.city",
-                        verbose_name="Localisation du poste",
+                        verbose_name="localisation du poste",
                     ),
                 ),
                 (
@@ -420,14 +419,14 @@ class Migration(migrations.Migration):
                         choices=[("PEC_OFFER", "Contrat PEC - Parcours Emploi Compétences")],
                         max_length=64,
                         null=True,
-                        verbose_name="Nature du contrat",
+                        verbose_name="nature du contrat",
                     ),
                 ),
             ],
             options={
                 "ordering": ["appellation__name", "ui_rank"],
-                "verbose_name": "Fiche de poste",
-                "verbose_name_plural": "Fiches de postes",
+                "verbose_name": "fiche de poste",
+                "verbose_name_plural": "fiches de postes",
                 "unique_together": set(),
             },
         ),
@@ -435,7 +434,7 @@ class Migration(migrations.Migration):
             model_name="siae",
             name="jobs",
             field=models.ManyToManyField(
-                blank=True, through="siaes.SiaeJobDescription", to="jobs.appellation", verbose_name="Métiers"
+                blank=True, through="siaes.SiaeJobDescription", to="jobs.appellation", verbose_name="métiers"
             ),
         ),
         migrations.CreateModel(
@@ -454,7 +453,7 @@ class Migration(migrations.Migration):
                         ],
                         default="EI",
                         max_length=4,
-                        verbose_name="Type",
+                        verbose_name="type",
                     ),
                 ),
                 (
@@ -463,7 +462,7 @@ class Migration(migrations.Migration):
                         db_index=True,
                         max_length=14,
                         validators=[itou.utils.validators.validate_siret],
-                        verbose_name="Siret à la signature",
+                        verbose_name="siret à la signature",
                     ),
                 ),
                 (
@@ -475,7 +474,7 @@ class Migration(migrations.Migration):
                             "Précise si la convention est active c.a.d. si elle a au moins une annexe financière "
                             "valide à ce jour."
                         ),
-                        verbose_name="Active",
+                        verbose_name="active",
                     ),
                 ),
                 (
@@ -484,19 +483,19 @@ class Migration(migrations.Migration):
                         blank=True,
                         db_index=True,
                         null=True,
-                        verbose_name="Date de  désactivation et début de délai de grâce",
+                        verbose_name="date de  désactivation et début de délai de grâce",
                     ),
                 ),
                 (
                     "reactivated_at",
-                    models.DateTimeField(blank=True, null=True, verbose_name="Date de réactivation manuelle"),
+                    models.DateTimeField(blank=True, null=True, verbose_name="date de réactivation manuelle"),
                 ),
                 ("asp_id", models.IntegerField(db_index=True, verbose_name="ID ASP de la SIAE")),
                 (
                     "created_at",
-                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="Date de création"),
+                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="date de création"),
                 ),
-                ("updated_at", models.DateTimeField(blank=True, null=True, verbose_name="Date de modification")),
+                ("updated_at", models.DateTimeField(blank=True, null=True, verbose_name="date de modification")),
                 (
                     "reactivated_by",
                     models.ForeignKey(
@@ -505,13 +504,12 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.SET_NULL,
                         related_name="reactivated_siae_convention_set",
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="Réactivée manuellement par",
+                        verbose_name="réactivée manuellement par",
                     ),
                 ),
             ],
             options={
-                "verbose_name": "Convention",
-                "verbose_name_plural": "Conventions",
+                "verbose_name": "convention",
                 "unique_together": {("asp_id", "kind")},
             },
         ),
@@ -537,7 +535,7 @@ class Migration(migrations.Migration):
                         max_length=17,
                         unique=True,
                         validators=[itou.utils.validators.validate_af_number],
-                        verbose_name="Numéro d'annexe financière",
+                        verbose_name="numéro d'annexe financière",
                     ),
                 ),
                 (
@@ -554,16 +552,16 @@ class Migration(migrations.Migration):
                             ("REJETE", "Rejetée"),
                         ],
                         max_length=20,
-                        verbose_name="Etat",
+                        verbose_name="état",
                     ),
                 ),
-                ("start_at", models.DateTimeField(verbose_name="Date de début d'effet")),
-                ("end_at", models.DateTimeField(verbose_name="Date de fin d'effet")),
+                ("start_at", models.DateTimeField(verbose_name="date de début d'effet")),
+                ("end_at", models.DateTimeField(verbose_name="date de fin d'effet")),
                 (
                     "created_at",
-                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="Date de création"),
+                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="date de création"),
                 ),
-                ("updated_at", models.DateTimeField(blank=True, null=True, verbose_name="Date de modification")),
+                ("updated_at", models.DateTimeField(blank=True, null=True, verbose_name="date de modification")),
                 (
                     "convention",
                     models.ForeignKey(
@@ -574,8 +572,8 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={
-                "verbose_name": "Annexe financière",
-                "verbose_name_plural": "Annexes financières",
+                "verbose_name": "annexe financière",
+                "verbose_name_plural": "annexes financières",
             },
         ),
         migrations.AddConstraint(

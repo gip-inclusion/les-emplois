@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="franceconnectstate",
             name="used_at",
-            field=models.DateTimeField(null=True, verbose_name="Date d'utilisation"),
+            field=models.DateTimeField(null=True, verbose_name="date d'utilisation"),
         ),
         migrations.AlterField(
             model_name="franceconnectstate",

@@ -10,7 +10,7 @@
       <small class="form-text text-muted">Appartement, suite, bloc, bâtiment, boite postale, etc.</small>
   
   </div>
-  <div class="form-group form-group-required"><label for="id_post_code">Code Postal</label><input class="form-control" disabled="" id="id_post_code" maxlength="5" name="post_code" placeholder="Code Postal" required="" title="" type="text"/></div>
+  <div class="form-group form-group-required"><label for="id_post_code">Code postal</label><input class="form-control" disabled="" id="id_post_code" maxlength="5" name="post_code" placeholder="Code postal" required="" title="" type="text"/></div>
   <div class="form-group form-group-required"><label for="id_city">Ville</label><input class="form-control" disabled="" id="id_city" maxlength="255" name="city" placeholder="Ville" required="" title="" type="text"/></div>
   <div class="form-group form-group-required"><label for="id_department">Département</label><select class="form-control" disabled="" id="id_department" name="department" required="" title="">
     <option value="">---------</option>
