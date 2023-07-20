@@ -58,28 +58,6 @@
     background: transparent;
 }
 
-/* BETA banner.
---------------------------------------------------------------------------- */
-.s-preheader {
-    position: relative;
-}
-
-.s-preheader:after {
-    content: "BETA";
-    color: #fff;
-    background: #ff5655;
-    text-align: center;
-    font-size: 1rem;
-    line-height: 1;
-    font-weight: bold;
-    padding: 0.5rem 2rem;
-    position: absolute;
-    z-index: 0;
-    top: 0;
-    left: -20px;
-    transform: rotate(-40deg);
-}
-
 /* Footer without the blue line
 --------------------------------------------------------------------------- */
 .s-prefooter {
