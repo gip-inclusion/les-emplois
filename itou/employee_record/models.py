@@ -149,6 +149,7 @@ class EmployeeRecordQuerySet(models.QuerySet):
             .filter(
                 approval_is_valid=False,
                 job_application__approval__end_at__lt=prolongation_cutoff,
+                created_at__lt=timezone.now() - relativedelta(months=6),  # Keep them at least 6 months
             )
         )
 

@@ -1,3 +1,5 @@
+import datetime
+import itertools
 import json
 from datetime import date, timedelta
 from unittest import mock
@@ -180,11 +182,25 @@ class EmployeeRecordModelTest(TestCase):
         assert result.id == employee_record.id
 
     def test_archivable(self):
-        EmployeeRecordFactory()
-        assert EmployeeRecord.objects.archivable().count() == 0
+        parameters = itertools.product(
+            [False, True],
+            [
+                self.faker.date_time_between(start_date="-1y", end_date="-3M", tzinfo=datetime.UTC),
+                self.faker.date_time_between(start_date="-3M", tzinfo=datetime.UTC),
+            ],
+            [
+                self.faker.date_time_between(start_date="-1y", end_date="-6M", tzinfo=datetime.UTC),
+                self.faker.date_time_between(start_date="-6M", tzinfo=datetime.UTC),
+            ],
+        )
+        for expired, end_at, created_at in parameters:
+            EmployeeRecordFactory(
+                job_application__approval__expired=expired,
+                job_application__approval__end_at=end_at,
+                created_at=created_at,
+            )
 
-        archivable_employee_record = EmployeeRecordFactory(job_application__approval__expired=True)
-        assert list(EmployeeRecord.objects.archivable()) == [archivable_employee_record]
+        assert EmployeeRecord.objects.archivable().count() == 1
 
 
 @pytest.mark.parametrize(
