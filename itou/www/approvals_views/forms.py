@@ -142,11 +142,15 @@ class CreateProlongationForm(forms.ModelForm):
         self.fields["end_at"].label = f'Du {self.instance.start_at.strftime("%d/%m/%Y")} au'
 
         end_at_extra_help_text = ""
-        if self.data and self.data.get("reason"):
-            prolongation_duration = Prolongation.MAX_CUMULATIVE_DURATION[self.data.get("reason")]["label"]
-            end_at_extra_help_text = (
-                f" <strong>(Durée maximum de 1 an renouvelable jusqu'à {prolongation_duration})</strong>."
-            )
+        if self.data and (reason := self.data.get("reason")):
+            try:
+                max_duration = Prolongation.MAX_CUMULATIVE_DURATION[reason]
+            except KeyError:
+                pass
+            else:
+                end_at_extra_help_text = (
+                    f" <strong>(Durée maximum de 1 an renouvelable jusqu'à {max_duration['label']})</strong>."
+                )
         self.fields["end_at"].help_text = mark_safe(
             f"Date jusqu'à laquelle le PASS IAE doit être prolongé{end_at_extra_help_text}<br>"
             f"Au format JJ/MM/AAAA, par exemple 20/12/1978."
