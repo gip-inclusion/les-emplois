@@ -20,6 +20,7 @@ from tests.utils.test import parse_response_to_soup
 @pytest.mark.usefixtures("unittest_compatibility")
 class ApprovalProlongationTest(S3AccessingTestCase):
     PROLONGATION_EMAIL_REPORT_TEXT = "- Fiche bilan :"
+    MAX_DURATION_TEXT = "Durée maximum de 1 an renouvelable"
 
     def setUp(self):
         """
@@ -73,6 +74,7 @@ class ApprovalProlongationTest(S3AccessingTestCase):
             "preview": "1",
         }
         response = self.client.post(url, data=post_data)
+        self.assertContains(response, self.MAX_DURATION_TEXT)
         self.assertContains(response, escape("Sélectionnez un choix valide."))
 
         # With valid reason
@@ -117,6 +119,19 @@ class ApprovalProlongationTest(S3AccessingTestCase):
         email = mail.outbox[0]
         assert len(email.to) == 1
         assert email.to[0] == post_data["email"]
+
+    def test_prolong_approval_view_bad_reason(self):
+        self.client.force_login(self.siae_user)
+        end_at = timezone.localdate() + relativedelta(months=1)
+        response = self.client.post(
+            reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk}),
+            {
+                "end_at": end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                "reason": "invalid",
+                "email": self.prescriber.email,
+            },
+        )
+        self.assertNotContains(response, self.MAX_DURATION_TEXT)
 
     def test_prolong_approval_view_without_prescriber(self):
         """
