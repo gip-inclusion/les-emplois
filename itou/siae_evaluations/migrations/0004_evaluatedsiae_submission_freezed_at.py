@@ -12,6 +12,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="evaluatedsiae",
             name="submission_freezed_at",
-            field=models.DateTimeField(blank=True, null=True, verbose_name="Transmission bloquée pour la SIAE le"),
+            field=models.DateTimeField(blank=True, null=True, verbose_name="transmission bloquée pour la SIAE le"),
         ),
     ]

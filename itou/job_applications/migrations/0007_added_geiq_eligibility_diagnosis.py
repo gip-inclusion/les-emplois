@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
                 on_delete=django.db.models.deletion.SET_NULL,
                 related_name="job_applications",
                 to="eligibility.geiqeligibilitydiagnosis",
-                verbose_name="Diagnostic d'éligibilité GEIQ",
+                verbose_name="diagnostic d'éligibilité GEIQ",
             ),
         ),
     ]

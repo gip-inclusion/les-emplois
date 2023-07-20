@@ -26,18 +26,18 @@ class Migration(migrations.Migration):
                         choices=[("prescriber", "Prescripteur"), ("siae_staff", "Employeur (SIAE)")],
                         default="prescriber",
                         max_length=10,
-                        verbose_name="Type de l'auteur",
+                        verbose_name="type de l'auteur",
                     ),
                 ),
                 (
                     "created_at",
                     models.DateTimeField(
-                        db_index=True, default=django.utils.timezone.now, verbose_name="Date de création"
+                        db_index=True, default=django.utils.timezone.now, verbose_name="date de création"
                     ),
                 ),
                 (
                     "updated_at",
-                    models.DateTimeField(blank=True, db_index=True, null=True, verbose_name="Date de modification"),
+                    models.DateTimeField(blank=True, db_index=True, null=True, verbose_name="date de modification"),
                 ),
                 (
                     "author",
@@ -45,7 +45,7 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="eligibility_diagnoses_made",
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="Auteur",
+                        verbose_name="auteur",
                     ),
                 ),
                 (
@@ -55,7 +55,7 @@ class Migration(migrations.Migration):
                         null=True,
                         on_delete=django.db.models.deletion.CASCADE,
                         to="prescribers.PrescriberOrganization",
-                        verbose_name="Organisation du prescripteur de l'auteur",
+                        verbose_name="organisation du prescripteur de l'auteur",
                     ),
                 ),
                 (
@@ -74,14 +74,14 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="eligibility_diagnoses",
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="Demandeur d'emploi",
+                        verbose_name="demandeur d'emploi",
                     ),
                 ),
-                ("expires_at", models.DateTimeField(db_index=True, verbose_name="Date d'expiration")),
+                ("expires_at", models.DateTimeField(db_index=True, verbose_name="date d'expiration")),
             ],
             options={
-                "verbose_name": "Diagnostic d'éligibilité",
-                "verbose_name_plural": "Diagnostics d'éligibilité",
+                "verbose_name": "diagnostic d'éligibilité",
+                "verbose_name_plural": "diagnostics d'éligibilité",
                 "ordering": ["-created_at"],
             },
         ),
@@ -95,20 +95,20 @@ class Migration(migrations.Migration):
                         choices=[("1", "Niveau 1"), ("2", "Niveau 2")],
                         default="1",
                         max_length=1,
-                        verbose_name="Niveau",
+                        verbose_name="niveau",
                     ),
                 ),
-                ("name", models.CharField(max_length=255, verbose_name="Nom")),
-                ("desc", models.CharField(blank=True, max_length=255, verbose_name="Description")),
-                ("written_proof", models.CharField(blank=True, max_length=255, verbose_name="Justificatif")),
+                ("name", models.CharField(max_length=255, verbose_name="nom")),
+                ("desc", models.CharField(blank=True, max_length=255, verbose_name="description")),
+                ("written_proof", models.CharField(blank=True, max_length=255, verbose_name="justificatif")),
                 (
                     "written_proof_url",
-                    models.URLField(blank=True, verbose_name="Lien d'aide à propos du justificatif"),
+                    models.URLField(blank=True, verbose_name="lien d'aide à propos du justificatif"),
                 ),
                 ("ui_rank", models.PositiveSmallIntegerField(default=32767)),
                 (
                     "created_at",
-                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="Date de création"),
+                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="date de création"),
                 ),
                 (
                     "created_by",
@@ -117,19 +117,19 @@ class Migration(migrations.Migration):
                         null=True,
                         on_delete=django.db.models.deletion.SET_NULL,
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="Créé par",
+                        verbose_name="créé par",
                     ),
                 ),
                 (
                     "written_proof_validity",
                     models.CharField(
-                        blank=True, default="", max_length=255, verbose_name="Durée de validité du justificatif"
+                        blank=True, default="", max_length=255, verbose_name="durée de validité du justificatif"
                     ),
                 ),
             ],
             options={
-                "verbose_name": "Critère administratif",
-                "verbose_name_plural": "Critères administratifs",
+                "verbose_name": "critère administratif",
+                "verbose_name_plural": "critères administratifs",
                 "ordering": ["level", "ui_rank"],
             },
         ),
@@ -139,7 +139,7 @@ class Migration(migrations.Migration):
                 ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 (
                     "created_at",
-                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="Date de création"),
+                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="date de création"),
                 ),
                 (
                     "administrative_criteria",
@@ -157,8 +157,8 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={
-                "verbose_name": "Critère administratif sélectionné",
-                "verbose_name_plural": "Critères administratifs sélectionnés",
+                "verbose_name": "critère administratif sélectionné",
+                "verbose_name_plural": "critères administratifs sélectionnés",
                 "unique_together": {("eligibility_diagnosis", "administrative_criteria")},
             },
         ),
@@ -169,7 +169,7 @@ class Migration(migrations.Migration):
                 blank=True,
                 through="eligibility.SelectedAdministrativeCriteria",
                 to="eligibility.administrativecriteria",
-                verbose_name="Critères administratifs",
+                verbose_name="critères administratifs",
             ),
         ),
     ]

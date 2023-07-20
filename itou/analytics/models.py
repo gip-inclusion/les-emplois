@@ -30,25 +30,25 @@ class Datum(models.Model):
     measured_at = models.DateTimeField(default=timezone.now)  # Not using auto_now_add=True to allow overrides
 
     class Meta:
-        verbose_name_plural = "Data"
+        verbose_name_plural = "data"
         unique_together = ["code", "bucket"]
         indexes = [models.Index(fields=["measured_at", "code"])]
 
 
 class StatsDashboardVisit(models.Model):
     dashboard_id = models.IntegerField(verbose_name="ID tableau de bord Metabase")
-    dashboard_name = models.TextField(verbose_name="Nom de la vue du tableau de bord")
-    department = models.CharField(verbose_name="Département", choices=DEPARTMENTS.items(), max_length=3, null=True)
-    region = models.TextField(verbose_name="Région", null=True)
+    dashboard_name = models.TextField(verbose_name="nom de la vue du tableau de bord")
+    department = models.CharField(verbose_name="département", choices=DEPARTMENTS.items(), max_length=3, null=True)
+    region = models.TextField(verbose_name="région", null=True)
     current_siae_id = models.IntegerField(verbose_name="ID SIAE courante", null=True)
     current_prescriber_organization_id = models.IntegerField(
         verbose_name="ID organisation prescriptrice courante", null=True
     )
     current_institution_id = models.IntegerField(verbose_name="ID institution courante", null=True)
-    user_kind = models.TextField(verbose_name="Type d'utilisateur", choices=UserKind.choices)
+    user_kind = models.TextField(verbose_name="type d'utilisateur", choices=UserKind.choices)
     user_id = models.IntegerField(verbose_name="ID utilisateur")
 
     measured_at = models.DateTimeField(default=timezone.now)  # Not using auto_now_add=True to allow overrides
 
     class Meta:
-        verbose_name_plural = "Visite de tableau de bord"
+        verbose_name_plural = "visite de tableau de bord"

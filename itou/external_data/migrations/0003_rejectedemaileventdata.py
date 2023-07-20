@@ -17,12 +17,12 @@ class Migration(migrations.Migration):
                 ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 (
                     "created_at",
-                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="Date de création"),
+                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="date de création"),
                 ),
                 (
                     "recipient",
                     django.contrib.postgres.fields.citext.CIEmailField(
-                        blank=True, db_index=True, max_length=254, verbose_name="Adresse e-mail du destinataire"
+                        blank=True, db_index=True, max_length=254, verbose_name="adresse e-mail du destinataire"
                     ),
                 ),
                 (
@@ -38,12 +38,12 @@ class Migration(migrations.Migration):
                             ("other", "Non précisé par l’ESP"),
                         ],
                         max_length=12,
-                        verbose_name="La raison du refus de l’envoi d’email",
+                        verbose_name="la raison du refus de l’envoi d’email",
                     ),
                 ),
             ],
             options={
-                "verbose_name": "Données collectées par le webhook en cas d’erreur d’envoi d’email",
+                "verbose_name": "données collectées par le webhook en cas d’erreur d’envoi d’email",
             },
         ),
     ]

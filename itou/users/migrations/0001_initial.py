@@ -58,7 +58,7 @@ class Migration(migrations.Migration):
                         max_length=254,
                         null=True,
                         unique=True,
-                        verbose_name="Adresse e-mail",
+                        verbose_name="adresse e-mail",
                     ),
                 ),
                 (
@@ -87,13 +87,13 @@ class Migration(migrations.Migration):
                         blank=True,
                         null=True,
                         validators=[itou.utils.validators.validate_birthdate],
-                        verbose_name="Date de naissance",
+                        verbose_name="date de naissance",
                     ),
                 ),
-                ("phone", models.CharField(blank=True, max_length=20, verbose_name="Téléphone")),
-                ("is_job_seeker", models.BooleanField(default=False, verbose_name="Demandeur d'emploi")),
-                ("is_prescriber", models.BooleanField(default=False, verbose_name="Prescripteur")),
-                ("is_siae_staff", models.BooleanField(default=False, verbose_name="Employeur (SIAE)")),
+                ("phone", models.CharField(blank=True, max_length=20, verbose_name="téléphone")),
+                ("is_job_seeker", models.BooleanField(default=False, verbose_name="demandeur d'emploi")),
+                ("is_prescriber", models.BooleanField(default=False, verbose_name="prescripteur")),
+                ("is_siae_staff", models.BooleanField(default=False, verbose_name="employeur (SIAE)")),
                 (
                     "groups",
                     models.ManyToManyField(
@@ -126,7 +126,7 @@ class Migration(migrations.Migration):
                         null=True,
                         on_delete=django.db.models.deletion.SET_NULL,
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="Créé par",
+                        verbose_name="créé par",
                     ),
                 ),
                 (
@@ -139,7 +139,7 @@ class Migration(migrations.Migration):
                             itou.utils.validators.validate_pole_emploi_id,
                             django.core.validators.MinLengthValidator(8),
                         ],
-                        verbose_name="Identifiant Pôle emploi",
+                        verbose_name="identifiant Pôle emploi",
                     ),
                 ),
                 (
@@ -157,20 +157,20 @@ class Migration(migrations.Migration):
                             "nécessaire pour effectuer manuellement les vérifications d’usage."
                         ),
                         max_length=30,
-                        verbose_name="Pas d'identifiant Pôle emploi\xa0?",
+                        verbose_name="pas d'identifiant Pôle emploi\xa0?",
                     ),
                 ),
-                ("address_line_1", models.CharField(blank=True, max_length=255, verbose_name="Adresse")),
+                ("address_line_1", models.CharField(blank=True, max_length=255, verbose_name="adresse")),
                 (
                     "address_line_2",
                     models.CharField(
                         blank=True,
                         help_text="Appartement, suite, bloc, bâtiment, boite postale, etc.",
                         max_length=255,
-                        verbose_name="Complément d'adresse",
+                        verbose_name="complément d'adresse",
                     ),
                 ),
-                ("city", models.CharField(blank=True, max_length=255, verbose_name="Ville")),
+                ("city", models.CharField(blank=True, max_length=255, verbose_name="ville")),
                 (
                     "coords",
                     django.contrib.gis.db.models.fields.PointField(blank=True, geography=True, null=True, srid=4326),
@@ -290,26 +290,26 @@ class Migration(migrations.Migration):
                         ],
                         db_index=True,
                         max_length=3,
-                        verbose_name="Département",
+                        verbose_name="département",
                     ),
                 ),
-                ("geocoding_score", models.FloatField(blank=True, null=True, verbose_name="Score du geocoding")),
+                ("geocoding_score", models.FloatField(blank=True, null=True, verbose_name="score du geocoding")),
                 (
                     "post_code",
                     models.CharField(
                         blank=True,
                         max_length=5,
                         validators=[itou.utils.validators.validate_post_code],
-                        verbose_name="Code Postal",
+                        verbose_name="code postal",
                     ),
                 ),
                 (
                     "resume_link",
-                    models.URLField(blank=True, max_length=500, verbose_name="Lien vers un CV"),
+                    models.URLField(blank=True, max_length=500, verbose_name="lien vers un CV"),
                 ),
                 (
                     "has_completed_welcoming_tour",
-                    models.BooleanField(default=False, verbose_name="Parcours de bienvenue effectué"),
+                    models.BooleanField(default=False, verbose_name="parcours de bienvenue effectué"),
                 ),
                 (
                     "birth_country",
@@ -318,7 +318,7 @@ class Migration(migrations.Migration):
                         null=True,
                         on_delete=django.db.models.deletion.SET_NULL,
                         to="asp.country",
-                        verbose_name="Pays de naissance",
+                        verbose_name="pays de naissance",
                     ),
                 ),
                 (
@@ -328,7 +328,7 @@ class Migration(migrations.Migration):
                         null=True,
                         on_delete=django.db.models.deletion.SET_NULL,
                         to="asp.commune",
-                        verbose_name="Commune de naissance",
+                        verbose_name="commune de naissance",
                     ),
                 ),
                 (
@@ -338,12 +338,12 @@ class Migration(migrations.Migration):
                         choices=[("M", "Monsieur"), ("MME", "Madame")],
                         default="",
                         max_length=3,
-                        verbose_name="Civilité",
+                        verbose_name="civilité",
                     ),
                 ),
                 (
                     "is_labor_inspector",
-                    models.BooleanField(default=False, verbose_name="Inspecteur du travail (DDETS, DREETS, DGEFP)"),
+                    models.BooleanField(default=False, verbose_name="inspecteur du travail (DDETS, DREETS, DGEFP)"),
                 ),
                 (
                     "external_data_source_history",
@@ -351,7 +351,7 @@ class Migration(migrations.Migration):
                         blank=True,
                         encoder=django.core.serializers.json.DjangoJSONEncoder,
                         null=True,
-                        verbose_name="Information sur la source des champs",
+                        verbose_name="information sur la source des champs",
                     ),
                 ),
                 (
@@ -379,7 +379,7 @@ class Migration(migrations.Migration):
                         ],
                         default="DJANGO",
                         max_length=20,
-                        verbose_name="Fournisseur d'identité (SSO)",
+                        verbose_name="fournisseur d'identité (SSO)",
                     ),
                 ),
             ],
@@ -403,7 +403,7 @@ class Migration(migrations.Migration):
                         related_name="jobseeker_profile",
                         serialize=False,
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="Demandeur d'emploi",
+                        verbose_name="demandeur d'emploi",
                     ),
                 ),
                 (
@@ -424,14 +424,14 @@ class Migration(migrations.Migration):
                             ("70", "Pas de formation au-delà de la scolarité obligatoire"),
                         ],
                         max_length=2,
-                        verbose_name="Niveau de formation (ASP)",
+                        verbose_name="niveau de formation (ASP)",
                     ),
                 ),
-                ("resourceless", models.BooleanField(default=False, verbose_name="Sans ressource")),
-                ("rqth_employee", models.BooleanField(default=False, verbose_name="Titulaire de la RQTH")),
+                ("resourceless", models.BooleanField(default=False, verbose_name="sans ressource")),
+                ("rqth_employee", models.BooleanField(default=False, verbose_name="titulaire de la RQTH")),
                 (
                     "oeth_employee",
-                    models.BooleanField(default=False, verbose_name="Bénéficiaire de la loi handicap (OETH)"),
+                    models.BooleanField(default=False, verbose_name="bénéficiaire de la loi handicap (OETH)"),
                 ),
                 (
                     "pole_emploi_since",
@@ -444,7 +444,7 @@ class Migration(migrations.Migration):
                             ("04", "24 mois et plus"),
                         ],
                         max_length=2,
-                        verbose_name="Inscrit à Pôle emploi depuis",
+                        verbose_name="inscrit à Pôle emploi depuis",
                     ),
                 ),
                 (
@@ -458,7 +458,7 @@ class Migration(migrations.Migration):
                             ("04", "24 mois et plus"),
                         ],
                         max_length=2,
-                        verbose_name="Sans emploi depuis",
+                        verbose_name="sans emploi depuis",
                     ),
                 ),
                 (
@@ -472,7 +472,7 @@ class Migration(migrations.Migration):
                             ("04", "24 mois et plus"),
                         ],
                         max_length=2,
-                        verbose_name="Allocataire du RSA depuis",
+                        verbose_name="allocataire du RSA depuis",
                     ),
                 ),
                 (
@@ -486,7 +486,7 @@ class Migration(migrations.Migration):
                             ("04", "24 mois et plus"),
                         ],
                         max_length=2,
-                        verbose_name="Allocataire de l'ASS depuis",
+                        verbose_name="allocataire de l'ASS depuis",
                     ),
                 ),
                 (
@@ -500,7 +500,7 @@ class Migration(migrations.Migration):
                             ("04", "24 mois et plus"),
                         ],
                         max_length=2,
-                        verbose_name="Allocataire de l'AAH depuis",
+                        verbose_name="allocataire de l'AAH depuis",
                     ),
                 ),
                 (
@@ -514,7 +514,7 @@ class Migration(migrations.Migration):
                             ("04", "24 mois et plus"),
                         ],
                         max_length=2,
-                        verbose_name="Allocataire de l'ATA depuis",
+                        verbose_name="allocataire de l'ATA depuis",
                     ),
                 ),
                 (
@@ -617,7 +617,7 @@ class Migration(migrations.Migration):
                             ("ZUP", "Zone urbanisation prio"),
                         ],
                         max_length=4,
-                        verbose_name="Type de voie",
+                        verbose_name="type de voie",
                     ),
                 ),
                 (
@@ -627,15 +627,15 @@ class Migration(migrations.Migration):
                         choices=[("B", "Bis"), ("T", "Ter"), ("Q", "Quater"), ("C", "Quinquies")],
                         default="",
                         max_length=1,
-                        verbose_name="Extension de voie",
+                        verbose_name="extension de voie",
                     ),
                 ),
                 (
                     "hexa_lane_number",
-                    models.CharField(blank=True, default="", max_length=10, verbose_name="Numéro de la voie"),
+                    models.CharField(blank=True, default="", max_length=10, verbose_name="numéro de la voie"),
                 ),
-                ("hexa_lane_name", models.CharField(blank=True, max_length=120, verbose_name="Nom de la voie")),
-                ("hexa_post_code", models.CharField(blank=True, max_length=6, verbose_name="Code postal")),
+                ("hexa_lane_name", models.CharField(blank=True, max_length=120, verbose_name="nom de la voie")),
+                ("hexa_post_code", models.CharField(blank=True, max_length=6, verbose_name="code postal")),
                 (
                     "hexa_commune",
                     models.ForeignKey(
@@ -643,13 +643,13 @@ class Migration(migrations.Migration):
                         null=True,
                         on_delete=django.db.models.deletion.SET_NULL,
                         to="asp.commune",
-                        verbose_name="Commune (ref. ASP)",
+                        verbose_name="commune (ref. ASP)",
                     ),
                 ),
                 (
                     "hexa_non_std_extension",
                     models.CharField(
-                        blank=True, default="", max_length=10, verbose_name="Extension de voie (non-repertoriée)"
+                        blank=True, default="", max_length=10, verbose_name="extension de voie (non-repertoriée)"
                     ),
                 ),
                 (
@@ -662,7 +662,7 @@ class Migration(migrations.Migration):
                         ],
                         default="NON",
                         max_length=6,
-                        verbose_name="Salarié bénéficiaire du RSA",
+                        verbose_name="salarié bénéficiaire du RSA",
                     ),
                 ),
                 (
@@ -679,17 +679,17 @@ class Migration(migrations.Migration):
                             ("07", "Autre"),
                         ],
                         max_length=2,
-                        verbose_name="Précédent employeur",
+                        verbose_name="précédent employeur",
                     ),
                 ),
                 (
                     "hexa_additional_address",
-                    models.CharField(blank=True, max_length=32, verbose_name="Complément d'adresse"),
+                    models.CharField(blank=True, max_length=32, verbose_name="complément d'adresse"),
                 ),
             ],
             options={
-                "verbose_name": "Profil demandeur d'emploi",
-                "verbose_name_plural": "Profils demandeur d'emploi",
+                "verbose_name": "profil demandeur d'emploi",
+                "verbose_name_plural": "profils demandeur d'emploi",
             },
         ),
     ]

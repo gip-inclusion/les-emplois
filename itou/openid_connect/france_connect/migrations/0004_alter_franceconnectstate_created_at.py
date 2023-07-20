@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
             model_name="franceconnectstate",
             name="created_at",
             field=models.DateTimeField(
-                db_index=True, default=django.utils.timezone.now, verbose_name="Date de création"
+                db_index=True, default=django.utils.timezone.now, verbose_name="date de création"
             ),
         ),
     ]

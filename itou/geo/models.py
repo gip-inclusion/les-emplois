@@ -18,10 +18,10 @@ class QPV(models.Model):
     Last update: 2022
     """
 
-    code = models.CharField(verbose_name="Code", max_length=8)
-    name = models.CharField(verbose_name="Référence", max_length=254)
-    communes_info = models.CharField(verbose_name="Nom des communes du QPV", max_length=254)
-    geometry = gis_models.MultiPolygonField(verbose_name="Contour géométrique du QPV")
+    code = models.CharField(verbose_name="code", max_length=8)
+    name = models.CharField(verbose_name="référence", max_length=254)
+    communes_info = models.CharField(verbose_name="nom des communes du QPV", max_length=254)
+    geometry = gis_models.MultiPolygonField(verbose_name="contour géométrique du QPV")
 
     objects = QPVQuerySet.as_manager()
 
@@ -31,8 +31,8 @@ class QPV(models.Model):
             # add GIS indexes (PG14+) should the need arise
         ]
 
-        verbose_name = "Quartier de la politique de la ville"
-        verbose_name_plural = "Quartiers de la politique de la ville"
+        verbose_name = "quartier de la politique de la ville"
+        verbose_name_plural = "quartiers de la politique de la ville"
 
     def __str__(self) -> str:
         return f"{self.code} - {self.name}"
@@ -84,8 +84,8 @@ class ZRR(models.Model):
     Last update: 2021
     """
 
-    insee_code = models.CharField(verbose_name="Code INSEE de la commune", max_length=5)
-    status = models.CharField(verbose_name="Classement en ZRR", choices=enums.ZRRStatus.choices, max_length=2)
+    insee_code = models.CharField(verbose_name="code INSEE de la commune", max_length=5)
+    status = models.CharField(verbose_name="classement en ZRR", choices=enums.ZRRStatus.choices, max_length=2)
 
     objects = ZRRQuerySet.as_manager()
 
@@ -94,8 +94,8 @@ class ZRR(models.Model):
             models.Index(fields=["insee_code"]),
             models.Index(fields=["status"]),
         )
-        verbose_name = "Classification en Zone de Revitalisation Rurale (ZRR)"
-        verbose_name_plural = "Classifications en Zone de Revitalisation Rurale (ZRR)"
+        verbose_name = "classification en Zone de Revitalisation Rurale (ZRR)"
+        verbose_name_plural = "classifications en Zone de Revitalisation Rurale (ZRR)"
 
     def __str__(self) -> str:
         return f"{self.insee_code} - {self.status}"

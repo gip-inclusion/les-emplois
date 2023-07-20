@@ -23,11 +23,11 @@ class Migration(migrations.Migration):
                 ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 (
                     "created_at",
-                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="Date de création"),
+                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="date de création"),
                 ),
                 (
                     "updated_at",
-                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="Date de modification"),
+                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="date de modification"),
                 ),
                 (
                     "status",
@@ -43,16 +43,16 @@ class Migration(migrations.Migration):
                         ],
                         default="NEW",
                         max_length=10,
-                        verbose_name="Statut",
+                        verbose_name="statut",
                     ),
                 ),
-                ("approval_number", models.CharField(max_length=12, verbose_name="Numéro d'agrément")),
-                ("asp_id", models.PositiveIntegerField(verbose_name="Identifiant ASP de la SIAE")),
+                ("approval_number", models.CharField(max_length=12, verbose_name="numéro d'agrément")),
+                ("asp_id", models.PositiveIntegerField(verbose_name="identifiant ASP de la SIAE")),
                 (
                     "asp_processing_code",
-                    models.CharField(max_length=4, null=True, verbose_name="Code de traitement ASP"),
+                    models.CharField(max_length=4, null=True, verbose_name="code de traitement ASP"),
                 ),
-                ("archived_json", models.JSONField(null=True, verbose_name="Archive JSON de la fiche salarié")),
+                ("archived_json", models.JSONField(null=True, verbose_name="archive JSON de la fiche salarié")),
                 (
                     "job_application",
                     models.ForeignKey(
@@ -60,7 +60,7 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.SET_NULL,
                         related_name="employee_record",
                         to="job_applications.jobapplication",
-                        verbose_name="Candidature / embauche",
+                        verbose_name="candidature / embauche",
                     ),
                 ),
                 (
@@ -69,13 +69,13 @@ class Migration(migrations.Migration):
                         null=True,
                         on_delete=django.db.models.deletion.SET_NULL,
                         to="siaes.siaefinancialannex",
-                        verbose_name="Annexe financière",
+                        verbose_name="annexe financière",
                     ),
                 ),
                 (
                     "asp_batch_line_number",
                     models.IntegerField(
-                        db_index=True, null=True, verbose_name="Ligne correspondante dans le fichier batch ASP"
+                        db_index=True, null=True, verbose_name="ligne correspondante dans le fichier batch ASP"
                     ),
                 ),
                 (
@@ -85,29 +85,29 @@ class Migration(migrations.Migration):
                         max_length=27,
                         null=True,
                         validators=[itou.employee_record.models.validate_asp_batch_filename],
-                        verbose_name="Fichier de batch ASP",
+                        verbose_name="fichier de batch ASP",
                     ),
                 ),
-                ("processed_at", models.DateTimeField(null=True, verbose_name="Date d'intégration")),
+                ("processed_at", models.DateTimeField(null=True, verbose_name="date d'intégration")),
                 (
                     "siret",
                     models.CharField(
                         db_index=True,
                         max_length=14,
                         validators=[itou.utils.validators.validate_siret],
-                        verbose_name="Siret structure mère",
+                        verbose_name="siret structure mère",
                     ),
                 ),
                 (
                     "asp_processing_label",
-                    models.CharField(max_length=200, null=True, verbose_name="Libellé de traitement ASP"),
+                    models.CharField(max_length=200, null=True, verbose_name="libellé de traitement ASP"),
                 ),
-                ("processed_as_duplicate", models.BooleanField(default=False, verbose_name="Déjà intégrée par l'ASP")),
+                ("processed_as_duplicate", models.BooleanField(default=False, verbose_name="déjà intégrée par l'ASP")),
             ],
             options={
                 "ordering": ["-created_at"],
-                "verbose_name": "Fiche salarié",
-                "verbose_name_plural": "Fiches salarié",
+                "verbose_name": "fiche salarié",
+                "verbose_name_plural": "fiches salarié",
                 "unique_together": {("asp_batch_file", "asp_batch_line_number")},
             },
         ),
@@ -117,11 +117,11 @@ class Migration(migrations.Migration):
                 ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 (
                     "created_at",
-                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="Date de création"),
+                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="date de création"),
                 ),
                 (
                     "updated_at",
-                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="Date de modification"),
+                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="date de modification"),
                 ),
                 (
                     "status",
@@ -134,7 +134,7 @@ class Migration(migrations.Migration):
                         ],
                         default="NEW",
                         max_length=10,
-                        verbose_name="Statut",
+                        verbose_name="statut",
                     ),
                 ),
                 (
@@ -145,16 +145,16 @@ class Migration(migrations.Migration):
                             ("JOB_SEEKER", "Modification de l'employé"),
                         ],
                         max_length=20,
-                        verbose_name="Type de notification",
+                        verbose_name="type de notification",
                     ),
                 ),
                 (
                     "asp_processing_code",
-                    models.CharField(max_length=4, null=True, verbose_name="Code de traitement ASP"),
+                    models.CharField(max_length=4, null=True, verbose_name="code de traitement ASP"),
                 ),
                 (
                     "asp_processing_label",
-                    models.CharField(max_length=200, null=True, verbose_name="Libellé de traitement ASP"),
+                    models.CharField(max_length=200, null=True, verbose_name="libellé de traitement ASP"),
                 ),
                 (
                     "asp_batch_file",
@@ -162,12 +162,12 @@ class Migration(migrations.Migration):
                         max_length=27,
                         null=True,
                         validators=[itou.employee_record.models.validate_asp_batch_filename],
-                        verbose_name="Fichier de batch ASP",
+                        verbose_name="fichier de batch ASP",
                     ),
                 ),
                 (
                     "asp_batch_line_number",
-                    models.IntegerField(null=True, verbose_name="Ligne correspondante dans le fichier batch ASP"),
+                    models.IntegerField(null=True, verbose_name="ligne correspondante dans le fichier batch ASP"),
                 ),
                 (
                     "employee_record",
@@ -175,13 +175,13 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="update_notifications",
                         to="employee_record.employeerecord",
-                        verbose_name="Fiche salarié",
+                        verbose_name="fiche salarié",
                     ),
                 ),
             ],
             options={
-                "verbose_name": "Notification de changement de la fiche salarié",
-                "verbose_name_plural": "Notifications de changement de la fiche salarié",
+                "verbose_name": "notification de changement de la fiche salarié",
+                "verbose_name_plural": "notifications de changement de la fiche salarié",
             },
         ),
         migrations.AddConstraint(

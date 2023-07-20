@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
                 primary_key=True,
                 serialize=False,
                 to=settings.AUTH_USER_MODEL,
-                verbose_name="Demandeur d'emploi",
+                verbose_name="demandeur d'emploi",
             ),
         ),
     ]

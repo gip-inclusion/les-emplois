@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
             name="ZRR",
             fields=[
                 ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
-                ("insee_code", models.CharField(max_length=5, verbose_name="Code INSEE de la commune")),
+                ("insee_code", models.CharField(max_length=5, verbose_name="code INSEE de la commune")),
                 (
                     "status",
                     models.CharField(
@@ -23,19 +23,19 @@ class Migration(migrations.Migration):
                             ("PC", "Partiellement classée en ZRR"),
                         ],
                         max_length=2,
-                        verbose_name="Classement en ZRR",
+                        verbose_name="classement en ZRR",
                     ),
                 ),
             ],
             options={
-                "verbose_name": "Classification en Zone de Revitalisation Rurale (ZRR)",
-                "verbose_name_plural": "Classifications en Zone de Revitalisation Rurale (ZRR)",
+                "verbose_name": "classification en Zone de Revitalisation Rurale (ZRR)",
+                "verbose_name_plural": "classifications en Zone de Revitalisation Rurale (ZRR)",
             },
         ),
         migrations.AlterField(
             model_name="qpv",
             name="code",
-            field=models.CharField(max_length=8, verbose_name="Code"),
+            field=models.CharField(max_length=8, verbose_name="code"),
         ),
         migrations.AddIndex(
             model_name="zrr",

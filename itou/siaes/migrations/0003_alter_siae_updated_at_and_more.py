@@ -21,26 +21,26 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="siae",
             name="updated_at",
-            field=models.DateTimeField(auto_now=True, verbose_name="Date de modification"),
+            field=models.DateTimeField(auto_now=True, verbose_name="date de modification"),
         ),
         migrations.AlterField(
             model_name="siaeconvention",
             name="updated_at",
-            field=models.DateTimeField(auto_now=True, verbose_name="Date de modification"),
+            field=models.DateTimeField(auto_now=True, verbose_name="date de modification"),
         ),
         migrations.AlterField(
             model_name="siaefinancialannex",
             name="updated_at",
-            field=models.DateTimeField(auto_now=True, verbose_name="Date de modification"),
+            field=models.DateTimeField(auto_now=True, verbose_name="date de modification"),
         ),
         migrations.AlterField(
             model_name="siaejobdescription",
             name="updated_at",
-            field=models.DateTimeField(auto_now=True, db_index=True, verbose_name="Date de modification"),
+            field=models.DateTimeField(auto_now=True, db_index=True, verbose_name="date de modification"),
         ),
         migrations.AlterField(
             model_name="siaemembership",
             name="updated_at",
-            field=models.DateTimeField(auto_now=True, verbose_name="Date de modification"),
+            field=models.DateTimeField(auto_now=True, verbose_name="date de modification"),
         ),
     ]

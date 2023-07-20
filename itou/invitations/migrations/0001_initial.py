@@ -23,29 +23,29 @@ class Migration(migrations.Migration):
             name="SiaeStaffInvitation",
             fields=[
                 ("id", models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ("email", models.EmailField(max_length=254, verbose_name="E-mail")),
-                ("first_name", models.CharField(max_length=255, verbose_name="Prénom")),
-                ("last_name", models.CharField(max_length=255, verbose_name="Nom")),
-                ("sent", models.BooleanField(default=False, verbose_name="Envoyée")),
-                ("accepted", models.BooleanField(default=False, verbose_name="Acceptée")),
+                ("email", models.EmailField(max_length=254, verbose_name="e-mail")),
+                ("first_name", models.CharField(max_length=255, verbose_name="prénom")),
+                ("last_name", models.CharField(max_length=255, verbose_name="nom")),
+                ("sent", models.BooleanField(default=False, verbose_name="envoyée")),
+                ("accepted", models.BooleanField(default=False, verbose_name="acceptée")),
                 (
                     "accepted_at",
-                    models.DateTimeField(blank=True, db_index=True, null=True, verbose_name="Date d'acceptation"),
+                    models.DateTimeField(blank=True, db_index=True, null=True, verbose_name="date d'acceptation"),
                 ),
                 (
                     "created_at",
                     models.DateTimeField(
-                        db_index=True, default=django.utils.timezone.now, verbose_name="Date de création"
+                        db_index=True, default=django.utils.timezone.now, verbose_name="date de création"
                     ),
                 ),
-                ("sent_at", models.DateTimeField(blank=True, db_index=True, null=True, verbose_name="Date d'envoi")),
+                ("sent_at", models.DateTimeField(blank=True, db_index=True, null=True, verbose_name="date d'envoi")),
                 (
                     "sender",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="siae_invitations",
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="Parrain ou marraine",
+                        verbose_name="parrain ou marraine",
                     ),
                 ),
                 (
@@ -56,30 +56,30 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={
-                "verbose_name": "Invitation employeur",
-                "verbose_name_plural": "Invitations employeurs",
+                "verbose_name": "invitation employeur",
+                "verbose_name_plural": "invitations employeurs",
             },
         ),
         migrations.CreateModel(
             name="PrescriberWithOrgInvitation",
             fields=[
                 ("id", models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ("email", models.EmailField(max_length=254, verbose_name="E-mail")),
-                ("first_name", models.CharField(max_length=255, verbose_name="Prénom")),
-                ("last_name", models.CharField(max_length=255, verbose_name="Nom")),
-                ("sent", models.BooleanField(default=False, verbose_name="Envoyée")),
-                ("accepted", models.BooleanField(default=False, verbose_name="Acceptée")),
+                ("email", models.EmailField(max_length=254, verbose_name="e-mail")),
+                ("first_name", models.CharField(max_length=255, verbose_name="prénom")),
+                ("last_name", models.CharField(max_length=255, verbose_name="nom")),
+                ("sent", models.BooleanField(default=False, verbose_name="envoyée")),
+                ("accepted", models.BooleanField(default=False, verbose_name="acceptée")),
                 (
                     "accepted_at",
-                    models.DateTimeField(blank=True, db_index=True, null=True, verbose_name="Date d'acceptation"),
+                    models.DateTimeField(blank=True, db_index=True, null=True, verbose_name="date d'acceptation"),
                 ),
                 (
                     "created_at",
                     models.DateTimeField(
-                        db_index=True, default=django.utils.timezone.now, verbose_name="Date de création"
+                        db_index=True, default=django.utils.timezone.now, verbose_name="date de création"
                     ),
                 ),
-                ("sent_at", models.DateTimeField(blank=True, db_index=True, null=True, verbose_name="Date d'envoi")),
+                ("sent_at", models.DateTimeField(blank=True, db_index=True, null=True, verbose_name="date d'envoi")),
                 (
                     "organization",
                     models.ForeignKey(
@@ -94,35 +94,35 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="prescriber_org_invitations",
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="Parrain ou marraine",
+                        verbose_name="parrain ou marraine",
                     ),
                 ),
             ],
             options={
-                "verbose_name": "Invitation prescripteurs",
-                "verbose_name_plural": "Invitations prescripteurs",
+                "verbose_name": "invitation prescripteurs",
+                "verbose_name_plural": "invitations prescripteurs",
             },
         ),
         migrations.CreateModel(
             name="LaborInspectorInvitation",
             fields=[
                 ("id", models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ("email", models.EmailField(max_length=254, verbose_name="E-mail")),
-                ("first_name", models.CharField(max_length=255, verbose_name="Prénom")),
-                ("last_name", models.CharField(max_length=255, verbose_name="Nom")),
-                ("sent", models.BooleanField(default=False, verbose_name="Envoyée")),
-                ("accepted", models.BooleanField(default=False, verbose_name="Acceptée")),
+                ("email", models.EmailField(max_length=254, verbose_name="e-mail")),
+                ("first_name", models.CharField(max_length=255, verbose_name="prénom")),
+                ("last_name", models.CharField(max_length=255, verbose_name="nom")),
+                ("sent", models.BooleanField(default=False, verbose_name="envoyée")),
+                ("accepted", models.BooleanField(default=False, verbose_name="acceptée")),
                 (
                     "accepted_at",
-                    models.DateTimeField(blank=True, db_index=True, null=True, verbose_name="Date d'acceptation"),
+                    models.DateTimeField(blank=True, db_index=True, null=True, verbose_name="date d'acceptation"),
                 ),
                 (
                     "created_at",
                     models.DateTimeField(
-                        db_index=True, default=django.utils.timezone.now, verbose_name="Date de création"
+                        db_index=True, default=django.utils.timezone.now, verbose_name="date de création"
                     ),
                 ),
-                ("sent_at", models.DateTimeField(blank=True, db_index=True, null=True, verbose_name="Date d'envoi")),
+                ("sent_at", models.DateTimeField(blank=True, db_index=True, null=True, verbose_name="date d'envoi")),
                 (
                     "institution",
                     models.ForeignKey(
@@ -137,13 +137,13 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="institution_invitations",
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="Parrain ou marraine",
+                        verbose_name="parrain ou marraine",
                     ),
                 ),
             ],
             options={
-                "verbose_name": "Invitation inspecteurs du travail",
-                "verbose_name_plural": "Invitations inspecteurs du travail",
+                "verbose_name": "invitation inspecteurs du travail",
+                "verbose_name_plural": "invitations inspecteurs du travail",
             },
         ),
     ]

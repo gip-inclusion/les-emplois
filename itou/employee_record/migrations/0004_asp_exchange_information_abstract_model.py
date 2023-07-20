@@ -13,8 +13,8 @@ class Migration(migrations.Migration):
             name="employeerecordupdatenotification",
             options={
                 "ordering": ["-created_at"],
-                "verbose_name": "Notification de changement de la fiche salarié",
-                "verbose_name_plural": "Notifications de changement de la fiche salarié",
+                "verbose_name": "notification de changement de la fiche salarié",
+                "verbose_name_plural": "notifications de changement de la fiche salarié",
             },
         ),
         migrations.AlterUniqueTogether(
@@ -24,12 +24,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="employeerecordupdatenotification",
             name="archived_json",
-            field=models.JSONField(blank=True, null=True, verbose_name="Archive JSON de la fiche salarié"),
+            field=models.JSONField(blank=True, null=True, verbose_name="archive JSON de la fiche salarié"),
         ),
         migrations.AlterField(
             model_name="employeerecord",
             name="archived_json",
-            field=models.JSONField(blank=True, null=True, verbose_name="Archive JSON de la fiche salarié"),
+            field=models.JSONField(blank=True, null=True, verbose_name="archive JSON de la fiche salarié"),
         ),
         migrations.AlterField(
             model_name="employeerecord",
@@ -38,13 +38,13 @@ class Migration(migrations.Migration):
                 max_length=27,
                 null=True,
                 validators=[itou.employee_record.models.validate_asp_batch_filename],
-                verbose_name="Fichier de batch ASP",
+                verbose_name="fichier de batch ASP",
             ),
         ),
         migrations.AlterField(
             model_name="employeerecord",
             name="asp_batch_line_number",
-            field=models.IntegerField(null=True, verbose_name="Ligne correspondante dans le fichier batch ASP"),
+            field=models.IntegerField(null=True, verbose_name="ligne correspondante dans le fichier batch ASP"),
         ),
         migrations.AddConstraint(
             model_name="employeerecord",

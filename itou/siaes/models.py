@@ -217,29 +217,29 @@ class Siae(AddressMixin, OrganizationAbstract):
     # The second one is the "SIRET à la signature" which we store as `siae.convention.siret_signature`. By design it
     # almost never changes.
     # Both SIRET numbers are kept up to date by the weekly `import_siae.py` script.
-    siret = models.CharField(verbose_name="Siret", max_length=14, validators=[validate_siret], db_index=True)
-    naf = models.CharField(verbose_name="Naf", max_length=5, validators=[validate_naf], blank=True)
-    kind = models.CharField(verbose_name="Type", max_length=8, choices=SiaeKind.choices, default=SiaeKind.EI)
+    siret = models.CharField(verbose_name="siret", max_length=14, validators=[validate_siret], db_index=True)
+    naf = models.CharField(verbose_name="naf", max_length=5, validators=[validate_naf], blank=True)
+    kind = models.CharField(verbose_name="type", max_length=8, choices=SiaeKind.choices, default=SiaeKind.EI)
     # `brand` (or `enseigne` in French) is used to override `name` if needed.
-    brand = models.CharField(verbose_name="Enseigne", max_length=255, blank=True)
-    phone = models.CharField(verbose_name="Téléphone", max_length=20, blank=True)
-    email = models.EmailField(verbose_name="E-mail", blank=True)
+    brand = models.CharField(verbose_name="enseigne", max_length=255, blank=True)
+    phone = models.CharField(verbose_name="téléphone", max_length=20, blank=True)
+    email = models.EmailField(verbose_name="e-mail", blank=True)
     # All siaes without any existing user require this auth_email
     # for the siae secure signup process to be possible.
     # Comes from external exports (ASP, GEIQ...)
-    auth_email = models.EmailField(verbose_name="E-mail d'authentification", blank=True)
-    website = models.URLField(verbose_name="Site web", blank=True)
-    description = models.TextField(verbose_name="Description", blank=True)
-    provided_support = models.TextField(verbose_name="Type d'accompagnement", blank=True)
+    auth_email = models.EmailField(verbose_name="e-mail d'authentification", blank=True)
+    website = models.URLField(verbose_name="site web", blank=True)
+    description = models.TextField(verbose_name="description", blank=True)
+    provided_support = models.TextField(verbose_name="type d'accompagnement", blank=True)
 
     source = models.CharField(
-        verbose_name="Source de données", max_length=20, choices=SOURCE_CHOICES, default=SOURCE_ASP
+        verbose_name="source de données", max_length=20, choices=SOURCE_CHOICES, default=SOURCE_ASP
     )
 
-    jobs = models.ManyToManyField("jobs.Appellation", verbose_name="Métiers", through="SiaeJobDescription", blank=True)
+    jobs = models.ManyToManyField("jobs.Appellation", verbose_name="métiers", through="SiaeJobDescription", blank=True)
     members = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
-        verbose_name="Membres",
+        verbose_name="membres",
         through="SiaeMembership",
         through_fields=("siae", "user"),
         blank=True,
@@ -247,7 +247,7 @@ class Siae(AddressMixin, OrganizationAbstract):
 
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name="Créé par",
+        verbose_name="créé par",
         related_name="created_siae_set",
         null=True,
         blank=True,
@@ -255,9 +255,9 @@ class Siae(AddressMixin, OrganizationAbstract):
     )
 
     # Ability to block new job applications
-    block_job_applications = models.BooleanField(verbose_name="Blocage des candidatures", default=False)
+    block_job_applications = models.BooleanField(verbose_name="blocage des candidatures", default=False)
     job_applications_blocked_at = models.DateTimeField(
-        verbose_name="Date du dernier blocage de candidatures", blank=True, null=True
+        verbose_name="date du dernier blocage de candidatures", blank=True, null=True
     )
 
     # A convention can only be deleted if it is no longer linked to any siae.
@@ -270,15 +270,14 @@ class Siae(AddressMixin, OrganizationAbstract):
     )
 
     job_app_score = models.FloatField(
-        verbose_name="Score de recommandation (ratio de candidatures récentes vs nombre d'offres d'emploi)", null=True
+        verbose_name="score de recommandation (ratio de candidatures récentes vs nombre d'offres d'emploi)", null=True
     )
 
     objects = SiaeManager()
     unfiltered_objects = SiaeQuerySet.as_manager()
 
     class Meta:
-        verbose_name = "Entreprise"
-        verbose_name_plural = "Entreprises"
+        verbose_name = "entreprise"
         unique_together = ("siret", "kind")
 
     @property
@@ -501,9 +500,9 @@ class SiaeMembership(MembershipAbstract):
         related_name="updated_siaemembership_set",
         null=True,
         on_delete=models.CASCADE,
-        verbose_name="Mis à jour par",
+        verbose_name="mis à jour par",
     )
-    notifications = models.JSONField(verbose_name="Notifications", default=dict, blank=True)
+    notifications = models.JSONField(verbose_name="notifications", default=dict, blank=True)
 
     class Meta:
         unique_together = ("user_id", "siae_id")
@@ -577,50 +576,50 @@ class SiaeJobDescription(models.Model):
 
     appellation = models.ForeignKey("jobs.Appellation", on_delete=models.CASCADE)
     siae = models.ForeignKey(Siae, on_delete=models.CASCADE, related_name="job_description_through")
-    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
-    updated_at = models.DateTimeField(verbose_name="Date de modification", auto_now=True, db_index=True)
-    is_active = models.BooleanField(verbose_name="Recrutement ouvert", default=True)
-    custom_name = models.CharField(verbose_name="Nom personnalisé", blank=True, max_length=255)
-    description = models.TextField(verbose_name="Description", blank=True)
+    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
+    updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True, db_index=True)
+    is_active = models.BooleanField(verbose_name="recrutement ouvert", default=True)
+    custom_name = models.CharField(verbose_name="nom personnalisé", blank=True, max_length=255)
+    description = models.TextField(verbose_name="description", blank=True)
     # is used to order job descriptions in the UI
     ui_rank = models.PositiveSmallIntegerField(default=MAX_UI_RANK)
     contract_type = models.CharField(
-        verbose_name="Type de contrat", choices=ContractType.choices, max_length=30, blank=True
+        verbose_name="type de contrat", choices=ContractType.choices, max_length=30, blank=True
     )
-    other_contract_type = models.CharField(verbose_name="Autre type de contrat", max_length=255, blank=True, null=True)
+    other_contract_type = models.CharField(verbose_name="autre type de contrat", max_length=255, blank=True, null=True)
     contract_nature = models.CharField(
-        verbose_name="Nature du contrat", choices=ContractNature.choices, max_length=64, blank=True, null=True
+        verbose_name="nature du contrat", choices=ContractNature.choices, max_length=64, blank=True, null=True
     )
     location = models.ForeignKey(
         "cities.City",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        verbose_name="Localisation du poste",
+        verbose_name="localisation du poste",
     )
     hours_per_week = models.PositiveSmallIntegerField(
-        verbose_name="Nombre d'heures par semaine",
+        verbose_name="nombre d'heures par semaine",
         blank=True,
         null=True,
         validators=[MaxValueValidator(MAX_WORKED_HOURS_PER_WEEK)],
     )
-    open_positions = models.PositiveSmallIntegerField(verbose_name="Nombre de postes ouverts", blank=True, default=1)
-    profile_description = models.TextField(verbose_name="Profil recherché et pré-requis", blank=True)
+    open_positions = models.PositiveSmallIntegerField(verbose_name="nombre de postes ouverts", blank=True, default=1)
+    profile_description = models.TextField(verbose_name="profil recherché et pré-requis", blank=True)
     is_resume_mandatory = models.BooleanField(verbose_name="CV nécessaire pour la candidature", default=False)
 
-    is_qpv_mandatory = models.BooleanField(verbose_name="Une clause QPV est nécessaire pour ce poste", default=False)
-    market_context_description = models.TextField(verbose_name="Contexte du marché", blank=True)
+    is_qpv_mandatory = models.BooleanField(verbose_name="une clause QPV est nécessaire pour ce poste", default=False)
+    market_context_description = models.TextField(verbose_name="contexte du marché", blank=True)
 
     source_id = models.CharField(verbose_name="ID dans le référentiel source", null=True, blank=True, max_length=255)
     source_kind = models.CharField(
-        verbose_name="Source de la donnée",
+        verbose_name="source de la donnée",
         choices=JobSource.choices,
         max_length=30,
         null=True,
     )
     source_url = models.URLField(verbose_name="URL source de l'offre", max_length=512, null=True, blank=True)
     field_history = models.JSONField(
-        verbose_name="Historique des champs modifiés sur le modèle",
+        verbose_name="historique des champs modifiés sur le modèle",
         null=True,
         encoder=DjangoJSONEncoder,
         default=list,
@@ -629,8 +628,8 @@ class SiaeJobDescription(models.Model):
     objects = SiaeJobDescriptionQuerySet.as_manager()
 
     class Meta:
-        verbose_name = "Fiche de poste"
-        verbose_name_plural = "Fiches de postes"
+        verbose_name = "fiche de poste"
+        verbose_name_plural = "fiches de postes"
         ordering = ["appellation__name", "ui_rank"]
         constraints = [
             UniqueConstraint(
@@ -760,7 +759,7 @@ class SiaeConvention(models.Model):
     DEACTIVATION_GRACE_PERIOD_IN_DAYS = 30
 
     kind = models.CharField(
-        verbose_name="Type",
+        verbose_name="type",
         max_length=4,
         choices=SIAE_WITH_CONVENTION_CHOICES,
         default=SiaeKind.EI.value,
@@ -773,7 +772,7 @@ class SiaeConvention(models.Model):
     # almost never changes.
     # Both SIRET numbers are kept up to date by the weekly `import_siae.py` script.
     siret_signature = models.CharField(
-        verbose_name="Siret à la signature",
+        verbose_name="siret à la signature",
         max_length=14,
         validators=[validate_siret],
         db_index=True,
@@ -789,7 +788,7 @@ class SiaeConvention(models.Model):
     # 1) our staff
     # 2) the `import_siae.py` script
     is_active = models.BooleanField(
-        verbose_name="Active",
+        verbose_name="active",
         default=True,
         help_text=(
             "Précise si la convention est active c.a.d. si elle a au moins une annexe financière valide à ce jour."
@@ -798,7 +797,7 @@ class SiaeConvention(models.Model):
     )
     # Grace period starts from this date.
     deactivated_at = models.DateTimeField(
-        verbose_name="Date de  désactivation et début de délai de grâce",
+        verbose_name="date de  désactivation et début de délai de grâce",
         blank=True,
         null=True,
         db_index=True,
@@ -806,13 +805,13 @@ class SiaeConvention(models.Model):
     # When itou staff manually reactivates an inactive convention, store who did it and when.
     reactivated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name="Réactivée manuellement par",
+        verbose_name="réactivée manuellement par",
         related_name="reactivated_siae_convention_set",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
     )
-    reactivated_at = models.DateTimeField(verbose_name="Date de réactivation manuelle", blank=True, null=True)
+    reactivated_at = models.DateTimeField(verbose_name="date de réactivation manuelle", blank=True, null=True)
 
     # Internal ID of siaes à la ASP. This ID is supposed to never change,
     # so as long as the ASP keeps including this field in all their exports,
@@ -826,12 +825,11 @@ class SiaeConvention(models.Model):
         db_index=True,
     )
 
-    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
-    updated_at = models.DateTimeField(verbose_name="Date de modification", auto_now=True)
+    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
+    updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
 
     class Meta:
-        verbose_name = "Convention"
-        verbose_name_plural = "Conventions"
+        verbose_name = "convention"
         unique_together = (
             ("asp_id", "kind"),
             # Unfortunately the (siret_signature, kind) couple is not unique,
@@ -888,22 +886,22 @@ class SiaeFinancialAnnex(models.Model):
     # - A0, A1, A2… is the "numéro d'avenant".
     # - M0, M1, M2… is the "numéro de modification de l'avenant".
     number = models.CharField(
-        verbose_name="Numéro d'annexe financière",
+        verbose_name="numéro d'annexe financière",
         max_length=17,
         validators=[validate_af_number],
         unique=True,
         db_index=True,
     )
     state = models.CharField(
-        verbose_name="Etat",
+        verbose_name="état",
         max_length=20,
         choices=STATE_CHOICES,
     )
-    start_at = models.DateTimeField(verbose_name="Date de début d'effet")
-    end_at = models.DateTimeField(verbose_name="Date de fin d'effet")
+    start_at = models.DateTimeField(verbose_name="date de début d'effet")
+    end_at = models.DateTimeField(verbose_name="date de fin d'effet")
 
-    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
-    updated_at = models.DateTimeField(verbose_name="Date de modification", auto_now=True)
+    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
+    updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
 
     # A financial annex cannot exist without a convention, and
     # deleting a convention will delete all its financial annexes.
@@ -914,8 +912,8 @@ class SiaeFinancialAnnex(models.Model):
     )
 
     class Meta:
-        verbose_name = "Annexe financière"
-        verbose_name_plural = "Annexes financières"
+        verbose_name = "annexe financière"
+        verbose_name_plural = "annexes financières"
 
     def __str__(self):
         return self.number

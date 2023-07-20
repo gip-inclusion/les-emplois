@@ -124,7 +124,7 @@ class Migration(migrations.Migration):
                 ],
                 db_index=True,
                 max_length=3,
-                verbose_name="Département",
+                verbose_name="département",
             ),
         ),
     ]

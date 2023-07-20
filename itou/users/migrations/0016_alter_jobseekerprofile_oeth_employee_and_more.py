@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             field=models.BooleanField(
                 default=False,
                 help_text="L'obligation d’emploi des travailleurs handicapés",
-                verbose_name="Bénéficiaire de la loi handicap (OETH)",
+                verbose_name="bénéficiaire de la loi handicap (OETH)",
             ),
         ),
         migrations.AlterField(
@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
             field=models.BooleanField(
                 default=False,
                 help_text="Reconnaissance de la qualité de travailleur handicapé",
-                verbose_name="Titulaire de la RQTH",
+                verbose_name="titulaire de la RQTH",
             ),
         ),
     ]

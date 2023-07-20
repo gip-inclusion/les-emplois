@@ -183,34 +183,34 @@ class User(AbstractUser, AddressMixin):
 
     title = models.CharField(
         max_length=3,
-        verbose_name="Civilité",
+        verbose_name="civilité",
         blank=True,
         default="",
         choices=Title.choices,
     )
 
     birthdate = models.DateField(
-        verbose_name="Date de naissance",
+        verbose_name="date de naissance",
         null=True,
         blank=True,
         validators=[validate_birthdate],
     )
     birth_place = models.ForeignKey(
         "asp.Commune",
-        verbose_name="Commune de naissance",
+        verbose_name="commune de naissance",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
     )
     birth_country = models.ForeignKey(
         "asp.Country",
-        verbose_name="Pays de naissance",
+        verbose_name="pays de naissance",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
     )
     email = CIEmailField(
-        "Adresse e-mail",
+        "adresse e-mail",
         blank=True,
         db_index=True,
         # Empty values are stored as NULL if both `null=True` and `unique=True` are set.
@@ -218,9 +218,9 @@ class User(AbstractUser, AddressMixin):
         null=True,
         unique=True,
     )
-    phone = models.CharField(verbose_name="Téléphone", max_length=20, blank=True)
+    phone = models.CharField(verbose_name="téléphone", max_length=20, blank=True)
 
-    kind = models.CharField(max_length=20, verbose_name="Type", choices=UserKind.choices, blank=False)
+    kind = models.CharField(max_length=20, verbose_name="type", choices=UserKind.choices, blank=False)
 
     asp_uid = models.TextField(
         verbose_name="ID unique envoyé à l'ASP",
@@ -240,7 +240,7 @@ class User(AbstractUser, AddressMixin):
     )
 
     lack_of_nir_reason = models.CharField(
-        verbose_name="Pas de NIR ?",
+        verbose_name="pas de NIR ?",
         help_text=mark_safe("Indiquez la raison de l'absence de NIR."),
         max_length=30,
         choices=LackOfNIRReason.choices,
@@ -256,14 +256,14 @@ class User(AbstractUser, AddressMixin):
     # It looks like it pre-dates the national merger and may be unique
     # by user and by region…
     pole_emploi_id = models.CharField(
-        verbose_name="Identifiant Pôle emploi",
+        verbose_name="identifiant Pôle emploi",
         help_text="7 chiffres suivis d'une 1 lettre ou d'un chiffre.",
         max_length=8,
         validators=[validate_pole_emploi_id, MinLengthValidator(8)],
         blank=True,
     )
     lack_of_pole_emploi_id_reason = models.CharField(
-        verbose_name="Pas d'identifiant Pôle emploi ?",
+        verbose_name="pas d'identifiant Pôle emploi ?",
         help_text=mark_safe(
             "Indiquez la raison de l'absence d'identifiant Pôle emploi.<br>"
             "Renseigner l'identifiant Pôle emploi des candidats inscrits "
@@ -275,32 +275,32 @@ class User(AbstractUser, AddressMixin):
         choices=REASON_CHOICES,
         blank=True,
     )
-    resume_link = models.URLField(max_length=500, verbose_name="Lien vers un CV", blank=True)
+    resume_link = models.URLField(max_length=500, verbose_name="lien vers un CV", blank=True)
 
     identity_provider = models.CharField(
         max_length=20,
-        verbose_name="Fournisseur d'identité (SSO)",
+        verbose_name="fournisseur d'identité (SSO)",
         default=IdentityProvider.DJANGO,
         choices=IdentityProvider.choices,
     )
 
-    has_completed_welcoming_tour = models.BooleanField(verbose_name="Parcours de bienvenue effectué", default=False)
+    has_completed_welcoming_tour = models.BooleanField(verbose_name="parcours de bienvenue effectué", default=False)
 
     created_by = models.ForeignKey(
         "self",
-        verbose_name="Créé par",
+        verbose_name="créé par",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
     )
     external_data_source_history = models.JSONField(
-        verbose_name="Information sur la source des champs",
+        verbose_name="information sur la source des champs",
         blank=True,
         null=True,
         encoder=DjangoJSONEncoder,
     )
 
-    last_checked_at = models.DateTimeField(verbose_name="Date de dernière vérification", default=timezone.now)
+    last_checked_at = models.DateTimeField(verbose_name="date de dernière vérification", default=timezone.now)
 
     objects = ItouUserManager()
 
@@ -1045,47 +1045,47 @@ class JobSeekerProfile(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         primary_key=True,
-        verbose_name="Demandeur d'emploi",
+        verbose_name="demandeur d'emploi",
         related_name="jobseeker_profile",
     )
 
     education_level = models.CharField(
         max_length=2,
-        verbose_name="Niveau de formation (ASP)",
+        verbose_name="niveau de formation (ASP)",
         blank=True,
         choices=EducationLevel.choices,
     )
 
-    resourceless = models.BooleanField(verbose_name="Sans ressource", default=False)
+    resourceless = models.BooleanField(verbose_name="sans ressource", default=False)
 
     rqth_employee = models.BooleanField(
-        verbose_name="Titulaire de la RQTH",
+        verbose_name="titulaire de la RQTH",
         help_text="Reconnaissance de la qualité de travailleur handicapé",
         default=False,
     )
     oeth_employee = models.BooleanField(
-        verbose_name="Bénéficiaire de la loi handicap (OETH)",
+        verbose_name="bénéficiaire de la loi handicap (OETH)",
         help_text="L'obligation d’emploi des travailleurs handicapés",
         default=False,
     )
 
     pole_emploi_since = models.CharField(
         max_length=2,
-        verbose_name="Inscrit à Pôle emploi depuis",
+        verbose_name="inscrit à Pôle emploi depuis",
         blank=True,
         choices=AllocationDuration.choices,
     )
 
     unemployed_since = models.CharField(
         max_length=2,
-        verbose_name="Sans emploi depuis",
+        verbose_name="sans emploi depuis",
         blank=True,
         choices=AllocationDuration.choices,
     )
 
     previous_employer_kind = models.CharField(
         max_length=2,
-        verbose_name="Précédent employeur",
+        verbose_name="précédent employeur",
         blank=True,
         choices=EmployerType.choices,
     )
@@ -1095,45 +1095,45 @@ class JobSeekerProfile(models.Model):
     # See asp.models.RSAAllocation for details
     has_rsa_allocation = models.CharField(
         max_length=6,
-        verbose_name="Salarié bénéficiaire du RSA",
+        verbose_name="salarié bénéficiaire du RSA",
         choices=RSAAllocation.choices,
         default=RSAAllocation.NO,
     )
 
     rsa_allocation_since = models.CharField(
         max_length=2,
-        verbose_name="Allocataire du RSA depuis",
+        verbose_name="allocataire du RSA depuis",
         blank=True,
         choices=AllocationDuration.choices,
     )
 
     ass_allocation_since = models.CharField(
         max_length=2,
-        verbose_name="Allocataire de l'ASS depuis",
+        verbose_name="allocataire de l'ASS depuis",
         blank=True,
         choices=AllocationDuration.choices,
     )
 
     aah_allocation_since = models.CharField(
         max_length=2,
-        verbose_name="Allocataire de l'AAH depuis",
+        verbose_name="allocataire de l'AAH depuis",
         blank=True,
         choices=AllocationDuration.choices,
     )
 
     ata_allocation_since = models.CharField(
         max_length=2,
-        verbose_name="Allocataire de l'ATA depuis",
+        verbose_name="allocataire de l'ATA depuis",
         blank=True,
         choices=AllocationDuration.choices,
     )
 
     # Jobseeker address in Hexa format
 
-    hexa_lane_number = models.CharField(max_length=10, verbose_name="Numéro de la voie", blank=True, default="")
+    hexa_lane_number = models.CharField(max_length=10, verbose_name="numéro de la voie", blank=True, default="")
     hexa_std_extension = models.CharField(
         max_length=1,
-        verbose_name="Extension de voie",
+        verbose_name="extension de voie",
         blank=True,
         default="",
         choices=LaneExtension.choices,
@@ -1141,29 +1141,29 @@ class JobSeekerProfile(models.Model):
     # No need to set blank=True, this field is never used with a text choice
     hexa_non_std_extension = models.CharField(
         max_length=10,
-        verbose_name="Extension de voie (non-repertoriée)",
+        verbose_name="extension de voie (non-repertoriée)",
         blank=True,
         default="",
     )
     hexa_lane_type = models.CharField(
         max_length=4,
-        verbose_name="Type de voie",
+        verbose_name="type de voie",
         blank=True,
         choices=LaneType.choices,
     )
-    hexa_lane_name = models.CharField(max_length=120, verbose_name="Nom de la voie", blank=True)
-    hexa_additional_address = models.CharField(max_length=32, verbose_name="Complément d'adresse", blank=True)
-    hexa_post_code = models.CharField(max_length=6, verbose_name="Code postal", blank=True)
+    hexa_lane_name = models.CharField(max_length=120, verbose_name="nom de la voie", blank=True)
+    hexa_additional_address = models.CharField(max_length=32, verbose_name="complément d'adresse", blank=True)
+    hexa_post_code = models.CharField(max_length=6, verbose_name="code postal", blank=True)
     hexa_commune = models.ForeignKey(
         Commune,
-        verbose_name="Commune (ref. ASP)",
+        verbose_name="commune (ref. ASP)",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
     )
 
     pe_obfuscated_nir = models.CharField(
-        verbose_name="Identifiant PE chiffré",
+        verbose_name="identifiant PE chiffré",
         null=True,
         blank=True,
         max_length=48,
@@ -1175,14 +1175,14 @@ class JobSeekerProfile(models.Model):
     )
 
     pe_last_certification_attempt_at = models.DateTimeField(
-        verbose_name="Date de la dernière tentative de certification",
+        verbose_name="date de la dernière tentative de certification",
         null=True,
         help_text="Date à laquelle nous avons tenté pour la dernière fois de certifier ce candidat",
     )
 
     class Meta:
-        verbose_name = "Profil demandeur d'emploi"
-        verbose_name_plural = "Profils demandeur d'emploi"
+        verbose_name = "profil demandeur d'emploi"
+        verbose_name_plural = "profils demandeur d'emploi"
 
     def __str__(self):
         return str(self.user)

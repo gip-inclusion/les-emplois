@@ -36,15 +36,15 @@ class InvitationAbstract(models.Model):
     EXPIRATION_DAYS = 14
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    email = models.EmailField(verbose_name="E-mail")
-    first_name = models.CharField(verbose_name="Prénom", max_length=255)
-    last_name = models.CharField(verbose_name="Nom", max_length=255)
-    sent = models.BooleanField(verbose_name="Envoyée", default=False)
+    email = models.EmailField(verbose_name="e-mail")
+    first_name = models.CharField(verbose_name="prénom", max_length=255)
+    last_name = models.CharField(verbose_name="nom", max_length=255)
+    sent = models.BooleanField(verbose_name="envoyée", default=False)
 
-    accepted = models.BooleanField(verbose_name="Acceptée", default=False)
-    accepted_at = models.DateTimeField(verbose_name="Date d'acceptation", blank=True, null=True, db_index=True)
-    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now, db_index=True)
-    sent_at = models.DateTimeField(verbose_name="Date d'envoi", blank=True, null=True, db_index=True)
+    accepted = models.BooleanField(verbose_name="acceptée", default=False)
+    accepted_at = models.DateTimeField(verbose_name="date d'acceptation", blank=True, null=True, db_index=True)
+    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now, db_index=True)
+    sent_at = models.DateTimeField(verbose_name="date d'envoi", blank=True, null=True, db_index=True)
 
     objects = InvitationQuerySet.as_manager()
 
@@ -135,7 +135,7 @@ class PrescriberWithOrgInvitation(InvitationAbstract):
     USER_KIND = UserKind.PRESCRIBER
     sender = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name="Parrain ou marraine",
+        verbose_name="parrain ou marraine",
         on_delete=models.CASCADE,
         related_name="prescriber_org_invitations",
     )
@@ -144,8 +144,8 @@ class PrescriberWithOrgInvitation(InvitationAbstract):
     )
 
     class Meta:
-        verbose_name = "Invitation prescripteurs"
-        verbose_name_plural = "Invitations prescripteurs"
+        verbose_name = "invitation prescripteurs"
+        verbose_name_plural = "invitations prescripteurs"
 
     @property
     def acceptance_link(self):
@@ -209,15 +209,15 @@ class SiaeStaffInvitation(InvitationAbstract):
     USER_KIND = UserKind.SIAE_STAFF
     sender = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name="Parrain ou marraine",
+        verbose_name="parrain ou marraine",
         on_delete=models.CASCADE,
         related_name="siae_invitations",
     )
     siae = models.ForeignKey("siaes.Siae", on_delete=models.CASCADE, related_name="invitations")
 
     class Meta:
-        verbose_name = "Invitation employeur"
-        verbose_name_plural = "Invitations employeurs"
+        verbose_name = "invitation employeur"
+        verbose_name_plural = "invitations employeurs"
 
     @property
     def acceptance_link(self):
@@ -281,7 +281,7 @@ class LaborInspectorInvitation(InvitationAbstract):
     USER_KIND = UserKind.LABOR_INSPECTOR
     sender = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name="Parrain ou marraine",
+        verbose_name="parrain ou marraine",
         on_delete=models.CASCADE,
         related_name="institution_invitations",
     )
@@ -290,8 +290,8 @@ class LaborInspectorInvitation(InvitationAbstract):
     )
 
     class Meta:
-        verbose_name = "Invitation inspecteurs du travail"
-        verbose_name_plural = "Invitations inspecteurs du travail"
+        verbose_name = "invitation inspecteurs du travail"
+        verbose_name_plural = "invitations inspecteurs du travail"
 
     @property
     def acceptance_link(self):

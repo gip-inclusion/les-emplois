@@ -14,19 +14,19 @@ class Migration(migrations.Migration):
             name="QPV",
             fields=[
                 ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
-                ("code", models.CharField(max_length=254, verbose_name="Code")),
-                ("name", models.CharField(max_length=254, verbose_name="Référence")),
-                ("communes_info", models.CharField(max_length=254, verbose_name="Nom des communes du QPV")),
+                ("code", models.CharField(max_length=254, verbose_name="code")),
+                ("name", models.CharField(max_length=254, verbose_name="référence")),
+                ("communes_info", models.CharField(max_length=254, verbose_name="nom des communes du QPV")),
                 (
                     "geometry",
                     django.contrib.gis.db.models.fields.MultiPolygonField(
-                        srid=4326, verbose_name="Contour géométrique du QPV"
+                        srid=4326, verbose_name="contour géométrique du QPV"
                     ),
                 ),
             ],
             options={
-                "verbose_name": "Quartier de la politique de la ville",
-                "verbose_name_plural": "Quartiers de la politique de la ville",
+                "verbose_name": "quartier de la politique de la ville",
+                "verbose_name_plural": "quartiers de la politique de la ville",
             },
         ),
         migrations.AddIndex(

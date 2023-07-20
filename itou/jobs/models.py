@@ -28,12 +28,12 @@ ROME_DOMAINS = {
 
 class Rome(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
-    code = models.CharField(verbose_name="Code ROME", max_length=5, primary_key=True)
-    name = models.CharField(verbose_name="Nom", max_length=255, db_index=True)
+    code = models.CharField(verbose_name="code ROME", max_length=5, primary_key=True)
+    name = models.CharField(verbose_name="nom", max_length=255, db_index=True)
 
     class Meta:
         verbose_name = "ROME"
-        verbose_name_plural = "ROMEs"
+        verbose_name_plural = "ROME"
 
     def __str__(self):
         return f"{self.name} ({self.code})"
@@ -80,8 +80,8 @@ class Appellation(models.Model):
     """
 
     updated_at = models.DateTimeField(auto_now=True)
-    code = models.CharField(verbose_name="Code", max_length=6, primary_key=True)
-    name = models.CharField(verbose_name="Nom", max_length=255, db_index=True)
+    code = models.CharField(verbose_name="code", max_length=6, primary_key=True)
+    name = models.CharField(verbose_name="nom", max_length=255, db_index=True)
     rome = models.ForeignKey(Rome, on_delete=models.CASCADE, null=True, related_name="appellations")
     # A PostgreSQL trigger (defined in migrations) updates this field automatically.
     full_text = SearchVectorField(null=True)
@@ -89,8 +89,7 @@ class Appellation(models.Model):
     objects = AppellationQuerySet.as_manager()
 
     class Meta:
-        verbose_name = "Appellation"
-        verbose_name_plural = "Appellations"
+        verbose_name = "appellation"
         ordering = ["name"]
         indexes = [GinIndex(fields=["full_text"])]
 

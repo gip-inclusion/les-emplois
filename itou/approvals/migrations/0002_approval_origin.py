@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 ],
                 default="default",
                 max_length=30,
-                verbose_name="Origine du pass",
+                verbose_name="origine du pass",
             ),
         ),
     ]

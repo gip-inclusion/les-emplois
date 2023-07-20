@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "created_at",
-                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="Date de création"),
+                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="date de création"),
                 ),
                 (
                     "source",
@@ -36,22 +36,22 @@ class Migration(migrations.Migration):
                         choices=[("PE_CONNECT", "API PE Connect"), ("UNKNOWN", "Autre")],
                         default="UNKNOWN",
                         max_length=20,
-                        verbose_name="Origine des données",
+                        verbose_name="origine des données",
                     ),
                 ),
-                ("report", models.JSONField(default=dict, verbose_name="Rapport technique")),
+                ("report", models.JSONField(default=dict, verbose_name="rapport technique")),
                 (
                     "user",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="Utilisateur",
+                        verbose_name="utilisateur",
                     ),
                 ),
             ],
             options={
-                "verbose_name": "Import de données externes",
-                "verbose_name_plural": "Imports de données externes",
+                "verbose_name": "import de données externes",
+                "verbose_name_plural": "imports de données externes",
                 "unique_together": {("user", "source")},
             },
         ),
@@ -60,7 +60,7 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "created_at",
-                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="Date de création"),
+                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="date de création"),
                 ),
                 (
                     "user",
@@ -71,13 +71,13 @@ class Migration(migrations.Migration):
                 (
                     "is_pe_jobseeker",
                     models.BooleanField(
-                        null=True, verbose_name="L'utilisateur est inscrit comme demandeur d'emploi PE"
+                        null=True, verbose_name="l'utilisateur est inscrit comme demandeur d'emploi PE"
                     ),
                 ),
                 (
                     "has_minimal_social_allowance",
                     models.BooleanField(
-                        null=True, verbose_name="L'utilisateur dispose d'une prestation de minima sociaux"
+                        null=True, verbose_name="l'utilisateur dispose d'une prestation de minima sociaux"
                     ),
                 ),
                 (
@@ -88,8 +88,8 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={
-                "verbose_name": "Données externes pour un chercheur d'emploi",
-                "verbose_name_plural": "Données externes pour un chercheur d'emploi",
+                "verbose_name": "données externes pour un chercheur d'emploi",
+                "verbose_name_plural": "données externes pour un chercheur d'emploi",
             },
         ),
     ]

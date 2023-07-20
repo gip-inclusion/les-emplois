@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
                 default=list,
                 encoder=django.core.serializers.json.DjangoJSONEncoder,
                 null=True,
-                verbose_name="Historique des champs modifiés sur le modèle",
+                verbose_name="historique des champs modifiés sur le modèle",
             ),
         ),
     ]

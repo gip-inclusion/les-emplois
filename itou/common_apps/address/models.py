@@ -114,22 +114,22 @@ class AddressMixin(models.Model):
 
     DEPARTMENT_CHOICES = DEPARTMENTS.items()
 
-    address_line_1 = models.CharField(verbose_name="Adresse", max_length=255, blank=True)
+    address_line_1 = models.CharField(verbose_name="adresse", max_length=255, blank=True)
     address_line_2 = models.CharField(
-        verbose_name="Complément d'adresse",
+        verbose_name="complément d'adresse",
         max_length=255,
         blank=True,
         help_text="Appartement, suite, bloc, bâtiment, boite postale, etc.",
     )
     post_code = models.CharField(
-        verbose_name="Code Postal",
+        verbose_name="code postal",
         validators=[validate_post_code],
         max_length=5,
         blank=True,
     )
-    city = models.CharField(verbose_name="Ville", max_length=255, blank=True)
+    city = models.CharField(verbose_name="ville", max_length=255, blank=True)
     department = models.CharField(
-        verbose_name="Département",
+        verbose_name="département",
         choices=DEPARTMENT_CHOICES,
         max_length=3,
         blank=True,
@@ -139,14 +139,14 @@ class AddressMixin(models.Model):
     # https://docs.djangoproject.com/en/2.2/ref/contrib/gis/model-api/#pointfield
     coords = gis_models.PointField(geography=True, null=True, blank=True)
     # BAN API score between 0 and 1 indicating the relevance of the geocoding result.
-    geocoding_score = models.FloatField(verbose_name="Score du geocoding", blank=True, null=True)
+    geocoding_score = models.FloatField(verbose_name="score du geocoding", blank=True, null=True)
     geocoding_updated_at = models.DateTimeField(
-        verbose_name="Dernière modification du geocoding",
+        verbose_name="dernière modification du geocoding",
         blank=True,
         null=True,
     )
     ban_api_resolved_address = models.TextField(
-        verbose_name="Libellé d'adresse retourné par le dernier geocoding",
+        verbose_name="libellé d'adresse retourné par le dernier geocoding",
         blank=True,
         null=True,
     )

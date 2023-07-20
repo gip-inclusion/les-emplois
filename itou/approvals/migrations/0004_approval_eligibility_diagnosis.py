@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
                 null=True,
                 on_delete=django.db.models.deletion.SET_NULL,
                 to="eligibility.eligibilitydiagnosis",
-                verbose_name="Diagnostic d'éligibilité",
+                verbose_name="diagnostic d'éligibilité",
             ),
         ),
     ]

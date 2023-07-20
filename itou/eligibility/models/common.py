@@ -33,12 +33,12 @@ class AbstractEligibilityDiagnosisModel(models.Model):
 
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name="Auteur",
+        verbose_name="auteur",
         on_delete=models.CASCADE,
         # removed clashing on former unused related_name `eligibility_diagnoses_made`
     )
     author_kind = models.CharField(
-        verbose_name="Type de l'auteur",
+        verbose_name="type de l'auteur",
         max_length=10,
         choices=AuthorKind.choices,
         default=AuthorKind.PRESCRIBER,
@@ -46,14 +46,14 @@ class AbstractEligibilityDiagnosisModel(models.Model):
     # When the author is a prescriber, keep a track of his current organization.
     author_prescriber_organization = models.ForeignKey(
         "prescribers.PrescriberOrganization",
-        verbose_name="Organisation du prescripteur de l'auteur",
+        verbose_name="organisation du prescripteur de l'auteur",
         null=True,
         blank=True,
         on_delete=models.CASCADE,
     )
-    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now, db_index=True)
-    updated_at = models.DateTimeField(verbose_name="Date de modification", auto_now=True, db_index=True)
-    expires_at = models.DateTimeField(verbose_name="Date d'expiration", db_index=True)
+    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now, db_index=True)
+    updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True, db_index=True)
+    expires_at = models.DateTimeField(verbose_name="date d'expiration", db_index=True)
 
     class Meta:
         abstract = True
@@ -86,26 +86,26 @@ class AbstractAdministrativeCriteria(models.Model):
     MAX_UI_RANK = 32767
 
     level = models.CharField(
-        verbose_name="Niveau",
+        verbose_name="niveau",
         max_length=1,
         choices=AdministrativeCriteriaLevel.choices,
         default=AdministrativeCriteriaLevel.LEVEL_1,
     )
-    name = models.CharField(verbose_name="Nom", max_length=255)
-    desc = models.CharField(verbose_name="Description", max_length=255, blank=True)
-    written_proof = models.CharField(verbose_name="Justificatif", max_length=255, blank=True)
+    name = models.CharField(verbose_name="nom", max_length=255)
+    desc = models.CharField(verbose_name="description", max_length=255, blank=True)
+    written_proof = models.CharField(verbose_name="justificatif", max_length=255, blank=True)
     written_proof_url = models.URLField(
-        verbose_name="Lien d'aide à propos du justificatif", max_length=200, blank=True
+        verbose_name="lien d'aide à propos du justificatif", max_length=200, blank=True
     )
     written_proof_validity = models.CharField(
-        verbose_name="Durée de validité du justificatif", max_length=255, blank=True, default=""
+        verbose_name="durée de validité du justificatif", max_length=255, blank=True, default=""
     )
     # Used to rank criteria in UI. Should be set by level (LEVEL_1: 1, 2, 3… LEVEL_2: 1, 2, 3…).
     # Default value is MAX_UI_RANK so that it's pushed at the end if `ui_rank` is forgotten.
     ui_rank = models.PositiveSmallIntegerField(default=MAX_UI_RANK)
-    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
+    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, verbose_name="Créé par", null=True, blank=True, on_delete=models.SET_NULL
+        settings.AUTH_USER_MODEL, verbose_name="créé par", null=True, blank=True, on_delete=models.SET_NULL
     )
 
     class Meta:

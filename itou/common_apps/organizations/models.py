@@ -28,9 +28,9 @@ class OrganizationAbstract(models.Model):
     Base model for Siae, Prescriber Organization and Institution models.
     """
 
-    name = models.CharField(verbose_name="Nom", max_length=255)
-    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
-    updated_at = models.DateTimeField(verbose_name="Date de modification", auto_now=True)
+    name = models.CharField(verbose_name="nom", max_length=255)
+    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
+    updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
 
     # This unique ID is supposed to used as a globally unique reference and should never be changed,
     # if the organization is supposed to be the same (even in the case of a change of address or SIRET)
@@ -41,7 +41,7 @@ class OrganizationAbstract(models.Model):
     # Child class should have a "members" attribute, for example:
     # members = models.ManyToManyField(
     #     settings.AUTH_USER_MODEL,
-    #     verbose_name="Membres",
+    #     verbose_name="membres",
     #     through="PrescriberMembership",
     #     blank=True,
     #     through_fields=("organization", "user"),
@@ -193,7 +193,7 @@ class MembershipAbstract(models.Model):
         related_name="updated_membershipmodel_set",
         null=True,
         on_delete=models.CASCADE,
-        verbose_name="Mis à jour par",
+        verbose_name="mis à jour par",
     )
 
     class Meta:
@@ -202,11 +202,11 @@ class MembershipAbstract(models.Model):
     """
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    joined_at = models.DateTimeField(verbose_name="Date d'adhésion", default=timezone.now)
-    is_admin = models.BooleanField(verbose_name="Administrateur", default=False)
-    is_active = models.BooleanField("Rattachement actif", default=True)
-    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
-    updated_at = models.DateTimeField(verbose_name="Date de modification", auto_now=True)
+    joined_at = models.DateTimeField(verbose_name="date d'adhésion", default=timezone.now)
+    is_admin = models.BooleanField(verbose_name="administrateur", default=False)
+    is_active = models.BooleanField("rattachement actif", default=True)
+    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
+    updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
 
     objects = MembershipQuerySet.as_manager()
 

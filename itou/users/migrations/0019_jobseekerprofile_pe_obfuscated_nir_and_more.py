@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 ),
                 max_length=48,
                 null=True,
-                verbose_name="Identifiant PE chiffré",
+                verbose_name="identifiant PE chiffré",
             ),
         ),
         migrations.AddField(
@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
             field=models.DateTimeField(
                 help_text="Date à laquelle nous avons tenté pour la dernière fois de certifier ce candidat",
                 null=True,
-                verbose_name="Date de la dernière tentative de certification",
+                verbose_name="date de la dernière tentative de certification",
             ),
         ),
     ]

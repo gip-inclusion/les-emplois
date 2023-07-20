@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
             model_name="jobapplication",
             name="planned_training_hours",
             field=models.PositiveSmallIntegerField(
-                blank=True, null=True, verbose_name="Nombre d'heures de formation prévues"
+                blank=True, null=True, verbose_name="nombre d'heures de formation prévues"
             ),
         ),
     ]

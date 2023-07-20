@@ -19,23 +19,23 @@ class Migration(migrations.Migration):
             name="GEIQAdministrativeCriteria",
             fields=[
                 ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
-                ("name", models.CharField(max_length=255, verbose_name="Nom")),
-                ("desc", models.CharField(blank=True, max_length=255, verbose_name="Description")),
-                ("written_proof", models.CharField(blank=True, max_length=255, verbose_name="Justificatif")),
+                ("name", models.CharField(max_length=255, verbose_name="nom")),
+                ("desc", models.CharField(blank=True, max_length=255, verbose_name="description")),
+                ("written_proof", models.CharField(blank=True, max_length=255, verbose_name="justificatif")),
                 (
                     "written_proof_url",
-                    models.URLField(blank=True, verbose_name="Lien d'aide à propos du justificatif"),
+                    models.URLField(blank=True, verbose_name="lien d'aide à propos du justificatif"),
                 ),
                 (
                     "written_proof_validity",
                     models.CharField(
-                        blank=True, default="", max_length=255, verbose_name="Durée de validité du justificatif"
+                        blank=True, default="", max_length=255, verbose_name="durée de validité du justificatif"
                     ),
                 ),
                 ("ui_rank", models.PositiveSmallIntegerField(default=32767)),
                 (
                     "created_at",
-                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="Date de création"),
+                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="date de création"),
                 ),
                 (
                     "annex",
@@ -43,7 +43,7 @@ class Migration(migrations.Migration):
                         choices=[("1", "Annexe 1"), ("2", "Annexe 2")],
                         default="1",
                         max_length=1,
-                        verbose_name="Annexe",
+                        verbose_name="annexe",
                     ),
                 ),
                 (
@@ -53,7 +53,7 @@ class Migration(migrations.Migration):
                         choices=[("1", "Niveau 1"), ("2", "Niveau 2")],
                         max_length=1,
                         null=True,
-                        verbose_name="Niveau",
+                        verbose_name="niveau",
                     ),
                 ),
                 (
@@ -63,7 +63,7 @@ class Migration(migrations.Migration):
                         null=True,
                         on_delete=django.db.models.deletion.SET_NULL,
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="Créé par",
+                        verbose_name="créé par",
                     ),
                 ),
                 (
@@ -73,13 +73,13 @@ class Migration(migrations.Migration):
                         null=True,
                         on_delete=django.db.models.deletion.SET_NULL,
                         to="eligibility.geiqadministrativecriteria",
-                        verbose_name="Critère parent",
+                        verbose_name="critère parent",
                     ),
                 ),
             ],
             options={
-                "verbose_name": "Critère administratif GEIQ",
-                "verbose_name_plural": "Critères administratifs GEIQ",
+                "verbose_name": "critère administratif GEIQ",
+                "verbose_name_plural": "critères administratifs GEIQ",
                 "ordering": [models.OrderBy(models.F("level"), nulls_last=True), "ui_rank"],
             },
         ),
@@ -93,54 +93,54 @@ class Migration(migrations.Migration):
                         choices=[("prescriber", "Prescripteur"), ("siae_staff", "Employeur (SIAE)"), ("geiq", "GEIQ")],
                         default="prescriber",
                         max_length=10,
-                        verbose_name="Type de l'auteur",
+                        verbose_name="type de l'auteur",
                     ),
                 ),
                 (
                     "created_at",
                     models.DateTimeField(
-                        db_index=True, default=django.utils.timezone.now, verbose_name="Date de création"
+                        db_index=True, default=django.utils.timezone.now, verbose_name="date de création"
                     ),
                 ),
                 (
                     "updated_at",
-                    models.DateTimeField(blank=True, db_index=True, null=True, verbose_name="Date de modification"),
+                    models.DateTimeField(blank=True, db_index=True, null=True, verbose_name="date de modification"),
                 ),
-                ("expires_at", models.DateTimeField(db_index=True, verbose_name="Date d'expiration")),
+                ("expires_at", models.DateTimeField(db_index=True, verbose_name="date d'expiration")),
             ],
             options={
-                "verbose_name": "Diagnostic d'éligibilité GEIQ",
-                "verbose_name_plural": "Diagnostics d'éligibilité GEIQ",
+                "verbose_name": "diagnostic d'éligibilité GEIQ",
+                "verbose_name_plural": "diagnostics d'éligibilité GEIQ",
             },
         ),
         migrations.AlterModelOptions(
             name="administrativecriteria",
             options={
                 "ordering": ["level", "ui_rank"],
-                "verbose_name": "Critère administratif IAE",
-                "verbose_name_plural": "Critères administratifs IAE",
+                "verbose_name": "critère administratif IAE",
+                "verbose_name_plural": "critères administratifs IAE",
             },
         ),
         migrations.AlterModelOptions(
             name="eligibilitydiagnosis",
             options={
                 "ordering": ["-created_at"],
-                "verbose_name": "Diagnostic d'éligibilité IAE",
-                "verbose_name_plural": "Diagnostics d'éligibilité IAE",
+                "verbose_name": "diagnostic d'éligibilité IAE",
+                "verbose_name_plural": "diagnostics d'éligibilité IAE",
             },
         ),
         migrations.AlterModelOptions(
             name="selectedadministrativecriteria",
             options={
-                "verbose_name": "Critère administratif IAE sélectionné",
-                "verbose_name_plural": "Critères administratifs IAE sélectionnés",
+                "verbose_name": "critère administratif IAE sélectionné",
+                "verbose_name_plural": "critères administratifs IAE sélectionnés",
             },
         ),
         migrations.AlterField(
             model_name="eligibilitydiagnosis",
             name="author",
             field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL, verbose_name="Auteur"
+                on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL, verbose_name="auteur"
             ),
         ),
         migrations.AlterField(
@@ -150,7 +150,7 @@ class Migration(migrations.Migration):
                 choices=[("prescriber", "Prescripteur"), ("siae_staff", "Employeur (SIAE)"), ("geiq", "GEIQ")],
                 default="prescriber",
                 max_length=10,
-                verbose_name="Type de l'auteur",
+                verbose_name="type de l'auteur",
             ),
         ),
         migrations.CreateModel(
@@ -159,7 +159,7 @@ class Migration(migrations.Migration):
                 ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 (
                     "created_at",
-                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="Date de création"),
+                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="date de création"),
                 ),
                 (
                     "administrative_criteria",
@@ -177,8 +177,8 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={
-                "verbose_name": "Critère administratif GEIQ sélectionné",
-                "verbose_name_plural": "Critères administratifs GEIQ sélectionnés",
+                "verbose_name": "critère administratif GEIQ sélectionné",
+                "verbose_name_plural": "critères administratifs GEIQ sélectionnés",
                 "unique_together": {("eligibility_diagnosis", "administrative_criteria")},
             },
         ),
@@ -189,14 +189,14 @@ class Migration(migrations.Migration):
                 blank=True,
                 through="eligibility.GEIQSelectedAdministrativeCriteria",
                 to="eligibility.geiqadministrativecriteria",
-                verbose_name="Critères administratifs GEIQ",
+                verbose_name="critères administratifs GEIQ",
             ),
         ),
         migrations.AddField(
             model_name="geiqeligibilitydiagnosis",
             name="author",
             field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL, verbose_name="Auteur"
+                on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL, verbose_name="auteur"
             ),
         ),
         migrations.AddField(
@@ -220,7 +220,7 @@ class Migration(migrations.Migration):
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
                 to="prescribers.prescriberorganization",
-                verbose_name="Organisation du prescripteur de l'auteur",
+                verbose_name="organisation du prescripteur de l'auteur",
             ),
         ),
         migrations.AddField(
@@ -230,7 +230,7 @@ class Migration(migrations.Migration):
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name="geiq_eligibility_diagnoses",
                 to=settings.AUTH_USER_MODEL,
-                verbose_name="Demandeur d'emploi",
+                verbose_name="demandeur d'emploi",
             ),
         ),
         migrations.AddConstraint(

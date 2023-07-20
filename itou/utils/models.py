@@ -52,10 +52,10 @@ class Upper(Transform):
 
 class AbstractSupportRemark(models.Model):
     class Meta:
-        verbose_name = "Commentaire du support"
+        verbose_name = "commentaire du support"
         abstract = True
 
-    remark = models.TextField(verbose_name="Commentaire", blank=True)
+    remark = models.TextField(verbose_name="commentaire", blank=True)
 
     # Attachment to different model types
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)

@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             fields=[
                 ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 ("dashboard_id", models.IntegerField(verbose_name="ID tableau de bord Metabase")),
-                ("dashboard_name", models.TextField(verbose_name="Nom de la vue du tableau de bord")),
+                ("dashboard_name", models.TextField(verbose_name="nom de la vue du tableau de bord")),
                 (
                     "department",
                     models.CharField(
@@ -130,10 +130,10 @@ class Migration(migrations.Migration):
                         ],
                         max_length=3,
                         null=True,
-                        verbose_name="Département",
+                        verbose_name="département",
                     ),
                 ),
-                ("region", models.TextField(null=True, verbose_name="Région")),
+                ("region", models.TextField(null=True, verbose_name="région")),
                 ("current_siae_id", models.IntegerField(null=True, verbose_name="ID SIAE courante")),
                 (
                     "current_prescriber_organization_id",
@@ -150,14 +150,14 @@ class Migration(migrations.Migration):
                             ("labor_inspector", "inspecteur du travail"),
                             ("itou_staff", "administrateur"),
                         ],
-                        verbose_name="Type d'utilisateur",
+                        verbose_name="type d'utilisateur",
                     ),
                 ),
                 ("user_id", models.IntegerField(verbose_name="ID utilisateur")),
                 ("measured_at", models.DateTimeField(default=django.utils.timezone.now)),
             ],
             options={
-                "verbose_name_plural": "Visite de tableau de bord",
+                "verbose_name_plural": "visite de tableau de bord",
             },
         ),
     ]

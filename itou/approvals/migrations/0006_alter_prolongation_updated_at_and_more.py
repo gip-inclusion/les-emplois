@@ -15,11 +15,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="prolongation",
             name="updated_at",
-            field=models.DateTimeField(auto_now=True, verbose_name="Date de modification"),
+            field=models.DateTimeField(auto_now=True, verbose_name="date de modification"),
         ),
         migrations.AlterField(
             model_name="suspension",
             name="updated_at",
-            field=models.DateTimeField(auto_now=True, null=True, verbose_name="Date de modification"),
+            field=models.DateTimeField(auto_now=True, null=True, verbose_name="date de modification"),
         ),
     ]

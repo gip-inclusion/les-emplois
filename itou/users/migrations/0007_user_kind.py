@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
                 ],
                 max_length=20,
                 null=True,
-                verbose_name="Type d'utilisateur",
+                verbose_name="type d'utilisateur",
             ),
         ),
     ]

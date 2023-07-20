@@ -205,8 +205,8 @@ class AbstractPeriod(models.Model):
     => Use 'old' when you have to deal with history or previous version of a record
     """
 
-    start_date = models.DateField(verbose_name="Début de validité")
-    end_date = models.DateField(verbose_name="Fin de validité", null=True, blank=True)
+    start_date = models.DateField(verbose_name="début de validité")
+    end_date = models.DateField(verbose_name="fin de validité", null=True, blank=True)
 
     objects = PeriodQuerySet.as_manager()
 
@@ -377,13 +377,13 @@ class Commune(PrettyPrintMixin, AbstractPeriod):
     reference file is currently not up-to-date (2018)
     """
 
-    code = models.CharField(max_length=5, verbose_name="Code commune INSEE", db_index=True)
-    name = models.CharField(max_length=50, verbose_name="Nom de la commune")
+    code = models.CharField(max_length=5, verbose_name="code commune INSEE", db_index=True)
+    name = models.CharField(max_length=50, verbose_name="nom de la commune")
 
-    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
+    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name="Créé par",
+        verbose_name="créé par",
         null=True,
         on_delete=models.SET_NULL,
     )
@@ -391,7 +391,7 @@ class Commune(PrettyPrintMixin, AbstractPeriod):
     objects = CommuneQuerySet.as_manager()
 
     class Meta:
-        verbose_name = "Commune"
+        verbose_name = "commune"
         indexes = [GinIndex(fields=["name"], name="aps_communes_name_gin_trgm", opclasses=["gin_trgm_ops"])]
 
     @staticmethod
@@ -441,11 +441,11 @@ class Department(PrettyPrintMixin, AbstractPeriod):
     Imported from ASP reference file: ref_insee_dpt_v2.csv
     """
 
-    code = models.CharField(max_length=3, verbose_name="Code département INSEE")
-    name = models.CharField(max_length=50, verbose_name="Nom du département")
+    code = models.CharField(max_length=3, verbose_name="code département INSEE")
+    name = models.CharField(max_length=50, verbose_name="nom du département")
 
     class Meta:
-        verbose_name = "Département"
+        verbose_name = "département"
 
 
 class CountryQuerySet(models.QuerySet):
@@ -478,16 +478,16 @@ class Country(PrettyPrintMixin, models.Model):
 
     objects = CountryQuerySet.as_manager()
 
-    code = models.CharField(max_length=3, verbose_name="Code pays INSEE")
-    name = models.CharField(max_length=50, verbose_name="Nom du pays")
-    group = models.CharField(max_length=15, verbose_name="Groupe", choices=Group.choices)
+    code = models.CharField(max_length=3, verbose_name="code pays INSEE")
+    name = models.CharField(max_length=50, verbose_name="nom du pays")
+    group = models.CharField(max_length=15, verbose_name="groupe", choices=Group.choices)
 
     # For compatibility, no usage yet
-    department = models.CharField(max_length=3, verbose_name="Code département", default="098")
+    department = models.CharField(max_length=3, verbose_name="code département", default="098")
 
     class Meta:
-        verbose_name = "Pays"
-        verbose_name_plural = "Pays"
+        verbose_name = "pays"
+        verbose_name_plural = "pays"
         ordering = ["name"]
 
     @property

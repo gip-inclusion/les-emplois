@@ -12,6 +12,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="user",
             name="last_checked_at",
-            field=models.DateTimeField(null=True, verbose_name="Date de dernière actualisation"),
+            field=models.DateTimeField(null=True, verbose_name="date de dernière actualisation"),
         ),
     ]

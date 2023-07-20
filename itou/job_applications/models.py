@@ -458,7 +458,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     job_seeker = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name="Demandeur d'emploi",
+        verbose_name="demandeur d'emploi",
         on_delete=models.CASCADE,
         related_name="job_applications",
     )
@@ -470,7 +470,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     # Use `self.get_eligibility_diagnosis()` to handle business rules.
     eligibility_diagnosis = models.ForeignKey(
         "eligibility.EligibilityDiagnosis",
-        verbose_name="Diagnostic d'éligibilité",
+        verbose_name="diagnostic d'éligibilité",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -478,7 +478,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     geiq_eligibility_diagnosis = models.ForeignKey(
         "eligibility.GEIQEligibilityDiagnosis",
-        verbose_name="Diagnostic d'éligibilité GEIQ",
+        verbose_name="diagnostic d'éligibilité GEIQ",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -487,15 +487,15 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     # Exclude flagged approvals (batch creation or import of approvals).
     # See itou.users.management.commands.import_ai_employees.
-    create_employee_record = models.BooleanField(default=True, verbose_name="Création d'une fiche salarié")
+    create_employee_record = models.BooleanField(default=True, verbose_name="création d'une fiche salarié")
 
     # The job seeker's resume used for this job application.
-    resume_link = models.URLField(max_length=500, verbose_name="Lien vers un CV", blank=True)
+    resume_link = models.URLField(max_length=500, verbose_name="lien vers un CV", blank=True)
 
     # Who send the job application. It can be the same user as `job_seeker`
     sender = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name="Émetteur",
+        verbose_name="émetteur",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -503,7 +503,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     )
 
     sender_kind = models.CharField(
-        verbose_name="Type de l'émetteur",
+        verbose_name="type de l'émetteur",
         max_length=10,
         choices=SenderKind.choices,
         default=SenderKind.PRESCRIBER,
@@ -517,7 +517,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     # When the sender is a prescriber, keep a track of his current organization (if any).
     sender_prescriber_organization = models.ForeignKey(
         "prescribers.PrescriberOrganization",
-        verbose_name="Organisation du prescripteur émettrice",
+        verbose_name="organisation du prescripteur émettrice",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -530,27 +530,27 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         related_name="job_applications_received",
     )
 
-    state = xwf_models.StateField(JobApplicationWorkflow, verbose_name="État", db_index=True)
+    state = xwf_models.StateField(JobApplicationWorkflow, verbose_name="état", db_index=True)
 
     # Jobs in which the job seeker is interested (optional).
-    selected_jobs = models.ManyToManyField("siaes.SiaeJobDescription", verbose_name="Métiers recherchés", blank=True)
+    selected_jobs = models.ManyToManyField("siaes.SiaeJobDescription", verbose_name="métiers recherchés", blank=True)
 
-    message = models.TextField(verbose_name="Message de candidature", blank=True)
-    answer = models.TextField(verbose_name="Message de réponse", blank=True)
-    answer_to_prescriber = models.TextField(verbose_name="Message de réponse au prescripteur", blank=True)
+    message = models.TextField(verbose_name="message de candidature", blank=True)
+    answer = models.TextField(verbose_name="message de réponse", blank=True)
+    answer_to_prescriber = models.TextField(verbose_name="message de réponse au prescripteur", blank=True)
     refusal_reason = models.CharField(
-        verbose_name="Motifs de refus", max_length=30, choices=RefusalReason.choices, blank=True
+        verbose_name="motifs de refus", max_length=30, choices=RefusalReason.choices, blank=True
     )
 
-    hiring_start_at = models.DateField(verbose_name="Date de début du contrat", blank=True, null=True, db_index=True)
-    hiring_end_at = models.DateField(verbose_name="Date prévisionnelle de fin du contrat", blank=True, null=True)
+    hiring_start_at = models.DateField(verbose_name="date de début du contrat", blank=True, null=True, db_index=True)
+    hiring_end_at = models.DateField(verbose_name="date prévisionnelle de fin du contrat", blank=True, null=True)
 
     hiring_without_approval = models.BooleanField(
-        default=False, verbose_name="L'entreprise choisit de ne pas obtenir un PASS IAE à l'embauche"
+        default=False, verbose_name="l'entreprise choisit de ne pas obtenir un PASS IAE à l'embauche"
     )
 
     origin = models.CharField(
-        verbose_name="Origine de la candidature", max_length=30, choices=Origin.choices, default=Origin.DEFAULT
+        verbose_name="origine de la candidature", max_length=30, choices=Origin.choices, default=Origin.DEFAULT
     )
 
     # Job applications sent to SIAEs subject to eligibility rules can obtain an
@@ -559,7 +559,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         "approvals.Approval", verbose_name="PASS IAE", null=True, blank=True, on_delete=models.SET_NULL
     )
     approval_delivery_mode = models.CharField(
-        verbose_name="Mode d'attribution du PASS IAE",
+        verbose_name="mode d'attribution du PASS IAE",
         max_length=30,
         choices=APPROVAL_DELIVERY_MODE_CHOICES,
         blank=True,
@@ -567,7 +567,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     # Fields used for approvals processed both manually or automatically.
     approval_number_sent_by_email = models.BooleanField(verbose_name="PASS IAE envoyé par email", default=False)
     approval_number_sent_at = models.DateTimeField(
-        verbose_name="Date d'envoi du PASS IAE", blank=True, null=True, db_index=True
+        verbose_name="date d'envoi du PASS IAE", blank=True, null=True, db_index=True
     )
     # Fields used only for manual processing.
     approval_manually_delivered_by = models.ForeignKey(
@@ -587,14 +587,14 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         related_name="approval_manually_refused",
     )
     approval_manually_refused_at = models.DateTimeField(
-        verbose_name="Date de refus manuel du PASS IAE", blank=True, null=True
+        verbose_name="date de refus manuel du PASS IAE", blank=True, null=True
     )
 
-    hidden_for_siae = models.BooleanField(default=False, verbose_name="Masqué coté employeur")
+    hidden_for_siae = models.BooleanField(default=False, verbose_name="masqué coté employeur")
 
-    transferred_at = models.DateTimeField(verbose_name="Date de transfert", null=True, blank=True)
+    transferred_at = models.DateTimeField(verbose_name="date de transfert", null=True, blank=True)
     transferred_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, verbose_name="Transférée par", null=True, blank=True, on_delete=models.SET_NULL
+        settings.AUTH_USER_MODEL, verbose_name="transférée par", null=True, blank=True, on_delete=models.SET_NULL
     )
     transferred_from = models.ForeignKey(
         "siaes.Siae",
@@ -605,24 +605,24 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         related_name="job_application_transferred",
     )
 
-    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now, db_index=True)
+    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now, db_index=True)
     # FIXME(rsebille): Remove the null=True. But beware, it will force PG to rewrite almost all the rows.
-    updated_at = models.DateTimeField(verbose_name="Date de modification", auto_now=True, db_index=True, null=True)
+    updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True, db_index=True, null=True)
 
     # GEIQ only
     prehiring_guidance_days = models.PositiveSmallIntegerField(
-        verbose_name="Nombre de jours d’accompagnement avant contrat",
+        verbose_name="nombre de jours d’accompagnement avant contrat",
         blank=True,
         null=True,
     )
     contract_type = models.CharField(
-        verbose_name="Type de contrat",
+        verbose_name="type de contrat",
         max_length=30,
         choices=ContractType.choices_for_siae_kind(SiaeKind.GEIQ),
         blank=True,
     )
     nb_hours_per_week = models.PositiveSmallIntegerField(
-        verbose_name="Nombre d'heures par semaine",
+        verbose_name="nombre d'heures par semaine",
         blank=True,
         null=True,
         validators=[
@@ -630,29 +630,29 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             MaxValueValidator(GEIQ_MAX_HOURS_PER_WEEK),
         ],
     )
-    contract_type_details = models.TextField(verbose_name="Précisions sur le type de contrat", blank=True)
+    contract_type_details = models.TextField(verbose_name="précisions sur le type de contrat", blank=True)
 
     qualification_type = models.CharField(
-        verbose_name="Type de qualification",
+        verbose_name="type de qualification",
         max_length=20,
         choices=QualificationType.choices,
         blank=True,
     )
     qualification_level = models.CharField(
-        verbose_name="Niveau de qualification",
+        verbose_name="niveau de qualification",
         max_length=40,
         choices=QualificationLevel.choices,
         blank=True,
     )
 
     planned_training_hours = models.PositiveSmallIntegerField(
-        verbose_name="Nombre d'heures de formation prévues",
+        verbose_name="nombre d'heures de formation prévues",
         blank=True,
         null=True,
     )
 
     inverted_vae_contract = models.BooleanField(
-        verbose_name="Contrat associé à une VAE inversée",
+        verbose_name="contrat associé à une VAE inversée",
         blank=True,
         null=True,
     )
@@ -660,8 +660,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     objects = JobApplicationQuerySet.as_manager()
 
     class Meta:
-        verbose_name = "Candidature"
-        verbose_name_plural = "Candidatures"
+        verbose_name = "candidature"
         ordering = ["-created_at"]
         constraints = [
             models.CheckConstraint(
@@ -1209,8 +1208,8 @@ class JobApplicationTransitionLog(xwf_models.BaseTransitionLog):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL)
 
     class Meta:
-        verbose_name = "Log des transitions de la candidature"
-        verbose_name_plural = "Log des transitions des candidatures"
+        verbose_name = "log des transitions de la candidature"
+        verbose_name_plural = "log des transitions des candidatures"
         ordering = ["-timestamp"]
 
     def __str__(self):
@@ -1225,13 +1224,13 @@ class JobApplicationTransitionLog(xwf_models.BaseTransitionLog):
 class PriorAction(models.Model):
     job_application = models.ForeignKey(JobApplication, related_name="prior_actions", on_delete=models.CASCADE)
     action = models.TextField(
-        verbose_name="Action",
+        verbose_name="action",
         choices=[
             ("Mise en situation professionnelle", ProfessionalSituationExperience.choices),
             ("Pré-qualification", Prequalification.choices),
         ],
     )
-    dates = InclusiveDateRangeField(verbose_name="Dates")
+    dates = InclusiveDateRangeField(verbose_name="dates")
 
     @property
     def action_kind(self):

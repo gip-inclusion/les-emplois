@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
                     django_xworkflows.models.StateField(
                         db_index=True,
                         max_length=16,
-                        verbose_name="État",
+                        verbose_name="état",
                         workflow=django_xworkflows.models._SerializedWorkflow(
                             initial_state="new",
                             name="JobApplicationWorkflow",
@@ -38,17 +38,17 @@ class Migration(migrations.Migration):
                         ),
                     ),
                 ),
-                ("message", models.TextField(blank=True, verbose_name="Message de candidature")),
-                ("answer", models.TextField(blank=True, verbose_name="Message de réponse")),
+                ("message", models.TextField(blank=True, verbose_name="message de candidature")),
+                ("answer", models.TextField(blank=True, verbose_name="message de réponse")),
                 (
                     "created_at",
                     models.DateTimeField(
-                        db_index=True, default=django.utils.timezone.now, verbose_name="Date de création"
+                        db_index=True, default=django.utils.timezone.now, verbose_name="date de création"
                     ),
                 ),
                 (
                     "updated_at",
-                    models.DateTimeField(blank=True, db_index=True, null=True, verbose_name="Date de modification"),
+                    models.DateTimeField(blank=True, db_index=True, null=True, verbose_name="date de modification"),
                 ),
                 (
                     "job_seeker",
@@ -56,7 +56,7 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="job_applications",
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="Demandeur d'emploi",
+                        verbose_name="demandeur d'emploi",
                     ),
                 ),
                 (
@@ -67,7 +67,7 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.SET_NULL,
                         related_name="job_applications_sent",
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="Émetteur",
+                        verbose_name="émetteur",
                     ),
                 ),
                 (
@@ -80,7 +80,7 @@ class Migration(migrations.Migration):
                         ],
                         default="prescriber",
                         max_length=10,
-                        verbose_name="Type de l'émetteur",
+                        verbose_name="type de l'émetteur",
                     ),
                 ),
                 (
@@ -90,7 +90,7 @@ class Migration(migrations.Migration):
                         null=True,
                         on_delete=django.db.models.deletion.SET_NULL,
                         to="prescribers.prescriberorganization",
-                        verbose_name="Organisation du prescripteur émettrice",
+                        verbose_name="organisation du prescripteur émettrice",
                     ),
                 ),
                 (
@@ -147,22 +147,22 @@ class Migration(migrations.Migration):
                             ("poorly_informed", "Candidature pas assez renseignée"),
                         ],
                         max_length=30,
-                        verbose_name="Motifs de refus",
+                        verbose_name="motifs de refus",
                     ),
                 ),
                 (
                     "hiring_start_at",
-                    models.DateField(blank=True, db_index=True, null=True, verbose_name="Date de début du contrat"),
+                    models.DateField(blank=True, db_index=True, null=True, verbose_name="date de début du contrat"),
                 ),
                 (
                     "selected_jobs",
                     models.ManyToManyField(
-                        blank=True, to="siaes.siaejobdescription", verbose_name="Métiers recherchés"
+                        blank=True, to="siaes.siaejobdescription", verbose_name="métiers recherchés"
                     ),
                 ),
                 (
                     "hiring_end_at",
-                    models.DateField(blank=True, null=True, verbose_name="Date prévisionnelle de fin du contrat"),
+                    models.DateField(blank=True, null=True, verbose_name="date prévisionnelle de fin du contrat"),
                 ),
                 (
                     "approval",
@@ -184,13 +184,13 @@ class Migration(migrations.Migration):
                         blank=True,
                         choices=[("automatic", "Automatique"), ("manual", "Manuel")],
                         max_length=30,
-                        verbose_name="Mode d'attribution du PASS IAE",
+                        verbose_name="mode d'attribution du PASS IAE",
                     ),
                 ),
                 (
                     "approval_number_sent_at",
                     models.DateTimeField(
-                        blank=True, db_index=True, null=True, verbose_name="Date d'envoi du PASS IAE"
+                        blank=True, db_index=True, null=True, verbose_name="date d'envoi du PASS IAE"
                     ),
                 ),
                 (
@@ -207,12 +207,12 @@ class Migration(migrations.Migration):
                 (
                     "hiring_without_approval",
                     models.BooleanField(
-                        default=False, verbose_name="L'entreprise choisit de ne pas obtenir un PASS IAE à l'embauche"
+                        default=False, verbose_name="l'entreprise choisit de ne pas obtenir un PASS IAE à l'embauche"
                     ),
                 ),
                 (
                     "approval_manually_refused_at",
-                    models.DateTimeField(blank=True, null=True, verbose_name="Date de refus manuel du PASS IAE"),
+                    models.DateTimeField(blank=True, null=True, verbose_name="date de refus manuel du PASS IAE"),
                 ),
                 (
                     "approval_manually_refused_by",
@@ -225,12 +225,12 @@ class Migration(migrations.Migration):
                         verbose_name="PASS IAE refusé manuellement par",
                     ),
                 ),
-                ("hidden_for_siae", models.BooleanField(default=False, verbose_name="Masqué coté employeur")),
-                ("resume_link", models.URLField(blank=True, max_length=500, verbose_name="Lien vers un CV")),
+                ("hidden_for_siae", models.BooleanField(default=False, verbose_name="masqué coté employeur")),
+                ("resume_link", models.URLField(blank=True, max_length=500, verbose_name="lien vers un CV")),
                 (
                     "created_from_pe_approval",
                     models.BooleanField(
-                        default=False, verbose_name="Candidature créée lors de l'import d'un agrément Pole Emploi"
+                        default=False, verbose_name="candidature créée lors de l'import d'un agrément Pole Emploi"
                     ),
                 ),
                 (
@@ -240,18 +240,18 @@ class Migration(migrations.Migration):
                         null=True,
                         on_delete=django.db.models.deletion.SET_NULL,
                         to="eligibility.eligibilitydiagnosis",
-                        verbose_name="Diagnostic d'éligibilité",
+                        verbose_name="diagnostic d'éligibilité",
                     ),
                 ),
                 (
                     "answer_to_prescriber",
-                    models.TextField(blank=True, verbose_name="Message de réponse au prescripteur"),
+                    models.TextField(blank=True, verbose_name="message de réponse au prescripteur"),
                 ),
                 (
                     "create_employee_record",
-                    models.BooleanField(default=True, verbose_name="Création d'une fiche salarié"),
+                    models.BooleanField(default=True, verbose_name="création d'une fiche salarié"),
                 ),
-                ("transferred_at", models.DateTimeField(blank=True, null=True, verbose_name="Date de transfert")),
+                ("transferred_at", models.DateTimeField(blank=True, null=True, verbose_name="date de transfert")),
                 (
                     "transferred_by",
                     models.ForeignKey(
@@ -259,7 +259,7 @@ class Migration(migrations.Migration):
                         null=True,
                         on_delete=django.db.models.deletion.SET_NULL,
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="Transférée par",
+                        verbose_name="transférée par",
                     ),
                 ),
                 (
@@ -275,8 +275,7 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={
-                "verbose_name": "Candidature",
-                "verbose_name_plural": "Candidatures",
+                "verbose_name": "candidature",
                 "ordering": ["-created_at"],
             },
             bases=(django_xworkflows.models.BaseWorkflowEnabled, models.Model),
@@ -313,8 +312,8 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={
-                "verbose_name": "Log des transitions de la candidature",
-                "verbose_name_plural": "Log des transitions des candidatures",
+                "verbose_name": "log des transitions de la candidature",
+                "verbose_name_plural": "log des transitions des candidatures",
                 "ordering": ["-timestamp"],
             },
         ),

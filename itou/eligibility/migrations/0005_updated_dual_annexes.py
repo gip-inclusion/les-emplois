@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
                 ],
                 default="1",
                 max_length=3,
-                verbose_name="Annexe",
+                verbose_name="annexe",
             ),
         ),
         # Must update data before next constraint update / activation

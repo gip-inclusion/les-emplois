@@ -15,12 +15,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="prolongation",
             name="contact_email",
-            field=models.EmailField(blank=True, max_length=254, verbose_name="E-mail de contact"),
+            field=models.EmailField(blank=True, max_length=254, verbose_name="e-mail de contact"),
         ),
         migrations.AddField(
             model_name="prolongation",
             name="contact_phone",
-            field=models.CharField(blank=True, max_length=20, verbose_name="Numéro de téléphone de contact"),
+            field=models.CharField(blank=True, max_length=20, verbose_name="numéro de téléphone de contact"),
         ),
         migrations.AddField(
             model_name="prolongation",
@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
                 null=True,
                 on_delete=django.db.models.deletion.SET_NULL,
                 to="prescribers.prescriberorganization",
-                verbose_name="Organisation du prescripteur habilité",
+                verbose_name="organisation du prescripteur habilité",
             ),
         ),
         migrations.AddField(
@@ -41,13 +41,13 @@ class Migration(migrations.Migration):
                 null=True,
                 on_delete=django.db.models.deletion.SET_NULL,
                 to="files.file",
-                verbose_name="Fichier bilan",
+                verbose_name="fichier bilan",
             ),
         ),
         migrations.AddField(
             model_name="prolongation",
             name="require_phone_interview",
-            field=models.BooleanField(blank=True, default=False, verbose_name="Demande d'entretien téléphonique"),
+            field=models.BooleanField(blank=True, default=False, verbose_name="demande d'entretien téléphonique"),
         ),
         migrations.AlterField(
             model_name="prolongation",
@@ -66,7 +66,7 @@ class Migration(migrations.Migration):
                 ],
                 default="COMPLETE_TRAINING",
                 max_length=30,
-                verbose_name="Motif",
+                verbose_name="motif",
             ),
         ),
         migrations.AddConstraint(
