@@ -34,7 +34,11 @@ from itou.utils.apis.metabase import (
     C1_SIAE_FILTER_KEY,
     DEPARTMENT_FILTER_KEY,
     IAE_NETWORK_FILTER_KEY,
+    JOB_APPLICATION_ORIGIN_FILTER_KEY,
     METABASE_DASHBOARDS,
+    PE_FILTER_VALUE,
+    PE_PRESCRIBER_FILTER_VALUE,
+    PRESCRIBER_FILTER_KEY,
     REGION_FILTER_KEY,
     get_view_name,
     metabase_embedded_url,
@@ -255,7 +259,7 @@ def stats_cd(request):
     return render_stats(request=request, context=context, params=params)
 
 
-def render_stats_pe(request, page_title):
+def render_stats_pe(request, page_title, extra_params={}):
     """
     PE ("Pôle emploi") stats shown to relevant members.
     They can view data for their whole departement, not only their agency.
@@ -271,6 +275,7 @@ def render_stats_pe(request, page_title):
     params = {
         DEPARTMENT_FILTER_KEY: [DEPARTMENTS[d] for d in departments],
     }
+    params.update(extra_params)
     context = {
         "page_title": page_title,
     }
@@ -301,6 +306,9 @@ def stats_pe_delay_main(request):
     return render_stats_pe(
         request=request,
         page_title="Délai d'entrée en IAE",
+        extra_params={
+            JOB_APPLICATION_ORIGIN_FILTER_KEY: PE_PRESCRIBER_FILTER_VALUE,
+        },
     )
 
 
@@ -309,6 +317,7 @@ def stats_pe_delay_raw(request):
     return render_stats_pe(
         request=request,
         page_title="Données brutes de délai d'entrée en IAE",
+        # No additional locked filter is needed for these PE stats.
     )
 
 
@@ -317,6 +326,9 @@ def stats_pe_conversion_main(request):
     return render_stats_pe(
         request=request,
         page_title="Taux de transformation",
+        extra_params={
+            PRESCRIBER_FILTER_KEY: PE_FILTER_VALUE,
+        },
     )
 
 
@@ -325,6 +337,9 @@ def stats_pe_conversion_raw(request):
     return render_stats_pe(
         request=request,
         page_title="Données brutes du taux de transformation",
+        extra_params={
+            PRESCRIBER_FILTER_KEY: PE_FILTER_VALUE,
+        },
     )
 
 
@@ -333,6 +348,9 @@ def stats_pe_state_main(request):
     return render_stats_pe(
         request=request,
         page_title="Etat des candidatures orientées",
+        extra_params={
+            PRESCRIBER_FILTER_KEY: PE_PRESCRIBER_FILTER_VALUE,
+        },
     )
 
 
@@ -341,6 +359,9 @@ def stats_pe_state_raw(request):
     return render_stats_pe(
         request=request,
         page_title="Données brutes de l’état des candidatures orientées",
+        extra_params={
+            PRESCRIBER_FILTER_KEY: PE_PRESCRIBER_FILTER_VALUE,
+        },
     )
 
 
@@ -349,6 +370,7 @@ def stats_pe_tension(request):
     return render_stats_pe(
         request=request,
         page_title="Fiches de poste en tension",
+        # No additional locked filter is needed for these PE stats.
     )
 
 
@@ -456,9 +478,7 @@ def stats_dreets_iae_hiring(request):
     )
 
 
-def render_stats_dgefp(request, page_title, extra_params=None, extra_context=None):
-    if extra_context is None:
-        extra_context = {}
+def render_stats_dgefp(request, page_title, extra_params=None, extra_context={}):
     ensure_stats_dgefp_permission(request)
     context = {
         "page_title": page_title,
