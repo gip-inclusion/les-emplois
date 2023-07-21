@@ -70,6 +70,11 @@ def get_ea_eatt_df():
     df = df.replace({np.nan: None})
 
     df = df[df.kind != "Entreprise Adaptée en Milieu Pénitentiaire"]
+
+    # note (fv): apparently, EA / EATT XLS source file can also contain the following field value
+    # (which is the same as the line above, on a business POV)
+    df = df[df.kind != "Entreprise Adaptée en Etablissement Pénitentiaire"]
+
     df["kind"] = df.kind.apply(convert_kind)
 
     # Drop rows without siret.
