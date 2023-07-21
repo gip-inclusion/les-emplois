@@ -33,7 +33,7 @@ class InvitationQuerySet(models.QuerySet):
 
 
 class InvitationAbstract(models.Model):
-    EXPIRATION_DAYS = 14
+    EXPIRATION_DAYS = 90
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(verbose_name="e-mail")
