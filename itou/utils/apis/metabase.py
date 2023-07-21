@@ -9,6 +9,10 @@ C1_SIAE_FILTER_KEY = "identifiant_de_la_structure_(c1)"
 IAE_NETWORK_FILTER_KEY = "id_r%C3%A9seau"
 DEPARTMENT_FILTER_KEY = "d%C3%A9partement"
 REGION_FILTER_KEY = "r%C3%A9gion"
+PRESCRIBER_FILTER_KEY = "prescripteur"
+JOB_APPLICATION_ORIGIN_FILTER_KEY = "origine_candidature"
+PE_PRESCRIBER_FILTER_VALUE = "Prescripteur habilité PE"
+PE_FILTER_VALUE = "Pôle emploi"
 
 METABASE_DASHBOARDS = {
     #
