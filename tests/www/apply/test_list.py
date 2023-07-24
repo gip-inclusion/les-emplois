@@ -67,25 +67,35 @@ class ProcessListTest(TestCase):
         eddie_hit_pit = hit_pit.members.get(first_name="Eddie")
 
         # Now send applications
-        for i, state in enumerate(JobApplicationWorkflow.states):
+        states = list(JobApplicationWorkflow.states)
+        remaining_states, last_state = states[:-1], states[-1]
+        common_kwargs = {
+            "to_siae": hit_pit,
+            "sender_prescriber_organization": pole_emploi,
+            "eligibility_diagnosis": None,
+        }
+        for i, state in enumerate(remaining_states):
             creation_date = timezone.now() - timezone.timedelta(days=i)
-            job_application = JobApplicationSentByPrescriberFactory(
-                to_siae=hit_pit,
+            JobApplicationSentByPrescriberFactory(
+                **common_kwargs,
                 state=state,
                 created_at=creation_date,
                 sender=thibault_pe,
-                sender_prescriber_organization=pole_emploi,
-                eligibility_diagnosis=None,
             )
-
-        maggie = job_application.job_seeker
-        maggie.save(update_fields={"first_name": "Maggie"})
+        # Treat Maggie specially, tests rely on her.
+        creation_date = timezone.now() - timezone.timedelta(days=i + 1)
+        maggie = JobSeekerFactory(first_name="Maggie")
         JobApplicationSentByPrescriberFactory(
-            to_siae=hit_pit,
-            sender=laurie_pe,
-            sender_prescriber_organization=pole_emploi,
+            **common_kwargs,
+            state=last_state,
+            created_at=creation_date,
+            sender=thibault_pe,
             job_seeker=maggie,
-            eligibility_diagnosis=None,
+        )
+        JobApplicationSentByPrescriberFactory(
+            **common_kwargs,
+            sender=laurie_pe,
+            job_seeker=maggie,
         )
 
         cls.prescriber_base_url = reverse("apply:list_for_prescriber")
