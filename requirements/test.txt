@@ -1138,9 +1138,9 @@ sqlparse==0.4.4 \
     # via
     #   -r requirements/base.txt
     #   django
-syrupy==4.0.6 \
-    --hash=sha256:523cf5d146d16c7db704e29f9c3a9c01f4ec8377a883f0379a82baa81b251d08 \
-    --hash=sha256:a03ebeb4bac692b890b9ca6d239c9b50405dbfa289a09b802e3ab899fad96f13
+syrupy==4.0.8 \
+    --hash=sha256:af00532db06664087671c3a1043fef5f41b23e7a1f6a7a8966da771ed1eade74 \
+    --hash=sha256:b884730ff6976d6892fedb2a69d0a545c0f63890802e66ede45befc9b2e18873
     # via -r requirements/test.in
 tablib[html,ods,xls,xlsx,yaml]==3.5.0 \
     --hash=sha256:9821caa9eca6062ff7299fa645e737aecff982e6b2b42046928a6413c8dabfd9 \
