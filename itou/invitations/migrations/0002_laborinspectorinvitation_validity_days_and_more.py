@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             field=models.PositiveSmallIntegerField(
                 default=14,
                 validators=[
-                    django.core.validators.MinValueValidator(14),
+                    django.core.validators.MinValueValidator(1),
                     django.core.validators.MaxValueValidator(90),
                 ],
                 verbose_name="durée de validité en jours",
@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
             field=models.PositiveSmallIntegerField(
                 default=14,
                 validators=[
-                    django.core.validators.MinValueValidator(14),
+                    django.core.validators.MinValueValidator(1),
                     django.core.validators.MaxValueValidator(90),
                 ],
                 verbose_name="durée de validité en jours",
@@ -40,7 +40,7 @@ class Migration(migrations.Migration):
             field=models.PositiveSmallIntegerField(
                 default=14,
                 validators=[
-                    django.core.validators.MinValueValidator(14),
+                    django.core.validators.MinValueValidator(1),
                     django.core.validators.MaxValueValidator(90),
                 ],
                 verbose_name="durée de validité en jours",

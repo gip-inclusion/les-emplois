@@ -50,7 +50,7 @@ class InvitationAbstract(models.Model):
     validity_days = models.PositiveSmallIntegerField(
         verbose_name="durée de validité en jours",
         default=DEFAULT_VALIDITY_DAYS,
-        validators=[MinValueValidator(DEFAULT_VALIDITY_DAYS), MaxValueValidator(90)],
+        validators=[MinValueValidator(1), MaxValueValidator(90)],
     )
 
     accepted = models.BooleanField(verbose_name="acceptée", default=False)
