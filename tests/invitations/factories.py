@@ -27,7 +27,9 @@ class SentSiaeStaffInvitationFactory(SiaeStaffInvitationFactory):
 
 class ExpiredSiaeStaffInvitationFactory(SiaeStaffInvitationFactory):
     sent = True
-    sent_at = factory.LazyFunction(lambda: timezone.now() - timedelta(days=models.InvitationAbstract.EXPIRATION_DAYS))
+    sent_at = factory.LazyFunction(
+        lambda: timezone.now() - timedelta(days=models.InvitationAbstract.DEFAULT_VALIDITY_DAYS)
+    )
 
 
 class PrescriberWithOrgSentInvitationFactory(factory.django.DjangoModelFactory):

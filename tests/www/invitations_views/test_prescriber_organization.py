@@ -462,7 +462,7 @@ class TestAcceptPrescriberWithOrgInvitationExceptions(TestCase):
 
     def test_expired_invitation_with_new_user(self):
         invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
-        invitation.sent_at -= timedelta(days=invitation.EXPIRATION_DAYS)
+        invitation.sent_at -= timedelta(days=invitation.DEFAULT_VALIDITY_DAYS)
         invitation.save()
         assert invitation.has_expired
 
@@ -484,7 +484,7 @@ class TestAcceptPrescriberWithOrgInvitationExceptions(TestCase):
             sender=self.sender,
             organization=self.organization,
         )
-        invitation.sent_at -= timedelta(days=invitation.EXPIRATION_DAYS)
+        invitation.sent_at -= timedelta(days=invitation.DEFAULT_VALIDITY_DAYS)
         invitation.save()
         assert invitation.has_expired
 
