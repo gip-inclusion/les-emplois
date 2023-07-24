@@ -24,6 +24,10 @@
       }
     }
   });
-  // Remove bootstrap CSS elements not needed for admin
-  document.querySelectorAll(".input-group-append").forEach(elt => { elt.remove(); });
+  // Remove toggle password button from the admin.
+    document.querySelectorAll(".input-group-append").forEach(elt => {
+    if ("password" in elt.children.item(0).dataset) {
+      elt.remove();
+    }
+  });
 }());
