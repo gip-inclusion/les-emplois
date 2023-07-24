@@ -240,6 +240,7 @@ class CreatedByProxyFilter(admin.SimpleListFilter):
 
 @admin.register(models.User)
 class ItouUserAdmin(UserAdmin):
+    show_full_result_count = False
     add_form = ItouUserCreationForm
     change_form_template = "admin/users/change_user_form.html"
     form = UserAdminForm
@@ -266,11 +267,6 @@ class ItouUserAdmin(UserAdmin):
         "created_by",
         "birth_place",
         "birth_country",
-    )
-    search_fields = UserAdmin.search_fields + (
-        "pk",
-        "nir",
-        "asp_uid",
     )
     readonly_fields = (
         "pk",
@@ -380,6 +376,26 @@ class ItouUserAdmin(UserAdmin):
             if obj.identity_provider != IdentityProvider.PE_CONNECT:
                 rof += ("first_name", "last_name", "email")
         return rof
+
+    def get_search_fields(self, request):
+        search_fields = []
+        search_term = request.GET.get("q", "").strip()
+        if len(search_term) == 30:
+            try:
+                int(search_term, base=16)
+            except ValueError:
+                pass
+            else:
+                search_fields.append("asp_uid__exact")
+        if search_term.isdecimal():
+            search_fields.append("pk__exact")
+            search_fields.append("nir__exact")
+        else:
+            search_fields.append("email")
+            if "@" not in search_term:
+                search_fields.append("first_name")
+                search_fields.append("last_name")
+        return search_fields
 
     def get_inlines(self, request, obj):
         inlines = [PkSupportRemarkInline]
