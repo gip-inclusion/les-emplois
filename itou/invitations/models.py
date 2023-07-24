@@ -3,6 +3,7 @@ import uuid
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.shortcuts import get_object_or_404, reverse
 from django.utils import timezone
@@ -19,8 +20,14 @@ logger = logging.getLogger(__name__)
 class InvitationQuerySet(models.QuerySet):
     @property
     def valid_lookup(self):
-        expiration_dt = timezone.now() - relativedelta(days=self.model.EXPIRATION_DAYS)
-        return models.Q(sent_at__gte=expiration_dt)
+        # 1) `relativedelta(days=models.F("validity_days"))` raises TypeError exception,
+        # see https://stackoverflow.com/questions/6158859/making-queries-using-f-and-timedelta-at-django
+        # 2) `relativedelta(days=1) * models.F("validity_days")` still raises an exception
+        # `django.db.utils.ProgrammingError: can't adapt type 'relativedelta'`
+        # 3) getting rid of relativedelta and using dates directly is the only solution found so far
+        # see https://stackoverflow.com/questions/56167142/django-orm-get-records-that-are-older-than-records-duration-days
+        expiration_date = timezone.localdate() - models.F("validity_days")
+        return models.Q(sent_at__date__gt=expiration_date)
 
     def valid(self):
         return self.filter(self.valid_lookup)
@@ -33,13 +40,18 @@ class InvitationQuerySet(models.QuerySet):
 
 
 class InvitationAbstract(models.Model):
-    EXPIRATION_DAYS = 90
+    DEFAULT_VALIDITY_DAYS = 14
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(verbose_name="e-mail")
     first_name = models.CharField(verbose_name="prénom", max_length=255)
     last_name = models.CharField(verbose_name="nom", max_length=255)
     sent = models.BooleanField(verbose_name="envoyée", default=False)
+    validity_days = models.PositiveSmallIntegerField(
+        verbose_name="durée de validité en jours",
+        default=DEFAULT_VALIDITY_DAYS,
+        validators=[MinValueValidator(DEFAULT_VALIDITY_DAYS), MaxValueValidator(90)],
+    )
 
     accepted = models.BooleanField(verbose_name="acceptée", default=False)
     accepted_at = models.DateTimeField(verbose_name="date d'acceptation", blank=True, null=True, db_index=True)
@@ -87,7 +99,7 @@ class InvitationAbstract(models.Model):
 
     @property
     def expiration_date(self):
-        return self.sent_at + relativedelta(days=self.EXPIRATION_DAYS)
+        return self.sent_at + relativedelta(days=self.validity_days)
 
     @property
     def has_expired(self):
