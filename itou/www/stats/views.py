@@ -259,7 +259,7 @@ def stats_cd(request):
     return render_stats(request=request, context=context, params=params)
 
 
-def render_stats_pe(request, page_title, extra_params={}):
+def render_stats_pe(request, page_title, extra_params=None):
     """
     PE ("Pôle emploi") stats shown to relevant members.
     They can view data for their whole departement, not only their agency.
@@ -275,6 +275,10 @@ def render_stats_pe(request, page_title, extra_params={}):
     params = {
         DEPARTMENT_FILTER_KEY: [DEPARTMENTS[d] for d in departments],
     }
+    if extra_params is None:
+        # Do not use mutable default arguments,
+        # see https://florimond.dev/en/posts/2018/08/python-mutable-defaults-are-the-source-of-all-evil/
+        extra_params = {}
     params.update(extra_params)
     context = {
         "page_title": page_title,
@@ -374,7 +378,11 @@ def stats_pe_tension(request):
     )
 
 
-def render_stats_ddets_iae(request, page_title, extra_context={}):
+def render_stats_ddets_iae(request, page_title, extra_context=None):
+    if extra_context is None:
+        # Do not use mutable default arguments,
+        # see https://florimond.dev/en/posts/2018/08/python-mutable-defaults-are-the-source-of-all-evil/
+        extra_context = {}
     department = get_stats_ddets_iae_department(request)
     params = get_params_for_departement(department)
     context = {
@@ -478,7 +486,11 @@ def stats_dreets_iae_hiring(request):
     )
 
 
-def render_stats_dgefp(request, page_title, extra_params=None, extra_context={}):
+def render_stats_dgefp(request, page_title, extra_params=None, extra_context=None):
+    if extra_context is None:
+        # Do not use mutable default arguments,
+        # see https://florimond.dev/en/posts/2018/08/python-mutable-defaults-are-the-source-of-all-evil/
+        extra_context = {}
     ensure_stats_dgefp_permission(request)
     context = {
         "page_title": page_title,
