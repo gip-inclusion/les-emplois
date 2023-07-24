@@ -29,20 +29,7 @@ from itou.common_apps.address.departments import (
     format_region_for_matomo,
 )
 from itou.utils import constants as global_constants
-from itou.utils.apis.metabase import (
-    ASP_SIAE_FILTER_KEY,
-    C1_SIAE_FILTER_KEY,
-    DEPARTMENT_FILTER_KEY,
-    IAE_NETWORK_FILTER_KEY,
-    JOB_APPLICATION_ORIGIN_FILTER_KEY,
-    METABASE_DASHBOARDS,
-    PE_FILTER_VALUE,
-    PE_PRESCRIBER_FILTER_VALUE,
-    PRESCRIBER_FILTER_KEY,
-    REGION_FILTER_KEY,
-    get_view_name,
-    metabase_embedded_url,
-)
+from itou.utils.apis import metabase as mb
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
@@ -84,32 +71,32 @@ def ensure_stats_dgefp_permission(request):
 
 def get_params_for_departement(department):
     return {
-        DEPARTMENT_FILTER_KEY: DEPARTMENTS[department],
-        REGION_FILTER_KEY: DEPARTMENT_TO_REGION[department],
+        mb.DEPARTMENT_FILTER_KEY: DEPARTMENTS[department],
+        mb.REGION_FILTER_KEY: DEPARTMENT_TO_REGION[department],
     }
 
 
 def get_params_for_region(region):
     departments = [DEPARTMENTS[dpt] for dpt in REGIONS[region]]
     params = {
-        DEPARTMENT_FILTER_KEY: departments,
-        REGION_FILTER_KEY: region,
+        mb.DEPARTMENT_FILTER_KEY: departments,
+        mb.REGION_FILTER_KEY: region,
     }
     return params
 
 
 def get_params_for_whole_country():
     return {
-        DEPARTMENT_FILTER_KEY: list(DEPARTMENTS.values()),
-        REGION_FILTER_KEY: list(REGIONS.keys()),
+        mb.DEPARTMENT_FILTER_KEY: list(DEPARTMENTS.values()),
+        mb.REGION_FILTER_KEY: list(REGIONS.keys()),
     }
 
 
 def render_stats(request, context, params=None, template_name="stats/stats.html"):
     if params is None:
         params = {}
-    view_name = get_view_name(request)
-    metabase_dashboard = METABASE_DASHBOARDS.get(view_name)
+    view_name = mb.get_view_name(request)
+    metabase_dashboard = mb.METABASE_DASHBOARDS.get(view_name)
     tally_popup_form_id = None
     tally_embed_form_id = None
     if settings.TALLY_URL and metabase_dashboard:
@@ -117,7 +104,7 @@ def render_stats(request, context, params=None, template_name="stats/stats.html"
         tally_embed_form_id = metabase_dashboard.get("tally_embed_form_id")
 
     base_context = {
-        "iframeurl": metabase_embedded_url(request=request, params=params),
+        "iframeurl": mb.metabase_embedded_url(request=request, params=params),
         "stats_base_url": settings.METABASE_SITE_URL,
         "tally_popup_form_id": tally_popup_form_id,
         "tally_embed_form_id": tally_embed_form_id,
@@ -177,7 +164,7 @@ def stats_pilotage(request, dashboard_id):
         raise PermissionDenied
 
     context = {
-        "iframeurl": metabase_embedded_url(dashboard_id=dashboard_id, with_title=True),
+        "iframeurl": mb.metabase_embedded_url(dashboard_id=dashboard_id, with_title=True),
     }
     return render_stats(request=request, context=context, template_name="stats/stats_pilotage.html")
 
@@ -198,7 +185,7 @@ def stats_siae_etp(request):
     return render_stats(
         request=request,
         context=context,
-        params={ASP_SIAE_FILTER_KEY: current_org.convention.asp_id},
+        params={mb.ASP_SIAE_FILTER_KEY: current_org.convention.asp_id},
     )
 
 
@@ -218,7 +205,7 @@ def render_stats_siae(request, page_title):
         request=request,
         context=context,
         params={
-            C1_SIAE_FILTER_KEY: [
+            mb.C1_SIAE_FILTER_KEY: [
                 str(membership.siae_id) for membership in request.user.active_or_in_grace_period_siae_memberships()
             ]
         },
@@ -273,7 +260,7 @@ def render_stats_pe(request, page_title, extra_params=None):
         raise PermissionDenied
     departments = request.user.get_stats_pe_departments(current_org=current_org)
     params = {
-        DEPARTMENT_FILTER_KEY: [DEPARTMENTS[d] for d in departments],
+        mb.DEPARTMENT_FILTER_KEY: [DEPARTMENTS[d] for d in departments],
     }
     if extra_params is None:
         # Do not use mutable default arguments,
@@ -311,7 +298,7 @@ def stats_pe_delay_main(request):
         request=request,
         page_title="Délai d'entrée en IAE",
         extra_params={
-            JOB_APPLICATION_ORIGIN_FILTER_KEY: PE_PRESCRIBER_FILTER_VALUE,
+            mb.JOB_APPLICATION_ORIGIN_FILTER_KEY: mb.PE_PRESCRIBER_FILTER_VALUE,
         },
     )
 
@@ -331,7 +318,7 @@ def stats_pe_conversion_main(request):
         request=request,
         page_title="Taux de transformation",
         extra_params={
-            PRESCRIBER_FILTER_KEY: PE_FILTER_VALUE,
+            mb.PRESCRIBER_FILTER_KEY: mb.PE_FILTER_VALUE,
         },
     )
 
@@ -342,7 +329,7 @@ def stats_pe_conversion_raw(request):
         request=request,
         page_title="Données brutes du taux de transformation",
         extra_params={
-            PRESCRIBER_FILTER_KEY: PE_FILTER_VALUE,
+            mb.PRESCRIBER_FILTER_KEY: mb.PE_FILTER_VALUE,
         },
     )
 
@@ -353,7 +340,7 @@ def stats_pe_state_main(request):
         request=request,
         page_title="Etat des candidatures orientées",
         extra_params={
-            PRESCRIBER_FILTER_KEY: PE_PRESCRIBER_FILTER_VALUE,
+            mb.PRESCRIBER_FILTER_KEY: mb.PE_PRESCRIBER_FILTER_VALUE,
         },
     )
 
@@ -364,7 +351,7 @@ def stats_pe_state_raw(request):
         request=request,
         page_title="Données brutes de l’état des candidatures orientées",
         extra_params={
-            PRESCRIBER_FILTER_KEY: PE_PRESCRIBER_FILTER_VALUE,
+            mb.PRESCRIBER_FILTER_KEY: mb.PE_PRESCRIBER_FILTER_VALUE,
         },
     )
 
@@ -557,5 +544,5 @@ def stats_iae_network_hiring(request):
     return render_stats(
         request=request,
         context=context,
-        params={IAE_NETWORK_FILTER_KEY: current_org.id},
+        params={mb.IAE_NETWORK_FILTER_KEY: current_org.id},
     )
