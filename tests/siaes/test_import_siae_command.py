@@ -16,8 +16,10 @@ from django.urls import reverse
 from freezegun import freeze_time
 
 from itou.siaes.enums import SiaeKind
-from itou.siaes.management.commands._import_siae.utils import anonymize_fluxiae_df
+from itou.siaes.management.commands._import_siae.utils import anonymize_fluxiae_df, could_siae_be_deleted
 from itou.siaes.models import Siae
+from tests.approvals.factories import ApprovalFactory
+from tests.eligibility.factories import EligibilityDiagnosisMadeBySiaeFactory
 from tests.siaes.factories import SiaeConventionFactory, SiaeFactory, SiaeWith2MembershipsFactory
 
 
@@ -200,3 +202,19 @@ def test_hashed_approval_number():
     assert df.hash_numéro_pass_iae[1] == "8e728c4578281ea0b6a7817e50a0f6d50c995c27f02dd359d67427ac3d86e019"
     assert df.hash_numéro_pass_iae[2] == "6cc868860cee823f0ffe0b3498bb4ebda51baa1b7858e2022f6590b0bd86c31c"
     assert "salarie_agrement" not in df
+
+
+def test_could_siae_be_deleted_with_eligibility_diagnosis():
+    # Check that eligibility diagnoses made by SIAE are blocking its deletion
+
+    # No eligibility diagnosis linked
+    siae = SiaeWith2MembershipsFactory()
+    assert could_siae_be_deleted(siae)
+
+    # An eligibility diagnosis without related approval
+    EligibilityDiagnosisMadeBySiaeFactory(author_siae=siae, author=siae.members.first())
+    assert could_siae_be_deleted(siae)
+
+    # Approval with eligibility diagnosis authored by SIAE
+    ApprovalFactory(eligibility_diagnosis__author_siae=siae)
+    assert not could_siae_be_deleted(siae)
