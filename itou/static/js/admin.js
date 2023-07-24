@@ -24,4 +24,6 @@
       }
     }
   });
+  // Remove bootstrap CSS elements not needed for admin
+  document.querySelectorAll(".input-group-append").forEach(elt => { elt.remove(); });
 }());
