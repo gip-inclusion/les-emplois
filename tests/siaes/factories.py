@@ -40,6 +40,7 @@ class SiaeConventionFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.SiaeConvention
         django_get_or_create = ("asp_id", "kind")
+        skip_postgeneration_save = True
 
     # Don't start a SIRET with 0.
     siret_signature = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
@@ -83,6 +84,7 @@ class SiaeFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = models.Siae
+        skip_postgeneration_save = True
 
     class Params:
         subject_to_eligibility = factory.Trait(

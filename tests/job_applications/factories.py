@@ -29,6 +29,7 @@ from tests.users.factories import (
 class JobApplicationFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.JobApplication
+        skip_postgeneration_save = True
 
     class Params:
         job_seeker_with_address = factory.Trait(job_seeker=factory.SubFactory(JobSeekerWithMockedAddressFactory))
@@ -201,3 +202,4 @@ class JobApplicationWithCompleteJobSeekerProfileFactory(JobApplicationWithApprov
         # case that can only happen in tests though.
         self.job_seeker.jobseeker_profile.delete()
         self.job_seeker.jobseeker_profile = JobSeekerProfileWithHexaAddressFactory(user=self.job_seeker)
+        self.job_seeker.save()

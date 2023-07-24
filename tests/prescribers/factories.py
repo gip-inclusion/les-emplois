@@ -59,6 +59,9 @@ class PrescriberOrganizationWithMembershipFactory(PrescriberOrganizationFactory)
     https://factoryboy.readthedocs.io/en/latest/recipes.html#many-to-many-relation-with-a-through
     """
 
+    class Meta:
+        skip_postgeneration_save = True
+
     membership = factory.RelatedFactory(PrescriberMembershipFactory, "organization")
 
 
@@ -68,6 +71,9 @@ class PrescriberOrganizationWith2MembershipFactory(PrescriberOrganizationFactory
 
     https://factoryboy.readthedocs.io/en/latest/recipes.html#many-to-many-relation-with-a-through
     """
+
+    class Meta:
+        skip_postgeneration_save = True
 
     membership1 = factory.RelatedFactory(PrescriberMembershipFactory, "organization")
     membership2 = factory.RelatedFactory(PrescriberMembershipFactory, "organization", is_admin=False)
@@ -81,4 +87,7 @@ class PrescriberPoleEmploiFactory(PrescriberOrganizationFactory):
 
 
 class PrescriberPoleEmploiWithMembershipFactory(PrescriberPoleEmploiFactory):
+    class Meta:
+        skip_postgeneration_save = True
+
     membership = factory.RelatedFactory(PrescriberMembershipFactory, "organization")

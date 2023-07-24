@@ -41,6 +41,7 @@ class EvaluationCampaignFactory(factory.django.DjangoModelFactory):
 class EvaluatedSiaeFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.EvaluatedSiae
+        skip_postgeneration_save = True
 
     class Params:
         complete = factory.Trait(
@@ -65,6 +66,7 @@ class EvaluatedSiaeFactory(factory.django.DjangoModelFactory):
 class EvaluatedJobApplicationFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.EvaluatedJobApplication
+        skip_postgeneration_save = True
 
     class Params:
         complete = factory.Trait(
