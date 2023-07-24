@@ -104,6 +104,9 @@ def could_siae_be_deleted(siae):
         return False
     if siae.job_applications_received.exclude(state=JobApplicationWorkflow.STATE_NEW).exists():
         return False
+    # Do not delete SIAE if any approval is linked to one of the elibility diagnosis it has created
+    if siae.eligibilitydiagnosis_set.exclude(approval=None).exists():
+        return False
     # An ASP siae can only be deleted when all its antennas have been deleted.
     if siae.source == Siae.SOURCE_ASP:
         return siae.convention.siaes.count() == 1
