@@ -395,9 +395,6 @@ class User(AbstractUser, AddressMixin):
         elif self.kind in UserKind:
             # Any other user kind isn't staff
             self.is_staff = False
-        elif self.is_staff:
-            # self.kind == "" : handle django admin_client pytest fixture
-            self.kind = UserKind.ITOU_STAFF
 
         self.validate_constraints()
 
