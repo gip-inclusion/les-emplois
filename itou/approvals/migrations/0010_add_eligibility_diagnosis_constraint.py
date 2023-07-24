@@ -2,12 +2,18 @@
 
 from django.db import migrations, models
 
-from itou.approvals.enums import Origin
-from itou.approvals.models import Approval
+
+class Origin(models.TextChoices):
+    DEFAULT = "default", "Créé normalement via les emplois"
+    PE_APPROVAL = "pe_approval", "Créé lors d'un import d'Agrément Pole Emploi"
+    # On November 30th, 2021, AI were delivered approvals without a diagnosis.
+    AI_STOCK = "ai_stock", "Créé lors de l'import du stock AI"
+    ADMIN = "admin", "Créé depuis l'admin"
 
 
 def migrate_approvals_from_ai_stock_and_pe_approval_origin(apps, schema_editor):
     # About 20 cases in PROD: fix is easy, investigation in progress to isolate source
+    Approval = apps.get_model("approvals", "Approval")
     to_update = Approval.objects.filter(
         eligibility_diagnosis__isnull=False, origin__in=(Origin.PE_APPROVAL, Origin.AI_STOCK)
     )
@@ -24,6 +30,7 @@ def migrate_approvals_from_ai_stock_and_pe_approval_origin(apps, schema_editor):
 
 def migrate_approvals_without_diagnosis_with_bad_origin(apps, schema_editor):
     # 13.07.2023: one single case in DB
+    Approval = apps.get_model("approvals", "Approval")
     to_update = Approval.objects.filter(eligibility_diagnosis=None, origin__in=(Origin.ADMIN, Origin.DEFAULT))
     print(f"\n{len(to_update)} approvals without any eligibility diagnosis (former PE approval):")
     print(
