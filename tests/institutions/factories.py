@@ -42,6 +42,9 @@ class InstitutionWithMembershipFactory(InstitutionFactory):
     https://factoryboy.readthedocs.io/en/latest/recipes.html#many-to-many-relation-with-a-through
     """
 
+    class Meta:
+        skip_postgeneration_save = True
+
     membership = factory.RelatedFactory(InstitutionMembershipFactory, "institution")
 
 
@@ -51,6 +54,9 @@ class InstitutionWith2MembershipFactory(InstitutionFactory):
 
     https://factoryboy.readthedocs.io/en/latest/recipes.html#many-to-many-relation-with-a-through
     """
+
+    class Meta:
+        skip_postgeneration_save = True
 
     membership1 = factory.RelatedFactory(InstitutionMembershipFactory, "institution")
     membership2 = factory.RelatedFactory(InstitutionMembershipFactory, "institution", is_admin=False)

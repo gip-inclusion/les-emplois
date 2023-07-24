@@ -23,6 +23,7 @@ fake = Faker("fr_FR")
 class ApprovalFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Approval
+        skip_postgeneration_save = True
 
     class Params:
         # Use old (but realistic) dates so `expired` can be used anywhere without triggering specials cases

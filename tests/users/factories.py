@@ -45,6 +45,7 @@ class UserFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = models.User
+        skip_postgeneration_save = True
 
     class Params:
         with_verified_email = factory.Trait(
@@ -240,8 +241,9 @@ class JobSeekerWithMockedAddressFactory(JobSeekerFactory):
         self.insee_code = address.get("insee_code")
         self.city = address.get("city")
 
-        self.birth_place = CommuneFactory.build()
-        self.birth_country = CountryFranceFactory.build()
+        self.birth_place = CommuneFactory()
+        self.birth_country = CountryFranceFactory()
+        self.save()
 
 
 class JobSeekerProfileWithHexaAddressFactory(factory.django.DjangoModelFactory):
@@ -256,7 +258,4 @@ class JobSeekerProfileWithHexaAddressFactory(factory.django.DjangoModelFactory):
     hexa_lane_type = random.choice(LaneType.values)
     hexa_lane_name = factory.Faker("street_address", locale="fr_FR")
     hexa_post_code = factory.Faker("postalcode")
-
-    @factory.post_generation
-    def _build_commune(self, create, extracted, **kwargs):
-        self.hexa_commune = CommuneFactory.build()
+    hexa_commune = factory.SubFactory(CommuneFactory)
