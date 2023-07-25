@@ -19,8 +19,10 @@ VIRTUAL_ENV ?= .venv
 export PATH := $(VIRTUAL_ENV)/bin:$(PATH)
 
 ifeq ($(USE_VENV),1)
+	VENV_REQUIREMENT := $(VIRTUAL_ENV)
 	EXEC_CMD :=
 else
+	VENV_REQUIREMENT :=
 	EXEC_CMD := docker exec -ti itou_django
 endif
 
@@ -41,7 +43,7 @@ endif
 venv: $(VIRTUAL_ENV)
 
 PIP_COMPILE_FLAGS := --allow-unsafe --generate-hashes $(PIP_COMPILE_OPTIONS)
-compile-deps: $(VIRTUAL_ENV)
+compile-deps: $(VENV_REQUIREMENT)
 	$(EXEC_CMD) pip-compile $(PIP_COMPILE_FLAGS) -o requirements/base.txt requirements/base.in
 	$(EXEC_CMD) pip-compile $(PIP_COMPILE_FLAGS) -o requirements/test.txt requirements/test.in
 	$(EXEC_CMD) pip-compile $(PIP_COMPILE_FLAGS) -o requirements/dev.txt requirements/dev.in
@@ -52,7 +54,7 @@ clean:
 cdsitepackages:
 	docker exec -ti -w /usr/local/lib/$(PYTHON_VERSION)/site-packages itou_django /bin/bash
 
-quality: $(VIRTUAL_ENV)
+quality: $(VENV_REQUIREMENT)
 	$(EXEC_CMD) black --check $(LINTER_CHECKED_DIRS)
 	$(EXEC_CMD) ruff check $(LINTER_CHECKED_DIRS)
 	$(EXEC_CMD) djlint --lint --check itou
@@ -60,7 +62,7 @@ quality: $(VIRTUAL_ENV)
 	$(EXEC_CMD) python manage.py makemigrations --check --dry-run --noinput
 	$(EXEC_CMD) python manage.py spectacular --validate --fail-on-warn --file /dev/null
 
-fix: $(VIRTUAL_ENV)
+fix: $(VENV_REQUIREMENT)
 	$(EXEC_CMD) black $(LINTER_CHECKED_DIRS)
 	$(EXEC_CMD) ruff check --fix $(LINTER_CHECKED_DIRS)
 	$(EXEC_CMD) djlint --reformat itou
@@ -125,7 +127,7 @@ graph_models_itou:
 
 .PHONY: test
 
-test: $(VIRTUAL_ENV)
+test: $(VENV_REQUIREMENT)
 	$(EXEC_CMD) pytest --numprocesses=logical --create-db $(TARGET)
 
 # Docker shell.
