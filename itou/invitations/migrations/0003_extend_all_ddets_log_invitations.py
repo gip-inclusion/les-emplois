@@ -7,9 +7,7 @@ from itou.institutions.enums import InstitutionKind
 
 def extend_all_ddets_log_invitations(apps, _schema_editor):
     LaborInspectorInvitation = apps.get_model("invitations", "LaborInspectorInvitation")
-    for invitation in LaborInspectorInvitation.objects.filter(institution__kind=InstitutionKind.DDETS_LOG):
-        invitation.validity_days = 90
-        invitation.save()
+    LaborInspectorInvitation.objects.filter(institution__kind=InstitutionKind.DDETS_LOG).update(validity_days=90)
 
 
 class Migration(migrations.Migration):
