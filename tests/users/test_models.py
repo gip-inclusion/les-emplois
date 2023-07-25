@@ -242,20 +242,20 @@ class ModelTest(TestCase):
         assert not job_seeker.is_handled_by_proxy
 
     def test_has_sso_provider(self):
-        job_seeker = JobSeekerFactory()
-        assert not job_seeker.has_sso_provider
+        user = JobSeekerFactory()
+        assert not user.has_sso_provider
 
-        job_seeker = JobSeekerFactory(identity_provider=IdentityProvider.DJANGO)
-        assert not job_seeker.has_sso_provider
+        user = JobSeekerFactory(identity_provider=IdentityProvider.DJANGO)
+        assert not user.has_sso_provider
 
-        job_seeker = JobSeekerFactory(identity_provider=IdentityProvider.FRANCE_CONNECT)
-        assert job_seeker.has_sso_provider
+        user = JobSeekerFactory(identity_provider=IdentityProvider.FRANCE_CONNECT)
+        assert user.has_sso_provider
 
-        job_seeker = JobSeekerFactory(identity_provider=IdentityProvider.INCLUSION_CONNECT)
-        assert job_seeker.has_sso_provider
+        user = PrescriberFactory(identity_provider=IdentityProvider.INCLUSION_CONNECT)
+        assert user.has_sso_provider
 
-        job_seeker = JobSeekerFactory(identity_provider=IdentityProvider.PE_CONNECT)
-        assert job_seeker.has_sso_provider
+        user = JobSeekerFactory(identity_provider=IdentityProvider.PE_CONNECT)
+        assert user.has_sso_provider
 
     def test_update_external_data_source_history_field(self):
         # TODO: (celine-m-s) I'm not very comfortable with this behaviour as we don't really
@@ -936,6 +936,37 @@ class ModelTest(TestCase):
             match="Un utilisateur ayant un NIR ne peut avoir un motif justifiant l'absence de son NIR.",
         ):
             user.save()
+
+    def test_identity_provider_vs_kind(self):
+        cases = [
+            [JobSeekerFactory, IdentityProvider.DJANGO, False],
+            [JobSeekerFactory, IdentityProvider.PE_CONNECT, False],
+            [JobSeekerFactory, IdentityProvider.FRANCE_CONNECT, False],
+            [JobSeekerFactory, IdentityProvider.INCLUSION_CONNECT, True],
+            [PrescriberFactory, IdentityProvider.DJANGO, False],
+            [PrescriberFactory, IdentityProvider.PE_CONNECT, True],
+            [PrescriberFactory, IdentityProvider.FRANCE_CONNECT, True],
+            [PrescriberFactory, IdentityProvider.INCLUSION_CONNECT, False],
+            [SiaeStaffFactory, IdentityProvider.DJANGO, False],
+            [SiaeStaffFactory, IdentityProvider.PE_CONNECT, True],
+            [SiaeStaffFactory, IdentityProvider.FRANCE_CONNECT, True],
+            [SiaeStaffFactory, IdentityProvider.INCLUSION_CONNECT, False],
+            [LaborInspectorFactory, IdentityProvider.DJANGO, False],
+            [LaborInspectorFactory, IdentityProvider.PE_CONNECT, True],
+            [LaborInspectorFactory, IdentityProvider.FRANCE_CONNECT, True],
+            [LaborInspectorFactory, IdentityProvider.INCLUSION_CONNECT, True],
+            [ItouStaffFactory, IdentityProvider.DJANGO, False],
+            [ItouStaffFactory, IdentityProvider.PE_CONNECT, True],
+            [ItouStaffFactory, IdentityProvider.FRANCE_CONNECT, True],
+            [ItouStaffFactory, IdentityProvider.INCLUSION_CONNECT, True],
+        ]
+        for factory, identity_provider, raises in cases:
+            with self.subTest(f"{factory} / {identity_provider}"):
+                if raises:
+                    with pytest.raises(ValidationError):
+                        factory(identity_provider=identity_provider)
+                else:
+                    factory(identity_provider=identity_provider)
 
 
 def mock_get_geocoding_data(address, post_code=None, limit=1):

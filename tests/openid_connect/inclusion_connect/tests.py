@@ -241,20 +241,6 @@ class InclusionConnectModelTest(InclusionConnectBaseTestCase):
         assert user.username == OIDC_USERINFO["sub"]
         assert user.identity_provider == users_enums.IdentityProvider.INCLUSION_CONNECT
 
-    def test_get_existing_user_with_same_email_other_SSO(self):
-        """
-        If there already is an existing user with email InclusionConnect sent us, we do not create it again,
-        we use it but we do not update it.
-        """
-        ic_user_data = InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)
-        PrescriberFactory(email=ic_user_data.email, identity_provider=users_enums.IdentityProvider.FRANCE_CONNECT)
-        user, created = ic_user_data.create_or_update_user()
-        assert not created
-        assert user.last_name != OIDC_USERINFO["family_name"]
-        assert user.first_name != OIDC_USERINFO["given_name"]
-        assert user.username != OIDC_USERINFO["sub"]
-        assert user.identity_provider != users_enums.IdentityProvider.INCLUSION_CONNECT
-
     def test_update_user_from_user_info(self):
         user = PrescriberFactory(**dataclasses.asdict(InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)))
         ic_user = InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)
@@ -560,6 +546,35 @@ class InclusionConnectCallbackViewTest(InclusionConnectBaseTestCase):
         user.refresh_from_db()
         assert user.kind == UserKind.PRESCRIBER
         assert get_user(self.client).is_authenticated is True
+
+    @respx.mock
+    def test_callback_refuses_job_seekers(self):
+        ic_user_data = InclusionConnectSiaeStaffData.from_user_info(OIDC_USERINFO)
+        user = UserFactory(username=ic_user_data.username, email=ic_user_data.email, kind=UserKind.JOB_SEEKER)
+
+        expected_redirect_url = add_url_params(
+            reverse("inclusion_connect:logout"), {"redirect_url": reverse("home:hp")}
+        )
+
+        mock_oauth_dance(self.client, UserKind.PRESCRIBER, expected_redirect_url=expected_redirect_url)
+        user.refresh_from_db()
+        assert user.kind == UserKind.JOB_SEEKER
+        assert get_user(self.client).is_authenticated is False
+
+        mock_oauth_dance(self.client, UserKind.PRESCRIBER, expected_redirect_url=expected_redirect_url, register=False)
+        user.refresh_from_db()
+        assert user.kind == UserKind.JOB_SEEKER
+        assert get_user(self.client).is_authenticated is False
+
+        mock_oauth_dance(self.client, UserKind.SIAE_STAFF, expected_redirect_url=expected_redirect_url)
+        user.refresh_from_db()
+        assert user.kind == UserKind.JOB_SEEKER
+        assert get_user(self.client).is_authenticated is False
+
+        mock_oauth_dance(self.client, UserKind.SIAE_STAFF, expected_redirect_url=expected_redirect_url, register=False)
+        user.refresh_from_db()
+        assert user.kind == UserKind.JOB_SEEKER
+        assert get_user(self.client).is_authenticated is False
 
     @respx.mock
     def test_callback_redirect_prescriber_on_too_many_kind_exception(self):

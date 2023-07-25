@@ -28,7 +28,7 @@ def test_add_user(client):
 
 
 def test_no_email_sent(client):
-    user = JobSeekerFactory(identity_provider=IdentityProvider.INCLUSION_CONNECT)
+    user = JobSeekerFactory(identity_provider=IdentityProvider.FRANCE_CONNECT)
 
     # Typical admin user.
     admin_user = ItouStaffFactory(is_superuser=True)
@@ -66,7 +66,7 @@ def test_no_email_sent(client):
     assert user_refreshed.last_name == user.last_name
     assert user_refreshed.date_joined == now
     assert user_refreshed.last_checked_at == now
-    assert user_refreshed.identity_provider == IdentityProvider.INCLUSION_CONNECT
+    assert user_refreshed.identity_provider == IdentityProvider.FRANCE_CONNECT
 
 
 def test_hijack_button(client):

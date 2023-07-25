@@ -377,6 +377,19 @@ class User(AbstractUser, AddressMixin):
         if self.birth_country and self.birth_country.code != self.INSEE_CODE_FRANCE and self.birth_place:
             raise ValidationError(self.ERROR_BIRTH_COMMUNE_WITH_FOREIGN_COUNTRY)
 
+    def validate_identity_provider(self):
+        if self.identity_provider == IdentityProvider.FRANCE_CONNECT and self.kind != UserKind.JOB_SEEKER:
+            raise ValidationError("France connect n'est utilisable que par un candidat.")
+
+        if self.identity_provider == IdentityProvider.PE_CONNECT and self.kind != UserKind.JOB_SEEKER:
+            raise ValidationError("PE connect n'est utilisable que par un candidat.")
+
+        if self.identity_provider == IdentityProvider.INCLUSION_CONNECT and self.kind not in [
+            UserKind.PRESCRIBER,
+            UserKind.SIAE_STAFF,
+        ]:
+            raise ValidationError("Inclusion connect n'est utilisable que par un presctipeur ou employeur.")
+
     def save(self, *args, **kwargs):
         must_create_profile = self._state.adding
 
@@ -397,6 +410,7 @@ class User(AbstractUser, AddressMixin):
             self.is_staff = False
 
         self.validate_constraints()
+        self.validate_identity_provider()
 
         super().save(*args, **kwargs)
 

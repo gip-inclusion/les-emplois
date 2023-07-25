@@ -18,9 +18,11 @@ class InclusionConnectState(OIDConnectState):
 class InclusionConnectPrescriberData(OIDConnectUserData):
     kind: str = UserKind.PRESCRIBER
     identity_provider: IdentityProvider = IdentityProvider.INCLUSION_CONNECT
+    login_allowed_user_kinds = [UserKind.PRESCRIBER, UserKind.SIAE_STAFF]
 
 
 @dataclasses.dataclass
 class InclusionConnectSiaeStaffData(OIDConnectUserData):
     kind: str = UserKind.SIAE_STAFF
     identity_provider: IdentityProvider = IdentityProvider.INCLUSION_CONNECT
+    login_allowed_user_kinds = [UserKind.PRESCRIBER, UserKind.SIAE_STAFF]
