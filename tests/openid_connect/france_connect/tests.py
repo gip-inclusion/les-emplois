@@ -234,7 +234,7 @@ class FranceConnectTest(TestCase):
         we use it but we do not update it
         """
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
-        JobSeekerFactory(email=fc_user_data.email, identity_provider=IdentityProvider.INCLUSION_CONNECT)
+        JobSeekerFactory(email=fc_user_data.email, identity_provider=IdentityProvider.PE_CONNECT)
         user, created = fc_user_data.create_or_update_user()
         assert not created
         assert user.last_name != FC_USERINFO["family_name"]

@@ -21,6 +21,7 @@ class FranceConnectUserData(OIDConnectUserData):
     city: str | None = None
     kind: str = UserKind.JOB_SEEKER
     identity_provider: IdentityProvider = IdentityProvider.FRANCE_CONNECT
+    login_allowed_user_kinds = [UserKind.JOB_SEEKER]
 
     @staticmethod
     def user_info_mapping_dict(user_info: dict):

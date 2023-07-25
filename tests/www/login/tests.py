@@ -53,7 +53,7 @@ class ItouLoginFormTest(TestCase):
         We should block him upstream but this means hard work (overriding default Allauth views),
         too long for this quite uncommon use case.
         """
-        user = PrescriberFactory(identity_provider=users_enums.IdentityProvider.FRANCE_CONNECT)
+        user = JobSeekerFactory(identity_provider=users_enums.IdentityProvider.FRANCE_CONNECT)
         form_data = {
             "login": user.email,
             "password": DEFAULT_PASSWORD,

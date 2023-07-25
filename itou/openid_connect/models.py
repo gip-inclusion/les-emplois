@@ -5,7 +5,7 @@ from django.core import signing
 from django.db import models
 from django.utils import crypto, timezone
 
-from itou.users.enums import IdentityProvider
+from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
 
 from .constants import OIDC_STATE_CLEANUP, OIDC_STATE_EXPIRATION
@@ -95,6 +95,7 @@ class OIDConnectUserData:
     username: str
     identity_provider: IdentityProvider
     kind: str
+    login_allowed_user_kinds = [UserKind]
 
     def create_or_update_user(self, is_login=False):
         """
@@ -135,7 +136,7 @@ class OIDConnectUserData:
                 # This happens when the user tried to update its email with one already used by another account.
                 raise MultipleUsersFoundException([user, other_user])
 
-        if user.kind != user_data_dict["kind"] and not is_login:
+        if user.kind not in self.login_allowed_user_kinds or (user.kind != user_data_dict["kind"] and not is_login):
             raise InvalidKindException(user)
 
         if not created:
