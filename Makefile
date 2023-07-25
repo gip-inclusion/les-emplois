@@ -42,9 +42,9 @@ venv: $(VIRTUAL_ENV)
 
 PIP_COMPILE_FLAGS := --allow-unsafe --generate-hashes $(PIP_COMPILE_OPTIONS)
 compile-deps: $(VIRTUAL_ENV)
-	pip-compile $(PIP_COMPILE_FLAGS) -o requirements/base.txt requirements/base.in
-	pip-compile $(PIP_COMPILE_FLAGS) -o requirements/test.txt requirements/test.in
-	pip-compile $(PIP_COMPILE_FLAGS) -o requirements/dev.txt requirements/dev.in
+	$(EXEC_CMD) pip-compile $(PIP_COMPILE_FLAGS) -o requirements/base.txt requirements/base.in
+	$(EXEC_CMD) pip-compile $(PIP_COMPILE_FLAGS) -o requirements/test.txt requirements/test.in
+	$(EXEC_CMD) pip-compile $(PIP_COMPILE_FLAGS) -o requirements/dev.txt requirements/dev.in
 
 clean:
 	find . -type d -name "__pycache__" -depth -exec rm -rf '{}' \;
@@ -53,20 +53,20 @@ cdsitepackages:
 	docker exec -ti -w /usr/local/lib/$(PYTHON_VERSION)/site-packages itou_django /bin/bash
 
 quality: $(VIRTUAL_ENV)
-	black --check $(LINTER_CHECKED_DIRS)
-	ruff check $(LINTER_CHECKED_DIRS)
-	djlint --lint --check itou
-	find * -type f -name '*.sh' -exec shellcheck --external-sources {} +
-	python manage.py makemigrations --check --dry-run --noinput
-	python manage.py spectacular --validate --fail-on-warn --file /dev/null
+	$(EXEC_CMD) black --check $(LINTER_CHECKED_DIRS)
+	$(EXEC_CMD) ruff check $(LINTER_CHECKED_DIRS)
+	$(EXEC_CMD) djlint --lint --check itou
+	$(EXEC_CMD) find * -type f -name '*.sh' -exec shellcheck --external-sources {} +
+	$(EXEC_CMD) python manage.py makemigrations --check --dry-run --noinput
+	$(EXEC_CMD) python manage.py spectacular --validate --fail-on-warn --file /dev/null
 
 fix: $(VIRTUAL_ENV)
-	black $(LINTER_CHECKED_DIRS)
-	ruff check --fix $(LINTER_CHECKED_DIRS)
-	djlint --reformat itou
+	$(EXEC_CMD) black $(LINTER_CHECKED_DIRS)
+	$(EXEC_CMD) ruff check --fix $(LINTER_CHECKED_DIRS)
+	$(EXEC_CMD) djlint --reformat itou
 	# Use || true because `git apply` exit with an error ("error: unrecognized input") when the pipe is empty,
 	# this happens when there is nothing to fix or shellcheck can't propose a fix.
-	find * -type f -name '*.sh' -exec shellcheck --external-sources --format=diff {} + | git apply || true
+	$(EXEC_CMD) find * -type f -name '*.sh' -exec shellcheck --external-sources --format=diff {} + | git apply || true
 
 # Django.
 # =============================================================================
@@ -213,7 +213,7 @@ postgres_dump_cities:
 
 .PHONY: update_itou_theme
 update_itou_theme:
-	docker exec itou_django /bin/sh -c "./scripts/upload_itou_theme.sh"
+	$(EXEC_CMD) /bin/sh -c "./scripts/upload_itou_theme.sh"
 
 # Deployment
 # =============================================================================
