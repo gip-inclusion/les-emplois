@@ -66,9 +66,6 @@ RUN pip install --upgrade pip \
     && pip install psycopg2-binary --no-binary psycopg2-binary \
     && rm -rf /requirements
 
-RUN apt-get purge -y --auto-remove build-essential libpq-dev $(! command -v gpg > /dev/null || echo 'gnupg dirmngr') \
-    && rm -rf /var/lib/apt/lists/*
-
 COPY --chown=app:app ./docker/dev/django/entrypoint.sh /entrypoint.sh
 
 RUN chmod +x /entrypoint.sh
