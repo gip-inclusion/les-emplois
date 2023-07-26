@@ -31,6 +31,7 @@ from tests.approvals.factories import (
     ApprovalFactory,
     PoleEmploiApprovalFactory,
     ProlongationFactory,
+    ProlongationRequestFactory,
     SuspensionFactory,
 )
 from tests.eligibility.factories import EligibilityDiagnosisFactory
@@ -1796,3 +1797,25 @@ def test_optional_contact_fields_validation(reason, faker):
             match="L'adresse email et le numéro de téléphone ne peuvent être saisis pour ce motif",
         ):
             prolongation.clean()
+
+
+def test_prolongation_from_prolongation_request():
+    prolongation_request = ProlongationRequestFactory(processed=True)
+
+    prolongation = Prolongation.from_prolongation_request(prolongation_request)
+    assert prolongation.request == prolongation_request
+    assert prolongation.validated_by == prolongation_request.processed_by
+    # Copied fields
+    assert prolongation.approval == prolongation_request.approval
+    assert prolongation.start_at == prolongation_request.start_at
+    assert prolongation.end_at == prolongation_request.end_at
+    assert prolongation.reason == prolongation_request.reason
+    assert prolongation.reason_explanation == prolongation_request.reason_explanation
+    assert prolongation.declared_by == prolongation_request.declared_by
+    assert prolongation.declared_by_siae == prolongation_request.declared_by_siae
+    assert prolongation.prescriber_organization == prolongation_request.prescriber_organization
+    assert prolongation.created_by == prolongation_request.created_by
+    assert prolongation.report_file == prolongation_request.report_file
+    assert prolongation.require_phone_interview == prolongation_request.require_phone_interview
+    assert prolongation.contact_email == prolongation_request.contact_email
+    assert prolongation.contact_phone == prolongation_request.contact_phone
