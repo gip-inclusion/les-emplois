@@ -138,26 +138,25 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
         ),
     )
 
+    @admin.display(description="salarié")
     def job_seeker_link(self, obj):
         if job_seeker := obj.job_application.job_seeker:
             return get_admin_view_link(job_seeker, content=job_seeker)
 
         return "-"
 
+    @admin.display(description="profil du salarié")
     def job_seeker_profile_link(self, obj):
         job_seeker_profile = obj.job_application.job_seeker.jobseeker_profile
         return get_admin_view_link(job_seeker_profile, content=f"Profil salarié ID:{job_seeker_profile.pk}")
 
+    @admin.display(description="type de traitement")
     def asp_processing_type(self, obj):
         if obj.processed_as_duplicate:
             return "Intégrée par les emplois suite à une erreur 3436 (doublon PASS IAE/SIRET)"
         if obj.asp_processing_code == obj.ASP_PROCESSING_SUCCESS_CODE:
             return "Intégrée par l'ASP"
         return "-"
-
-    asp_processing_type.short_description = "Type de traitement"
-    job_seeker_link.short_description = "Salarié"
-    job_seeker_profile_link.short_description = "Profil du salarié"
 
 
 @admin.register(models.EmployeeRecordUpdateNotification)

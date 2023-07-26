@@ -27,10 +27,9 @@ class HasMembersFilter(admin.SimpleListFilter):
 
 
 class OrganizationAdmin(admin.ModelAdmin):
+    @admin.display(ordering="_member_count")
     def member_count(self, obj):
         return obj._member_count
-
-    member_count.admin_order_field = "_member_count"
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
