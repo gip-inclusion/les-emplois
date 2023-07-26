@@ -55,7 +55,7 @@ class JobApplicationInline(admin.StackedInline):
     # there is no direct relation between approvals and employee records
     # (YET...)
     @staticmethod
-    @admin.display(description="Fiches salariés")
+    @admin.display(description="fiches salariés")
     def employee_record_status(obj):
         if obj.employee_record.exists():
             return mark_safe(
@@ -238,11 +238,9 @@ class ApprovalAdmin(admin.ModelAdmin):
 
         super().save_model(request, obj, form, change)
 
+    @admin.display(boolean=True, description="en cours de validité")
     def is_valid(self, obj):
         return obj.is_valid()
-
-    is_valid.boolean = True
-    is_valid.short_description = "En cours de validité"
 
     def manually_add_approval(self, request, job_application_id):
         """
@@ -271,14 +269,13 @@ class ApprovalAdmin(admin.ModelAdmin):
         ]
         return additional_urls + super().get_urls()
 
+    @admin.display(description="date de naissance")
     def birthdate(self, obj):
         """
         User birthdate as custom value in display
 
         """
         return obj.user.birthdate
-
-    birthdate.short_description = "Date de naissance"
 
 
 class IsInProgressFilter(admin.SimpleListFilter):
@@ -337,11 +334,9 @@ class SuspensionAdmin(admin.ModelAdmin):
     )
     inlines = (PkSupportRemarkInline,)
 
+    @admin.display(boolean=True, description="en cours")
     def is_in_progress(self, obj):
         return obj.is_in_progress
-
-    is_in_progress.boolean = True
-    is_in_progress.short_description = "En cours"
 
     def save_model(self, request, obj, form, change):
         if not change:
@@ -384,16 +379,13 @@ class ProlongationCommonAdmin(admin.ModelAdmin):
     def get_list_display(self, request):
         return self.list_display + ("created_at",)  # Put the audit fields after the one added in subclasses
 
+    @admin.display(boolean=True, description="en cours")
     def is_in_progress(self, obj):
         return obj.is_in_progress
 
-    is_in_progress.boolean = True
-    is_in_progress.short_description = "En cours"
-
+    @admin.display(description="lien du fichier bilan")
     def report_file_link(self, obj):
         return mark_safe(f"<a href='{obj.report_file.link}'>{obj.report_file.key}</a>")
-
-    report_file_link.short_description = "Lien du fichier bilan"
 
     def get_queryset(self, request):
         # Speed up the list display view by fetching related objects.
@@ -452,8 +444,6 @@ class PoleEmploiApprovalAdmin(admin.ModelAdmin):
     list_filter = (IsValidFilter,)
     date_hierarchy = "birthdate"
 
+    @admin.display(boolean=True, description="en cours de validité")
     def is_valid(self, obj):
         return obj.is_valid()
-
-    is_valid.boolean = True
-    is_valid.short_description = "En cours de validité"

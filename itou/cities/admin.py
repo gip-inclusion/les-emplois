@@ -17,7 +17,7 @@ class CityAdmin(ItouGISMixin, admin.ModelAdmin):
 
     fields = ("name", "department", "post_codes", "code_insee", "zrr", "coords", "edition_mode")
 
-    @admin.display(description="Commune en ZRR")
+    @admin.display(description="commune en ZRR")
     def zrr(self, obj):
         # DO NOT USE THIS DYNAMIC FIELD IN 'list_display'
         try:

@@ -26,10 +26,9 @@ class EvaluatedSiaesInline(admin.TabularInline):
     def state(self, obj):
         return obj.state
 
+    @admin.display(description="lien vers les Siaes évaluées")
     def id_link(self, obj):
         return get_admin_view_link(obj, content=mark_safe(f"Lien vers la Siae évaluée <strong>{obj}</strong>"))
-
-    id_link.short_description = "Lien vers les Siaes évaluées"
 
 
 class EvaluatedJobApplicationsInline(admin.TabularInline):
@@ -46,10 +45,9 @@ class EvaluatedJobApplicationsInline(admin.TabularInline):
     def state(self, obj):
         return obj.state
 
+    @admin.display(description="lien vers les candidatures évaluées")
     def id_link(self, obj):
         return get_admin_view_link(obj, content=mark_safe(f"Lien vers la candidature évaluée <strong>{obj}</strong>"))
-
-    id_link.short_description = "Lien vers les candidatures évaluées"
 
     def approval(self, obj):
         if obj.job_application.approval:
@@ -68,12 +66,11 @@ class EvaluatedAdministrativeCriteriaInline(admin.TabularInline):
     readonly_fields = ("id_link", "uploaded_at", "submitted_at", "review_state")
     extra = 0
 
+    @admin.display(description="lien vers les critères administratifs évalués")
     def id_link(self, obj):
         return get_admin_view_link(
             obj, content=mark_safe(f"Lien vers le critère administratif <strong>{obj}</strong>")
         )
-
-    id_link.short_description = "Lien vers les critères administratifs évalués"
 
 
 def _evaluated_siae_serializer(queryset):
@@ -306,11 +303,11 @@ class SanctionsAdmin(admin.ModelAdmin):
         "no_sanction_reason",
     ]
 
-    @admin.display(description="Campagne", ordering="evaluated_siae__evaluation_campaign")
+    @admin.display(description="campagne", ordering="evaluated_siae__evaluation_campaign")
     def evaluation_campaign(self, obj):
         return obj.evaluated_siae.evaluation_campaign.name
 
-    @admin.display(description="Institution", ordering="evaluated_siae__evaluation_campaign__institution")
+    @admin.display(description="institution", ordering="evaluated_siae__evaluation_campaign__institution")
     def institution(self, obj):
         return obj.evaluated_siae.evaluation_campaign.institution
 

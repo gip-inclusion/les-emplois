@@ -40,10 +40,9 @@ class JobsInline(admin.TabularInline):
         "jobdescription_id_link",
     )
 
+    @admin.display(description="lien vers la fiche de poste")
     def jobdescription_id_link(self, obj):
         return get_admin_view_link(obj, content=mark_safe(f"<strong>Fiche de poste ID: {obj.id}</strong>"))
-
-    jobdescription_id_link.short_description = "Lien vers la fiche de poste"
 
 
 class FinancialAnnexesInline(admin.TabularInline):
@@ -54,11 +53,9 @@ class FinancialAnnexesInline(admin.TabularInline):
 
     ordering = ("-number",)
 
+    @admin.display(boolean=True, description="active")
     def is_active(self, obj):
         return obj.is_active
-
-    is_active.boolean = True
-    is_active.short_description = "Active"
 
     def has_change_permission(self, request, obj=None):
         return False

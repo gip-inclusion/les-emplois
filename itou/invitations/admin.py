@@ -32,15 +32,13 @@ class BaseInvitationAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         return super().get_queryset(request).select_related("sender")
 
+    @admin.display(boolean=True, description="en cours de validité")
     def is_valid(self, obj):
         return not obj.has_expired
 
+    @admin.display(description="lien")
     def acceptance_link(self, obj):
         return obj.acceptance_link
-
-    is_valid.boolean = True
-    is_valid.short_description = "En cours de validité"
-    acceptance_link.short_description = "Lien"
 
 
 @admin.register(SiaeStaffInvitation)

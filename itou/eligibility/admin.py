@@ -77,11 +77,9 @@ class AbstractEligibilityDiagnosisAdmin(admin.ModelAdmin):
         "author_kind",
     )
 
+    @admin.display(boolean=True, description="en cours de validité")
     def is_valid(self, obj):
         return obj.is_valid
-
-    is_valid.boolean = True
-    is_valid.short_description = "En cours de validité"
 
 
 @admin.register(models.EligibilityDiagnosis)
@@ -107,6 +105,7 @@ class EligibilityDiagnosisAdmin(AbstractEligibilityDiagnosisAdmin):
             "is_considered_valid",
         )
 
+    @admin.display(boolean=True, description="valide ou PASS IAE en cours")
     def is_considered_valid(self, obj):
         """
         This uses a property of the model and is intended to be used on the
@@ -114,17 +113,12 @@ class EligibilityDiagnosisAdmin(AbstractEligibilityDiagnosisAdmin):
         """
         return obj.is_considered_valid
 
-    is_considered_valid.boolean = True
-    is_considered_valid.short_description = "Valide ou PASS IAE en cours"
-
+    @admin.display(boolean=True, description="PASS IAE en cours")
     def has_approval(self, obj):
         """
         This uses an annotated attribute and is intended to be used on the list view.
         """
         return obj._has_approval
-
-    has_approval.boolean = True
-    has_approval.short_description = "PASS IAE en cours"
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
@@ -151,16 +145,13 @@ class GEIQEligibilityDiagnosisAdmin(AbstractEligibilityDiagnosisAdmin):
             "allowance_amount",
         )
 
+    @admin.display(boolean=True, description="éligibilité GEIQ confirmée")
     def has_eligibility(self, obj):
         return obj.eligibility_confirmed
 
-    has_eligibility.boolean = True
-    has_eligibility.short_description = "Eligibilité GEIQ confirmée"
-
+    @admin.display(description="montant de l'aide")
     def allowance_amount(self, obj):
         return f"{obj.allowance_amount} EUR"
-
-    allowance_amount.short_description = "Montant de l'aide"
 
 
 class AbstractAdministrativeCriteriaAdmin(admin.ModelAdmin):

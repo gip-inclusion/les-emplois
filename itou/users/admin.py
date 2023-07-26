@@ -153,7 +153,7 @@ class SentJobApplicationInline(JobApplicationInline):
     verbose_name = "candidature envoyée"
     verbose_name_plural = "candidatures envoyées"
 
-    @admin.display(description="Candidat")
+    @admin.display(description="candidat")
     def job_seeker_link(self, obj):
         return get_admin_view_link(obj.job_seeker, content=obj.job_seeker.get_full_name())
 
@@ -181,11 +181,9 @@ class EligibilityDiagnosisInline(admin.TabularInline):
     def pk_link(self, obj):
         return get_admin_view_link(obj)
 
+    @admin.display(boolean=True, description="en cours de validité")
     def is_valid(self, obj):
         return obj.is_valid
-
-    is_valid.boolean = True
-    is_valid.short_description = "En cours de validité"
 
 
 class GEIQEligibilityDiagnosisInline(EligibilityDiagnosisInline):
@@ -211,15 +209,13 @@ class ApprovalInline(admin.TabularInline):
     def has_add_permission(self, request, obj=None):
         return False
 
-    @admin.display(description="Numéro")
+    @admin.display(description="numéro")
     def pk_link(self, obj):
         return get_admin_view_link(obj, content=obj.number)
 
+    @admin.display(boolean=True, description="en cours de validité")
     def is_valid(self, obj):
         return obj.is_valid()
-
-    is_valid.boolean = True
-    is_valid.short_description = "En cours de validité"
 
 
 class CreatedByProxyFilter(admin.SimpleListFilter):
@@ -319,25 +315,20 @@ class ItouUserAdmin(UserAdmin):
         ),
     )
 
+    @admin.display(boolean=True, description="email validé", ordering="_has_verified_email")
     def has_verified_email(self, obj):
         """
         Quickly identify unverified email that could be the result of a typo.
         """
         return obj._has_verified_email
 
-    has_verified_email.boolean = True
-    has_verified_email.admin_order_field = "_has_verified_email"
-    has_verified_email.short_description = "Email validé"
-
+    @admin.display(boolean=True, description="créé par un tiers")
     def is_created_by_a_proxy(self, obj):
         # Use the "hidden" field with an `_id` suffix to avoid hitting the database for each row.
         # https://docs.djangoproject.com/en/dev/ref/models/fields/#database-representation
         return bool(obj.created_by_id)
 
-    is_created_by_a_proxy.boolean = True
-    is_created_by_a_proxy.short_description = "créé par un tiers"
-
-    @admin.display(description="Adresse en QPV")
+    @admin.display(description="adresse en QPV")
     def address_in_qpv(self, obj):
         # DO NOT PUT THIS FIELD IN 'list_display' : dynamically computed, only for detail page
         if not obj.coords:
@@ -539,36 +530,29 @@ class JobSeekerProfileAdmin(admin.ModelAdmin):
 
     inlines = (PkSupportRemarkInline,)
 
+    @admin.display(description="date de naissance")
     def birthdate(self, obj):
         return obj.user.birthdate
 
-    birthdate.short_description = "Date de naissance"
-
+    @admin.display(description="NIR")
     def nir(self, obj):
         return obj.user.nir or "-"
 
-    nir.short_description = "NIR"
-
+    @admin.display(description="nom complet")
     def username(self, obj):
         return f"{obj.user.first_name} {obj.user.last_name}"
 
-    username.short_description = "Nom complet"
-
+    @admin.display(description="identifiant Pôle emploi")
     def pole_emploi_id(self, obj):
         return obj.user.pole_emploi_id or "-"
 
-    pole_emploi_id.short_description = "Identifiant Pôle emploi"
-
+    @admin.display(boolean=True, description="profil certifié par Pôle emploi")
     def is_pe_certified(self, obj):
         return obj.pe_obfuscated_nir is not None
 
-    is_pe_certified.short_description = "Profil certifié par Pôle emploi"
-    is_pe_certified.boolean = True
-
+    @admin.display(description="utilisateur")
     def user_link(self, obj):
         return get_admin_view_link(obj.user, content=f"🔗 {obj.user.email}")
-
-    user_link.short_description = "Utilisateur"
 
 
 class EmailAddressWithRemarkAdmin(EmailAddressAdmin):
