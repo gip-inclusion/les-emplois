@@ -407,7 +407,7 @@ class ProlongationRequestAdmin(ProlongationCommonAdmin):
 
 
 @admin.register(models.Prolongation)
-class ProlongationCommonAdmin(ProlongationCommonAdmin):
+class ProlongationAdmin(ProlongationCommonAdmin):
     list_display = ProlongationCommonAdmin.list_display + ("is_in_progress",)
     raw_id_fields = ProlongationCommonAdmin.raw_id_fields + ("request",)
     list_filter = (
