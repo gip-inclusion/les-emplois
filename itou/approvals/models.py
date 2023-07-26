@@ -1199,6 +1199,9 @@ class ProlongationRequest(CommonProlongation):
             ),
         ]
 
+    def __str__(self):
+        return f"{self.approval} — {self.get_status_display()} — {self.start_at:%d/%m/%Y} - {self.end_at:%d/%m/%Y}"
+
     def notify_authorized_prescriber(self):
         notifications.ProlongationRequestCreated(self).send()
 
