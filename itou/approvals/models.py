@@ -1314,6 +1314,7 @@ class Prolongation(CommonProlongation):
         }
 
         obj = cls()
+        obj.request = prolongation_request
         for field in fields_to_copy:
             setattr(obj, field, getattr(prolongation_request, field))
         # The user granting the request can be different from the one that was ask to
