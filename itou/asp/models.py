@@ -414,7 +414,7 @@ class Commune(PrettyPrintMixin, AbstractPeriod):
         except Commune.DoesNotExist as ex:
             raise CommuneUnknownInPeriodError(
                 f"Période inconnue dans le référentiel ASP pour le code INSEE {insee_code} "
-                f"en date du {point_in_time:%d-%m-%Y}"
+                f"en date du {point_in_time:%d/%m/%Y}"
             ) from ex
 
     @cached_property

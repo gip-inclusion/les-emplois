@@ -139,7 +139,7 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
                 self.cleaned_data["birth_place"] = Commune.by_insee_code_and_period(commune_code, birth_date)
             except CommuneUnknownInPeriodError as ex:
                 raise forms.ValidationError(
-                    f"Le code INSEE {commune_code} n'est pas référencé en date du {birth_date:%d-%m-%Y}"
+                    f"Le code INSEE {commune_code} n'est pas référencé en date du {birth_date:%d/%m/%Y}"
                 ) from ex
 
     class Meta:
