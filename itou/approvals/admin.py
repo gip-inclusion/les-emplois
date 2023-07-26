@@ -310,6 +310,22 @@ class HasReportFile(admin.SimpleListFilter):
         return queryset
 
 
+class FromProlongationRequest(admin.SimpleListFilter):
+    title = "une demande de prolongation"
+    parameter_name = "from_prolongation_request"
+
+    def lookups(self, request, model_admin):
+        return ("yes", "Oui"), ("no", "Non")
+
+    def queryset(self, request, queryset):
+        match self.value():
+            case "yes":
+                return queryset.filter(request__isnull=False)
+            case "no":
+                return queryset.filter(request=None)
+        return queryset
+
+
 @admin.register(models.Suspension)
 class SuspensionAdmin(admin.ModelAdmin):
     list_display = (
@@ -408,13 +424,18 @@ class ProlongationRequestAdmin(ProlongationCommonAdmin):
 
 @admin.register(models.Prolongation)
 class ProlongationAdmin(ProlongationCommonAdmin):
-    list_display = ProlongationCommonAdmin.list_display + ("is_in_progress",)
+    list_display = ProlongationCommonAdmin.list_display + ("is_in_progress", "from_prolongation_request")
     raw_id_fields = ProlongationCommonAdmin.raw_id_fields + ("request",)
     list_filter = (
         IsInProgressFilter,
         HasReportFile,
+        FromProlongationRequest,
     ) + ProlongationCommonAdmin.list_filter
     date_hierarchy = "start_at"
+
+    @admin.display(boolean=True, description="demande")
+    def from_prolongation_request(self, obj):
+        return obj.request is not None
 
 
 @admin.register(models.PoleEmploiApproval)
