@@ -357,8 +357,7 @@ class ProlongationCommonAdmin(admin.ModelAdmin):
         "end_at",
         "declared_by",
         "validated_by",
-        "created_at",
-        "is_in_progress",
+        "reason",
     )
     list_display_links = ("pk", "approval")
     raw_id_fields = (
@@ -372,12 +371,7 @@ class ProlongationCommonAdmin(admin.ModelAdmin):
         "updated_by",
     )
     exclude = ("report_file",)
-    list_filter = (
-        IsInProgressFilter,
-        HasReportFile,
-        "reason",
-    )
-    date_hierarchy = "start_at"
+    list_filter = ("reason",)
     readonly_fields = (
         "created_at",
         "created_by",
@@ -386,6 +380,9 @@ class ProlongationCommonAdmin(admin.ModelAdmin):
         "report_file_link",
     )
     inlines = (PkSupportRemarkInline,)
+
+    def get_list_display(self, request):
+        return self.list_display + ("created_at",)  # Put the audit fields after the one added in subclasses
 
     def is_in_progress(self, obj):
         return obj.is_in_progress
@@ -412,12 +409,20 @@ class ProlongationCommonAdmin(admin.ModelAdmin):
 
 @admin.register(models.ProlongationRequest)
 class ProlongationRequestAdmin(ProlongationCommonAdmin):
+    list_display = ProlongationCommonAdmin.list_display + ("status",)
+    list_filter = ("status",) + ProlongationCommonAdmin.list_filter
     readonly_fields = ProlongationCommonAdmin.readonly_fields + ("processed_at", "processed_by")
 
 
 @admin.register(models.Prolongation)
 class ProlongationCommonAdmin(ProlongationCommonAdmin):
+    list_display = ProlongationCommonAdmin.list_display + ("is_in_progress",)
     raw_id_fields = ProlongationCommonAdmin.raw_id_fields + ("request",)
+    list_filter = (
+        IsInProgressFilter,
+        HasReportFile,
+    ) + ProlongationCommonAdmin.list_filter
+    date_hierarchy = "start_at"
 
 
 @admin.register(models.PoleEmploiApproval)
