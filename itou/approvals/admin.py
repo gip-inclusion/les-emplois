@@ -417,7 +417,7 @@ class ProlongationCommonAdmin(admin.ModelAdmin):
 
 @admin.register(models.ProlongationRequest)
 class ProlongationRequestAdmin(ProlongationCommonAdmin):
-    list_display = ProlongationCommonAdmin.list_display + ("status",)
+    list_display = ProlongationCommonAdmin.list_display + ("status", "processed_at")
     list_filter = ("status",) + ProlongationCommonAdmin.list_filter
     readonly_fields = ProlongationCommonAdmin.readonly_fields + ("processed_at", "processed_by")
 
