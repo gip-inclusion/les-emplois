@@ -394,6 +394,7 @@ class ProlongationCommonAdmin(admin.ModelAdmin):
         "report_file_link",
     )
     inlines = (PkSupportRemarkInline,)
+    list_select_related = ("approval", "declared_by", "validated_by")
 
     def get_list_display(self, request):
         return self.list_display + ("created_at",)  # Put the audit fields after the one added in subclasses
@@ -409,10 +410,6 @@ class ProlongationCommonAdmin(admin.ModelAdmin):
             obj.report_file.link,
             obj.report_file.key,
         )
-
-    def get_queryset(self, request):
-        # Speed up the list display view by fetching related objects.
-        return super().get_queryset(request).select_related("approval", "declared_by", "validated_by")
 
     def save_model(self, request, obj, form, change):
         if change:

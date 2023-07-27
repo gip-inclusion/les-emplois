@@ -28,9 +28,7 @@ class BaseInvitationAdmin(admin.ModelAdmin):
     list_filter = ("accepted", IsValidFilter)
     readonly_fields = ("is_valid", "created_at", "sent_at", "accepted_at", "acceptance_link")
     raw_id_fields = ("sender",)
-
-    def get_queryset(self, request):
-        return super().get_queryset(request).select_related("sender")
+    list_select_related = ("sender",)
 
     @admin.display(boolean=True, description="en cours de validité")
     def is_valid(self, obj):
@@ -46,9 +44,7 @@ class SiaeStaffInvitationAdmin(BaseInvitationAdmin):
     list_display = BaseInvitationAdmin.list_display + ("siae",)
     raw_id_fields = BaseInvitationAdmin.raw_id_fields + ("siae",)
     search_fields = BaseInvitationAdmin.search_fields + ("siae__siret",)
-
-    def get_queryset(self, request):
-        return super().get_queryset(request).select_related("siae")
+    list_select_related = BaseInvitationAdmin.list_select_related + ("siae",)
 
 
 @admin.register(PrescriberWithOrgInvitation)
@@ -56,9 +52,7 @@ class PrescriberWithOrgInvitationAdmin(BaseInvitationAdmin):
     list_display = BaseInvitationAdmin.list_display + ("organization",)
     raw_id_fields = BaseInvitationAdmin.raw_id_fields + ("organization",)
     search_fields = BaseInvitationAdmin.search_fields + ("organization__siret",)
-
-    def get_queryset(self, request):
-        return super().get_queryset(request).select_related("organization")
+    list_select_related = BaseInvitationAdmin.list_select_related + ("organization",)
 
 
 @admin.register(LaborInspectorInvitation)
@@ -66,6 +60,4 @@ class LaborInspectorInvitationAdmin(BaseInvitationAdmin):
     list_display = BaseInvitationAdmin.list_display + ("institution",)
     raw_id_fields = BaseInvitationAdmin.raw_id_fields + ("institution",)
     search_fields = BaseInvitationAdmin.search_fields + ("institution__name",)
-
-    def get_queryset(self, request):
-        return super().get_queryset(request).select_related("institution")
+    list_select_related = BaseInvitationAdmin.list_select_related + ("institution",)
