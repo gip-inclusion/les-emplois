@@ -241,38 +241,31 @@ class ProcessListSiaeTest(ProcessListTest):
             # 9 job applications (1 per state in JobApplicationWorkflow + 1 sent by prescriber)
             # 22 requests, maggie has a diagnosis made by a prescriber in this test
             + 1  # jobapp1: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
-            + 1  # jobapp1: select last valid diagnosis made by prescriber (exists)
+            + 1  # jobapp1: select last valid diagnosis made by prescriber or SIAE (prescriber)
             # 24 requests
             + 1  # jobapp2: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
-            + 1  # jobapp2: select last valid diagnosis made by prescriber (does not exist)
-            + 1  # jobapp2: select last valid diagnosis made by siae (exists)
-            # 27 requests
+            + 1  # jobapp2: select last valid diagnosis made by prescriber or SIAE (SIAE)
+            # 26 requests
             + 1  # jobapp3: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
-            + 1  # jobapp3: select last valid diagnosis made by prescriber (does not exist)
-            + 1  # jobapp3: select last valid diagnosis made by siae (exists)
-            # 30 requests
+            + 1  # jobapp3: select last valid diagnosis made by prescriber or SIAE (SIAE)
+            # 28 requests
             + 1  # jobapp4: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
-            + 1  # jobapp4: select last valid diagnosis made by prescriber (does not exist)
-            + 1  # jobapp4: select last valid diagnosis made by siae (exists)
-            # 33 requests
+            + 1  # jobapp4: select last valid diagnosis made by prescriber or SIAE (SIAE)
+            # 30 requests
             + 1  # jobapp5: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
-            + 1  # jobapp5: select last valid diagnosis made by prescriber (does not exist)
-            + 1  # jobapp5: select last valid diagnosis made by siae (exists)
-            # 36 requests
+            + 1  # jobapp5: select last valid diagnosis made by prescriber or SIAE (SIAE)
+            # 32 requests
             + 1  # jobapp6: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
-            + 1  # jobapp6: select last valid diagnosis made by prescriber (does not exist)
-            + 1  # jobapp6: select last valid diagnosis made by siae (exists)
-            # 39 requests
+            + 1  # jobapp6: select last valid diagnosis made by prescriber or SIAE (SIAE)
+            # 34 requests
             + 1  # jobapp7: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
-            + 1  # jobapp7: select last valid diagnosis made by prescriber (does not exist)
-            + 1  # jobapp7: select last valid diagnosis made by siae (exists)
-            # 42 requests
+            + 1  # jobapp7: select last valid diagnosis made by prescriber or SIAE (SIAE)
+            # 36 requests
             + 1  # jobapp8: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
-            + 1  # jobapp8: select last valid diagnosis made by prescriber (does not exist)
-            + 1  # jobapp8: select last valid diagnosis made by siae (exists)
-            # 45 requests, maggie has a diagnosis made by a prescriber in this test
+            + 1  # jobapp8: select last valid diagnosis made by prescriber or SIAE (SIAE)
+            # 38 requests, maggie has a diagnosis made by a prescriber in this test
             + 1  # jobapp9: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
-            + 1  # jobapp9: select last valid diagnosis made by prescriber (exists)
+            + 1  # jobapp8: select last valid diagnosis made by prescriber or SIAE (prescriber)
             + 3  # update session
         ):
             response = self.client.get(self.siae_base_url)
