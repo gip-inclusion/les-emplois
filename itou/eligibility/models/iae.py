@@ -75,22 +75,25 @@ class EligibilityDiagnosisManager(models.Manager):
         diagnosis already exists.
         """
 
+        query = self.for_job_seeker(job_seeker).order_by("-created_at")
+        if not job_seeker.has_valid_common_approval:
+            query = query.valid()
+        # Otherwise, a diagnosis is considered valid for the duration of an
+        # approval, we just retrieve the last one no matter if it's valid or
+        # not.
+
+        filter = models.Q(author_kind=AuthorKind.PRESCRIBER)
+        if for_siae:
+            filter |= models.Q(author_siae=for_siae)
+
         last = None
-        query = self.for_job_seeker(job_seeker).order_by("created_at")
-
-        # A diagnosis is considered valid for the duration of an approval,
-        # we just retrieve the last one no matter if it's valid or not.
-        if job_seeker.has_valid_common_approval:
-            last = query.by_author_kind_prescriber().last()
-            if not last and for_siae:
-                last = query.authored_by_siae(for_siae).last()
-
-        # Otherwise, search only in "non expired" diagnosis.
-        else:
-            last = query.valid().by_author_kind_prescriber().last()
-            if not last and for_siae:
-                last = query.valid().authored_by_siae(for_siae).last()
-
+        for diagnosis in query.filter(filter):
+            # Prescriber diagnosis have precedence over SIAE diagnosis.
+            if diagnosis.author_kind == AuthorKind.PRESCRIBER:
+                last = diagnosis
+                break
+            elif for_siae and not last:
+                last = diagnosis
         return last
 
     def last_expired(self, job_seeker, for_siae=None):
