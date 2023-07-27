@@ -84,26 +84,17 @@ class AbstractEligibilityDiagnosisAdmin(admin.ModelAdmin):
 
 @admin.register(models.EligibilityDiagnosis)
 class EligibilityDiagnosisAdmin(AbstractEligibilityDiagnosisAdmin):
+    list_display = AbstractEligibilityDiagnosisAdmin.list_display + ("has_approval",)
+    list_filter = AbstractEligibilityDiagnosisAdmin.list_filter + (HasApprovalFilter,)
+    raw_id_fields = AbstractEligibilityDiagnosisAdmin.raw_id_fields + ("author_siae",)
+    readonly_fields = AbstractEligibilityDiagnosisAdmin.readonly_fields + (
+        "is_valid",
+        "is_considered_valid",
+    )
     inlines = (
         AdministrativeCriteriaInline,
         PkSupportRemarkInline,
     )
-
-    def get_list_filter(self, request):
-        return self.list_filter + (HasApprovalFilter,)
-
-    def __init__(self, model, admin_site):
-        super().__init__(model, admin_site)
-        self.raw_id_fields += ("author_siae",)
-
-    def get_list_display(self, request):
-        return self.list_display + ("has_approval",)
-
-    def get_readonly_fields(self, request, obj=None):
-        return self.readonly_fields + (
-            "is_valid",
-            "is_considered_valid",
-        )
 
     @admin.display(boolean=True, description="valide ou PASS IAE en cours")
     def is_considered_valid(self, obj):
@@ -129,21 +120,15 @@ class EligibilityDiagnosisAdmin(AbstractEligibilityDiagnosisAdmin):
 
 @admin.register(models.GEIQEligibilityDiagnosis)
 class GEIQEligibilityDiagnosisAdmin(AbstractEligibilityDiagnosisAdmin):
+    raw_id_fields = AbstractEligibilityDiagnosisAdmin.raw_id_fields + ("author_geiq",)
+    readonly_fields = AbstractEligibilityDiagnosisAdmin.readonly_fields + (
+        "has_eligibility",
+        "allowance_amount",
+    )
     inlines = (
         GEIQAdministrativeCriteriaInline,
         PkSupportRemarkInline,
     )
-
-    def __init__(self, model, admin_site):
-        super().__init__(model, admin_site)
-
-        self.raw_id_fields += ("author_geiq",)
-
-    def get_readonly_fields(self, request, obj=None):
-        return self.readonly_fields + (
-            "has_eligibility",
-            "allowance_amount",
-        )
 
     @admin.display(boolean=True, description="éligibilité GEIQ confirmée")
     def has_eligibility(self, obj):
@@ -193,15 +178,11 @@ class GEIQAdministrativeCriteriaAdmin(AbstractAdministrativeCriteriaAdmin):
         "level",
         "created_at",
     )
+    raw_id_fields = AbstractAdministrativeCriteriaAdmin.raw_id_fields + ("parent",)
+    list_filter = AbstractAdministrativeCriteriaAdmin.list_filter + ("annex",)
     ordering = (
+        "annex",
         "level",
         "ui_rank",
         "pk",
     )
-
-    def __init__(self, model, admin_site):
-        super().__init__(model, admin_site)
-
-        self.raw_id_fields += ("parent",)
-        self.list_filter += ("annex",)
-        self.ordering = ("annex",) + self.ordering
