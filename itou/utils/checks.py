@@ -36,7 +36,13 @@ def check_verbose_name_lower(app_configs, **kwargs):
                             obj=model,
                         )
                     )
-        for field in (f for f in model._meta.get_fields() if not f.is_relation):
+        for field in model._meta.get_fields():
+            exclude_predicates = [
+                field.is_relation and field.auto_created,  # Reverse side of the relation
+                field.is_relation and field.related_model is None,  # GenericForeignKey
+            ]
+            if any(exclude_predicates):
+                continue
             if bad_name(field.verbose_name):
                 errors.append(
                     Error(
