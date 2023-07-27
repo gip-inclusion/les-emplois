@@ -17,11 +17,13 @@ class EvaluatedSiaesInline(admin.TabularInline):
     extra = 0
 
     def get_queryset(self, request):
-        queryset = super().get_queryset(request)
-        queryset = queryset.prefetch_related(
-            "evaluated_job_applications", "evaluated_job_applications__evaluated_administrative_criteria"
+        return (
+            super()
+            .get_queryset(request)
+            .prefetch_related(
+                "evaluated_job_applications", "evaluated_job_applications__evaluated_administrative_criteria"
+            )
         )
-        return queryset
 
     def state(self, obj):
         return obj.state
@@ -38,9 +40,7 @@ class EvaluatedJobApplicationsInline(admin.TabularInline):
     extra = 0
 
     def get_queryset(self, request):
-        queryset = super().get_queryset(request)
-        queryset = queryset.prefetch_related("evaluated_administrative_criteria")
-        return queryset
+        return super().get_queryset(request).prefetch_related("evaluated_administrative_criteria")
 
     def state(self, obj):
         return obj.state
@@ -234,11 +234,13 @@ class EvaluatedSiaeAdmin(admin.ModelAdmin):
     ]
 
     def get_queryset(self, request):
-        queryset = super().get_queryset(request)
-        queryset = queryset.prefetch_related(
-            "evaluated_job_applications", "evaluated_job_applications__evaluated_administrative_criteria"
+        return (
+            super()
+            .get_queryset(request)
+            .prefetch_related(
+                "evaluated_job_applications", "evaluated_job_applications__evaluated_administrative_criteria"
+            )
         )
-        return queryset
 
     def state(self, obj):
         return obj.state
@@ -254,9 +256,7 @@ class EvaluatedJobApplicationAdmin(admin.ModelAdmin):
     ]
 
     def get_queryset(self, request):
-        queryset = super().get_queryset(request)
-        queryset = queryset.prefetch_related("evaluated_administrative_criteria")
-        return queryset
+        return super().get_queryset(request).prefetch_related("evaluated_administrative_criteria")
 
     def state(self, obj):
         return obj.state
