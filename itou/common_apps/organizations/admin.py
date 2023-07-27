@@ -32,9 +32,7 @@ class OrganizationAdmin(admin.ModelAdmin):
         return obj._member_count
 
     def get_queryset(self, request):
-        queryset = super().get_queryset(request)
-        queryset = queryset.annotate(_member_count=Count("members", distinct=True))
-        return queryset
+        return super().get_queryset(request).annotate(_member_count=Count("members", distinct=True))
 
     def save_related(self, request, form, formsets, change):
         had_admin = change and form.instance.active_admin_members.exists()
