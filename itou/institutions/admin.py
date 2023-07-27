@@ -71,10 +71,6 @@ class InstitutionAdmin(ItouGISMixin, OrganizationAdmin):
         "city",
     )
 
-    def get_queryset(self, request):
-        # OrganizationAdmin adds some useful annotations.
-        return super().get_queryset(request)
-
     def save_model(self, request, obj, form, change):
         if not change:
             if not obj.geocoding_score and obj.geocoding_address:
