@@ -280,26 +280,26 @@ class ApprovalModelTest(TestCase):
 
     @freeze_time("2022-11-17")
     def test_is_open_to_prolongation(self):
-        # Ensure that "now" is "before" the period open to prolongations (12 months after approval start)
+        # Ensure that "now" is "before" the period open to prolongations (7 months before approval end)
         approval = ApprovalFactory(
-            start_at=datetime.date(2021, 11, 18),
-            end_at=datetime.date(2023, 11, 17),
+            start_at=datetime.date(2021, 6, 17),
+            end_at=datetime.date(2023, 6, 18),
         )
         assert not approval.is_open_to_prolongation
 
         # Ensure "now" is in the period open to prolongations.
         approval = ApprovalFactory(
-            start_at=datetime.date(2021, 11, 17),
-            end_at=datetime.date(2023, 11, 16),
+            start_at=datetime.date(2021, 6, 16),
+            end_at=datetime.date(2023, 6, 15),
         )
         assert approval.is_open_to_prolongation
 
-        # until 3 month after the end date, users are allowed to prolong it up to 3 months after the end.
+        # users are not allowed to make a prolongation 3 months after the approval end anymore.
         approval = ApprovalFactory(
             start_at=datetime.date(2020, 8, 18),
             end_at=datetime.date(2022, 8, 17),
         )
-        assert approval.is_open_to_prolongation
+        assert not approval.is_open_to_prolongation
 
         # Ensure "now" is "after" the period open to prolongations.
         approval = ApprovalFactory(

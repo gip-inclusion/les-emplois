@@ -1,11 +1,9 @@
 import django.db.transaction as transaction
-from dateutil.relativedelta import relativedelta
 from django.core.management.base import BaseCommand
 from django.db.models import F, Max
 from django.db.models.functions import Greatest
 from django.utils import timezone
 
-from itou.approvals.models import Approval
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification
 
@@ -135,10 +133,7 @@ class Command(BaseCommand):
     @transaction.atomic()
     def _check_missed_notifications(self, dry_run):
         self.stdout.write("* Checking missing employee records notifications:")
-
-        prolongation_cutoff = timezone.now() - relativedelta(
-            months=Approval.IS_OPEN_TO_PROLONGATION_BOUNDARIES_MONTHS_AFTER_END,
-        )
+        prolongation_cutoff = timezone.now()
         employee_record_with_missing_notification = (
             EmployeeRecord.objects.annotate(
                 last_employee_record_snapshot=Greatest(
