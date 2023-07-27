@@ -268,7 +268,8 @@ class SiaeJobDescriptionAdmin(admin.ModelAdmin):
         "source_url",
     )
 
-    def get_display_name(self, obj):
+    @admin.display(description="Intitulé du poste")
+    def display_name(self, obj):
         return obj.custom_name if obj.custom_name else obj.appellation
 
 
