@@ -32,7 +32,7 @@ def check_verbose_name_lower(app_configs, **kwargs):
                     errors.append(
                         Error(
                             f"Model {model} {fieldname} should be lower cased.",
-                            hint=f"Rename {fieldname} from {name} to {suggest_name(name)}.",
+                            hint=f"Rename {fieldname} from “{name}” to “{suggest_name(name)}”.",
                             obj=model,
                         )
                     )
@@ -44,10 +44,11 @@ def check_verbose_name_lower(app_configs, **kwargs):
             if any(exclude_predicates):
                 continue
             if bad_name(field.verbose_name):
+                suggested_name = suggest_name(field.verbose_name)
                 errors.append(
                     Error(
-                        f"Field {field} verbose_name should be lower cased.",
-                        hint=f"Rename verbose_name from {field.verbose_name} to {suggest_name(field.verbose_name)}.",
+                        f"Field “{field}” verbose_name should be lower cased.",
+                        hint=f"Rename verbose_name from “{field.verbose_name}” to “{suggested_name}”.",
                         obj=model,
                     )
                 )
