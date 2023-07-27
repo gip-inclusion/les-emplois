@@ -388,7 +388,7 @@ class User(AbstractUser, AddressMixin):
             UserKind.PRESCRIBER,
             UserKind.SIAE_STAFF,
         ]:
-            raise ValidationError("Inclusion connect n'est utilisable que par un presctipeur ou employeur.")
+            raise ValidationError("Inclusion connect n'est utilisable que par un prescripteur ou employeur.")
 
     def save(self, *args, **kwargs):
         must_create_profile = self._state.adding
