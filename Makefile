@@ -80,7 +80,7 @@ fix: $(VENV_REQUIREMENT)
 # make django_admin COMMAND=createsuperuser
 # make --silent django_admin COMMAND="dumpdata siaes.Siae --indent=3" > itou/fixtures/django/02_siaes.json
 django_admin:
-	$(EXEC_CMD) django-admin $(COMMAND)
+	$(EXEC_CMD) python manage.py $(COMMAND)
 
 # After migrate
 ifeq ($(USE_VENV),1)
