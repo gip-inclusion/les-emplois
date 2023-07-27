@@ -30,6 +30,7 @@ class PriorActionInline(admin.TabularInline):
     extra = 0
     can_delete = False
     readonly_fields = ("action", "dates")
+    verbose_name_plural = "actions préalable à l'embauche"
 
     def has_add_permission(self, request, obj=None):
         return False
@@ -37,12 +38,13 @@ class PriorActionInline(admin.TabularInline):
 
 class JobsInline(admin.TabularInline):
     model = models.JobApplication.selected_jobs.through
+    verbose_name_plural = "fiches de poste"
     extra = 1
     raw_id_fields = ("siaejobdescription",)
 
 
 class ManualApprovalDeliveryRequiredFilter(admin.SimpleListFilter):
-    title = "Délivrance manuelle de PASS IAE requise"
+    title = "délivrance manuelle de PASS IAE requise"
     parameter_name = "manual_approval_delivery_required"
 
     def lookups(self, request, model_admin):
