@@ -6,9 +6,11 @@ from unittest import mock
 
 import freezegun
 import pytest
+from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
+from itou.approvals.models import Approval
 from itou.employee_record.enums import Status
 from itou.employee_record.exceptions import CloningError, DuplicateCloningError, InvalidStatusError
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, validate_asp_batch_filename
@@ -182,6 +184,7 @@ class EmployeeRecordModelTest(TestCase):
         assert result.id == employee_record.id
 
     def test_archivable(self):
+        # note (fV): test updated because prolongation validity period has changed (impacting approval validity dates)
         parameters = itertools.product(
             [False, True],
             [
@@ -200,7 +203,7 @@ class EmployeeRecordModelTest(TestCase):
                 created_at=created_at,
             )
 
-        assert EmployeeRecord.objects.archivable().count() == 1
+        assert EmployeeRecord.objects.archivable().count() == 2
 
 
 @pytest.mark.parametrize(
@@ -589,8 +592,8 @@ class EmployeeRecordLifeCycleTest(TestCase):
             self.employee_record.update_as_archived()
 
         # Make the approval expires
-        approval.start_at = timezone.now().date() - timedelta(days=2)
-        approval.end_at = timezone.now().date() - timedelta(days=1)
+        approval.start_at = timezone.localdate() - relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)
+        approval.end_at = timezone.localdate() - relativedelta(months=1)
         approval.save()
         assert not approval.is_valid()
 

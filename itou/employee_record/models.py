@@ -136,9 +136,7 @@ class EmployeeRecordQuerySet(models.QuerySet):
         return self.filter(asp_batch_file=filename, asp_batch_line_number=line_number)
 
     def archivable(self):
-        prolongation_cutoff = timezone.now() - relativedelta(
-            months=Approval.IS_OPEN_TO_PROLONGATION_BOUNDARIES_MONTHS_AFTER_END,
-        )
+        prolongation_cutoff = timezone.now()
         return (
             self.annotate(
                 approval_is_valid=Exists(Approval.objects.filter(number=OuterRef("approval_number")).valid())
