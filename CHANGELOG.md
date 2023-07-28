@@ -1,5 +1,21 @@
 # Journal des modifications
 
+## [68] - 2023-07-31
+
+### Ajouté
+- PASS IAE : ajout des demandes de prolongation
+- GEIQ : déclaration une embauche faite dans le cadre de l'expérimentation VAE inversée
+- Fiches salarié : les créations tardives ne sont plus archivées instantanément
+- Contrôle a posteriori : configuration du début de la phase contradictoire
+- Contrôle a posteriori : recherche des SIAE évaluées par SIRET
+- Contrôle a posteriori : notification des DDETS lors du passage en phase 2 & 3 bis
+
+### Modifié
+- Imports ASP : certaines SIAE émettrices d'un diagnostic lié à un PASS IAE ne sont plus supprimées automatiquement
+- Admin : amélioration des performances, rubrique "Utilisateurs"
+- Modifications diverses suite au passage à Zendesk
+
+
 ## [67] - 2023-07-17
 
 ### Ajouté
@@ -54,7 +70,7 @@
 
 ### Ajouté
 
-- N'autoriser que des prescripteurs à rejoindre des organisations 
+- N'autoriser que des prescripteurs à rejoindre des organisations
 - Création automatique d'un profil à la création d'un demandeur d'emploi
 - Gestion des salariés et PASS IAE : modification des infos personnelles d'un candidat même sans candidature
 - GEIQ: ajout de champs à la candidature relatifs à la qualification et la formation
