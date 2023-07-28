@@ -23,7 +23,7 @@
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12 col-lg-8 order-2 order-lg-1 mt-3 mt-lg-0 {% if not siae.description and not siae.provided_support %}d-none d-lg-block{% endif %}">
-                    <div class="c-box p-3 h-100 {% if not siae.description and not siae.provided_support %}d-flex align-items-center justify-content-center{% endif %}">
+                    <div class="c-box h-100 {% if not siae.description and not siae.provided_support %}d-flex align-items-center justify-content-center{% endif %}">
                         {% if siae.description %}
                             <article class="mb-3 mb-lg-5">
                                 <h2 class="h3">Son activité</h2>
@@ -55,59 +55,50 @@
                 </div>
                 <div class="col-12 col-lg-4 order-1 order-lg-2 d-flex flex-column">
                     <h2 class="sr-only">Actions rapides</h2>
-                    <div class="c-card card rounded-lg mb-3 mb-lg-5">
-                        <div class="card-body">
-                            {% if not siae.block_job_applications %}
-                                <a class="btn btn-primary btn-block btn-ico justify-content-center" href="{% url 'apply:start' siae_pk=siae.pk %}" aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
-                                    <i class="ri-draft-line"></i>
-                                    <span>Postuler</span>
-                                </a>
-                            {% endif %}
-                            {% if active_jobs_descriptions or other_jobs_descriptions %}
-                                <a href="#metiers" class="btn btn-outline-primary btn-block btn-ico mt-3 justify-content-center">
-                                    <i class="ri-eye-line"></i>
-                                    <span>Voir les métiers</span>
-                                </a>
-                            {% endif %}
-                        </div>
+                    <div class="c-box mb-3 mb-lg-5">
+                        {% if not siae.block_job_applications %}
+                            <a class="btn btn-primary btn-block btn-ico justify-content-center" href="{% url 'apply:start' siae_pk=siae.pk %}" aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
+                                <i class="ri-draft-line"></i>
+                                <span>Postuler</span>
+                            </a>
+                        {% endif %}
+                        {% if active_jobs_descriptions or other_jobs_descriptions %}
+                            <a href="#metiers" class="btn btn-outline-primary btn-block btn-ico mt-3 justify-content-center">
+                                <i class="ri-eye-line"></i>
+                                <span>Voir les métiers</span>
+                            </a>
+                        {% endif %}
                     </div>
-                    <div class="c-card card rounded-lg flex-grow-1">
-                        <div class="card-body">
-                            <div class="card-title">
-                                <h2 class="h3">Coordonnées</h2>
-                            </div>
-                            <div class="card-text">
-                                <ul class="list-unstyled">
-                                    <li class="my-3">
-                                        <div class="d-flex align-items-start">
-                                            <i class="ri-map-pin-2-line ri-xl mr-2"></i>
-                                            <address class="font-weight-bold m-0">{{ siae.address_on_one_line }}</address>
-                                        </div>
-                                    </li>
+                    <div class="c-box flex-grow-1">
+                        <h2 class="h3">Coordonnées</h2>
+                        <ul class="list-unstyled mb-0">
+                            <li class="my-2">
+                                <div class="d-flex align-items-start">
+                                    <i class="ri-map-pin-2-line ri-xl mr-2"></i>
+                                    <address class="font-weight-bold m-0">{{ siae.address_on_one_line }}</address>
+                                </div>
+                            </li>
+                            {% if siae.email %}
+                                <li class="my-2">
+                                    <i class="ri-mail-line ri-xl mr-2"></i>
+                                    <a aria-label="Contact par mail" href="mailto:{{ siae.email }}" class="font-weight-bold">{{ siae.email }}</a>
+                                </li>
+                            {% endif %}
 
-                                    {% if siae.email %}
-                                        <li class="my-3">
-                                            <i class="ri-mail-line ri-xl mr-2"></i>
-                                            <a aria-label="Contact par mail" href="mailto:{{ siae.email }}" class="font-weight-bold">{{ siae.email }}</a>
-                                        </li>
-                                    {% endif %}
+                            {% if siae.phone %}
+                                <li class="my-2">
+                                    <i class="ri-phone-line ri-xl mr-2"></i>
+                                    <a aria-label="Contact téléphonique" href="tel:{{ siae.phone|cut:" " }}" class="font-weight-bold">{{ siae.phone|format_phone }}</a>
+                                </li>
+                            {% endif %}
 
-                                    {% if siae.phone %}
-                                        <li class="my-3">
-                                            <i class="ri-phone-line ri-xl mr-2"></i>
-                                            <a aria-label="Contact téléphonique" href="tel:{{ siae.phone|cut:" " }}" class="font-weight-bold">{{ siae.phone|format_phone }}</a>
-                                        </li>
-                                    {% endif %}
-
-                                    {% if siae.website %}
-                                        <li class="my-3">
-                                            <i class="ri-global-line ri-xl mr-2"></i>
-                                            <a aria-label="Site web (ouverture dans un nouvel onglet)" href="{{ siae.website }}" rel="noopener" target="_blank" class="font-weight-bold">{{ siae.website }}</a>
-                                        </li>
-                                    {% endif %}
-                                </ul>
-                            </div>
-                        </div>
+                            {% if siae.website %}
+                                <li class="my-2">
+                                    <i class="ri-global-line ri-xl mr-2"></i>
+                                    <a aria-label="Site web (ouverture dans un nouvel onglet)" href="{{ siae.website }}" rel="noopener" target="_blank" class="font-weight-bold">{{ siae.website }}</a>
+                                </li>
+                            {% endif %}
+                        </ul>
                     </div>
                 </div>
             </div>
