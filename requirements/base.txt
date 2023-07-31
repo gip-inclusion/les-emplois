@@ -825,8 +825,8 @@ urllib3==1.26.16 \
     #   django-anymail
     #   requests
     #   sentry-sdk
-uwsgi==2.0.21 \
-    --hash=sha256:35a30d83791329429bc04fe44183ce4ab512fcf6968070a7bfba42fc5a0552a9
+uwsgi==2.0.22 \
+    --hash=sha256:4cc4727258671ac5fa17ab422155e9aaef8a2008ebb86e4404b66deaae965db2
     # via -r requirements/base.in
 webencodings==0.5.1 \
     --hash=sha256:a0af1213f3c2226497a97e2b3aa01a7e4bee4f403f95be16fc9acd2947514a78 \

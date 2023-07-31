@@ -1241,7 +1241,6 @@ six==1.16.0 \
     --hash=sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254
     # via
     #   -r requirements/test.txt
-    #   asttokens
     #   cssbeautifier
     #   html5lib
     #   jsbeautifier
@@ -1316,8 +1315,8 @@ urllib3==1.26.16 \
     #   django-anymail
     #   requests
     #   sentry-sdk
-uwsgi==2.0.21 \
-    --hash=sha256:35a30d83791329429bc04fe44183ce4ab512fcf6968070a7bfba42fc5a0552a9
+uwsgi==2.0.22 \
+    --hash=sha256:4cc4727258671ac5fa17ab422155e9aaef8a2008ebb86e4404b66deaae965db2
     # via -r requirements/test.txt
 virtualenv==20.24.0 \
     --hash=sha256:18d1b37fc75cc2670625702d76849a91ebd383768b4e91382a8d51be3246049e \
