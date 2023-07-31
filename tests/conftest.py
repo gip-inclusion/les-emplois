@@ -9,6 +9,7 @@ from django.contrib.gis.db.models.fields import get_srid_info
 from django.core import management
 from django.core.cache import cache
 from django.db import connection
+from django.test import override_settings
 from factory import Faker
 
 
@@ -68,6 +69,12 @@ def preload_spatial_reference(django_db_setup, django_db_blocker):
     """
     with django_db_blocker.unblock():
         get_srid_info(4326, connection)
+
+
+@pytest.fixture(autouse=True, scope="session")
+def test_settings():
+    with override_settings(S3_STORAGE_ENDPOINT_DOMAIN=None, S3_STORAGE_BUCKET_NAME=None):
+        yield
 
 
 @pytest.fixture(autouse=True, scope="session", name="django_loaddata")
