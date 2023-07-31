@@ -42,16 +42,7 @@ class EligibilityDiagnosisQuerySetTest(TestCase):
 
 
 class EligibilityDiagnosisManagerTest(TestCase):
-    """
-    Test EligibilityDiagnosisManager.
-    """
-
-    def test_valid_and_expired_methods(self):
-        """
-        Test both `has_considered_valid()`, `last_considered_valid()` and `last_expired()` methods.
-        """
-
-        # No diagnosis.
+    def test_no_diagnosis(self):
         job_seeker = JobSeekerFactory()
         has_considered_valid = EligibilityDiagnosis.objects.has_considered_valid(job_seeker=job_seeker)
         last_considered_valid = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=job_seeker)
@@ -60,7 +51,7 @@ class EligibilityDiagnosisManagerTest(TestCase):
         assert last_expired is None
         assert not has_considered_valid
 
-        # Has Itou diagnosis.
+    def test_itou_diagnosis(self):
         diagnosis = EligibilityDiagnosisFactory()
         has_considered_valid = EligibilityDiagnosis.objects.has_considered_valid(job_seeker=diagnosis.job_seeker)
         last_considered_valid = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=diagnosis.job_seeker)
@@ -69,7 +60,7 @@ class EligibilityDiagnosisManagerTest(TestCase):
         assert last_expired is None
         assert has_considered_valid
 
-        # Has valid Pôle emploi diagnosis.
+    def test_pole_emploi_diagnosis(self):
         job_seeker = JobSeekerFactory()
         PoleEmploiApprovalFactory(pole_emploi_id=job_seeker.pole_emploi_id, birthdate=job_seeker.birthdate)
         has_considered_valid = EligibilityDiagnosis.objects.has_considered_valid(job_seeker=job_seeker)
@@ -79,7 +70,7 @@ class EligibilityDiagnosisManagerTest(TestCase):
         assert last_considered_valid is None
         assert last_expired is None
 
-        # Has expired Pôle emploi diagnosis.
+    def test_expired_pole_emploi_diagnosis(self):
         job_seeker = JobSeekerFactory()
         end_at = datetime.date.today() - relativedelta(years=2)
         start_at = end_at - relativedelta(years=2)
@@ -93,7 +84,7 @@ class EligibilityDiagnosisManagerTest(TestCase):
         assert last_considered_valid is None
         assert last_expired is None
 
-        # Has expired Itou diagnosis.
+    def test_expired_itou_diagnosis(self):
         expired_diagnosis = ExpiredEligibilityDiagnosisFactory()
         has_considered_valid = EligibilityDiagnosis.objects.has_considered_valid(
             job_seeker=expired_diagnosis.job_seeker
@@ -106,7 +97,7 @@ class EligibilityDiagnosisManagerTest(TestCase):
         assert last_considered_valid is None
         assert last_expired is not None
 
-        # Has expired Itou diagnosis but has an ongoing PASS IAE.
+    def test_expired_itou_diagnosis_with_ongoing_approval(self):
         expired_diagnosis = ExpiredEligibilityDiagnosisFactory()
         ApprovalFactory(user=expired_diagnosis.job_seeker, eligibility_diagnosis=expired_diagnosis)
         has_considered_valid = EligibilityDiagnosis.objects.has_considered_valid(
@@ -116,12 +107,11 @@ class EligibilityDiagnosisManagerTest(TestCase):
             job_seeker=expired_diagnosis.job_seeker
         )
         last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=expired_diagnosis.job_seeker)
-
         assert has_considered_valid
         assert last_considered_valid == expired_diagnosis
         assert last_expired is None
 
-        # Has Itou diagnosis made by an SIAE.
+    def test_itou_diagnosis_by_siae(self):
         siae1 = SiaeFactory(with_membership=True)
         siae2 = SiaeFactory(with_membership=True)
         diagnosis = EligibilityDiagnosisMadeBySiaeFactory(author_siae=siae1)
@@ -148,7 +138,7 @@ class EligibilityDiagnosisManagerTest(TestCase):
         assert last_considered_valid is None
         assert last_expired is None
 
-        # Has Itou diagnosis made by a prescriber.
+    def test_itou_diagnosis_by_prescriber(self):
         siae = SiaeFactory(with_membership=True)
         prescriber_diagnosis = EligibilityDiagnosisFactory()
         # From siae perspective.
@@ -165,7 +155,7 @@ class EligibilityDiagnosisManagerTest(TestCase):
         assert last_considered_valid == prescriber_diagnosis
         assert last_expired is None
 
-        # Has 2 Itou diagnoses: 1 made by an SIAE prior to another one by a prescriber.
+    def test_itou_diagnosis_both_siae_and_prescriber(self):
         job_seeker = JobSeekerFactory()
         siae = SiaeFactory(with_membership=True)
         prescriber_diagnosis = EligibilityDiagnosisFactory(job_seeker=job_seeker)
@@ -180,41 +170,36 @@ class EligibilityDiagnosisManagerTest(TestCase):
         assert last_considered_valid == prescriber_diagnosis
         assert last_expired is None
 
-        # Has an expired Itou diagnoses made by another SIAE.
+    def test_expired_itou_diagnosis_by_another_siae(self):
         job_seeker = JobSeekerFactory()
         siae1 = SiaeFactory(with_membership=True)
         siae2 = SiaeFactory(with_membership=True)
         expired_diagnosis = ExpiredEligibilityDiagnosisMadeBySiaeFactory(job_seeker=job_seeker, author_siae=siae1)
-
         # From `siae` perspective.
         last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=job_seeker, for_siae=siae1)
         assert last_expired == expired_diagnosis
         last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=job_seeker, for_siae=siae2)
         assert last_expired is None
 
-        # Has 2 Itou diagnoses: 1 is considered expired and the second is considered valid.
+    def test_itou_diagnosis_one_valid_other_expired(self):
         job_seeker = JobSeekerFactory()
         ExpiredEligibilityDiagnosisFactory(job_seeker=job_seeker)
         EligibilityDiagnosisFactory(job_seeker=job_seeker)
-
         last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=job_seeker)
         last_considered_valid = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=job_seeker)
         # When has a valid diagnosis, `last_expired` return None
         assert last_considered_valid is not None
         assert last_expired is None
 
-        # Has 2 Itou diagnoses expired: the last one expired must be returned.
+    def test_itou_diagnosis_expired_uses_the_most_recent(self):
         job_seeker = JobSeekerFactory()
-
         date_6m = (
             timezone.now() - relativedelta(months=EligibilityDiagnosis.EXPIRATION_DELAY_MONTHS) - relativedelta(day=1)
         )
         date_12m = date_6m - relativedelta(months=6)
-
         expired_diagnosis_old = EligibilityDiagnosisFactory(job_seeker=job_seeker, created_at=date_12m)
         last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=job_seeker)
         assert last_expired == expired_diagnosis_old
-
         expired_diagnosis_last = EligibilityDiagnosisFactory(job_seeker=job_seeker, created_at=date_6m)
         last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=job_seeker)
         assert last_expired == expired_diagnosis_last
