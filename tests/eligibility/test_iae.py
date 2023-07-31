@@ -194,6 +194,25 @@ class EligibilityDiagnosisManagerTest(TestCase):
         assert last_considered_valid is not None
         assert last_expired is None
 
+    def test_itou_diagnosis_one_valid_other_expired_same_siae(self):
+        siae = SiaeFactory(with_membership=True)
+        ExpiredEligibilityDiagnosisFactory(
+            job_seeker=self.job_seeker,
+            author_siae=siae,
+            author_kind=AuthorKind.SIAE_STAFF,
+        )
+        new_diag = EligibilityDiagnosisFactory(
+            job_seeker=self.job_seeker,
+            author_siae=siae,
+            author_kind=AuthorKind.SIAE_STAFF,
+        )
+        # An approval causes the system to ignore expires_at.
+        ApprovalFactory(user=self.job_seeker, eligibility_diagnosis=new_diag)
+        last_considered_valid = EligibilityDiagnosis.objects.last_considered_valid(
+            job_seeker=self.job_seeker, for_siae=siae
+        )
+        assert last_considered_valid == new_diag
+
     def test_itou_diagnosis_expired_uses_the_most_recent(self):
         date_6m = (
             timezone.now() - relativedelta(months=EligibilityDiagnosis.EXPIRATION_DELAY_MONTHS) - relativedelta(day=1)
