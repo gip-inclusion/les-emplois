@@ -616,6 +616,18 @@ class EvaluatedJobApplicationQuerySet(models.QuerySet):
 
 
 class EvaluatedJobApplication(models.Model):
+    STATES_PRIORITY = [
+        # Low priority: all criteria must have this state for the evaluated job application to have it
+        evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED,
+        evaluation_enums.EvaluatedJobApplicationsState.REFUSED,
+        evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+        evaluation_enums.EvaluatedJobApplicationsState.SUBMITTED,
+        evaluation_enums.EvaluatedJobApplicationsState.UPLOADED,
+        evaluation_enums.EvaluatedJobApplicationsState.PROCESSING,
+        evaluation_enums.EvaluatedJobApplicationsState.PENDING,
+        # High priority: if at least one criteria has this state, the evaluated job application will also
+    ]
+
     job_application = models.ForeignKey(
         "job_applications.JobApplication",
         verbose_name="candidature",
@@ -640,17 +652,6 @@ class EvaluatedJobApplication(models.Model):
         return f"{self.job_application}"
 
     def compute_state(self):
-        STATES_PRIORITY = [
-            # Low priority: all criteria must have this state for the evaluated job application to have it
-            evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED,
-            evaluation_enums.EvaluatedJobApplicationsState.REFUSED,
-            evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
-            evaluation_enums.EvaluatedJobApplicationsState.SUBMITTED,
-            evaluation_enums.EvaluatedJobApplicationsState.UPLOADED,
-            evaluation_enums.EvaluatedJobApplicationsState.PROCESSING,
-            # High priority: if at least one criteria has this state, the evaluated job application will also
-        ]
-
         def state_from(criteria):
             if criteria.proof_url == "":
                 return evaluation_enums.EvaluatedJobApplicationsState.PROCESSING
@@ -665,9 +666,43 @@ class EvaluatedJobApplication(models.Model):
 
         return max(
             (state_from(criteria) for criteria in self.evaluated_administrative_criteria.all()),
-            key=STATES_PRIORITY.index,
+            key=self.STATES_PRIORITY.index,
             default=evaluation_enums.EvaluatedJobApplicationsState.PENDING,
         )
+
+    def hide_state_from_siae(self):
+        """Hide in-progress evaluation from SIAE, until results are official."""
+        if self.evaluated_siae.submission_freezed_at is None:
+            return False
+        adversarial_stage_start = self.evaluated_siae.evaluation_campaign.calendar.adversarial_stage_start
+        if (
+            timezone.localdate()
+            <=
+            # submission_freezed_at is reset with EvaluationCampaign.transition_to_adversarial_phase, which immediately
+            # shows their state to SIAEs.
+            # On the day of the transition, keep phase 2bis active so that SIAE don’t see their state until the admin
+            # action in the admin to transition to adversarial stage is performed.
+            adversarial_stage_start
+        ):
+            # Phase 2bis.
+            return True
+        # Phase 3bis.
+        state_is_from_phase2 = all(
+            # SIAE did not submit new documents, show evaluation from phase 2.
+            crit.submitted_at and crit.submitted_at < self.evaluated_siae.reviewed_at
+            for crit in self.evaluated_administrative_criteria.all()
+        )
+        return not state_is_from_phase2
+
+    def compute_state_for_siae(self):
+        real_state = self.compute_state()
+        if self.hide_state_from_siae():
+            submitted_state = evaluation_enums.EvaluatedJobApplicationsState.SUBMITTED
+            real_state_priority = self.STATES_PRIORITY.index(real_state)
+            submitted_state_priority = self.STATES_PRIORITY.index(submitted_state)
+            if real_state_priority < submitted_state_priority:
+                return submitted_state
+        return real_state
 
     @property
     def should_select_criteria(self):
@@ -762,6 +797,11 @@ class EvaluatedAdministrativeCriteria(models.Model):
             self.review_state == evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
             and self.evaluated_job_application.evaluated_siae.reviewed_at
         )
+
+    def review_state_for_siae(self):
+        if self.evaluated_job_application.hide_state_from_siae():
+            return evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
+        return self.review_state
 
 
 class Sanctions(models.Model):

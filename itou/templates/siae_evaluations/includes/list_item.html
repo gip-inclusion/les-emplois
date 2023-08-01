@@ -1,38 +1,38 @@
-
 <div class="card my-3">
     {# navigation : anchor to scroll to a specific card when returning to this page #}
     <a class="scrolldown-anchor" id="{{ item.pk }}"></a>
     <div class="card-header">
-        {% include "siae_evaluations/includes/job_seeker_infos_for_siae.html" with job_seeker=item.job_application.job_seeker approval=item.job_application.approval state=item.compute_state reviewed_at=item.evaluated_siae.reviewed_at %}
+        {% include "siae_evaluations/includes/job_seeker_infos_for_siae.html" with job_seeker=item.job_application.job_seeker approval=item.job_application.approval state=item.compute_state_for_siae reviewed_at=item.evaluated_siae.reviewed_at %}
     </div>
 
     <div class="card-body">
 
         {% for evaluated_administrative_criteria in item.evaluated_administrative_criteria.all %}
-            <div class="row mt-1">
-                <div class="col-md-12">
-                    {% if item.evaluated_siae.reviewed_at %}
-                        {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_administrative_criteria.administrative_criteria review_state=evaluated_administrative_criteria.review_state %}
-                    {% else %}
-                        {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_administrative_criteria.administrative_criteria %}
-                    {% endif %}
+            {% with criteria_review_state=evaluated_administrative_criteria.review_state_for_siae %}
+                <div class="row mt-1">
+                    <div class="col-md-12">
+                        {% if item.evaluated_siae.reviewed_at %}
+                            {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_administrative_criteria.administrative_criteria review_state=criteria_review_state %}
+                        {% else %}
+                            {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_administrative_criteria.administrative_criteria %}
+                        {% endif %}
+                    </div>
+                    <div class="col-md-12 mt-3">
+                        {% if evaluated_administrative_criteria.can_upload %}
+                            <a href="{% url 'siae_evaluations_views:siae_upload_doc' evaluated_administrative_criteria.pk %}"
+                               class="btn {% if evaluated_administrative_criteria.proof_url and criteria_review_state == 'PENDING' %}btn-outline-primary {% else %}btn-primary {% endif %}float-right">
+                                {% if evaluated_administrative_criteria.proof_url %}
+                                    Modifier le justificatif
+                                {% else %}
+                                    Ajouter un justificatif
+                                {% endif %}
+                            </a>
+                        {% elif evaluated_administrative_criteria.proof_url %}
+                            <a href="{{ evaluated_administrative_criteria.proof_url }}" target="_blank" class="btn btn-outline-primary float-right">Visualiser le justificatif soumis</a>
+                        {% endif %}
+                    </div>
                 </div>
-                <div class="col-md-12 mt-3">
-                    {% if evaluated_administrative_criteria.can_upload %}
-                        <a href="{% url 'siae_evaluations_views:siae_upload_doc' evaluated_administrative_criteria.pk %}"
-                           class="btn {% if evaluated_administrative_criteria.proof_url and evaluated_administrative_criteria.review_state == 'PENDING' %}btn-outline-primary {% else %}btn-primary {% endif %}float-right">
-                            {% if evaluated_administrative_criteria.proof_url %}
-                                Modifier le justificatif
-                            {% else %}
-                                Ajouter un justificatif
-                            {% endif %}
-                        </a>
-                    {% elif evaluated_administrative_criteria.proof_url %}
-                        <a href="{{ evaluated_administrative_criteria.proof_url }}" target="_blank" class="btn btn-outline-primary float-right">Visualiser le justificatif soumis</a>
-                    {% endif %}
-                </div>
-            </div>
-
+            {% endwith %}
         {% endfor %}
 
         <div class="row mt-1">
@@ -46,16 +46,19 @@
             </div>
         </div>
 
-        {% if item.evaluated_siae.reviewed_at and item.compute_state == 'REFUSED' or item.evaluated_siae.reviewed_at and item.compute_state == 'REFUSED_2' %}
-            <div class="row mt-5">
-                <div class="col-md-12">
-                    <h3>Commentaires de la DDETS</h3>
-                    {{ item.labor_inspector_explanation }}
-
-                </div>
-            </div>
+        {% if item.evaluated_siae.reviewed_at %}
+            {% if not item.hide_state_from_siae %}
+                {% with jobapp_state=item.compute_state %}
+                    {% if jobapp_state == 'REFUSED' or jobapp_state == 'REFUSED_2' %}
+                        <div class="row mt-5">
+                            <div class="col-md-12">
+                                <h3>Commentaires de la DDETS</h3>
+                                {{ item.labor_inspector_explanation }}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endwith %}
+            {% endif %}
         {% endif %}
-
-
     </div>
 </div>

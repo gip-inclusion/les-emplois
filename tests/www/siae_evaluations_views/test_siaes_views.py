@@ -66,6 +66,11 @@ def create_evaluated_siae_with_consistent_datas(siae, user, level_1=True, level_
 
 
 class SiaeJobApplicationListViewTest(S3AccessingTestCase):
+    refused_html = """\
+        <p class="text-danger">
+            <i class="ri-indeterminate-circle-line"></i> Refusé
+        </p>"""
+
     def setUp(self):
         membership = SiaeMembershipFactory()
         self.user = membership.user
@@ -194,6 +199,165 @@ class SiaeJobApplicationListViewTest(S3AccessingTestCase):
         response = self.client.get(self.url(evaluated_siae))
         self.assertContains(response, SHOW_PROOF_URL_LABEL)
         self.assertContains(response, evaluated_administrative_criteria.proof_url)
+
+    def test_state_hidden_with_submission_freezed_at(self):
+        not_in_output = "This string should not be in output."
+        evaluated_siae_phase_2bis = EvaluatedSiaeFactory(
+            evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(days=10),
+            siae=self.siae,
+            submission_freezed_at=timezone.now() - relativedelta(days=1),
+            reviewed_at=timezone.now(),
+        )
+        evaluated_siae_phase_3bis = EvaluatedSiaeFactory(
+            evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(days=10),
+            siae=self.siae,
+            submission_freezed_at=timezone.now() - relativedelta(days=1),
+            reviewed_at=timezone.now() - relativedelta(days=5),
+            final_reviewed_at=timezone.now(),
+        )
+        for evaluated_siae, state in [
+            (evaluated_siae_phase_2bis, evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED),
+            (evaluated_siae_phase_3bis, evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2),
+        ]:
+            with self.subTest(evaluated_siae):
+                evaluated_job_app = EvaluatedJobApplicationFactory(
+                    evaluated_siae=evaluated_siae,
+                    job_application__job_seeker__first_name="Manny",
+                    job_application__job_seeker__last_name="Calavera",
+                    labor_inspector_explanation=not_in_output,
+                )
+                EvaluatedAdministrativeCriteriaFactory(
+                    evaluated_job_application=evaluated_job_app,
+                    uploaded_at=timezone.now() - relativedelta(days=5),
+                    submitted_at=timezone.now() - relativedelta(days=3),
+                    review_state=state,
+                )
+                self.client.force_login(self.user)
+                response = self.client.get(self.url(evaluated_siae))
+                self.assertContains(
+                    response,
+                    """
+                    <div class="row">
+                        <div class="col-lg-8 col-md-7 col-12">
+                            <h3 class="h2">
+                                Auto-prescription pour <span class="text-muted">Manny Calavera</span>
+                            </h3>
+                        </div>
+                        <div class="col-lg-4 col-md-5 col-12 text-right">
+                            <p class="badge badge-pill badge-communaute-light float-right">transmis</p>
+                        </div>
+                    </div>
+                    """,
+                    html=True,
+                    count=1,
+                )
+                self.assertNotContains(response, not_in_output)
+                self.assertNotContains(response, self.refused_html, html=True)
+
+    def test_application_shown_after_submission_freeze_phase_3bis(self):
+        test_data = [
+            (
+                evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+                '<p class="badge badge-pill badge-success float-right">validé</p>',
+                """
+                <div class="col-md-9 mt-1">
+                    <h3>Bénéficiaire du RSA</h3>
+                </div>
+                <div class="col-md-3 mt-1 text-right">
+                    <p class="text-success">
+                        <i class="ri-checkbox-circle-line"></i> Validé
+                    </p>
+                </div>
+                """,
+            ),
+            (
+                evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
+                '<p class="badge badge-pill badge-danger float-right">problème constaté</p>',
+                f"""
+                <div class="col-md-9 mt-1">
+                    <h3>Bénéficiaire du RSA</h3>
+                </div>
+                <div class="col-md-3 mt-1 text-right">
+                    {self.refused_html}
+                </div>
+                """,
+            ),
+        ]
+        brsa = AdministrativeCriteria.objects.get(name="Bénéficiaire du RSA")
+        for state, expected_jobapp_html, expected_criteria_html in test_data:
+            with self.subTest(state):
+                evaluated_siae_phase_3bis = EvaluatedSiaeFactory(
+                    evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(days=10),
+                    evaluation_campaign__calendar__adversarial_stage_start=timezone.localdate()
+                    - relativedelta(days=5),
+                    siae=self.siae,
+                    submission_freezed_at=timezone.now() - relativedelta(days=1),
+                    reviewed_at=timezone.now() - relativedelta(days=6),
+                    final_reviewed_at=timezone.now() - relativedelta(days=6),
+                )
+                evaluated_job_app = EvaluatedJobApplicationFactory(
+                    evaluated_siae=evaluated_siae_phase_3bis,
+                    job_application__job_seeker__first_name="Manny",
+                    job_application__job_seeker__last_name="Calavera",
+                )
+                EvaluatedAdministrativeCriteriaFactory(
+                    evaluated_job_application=evaluated_job_app,
+                    administrative_criteria=brsa,
+                    uploaded_at=timezone.now() - relativedelta(days=9),
+                    submitted_at=timezone.now() - relativedelta(days=8),
+                    review_state=state,
+                )
+                self.client.force_login(self.user)
+                response = self.client.get(self.url(evaluated_siae_phase_3bis))
+                self.assertContains(
+                    response,
+                    f"""
+                    <div class="row">
+                        <div class="col-lg-8 col-md-7 col-12">
+                            <h3 class="h2">
+                                Auto-prescription pour <span class="text-muted">Manny Calavera</span>
+                            </h3>
+                        </div>
+                        <div class="col-lg-4 col-md-5 col-12 text-right">
+                        {expected_jobapp_html}
+                        </div>
+                    </div>
+                    """,
+                    html=True,
+                    count=1,
+                )
+                self.assertContains(response, expected_criteria_html, html=True, count=1)
+
+    def test_state_when_not_sent_before_submission_freeze(self):
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(days=10),
+            siae=self.siae,
+            submission_freezed_at=timezone.now() - relativedelta(days=1),
+        )
+        EvaluatedJobApplicationFactory(
+            evaluated_siae=evaluated_siae,
+            job_application__job_seeker__first_name="Manny",
+            job_application__job_seeker__last_name="Calavera",
+        )
+        self.client.force_login(self.user)
+        response = self.client.get(self.url(evaluated_siae))
+        self.assertContains(
+            response,
+            """
+            <div class="row">
+                <div class="col-lg-8 col-md-7 col-12">
+                    <h3 class="h2">
+                        Auto-prescription pour <span class="text-muted">Manny Calavera</span>
+                    </h3>
+                </div>
+                <div class="col-lg-4 col-md-5 col-12 text-right">
+                    <p class="badge badge-pill badge-pilotage float-right">à traiter</p>
+                </div>
+            </div>
+            """,
+            html=True,
+            count=1,
+        )
 
     def test_content_with_selected_criteria(self):
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
