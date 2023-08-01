@@ -5,7 +5,7 @@
 {% block title %}Embauche - Eligibilité GEIQ {{ block.super }}{% endblock %}
 
 {% block content_title %}
-    <h1 class="h1-hero-c1">
+    <h1>
         Candidature de
         <span class="text-muted">{{ job_application.job_seeker.get_full_name|title|mask_unless:can_view_personal_information }}</span>
     </h1>

@@ -1,14 +1,14 @@
 
 <div class="content-small">
     {% if action == "remove" %}
-        <h1 class="h1-hero-c1">Retrait des droits d'administrateur</h1>
-        <h2 class="h1 text-muted">{{ structure.display_name }}</h2>
+        <h1>Retrait des droits d'administrateur</h1>
+        <h2 class="text-muted">{{ structure.display_name }}</h2>
         <div class="mt-4 alert alert-warning">
             Vous allez retirer les droits d'administrateur de votre structure à <b>{{ target_member.get_full_name }}</b>
         </div>
     {% else %}
-        <h1 class="h1-hero-c1">Ajout des droits d'administrateur</h1>
-        <h2 class="h1 text-muted">{{ structure.display_name }}</h2>
+        <h1>Ajout des droits d'administrateur</h1>
+        <h2 class="text-muted">{{ structure.display_name }}</h2>
         <div class="mt-4 alert alert-warning">
             Vous allez ajouter les droits d'administrateur de votre structure à <b>{{ target_member.get_full_name }}</b>
         </div>
