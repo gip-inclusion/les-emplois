@@ -597,6 +597,13 @@ class SiaeJobDescription(models.Model):
         blank=True,
         verbose_name="localisation du poste",
     )
+    location_asp = models.ForeignKey(
+        "asp.Commune",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="localisation du poste (format ASP)",
+    )
     hours_per_week = models.PositiveSmallIntegerField(
         verbose_name="nombre d'heures par semaine",
         blank=True,
