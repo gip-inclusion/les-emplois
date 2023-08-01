@@ -46,7 +46,7 @@
             </div>
         </div>
 
-        {% if item.evaluated_siae.reviewed_at and item.state == 'REFUSED' or item.evaluated_siae.reviewed_at and item.state == 'REFUSED_2' %}
+        {% if item.evaluated_siae.reviewed_at and item.compute_state == 'REFUSED' or item.evaluated_siae.reviewed_at and item.compute_state == 'REFUSED_2' %}
             <div class="row mt-5">
                 <div class="col-md-12">
                     <h3>Commentaires de la DDETS</h3>
