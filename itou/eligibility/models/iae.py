@@ -84,9 +84,6 @@ class EligibilityDiagnosisManager(models.Manager):
             last = query.by_author_kind_prescriber().last()
             if not last and for_siae:
                 last = query.authored_by_siae(for_siae).last()
-            if not last:
-                # Deals with cases from the past (when there was no restriction).
-                last = query.last()
 
         # Otherwise, search only in "non expired" diagnosis.
         else:
