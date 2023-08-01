@@ -344,6 +344,26 @@ class SiaeJobApplicationListViewTest(S3AccessingTestCase):
         response = self.client.get(select_criteria)
         assert response.status_code == 403
 
+    def test_shows_labor_inspector_explanation_when_refused(self):
+        explanation = "Justificatif invalide au moment de l’embauche."
+        evaluated_siae = EvaluatedSiaeFactory(
+            siae=self.siae,
+            evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(days=50),
+            reviewed_at=timezone.now() - relativedelta(days=10),
+        )
+        evaluated_job_app = EvaluatedJobApplicationFactory(
+            evaluated_siae=evaluated_siae, labor_inspector_explanation=explanation
+        )
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_app,
+            uploaded_at=timezone.now() - relativedelta(days=15),
+            submitted_at=timezone.now() - relativedelta(days=12),
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
+        )
+        self.client.force_login(self.user)
+        response = self.client.get(self.url(evaluated_siae))
+        self.assertContains(response, explanation)
+
 
 class SiaeSelectCriteriaViewTest(TestCase):
     def setUp(self):
