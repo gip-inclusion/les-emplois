@@ -3,10 +3,8 @@
 {% block title %}Collaborateurs {{ block.super }}{% endblock %}
 
 {% block content_title %}
-    <h1 class="s-title-01__title h1">
-        <strong>Collaborateurs</strong>
-    </h1>
-    <h2 class="h2">{{ siae.display_name }}</h2>
+    <h1>Collaborateurs</h1>
+    <h2>{{ siae.display_name }}</h2>
     <div class="alert alert-info">
         <p class="mb-0">
             Vous êtes connecté(e) en tant que <b>{{ user.get_full_name|title }}</b> ({{ user.email }})

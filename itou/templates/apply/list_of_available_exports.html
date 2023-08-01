@@ -5,10 +5,10 @@
 
 {% block content_title %}
     {% if export_for == "siae" %}
-        <h1 class="s-title-01__title h1">Export des candidatures reçues</h1>
-        <h2 class="h2">{{ siae.display_name }}</h2>
+        <h1>Export des candidatures reçues</h1>
+        <h2>{{ siae.display_name }}</h2>
     {% else %}
-        <h1 class="s-title-01__title h1">Export des candidatures</h1>
+        <h1>Export des candidatures</h1>
     {% endif %}
 
     {% if export_for == "siae" or can_view_stats_pe %}

@@ -76,8 +76,8 @@
             </div>
 
             {% comment %}
-            Si les templates enfants n'ont pas besoin d'une section <section .s-title-01>, penser à mettre le {% block content_title_wrapper %}{% endblock %} vide dans ces templates surcharger le code ci-dessous
             Si les templates enfants ont besoin d'une section <section .s-title-01>, penser à mettre le contenu dans le {% block content_title %}{% endblock %}
+            Sinon, penser à mettre le {% block content_title_wrapper %}{% endblock %} vide dans ces templates pour vider le DOM "enrobant" ci-dessous
             {% endcomment %}
             {% block content_title_wrapper %}
                 <section class="s-title-01">
