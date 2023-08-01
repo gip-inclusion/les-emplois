@@ -535,7 +535,10 @@ def siae_job_applications_list(
     evaluated_job_applications = (
         EvaluatedJobApplication.objects.filter(evaluated_siae=evaluated_siae)
         .select_related(
-            "evaluated_siae", "job_application", "job_application__job_seeker", "job_application__approval"
+            "evaluated_siae__evaluation_campaign__calendar",
+            "job_application",
+            "job_application__job_seeker",
+            "job_application__approval",
         )
         .prefetch_related("evaluated_administrative_criteria")
     )
