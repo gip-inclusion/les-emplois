@@ -530,7 +530,8 @@ class AcceptForm(forms.ModelForm):
                         "hx-target": "#geiq_contract_type_and_options_block",
                     },
                 )
-            else:
+
+            if job_application.to_siae.kind in SIAE_WITH_CONVENTION_KINDS:
                 # Add specific details to help texts for IAE
                 self.fields["hiring_start_at"].help_text += (
                     " La date est modifiable jusqu'à la veille de la date saisie. En cas de premier PASS IAE pour "
