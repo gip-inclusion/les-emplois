@@ -366,7 +366,6 @@ class SuspensionForm(forms.ModelForm):
                 f"Renseignez une date de fin à {Suspension.MAX_DURATION_MONTHS} mois "
                 "si le contrat de travail est terminé ou rompu."
             ),
-            "reason_explanation": "Obligatoire seulement en cas de force majeure.",
         }
 
     def clean_start_at(self):
