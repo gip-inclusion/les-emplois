@@ -32,6 +32,12 @@ TABLE.add_columns(
             "comment": "Etat de la demande",
             "fn": lambda o: get_choice(choices=ProlongationRequestStatus.choices, key=o.status),
         },
+        {
+            "name": "date_de_demande",
+            "type": "date",
+            "comment": "Date de la demande",
+            "fn": lambda o: o.created_at.date(),
+        },
         get_column_from_field(get_field("processed_at"), name="date_traitement"),
         get_column_from_field(get_field("processed_by_id"), name="id_utilisateur_traitant"),
         get_column_from_field(get_field("reminder_sent_at"), name="date_envoi_rappel"),
