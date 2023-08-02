@@ -546,6 +546,7 @@ def test_populate_prolongation_requests():
                 prolongation_request.prescriber_organization_id,
                 prolongation.pk,
                 prolongation_request.get_status_display(),
+                prolongation_request.created_at.date(),
                 prolongation_request.processed_at,
                 prolongation_request.processed_by_id,
                 prolongation_request.reminder_sent_at,
