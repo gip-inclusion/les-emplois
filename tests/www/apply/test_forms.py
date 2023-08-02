@@ -7,7 +7,7 @@ from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.job_applications.enums import QualificationLevel, QualificationType
 from itou.job_applications.models import JobApplicationWorkflow
-from itou.siaes.enums import ContractType, SiaeKind
+from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS, ContractType, SiaeKind
 from itou.www.apply import forms as apply_forms
 from tests.job_applications.factories import (
     JobApplicationFactory,
@@ -350,3 +350,32 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
         assertNotContains(response, "Il n'est pas possible d'antidater un contrat.")
         job_application.refresh_from_db()
         assert job_application.state == JobApplicationWorkflow.STATE_ACCEPTED
+
+    HELP_START_AT = (
+        "La date est modifiable jusqu'à la veille de la date saisie. "
+        "En cas de premier PASS IAE pour la personne, cette date déclenche le début de son parcours."
+    )
+    HELP_END_AT = (
+        "Elle sert uniquement à des fins d'informations et est sans conséquence sur les déclarations "
+        "à faire dans l'extranet 2.0 de l'ASP. "
+        "<b>Ne pas compléter cette date dans le cadre d’un CDI Inclusion</b>"
+    )
+
+    def test_specific_iae_mentions_in_accept_form(self):
+        def _response(kind):
+            job_application = JobApplicationFactory(to_siae__kind=kind, state="processing")
+            url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+
+            self.client.force_login(job_application.to_siae.members.first())
+            response = self.client.get(url_accept)
+
+            assert response.status_code == 200
+            return response
+
+        for kind in SIAE_WITH_CONVENTION_KINDS:
+            assertContains(_response(kind), self.HELP_START_AT)
+            assertContains(_response(kind), self.HELP_END_AT)
+
+        for kind in (SiaeKind.EA, SiaeKind.EATT, SiaeKind.GEIQ, SiaeKind.OPCS):
+            assertNotContains(_response(kind), self.HELP_START_AT)
+            assertNotContains(_response(kind), self.HELP_END_AT)
