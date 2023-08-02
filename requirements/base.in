@@ -111,5 +111,4 @@ python-dotenv  # https://github.com/theskumar/python-dotenv
 
 # Production requirements
 # ------------------------------------------------------------------------------
-uwsgi==2.0.*  # https://github.com/unbit/uwsgi
 sentry-sdk  # https://github.com/getsentry/sentry-python
