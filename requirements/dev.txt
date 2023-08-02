@@ -1315,9 +1315,6 @@ urllib3==1.26.16 \
     #   django-anymail
     #   requests
     #   sentry-sdk
-uwsgi==2.0.22 \
-    --hash=sha256:4cc4727258671ac5fa17ab422155e9aaef8a2008ebb86e4404b66deaae965db2
-    # via -r requirements/test.txt
 virtualenv==20.24.0 \
     --hash=sha256:18d1b37fc75cc2670625702d76849a91ebd383768b4e91382a8d51be3246049e \
     --hash=sha256:e2a7cef9da880d693b933db7654367754f14e20650dc60e8ee7385571f8593a3
