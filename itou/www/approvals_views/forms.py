@@ -94,6 +94,7 @@ class CreateProlongationForm(forms.ModelForm):
     """Declare a prolongation. Used when the reason doesn't need to be validated by a prescriber."""
 
     reason = forms.ChoiceField(
+        label="Motif",
         choices=ProlongationReason.choices,
         initial=None,  # Uncheck radio buttons.
         widget=forms.RadioSelect(),
