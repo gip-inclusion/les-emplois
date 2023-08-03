@@ -3,19 +3,14 @@ import datetime
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
-from django.db import transaction
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.template import loader
-from django.template.response import TemplateResponse
 from django.urls import reverse, reverse_lazy
-from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.http import urlencode
-from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_POST
 from django.views.generic.base import TemplateView
-from django_htmx.http import HttpResponseClientRedirect
 from django_xworkflows import models as xwf_models
 
 from itou.eligibility.models import EligibilityDiagnosis
@@ -23,18 +18,14 @@ from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow, PriorAction
 from itou.siaes.enums import ContractType, SiaeKind
 from itou.siaes.models import Siae
-from itou.users.models import ApprovalAlreadyExistsError
-from itou.utils import constants as global_constants
 from itou.utils.htmx import hx_trigger_modal_control
 from itou.utils.perms.prescriber import get_all_available_job_applications_as_prescriber
-from itou.utils.urls import get_external_link_markup, get_safe_url
+from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
     AcceptForm,
     AnswerForm,
-    JobSeekerPersonalDataForm,
     PriorActionForm,
     RefusalForm,
-    UserAddressForm,
 )
 from itou.www.apply.views import common as common_views, constants as apply_view_constants
 
@@ -256,160 +247,20 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
     job_application = get_object_or_404(queryset, id=job_application_id)
     check_waiting_period(job_application)
     next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
-
-    forms = []
-
-    # Ask the SIAE to verify the job seeker's Pôle emploi status.
-    # This will ensure a smooth Approval delivery.
-    form_personal_data = None
-    form_user_address = None
-
-    if job_application.to_siae.is_subject_to_eligibility_rules:
-        # Info that will be used to search for an existing Pôle emploi approval.
-        form_personal_data = JobSeekerPersonalDataForm(
-            instance=job_application.job_seeker,
-            data=request.POST or None,
-            tally_form_query=f"jobapplication={job_application.pk}",
-        )
-        forms.append(form_personal_data)
-
-        form_user_address = UserAddressForm(instance=job_application.job_seeker, data=request.POST or None)
-        forms.append(form_user_address)
-
-    form_accept = AcceptForm(instance=job_application, siae=job_application.to_siae, data=request.POST or None)
-    forms.append(form_accept)
-
-    context = {
-        "form_accept": form_accept,
-        "form_user_address": form_user_address,
-        "form_personal_data": form_personal_data,
-        "job_application": job_application,
-        "can_view_personal_information": True,  # SIAE members have access to personal info
-        "hide_value": ContractType.OTHER.value,
-        "matomo_custom_title": "Candidature acceptée",
-        "job_seeker": job_application.job_seeker,
-        "siae": job_application.to_siae,
-        "back_url": reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id}),
-    }
-
     if not job_application.hiring_without_approval and job_application.eligibility_diagnosis_by_siae_required:
         messages.error(request, "Cette candidature requiert un diagnostic d'éligibilité pour être acceptée.")
         return HttpResponseRedirect(next_url)
 
-    if request.method == "POST" and all([form.is_valid() for form in forms]):
-        if request.htmx and not request.POST.get("confirmed"):
-            return TemplateResponse(
-                request=request,
-                template="apply/includes/job_application_accept_form.html",
-                context=context,
-                headers=hx_trigger_modal_control("js-confirmation-modal", "show"),
-            )
-
-        try:
-            with transaction.atomic():
-                if form_personal_data:
-                    form_personal_data.save()
-                if form_user_address:
-                    form_user_address.save()
-                # After each successful transition, a save() is performed by django-xworkflows,
-                # so use `commit=False` to avoid a double save.
-                job_application = form_accept.save(commit=False)
-                job_application.accept(user=request.user)
-
-                # Mark job seeker's infos as up-to-date
-                job_application.job_seeker.last_checked_at = timezone.now()
-                job_application.job_seeker.save(update_fields=["last_checked_at"])
-        except ApprovalAlreadyExistsError:
-            link_to_form = get_external_link_markup(
-                url=f"{global_constants.ITOU_HELP_CENTER_URL }/requests/new",
-                text="ce formulaire",
-            )
-            messages.error(
-                request,
-                # NOTE(vperron): maybe a small template would be better if this gets more complex.
-                mark_safe(
-                    "Ce candidat semble avoir plusieurs comptes sur Les emplois de l'inclusion "
-                    "(même identifiant Pôle emploi mais adresse e-mail différente). "
-                    "<br>"
-                    "Un PASS IAE lui a déjà été délivré mais il est associé à un autre compte. "
-                    "<br>"
-                    f"Pour que nous régularisions la situation, merci de remplir {link_to_form} en nous indiquant : "
-                    "<ul>"
-                    "<li> nom et prénom du salarié"
-                    "<li> numéro de sécurité sociale"
-                    "<li> sa date de naissance"
-                    "<li> son identifiant Pôle Emploi"
-                    "<li> la référence d’un agrément Pôle Emploi ou d’un PASS IAE lui appartenant (si vous l’avez) "
-                    "</ul>"
-                ),
-            )
-            return HttpResponseClientRedirect(next_url)
-        except xwf_models.InvalidTransitionError:
-            messages.error(request, "Action déjà effectuée.")
-            return HttpResponseClientRedirect(next_url)
-
-        if job_application.to_siae.is_subject_to_eligibility_rules:
-            # Automatic approval delivery mode.
-            if job_application.approval:
-                external_link = get_external_link_markup(
-                    url=(
-                        "https://www.pole-emploi.fr/employeur/aides-aux-recrutements/"
-                        "les-aides-a-lembauche/insertion-par-lactivite-economiq.html"
-                    ),
-                    text="l’aide spécifique de Pôle emploi",
-                )
-                messages.success(
-                    request,
-                    mark_safe(
-                        "Embauche acceptée ! Pour un contrat de professionnalisation, vous pouvez "
-                        f"demander l'aide au poste ou {external_link}."
-                    ),
-                )
-                messages.success(
-                    request,
-                    (
-                        "Le numéro de PASS IAE peut être utilisé pour la déclaration "
-                        "de la personne dans l'extranet IAE 2.0 de l'ASP."
-                    ),
-                )
-            # Manual approval delivery mode.
-            elif not job_application.hiring_without_approval:
-                external_link = get_external_link_markup(
-                    url=(
-                        f"{global_constants.ITOU_HELP_CENTER_URL }/articles/"
-                        "14733528375185--PASS-IAE-Comment-ça-marche-/#verification-des-demandes-de-pass-iae"
-                    ),
-                    text="consulter notre espace documentation",
-                )
-                messages.success(
-                    request,
-                    mark_safe(
-                        "Votre demande de PASS IAE est en cours de vérification auprès de nos équipes.<br>"
-                        "Si vous souhaitez en savoir plus sur le processus de vérification, n’hésitez pas à "
-                        f"{external_link}."
-                    ),
-                )
-        elif job_application.to_siae.kind == SiaeKind.GEIQ:
-            # If job seeker has as valid GEIQ diagnosis issued by a GEIQ or a prescriber
-            # link this diagnosis to the current job application
-            if geiq_eligibility_diagnosis := GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
-                job_application.job_seeker, job_application.to_siae
-            ).first():
-                job_application.geiq_eligibility_diagnosis = geiq_eligibility_diagnosis
-                job_application.save(update_fields=["geiq_eligibility_diagnosis"])
-
-        external_link = get_external_link_markup(
-            url=job_application.to_siae.accept_survey_url,
-            text="Je donne mon avis",
-        )
-        messages.warning(
-            request,
-            mark_safe(f"Êtes-vous satisfait des emplois de l'inclusion ? {external_link}"),
-        )
-
-        return HttpResponseClientRedirect(next_url)
-
-    return render(request, template_name, {**context, "has_form_error": any(form.errors for form in forms)})
+    return common_views._accept(
+        request,
+        job_application.to_siae,
+        job_application.job_seeker,
+        error_url=next_url,
+        back_url=next_url,
+        template_name=template_name,
+        extra_context={},
+        job_application=job_application,
+    )
 
 
 class AcceptHTMXFragmentView(TemplateView):
