@@ -71,4 +71,4 @@ class Migration(migrations.Migration):
         ("siaes", "0005_siaejobdescription_location_asp"),
     ]
 
-    operations = [migrations.RunPython(forwards, elidable=True)]
+    operations = [migrations.RunPython(forwards, migrations.RunPython.noop, elidable=True)]

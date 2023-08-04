@@ -18,11 +18,7 @@
         <div class="d-inline ml-lg-auto">
             <span class="fs-sm text-nowrap">
                 <i class="ri-map-pin-2-line ri-sm"></i>
-                {% if job.location %}
-                    {{ job.location }}
-                {% else %}
-                    {{ job.siae.city|title }} ({{ job.siae.department }})
-                {% endif %}
+                {{ job.display_location }}
             </span>
         </div>
     </a>

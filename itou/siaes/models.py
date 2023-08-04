@@ -688,9 +688,9 @@ class SiaeJobDescription(models.Model):
 
     @property
     def display_location(self):
-        if self.location:
-            return f"{self.location.name} ({self.location.department})"
-        return f"{self.siae.city} ({self.siae.department})"
+        if self.location_asp:
+            return f"{self.location_asp.display_name} ({self.location_asp.asp_department_code})"
+        return f"{self.siae.city.title()} ({self.siae.department})"
 
     @property
     def display_contract_type(self):

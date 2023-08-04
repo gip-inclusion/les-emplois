@@ -15,11 +15,7 @@
             </div>
             <span class="fs-sm mt-1 d-flex align-items-center">
                 <i class="ri-map-pin-2-line ri-sm mr-1"></i>
-                {% if job.location %}
-                    {{ job.location }}
-                {% else %}
-                    {{ siae.city|title }} ({{ siae.department }})
-                {% endif %}
+                {{ job.display_location }}
             </span>
         </div>
         <div class="mt-lg-0 ml-auto d-flex flex-column align-items-end justify-content-center">

@@ -59,11 +59,7 @@
         <div class="fs-sm d-flex flex-column flex-lg-row align-items-lg-center">
             <span class="mr-3">
                 <i class="ri-map-pin-2-line mr-1"></i>
-                {% if job_description.location %}
-                    {{ job_description.location }}
-                {% else %}
-                    {{ job_description.siae.city | title }} ({{ job_description.siae.department }})
-                {% endif %}
+                {{ job_description.display_location }}
             </span>
             <span class="mr-3 flex-md-grow-1">
                 <i class="ri-navigation-line mr-1"></i>à <b>{{ job_description.distance | floatformat:"-1" }}&nbsp;km</b> de votre lieu de recherche

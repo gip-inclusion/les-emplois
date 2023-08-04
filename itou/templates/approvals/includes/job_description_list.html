@@ -42,10 +42,12 @@
             {% with job=all_jobs.0 %}
                 <i class="ri-briefcase-line ri-xl mr-1"></i>
                 <span class="font-weight-bold mr-1 mr-md-2">{{ job.display_name }}</span>
-                {% if job.location %}
+                {% comment %} # TODO: should we use SiaeJobDescription.display_location here instead?
+                # Not sure as it displays the SIAE city if SiaeJobDescription.location_asp is empty. {% endcomment %}
+                {% if job.location_asp %}
                     <span class="fs-sm text-nowrap">
                         <i class="ri-map-pin-2-line ri-sm mr-1"></i>
-                        {{ first_job.location }}
+                        {{ first_job.location_asp }}
                     </span>
                 {% endif %}
             {% endwith %}
@@ -64,11 +66,12 @@
                     <li class="list-group-item list-group-item-action">
                         <span class="d-flex flex-wrap align-items-center text-decoration-none">
                             <span class="font-weight-bold mr-1 mr-md-2">{{ job.display_name }}</span>
-
-                            {% if job.location %}
+                            {% comment %} # TODO: should we use SiaeJobDescription.display_location here instead?
+                            # Not sure as it displays the SIAE city if SiaeJobDescription.location_asp is empty. {% endcomment %}
+                            {% if job.location_asp %}
                                 <span class="ml-auto fs-sm text-nowrap">
                                     <i class="ri-map-pin-2-line ri-sm mr-1"></i>
-                                    {{ job.location }}
+                                    {{ job.location_asp }}
                                 </span>
 
                             {% endif %}
