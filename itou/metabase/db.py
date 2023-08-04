@@ -3,21 +3,16 @@ Helper methods for manipulating tables used by both populate_metabase_emplois an
 """
 import copy
 import gc
-import logging
 import os
 import urllib
 
 import httpx
-import psycopg2
+import psycopg
 from django.conf import settings
 from django.utils import timezone
-from psycopg2 import extras as psycopg2_extras, sql
-from psycopg2.extras import LoggingConnection, LoggingCursor
+from psycopg import sql
 
-from itou.metabase.utils import chunked_queryset, compose, convert_boolean_to_int
-
-
-logger = logging.getLogger("django.db.backends")
+from itou.metabase.utils import chunked_queryset, compose, convert_boolean_to_int, convert_uuid_to_str
 
 
 class MetabaseDatabaseCursor:
@@ -26,7 +21,7 @@ class MetabaseDatabaseCursor:
         self.connection = None
 
     def __enter__(self):
-        self.connection = psycopg2.connect(
+        self.connection = psycopg.connect(
             host=settings.METABASE_HOST,
             port=settings.METABASE_PORT,
             dbname=settings.METABASE_DATABASE,
@@ -36,10 +31,8 @@ class MetabaseDatabaseCursor:
             keepalives_idle=30,
             keepalives_interval=5,
             keepalives_count=5,
-            connection_factory=LoggingConnection,
         )
-        self.connection.initialize(logger)
-        self.cursor = self.connection.cursor(cursor_factory=LoggingCursor if settings.SQL_DEBUG else None)
+        self.cursor = self.connection.cursor()
         return self.cursor, self.connection
 
     def __exit__(self, exc_type, exc_value, exc_traceback):
@@ -253,7 +246,7 @@ def populate_table(table, batch_size, querysets=None, extra_object=None):
     This is why we instead do small and frequent commits, so that the db stays available
     throughout the script.
 
-    Note that psycopg2 will always automatically open a new transaction when none is open.
+    Note that psycopg will always automatically open a new transaction when none is open.
     Thus it will open a new one after each such commit.
     """
 
@@ -282,6 +275,9 @@ def populate_table(table, batch_size, querysets=None, extra_object=None):
         if c["type"] == "boolean":
             c["type"] = "integer"
             c["fn"] = compose(convert_boolean_to_int, c["fn"])
+        if c["type"] == "varchar":
+            # Force uuid as strings as UUIDDUmper does not include hyphens
+            c["fn"] = compose(convert_uuid_to_str, c["fn"])
 
     print(f"Injecting {total_rows} rows with {len(table.columns)} columns into table {table_name}:")
 
@@ -291,14 +287,17 @@ def populate_table(table, batch_size, querysets=None, extra_object=None):
     with MetabaseDatabaseCursor() as (cur, conn):
 
         def inject_chunk(table_columns, chunk, new_table_name):
-            insert_query = sql.SQL("insert into {new_table_name} ({fields}) values %s").format(
-                new_table_name=sql.Identifier(new_table_name),
-                fields=sql.SQL(",").join(
-                    [sql.Identifier(c["name"]) for c in table_columns],
-                ),
-            )
-            dataset = [[c["fn"](o) for c in table_columns] for o in chunk]
-            psycopg2_extras.execute_values(cur, insert_query, dataset, template=None)
+            rows = [[c["fn"](row) for c in table_columns] for row in chunk]
+            with cur.copy(
+                sql.SQL("COPY {new_table_name} ({fields}) FROM STDIN").format(
+                    new_table_name=sql.Identifier(new_table_name),
+                    fields=sql.SQL(",").join(
+                        [sql.Identifier(c["name"]) for c in table_columns],
+                    ),
+                )
+            ) as copy:
+                for row in rows:
+                    copy.write_row(row)
             conn.commit()
 
         # Add comments on table columns.

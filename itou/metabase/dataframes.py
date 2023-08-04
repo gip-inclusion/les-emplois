@@ -3,10 +3,10 @@ Helper methods for manipulating dataframes used by both populate_metabase_emploi
 populate_metabase_fluxiae scripts.
 """
 import csv
-from io import StringIO
 
 import numpy as np
 import pandas as pd
+from psycopg import sql
 from tqdm import tqdm
 
 from itou.metabase.db import MetabaseDatabaseCursor, create_table, get_new_table_name, rename_table_atomically
@@ -38,7 +38,7 @@ def store_df(df, table_name, max_attempts=5):
     Store dataframe in database.
 
     Do this chunk by chunk to solve
-    psycopg2.OperationalError "server closed the connection unexpectedly" error.
+    psycopg.OperationalError "server closed the connection unexpectedly" error.
 
     Try up to `max_attempts` times.
     """
@@ -55,11 +55,15 @@ def store_df(df, table_name, max_attempts=5):
         try:
             create_table(new_table_name, infer_columns_from_df(df), reset=True)
             for df_chunk in tqdm(df_chunks):
-                buffer = StringIO()
-                df_chunk.to_csv(buffer, header=False, index=False, sep="\t", quoting=csv.QUOTE_NONE, escapechar="\\")
-                buffer.seek(0)
+                data = df_chunk.to_csv(header=False, index=False, sep="\t", quoting=csv.QUOTE_NONE, escapechar="\\")
                 with MetabaseDatabaseCursor() as (cursor, conn):
-                    cursor.copy_from(buffer, new_table_name, sep="\t", null="")
+                    with cursor.copy(
+                        sql.SQL("COPY {table_name} FROM STDIN (FORMAT CSV, DELIMITER '\t')").format(
+                            table_name=sql.Identifier(new_table_name),
+                        )
+                    ) as copy:
+                        copy.write(data)
+                        # cursor.copy_from(buffer, new_table_name, sep="\t", null="")
                     conn.commit()
             break
         except Exception as e:

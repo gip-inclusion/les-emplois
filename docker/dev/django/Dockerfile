@@ -62,8 +62,8 @@ RUN apt-get update && apt-get install -y \
 COPY ./requirements /requirements
 RUN pip install --upgrade pip \
     && pip install --no-cache-dir -r /requirements/dev.txt \
-    && pip uninstall psycopg2-binary -y \
-    && pip install psycopg2-binary --no-binary psycopg2-binary \
+    && pip uninstall psycopg[binary] -y \
+    && pip install psycopg[binary] --no-binary psycopg[binary] \
     && rm -rf /requirements
 
 COPY --chown=app:app ./docker/dev/django/entrypoint.sh /entrypoint.sh
