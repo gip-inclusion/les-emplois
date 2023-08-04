@@ -302,7 +302,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
         if request.htmx and not request.POST.get("confirmed"):
             return TemplateResponse(
                 request=request,
-                template=template_name,
+                template="apply/includes/job_application_accept_form.html",
                 context=context,
                 headers=hx_trigger_modal_control("js-confirmation-modal", "show"),
             )
