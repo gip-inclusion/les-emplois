@@ -8,10 +8,12 @@ class Migration(migrations.Migration):
         ("asp", "0004_cp_cities_name"),
     ]
 
-    operations = [
-        migrations.AlterField(
-            model_name="commune",
-            name="display_name",
-            field=models.CharField(max_length=255, verbose_name="nom affiché"),
-        ),
-    ]
+    # TODO: 5596 Commune have a null display_name.
+    # operations = [
+    #     migrations.AlterField(
+    #         model_name="commune",
+    #         name="display_name",
+    #         field=models.CharField(max_length=255, verbose_name="nom affiché"),
+    #     ),
+    # ]
+    operations = []

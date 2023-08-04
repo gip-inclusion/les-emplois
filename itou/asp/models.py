@@ -9,6 +9,8 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 from unidecode import unidecode
 
+from itou.common_apps.address.departments import DEPARTMENTS
+
 from .exceptions import CommuneUnknownInPeriodError, UnknownCommuneError
 
 
@@ -377,9 +379,14 @@ class Commune(PrettyPrintMixin, AbstractPeriod):
     reference file is currently not up-to-date (2018)
     """
 
+    DEPARTMENT_CHOICES = DEPARTMENTS.items()
+
     code = models.CharField(max_length=5, verbose_name="code commune INSEE", db_index=True)
-    name = models.CharField(max_length=50, verbose_name="nom de la commune")
+    department = models.CharField(
+        verbose_name="département", choices=DEPARTMENT_CHOICES, max_length=3, db_index=True, null=True
+    )  # TODO: remove nullable
     display_name = models.CharField(max_length=255, verbose_name="nom affiché")
+    name = models.CharField(max_length=50, verbose_name="nom de la commune")
 
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     created_by = models.ForeignKey(
