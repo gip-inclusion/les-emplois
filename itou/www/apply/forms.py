@@ -425,7 +425,7 @@ class RefusalForm(forms.Form):
 
 class AnswerForm(forms.Form):
     """
-    Allow an SIAE to add an answer message when postponing or accepting.
+    Allow an SIAE to add an answer message when postponing.
     """
 
     answer = forms.CharField(
@@ -438,7 +438,7 @@ class AnswerForm(forms.Form):
 
 class AcceptForm(forms.ModelForm):
     """
-    Allow an SIAE to add an answer message when postponing or accepting.
+    Allow an SIAE to accept a job application.
     If SIAE is a GEIQ, add specific fields (contract type, number of hours per week)
     """
 
