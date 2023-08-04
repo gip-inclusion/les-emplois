@@ -1,11 +1,13 @@
 from unittest import mock
 
-from itou.asp.models import LaneExtension, LaneType, find_lane_type_aliases
+from itou.asp.models import Commune, LaneExtension, LaneType, find_lane_type_aliases
 from itou.common_apps.address.format import format_address
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, RESULTS_BY_ADDRESS
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_NO_RESULT_MOCK
 from tests.users.factories import JobSeekerFactory, JobSeekerWithAddressFactory
 from tests.utils.test import TestCase
+
+from .factories import CommuneFactory
 
 
 def _users_with_mock_address(idx):
@@ -18,6 +20,19 @@ def _users_with_mock_address(idx):
 
 def mock_get_geocoding_data(address, post_code=None, limit=1):
     return RESULTS_BY_ADDRESS.get(address)
+
+
+def test_commune_department_code():
+    commune = CommuneFactory.build(code="07141")
+    assert commune.department_code == "007"
+    commune = CommuneFactory.build(code="87114")
+    assert commune.department_code == "087"
+    # The CommuneFactory can only be used with a limited data set
+    # which does not include a Commune INSEE code starting by 97 or 98.
+    commune = Commune.objects.create(
+        code="97801", name="SAINT-MARTIN", display_name="Saint-Martin", start_date="2007-02-21"
+    )
+    assert commune.department_code == "978"
 
 
 @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_NO_RESULT_MOCK)
