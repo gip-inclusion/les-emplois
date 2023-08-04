@@ -34,7 +34,7 @@
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'siaes_views:members' %}" class="btn-link btn-ico">
                             <i class="ri-team-line ri-lg font-weight-normal"></i>
-                            <span>Gérer des collaborateurs</span>
+                            <span>Gérer les collaborateurs</span>
                         </a>
                     </li>
                 {% endif %}
@@ -50,7 +50,7 @@
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'siaes_views:show_financial_annexes' %}" class="btn-link btn-ico">
                             <i class="ri-folder-chart-line ri-lg font-weight-normal"></i>
-                            <span>Mes annexes financières</span>
+                            <span>Voir les annexes financières</span>
                         </a>
                         {% if not current_siae.is_active %}
                             <span class="badge badge-xs badge-pill badge-warning-lighter text-warning"><i class="ri-error-warning-line" aria-hidden="true"></i>Action requise</span>

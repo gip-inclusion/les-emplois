@@ -5,7 +5,7 @@
         Enregistrer une candidature
         {% if job_seeker %}pour {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}{% endif %}
     {% else %}
-        Déclarer l'embauche
+        Déclarer une embauche
         {% if job_seeker %}de {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}{% endif %}
     {% endif %}
 {% elif request.user.is_prescriber %}

@@ -15,7 +15,7 @@
                         <li class="d-flex justify-content-between align-items-center mb-3">
                             <a href="{% url 'prescribers_views:edit_organization' %}" class="btn-link btn-ico">
                                 <i class="ri-pencil-line ri-lg ri-lg font-weight-normal"></i>
-                                <span>Modifier les informations</span>
+                                <span>Modifier cette organisation</span>
                             </a>
                         </li>
                     {% endif %}
@@ -31,7 +31,7 @@
                 <li class="d-flex justify-content-between align-items-center mb-3">
                     <a href="{% url 'prescribers_views:members' %}" class="btn-link btn-ico">
                         <i class="ri-team-line ri-lg ri-lg font-weight-normal"></i>
-                        <span>Gérer vos collaborateurs</span>
+                        <span>Gérer les collaborateurs</span>
                     </a>
                 </li>
                 {% if current_prescriber_organization.kind == precriber_kind_dept and user_is_prescriber_org_admin %}

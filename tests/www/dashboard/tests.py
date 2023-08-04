@@ -134,7 +134,7 @@ class DashboardViewTest(TestCase):
 
         url = reverse("dashboard:index")
         response = self.client.get(url)
-        self.assertContains(response, "Gérer mes fiches salarié")
+        self.assertContains(response, "Gérer les fiches salarié")
         self.assertNotContains(response, "badge-danger")
         assert response.context["num_rejected_employee_records"] == 0
 
