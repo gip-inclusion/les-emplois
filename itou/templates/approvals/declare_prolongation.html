@@ -27,33 +27,27 @@
                         {# Edit mode. #}
                         {% include "approvals/includes/card.html" with common_approval=approval %}
                         <div class="c-box my-4">
-                            {% block htmx %}
-                                <form id="mainForm" method="post" action="" class="js-prevent-multiple-submit">
-                                    {% csrf_token %}
+                            <form id="mainForm" method="post" action="" class="js-prevent-multiple-submit">
+                                {% csrf_token %}
 
-                                    {% if not request.htmx %}
-                                        {# Skip validation display on HTMX reloads #}
-                                        {% bootstrap_form_errors form type="non_fields" %}
-                                    {% endif %}
+                                {% bootstrap_form_errors form type="non_fields" %}
 
-                                    {% bootstrap_field form.reason %}
-                                    {% bootstrap_field form.end_at %}
+                                {% bootstrap_field form.reason %}
+                                {% bootstrap_field form.end_at %}
 
-                                    {# HTMX: optional report file upload #}
-                                    {% include "approvals/includes/declaration_upload_panel.html" %}
+                                {% include "approvals/includes/declaration_upload_panel.html" %}
 
-                                    <hr />
+                                <hr />
 
-                                    {% buttons %}
-                                        <div class="text-right">
-                                            <a class="btn btn-outline-primary" href="{{ back_url }}">Retour</a>
-                                            {# Enable preview mode: preview=1. #}
-                                            <button type="submit" name="preview" value="1" class="btn btn-primary">Valider la déclaration</button>
-                                        </div>
-                                    {% endbuttons %}
+                                {% buttons %}
+                                    <div class="text-right">
+                                        <a class="btn btn-outline-primary" href="{{ back_url }}">Retour</a>
+                                        {# Enable preview mode: preview=1. #}
+                                        <button type="submit" name="preview" value="1" class="btn btn-primary">Valider la déclaration</button>
+                                    </div>
+                                {% endbuttons %}
 
-                                </form>
-                            {% endblock %}
+                            </form>
                         </div>
                     {% else %}
                         {# Preview mode: ask for confirmation before committing to DB. #}
