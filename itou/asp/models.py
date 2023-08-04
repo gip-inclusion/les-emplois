@@ -379,7 +379,7 @@ class Commune(PrettyPrintMixin, AbstractPeriod):
 
     code = models.CharField(max_length=5, verbose_name="code commune INSEE", db_index=True)
     name = models.CharField(max_length=50, verbose_name="nom de la commune")
-    display_name = models.CharField(max_length=255, verbose_name="nom affiché", null=True)  # TODO: remove nullable
+    display_name = models.CharField(max_length=255, verbose_name="nom affiché")
 
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     created_by = models.ForeignKey(
