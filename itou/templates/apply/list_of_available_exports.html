@@ -1,14 +1,14 @@
 {% extends BASE_TEMPLATE %}
 {% load i18n %}
 
-{% block title %}Export des suivis de candidatures {{ block.super }}{% endblock %}
+{% block title %}Export des candidatures {{ block.super }}{% endblock %}
 
 {% block content_title %}
     {% if export_for == "siae" %}
-        <h1>Export des candidatures reçues</h1>
+        <h1>Exporter toutes les candidatures reçues</h1>
         <h2>{{ siae.display_name }}</h2>
     {% else %}
-        <h1>Export des candidatures</h1>
+        <h1>Exporter toutes les candidatures</h1>
     {% endif %}
 
     {% if export_for == "siae" or can_view_stats_pe %}
