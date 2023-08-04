@@ -17,7 +17,7 @@ To do the final comparison. Meld or vimdiff can be used to inspect what's wrong.
 import os
 
 from django.core.management.base import BaseCommand
-from psycopg2 import sql
+from psycopg import sql
 
 from itou.metabase.db import MetabaseDatabaseCursor
 

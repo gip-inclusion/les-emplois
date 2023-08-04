@@ -11,7 +11,7 @@ import tenacity
 from dateutil.rrule import MO, WEEKLY, rrule
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from psycopg2 import extras as psycopg2_extras, sql
+from psycopg import sql
 from sentry_sdk.crons import monitor
 
 from itou.metabase.db import MetabaseDatabaseCursor, create_table
@@ -103,13 +103,16 @@ def update_table_at_date(table_name, column_names, at, rows):
                 value=sql.Literal(str(at)),
             )
         )
-        insert_query = sql.SQL("INSERT INTO {table_name} ({fields}) VALUES %s").format(
-            table_name=sql.Identifier(table_name),
-            fields=sql.SQL(",").join(
-                [sql.Identifier(col) for col in column_names],
-            ),
-        )
-        psycopg2_extras.execute_values(cursor, insert_query, rows)
+        with cursor.copy(
+            sql.SQL("COPY {table_name} ({fields}) FROM STDIN").format(
+                table_name=sql.Identifier(table_name),
+                fields=sql.SQL(",").join(
+                    [sql.Identifier(col) for col in column_names],
+                ),
+            )
+        ) as copy:
+            for row in rows:
+                copy.write_row(row)
         conn.commit()
 
 

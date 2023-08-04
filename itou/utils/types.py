@@ -1,4 +1,4 @@
-from psycopg2.extras import DateRange
+from psycopg.types.range import DateRange
 
 
 class InclusiveDateRange(DateRange):

@@ -11,7 +11,7 @@ from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.db import IntegrityError, transaction
+from django.db import IntegrityError, connection, transaction
 from django.forms import model_to_dict
 from django.test import TransactionTestCase
 from django.urls import reverse
@@ -1645,28 +1645,34 @@ class ApprovalConcurrentModelTest(TransactionTestCase):
         # Let's do like they do in the Django tests themselves: use threads and sleep().
         def first_request():
             nonlocal approval
-            with transaction.atomic():
-                approval = ApprovalFactory.build(
-                    # eligibility_diagnosis=None,
-                    user=user1,
-                    number=Approval.get_next_number(),
-                    origin_pe_approval=True,
-                )
-                time.sleep(0.2)  # sleep long enough for the concurrent request to start
-                approval.save()
+            try:
+                with transaction.atomic():
+                    approval = ApprovalFactory.build(
+                        # eligibility_diagnosis=None,
+                        user=user1,
+                        number=Approval.get_next_number(),
+                        origin_pe_approval=True,
+                    )
+                    time.sleep(0.2)  # sleep long enough for the concurrent request to start
+                    approval.save()
+            finally:
+                connection.close()
 
         def concurrent_request():
             nonlocal approval2
-            with transaction.atomic():
-                time.sleep(0.1)  # ensure we are not the first to take the lock
-                approval2 = ApprovalFactory.build(
-                    # eligibility_diagnosis=None,
-                    user=user2,
-                    number=Approval.get_next_number(),
-                    origin_pe_approval=True,
-                )
-                time.sleep(0.2)  # sleep long enough to save() after the first request's save()
-                approval2.save()
+            try:
+                with transaction.atomic():
+                    time.sleep(0.1)  # ensure we are not the first to take the lock
+                    approval2 = ApprovalFactory.build(
+                        # eligibility_diagnosis=None,
+                        user=user2,
+                        number=Approval.get_next_number(),
+                        origin_pe_approval=True,
+                    )
+                    time.sleep(0.2)  # sleep long enough to save() after the first request's save()
+                    approval2.save()
+            finally:
+                connection.close()
 
         t1 = threading.Thread(target=first_request)
         t2 = threading.Thread(target=concurrent_request)

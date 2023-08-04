@@ -74,7 +74,7 @@ def get_column_from_field(field, name):
 def get_choice(choices, key):
     choices = dict(choices)
     # Gettext fixes `can't adapt type '__proxy__'` error
-    # due to laxy_gettext and psycopg2 not going well together.
+    # due to laxy_gettext and psycopg not going well together.
     # See https://code.djangoproject.com/ticket/13965
     if key in choices:
         # FIXME: we dropped translations, this should be easier now.

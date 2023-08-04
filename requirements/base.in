@@ -1,5 +1,5 @@
 html5lib  # https://github.com/html5lib/html5lib-python
-psycopg2  # https://github.com/psycopg/psycopg2
+psycopg[binary]  # https://github.com/psycopg/psycopg
 requests  # https://github.com/psf/requests
 python-dateutil  # https://pypi.org/project/python-dateutil/
 openpyxl  # https://openpyxl.readthedocs.io/en/stable/
