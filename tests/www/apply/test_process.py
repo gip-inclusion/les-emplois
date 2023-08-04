@@ -90,7 +90,7 @@ class ProcessViewsTest(TestCase):
         # I guess it's normal as it's an AJAX response.
         # See https://django-htmx.readthedocs.io/en/latest/http.html#django_htmx.http.HttpResponseClientRedirect # noqa
         if assert_successful:
-            self.assertRedirects(response, next_url, status_code=200)
+            self.assertRedirects(response, next_url, status_code=200, fetch_redirect_response=False)
         return response, next_url
 
     def test_details_for_siae(self, *args, **kwargs):
