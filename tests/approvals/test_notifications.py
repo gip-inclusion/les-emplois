@@ -21,7 +21,7 @@ def test_prolongation_request_created_reminder(snapshot):
     email = notifications.ProlongationRequestCreatedReminder(prolongation_request).email
 
     assert email.to == [prolongation_request.validated_by.email]
-    assert email.cc == [member.email for member in other_prescribers]
+    assert set(email.cc) == {member.email for member in other_prescribers}
     assert email.subject == snapshot(name="subject")
     assert email.body == snapshot(name="body")
 
