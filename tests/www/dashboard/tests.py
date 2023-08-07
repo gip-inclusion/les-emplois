@@ -205,8 +205,6 @@ class DashboardViewTest(TestCase):
 
                 response = self.client.get(reverse("dashboard:index"))
                 self.assertContains(response, "Prolonger/suspendre un agrément émis par Pôle emploi")
-                self.assertContains(response, "Déclarer une embauche")
-                self.assertContains(response, reverse("apply:start", kwargs={"siae_pk": siae.pk}))
 
         for kind in [SiaeKind.EA, SiaeKind.EATT, SiaeKind.GEIQ, SiaeKind.OPCS]:
             with self.subTest(f"should not display when siae_kind={kind}"):
@@ -216,27 +214,42 @@ class DashboardViewTest(TestCase):
 
                 response = self.client.get(reverse("dashboard:index"))
                 self.assertNotContains(response, "Prolonger/suspendre un agrément émis par Pôle emploi")
-                self.assertNotContains(response, "Déclarer une embauche")
+                if kind != SiaeKind.GEIQ:
+                    self.assertNotContains(response, "Déclarer une embauche")
 
     def test_dashboard_job_applications(self):
-        for kind in [SiaeKind.GEIQ]:
+        HIRE_LINK_LABEL = "Déclarer une embauche"
+        APPLICATION_SAVE_LABEL = "Enregistrer une candidature"
+        display_kinds = [
+            SiaeKind.AI,
+            SiaeKind.EI,
+            SiaeKind.EITI,
+            SiaeKind.ACI,
+            SiaeKind.ETTI,
+            SiaeKind.GEIQ,
+        ]
+        for kind in display_kinds:
             with self.subTest(f"should display when siae_kind={kind}"):
                 siae = SiaeFactory(kind=kind, with_membership=True)
                 user = siae.members.first()
                 self.client.force_login(user)
 
                 response = self.client.get(reverse("dashboard:index"))
-                self.assertContains(response, "Enregistrer une candidature")
+                self.assertContains(response, APPLICATION_SAVE_LABEL)
                 self.assertContains(response, reverse("apply:start", kwargs={"siae_pk": siae.pk}))
+                self.assertContains(response, HIRE_LINK_LABEL)
+                self.assertContains(response, reverse("apply:check_nir_for_hire", kwargs={"siae_pk": siae.pk}))
 
-        for kind in set(SiaeKind) - {SiaeKind.GEIQ}:
+        for kind in set(SiaeKind) - set(display_kinds):
             with self.subTest(f"should not display when siae_kind={kind}"):
                 siae = SiaeFactory(kind=kind, with_membership=True)
                 user = siae.members.first()
                 self.client.force_login(user)
-
                 response = self.client.get(reverse("dashboard:index"))
-                self.assertNotContains(response, "Enregistrer une candidature")
+                self.assertNotContains(response, APPLICATION_SAVE_LABEL)
+                self.assertNotContains(response, reverse("apply:start", kwargs={"siae_pk": siae.pk}))
+                self.assertNotContains(response, HIRE_LINK_LABEL)
+                self.assertNotContains(response, reverse("apply:check_nir_for_hire", kwargs={"siae_pk": siae.pk}))
 
     def test_dashboard_agreements_with_suspension_sanction(self):
         siae = SiaeFactory(subject_to_eligibility=True, with_membership=True)
