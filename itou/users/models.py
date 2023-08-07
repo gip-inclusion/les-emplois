@@ -241,7 +241,7 @@ class User(AbstractUser, AddressMixin):
 
     lack_of_nir_reason = models.CharField(
         verbose_name="pas de NIR ?",
-        help_text=mark_safe("Indiquez la raison de l'absence de NIR."),
+        help_text="Indiquez la raison de l'absence de NIR.",
         max_length=30,
         choices=LackOfNIRReason.choices,
         blank=True,
