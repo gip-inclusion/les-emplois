@@ -10,6 +10,7 @@ from django.template import loader
 from django.template.response import TemplateResponse
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
+from django.utils.html import format_html
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_POST
@@ -533,12 +534,15 @@ def transfer(request, job_application_id):
         job_application.transfer_to(request.user, target_siae)
         messages.success(
             request,
-            mark_safe(
-                f"<p>La candidature de <b>{ job_application.job_seeker.first_name }"
-                f" { job_application.job_seeker.last_name }</b>"
-                f" a bien été transférée à la SIAE <b>{ target_siae.display_name }</b>,"
-                f" { target_siae.address_on_one_line }.</p>"
-                "<p>Pour la consulter, rendez-vous sur son tableau de bord en changeant de structure.</p>",
+            format_html(
+                (
+                    "<p>La candidature de <b>{} {}</b> a bien été transférée à la SIAE <b>{}</b>, {}.</p>"
+                    "<p>Pour la consulter, rendez-vous sur son tableau de bord en changeant de structure.</p>"
+                ),
+                job_application.job_seeker.first_name,
+                job_application.job_seeker.last_name,
+                target_siae.display_name,
+                target_siae.address_on_one_line,
             ),
         )
     except Exception as ex:
