@@ -1,5 +1,5 @@
 from collections import namedtuple
-from datetime import datetime
+from datetime import date, datetime
 from functools import partial
 from urllib.parse import urlencode
 
@@ -798,7 +798,12 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         assert user.nir == NEW_NIR.replace(" ", "")
 
     def test_edit_sso(self):
-        user = JobSeekerFactory(identity_provider=IdentityProvider.FRANCE_CONNECT)
+        user = JobSeekerFactory(
+            identity_provider=IdentityProvider.FRANCE_CONNECT,
+            first_name="Not Bob",
+            last_name="Not Saint Clar",
+            birthdate=date(1970, 1, 1),
+        )
         self.client.force_login(user)
         url = reverse("dashboard:edit_user_info")
         response = self.client.get(url)
