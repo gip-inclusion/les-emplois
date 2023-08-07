@@ -100,6 +100,9 @@ class SiaeFactory(factory.django.DjangoModelFactory):
         with_jobs = factory.Trait(romes=factory.PostGeneration(_create_job_from_rome_code))
         for_snapshot = factory.Trait(
             name="ACME Inc.",
+            address_line_1="112 rue de la Croix-Nivert",
+            post_code="75015",
+            city="Paris",
             membership=factory.Maybe(
                 "with_membership",
                 yes_declaration=factory.RelatedFactory(

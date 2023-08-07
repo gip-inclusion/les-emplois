@@ -1402,6 +1402,7 @@ class ProcessTemplatesTest(TestCase):
         self.assertNotContains(response, self.url_accept)
 
 
+@pytest.mark.usefixtures("unittest_compatibility")
 class ProcessTransferJobApplicationTest(TestCase):
     TRANSFER_TO_OTHER_SIAE_SENTENCE = "Transférer vers une autre structure"
 
@@ -1472,13 +1473,14 @@ class ProcessTransferJobApplicationTest(TestCase):
         # user must be redirected to job application list
         # with a nice message
         siae = SiaeFactory(with_membership=True)
-        other_siae = SiaeFactory(with_membership=True)
+        other_siae = SiaeFactory(with_membership=True, for_snapshot=True)
         user = siae.members.first()
         other_siae.members.add(user)
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             to_siae=siae,
             state=JobApplicationWorkflow.STATE_PROCESSING,
+            job_seeker__for_snapshot=True,
         )
         transfer_url = reverse("apply:transfer", kwargs={"job_application_id": job_application.pk})
 
@@ -1500,7 +1502,7 @@ class ProcessTransferJobApplicationTest(TestCase):
         self.assertRedirects(response, reverse("apply:list_for_siae"))
         assert messages
         assert len(messages) == 1
-        assert f"transférée à la SIAE <b>{other_siae.display_name}</b>" in str(messages[0])
+        assert str(messages[0]) == self.snapshot(name="job application transfer message")
 
     def test_job_application_transfer_without_rights(self):
         siae = SiaeFactory()
