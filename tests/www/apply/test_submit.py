@@ -3778,3 +3778,52 @@ class HireConfirmationTestCase(TestCase):
         assert job_application.message == ""
         assert list(job_application.selected_jobs.all()) == []
         assert job_application.resume_link == ""
+
+
+class NewHireProcessInfoTestCase(TestCase):
+    GEIQ_APPLY_PROCESS_INFO = "Cet espace vous permet d’enregistrer une candidature à traiter plus tard"
+    OTHER_APPLY_PROCESS_INFO = "Cet espace vous permet d’enregistrer une nouvelle candidature."
+
+    GEIQ_DIRECT_HIRE_PROCESS_INFO = "Si vous souhaitez créer une candidature à traiter plus tard"
+    OTHER_DIRECT_HIRE_PROCESS_INFO = "Pour la création d’une candidature, veuillez vous rendre sur"
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.siae = SiaeFactory(subject_to_eligibility=True, with_membership=True)
+        cls.geiq = SiaeFactory(kind=SiaeKind.GEIQ, with_membership=True)
+        cls.job_seeker = JobSeekerFactory(nir="")
+
+    def test_as_job_seeker(self):
+        self.client.force_login(self.job_seeker)
+        response = self.client.get(reverse("apply:check_nir_for_job_seeker", kwargs={"siae_pk": self.siae.pk}))
+        self.assertNotContains(response, self.OTHER_APPLY_PROCESS_INFO)
+        self.assertNotContains(response, self.OTHER_DIRECT_HIRE_PROCESS_INFO)
+        response = self.client.get(reverse("apply:check_nir_for_job_seeker", kwargs={"siae_pk": self.geiq.pk}))
+        self.assertNotContains(response, self.GEIQ_APPLY_PROCESS_INFO)
+        self.assertNotContains(response, self.GEIQ_DIRECT_HIRE_PROCESS_INFO)
+
+    def test_as_prescriber(self):
+        self.client.force_login(PrescriberFactory())
+        response = self.client.get(reverse("apply:check_nir_for_sender", kwargs={"siae_pk": self.siae.pk}))
+        self.assertNotContains(response, self.OTHER_APPLY_PROCESS_INFO)
+        self.assertNotContains(response, self.OTHER_DIRECT_HIRE_PROCESS_INFO)
+        response = self.client.get(reverse("apply:check_nir_for_sender", kwargs={"siae_pk": self.geiq.pk}))
+        self.assertNotContains(response, self.GEIQ_APPLY_PROCESS_INFO)
+        self.assertNotContains(response, self.GEIQ_DIRECT_HIRE_PROCESS_INFO)
+
+    def test_as_siae_member(self):
+        self.client.force_login(self.siae.members.first())
+        response = self.client.get(reverse("apply:check_nir_for_sender", kwargs={"siae_pk": self.siae.pk}))
+        self.assertContains(response, self.OTHER_APPLY_PROCESS_INFO)
+        self.assertNotContains(response, self.OTHER_DIRECT_HIRE_PROCESS_INFO)
+        response = self.client.get(reverse("apply:check_nir_for_hire", kwargs={"siae_pk": self.siae.pk}))
+        self.assertNotContains(response, self.OTHER_APPLY_PROCESS_INFO)
+        self.assertContains(response, self.OTHER_DIRECT_HIRE_PROCESS_INFO)
+
+        self.client.force_login(self.geiq.members.first())
+        response = self.client.get(reverse("apply:check_nir_for_sender", kwargs={"siae_pk": self.geiq.pk}))
+        self.assertContains(response, self.GEIQ_APPLY_PROCESS_INFO)
+        self.assertNotContains(response, self.GEIQ_DIRECT_HIRE_PROCESS_INFO)
+        response = self.client.get(reverse("apply:check_nir_for_hire", kwargs={"siae_pk": self.geiq.pk}))
+        self.assertNotContains(response, self.GEIQ_APPLY_PROCESS_INFO)
+        self.assertContains(response, self.GEIQ_DIRECT_HIRE_PROCESS_INFO)
