@@ -1481,6 +1481,7 @@ class ProcessTransferJobApplicationTest(TestCase):
             to_siae=siae,
             state=JobApplicationWorkflow.STATE_PROCESSING,
             job_seeker__for_snapshot=True,
+            job_seeker__first_name="<>html escaped<>",
         )
         transfer_url = reverse("apply:transfer", kwargs={"job_application_id": job_application.pk})
 
