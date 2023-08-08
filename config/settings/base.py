@@ -609,31 +609,26 @@ CSP_IMG_SRC = [
     "https://tile.openstreetmap.org",
     "https://*.tile.openstreetmap.org",
     "*.hotjar.com",
-    "https://www.gstatic.com",  # Used by google translate
-    "https://translate.google.com",  # Used by google translate
     "https://cdn.redoc.ly",
 ]
 CSP_STYLE_SRC = [
     "'self'",
     # It would be better to whilelist styles hashes but it's to much work for now.
     "'unsafe-inline'",
-    "*.googleapis.com",  # Google translate
-    "https://cdnjs.cloudflare.com",  # Used by select 2, gis widgets and maybe more in the future
+    "https://cdn.jsdelivr.net/npm/ol@v7.2.2/",  # GIS widget
 ]
 CSP_FONT_SRC = [
-    # There are many users that override the font with extensions or with services such as google translates.
-    # For accessibility reasons we need to allow the user to chose the used font.
-    "*",
+    "'self'",
     # '*' does not allows 'data:' fonts
     "data:",  # Because of tarteaucitron.js
+    "https://fonts.gstatic.com/",  # Used in theme-inclusion
 ]
 CSP_SCRIPT_SRC = [
     "'self'",
     "https://stats.inclusion.beta.gouv.fr",
     "*.hotjar.com",
-    "https://translate.googleapis.com",  # Allow google translate
-    "https://cdnjs.cloudflare.com",  # Used by select 2, gis widgets and maybe more in the future
-    "https://cdn.jsdelivr.net",  # Used by redoc and maybe more
+    "https://cdn.jsdelivr.net/npm/ol@v7.2.2/",  # GIS widget
+    "https://cdn.jsdelivr.net/npm/redoc",
     "https://tally.so",
 ]
 # Some browsers don't seem to fallback on script-src if script-src-elem is not there
@@ -645,8 +640,8 @@ CSP_CONNECT_SRC = [
     "*.hotjar.com",
     "*.hotjar.io",
     "wss://*.hotjar.com",
-    "https://translate.googleapis.com",  # Allow google translate
 ]
+CSP_OBJECT_SRC = ["'none'"]
 
 if MATOMO_BASE_URL:
     CSP_IMG_SRC.append(MATOMO_BASE_URL)
