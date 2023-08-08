@@ -5,11 +5,21 @@ from django.conf import settings
 
 from itou.approvals.enums import Origin
 from itou.approvals.models import Approval, PoleEmploiApproval
-from itou.metabase.tables.utils import MetabaseTable, get_department_and_region_columns, get_hiring_siae, hash_content
+from itou.metabase.tables.utils import (
+    MetabaseTable,
+    get_column_from_field,
+    get_department_and_region_columns,
+    get_hiring_siae,
+    hash_content,
+)
 from itou.prescribers.models import PrescriberOrganization
 
 
 POLE_EMPLOI_APPROVAL_MINIMUM_START_DATE = datetime(2018, 1, 1)
+
+
+def get_field(name):
+    return Approval._meta.get_field(name)
 
 
 @functools.cache
@@ -67,6 +77,7 @@ def get_approval_type(approval):
 TABLE = MetabaseTable(name="pass_agréments")
 TABLE.add_columns(
     [
+        get_column_from_field(get_field("id"), name="id"),
         {"name": "type", "type": "varchar", "comment": "Type", "fn": get_approval_type},
         {"name": "date_début", "type": "date", "comment": "Date de début", "fn": lambda o: o.start_at},
         {"name": "date_fin", "type": "date", "comment": "Date de fin", "fn": lambda o: o.end_at},

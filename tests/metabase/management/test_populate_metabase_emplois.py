@@ -432,6 +432,7 @@ def test_populate_approvals():
         rows = cursor.fetchall()
         assert rows == [
             (
+                approval.pk,
                 "PASS IAE (XXXXX)",
                 datetime.date(2023, 2, 2),
                 datetime.date(2025, 2, 1),
@@ -450,6 +451,7 @@ def test_populate_approvals():
                 datetime.date(2023, 2, 1),
             ),
             (
+                pe_approval.pk,
                 "Agrément PE",
                 datetime.date(2023, 2, 2),
                 datetime.date(2025, 2, 1),
