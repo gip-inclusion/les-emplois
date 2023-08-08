@@ -615,7 +615,6 @@ CSP_STYLE_SRC = [
     "'self'",
     # It would be better to whilelist styles hashes but it's to much work for now.
     "'unsafe-inline'",
-    "https://cdn.jsdelivr.net/npm/ol@v7.2.2/",  # GIS widget
 ]
 CSP_FONT_SRC = [
     "'self'",
@@ -627,7 +626,6 @@ CSP_SCRIPT_SRC = [
     "'self'",
     "https://stats.inclusion.beta.gouv.fr",
     "*.hotjar.com",
-    "https://cdn.jsdelivr.net/npm/ol@v7.2.2/",  # GIS widget
     "https://cdn.jsdelivr.net/npm/redoc",
     "https://tally.so",
 ]
