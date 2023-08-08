@@ -10,6 +10,7 @@ urlpatterns = [
     path("", views.stats_public, name="stats_public"),
     path("pilotage/<int:dashboard_id>", views.stats_pilotage, name="stats_pilotage"),
     # Employer stats.
+    path("siae/aci", views.stats_siae_aci, name="stats_siae_aci"),
     path("siae/etp", views.stats_siae_etp, name="stats_siae_etp"),
     path("siae/hiring", views.stats_siae_hiring, name="stats_siae_hiring"),
     path("siae/auto_prescription", views.stats_siae_auto_prescription, name="stats_siae_auto_prescription"),

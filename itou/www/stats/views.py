@@ -35,13 +35,6 @@ from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
 
 
-def get_stats_siae_etp_current_org(request):
-    current_org = get_current_siae_or_404(request)
-    if not request.user.can_view_stats_siae_etp(current_org=current_org):
-        raise PermissionDenied
-    return current_org
-
-
 def get_stats_siae_current_org(request):
     current_org = get_current_siae_or_404(request)
     if not request.user.can_view_stats_siae(current_org=current_org):
@@ -170,13 +163,36 @@ def stats_pilotage(request, dashboard_id):
 
 
 @login_required
+def stats_siae_aci(request):
+    """
+    ACI stats shown to their own members.
+    They can only view data for their own ACI.
+    """
+    current_org = get_stats_siae_current_org(request)
+    if not request.user.can_view_stats_siae_aci(current_org=current_org):
+        raise PermissionDenied
+    context = {
+        "page_title": "Suivi du cofinancement de mon ACI",
+        "department": current_org.department,
+        "matomo_custom_url_suffix": format_region_and_department_for_matomo(current_org.department),
+    }
+    return render_stats(
+        request=request,
+        context=context,
+        params={mb.ASP_SIAE_FILTER_KEY_FLAVOR2: current_org.convention.asp_id},
+    )
+
+
+@login_required
 def stats_siae_etp(request):
     """
     SIAE stats shown to their own members.
     They can only view data for their own SIAE.
     These stats are about ETP data from the ASP.
     """
-    current_org = get_stats_siae_etp_current_org(request)
+    current_org = get_stats_siae_current_org(request)
+    if not request.user.can_view_stats_siae_etp(current_org=current_org):
+        raise PermissionDenied
     context = {
         "page_title": "Données de ma structure (extranet ASP)",
         "department": current_org.department,
@@ -185,7 +201,7 @@ def stats_siae_etp(request):
     return render_stats(
         request=request,
         context=context,
-        params={mb.ASP_SIAE_FILTER_KEY: current_org.convention.asp_id},
+        params={mb.ASP_SIAE_FILTER_KEY_FLAVOR1: current_org.convention.asp_id},
     )
 
 

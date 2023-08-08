@@ -749,9 +749,20 @@ class User(AbstractUser, AddressMixin):
             and current_org.convention is not None
         )
 
+    def can_view_stats_siae_aci(self, current_org):
+        """
+        Non official stats with very specific access rights.
+        """
+        return (
+            self.can_view_stats_siae(current_org)
+            and current_org.kind == SiaeKind.ACI
+            and current_org.convention is not None
+            and current_org.convention.asp_id in settings.STATS_SIAE_ASP_ID_WHITELIST
+        )
+
     def can_view_stats_siae_etp(self, current_org):
         """
-        Non official SIAE stats with very specific access rights.
+        Non official stats with very specific access rights.
         """
         return self.can_view_stats_siae(current_org) and self.pk in settings.STATS_SIAE_USER_PK_WHITELIST
 

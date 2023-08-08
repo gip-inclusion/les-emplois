@@ -442,8 +442,9 @@ PILOTAGE_DASHBOARDS_WHITELIST = json.loads(
 # Only ACIs given by Convergence France may access some contracts
 ACI_CONVERGENCE_SIRET_WHITELIST = json.loads(os.getenv("ACI_CONVERGENCE_SIRET_WHITELIST", "[]"))
 
-# Specific stats are progressively being deployed to more and more departments and specific users.
-# Kept as a setting to not let User PKs in clear in the code.
+# Specific experimental stats are progressively being deployed to more and more users and/or siaes.
+# Kept as a setting to not let User/Siae PKs in clear in the code.
+STATS_SIAE_ASP_ID_WHITELIST = json.loads(os.getenv("STATS_SIAE_ASP_ID_WHITELIST", "[]"))
 STATS_SIAE_USER_PK_WHITELIST = json.loads(os.getenv("STATS_SIAE_USER_PK_WHITELIST", "[]"))
 
 # Slack notifications sent by Metabase cronjobs.
