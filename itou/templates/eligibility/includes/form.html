@@ -16,7 +16,7 @@
 
     {% bootstrap_form_errors form_administrative_criteria type="all" %}
 
-    {% if request.user.is_siae_staff %}<h3 class="h2">Critères administratifs de niveau 1</h3>{% endif %}
+    {% if request.user.is_siae_staff %}<h3>Critères administratifs de niveau 1</h3>{% endif %}
 
     {% for field in form_administrative_criteria %}
         {% if form_administrative_criteria.LEVEL_1_PREFIX in field.name %}
@@ -24,7 +24,7 @@
         {% endif %}
     {% endfor %}
 
-    {% if request.user.is_siae_staff %}<h3 class="h2">Critères administratifs de niveau 2</h3>{% endif %}
+    {% if request.user.is_siae_staff %}<h3>Critères administratifs de niveau 2</h3>{% endif %}
 
     {% for field in form_administrative_criteria %}
         {% if form_administrative_criteria.LEVEL_2_PREFIX in field.name %}
@@ -37,10 +37,17 @@
         à conserver les justificatifs correspondants aux critères d'éligibilité sélectionnés pendant 24 mois, en cas de contrôle.
     </p>
     {% buttons %}
-        <p class="text-right">
-            {% if cancel_url %}<a class="btn btn-outline-primary" href="{{ cancel_url }}">Annuler</a>{% endif %}
-            <button type="submit" class="btn btn-primary">Valider</button>
-        </p>
+        <hr>
+        <div class="form-row align-items-center justify-content-end">
+            {% if cancel_url %}
+                <div class="form-group mb-0 col-6 col-lg-auto">
+                    <a class="btn btn-outline-primary btn-block" href="{{ cancel_url }}">Annuler</a>
+                </div>
+            {% endif %}
+            <div class="form-group mb-0 col-6 col-lg-auto">
+                <button type="submit" class="btn btn-primary btn-block">Valider</button>
+            </div>
+        </div>
     {% endbuttons %}
 
 </form>

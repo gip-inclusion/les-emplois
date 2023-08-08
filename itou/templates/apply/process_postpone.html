@@ -2,39 +2,28 @@
 {% load bootstrap4 %}
 {% load str_filters %}
 
-{% block content %}
+{% block content_extend %}
+    <div class="c-form mb-4">
+        <form method="post" class="js-prevent-multiple-submit">
 
-    {{ block.super }}
+            {% csrf_token %}
 
-    <section class="s-section">
-        <div class="s-section__container container">
-            <div class="row">
-                <div class="col-12 col-lg-8">
-                    <div class="c-form">
-                        <form method="post" class="js-prevent-multiple-submit">
+            {% bootstrap_form form alert_error_type="all" %}
 
-                            {% csrf_token %}
-
-                            {% bootstrap_form form alert_error_type="all" %}
-
-                            {% buttons %}
-                                <hr>
-                                <div class="form-row align-items-center justify-content-end">
-                                    <div class="form-group mb-0 col-6 col-lg-auto">
-                                        <a class="btn btn-outline-primary" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">Annuler</a>
-                                    </div>
-                                    <div class="form-group mb-0 col-6 col-lg-auto">
-                                        <button type="submit" class="btn btn-block btn-success" aria-label="Mettre la candidature de {{ job_application.job_seeker.get_full_name|title|mask_unless:can_view_personal_information }} en liste d'attente">
-                                            Mettre en liste d'attente
-                                        </button>
-                                    </div>
-                                </div>
-                            {% endbuttons %}
-
-                        </form>
+            {% buttons %}
+                <hr>
+                <div class="form-row align-items-center justify-content-end">
+                    <div class="form-group mb-0 col-6 col-lg-auto">
+                        <a class="btn btn-outline-primary btn-block" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">Annuler</a>
+                    </div>
+                    <div class="form-group mb-0 col-6 col-lg-auto">
+                        <button type="submit" class="btn btn-block btn-success" aria-label="Mettre la candidature de {{ job_application.job_seeker.get_full_name|title|mask_unless:can_view_personal_information }} en liste d'attente">
+                            Mettre en liste d'attente
+                        </button>
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
+            {% endbuttons %}
+
+        </form>
+    </div>
 {% endblock %}
