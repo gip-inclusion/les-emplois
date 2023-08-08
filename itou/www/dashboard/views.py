@@ -54,6 +54,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
     active_campaigns = []
     closed_campaigns = []
     evaluated_siae_notifications = EvaluatedSiae.objects.none()
+    siae_suspension_text_with_dates = None
 
     # `current_org` can be a Siae, a PrescriberOrganization or an Institution.
     current_org = None
@@ -101,6 +102,9 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         num_rejected_employee_records = (
             EmployeeRecord.objects.for_siae(current_org).filter(status=Status.REJECTED).count()
         )
+        if current_org.is_subject_to_eligibility_rules:
+            # Otherwise they cannot be suspended
+            siae_suspension_text_with_dates = current_org.get_active_suspension_text_with_dates()
 
     if request.user.is_prescriber:
         try:
@@ -173,6 +177,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "active_campaigns": active_campaigns,
         "closed_campaigns": closed_campaigns,
         "evaluated_siae_notifications": evaluated_siae_notifications,
+        "siae_suspension_text_with_dates": siae_suspension_text_with_dates,
         "precriber_kind_pe": PrescriberOrganizationKind.PE,
         "precriber_kind_dept": PrescriberOrganizationKind.DEPT,
         "show_dora_banner": (
