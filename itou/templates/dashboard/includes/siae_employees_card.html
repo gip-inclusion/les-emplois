@@ -11,21 +11,22 @@
                 We will have to discuss this matter further with AVE, but it has been
                 decided that it probably did not make much sense initially.
                 {% endcomment %}
-                {% with suspension=current_siae.get_active_suspension_text_with_dates %}
-                    <li class="d-flex justify-content-between align-items-center mb-3">
-                        {% if suspension %}
-                            <span class="btn-link btn-ico" data-toggle="tooltip" data-placement="top" title="Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle a posteriori. {{ suspension }}">
-                                <i class="ri-user-follow-line ri-lg font-weight-normal disabled"></i>
-                                <span class="disabled">Déclarer une embauche</span>
-                            </span>
-                        {% else %}
-                            <a href="{% url 'apply:start' siae_pk=current_siae.pk %}" class="btn-link btn-ico">
-                                <i class="ri-user-follow-line ri-lg font-weight-normal"></i>
-                                <span>Déclarer une embauche</span>
-                            </a>
-                        {% endif %}
-                    </li>
-                {% endwith %}
+                <li class="d-flex justify-content-between align-items-center mb-3">
+                    {% if siae_suspension_text_with_dates %}
+                        <span class="btn-link btn-ico"
+                              data-toggle="tooltip"
+                              data-placement="top"
+                              title="Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle a posteriori. {{ siae_suspension_text_with_dates }}">
+                            <i class="ri-user-follow-line ri-lg font-weight-normal disabled"></i>
+                            <span class="disabled">Déclarer une embauche</span>
+                        </span>
+                    {% else %}
+                        <a href="{% url 'apply:start' siae_pk=current_siae.pk %}" class="btn-link btn-ico">
+                            <i class="ri-user-follow-line ri-lg font-weight-normal"></i>
+                            <span>Déclarer une embauche</span>
+                        </a>
+                    {% endif %}
+                </li>
                 <li class="d-flex justify-content-between align-items-center mb-3">
                     <a href="{% url 'approvals:list' %}" data-matomo-category="salaries" data-matomo-action="clic" data-matomo-option="gestion-des-salaries-et-pass-iae" class="matomo-event btn-link btn-ico">
                         <i class="ri-contacts-book-line ri-lg font-weight-normal"></i>
