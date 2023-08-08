@@ -101,3 +101,9 @@ class OSMWidget(gis_widgets.OSMWidget):
     # because widget render does not access to the request context
     # (see itou.utils.admin.ItouGISMixin)
     template_name = "utils/widgets/csp_proof_openlayers-osm.html"
+
+    class Media:
+        css = {
+            "all": ["vendor/ol-7.2.2/ol.css"],
+        }
+        js = ["vendor/ol-7.2.2/ol.js"]
