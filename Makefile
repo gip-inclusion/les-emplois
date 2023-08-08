@@ -93,7 +93,9 @@ populate_db_with_cities:
 endif
 
 populate_db: populate_db_with_cities
-	$(EXEC_CMD) bash -c "./manage.py loaddata_bulk itou/fixtures/django/*.json"
+	# Split loaddata_bulk into parts to avoid OOM errors in review apps
+	$(EXEC_CMD) bash -c "./manage.py loaddata_bulk itou/fixtures/django/0*.json"
+	$(EXEC_CMD) bash -c "./manage.py loaddata_bulk itou/fixtures/django/1*.json itou/fixtures/django/2*.json"
 	$(EXEC_CMD) python manage.py shell -c 'from itou.siae_evaluations import fixtures;fixtures.load_data()'
 
 populate_db_minimal: populate_db_with_cities
