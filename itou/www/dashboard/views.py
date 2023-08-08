@@ -163,6 +163,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "can_show_employee_records": can_show_employee_records,
         "can_view_stats_dashboard_widget": request.user.can_view_stats_dashboard_widget(current_org=current_org),
         "can_view_stats_siae": request.user.can_view_stats_siae(current_org=current_org),
+        "can_view_stats_siae_aci": request.user.can_view_stats_siae_aci(current_org=current_org),
         "can_view_stats_siae_etp": request.user.can_view_stats_siae_etp(current_org=current_org),
         "can_view_stats_cd": request.user.can_view_stats_cd(current_org=current_org),
         "can_view_stats_pe": request.user.can_view_stats_pe(current_org=current_org),

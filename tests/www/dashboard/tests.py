@@ -286,6 +286,8 @@ class DashboardViewTest(TestCase):
         # Unofficial stats are only accessible to specific whitelisted siaes.
         self.assertNotContains(response, "Voir les données de ma structure (extranet ASP)")
         self.assertNotContains(response, reverse("stats:stats_siae_etp"))
+        self.assertNotContains(response, "Voir le suivi du cofinancement de mon ACI")
+        self.assertNotContains(response, reverse("stats:stats_siae_aci"))
 
     def test_dashboard_ddets_log_institution_stats(self):
         membershipfactory = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_LOG)
