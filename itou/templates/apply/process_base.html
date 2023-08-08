@@ -53,7 +53,7 @@
                                 {% include "approvals/includes/card.html" with common_approval=job_application.job_seeker.latest_common_approval job_application=job_application %}
                             {% endif %}
                         {% elif request.user.is_prescriber %}
-                            <div class="c-box my-4">
+                            <div class="c-box mb-4">
                                 {# Approval status. #}
                                 {% if job_application.approval %}
                                     {% include "approvals/includes/status.html" with common_approval=job_application.approval %}
@@ -70,6 +70,8 @@
                         {% endif %}
 
                     {% endif %}
+
+                    {% block content_extend %}{% endblock %}
                 </div>
             </div>
         </div>
