@@ -3,13 +3,15 @@
 
 {% block title %}Postuler {{ block.super }}{% endblock %}
 
+{% block content_title %}
+    <h1>{% include 'apply/includes/_submit_title.html' %}</h1>
+{% endblock %}
+
 {% block content %}
     <section class="s-section-twocolumns s-section">
         <div class="container">
             <div class="row">
                 <div class="col-12 col-lg-6 order-md-1 pr-lg-5 mt-4">
-                    <h1>{% include 'apply/includes/_submit_title.html' %}</h1>
-
                     <div class="card c-card c-card--emploi mb-3 mb-lg-5">
                         <div class="card-body">
                             <p>
