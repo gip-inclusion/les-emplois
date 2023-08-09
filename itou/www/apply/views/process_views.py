@@ -419,13 +419,13 @@ class AcceptHTMXFragmentView(TemplateView):
         super().setup(request, *args, **kwargs)
 
         queryset = JobApplication.objects.siae_member_required(request.user)
-        self.job_application = get_object_or_404(queryset, id=job_application_id)
-        self.form_accept = AcceptForm(instance=self.job_application, data=request.POST or None)
+        job_application = get_object_or_404(queryset, id=job_application_id)
+        self.form_accept = AcceptForm(instance=job_application, data=request.POST or None)
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "form_accept": self.form_accept,
-            "job_application": self.job_application,
+            "hide_value": ContractType.OTHER.value,
         }
 
     def post(self, request, job_application_id, *args, **kwargs):

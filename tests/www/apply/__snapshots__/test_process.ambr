@@ -58,7 +58,7 @@
   
   </select></div>
       <div class="form-group"><div class="form-check"><input type="checkbox" name="inverted_vae_contract" class="form-check-input" disabled id="id_inverted_vae_contract"><label class="form-check-label" for="id_inverted_vae_contract">Contrat associé à une VAE inversée</label></div></div>
-      <div id="contractTypeDetails" class="d-none">
+      <div id="contractTypeDetails" >
           <div class="form-group is-invalid"><label for="id_contract_type_details">Précisions sur le type de contrat</label><textarea name="contract_type_details" cols="40" rows="2" class="form-control is-invalid" placeholder="Précisions sur le type de contrat" title="Si vous avez choisi un autre type de contrat, merci de bien vouloir fournir plus de précisions" id="id_contract_type_details">
   </textarea>
       <div class="invalid-feedback">Les précisions sont nécessaires pour ce type de contrat</div>
