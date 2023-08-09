@@ -1904,6 +1904,7 @@ class UpdateJobSeekerViewTestCase(TestCase):
         self.assertNotContains(response, self.INFO_MODIFIABLE_PAR_CANDIDAT_UNIQUEMENT)
 
         NEW_FIRST_NAME = "New first name"
+        PROCESS_TITLE = "Modification du compte candidat"
 
         post_data = {
             "title": "M",
@@ -1927,10 +1928,12 @@ class UpdateJobSeekerViewTestCase(TestCase):
 
         # If you go back to step 1, new data is shown
         response = self.client.get(self.step_1_url)
+        self.assertContains(response, PROCESS_TITLE, html=True)
         self.assertContains(response, NEW_FIRST_NAME)
 
         # STEP 2
         response = self.client.get(self.step_2_url)
+        self.assertContains(response, PROCESS_TITLE, html=True)
         self.assertContains(response, self.job_seeker.phone)
         self.assertNotContains(response, self.INFO_MODIFIABLE_PAR_CANDIDAT_UNIQUEMENT)
 
@@ -1958,6 +1961,7 @@ class UpdateJobSeekerViewTestCase(TestCase):
 
         # STEP 3
         response = self.client.get(self.step_3_url)
+        self.assertContains(response, PROCESS_TITLE, html=True)
         self.assertContains(response, "Niveau de formation")
 
         post_data = {
@@ -1997,6 +2001,7 @@ class UpdateJobSeekerViewTestCase(TestCase):
 
         # Step END
         response = self.client.get(self.step_end_url)
+        self.assertContains(response, PROCESS_TITLE, html=True)
         self.assertContains(response, NEW_FIRST_NAME)
         self.assertContains(response, NEW_ADDRESS_LINE)
         self.assertContains(response, "Formation de niveau BAC")
