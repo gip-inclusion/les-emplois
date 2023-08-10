@@ -6,7 +6,7 @@
     <section class="s-section">
         <div class="s-section__container container">
             <div class="row">
-                <div class="col-12 col-lg-7 pl-lg-5">
+                <div class="col-12 col-lg-8 pl-lg-5">
                     <div class="card c-card mb-3 mb-lg-5 p-3">
                         <div class="card-header">
                             <h1 class="h2">Status de prescripteur habilité non vérifié</h1>
@@ -29,24 +29,15 @@
                             </div>
                             <strong>Êtes-vous certain de vouloir continuer ?</strong>
                         </div>
-                        <div class="row mt-3 mt-lg-5 justify-content-end">
-                            <div class="col-6 col-lg-auto">
-                                <a class="btn btn-link" aria-label="Revenir à la recherche" href="{% url 'home:hp' %}">Revenir à la recherche</a>
+                        <div class="form-row align-items-center justify-content-end">
+                            <div class="form-group mb-0 col-6 col-lg-auto">
+                                <a class="btn btn-link btn-block" aria-label="Revenir à la recherche" href="{% url 'home:hp' %}">Revenir à la recherche</a>
                             </div>
-                            <div class="col-6 col-lg-auto">
-                                <a href="{% url 'apply:check_nir_for_sender' siae_pk=siae.pk %}" class="btn btn-primary">Suivant</a>
+                            <div class="form-group mb-0 col-6 col-lg-auto">
+                                <a href="{% url 'apply:check_nir_for_sender' siae_pk=siae.pk %}" class="btn btn-primary btn-block">Suivant</a>
                             </div>
                         </div>
                     </div>
-                    <strong>Êtes-vous certain de vouloir continuer ?</strong>
-                </div>
-            </div>
-            <div class="row mt-3 mt-lg-5 justify-content-end">
-                <div class="col-6 col-lg-auto">
-                    <a class="btn btn-link" href="{% url 'home:hp' %}">Revenir à la recherche</a>
-                </div>
-                <div class="col-6 col-lg-auto">
-                    <a href="{% url 'apply:check_nir_for_sender' siae_pk=siae.pk %}" class="btn btn-primary">Suivant</a>
                 </div>
             </div>
         </div>

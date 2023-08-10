@@ -5,20 +5,23 @@
 
 {% block title %}Création du compte candidat {{ block.super }}{% endblock %}
 
+{% block content_title %}
+    <h1>{{ request.user.is_siae_staff|yesno:"Auto-prescription enregistrée !,Candidature envoyée !" }}</h1>
+    <p>
+        {% if request.user.is_job_seeker %}
+            Votre candidature
+        {% else %}
+            La candidature de {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}
+        {% endif %}
+        <b>a bien été envoyée chez {{ job_application.to_siae.display_name }}</b>.
+    </p>
+{% endblock %}
+
 {% block content %}
     <section class="s-section-twocolumns s-section">
         <div class="container">
             <div class="row">
                 <div class="col-12 col-lg-8 js-swap-elements">
-                    <h1 class="my-5">{{ request.user.is_siae_staff|yesno:"Auto-prescription enregistrée !,Candidature envoyée !" }}</h1>
-                    <p>
-                        {% if request.user.is_job_seeker %}
-                            Votre candidature
-                        {% else %}
-                            La candidature de {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}
-                        {% endif %}
-                        <b>a bien été envoyée chez {{ job_application.to_siae.display_name }}</b>.
-                    </p>
                     {% if can_view_personal_information %}
                         <p>
                             <b>
