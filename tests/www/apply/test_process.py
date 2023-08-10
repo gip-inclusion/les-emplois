@@ -1976,3 +1976,53 @@ def test_details_for_geiq_with_inverted_vae_contract(client, inverted_vae_contra
 
     assertContains(response, job_application.get_contract_type_display())
     expected_predicate(response, inverted_vae_text)
+
+
+@pytest.mark.parametrize("qualification_type", job_applications_enums.QualificationType)
+def test_reload_qualification_fields(qualification_type, client, snapshot):
+    job_application = JobApplicationFactory(id="11111111-2222-3333-4444-555555555555", to_siae__kind=SiaeKind.GEIQ)
+    siae_member = job_application.to_siae.members.first()
+    client.force_login(siae_member)
+    url = reverse("apply:reload_qualification_fields", kwargs={"job_application_id": job_application.pk})
+    response = client.post(
+        url,
+        data={
+            "guidance_days": "0",
+            "contract_type": ContractType.APPRENTICESHIP,
+            "contract_type_details": "",
+            "nb_hours_per_week": "",
+            "hiring_start_at": "",
+            "qualification_type": qualification_type,
+            "qualification_level": "",
+            "planned_training_hours": "0",
+            "hiring_end_at": "",
+            "answer": "",
+        },
+    )
+    assert response.content.decode() == snapshot()
+
+
+@pytest.mark.parametrize(
+    "contract_type", [value for value, _label in ContractType.choices_for_siae_kind(SiaeKind.GEIQ)]
+)
+def test_reload_contract_type_and_options(contract_type, client, snapshot):
+    job_application = JobApplicationFactory(id="11111111-2222-3333-4444-555555555555", to_siae__kind=SiaeKind.GEIQ)
+    siae_member = job_application.to_siae.members.first()
+    client.force_login(siae_member)
+    url = reverse("apply:reload_contract_type_and_options", kwargs={"job_application_id": job_application.pk})
+    response = client.post(
+        url,
+        data={
+            "guidance_days": "0",
+            "contract_type": contract_type,
+            "contract_type_details": "",
+            "nb_hours_per_week": "",
+            "hiring_start_at": "",
+            "qualification_type": "CQP",
+            "qualification_level": "",
+            "planned_training_hours": "0",
+            "hiring_end_at": "",
+            "answer": "",
+        },
+    )
+    assert response.content.decode() == snapshot()
