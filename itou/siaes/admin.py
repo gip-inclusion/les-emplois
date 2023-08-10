@@ -1,7 +1,7 @@
 import datetime
 
 from django.contrib import admin, messages
-from django.utils.safestring import mark_safe
+from django.utils.html import format_html
 from django.utils.timezone import now
 from import_export import resources
 from import_export.admin import ExportActionMixin
@@ -42,7 +42,7 @@ class JobsInline(admin.TabularInline):
 
     @admin.display(description="lien vers la fiche de poste")
     def jobdescription_id_link(self, obj):
-        return get_admin_view_link(obj, content=mark_safe(f"<strong>Fiche de poste ID: {obj.id}</strong>"))
+        return get_admin_view_link(obj, content=format_html("<strong>Fiche de poste ID: {}</strong>", obj.id))
 
 
 class FinancialAnnexesInline(admin.TabularInline):

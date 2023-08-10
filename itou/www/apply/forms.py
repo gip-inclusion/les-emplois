@@ -9,7 +9,7 @@ from django.db.models import Q
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.safestring import mark_safe
+from django.utils.html import format_html
 from django_select2.forms import Select2MultipleWidget
 
 from itou.approvals.models import Approval
@@ -93,13 +93,19 @@ class CheckJobSeekerNirForm(forms.Form):
             if existing_account:
                 error_message = (
                     "Ce numéro de sécurité sociale est déjà utilisé par un autre compte. Merci de vous "
-                    f"reconnecter avec l'adresse e-mail <b>{redact_email_address(existing_account.email)}</b>. "
+                    "reconnecter avec l'adresse e-mail <b>{}</b>. "
                     "Si vous ne vous souvenez plus de votre mot de passe, vous pourrez "
                     "cliquer sur « mot de passe oublié ». "
-                    f'En cas de souci, vous pouvez <a href="{global_constants.ITOU_HELP_CENTER_URL}" rel="noopener" '
+                    'En cas de souci, vous pouvez <a href="{}" rel="noopener" '
                     'target="_blank" aria-label="Ouverture dans un nouvel onglet">nous contacter</a>.'
                 )
-                raise forms.ValidationError(mark_safe(error_message))
+                raise forms.ValidationError(
+                    format_html(
+                        error_message,
+                        redact_email_address(existing_account.email),
+                        global_constants.ITOU_HELP_CENTER_URL,
+                    )
+                )
         else:
             # For the moment, consider NIR to be unique among users.
             self.job_seeker = existing_account

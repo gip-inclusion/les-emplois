@@ -10,7 +10,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.safestring import mark_safe
+from django.utils.html import format_html
 from django.views.generic import TemplateView
 
 from itou.approvals.models import Approval
@@ -378,11 +378,12 @@ class SearchByEmailForSenderView(SessionNamespaceRequiredMixin, ApplyStepForSend
                     job_seeker.lack_of_nir_reason = ""
                     job_seeker.save(update_fields=["nir", "lack_of_nir_reason"])
                 except ValidationError:
-                    msg = mark_safe(
-                        f"Le<b> numéro de sécurité sociale</b> renseigné ({ nir }) est "
+                    msg = format_html(
+                        "Le<b> numéro de sécurité sociale</b> renseigné ({}) est "
                         "déjà utilisé par un autre candidat sur la Plateforme.<br>"
                         "Merci de renseigner <b>le numéro personnel et unique</b> "
-                        "du candidat pour lequel vous souhaitez postuler."
+                        "du candidat pour lequel vous souhaitez postuler.",
+                        nir,
                     )
                     messages.warning(request, msg)
                     logger.exception("step_job_seeker: error when saving job_seeker=%s nir=%s", job_seeker, nir)

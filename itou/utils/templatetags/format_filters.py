@@ -68,7 +68,7 @@ def format_nir(nir):
 @stringfilter
 def format_approval_number(number, autoescape=True):
     if not number:
-        return mark_safe("")
+        return ""
     group_indices = [[0, 5], [5, 7], [7, None]]
     escape = conditional_escape if autoescape else lambda text: text
     parts = [escape(number[start:end]) for start, end in group_indices]

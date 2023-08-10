@@ -8,8 +8,8 @@ from django.contrib.auth import login
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils import crypto
+from django.utils.html import format_html
 from django.utils.http import urlencode
-from django.utils.safestring import mark_safe
 
 from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF, IdentityProvider, UserKind
 from itou.users.models import User
@@ -92,13 +92,18 @@ def _generate_inclusion_params_from_session(ic_data):
 
 
 def _add_user_kind_error_message(request, existing_user, new_user_kind):
-    error = (
-        f"Un compte {existing_user.get_kind_display()} existe déjà avec cette adresse e-mail. "
-        "Vous devez créer un compte Inclusion Connect avec une autre adresse e-mail pour "
-        f"devenir {UserKind(new_user_kind).label} sur la plateforme. Besoin d'aide ? "
-        f"<a href='{ITOU_HELP_CENTER_URL}/requests/new' target='_blank'>Contactez-nous</a>."
+    messages.error(
+        request,
+        format_html(
+            "Un compte {} existe déjà avec cette adresse e-mail. "
+            "Vous devez créer un compte Inclusion Connect avec une autre adresse e-mail pour "
+            "devenir {} sur la plateforme. Besoin d'aide ? "
+            "<a href='{}/requests/new' target='_blank'>Contactez-nous</a>.",
+            existing_user.get_kind_display(),
+            UserKind(new_user_kind).label,
+            ITOU_HELP_CENTER_URL,
+        ),
     )
-    messages.error(request, mark_safe(error))
 
 
 def inclusion_connect_authorize(request):
@@ -308,11 +313,14 @@ def inclusion_connect_callback(request):
         # let him login, but display a message because we didn't update his email
         messages.error(
             request,
-            mark_safe(
+            format_html(
                 "Vous avez modifié votre e-mail sur Inclusion Connect, mais celui-ci est déjà associé à un compte "
-                f"sur la plateforme. Nous n'avons donc pas pu mettre à jour {e.users[0].email} en {e.users[1].email}. "
+                "sur la plateforme. Nous n'avons donc pas pu mettre à jour {} en {}. "
                 "Veuillez vous rapprocher du support pour débloquer la situation en suivant "
-                f"<a href='{global_constants.ITOU_HELP_CENTER_URL}'>ce lien</a>."
+                "<a href='{}'>ce lien</a>.",
+                e.users[0].email,
+                e.users[1].email,
+                global_constants.ITOU_HELP_CENTER_URL,
             ),
         )
         user = e.users[0]

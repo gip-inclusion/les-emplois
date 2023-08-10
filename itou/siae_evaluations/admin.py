@@ -1,6 +1,6 @@
 from django.contrib import admin, messages
 from django.utils import timezone
-from django.utils.safestring import mark_safe
+from django.utils.html import format_html
 
 from itou.siae_evaluations import models
 from itou.utils.admin import get_admin_view_link
@@ -28,7 +28,7 @@ class EvaluatedSiaesInline(admin.TabularInline):
 
     @admin.display(description="lien vers les Siaes évaluées")
     def id_link(self, obj):
-        return get_admin_view_link(obj, content=mark_safe(f"Lien vers la Siae évaluée <strong>{obj}</strong>"))
+        return get_admin_view_link(obj, content=format_html("Lien vers la Siae évaluée <strong>{}</strong>", obj))
 
 
 class EvaluatedJobApplicationsInline(admin.TabularInline):
@@ -47,7 +47,9 @@ class EvaluatedJobApplicationsInline(admin.TabularInline):
 
     @admin.display(description="lien vers les candidatures évaluées")
     def id_link(self, obj):
-        return get_admin_view_link(obj, content=mark_safe(f"Lien vers la candidature évaluée <strong>{obj}</strong>"))
+        return get_admin_view_link(
+            obj, content=format_html("Lien vers la candidature évaluée <strong>{}</strong>", obj)
+        )
 
     def approval(self, obj):
         if obj.job_application.approval:
@@ -69,7 +71,7 @@ class EvaluatedAdministrativeCriteriaInline(admin.TabularInline):
     @admin.display(description="lien vers les critères administratifs évalués")
     def id_link(self, obj):
         return get_admin_view_link(
-            obj, content=mark_safe(f"Lien vers le critère administratif <strong>{obj}</strong>")
+            obj, content=format_html("Lien vers le critère administratif <strong>{}</strong>", obj)
         )
 
 

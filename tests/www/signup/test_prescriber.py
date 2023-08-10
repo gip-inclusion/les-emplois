@@ -9,7 +9,6 @@ from django.test import Client, override_settings
 from django.urls import reverse
 from django.utils.html import escape
 from django.utils.http import urlencode
-from django.utils.safestring import mark_safe
 
 from itou.openid_connect.inclusion_connect.constants import INCLUSION_CONNECT_SESSION_KEY
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
@@ -686,7 +685,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
             "kind": PrescriberOrganizationKind.PLIE.value,
         }
         response = self.client.post(url, data=post_data)
-        self.assertContains(response, mark_safe("utilise déjà ce type d'organisation avec le même SIRET"))
+        self.assertContains(response, "utilise déjà ce type d'organisation avec le même SIRET")
         mock_call_ban_geocoding_api.assert_called_once()
 
     def test_form_to_request_for_an_invitation(self):
