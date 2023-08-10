@@ -22,6 +22,7 @@ from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.institutions.models import Institution
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siae_evaluations.models import Calendar, EvaluationCampaign, create_campaigns_and_calendar
+from itou.siaes.enums import SiaeKind
 from itou.users.models import User
 
 
@@ -89,9 +90,9 @@ def load_data():
                 title=random.choice(users_enums.Title.values),
             )
             level = str((i % 2) + 1)
-            # For ETTI and AI: 1 criterion level 1 OR 2 level 2 criteria.
             # See AdministrativeCriteriaForm
-            min_selected_criteria = 1 if level == AdministrativeCriteriaLevel.LEVEL_1 else 2
+            level2_criteria_count = 2 if controlled_siae.kind in [SiaeKind.AI, SiaeKind.ETTI] else 3
+            min_selected_criteria = 1 if level == AdministrativeCriteriaLevel.LEVEL_1 else level2_criteria_count
             pks_list = random.sample(level_to_criteria_pks[level], k=random.randint(min_selected_criteria, 4))
 
             AdministrativeCriteria.objects.filter(pk__in=pks_list)
