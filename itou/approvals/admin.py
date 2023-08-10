@@ -1,5 +1,6 @@
 from django.contrib import admin, messages
 from django.urls import path
+from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
 from itou.approvals import models
@@ -46,9 +47,11 @@ class JobApplicationInline(admin.StackedInline):
 
     @admin.display(description="SIAE destinataire")
     def to_siae_link(self, obj):
-        return mark_safe(
-            get_admin_view_link(obj.to_siae, content=obj.to_siae.display_name)
-            + f" — SIRET : {obj.to_siae.siret} ({obj.to_siae.kind})"
+        return format_html(
+            "{} — SIRET : {} ({})",
+            get_admin_view_link(obj.to_siae, content=obj.to_siae.display_name),
+            obj.to_siae.siret,
+            obj.to_siae.kind,
         )
 
     # Custom read-only fields as workaround :
@@ -401,7 +404,11 @@ class ProlongationCommonAdmin(admin.ModelAdmin):
 
     @admin.display(description="lien du fichier bilan")
     def report_file_link(self, obj):
-        return mark_safe(f"<a href='{obj.report_file.link}'>{obj.report_file.key}</a>")
+        return format_html(
+            "<a href='{}'>{}</a>",
+            obj.report_file.link,
+            obj.report_file.key,
+        )
 
     def get_queryset(self, request):
         # Speed up the list display view by fetching related objects.

@@ -3,6 +3,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.urls import reverse
+from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
 from itou.common_apps.address.departments import DEPARTMENTS
@@ -254,19 +255,21 @@ class PrescriberChooseOrgKindForm(forms.Form):
         kind = self.cleaned_data["kind"]
         org = PrescriberOrganization.objects.filter(siret=self.siret, kind=kind).first()
         if org:
-            error = f"« {org.display_name} » utilise déjà ce type d'organisation avec le même SIRET ({self.siret})."
+            error = "« {} » utilise déjà ce type d'organisation avec le même SIRET ({})."
+            error_args = [org.display_name, self.siret]
             # Get the first member to display their name and the link to the invitation request
             member = org.prescribermembership_set.first()
             if member:
-                url = reverse("signup:prescriber_request_invitation", args=[member.id])
                 error += (
-                    f" "
-                    f"Pour rejoindre cette organisation, vous devez obtenir une invitation de : "
-                    f"{member.user.first_name.title()} {member.user.last_name[0].upper()}."
-                    f" "
-                    f'<a href="{url}">Demander une invitation</a>'
+                    " Pour rejoindre cette organisation, vous devez obtenir une invitation de : {} {}."
+                    ' <a href="{}">Demander une invitation</a>'
                 )
-            raise forms.ValidationError(mark_safe(error))
+                error_args += [
+                    member.user.first_name.title(),
+                    member.user.last_name[0].upper(),
+                    reverse("signup:prescriber_request_invitation", args=[member.id]),
+                ]
+            raise forms.ValidationError(format_html(error, *error_args))
         return kind
 
     def clean(self):

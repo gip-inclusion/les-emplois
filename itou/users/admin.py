@@ -3,7 +3,7 @@ from allauth.account.models import EmailAddress
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.db.models import Exists, OuterRef
-from django.utils.safestring import mark_safe
+from django.utils.html import format_html
 
 from itou.approvals.models import Approval
 from itou.common_apps.address.models import BAN_API_RELIANCE_SCORE
@@ -141,8 +141,10 @@ class JobApplicationInline(admin.TabularInline):
 
     @admin.display(description="SIAE destinataire")
     def to_siae_link(self, obj):
-        return mark_safe(
-            get_admin_view_link(obj.to_siae, content=obj.to_siae.display_name) + f" — SIRET : {obj.to_siae.siret}"
+        return format_html(
+            "{} — SIRET : {}",
+            get_admin_view_link(obj.to_siae, content=obj.to_siae.display_name),
+            obj.to_siae.siret,
         )
 
 
