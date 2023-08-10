@@ -1,33 +1,24 @@
 {% extends "apply/submit_base.html" %}
 {% load bootstrap4 %}
 
-{% block content %}
+{% block content_extend %}
+    <div class="alert alert-warning">
+        <p class="mb-0">La date de naissance et les informations Pôle emploi sont obligatoires pour continuer.</p>
+    </div>
 
-    {{ block.super }}
+    <form method="post" class="js-prevent-multiple-submit">
+        {% csrf_token %}
 
-    <section class="s-section">
-        <div class="s-section__container container">
-            <div class="row">
-                <div class="col-12 col-lg-8">
-                    <div class="alert alert-warning">
-                        <p class="mb-0">La date de naissance et les informations Pôle emploi sont obligatoires pour continuer.</p>
-                    </div>
+        {% bootstrap_form form alert_error_type="all" %}
 
-                    <form method="post" class="js-prevent-multiple-submit">
-
-                        {% csrf_token %}
-
-                        {% bootstrap_form form alert_error_type="all" %}
-
-                        {% buttons %}
-                            <button type="submit" class="btn btn-primary">Continuer</button>
-                        {% endbuttons %}
-
-                    </form>
+        {% buttons %}
+            <hr>
+            <div class="form-row align-items-center justify-content-end">
+                <div class="form-group mb-0 col-12 col-lg-auto">
+                    <button type="submit" class="btn btn-primary btn-block">Continuer</button>
                 </div>
             </div>
-        </div>
-    </section>
-
+        {% endbuttons %}
+    </form>
 
 {% endblock %}

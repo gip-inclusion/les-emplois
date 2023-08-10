@@ -6,69 +6,65 @@
 
 {% block left_column %}
     <form method="post" class="js-prevent-multiple-submit js-format-nir">
-        <div class="card c-card p-3">
-            <div class="card-body">
+        <div class="c-form">
+            {% csrf_token %}
 
-                {% csrf_token %}
+            {% bootstrap_form_errors form type="all" %}
 
-                {% bootstrap_form_errors form type="all" %}
+            {% bootstrap_form form %}
 
-                {% bootstrap_form form %}
-
-                {% if form.errors %}
-                    <div class="alert alert-info">
-                        <div class="row">
-                            <div class="col-auto pr-0">
-                                <i class="ri-information-line ri-xl text-info"></i>
-                            </div>
-                            <div class="col">
-                                <p class="mb-0">
-                                    Vous possédez un numéro de sécurité sociale temporaire ?
-                                    <button type="submit" name="skip" value="1" class="btn btn-link p-0 matomo-event" data-matomo-category="nir-temporaire" data-matomo-action="etape-suivante" data-matomo-option="candidature">
-                                        Cliquez ici pour accéder à l'étape suivante.
-                                    </button>
-                                </p>
-                            </div>
+            {% if form.errors %}
+                <div class="alert alert-info">
+                    <div class="row">
+                        <div class="col-auto pr-0">
+                            <i class="ri-information-line ri-xl text-info"></i>
+                        </div>
+                        <div class="col">
+                            <p class="mb-0">
+                                Vous possédez un numéro de sécurité sociale temporaire ?
+                                <button type="submit" name="skip" value="1" class="btn btn-link p-0 matomo-event" data-matomo-category="nir-temporaire" data-matomo-action="etape-suivante" data-matomo-option="candidature">
+                                    Cliquez ici pour accéder à l'étape suivante.
+                                </button>
+                            </p>
                         </div>
                     </div>
-                {% else %}
-                    <div class="alert alert-info">
-                        <div class="row">
-                            <div class="col-auto pr-0">
-                                <i class="ri-information-line ri-xl text-info"></i>
-                            </div>
-                            <div class="col">
-                                <p class="mb-0">
-                                    {% if request.user.is_job_seeker %}
-                                        Vous n'avez pas de numéro de sécurité sociale ?
-                                        <br>
-                                    {% else %}
-                                        Le candidat n'a pas de numéro de sécurité sociale ?
-                                        <br>
-                                    {% endif %}
-                                    <a href="https://www.ameli.fr/assure/droits-demarches/principes/numero-securite-sociale"
-                                       aria-label="ameli.fr, article concernant le numéro de sécurité sociale (ouverture dans un nouvel onglet)"
-                                       rel="noopener"
-                                       target="_blank">ameli.fr</a><i class="ri-external-link-line ml-1"></i>, le site de l'assurance maladie, vous explique comment l'obtenir.
-                                </p>
-                            </div>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <div class="row">
+                        <div class="col-auto pr-0">
+                            <i class="ri-information-line ri-xl text-info"></i>
+                        </div>
+                        <div class="col">
+                            <p class="mb-0">
+                                {% if request.user.is_job_seeker %}
+                                    Vous n'avez pas de numéro de sécurité sociale ?
+                                    <br>
+                                {% else %}
+                                    Le candidat n'a pas de numéro de sécurité sociale ?
+                                    <br>
+                                {% endif %}
+                                <a href="https://www.ameli.fr/assure/droits-demarches/principes/numero-securite-sociale"
+                                   aria-label="ameli.fr, article concernant le numéro de sécurité sociale (ouverture dans un nouvel onglet)"
+                                   rel="noopener"
+                                   target="_blank">ameli.fr</a><i class="ri-external-link-line ml-1"></i>, le site de l'assurance maladie, vous explique comment l'obtenir.
+                            </p>
                         </div>
                     </div>
-                {% endif %}
-                {% buttons %}
-                    {# Reload this page and show a modal containing more information about the job seeker. #}
-                    <hr class="my-3 my-lg-5">
-
-                    <div class="row mt-3 mt-lg-5 justify-content-end">
-                        <div class="col-6 col-lg-auto">
-                            <a class="btn btn-link" aria-label="Retourner au tableau de bord" href="{% url 'dashboard:index' %}">Retour</a>
-                        </div>
-                        <div class="col-6 col-lg-auto">
-                            <button type="submit" name="preview" value="1" class="btn btn-primary">Suivant</button>
-                        </div>
+                </div>
+            {% endif %}
+            {% buttons %}
+                {# Reload this page and show a modal containing more information about the job seeker. #}
+                <hr>
+                <div class="form-row align-items-center justify-content-end">
+                    <div class="form-group mb-0 col-6 col-lg-auto">
+                        <a class="btn btn-link btn-block" aria-label="Retourner au tableau de bord" href="{% url 'dashboard:index' %}">Retour</a>
                     </div>
-                {% endbuttons %}
-            </div>
+                    <div class="form-group mb-0 col-6 col-lg-auto">
+                        <button type="submit" name="preview" value="1" class="btn btn-primary btn-block">Suivant</button>
+                    </div>
+                </div>
+            {% endbuttons %}
         </div>
         {% if preview_mode %}
             <!-- Modal -->

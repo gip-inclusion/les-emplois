@@ -1,5 +1,3 @@
 {% if common_approval %}
-    <div class="c-box mb-3 mb-lg-5">
-        {% include "approvals/includes/status.html" with common_approval=common_approval %}
-    </div>
+    <div class="c-box mb-4">{% include "approvals/includes/status.html" with common_approval=common_approval %}</div>
 {% endif %}

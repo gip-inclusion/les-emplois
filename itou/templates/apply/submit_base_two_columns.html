@@ -11,8 +11,8 @@
     <section class="s-section-twocolumns s-section">
         <div class="container">
             <div class="row">
-                <div class="col-12 col-lg-6 order-md-1 pr-lg-5 mt-4">
-                    <div class="card c-card c-card--emploi mb-3 mb-lg-5">
+                <div class="col-12 col-lg-6 order-md-1 pr-lg-5">
+                    <div class="card c-card c-card--emploi mb-3 mb-lg-4">
                         <div class="card-body">
                             <p>
                                 <i class="ri-home-7-line ri-xl mr-2"></i>{{ siae.kind }} - {{ siae.get_kind_display }}
@@ -40,7 +40,7 @@
                         {% endif %}
                         numéro de sécurité sociale ?
                     </h2>
-                    <img class="mt-5 img-fluid" src="{% static 'img/carte_vitale.png' %}" alt="Spécimen de carte vitale">
+                    <img class="mt-3 img-fluid" src="{% static 'img/carte_vitale.png' %}" alt="Spécimen de carte vitale">
                     <p class="ff-extra-01 mt-0">
                         Il est présent à cet endroit sur
                         {% if request.user.is_job_seeker %}

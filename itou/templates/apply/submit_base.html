@@ -12,6 +12,8 @@
             <div class="row">
                 <div class="col-12 col-lg-8">
                     {% include "approvals/includes/card.html" with common_approval=job_seeker.latest_common_approval %}
+
+                    {% block content_extend %}{% endblock %}
                 </div>
             </div>
         </div>

@@ -3,72 +3,79 @@
 
 {% block title %}Postuler {{ block.super }}{% endblock %}
 
+{% block content_title %}
+    <div class="w-100 w-lg-66">
+        <div class="d-flex align-items-center">
+            <h1 class="flex-grow-1">{% include 'apply/includes/_submit_title.html' %}</h1>
+            <div>
+                {% if is_subject_to_eligibility_rules %}
+                    {% if job_seeker.has_valid_common_approval %}
+                        <span class="badge badge-base badge-pill badge-success-lighter text-success">
+                            <i class="ri-pass-valid-line" aria-hidden="true"></i>
+                            PASS IAE valide
+                        </span>
+                    {% elif eligibility_diagnosis %}
+                        <span class="badge badge-base badge-pill badge-success-lighter text-success">
+                            <i class="ri-check-line" aria-hidden="true"></i>
+                            Éligible à l’IAE
+                        </span>
+                    {% else %}
+                        <span class="badge badge-base badge-pill badge-accent-02-lighter text-primary">
+                            <i class="ri-error-warning-line" aria-hidden="true"></i>
+                            Éligibilité IAE à valider
+                        </span>
+                    {% endif %}
+                {% elif is_subject_to_geiq_eligibility_rules %}
+                    {% if geiq_eligibility_diagnosis.eligibility_confirmed %}
+                        <span class="badge badge-base badge-pill badge-success-lighter text-success">
+                            <i class="ri-check-line" aria-hidden="true"></i>
+                            Éligibilité GEIQ confirmée
+                        </span>
+                    {% else %}
+                        <span class="badge badge-base badge-pill badge-accent-02-lighter text-primary">
+                            <i class="ri-error-warning-line" aria-hidden="true"></i>
+                            Éligibilité GEIQ non confirmée
+                        </span>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        <p>
+            Dernière actualisation du profil : {{ job_seeker.last_checked_at|date }} à {{ job_seeker.last_checked_at|time }}
+            {% if can_view_personal_information and not request.user.is_job_seeker %}
+                <a class="btn btn-link" href="{% url "apply:update_job_seeker_step_1" siae_pk=siae.pk job_seeker_pk=job_seeker.pk %}">Vérifier le profil</a>
+            {% endif %}
+            {% if new_check_needed %}<i class="ri-information-line ri-xl text-warning"></i>{% endif %}
+        </p>
+        {% if new_check_needed %}
+            <div class="alert alert-warning alert-dismissible fade show">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
+                    <i class="ri-close-line"></i>
+                </button>
+                <div class="row">
+                    <div class="col-auto pr-0">
+                        <i class="ri-information-line ri-xl text-warning"></i>
+                    </div>
+                    <div class="col">
+                        <p>
+                            <strong>Veuillez vérifier les informations du candidat</strong>
+                        </p>
+                        <p>
+                            La situation du candidat a peut-être changé depuis le {{ job_seeker.last_checked_at|date }}. Merci de vérifier la validité des informations présentes sur son profil.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
 {% block content %}
     <section class="s-section-twocolumns s-section">
         <div class="container">
             <div class="row">
                 <div class="col-12 col-lg-8">
-                    <div class="d-flex flex-column flex-md-row align-items-center">
-                        <h1 class="my-5 flex-grow-1">{% include 'apply/includes/_submit_title.html' %}</h1>
-                        {% if is_subject_to_eligibility_rules %}
-                            {% if job_seeker.has_valid_common_approval %}
-                                <span class="badge badge-base badge-pill badge-success-lighter text-success">
-                                    <i class="ri-pass-valid-line" aria-hidden="true"></i>
-                                    PASS IAE valide
-                                </span>
-                            {% elif eligibility_diagnosis %}
-                                <span class="badge badge-base badge-pill badge-success-lighter text-success">
-                                    <i class="ri-check-line" aria-hidden="true"></i>
-                                    Éligible à l’IAE
-                                </span>
-                            {% else %}
-                                <span class="badge badge-base badge-pill badge-accent-02-lighter text-primary">
-                                    <i class="ri-error-warning-line" aria-hidden="true"></i>
-                                    Éligibilité IAE à valider
-                                </span>
-                            {% endif %}
-                        {% elif is_subject_to_geiq_eligibility_rules %}
-                            {% if geiq_eligibility_diagnosis.eligibility_confirmed %}
-                                <span class="badge badge-base badge-pill badge-success-lighter text-success">
-                                    <i class="ri-check-line" aria-hidden="true"></i>
-                                    Éligibilité GEIQ confirmée
-                                </span>
-                            {% else %}
-                                <span class="badge badge-base badge-pill badge-accent-02-lighter text-primary">
-                                    <i class="ri-error-warning-line" aria-hidden="true"></i>
-                                    Éligibilité GEIQ non confirmée
-                                </span>
-                            {% endif %}
-                        {% endif %}
-                    </div>
-                    <div class="d-flex flex-column flex-md-row align-items-center mb-4">
-                        Dernière actualisation du profil : {{ job_seeker.last_checked_at|date }} à {{ job_seeker.last_checked_at|time }}
-                        {% if can_view_personal_information and not request.user.is_job_seeker %}
-                            <a class="btn btn-link" href="{% url "apply:update_job_seeker_step_1" siae_pk=siae.pk job_seeker_pk=job_seeker.pk %}">Vérifier le profil</a>
-                        {% endif %}
-                        {% if new_check_needed %}<i class="ri-information-line ri-xl text-warning"></i>{% endif %}
-                    </div>
-                    {% if new_check_needed %}
-                        <div class="alert alert-warning alert-dismissible fade show mb-4">
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
-                                <i class="ri-close-line"></i>
-                            </button>
-                            <div class="row">
-                                <div class="col-auto pr-0">
-                                    <i class="ri-information-line ri-xl text-warning"></i>
-                                </div>
-                                <div class="col">
-                                    <p>
-                                        <strong>Veuillez vérifier les informations du candidat</strong>
-                                    </p>
-                                    <p>
-                                        La situation du candidat a peut-être changé depuis le {{ job_seeker.last_checked_at|date }}. Merci de vérifier la validité des informations présentes sur son profil.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
-                    <div class="c-stepper my-5">
+                    <div class="c-stepper mb-4">
                         <div class="progress progress--emploi mb-2">
                             <div class="progress-bar progress-bar-{{ progress }}" role="progressbar" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100">
                             </div>
@@ -117,14 +124,18 @@
 
                             {% block form_content %}{% endblock %}
 
-                            <hr class="my-5">
                             {% buttons %}
-                                <div class="text-right">
+                                <hr>
+                                <div class="form-row align-items-center justify-content-end">
                                     {% if back_url %}
-                                        <a class="btn btn-link" href="{{ back_url }}" aria-label="Retourner à l'étape précédente">Retour</a>
+                                        <div class="form-group mb-0 col-6 col-lg-auto">
+                                            <a class="btn btn-link btn-block" href="{{ back_url }}" aria-label="Retourner à l'étape précédente">Retour</a>
+                                        </div>
                                     {% endif %}
                                     {% block form_submit_button %}
-                                        <button type="submit" class="btn btn-primary" aria-label="Passer à l'étape suivante">Suivant</button>
+                                        <div class="form-group mb-0 col-6 col-lg-auto">
+                                            <button type="submit" class="btn btn-primary btn-block" aria-label="Passer à l'étape suivante">Suivant</button>
+                                        </div>
                                     {% endblock %}
                                 </div>
                             {% endbuttons %}
