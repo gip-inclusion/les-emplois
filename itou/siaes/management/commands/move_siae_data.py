@@ -32,8 +32,8 @@ HELP_TEXT = """
     does everything.
 
     Examples of use in local dev:
-    $ make django_admin COMMAND="move_siae_data --from 3243 --to 9612"
-    $ make django_admin COMMAND="move_siae_data --from 3243 --to 9612 --only-job-applications"
+    $ make mgmt_cmd COMMAND="move_siae_data --from 3243 --to 9612"
+    $ make mgmt_cmd COMMAND="move_siae_data --from 3243 --to 9612 --only-job-applications"
 
     And in production:
     $ cd && cd app_* && django-admin move_siae_data --from 3243 --to 9612 --wet-run

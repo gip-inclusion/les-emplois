@@ -73,13 +73,13 @@ fix: $(VENV_REQUIREMENT)
 # Django.
 # =============================================================================
 
-.PHONY: django_admin populate_db populate_db_with_cities populate_db_minimal graph_models_itou
+.PHONY: mgmt_cmd populate_db populate_db_with_cities populate_db_minimal graph_models_itou
 
-# make django_admin
-# make django_admin COMMAND=dbshell
-# make django_admin COMMAND=createsuperuser
-# make --silent django_admin COMMAND="dumpdata siaes.Siae --indent=3" > itou/fixtures/django/02_siaes.json
-django_admin:
+# make mgmt_cmd
+# make mgmt_cmd COMMAND=dbshell
+# make mgmt_cmd COMMAND=createsuperuser
+# make --silent mgmt_cmd COMMAND="dumpdata siaes.Siae --indent=3" > itou/fixtures/django/02_siaes.json
+mgmt_cmd:
 	$(EXEC_CMD) python manage.py $(COMMAND)
 
 # After migrate

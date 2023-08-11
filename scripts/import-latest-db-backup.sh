@@ -28,5 +28,5 @@ cat << EOF
 
 Import is over. Now you need to:
  - restart your container: make run
- - make django_admin COMMAND=set_fake_passwords
+ - make mgmt_cmd COMMAND=set_fake_passwords
 EOF
