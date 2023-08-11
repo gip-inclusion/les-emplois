@@ -197,6 +197,17 @@ class JobSeekerWithAddressFactory(JobSeekerFactory):
             coords=None,
             geocoding_score=None,
         )
+        for_snapshot = factory.Trait(
+            public_id="7614fc4b-aef9-4694-ab17-12324300180a",
+            title="MME",
+            first_name="Sacha",
+            last_name="Dupont",
+            birthdate="1990-05-01",
+            nir="290010101010125",
+            address_line_1="Rue du clos de la Grange",
+            post_code="91234",
+            city="Choufleury",
+        )
 
     address_line_1 = factory.Faker("street_address", locale="fr_FR")
     department = factory.fuzzy.FuzzyChoice(DEPARTMENTS.keys())
