@@ -530,6 +530,9 @@ SPECTACULAR_SETTINGS = {
         "SiaeKindEnum": "itou.siaes.enums.SiaeKind",
         "PrescriberOrganizationKindEnum": "itou.prescribers.enums.PrescriberOrganizationKind",
     },
+    # Allows to document the choices of a field even if the serializer has allow_null=True.
+    # cf. https://github.com/tfranzel/drf-spectacular/issues/235
+    "ENUM_ADD_EXPLICIT_BLANK_NULL_CHOICE": False,
 }
 
 # Requests default timeout is None... See https://blog.mathieu-leplatre.info/handling-requests-timeout-in-python.html
