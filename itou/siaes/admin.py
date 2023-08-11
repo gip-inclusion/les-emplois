@@ -90,7 +90,7 @@ class SiaeResource(resources.ModelResource):
     last_name = Field(attribute="created_by__last_name", column_name="Nom")
     first_name = Field(attribute="created_by__first_name", column_name="Prénom")
     phone = Field(attribute="created_by__phone", column_name="Téléphone")
-    email = Field(attribute="created_by__email", column_name="E-mail")
+    email = Field(attribute="created_by__email", column_name="Adresse e-mail")
     created_at = Field(attribute="created_at", column_name="Date de création")
 
     class Meta:

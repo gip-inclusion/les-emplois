@@ -164,7 +164,7 @@ class CreateProlongationRequestForm(CreateProlongationForm):
     report_file_path = forms.CharField(required=False, disabled=True, widget=forms.HiddenInput())
     uploaded_file_name = forms.CharField(required=False, disabled=True, widget=forms.HiddenInput())
     email = forms.EmailField(
-        label="E-mail du prescripteur habilité sollicité pour cette prolongation",
+        label="Adresse e-mail du prescripteur habilité sollicité pour cette prolongation",
         help_text=(
             "Attention : l'adresse e-mail doit correspondre à un compte utilisateur de type prescripteur habilité"
         ),
@@ -218,7 +218,7 @@ class CreateProlongationRequestForm(CreateProlongationForm):
         # Customize "email" and "prescriber_organization" fields
         if self.data.get("reason") not in Prolongation.REASONS_NOT_NEED_PRESCRIBER_OPINION:
             self.fields["email"].required = True
-        self.fields["email"].widget.attrs.update({"placeholder": "E-mail du prescripteur habilité"})
+        self.fields["email"].widget.attrs.update({"placeholder": "Adresse e-mail du prescripteur habilité"})
         self.fields["prescriber_organization"].widget.attrs.update(
             {
                 "hx-post": reverse(

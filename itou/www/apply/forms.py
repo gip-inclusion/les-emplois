@@ -38,7 +38,7 @@ class UserExistsForm(forms.Form):
         self.user = None
 
     email = forms.EmailField(
-        label="E-mail personnel du candidat",
+        label="Adresse e-mail du candidat",
         widget=forms.EmailInput(attrs={"autocomplete": "off", "placeholder": "julie@example.com"}),
     )
 
