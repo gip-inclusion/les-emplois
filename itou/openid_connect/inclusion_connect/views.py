@@ -137,7 +137,9 @@ def inclusion_connect_authorize(request):
     ic_session = InclusionConnectSession(state=data["state"])
     ic_session.bind_to_request(request)
 
-    if register:
+    if channel == InclusionConnectChannel.ACTIVATION:
+        base_url = constants.INCLUSION_CONNECT_ENDPOINT_ACTIVATE
+    elif register:
         base_url = constants.INCLUSION_CONNECT_ENDPOINT_REGISTER
     else:
         base_url = constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE
@@ -193,14 +195,12 @@ def inclusion_connect_activate_account(request):
         return HttpResponseRedirect(params.get("previous_url", reverse("home:hp")))
 
     if user.identity_provider == IdentityProvider.INCLUSION_CONNECT:
-        params["channel"] = InclusionConnectChannel.ACTIVATION
         request.GET = params
         return inclusion_connect_authorize(request)
 
     params["channel"] = InclusionConnectChannel.ACTIVATION
     params["user_firstname"] = user.first_name
     params["user_lastname"] = user.last_name
-    params["register"] = True
     request.GET = params
     return inclusion_connect_authorize(request)
 
