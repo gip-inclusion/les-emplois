@@ -8,7 +8,6 @@ from tests.utils.test import TestCase, reload_module
 
 TEST_SETTINGS = {
     "INCLUSION_CONNECT_BASE_URL": "https://inclusion.connect.fake",
-    "INCLUSION_CONNECT_REALM": "foobar",
     "INCLUSION_CONNECT_CLIENT_ID": "IC_CLIENT_ID_123",
     "INCLUSION_CONNECT_CLIENT_SECRET": "IC_CLIENT_SECRET_123",
 }

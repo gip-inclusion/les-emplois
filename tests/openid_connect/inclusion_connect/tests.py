@@ -661,7 +661,7 @@ class InclusionConnectAccountActivationTest(InclusionConnectBaseTestCase):
         params = {"user_email": user.email, "user_kind": UserKind.PRESCRIBER}
         url = f"{reverse('inclusion_connect:activate_account')}?{urlencode(params)}"
         response = self.client.get(url, follow=False)
-        assert response.url.startswith(constants.INCLUSION_CONNECT_ENDPOINT_REGISTER)
+        assert response.url.startswith(constants.INCLUSION_CONNECT_ENDPOINT_ACTIVATE)
         assert constants.INCLUSION_CONNECT_SESSION_KEY in self.client.session
         assert f"login_hint={quote(user.email)}" in response.url
         assert f"firstname={user.first_name}" in response.url
