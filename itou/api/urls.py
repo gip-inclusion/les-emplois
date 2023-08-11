@@ -3,6 +3,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView
 from rest_framework import routers
 
 from itou.api.data_inclusion_api.views import DataInclusionStructureView
+from itou.api.geiq.views import GeiqJobApplicationListView
 
 from .applicants_api.views import ApplicantsView
 from .employee_record_api.viewsets import (
@@ -32,6 +33,7 @@ urlpatterns = [
     path("token-auth/", ObtainAuthToken.as_view(), name="token-auth"),
     # Needed for Browsable API (dev)
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
+    path("candidatures-geiq/", GeiqJobApplicationListView.as_view(), name="geiq_jobapplication_list"),
     # OpenAPI
     # See: https://www.django-rest-framework.org/topics/documenting-your-api/
     # OAS 3 YAML schema (downloadable)

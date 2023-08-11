@@ -1,0 +1,161 @@
+# serializer version: 1
+# name: test_candidatures_geiq_is_empty[cancelled][empty]
+  dict({
+    'count': 0,
+    'next': None,
+    'previous': None,
+    'results': list([
+    ]),
+  })
+# ---
+# name: test_candidatures_geiq_is_empty[new][empty]
+  dict({
+    'count': 0,
+    'next': None,
+    'previous': None,
+    'results': list([
+    ]),
+  })
+# ---
+# name: test_candidatures_geiq_is_empty[obsolete][empty]
+  dict({
+    'count': 0,
+    'next': None,
+    'previous': None,
+    'results': list([
+    ]),
+  })
+# ---
+# name: test_candidatures_geiq_is_empty[postponed][empty]
+  dict({
+    'count': 0,
+    'next': None,
+    'previous': None,
+    'results': list([
+    ]),
+  })
+# ---
+# name: test_candidatures_geiq_is_empty[prior_to_hire][empty]
+  dict({
+    'count': 0,
+    'next': None,
+    'previous': None,
+    'results': list([
+    ]),
+  })
+# ---
+# name: test_candidatures_geiq_is_empty[processing][empty]
+  dict({
+    'count': 0,
+    'next': None,
+    'previous': None,
+    'results': list([
+    ]),
+  })
+# ---
+# name: test_candidatures_geiq_is_empty[refused][empty]
+  dict({
+    'count': 0,
+    'next': None,
+    'previous': None,
+    'results': list([
+    ]),
+  })
+# ---
+# name: test_candidatures_geiq_nominal[empty]
+  dict({
+    'count': 0,
+    'next': None,
+    'previous': None,
+    'results': list([
+    ]),
+  })
+# ---
+# name: test_candidatures_geiq_nominal[with_results]
+  dict({
+    'count': 2,
+    'next': None,
+    'previous': None,
+    'results': list([
+      dict({
+        'adresse_code_postal': '91234',
+        'adresse_ligne_1': 'Rue du clos de la Grange',
+        'adresse_ligne_2': '',
+        'adresse_ville': 'Choufleury',
+        'auteur_diagnostic': 'geiq',
+        'civilite': 'MME',
+        'criteres_eligibilite': list([
+          'jeune-26-ans',
+        ]),
+        'date_debut_contrat': '2023-07-21',
+        'date_fin_contrat': '2025-07-21',
+        'date_naissance': '1990-05-01',
+        'duree_hebdo': 47,
+        'est_vae_inversee': True,
+        'id_embauche': 'bf657b69-3245-430c-b461-09c6792b9504',
+        'id_utilisateur': '7614fc4b-aef9-4694-ab17-12324300180a',
+        'jours_accompagnement': 42,
+        'mises_en_situation_pro': list([
+          dict({
+            'code': 'PROFESSIONAL_SITUATION_EXPERIENCE_PMSMP',
+            'date_debut': '2023-07-21',
+            'date_fin': '2025-07-21',
+          }),
+        ]),
+        'nb_heures_formation': 1664,
+        'nir': '290010101010125',
+        'niveau_formation': 'LEVEL_3',
+        'niveau_qualification': 'NOT_RELEVANT',
+        'nom': 'Dupont',
+        'poste_occupe': None,
+        'prenom': 'Sacha',
+        'prequalifications': list([
+          dict({
+            'code': 'PREQUALIFICATION_AFPR',
+            'date_debut': '2023-07-21',
+            'date_fin': '2025-07-21',
+          }),
+        ]),
+        'siret_employeur': '11832575900001',
+        'source_orientation': 'prescriber',
+        'type_contrat': 'PROFESSIONAL_TRAINING',
+        'type_prescripteur': 'HUDA',
+        'type_qualification': 'CQP',
+      }),
+      dict({
+        'adresse_code_postal': '91234',
+        'adresse_ligne_1': 'Rue du clos de la Grange',
+        'adresse_ligne_2': '',
+        'adresse_ville': 'Choufleury',
+        'auteur_diagnostic': 'prescriber',
+        'civilite': 'MME',
+        'criteres_eligibilite': list([
+        ]),
+        'date_debut_contrat': '2023-07-21',
+        'date_fin_contrat': '2025-07-21',
+        'date_naissance': '1990-05-01',
+        'duree_hebdo': 35,
+        'est_vae_inversee': False,
+        'id_embauche': 'bf657b69-3245-430c-b461-09c6792b9505',
+        'id_utilisateur': '7614fc4b-aef9-4694-ab17-12324300180a',
+        'jours_accompagnement': 28,
+        'mises_en_situation_pro': list([
+        ]),
+        'nb_heures_formation': 12,
+        'nir': '290010101010125',
+        'niveau_formation': 'LEVEL_3',
+        'niveau_qualification': 'LEVEL_3',
+        'nom': 'Dupont',
+        'poste_occupe': None,
+        'prenom': 'Sacha',
+        'prequalifications': list([
+        ]),
+        'siret_employeur': '11832575966666',
+        'source_orientation': 'siae_staff',
+        'type_contrat': 'APPRENTICESHIP',
+        'type_prescripteur': 'PE',
+        'type_qualification': 'CCN',
+      }),
+    ]),
+  })
+# ---
