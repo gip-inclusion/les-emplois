@@ -40,8 +40,24 @@ from tests.utils.test import TestCase, assertMessages
 
 
 class ApplyTest(TestCase):
+    def test_siae_with_no_members(self):
+        siae = SiaeFactory()
+        user = JobSeekerFactory()
+        self.client.force_login(user)
+        url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
+        response = self.client.get(url)
+        assert response.status_code == 403
+        assertContains(
+            response,
+            '<p class="mb-0">'
+            "Cet employeur n&#x27;est pas inscrit, vous ne pouvez pas déposer de candidatures en ligne."
+            "</p>",
+            status_code=403,
+            count=1,
+        )
+
     def test_anonymous_access(self):
-        siae = SiaeFactory(with_jobs=True)
+        siae = SiaeFactory(with_jobs=True, with_membership=True)
         for viewname in (
             "apply:start",
             "apply:pending_authorization_for_sender",

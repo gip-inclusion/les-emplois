@@ -83,7 +83,7 @@ class ApplyStepBaseView(LoginRequiredMixin, TemplateView):
         self.apply_session = None
 
     def setup(self, request, *args, **kwargs):
-        self.siae = get_object_or_404(Siae, pk=kwargs["siae_pk"])
+        self.siae = get_object_or_404(Siae.objects.with_has_active_members(), pk=kwargs["siae_pk"])
         self.apply_session = SessionNamespace(request.session, f"job_application-{self.siae.pk}")
         super().setup(request, *args, **kwargs)
 
@@ -94,6 +94,12 @@ class ApplyStepBaseView(LoginRequiredMixin, TemplateView):
             UserKind.SIAE_STAFF,
         ]:
             raise PermissionDenied("Vous n'êtes pas autorisé à déposer de candidature.")
+
+        if not self.siae.has_active_members:
+            raise PermissionDenied(
+                "Cet employeur n'est pas inscrit, vous ne pouvez pas déposer de candidatures en ligne."
+            )
+
         return super().dispatch(request, *args, **kwargs)
 
     def get_back_url(self):

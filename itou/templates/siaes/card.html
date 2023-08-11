@@ -47,8 +47,10 @@
                 </div>
                 <div class="col-12 col-lg-4 order-1 order-lg-2 d-flex flex-column">
                     <h2 class="sr-only">Actions rapides</h2>
-                    <div class="c-box mb-3 mb-lg-5">
-                        {% if not siae.block_job_applications %}
+                    <div class="c-box mb-3 mb-lg-5{% if not siae.has_active_members %} bg-emploi-lightest border-info{% endif %}">
+                        {% if not siae.has_active_members %}
+                            <p class="mb-0">Cet employeur n'est pas inscrit, vous ne pouvez pas déposer de candidatures en ligne.</p>
+                        {% elif not siae.block_job_applications %}
                             <a class="btn btn-primary btn-block btn-ico justify-content-center" href="{% url 'apply:start' siae_pk=siae.pk %}" aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
                                 <i class="ri-draft-line"></i>
                                 <span>Postuler</span>
@@ -141,7 +143,7 @@
                                 </ul>
                             </div>
                         {% endif %}
-                        {% if not siae.block_job_applications %}
+                        {% if not siae.block_job_applications and siae.has_active_members %}
                             <div class="d-flex justify-content-end mt-3">
                                 <a class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0" href="{% url 'apply:start' siae_pk=siae.pk %}" aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
                                     <i class="ri-draft-line"></i>
