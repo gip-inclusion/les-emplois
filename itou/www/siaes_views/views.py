@@ -384,7 +384,7 @@ def select_financial_annex(request, template_name="siaes/select_financial_annex.
 
 
 def card(request, siae_id, template_name="siaes/card.html"):
-    siae = get_object_or_404(Siae, pk=siae_id)
+    siae = get_object_or_404(Siae.objects.with_has_active_members(), pk=siae_id)
     jobs_descriptions = SiaeJobDescription.objects.filter(siae=siae).select_related("appellation", "location")
     back_url = get_safe_url(request, "back_url")
     active_jobs_descriptions = []

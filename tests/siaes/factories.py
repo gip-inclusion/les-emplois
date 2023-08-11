@@ -111,6 +111,8 @@ class SiaeFactory(factory.django.DjangoModelFactory):
                     user__for_snapshot=True,
                 ),
             ),
+            email="contact@acmeinc.com",
+            phone="0612345678",
         )
 
     # Don't start a SIRET with 0.

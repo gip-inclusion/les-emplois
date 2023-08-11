@@ -11,7 +11,7 @@ from tests.cities.factories import create_city_guerande, create_city_saint_andre
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationFactory
-from tests.siaes.factories import SiaeFactory, SiaeJobDescriptionFactory
+from tests.siaes.factories import SiaeFactory, SiaeJobDescriptionFactory, SiaeMembershipFactory
 from tests.utils.test import BASE_NUM_QUERIES, TestCase
 
 
@@ -205,7 +205,7 @@ class SearchSiaeTest(TestCase):
     def test_is_popular(self):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         city = create_city_saint_andre()
-        siae = SiaeFactory(department="44", coords=city.coords, post_code="44117")
+        siae = SiaeFactory(department="44", coords=city.coords, post_code="44117", with_membership=True)
         job = SiaeJobDescriptionFactory(siae=siae)
         JobApplicationFactory.create_batch(20, to_siae=siae, selected_jobs=[job], state="new")
         response = self.client.get(self.url, {"city": city.slug})
@@ -223,6 +223,23 @@ class SearchSiaeTest(TestCase):
             """,
             html=True,
         )
+
+    def test_has_no_active_members(self):
+        hiring_str = "recrutements en cours"
+        no_hiring_str = (
+            "Cet employeur n'est actuellement pas inscrit sur le site des emplois de l’inclusion, "
+            "vous ne pouvez pas déposer de candidature en ligne"
+        )
+        city = create_city_saint_andre()
+        siae = SiaeFactory(department="44", coords=city.coords, post_code="44117", with_jobs=True)
+        response = self.client.get(self.url, {"city": city.slug})
+        self.assertNotContains(response, hiring_str)
+        self.assertContains(response, no_hiring_str)
+
+        SiaeMembershipFactory(siae=siae)
+        response = self.client.get(self.url, {"city": city.slug})
+        self.assertContains(response, hiring_str)
+        self.assertNotContains(response, no_hiring_str)
 
 
 class SearchPrescriberTest(TestCase):

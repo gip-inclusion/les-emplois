@@ -45,7 +45,11 @@
         </p>
     </div>
     <div class="card-body">
-        {% if siae.block_job_applications %}
+        {% if not siae.has_active_members %}
+            <p class="mb-0">
+                <i>Cet employeur n'est actuellement pas inscrit sur le site des emplois de l’inclusion, vous ne pouvez pas déposer de candidature en ligne</i>
+            </p>
+        {% elif siae.block_job_applications %}
             <p class="mb-0">
                 <i>Cet employeur ne traite plus de nouvelles candidatures pour le moment</i>
             </p>

@@ -20,9 +20,10 @@ from tests.siaes.factories import (
     SiaeWith2MembershipsFactory,
     SiaeWithMembershipAndJobsFactory,
 )
-from tests.utils.test import TestCase
+from tests.utils.test import TestCase, parse_response_to_soup
 
 
+@pytest.mark.usefixtures("unittest_compatibility")
 class CardViewTest(TestCase):
     OTHER_TAB_ID = "autres-metiers"
     APPLY = "Postuler"
@@ -43,8 +44,15 @@ class CardViewTest(TestCase):
         self.assertNotContains(response, self.OTHER_TAB_ID)
         self.assertContains(response, self.APPLY)
 
+    def test_card_no_active_members(self):
+        siae = SiaeFactory(with_membership=False, for_snapshot=True)
+        url = reverse("siaes_views:card", kwargs={"siae_id": siae.pk})
+        response = self.client.get(url)
+        soup = parse_response_to_soup(response, selector="#main")
+        assert str(soup) == self.snapshot()
+
     def test_card_no_active_jobs(self):
-        siae = SiaeFactory(name="les petits jardins")
+        siae = SiaeFactory(name="les petits jardins", with_membership=True)
         job_description = SiaeJobDescriptionFactory(
             siae=siae,
             custom_name="Plaquiste",
@@ -164,7 +172,7 @@ class CardViewTest(TestCase):
         self.assertContains(response, self.APPLY)
 
     def test_card_no_other_jobs(self):
-        siae = SiaeFactory(name="les petits jardins")
+        siae = SiaeFactory(name="les petits jardins", with_membership=True)
         job_description = SiaeJobDescriptionFactory(
             siae=siae,
             custom_name="Plaquiste",
@@ -264,7 +272,7 @@ class CardViewTest(TestCase):
         self.assertContains(response, self.APPLY)
 
     def test_card_active_and_other_jobs(self):
-        siae = SiaeFactory(name="les petits jardins")
+        siae = SiaeFactory(name="les petits jardins", with_membership=True)
         # Job appellation must be different, the factory picks one at random.
         app1, app2 = Appellation.objects.filter(code__in=["12001", "12007"]).order_by("code")
         active_job_description = SiaeJobDescriptionFactory(
