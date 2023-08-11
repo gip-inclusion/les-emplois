@@ -7,6 +7,6 @@ Détails
 -------------------
 - Prénom : {{ first_name }}
 - Nom : {{ last_name }}
-- E-mail : {{ email }}
+- Adresse e-mail : {{ email }}
 
 {% endblock %}

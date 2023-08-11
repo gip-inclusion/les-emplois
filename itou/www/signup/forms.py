@@ -226,7 +226,7 @@ class FacilitatorSearchForm(CheckAlreadyExistsForm):
 # ------------------------------------------------------------------------------------------
 class PrescriberRequestInvitationForm(FullnameFormMixin):
     email = forms.EmailField(
-        label="E-mail",
+        label="Adresse e-mail",
         required=True,
         widget=forms.TextInput(
             attrs={
@@ -334,7 +334,7 @@ class PrescriberPoleEmploiSafirCodeForm(forms.Form):
 
 class PrescriberCheckPEemail(forms.Form):
     email = forms.EmailField(
-        label="E-mail",
+        label="Adresse e-mail",
         required=True,
         widget=forms.TextInput(
             attrs={
