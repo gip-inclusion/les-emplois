@@ -104,3 +104,7 @@ class QualificationLevel(models.TextChoices):
     LEVEL_4 = "LEVEL_4", "Niveau 4 (BP, Bac général, Techno ou Pro, BT)"
     LEVEL_5 = "LEVEL_5", "Niveau 5 ou + (Bac+2 ou +)"
     NOT_RELEVANT = "NOT_RELEVANT", "Non concerné"
+
+
+GEIQ_MIN_HOURS_PER_WEEK = 1
+GEIQ_MAX_HOURS_PER_WEEK = 48

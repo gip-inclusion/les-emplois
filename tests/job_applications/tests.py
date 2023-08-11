@@ -19,7 +19,15 @@ from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.employee_record.enums import Status
 from itou.job_applications.admin_forms import JobApplicationAdminForm
-from itou.job_applications.enums import Origin, QualificationLevel, QualificationType, RefusalReason, SenderKind
+from itou.job_applications.enums import (
+    GEIQ_MAX_HOURS_PER_WEEK,
+    GEIQ_MIN_HOURS_PER_WEEK,
+    Origin,
+    QualificationLevel,
+    QualificationType,
+    RefusalReason,
+    SenderKind,
+)
 from itou.job_applications.export import JOB_APPLICATION_CSV_HEADERS, stream_xlsx_export
 from itou.job_applications.models import JobApplication, JobApplicationTransitionLog, JobApplicationWorkflow
 from itou.job_applications.notifications import NewQualifiedJobAppEmployersNotification
@@ -242,13 +250,13 @@ class JobApplicationModelTest(TestCase):
         # Validators
         with self.assertRaisesRegex(
             ValidationError,
-            f"Assurez-vous que cette valeur est supérieure ou égale à {JobApplication.GEIQ_MIN_HOURS_PER_WEEK}.",
+            f"Assurez-vous que cette valeur est supérieure ou égale à {GEIQ_MIN_HOURS_PER_WEEK}.",
         ):
             JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, nb_hours_per_week=0)
 
         with self.assertRaisesRegex(
             ValidationError,
-            f"Assurez-vous que cette valeur est inférieure ou égale à {JobApplication.GEIQ_MAX_HOURS_PER_WEEK}.",
+            f"Assurez-vous que cette valeur est inférieure ou égale à {GEIQ_MAX_HOURS_PER_WEEK}.",
         ):
             JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, nb_hours_per_week=49)
 

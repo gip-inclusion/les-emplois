@@ -19,6 +19,8 @@ from itou.employee_record import enums as employeerecord_enums
 from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.enums import (
+    GEIQ_MAX_HOURS_PER_WEEK,
+    GEIQ_MIN_HOURS_PER_WEEK,
     Origin,
     Prequalification,
     ProfessionalSituationExperience,
@@ -450,9 +452,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     )
 
     WEEKS_BEFORE_CONSIDERED_OLD = 3
-
-    GEIQ_MIN_HOURS_PER_WEEK = 1
-    GEIQ_MAX_HOURS_PER_WEEK = 48
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
