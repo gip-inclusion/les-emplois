@@ -615,12 +615,12 @@ CSP_STYLE_SRC = [
     "'self'",
     # It would be better to whilelist styles hashes but it's to much work for now.
     "'unsafe-inline'",
+    "https://fonts.googleapis.com/",  # Used in theme-inclusion
 ]
 CSP_FONT_SRC = [
     "'self'",
     # '*' does not allows 'data:' fonts
     "data:",  # Because of tarteaucitron.js
-    "https://fonts.gstatic.com/",  # Used in theme-inclusion
 ]
 CSP_SCRIPT_SRC = [
     "'self'",
