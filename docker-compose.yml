@@ -54,6 +54,10 @@ services:
     restart: always
     ports:
       - "${DJANGO_PORT_ON_DOCKER_HOST:-8000}:8000"
+    # Make interactive debugging possible.
+    # Source: https://stackoverflow.com/questions/36249744/interactive-shell-using-docker-compose
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
 
 volumes:
   postgres_data:
