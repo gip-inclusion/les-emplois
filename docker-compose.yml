@@ -56,6 +56,8 @@ services:
       - "${DJANGO_PORT_ON_DOCKER_HOST:-8000}:8000"
     # Make interactive debugging possible.
     # Source: https://stackoverflow.com/questions/36249744/interactive-shell-using-docker-compose
+    # Run the usual `make run` (`docker-compose up`) and then in a second terminal run `docker attach itou_django`.
+    # You should now be able to access the usual interactive debugger on that second terminal.
     stdin_open: true # docker run -i
     tty: true        # docker run -t
 
