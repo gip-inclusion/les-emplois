@@ -100,6 +100,21 @@ class UserHijackPermTestCase(TestCase):
         assert response["Location"] == "/bar/"
         assert cm.records[0].message == f"admin={hijacker} has ended impersonation of user={hijacked}"
 
+    def test_release_redirects_to_admin(self):
+        hijacked = JobSeekerFactory()
+        hijacker = ItouStaffFactory(is_superuser=True)
+        self.client.force_login(hijacker)
+
+        initial_url = reverse("admin:users_user_changelist")
+
+        response = self.client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk}, HTTP_REFERER=initial_url)
+        assert response.status_code == 302
+        assert response["Location"] == "/accounts/profile/"
+
+        response = self.client.post(reverse("hijack:release"), {"user_pk": hijacked.pk})
+        assert response.status_code == 302
+        assert response["Location"] == "/admin/users/user/"
+
 
 @pytest.mark.parametrize(
     "user_factory,identity_provider,is_redirected",
