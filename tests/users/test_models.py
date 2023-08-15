@@ -713,10 +713,19 @@ class ModelTest(TestCase):
         user3 = siae3.members.get()
         assert user3.can_view_stats_siae(current_org=siae3)
 
+    @override_settings(STATS_CD_DEPARTMENT_WHITELIST=["93"])
     def test_can_view_stats_cd(self):
         """
         CD as in "Conseil Départemental".
         """
+        # Department outside of the whitelist cannot access.
+        org = PrescriberOrganizationWithMembershipFactory(
+            authorized=True, kind=PrescriberOrganizationKind.DEPT, department="01"
+        )
+        user = org.members.get()
+        assert not user.can_view_stats_cd(current_org=org)
+        assert not user.can_view_stats_dashboard_widget(current_org=org)
+
         # Admin prescriber of authorized CD can access.
         org = PrescriberOrganizationWithMembershipFactory(
             authorized=True, kind=PrescriberOrganizationKind.DEPT, department="93"
@@ -737,13 +746,20 @@ class ModelTest(TestCase):
         assert user.can_view_stats_dashboard_widget(current_org=org)
 
         # Non authorized organization does not give access.
-        org = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganizationKind.DEPT)
+        org = PrescriberOrganizationWithMembershipFactory(
+            kind=PrescriberOrganizationKind.DEPT,
+            department="93",
+        )
         user = org.members.get()
         assert not user.can_view_stats_cd(current_org=org)
         assert not user.can_view_stats_dashboard_widget(current_org=org)
 
         # Non CD organization does not give access.
-        org = PrescriberOrganizationWithMembershipFactory(authorized=True, kind=PrescriberOrganizationKind.CHRS)
+        org = PrescriberOrganizationWithMembershipFactory(
+            authorized=True,
+            kind=PrescriberOrganizationKind.CHRS,
+            department="93",
+        )
         user = org.members.get()
         assert not user.can_view_stats_cd(current_org=org)
         assert not user.can_view_stats_dashboard_widget(current_org=org)

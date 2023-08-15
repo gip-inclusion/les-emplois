@@ -243,8 +243,7 @@ def stats_siae_follow_siae_evaluation(request):
     return render_stats_siae(request=request, page_title="Suivi du contrôle a posteriori")
 
 
-@login_required
-def stats_cd(request):
+def render_stats_cd(request, page_title):
     """
     CD ("Conseil Départemental") stats shown to relevant members.
     They can only view data for their own departement.
@@ -255,11 +254,21 @@ def stats_cd(request):
     department = current_org.department
     params = get_params_for_departement(department)
     context = {
-        "page_title": f"Données de mon département : {DEPARTMENTS[department]}",
+        "page_title": f"{page_title} de mon département : {DEPARTMENTS[department]}",
         "department": department,
         "matomo_custom_url_suffix": format_region_and_department_for_matomo(department),
     }
     return render_stats(request=request, context=context, params=params)
+
+
+@login_required
+def stats_cd_hiring(request):
+    return render_stats_cd(request=request, page_title="Facilitation des embauches en IAE")
+
+
+@login_required
+def stats_cd_brsa(request):
+    return render_stats_cd(request=request, page_title="Suivi des prescriptions des accompagnateurs des publics bRSA")
 
 
 def render_stats_pe(request, page_title, extra_params=None):

@@ -45,8 +45,11 @@ METABASE_DASHBOARDS = {
     #
     # Prescriber stats - CD.
     #
-    "stats_cd": {
-        "dashboard_id": 118,
+    "stats_cd_hiring": {
+        "dashboard_id": 346,
+    },
+    "stats_cd_brsa": {
+        "dashboard_id": 330,
     },
     #
     # Prescriber stats - PE.

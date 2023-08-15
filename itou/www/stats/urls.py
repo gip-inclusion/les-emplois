@@ -19,8 +19,10 @@ urlpatterns = [
         views.stats_siae_follow_siae_evaluation,
         name="stats_siae_follow_siae_evaluation",
     ),
-    # Prescriber stats.
-    path("cd", views.stats_cd, name="stats_cd"),
+    # Prescriber stats - CD.
+    path("cd/hiring", views.stats_cd_hiring, name="stats_cd_hiring"),
+    path("cd/brsa", views.stats_cd_brsa, name="stats_cd_brsa"),
+    # Prescriber stats - PE.
     path("pe/delay/main", views.stats_pe_delay_main, name="stats_pe_delay_main"),
     path("pe/delay/raw", views.stats_pe_delay_raw, name="stats_pe_delay_raw"),
     path("pe/conversion/main", views.stats_pe_conversion_main, name="stats_pe_conversion_main"),
