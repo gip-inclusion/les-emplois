@@ -787,6 +787,7 @@ class User(AbstractUser, AddressMixin):
             and current_org.is_authorized
             and current_org.authorization_status == PrescriberAuthorizationStatus.VALIDATED
             and not current_org.is_brsa
+            and current_org.department in settings.STATS_CD_DEPARTMENT_WHITELIST
         )
 
     def can_view_stats_pe(self, current_org):
