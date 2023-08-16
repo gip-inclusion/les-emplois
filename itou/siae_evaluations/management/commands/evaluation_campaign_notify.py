@@ -5,6 +5,7 @@ from django.core.management import BaseCommand
 from django.db.models import Exists, F, Max, OuterRef, Q
 from django.utils import timezone
 
+from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.emails import CampaignEmailFactory, SIAEEmailFactory
 from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria, EvaluatedSiae, EvaluationCampaign
 from itou.utils.emails import send_email_messages
@@ -69,6 +70,14 @@ class Command(BaseCommand):
         submissions_frozen = ~Exists(siae_subq.filter(submission_freezed_at=None))
         has_siae_to_control = Exists(
             siae_subq.filter(
+                Exists(
+                    EvaluatedAdministrativeCriteria.objects.filter(
+                        evaluated_job_application__evaluated_siae=OuterRef("pk"),
+                        review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING,
+                        submitted_at__isnull=False,
+                    )
+                ),
+            ).filter(
                 Q(reviewed_at=None, evaluation_campaign__calendar__adversarial_stage_start__gt=today)
                 | Q(final_reviewed_at=None, evaluation_campaign__calendar__adversarial_stage_start__lte=today)
             )

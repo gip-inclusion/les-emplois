@@ -574,6 +574,19 @@ class TestManagementCommand:
         assert email.body == snapshot()
 
     @freeze_time("2023-01-18 11:11:11")
+    def test_institution_submission_freeze_no_reminder_without_docs(self, capsys, mailoutbox, snapshot):
+        campaign = EvaluationCampaignFactory(evaluations_asked_at=timezone.now() - relativedelta(weeks=3))
+        siae = EvaluatedSiaeFactory(evaluation_campaign=campaign)
+        EvaluatedJobApplicationFactory(evaluated_siae=siae)
+        campaign.freeze(timezone.now())
+
+        call_command("evaluation_campaign_notify")
+        stdout, stderr = capsys.readouterr()
+        assert stdout == ""
+        assert stderr == ""
+        assert [] == mailoutbox
+
+    @freeze_time("2023-01-18 11:11:11")
     def test_institution_submission_freeze_notification_ignores_closed_campaigns(self, capsys, mailoutbox):
         campaign = EvaluationCampaignFactory(
             evaluations_asked_at=timezone.now() - relativedelta(weeks=6),
