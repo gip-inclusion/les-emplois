@@ -87,7 +87,7 @@ TABLE.add_columns(
         {
             "name": "habilitée",
             "type": "boolean",
-            "comment": "Organisation habilitée par le Préfet",
+            "comment": "Organisation habilitée",
             "fn": lambda o: o.is_authorized,
         },
     ]
