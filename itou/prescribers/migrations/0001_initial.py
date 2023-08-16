@@ -211,7 +211,7 @@ class Migration(migrations.Migration):
                     "is_authorized",
                     models.BooleanField(
                         default=False,
-                        help_text="Précise si l'organisation est habilitée par le Préfet.",
+                        help_text="Précise si l'organisation est habilitée.",
                         verbose_name="habilitation",
                     ),
                 ),

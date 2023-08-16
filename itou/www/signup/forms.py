@@ -282,7 +282,7 @@ class PrescriberChooseKindForm(forms.Form):
     KIND_UNAUTHORIZED_ORG = "unauthorized_org"
 
     KIND_CHOICES = (
-        (KIND_AUTHORIZED_ORG, "Pour une organisation habilitée par le Préfet"),
+        (KIND_AUTHORIZED_ORG, "Pour une organisation habilitée"),
         (KIND_UNAUTHORIZED_ORG, "Pour une organisation non-habilitée"),
     )
 
@@ -295,8 +295,8 @@ class PrescriberChooseKindForm(forms.Form):
 
 class PrescriberConfirmAuthorizationForm(forms.Form):
     CONFIRM_AUTHORIZATION_CHOICES = (
-        (1, "Oui, je confirme que mon organisation est habilitée par le Préfet"),
-        (0, "Non, mon organisation n’est pas habilitée par le Préfet"),
+        (1, "Oui, je confirme que mon organisation est habilitée"),
+        (0, "Non, mon organisation n’est pas habilitée"),
     )
 
     confirm_authorization = forms.TypedChoiceField(
