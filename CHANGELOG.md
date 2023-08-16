@@ -1,5 +1,17 @@
 # Journal des modifications
 
+## [69] - 2023-08-16
+
+### Ajouté
+- Admin : retour sur l'admin quand on relâche un utilisateur détourné
+
+### Modifié
+- Modification du menu "besoin d'aide"
+- Parcours de candidature : modifications et corrections
+- CSP : Améliorations et corrections des règles CSP
+- PASS IAE : modification de la période durant laquelle les prolongations sont possibles
+
+
 ## [68] - 2023-07-31
 
 ### Ajouté
