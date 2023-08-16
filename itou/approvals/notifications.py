@@ -1,4 +1,5 @@
 from dateutil.relativedelta import relativedelta
+from django.db.models import F
 
 from itou.common_apps.notifications.base_class import BaseNotification
 from itou.prescribers.models import PrescriberMembership
@@ -35,6 +36,8 @@ class ProlongationRequestCreatedReminder(BaseNotification):
             PrescriberMembership.objects.active()
             .filter(organization=self.prolongation_request.prescriber_organization)
             .exclude(user=self.prolongation_request.validated_by)
+            # Limit to the last 10 active colleagues, it should cover the ones dedicated to the IAE and some more.
+            .order_by(F("user__last_login").desc(nulls_last=True), "-joined_at", "-pk")[:10]
             .values_list("user__email", flat=True)
         )
         context = {
