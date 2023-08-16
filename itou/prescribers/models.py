@@ -135,7 +135,7 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
     is_authorized = models.BooleanField(
         verbose_name="habilitation",
         default=False,
-        help_text="Précise si l'organisation est habilitée par le Préfet.",
+        help_text="Précise si l'organisation est habilitée.",
     )
     code_safir_pole_emploi = models.CharField(
         verbose_name="code Safir",
