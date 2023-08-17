@@ -2026,3 +2026,39 @@ def test_reload_contract_type_and_options(contract_type, client, snapshot):
         },
     )
     assert response.content.decode() == snapshot()
+
+
+def test_htmx_reload_contract_type_and_options(client, snapshot):
+    job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, state=JobApplicationWorkflow.STATE_PROCESSING)
+    siae_member = job_application.to_siae.members.first()
+    client.force_login(siae_member)
+    accept_url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+    data = {
+        "guidance_days": "1",
+        "contract_type": ContractType.PROFESSIONAL_TRAINING,
+        "contract_type_details": "",
+        "nb_hours_per_week": "2",
+        "hiring_start_at": "",  # No date to ensure error
+        "qualification_type": "CQP",
+        "qualification_level": job_applications_enums.QualificationLevel.LEVEL_3,
+        "prehiring_guidance_days": "0",
+        "planned_training_hours": "0",
+        "hiring_end_at": "",
+        "answer": "",
+    }
+    response = client.post(accept_url, data=data)
+    form_soup = parse_response_to_soup(response, selector="#formTarget")
+
+    # Update form soup with htmx call
+    reload_url = reverse("apply:reload_contract_type_and_options", kwargs={"job_application_id": job_application.pk})
+    data["contract_type"] = ContractType.OTHER
+    htmx_response = client.post(
+        reload_url,
+        data=data,
+    )
+    update_page_with_htmx(form_soup, "#id_contract_type", htmx_response)
+
+    # Check that a complete re-POST returns the exact same form
+    response = client.post(accept_url, data=data)
+    reloaded_form_soup = parse_response_to_soup(response, selector="#formTarget")
+    assertSoupEqual(form_soup, reloaded_form_soup)
