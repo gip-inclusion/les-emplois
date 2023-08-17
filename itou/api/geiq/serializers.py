@@ -1,8 +1,6 @@
-import os
 from typing import List
 
-from django.apps import apps
-from django.db import connection, models
+from django.db import models
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
@@ -46,19 +44,19 @@ ASP_TO_LABEL_EDUCATION_LEVELS = {
 
 
 def lazy_administrative_criteria_choices():
-    # The CI check is only there because the `manage.py makemigrations --check` would fail otherwise.
-    # Indeed, it is run before any migrations are done but in a ready context. Another way is to migrate
-    # the app before that check but that would make the CI slower all the time.
-    # Another way to see it is that it's reasonable that those specific API spectacular annotations are
-    # not rendered on CI.
-    # I would be happy to hear of another way to do it, by rendering `extend_schema_field` itself lazy maybe ?
-    if apps.ready and not os.getenv("CI", False):
-        try:
-            connection.ensure_connection()
-            return GEIQAdministrativeCriteria.objects.order_by("slug").values_list("slug", "name")
-        except Exception:  # this happens during tests when pytest reads the code and has not initialized the db yet
-            pass
-    return [[0, "-"]]  # make spectacular happy, it needs at least one option in the choices.
+    return dict(GEIQAdministrativeCriteria.objects.order_by("slug").values_list("slug", "name"))
+
+
+class LazyChoiceField(serializers.ChoiceField):
+    def get_choices(self):
+        if callable(self._choices):
+            self._choices = self._choices()
+        return self._choices
+
+    def set_choices(self, choices):
+        self._choices = choices
+
+    choices = property(fget=get_choices, fset=set_choices)
 
 
 class PriorActionSerializer(serializers.ModelSerializer):
@@ -169,7 +167,7 @@ class GeiqJobApplicationSerializer(serializers.ModelSerializer):
         )
         read_only_fields = fields
 
-    @extend_schema_field(serializers.ChoiceField(choices=lazy_administrative_criteria_choices()))
+    @extend_schema_field(LazyChoiceField(choices=lazy_administrative_criteria_choices))
     def get_criteres_eligibilite(self, obj) -> List[str]:
         if diag := obj.geiq_eligibility_diagnosis:
             return sorted({crit.slug for crit in diag.administrative_criteria.all()})
