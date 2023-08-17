@@ -14,7 +14,7 @@ from factory import Faker
 
 
 # Rewrite before importing itou code.
-pytest.register_assert_rewrite("itou.utils.test")
+pytest.register_assert_rewrite("tests.utils.test", "tests.utils.htmx.test")
 
 from itou.utils import faker_providers  # noqa: E402
 from tests.users.factories import ItouStaffFactory  # noqa: E402
