@@ -1,4 +1,3 @@
-from dateutil.relativedelta import relativedelta
 from django.db.models import F
 
 from itou.common_apps.notifications.base_class import BaseNotification
@@ -42,7 +41,6 @@ class ProlongationRequestCreatedReminder(BaseNotification):
         )
         context = {
             "prolongation_request": self.prolongation_request,
-            "auto_grant_date": self.prolongation_request.created_at.date() + relativedelta(days=30),
         }
         subject = "approvals/email/prolongation_request/created_reminder_subject.txt"
         body = "approvals/email/prolongation_request/created_reminder_body.txt"
