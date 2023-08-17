@@ -428,28 +428,28 @@ class AcceptHTMXFragmentView(TemplateView):
             "hide_value": ContractType.OTHER.value,
         }
 
-    def post(self, request, job_application_id, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         return self.render_to_response(self.get_context_data(**kwargs))
 
 
 class ReloadQualificationFields(AcceptHTMXFragmentView):
     template_name = "apply/includes/geiq/geiq_qualification_fields.html"
 
-    def post(self, request, job_application_id, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         # we don't want to display error on this field for an HTMX reload:
         self.form_accept.errors.pop("qualification_level", None)
 
-        return super().post(request, job_application_id, *args, **kwargs)
+        return super().post(request, *args, **kwargs)
 
 
 class ReloadContractTypeAndOptions(AcceptHTMXFragmentView):
     template_name = "apply/includes/geiq/geiq_contract_type_and_options.html"
 
-    def post(self, request, job_application_id, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         # we don't want to display error on this field for an HTMX reload:
         self.form_accept.errors.pop("nb_hours_per_week", None)
 
-        return super().post(request, job_application_id, *args, **kwargs)
+        return super().post(request, *args, **kwargs)
 
 
 @login_required
