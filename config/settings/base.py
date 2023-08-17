@@ -262,6 +262,13 @@ LOGGING = {
     "disable_existing_loggers": False,
     "handlers": {
         "console": {"class": "logging.StreamHandler"},
+        "file": {
+            "class": "logging.handlers.TimedRotatingFileHandler",
+            "filename": os.path.join(os.getenv("ITOU_LOG_DIRECTORY", ""), "itou.log"),
+            "when": "midnight",
+            "backupCount": "365",
+            "formatter": "itou",
+        },
         "null": {"class": "logging.NullHandler"},
         "api_console": {
             "class": "logging.StreamHandler",
@@ -269,12 +276,14 @@ LOGGING = {
         },
     },
     "formatters": {
+        "itou": {"format": "[%(levelname)s] %(asctime)s %(name)s %(message)s"},
         "api_simple": {
             "format": "{levelname} {asctime} {pathname} : {message}",
             "style": "{",
         },
     },
     "loggers": {
+        "root": {"handlers": ["file"]},
         "django": {
             "handlers": ["console"],
             "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
