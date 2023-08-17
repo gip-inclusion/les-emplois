@@ -292,6 +292,9 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
         "can_view_personal_information": True,  # SIAE members have access to personal info
         "hide_value": ContractType.OTHER.value,
         "matomo_custom_title": "Candidature acceptée",
+        "job_seeker": job_application.job_seeker,
+        "siae": job_application.to_siae,
+        "back_url": reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id}),
     }
 
     if not job_application.hiring_without_approval and job_application.eligibility_diagnosis_by_siae_required:
