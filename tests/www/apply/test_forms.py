@@ -86,20 +86,21 @@ class RefusalFormTest(TestCase):
         assert "answer_to_prescriber" not in form.fields.keys()
 
 
-@pytest.mark.usefixtures("unittest_compatibility")
-class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
-    def test_accept_form_without_geiq(self):
+class TestAcceptForm:
+    @pytest.mark.parametrize("with_job_application", [True, False])
+    def test_accept_form_without_geiq(self, with_job_application):
         # Job application accept form for a "standard" SIAE
-        form = apply_forms.AcceptForm(instance=JobApplicationFactory(to_siae__kind=SiaeKind.EI))
+        job_application = JobApplicationFactory(to_siae__kind=SiaeKind.EI)
+        form = apply_forms.AcceptForm(
+            instance=job_application if with_job_application else None, siae=job_application.to_siae
+        )
 
         assert list(form.fields.keys()) == ["hiring_start_at", "hiring_end_at", "answer"]
         # Nothing more to see, move on...
 
-    def test_accept_form_with_geiq(self):
-        # Job application accept form for a GEIQ: more fields
-        form = apply_forms.AcceptForm(instance=JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ))
-
-        assert sorted(form.fields.keys()) == [
+    @pytest.mark.parametrize("with_job_application", [True, False])
+    def test_accept_form_with_geiq(self, with_job_application):
+        EXPECTED_FIELDS = [
             "answer",
             "contract_type",
             "contract_type_details",
@@ -112,30 +113,31 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
             "qualification_level",
             "qualification_type",
         ]
+        # Job application accept form for a GEIQ: more fields
+        job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ)
+        form = apply_forms.AcceptForm(
+            instance=job_application if with_job_application else None, siae=job_application.to_siae
+        )
+
+        assert sorted(form.fields.keys()) == EXPECTED_FIELDS
 
         # Dynamic contract type details field
+        job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ)
         form = apply_forms.AcceptForm(
-            instance=JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ), data={"contract_type": ContractType.OTHER}
+            instance=job_application if with_job_application else None,
+            siae=job_application.to_siae,
+            data={"contract_type": ContractType.OTHER},
         )
-        assert sorted(form.fields.keys()) == [
-            "answer",
-            "contract_type",
-            "contract_type_details",
-            "hiring_end_at",
-            "hiring_start_at",
-            "inverted_vae_contract",
-            "nb_hours_per_week",
-            "planned_training_hours",
-            "prehiring_guidance_days",
-            "qualification_level",
-            "qualification_type",
-        ]
+        assert sorted(form.fields.keys()) == EXPECTED_FIELDS
 
-    def test_accept_form_geiq_required_fields_validation(self):
+    @pytest.mark.parametrize("with_job_application", [True, False])
+    def test_accept_form_geiq_required_fields_validation(self, faker, with_job_application):
         job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ)
 
         post_data = {"hiring_start_at": f"{datetime.now():%Y-%m-%d}"}
-        form = apply_forms.AcceptForm(instance=job_application, data=post_data)
+        form = apply_forms.AcceptForm(
+            instance=job_application if with_job_application else None, siae=job_application.to_siae, data=post_data
+        )
         sorted_errors = dict(sorted(form.errors.items()))
         assert sorted_errors == {
             "contract_type": ["Ce champ est obligatoire."],
@@ -146,8 +148,10 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
             "qualification_type": ["Ce champ est obligatoire."],
         }
 
-        post_data |= {"prehiring_guidance_days": self.faker.pyint()}
-        form = apply_forms.AcceptForm(instance=job_application, data=post_data)
+        post_data |= {"prehiring_guidance_days": faker.pyint()}
+        form = apply_forms.AcceptForm(
+            instance=job_application if with_job_application else None, siae=job_application.to_siae, data=post_data
+        )
         sorted_errors = dict(sorted(form.errors.items()))
         assert sorted_errors == {
             "contract_type": ["Ce champ est obligatoire."],
@@ -158,7 +162,9 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
         }
 
         post_data |= {"contract_type": ContractType.APPRENTICESHIP}
-        form = apply_forms.AcceptForm(instance=job_application, data=post_data)
+        form = apply_forms.AcceptForm(
+            instance=job_application if with_job_application else None, siae=job_application.to_siae, data=post_data
+        )
         sorted_errors = dict(sorted(form.errors.items()))
         assert sorted_errors == {
             "nb_hours_per_week": ["Ce champ est obligatoire."],
@@ -171,21 +177,28 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
             "nb_hours_per_week": 35,
             "qualification_type": QualificationType.CCN,
             "qualification_level": QualificationLevel.LEVEL_4,
-            "planned_training_hours": self.faker.pyint(),
+            "planned_training_hours": faker.pyint(),
         }
-        form = apply_forms.AcceptForm(instance=job_application, data=post_data)
+        form = apply_forms.AcceptForm(
+            instance=job_application if with_job_application else None, siae=job_application.to_siae, data=post_data
+        )
         assert form.is_valid()
 
-    def test_accept_form_geiq_contract_type_field_validation(self):
+    @pytest.mark.parametrize("with_job_application", [True, False])
+    def test_accept_form_geiq_contract_type_field_validation(self, faker, with_job_application):
         job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ)
         post_data = {
             "hiring_start_at": f"{datetime.now():%Y-%m-%d}",
-            "prehiring_guidance_days": self.faker.pyint(),
+            "prehiring_guidance_days": faker.pyint(),
             "nb_hours_per_week": 35,
         }
 
         # ContractType.OTHER ask for more details
-        form = apply_forms.AcceptForm(instance=job_application, data=post_data | {"contract_type": ContractType.OTHER})
+        form = apply_forms.AcceptForm(
+            instance=job_application if with_job_application else None,
+            siae=job_application.to_siae,
+            data=post_data | {"contract_type": ContractType.OTHER},
+        )
 
         assert form.errors == {
             "contract_type_details": ["Les précisions sont nécessaires pour ce type de contrat"],
@@ -195,46 +208,52 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
         }
 
         form = apply_forms.AcceptForm(
-            instance=job_application,
+            instance=job_application if with_job_application else None,
+            siae=job_application.to_siae,
             data=post_data
             | {
                 "contract_type": ContractType.OTHER,
                 "contract_type_details": "foo",
                 "qualification_type": QualificationType.CQP,
                 "qualification_level": QualificationLevel.LEVEL_3,
-                "planned_training_hours": self.faker.pyint(),
+                "planned_training_hours": faker.pyint(),
             },
         )
         assert form.is_valid()
 
         # ContractType.APPRENTICESHIP doesn't ask for more details
         form = apply_forms.AcceptForm(
-            instance=job_application,
+            instance=job_application if with_job_application else None,
+            siae=job_application.to_siae,
             data=post_data
             | {
                 "contract_type": ContractType.APPRENTICESHIP,
                 "qualification_type": QualificationType.CCN,
                 "qualification_level": QualificationLevel.LEVEL_4,
-                "planned_training_hours": self.faker.pyint(),
-                "nb_of_hours_per_week": self.faker.pyint(),
+                "planned_training_hours": faker.pyint(),
+                "nb_of_hours_per_week": faker.pyint(),
             },
         )
         assert form.is_valid()
 
         # ContractType.PROFESSIONAL_TRAINING doesn't ask for more details
         form = apply_forms.AcceptForm(
-            instance=job_application,
+            instance=job_application if with_job_application else None,
+            siae=job_application.to_siae,
             data=post_data
             | {
                 "contract_type": ContractType.PROFESSIONAL_TRAINING,
                 "qualification_type": QualificationType.CCN,
                 "qualification_level": QualificationLevel.NOT_RELEVANT,
-                "planned_training_hours": self.faker.pyint(),
-                "nb_of_hours_per_week": self.faker.pyint(),
+                "planned_training_hours": faker.pyint(),
+                "nb_of_hours_per_week": faker.pyint(),
             },
         )
         assert form.is_valid()
 
+
+@pytest.mark.usefixtures("unittest_compatibility")
+class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
     def test_save_geiq_form_fields_from_view(self):
         # non-GEIQ accept case tests are in `tests_process.py`
         job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, state="processing")

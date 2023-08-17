@@ -1980,10 +1980,10 @@ def test_details_for_geiq_with_inverted_vae_contract(client, inverted_vae_contra
 
 @pytest.mark.parametrize("qualification_type", job_applications_enums.QualificationType)
 def test_reload_qualification_fields(qualification_type, client, snapshot):
-    job_application = JobApplicationFactory(id="11111111-2222-3333-4444-555555555555", to_siae__kind=SiaeKind.GEIQ)
-    siae_member = job_application.to_siae.members.first()
+    siae = SiaeFactory(pk=10, kind=SiaeKind.GEIQ, with_membership=True)
+    siae_member = siae.members.first()
     client.force_login(siae_member)
-    url = reverse("apply:reload_qualification_fields", kwargs={"job_application_id": job_application.pk})
+    url = reverse("apply:reload_qualification_fields", kwargs={"siae_pk": siae.pk})
     response = client.post(
         url,
         data={
@@ -2002,14 +2002,37 @@ def test_reload_qualification_fields(qualification_type, client, snapshot):
     assert response.content.decode() == snapshot()
 
 
+def test_reload_qualification_fields_404(client):
+    siae = SiaeFactory(kind=SiaeKind.GEIQ, with_membership=True)
+    siae_member = siae.members.first()
+    client.force_login(siae_member)
+    url = reverse("apply:reload_qualification_fields", kwargs={"siae_pk": 0})
+    response = client.post(
+        url,
+        data={
+            "guidance_days": "0",
+            "contract_type": ContractType.APPRENTICESHIP,
+            "contract_type_details": "",
+            "nb_hours_per_week": "",
+            "hiring_start_at": "",
+            "qualification_type": job_applications_enums.QualificationType.CQP,
+            "qualification_level": "",
+            "planned_training_hours": "0",
+            "hiring_end_at": "",
+            "answer": "",
+        },
+    )
+    assert response.status_code == 404
+
+
 @pytest.mark.parametrize(
     "contract_type", [value for value, _label in ContractType.choices_for_siae_kind(SiaeKind.GEIQ)]
 )
 def test_reload_contract_type_and_options(contract_type, client, snapshot):
-    job_application = JobApplicationFactory(id="11111111-2222-3333-4444-555555555555", to_siae__kind=SiaeKind.GEIQ)
-    siae_member = job_application.to_siae.members.first()
+    siae = SiaeFactory(pk=10, kind=SiaeKind.GEIQ, with_membership=True)
+    siae_member = siae.members.first()
     client.force_login(siae_member)
-    url = reverse("apply:reload_contract_type_and_options", kwargs={"job_application_id": job_application.pk})
+    url = reverse("apply:reload_contract_type_and_options", kwargs={"siae_pk": siae.pk})
     response = client.post(
         url,
         data={
@@ -2026,6 +2049,29 @@ def test_reload_contract_type_and_options(contract_type, client, snapshot):
         },
     )
     assert response.content.decode() == snapshot()
+
+
+def test_reload_contract_type_and_options_404(client):
+    siae = SiaeFactory(kind=SiaeKind.GEIQ, with_membership=True)
+    siae_member = siae.members.first()
+    client.force_login(siae_member)
+    url = reverse("apply:reload_contract_type_and_options", kwargs={"siae_pk": 0})
+    response = client.post(
+        url,
+        data={
+            "guidance_days": "0",
+            "contract_type": ContractType.APPRENTICESHIP,
+            "contract_type_details": "",
+            "nb_hours_per_week": "",
+            "hiring_start_at": "",
+            "qualification_type": "CQP",
+            "qualification_level": "",
+            "planned_training_hours": "0",
+            "hiring_end_at": "",
+            "answer": "",
+        },
+    )
+    assert response.status_code == 404
 
 
 def test_htmx_reload_contract_type_and_options(client, snapshot):
@@ -2050,7 +2096,7 @@ def test_htmx_reload_contract_type_and_options(client, snapshot):
     form_soup = parse_response_to_soup(response, selector="#formTarget")
 
     # Update form soup with htmx call
-    reload_url = reverse("apply:reload_contract_type_and_options", kwargs={"job_application_id": job_application.pk})
+    reload_url = reverse("apply:reload_contract_type_and_options", kwargs={"siae_pk": job_application.to_siae.pk})
     data["contract_type"] = ContractType.OTHER
     htmx_response = client.post(
         reload_url,
