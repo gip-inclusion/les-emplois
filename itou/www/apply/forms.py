@@ -462,8 +462,9 @@ class AcceptForm(forms.ModelForm):
     # Choices are dynamically set on HTMX reload
     qualification_level = forms.ChoiceField(choices=[], label="Niveau de qualification")
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, siae, **kwargs):
         super().__init__(*args, **kwargs)
+        self.is_geiq = siae.kind == SiaeKind.GEIQ
 
         self.fields["hiring_start_at"].required = True
         for field in ["hiring_start_at", "hiring_end_at"]:
@@ -477,77 +478,71 @@ class AcceptForm(forms.ModelForm):
         self.initial["nb_hours_per_week"] = None
         post_data = kwargs.get("data")
 
-        if job_application := kwargs.get("instance"):
-            is_geiq = job_application.to_siae.kind == SiaeKind.GEIQ
-            # Remove or make GEIQ specific fields mandatory
-            for geiq_field_name in self.GEIQ_REQUIRED_FIELDS:
-                if is_geiq:
-                    # Contract type details are dynamic and not required all the time
-                    self.fields[geiq_field_name].required = geiq_field_name not in (
-                        "contract_type_details",
-                        "inverted_vae_contract",
-                    )
-                else:
-                    self.fields.pop(geiq_field_name)
+        # Remove or make GEIQ specific fields mandatory
+        for geiq_field_name in self.GEIQ_REQUIRED_FIELDS:
+            if self.is_geiq:
+                # Contract type details are dynamic and not required all the time
+                self.fields[geiq_field_name].required = geiq_field_name not in (
+                    "contract_type_details",
+                    "inverted_vae_contract",
+                )
+            else:
+                self.fields.pop(geiq_field_name)
 
-            if is_geiq:
-                # Change default size (too large)
-                self.fields["contract_type_details"].widget.attrs.update({"rows": 2})
-                self.initial["prehiring_guidance_days"] = 0
-                self.initial["planned_training_hours"] = 0
-                self.fields["hiring_start_at"].help_text = "Au format JJ/MM/AAAA, par exemple  {}.".format(
-                    datetime.date.today().strftime("%d/%m/%Y"),
+        if self.is_geiq:
+            # Change default size (too large)
+            self.fields["contract_type_details"].widget.attrs.update({"rows": 2})
+            self.initial["prehiring_guidance_days"] = 0
+            self.initial["planned_training_hours"] = 0
+            self.fields["hiring_start_at"].help_text = "Au format JJ/MM/AAAA, par exemple  {}.".format(
+                datetime.date.today().strftime("%d/%m/%Y"),
+            )
+            # Dynamic selection of qualification level
+            self.fields["qualification_type"].widget.attrs.update(
+                {
+                    "hx-post": reverse("apply:reload_qualification_fields", kwargs={"siae_pk": siae.pk}),
+                    "hx-swap": "outerHTML",
+                    "hx-target": "#geiq_qualification_fields_block",
+                },
+            )
+            # Set dynamically in a custom form field,
+            # otherwise choices values are overriden at every HTMX reload
+            self.fields["qualification_level"].choices = (
+                BLANK_CHOICE_DASH + job_applications_enums.QualificationLevel.choices
+            )
+            if (
+                post_data
+                and post_data.get("qualification_type") == job_applications_enums.QualificationType.STATE_DIPLOMA
+            ):
+                # Remove irrelevant option
+                idx = 1 + job_applications_enums.QualificationLevel.values.index(
+                    job_applications_enums.QualificationLevel.NOT_RELEVANT
                 )
-                # Dynamic selection of qualification level
-                self.fields["qualification_type"].widget.attrs.update(
-                    {
-                        "hx-post": reverse(
-                            "apply:reload_qualification_fields", kwargs={"job_application_id": job_application.pk}
-                        ),
-                        "hx-swap": "outerHTML",
-                        "hx-target": "#geiq_qualification_fields_block",
-                    },
-                )
-                # Set dynamically in a custom form field,
-                # otherwise choices values are overriden at every HTMX reload
-                self.fields["qualification_level"].choices = (
-                    BLANK_CHOICE_DASH + job_applications_enums.QualificationLevel.choices
-                )
-                if (
-                    post_data
-                    and post_data.get("qualification_type") == job_applications_enums.QualificationType.STATE_DIPLOMA
-                ):
-                    # Remove irrelevant option
-                    idx = 1 + job_applications_enums.QualificationLevel.values.index(
-                        job_applications_enums.QualificationLevel.NOT_RELEVANT
-                    )
-                    self.fields["qualification_level"].choices.pop(idx)
+                self.fields["qualification_level"].choices.pop(idx)
 
-                self.fields["inverted_vae_contract"].widget = forms.CheckboxInput()
-                self.fields["inverted_vae_contract"].disabled = not (
-                    post_data and post_data.get("contract_type") == ContractType.PROFESSIONAL_TRAINING
-                )
-                self.fields["contract_type"].widget.attrs.update(
-                    {
-                        "hx-post": reverse(
-                            "apply:reload_contract_type_and_options", kwargs={"job_application_id": job_application.pk}
-                        ),
-                        "hx-swap": "outerHTML",
-                        "hx-target": "#geiq_contract_type_and_options_block",
-                    },
-                )
+            self.fields["inverted_vae_contract"].widget = forms.CheckboxInput()
+            self.fields["inverted_vae_contract"].disabled = not (
+                post_data and post_data.get("contract_type") == ContractType.PROFESSIONAL_TRAINING
+            )
+            self.fields["contract_type"].widget.attrs.update(
+                {
+                    "hx-post": reverse("apply:reload_contract_type_and_options", kwargs={"siae_pk": siae.pk}),
+                    "hx-swap": "outerHTML",
+                    "hx-target": "#geiq_contract_type_and_options_block",
+                },
+            )
 
-            elif job_application.to_siae.kind in SIAE_WITH_CONVENTION_KINDS:
-                # Add specific details to help texts for IAE
-                self.fields["hiring_start_at"].help_text += (
-                    " La date est modifiable jusqu'à la veille de la date saisie. En cas de premier PASS IAE pour "
-                    "la personne, cette date déclenche le début de son parcours."
-                )
-                self.fields["hiring_end_at"].help_text += (
-                    " Elle sert uniquement à des fins d'informations et est sans conséquence sur les déclarations "
-                    "à faire dans l'extranet 2.0 de l'ASP. "
-                    "<b>Ne pas compléter cette date dans le cadre d’un CDI Inclusion</b>"
-                )
+        elif siae.kind in SIAE_WITH_CONVENTION_KINDS:
+            # Add specific details to help texts for IAE
+            self.fields["hiring_start_at"].help_text += (
+                " La date est modifiable jusqu'à la veille de la date saisie. En cas de premier PASS IAE pour "
+                "la personne, cette date déclenche le début de son parcours."
+            )
+            self.fields["hiring_end_at"].help_text += (
+                " Elle sert uniquement à des fins d'informations et est sans conséquence sur les déclarations "
+                "à faire dans l'extranet 2.0 de l'ASP. "
+                "<b>Ne pas compléter cette date dans le cadre d’un CDI Inclusion</b>"
+            )
 
     class Meta:
         model = JobApplication
@@ -584,7 +579,7 @@ class AcceptForm(forms.ModelForm):
         hiring_start_at = self.cleaned_data["hiring_start_at"]
 
         # Hiring in the past is *temporarily* possible for GEIQ
-        if hiring_start_at and hiring_start_at < datetime.date.today() and self.instance.to_siae.kind != SiaeKind.GEIQ:
+        if hiring_start_at and hiring_start_at < datetime.date.today() and not self.is_geiq:
             raise forms.ValidationError(JobApplication.ERROR_START_IN_PAST)
 
         return hiring_start_at
@@ -598,7 +593,7 @@ class AcceptForm(forms.ModelForm):
         if hiring_end_at and hiring_start_at and hiring_end_at < hiring_start_at:
             raise forms.ValidationError(JobApplication.ERROR_END_IS_BEFORE_START)
 
-        if self.instance.to_siae.kind == SiaeKind.GEIQ:
+        if self.is_geiq:
             # This validation is enforced by database constraints,
             # but we are nice enough to display a warning message to the user
             # (constraints violation message are generic)

@@ -281,7 +281,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
         form_user_address = UserAddressForm(instance=job_application.job_seeker, data=request.POST or None)
         forms.append(form_user_address)
 
-    form_accept = AcceptForm(instance=job_application, data=request.POST or None)
+    form_accept = AcceptForm(instance=job_application, siae=job_application.to_siae, data=request.POST or None)
     forms.append(form_accept)
 
     context = {
@@ -415,12 +415,18 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
 
 
 class AcceptHTMXFragmentView(TemplateView):
-    def setup(self, request, job_application_id, *args, **kwargs):
+    def setup(self, request, job_application_id=None, siae_pk=None, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
-        queryset = JobApplication.objects.siae_member_required(request.user)
-        job_application = get_object_or_404(queryset, id=job_application_id)
-        self.form_accept = AcceptForm(instance=job_application, data=request.POST or None)
+        if siae_pk is not None:
+            siae = get_object_or_404(Siae.objects.member_required(request.user), pk=siae_pk)
+            job_application = None
+        elif job_application_id:
+            # TODO(xfernandez): remove this version in a week
+            queryset = JobApplication.objects.siae_member_required(request.user)
+            job_application = get_object_or_404(queryset, id=job_application_id)
+            siae = job_application.to_siae
+        self.form_accept = AcceptForm(instance=job_application, siae=siae, data=request.POST or None)
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
