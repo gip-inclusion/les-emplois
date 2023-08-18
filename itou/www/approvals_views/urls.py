@@ -23,9 +23,9 @@ urlpatterns = [
         name="check_contact_details",
     ),
     path(
-        "declare_prolongation/<int:approval_id>/toggle_upload_panel",
-        views.ToggledUploadPanelView.as_view(),
-        name="toggle_upload_panel",
+        "declare_prolongation/<int:approval_id>/prolongation_form_for_reason",
+        views.UpdateFormForReasonView.as_view(),
+        name="prolongation_form_for_reason",
     ),
     path("prolongation/requests", views.prolongation_requests_list, name="prolongation_requests_list"),
     path(

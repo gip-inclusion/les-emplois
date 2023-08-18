@@ -127,9 +127,12 @@ class CreateProlongationForm(forms.ModelForm):
         self.fields["reason"].choices = ProlongationReason.for_siae(self.instance.declared_by_siae)
         self.fields["reason"].widget.attrs.update(
             {
-                "hx-post": reverse("approvals:toggle_upload_panel", kwargs={"approval_id": self.instance.approval_id}),
-                "hx-target": "#upload_panel",
-                "hx-select": "#upload_panel",
+                "hx-post": reverse(
+                    "approvals:prolongation_form_for_reason",
+                    kwargs={"approval_id": self.instance.approval_id},
+                ),
+                "hx-swap": "outerHTML",
+                "hx-target": "#mainForm",
             }
         )
 
