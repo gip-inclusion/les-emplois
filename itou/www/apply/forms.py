@@ -537,7 +537,7 @@ class AcceptForm(forms.ModelForm):
                     },
                 )
 
-            if job_application.to_siae.kind in SIAE_WITH_CONVENTION_KINDS:
+            elif job_application.to_siae.kind in SIAE_WITH_CONVENTION_KINDS:
                 # Add specific details to help texts for IAE
                 self.fields["hiring_start_at"].help_text += (
                     " La date est modifiable jusqu'à la veille de la date saisie. En cas de premier PASS IAE pour "
