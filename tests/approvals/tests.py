@@ -1467,7 +1467,7 @@ class ProlongationModelTest(TestCase):
         start_at = datetime.date(2021, 2, 1)
 
         reason = ProlongationReason.SENIOR_CDI
-        expected_max_end_at = datetime.date(2031, 1, 31)  # 10 years.
+        expected_max_end_at = datetime.date(2031, 1, 29)  # 10 years.
         max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
         assert max_end_at == expected_max_end_at
 
@@ -1482,7 +1482,7 @@ class ProlongationModelTest(TestCase):
         assert max_end_at == expected_max_end_at
 
         reason = ProlongationReason.SENIOR
-        expected_max_end_at = datetime.date(2026, 1, 31)  # 5 years.
+        expected_max_end_at = datetime.date(2026, 1, 30)  # 5 years.
         max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
         assert max_end_at == expected_max_end_at
 
