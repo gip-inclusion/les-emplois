@@ -250,11 +250,7 @@ class DeclareProlongationHTMXFragmentView(TemplateView):
     HTMX interactions on dynamic parts of the prolongation declaration form
     """
 
-    # Sometimes validation errors don't have to be displayed after loading of an HTMX fragment
-    # and we only want to display them after a "main" validation action (final validation of form)
-    clear_errors_after_loading = True
-
-    # if 'clear_errors_after_loading' is true, select form errors to be cleared
+    # Select form errors to be cleared
     clear_errors = []
 
     def _clear_errors(self):
@@ -287,19 +283,18 @@ class DeclareProlongationHTMXFragmentView(TemplateView):
         return context
 
     def post(self, request, *args, **kwargs):
-        if self.clear_errors_after_loading:
-            try:
-                self.form.is_valid()
-            except TypeError:
-                # django-bootstrap4 does a validation of form when rendering template by calling 'form.errors':
-                # - the first logical action on the form does an HTMX reload, and a partial rendering
-                # - thus triggering a 'fullclean()' on a yet incomplete form 'Prolongation' instance,
-                # - even if *not* asked to do so (form has not yet been explicitly validated)
-                # - leading to a TypeError (date validation processing in 'Prolongation.clean()')
-                #
-                # If anybody knows how to disable this behavior of bootstrap4 (if possible)...
-                pass
-            self._clear_errors()
+        try:
+            self.form.is_valid()
+        except TypeError:
+            # django-bootstrap4 does a validation of form when rendering template by calling 'form.errors':
+            # - the first logical action on the form does an HTMX reload, and a partial rendering
+            # - thus triggering a 'fullclean()' on a yet incomplete form 'Prolongation' instance,
+            # - even if *not* asked to do so (form has not yet been explicitly validated)
+            # - leading to a TypeError (date validation processing in 'Prolongation.clean()')
+            #
+            # If anybody knows how to disable this behavior of bootstrap4 (if possible)...
+            pass
+        self._clear_errors()
 
         return render(request, self.template_name, self.get_context_data())
 
