@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.core import mail
@@ -8,9 +10,11 @@ from django.utils.http import urlencode
 from freezegun import freeze_time
 
 from itou.approvals.enums import ProlongationReason
+from itou.approvals.models import Prolongation
 from itou.siaes.enums import SiaeKind
 from itou.utils.storage.s3 import S3Upload
 from itou.utils.widgets import DuetDatePickerWidget
+from tests.approvals.factories import ProlongationFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
@@ -22,7 +26,6 @@ from tests.utils.test import parse_response_to_soup
 @freeze_time("2023-08-23")
 class ApprovalProlongationTest(S3AccessingTestCase):
     PROLONGATION_EMAIL_REPORT_TEXT = "- Fiche bilan :"
-    MAX_DURATION_TEXT = "Durée maximum de 1 an renouvelable"
 
     def setUp(self):
         """
@@ -76,7 +79,6 @@ class ApprovalProlongationTest(S3AccessingTestCase):
             "preview": "1",
         }
         response = self.client.post(url, data=post_data)
-        self.assertContains(response, self.MAX_DURATION_TEXT)
         self.assertContains(response, escape("Sélectionnez un choix valide."))
 
         # With valid reason
@@ -122,6 +124,16 @@ class ApprovalProlongationTest(S3AccessingTestCase):
         assert len(email.to) == 1
         assert email.to[0] == post_data["email"]
 
+    def test_prolong_approval_view_prepopulates_SENIOR_CDI(self):
+        self.client.force_login(self.siae_user)
+        response = self.client.post(
+            reverse("approvals:prolongation_form_for_reason", kwargs={"approval_id": self.approval.pk}),
+            {"reason": ProlongationReason.SENIOR_CDI},
+        )
+        soup = parse_response_to_soup(response)
+        [end_at_field] = soup.select("[name=end_at]")
+        assert str(end_at_field.parent) == self.snapshot(name="value is set to max_end_at")
+
     def test_prolong_approval_view_bad_reason(self):
         self.client.force_login(self.siae_user)
         end_at = timezone.localdate() + relativedelta(months=1)
@@ -133,7 +145,11 @@ class ApprovalProlongationTest(S3AccessingTestCase):
                 "email": self.prescriber.email,
             },
         )
-        self.assertNotContains(response, self.MAX_DURATION_TEXT)
+        self.assertContains(
+            response,
+            '<div class="invalid-feedback">Sélectionnez un choix valide. invalid n’en fait pas partie.</div>',
+            count=1,
+        )
 
     def test_prolong_approval_view_no_end_at(self):
         self.client.force_login(self.siae_user)
@@ -178,6 +194,70 @@ class ApprovalProlongationTest(S3AccessingTestCase):
         assert response.status_code == 200
         fresh_page = parse_response_to_soup(response, selector="#main")
         assertSoupEqual(page, fresh_page)
+
+    @freeze_time("2023-08-23")
+    def test_end_at_limits(self):
+        assert len(ProlongationReason.choices) == 6
+
+        self.client.force_login(self.siae_user)
+        for end_at, reason in [
+            (self.approval.end_at + timedelta(days=10 * 365), ProlongationReason.SENIOR_CDI),
+            (self.approval.end_at + timedelta(days=365), ProlongationReason.COMPLETE_TRAINING),
+            (self.approval.end_at + timedelta(days=365), ProlongationReason.RQTH),
+            (self.approval.end_at + timedelta(days=365), ProlongationReason.SENIOR),
+            (self.approval.end_at + timedelta(days=365), ProlongationReason.PARTICULAR_DIFFICULTIES),
+            # Since December 1, 2021, HEALTH_CONTEXT reason can no longer be used
+        ]:
+            with self.subTest(reason):
+                response = self.client.post(
+                    reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk}),
+                    data={
+                        "reason": reason,
+                        "end_at": end_at,
+                        "email": self.prescriber.email,
+                        # Missing prescriber organization.
+                    },
+                )
+                soup = parse_response_to_soup(response)
+                [end_at_field] = soup.select("[name=end_at]")
+                assert str(end_at_field.parent) == self.snapshot(name=reason)
+
+    def test_end_at_with_existing_prolongation(self):
+        reason = ProlongationReason.RQTH
+        # RQTH max prolongation duration is 3 years, this prolongation consumes 2.5 years.
+        # Only 183 days remain.
+        end_at = self.approval.end_at + timedelta(days=2 * 365 + 182)
+        prolongation = ProlongationFactory(
+            approval=self.approval,
+            start_at=self.approval.end_at,
+            end_at=end_at,
+            reason=reason,
+        )
+        with freeze_time(end_at):
+            self.client.force_login(self.siae_user)
+            url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
+            response = self.client.post(
+                url,
+                data={
+                    "reason": reason,
+                    # Reach RQTH max duration of 3 years.
+                    "end_at": self.approval.end_at + timedelta(days=3 * 365 + 1),
+                    "email": self.prescriber.email,
+                    "prescriber_organization": self.prescriber_organization.pk,
+                },
+            )
+            max_end_at = self.approval.end_at + timedelta(days=3 * 365)
+            self.assertContains(
+                response,
+                f"""
+                <div class="invalid-feedback">
+                    Assurez-vous que cette valeur est inférieure ou égale à {max_end_at.isoformat()}.
+                </div>
+                """,
+                html=True,
+                count=1,
+            )
+            self.assertQuerySetEqual(Prolongation.objects.all(), [prolongation])
 
     def test_prolong_approval_view_without_prescriber(self):
         """
