@@ -930,33 +930,32 @@ class CommonProlongation(models.Model):
     """
 
     # Max duration: 10 years but it depends on the `reason` field, see `get_max_end_at`.
-    # The addition of 0.25 day per year makes it possible to better manage leap years.
-    MAX_DURATION = datetime.timedelta(days=365.25 * 10)
+    MAX_DURATION = datetime.timedelta(days=10 * 365)
 
     MAX_CUMULATIVE_DURATION = {
         enums.ProlongationReason.SENIOR_CDI: {
-            "duration": datetime.timedelta(days=365.25 * 10),  # 10 years
-            "label": "10 ans",
+            "duration": MAX_DURATION,
+            "label": "10 ans (3650 jours)",
         },
         enums.ProlongationReason.COMPLETE_TRAINING: {
-            "duration": datetime.timedelta(days=365.25 * 2),  # 2 years
-            "label": "2 ans",
+            "duration": datetime.timedelta(days=2 * 365),
+            "label": "2 ans (730 jours)",
         },
         enums.ProlongationReason.RQTH: {
-            "duration": datetime.timedelta(days=365.25 * 3),  # 3 years
-            "label": "3 ans",
+            "duration": datetime.timedelta(days=3 * 365),
+            "label": "3 ans (1095 jours)",
         },
         enums.ProlongationReason.SENIOR: {
-            "duration": datetime.timedelta(days=365.25 * 5),  # 5 years
-            "label": "5 ans",
+            "duration": datetime.timedelta(days=5 * 365),
+            "label": "5 ans (1825 jours)",
         },
         enums.ProlongationReason.PARTICULAR_DIFFICULTIES: {
-            "duration": datetime.timedelta(days=365.25 * 3),  # 3 years
-            "label": "12 mois, reconductibles dans la limite de 5 ans de parcours",
+            "duration": datetime.timedelta(days=3 * 365),
+            "label": "12 mois (365 jours), reconductibles dans la limite de 5 ans de parcours",
         },
         enums.ProlongationReason.HEALTH_CONTEXT: {
-            "duration": datetime.timedelta(days=365),  # one year
-            "label": "12 mois",
+            "duration": datetime.timedelta(days=365),
+            "label": "12 mois (365 jours)",
         },
     }
 
@@ -1154,11 +1153,11 @@ class CommonProlongation(models.Model):
         """
         max_duration = Prolongation.MAX_DURATION
         if reason == enums.ProlongationReason.PARTICULAR_DIFFICULTIES.value:
-            # 12 months renewable up to 3 years for this reason
-            max_duration = relativedelta(months=12)
+            # A year, renewable up to 3 years for this reason
+            max_duration = datetime.timedelta(days=365)
         elif reason in Prolongation.MAX_CUMULATIVE_DURATION:
             max_duration = Prolongation.MAX_CUMULATIVE_DURATION[reason]["duration"]
-        return start_at + max_duration - relativedelta(days=1)
+        return start_at + max_duration - datetime.timedelta(days=1)
 
 
 class ProlongationRequest(CommonProlongation):
