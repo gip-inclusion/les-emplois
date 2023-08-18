@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import escape
 from django.utils.http import urlencode
+from freezegun import freeze_time
 
 from itou.approvals.enums import ProlongationReason
 from itou.approvals.models import Prolongation
@@ -13,6 +14,7 @@ from itou.utils.storage.s3 import S3Upload
 from itou.utils.widgets import DuetDatePickerWidget
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.storage.test import S3AccessingTestCase
 from tests.utils.test import parse_response_to_soup
 
@@ -132,6 +134,37 @@ class ApprovalProlongationTest(S3AccessingTestCase):
             },
         )
         self.assertNotContains(response, self.MAX_DURATION_TEXT)
+
+    @freeze_time()
+    def test_htmx_on_reason(self):
+        self.client.force_login(self.siae_user)
+        response = self.client.get(
+            reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk}),
+        )
+        assert response.status_code == 200
+        page = parse_response_to_soup(response, selector="#main")
+        data = {
+            "reason": ProlongationReason.RQTH,
+            # Workaround the validation of the initial page by providing enough data.
+            "end_at": self.approval.end_at + relativedelta(days=30),
+            "email": self.prescriber.email,
+        }
+        response = self.client.post(
+            reverse("approvals:prolongation_form_for_reason", kwargs={"approval_id": self.approval.pk}),
+            data,
+        )
+        update_page_with_htmx(
+            page,
+            "#id_reason_2",  # RQTH
+            response,
+        )
+        response = self.client.post(
+            reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk}),
+            data,
+        )
+        assert response.status_code == 200
+        fresh_page = parse_response_to_soup(response, selector="#main")
+        assertSoupEqual(page, fresh_page)
 
     def test_prolong_approval_view_without_prescriber(self):
         """

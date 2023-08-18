@@ -195,6 +195,10 @@ class ApprovalPrintableDisplay(ApprovalBaseViewMixin, TemplateView):
         return context
 
 
+def prolongation_back_url(request):
+    return get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
+
+
 @login_required
 def declare_prolongation(request, approval_id, template_name="approvals/declare_prolongation.html"):
     """
@@ -207,7 +211,7 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
     if not approval.can_be_prolonged:
         raise PermissionDenied()
 
-    back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
+    back_url = prolongation_back_url(request)
     preview = False
 
     form = get_prolongation_form(approval=approval, siae=siae, data=request.POST or None)
@@ -299,6 +303,20 @@ class DeclareProlongationHTMXFragmentView(TemplateView):
         return render(request, self.template_name, self.get_context_data())
 
 
+class UpdateFormForReasonView(DeclareProlongationHTMXFragmentView):
+    template_name = "approvals/includes/prolongation_declaration_form.html"
+    clear_errors = ("email", "end_at")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context |= {
+            "back_url": prolongation_back_url(self.request),
+            "unfold_details": self.form.data.get("reason") in PROLONGATION_REPORT_FILE_REASONS,
+            "can_upload_prolongation_report": self.siae.can_upload_prolongation_report,
+        }
+        return context
+
+
 class CheckPrescriberEmailView(DeclareProlongationHTMXFragmentView):
     template_name = "approvals/includes/declaration_prescriber_email.html"
     clear_errors = ("prescriber_organization",)
@@ -307,19 +325,6 @@ class CheckPrescriberEmailView(DeclareProlongationHTMXFragmentView):
 class CheckContactDetailsView(DeclareProlongationHTMXFragmentView):
     template_name = "approvals/includes/declaration_contact_details.html"
     clear_errors = ("contact_email", "contact_phone")
-
-
-class ToggledUploadPanelView(DeclareProlongationHTMXFragmentView):
-    template_name = "approvals/includes/declaration_upload_panel.html"
-    clear_errors = ("email",)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context |= {
-            "unfold_details": self.form.data.get("reason") in PROLONGATION_REPORT_FILE_REASONS,
-            "can_upload_prolongation_report": self.siae.can_upload_prolongation_report,
-        }
-        return context
 
 
 @login_required
