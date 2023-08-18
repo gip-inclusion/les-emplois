@@ -143,7 +143,7 @@ class CreateProlongationForm(forms.ModelForm):
         self.fields["end_at"].label = f'Du {self.instance.start_at.strftime("%d/%m/%Y")} au'
 
         end_at_extra_help_text = ""
-        if self.data and (reason := self.data.get("reason")):
+        if reason := self.data.get("reason"):
             try:
                 max_duration = Prolongation.MAX_CUMULATIVE_DURATION[reason]
             except KeyError:
