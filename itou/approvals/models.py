@@ -1076,7 +1076,7 @@ class CommonProlongation(models.Model):
             raise ValidationError({"end_at": "La durée minimale doit être d'au moins un jour."})
 
         # A prolongation cannot exceed max duration.
-        max_end_at = self.get_max_end_at(self.start_at, self.reason)
+        max_end_at = self.get_max_end_at(self.approval_id, self.start_at, self.reason)
         if self.end_at > max_end_at:
             raise ValidationError(
                 {
@@ -1147,17 +1147,19 @@ class CommonProlongation(models.Model):
         return cumulative_duration >= self.MAX_CUMULATIVE_DURATION[self.reason]["duration"]
 
     @staticmethod
-    def get_max_end_at(start_at, reason=None):
+    def get_max_end_at(approval_id, start_at, reason=None):
         """
         Returns the maximum date on which a prolongation can end.
         """
-        max_duration = Prolongation.MAX_DURATION
-        if reason == enums.ProlongationReason.PARTICULAR_DIFFICULTIES.value:
-            # A year, renewable up to 3 years for this reason
-            max_duration = datetime.timedelta(days=365)
-        elif reason in Prolongation.MAX_CUMULATIVE_DURATION:
-            max_duration = Prolongation.MAX_CUMULATIVE_DURATION[reason]["duration"]
-        return start_at + max_duration - datetime.timedelta(days=1)
+        try:
+            max_cumulative_duration = Prolongation.MAX_CUMULATIVE_DURATION[reason]
+        except KeyError:
+            max_end = start_at + Prolongation.MAX_DURATION
+        else:
+            used = Prolongation.objects.get_cumulative_duration_for(approval_id, reason=reason)
+            remaining_days = max_cumulative_duration["duration"] - used
+            max_end = start_at + remaining_days
+        return max_end
 
 
 class ProlongationRequest(CommonProlongation):
@@ -1246,12 +1248,12 @@ class ProlongationQuerySet(models.QuerySet):
 
 
 class ProlongationManager(models.Manager):
-    def get_cumulative_duration_for(self, approval, reason=None):
+    def get_cumulative_duration_for(self, approval_id, reason=None):
         """
         Returns the total duration of all prolongations of the given approval
         for the given reason (if any).
         """
-        kwargs = {"approval": approval}
+        kwargs = {"approval_id": approval_id}
         if reason:
             kwargs["reason"] = reason
         duration = datetime.timedelta(0)

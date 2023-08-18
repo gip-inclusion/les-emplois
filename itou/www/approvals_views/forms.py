@@ -1,8 +1,12 @@
+from datetime import timedelta
+
 from django import forms
 from django.core.exceptions import ValidationError
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models import Exists, OuterRef, Q
 from django.shortcuts import reverse
 from django.utils import timezone
+from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django_select2.forms import Select2MultipleWidget
 
@@ -101,6 +105,47 @@ class CreateProlongationForm(forms.ModelForm):
     )
     end_at = forms.DateField(widget=DuetDatePickerWidget())
 
+    PROLONGATION_RULES = {
+        ProlongationReason.SENIOR_CDI: {
+            "max_duration": Prolongation.MAX_DURATION,
+            "help_text": (
+                "Pour le CDI Inclusion, jusqu’à la retraite "
+                "(pour des raisons techniques, une durée de 10 ans est appliquée par défaut)."
+            ),
+        },
+        ProlongationReason.COMPLETE_TRAINING: {
+            "max_duration": timedelta(days=365),
+            "help_text": format_html(
+                "12 mois maximum pour chaque demande.<br>"
+                "Renouvellements possibles jusqu’à la fin de l’action de formation."
+            ),
+        },
+        ProlongationReason.RQTH: {
+            "max_duration": timedelta(days=365),
+            "help_text": format_html(
+                "12 mois maximum pour chaque demande.<br>"
+                "Renouvellements possibles dans la limite de 5 ans de parcours IAE "
+                "(2 ans de parcours initial + 3 ans)."
+            ),
+        },
+        ProlongationReason.SENIOR: {
+            "max_duration": timedelta(days=365),
+            "help_text": format_html(
+                "12 mois maximum pour chaque demande.<br>"
+                "Renouvellements possibles dans la limite de 7 ans de parcours IAE "
+                "(2 ans de parcours initial + 5 ans)."
+            ),
+        },
+        ProlongationReason.PARTICULAR_DIFFICULTIES: {
+            "max_duration": timedelta(days=365),
+            "help_text": format_html(
+                "12 mois maximum pour chaque demande.<br>"
+                "Renouvellements possibles dans la limite de 5 ans de parcours IAE "
+                "(2 ans de parcours initial + 3 ans)."
+            ),
+        },
+    }
+
     class Meta:
         model = Prolongation
         fields = [
@@ -133,28 +178,30 @@ class CreateProlongationForm(forms.ModelForm):
         )
 
         # Customize "end_at" field
-        self.fields["end_at"].widget.attrs.update(
-            {
-                "min": self.instance.start_at,
-                "max": Prolongation.get_max_end_at(self.instance.start_at),
-            }
-        )
-        self.fields["end_at"].label = f"Du {self.instance.start_at:%d/%m/%Y} au"
-
-        end_at_extra_help_text = ""
-        if reason := self.data.get("reason"):
-            try:
-                max_duration = Prolongation.MAX_CUMULATIVE_DURATION[reason]
-            except KeyError:
-                pass
-            else:
-                end_at_extra_help_text = (
-                    f" <strong>(Durée maximum de 1 an renouvelable jusqu'à {max_duration['label']})</strong>."
-                )
-        self.fields["end_at"].help_text = mark_safe(
-            f"Date jusqu'à laquelle le PASS IAE doit être prolongé{end_at_extra_help_text}<br>"
-            f"Au format JJ/MM/AAAA, par exemple 20/12/1978."
-        )
+        end_at = self.fields["end_at"]
+        end_at.label = f"Du {self.instance.start_at:%d/%m/%Y} au"
+        reason_not_validated = self.data.get("reason")
+        try:
+            rule_details = self.PROLONGATION_RULES[reason_not_validated]
+        except KeyError:
+            end_at.disabled = True
+        else:
+            end_at.help_text = rule_details["help_text"]
+            max_end_at = min(
+                self.instance.start_at + rule_details["max_duration"],
+                Prolongation.get_max_end_at(self.instance.approval_id, self.instance.start_at, reason_not_validated),
+            )
+            end_at.widget.attrs["max"] = max_end_at
+            if reason_not_validated == ProlongationReason.SENIOR_CDI and not self.data.get("end_at"):
+                # The field should have an initial value, but Django ignores `initial` when the form is bound.
+                # Due to the POSTing of the form via HTMX, the form is always bound and `initial` is never read.
+                # Instead, force the default value when switching to ProlongationReason.SENIOR_CDI.
+                self.data = self.data.copy()
+                self.data["end_at"] = max_end_at
+            end_at.widget.attrs["min"] = self.instance.start_at
+            end_at.validators.append(MinValueValidator(self.instance.start_at))
+            # Try switching reason with a date beyond the max_end_at of the new reason
+            end_at.validators.append(MaxValueValidator(max_end_at))
 
 
 class CreateProlongationRequestForm(CreateProlongationForm):
