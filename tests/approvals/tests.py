@@ -1465,36 +1465,45 @@ class ProlongationModelTest(TestCase):
 
     def test_get_max_end_at(self):
         start_at = datetime.date(2021, 2, 1)
+        approval = ApprovalFactory()
+        for reason, expected_max_end_at in [
+            (ProlongationReason.SENIOR_CDI, datetime.date(2031, 1, 30)),  # 3650 days (~10 years).
+            (ProlongationReason.COMPLETE_TRAINING, datetime.date(2023, 2, 1)),  # 730 days (2 years).
+            (ProlongationReason.RQTH, datetime.date(2024, 2, 1)),  # 1095 days (3 years).
+            (ProlongationReason.SENIOR, datetime.date(2026, 1, 31)),  # 1825 days (~5 years).
+            (ProlongationReason.PARTICULAR_DIFFICULTIES, datetime.date(2024, 2, 1)),  # 1095 days (3 years).
+            (ProlongationReason.HEALTH_CONTEXT, datetime.date(2022, 2, 1)),  # 365 days.
+        ]:
+            # Cheap parametrize, to indicate what reason failed.
+            print(reason)
+            assert Prolongation.get_max_end_at(approval.pk, start_at, reason=reason) == expected_max_end_at
 
-        reason = ProlongationReason.SENIOR_CDI
-        expected_max_end_at = datetime.date(2031, 1, 29)  # 10 years.
-        max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
-        assert max_end_at == expected_max_end_at
-
-        reason = ProlongationReason.COMPLETE_TRAINING
-        expected_max_end_at = datetime.date(2023, 1, 31)  # 2 years.
-        max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
-        assert max_end_at == expected_max_end_at
-
-        reason = ProlongationReason.RQTH
-        expected_max_end_at = datetime.date(2024, 1, 31)  # 3 years.
-        max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
-        assert max_end_at == expected_max_end_at
-
-        reason = ProlongationReason.SENIOR
-        expected_max_end_at = datetime.date(2026, 1, 30)  # 5 years.
-        max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
-        assert max_end_at == expected_max_end_at
-
+    @freeze_time("2023-08-21")
+    def test_year_after_year_prolongation(self):
+        today = datetime.date(2023, 8, 21)
+        approval = ApprovalFactory(start_at=today - relativedelta(years=2), end_at=today)
         reason = ProlongationReason.PARTICULAR_DIFFICULTIES
-        expected_max_end_at = datetime.date(2022, 1, 31)  # 3 years.
-        max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
-        assert max_end_at == expected_max_end_at
-
-        reason = ProlongationReason.HEALTH_CONTEXT
-        expected_max_end_at = datetime.date(2022, 1, 31)  # 1 year.
-        max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
-        assert max_end_at == expected_max_end_at
+        # Approval.end_at is inclusive.
+        start_at = today + datetime.timedelta(days=1)
+        for _ in range(3):
+            end = start_at + datetime.timedelta(days=365)
+            prolongation = ProlongationFactory(
+                approval=approval,
+                start_at=start_at,
+                end_at=end,
+                reason=reason,
+            )
+            start_at = end
+        approval.refresh_from_db()
+        assert approval.end_at == datetime.date(2026, 8, 20)
+        # Total of three years is used up.
+        assert Prolongation.get_max_end_at(
+            approval.pk,
+            datetime.date(2026, 8, 21),
+            reason,
+            # Prolongation end date is exclusive, this is an empty day [2026-08-21,2026-08-21).
+        ) == datetime.date(2026, 8, 21)
+        assert prolongation.has_reached_max_cumulative_duration() is True
 
     def test_time_boundaries(self):
         """
