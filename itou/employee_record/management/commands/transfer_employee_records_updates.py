@@ -101,7 +101,7 @@ class Command(EmployeeRecordTransferCommand):
 
             if not notification:
                 self.stdout.write(f"Could not get existing notification: {batch_filename=}, {line_number=}")
-                record_errors += 1
+                # Do not count as an error
                 continue
 
             archived_json = JSONRenderer().render(employee_record)

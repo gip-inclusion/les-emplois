@@ -97,6 +97,7 @@ class Command(EmployeeRecordTransferCommand):
 
             if not line_number:
                 self.stdout.write(f"No line number for employee record {idx=}, {feedback_file=}", idx, feedback_file)
+                record_errors += 1
                 continue
 
             # Now we must find the matching FS
