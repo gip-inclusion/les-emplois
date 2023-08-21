@@ -704,7 +704,7 @@ class SiaeJobDescription(models.Model):
     def get_absolute_url(self):
         if self.is_external:
             return self.source_url
-        return reverse("siaes_views:job_description_card", kwargs={"job_description_id": self.pk})
+        return get_absolute_url(reverse("siaes_views:job_description_card", kwargs={"job_description_id": self.pk}))
 
 
 class SiaeConvention(models.Model):

@@ -40,7 +40,7 @@
                                         <a href="#job_description_link" class="btn btn-sm btn-outline-primary" data-toggle="collapse" aria-label="Partager cette fiche métier">Partager cette fiche métier</a>
                                         <div class="collapse pt-2" id="job_description_link">
                                             <p class="small mb-1">Cliquez sur le lien ci-dessous pour le copier:</p>
-                                            <input type="text" class="form-control form-control-sm" value="{{ request.scheme }}://{{ request.get_host }}{{ job.get_absolute_url }}">
+                                            <input type="text" class="form-control form-control-sm" value="{{ job.get_absolute_url }}">
                                         </div>
                                     </div>
                                     {% if job.is_active and not siae.block_job_applications %}
