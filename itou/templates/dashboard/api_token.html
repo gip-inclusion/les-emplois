@@ -48,12 +48,10 @@
                                         <div class="form-row align-items-center">
                                             <div class="form-group mb-0 col-8">
                                                 Votre token d'API est :
-                                                <span id="token">{{ token.key }}</span>
+                                                <span>{{ token.key }}</span>
                                             </div>
                                             <div class="form-group mb-0 col-4 text-right">
-                                                <button class="btn btn-primary" id="copy-token">
-                                                    <i class="ri-file-copy-line mr-2 ri-lg"></i>Copier le token
-                                                </button>
+                                                {% include 'includes/copy_to_clipboard.html' with content=token.key text="Copier le token" css_classes="btn-primary" %}
                                             </div>
                                         </div>
                                     </div>
@@ -65,12 +63,4 @@
             </div>
         </div>
     </section>
-
-    <script nonce="{{ CSP_NONCE }}">
-        var copyToken = document.getElementById('copy-token')
-        copyToken.addEventListener("click", function select(event) {
-            var token = document.getElementById('token');
-            navigator.clipboard.writeText(token.innerText);
-        });
-    </script>
 {% endblock %}
