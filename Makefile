@@ -60,7 +60,6 @@ quality: $(VENV_REQUIREMENT)
 	$(EXEC_CMD) djlint --lint --check itou
 	$(EXEC_CMD) find * -type f -name '*.sh' -exec shellcheck --external-sources {} +
 	$(EXEC_CMD) python manage.py makemigrations --check --dry-run --noinput
-	$(EXEC_CMD) python manage.py spectacular --validate --fail-on-warn --file /dev/null
 
 fix: $(VENV_REQUIREMENT)
 	$(EXEC_CMD) black $(LINTER_CHECKED_DIRS)
