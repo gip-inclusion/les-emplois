@@ -30,15 +30,7 @@
                         </td>
                         <td>{{ invitation.sent_at|date:"d F Y à H:i" }}</td>
                         <td>
-                            <p>
-                                <a data-toggle="collapse" href="#share-invitation-link-{{ forloop.counter }}" role="button" aria-expanded="false">
-                                    Afficher le lien
-                                </a>
-                            </p>
-                            <div class="collapse form-group invitation-link" id="share-invitation-link-{{ forloop.counter }}">
-                                <p>Cliquez sur le lien ci-dessous pour le copier:</p>
-                                <input type="text" class="form-control" readonly="readonly" value="{{ invitation.acceptance_link }}">
-                            </div>
+                            {% include 'includes/copy_to_clipboard.html' with content=invitation.acceptance_link css_classes="btn-outline-primary btn-sm" %}
                         </td>
                     </tr>
                 {% endfor %}
@@ -46,15 +38,3 @@
         </table>
     </div>
 </div>
-
-
-<script nonce="{{ CSP_NONCE }}">
-    var links = document.getElementsByClassName('invitation-link')
-    for (var i = 0, j = links.length; i < j; i++) {
-        links[i].addEventListener("click", function select(event) {
-            var input = event.target.querySelector('input');
-            input.select();
-            navigator.clipboard.writeText(input.value);
-        });
-    }
-</script>

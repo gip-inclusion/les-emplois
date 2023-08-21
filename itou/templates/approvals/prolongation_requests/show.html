@@ -52,10 +52,7 @@
                             <p>
                                 <i class="ri-mail-line"></i>
                                 <a class="btn-link mr-3" href="mailto:{{ prolongation_request.contact_email }}">{{ prolongation_request.contact_email }}</a>
-                                <button class="btn btn-secondary btn-ico" data-copy-to-clipboard="{{ prolongation_request.contact_email }}" id="copy-to-clipboard">
-                                    <i class="ri-file-copy-line ri-lg font-weight-normal"></i>
-                                    <span>Copier</span>
-                                </button>
+                                {% include 'includes/copy_to_clipboard.html' with content=prolongation_request.contact_email css_classes="btn-secondary" %}
                             </p>
                             <p>
                                 <i class="ri-phone-line"></i>
@@ -85,14 +82,4 @@
             </div>
         </div>
     </section>
-{% endblock %}
-
-{% block script %}
-    {{ block.super }}
-    <script nonce="{{ CSP_NONCE }}">
-        // TODO: Refactor that behavior into utils
-        document.getElementById('copy-to-clipboard').addEventListener("click", function select(event) {
-            navigator.clipboard.writeText(event.currentTarget.dataset.copyToClipboard);
-        });
-    </script>
 {% endblock %}

@@ -56,4 +56,11 @@ htmx.onLoad((target) => {
     // null value removes the attribute altogether instead of having aria-disabled="false"
     $('a.btn', this).attr("aria-disabled", $(selector).length !== 0 || null)
   })
+
+  /**
+   * JS to copy some text from the DOM into the clipboard.
+   */
+  $(".js-copy-to-clipboard", target).on("click", function(event) {
+    navigator.clipboard.writeText(event.currentTarget.dataset.copyToClipboard)
+  })
 });

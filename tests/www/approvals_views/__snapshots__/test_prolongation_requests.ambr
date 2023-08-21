@@ -81,10 +81,11 @@
                               <p>
                                   <i class="ri-mail-line"></i>
                                   <a class="btn-link mr-3" href="mailto:email@example.com">email@example.com</a>
-                                  <button class="btn btn-secondary btn-ico" data-copy-to-clipboard="email@example.com" id="copy-to-clipboard">
-                                      <i class="ri-file-copy-line ri-lg font-weight-normal"></i>
-                                      <span>Copier</span>
-                                  </button>
+                                  <button class="js-copy-to-clipboard btn btn-ico btn-secondary" data-copy-to-clipboard="email@example.com">
+      <i class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <span>Copier</span>
+  </button>
+  
                               </p>
                               <p>
                                   <i class="ri-phone-line"></i>
