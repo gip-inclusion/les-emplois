@@ -134,7 +134,7 @@ class CardViewTest(TestCase):
                       data-matomo-action="clic"
                       data-matomo-category="candidature"
                       data-matomo-option="clic-metiers"
-                      href="/siae/job_description/{job_description.pk}/card?back_url=/siae/{siae.pk}/card">
+                      href="{job_description.get_absolute_url()}?back_url=/siae/{siae.pk}/card">
                     Plaquiste
                    </a>
                   </div>
@@ -234,7 +234,7 @@ class CardViewTest(TestCase):
                       data-matomo-action="clic"
                       data-matomo-category="candidature"
                       data-matomo-option="clic-metiers"
-                      href="/siae/job_description/{job_description.pk}/card?back_url=/siae/{siae.pk}/card">
+                      href="{job_description.get_absolute_url()}?back_url=/siae/{siae.pk}/card">
                     Plaquiste
                    </a>
                   </div>
@@ -359,7 +359,7 @@ class CardViewTest(TestCase):
                       data-matomo-action="clic"
                       data-matomo-category="candidature"
                       data-matomo-option="clic-metiers"
-                      href="/siae/job_description/{active_job_description.pk}/card?back_url=/siae/{siae.pk}/card">
+                      href="{active_job_description.get_absolute_url()}?back_url=/siae/{siae.pk}/card">
                     Plaquiste
                    </a>
                   </div>
@@ -388,7 +388,7 @@ class CardViewTest(TestCase):
                       data-matomo-action="clic"
                       data-matomo-category="candidature"
                       data-matomo-option="clic-metiers"
-                      href="/siae/job_description/{other_job_description.pk}/card?back_url=/siae/{siae.pk}/card">
+                      href="{other_job_description.get_absolute_url()}?back_url=/siae/{siae.pk}/card">
                     Peintre
                    </a>
                   </div>
@@ -507,7 +507,7 @@ class CardViewTest(TestCase):
                       data-matomo-action="clic"
                       data-matomo-category="candidature"
                       data-matomo-option="clic-metiers"
-                      href="/siae/job_description/{job_description.pk}/card?back_url=/siae/{siae.pk}/card">
+                      href="{job_description.get_absolute_url()}?back_url=/siae/{siae.pk}/card">
                     Plaquiste
                    </a>
                   </div>
