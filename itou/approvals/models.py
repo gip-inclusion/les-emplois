@@ -1144,7 +1144,7 @@ class CommonProlongation(models.Model):
         if additional_duration:
             cumulative_duration += additional_duration
 
-        return cumulative_duration > self.MAX_CUMULATIVE_DURATION[self.reason]["duration"]
+        return cumulative_duration >= self.MAX_CUMULATIVE_DURATION[self.reason]["duration"]
 
     @staticmethod
     def get_max_end_at(start_at, reason=None):
