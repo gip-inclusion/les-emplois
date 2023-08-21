@@ -646,6 +646,7 @@ CSP_CONNECT_SRC = [
     "*.hotjar.io",
     "wss://*.hotjar.com",
 ]
+
 CSP_OBJECT_SRC = ["'none'"]
 
 if MATOMO_BASE_URL:
@@ -656,6 +657,11 @@ if MATOMO_BASE_URL:
 CSP_WORKER_SRC = [
     "'self' blob:",  # Redoc seems to use blob:https://emplois.inclusion.beta.gouv.fr/some-ran-dom-uu-id
 ]
+if API_BAN_BASE_URL:
+    CSP_CONNECT_SRC += [
+        API_BAN_BASE_URL,
+    ]
+
 if S3_STORAGE_ENDPOINT_DOMAIN:
     CSP_CONNECT_SRC += [
         f"https://{S3_STORAGE_ENDPOINT_DOMAIN}",

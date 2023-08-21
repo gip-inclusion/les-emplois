@@ -4,6 +4,7 @@ Specific widgets used in forms.
 import datetime
 
 from django import forms
+from django.conf import settings
 from django.contrib.gis.forms import widgets as gis_widgets
 
 from itou.utils.validators import get_max_birthdate, get_min_birthdate
@@ -107,3 +108,17 @@ class OSMWidget(gis_widgets.OSMWidget):
             "all": ["vendor/ol-7.2.2/ol.css"],
         }
         js = ["vendor/ol-7.2.2/ol.js"]
+
+
+class AddressAutocompleteWidget(forms.TextInput):
+    class Media:
+        js = ["js/address_autocomplete_fields.js"]
+
+    def build_attrs(self, base_attrs, extra_attrs=None):
+        attrs = super().build_attrs(base_attrs, extra_attrs=extra_attrs)
+        attrs["class"] = "js-address-autocomplete-input form-control"
+        attrs["data-autocomplete-source-url"] = f"{settings.API_BAN_BASE_URL}/search/"
+        attrs["data-autosubmit-on-enter-pressed"] = 0
+        attrs["placeholder"] = "16, rue Eric Tabarly"
+        attrs["autocomplete"] = "off"
+        return attrs

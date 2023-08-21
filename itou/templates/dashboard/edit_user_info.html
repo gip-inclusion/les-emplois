@@ -82,4 +82,8 @@
     {% if request.user.is_job_seeker %}
         <script src="{% static 'js/split_nir.js' %}"></script>
     {% endif %}
+    {% if request.user.is_job_seeker %}
+        {% comment %} Needed for the AddressAutocompleteWidget {% endcomment %}
+        {{ form.media }}
+    {% endif %}
 {% endblock %}

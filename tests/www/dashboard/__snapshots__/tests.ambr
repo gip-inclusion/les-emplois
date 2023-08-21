@@ -1,0 +1,4 @@
+# serializer version: 1
+# name: EditUserInfoViewTest.test_update_address[user address input]
+  '<input autocomplete="off" class="js-address-autocomplete-input form-control" data-autocomplete-source-url="None/search/" data-autosubmit-on-enter-pressed="0" id="id_address_for_autocomplete" name="address_for_autocomplete" placeholder="16, rue Eric Tabarly" required="" title="" type="text" value="10 Rue du Moulin du Gue, 35400 Saint-Malo"/>'
+# ---

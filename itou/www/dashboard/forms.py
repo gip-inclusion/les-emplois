@@ -2,8 +2,10 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
-from itou.common_apps.address.forms import MandatoryAddressFormMixin, OptionalAddressFormMixin
+from itou.cities.models import City
+from itou.common_apps.address.forms import OptionalAddressFormMixin
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
+from itou.geo.utils import coords_to_geometry
 from itou.job_applications.notifications import (
     NewQualifiedJobAppEmployersNotification,
     NewSpontaneousJobAppEmployersNotification,
@@ -11,8 +13,12 @@ from itou.job_applications.notifications import (
 from itou.users.enums import IdentityProvider
 from itou.users.models import User
 from itou.utils import constants as global_constants
-from itou.utils.apis.exceptions import AddressLookupError
-from itou.utils.widgets import DuetDatePickerWidget, MultipleSwitchCheckboxWidget, SwitchCheckboxWidget
+from itou.utils.widgets import (
+    AddressAutocompleteWidget,
+    DuetDatePickerWidget,
+    MultipleSwitchCheckboxWidget,
+    SwitchCheckboxWidget,
+)
 
 
 class SSOReadonlyMixin:
@@ -28,7 +34,79 @@ class SSOReadonlyMixin:
                     self.fields[name].disabled = True
 
 
-class EditJobSeekerInfoForm(JobSeekerNIRUpdateMixin, MandatoryAddressFormMixin, SSOReadonlyMixin, forms.ModelForm):
+class JobSeekerAddressForm(forms.ModelForm):
+    address_for_autocomplete = forms.CharField(
+        label="Adresse",
+        required=True,
+        widget=AddressAutocompleteWidget(),
+    )
+    address_line_1 = forms.CharField(
+        label="Adresse", widget=forms.TextInput(attrs={"placeholder": "102 Quai de Jemmapes"})
+    )
+    address_line_2 = forms.CharField(
+        label="Complément d'adresse", widget=forms.TextInput(attrs={"placeholder": "Appartement 16"}), required=False
+    )
+    post_code = forms.IntegerField(label="Code postal", widget=forms.NumberInput(attrs={"placeholder": "75010"}))
+    insee_code = forms.CharField(widget=forms.HiddenInput(), required=False)
+    latitude = forms.FloatField(widget=forms.HiddenInput(), required=False)
+    longitude = forms.FloatField(widget=forms.HiddenInput(), required=False)
+    geocoding_score = forms.FloatField(widget=forms.HiddenInput(), required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        js_handled_fields = [
+            "address_line_1",
+            "address_line_2",
+            "post_code",
+            "insee_code",
+            "latitude",
+            "longitude",
+            "geocoding_score",
+        ]
+        for field_name in js_handled_fields:
+            self.fields[field_name].widget.attrs["class"] = f"js-{field_name.replace('_', '-')}"
+            self.fields[field_name].required = False
+        if self.instance:
+            job_seeker = self.instance
+            if job_seeker.address_line_1:
+                self.fields["address_for_autocomplete"].initial = job_seeker.geocoding_address
+            if job_seeker.address_line_2:
+                self.fields["address_line_2"].initial = job_seeker.address_line_2
+
+    class Meta:
+        model = User
+        fields = [
+            # Make sure this field is the first one.
+            "address_for_autocomplete",
+            "address_line_1",
+            "address_line_2",
+            "post_code",
+            "geocoding_score",
+        ]
+
+    def clean_insee_code(self):
+        insee_code = self.cleaned_data["insee_code"]
+        city = None
+        if insee_code:
+            try:
+                city = City.objects.get(code_insee=insee_code)
+            except City.DoesNotExist:
+                raise ValidationError("Cette ville n'existe pas dans le référentiel de l'INSEE.")
+        if city:
+            # FIXME(vperron) : Someday, resolve every city name + post code into an actual cities.City.
+            self.instance.city = city.name
+        return insee_code
+
+    def clean(self):
+        super().clean()
+        latitude = self.cleaned_data["latitude"]
+        longitude = self.cleaned_data["longitude"]
+        if latitude and longitude:
+            self.instance.coords = coords_to_geometry(lat=latitude, lon=longitude)
+        return self.cleaned_data
+
+
+class EditJobSeekerInfoForm(JobSeekerAddressForm, JobSeekerNIRUpdateMixin, SSOReadonlyMixin, forms.ModelForm):
     """
     Edit a job seeker profile.
     """
@@ -49,14 +127,9 @@ class EditJobSeekerInfoForm(JobSeekerNIRUpdateMixin, MandatoryAddressFormMixin, 
             "lack_of_nir_reason",
             "birthdate",
             "phone",
-            "address_line_1",
-            "address_line_2",
-            "post_code",
-            "city",
-            "city_slug",
             "pole_emploi_id",
             "lack_of_pole_emploi_id_reason",
-        ]
+        ] + JobSeekerAddressForm.Meta.fields
         help_texts = {
             "birthdate": "Au format JJ/MM/AAAA, par exemple 20/12/1978",
         }
@@ -92,14 +165,6 @@ class EditJobSeekerInfoForm(JobSeekerNIRUpdateMixin, MandatoryAddressFormMixin, 
     def clean(self):
         super().clean()
         self._meta.model.clean_pole_emploi_fields(self.cleaned_data)
-
-        if address_line_1 := self.cleaned_data.get("address_line_1"):
-            # Update job seeker geolocation
-            try:
-                self.instance.set_coords(address_line_1, self.cleaned_data["post_code"])
-            except AddressLookupError:
-                # Nothing to do: re-raised and already logged as error
-                pass
 
     def save(self, commit=True):
         self.instance.last_checked_at = timezone.now()

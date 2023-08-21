@@ -17,8 +17,8 @@ def mock_ban_api(user_id):
     resp = Response(
         200,
         text=f"""id;adresse_line_1;post_code;city;result_label;result_score;latitude;longitude\n"""
-        f"""{user_id};École Claude Déruet;6 Rue Albert 1er;54600,Villers-lès-Nancy;"""
-        f"""Avenue de la République 54580 Moineville;0.94;49.205293;5.944871\n""",
+        f"""{user_id};10 rue du Moulin du Gue;35400;Saint-Malo;"""
+        f"""10 Rue du Moulin du Gue 35400 Saint-Malo;0.97;48.658983;-1.963752\r\n""",
     )
     respx.post(settings.API_BAN_BASE_URL + "/search/csv").mock(return_value=resp)
 
@@ -49,7 +49,13 @@ class GeolocateJobseekerManagementCommandTest(TestCase):
 
     @respx.mock
     def test_update_wet_run(self):
-        user = JobSeekerWithAddressFactory(is_active=True, without_geoloc=True)
+        user = JobSeekerWithAddressFactory(
+            is_active=True,
+            without_geoloc=True,
+            address_line_1="10 rue du Moulin du Gue",
+            post_code="35400",
+            city="Saint-Malo",
+        )
 
         mock_ban_api(user.pk)
 
@@ -61,8 +67,8 @@ class GeolocateJobseekerManagementCommandTest(TestCase):
 
         user.refresh_from_db()
 
-        assert "SRID=4326;POINT (5.944871 49.205293)" == user.coords
-        assert 0.94 == user.geocoding_score
+        assert "SRID=4326;POINT (-1.963752 48.658983)" == user.coords
+        assert 0.97 == user.geocoding_score
         assert "+ updated: 1, errors: 0, total: 1" in out
 
     def test_export_dry_run(self):
@@ -72,8 +78,8 @@ class GeolocateJobseekerManagementCommandTest(TestCase):
         assert "+ implicit 'dry-run': NOT creating file" in out
 
     def test_export_wet_run(self):
-        coords = "SRID=4326;POINT (5.944871 49.205293)"
-        score = 0.95
+        coords = "SRID=4326;POINT (-1.963752 48.658983)"
+        score = 0.97
         JobSeekerWithAddressFactory(
             is_active=True,
             coords=coords,
@@ -105,7 +111,7 @@ class GeolocateJobseekerManagementCommandTest(TestCase):
 
         with open(path, "w") as f:
             f.write("id;coords;geocoding_score\n")
-            f.write(f"""{user.pk};"SRID=4326;POINT (5.944871 49.205293)";0.95""")
+            f.write(f"""{user.pk};"SRID=4326;POINT (-1.963752 48.658983)";0.97""")
 
         out, _ = self.run_command("import", filename=path, wet_run=True)
 
@@ -113,6 +119,6 @@ class GeolocateJobseekerManagementCommandTest(TestCase):
 
         user.refresh_from_db()
 
-        assert 0.95 == user.geocoding_score
-        assert "SRID=4326;POINT (5.944871 49.205293)" == user.coords
+        assert 0.97 == user.geocoding_score
+        assert "SRID=4326;POINT (-1.963752 48.658983)" == user.coords
         assert "+ updated 1 'user.User' objects" in out

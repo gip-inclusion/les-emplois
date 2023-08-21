@@ -7,6 +7,7 @@ import respx
 from allauth.account.models import EmailAddress, EmailConfirmationHMAC
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
+from django.contrib.gis.geos import Point
 from django.core import mail
 from django.test import override_settings
 from django.urls import reverse
@@ -16,6 +17,7 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 from rest_framework.authtoken.models import Token
 
+from itou.cities.models import City
 from itou.employee_record.enums import Status
 from itou.institutions.enums import InstitutionKind
 from itou.job_applications.notifications import (
@@ -697,7 +699,36 @@ class DashboardViewTest(TestCase):
 class EditUserInfoViewTest(InclusionConnectBaseTestCase):
     def setUp(self):
         super().setUp()
+        self.city = City.objects.create(
+            name="Saint-Malo",
+            slug="saint-malo-35",
+            department="35",
+            coords=Point(-2.3140436, 47.3618584),
+            post_codes=["35400"],
+            code_insee="35288",
+        )
         self.NIR_UPDATE_TALLY_LINK_LABEL = "Demander la correction du numéro de sécurité sociale"
+
+    @property
+    def address_form_fields(self):
+        return {
+            "address_for_autocomplete": "10 rue du Moulin du Gue 35400 Saint-Malo",
+            "address_line_1": "10 Rue du Moulin du Gue",
+            "address_line_2": "appartement 240",
+            "insee_code": "35288",
+            "latitude": 48.658983,
+            "longitude": -1.963752,
+            "post_code": "35400",
+            "geocoding_score": 0.9714,
+        }
+
+    def _test_address_autocomplete(self, user, post_data):
+        assert user.address_line_1 == post_data["address_line_1"]
+        assert user.address_line_2 == post_data["address_line_2"]
+        assert user.post_code == post_data["post_code"]
+        assert user.city == self.city.name
+        assert user.latitude == float(post_data["latitude"])
+        assert user.longitude == float(post_data["longitude"])
 
     @override_settings(TALLY_URL="https://tally.so")
     def test_edit_with_nir(self):
@@ -725,11 +756,7 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
             "birthdate": "20/12/1978",
             "phone": "0610203050",
             "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
-            "address_line_1": "10, rue du Gué",
-            "address_line_2": "Sous l'escalier",
-            "post_code": "35400",
-            "city": "Saint-Malo",
-        }
+        } | self.address_form_fields
         response = self.client.post(url, data=post_data)
         assert response.status_code == 302
 
@@ -738,13 +765,68 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         assert user.last_name == post_data["last_name"]
         assert user.phone == post_data["phone"]
         assert user.birthdate.strftime("%d/%m/%Y") == post_data["birthdate"]
-        assert user.address_line_1 == post_data["address_line_1"]
-        assert user.address_line_2 == post_data["address_line_2"]
-        assert user.post_code == post_data["post_code"]
-        assert user.city == post_data["city"]
+        self._test_address_autocomplete(user=user, post_data=post_data)
 
         # Ensure that the job seeker cannot edit email here.
         assert user.email != post_data["email"]
+
+    @pytest.mark.usefixtures("unittest_compatibility")
+    def test_update_address(self):
+        user = JobSeekerFactory()
+        self.client.force_login(user)
+        url = reverse("dashboard:edit_user_info")
+        response = self.client.get(url)
+        # Address is mandatory.
+        post_data = {
+            "email": "bob@saintclar.net",
+            "first_name": "Bob",
+            "last_name": "Saint Clar",
+            "birthdate": "20/12/1978",
+            "phone": "0610203050",
+            "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
+        }
+        response = self.client.post(url, data=post_data)
+        assert response.status_code == 200
+        assert not response.context["form"].is_valid()
+
+        # Now try again providing every required field.
+        post_data = post_data | self.address_form_fields
+        response = self.client.post(url, data=post_data)
+        assert response.status_code == 302
+        user = User.objects.get(id=user.id)
+        self._test_address_autocomplete(user=user, post_data=post_data)
+
+        # Ensure the job seeker's address is displayed in the autocomplete input field.
+        url = reverse("dashboard:edit_user_info")
+        response = self.client.get(url)
+        results_section = parse_response_to_soup(response, selector=".js-address-autocomplete-input")
+        assert str(results_section) == self.snapshot(name="user address input")
+
+    def test_update_address_unavailable_api(self):
+        user = JobSeekerFactory()
+        self.client.force_login(user)
+        url = reverse("dashboard:edit_user_info")
+        response = self.client.get(url)
+        # Address is mandatory.
+        post_data = {
+            "email": "bob@saintclar.net",
+            "first_name": "Bob",
+            "last_name": "Saint Clar",
+            "birthdate": "20/12/1978",
+            "phone": "0610203050",
+            "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
+            # Address fallback fields,
+            "address_for_autocomplete": "26 rue du Labrador",
+            "address_line_1": "102 Quai de Jemmapes",
+            "address_line_2": "Appartement 16",
+            "post_code": "75010",
+        }
+        response = self.client.post(url, data=post_data)
+        assert response.status_code == 302
+        user = User.objects.get(id=user.id)
+        assert user.address_line_1 == post_data["address_line_1"]
+        assert user.address_line_2 == post_data["address_line_2"]
+        assert user.post_code == post_data["post_code"]
 
     def test_edit_with_lack_of_nir_reason(self):
         user = JobSeekerFactory(nir="", lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER)
@@ -764,19 +846,16 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
             "birthdate": "20/12/1978",
             "phone": "0610203050",
             "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
-            "address_line_1": "10, rue du Gué",
-            "address_line_2": "Sous l'escalier",
-            "post_code": "35400",
-            "city": "Saint-Malo",
             "lack_of_nir": False,
             "nir": NEW_NIR,
-        }
+        } | self.address_form_fields
         response = self.client.post(url, data=post_data)
         assert response.status_code == 302
 
         user.refresh_from_db()
         assert user.lack_of_nir_reason == ""
         assert user.nir == NEW_NIR.replace(" ", "")
+        self._test_address_autocomplete(user=user, post_data=post_data)
 
     def test_edit_without_nir_information(self):
         user = JobSeekerFactory(nir="", lack_of_nir_reason="")
@@ -795,19 +874,16 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
             "birthdate": "20/12/1978",
             "phone": "0610203050",
             "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
-            "address_line_1": "10, rue du Gué",
-            "address_line_2": "Sous l'escalier",
-            "post_code": "35400",
-            "city": "Saint-Malo",
             "lack_of_nir": False,
             "nir": NEW_NIR,
-        }
+        } | self.address_form_fields
         response = self.client.post(url, data=post_data)
         assert response.status_code == 302
 
         user.refresh_from_db()
         assert user.lack_of_nir_reason == ""
         assert user.nir == NEW_NIR.replace(" ", "")
+        self._test_address_autocomplete(user=user, post_data=post_data)
 
     def test_edit_sso(self):
         user = JobSeekerFactory(
@@ -828,20 +904,13 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
             "birthdate": "20/12/1978",
             "phone": "0610203050",
             "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
-            "address_line_1": "10, rue du Gué",
-            "address_line_2": "Sous l'escalier",
-            "post_code": "35400",
-            "city": "Saint-Malo",
-        }
+        } | self.address_form_fields
         response = self.client.post(url, data=post_data)
         assert response.status_code == 302
 
         user = User.objects.get(id=user.id)
         assert user.phone == post_data["phone"]
-        assert user.address_line_1 == post_data["address_line_1"]
-        assert user.address_line_2 == post_data["address_line_2"]
-        assert user.post_code == post_data["post_code"]
-        assert user.city == post_data["city"]
+        self._test_address_autocomplete(user=user, post_data=post_data)
 
         # Ensure that the job seeker cannot update data retreived from the SSO here.
         assert user.first_name != post_data["first_name"]
@@ -918,7 +987,35 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
 class EditJobSeekerInfo(TestCase):
     def setUp(self):
         super().setUp()
+        self.city = City.objects.create(
+            name="Saint-Malo",
+            slug="saint-malo-35",
+            department="35",
+            coords=Point(-2.3140436, 47.3618584),
+            post_codes=["35400"],
+            code_insee="35288",
+        )
         self.NIR_UPDATE_TALLY_LINK_LABEL = "Demander la correction du numéro de sécurité sociale"
+
+    @property
+    def address_form_fields(self):
+        return {
+            "address_for_autocomplete": "10 rue du Moulin du Gue 35400 Saint-Malo",
+            "address_line_1": "10 Rue du Moulin du Gue",
+            "insee_code": "35288",
+            "latitude": "48.658983",
+            "longitude": "-1.963752",
+            "post_code": "35400",
+        }
+
+    def _test_address_autocomplete(self, user, post_data):
+        assert user.address_line_1 == post_data["address_line_1"]
+        if post_data.get("addres_line_2"):
+            assert user.address_line_2 == post_data["address_line_2"]
+        assert user.post_code == post_data["post_code"]
+        assert user.city == self.city.name
+        assert user.latitude == float(post_data["latitude"])
+        assert user.longitude == float(post_data["longitude"])
 
     @override_settings(TALLY_URL="https://tally.so")
     def test_edit_by_siae_with_nir(self):
@@ -952,10 +1049,7 @@ class EditJobSeekerInfo(TestCase):
             "last_name": "Saint Clar",
             "birthdate": "20/12/1978",
             "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
-            "address_line_1": "10, rue du Gué",
-            "post_code": "35400",
-            "city": "Saint-Malo",
-        }
+        } | self.address_form_fields
         response = self.client.post(url, data=post_data)
 
         assert response.status_code == 302
@@ -965,9 +1059,7 @@ class EditJobSeekerInfo(TestCase):
         assert job_seeker.first_name == post_data["first_name"]
         assert job_seeker.last_name == post_data["last_name"]
         assert job_seeker.birthdate.strftime("%d/%m/%Y") == post_data["birthdate"]
-        assert job_seeker.address_line_1 == post_data["address_line_1"]
-        assert job_seeker.post_code == post_data["post_code"]
-        assert job_seeker.city == post_data["city"]
+        self._test_address_autocomplete(user=job_seeker, post_data=post_data)
 
         # Optional fields
         post_data |= {
@@ -1012,12 +1104,9 @@ class EditJobSeekerInfo(TestCase):
             "last_name": "Saint Clar",
             "birthdate": "20/12/1978",
             "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
-            "address_line_1": "10, rue du Gué",
-            "post_code": "35400",
-            "city": "Saint-Malo",
             "lack_of_nir": False,
             "nir": NEW_NIR,
-        }
+        } | self.address_form_fields
         response = self.client.post(url, data=post_data)
 
         assert response.status_code == 302
@@ -1056,11 +1145,8 @@ class EditJobSeekerInfo(TestCase):
             "last_name": "Saint Clar",
             "birthdate": "20/12/1978",
             "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
-            "address_line_1": "10, rue du Gué",
-            "post_code": "35400",
-            "city": "Saint-Malo",
             "lack_of_nir": False,
-        }
+        } | self.address_form_fields
         response = self.client.post(url, data=post_data)
         self.assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
 
@@ -1196,10 +1282,7 @@ class EditJobSeekerInfo(TestCase):
             "email": new_email,
             "birthdate": "20/12/1978",
             "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
-            "address_line_1": "10, rue du Gué",
-            "post_code": "35400",
-            "city": "Saint-Malo",
-        }
+        } | self.address_form_fields
         response = self.client.post(url, data=post_data)
 
         assert response.status_code == 302
@@ -1217,7 +1300,7 @@ class EditJobSeekerInfo(TestCase):
         job_seeker.refresh_from_db()
 
         assert job_seeker.phone == post_data["phone"]
-        assert job_seeker.address_line_2 == post_data["address_line_2"]
+        self._test_address_autocomplete(user=job_seeker, post_data=post_data)
 
     def test_edit_email_when_confirmed(self):
         new_email = "bidou@yopmail.com"
@@ -1246,10 +1329,7 @@ class EditJobSeekerInfo(TestCase):
             "email": new_email,
             "birthdate": "20/12/1978",
             "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
-            "address_line_1": "10, rue du Gué",
-            "post_code": "35400",
-            "city": "Saint-Malo",
-        }
+        } | self.address_form_fields
         response = self.client.post(url, data=post_data)
 
         assert response.status_code == 302
@@ -1261,7 +1341,7 @@ class EditJobSeekerInfo(TestCase):
         assert job_seeker.birthdate.strftime("%d/%m/%Y") == post_data["birthdate"]
         assert job_seeker.address_line_1 == post_data["address_line_1"]
         assert job_seeker.post_code == post_data["post_code"]
-        assert job_seeker.city == post_data["city"]
+        assert job_seeker.city == self.city.name
 
         # Optional fields
         post_data |= {
@@ -1272,7 +1352,7 @@ class EditJobSeekerInfo(TestCase):
         job_seeker.refresh_from_db()
 
         assert job_seeker.phone == post_data["phone"]
-        assert job_seeker.address_line_2 == post_data["address_line_2"]
+        self._test_address_autocomplete(user=job_seeker, post_data=post_data)
 
     def test_edit_no_address_does_not_crash(self):
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
@@ -1294,7 +1374,7 @@ class EditJobSeekerInfo(TestCase):
         }
         response = self.client.post(url, data=post_data)
         self.assertContains(response, "Ce champ est obligatoire.")
-        assert response.context["form"].errors["address_line_1"] == ["Ce champ est obligatoire."]
+        assert response.context["form"].errors["address_for_autocomplete"] == ["Ce champ est obligatoire."]
 
 
 class ChangeEmailViewTest(TestCase):
