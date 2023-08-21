@@ -1558,8 +1558,10 @@ class ProlongationModelTest(TestCase):
             reason=ProlongationReason.COMPLETE_TRAINING.value,
         )
 
-        assert not prolongation.has_reached_max_cumulative_duration()
-        assert prolongation.has_reached_max_cumulative_duration(additional_duration=datetime.timedelta(days=1))
+        assert (
+            prolongation.has_reached_max_cumulative_duration(additional_duration=datetime.timedelta(days=-1)) is False
+        )
+        assert prolongation.has_reached_max_cumulative_duration() is True
 
     def test_has_reached_max_cumulative_duration_for_particular_difficulties(self):
         approval = ApprovalFactory()
@@ -1571,7 +1573,7 @@ class ProlongationModelTest(TestCase):
             reason=ProlongationReason.PARTICULAR_DIFFICULTIES.value,
         )
 
-        assert not prolongation1.has_reached_max_cumulative_duration()
+        assert prolongation1.has_reached_max_cumulative_duration() is False
 
         prolongation2 = ProlongationFactory(
             approval=approval,
@@ -1580,8 +1582,10 @@ class ProlongationModelTest(TestCase):
             reason=ProlongationReason.PARTICULAR_DIFFICULTIES.value,
         )
 
-        assert not prolongation2.has_reached_max_cumulative_duration()
-        assert prolongation2.has_reached_max_cumulative_duration(additional_duration=datetime.timedelta(days=1))
+        assert (
+            prolongation2.has_reached_max_cumulative_duration(additional_duration=datetime.timedelta(days=-1)) is False
+        )
+        assert prolongation2.has_reached_max_cumulative_duration() is True
 
 
 class ApprovalConcurrentModelTest(TransactionTestCase):
