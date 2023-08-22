@@ -88,12 +88,15 @@ class ApplyStepBaseView(LoginRequiredMixin, TemplateView):
         super().setup(request, *args, **kwargs)
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated and request.user.kind not in [
-            UserKind.JOB_SEEKER,
-            UserKind.PRESCRIBER,
-            UserKind.SIAE_STAFF,
-        ]:
-            raise PermissionDenied("Vous n'êtes pas autorisé à déposer de candidature.")
+        if request.user.is_authenticated:
+            if request.user.kind not in [
+                UserKind.JOB_SEEKER,
+                UserKind.PRESCRIBER,
+                UserKind.SIAE_STAFF,
+            ]:
+                raise PermissionDenied("Vous n'êtes pas autorisé à déposer de candidature.")
+            elif request.user.is_siae_staff and not self.siae.has_member(request.user):
+                raise PermissionDenied("Vous ne pouvez postuler pour un candidat que dans votre structure.")
 
         if not self.siae.has_active_members:
             raise PermissionDenied(
@@ -177,8 +180,6 @@ class StartView(ApplyStepBaseView):
     def get(self, request, *args, **kwargs):
         # SIAE members can only submit a job application to their SIAE
         if request.user.is_siae_staff:
-            if not self.siae.has_member(request.user):
-                raise PermissionDenied("Vous ne pouvez postuler pour un candidat que dans votre structure.")
             if suspension_explanation := self.siae.get_active_suspension_text_with_dates():
                 raise PermissionDenied(
                     "Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle "
