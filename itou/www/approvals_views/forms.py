@@ -251,6 +251,18 @@ class CreateProlongationRequestForm(CreateProlongationForm):
         },
     )
 
+    class Meta(CreateProlongationForm.Meta):
+        model = ProlongationRequest
+        fields = CreateProlongationForm.Meta.fields + [
+            "report_file_path",
+            "uploaded_file_name",
+            "email",
+            "prescriber_organization",
+            "require_phone_interview",
+            "contact_email",
+            "contact_phone",
+        ]
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -331,18 +343,6 @@ class CreateProlongationRequestForm(CreateProlongationForm):
                 # No visible field for this form field
                 raise ValidationError("Vous devez fournir un fichier de bilan renseigné")
 
-    class Meta(CreateProlongationForm.Meta):
-        model = ProlongationRequest
-        fields = CreateProlongationForm.Meta.fields + [
-            "report_file_path",
-            "uploaded_file_name",
-            "email",
-            "prescriber_organization",
-            "require_phone_interview",
-            "contact_email",
-            "contact_phone",
-        ]
-
 
 class ProlongationRequestFilterForm(forms.Form):
     only_pending = forms.BooleanField(
@@ -364,35 +364,6 @@ class SuspensionForm(forms.ModelForm):
         label="Je ne connais pas la date de fin de la suspension.",
         help_text=f"La Plateforme indiquera {Suspension.MAX_DURATION_MONTHS} mois par défaut.",
     )
-
-    def __init__(self, *args, **kwargs):
-        self.approval = kwargs.pop("approval")
-        self.siae = kwargs.pop("siae")
-        super().__init__(*args, **kwargs)
-        # Show new reasons but keep old ones for history.
-        self.fields["reason"].choices = Suspension.Reason.displayed_choices_for_siae(self.siae)
-
-        # End date is not strictly required because it can be set
-        # with `set_default_end_date` input
-        self.fields["end_at"].required = False
-
-        today = timezone.localdate()
-        if self.instance.pk:
-            referent_date = self.instance.created_at.date()
-            suspension_pk = self.instance.pk
-        else:
-            referent_date = today
-            suspension_pk = None
-            self.instance.siae = self.siae
-            self.instance.approval = self.approval
-            self.fields["reason"].initial = None  # Uncheck radio buttons.
-
-        min_start_at = Suspension.next_min_start_at(self.approval, suspension_pk, referent_date, True)
-        # A suspension is backdatable but cannot start in the future.
-        self.fields["start_at"].widget = DuetDatePickerWidget({"min": min_start_at, "max": today})
-        self.fields["end_at"].widget = DuetDatePickerWidget(
-            {"min": min_start_at, "max": Suspension.get_max_end_at(today)}
-        )
 
     class Meta:
         model = Suspension
@@ -423,6 +394,35 @@ class SuspensionForm(forms.ModelForm):
                 "si le contrat de travail est terminé ou rompu."
             ),
         }
+
+    def __init__(self, *args, **kwargs):
+        self.approval = kwargs.pop("approval")
+        self.siae = kwargs.pop("siae")
+        super().__init__(*args, **kwargs)
+        # Show new reasons but keep old ones for history.
+        self.fields["reason"].choices = Suspension.Reason.displayed_choices_for_siae(self.siae)
+
+        # End date is not strictly required because it can be set
+        # with `set_default_end_date` input
+        self.fields["end_at"].required = False
+
+        today = timezone.localdate()
+        if self.instance.pk:
+            referent_date = self.instance.created_at.date()
+            suspension_pk = self.instance.pk
+        else:
+            referent_date = today
+            suspension_pk = None
+            self.instance.siae = self.siae
+            self.instance.approval = self.approval
+            self.fields["reason"].initial = None  # Uncheck radio buttons.
+
+        min_start_at = Suspension.next_min_start_at(self.approval, suspension_pk, referent_date, True)
+        # A suspension is backdatable but cannot start in the future.
+        self.fields["start_at"].widget = DuetDatePickerWidget({"min": min_start_at, "max": today})
+        self.fields["end_at"].widget = DuetDatePickerWidget(
+            {"min": min_start_at, "max": Suspension.get_max_end_at(today)}
+        )
 
     def clean_start_at(self):
         start_at = self.cleaned_data.get("start_at")

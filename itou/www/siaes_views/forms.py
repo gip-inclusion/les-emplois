@@ -13,19 +13,6 @@ from itou.utils.urls import get_external_link_markup
 
 
 class CreateSiaeForm(forms.ModelForm):
-    def __init__(self, current_siae, current_user, *args, **kwargs):
-        self.current_siae = current_siae
-        self.current_user = current_user
-        super().__init__(*args, **kwargs)
-
-        self.fields["kind"].choices = [(current_siae.kind, dict(SiaeKind.choices)[current_siae.kind])]
-
-        self.fields["department"].choices = [("", "---")] + list(DEPARTMENTS.items())
-
-        required_fields = ["address_line_1", "post_code", "city", "department", "phone"]
-        for required_field in required_fields:
-            self.fields[required_field].required = True
-
     class Meta:
         model = Siae
         fields = [
@@ -50,6 +37,19 @@ class CreateSiaeForm(forms.ModelForm):
             "website": "Votre site web doit commencer par http:// ou https://",
             "description": "Texte de présentation de votre structure.",
         }
+
+    def __init__(self, current_siae, current_user, *args, **kwargs):
+        self.current_siae = current_siae
+        self.current_user = current_user
+        super().__init__(*args, **kwargs)
+
+        self.fields["kind"].choices = [(current_siae.kind, dict(SiaeKind.choices)[current_siae.kind])]
+
+        self.fields["department"].choices = [("", "---")] + list(DEPARTMENTS.items())
+
+        required_fields = ["address_line_1", "post_code", "city", "department", "phone"]
+        for required_field in required_fields:
+            self.fields[required_field].required = True
 
     def clean_kind(self):
         return self.current_siae.kind
@@ -95,17 +95,6 @@ class CreateSiaeForm(forms.ModelForm):
 
 
 class EditSiaeForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        required_fields = ["brand", "address_line_1", "post_code", "city", "phone", "email"]
-        for required_field in required_fields:
-            self.fields[required_field].required = True
-
-        self.fields["brand"].widget.attrs["placeholder"] = ""
-        self.fields["address_line_1"].widget.attrs["placeholder"] = ""
-        self.fields["address_line_2"].widget.attrs["placeholder"] = ""
-
     class Meta:
         model = Siae
         fields = [
@@ -133,21 +122,23 @@ class EditSiaeForm(forms.ModelForm):
             "website": "Votre site web doit commencer par http:// ou https://",
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        required_fields = ["brand", "address_line_1", "post_code", "city", "phone", "email"]
+        for required_field in required_fields:
+            self.fields[required_field].required = True
+
+        self.fields["brand"].widget.attrs["placeholder"] = ""
+        self.fields["address_line_1"].widget.attrs["placeholder"] = ""
+        self.fields["address_line_2"].widget.attrs["placeholder"] = ""
+
     def clean_department(self):
         post_code = self.cleaned_data.get("post_code")
         return department_from_postcode(post_code)
 
 
 class EditSiaeDescriptionForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["description"].widget.attrs[
-            "placeholder"
-        ] = "Présentez votre entreprise, votre secteur d’activité, domaines d’intervention, etc."
-        self.fields["provided_support"].widget.attrs[
-            "placeholder"
-        ] = "Indiquez les modalités d’accompagnement, par qui, comment, à quelle fréquence, etc."
-
     class Meta:
         model = Siae
         fields = [
@@ -158,6 +149,15 @@ class EditSiaeDescriptionForm(forms.ModelForm):
             "description": "Description générale de l'activité",
             "provided_support": "Type d'accompagnement proposé",
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["description"].widget.attrs[
+            "placeholder"
+        ] = "Présentez votre entreprise, votre secteur d’activité, domaines d’intervention, etc."
+        self.fields["provided_support"].widget.attrs[
+            "placeholder"
+        ] = "Indiquez les modalités d’accompagnement, par qui, comment, à quelle fréquence, etc."
 
 
 class BlockJobApplicationsForm(forms.ModelForm):
@@ -255,6 +255,31 @@ class EditJobDescriptionForm(forms.ModelForm):
         required=False, widget=forms.HiddenInput(attrs={"class": "js-city-autocomplete-hidden"})
     )
 
+    class Meta:
+        model = SiaeJobDescription
+        fields = [
+            "job_appellation",
+            "job_appellation_code",
+            "custom_name",
+            "location_label",
+            "location_code",
+            "market_context_description",
+            "contract_type",
+            "other_contract_type",
+            "hours_per_week",
+            "open_positions",
+        ]
+        labels = {
+            "custom_name": "Nom du poste à afficher",
+            "location_label": "Localisation du poste (si différente du siège)",
+            "hours_per_week": "Nombre d'heures par semaine",
+            "open_positions": "Nombre de poste(s) ouvert(s) au recrutement",
+        }
+        help_texts = {
+            "custom_name": "Si le champ est renseigné, il sera utilisé à la place du nom ci-dessus.",
+            "other_contract_type": "Veuillez préciser quel est le type de contrat.",
+        }
+
     def __init__(self, current_siae: Siae, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.instance.siae = current_siae
@@ -302,31 +327,6 @@ class EditJobDescriptionForm(forms.ModelForm):
             )
         ] + ContractType.choices_for_siae(siae=current_siae)
 
-    class Meta:
-        model = SiaeJobDescription
-        fields = [
-            "job_appellation",
-            "job_appellation_code",
-            "custom_name",
-            "location_label",
-            "location_code",
-            "market_context_description",
-            "contract_type",
-            "other_contract_type",
-            "hours_per_week",
-            "open_positions",
-        ]
-        labels = {
-            "custom_name": "Nom du poste à afficher",
-            "location_label": "Localisation du poste (si différente du siège)",
-            "hours_per_week": "Nombre d'heures par semaine",
-            "open_positions": "Nombre de poste(s) ouvert(s) au recrutement",
-        }
-        help_texts = {
-            "custom_name": "Si le champ est renseigné, il sera utilisé à la place du nom ci-dessus.",
-            "other_contract_type": "Veuillez préciser quel est le type de contrat.",
-        }
-
     def clean_job_appellation_code(self):
         job_appellation_code = self.cleaned_data.get("job_appellation_code")
         if not job_appellation_code:
@@ -351,17 +351,6 @@ class EditJobDescriptionForm(forms.ModelForm):
 
 
 class EditJobDescriptionDetailsForm(forms.ModelForm):
-    def __init__(self, current_siae: Siae, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.instance.siae = current_siae
-
-        placeholder = "Soyez le plus concret possible"
-        self.fields["description"].widget.attrs.update({"placeholder": placeholder})
-        self.fields["profile_description"].widget.attrs.update({"placeholder": placeholder})
-
-        if not current_siae.is_opcs:
-            del self.fields["is_qpv_mandatory"]
-
     class Meta:
         model = SiaeJobDescription
         fields = [
@@ -377,3 +366,14 @@ class EditJobDescriptionDetailsForm(forms.ModelForm):
             "is_qpv_mandatory": "Le marché s’inscrit dans le cadre du NPNRU et ces clauses sociales doivent "
             "bénéficier en priorité aux publics résidant en Quartier Prioritaire de la Ville.",
         }
+
+    def __init__(self, current_siae: Siae, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.instance.siae = current_siae
+
+        placeholder = "Soyez le plus concret possible"
+        self.fields["description"].widget.attrs.update({"placeholder": placeholder})
+        self.fields["profile_description"].widget.attrs.update({"placeholder": placeholder})
+
+        if not current_siae.is_opcs:
+            del self.fields["is_qpv_mandatory"]
