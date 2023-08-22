@@ -91,7 +91,7 @@ class BaseProlongationFactory(factory.django.DjangoModelFactory):
 
     approval = factory.SubFactory(ApprovalFactory)
     start_at = factory.Faker("date_between", start_date=factory.SelfAttribute("..approval.start_at"))
-    end_at = factory.LazyAttribute(lambda obj: Prolongation.get_max_end_at(obj.start_at, reason=obj.reason))
+    end_at = factory.LazyAttribute(lambda obj: obj.start_at + datetime.timedelta(days=30))
     reason = ProlongationReason.COMPLETE_TRAINING.value
     reason_explanation = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
     declared_by = factory.LazyAttribute(lambda obj: obj.declared_by_siae.members.first())
