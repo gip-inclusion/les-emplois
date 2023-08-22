@@ -55,9 +55,9 @@
   <div class="c-box mb-3 mb-lg-5">
                           <h2>Détail de la demande</h2>
                           <hr/>
-                          <h3>Date de fin de PASS IAE demandée : 30/12/2004</h3>
+                          <h3>Date de fin de PASS IAE demandée : 31/01/2000</h3>
                           <p>
-                              La prolongation est demandée pour une durée de 1825 jours.
+                              La prolongation est demandée pour une durée de 30 jours.
                           </p>
                           <h3>Motif sélectionné par l’employeur</h3>
                           <p>50 ans et plus</p>
@@ -120,7 +120,7 @@
       <div class="card-body">
           
               <div class="card-title">
-                  <h4>Prolongation du PASS IAE jusqu’au 30/12/2004</h4>
+                  <h4>Prolongation du PASS IAE jusqu’au 31/01/2000</h4>
               </div>
               <div class="card-text">
                   <p class="mb-2">
@@ -139,7 +139,7 @@
       <div class="card-body">
           
               <div class="card-title">
-                  <h4>Prolonger le PASS IAE jusqu’au 30/12/2004</h4>
+                  <h4>Prolonger le PASS IAE jusqu’au 31/01/2000</h4>
               </div>
               <div class="card-text">
                   <form method="post">
