@@ -1,4 +1,5 @@
 from django import forms
+from django.db.models.fields import BLANK_CHOICE_DASH
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.safestring import mark_safe
@@ -216,7 +217,10 @@ class FinancialAnnexSelectForm(forms.Form):
 # SIAE job descriptions forms (2 steps and session based)
 
 
-class EditJobDescriptionForm(forms.ModelForm):
+class JobAppellationAndLocationMixin(forms.Form):
+    # NB we need to inherit from forms.Form if we want the attributes
+    # to be added to the a Form using this mixin (django magic)
+
     # See: itou/static/js/job_autocomplete.js
     job_appellation = forms.CharField(
         label="Poste (code ROME)",
@@ -229,29 +233,34 @@ class EditJobDescriptionForm(forms.ModelForm):
                 "autocomplete": "off",
             }
         ),
+        required=False,
     )
     # Hidden placeholder field for "real" job appellation.
     job_appellation_code = forms.CharField(
-        max_length=6, widget=forms.HiddenInput(attrs={"class": "js-job-autocomplete-hidden form-control"})
+        max_length=6,
+        widget=forms.HiddenInput(attrs={"class": "js-job-autocomplete-hidden form-control"}),
+        required=False,
     )
 
-    LOCATION_AUTOCOMPLETE_URL = reverse_lazy("autocomplete:cities")
+    # See: itou/static/js/city_autocomplete_field.js
+
     location_label = forms.CharField(
         label="Localisation du poste (si différent du siège)",
         widget=forms.TextInput(
             attrs={
-                "class": "js-city-autocomplete-input form-control",
+                "class": "js-city4jobs-autocomplete-input form-control",
                 "data-autosubmit-on-enter-pressed": 0,
-                "data-autocomplete-source-url": LOCATION_AUTOCOMPLETE_URL,
+                "data-autocomplete-source-url": reverse_lazy("autocomplete:cities"),
                 "placeholder": "Ex. Poitiers",
                 "autocomplete": "off",
             }
         ),
         required=False,
     )
-
+    # Hidden placeholder field for "real" city
     location_code = forms.CharField(
-        required=False, widget=forms.HiddenInput(attrs={"class": "js-city-autocomplete-hidden"})
+        widget=forms.HiddenInput(attrs={"class": "js-city4jobs-autocomplete-hidden"}),
+        required=False,
     )
 
     class Meta:
@@ -279,9 +288,24 @@ class EditJobDescriptionForm(forms.ModelForm):
             "other_contract_type": "Veuillez préciser quel est le type de contrat.",
         }
 
+    def clean_job_appellation_code(self):
+        if job_appellation_code := self.cleaned_data.get("job_appellation_code"):
+            try:
+                Appellation.objects.get(code=job_appellation_code)
+            except Appellation.DoesNotExist:
+                raise forms.ValidationError("Le poste n'est pas correctement renseigné")
+            else:
+                return job_appellation_code
+
+
+# SIAE job descriptions forms (2 steps and session based)
+class EditJobDescriptionForm(JobAppellationAndLocationMixin, forms.ModelForm):
     def __init__(self, current_siae: Siae, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.instance.siae = current_siae
+
+        self.fields["job_appellation"].required = True
+        self.fields["job_appellation_code"].required = True
 
         if self.instance.pk:
             self.fields["job_appellation"].initial = self.instance.appellation.name
@@ -304,20 +328,38 @@ class EditJobDescriptionForm(forms.ModelForm):
 
         self.fields["contract_type"].required = True
         self.fields["open_positions"].required = True
-        self.fields["job_appellation_code"].required = False
-        self.fields["job_appellation"].required = True
 
         if current_siae.is_opcs:
             self.fields["market_context_description"].required = True
         else:
             del self.fields["market_context_description"]
 
-        self.fields["contract_type"].choices = [
-            (
-                "",
-                "---------",
-            )
-        ] + ContractType.choices_for_siae(siae=current_siae)
+        self.fields["contract_type"].choices = BLANK_CHOICE_DASH + ContractType.choices_for_siae(siae=current_siae)
+
+    class Meta:
+        model = SiaeJobDescription
+        fields = [
+            "job_appellation",
+            "job_appellation_code",
+            "custom_name",
+            "location_label",
+            "location_code",
+            "market_context_description",
+            "contract_type",
+            "other_contract_type",
+            "hours_per_week",
+            "open_positions",
+        ]
+        labels = {
+            "custom_name": "Nom du poste à afficher",
+            "location_label": "Localisation du poste (si différente du siège)",
+            "hours_per_week": "Nombre d'heures par semaine",
+            "open_positions": "Nombre de poste(s) ouvert(s) au recrutement",
+        }
+        help_texts = {
+            "custom_name": "Si le champ est renseigné, il sera utilisé à la place du nom ci-dessus.",
+            "other_contract_type": "Veuillez préciser quel est le type de contrat.",
+        }
 
     def clean_job_appellation_code(self):
         job_appellation_code = self.cleaned_data.get("job_appellation_code")

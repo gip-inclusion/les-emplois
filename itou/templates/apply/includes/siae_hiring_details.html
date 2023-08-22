@@ -15,6 +15,15 @@
             </p>
         {% endif %}
 
+        <p>
+            Poste retenu :
+            {% if job_application.hired_job %}
+                {{ job_application.hired_job }} à {{ job_application.hired_job.display_location }}
+            {% else %}
+                non renseigné
+            {% endif %}
+        </p>
+
         <ul>
             <li>Début : {{ job_application.hiring_start_at|date:"d F Y" }}</li>
             <li>Fin : {{ job_application.hiring_end_at|date:"d F Y"|default:"Non renseigné" }}</li>

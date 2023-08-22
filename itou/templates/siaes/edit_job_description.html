@@ -75,6 +75,7 @@
 {% block script %}
     {{ block.super }}
     <script src="{% static "js/job_autocomplete.js" %}"></script>
+    <script src="{% static "js/city_autocomplete_field_for_jobs.js" %}"></script>
     <script nonce="{{ CSP_NONCE }}">
         function disable_other_contract_type() {
             var isDisabled = $("#id_contract_type").val() !== "OTHER"

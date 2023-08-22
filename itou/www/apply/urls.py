@@ -287,4 +287,9 @@ urlpatterns = [
         process_views.ReloadContractTypeAndOptions.as_view(),
         name="reload_contract_type_and_options",
     ),
+    path(
+        "<siae_pk>/accept/reload_job_description_fields",
+        process_views.ReloadJobDescriptionFields.as_view(),
+        name="reload_job_description_fields",
+    ),
 ]

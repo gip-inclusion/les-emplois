@@ -1,5 +1,6 @@
 import contextlib
 import datetime
+from operator import itemgetter
 
 import sentry_sdk
 from dateutil.relativedelta import relativedelta
@@ -18,7 +19,8 @@ from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS, department_from_postcode
 from itou.common_apps.address.forms import MandatoryAddressFormMixin
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
-from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind, ContractType
+from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind, ContractType, JobDescriptionSource
+from itou.companies.models import SiaeJobDescription
 from itou.eligibility.models import AdministrativeCriteria
 from itou.files.forms import ItouFileField
 from itou.job_applications import enums as job_applications_enums
@@ -30,6 +32,7 @@ from itou.utils.emails import redact_email_address
 from itou.utils.types import InclusiveDateRange
 from itou.utils.validators import validate_nir, validate_pole_emploi_id
 from itou.utils.widgets import DuetDatePickerWidget
+from itou.www.companies_views.forms import JobAppellationAndLocationMixin
 
 
 class UserExistsForm(forms.Form):
@@ -448,11 +451,18 @@ class AnswerForm(forms.Form):
     )
 
 
-class AcceptForm(forms.ModelForm):
+class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
     """
     Allow an SIAE to accept a job application.
     If SIAE is a GEIQ, add specific fields (contract type, number of hours per week)
     """
+
+    SIAE_OPTIONAL_FIELDS = (
+        "hired_job",
+        "location_label",
+        "location_code",
+        "job_appellation",
+    )
 
     GEIQ_REQUIRED_FIELDS = (
         "prehiring_guidance_days",
@@ -463,15 +473,23 @@ class AcceptForm(forms.ModelForm):
         "qualification_level",
         "planned_training_hours",
         "inverted_vae_contract",
+        "hired_job",
     )
+
+    OTHER_HIRED_JOB = "other"
 
     # Choices are dynamically set on HTMX reload
     qualification_level = forms.ChoiceField(choices=[], label="Niveau de qualification")
+
+    # Can't use a `ModelChoiceField`: choices are constrained (can't add custom value)
+    hired_job = forms.ChoiceField(label="Poste retenu")
 
     class Meta:
         model = JobApplication
         fields = [
             "prehiring_guidance_days",
+            "location_label",
+            "location_code",
             "contract_type",
             "contract_type_details",
             "nb_hours_per_week",
@@ -487,11 +505,11 @@ class AcceptForm(forms.ModelForm):
             # Make it clear to employers that `hiring_start_at` has an impact on the start of the
             # "parcours IAE" and the payment of the "aide au poste".
             "hiring_start_at": (
-                "Au format JJ/MM/AAAA, par exemple  {}. Il n'est pas possible d'antidater un contrat.".format(
+                "Au format JJ/MM/AAAA, par exemple {}. Il n'est pas possible d'antidater un contrat.".format(
                     datetime.date.today().strftime("%d/%m/%Y")
                 )
             ),
-            "hiring_end_at": "Au format JJ/MM/AAAA, par exemple  {}.".format(
+            "hiring_end_at": "Au format JJ/MM/AAAA, par exemple {}.".format(
                 (datetime.date.today() + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)).strftime("%d/%m/%Y")
             ),
             "prehiring_guidance_days": """Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche""",
@@ -502,6 +520,7 @@ class AcceptForm(forms.ModelForm):
 
     def __init__(self, *args, siae, **kwargs):
         super().__init__(*args, **kwargs)
+        self.siae = siae
         self.is_geiq = siae.kind == CompanyKind.GEIQ
 
         self.fields["hiring_start_at"].required = True
@@ -525,14 +544,15 @@ class AcceptForm(forms.ModelForm):
                     "inverted_vae_contract",
                 )
             else:
-                self.fields.pop(geiq_field_name)
+                if geiq_field_name not in self.SIAE_OPTIONAL_FIELDS:
+                    self.fields.pop(geiq_field_name)
 
         if self.is_geiq:
             # Change default size (too large)
             self.fields["contract_type_details"].widget.attrs.update({"rows": 2})
             self.initial["prehiring_guidance_days"] = 0
             self.initial["planned_training_hours"] = 0
-            self.fields["hiring_start_at"].help_text = "Au format JJ/MM/AAAA, par exemple  {}.".format(
+            self.fields["hiring_start_at"].help_text = "Au format JJ/MM/AAAA, par exemple {}.".format(
                 datetime.date.today().strftime("%d/%m/%Y"),
             )
             # Dynamic selection of qualification level
@@ -541,6 +561,7 @@ class AcceptForm(forms.ModelForm):
                     "hx-trigger": "change",
                     "hx-post": reverse("apply:reload_qualification_fields", kwargs={"siae_pk": siae.pk}),
                     "hx-swap": "outerHTML",
+                    "hx-select": "#geiq_qualification_fields_block",
                     "hx-target": "#geiq_qualification_fields_block",
                 },
             )
@@ -568,10 +589,10 @@ class AcceptForm(forms.ModelForm):
                     "hx-trigger": "change",
                     "hx-post": reverse("apply:reload_contract_type_and_options", kwargs={"siae_pk": siae.pk}),
                     "hx-swap": "outerHTML",
+                    "hx-select": "#geiq_contract_type_and_options_block",
                     "hx-target": "#geiq_contract_type_and_options_block",
                 },
             )
-
         elif siae.kind in SIAE_WITH_CONVENTION_KINDS:
             # Add specific details to help texts for IAE
             self.fields["hiring_start_at"].help_text += (
@@ -584,18 +605,54 @@ class AcceptForm(forms.ModelForm):
                 "<b>Ne pas compléter cette date dans le cadre d’un CDI Inclusion</b>"
             )
 
+        # `hired_job` can't be used from model directly because of constrained choices
+        # we must use a "simple" ChoiceField and update the value on cleaning
+        self.fields["hired_job"].required = self.is_geiq
+
+        def sorted_jobs_for_display(jobs):
+            return sorted(
+                [
+                    (job_description.pk, f"{job_description.display_name} - {job_description.display_location}")
+                    for job_description in jobs
+                ],
+                key=itemgetter(1),
+            )
+
+        choices = [("", "Sélectionnez un poste")]
+        if jobs := siae.job_description_through.all().order_by("custom_name", "is_active"):
+            if active_jobs := sorted_jobs_for_display(job for job in jobs if job.is_active):
+                choices.append(("Postes ouverts au recrutement", active_jobs))
+            if inactive_jobs := sorted_jobs_for_display(job for job in jobs if not job.is_active):
+                choices.append(("Postes fermés au recrutement", inactive_jobs))
+        choices.append(
+            (
+                "Métiers non présents dans ma structure",
+                [(self.OTHER_HIRED_JOB, "Ajouter un poste lié à un nouveau métier")],
+            )
+        )
+        self.fields["hired_job"].choices = choices
+        self.fields["hired_job"].widget.attrs.update(
+            {
+                "hx-post": reverse("apply:reload_job_description_fields", kwargs={"siae_pk": siae.pk}),
+                "hx-swap": "outerHTML",
+                "hx-select": "#job_description_fields_block",
+                "hx-target": "#job_description_fields_block",
+            }
+        )
+
+        self.fields["job_appellation"].label = "Préciser le nom du poste (code ROME)"
+        self.fields["location_label"].label = "Localisation du poste"
+
     def clean_hiring_start_at(self):
         hiring_start_at = self.cleaned_data["hiring_start_at"]
 
         # Hiring in the past is *temporarily* possible for GEIQ
         if hiring_start_at and hiring_start_at < datetime.date.today() and not self.is_geiq:
-            raise forms.ValidationError(JobApplication.ERROR_START_IN_PAST)
-
-        return hiring_start_at
+            self.add_error("hiring_start_at", forms.ValidationError(JobApplication.ERROR_START_IN_PAST))
+        else:
+            return hiring_start_at
 
     def clean(self):
-        cleaned_data = super().clean()
-
         hiring_start_at = self.cleaned_data.get("hiring_start_at")
         hiring_end_at = self.cleaned_data.get("hiring_end_at")
 
@@ -610,14 +667,59 @@ class AcceptForm(forms.ModelForm):
             contract_type_details = self.cleaned_data.get("contract_type_details")
 
             if contract_type == ContractType.OTHER and not contract_type_details:
-                raise forms.ValidationError(
-                    {"contract_type_details": ["Les précisions sont nécessaires pour ce type de contrat"]}
-                )
+                self.add_error("contract_type_details", "Les précisions sont nécessaires pour ce type de contrat")
 
             if contract_type == ContractType.PROFESSIONAL_TRAINING:
-                cleaned_data["inverted_vae_contract"] = bool(cleaned_data.get("inverted_vae_contract"))
+                self.cleaned_data["inverted_vae_contract"] = bool(self.cleaned_data.get("inverted_vae_contract"))
 
-        return cleaned_data
+        location_code = self.cleaned_data.get("location_code")
+        job_appellation_code = self.cleaned_data.get("job_appellation_code")
+
+        if self.cleaned_data.get("hired_job") == self.OTHER_HIRED_JOB:
+            if not job_appellation_code:
+                self.add_error("job_appellation", forms.ValidationError("Un poste doit être saisi en cas de création"))
+            elif not location_code:
+                # location becomes mandatory in this case only:
+                self.add_error(
+                    "location_label",
+                    forms.ValidationError("La localisation du poste est obligatoire en cas de création"),
+                )
+
+    def save(self, commit):
+        # We might create a JobDescription here even with atomic==False
+        # so we need to wrap the call to save in a atomic transaction
+        instance = super().save(commit)
+        location_code = self.cleaned_data.get("location_code")
+        job_appellation_code = self.cleaned_data.get("job_appellation_code")
+
+        if self.cleaned_data.get("hired_job") == self.OTHER_HIRED_JOB:
+            city = City.objects.get(slug=location_code)
+
+            # Check that the new job application is not a duplicate from the list
+            if existing_job_description := SiaeJobDescription.objects.filter(
+                siae=self.siae, location=city, appellation_id=job_appellation_code
+            ).first():
+                # Found one matching: reuse it and don't create a new one
+                self.instance.hired_job = existing_job_description
+            else:
+                # If no job description in the list is matching, eventually create a new one:
+                # - inactive
+                # - marked as autogenerated
+                # - associated to current job application
+                new_job_description = SiaeJobDescription(
+                    siae=self.siae,
+                    appellation_id=job_appellation_code,
+                    location=city,
+                    is_active=False,
+                    description="La structure n’a pas encore renseigné cette rubrique",
+                    creation_source=JobDescriptionSource.HIRING,
+                )
+                new_job_description.save()
+                instance.hired_job = new_job_description
+        else:
+            # A job description has been selected is the list: link it to current hiring
+            instance.hired_job_id = self.cleaned_data.get("hired_job")
+        return instance
 
 
 class PriorActionForm(forms.ModelForm):
