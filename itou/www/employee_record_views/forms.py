@@ -101,6 +101,19 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
         required=False, widget=forms.HiddenInput(attrs={"class": "js-commune-autocomplete-hidden"})
     )
 
+    class Meta:
+        model = User
+        fields = [
+            "title",
+            "first_name",
+            "last_name",
+            "birthdate",
+            "insee_commune",
+            "insee_commune_code",
+            "birth_place",
+            "birth_country",
+        ]
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -142,19 +155,6 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
                     f"Le code INSEE {commune_code} n'est pas référencé en date du {birth_date:%d/%m/%Y}"
                 ) from ex
 
-    class Meta:
-        model = User
-        fields = [
-            "title",
-            "first_name",
-            "last_name",
-            "birthdate",
-            "insee_commune",
-            "insee_commune_code",
-            "birth_place",
-            "birth_country",
-        ]
-
 
 class NewEmployeeRecordStep2Form(forms.ModelForm):
     """
@@ -177,6 +177,22 @@ class NewEmployeeRecordStep2Form(forms.ModelForm):
         ),
     )
     insee_commune_code = forms.CharField(widget=forms.HiddenInput(attrs={"class": "js-commune-autocomplete-hidden"}))
+
+    class Meta:
+        model = JobSeekerProfile
+        fields = [
+            "hexa_lane_type",
+            "hexa_lane_number",
+            "hexa_std_extension",
+            "hexa_lane_name",
+            "hexa_additional_address",
+            "hexa_post_code",
+            "hexa_commune",
+        ]
+        labels = {
+            "hexa_lane_number": "Numéro",
+            "hexa_std_extension": "Extension",
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -227,22 +243,6 @@ class NewEmployeeRecordStep2Form(forms.ModelForm):
             else:
                 self.cleaned_data["hexa_commune"] = commune
 
-    class Meta:
-        model = JobSeekerProfile
-        fields = [
-            "hexa_lane_type",
-            "hexa_lane_number",
-            "hexa_std_extension",
-            "hexa_lane_name",
-            "hexa_additional_address",
-            "hexa_post_code",
-            "hexa_commune",
-        ]
-        labels = {
-            "hexa_lane_number": "Numéro",
-            "hexa_std_extension": "Extension",
-        }
-
 
 class NewEmployeeRecordStep3Form(forms.ModelForm):
     """
@@ -279,6 +279,26 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
 
     # This field is a subset of the possible choices of `has_rsa_allocation` model field
     rsa_markup = forms.ChoiceField(required=False, label="Majoration du RSA", choices=RSAAllocation.choices[1:])
+
+    class Meta:
+        model = JobSeekerProfile
+        fields = [
+            "education_level",
+            "resourceless",
+            "pole_emploi_since",
+            "unemployed_since",
+            "rqth_employee",
+            "oeth_employee",
+            "rsa_allocation_since",
+            "ass_allocation_since",
+            "aah_allocation_since",
+        ]
+        labels = {
+            "education_level": "Niveau de formation",
+            "resourceless": "Sans ressource ?",
+            "pole_emploi_since": "Inscrit depuis",
+            "has_rsa_allocation": "Bénéficiaire du RSA ?",
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -355,26 +375,6 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
             self.instance.user.pole_emploi_id = self.cleaned_data["pole_emploi_id"]
 
         super().save(*args, **kwargs)
-
-    class Meta:
-        model = JobSeekerProfile
-        fields = [
-            "education_level",
-            "resourceless",
-            "pole_emploi_since",
-            "unemployed_since",
-            "rqth_employee",
-            "oeth_employee",
-            "rsa_allocation_since",
-            "ass_allocation_since",
-            "aah_allocation_since",
-        ]
-        labels = {
-            "education_level": "Niveau de formation",
-            "resourceless": "Sans ressource ?",
-            "pole_emploi_since": "Inscrit depuis",
-            "has_rsa_allocation": "Bénéficiaire du RSA ?",
-        }
 
 
 class NewEmployeeRecordStep4(forms.Form):

@@ -39,6 +39,28 @@ class EditJobSeekerInfoForm(JobSeekerNIRUpdateMixin, MandatoryAddressFormMixin, 
         widget=forms.TextInput(attrs={"autocomplete": "off"}),
     )
 
+    class Meta:
+        model = User
+        fields = [
+            "email",
+            "first_name",
+            "last_name",
+            "nir",
+            "lack_of_nir_reason",
+            "birthdate",
+            "phone",
+            "address_line_1",
+            "address_line_2",
+            "post_code",
+            "city",
+            "city_slug",
+            "pole_emploi_id",
+            "lack_of_pole_emploi_id_reason",
+        ]
+        help_texts = {
+            "birthdate": "Au format JJ/MM/AAAA, par exemple 20/12/1978",
+        }
+
     def __init__(self, *args, **kwargs):
         editor = kwargs.get("editor", None)
         super().__init__(*args, **kwargs)
@@ -67,28 +89,6 @@ class EditJobSeekerInfoForm(JobSeekerNIRUpdateMixin, MandatoryAddressFormMixin, 
             # Otherwise, hide the field
             self.fields["email"].widget = forms.HiddenInput()
 
-    class Meta:
-        model = User
-        fields = [
-            "email",
-            "first_name",
-            "last_name",
-            "nir",
-            "lack_of_nir_reason",
-            "birthdate",
-            "phone",
-            "address_line_1",
-            "address_line_2",
-            "post_code",
-            "city",
-            "city_slug",
-            "pole_emploi_id",
-            "lack_of_pole_emploi_id_reason",
-        ]
-        help_texts = {
-            "birthdate": "Au format JJ/MM/AAAA, par exemple 20/12/1978",
-        }
-
     def clean(self):
         super().clean()
         self._meta.model.clean_pole_emploi_fields(self.cleaned_data)
@@ -106,15 +106,6 @@ class EditJobSeekerInfoForm(JobSeekerNIRUpdateMixin, MandatoryAddressFormMixin, 
 
 
 class EditUserInfoForm(OptionalAddressFormMixin, SSOReadonlyMixin, forms.ModelForm):
-    """
-    Edit a user profile.
-    """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        assert not self.instance.is_job_seeker, self.instance
-
     class Meta:
         model = User
         fields = [
@@ -127,6 +118,11 @@ class EditUserInfoForm(OptionalAddressFormMixin, SSOReadonlyMixin, forms.ModelFo
             "city",
             "city_slug",
         ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        assert not self.instance.is_job_seeker, self.instance
 
     def save(self, commit=True):
         self.instance.last_checked_at = timezone.now()

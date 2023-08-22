@@ -126,16 +126,6 @@ class CheckJobSeekerNirForm(forms.Form):
 
 
 class CheckJobSeekerInfoForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["birthdate"].required = True
-        self.fields["birthdate"].widget = DuetDatePickerWidget(
-            {
-                "min": DuetDatePickerWidget.min_birthdate(),
-                "max": DuetDatePickerWidget.max_birthdate(),
-            }
-        )
-
     class Meta:
         model = User
         fields = [
@@ -147,6 +137,16 @@ class CheckJobSeekerInfoForm(forms.ModelForm):
         help_texts = {
             "birthdate": "Au format JJ/MM/AAAA, par exemple 20/12/1978.",
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["birthdate"].required = True
+        self.fields["birthdate"].widget = DuetDatePickerWidget(
+            {
+                "min": DuetDatePickerWidget.min_birthdate(),
+                "max": DuetDatePickerWidget.max_birthdate(),
+            }
+        )
 
     def clean(self):
         super().clean()
@@ -160,6 +160,17 @@ class CreateOrUpdateJobSeekerStep1Form(JobSeekerNIRUpdateMixin, forms.ModelForm)
         "last_name",
         "birthdate",
     ]
+
+    class Meta:
+        model = User
+        fields = [
+            "nir",
+            "lack_of_nir_reason",
+            "title",
+            "first_name",
+            "last_name",
+            "birthdate",
+        ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -175,19 +186,19 @@ class CreateOrUpdateJobSeekerStep1Form(JobSeekerNIRUpdateMixin, forms.ModelForm)
             }
         )
 
+
+class CreateOrUpdateJobSeekerStep2Form(MandatoryAddressFormMixin, forms.ModelForm):
     class Meta:
         model = User
         fields = [
-            "nir",
-            "lack_of_nir_reason",
-            "title",
-            "first_name",
-            "last_name",
-            "birthdate",
+            "address_line_1",
+            "address_line_2",
+            "post_code",
+            "city_slug",
+            "city",
+            "phone",
         ]
 
-
-class CreateOrUpdateJobSeekerStep2Form(MandatoryAddressFormMixin, forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -203,17 +214,6 @@ class CreateOrUpdateJobSeekerStep2Form(MandatoryAddressFormMixin, forms.ModelFor
 
         if post_code := self.cleaned_data.get("post_code"):
             self.cleaned_data["department"] = department_from_postcode(post_code)
-
-    class Meta:
-        model = User
-        fields = [
-            "address_line_1",
-            "address_line_2",
-            "post_code",
-            "city_slug",
-            "city",
-            "phone",
-        ]
 
 
 class CreateOrUpdateJobSeekerStep3Form(forms.ModelForm):
@@ -238,6 +238,21 @@ class CreateOrUpdateJobSeekerStep3Form(forms.ModelForm):
         label="Majoration du RSA",
         choices=asp_models.RSAAllocation.choices[1:],
     )
+
+    class Meta:
+        model = JobSeekerProfile
+        fields = [
+            "education_level",
+            "resourceless",
+            "pole_emploi_since",
+            "unemployed_since",
+            "rqth_employee",
+            "oeth_employee",
+            "has_rsa_allocation",
+            "rsa_allocation_since",
+            "ass_allocation_since",
+            "aah_allocation_since",
+        ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -307,21 +322,6 @@ class CreateOrUpdateJobSeekerStep3Form(forms.ModelForm):
         else:
             self.cleaned_data["has_rsa_allocation"] = asp_models.RSAAllocation.NO
 
-    class Meta:
-        model = JobSeekerProfile
-        fields = [
-            "education_level",
-            "resourceless",
-            "pole_emploi_since",
-            "unemployed_since",
-            "rqth_employee",
-            "oeth_employee",
-            "has_rsa_allocation",
-            "rsa_allocation_since",
-            "ass_allocation_since",
-            "aah_allocation_since",
-        ]
-
 
 class ApplicationJobsForm(forms.ModelForm):
     spontaneous_application = forms.BooleanField(
@@ -366,6 +366,12 @@ class SubmitJobApplicationForm(forms.ModelForm):
         required=False,
     )
 
+    class Meta:
+        model = JobApplication
+        fields = ["selected_jobs", "message", "resume_link"]
+        widgets = {"selected_jobs": forms.CheckboxSelectMultiple()}
+        labels = {"selected_jobs": "Métiers recherchés"}
+
     def __init__(self, siae, user, *args, **kwargs):
         self.siae = siae
         super().__init__(*args, **kwargs)
@@ -383,12 +389,6 @@ class SubmitJobApplicationForm(forms.ModelForm):
             self.fields["message"].label = "Message à l’employeur (avec copie transmise au candidat)"
             help_text = "Message obligatoire et non modifiable après l’envoi."
         self.fields["message"].help_text = help_text
-
-    class Meta:
-        model = JobApplication
-        fields = ["selected_jobs", "message", "resume_link"]
-        widgets = {"selected_jobs": forms.CheckboxSelectMultiple()}
-        labels = {"selected_jobs": "Métiers recherchés"}
 
     def clean_resume_link(self):
         resume_link = self.cleaned_data.get("resume_link")
@@ -477,6 +477,38 @@ class AcceptForm(forms.ModelForm):
     # Choices are dynamically set on HTMX reload
     qualification_level = forms.ChoiceField(choices=[], label="Niveau de qualification")
 
+    class Meta:
+        model = JobApplication
+        fields = [
+            "prehiring_guidance_days",
+            "contract_type",
+            "contract_type_details",
+            "nb_hours_per_week",
+            "hiring_start_at",
+            "qualification_level",
+            "qualification_type",
+            "planned_training_hours",
+            "hiring_end_at",
+            "answer",
+            "inverted_vae_contract",
+        ]
+        help_texts = {
+            # Make it clear to employers that `hiring_start_at` has an impact on the start of the
+            # "parcours IAE" and the payment of the "aide au poste".
+            "hiring_start_at": (
+                "Au format JJ/MM/AAAA, par exemple  {}. Il n'est pas possible d'antidater un contrat.".format(
+                    datetime.date.today().strftime("%d/%m/%Y")
+                )
+            ),
+            "hiring_end_at": "Au format JJ/MM/AAAA, par exemple  {}.".format(
+                (datetime.date.today() + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)).strftime("%d/%m/%Y")
+            ),
+            "prehiring_guidance_days": """Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche""",
+            "contract_type_details": (
+                "Si vous avez choisi un autre type de contrat, merci de bien vouloir fournir plus de précisions"
+            ),
+        }
+
     def __init__(self, *args, siae, **kwargs):
         super().__init__(*args, **kwargs)
         self.is_geiq = siae.kind == SiaeKind.GEIQ
@@ -558,38 +590,6 @@ class AcceptForm(forms.ModelForm):
                 "à faire dans l'extranet 2.0 de l'ASP. "
                 "<b>Ne pas compléter cette date dans le cadre d’un CDI Inclusion</b>"
             )
-
-    class Meta:
-        model = JobApplication
-        fields = [
-            "prehiring_guidance_days",
-            "contract_type",
-            "contract_type_details",
-            "nb_hours_per_week",
-            "hiring_start_at",
-            "qualification_level",
-            "qualification_type",
-            "planned_training_hours",
-            "hiring_end_at",
-            "answer",
-            "inverted_vae_contract",
-        ]
-        help_texts = {
-            # Make it clear to employers that `hiring_start_at` has an impact on the start of the
-            # "parcours IAE" and the payment of the "aide au poste".
-            "hiring_start_at": (
-                "Au format JJ/MM/AAAA, par exemple  {}. Il n'est pas possible d'antidater un contrat.".format(
-                    datetime.date.today().strftime("%d/%m/%Y")
-                )
-            ),
-            "hiring_end_at": "Au format JJ/MM/AAAA, par exemple  {}.".format(
-                (datetime.date.today() + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)).strftime("%d/%m/%Y")
-            ),
-            "prehiring_guidance_days": """Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche""",
-            "contract_type_details": (
-                "Si vous avez choisi un autre type de contrat, merci de bien vouloir fournir plus de précisions"
-            ),
-        }
 
     def clean_hiring_start_at(self):
         hiring_start_at = self.cleaned_data["hiring_start_at"]
@@ -679,12 +679,6 @@ class EditHiringDateForm(forms.ModelForm):
     Allows a SIAE to change contract date (if current one is in the future)
     """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["hiring_start_at"].required = True
-        for field in ["hiring_start_at", "hiring_end_at"]:
-            self.fields[field].widget = DuetDatePickerWidget()
-
     class Meta:
         model = JobApplication
         fields = ["hiring_start_at", "hiring_end_at"]
@@ -701,6 +695,12 @@ class EditHiringDateForm(forms.ModelForm):
                 "<b>Ne pas compléter cette date dans le cadre d’un CDI Inclusion</b>"
             ),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["hiring_start_at"].required = True
+        for field in ["hiring_start_at", "hiring_end_at"]:
+            self.fields[field].widget = DuetDatePickerWidget()
 
     def clean_hiring_start_at(self):
         hiring_start_at = self.cleaned_data["hiring_start_at"]
@@ -740,6 +740,11 @@ class JobSeekerPersonalDataForm(JobSeekerNIRUpdateMixin, forms.ModelForm):
     Info that will be used to search for an existing Pôle emploi approval.
     """
 
+    class Meta:
+        model = User
+        fields = ["nir", "lack_of_nir_reason", "birthdate", "pole_emploi_id", "lack_of_pole_emploi_id_reason"]
+        help_texts = {"birthdate": "Au format JJ/MM/AAAA, par exemple 20/12/1978."}
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["birthdate"].widget = DuetDatePickerWidget(
@@ -748,11 +753,6 @@ class JobSeekerPersonalDataForm(JobSeekerNIRUpdateMixin, forms.ModelForm):
                 "max": DuetDatePickerWidget.max_birthdate(),
             }
         )
-
-    class Meta:
-        model = User
-        fields = ["nir", "lack_of_nir_reason", "birthdate", "pole_emploi_id", "lack_of_pole_emploi_id_reason"]
-        help_texts = {"birthdate": "Au format JJ/MM/AAAA, par exemple 20/12/1978."}
 
     def clean(self):
         super().clean()

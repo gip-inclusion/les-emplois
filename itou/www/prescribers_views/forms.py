@@ -5,9 +5,26 @@ from itou.prescribers.models import PrescriberOrganization
 
 
 class EditPrescriberOrganizationForm(forms.ModelForm):
-    """
-    Edit a prescriber organization.
-    """
+    class Meta:
+        model = PrescriberOrganization
+        fields = [
+            "siret",
+            "name",
+            "address_line_1",
+            "address_line_2",
+            "post_code",
+            "city",
+            "department",
+            "phone",
+            "email",
+            "website",
+            "description",
+        ]
+        help_texts = {
+            "siret": "Le numéro SIRET contient 14 chiffres.",
+            "description": "Texte de présentation de votre structure.",
+            "website": "Votre site web doit commencer par http:// ou https://",
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -37,27 +54,6 @@ class EditPrescriberOrganizationForm(forms.ModelForm):
         if self.instance.kind == PrescriberOrganizationKind.PE:
             for field in self.fields.values():
                 field.disabled = True
-
-    class Meta:
-        model = PrescriberOrganization
-        fields = [
-            "siret",
-            "name",
-            "address_line_1",
-            "address_line_2",
-            "post_code",
-            "city",
-            "department",
-            "phone",
-            "email",
-            "website",
-            "description",
-        ]
-        help_texts = {
-            "siret": "Le numéro SIRET contient 14 chiffres.",
-            "description": "Texte de présentation de votre structure.",
-            "website": "Votre site web doit commencer par http:// ou https://",
-        }
 
     def clean_siret(self):
         siret = self.cleaned_data["siret"]
