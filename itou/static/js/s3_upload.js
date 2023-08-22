@@ -27,9 +27,6 @@ window.s3UploadInit = function s3UploadInit({
   // When a file is added to the drop zone, send a POST request to this URL.
   const formUrl = formValues["url"];
 
-  // Submit button to be disabled during file processing
-  const submitButton = $("button[type='submit']");
-
   // S3 form params sent when a new file is added to the drop zone.
   const formParams = formValues["fields"];
 
@@ -79,6 +76,8 @@ window.s3UploadInit = function s3UploadInit({
   });
 
   const dropzone = existingDropzone ? existingDropzone : new Dropzone(dropzoneSelector, dropzoneConfig);
+  // Submit button to be disabled during file processing
+  const submitButton = $(":submit", $(myDropzoneElement).parents("form"));
 
   // Events
   dropzone.on("addedfile", function (file) {
