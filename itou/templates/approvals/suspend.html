@@ -54,7 +54,7 @@
                                 {% buttons %}
                                     <a class="btn btn-outline-primary" href="{{ back_url }}" aria-label="Retour à l'étape précédente">Retour</a>
                                     {# Enable preview mode: preview=1. #}
-                                    <button type="submit" name="preview" value="1" class="btn btn-primary" aria-label="Valider la suspension du PASS IAE de {{ approval.user.get_full_name }}">
+                                    <button name="preview" value="1" class="btn btn-primary" aria-label="Valider la suspension du PASS IAE de {{ approval.user.get_full_name }}">
                                         Valider la suspension
                                     </button>
                                 {% endbuttons %}
@@ -97,11 +97,11 @@
                                     </p>
                                     {% buttons %}
                                         {# Allow the user to modify the suspension: edit=1. #}
-                                        <button type="submit" name="edit" value="1" class="btn btn-secondary" aria-label="Annuler la suspension du PASS IAE de {{ approval.user.get_full_name }}">
+                                        <button name="edit" value="1" class="btn btn-secondary" aria-label="Annuler la suspension du PASS IAE de {{ approval.user.get_full_name }}">
                                             Annuler
                                         </button>
                                         {# Create a suspension: save=1. #}
-                                        <button type="submit" name="save" value="1" class="btn btn-primary" aria-label="Confirmer la suspension du PASS IAE de {{ approval.user.get_full_name }}">
+                                        <button name="save" value="1" class="btn btn-primary" aria-label="Confirmer la suspension du PASS IAE de {{ approval.user.get_full_name }}">
                                             Confirmer la suspension
                                         </button>
                                     {% endbuttons %}

@@ -8,7 +8,7 @@
             {% csrf_token %}
             {% buttons %}
                 <p class="text-right">
-                    <button type="submit" class="btn btn-primary">J'étudie cette candidature</button>
+                    <button class="btn btn-primary">J'étudie cette candidature</button>
                 </p>
             {% endbuttons %}
         </form>
@@ -60,7 +60,7 @@
                 {% if job_application.inverted_vae_contract %}associé à une VAE inversée{% endif %}
             </p>
         {% endif %}
- 
+
         <ul>
             <li>Début : {{ job_application.hiring_start_at|date:"d F Y" }}</li>
             <li>Fin : {{ job_application.hiring_end_at|date:"d F Y"|default:"Non renseigné" }}</li>

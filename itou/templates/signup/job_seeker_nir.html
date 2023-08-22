@@ -29,14 +29,14 @@
                             {% if form.errors %}
                                 <div class="alert alert-info">
                                     Vous possédez un numéro de sécurité sociale temporaire ?
-                                    <button type="submit" name="skip" value="1" class="btn btn-link p-0 matomo-event" data-matomo-category="nir-temporaire" data-matomo-action="etape-suivante" data-matomo-option="inscription">
+                                    <button name="skip" value="1" class="btn btn-link p-0 matomo-event" data-matomo-category="nir-temporaire" data-matomo-action="etape-suivante" data-matomo-option="inscription">
                                         Cliquez ici pour accéder à l'étape suivante.
                                     </button>
                                 </div>
                             {% endif %}
 
                             {% buttons %}
-                                <button type="submit" class="btn btn-primary">Suivant</button>
+                                <button class="btn btn-primary">Suivant</button>
                             {% endbuttons %}
 
                         </form>
