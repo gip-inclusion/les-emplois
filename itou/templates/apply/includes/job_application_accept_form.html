@@ -33,7 +33,7 @@
         <hr>
         <h2>Embauche</h2>
         {% bootstrap_form_errors form_accept type="non_fields" %}
- 
+
         {# reloadable contract type and options for GEIQ #}
         {% if job_application.to_siae.kind == SiaeKind.GEIQ %}
             {% include "apply/includes/geiq/geiq_contract_type_and_options.html" %}
@@ -56,7 +56,7 @@
                     <a class="btn btn-block btn-outline-primary" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">Retour</a>
                 </div>
                 <div class="form-group mb-0 col-6 col-lg-auto">
-                    <button type="submit" class="btn btn-ico btn-block btn-primary" aria-label="Valider l’embauche de {{ job_application.job_seeker.get_full_name|title|mask_unless:can_view_personal_information }}">
+                    <button class="btn btn-ico btn-block btn-primary" aria-label="Valider l’embauche de {{ job_application.job_seeker.get_full_name|title|mask_unless:can_view_personal_information }}">
                         <i class="ri-check-line ri-xl"></i>
                         <span>Valider l’embauche</span>
                     </button>

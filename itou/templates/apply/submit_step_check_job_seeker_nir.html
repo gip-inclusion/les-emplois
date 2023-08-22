@@ -22,7 +22,7 @@
                         <div class="col">
                             <p class="mb-0">
                                 Vous possédez un numéro de sécurité sociale temporaire ?
-                                <button type="submit" name="skip" value="1" class="btn btn-link p-0 matomo-event" data-matomo-category="nir-temporaire" data-matomo-action="etape-suivante" data-matomo-option="candidature">
+                                <button name="skip" value="1" class="btn btn-link p-0 matomo-event" data-matomo-category="nir-temporaire" data-matomo-action="etape-suivante" data-matomo-option="candidature">
                                     Cliquez ici pour accéder à l'étape suivante.
                                 </button>
                             </p>
@@ -61,7 +61,7 @@
                         <a class="btn btn-link btn-block" aria-label="Retourner au tableau de bord" href="{% url 'dashboard:index' %}">Retour</a>
                     </div>
                     <div class="form-group mb-0 col-6 col-lg-auto">
-                        <button type="submit" name="preview" value="1" class="btn btn-primary btn-block">Suivant</button>
+                        <button name="preview" value="1" class="btn btn-primary btn-block">Suivant</button>
                     </div>
                 </div>
             {% endbuttons %}
@@ -88,9 +88,9 @@
                         <div class="modal-footer">
                             {% buttons %}
                                 {# Reload this page with a new form. #}
-                                <button type="submit" name="cancel" value="1" class="btn btn-sm btn-secondary">Ce n'est pas mon candidat</button>
+                                <button name="cancel" value="1" class="btn btn-sm btn-secondary">Ce n'est pas mon candidat</button>
                                 {# Go to the next step. #}
-                                <button type="submit" name="confirm" value="1" class="btn btn-sm btn-primary">Continuer</button>
+                                <button name="confirm" value="1" class="btn btn-sm btn-primary">Continuer</button>
                             {% endbuttons %}
                         </div>
                     </div>

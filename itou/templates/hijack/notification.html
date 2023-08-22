@@ -13,7 +13,7 @@
             {% csrf_token %}
             <input type="hidden" name="next" value="{{ request.path }}">
             <button id="hide-btn" class="djhj-button" type="button">{% trans 'hide' %}</button>
-            <button class="djhj-button" type="submit">{% trans 'release' %}</button>
+            <button class="djhj-button">{% trans 'release' %}</button>
         </form>
     </div>
 </div>

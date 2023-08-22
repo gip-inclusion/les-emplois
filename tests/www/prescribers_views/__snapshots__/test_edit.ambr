@@ -243,7 +243,7 @@
   
                           <div class="form-group">
                               <a class="btn btn-outline-primary" href="/dashboard/">Annuler</a>
-                              <button class="btn btn-primary" type="submit">Enregistrer</button>
+                              <button class="btn btn-primary">Enregistrer</button>
                           </div>
   
                       </form>

@@ -35,7 +35,7 @@
                             {% for s in user_siaes %}
                                 {% if s.pk != current_siae.pk %}
                                     <li>
-                                        <button class="dropdown-item font-weight-bold" type="submit" name="siae_id" value="{{ s.pk }}">
+                                        <button class="dropdown-item font-weight-bold" name="siae_id" value="{{ s.pk }}">
                                             <span class="badge badge-pill badge-xs badge-primary mr-1">{{ s.kind }}</span>
                                             {{ s.display_name|truncatechars:50 }}
                                         </button>
@@ -59,7 +59,7 @@
                             {% for po in user_prescriberorganizations %}
                                 {% if po.pk != current_prescriber_organization.pk %}
                                     <li>
-                                        <button class="dropdown-item font-weight-bold" type="submit" name="prescriber_organization_id" value="{{ po.pk }}">
+                                        <button class="dropdown-item font-weight-bold" name="prescriber_organization_id" value="{{ po.pk }}">
                                             <span class="badge badge-pill badge-xs badge-primary mr-1">{{ po.kind }}</span>
                                             {{ po.display_name|truncatechars:50 }}
                                         </button>
@@ -84,7 +84,7 @@
                             {% for i in user_institutions %}
                                 {% if i.pk != current_institution.pk %}
                                     <li>
-                                        <button class="dropdown-item font-weight-bold" type="submit" name="institution_id" value="{{ i.pk }}">
+                                        <button class="dropdown-item font-weight-bold" name="institution_id" value="{{ i.pk }}">
                                             <span class="badge badge-xs badge-pill badge-primary mr-1">{{ i.kind }}</span>
                                             {{ i.display_name|truncatechars:50 }}
                                         </button>

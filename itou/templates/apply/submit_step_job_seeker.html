@@ -46,7 +46,7 @@
                     </div>
                     <div class="form-group mb-0 col-6 col-lg-auto">
                         {# Reload this page and show a modal containing more information about the job seeker. #}
-                        <button type="submit" name="preview" value="1" class="btn btn-primary btn-block" aria-label="Passer à l'étape suivante">
+                        <button name="preview" value="1" class="btn btn-primary btn-block" aria-label="Passer à l'étape suivante">
                             Suivant
                         </button>
                     </div>
@@ -83,9 +83,9 @@
                         <div class="modal-footer">
                             {% buttons %}
                                 {# Reload this page with a new form. #}
-                                <button type="submit" name="cancel" value="1" class="btn btn-sm btn-secondary">Ce n'est pas mon candidat</button>
+                                <button name="cancel" value="1" class="btn btn-sm btn-secondary">Ce n'est pas mon candidat</button>
                                 {# Go to the next step. #}
-                                <button type="submit" name="confirm" value="1" class="btn btn-sm btn-primary">Continuer</button>
+                                <button name="confirm" value="1" class="btn btn-sm btn-primary">Continuer</button>
                             {% endbuttons %}
                         </div>
                     </div>
