@@ -4,6 +4,7 @@ import datetime
 import sentry_sdk
 from dateutil.relativedelta import relativedelta
 from django import forms
+from django.conf import settings
 from django.core.validators import MinLengthValidator
 from django.db.models import Q
 from django.db.models.fields import BLANK_CHOICE_DASH
@@ -18,7 +19,6 @@ from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS, department_from_postcode
 from itou.common_apps.address.forms import MandatoryAddressFormMixin
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
-from itou.common_apps.resume.forms import ResumeFormMixin
 from itou.eligibility.models import AdministrativeCriteria
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow, PriorAction
@@ -355,10 +355,15 @@ class ApplicationJobsForm(forms.ModelForm):
             )
 
 
-class SubmitJobApplicationForm(forms.ModelForm, ResumeFormMixin):
+class SubmitJobApplicationForm(forms.ModelForm):
     """
     Submit a job application to an SIAE.
     """
+
+    resume_link = forms.URLField(
+        label="Curriculum Vitae (CV)",
+        required=False,
+    )
 
     def __init__(self, siae, user, *args, **kwargs):
         self.siae = siae
@@ -380,9 +385,18 @@ class SubmitJobApplicationForm(forms.ModelForm, ResumeFormMixin):
 
     class Meta:
         model = JobApplication
-        fields = ["selected_jobs", "message"] + ResumeFormMixin.Meta.fields
+        fields = ["selected_jobs", "message", "resume_link"]
         widgets = {"selected_jobs": forms.CheckboxSelectMultiple()}
         labels = {"selected_jobs": "Métiers recherchés"}
+
+    def clean_resume_link(self):
+        resume_link = self.cleaned_data.get("resume_link")
+        # ensure the CV has been uploaded via our S3 platform and is not a link to a 3rd party website
+        if resume_link and settings.S3_STORAGE_ENDPOINT_DOMAIN not in resume_link:
+            self.add_error(
+                "resume_link", forms.ValidationError("Le CV proposé ne provient pas d'une source de confiance.")
+            )
+        return resume_link
 
 
 class RefusalForm(forms.Form):

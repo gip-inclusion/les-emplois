@@ -26,7 +26,6 @@ from faker import Faker as fk
 import itou.utils.json
 import itou.utils.session
 from itou.approvals.models import Suspension
-from itou.common_apps.resume.forms import ResumeFormMixin
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.models import Siae, SiaeMembership
 from itou.users.enums import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF, UserKind
@@ -898,27 +897,6 @@ class UtilsEmailsSplitRecipientTest(TestCase):
         assert 2 == len(result)
         assert 50 == len(result[0].to)
         assert 25 == len(result[1].to)
-
-
-class ResumeFormMixinTest(TestCase):
-    @override_settings(S3_STORAGE_ENDPOINT_DOMAIN="foobar.com")
-    def test_ensure_link_safe_hosting(self):
-        form = ResumeFormMixin(data={"resume_link": "https://www.evil.com/virus.pdf"})
-        assert not form.is_valid()
-        assert form.errors["resume_link"][0] == "Le CV proposé ne provient pas d'une source de confiance."
-
-        form = ResumeFormMixin(data={"resume_link": "https://foobar.com/safe.pdf"})
-        assert form.is_valid()
-
-    def test_resume_is_optional(self):
-        form = ResumeFormMixin(data={})
-        assert form.is_valid()
-
-        form = ResumeFormMixin(data={"resume_link": None})
-        assert form.is_valid()
-
-        form = ResumeFormMixin(data={"resume_link": ""})
-        assert form.is_valid()
 
 
 class SupportRemarkAdminViewsTest(TestCase):

@@ -3,6 +3,7 @@ import uuid
 
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
+from django.test import override_settings
 from django.urls import resolve, reverse
 from django.utils import timezone
 from pytest_django.asserts import assertContains, assertRedirects
@@ -39,7 +40,7 @@ from tests.utils.storage.test import S3AccessingTestCase
 from tests.utils.test import TestCase, assertMessages
 
 
-class ApplyTest(TestCase):
+class ApplyTest(S3AccessingTestCase):
     def test_siae_with_no_members(self):
         siae = SiaeFactory()
         user = JobSeekerFactory()
@@ -124,6 +125,62 @@ class ApplyTest(TestCase):
             url = reverse(viewname, kwargs={"siae_pk": siae.pk, "job_seeker_pk": prescriber.pk})
             response = self.client.get(url)
             assert response.status_code == 404
+
+    @override_settings(S3_STORAGE_ENDPOINT_DOMAIN="foobar.com")
+    def test_resume_link_bad_host(self):
+        siae = SiaeFactory(with_jobs=True, with_membership=True)
+        job_seeker = JobSeekerFactory()
+        self.client.force_login(job_seeker)
+        response = self.client.post(
+            reverse("apply:application_resume", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk}),
+            {
+                "message": "Hire me?",
+                "resume_link": "https://www.evil.com/virus.pdf",
+            },
+        )
+        self.assertContains(
+            response,
+            """
+            <div class="alert alert-danger" role="alert">
+                Le CV proposé ne provient pas d&#x27;une source de confiance.
+            </div>
+            """,
+            html=True,
+            count=1,
+        )
+
+    @override_settings(S3_STORAGE_ENDPOINT_DOMAIN="foobar.com")
+    def test_resume_link_good_host(self):
+        siae = SiaeFactory(with_jobs=True, with_membership=True)
+        job_seeker = JobSeekerFactory()
+        self.client.force_login(job_seeker)
+        response = self.client.post(
+            reverse("apply:application_resume", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk}),
+            {
+                "message": "Hire me?",
+                "resume_link": "https://foobar.com/safe.pdf",
+            },
+        )
+        job_application = JobApplication.objects.get()
+        self.assertRedirects(
+            response,
+            reverse("apply:application_end", kwargs={"siae_pk": siae.pk, "application_pk": job_application.pk}),
+        )
+
+    @override_settings(S3_STORAGE_ENDPOINT_DOMAIN="foobar.com")
+    def test_resume_is_optional(self):
+        siae = SiaeFactory(with_jobs=True, with_membership=True)
+        job_seeker = JobSeekerFactory()
+        self.client.force_login(job_seeker)
+        response = self.client.post(
+            reverse("apply:application_resume", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk}),
+            {"message": "Hire me?"},
+        )
+        job_application = JobApplication.objects.get()
+        self.assertRedirects(
+            response,
+            reverse("apply:application_end", kwargs={"siae_pk": siae.pk, "application_pk": job_application.pk}),
+        )
 
 
 def test_check_nir_job_seeker_with_lack_of_nir_reason(client):
