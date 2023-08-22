@@ -334,7 +334,9 @@ def prolongation_requests_list(request, template_name="approvals/prolongation_re
         raise Http404()
 
     context = {
-        "prolongation_requests": ProlongationRequest.objects.filter(prescriber_organization=current_organization),
+        "prolongation_requests": ProlongationRequest.objects.filter(
+            prescriber_organization=current_organization
+        ).select_related("approval__user", "declared_by_siae"),
     }
     return render(request, template_name, context)
 

@@ -2,12 +2,12 @@ import pytest
 from django.contrib import messages
 from django.template import loader
 from django.urls import reverse
-from pytest_django.asserts import assertRedirects
+from pytest_django.asserts import assertNumQueries, assertRedirects
 
 from itou.approvals.enums import ProlongationRequestStatus
 from tests.approvals import factories as approvals_factories
 from tests.users import factories as users_factories
-from tests.utils.test import assertMessages, parse_response_to_soup
+from tests.utils.test import BASE_NUM_QUERIES, assertMessages, parse_response_to_soup
 
 
 @pytest.mark.parametrize(
@@ -28,7 +28,20 @@ def test_list_view(snapshot, client):
     prolongation_request = approvals_factories.ProlongationRequestFactory(for_snapshot=True)
     client.force_login(prolongation_request.validated_by)
 
-    response = client.get(reverse("approvals:prolongation_requests_list"))
+    num_queries = (
+        BASE_NUM_QUERIES
+        + 1  # fetch django session
+        + 1  # fetch user
+        + 1  # check user is in member of the organization
+        + 1  # fetch organization membership
+        + 1  # fetch organization infos
+        + 1  # fetch user's current organization
+        + 1  # fetch organization info and membership (from context processor)
+        + 1  # fetch prolongation requests rows
+        + 3  # savepoint, update session, release savepoint
+    )
+    with assertNumQueries(num_queries):
+        response = client.get(reverse("approvals:prolongation_requests_list"))
     assert str(parse_response_to_soup(response, ".s-section .c-box")) == snapshot
 
 
