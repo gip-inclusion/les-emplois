@@ -50,7 +50,7 @@ htmx.onLoad((target) => {
     * Typically useful when forms are available and you don't want the user
     * to be confused in which button to use or to forget to validate the editing form.
   **/
-  $('[data-disable-btn-if]').each(function() {
+  $('[data-disable-btn-if]', target).each(function() {
     const selector = this.getAttribute("data-disable-btn-if")
     $('.btn', this).toggleClass("disabled", $(selector).length !== 0)
     // null value removes the attribute altogether instead of having aria-disabled="false"
