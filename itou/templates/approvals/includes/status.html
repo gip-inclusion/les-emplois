@@ -8,6 +8,7 @@ Arguments:
 
     user
     common_approval  (which may be an Approval or PE Approval)
+    hiring_pending
     job_application
 
 {% endcomment %}
@@ -34,7 +35,7 @@ Arguments:
         {% else %}
             Numéro d'agrément :
         {% endif %}
-        {% if user.is_siae_staff and job_application.is_pending %}
+        {% if user.is_siae_staff and hiring_pending %}
             {% comment %}
             If the PASS IAE number is displayed at this time, some employers think that there is
             no need to validate the application because a number is already assigned.
@@ -59,13 +60,13 @@ Arguments:
                    title="Le reliquat est calculé sur la base d'un nombre de jours calendaires. Si le PASS IAE n'est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i>
             </li>
 
-            {% if job_application.is_pending and user.is_siae_staff %}
+            {% if hiring_pending and user.is_siae_staff %}
                 <li>
                     PASS IAE valide jusqu’au {{ common_approval.remainder_as_date|date:"d/m/Y" }}, si le contrat démarre aujourd’hui.
                 </li>
             {% endif %}
 
-            {% if not job_application.is_pending %}
+            {% if not hiring_pending %}
                 <li class="pb-2">
                     Date de fin prévisionnelle : {{ common_approval.end_at|date:"d/m/Y" }}
                     <i class="ri-information-line ri-xl" data-toggle="tooltip" title="Cette date de fin est susceptible d'évoluer avec les éventuelles suspensions et prolongations du PASS IAE."></i>
@@ -78,7 +79,7 @@ Arguments:
         </p>
 
         {% if user.is_siae_staff %}
-            {% if job_application.is_pending and job_application.get_eligibility_diagnosis.is_valid %}
+            {% if hiring_pending and job_application.get_eligibility_diagnosis.is_valid %}
                 {% comment %}
             When an authorized prescriber bypasses the waiting period and sends a candidate
             with an "expired" approval, the employer receives the application with the mention
