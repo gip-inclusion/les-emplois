@@ -1,8 +1,7 @@
 {% load django_bootstrap5 %}
 {% load str_filters %}
-
-<div class="c-form" id="formTarget">
-    <form method="post" hx-post="{{ request.path }}" hx-swap="outerHTML show:#acceptForm:top" hx-target="#formTarget" class="js-format-nir" id="acceptForm">
+<div class="c-form">
+    <form id="acceptForm" method="post" hx-post="{{ request.path }}" hx-swap="outerHTML show:#acceptForm:top" hx-select="#acceptForm" class="js-format-nir">
         {% if has_form_error %}
             <div class="alert alert-danger">
                 <p class="mb-0">Merci de corriger les erreurs ci-dessous</p>
@@ -25,19 +24,21 @@
             {% bootstrap_field form_personal_data.lack_of_pole_emploi_id_reason %}
         {% endif %}
 
-
         {% if form_user_address %}
             {% bootstrap_form form_user_address alert_error_type="all" %}
         {% endif %}
 
         <hr>
-        <h2>Embauche</h2>
+        <h2>Contrat</h2>
         {% bootstrap_form_errors form_accept type="non_fields" %}
 
         {# reloadable contract type and options for GEIQ #}
         {% if siae.kind == CompanyKind.GEIQ %}
             {% include "apply/includes/geiq/geiq_contract_type_and_options.html" %}
         {% endif %}
+
+        {# job description: mandatory for GEIQ, optional for other types #}
+        {% include "apply/includes/job_description_fields.html" %}
 
         {% bootstrap_field form_accept.hiring_start_at %}
 
@@ -63,6 +64,5 @@
                 </div>
             </div>
         </div>
-
     </form>
 </div>

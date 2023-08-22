@@ -21,12 +21,7 @@ from itou.job_applications.models import JobApplication, JobApplicationWorkflow,
 from itou.utils.htmx import hx_trigger_modal_control
 from itou.utils.perms.prescriber import get_all_available_job_applications_as_prescriber
 from itou.utils.urls import get_safe_url
-from itou.www.apply.forms import (
-    AcceptForm,
-    AnswerForm,
-    PriorActionForm,
-    RefusalForm,
-)
+from itou.www.apply.forms import AcceptForm, AnswerForm, PriorActionForm, RefusalForm
 from itou.www.apply.views import common as common_views, constants as apply_view_constants
 
 
@@ -40,7 +35,8 @@ def check_waiting_period(job_application):
     # This code should still stay relevant for the 3.5 years to come to account for the PE approvals
     # that have been delivered in December 2021 (and that may have 2 years waiting periods)
     if job_application.job_seeker.approval_can_be_renewed_by(
-        siae=job_application.to_siae, sender_prescriber_organization=job_application.sender_prescriber_organization
+        siae=job_application.to_siae,
+        sender_prescriber_organization=job_application.sender_prescriber_organization,
     ):
         raise PermissionDenied(apply_view_constants.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY)
 
@@ -242,7 +238,6 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
     """
     Trigger the `accept` transition.
     """
-
     queryset = JobApplication.objects.siae_member_required(request.user)
     job_application = get_object_or_404(queryset, id=job_application_id)
     check_waiting_period(job_application)
@@ -264,6 +259,8 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
 
 
 class AcceptHTMXFragmentView(TemplateView):
+    NO_ERROR_FIELDS = []
+
     def setup(self, request, job_application_id=None, siae_pk=None, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
@@ -284,27 +281,27 @@ class AcceptHTMXFragmentView(TemplateView):
         }
 
     def post(self, request, *args, **kwargs):
+        # we don't want to display error on this field for an HTMX reload:
+        for field_name in self.NO_ERROR_FIELDS:
+            if field_name in self.form_accept.errors.keys():
+                self.form_accept.errors.pop(field_name)
+
         return self.render_to_response(self.get_context_data(**kwargs))
 
 
 class ReloadQualificationFields(AcceptHTMXFragmentView):
     template_name = "apply/includes/geiq/geiq_qualification_fields.html"
-
-    def post(self, request, *args, **kwargs):
-        # we don't want to display error on this field for an HTMX reload:
-        self.form_accept.errors.pop("qualification_level", None)
-
-        return super().post(request, *args, **kwargs)
+    NO_ERROR_FIELDS = ("qualification_level",)
 
 
 class ReloadContractTypeAndOptions(AcceptHTMXFragmentView):
     template_name = "apply/includes/geiq/geiq_contract_type_and_options.html"
+    NO_ERROR_FIELDS = ("contract_type_details", "nb_hours_per_week")
 
-    def post(self, request, *args, **kwargs):
-        # we don't want to display error on this field for an HTMX reload:
-        self.form_accept.errors.pop("nb_hours_per_week", None)
 
-        return super().post(request, *args, **kwargs)
+class ReloadJobDescriptionFields(AcceptHTMXFragmentView):
+    template_name = "apply/includes/job_description_fields.html"
+    NO_ERROR_FIELDS = ("job_appellation", "location_label")
 
 
 @login_required
@@ -456,12 +453,11 @@ def geiq_eligibility(request, job_application_id, template_name="apply/process_g
     )
 
 
-# HTMX fragments
-
-
 @login_required
 def geiq_eligibility_criteria(
-    request, job_application_id, template_name="apply/includes/geiq/check_geiq_eligibility_form.html"
+    request,
+    job_application_id,
+    template_name="apply/includes/geiq/check_geiq_eligibility_form.html",
 ):
     """Dynamic GEIQ eligibility criteria form (HTMX)"""
 
@@ -521,7 +517,10 @@ def add_or_modify_prior_action(request, job_application_id, prior_action_id=None
         return HttpResponseForbidden()
 
     prior_action = (
-        get_object_or_404(PriorAction.objects.filter(job_application=job_application), pk=prior_action_id)
+        get_object_or_404(
+            PriorAction.objects.filter(job_application=job_application),
+            pk=prior_action_id,
+        )
         if prior_action_id
         else None
     )
@@ -588,10 +587,16 @@ def add_or_modify_prior_action(request, job_application_id, prior_action_id=None
         "form_url": (
             reverse(
                 "apply:modify_prior_action",
-                kwargs={"job_application_id": job_application.pk, "prior_action_id": prior_action.pk},
+                kwargs={
+                    "job_application_id": job_application.pk,
+                    "prior_action_id": prior_action.pk,
+                },
             )
             if prior_action
-            else reverse("apply:add_prior_action", kwargs={"job_application_id": job_application.pk})
+            else reverse(
+                "apply:add_prior_action",
+                kwargs={"job_application_id": job_application.pk},
+            )
         ),
         # When editing existing action, we want to keep the hr from job_application_prior_action.html
         "final_hr": prior_action is not None,

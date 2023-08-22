@@ -3,8 +3,8 @@
     {% bootstrap_field form_accept.prehiring_guidance_days %}
     {% bootstrap_field form_accept.contract_type %}
     {% bootstrap_field form_accept.inverted_vae_contract %}
-    <div id="contractTypeDetails" {% if not form_accept.is_bound or form_accept.contract_type.value != hide_value %}class="d-none"{% endif %}>
-        {% bootstrap_field form_accept.contract_type_details %}
-    </div>
+    {% if form_accept.contract_type.value == hide_value %}
+        <div id="contractTypeDetails">{% bootstrap_field form_accept.contract_type_details %}</div>
+    {% endif %}
     {% bootstrap_field form_accept.nb_hours_per_week %}
 </div>
