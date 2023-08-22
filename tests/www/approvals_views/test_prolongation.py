@@ -8,7 +8,6 @@ from django.utils.http import urlencode
 from freezegun import freeze_time
 
 from itou.approvals.enums import ProlongationReason
-from itou.approvals.models import Prolongation
 from itou.siaes.enums import SiaeKind
 from itou.utils.storage.s3 import S3Upload
 from itou.utils.widgets import DuetDatePickerWidget
@@ -68,7 +67,7 @@ class ApprovalProlongationTest(S3AccessingTestCase):
 
         # Since December 1, 2021, health context reason can no longer be used
         reason = ProlongationReason.HEALTH_CONTEXT
-        end_at = Prolongation.get_max_end_at(self.approval.end_at, reason=reason)
+        end_at = self.approval.end_at + relativedelta(days=30)
         post_data = {
             "end_at": end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "reason": reason,
@@ -82,7 +81,7 @@ class ApprovalProlongationTest(S3AccessingTestCase):
 
         # With valid reason
         reason = ProlongationReason.SENIOR
-        end_at = Prolongation.get_max_end_at(self.approval.end_at, reason=reason)
+        end_at = self.approval.end_at + relativedelta(days=30)
 
         post_data = {
             "end_at": end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
@@ -197,7 +196,7 @@ class ApprovalProlongationTest(S3AccessingTestCase):
         assert response.context["preview"] is False
 
         reason = ProlongationReason.COMPLETE_TRAINING
-        end_at = Prolongation.get_max_end_at(self.approval.end_at, reason=reason)
+        end_at = self.approval.end_at + relativedelta(days=30)
 
         post_data = {
             "end_at": end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
@@ -267,7 +266,7 @@ class ApprovalProlongationTest(S3AccessingTestCase):
         response = self.client.get(url)
 
         reason = ProlongationReason.RQTH
-        end_at = Prolongation.get_max_end_at(self.approval.end_at, reason=reason)
+        end_at = self.approval.end_at + relativedelta(days=30)
 
         post_data = {
             "end_at": end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
@@ -298,7 +297,7 @@ class ApprovalProlongationTest(S3AccessingTestCase):
         response = self.client.get(url)
 
         reason = ProlongationReason.SENIOR
-        end_at = Prolongation.get_max_end_at(self.approval.end_at, reason=reason)
+        end_at = self.approval.end_at + relativedelta(days=30)
 
         post_data = {
             "end_at": end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
@@ -333,7 +332,7 @@ class ApprovalProlongationTest(S3AccessingTestCase):
         self.client.get(url)
 
         reason = ProlongationReason.SENIOR
-        end_at = Prolongation.get_max_end_at(self.approval.end_at, reason=reason)
+        end_at = self.approval.end_at + relativedelta(days=30)
 
         post_data = {
             "end_at": end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
@@ -360,7 +359,7 @@ class ApprovalProlongationTest(S3AccessingTestCase):
         self.client.get(url)
 
         reason = ProlongationReason.SENIOR
-        end_at = Prolongation.get_max_end_at(self.approval.end_at, reason=reason)
+        end_at = self.approval.end_at + relativedelta(days=30)
 
         post_data = {
             "end_at": end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
@@ -389,7 +388,7 @@ class ApprovalProlongationTest(S3AccessingTestCase):
         self.client.get(url)
 
         reason = ProlongationReason.SENIOR
-        end_at = Prolongation.get_max_end_at(self.approval.end_at, reason=reason)
+        end_at = self.approval.end_at + relativedelta(days=30)
 
         post_data = {
             "end_at": end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
@@ -413,7 +412,7 @@ class ApprovalProlongationTest(S3AccessingTestCase):
         response = self.client.get(url)
 
         reason = ProlongationReason.SENIOR
-        end_at = Prolongation.get_max_end_at(self.approval.end_at, reason=reason)
+        end_at = self.approval.end_at + relativedelta(days=30)
 
         post_data = {
             "end_at": end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),

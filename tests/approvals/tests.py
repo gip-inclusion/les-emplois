@@ -1400,7 +1400,7 @@ class ProlongationModelTestTrigger(TestCase):
         approval_duration_2 = approval.duration
 
         # Edit prolongation to be shorter.
-        prolongation.end_at -= relativedelta(months=2)
+        prolongation.end_at -= relativedelta(days=2)
         prolongation.save()
         prolongation_duration_2 = prolongation.duration
         approval.refresh_from_db()
