@@ -20,9 +20,8 @@ cd "$APP_HOME" || exit
 # Check for common blocking errors before uploads
 django-admin sanitize_employee_records
 
-# Upload employee records 
+# Upload employee records
 django-admin transfer_employee_records --upload --wet-run
 
-# Upload update notifications 
+# Upload update notifications
 django-admin transfer_employee_records_updates --upload --wet-run
-
