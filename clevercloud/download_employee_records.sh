@@ -22,4 +22,3 @@ django-admin transfer_employee_records --download --wet-run
 
 # Download update notifications
 django-admin transfer_employee_records_updates --download --wet-run
-
