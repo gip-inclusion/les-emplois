@@ -99,10 +99,7 @@ class CreateProlongationForm(forms.ModelForm):
         initial=None,  # Uncheck radio buttons.
         widget=forms.RadioSelect(),
     )
-    end_at = forms.DateField(
-        initial=None,
-        widget=DuetDatePickerWidget(),
-    )
+    end_at = forms.DateField(widget=DuetDatePickerWidget())
 
     class Meta:
         model = Prolongation
