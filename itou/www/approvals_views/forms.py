@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db.models import Exists, OuterRef, Q
@@ -120,7 +122,8 @@ class CreateProlongationForm(forms.ModelForm):
             self.instance.approval = approval
             self.instance.declared_by_siae = siae
             # `start_at` should begin just after the approval. It cannot be set by the user.
-            self.instance.start_at = self.instance.approval.end_at
+            # Approval.end_at is inclusive.
+            self.instance.start_at = self.instance.approval.end_at + timedelta(days=1)
             self.instance.end_at = None
 
         # Customize "reason" field

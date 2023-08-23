@@ -1105,10 +1105,11 @@ class CommonProlongation(models.Model):
             raise ValidationError("Cet utilisateur n'est pas un prescripteur habilité.")
 
         # Avoid blocking updates in admin by limiting this check to only new instances.
-        if not self.pk and self.start_at != self.approval.end_at:
+        expected_start = self.approval.end_at + datetime.timedelta(days=1)
+        if not self.pk and self.start_at != expected_start:
             raise ValidationError(
-                "La date de début doit être la même que la date de fin du PASS IAE "
-                f"« {self.approval.end_at.strftime('%d/%m/%Y')} »."
+                "La date de début doit suivre immédiatement la date de fin du PASS IAE "
+                f"« {expected_start.strftime('%d/%m/%Y')} »."
             )
 
         if self.has_reached_max_cumulative_duration(additional_duration=self.duration):

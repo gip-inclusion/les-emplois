@@ -1461,7 +1461,7 @@ class ProlongationModelTest(TestCase):
 
         with pytest.raises(ValidationError) as error:
             prolongation.clean()
-        assert "La date de début doit être la même que la date de fin du PASS IAE" in error.value.message
+        assert "La date de début doit suivre immédiatement la date de fin du PASS IAE" in error.value.message
 
     def test_clean_with_no_end_at(self):
         """
