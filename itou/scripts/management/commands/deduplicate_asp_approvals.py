@@ -43,7 +43,7 @@ class Command(BaseCommand):
                     )
                     users = User.objects.filter(last_name__icontains=name, first_name__icontains=first_name)
                     for user in users:
-                        if user.birthdate and birthday == f"{user.birthdate.strftime('%d/%m/%Y')}":
+                        if user.birthdate and birthday == f"{user.birthdate:%d/%m/%Y}":
                             debug_log(f"\t> FOUND BY NAME {user.first_name} {user.last_name}")
                             possible_passes = Approval.objects.filter(user=user)
                             debug_log(f"\t\t> FOUND count={possible_passes.count()} passes")

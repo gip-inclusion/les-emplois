@@ -355,7 +355,7 @@ class ProcessViewsTest(TestCase):
                 response = self.client.get(next_url)
                 # test case hiring_end_at
                 if hiring_end_at:
-                    self.assertContains(response, f"Fin : {hiring_end_at.strftime('%d')}")
+                    self.assertContains(response, f"Fin : {hiring_end_at:%d}")
                 else:
                     self.assertContains(response, "Fin : Non renseigné")
                 # last_checked_at has been updated

@@ -82,7 +82,7 @@ class EditContractTest(TestCase):
 
         # test how hiring_end_date is displayed
         response = self.client.get(next_url)
-        self.assertContains(response, f"Fin : {future_end_date.strftime('%d')}")
+        self.assertContains(response, f"Fin : {future_end_date:%d}")
 
     def test_future_contract_date_without_hiring_end_at(self):
         """
