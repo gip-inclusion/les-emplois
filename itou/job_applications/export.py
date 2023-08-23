@@ -1,8 +1,10 @@
 from itou.job_applications.enums import SenderKind
+from itou.users.enums import Title
 from itou.utils.export import to_streaming_response
 
 
 JOB_APPLICATION_CSV_HEADERS = [
+    "Civilité candidat",
     "Nom candidat",
     "Prénom candidat",
     "Email candidat",
@@ -78,6 +80,17 @@ def _get_readable_sender_kind(job_application):
     return kind
 
 
+def _resolve_title(title, nir):
+    if title:
+        return title
+    if nir:
+        return {
+            "1": Title.M,
+            "2": Title.MME,
+        }[nir[0]]
+    return ""
+
+
 def _serialize_job_application(job_application):
     job_seeker = job_application.job_seeker
     siae = job_application.to_siae
@@ -92,6 +105,7 @@ def _serialize_job_application(job_application):
         approval_end_date = approval.end_at
 
     return [
+        _resolve_title(job_seeker.title, job_seeker.nir),
         job_seeker.last_name,
         job_seeker.first_name,
         job_seeker.email,
