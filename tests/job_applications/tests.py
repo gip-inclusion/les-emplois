@@ -28,11 +28,12 @@ from itou.job_applications.enums import (
     RefusalReason,
     SenderKind,
 )
-from itou.job_applications.export import JOB_APPLICATION_CSV_HEADERS, stream_xlsx_export
+from itou.job_applications.export import JOB_APPLICATION_CSV_HEADERS, _resolve_title, stream_xlsx_export
 from itou.job_applications.models import JobApplication, JobApplicationTransitionLog, JobApplicationWorkflow
 from itou.job_applications.notifications import NewQualifiedJobAppEmployersNotification
 from itou.jobs.models import Appellation
 from itou.siaes.enums import ContractType, SiaeKind
+from itou.users.enums import Title
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.templatetags import format_filters
@@ -1614,11 +1615,11 @@ class JobApplicationWorkflowTest(TestCase):
             job_application.cancel(user=cancellation_user)
 
 
-class JobApplicationCsvExportTest(TestCase):
+class JobApplicationXlsxExportTest(TestCase):
     @patch("itou.job_applications.models.huey_notify_pole_emploi")
     def test_xlsx_export_contains_the_necessary_info(self, *args, **kwargs):
         create_test_romes_and_appellations(["M1805"], appellations_per_rome=2)
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerFactory(title=Title.MME)
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker,
             state=JobApplicationWorkflow.STATE_PROCESSING,
@@ -1634,6 +1635,7 @@ class JobApplicationCsvExportTest(TestCase):
         assert get_rows_from_streaming_response(response) == [
             JOB_APPLICATION_CSV_HEADERS,
             [
+                "MME",
                 job_seeker.last_name,
                 job_seeker.first_name,
                 job_seeker.email,
@@ -1675,6 +1677,7 @@ class JobApplicationCsvExportTest(TestCase):
         assert get_rows_from_streaming_response(response) == [
             JOB_APPLICATION_CSV_HEADERS,
             [
+                job_seeker.title,
                 job_seeker.last_name,
                 job_seeker.first_name,
                 job_seeker.email,
@@ -1699,6 +1702,14 @@ class JobApplicationCsvExportTest(TestCase):
                 "",
             ],
         ]
+
+    def test_all_gender_cases_in_export(self):
+        assert _resolve_title(title="", nir="") == ""
+        assert _resolve_title(title=Title.M, nir="") == Title.M
+        assert _resolve_title(title="", nir="1") == Title.M
+        assert _resolve_title(title="", nir="2") == Title.MME
+        with pytest.raises(KeyError):
+            _resolve_title(title="", nir="0")
 
 
 class JobApplicationAdminFormTest(TestCase):
