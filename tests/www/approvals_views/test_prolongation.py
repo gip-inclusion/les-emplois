@@ -135,6 +135,20 @@ class ApprovalProlongationTest(S3AccessingTestCase):
         )
         self.assertNotContains(response, self.MAX_DURATION_TEXT)
 
+    def test_prolong_approval_view_no_end_at(self):
+        self.client.force_login(self.siae_user)
+        response = self.client.post(
+            reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk}),
+            {
+                # end_at is missing.
+                "reason": ProlongationReason.SENIOR,
+                "email": self.prescriber.email,
+            },
+        )
+        soup = parse_response_to_soup(response)
+        [end_at_field] = soup.select("[name=end_at]")
+        assert str(end_at_field.parent) == self.snapshot()
+
     @freeze_time()
     def test_htmx_on_reason(self):
         self.client.force_login(self.siae_user)

@@ -1072,7 +1072,8 @@ class CommonProlongation(models.Model):
 
     def clean(self):
         if not self.end_at:
-            raise ValidationError({"end_at": "La date de fin de prolongation est obligatoire."})
+            # Model.clean() is called by ModelForm.clean(), even if the form is invalid.
+            return
 
         # Min duration == 1 day.
         if self.end_at <= self.start_at:
