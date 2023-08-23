@@ -613,7 +613,7 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
         assert response.url == next_url
 
         response = self.client.get(next_url)
-        assert response.status_code == 200
+        self.assertContains(response, "Créer le compte candidat")
 
         response = self.client.post(next_url)
         assert response.status_code == 302
@@ -855,7 +855,7 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
         assert response.url == next_url
 
         response = self.client.get(next_url)
-        assert response.status_code == 200
+        self.assertContains(response, "Créer le compte candidat")
 
         response = self.client.post(next_url)
         assert response.status_code == 302
@@ -1126,7 +1126,7 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
         assert response.url == next_url
 
         response = self.client.get(next_url)
-        assert response.status_code == 200
+        self.assertContains(response, "Créer le compte candidat")
 
         # Let's add another job seeker with exactly the same NIR, in the middle of the process.
         # ----------------------------------------------------------------------
@@ -1567,7 +1567,7 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
         assert response.url == next_url
 
         response = self.client.get(next_url)
-        assert response.status_code == 200
+        self.assertContains(response, "Créer le compte candidat")
 
         response = self.client.post(next_url)
         assert response.status_code == 302
@@ -2078,6 +2078,7 @@ class UpdateJobSeekerViewTestCase(TestCase):
         self.assertContains(response, NEW_FIRST_NAME)
         self.assertContains(response, NEW_ADDRESS_LINE)
         self.assertContains(response, "Formation de niveau BAC")
+        self.assertContains(response, "Valider les informations")
 
         previous_last_checked_at = self.job_seeker.last_checked_at
 

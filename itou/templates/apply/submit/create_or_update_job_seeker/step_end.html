@@ -136,7 +136,13 @@
                             {% buttons %}
                                 <div class="text-right">
                                     <a class="btn btn-link" href="{{ back_url }}" aria-label="Retourner à l'étape précédente">Retour</a>
-                                    <button class="btn btn-primary">Valider les informations</button>
+                                    <button class="btn btn-primary">
+                                        {% if update_job_seeker %}
+                                            Valider les informations
+                                        {% else %}
+                                            Créer le compte candidat
+                                        {% endif %}
+                                    </button>
                                 </div>
                             {% endbuttons %}
                         </form>
