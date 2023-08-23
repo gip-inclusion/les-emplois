@@ -1,8 +1,12 @@
 #!/bin/bash -l
 
-# Fetch and upload files to ASP SFTP server
+set -u
 
-# Do not run if this env var is not set:
+if [[ "$CRON_ENABLED" != "1" ]]; then
+    echo "Crons not enabled."
+    exit 0
+fi
+
 if [[ "$EMPLOYEE_RECORD_CRON_ENABLED" != "1" ]]; then
     exit 0
 fi
@@ -14,11 +18,6 @@ if [[ "$INSTANCE_NUMBER" != "0" ]]; then
     exit 0
 fi
 
-# $APP_HOME is set by default by clever cloud.
 cd "$APP_HOME" || exit
-
-# Upload employee records
-django-admin transfer_employee_records --upload --wet-run
-
-# Upload update notifications
-django-admin transfer_employee_records_updates --upload --wet-run
+django-admin transfer_employee_records --wet-run "$@"
+django-admin transfer_employee_records_updates --wet-run "$@"
