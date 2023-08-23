@@ -143,7 +143,7 @@ class CreateProlongationForm(forms.ModelForm):
                 "max": Prolongation.get_max_end_at(self.instance.start_at),
             }
         )
-        self.fields["end_at"].label = f'Du {self.instance.start_at.strftime("%d/%m/%Y")} au'
+        self.fields["end_at"].label = f"Du {self.instance.start_at:%d/%m/%Y} au"
 
         end_at_extra_help_text = ""
         if reason := self.data.get("reason"):
