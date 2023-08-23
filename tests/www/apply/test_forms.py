@@ -291,6 +291,8 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
         assert job_application.contract_type == post_data["contract_type"]
         assert job_application.contract_type_details == post_data["contract_type_details"]
         assert job_application.nb_hours_per_week == post_data["nb_hours_per_week"]
+        assert job_application.qualification_level == post_data["qualification_level"]
+        assert job_application.qualification_type == post_data["qualification_type"]
         assert not job_application.inverted_vae_contract
 
     def test_geiq_inverted_vae_fields(self):

@@ -566,6 +566,7 @@ class AcceptForm(forms.ModelForm):
             "contract_type_details",
             "nb_hours_per_week",
             "hiring_start_at",
+            "qualification_level",
             "qualification_type",
             "planned_training_hours",
             "hiring_end_at",
