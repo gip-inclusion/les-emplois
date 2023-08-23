@@ -812,7 +812,7 @@ class Suspension(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.pk} {self.start_at.strftime('%d/%m/%Y')} - {self.end_at.strftime('%d/%m/%Y')}"
+        return f"{self.pk} {self.start_at:%d/%m/%Y} - {self.end_at:%d/%m/%Y}"
 
     def clean(self):
         if self.reason == self.Reason.FORCE_MAJEURE and not self.reason_explanation:
@@ -833,7 +833,7 @@ class Suspension(models.Model):
                 {
                     "end_at": (
                         f"La durée totale ne peut excéder {self.MAX_DURATION_MONTHS} mois. "
-                        f"Date de fin maximum: {max_end_at.strftime('%d/%m/%Y')}."
+                        f"Date de fin maximum: {max_end_at:%d/%m/%Y}."
                     )
                 }
             )
@@ -843,9 +843,8 @@ class Suspension(models.Model):
             raise ValidationError(
                 {
                     "start_at": (
-                        f"La suspension ne peut pas commencer en dehors des limites du PASS IAE "
-                        f"{self.approval.start_at.strftime('%d/%m/%Y')} - "
-                        f"{self.approval.end_at.strftime('%d/%m/%Y')}."
+                        "La suspension ne peut pas commencer en dehors des limites du PASS IAE "
+                        f"{self.approval.start_at:%d/%m/%Y} - {self.approval.end_at:%d/%m/%Y}."
                     )
                 }
             )
@@ -853,9 +852,7 @@ class Suspension(models.Model):
         referent_date = self.created_at.date() if self.pk else None
         next_min_start_at = self.next_min_start_at(self.approval, self.pk, referent_date, False)
         if next_min_start_at and self.start_at < next_min_start_at:
-            raise ValidationError(
-                {"start_at": (f"La date de début minimum est : {next_min_start_at.strftime('%d/%m/%Y')}.")}
-            )
+            raise ValidationError({"start_at": (f"La date de début minimum est : {next_min_start_at:%d/%m/%Y}.")})
 
     @property
     def duration(self):
@@ -1068,7 +1065,7 @@ class CommonProlongation(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.pk} {self.start_at.strftime('%d/%m/%Y')} - {self.end_at.strftime('%d/%m/%Y')}"
+        return f"{self.pk} {self.start_at:%d/%m/%Y} - {self.end_at:%d/%m/%Y}"
 
     def clean(self):
         if not self.end_at:
@@ -1085,7 +1082,7 @@ class CommonProlongation(models.Model):
                 {
                     "end_at": (
                         f"La durée totale est trop longue pour le motif « {self.get_reason_display()} ». "
-                        f"Date de fin maximum : {max_end_at.strftime('%d/%m/%Y')}."
+                        f"Date de fin maximum : {max_end_at:%d/%m/%Y}."
                     )
                 }
             )
@@ -1108,7 +1105,7 @@ class CommonProlongation(models.Model):
         if not self.pk and self.start_at != self.approval.end_at:
             raise ValidationError(
                 "La date de début doit être la même que la date de fin du PASS IAE "
-                f"« {self.approval.end_at.strftime('%d/%m/%Y')} »."
+                f"« {self.approval.end_at:%d/%m/%Y} »."
             )
 
         if self.has_reached_max_cumulative_duration(additional_duration=self.duration):

@@ -177,7 +177,7 @@ class SiaeAdmin(ItouGISMixin, ExportActionMixin, OrganizationAdmin):
     inlines = (SiaeMembersInline, JobsInline, PkSupportRemarkInline)
 
     def get_export_filename(self, request, queryset, file_format):
-        return f"Entreprises-{now().strftime('%Y-%m-%d')}.{file_format.get_extension()}"
+        return f"Entreprises-{now():%Y-%m-%d}.{file_format.get_extension()}"
 
     def get_readonly_fields(self, request, obj=None):
         readonly_fields = [

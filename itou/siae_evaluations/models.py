@@ -63,8 +63,7 @@ def create_campaigns_and_calendar(
     """
 
     name = (
-        f"contrôle pour la période du {evaluated_period_start_at.strftime('%d/%m/%Y')} "
-        f"au {evaluated_period_end_at.strftime('%d/%m/%Y')}"
+        f"contrôle pour la période du {evaluated_period_start_at:%d/%m/%Y} " f"au {evaluated_period_end_at:%d/%m/%Y}"
     )
 
     institutions = Institution.objects.filter(kind=InstitutionKind.DDETS_IAE)
