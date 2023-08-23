@@ -100,7 +100,6 @@ class CreateProlongationForm(forms.ModelForm):
         widget=forms.RadioSelect(),
     )
     end_at = forms.DateField(
-        required=False,  # Checked by model clean(), avoid double validation message
         initial=None,
         widget=DuetDatePickerWidget(),
     )

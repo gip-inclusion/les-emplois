@@ -5,3 +5,14 @@
 # name: ApprovalProlongationTest.test_check_multiple_prescriber_organization[prescriber is member of many organizations]
   '<div class="invalid-feedback">Ce champ est obligatoire.</div>'
 # ---
+# name: ApprovalProlongationTest.test_prolong_approval_view_no_end_at
+  '''
+  <div class="form-group is-invalid form-group-required"><label for="id_end_at">Du 23/10/2023 au</label><duet-date-picker class="is-invalid" identifier="id_end_at" max="2033-10-21" min="2023-10-23" name="end_at" placeholder="Du 23/10/2023 au" required="" title="Date jusqu'à laquelle le PASS IAE doit être prolongé (Durée maximum de 1 an renouvelable jusqu'à 5 ans).Au format JJ/MM/AAAA, par exemple 20/12/1978."></duet-date-picker>
+      <div class="invalid-feedback">Ce champ est obligatoire.</div>
+  
+  
+      <small class="form-text text-muted">Date jusqu'à laquelle le PASS IAE doit être prolongé <strong>(Durée maximum de 1 an renouvelable jusqu'à 5 ans)</strong>.<br/>Au format JJ/MM/AAAA, par exemple 20/12/1978.</small>
+  
+  </div>
+  '''
+# ---
