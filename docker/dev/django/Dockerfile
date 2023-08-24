@@ -57,9 +57,7 @@ RUN pip install --upgrade pip \
     && pip install psycopg[binary] --no-binary psycopg[binary] \
     && rm -rf /requirements
 
-COPY --chown=$APP_USER:$APP_USER ./docker/dev/django/entrypoint.sh /entrypoint.sh
-
-RUN chmod +x /entrypoint.sh
+COPY --chown=$APP_USER:$APP_USER --chmod=755 ./docker/dev/django/entrypoint.sh /entrypoint.sh
 
 USER $APP_USER
 
