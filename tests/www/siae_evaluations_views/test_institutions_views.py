@@ -2673,7 +2673,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
                                title=""
                                value="2022-11-20"></duet-date-picker>
               <div class="invalid-feedback">
-               Assurez-vous que cette valeur est supérieure ou égale à 2022-11-24.
+               Assurez-vous que cette valeur est supérieure ou égale à 24/11/2022.
               </div>
             </div>
             """,
@@ -2696,7 +2696,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
                                title=""
                                value="2022-11-20"></duet-date-picker>
               <div class="invalid-feedback">
-               Assurez-vous que cette valeur est supérieure ou égale à 2022-11-24.
+               Assurez-vous que cette valeur est supérieure ou égale à 24/11/2022.
               </div>
             </div>
             """,
