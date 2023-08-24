@@ -17,11 +17,7 @@ ENV PYTHONUNBUFFERED=1
 # https://www.andreagrandi.it/2018/10/16/using-ipdb-with-python-37-breakpoint/
 ENV PYTHONBREAKPOINT=ipdb.set_trace
 
-# Add new user to run the whole thing as non-root.
-RUN set -ex \
-    && addgroup $APP_USER \
-    && adduser --ingroup $APP_USER --home $APP_DIR --disabled-password $APP_USER;
-
+# Install tools to setup the PostgreSQL reposity
 RUN set -ex; \
     apt-get update; \
     apt-get install -y --no-install-recommends \
@@ -29,14 +25,12 @@ RUN set -ex; \
       lsb-release \
     ; \
     rm -rf /var/lib/apt/lists/*;
-
-
 # Add the PostgreSQL key to verify their Debian packages.
 RUN curl --silent https://www.postgresql.org/media/keys/ACCC4CF8.asc --output /etc/apt/keyrings/postgresql.asc --create-dirs
-
 # Add PostgreSQL's repository. It contains the most recent stable release.
 RUN echo "deb [signed-by=/etc/apt/keyrings/postgresql.asc] http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list
 
+# Install system dependancies
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpq-dev \
@@ -48,7 +42,7 @@ RUN apt-get update && apt-get install -y \
     moreutils \
     --no-install-recommends
 
-# Requirements are installed here to ensure they will be cached.
+# Install python dependancies
 COPY ./requirements /requirements
 RUN pip install --upgrade pip \
     && pip install --no-cache-dir -r /requirements/dev.txt \
@@ -56,10 +50,15 @@ RUN pip install --upgrade pip \
     && pip install psycopg[binary] --no-binary psycopg[binary] \
     && rm -rf /requirements
 
+# Add new user to run the whole thing as non-root.
+RUN set -ex \
+    && addgroup $APP_USER \
+    && adduser --ingroup $APP_USER --home $APP_DIR --disabled-password $APP_USER;
+
+# Setup the entrypoint
 COPY --chown=$APP_USER:$APP_USER --chmod=755 ./docker/dev/django/entrypoint.sh /entrypoint.sh
-
-USER $APP_USER
-
-WORKDIR $APP_DIR
-
 ENTRYPOINT ["/entrypoint.sh"]
+
+# Don't use root as default user
+USER $APP_USER
+WORKDIR $APP_DIR
