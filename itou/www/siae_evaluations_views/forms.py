@@ -2,7 +2,6 @@ from dateutil.relativedelta import relativedelta
 from django import forms
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.core.validators import MinValueValidator
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 
@@ -14,6 +13,7 @@ from itou.siae_evaluations.models import (
     EvaluationCampaign,
 )
 from itou.utils.types import InclusiveDateRange
+from itou.utils.validators import MinDateValidator
 from itou.utils.widgets import DuetDatePickerWidget
 
 
@@ -176,7 +176,7 @@ class InstitutionEvaluatedSiaeNotifyStep3Form(forms.Form):
         if TEMPORARY_SUSPENSION in sanctions:
             self.fields["temporary_suspension_from"] = forms.DateField(
                 label="À partir du",
-                validators=[MinValueValidator(sanction_start_date)],
+                validators=[MinDateValidator(sanction_start_date)],
                 widget=DuetDatePickerWidget(
                     attrs={
                         "aria-label": f"{SANCTION_CHOICES[TEMPORARY_SUSPENSION]} à partir du",
@@ -187,7 +187,7 @@ class InstitutionEvaluatedSiaeNotifyStep3Form(forms.Form):
             )
             self.fields["temporary_suspension_to"] = forms.DateField(
                 label="Jusqu’au",
-                validators=[MinValueValidator(sanction_start_date)],
+                validators=[MinDateValidator(sanction_start_date)],
                 widget=DuetDatePickerWidget(
                     attrs={
                         "aria-label": f"{SANCTION_CHOICES[TEMPORARY_SUSPENSION]} jusqu’au",
@@ -199,7 +199,7 @@ class InstitutionEvaluatedSiaeNotifyStep3Form(forms.Form):
         if PERMANENT_SUSPENSION in sanctions:
             self.fields["permanent_suspension"] = forms.DateField(
                 label="À partir du",
-                validators=[MinValueValidator(sanction_start_date)],
+                validators=[MinDateValidator(sanction_start_date)],
                 widget=DuetDatePickerWidget(
                     attrs={
                         "aria-label": f"{SANCTION_CHOICES[PERMANENT_SUSPENSION]} à partir du",
