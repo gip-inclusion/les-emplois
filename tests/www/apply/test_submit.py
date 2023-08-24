@@ -1954,6 +1954,11 @@ class UpdateJobSeekerViewTestCase(TestCase):
             response = self.client.get(url)
             assert response.status_code == 403
 
+    def _check_that_last_step_doesnt_crash_with_direct_access(self, user):
+        self.client.force_login(user)
+        self.client.get(self.step_1_url)  # Setup job_seeker_session
+        self.client.get(self.step_end_url)  # Use partial job_seeker_session
+
     def _check_everything_allowed(self, user, extra_post_data_1=None):
         self.client.force_login(user)
 
@@ -2257,6 +2262,13 @@ class UpdateJobSeekerViewTestCase(TestCase):
         )
         # Check that we could update its NIR infos
         assert self.job_seeker.lack_of_nir_reason == LackOfNIRReason.TEMPORARY_NUMBER
+
+    def test_as_siae_that_last_step_doesnt_crash_with_direct_access(self):
+        # Make sure the job seeker does not manage its own account
+        self.job_seeker.created_by = SiaeStaffFactory()
+        self.job_seeker.last_login = None
+        self.job_seeker.save(update_fields=["created_by", "last_login"])
+        self._check_that_last_step_doesnt_crash_with_direct_access(self.siae.members.first())
 
 
 class UpdateJobSeekerStep3ViewTestCase(TestCase):

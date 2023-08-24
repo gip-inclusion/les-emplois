@@ -1296,7 +1296,7 @@ class UpdateJobSeekerStepEndView(UpdateJobSeekerBaseView):
             "ass_allocation",
             "aah_allocation",
         ]
-        return {k: v for k, v in self.job_seeker_session.get("profile").items() if k not in fields_to_exclude}
+        return {k: v for k, v in self.job_seeker_session.get("profile", {}).items() if k not in fields_to_exclude}
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
