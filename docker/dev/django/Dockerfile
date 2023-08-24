@@ -1,7 +1,7 @@
 ARG PYTHON_VERSION
 
-# Debian Buster slim variant.
-FROM python:$PYTHON_VERSION-slim-buster
+# https://hub.docker.com/_/python
+FROM python:$PYTHON_VERSION-slim
 
 ARG APP_USER
 ARG APP_DIR
