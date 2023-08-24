@@ -41,7 +41,7 @@ class PEAMUOAuth2CallbackView(OAuth2CallbackView):
                 error = AuthError.UNKNOWN
                 logger.error("Unknown error in PEAMU dispatch.")
             return render_authentication_error(request, self.adapter.provider_id, error=error)
-        app = self.adapter.get_provider().get_app(self.request)
+        app = self.adapter.get_provider().app
         client = self.get_client(self.request, app)
         try:
             access_token = self.adapter.get_access_token_data(request, app, client)

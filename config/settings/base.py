@@ -28,7 +28,8 @@ ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "inclusion.beta.gouv.fr,emplois.inclu
 
 SITE_ID = 1
 
-DJANGO_APPS = [
+INSTALLED_APPS = [
+    # Django apps.
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -39,12 +40,7 @@ DJANGO_APPS = [
     "django.contrib.gis",
     "django.contrib.postgres",
     "django.forms",  # Required to override default Django widgets. See FORM_RENDERER
-]
-
-THIRD_PARTY_APPS = [
-    "allauth",
-    "allauth.account",
-    "allauth.socialaccount",
+    # Third party apps.
     "anymail",
     "bootstrap4",
     "django_select2",
@@ -58,10 +54,12 @@ THIRD_PARTY_APPS = [
     "hijack",
     "hijack.contrib.admin",
     "pgtrigger",
-]
-
-
-LOCAL_APPS = [
+    # Register adapters before to load allauth apps.
+    "itou.allauth_adapters",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    # ITOU apps.
     "itou.utils",
     "itou.cities",
     "itou.jobs",
@@ -105,8 +103,6 @@ LOCAL_APPS = [
     "itou.analytics",
 ]
 
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
-
 
 DJANGO_MIDDLEWARES = [
     "django.middleware.gzip.GZipMiddleware",
@@ -120,6 +116,7 @@ DJANGO_MIDDLEWARES = [
 ]
 
 THIRD_PARTY_MIDDLEWARES = [
+    "allauth.account.middleware.AccountMiddleware",
     "csp.middleware.CSPMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
     "hijack.middleware.HijackUserMiddleware",
@@ -332,22 +329,6 @@ BOOTSTRAP4 = {
     # otherwise empty required fields will be marked as valid. This might be
     # a bug in django-bootstrap4, it should be investigated.
     "success_css_class": "",
-}
-
-
-# This trick
-# https://github.com/pennersr/django-allauth/issues/749#issuecomment-70402595
-# fixes the following issue
-# https://github.com/pennersr/django-allauth/issues/749
-# Without this trick, python manage.py makemigrations
-# would want to create a migration in django-allauth dependency
-# /usr/local/lib/python3.9/site-packages/allauth/socialaccount/migrations/0004_auto_20200415_1510.py
-# - Alter field provider on socialaccount
-# - Alter field provider on socialapp
-#
-# This setting redirects the migrations for socialaccount to our directory
-MIGRATION_MODULES = {
-    "socialaccount": "itou.allauth_adapters.migrations",
 }
 
 

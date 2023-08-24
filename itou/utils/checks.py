@@ -17,7 +17,9 @@ def suggest_name(name):
 
 def check_verbose_name_lower(app_configs, **kwargs):
     if app_configs is None:
-        app_configs = [ac for ac in apps.app_configs.values() if ac.name in settings.LOCAL_APPS]
+        app_configs = [
+            ac for ac in apps.app_configs.values() if ac.name in settings.INSTALLED_APPS if ac.name.startswith("itou.")
+        ]
     models = (m for m in apps.get_models() if m._meta.app_config in app_configs)
 
     errors = []
