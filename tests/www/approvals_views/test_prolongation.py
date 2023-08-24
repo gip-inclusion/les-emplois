@@ -251,7 +251,7 @@ class ApprovalProlongationTest(S3AccessingTestCase):
                 response,
                 f"""
                 <div class="invalid-feedback">
-                    Assurez-vous que cette valeur est inférieure ou égale à {max_end_at.isoformat()}.
+                    Assurez-vous que cette valeur est inférieure ou égale à {max_end_at:%d/%m/%Y}.
                 </div>
                 """,
                 html=True,

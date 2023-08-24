@@ -2,7 +2,6 @@ from datetime import timedelta
 
 from django import forms
 from django.core.exceptions import ValidationError
-from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models import Exists, OuterRef, Q
 from django.shortcuts import reverse
 from django.utils import timezone
@@ -17,6 +16,7 @@ from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import UserKind
 from itou.users.models import User
+from itou.utils.validators import MaxDateValidator, MinDateValidator
 from itou.utils.widgets import DuetDatePickerWidget
 
 
@@ -110,38 +110,38 @@ class CreateProlongationForm(forms.ModelForm):
             "max_duration": Prolongation.MAX_DURATION,
             "help_text": (
                 "Pour le CDI Inclusion, jusqu’à la retraite "
-                "(pour des raisons techniques, une durée de 10 ans est appliquée par défaut)."
+                "(pour des raisons techniques, une durée de 10 ans (3650 jours) est appliquée par défaut)."
             ),
         },
         ProlongationReason.COMPLETE_TRAINING: {
             "max_duration": timedelta(days=365),
             "help_text": format_html(
-                "12 mois maximum pour chaque demande.<br>"
+                "12 mois (365 jours) maximum pour chaque demande.<br> "
                 "Renouvellements possibles jusqu’à la fin de l’action de formation."
             ),
         },
         ProlongationReason.RQTH: {
             "max_duration": timedelta(days=365),
             "help_text": format_html(
-                "12 mois maximum pour chaque demande.<br>"
+                "12 mois (365 jours) maximum pour chaque demande.<br> "
                 "Renouvellements possibles dans la limite de 5 ans de parcours IAE "
-                "(2 ans de parcours initial + 3 ans)."
+                "(2 ans de parcours initial + 3 ans (1095 jours))."
             ),
         },
         ProlongationReason.SENIOR: {
             "max_duration": timedelta(days=365),
             "help_text": format_html(
-                "12 mois maximum pour chaque demande.<br>"
+                "12 mois (365 jours) maximum pour chaque demande.<br> "
                 "Renouvellements possibles dans la limite de 7 ans de parcours IAE "
-                "(2 ans de parcours initial + 5 ans)."
+                "(2 ans de parcours initial + 5 ans (1825 jours))."
             ),
         },
         ProlongationReason.PARTICULAR_DIFFICULTIES: {
             "max_duration": timedelta(days=365),
             "help_text": format_html(
-                "12 mois maximum pour chaque demande.<br>"
+                "12 mois (365 jours) maximum pour chaque demande.<br> "
                 "Renouvellements possibles dans la limite de 5 ans de parcours IAE "
-                "(2 ans de parcours initial + 3 ans)."
+                "(2 ans de parcours initial + 3 ans (1095 jours))."
             ),
         },
     }
@@ -199,9 +199,9 @@ class CreateProlongationForm(forms.ModelForm):
                 self.data = self.data.copy()
                 self.data["end_at"] = max_end_at
             end_at.widget.attrs["min"] = self.instance.start_at
-            end_at.validators.append(MinValueValidator(self.instance.start_at))
+            end_at.validators.append(MinDateValidator(self.instance.start_at))
             # Try switching reason with a date beyond the max_end_at of the new reason
-            end_at.validators.append(MaxValueValidator(max_end_at))
+            end_at.validators.append(MaxDateValidator(max_end_at))
 
 
 class CreateProlongationRequestForm(CreateProlongationForm):
