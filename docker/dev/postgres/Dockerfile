@@ -1,5 +1,7 @@
+ARG PG_MAJOR
+
 # https://registry.hub.docker.com/r/postgis/postgis
-FROM postgis/postgis:14-master
+FROM postgis/postgis:$PG_MAJOR-master
 
 COPY ./docker/dev/postgres/maintenance /tmp/maintenance
 
