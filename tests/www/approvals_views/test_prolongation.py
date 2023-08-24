@@ -20,6 +20,7 @@ from tests.utils.test import parse_response_to_soup
 
 
 @pytest.mark.usefixtures("unittest_compatibility")
+@freeze_time("2023-08-23")
 class ApprovalProlongationTest(S3AccessingTestCase):
     PROLONGATION_EMAIL_REPORT_TEXT = "- Fiche bilan :"
     MAX_DURATION_TEXT = "Durée maximum de 1 an renouvelable"
@@ -149,7 +150,6 @@ class ApprovalProlongationTest(S3AccessingTestCase):
         [end_at_field] = soup.select("[name=end_at]")
         assert str(end_at_field.parent) == self.snapshot()
 
-    @freeze_time()
     def test_htmx_on_reason(self):
         self.client.force_login(self.siae_user)
         response = self.client.get(
