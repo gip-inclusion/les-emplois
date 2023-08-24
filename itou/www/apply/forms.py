@@ -1,5 +1,6 @@
 import contextlib
 import datetime
+from urllib.parse import urlparse
 
 import sentry_sdk
 from dateutil.relativedelta import relativedelta
@@ -392,7 +393,7 @@ class SubmitJobApplicationForm(forms.ModelForm):
     def clean_resume_link(self):
         resume_link = self.cleaned_data.get("resume_link")
         # ensure the CV has been uploaded via our S3 platform and is not a link to a 3rd party website
-        if resume_link and settings.S3_STORAGE_ENDPOINT_DOMAIN not in resume_link:
+        if resume_link and not urlparse(resume_link).netloc == settings.S3_STORAGE_ENDPOINT_DOMAIN:
             self.add_error(
                 "resume_link", forms.ValidationError("Le CV proposé ne provient pas d'une source de confiance.")
             )
