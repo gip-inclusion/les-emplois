@@ -135,7 +135,30 @@ class ApplyTest(S3AccessingTestCase):
             reverse("apply:application_resume", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk}),
             {
                 "message": "Hire me?",
-                "resume_link": "https://www.evil.com/virus.pdf",
+                "resume_link": "https://www.evil.com/virus.pdf?txt=foobar.com",
+            },
+        )
+        self.assertContains(
+            response,
+            """
+            <div class="alert alert-danger" role="alert">
+                Le CV proposé ne provient pas d&#x27;une source de confiance.
+            </div>
+            """,
+            html=True,
+            count=1,
+        )
+
+    @override_settings(S3_STORAGE_ENDPOINT_DOMAIN="foobar.com")
+    def test_resume_link_sub_host(self):
+        siae = SiaeFactory(with_jobs=True, with_membership=True)
+        job_seeker = JobSeekerFactory()
+        self.client.force_login(job_seeker)
+        response = self.client.post(
+            reverse("apply:application_resume", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk}),
+            {
+                "message": "Hire me?",
+                "resume_link": "https://foobar.com.evil.bzh/virus.pdf",
             },
         )
         self.assertContains(
