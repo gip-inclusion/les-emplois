@@ -1,4 +1,3 @@
-from allauth.socialaccount import providers
 from allauth.socialaccount.providers.base import ProviderAccount
 from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
 from django.conf import settings
@@ -74,6 +73,3 @@ class PEAMUProvider(OAuth2Provider):
 
     def extract_common_fields(self, data):
         return dict(email=data.get("email"), last_name=data.get("family_name"), first_name=data.get("given_name"))
-
-
-providers.registry.register(PEAMUProvider)

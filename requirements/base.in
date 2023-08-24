@@ -18,7 +18,7 @@ django==4.2.*  # https://www.djangoproject.com/
 
 # django-allauth
 # Pinned until https://github.com/pennersr/django-allauth/pull/3230 is resolved.
-django-allauth==0.51.0 # https://github.com/pennersr/django-allauth
+django-allauth  # https://github.com/pennersr/django-allauth
 
 # django-anymail
 django-anymail  # https://github.com/anymail/django-anymail
