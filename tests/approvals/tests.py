@@ -1474,9 +1474,8 @@ class ProlongationModelTest(TestCase):
             (ProlongationReason.PARTICULAR_DIFFICULTIES, datetime.date(2024, 2, 1)),  # 1095 days (3 years).
             (ProlongationReason.HEALTH_CONTEXT, datetime.date(2022, 2, 1)),  # 365 days.
         ]:
-            # Cheap parametrize, to indicate what reason failed.
-            print(reason)
-            assert Prolongation.get_max_end_at(approval.pk, start_at, reason=reason) == expected_max_end_at
+            with self.subTest(reason):
+                assert Prolongation.get_max_end_at(approval.pk, start_at, reason=reason) == expected_max_end_at
 
     @freeze_time("2023-08-21")
     def test_year_after_year_prolongation(self):
