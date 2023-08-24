@@ -23,30 +23,20 @@ RUN set -ex \
     && adduser --ingroup $APP_USER --home $APP_DIR --disabled-password $APP_USER;
 
 RUN set -ex; \
-    if ! command -v gpg > /dev/null; then \
-        apt-get update; \
-        apt-get install -y --no-install-recommends \
-            gnupg \
-            dirmngr \
-        ; \
-        rm -rf /var/lib/apt/lists/*; \
-    fi
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+      gnupg \
+      curl \
+      lsb-release \
+    ; \
+    rm -rf /var/lib/apt/lists/*;
 
-# Add the PostgreSQL PGP key to verify their Debian packages.
-RUN set -ex; \
-# pub   4096R/ACCC4CF8 2011-10-13 [expires: 2019-07-02]
-#       Key fingerprint = B97B 0AFC AA1A 47F0 44F2  44A0 7FCC 7D46 ACCC 4CF8
-# uid                  PostgreSQL Debian Repository
-    key='B97B0AFCAA1A47F044F244A07FCC7D46ACCC4CF8'; \
-    export GNUPGHOME="$(mktemp -d)"; \
-    gpg --batch --keyserver keyserver.ubuntu.com --recv-keys "$key"; \
-    gpg --batch --export "$key" > /etc/apt/trusted.gpg.d/postgres.gpg; \
-    command -v gpgconf > /dev/null && gpgconf --kill all; \
-    rm -rf "$GNUPGHOME"; \
-    apt-key list;
+
+# Add the PostgreSQL key to verify their Debian packages.
+RUN curl --silent https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
 
 # Add PostgreSQL's repository. It contains the most recent stable release.
-RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ buster-pgdg main $PG_MAJOR" > /etc/apt/sources.list.d/pgdg.list
+RUN echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list
 
 RUN apt-get update && apt-get install -y \
     build-essential \
