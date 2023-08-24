@@ -1,5 +1,11 @@
+ARG PYTHON_VERSION
+
 # Debian Buster slim variant.
-FROM python:3.11-slim-buster
+FROM python:$PYTHON_VERSION-slim-buster
+
+ARG APP_USER
+ARG APP_DIR
+ARG PG_MAJOR
 
 # Inspiration
 # https://github.com/azavea/docker-django/blob/1ef366/Dockerfile-slim.template
@@ -11,12 +17,10 @@ ENV PYTHONUNBUFFERED=1
 # https://www.andreagrandi.it/2018/10/16/using-ipdb-with-python-37-breakpoint/
 ENV PYTHONBREAKPOINT=ipdb.set_trace
 
-ENV APP_DIR="/app"
-
 # Add new user to run the whole thing as non-root.
 RUN set -ex \
-    && addgroup app \
-    && adduser --ingroup app --home $APP_DIR --disabled-password app;
+    && addgroup $APP_USER \
+    && adduser --ingroup $APP_USER --home $APP_DIR --disabled-password $APP_USER;
 
 RUN set -ex; \
     if ! command -v gpg > /dev/null; then \
@@ -41,8 +45,6 @@ RUN set -ex; \
     rm -rf "$GNUPGHOME"; \
     apt-key list;
 
-ENV PG_MAJOR="14"
-
 # Add PostgreSQL's repository. It contains the most recent stable release.
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ buster-pgdg main $PG_MAJOR" > /etc/apt/sources.list.d/pgdg.list
 
@@ -65,11 +67,11 @@ RUN pip install --upgrade pip \
     && pip install psycopg[binary] --no-binary psycopg[binary] \
     && rm -rf /requirements
 
-COPY --chown=app:app ./docker/dev/django/entrypoint.sh /entrypoint.sh
+COPY --chown=$APP_USER:$APP_USER ./docker/dev/django/entrypoint.sh /entrypoint.sh
 
 RUN chmod +x /entrypoint.sh
 
-USER app
+USER $APP_USER
 
 WORKDIR $APP_DIR
 
