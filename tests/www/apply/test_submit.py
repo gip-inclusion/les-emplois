@@ -1945,13 +1945,6 @@ class UpdateJobSeekerViewTestCase(TestCase):
 
     def _check_nothing_permitted(self, user):
         self.client.force_login(user)
-        apply_session = SessionNamespace(self.client.session, f"job_application-{self.siae.pk}")
-        apply_session.init(
-            {
-                "selected_jobs": [],
-            }
-        )
-        apply_session.save()
         for url in [
             self.step_1_url,
             self.step_2_url,
@@ -1963,13 +1956,6 @@ class UpdateJobSeekerViewTestCase(TestCase):
 
     def _check_everything_allowed(self, user, extra_post_data_1=None):
         self.client.force_login(user)
-        apply_session = SessionNamespace(self.client.session, f"job_application-{self.siae.pk}")
-        apply_session.init(
-            {
-                "selected_jobs": [],
-            }
-        )
-        apply_session.save()
 
         # STEP 1
         response = self.client.get(self.step_1_url)
@@ -2100,13 +2086,6 @@ class UpdateJobSeekerViewTestCase(TestCase):
 
     def _check_only_administrative_allowed(self, user):
         self.client.force_login(user)
-        apply_session = SessionNamespace(self.client.session, f"job_application-{self.siae.pk}")
-        apply_session.init(
-            {
-                "selected_jobs": [],
-            }
-        )
-        apply_session.save()
 
         # STEP 1
         response = self.client.get(self.step_1_url)
