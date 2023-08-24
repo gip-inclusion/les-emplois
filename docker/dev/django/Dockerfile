@@ -1,7 +1,6 @@
 # Debian Buster slim variant.
 FROM python:3.11-slim-buster
 
-ENV DOCKER_DEFAULT_PLATFORM=linux/amd64
 # Inspiration
 # https://github.com/azavea/docker-django/blob/1ef366/Dockerfile-slim.template
 # https://github.com/docker-library/postgres/blob/9d8e24/11/Dockerfile
