@@ -1944,22 +1944,22 @@ class LastCheckedAtViewTest(TestCase):
         self._check_last_checked_at(prescriber, sees_warning=True, sees_verify_link=True)
 
 
-class UpdateJobSeekerViewTestCase(TestCase):
+class UpdateJobSeekerBaseTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.siae = SiaeFactory(subject_to_eligibility=True, with_membership=True)
         cls.job_seeker = JobSeekerFactory()
         cls.step_1_url = reverse(
-            "apply:update_job_seeker_step_1", kwargs={"siae_pk": cls.siae.pk, "job_seeker_pk": cls.job_seeker.pk}
+            cls.STEP_1_VIEW_NAME, kwargs={"siae_pk": cls.siae.pk, "job_seeker_pk": cls.job_seeker.pk}
         )
         cls.step_2_url = reverse(
-            "apply:update_job_seeker_step_2", kwargs={"siae_pk": cls.siae.pk, "job_seeker_pk": cls.job_seeker.pk}
+            cls.STEP_2_VIEW_NAME, kwargs={"siae_pk": cls.siae.pk, "job_seeker_pk": cls.job_seeker.pk}
         )
         cls.step_3_url = reverse(
-            "apply:update_job_seeker_step_3", kwargs={"siae_pk": cls.siae.pk, "job_seeker_pk": cls.job_seeker.pk}
+            cls.STEP_3_VIEW_NAME, kwargs={"siae_pk": cls.siae.pk, "job_seeker_pk": cls.job_seeker.pk}
         )
         cls.step_end_url = reverse(
-            "apply:update_job_seeker_step_end", kwargs={"siae_pk": cls.siae.pk, "job_seeker_pk": cls.job_seeker.pk}
+            cls.STEP_END_VIEW_NAME, kwargs={"siae_pk": cls.siae.pk, "job_seeker_pk": cls.job_seeker.pk}
         )
         [cls.city] = create_test_cities(["67"], num_per_department=1)
 
@@ -2099,7 +2099,9 @@ class UpdateJobSeekerViewTestCase(TestCase):
         response = self.client.post(self.step_end_url)
         assertRedirects(
             response,
-            reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk}),
+            reverse(
+                self.FINAL_REDIRECT_VIEW_NAME, kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk}
+            ),
             fetch_redirect_response=False,
         )
         assert self.client.session.get(self.job_seeker_session_key) is None
@@ -2186,7 +2188,9 @@ class UpdateJobSeekerViewTestCase(TestCase):
         response = self.client.post(self.step_end_url)
         assertRedirects(
             response,
-            reverse("apply:application_jobs", kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk}),
+            reverse(
+                self.FINAL_REDIRECT_VIEW_NAME, kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk}
+            ),
             fetch_redirect_response=False,
         )
         assert self.client.session.get(self.job_seeker_session_key) is None
@@ -2195,6 +2199,14 @@ class UpdateJobSeekerViewTestCase(TestCase):
         assert self.job_seeker.has_jobseeker_profile is True
         assert self.job_seeker.jobseeker_profile.education_level == EducationLevel.BAC_LEVEL
         assert self.job_seeker.last_checked_at != previous_last_checked_at
+
+
+class UpdateJobSeekerTestCase(UpdateJobSeekerBaseTestCase):
+    STEP_1_VIEW_NAME = "apply:update_job_seeker_step_1"
+    STEP_2_VIEW_NAME = "apply:update_job_seeker_step_2"
+    STEP_3_VIEW_NAME = "apply:update_job_seeker_step_3"
+    STEP_END_VIEW_NAME = "apply:update_job_seeker_step_end"
+    FINAL_REDIRECT_VIEW_NAME = "apply:application_jobs"
 
     def test_anonymous_step_1(self):
         response = self.client.get(self.step_1_url)
