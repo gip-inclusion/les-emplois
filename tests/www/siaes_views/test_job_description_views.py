@@ -496,10 +496,9 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
             BASE_NUM_QUERIES
             + 1  # fetch django session
             + 1  # fetch user
-            + 1  # check user is active
+            + 1  # fetch user memberships
             + 1  # fetch siaes_siaejobdescription
             + 1  # fetch siaes infos
-            + 1  # fetch prescribers_prescribermembership/organization
             + 1  # fetch jobappelation
             + 1  # fetch other job infos
         ):

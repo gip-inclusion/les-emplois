@@ -10,10 +10,34 @@ from itou.utils import constants as global_constants
 from itou.www.login import urls as login_urls
 
 
+def extract_membership_infos_and_update_session(memberships, org_through_field, session, session_key):
+    current_org_pk = session.get(session_key)
+    orgs = []
+    current_org = None
+    admin_status = {}
+    for membership in memberships:
+        org = getattr(membership, org_through_field)
+        orgs.append(org)
+        if org.pk == current_org_pk:
+            current_org = org
+        admin_status[org.pk] = membership.is_admin
+    if current_org is None:
+        if orgs:
+            # If an org exists, choose the first one
+            current_org = orgs[0]
+            session[session_key] = current_org.pk
+        elif current_org_pk:
+            # If the user has not active membership anymore
+            # => No need to track the current org in session (none)
+            # => Remove any old session entry if needed
+            del session[session_key]
+    return orgs, current_org, current_org and admin_status[current_org.pk]
+
+
 class ItouCurrentOrganizationMiddleware:
     """
-    Store the ID of the current prescriber organization or employer structure in session.
-    https://docs.djangoproject.com/en/dev/topics/http/middleware/#writing-your-own-middleware
+    Store the ID of the current prescriber organization or employer structure in session
+    and enrich the request object with the memberships infos.
     """
 
     def __init__(self, get_response):
@@ -30,7 +54,7 @@ class ItouCurrentOrganizationMiddleware:
         # This raises an error so we skip the middleware only in this case.
         login_routes = [reverse(f"login:{url.name}") for url in login_urls.urlpatterns] + [reverse("account_login")]
         skip_middleware_conditions = [
-            request.path in [reverse("account_logout"), *login_routes],
+            request.path in login_routes,
             request.path.startswith("/invitations/") and not request.path.startswith("/invitations/invite"),
             request.path.startswith("/signup/siae/join"),  # siae staff about to join an siae
             request.path.startswith("/signup/facilitator/join"),  # facilitator about to join an siae
@@ -47,86 +71,98 @@ class ItouCurrentOrganizationMiddleware:
                 and not request.path.startswith("/inclusion_connect")  # Allow to access ic views
                 and not request.path.startswith("/hijack/release")  # Allow to release hijack
                 and settings.FORCE_IC_LOGIN  # Allow to disable on dev setup
+                and request != reverse("account_logout")
             ):
                 # Add request.path as next param ?
                 return HttpResponseRedirect(reverse("dashboard:activate_ic_account"))
 
             if user.is_siae_staff:
-                current_siae_pk = request.session.get(global_constants.ITOU_SESSION_CURRENT_SIAE_KEY)
-                siae_set = user.siae_set.filter(siaemembership__is_active=True).active_or_in_grace_period()
+                active_memberships = list(user.siaemembership_set.filter(is_active=True))
+                siaes = {
+                    siae.pk: siae
+                    for siae in user.siae_set.filter(
+                        pk__in=[membership.siae_id for membership in active_memberships]
+                    ).active_or_in_grace_period()
+                }
+                really_active_memberships = []
+                for membership in active_memberships:
+                    if membership.siae_id in siaes:
+                        # The siae is active (or in grace period)
+                        membership.siae = siaes[membership.siae_id]
+                        really_active_memberships.append(membership)
+                # If there is no current siae, we want to default to the first active one
+                # (and preferably not one in grace period)
+                really_active_memberships.sort(key=lambda m: m.siae.has_convention_in_grace_period)
 
-                if not siae_set.filter(pk=current_siae_pk).exists():
-                    # User is no longer an active member of siae stored in session,
-                    # or siae stored in session no longer exists.
-                    # Let's automatically switch to another siae when possible,
-                    # preferably an active one.
-                    first_siae = siae_set.active().first() or siae_set.first()
-                    if first_siae:
-                        request.session[global_constants.ITOU_SESSION_CURRENT_SIAE_KEY] = first_siae.pk
-                    else:
-                        # SIAE user has no active SIAE and thus must not be able to access any page,
-                        # thus we force a logout with a few exceptions:
-                        # - logout (to avoid infinite redirect loop)
-                        # - pages of the invitation process (including login)
-                        #   as being invited to a new active siae is the only
-                        #   way for an inactive siae user to be ressucitated.
-                        if not user.siaemembership_set.filter(is_active=True).exists():
-                            message = (
-                                "Nous sommes désolés, votre compte n'est "
-                                "actuellement rattaché à aucune structure.<br>"
-                                "Nous espérons cependant avoir l'occasion de vous accueillir de "
-                                "nouveau."
-                            )
-                        else:
-                            message = (
-                                "Nous sommes désolés, votre compte n'est "
-                                "malheureusement plus actif car la ou les "
-                                "structures associées ne sont plus "
-                                "conventionnées. Nous espérons cependant "
-                                "avoir l'occasion de vous accueillir de "
-                                "nouveau."
-                            )
-                        message = safestring.mark_safe(message)
-                        messages.warning(request, message)
-                        return redirect("account_logout")
-
-            elif user.is_prescriber:
-                # Prescriber users can now select an organization
-                # (if they are member of several prescriber organizations)
-                current_prescriber_org_key = request.session.get(
-                    global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY
+                (
+                    request.organizations,
+                    request.current_organization,
+                    request.is_current_organization_admin,
+                ) = extract_membership_infos_and_update_session(
+                    really_active_memberships,
+                    "siae",
+                    request.session,
+                    global_constants.ITOU_SESSION_CURRENT_SIAE_KEY,
                 )
-                if user.is_prescriber_with_org:
-                    if not current_prescriber_org_key:
-                        # Choose first prescriber organization for user if none is selected yet
-                        # (f.i. after login)
-                        request.session[global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY] = (
-                            user.prescribermembership_set.filter(is_active=True).first().organization.pk
-                        )
-                elif current_prescriber_org_key:
-                    # If the user is an "orienteur"
-                    # => No need to track the current org in session (none)
-                    # => Remove any old session entry if needed
-                    del request.session[global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY]
 
-            elif user.is_labor_inspector:
-                current_institution_key = request.session.get(global_constants.ITOU_SESSION_CURRENT_INSTITUTION_KEY)
-                if not current_institution_key:
-                    first_active_membership = user.institutionmembership_set.filter(is_active=True).first()
-                    if not first_active_membership:
+                if not request.current_organization and request.path != reverse("account_logout"):
+                    # SIAE user has no active SIAE and thus must not be able to access any page,
+                    # thus we force a logout with a few exceptions (cf skip_middleware_conditions)
+                    if not active_memberships:
                         message = (
                             "Nous sommes désolés, votre compte n'est "
                             "actuellement rattaché à aucune structure.<br>"
                             "Nous espérons cependant avoir l'occasion de vous accueillir de "
                             "nouveau."
                         )
-                        message = safestring.mark_safe(message)
-                        messages.warning(request, message)
-                        return redirect("account_logout")
+                    else:
+                        message = (
+                            "Nous sommes désolés, votre compte n'est "
+                            "malheureusement plus actif car la ou les "
+                            "structures associées ne sont plus "
+                            "conventionnées. Nous espérons cependant "
+                            "avoir l'occasion de vous accueillir de "
+                            "nouveau."
+                        )
+                    message = safestring.mark_safe(message)
+                    messages.warning(request, message)
+                    return redirect("account_logout")
 
-                    request.session[
-                        global_constants.ITOU_SESSION_CURRENT_INSTITUTION_KEY
-                    ] = first_active_membership.institution.pk
+            elif user.is_prescriber:
+                (
+                    request.organizations,
+                    request.current_organization,
+                    request.is_current_organization_admin,
+                ) = extract_membership_infos_and_update_session(
+                    user.prescribermembership_set.filter(is_active=True)
+                    .order_by("created_at")
+                    .select_related("organization"),
+                    "organization",
+                    request.session,
+                    global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY,
+                )
+
+            elif user.is_labor_inspector:
+                (
+                    request.organizations,
+                    request.current_organization,
+                    request.is_current_organization_admin,
+                ) = extract_membership_infos_and_update_session(
+                    user.institutionmembership_set.filter(is_active=True).select_related("institution"),
+                    "institution",
+                    request.session,
+                    global_constants.ITOU_SESSION_CURRENT_INSTITUTION_KEY,
+                )
+                if not request.current_organization and request.path != reverse("account_logout"):
+                    message = (
+                        "Nous sommes désolés, votre compte n'est "
+                        "actuellement rattaché à aucune structure.<br>"
+                        "Nous espérons cependant avoir l'occasion de vous accueillir de "
+                        "nouveau."
+                    )
+                    message = safestring.mark_safe(message)
+                    messages.warning(request, message)
+                    return redirect("account_logout")
 
         response = self.get_response(request)
 

@@ -32,11 +32,8 @@ def test_list_view(snapshot, client):
         BASE_NUM_QUERIES
         + 1  # fetch django session
         + 1  # fetch user
-        + 1  # check user is in member of the organization
-        + 1  # fetch organization membership
+        + 1  # check user memberships
         + 1  # fetch organization infos
-        + 1  # fetch user's current organization
-        + 1  # fetch organization info and membership (from context processor)
         + 1  # fetch prolongation requests rows
         + 3  # savepoint, update session, release savepoint
     )

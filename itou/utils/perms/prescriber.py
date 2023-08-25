@@ -20,7 +20,7 @@ def get_all_available_job_applications_as_prescriber(request):
     """
     from itou.job_applications.models import JobApplication
 
-    if request.user.is_prescriber_with_org:
+    if request.current_organization and request.user.is_prescriber:  # Set by middleware for prescriber users
         prescriber_organization = get_current_org_or_404(request)
         # Show all applications organization-wide + applications sent by the
         # current user for backward compatibility (in the past, a user could

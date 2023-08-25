@@ -237,7 +237,6 @@ class ProcessListSiaeTest(ProcessListTest):
             + 1  # manually prefetch administrative_criteria
             #
             # Render template:
-            + 1  # context processor: user siae membership
             # 9 job applications (1 per state in JobApplicationWorkflow + 1 sent by prescriber)
             # 22 requests, maggie has a diagnosis made by a prescriber in this test
             + 1  # jobapp1: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
@@ -866,7 +865,7 @@ def test_list_for_unauthorized_prescriber_view(client):
         BASE_NUM_QUERIES
         + 1  # fetch django session
         + 1  # fetch user
-        + 1  # check for membeship
+        + 1  # fetch user memberships
         + 1  # get list of senders (distinct sender_id)
         + 1  # get list of job seekers (distinct job_seeker_id)
         + 1  # get list of administrative criteria

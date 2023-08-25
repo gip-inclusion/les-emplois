@@ -124,9 +124,9 @@ class TestItouCurrentOrganizationMiddleware:
         request.user = siae.members.first()
         SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
         with assertNumQueries(
-            # Check if siae exists
+            # Retrieve user memberships
             1
-            # get the first one
+            # Check if siaes are active or in grace period
             + 1
         ):
             ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
@@ -140,12 +140,7 @@ class TestItouCurrentOrganizationMiddleware:
         request.user = SiaeStaffFactory()
         SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
         MessageMiddleware(get_response_for_middlewaremixin).process_request(request)
-        with assertNumQueries(
-            1  # Check if siae exists
-            + 1  # get the first active
-            + 1  # get the first active_or_in_grace_period
-            + 1  # check if any active membership exists
-        ):
+        with assertNumQueries(1):  # Retrieve user memberships
             response = ItouCurrentOrganizationMiddleware(get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 0
         assertRedirects(response, reverse("account_logout"), fetch_redirect_response=False)
@@ -172,10 +167,10 @@ class TestItouCurrentOrganizationMiddleware:
         SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
         MessageMiddleware(get_response_for_middlewaremixin).process_request(request)
         with assertNumQueries(
-            1  # Check if siae exists
-            + 1  # get the first active
-            + 1  # get the first active_or_in_grace_period
-            + 1  # check if any active membership exists
+            # Retrieve user memberships
+            1
+            # Check if siaes are active or in grace period
+            + 1
         ):
             response = ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 0
@@ -204,11 +199,9 @@ class TestItouCurrentOrganizationMiddleware:
         SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
         MessageMiddleware(get_response_for_middlewaremixin).process_request(request)
         with assertNumQueries(
-            # Check if siae exists
+            # Retrieve user memberships
             1
-            # get the first active
-            + 1
-            # check if any active membership exists
+            # Check if siaes are active or in grace period
             + 1
         ):
             ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
@@ -225,9 +218,9 @@ class TestItouCurrentOrganizationMiddleware:
         SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
         MessageMiddleware(get_response_for_middlewaremixin).process_request(request)
         with assertNumQueries(
-            # Check if siae exists
+            # Retrieve user memberships
             1
-            # get the first active
+            # Check if siaes are active or in grace period
             + 1
         ):
             ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
@@ -240,11 +233,15 @@ class TestItouCurrentOrganizationMiddleware:
         request = factory.get("/")
         request.user = PrescriberFactory()
         SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
-        with assertNumQueries(1):
+        with assertNumQueries(1):  # retrieve user memberships
             ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 1
         # Session untouched
         assert request.session.is_empty()
+        # Check new request attributes
+        assert request.current_organization is None
+        assert request.organizations == []
+        assert not request.is_current_organization_admin
 
     def test_prescriber_with_organization(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
@@ -252,15 +249,15 @@ class TestItouCurrentOrganizationMiddleware:
         organization = PrescriberOrganizationWithMembershipFactory()
         request.user = organization.members.first()
         SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
-        with assertNumQueries(
-            1  # is_prescriber_with_org
-            + 1  # get first active membership...
-            + 1  # ... and retrieve its organization pk
-        ):
+        with assertNumQueries(1):  # retrieve user memberships
             ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 1
         # Session updated
         assert request.session[global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY] == organization.pk
+        # Check new request attributes
+        assert request.current_organization == organization
+        assert request.organizations == [organization]
+        assert request.is_current_organization_admin
 
     def test_prescriber_wrong_org_in_session(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
@@ -270,11 +267,15 @@ class TestItouCurrentOrganizationMiddleware:
         SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
         request.session[global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY] = organization.pk
         request.session.save()
-        with assertNumQueries(1):
+        with assertNumQueries(1):  # retrieve user memberships
             ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 1
         # Session cleaned up
         assert request.session.get(global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY) is None
+        # Check new request attributes
+        assert request.current_organization is None
+        assert request.organizations == []
+        assert not request.is_current_organization_admin
 
     def test_labor_inspector_admin_member(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
@@ -282,16 +283,15 @@ class TestItouCurrentOrganizationMiddleware:
         institution = InstitutionWithMembershipFactory()
         request.user = institution.members.first()
         SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
-        with assertNumQueries(
-            #  get first active membership...
-            1
-            # ... and retrieve its institution pk
-            + 1
-        ):
+        with assertNumQueries(1):  # retrieve user memberships
             ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 1
         # Session updated
         assert request.session[global_constants.ITOU_SESSION_CURRENT_INSTITUTION_KEY] == institution.pk
+        # Check new request attributes
+        assert request.current_organization == institution
+        assert request.organizations == [institution]
+        assert request.is_current_organization_admin
 
     def test_labor_inspector_member_of_2_institutions(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
@@ -302,11 +302,15 @@ class TestItouCurrentOrganizationMiddleware:
         SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
         request.session[global_constants.ITOU_SESSION_CURRENT_INSTITUTION_KEY] = institution2.pk
         request.session.save()
-        with assertNumQueries(0):
+        with assertNumQueries(1):  # retrieve user memberships
             ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 1
         # Session untouched
         assert request.session[global_constants.ITOU_SESSION_CURRENT_INSTITUTION_KEY] == institution2.pk
+        # Check new request attributes
+        assert request.current_organization == institution2
+        assert request.organizations == [institution1, institution2]
+        assert not request.is_current_organization_admin
 
     def test_labor_inspector_no_member(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
@@ -314,7 +318,7 @@ class TestItouCurrentOrganizationMiddleware:
         request.user = LaborInspectorFactory()
         SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
         MessageMiddleware(get_response_for_middlewaremixin).process_request(request)
-        with assertNumQueries(1):
+        with assertNumQueries(1):  # retrieve user memberships
             response = ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 0
         assertRedirects(response, reverse("account_logout"), fetch_redirect_response=False)
@@ -332,6 +336,10 @@ class TestItouCurrentOrganizationMiddleware:
         )
         # Session untouched
         assert request.session.is_empty()
+        # Check new request attributes
+        assert request.current_organization is None
+        assert request.organizations == []
+        assert not request.is_current_organization_admin
 
 
 class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
@@ -342,6 +350,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
         middleware = SessionMiddleware(get_response_for_middlewaremixin)
         middleware.process_request(request)
         request.session[establishment_session_key] = establishment_pk
+        ItouCurrentOrganizationMiddleware(get_response_for_middlewaremixin)(request)
         request.session.save()
         return request
 
@@ -356,7 +365,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
             establishment_pk=siae.pk,
         )
 
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(0):
             result = get_current_organization_and_perms(request)
             assert result == {
                 "current_siae": siae,
@@ -386,7 +395,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
             establishment_pk=siae2.pk,
         )
 
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(0):
             result = get_current_organization_and_perms(request)
             assert result == {
                 "current_siae": siae2,
@@ -411,7 +420,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
             establishment_pk=organization.pk,
         )
 
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(0):
             result = get_current_organization_and_perms(request)
             assert result == {
                 "current_prescriber_organization": organization,
@@ -440,7 +449,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
             establishment_pk=organization1.pk,
         )
 
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(0):
             result = get_current_organization_and_perms(request)
             assert result == {
                 "current_prescriber_organization": organization1,
@@ -465,7 +474,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
             establishment_pk=institution.pk,
         )
 
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(0):
             result = get_current_organization_and_perms(request)
             assert result == {
                 "current_institution": institution,
@@ -494,7 +503,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
             establishment_pk=institution2.pk,
         )
 
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(0):
             result = get_current_organization_and_perms(request)
             assert result == {
                 "current_institution": institution2,
