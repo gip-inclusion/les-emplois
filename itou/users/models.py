@@ -673,16 +673,6 @@ class User(AbstractUser, AddressMixin):
     def has_pole_emploi_email(self):
         return self.email and self.email.endswith(global_constants.POLE_EMPLOI_EMAIL_SUFFIX)
 
-    @cached_property
-    def is_siae_staff_with_siae(self):
-        """
-        Useful to identify users deactivated as member of a SIAE
-        and without any membership left.
-        They are in a "dangling" status: still active (membership-wise) but unable to login
-        because not member of any SIAE.
-        """
-        return self.is_siae_staff and self.siaemembership_set.filter(is_active=True).exists()
-
     def active_or_in_grace_period_siae_memberships(self):
         """
         Return the siae memberships accessible to the employer, which means either active
