@@ -1,6 +1,3 @@
-from django.core.exceptions import PermissionDenied
-from django.urls import reverse
-
 from itou.users.enums import IdentityProvider
 from itou.utils import constants as global_constants
 
@@ -24,8 +21,6 @@ def get_current_organization_and_perms(request):
 
         if siae_pk:
             extra_context, extra_matomo_context = get_context_siae(request.user, siae_pk)
-            if "current_siae" not in extra_context and request.path != reverse("account_logout"):
-                raise PermissionDenied
 
         if prescriber_org_pk:
             extra_context, extra_matomo_context = get_context_prescriber(request.user, prescriber_org_pk)
