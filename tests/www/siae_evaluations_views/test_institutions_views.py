@@ -613,11 +613,10 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         with self.assertNumQueries(
             BASE_NUM_QUERIES
             + 1  # django session
-            + 1  # fetch user
-            + 3  # fetch institution membership & institution x 2 !should be fixed!
+            + 2  # fetch user & its memberships (middleware)
+            + 1  # fetch institution membership
             + 1  # fetch evaluation campaign
             + 3  # fetch evaluated_siae and its prefetch_related eval_job_app & eval_admin_crit
-            + 1  # one again institution membership
             + 3  # savepoint, update session, release savepoint
         ):
             response = self.client.get(url)
@@ -1712,10 +1711,10 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         with self.assertNumQueries(
             BASE_NUM_QUERIES
             + 1  # django session
-            + 1  # fetch user
-            + 3  # fetch institution membership & institution x 2 !should be fixed!
-            + 6  # fetch evaluated_siae and its prefetch_related
-            + 1  # one again institution membership
+            + 2  # fetch user & its memberships (middleware)
+            + 1  # fetch institution membership
+            + 3  # fetch evaluated_siae, evaluated_jobapp & criteria
+            + 3  # fetch jobapplication, approvals & users
             + 3  # savepoint, update session, release savepoint
         ):
             response = self.client.get(url)
@@ -1967,10 +1966,10 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
         with self.assertNumQueries(
             BASE_NUM_QUERIES
             + 1  # Load session
-            + 4  # Check user, membership, institution & institution membership (!)
+            + 2  # Check user & its memberships
+            + 1  # Laod institution infos
             + 1  # Load evaluated siae infos
             + 1  # Load evaluated job applications
-            + 1  # Check institution membership again
             + 3  # Load evaluated siae infos + job application + criteria for previous campaigns
             + 3  # Update session
         ):
@@ -3624,10 +3623,10 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         with self.assertNumQueries(
             BASE_NUM_QUERIES
             + 1  # django session
-            + 1  # fetch user
-            + 3  # fetch institution membership & institution x 2 !should be fixed!
-            + 5  # fetch evaluated_siae and its prefetch_related (evalcriteria, admincriteria, jobapp, approval)
-            + 2  # user & institution membership (again)
+            + 2  # fetch user & its memberships (middleware)
+            + 1  # fetch institution membership
+            + 3  # fetch evaluated_jobapp & criteria
+            + 3  # jobapp, approvals & users
             + 2  # evaljobapp & its evalcriteria
             + 3  # savepoint, update session, release savepoint
         ):

@@ -1,5 +1,4 @@
 from itou.users.enums import IdentityProvider
-from itou.utils import constants as global_constants
 
 
 def sort_organizations(collection):
@@ -7,22 +6,19 @@ def sort_organizations(collection):
 
 
 def get_current_organization_and_perms(request):
-    siae_pk = request.session.get(global_constants.ITOU_SESSION_CURRENT_SIAE_KEY)
-    prescriber_org_pk = request.session.get(global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY)
-    institution_pk = request.session.get(global_constants.ITOU_SESSION_CURRENT_INSTITUTION_KEY)
-
     if request.user.is_authenticated:
         context, extra_context, extra_matomo_context = {}, {}, {}
         matomo_context = {"is_authenticated": "yes"} | user_to_account_type(request.user)
 
-        if siae_pk:
-            extra_context, extra_matomo_context = get_context_siae(request.user, siae_pk)
+        if getattr(request, "current_organization", None) is not None:
+            if request.user.is_siae_staff:
+                extra_context, extra_matomo_context = get_context_siae(request)
 
-        if prescriber_org_pk:
-            extra_context, extra_matomo_context = get_context_prescriber(request.user, prescriber_org_pk)
+            if request.user.is_prescriber:
+                extra_context, extra_matomo_context = get_context_prescriber(request)
 
-        if institution_pk:
-            extra_context, extra_matomo_context = get_context_institution(request.user, institution_pk)
+            if request.user.is_labor_inspector:
+                extra_context, extra_matomo_context = get_context_institution(request)
 
         context.update(extra_context)
         return context | {"matomo_custom_variables": matomo_context | extra_matomo_context}
@@ -36,95 +32,54 @@ def get_current_organization_and_perms(request):
     }
 
 
-def get_context_siae(user, siae_pk):
-    context = {}
-    matomo_context = {}
-    memberships = user.active_or_in_grace_period_siae_memberships()
-    siaes = []
-    for membership in memberships:
-        siaes.append(membership.siae)
-        if membership.siae_id == siae_pk:
-            matomo_context.update(
-                {
-                    "account_current_siae_id": siae_pk,
-                    "account_sub_type": "employer_admin" if membership.is_admin else "employer_not_admin",
-                }
-            )
-            context.update(
-                {
-                    "current_siae": membership.siae,
-                    "user_is_siae_admin": membership.is_admin,
-                }
-            )
-    context["user_siaes"] = sort_organizations(siaes)
-    return context, matomo_context
-
-
-def get_context_prescriber(user, prescriber_org_pk):
-    context = {}
-    matomo_context = {}
-    memberships = (
-        user.prescribermembership_set.filter(is_active=True).order_by("created_at").select_related("organization")
+def get_context_siae(request):
+    return (
+        # context
+        {
+            "current_siae": request.current_organization,
+            "user_is_siae_admin": request.is_current_organization_admin,
+            "user_siaes": sort_organizations(request.organizations),
+        },
+        # matomo_context
+        {
+            "account_current_siae_id": request.current_organization.pk,
+            "account_sub_type": "employer_admin" if request.is_current_organization_admin else "employer_not_admin",
+        },
     )
 
-    prescriber_orgs = []
-    for membership in memberships:
-        # Same as above:
-        # In order to avoid an extra SQL query, fetch related organizations
-        # and artifially reconstruct the list of organizations the user belongs to
-        # (and other stuff while at it)
-        prescriber_orgs.append(membership.organization)
-        if membership.organization.pk == prescriber_org_pk:
-            org = membership.organization
-            matomo_context.update(
-                {
-                    "account_current_prescriber_org_id": org.pk,
-                    "account_sub_type": "prescriber_with_authorized_org"
-                    if org.is_authorized
-                    else "prescriber_with_unauthorized_org",
-                }
-            )
-            context.update(
-                {
-                    "current_prescriber_organization": org,
-                    "user_is_prescriber_org_admin": membership.is_admin,
-                }
-            )
-    context["user_prescriberorganizations"] = sort_organizations(prescriber_orgs)
-    return context, matomo_context
 
-
-def get_context_institution(user, institution_pk):
-    context = {}
-    matomo_context = {}
-    memberships = (
-        user.institutionmembership_set.filter(is_active=True).order_by("created_at").select_related("institution")
+def get_context_prescriber(request):
+    return (
+        # context
+        {
+            "current_prescriber_organization": request.current_organization,
+            "user_is_prescriber_org_admin": request.is_current_organization_admin,
+            "user_prescriberorganizations": sort_organizations(request.organizations),
+        },
+        # matomo_context
+        {
+            "account_current_prescriber_org_id": request.current_organization.pk,
+            "account_sub_type": "prescriber_with_authorized_org"
+            if request.current_organization.is_authorized
+            else "prescriber_with_unauthorized_org",
+        },
     )
 
-    institutions = []
-    for membership in memberships:
-        # Same as above:
-        # In order to avoid an extra SQL query, fetch related institutions
-        # and artificially reconstruct the list of institutions the user belongs to
-        # (and other stuff while at it)
-        institutions.append(membership.institution)
-        if membership.institution.pk == institution_pk:
-            institution = membership.institution
-            matomo_context.update(
-                {
-                    "account_current_institution_id": institution.pk,
-                    "account_sub_type": "inspector_admin" if membership.is_admin else "inspector_not_admin",
-                }
-            )
-            context.update(
-                {
-                    "current_institution": institution,
-                    "user_is_institution_admin": membership.is_admin,
-                }
-            )
 
-    context["user_institutions"] = sort_organizations(institutions)
-    return context, matomo_context
+def get_context_institution(request):
+    return (
+        # context
+        {
+            "current_institution": request.current_organization,
+            "user_is_institution_admin": request.is_current_organization_admin,
+            "user_institutions": sort_organizations(request.organizations),
+        },
+        # matomo_context
+        {
+            "account_current_institution_id": request.current_organization.pk,
+            "account_sub_type": "inspector_admin" if request.is_current_organization_admin else "inspector_not_admin",
+        },
+    )
 
 
 def user_to_account_type(user):
