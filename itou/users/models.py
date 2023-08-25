@@ -42,7 +42,6 @@ from itou.prescribers.enums import (
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.enums import SiaeKind
 from itou.siaes.models import Siae
-from itou.utils import constants as global_constants
 from itou.utils.apis.exceptions import AddressLookupError
 from itou.utils.models import UniqueConstraintWithErrorCode
 from itou.utils.validators import validate_birthdate, validate_nir, validate_pole_emploi_id
@@ -668,10 +667,6 @@ class User(AbstractUser, AddressMixin):
     def joined_recently(self):
         time_since_date_joined = timezone.now() - self.date_joined
         return time_since_date_joined.days < 7
-
-    @property
-    def has_pole_emploi_email(self):
-        return self.email and self.email.endswith(global_constants.POLE_EMPLOI_EMAIL_SUFFIX)
 
     def active_or_in_grace_period_siae_memberships(self):
         """
