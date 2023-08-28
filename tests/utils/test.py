@@ -22,12 +22,16 @@ class Message(NamedTuple):
 LEVEL_TO_NAME = {intlevel: name for name, intlevel in DEFAULT_LEVELS.items()}
 
 
-def assertMessages(response: HttpResponse, expected_messages: list[Message]):
-    request_messages = get_messages(response.wsgi_request)
+def assertMessagesFromRequest(request, expected_messages: list[Message]):
+    request_messages = get_messages(request)
     for message, (expected_level, expected_msg) in zip(request_messages, expected_messages, strict=True):
         msg_levelname = LEVEL_TO_NAME.get(message.level, message.level)
         expected_levelname = LEVEL_TO_NAME.get(expected_level, expected_level)
         assert (msg_levelname, message.message) == (expected_levelname, expected_msg)
+
+
+def assertMessages(response: HttpResponse, expected_messages: list[Message]):
+    assertMessagesFromRequest(response.wsgi_request, expected_messages)
 
 
 def pprint_html(response, **selectors):
