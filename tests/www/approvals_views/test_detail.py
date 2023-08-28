@@ -115,7 +115,7 @@ class TestApprovalDetailView:
             + 1  # select latest approval for user (can_be_prolonged)
             + 1  # approval.remainder fetches approval suspensions to compute remaining days.
             + 1  # release savepoint before the template rendering
-            + 1  # template: job_application.get_eligibility_diagnosis => Siae.is_subject_to_eligibility_rules
+            + 1  # siae membership (context processor)
             + 1  # template: approval.pending_prolongation_request fetch the current pending prolongation request
             + 1  # template: approval.suspensions_for_status_card lists approval suspensions
             + 1  # template: approval prolongations list.
