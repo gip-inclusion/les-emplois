@@ -1,5 +1,19 @@
 # Journal des modifications
 
+## [70] - 2023-08-28
+
+### Ajouté
+- GEIQ : API embauches à destination de la FFGEIQ et des logiciels de gestion des GEIQ
+- Contrôle a posteriori : retrait du rappel lorsque les SIAE restantes n'ont pas soumis de documents
+- Contrôle a posteriori : le contrôle d’une candidature n'est pas affiché tant que son état n’est pas officiel
+- Candidatures : affichage de l'éligibilité IAE dans la liste des candidatures SIAE
+- Candidatures : les candidatures sont bloquées pour les SIAE sans membre actif
+
+### Modifié
+- MaJ du thème itou vers la version 0.7.4
+- Candidatures : améliorations dans l'affichage des étapes (gabarits)
+
+
 ## [69] - 2023-08-16
 
 ### Ajouté
