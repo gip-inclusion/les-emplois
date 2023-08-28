@@ -35,7 +35,6 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     libpq-dev \
     gdal-bin \
-    gettext \
     git \
     postgresql-client-$PG_MAJOR \
     jq \
