@@ -14,6 +14,17 @@ from itou.siaes.enums import ContractType, SiaeKind
 from itou.users.enums import Title
 
 
+class LabelCivilite(models.TextChoices):
+    H = "H", "Homme"
+    F = "F", "Femme"
+
+
+EMPLOIS_TO_LABEL_CIVILITE = {
+    Title.M: LabelCivilite.H,
+    Title.MME: LabelCivilite.F,
+}
+
+
 class LabelEducationLevel(models.TextChoices):
     LEVEL_3 = "LEVEL_3", "Niveau 3 (CAP, BEP)"
     LEVEL_4 = "LEVEL_4", "Niveau 4 (BP, Bac Général, Techno ou Pro, BT)"
@@ -83,10 +94,7 @@ class GeiqJobApplicationSerializer(serializers.ModelSerializer):
     nom = serializers.CharField(source="job_seeker.last_name")
     prenom = serializers.CharField(source="job_seeker.first_name")
     date_naissance = serializers.DateField(source="job_seeker.birthdate")
-    civilite = serializers.ChoiceField(
-        source="job_seeker.title",
-        choices=sorted(Title.choices),
-    )
+    civilite = serializers.SerializerMethodField()
     adresse_ligne_1 = serializers.CharField(source="job_seeker.address_line_1")
     adresse_ligne_2 = serializers.CharField(source="job_seeker.address_line_2")
     adresse_code_postal = serializers.CharField(source="job_seeker.post_code")
@@ -172,6 +180,10 @@ class GeiqJobApplicationSerializer(serializers.ModelSerializer):
         if diag := obj.geiq_eligibility_diagnosis:
             return sorted({crit.slug for crit in diag.administrative_criteria.all()})
         return []
+
+    @extend_schema_field(serializers.ChoiceField(choices=sorted(LabelCivilite.choices)))
+    def get_civilite(self, obj) -> str | None:
+        return EMPLOIS_TO_LABEL_CIVILITE.get(obj.job_seeker.title, None)
 
     @extend_schema_field(serializers.ChoiceField(choices=sorted(LabelEducationLevel.choices)))
     def get_niveau_formation(self, obj) -> str | None:
