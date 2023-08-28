@@ -266,6 +266,7 @@ class SiaeJobDescriptionAdmin(admin.ModelAdmin):
         "source_id",
         "source_kind",
         "source_url",
+        "field_history",
     )
 
     @admin.display(description="Intitulé du poste")
