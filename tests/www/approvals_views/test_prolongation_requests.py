@@ -1,3 +1,4 @@
+import factory
 import pytest
 from django.contrib import messages
 from django.template import loader
@@ -40,6 +41,27 @@ def test_list_view(snapshot, client):
     with assertNumQueries(num_queries):
         response = client.get(reverse("approvals:prolongation_requests_list"))
     assert str(parse_response_to_soup(response, ".s-section .c-box")) == snapshot
+
+
+def test_list_view_only_pending_filter(client):
+    pending_prolongation_request = approvals_factories.ProlongationRequestFactory(
+        status=ProlongationRequestStatus.PENDING,
+    )
+    other_prolongation_requests = approvals_factories.ProlongationRequestFactory.create_batch(
+        2,
+        status=factory.Iterator([ProlongationRequestStatus.GRANTED, ProlongationRequestStatus.DENIED]),
+        prescriber_organization=pending_prolongation_request.prescriber_organization,
+    )
+    client.force_login(pending_prolongation_request.validated_by)
+
+    response = client.get(reverse("approvals:prolongation_requests_list"))
+    assert set(response.context["prolongation_requests"]) == {
+        pending_prolongation_request,
+        *other_prolongation_requests,
+    }
+
+    response = client.get(reverse("approvals:prolongation_requests_list"), data={"only_pending": True})
+    assert list(response.context["prolongation_requests"]) == [pending_prolongation_request]
 
 
 def test_show_view_access(client):

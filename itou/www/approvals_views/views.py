@@ -28,6 +28,7 @@ from itou.www.apply.forms import UserExistsForm
 from itou.www.approvals_views.forms import (
     ApprovalForm,
     PoleEmploiApprovalSearchForm,
+    ProlongationRequestFilterForm,
     SuspensionForm,
     get_prolongation_form,
 )
@@ -333,10 +334,17 @@ def prolongation_requests_list(request, template_name="approvals/prolongation_re
     if not current_organization.is_authorized:
         raise Http404()
 
+    queryset = ProlongationRequest.objects.filter(prescriber_organization=current_organization).select_related(
+        "approval__user", "declared_by_siae"
+    )
+
+    form = ProlongationRequestFilterForm(data=request.GET)
+    if form.is_valid() and form.cleaned_data["only_pending"]:
+        queryset = queryset.filter(status=approvals_enums.ProlongationRequestStatus.PENDING)
+
     context = {
-        "prolongation_requests": ProlongationRequest.objects.filter(
-            prescriber_organization=current_organization
-        ).select_related("approval__user", "declared_by_siae"),
+        "form": form,
+        "prolongation_requests": queryset,
     }
     return render(request, template_name, context)
 
