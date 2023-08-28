@@ -1324,9 +1324,9 @@ stack-data==0.6.2 \
     --hash=sha256:32d2dd0376772d01b6cb9fc996f3c8b57a357089dec328ed4b6553d037eaf815 \
     --hash=sha256:cbb2a53eb64e5785878201a97ed7c7b94883f48b87bfb0bbe8b623c74679e4a8
     # via ipython
-syrupy==4.0.8 \
-    --hash=sha256:af00532db06664087671c3a1043fef5f41b23e7a1f6a7a8966da771ed1eade74 \
-    --hash=sha256:b884730ff6976d6892fedb2a69d0a545c0f63890802e66ede45befc9b2e18873
+syrupy==4.2.1 \
+    --hash=sha256:4054878270184979a20e78b17a19f5f19eb62c6cbdc3adac6f432a528ddeb099 \
+    --hash=sha256:8c2f4e0c4416780f21f3cd696c64b046d79ddff43522d6a9a4ad7a4f48e9a594
     # via -r requirements/test.txt
 tablib[html,ods,xls,xlsx,yaml]==3.5.0 \
     --hash=sha256:9821caa9eca6062ff7299fa645e737aecff982e6b2b42046928a6413c8dabfd9 \
