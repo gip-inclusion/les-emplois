@@ -870,10 +870,11 @@ def test_list_for_unauthorized_prescriber_view(client):
         + 1  # get list of senders (distinct sender_id)
         + 1  # get list of job seekers (distinct job_seeker_id)
         + 1  # get list of administrative criteria
-        + 3  # get list of job application + prefetch of job descriptions + prefetch of approvals
-        + 1  # get list of siaes (distinct)
+        + 2  # get list of job application + prefetch of job descriptions
+        + 1  # get list of siaes (distinct to_siae_id)
         + 3  # count, list & prefetch of job application
-        + 1  # check user membership again
+        + 1  # get job seekers approvals
+        + 1  # check user authorized membership (can_edit_personal_information)
         + 3  # update session
     ):
         response = client.get(url)
