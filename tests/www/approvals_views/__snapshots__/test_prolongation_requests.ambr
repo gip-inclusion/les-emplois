@@ -3,7 +3,14 @@
   '''
   <div class="c-box">
                           <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between">
-                              <h3 class="h4 mb-0">1 résultat</h3>
+                              <h3 class="mb-0">1 résultat</h3>
+                          </div>
+                          <div class="d-flex flex-column flex-md-row mt-3 mt-md-4">
+                              <h4 class="mr-4">Filtres :</h4>
+                              <form action="/approvals/prolongation/requests" hx-boost="true" hx-select=".s-section" hx-swap="outerHTML show:window:top" hx-target=".s-section" hx-trigger="change">
+                                  <input id="id_only_pending" name="only_pending" type="checkbox"/>
+                                  <label for="id_only_pending">Voir uniquement les demandes à traiter</label>
+                              </form>
                           </div>
   
                           <div class="table-responsive-lg mt-3 mt-md-4">
@@ -46,7 +53,6 @@
                                   </tbody>
                               </table>
                           </div>
-  
                       </div>
   '''
 # ---

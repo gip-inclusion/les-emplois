@@ -344,6 +344,14 @@ class CreateProlongationRequestForm(CreateProlongationForm):
         ]
 
 
+class ProlongationRequestFilterForm(forms.Form):
+    only_pending = forms.BooleanField(
+        label="Voir uniquement les demandes à traiter",
+        label_suffix="",
+        required=False,
+    )
+
+
 class SuspensionForm(forms.ModelForm):
     """
     Create or edit a suspension.
