@@ -2,10 +2,6 @@ from itou.users.enums import IdentityProvider
 from itou.utils import constants as global_constants
 
 
-def join_keys_str(collection):
-    return ";".join(str(o.pk) for o in collection)
-
-
 def sort_organizations(collection):
     return sorted(collection, key=lambda o: (o.kind, o.display_name))
 
