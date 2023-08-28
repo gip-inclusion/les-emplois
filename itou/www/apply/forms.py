@@ -857,7 +857,7 @@ class FilterJobApplicationsForm(forms.Form):
         filters_counter = 0
         for qs_filter in qs_filters:
             for filters in qs_filter.children:
-                filters_counter += len(filters[1]) if type(filters[1]) is list else 1
+                filters_counter += len(filters[1]) if isinstance(filters[1], list) else 1
 
         return filters_counter
 
