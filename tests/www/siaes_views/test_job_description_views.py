@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.contrib.gis.geos import Point
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
+from freezegun import freeze_time
 
 from itou.cities.models import City
 from itou.jobs.models import Appellation
@@ -116,6 +117,7 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
         self.assertRedirects(response, self.url)
         assert self.siae.block_job_applications
 
+    @freeze_time("2021-06-21 10:10:10.10")
     def test_toggle_job_description_activity(self):
         response = self._login(self.user)
 
@@ -130,6 +132,14 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
 
         self.assertRedirects(response, self.url)
         assert not job_description.is_active
+        assert job_description.field_history == [
+            {
+                "at": "2021-06-21T10:10:10.100Z",
+                "field": "is_active",
+                "from": True,
+                "to": False,
+            },
+        ]
 
         post_data = {
             "job_description_id": job_description.pk,
@@ -140,6 +150,21 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
 
         self.assertRedirects(response, self.url)
         assert job_description.is_active
+        assert job_description.field_history == [
+            {
+                "at": "2021-06-21T10:10:10.100Z",
+                "field": "is_active",
+                "from": True,
+                "to": False,
+            },
+            {
+                "at": "2021-06-21T10:10:10.100Z",
+                "field": "is_active",
+                "from": False,
+                "to": True,
+            },
+        ]
+
         assertMessages(response, [(messages.SUCCESS, "Le recrutement est maintenant ouvert.")])
 
         # Check that we do not crash on unexisting job description
