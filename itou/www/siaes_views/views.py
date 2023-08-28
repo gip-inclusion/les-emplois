@@ -4,7 +4,6 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
-from django.utils import timezone
 from django.utils.html import format_html
 
 from itou.cities.models import City
@@ -98,18 +97,19 @@ def job_description_list(request, template_name="siaes/job_description_list.html
 
         if action == "delete":
             job_description_id = request.POST.get("job_description_id")
-            nb_deleted = SiaeJobDescription.objects.filter(siae_id=siae.pk, pk=job_description_id).delete()[0]
-            if nb_deleted:
+            job_description = SiaeJobDescription.objects.filter(siae_id=siae.pk, pk=job_description_id).first()
+            if job_description is not None:
+                job_description.delete()
                 messages.success(request, "La fiche de poste a été supprimée.")
             else:
                 messages.warning(request, "La fiche de poste que vous souhaitez supprimer n'existe plus.")
         elif action == "toggle_active":
             job_description_id = request.POST.get("job_description_id")
             is_active = bool(request.POST.get("job_description_is_active", False))
-            nb_updated = SiaeJobDescription.objects.filter(siae_id=siae.pk, pk=job_description_id).update(
-                is_active=is_active, updated_at=timezone.now()
-            )
-            if nb_updated:
+            job_description = SiaeJobDescription.objects.filter(siae_id=siae.pk, pk=job_description_id).first()
+            if job_description is not None:
+                job_description.is_active = is_active
+                job_description.save(update_fields=["is_active"])
                 messages.success(request, f"Le recrutement est maintenant {'ouvert' if is_active else 'fermé'}.")
             else:
                 messages.error(request, "La fiche de poste que vous souhaitiez modifier n'existe plus.")
