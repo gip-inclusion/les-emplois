@@ -19,7 +19,7 @@ from itou.job_applications.enums import Origin, SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.users.models import User
 from itou.utils import constants as global_constants
-from itou.utils.pagination import ItouPaginator
+from itou.utils.pagination import ItouPaginator, pager
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.storage.s3 import S3Upload
@@ -344,7 +344,7 @@ def prolongation_requests_list(request, template_name="approvals/prolongation_re
 
     context = {
         "form": form,
-        "prolongation_requests": queryset,
+        "pager": pager(queryset, request.GET.get("page"), items_per_page=10),
     }
     return render(request, template_name, context)
 

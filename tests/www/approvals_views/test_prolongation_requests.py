@@ -36,6 +36,7 @@ def test_list_view(snapshot, client):
         + 1  # check user memberships
         + 1  # fetch organization infos
         + 1  # fetch prolongation requests rows
+        + 1  # count prolongation requests rows (from pager)
         + 3  # savepoint, update session, release savepoint
     )
     with assertNumQueries(num_queries):
@@ -55,13 +56,13 @@ def test_list_view_only_pending_filter(client):
     client.force_login(pending_prolongation_request.validated_by)
 
     response = client.get(reverse("approvals:prolongation_requests_list"))
-    assert set(response.context["prolongation_requests"]) == {
+    assert set(response.context["pager"].object_list) == {
         pending_prolongation_request,
         *other_prolongation_requests,
     }
 
     response = client.get(reverse("approvals:prolongation_requests_list"), data={"only_pending": True})
-    assert list(response.context["prolongation_requests"]) == [pending_prolongation_request]
+    assert list(response.context["pager"].object_list) == [pending_prolongation_request]
 
 
 def test_show_view_access(client):
