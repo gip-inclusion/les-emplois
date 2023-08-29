@@ -172,6 +172,7 @@ class CreateProlongationForm(forms.ModelForm):
                     "approvals:prolongation_form_for_reason",
                     kwargs={"approval_id": self.instance.approval_id},
                 ),
+                "hx-params": "not end_at",  # Clear "end_at" when switching reason
                 "hx-swap": "outerHTML",
                 "hx-target": "#mainForm",
             }
