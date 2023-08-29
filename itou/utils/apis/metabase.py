@@ -20,7 +20,7 @@ METABASE_DASHBOARDS = {
     # Public stats.
     #
     "stats_public": {
-        "dashboard_id": 119,
+        "dashboard_id": 236,
     },
     #
     # Employer stats.
