@@ -7,7 +7,7 @@
     <h2>{{ siae.display_name }}</h2>
     <div class="alert alert-info">
         <p class="mb-0">
-            Vous êtes connecté(e) en tant que <b>{{ user.get_full_name|title }}</b> ({{ user.email }})
+            Vous êtes connecté(e) en tant que <b>{{ user.get_full_name }}</b> ({{ user.email }})
         </p>
     </div>
 {% endblock %}

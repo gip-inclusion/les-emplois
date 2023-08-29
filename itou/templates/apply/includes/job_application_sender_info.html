@@ -1,11 +1,11 @@
 {% load format_filters %}
 <ul>
     <li>
-        Prénom : <b>{{ job_application.sender.first_name }}</b>
+        Prénom : <b>{{ job_application.sender.first_name|title }}</b>
     </li>
 
     <li>
-        Nom : <b>{{ job_application.sender.last_name }}</b>
+        Nom : <b>{{ job_application.sender.last_name|upper }}</b>
     </li>
 
     <li>

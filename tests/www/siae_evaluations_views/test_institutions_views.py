@@ -965,7 +965,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(response, evaluated_siae)
         formatted_number = format_approval_number(evaluated_job_application.job_application.approval.number)
         self.assertContains(response, formatted_number, html=True, count=1)
-        self.assertContains(response, evaluated_job_application.job_application.job_seeker.last_name)
+        self.assertContains(response, evaluated_job_application.job_application.job_seeker.get_full_name())
         assert response.context["back_url"] == reverse(
             "siae_evaluations_views:institution_evaluated_siae_list",
             kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
@@ -1261,7 +1261,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(response, evaluated_siae)
         formatted_number = format_approval_number(evaluated_job_application.job_application.approval.number)
         self.assertContains(response, formatted_number, html=True, count=1)
-        self.assertContains(response, evaluated_job_application.job_application.job_seeker.last_name)
+        self.assertContains(response, evaluated_job_application.job_application.job_seeker.get_full_name())
         assert response.context["back_url"] == reverse(
             "siae_evaluations_views:institution_evaluated_siae_list",
             kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},

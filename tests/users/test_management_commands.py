@@ -449,11 +449,11 @@ class TestCommandNewUsersToMailJet:
         assert json.loads(postcall.request.content) == {
             "Action": "addnoforce",
             "Contacts": [
-                {"Email": "annie.amma@mailinator.com", "Name": "Annie Amma"},
-                {"Email": "bob.bailey@mailinator.com", "Name": "Bob Bailey"},
-                {"Email": "cindy.cinnamon@mailinator.com", "Name": "Cindy Cinnamon"},
-                {"Email": "dave.doll@mailinator.com", "Name": "Dave Doll"},
-                {"Email": "eve.ebi@mailinator.com", "Name": "Eve Ebi"},
+                {"Email": "annie.amma@mailinator.com", "Name": "Annie AMMA"},
+                {"Email": "bob.bailey@mailinator.com", "Name": "Bob BAILEY"},
+                {"Email": "cindy.cinnamon@mailinator.com", "Name": "Cindy CINNAMON"},
+                {"Email": "dave.doll@mailinator.com", "Name": "Dave DOLL"},
+                {"Email": "eve.ebi@mailinator.com", "Name": "Eve EBI"},
             ],
         }
         assert caplog.record_tuples == [
@@ -561,14 +561,14 @@ class TestCommandNewUsersToMailJet:
         [pe_postcall] = pe_post_mock.calls
         assert json.loads(pe_postcall.request.content) == {
             "Action": "addnoforce",
-            "Contacts": [{"Email": "alice.aamar@mailinator.com", "Name": "Alice Aamar"}],
+            "Contacts": [{"Email": "alice.aamar@mailinator.com", "Name": "Alice AAMAR"}],
         }
         [other_org_postcall] = other_org_post_mock.calls
         assert json.loads(other_org_postcall.request.content) == {
             "Action": "addnoforce",
             "Contacts": [
-                {"Email": "alice.aamar@mailinator.com", "Name": "Alice Aamar"},
-                {"Email": "justin.wood@mailinator.com", "Name": "Justin Wood"},
+                {"Email": "alice.aamar@mailinator.com", "Name": "Alice AAMAR"},
+                {"Email": "justin.wood@mailinator.com", "Name": "Justin WOOD"},
             ],
         }
         assert caplog.record_tuples == [
@@ -661,9 +661,9 @@ class TestCommandNewUsersToMailJet:
         assert json.loads(postcall.request.content) == {
             "Action": "addnoforce",
             "Contacts": [
-                {"Email": "billy.boo@mailinator.com", "Name": "Billy Boo"},
-                {"Email": "sonny.sunder@mailinator.com", "Name": "Sonny Sunder"},
-                {"Email": "timmy.timber@mailinator.com", "Name": "Timmy Timber"},
+                {"Email": "billy.boo@mailinator.com", "Name": "Billy BOO"},
+                {"Email": "sonny.sunder@mailinator.com", "Name": "Sonny SUNDER"},
+                {"Email": "timmy.timber@mailinator.com", "Name": "Timmy TIMBER"},
             ],
         }
         assert caplog.record_tuples == [
@@ -750,13 +750,13 @@ class TestCommandNewUsersToMailJet:
         assert json.loads(postcall1.request.content) == {
             "Action": "addnoforce",
             "Contacts": [
-                {"Email": "annie.amma@mailinator.com", "Name": "Annie Amma"},
+                {"Email": "annie.amma@mailinator.com", "Name": "Annie AMMA"},
             ],
         }
         assert json.loads(postcall2.request.content) == {
             "Action": "addnoforce",
             "Contacts": [
-                {"Email": "bob.bailey@mailinator.com", "Name": "Bob Bailey"},
+                {"Email": "bob.bailey@mailinator.com", "Name": "Bob BAILEY"},
             ],
         }
         assert caplog.record_tuples == [
@@ -817,7 +817,7 @@ class TestCommandNewUsersToMailJet:
         assert json.loads(postcall.request.content) == {
             "Action": "addnoforce",
             "Contacts": [
-                {"Email": "annie.amma@mailinator.com", "Name": "Annie Amma"},
+                {"Email": "annie.amma@mailinator.com", "Name": "Annie AMMA"},
             ],
         }
         assert caplog.record_tuples == [

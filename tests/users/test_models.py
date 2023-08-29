@@ -984,6 +984,17 @@ class ModelTest(TestCase):
                 else:
                     factory(identity_provider=identity_provider)
 
+    def test_get_full_name(self):
+        assert JobSeekerFactory(first_name="CLÉMENT", last_name="Dupont").get_full_name() == "Clément DUPONT"
+        assert (
+            JobSeekerFactory(first_name="JEAN-FRANÇOIS", last_name="de Saint Exupéry").get_full_name()
+            == "Jean-François DE SAINT EXUPÉRY"
+        )
+        assert (
+            JobSeekerFactory(first_name=" marie aurore", last_name="maréchal").get_full_name()
+            == "Marie Aurore MARÉCHAL"
+        )
+
 
 def mock_get_geocoding_data(address, post_code=None, limit=1):
     return RESULTS_BY_ADDRESS.get(address)

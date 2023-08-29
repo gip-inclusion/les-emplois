@@ -12,7 +12,7 @@
     </h1>
     <div class="alert alert-info">
         <p class="mb-0">
-            Renseignez vos coordonnées afin d'être invité par {{ prescriber.first_name|title }} {{ prescriber.last_name|slice:1 }} de l'organisation « {{ organization.display_name }} ».
+            Renseignez vos coordonnées afin d'être invité par {{ prescriber.first_name|title }} {{ prescriber.last_name|slice:1|upper }} de l'organisation « {{ organization.display_name }} ».
         </p>
     </div>
 {% endblock %}

@@ -23,7 +23,7 @@
                 {# For security, display only the first char of the last name. #}
                 <i>
                     Demandez une invitation à
-                    {{ membership.user.first_name|title }} {{ membership.user.last_name|slice:1 }}.
+                    {{ membership.user.first_name|title }} {{ membership.user.last_name|slice:1|upper }}.
                     pour rejoindre cette organisation.
                 </i>
                 <br>

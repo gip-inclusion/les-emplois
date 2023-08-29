@@ -542,7 +542,7 @@ class JobSeekerProfileAdmin(admin.ModelAdmin):
 
     @admin.display(description="nom complet")
     def username(self, obj):
-        return f"{obj.user.first_name} {obj.user.last_name}"
+        return obj.user.get_full_name()
 
     @admin.display(description="identifiant Pôle emploi")
     def pole_emploi_id(self, obj):

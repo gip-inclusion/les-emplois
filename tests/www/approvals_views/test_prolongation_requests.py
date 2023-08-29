@@ -96,7 +96,7 @@ def test_show_view_action(client, action, expected_status, expected_message):
     assertRedirects(response, reverse("approvals:prolongation_requests_list"), fetch_redirect_response=False)
     assertMessages(
         response,
-        [(messages.SUCCESS, f"La prolongation de John Doe a bien été {expected_message}.")],
+        [(messages.SUCCESS, f"La prolongation de John DOE a bien été {expected_message}.")],
     )
     prolongation_request.refresh_from_db()
     assert prolongation_request.status == expected_status

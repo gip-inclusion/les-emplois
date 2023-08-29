@@ -195,10 +195,7 @@ class JobApplicationTransferModelTest(TestCase):
 
         assert len(mail.outbox[0].to) == 1
         assert origin_user.email in mail.outbox[0].to
-        assert (
-            f"La candidature de {job_seeker.first_name} {job_seeker.last_name} a été transférée"
-            in mail.outbox[0].subject
-        )
+        assert f"La candidature de {job_seeker.get_full_name()} a été transférée" == mail.outbox[0].subject
         assert "a transféré la candidature de :" in mail.outbox[0].body
 
         assert len(mail.outbox[1].to) == 1
@@ -231,10 +228,7 @@ class JobApplicationTransferModelTest(TestCase):
         # Focusing on prescriber email content
         assert len(mail.outbox[2].to) == 1
         assert job_application.sender.email in mail.outbox[2].to
-        assert (
-            f"La candidature de {job_seeker.first_name} {job_seeker.last_name} a été transférée"
-            in mail.outbox[2].subject
-        )
+        assert f"La candidature de {job_seeker.get_full_name()} a été transférée" == mail.outbox[2].subject
         assert "a transféré la candidature de :" in mail.outbox[2].body
 
     def test_transfer_notifications_to_many_siae_members(self):
@@ -261,8 +255,5 @@ class JobApplicationTransferModelTest(TestCase):
         assert len(mail.outbox[0].to) == 2
         assert origin_user_1.email in mail.outbox[0].to
         assert origin_user_2.email in mail.outbox[0].to
-        assert (
-            f"La candidature de {job_seeker.first_name} {job_seeker.last_name} a été transférée"
-            in mail.outbox[0].subject
-        )
+        assert f"La candidature de {job_seeker.get_full_name()} a été transférée" == mail.outbox[0].subject
         assert "a transféré la candidature de :" in mail.outbox[0].body

@@ -515,7 +515,7 @@ def archive(request, job_application_id):
 
     if request.method == "POST":
         try:
-            username = f"{job_application.job_seeker.first_name} {job_application.job_seeker.last_name}"
+            username = job_application.job_seeker.get_full_name()
             siae_name = job_application.to_siae.display_name
 
             job_application.hidden_for_siae = True

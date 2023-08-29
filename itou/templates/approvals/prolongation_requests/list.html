@@ -37,7 +37,7 @@
                                     {% for prolongation_request in prolongation_requests %}
                                         <tr>
                                             <th scope="row">{{ forloop.counter }}</th>
-                                            <td class="font-weight-bold">{{ prolongation_request.approval.user.get_full_name|title }}</td>
+                                            <td class="font-weight-bold">{{ prolongation_request.approval.user.get_full_name }}</td>
                                             <td>{{ prolongation_request.approval.number|format_approval_number }}</td>
                                             <td>{{ prolongation_request.declared_by_siae }}</td>
                                             <td>{{ prolongation_request.created_at|date:"d/m/Y" }}</td>

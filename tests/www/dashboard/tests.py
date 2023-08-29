@@ -877,8 +877,8 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         self.assertNotContains(response, "id_lack_of_nir")
         self.assertNotContains(response, "id_lack_of_nir_reason")
         self.assertNotContains(response, "birthdate")
-        self.assertContains(response, f"Prénom : <strong>{user.first_name}</strong>")
-        self.assertContains(response, f"Nom : <strong>{user.last_name}</strong>")
+        self.assertContains(response, f"Prénom : <strong>{user.first_name.title()}</strong>")
+        self.assertContains(response, f"Nom : <strong>{user.last_name.upper()}</strong>")
         self.assertContains(response, f"Adresse e-mail : <strong>{user.email}</strong>")
         self.assertContains(response, "Modifier ces informations")
 

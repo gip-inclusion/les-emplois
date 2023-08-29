@@ -63,7 +63,7 @@
                                                     {% for membership in org.prescribermembership_set.all %}
                                                         <tr>
                                                             <th scope="row">{{ forloop.counter }}</th>
-                                                            <td>{{ membership.user.last_name|title }}</td>
+                                                            <td>{{ membership.user.last_name|upper }}</td>
                                                             <td>{{ membership.user.first_name|title }}</td>
                                                             <td>
                                                                 <a href="mailto:{{ membership.user.email }}">{{ membership.user.email }}</a>

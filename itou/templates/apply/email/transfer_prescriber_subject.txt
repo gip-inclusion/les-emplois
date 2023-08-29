@@ -1,4 +1,4 @@
 {% extends "layout/base_email_text_subject.txt" %}
 {% block subject %}
-La candidature de {{ job_application.job_seeker.first_name }} {{ job_application.job_seeker.last_name }} a été transférée 
+La candidature de {{ job_application.job_seeker.get_full_name }} a été transférée
 {% endblock %}

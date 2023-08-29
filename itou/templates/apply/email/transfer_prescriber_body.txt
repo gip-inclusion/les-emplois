@@ -3,8 +3,8 @@
 
 Candidature transférée
 
-{{ transferred_by.first_name }} {{ transferred_by.last_name }} a transféré la candidature de : {{ job_application.job_seeker.first_name }} {{ job_application.job_seeker.last_name }} 
-de la structure {{ origin_siae.display_name }}  
-vers la structure {{ target_siae.display_name }}.   
+{{ transferred_by.get_full_name }} a transféré la candidature de : {{ job_application.job_seeker.get_full_name }}
+de la structure {{ origin_siae.display_name }}
+vers la structure {{ target_siae.display_name }}.
 
 {% endblock body %}
