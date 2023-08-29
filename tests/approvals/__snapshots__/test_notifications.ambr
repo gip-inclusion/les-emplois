@@ -1,6 +1,11 @@
 # serializer version: 1
 # name: test_prolongation_request_created[body]
   '''
+  ********************************************************************
+  👉 Cette demande est à traiter exclusivement sur votre tableau de bord prescripteur.
+  ❌ Merci de ne pas transférer cette demande à notre équipe support.
+  *********************************************************************
+  
   Bonjour,
   
   John DOE de la structure Acme inc. a besoin de votre accord pour prolonger un PASS IAE.
@@ -54,6 +59,11 @@
   Une demande de prolongation du PASS IAE a été transmise à un membre de votre organisation, cette demande est toujours en attente de réponse. Si des démarches sont en cours, veuillez ne pas tenir compte de ce message.
   
   Rappel du message initial :
+  
+  ********************************************************************
+  👉 Cette demande est à traiter exclusivement sur votre tableau de bord prescripteur.
+  ❌ Merci de ne pas transférer cette demande à notre équipe support.
+  *********************************************************************
   
   Bonjour,
   
