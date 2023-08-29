@@ -1,0 +1,96 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+
+{# Adapted from Django's admin/change_form.html #}
+{% block extrahead %}
+    {{ block.super }}
+    <script src="{% url 'admin:jsi18n' %}"></script>
+    {{ media }}
+    <script nonce="{{ CSP_NONCE }}">
+        document.addEventListener('DOMContentLoaded', function() {
+            const buttons = document.getElementsByClassName("with-confirm");
+            Array.from(buttons).forEach(function(button) {
+                button.addEventListener("click", function(event) {
+                    if (!confirm('Êtes vous certain ?')) {
+                        event.preventDefault();
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static "admin/css/forms.css" %}">
+{% endblock %}
+
+{% block breadcrumbs %}
+    <div class="breadcrumbs">
+        <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+        &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+        &rsaquo;
+        {% if has_view_permission %}
+            <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+        {% else %}
+            {{ opts.verbose_name_plural|capfirst }}
+        {% endif %}
+        &rsaquo; Transférer les données de <a href="{% url opts|admin_urlname:'change' object_id=from_user.pk %}">{{ from_user|truncatewords:"18" }}</a>
+        {% if to_user %}
+            vers <a href="{% url opts|admin_urlname:'change' object_id=to_user.pk %}">{{ to_user|truncatewords:"18" }}</a>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block content %}
+    <h1>
+        Transfert des données de {{ from_user }}
+        {% if to_user %}vers {{ to_user }}{% endif %}
+    </h1>
+    <h2>Données à transférer</h2>
+    {% for data in transfer_data %}
+        <h3>{{ data.title }}</h3>
+        <div class="form-row">
+            <div>
+                <h3>{{ from_user }}</h3>
+                <ul>
+                    {% for item in data.from %}
+                        <li>
+                            <a href="{{ item.admin_link }}">{{ item }}</a>
+                        </li>
+                    {% empty %}
+                        <li>- Rien à transférer</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% if to_user %}
+                <div>
+                    <h3>{{ to_user }}</h3>
+                    <ul>
+                        {% for item in data.to %}
+                            <li>
+                                <a href="{{ item.admin_link }}">{{ item }}</a>
+                            </li>
+                        {% empty %}
+                            <li>- Pas de données</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        </div>
+    {% endfor %}
+
+    <h2>Transfert</h2>
+    {% if nothing_to_transfer %}
+        Transfert impossible: aucune donnée à transférer
+    {% else %}
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="form-row">{{ form }}</div>
+            <div class="submit-row">
+                <input class="default{% if to_user %} with-confirm{% endif %}" type="submit" value="Valider">
+            </div>
+        </form>
+    {% endif %}
+
+{% endblock %}

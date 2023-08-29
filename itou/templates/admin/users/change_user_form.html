@@ -8,6 +8,12 @@
         <li>{% include 'hijack/contrib/admin/button.html' with another_user=original is_user_admin=True next=login_url %}</li>
     {% endif %}
 
+    {% if original.is_job_seeker and has_change_permission %}
+        <li>
+            <a href="{% url 'admin:transfer_user_data' from_user_pk=original.pk %}">Transférer</a>
+        </li>
+    {% endif %}
+
     {{ block.super }}
 
 {% endblock %}
