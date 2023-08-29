@@ -4,7 +4,7 @@ import re
 import html5lib
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
-from django.core.validators import MinValueValidator, RegexValidator
+from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
 from django.utils import timezone
 
 
@@ -125,11 +125,23 @@ def validate_html(html):
         raise ValidationError("HTML invalide.") from exc
 
 
+def reformat_limit_date(exc):
+    params = exc.params.copy()
+    params["limit_value"] = f"{params['limit_value']:%d/%m/%Y}"
+    return ValidationError(exc.message, code=exc.code, params=params)
+
+
 class MinDateValidator(MinValueValidator):
     def __call__(self, value):
         try:
             super().__call__(value)
         except ValidationError as e:
-            params = e.params.copy()
-            params["limit_value"] = f"{params['limit_value']:%d/%m/%Y}"
-            raise ValidationError(e.message, code=e.code, params=params) from e
+            raise reformat_limit_date(e) from e
+
+
+class MaxDateValidator(MaxValueValidator):
+    def __call__(self, value):
+        try:
+            super().__call__(value)
+        except ValidationError as e:
+            raise reformat_limit_date(e) from e
