@@ -1794,6 +1794,6 @@ def test_prolongation_requests_badge(client):
     client.force_login(prescriber)
     soup = parse_response_to_soup(
         client.get(reverse("dashboard:index")),
-        f"""a[href='{reverse("approvals:prolongation_requests_list")}'] + .badge""",
+        f"""a[href^='{reverse("approvals:prolongation_requests_list")}'] + .badge""",
     )
     assert soup.text == "3"
