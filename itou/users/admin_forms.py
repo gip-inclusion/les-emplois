@@ -1,3 +1,6 @@
+from collections import namedtuple
+
+from django import forms
 from django.contrib.admin import widgets
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from django.core.exceptions import ValidationError
@@ -46,3 +49,58 @@ class UserAdminForm(UserChangeForm):
             except AddressLookupError:
                 # Nothing to do: re-raised and already logged as error
                 pass
+
+
+FakeField = namedtuple("FakeField", ("name",))
+
+
+class FakeRelForToUserRawIdWidget:
+    model = User
+    limit_choices_to = {
+        "kind": UserKind.JOB_SEEKER,
+    }
+
+    def get_related_field(self):
+        # This must return something that has the name of an existing field
+        return FakeField("id")
+
+
+class ToUserRawIdWidget(widgets.ForeignKeyRawIdWidget):
+    def __init__(self, admin_site, attrs=None, using=None):
+        super().__init__(FakeRelForToUserRawIdWidget(), admin_site, attrs, using)
+
+
+class SelectTargetUserForm(forms.Form):
+    # Needed to avoid RemovedInDjango50Warning
+    template_name = forms.Form.template_name_div
+
+    to_user = forms.ModelChoiceField(
+        User.objects.filter(kind=UserKind.JOB_SEEKER), required=True, label="Choisissez l'utilisateur cible"
+    )
+
+    def __init__(self, *args, from_user, admin_site, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["to_user"].widget = ToUserRawIdWidget(admin_site)
+        self.from_user = from_user
+
+    def clean_to_user(self):
+        to_user = self.cleaned_data["to_user"]
+        if to_user.pk == self.from_user.pk:
+            raise ValidationError("L'utilisateur cible doit être différent de celui d'origine")
+        return to_user
+
+
+class ChooseFieldsToTransfer(forms.Form):
+    # Needed to avoid RemovedInDjango50Warning
+    template_name = forms.Form.template_name_div
+
+    fields_to_transfer = forms.MultipleChoiceField(
+        choices=[],
+        required=True,
+        label="Choisissez les objets à transférer",
+        widget=forms.CheckboxSelectMultiple(),
+    )
+
+    def __init__(self, *args, fields_choices, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["fields_to_transfer"].choices = fields_choices

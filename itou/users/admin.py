@@ -1,8 +1,14 @@
 from allauth.account.admin import EmailAddressAdmin
 from allauth.account.models import EmailAddress
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin
+from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import PermissionDenied
 from django.db.models import Exists, OuterRef
+from django.shortcuts import get_object_or_404, redirect
+from django.template.response import TemplateResponse
+from django.urls import path, reverse
+from django.utils import timezone
 from django.utils.html import format_html
 
 from itou.approvals.models import Approval
@@ -14,9 +20,10 @@ from itou.job_applications.models import JobApplication
 from itou.prescribers.models import PrescriberMembership
 from itou.siaes.models import SiaeMembership
 from itou.users import models
-from itou.users.admin_forms import ItouUserCreationForm, UserAdminForm
-from itou.users.enums import IdentityProvider
+from itou.users.admin_forms import ChooseFieldsToTransfer, ItouUserCreationForm, SelectTargetUserForm, UserAdminForm
+from itou.users.enums import IdentityProvider, UserKind
 from itou.utils.admin import PkSupportRemarkInline, get_admin_view_link
+from itou.utils.models import PkSupportRemark
 
 
 class EmailAddressInline(admin.TabularInline):
@@ -236,6 +243,30 @@ class CreatedByProxyFilter(admin.SimpleListFilter):
         return queryset
 
 
+JOB_SEEKER_FIELDS_TO_TRANSFER = {
+    "approvals",  # Approval.user
+    "eligibility_diagnoses",  # EligibilityDiagnosis.job_seeker
+    "geiq_eligibility_diagnoses",  # GEIQEligibilityDiagnosis.job_seeker
+    "job_applications",  # JobApplication.job_seeker
+}
+
+
+def get_fields_to_transfer_for_job_seekers():
+    # Get list of fields pointing to the User models
+    return {models.User._meta.get_field(name) for name in JOB_SEEKER_FIELDS_TO_TRANSFER}
+
+
+def add_support_remark_to_user(user, text):
+    user_content_type = ContentType.objects.get_for_model(models.User)
+    try:
+        remark = PkSupportRemark.objects.filter(content_type=user_content_type, object_id=user.pk).get()
+    except PkSupportRemark.DoesNotExist:
+        PkSupportRemark.objects.create(content_type=user_content_type, object_id=user.pk, remark=text)
+    else:
+        remark.remark += "\n" + text
+        remark.save(update_fields=("remark",))
+
+
 @admin.register(models.User)
 class ItouUserAdmin(UserAdmin):
     show_full_result_count = False
@@ -423,6 +454,123 @@ class ItouUserAdmin(UserAdmin):
                     inlines.insert(-1, inline_class)
 
         return tuple(inlines)
+
+    def get_urls(self):
+        urls = super().get_urls()
+        return [
+            path(
+                "transfer/<int:from_user_pk>",
+                self.admin_site.admin_view(self.transfer_view),
+                name="transfer_user_data",
+            ),
+            path(
+                "transfer/<int:from_user_pk>/<int:to_user_pk>",
+                self.admin_site.admin_view(self.transfer_view),
+                name="transfer_user_data",
+            ),
+        ] + urls
+
+    def transfer_view(self, request, from_user_pk, to_user_pk=None):
+        if not self.has_change_permission(request):
+            raise PermissionDenied
+
+        from_user = get_object_or_404(models.User.objects.filter(kind=UserKind.JOB_SEEKER), pk=from_user_pk)
+        to_user = (
+            get_object_or_404(models.User.objects.filter(kind=UserKind.JOB_SEEKER), pk=to_user_pk)
+            if to_user_pk is not None
+            else None
+        )
+
+        def _get_transfer_data_from_user(user, field):
+            data = []
+            for item in getattr(user, field.name).all():
+                item.admin_link = reverse(
+                    f"admin:{item._meta.app_label}_{item._meta.model_name}_change", args=[item.pk]
+                )
+                data.append(item)
+            return data
+
+        transfer_fields = {field.name: field for field in get_fields_to_transfer_for_job_seekers()}
+        fields_choices = []
+        transfer_data = {}
+        for field in transfer_fields.values():
+            title = field.related_model._meta.verbose_name_plural.upper()
+            from_data = _get_transfer_data_from_user(from_user, field)
+            to_data = _get_transfer_data_from_user(to_user, field) if to_user else None
+            transfer_data[field.name] = {
+                "title": title,
+                "from": from_data,
+                "to": to_data,
+            }
+            plural = "s" if len(from_data) > 1 else ""
+            if from_data:
+                fields_choices.append((field.name, f"{title} ({len(from_data)} objet{plural} à transférer)"))
+
+        if not to_user:
+            form = SelectTargetUserForm(
+                from_user=from_user,
+                admin_site=self.admin_site,
+                data=request.POST or None,
+            )
+            if request.POST and form.is_valid():
+                return redirect(
+                    reverse(
+                        "admin:transfer_user_data",
+                        kwargs={"from_user_pk": from_user.pk, "to_user_pk": form.cleaned_data["to_user"].pk},
+                    )
+                )
+        else:
+            form = ChooseFieldsToTransfer(
+                fields_choices=sorted(fields_choices, key=lambda field: field[1]), data=request.POST or None
+            )
+            if request.POST and form.is_valid():
+                items_transfered = []
+                for field_name in form.cleaned_data["fields_to_transfer"]:
+                    field = transfer_fields[field_name]
+                    for item in transfer_data[field_name]["from"]:
+                        setattr(item, field.remote_field.name, to_user)
+                        item.save()
+                        items_transfered.append((transfer_data[field_name]["title"], item))
+                if items_transfered:
+                    summary_text = "\n".join(
+                        [
+                            "-" * 20,
+                            f"Transfert du {timezone.now():%Y-%m-%d %H:%M:%S} effectué par {request.user} ",
+                            f"de l'utilisateur {from_user.pk} vers {to_user.pk}:",
+                        ]
+                        + [f"- {item_title} {item} transféré " for item_title, item in items_transfered]
+                        + ["-" * 20]
+                    )
+                    add_support_remark_to_user(from_user, summary_text)
+                    add_support_remark_to_user(to_user, summary_text)
+                    message = format_html(
+                        "Transfert effectué avec succès de l'utilisateur {from_user} vers {to_user}.",
+                        from_user=from_user,
+                        to_user=to_user,
+                    )
+                    messages.info(request, message)
+
+                return redirect(
+                    reverse(
+                        "admin:users_user_change",
+                        kwargs={"object_id": to_user.pk},
+                    )
+                )
+        context = self.admin_site.each_context(request) | {
+            "media": self.media,
+            "opts": self.opts,
+            "form": form,
+            "from_user": from_user,
+            "to_user": to_user,
+            "nothing_to_transfer": not fields_choices,
+            "transfer_data": sorted(transfer_data.values(), key=lambda data: data["title"]),
+        }
+
+        return TemplateResponse(
+            request,
+            "admin/users/transfer_user.html",
+            context,
+        )
 
 
 class IsPECertifiedFilter(admin.SimpleListFilter):
