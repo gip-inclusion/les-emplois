@@ -951,7 +951,7 @@ class CommonProlongation(models.Model):
         },
         enums.ProlongationReason.PARTICULAR_DIFFICULTIES: {
             "duration": datetime.timedelta(days=3 * 365),
-            "label": "12 mois (365 jours), reconductibles dans la limite de 5 ans de parcours",
+            "label": "3 ans (1095 jours)",
         },
         enums.ProlongationReason.HEALTH_CONTEXT: {
             "duration": datetime.timedelta(days=365),

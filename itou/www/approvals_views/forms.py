@@ -110,38 +110,38 @@ class CreateProlongationForm(forms.ModelForm):
             "max_duration": Prolongation.MAX_DURATION,
             "help_text": (
                 "Pour le CDI Inclusion, jusqu’à la retraite "
-                "(pour des raisons techniques, une durée de 10 ans est appliquée par défaut)."
+                "(pour des raisons techniques, une durée de 10 ans (3650 jours) est appliquée par défaut)."
             ),
         },
         ProlongationReason.COMPLETE_TRAINING: {
             "max_duration": timedelta(days=365),
             "help_text": format_html(
-                "12 mois maximum pour chaque demande.<br>"
+                "12 mois (365 jours) maximum pour chaque demande.<br> "
                 "Renouvellements possibles jusqu’à la fin de l’action de formation."
             ),
         },
         ProlongationReason.RQTH: {
             "max_duration": timedelta(days=365),
             "help_text": format_html(
-                "12 mois maximum pour chaque demande.<br>"
+                "12 mois (365 jours) maximum pour chaque demande.<br> "
                 "Renouvellements possibles dans la limite de 5 ans de parcours IAE "
-                "(2 ans de parcours initial + 3 ans)."
+                "(2 ans de parcours initial + 3 ans (1095 jours))."
             ),
         },
         ProlongationReason.SENIOR: {
             "max_duration": timedelta(days=365),
             "help_text": format_html(
-                "12 mois maximum pour chaque demande.<br>"
+                "12 mois (365 jours) maximum pour chaque demande.<br> "
                 "Renouvellements possibles dans la limite de 7 ans de parcours IAE "
-                "(2 ans de parcours initial + 5 ans)."
+                "(2 ans de parcours initial + 5 ans (1825 jours))."
             ),
         },
         ProlongationReason.PARTICULAR_DIFFICULTIES: {
             "max_duration": timedelta(days=365),
             "help_text": format_html(
-                "12 mois maximum pour chaque demande.<br>"
+                "12 mois (365 jours) maximum pour chaque demande.<br> "
                 "Renouvellements possibles dans la limite de 5 ans de parcours IAE "
-                "(2 ans de parcours initial + 3 ans)."
+                "(2 ans de parcours initial + 3 ans (1095 jours))."
             ),
         },
     }
