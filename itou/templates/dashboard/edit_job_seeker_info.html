@@ -2,11 +2,11 @@
 {% load bootstrap4 %}
 {% load static %}
 
-{% block title %}Informations personnelles de {{ job_seeker.get_full_name|title }} {{ block.super }}{% endblock %}
+{% block title %}Informations personnelles de {{ job_seeker.get_full_name }} {{ block.super }}{% endblock %}
 
 {% block content_title %}
     <h1>
-        Informations personnelles de <span class="text-muted">{{ job_seeker.get_full_name|title }}</span>
+        Informations personnelles de <span class="text-muted">{{ job_seeker.get_full_name }}</span>
     </h1>
     <div class="alert alert-warning">
         <p>

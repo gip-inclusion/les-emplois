@@ -13,7 +13,7 @@
     <h1>
         Déclarer une prolongation de PASS IAE
         <br>
-        <span class="text-muted">{{ approval.user.get_full_name|title }}</span>
+        <span class="text-muted">{{ approval.user.get_full_name }}</span>
     </h1>
 {% endblock %}
 
@@ -54,7 +54,7 @@
                                     {% if form.instance.validated_by.email %}
                                         <p class="card-text">
                                             Un e-mail sera envoyé au prescripteur habilité désigné pour autoriser la prolongation :
-                                            <b>{{ form.instance.validated_by.get_full_name|title }}</b>
+                                            <b>{{ form.instance.validated_by.get_full_name }}</b>
                                             ({{ form.instance.validated_by.email }})
                                         </p>
                                     {% endif %}

@@ -3,7 +3,9 @@
 
 {% block title %}Invitation {{ block.super }}{% endblock %}
 
-{% block content_title %}<h1>Bienvenue {{ invitation.first_name }} {{ invitation.last_name }} !</h1>{% endblock %}
+{% block content_title %}
+    <h1>Bienvenue {{ invitation.first_name|title }} {{ invitation.last_name|upper }} !</h1>
+{% endblock %}
 
 {% block content %}
     <section class="s-section">

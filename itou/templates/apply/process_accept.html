@@ -21,7 +21,7 @@
                 </div>
                 <div class="modal-body">
                     <p>
-                        Êtes-vous sûr(e) de vouloir confirmer l’embauche de <strong>{{ job_application.job_seeker.first_name }} {{ job_application.job_seeker.last_name }}</strong> dans la structure suivante ?
+                        Êtes-vous sûr(e) de vouloir confirmer l’embauche de <strong>{{ job_application.job_seeker.get_full_name }}</strong> dans la structure suivante ?
                     </p>
                     {% include "siaes/includes/_siae_info.html" with siae=job_application.to_siae %}
                 </div>

@@ -2089,7 +2089,7 @@ class UpdateJobSeekerViewTestCase(TestCase):
         # Step END
         response = self.client.get(self.step_end_url)
         self.assertContains(response, PROCESS_TITLE, html=True)
-        self.assertContains(response, NEW_FIRST_NAME)
+        self.assertContains(response, NEW_FIRST_NAME.title())  # User.get_full_name() changes the firstname display
         self.assertContains(response, NEW_ADDRESS_LINE)
         self.assertContains(response, "Formation de niveau BAC")
         self.assertContains(response, "Valider les informations")

@@ -716,7 +716,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         mail_subject = mail.outbox[0].subject
         assert f"Demande pour rejoindre {prescriber_org.display_name}" in mail_subject
         mail_body = mail.outbox[0].body
-        assert prescriber_membership.user.get_full_name().title() in mail_body
+        assert prescriber_membership.user.get_full_name() in mail_body
         assert prescriber_membership.organization.display_name in mail_body
         invitation_url = f'{reverse("invitations_views:invite_prescriber_with_org")}?{urlencode(requestor)}'
         assert invitation_url in mail_body

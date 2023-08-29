@@ -3,7 +3,7 @@
     <div class="col-md-8">
         <h3 class="h2">
             Auto-prescription pour
-            <span class="text-muted">{{ job_seeker.get_full_name|title }}</span>
+            <span class="text-muted">{{ job_seeker.get_full_name }}</span>
         </h3>
         <p class="m-0">
             PASS IAE :&nbsp;<b>{{ approval.number|format_approval_number }}</b> délivré le {{ approval.start_at|date:"d E Y" }}

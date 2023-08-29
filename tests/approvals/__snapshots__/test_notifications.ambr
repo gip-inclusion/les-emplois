@@ -3,7 +3,7 @@
   '''
   Bonjour,
   
-  John Doe de la structure Acme inc. a besoin de votre accord pour prolonger un PASS IAE.
+  John DOE de la structure Acme inc. a besoin de votre accord pour prolonger un PASS IAE.
   
   L'employeur souhaite vous apporter des explications supplémentaires par téléphone. Vous trouverez ci-dessous ses coordonnées pour le contacter :
   
@@ -12,7 +12,7 @@
   
   - Numéro de PASS : 999999999999
   - Prénom : John
-  - Nom : Doe
+  - Nom : DOE
   - Date de naissance : 01/01/2000
   - Début de la prolongation : 01/01/2000
   - Fin de la prolongation : 31/01/2000
@@ -45,7 +45,7 @@
   '''
 # ---
 # name: test_prolongation_request_created[subject]
-  'Demande de prolongation du PASS IAE de John Doe'
+  'Demande de prolongation du PASS IAE de John DOE'
 # ---
 # name: test_prolongation_request_created_reminder[body]
   '''
@@ -57,7 +57,7 @@
   
   Bonjour,
   
-  John Doe de la structure Acme inc. a besoin de votre accord pour prolonger un PASS IAE.
+  John DOE de la structure Acme inc. a besoin de votre accord pour prolonger un PASS IAE.
   
   L'employeur souhaite vous apporter des explications supplémentaires par téléphone. Vous trouverez ci-dessous ses coordonnées pour le contacter :
   
@@ -66,7 +66,7 @@
   
   - Numéro de PASS : 999999999999
   - Prénom : John
-  - Nom : Doe
+  - Nom : DOE
   - Date de naissance : 01/01/2000
   - Début de la prolongation : 01/01/2000
   - Fin de la prolongation : 31/01/2000
@@ -99,7 +99,7 @@
   '''
 # ---
 # name: test_prolongation_request_created_reminder[subject]
-  'Relance - Demande de prolongation du PASS IAE de John Doe'
+  'Relance - Demande de prolongation du PASS IAE de John DOE'
 # ---
 # name: test_prolongation_request_denied_employer[body]
   '''
@@ -109,7 +109,7 @@
   
   Références :
   Numéro : 99999 99 99999
-  Bénéficiaire : John Doe
+  Bénéficiaire : John DOE
   
   Vous pouvez consulter la date de fin prévisionnelle du PASS IAE dans votre espace employeur sur les emplois de l’inclusion.
   
@@ -120,7 +120,7 @@
   '''
 # ---
 # name: test_prolongation_request_denied_employer[subject]
-  'Prolongation du PASS IAE de John Doe refusée'
+  'Prolongation du PASS IAE de John DOE refusée'
 # ---
 # name: test_prolongation_request_denied_jobseeker[body]
   '''
@@ -149,7 +149,7 @@
   
   Références :
   Numéro : 99999 99 99999
-  Bénéficiaire : John Doe
+  Bénéficiaire : John DOE
   
   Vous pouvez consulter la nouvelle date de fin prévisionnelle du PASS IAE dans votre espace employeur sur les emplois de l’inclusion.
   
@@ -160,7 +160,7 @@
   '''
 # ---
 # name: test_prolongation_request_granted_employer[subject]
-  'Prolongation du PASS IAE de John Doe acceptée'
+  'Prolongation du PASS IAE de John DOE acceptée'
 # ---
 # name: test_prolongation_request_granted_jobseeker[body]
   '''

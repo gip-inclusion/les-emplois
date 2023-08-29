@@ -31,7 +31,7 @@
                                       
                                           <tr>
                                               <th scope="row">1</th>
-                                              <td class="font-weight-bold">John Doe</td>
+                                              <td class="font-weight-bold">John DOE</td>
                                               <td><span>99999</span><span class="ml-1">99</span><span class="ml-1">99999</span></td>
                                               <td>ACME Inc.</td>
                                               <td>01/01/2000</td>
@@ -78,7 +78,7 @@
                                   Le bilan des actions réalisées et actions prévues avec le salarié, rempli par l’employeur est présent sur le document excel téléchargeable ci-dessous.
                               </p>
                               <p>
-                                  <a class="btn btn-secondary btn-ico" download="Bilan prolongation PASS IAE 999999999999 John Doe.xlsx" href="https://None/None/f0r_5n4p5h07">
+                                  <a class="btn btn-secondary btn-ico" download="Bilan prolongation PASS IAE 999999999999 John DOE.xlsx" href="https://None/None/f0r_5n4p5h07">
                                       <i class="ri-download-line ri-lg font-weight-normal"></i>
                                       <span>Télécharger le bilan</span>
                                   </a>
@@ -116,7 +116,7 @@
               </div>
               <div class="card-text">
                   <p class="mb-2">
-                      Demande refusée le 01 janvier 2000 par John Doe
+                      Demande refusée le 01 janvier 2000 par John DOE
                   </p>
               </div>
           
@@ -135,7 +135,7 @@
               </div>
               <div class="card-text">
                   <p class="mb-2">
-                      Demande acceptée le 01 janvier 2000 par John Doe
+                      Demande acceptée le 01 janvier 2000 par John DOE
                   </p>
               </div>
           

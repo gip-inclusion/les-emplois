@@ -1,7 +1,7 @@
 {% extends "layout/base_email_text_body.txt" %}
 {% block body %}
 
-Bonjour {{ first_name|capfirst }} {{ last_name|capfirst }} !
+Bonjour {{ first_name|title }} {{ last_name|upper }} !
 
 Vous avez été invité(e) à vous rattacher au compte de la structure {{ establishment.display_name }} sur les emplois de l'inclusion. Cliquez sur le lien ci-dessous pour vous inscrire en quelques clics. Nous sommes ravis de vous accueillir sur les emplois de l'inclusion !
 

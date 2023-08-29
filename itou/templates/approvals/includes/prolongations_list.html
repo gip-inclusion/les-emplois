@@ -5,7 +5,7 @@
             <small class="ml-3">{{ p.get_reason_display }}</small>
             {% if p.validated_by %}
                 <small class="d-block mb-2">
-                    Autorisée par <i>{{ p.validated_by.get_full_name|title }}</i>
+                    Autorisée par <i>{{ p.validated_by.get_full_name }}</i>
                     {% if p.prescriber_organization %}({{ p.prescriber_organization.display_name }}){% endif %}
                 </small>
             {% endif %}

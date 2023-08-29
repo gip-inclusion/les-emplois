@@ -2,7 +2,7 @@
 {% load format_filters %}
 {% block body %}
 
-Bonjour {{ to.get_full_name|title }},
+Bonjour {{ to.get_full_name }},
 
 {{ full_name|title }} a demandé à rejoindre votre organisation « {{ organization.display_name }} ».
 

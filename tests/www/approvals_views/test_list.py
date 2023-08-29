@@ -45,7 +45,7 @@ class TestApprovalsListView:
         response = client.get(url)
 
         assertContains(response, "2 résultats")
-        assertContains(response, approval.user.get_full_name(), count=3)
+        assertContains(response, approval.user.get_full_name(), count=2)
         assertContains(response, reverse("approvals:detail", kwargs={"pk": approval.pk}))
         assertContains(response, reverse("approvals:detail", kwargs={"pk": another_approval.pk}))
 

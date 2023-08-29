@@ -35,9 +35,9 @@
                                         {% csrf_token %}
                                         {% if ic_account_url %}
                                             <div>
-                                                Prénom : <strong>{{ user.first_name }}</strong>
+                                                Prénom : <strong>{{ user.first_name|title }}</strong>
                                                 <br>
-                                                Nom : <strong>{{ user.last_name }}</strong>
+                                                Nom : <strong>{{ user.last_name|upper }}</strong>
                                                 <br>
                                                 Adresse e-mail : <strong>{{ user.email }}</strong>
                                             </div>

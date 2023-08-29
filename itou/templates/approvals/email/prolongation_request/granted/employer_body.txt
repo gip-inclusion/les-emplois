@@ -7,7 +7,7 @@ L’organisation {{ prolongation_request.prescriber_organization.display_name }}
 
 Références :
 Numéro : {{ prolongation_request.approval.number_with_spaces }}
-Bénéficiaire : {{ prolongation_request.approval.user.get_full_name|title }}
+Bénéficiaire : {{ prolongation_request.approval.user.get_full_name }}
 
 Vous pouvez consulter la nouvelle date de fin prévisionnelle du PASS IAE dans votre espace employeur sur les emplois de l’inclusion.
 {% endblock body %}

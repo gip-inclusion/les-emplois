@@ -433,6 +433,13 @@ class User(AbstractUser, AddressMixin):
                 self.jobseeker_profile.pe_last_certification_attempt_at = None
                 self.jobseeker_profile.save(update_fields=["pe_obfuscated_nir", "pe_last_certification_attempt_at"])
 
+    def get_full_name(self):
+        """
+        Return the first_name plus the last_name, with a space in between.
+        """
+        full_name = "%s %s" % (self.first_name.strip().title(), self.last_name.upper())
+        return full_name.strip()
+
     @property
     def is_job_seeker(self):
         return self.kind == UserKind.JOB_SEEKER

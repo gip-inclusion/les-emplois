@@ -239,7 +239,7 @@ class SiaeJobApplicationListViewTest(S3AccessingTestCase):
                     <div class="row">
                         <div class="col-lg-8 col-md-7 col-12">
                             <h3 class="h2">
-                                Auto-prescription pour <span class="text-muted">Manny Calavera</span>
+                                Auto-prescription pour <span class="text-muted">Manny CALAVERA</span>
                             </h3>
                         </div>
                         <div class="col-lg-4 col-md-5 col-12 text-right">
@@ -314,7 +314,7 @@ class SiaeJobApplicationListViewTest(S3AccessingTestCase):
                     <div class="row">
                         <div class="col-lg-8 col-md-7 col-12">
                             <h3 class="h2">
-                                Auto-prescription pour <span class="text-muted">Manny Calavera</span>
+                                Auto-prescription pour <span class="text-muted">Manny CALAVERA</span>
                             </h3>
                         </div>
                         <div class="col-lg-4 col-md-5 col-12 text-right">
@@ -346,7 +346,7 @@ class SiaeJobApplicationListViewTest(S3AccessingTestCase):
             <div class="row">
                 <div class="col-lg-8 col-md-7 col-12">
                     <h3 class="h2">
-                        Auto-prescription pour <span class="text-muted">Manny Calavera</span>
+                        Auto-prescription pour <span class="text-muted">Manny CALAVERA</span>
                     </h3>
                 </div>
                 <div class="col-lg-4 col-md-5 col-12 text-right">

@@ -35,7 +35,7 @@
                             <a class="btn btn-outline-primary" href="{{ back_url }}">Retour</a>
                         {% else %}
                             <p>
-                                L'agrément <strong>{{ approval.number }}</strong> a été délivré pour <strong>{{ approval.first_name|title }} {{ approval.last_name|title }}</strong>.
+                                L'agrément <strong>{{ approval.number }}</strong> a été délivré pour <strong>{{ approval.first_name|title }} {{ approval.last_name|upper }}</strong>.
                             </p>
                             <p>Nous allons l'importer dans votre compte pour vous permettre de le suspendre ou de le prolonger.</p>
                             <p>Mais avant, nous avons besoin de connaître l'adresse e-mail de votre salarié(e).</p>

@@ -1,4 +1,4 @@
 {% extends "layout/base_email_text_subject.txt" %}
 {% block subject %}
-{{ first_name|capfirst }} {{ last_name|capfirst }} a accepté votre invitation.
+{{ first_name|title }} {{ last_name|upper }} a accepté votre invitation.
 {% endblock %}

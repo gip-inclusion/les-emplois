@@ -1,5 +1,4 @@
 import pytest
-from django.template.defaultfilters import capfirst
 from django.test import SimpleTestCase
 from django.utils import timezone
 
@@ -81,11 +80,11 @@ class InvitationEmailsTest(SimpleTestCase):
         email = invitation.email_invitation
 
         # Subject
-        assert invitation.sender.get_full_name().title() in email.subject
+        assert invitation.sender.get_full_name() in email.subject
 
         # Body
-        assert capfirst(invitation.first_name) in email.body
-        assert capfirst(invitation.last_name) in email.body
+        assert invitation.first_name.title() in email.body
+        assert invitation.last_name.upper() in email.body
         assert invitation.acceptance_link in email.body
 
         assert str(timezone.localdate(invitation.expiration_date).day) in email.body
@@ -128,12 +127,12 @@ class TestPrescriberWithOrgInvitationEmails(SimpleTestCase):
         email = invitation.email_accepted_notif_sender
 
         # Subject
-        assert capfirst(invitation.first_name) in email.subject
-        assert capfirst(invitation.last_name) in email.subject
+        assert invitation.first_name.title() in email.subject
+        assert invitation.last_name.upper() in email.subject
 
         # Body
-        assert capfirst(invitation.first_name) in email.body
-        assert capfirst(invitation.last_name) in email.body
+        assert invitation.first_name.title() in email.body
+        assert invitation.last_name.upper() in email.body
         assert invitation.email in email.body
         assert invitation.organization.display_name in email.body
 
@@ -148,8 +147,8 @@ class TestPrescriberWithOrgInvitationEmails(SimpleTestCase):
         assert invitation.organization.display_name in email.subject
 
         # Body
-        assert capfirst(invitation.first_name) in email.body
-        assert capfirst(invitation.last_name) in email.body
+        assert invitation.first_name.title() in email.body
+        assert invitation.last_name.upper() in email.body
         assert invitation.acceptance_link in email.body
         assert invitation.organization.display_name in email.body
 
@@ -184,12 +183,12 @@ class TestSiaeInvitationEmails(SimpleTestCase):
         email = invitation.email_accepted_notif_sender
 
         # Subject
-        assert capfirst(invitation.first_name) in email.subject
-        assert capfirst(invitation.last_name) in email.subject
+        assert invitation.first_name.title() in email.subject
+        assert invitation.last_name.upper() in email.subject
 
         # Body
-        assert capfirst(invitation.first_name) in email.body
-        assert capfirst(invitation.last_name) in email.body
+        assert invitation.first_name.title() in email.body
+        assert invitation.last_name.upper() in email.body
         assert invitation.email in email.body
         assert invitation.siae.display_name in email.body
 
@@ -204,8 +203,8 @@ class TestSiaeInvitationEmails(SimpleTestCase):
         assert invitation.siae.display_name in email.subject
 
         # Body
-        assert capfirst(invitation.first_name) in email.body
-        assert capfirst(invitation.last_name) in email.body
+        assert invitation.first_name.title() in email.body
+        assert invitation.last_name.upper() in email.body
         assert invitation.acceptance_link in email.body
         assert invitation.siae.display_name in email.body
 

@@ -9,7 +9,7 @@
     <ul>
         <li>
             <b>Nom : </b>
-            {{ job_seeker.last_name }}
+            {{ job_seeker.last_name|upper }}
             <small>
                 (<a href="{% url "admin:approvals_poleemploiapproval_changelist" %}?q={{ job_seeker.last_name|urlencode }}" target="_blank">
                 rechercher dans les agréments Pôle emploi
@@ -18,7 +18,7 @@
     </li>
     <li>
         <b>Prénom : </b>
-        {{ job_seeker.first_name }}
+        {{ job_seeker.first_name|title }}
     </li>
     <li>
         <b>Date de naissance : </b>

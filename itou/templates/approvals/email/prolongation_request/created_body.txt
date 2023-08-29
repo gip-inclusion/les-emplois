@@ -2,7 +2,7 @@
 {% block body %}
 Bonjour,
 
-{{ prolongation_request.declared_by.get_full_name|title }} de la structure {{ prolongation_request.declared_by_siae.display_name }} a besoin de votre accord pour prolonger un PASS IAE.
+{{ prolongation_request.declared_by.get_full_name }} de la structure {{ prolongation_request.declared_by_siae.display_name }} a besoin de votre accord pour prolonger un PASS IAE.
 
 {% if prolongation_request.require_phone_interview %}
 L'employeur souhaite vous apporter des explications supplémentaires par téléphone. Vous trouverez ci-dessous ses coordonnées pour le contacter :
@@ -13,7 +13,7 @@ L'employeur souhaite vous apporter des explications supplémentaires par télép
 
 - Numéro de PASS : {{ prolongation_request.approval.number }}
 - Prénom : {{ prolongation_request.approval.user.first_name|title }}
-- Nom : {{ prolongation_request.approval.user.last_name|title }}
+- Nom : {{ prolongation_request.approval.user.last_name|upper }}
 - Date de naissance : {{ prolongation_request.approval.user.birthdate|date:"d/m/Y" }}
 - Début de la prolongation : {{ prolongation_request.start_at|date:"d/m/Y" }}
 - Fin de la prolongation : {{ prolongation_request.end_at|date:"d/m/Y" }}

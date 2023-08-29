@@ -1,12 +1,12 @@
 {% extends "layout/base_email_text_body.txt" %}
 {% block body %}
 
-{{ first_name|capfirst }} {{ last_name|capfirst }} est désormais membre de la structure {{ establishment_name }}.
+{{ first_name|title }} {{ last_name|upper }} est désormais membre de la structure {{ establishment_name }}.
 
 Détails
 -------------------
-- Prénom : {{ first_name }}
-- Nom : {{ last_name }}
+- Prénom : {{ first_name|title }}
+- Nom : {{ last_name|upper }}
 - Adresse e-mail : {{ email }}
 
 {% endblock %}

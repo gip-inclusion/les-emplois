@@ -9,7 +9,6 @@ from django.core import mail
 from django.core.exceptions import ValidationError
 from django.db.models import Max
 from django.forms.models import model_to_dict
-from django.template.defaultfilters import title
 from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
@@ -691,8 +690,8 @@ class JobApplicationNotificationsTest(TestCase):
         assert len(email.to) == 1
 
         # Body.
-        assert job_application.job_seeker.first_name in email.body
-        assert job_application.job_seeker.last_name in email.body
+        assert job_application.job_seeker.first_name.title() in email.body
+        assert job_application.job_seeker.last_name.upper() in email.body
         assert job_application.job_seeker.birthdate.strftime("%d/%m/%Y") in email.body
         assert job_application.job_seeker.email in email.body
         assert format_filters.format_phone(job_application.job_seeker.phone) in email.body
@@ -722,14 +721,14 @@ class JobApplicationNotificationsTest(TestCase):
 
         # Body.
         assert job_application.job_seeker.first_name.title() in email.body
-        assert job_application.job_seeker.last_name.title() in email.body
+        assert job_application.job_seeker.last_name.upper() in email.body
         assert job_application.job_seeker.birthdate.strftime("%d/%m/%Y") in email.body
         assert job_application.job_seeker.email in email.body
         assert format_filters.format_phone(job_application.job_seeker.phone) in email.body
         assert job_application.message in email.body
         for job in job_application.selected_jobs.all():
             assert job.display_name in email.body
-        assert job_application.sender.get_full_name().title() in email.body
+        assert job_application.sender.get_full_name() in email.body
         assert job_application.sender.email in email.body
         assert format_filters.format_phone(job_application.sender.phone) in email.body
         assert job_application.to_siae.display_name in email.body
@@ -738,7 +737,7 @@ class JobApplicationNotificationsTest(TestCase):
 
         # Assert the Job Seeker does not have access to confidential information.
         email = job_application.email_new_for_job_seeker()
-        assert job_application.sender.get_full_name().title() in email.body
+        assert job_application.sender.get_full_name() in email.body
         assert job_application.sender_prescriber_organization.display_name in email.body
         assert job_application.sender.email not in email.body
         assert format_filters.format_phone(job_application.sender.phone) not in email.body
@@ -757,17 +756,13 @@ class JobApplicationNotificationsTest(TestCase):
 
         # Body.
         assert job_application.job_seeker.first_name.title() in email.body
-        assert job_application.job_seeker.last_name.title() in email.body
+        assert job_application.job_seeker.last_name.upper() in email.body
         assert job_application.job_seeker.birthdate.strftime("%d/%m/%Y") in email.body
         assert job_application.job_seeker.email in email.body
         assert format_filters.format_phone(job_application.job_seeker.phone) in email.body
         assert job_application.message in email.body
         for job in job_application.selected_jobs.all():
             assert job.display_name in email.body
-        assert job_application.sender.first_name.title() in email.body
-        assert job_application.sender.last_name.title() in email.body
-        assert job_application.sender.email in email.body
-        assert format_filters.format_phone(job_application.sender.phone) in email.body
         assert job_application.to_siae.display_name in email.body
         assert reverse("login:job_seeker") in email.body
         assert reverse("account_reset_password") in email.body
@@ -798,8 +793,8 @@ class JobApplicationNotificationsTest(TestCase):
         # Subject.
         assert "Candidature acceptée et votre avis sur les emplois de l'inclusion" in email.subject
         # Body.
-        assert title(job_application.job_seeker.get_full_name()) in email.body
-        assert title(job_application.sender.get_full_name()) in email.body
+        assert job_application.job_seeker.get_full_name() in email.body
+        assert job_application.sender.get_full_name() in email.body
         assert job_application.to_siae.display_name in email.body
         assert job_application.answer in email.body
         assert "Date de début du contrat" in email.body
@@ -825,8 +820,8 @@ class JobApplicationNotificationsTest(TestCase):
         assert settings.ITOU_EMAIL_CONTACT in email.to
         assert len(email.to) == 1
         # Body.
-        assert job_application.job_seeker.first_name in email.body
-        assert job_application.job_seeker.last_name in email.body
+        assert job_application.job_seeker.first_name.title() in email.body
+        assert job_application.job_seeker.last_name.upper() in email.body
         assert job_application.job_seeker.email in email.body
         assert job_application.job_seeker.birthdate.strftime("%d/%m/%Y") in email.body
         assert job_application.to_siae.siret in email.body
@@ -863,10 +858,8 @@ class JobApplicationNotificationsTest(TestCase):
         assert job_application.sender.email in email.to
         assert len(email.to) == 1
         # Body.
-        assert job_application.sender.first_name.title() in email.body
-        assert job_application.sender.last_name.title() in email.body
-        assert job_application.job_seeker.first_name.title() in email.body
-        assert job_application.job_seeker.last_name.title() in email.body
+        assert job_application.sender.get_full_name() in email.body
+        assert job_application.job_seeker.get_full_name() in email.body
         assert job_application.to_siae.display_name in email.body
         assert job_application.answer in email.body
         assert job_application.answer_to_prescriber in email.body
@@ -905,8 +898,8 @@ class JobApplicationNotificationsTest(TestCase):
         assert approval.number_with_spaces in email.body
         assert approval.start_at.strftime("%d/%m/%Y") in email.body
         assert f"{approval.remainder.days} jours" in email.body
-        assert approval.user.last_name in email.body
-        assert approval.user.first_name in email.body
+        assert approval.user.last_name.upper() in email.body
+        assert approval.user.first_name.title() in email.body
         assert approval.user.birthdate.strftime("%d/%m/%Y") in email.body
         assert job_application.hiring_start_at.strftime("%d/%m/%Y") in email.body
         assert job_application.hiring_end_at.strftime("%d/%m/%Y") in email.body
@@ -1012,10 +1005,8 @@ class JobApplicationNotificationsTest(TestCase):
         assert len(email.bcc) == 1
         # Body.
         assert "annulée" in email.body
-        assert job_application.sender.first_name in email.body
-        assert job_application.sender.last_name in email.body
-        assert job_application.job_seeker.first_name in email.body
-        assert job_application.job_seeker.last_name in email.body
+        assert job_application.sender.get_full_name() in email.body
+        assert job_application.job_seeker.get_full_name() in email.body
 
         # When sent by jobseeker.
         job_application = JobApplicationSentByJobSeekerFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)

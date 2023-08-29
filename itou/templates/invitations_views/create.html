@@ -77,8 +77,8 @@
                                     <tbody>
                                         {% for invitation in pending_invitations %}
                                             <tr>
-                                                <td>{{ invitation.first_name }}</td>
-                                                <td>{{ invitation.last_name }}</td>
+                                                <td>{{ invitation.first_name|title }}</td>
+                                                <td>{{ invitation.last_name|upper }}</td>
                                                 <td>{{ invitation.email }}</td>
                                                 <td>{{ invitation.sent_at|date }}</td>
                                             </tr>
