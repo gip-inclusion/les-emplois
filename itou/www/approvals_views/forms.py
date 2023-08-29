@@ -2,7 +2,6 @@ from datetime import timedelta
 
 from django import forms
 from django.core.exceptions import ValidationError
-from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models import Exists, OuterRef, Q
 from django.shortcuts import reverse
 from django.utils import timezone
@@ -17,6 +16,7 @@ from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import UserKind
 from itou.users.models import User
+from itou.utils.validators import MaxDateValidator, MinDateValidator
 from itou.utils.widgets import DuetDatePickerWidget
 
 
@@ -199,9 +199,9 @@ class CreateProlongationForm(forms.ModelForm):
                 self.data = self.data.copy()
                 self.data["end_at"] = max_end_at
             end_at.widget.attrs["min"] = self.instance.start_at
-            end_at.validators.append(MinValueValidator(self.instance.start_at))
+            end_at.validators.append(MinDateValidator(self.instance.start_at))
             # Try switching reason with a date beyond the max_end_at of the new reason
-            end_at.validators.append(MaxValueValidator(max_end_at))
+            end_at.validators.append(MaxDateValidator(max_end_at))
 
 
 class CreateProlongationRequestForm(CreateProlongationForm):
