@@ -1,5 +1,10 @@
 {% extends "layout/base_email_text_body.txt" %}
 {% block body %}
+********************************************************************
+👉 Cette demande est à traiter exclusivement sur votre tableau de bord prescripteur.
+❌ Merci de ne pas transférer cette demande à notre équipe support.
+*********************************************************************
+
 Bonjour,
 
 {{ prolongation_request.declared_by.get_full_name }} de la structure {{ prolongation_request.declared_by_siae.display_name }} a besoin de votre accord pour prolonger un PASS IAE.
