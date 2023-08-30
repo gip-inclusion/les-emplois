@@ -371,12 +371,6 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
                 "current_siae": siae,
                 "user_is_siae_admin": True,
                 "user_siaes": [siae],
-                "matomo_custom_variables": {
-                    "is_authenticated": "yes",
-                    "account_type": "siae_staff",
-                    "account_sub_type": "employer_admin",
-                    "account_current_siae_id": siae.pk,
-                },
             }
 
     def test_siae_multiple_memberships(self):
@@ -401,12 +395,6 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
                 "current_siae": siae2,
                 "user_is_siae_admin": False,
                 "user_siaes": [siae1, siae2],
-                "matomo_custom_variables": {
-                    "is_authenticated": "yes",
-                    "account_type": "siae_staff",
-                    "account_sub_type": "employer_not_admin",
-                    "account_current_siae_id": siae2.pk,
-                },
             }
 
     def test_prescriber_organization_one_membership(self):
@@ -426,12 +414,6 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
                 "current_prescriber_organization": organization,
                 "user_prescriberorganizations": [organization],
                 "user_is_prescriber_org_admin": True,
-                "matomo_custom_variables": {
-                    "is_authenticated": "yes",
-                    "account_type": "prescriber",
-                    "account_sub_type": "prescriber_with_unauthorized_org",
-                    "account_current_prescriber_org_id": organization.pk,
-                },
             }
 
     def test_prescriber_organization_multiple_membership(self):
@@ -455,12 +437,6 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
                 "current_prescriber_organization": organization1,
                 "user_prescriberorganizations": [organization1, organization2],
                 "user_is_prescriber_org_admin": True,
-                "matomo_custom_variables": {
-                    "is_authenticated": "yes",
-                    "account_type": "prescriber",
-                    "account_sub_type": "prescriber_with_unauthorized_org",
-                    "account_current_prescriber_org_id": organization1.pk,
-                },
             }
 
     def test_labor_inspector_one_institution(self):
@@ -480,12 +456,6 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
                 "current_institution": institution,
                 "user_institutions": [institution],
                 "user_is_institution_admin": True,
-                "matomo_custom_variables": {
-                    "is_authenticated": "yes",
-                    "account_type": "labor_inspector",
-                    "account_sub_type": "inspector_admin",
-                    "account_current_institution_id": institution.pk,
-                },
             }
 
     def test_labor_inspector_multiple_institutions(self):
@@ -509,12 +479,6 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
                 "current_institution": institution2,
                 "user_institutions": [institution1, institution2],
                 "user_is_institution_admin": False,
-                "matomo_custom_variables": {
-                    "is_authenticated": "yes",
-                    "account_type": "labor_inspector",
-                    "account_sub_type": "inspector_not_admin",
-                    "account_current_institution_id": institution2.pk,
-                },
             }
 
 
