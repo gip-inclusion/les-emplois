@@ -153,13 +153,16 @@
                   <h4>Prolonger le PASS IAE jusqu’au 31/01/2000</h4>
               </div>
               <div class="card-text">
-                  <form method="post">
+                  <form method="post" action="/approvals/prolongation/request/666/grant">
                       
-                      <button name="action" value="grant" class="btn btn-primary btn-block btn-ico justify-content-center">
+                      <button class="btn btn-primary btn-block btn-ico justify-content-center">
                           <i class="ri-check-line"></i>
                           <span>Accepter</span>
                       </button>
-                      <button name="action" value="deny" class="btn btn-outline-primary btn-block btn-ico mt-3 justify-content-center">
+                  </form>
+                  <form method="post" action="/approvals/prolongation/request/666/deny">
+                      
+                      <button class="btn btn-outline-primary btn-block btn-ico mt-3 justify-content-center">
                           <i class="ri-close-line"></i>
                           <span>Refuser</span>
                       </button>

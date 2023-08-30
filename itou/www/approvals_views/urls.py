@@ -33,6 +33,16 @@ urlpatterns = [
         views.prolongation_request_show,
         name="prolongation_request_show",
     ),
+    path(
+        "prolongation/request/<int:prolongation_request_id>/grant",
+        views.prolongation_request_grant,
+        name="prolongation_request_grant",
+    ),
+    path(
+        "prolongation/request/<int:prolongation_request_id>/deny",
+        views.prolongation_request_deny,
+        name="prolongation_request_deny",
+    ),
     path("suspend/<int:approval_id>", views.suspend, name="suspend"),
     path("suspension/<int:suspension_id>/edit", views.suspension_update, name="suspension_update"),
     path("suspension/<int:suspension_id>/delete", views.suspension_delete, name="suspension_delete"),
