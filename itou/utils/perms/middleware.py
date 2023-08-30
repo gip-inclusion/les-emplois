@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.utils import safestring
+from django.utils.html import format_html
 
 from itou.users.enums import IdentityProvider, UserKind
 from itou.utils import constants as global_constants
@@ -109,7 +109,7 @@ class ItouCurrentOrganizationMiddleware:
                     # SIAE user has no active SIAE and thus must not be able to access any page,
                     # thus we force a logout with a few exceptions (cf skip_middleware_conditions)
                     if not active_memberships:
-                        message = (
+                        message = format_html(
                             "Nous sommes désolés, votre compte n'est "
                             "actuellement rattaché à aucune structure.<br>"
                             "Nous espérons cependant avoir l'occasion de vous accueillir de "
@@ -124,7 +124,6 @@ class ItouCurrentOrganizationMiddleware:
                             "avoir l'occasion de vous accueillir de "
                             "nouveau."
                         )
-                    message = safestring.mark_safe(message)
                     messages.warning(request, message)
                     return redirect("account_logout")
 
@@ -154,13 +153,12 @@ class ItouCurrentOrganizationMiddleware:
                     global_constants.ITOU_SESSION_CURRENT_INSTITUTION_KEY,
                 )
                 if not request.current_organization and request.path != reverse("account_logout"):
-                    message = (
+                    message = format_html(
                         "Nous sommes désolés, votre compte n'est "
                         "actuellement rattaché à aucune structure.<br>"
                         "Nous espérons cependant avoir l'occasion de vous accueillir de "
                         "nouveau."
                     )
-                    message = safestring.mark_safe(message)
                     messages.warning(request, message)
                     return redirect("account_logout")
 
