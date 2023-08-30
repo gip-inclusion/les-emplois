@@ -430,7 +430,11 @@ class ProlongationCommonAdmin(ItouModelAdmin):
 class ProlongationRequestAdmin(ProlongationCommonAdmin):
     list_display = ProlongationCommonAdmin.list_display + ("status", "processed_at")
     list_filter = ("status",) + ProlongationCommonAdmin.list_filter
-    readonly_fields = ProlongationCommonAdmin.readonly_fields + ("processed_at", "processed_by")
+    readonly_fields = ProlongationCommonAdmin.readonly_fields + ("processed_at", "processed_by", "prolongation")
+
+    @admin.display(description="prolongation créée")
+    def prolongation(self, obj):
+        return obj.prolongation
 
 
 @admin.register(models.Prolongation)
