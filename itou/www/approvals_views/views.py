@@ -9,7 +9,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
-from django.views.decorators.http import require_POST
+from django.views import View
 from django.views.generic import DetailView, ListView, TemplateView
 
 from itou.approvals import enums as approvals_enums
@@ -351,59 +351,50 @@ def prolongation_requests_list(request, template_name="approvals/prolongation_re
     return render(request, template_name, context)
 
 
-@login_required
-def prolongation_request_show(
-    request, prolongation_request_id, template_name="approvals/prolongation_requests/show.html"
-):
-    current_organization = get_current_org_or_404(request)
-    prolongation_request = get_object_or_404(
-        ProlongationRequest.objects.filter(prescriber_organization=current_organization),
-        pk=prolongation_request_id,
-    )
+class ProlongationRequestViewMixin(LoginRequiredMixin):
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
 
-    context = {
-        "prolongation_request": prolongation_request,
-        "matomo_custom_title": "Demande de prolongation",
-    }
-    return render(request, template_name, context)
+        self.prolongation_request = get_object_or_404(
+            ProlongationRequest.objects.filter(prescriber_organization=get_current_org_or_404(request)),
+            pk=kwargs["prolongation_request_id"],
+        )
 
-
-@login_required
-@require_POST
-def prolongation_request_grant(request, prolongation_request_id):
-    current_organization = get_current_org_or_404(request)
-    prolongation_request = get_object_or_404(
-        ProlongationRequest.objects.filter(prescriber_organization=current_organization),
-        pk=prolongation_request_id,
-    )
-
-    prolongation_request.grant(request.user)
-    messages.success(
-        request,
-        f"La prolongation de {prolongation_request.approval.user.get_full_name()} a bien été acceptée.",
-        extra_tags="toast",
-    )
-
-    return HttpResponseRedirect(reverse("approvals:prolongation_requests_list"))
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "prolongation_request": self.prolongation_request,
+            "matomo_custom_title": "Demande de prolongation",
+        }
 
 
-@login_required
-@require_POST
-def prolongation_request_deny(request, prolongation_request_id):
-    current_organization = get_current_org_or_404(request)
-    prolongation_request = get_object_or_404(
-        ProlongationRequest.objects.filter(prescriber_organization=current_organization),
-        pk=prolongation_request_id,
-    )
+class ProlongationRequestShowView(ProlongationRequestViewMixin, TemplateView):
+    template_name = "approvals/prolongation_requests/show.html"
 
-    prolongation_request.deny(request.user)
-    messages.success(
-        request,
-        f"La prolongation de {prolongation_request.approval.user.get_full_name()} a bien été refusée.",
-        extra_tags="toast",
-    )
 
-    return HttpResponseRedirect(reverse("approvals:prolongation_requests_list"))
+class ProlongationRequestGrantView(ProlongationRequestViewMixin, View):
+    http_method_names = ["post"]
+
+    def post(self, request, *args, **kwargs):
+        self.prolongation_request.grant(request.user)
+        messages.success(
+            request,
+            f"La prolongation de {self.prolongation_request.approval.user.get_full_name()} a bien été acceptée.",
+            extra_tags="toast",
+        )
+        return HttpResponseRedirect(reverse("approvals:prolongation_requests_list"))
+
+
+class ProlongationRequestDenyView(ProlongationRequestViewMixin, View):
+    http_method_names = ["post"]
+
+    def post(self, request, *args, **kwargs):
+        self.prolongation_request.deny(self.request.user)
+        messages.success(
+            self.request,
+            f"La prolongation de {self.prolongation_request.approval.user.get_full_name()} a bien été refusée.",
+            extra_tags="toast",
+        )
+        return HttpResponseRedirect(reverse("approvals:prolongation_requests_list"))
 
 
 @login_required
