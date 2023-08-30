@@ -9,8 +9,9 @@ import faker
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
-from django.contrib.auth.models import Permission
+from django.contrib.auth.models import AnonymousUser, Permission
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.exceptions import ValidationError
 from django.core.mail.message import EmailMessage
@@ -22,6 +23,7 @@ from django.utils import timezone
 from django.utils.html import escape
 from factory import Faker
 from faker import Faker as fk
+from pytest_django.asserts import assertNumQueries, assertRedirects
 
 import itou.utils.json
 import itou.utils.session
@@ -35,6 +37,7 @@ from itou.utils.emails import redact_email_address
 from itou.utils.models import PkSupportRemark
 from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.perms.context_processors import get_current_organization_and_perms
+from itou.utils.perms.middleware import ItouCurrentOrganizationMiddleware
 from itou.utils.perms.user import get_user_info
 from itou.utils.sync import DiffItem, DiffItemKind, yield_sync_diff
 from itou.utils.tasks import sanitize_mailjet_recipients
@@ -61,12 +64,22 @@ from itou.utils.validators import (
     validate_siret,
 )
 from tests.approvals.factories import SuspensionFactory
-from tests.institutions.factories import InstitutionFactory, InstitutionWithMembershipFactory
+from tests.institutions.factories import (
+    InstitutionFactory,
+    InstitutionMembershipFactory,
+    InstitutionWithMembershipFactory,
+)
 from tests.job_applications.factories import JobApplicationFactory
-from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from tests.siaes.factories import SiaeFactory
-from tests.users.factories import ItouStaffFactory, JobSeekerFactory, PrescriberFactory
-from tests.utils.test import TestCase, parse_response_to_soup
+from tests.prescribers.factories import PrescriberOrganizationFactory, PrescriberOrganizationWithMembershipFactory
+from tests.siaes.factories import SiaeFactory, SiaeMembershipFactory, SiaePendingGracePeriodFactory
+from tests.users.factories import (
+    ItouStaffFactory,
+    JobSeekerFactory,
+    LaborInspectorFactory,
+    PrescriberFactory,
+    SiaeStaffFactory,
+)
+from tests.utils.test import TestCase, assertMessagesFromRequest, parse_response_to_soup
 
 
 def get_response_for_middlewaremixin(request):
@@ -78,6 +91,247 @@ def get_response_for_middlewaremixin(request):
     An empty `HttpResponse` does the trick.
     """
     return HttpResponse()
+
+
+@pytest.fixture
+def mocked_get_response_for_middlewaremixin(mocker):
+    return mocker.Mock(wraps=get_response_for_middlewaremixin)
+
+
+class TestItouCurrentOrganizationMiddleware:
+    def test_anonymous_user(self, mocked_get_response_for_middlewaremixin):
+        factory = RequestFactory()
+        request = factory.get("/")
+        request.user = AnonymousUser()
+        with assertNumQueries(0):
+            ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
+        assert mocked_get_response_for_middlewaremixin.call_count == 1
+
+    def test_job_seeker(self, mocked_get_response_for_middlewaremixin):
+        factory = RequestFactory()
+        request = factory.get("/")
+        request.user = JobSeekerFactory()
+        SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
+        with assertNumQueries(0):
+            ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
+        assert mocked_get_response_for_middlewaremixin.call_count == 1
+        assert request.session.is_empty()
+
+    def test_siae_member(self, mocked_get_response_for_middlewaremixin):
+        factory = RequestFactory()
+        request = factory.get("/")
+        siae = SiaeMembershipFactory().siae
+        request.user = siae.members.first()
+        SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
+        with assertNumQueries(
+            # Check if siae exists
+            1
+            # get the first one
+            + 1
+        ):
+            ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
+        assert mocked_get_response_for_middlewaremixin.call_count == 1
+        # Session updated
+        assert request.session[global_constants.ITOU_SESSION_CURRENT_SIAE_KEY] == siae.pk
+
+    def test_siae_no_member(self, mocked_get_response_for_middlewaremixin):
+        factory = RequestFactory()
+        request = factory.get("/")
+        request.user = SiaeStaffFactory()
+        SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
+        MessageMiddleware(get_response_for_middlewaremixin).process_request(request)
+        with assertNumQueries(
+            1  # Check if siae exists
+            + 1  # get the first active
+            + 1  # get the first active_or_in_grace_period
+            + 1  # check if any active membership exists
+        ):
+            response = ItouCurrentOrganizationMiddleware(get_response_for_middlewaremixin)(request)
+        assert mocked_get_response_for_middlewaremixin.call_count == 0
+        assertRedirects(response, reverse("account_logout"), fetch_redirect_response=False)
+        assertMessagesFromRequest(
+            request,
+            [
+                (
+                    "WARNING",
+                    (
+                        "Nous sommes désolés, votre compte n'est actuellement rattaché à aucune structure."
+                        "<br>Nous espérons cependant avoir l'occasion de vous accueillir de nouveau."
+                    ),
+                )
+            ],
+        )
+        # Session untouched
+        assert request.session.is_empty()
+
+    def test_siae_member_of_inactive_siae(self, mocked_get_response_for_middlewaremixin):
+        factory = RequestFactory()
+        request = factory.get("/")
+        siae = SiaeMembershipFactory(siae__subject_to_eligibility=True, siae__convention=None).siae
+        request.user = siae.members.first()
+        SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
+        MessageMiddleware(get_response_for_middlewaremixin).process_request(request)
+        with assertNumQueries(
+            1  # Check if siae exists
+            + 1  # get the first active
+            + 1  # get the first active_or_in_grace_period
+            + 1  # check if any active membership exists
+        ):
+            response = ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
+        assert mocked_get_response_for_middlewaremixin.call_count == 0
+        assertRedirects(response, reverse("account_logout"), fetch_redirect_response=False)
+        assertMessagesFromRequest(
+            request,
+            [
+                (
+                    "WARNING",
+                    (
+                        "Nous sommes désolés, votre compte n'est malheureusement plus actif car la ou les "
+                        "structures associées ne sont plus conventionnées. "
+                        "Nous espérons cependant avoir l'occasion de vous accueillir de nouveau."
+                    ),
+                )
+            ],
+        )
+        # Session untouched
+        assert request.session.is_empty()
+
+    def test_siae_member_of_siae_in_grace_period(self, mocked_get_response_for_middlewaremixin):
+        factory = RequestFactory()
+        request = factory.get("/")
+        siae = SiaePendingGracePeriodFactory()
+        request.user = SiaeMembershipFactory(siae=siae).user
+        SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
+        MessageMiddleware(get_response_for_middlewaremixin).process_request(request)
+        with assertNumQueries(
+            # Check if siae exists
+            1
+            # get the first active
+            + 1
+            # check if any active membership exists
+            + 1
+        ):
+            ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
+        assert mocked_get_response_for_middlewaremixin.call_count == 1
+        # Session updated
+        assert request.session[global_constants.ITOU_SESSION_CURRENT_SIAE_KEY] == siae.pk
+
+    def test_siae_member_of_siae_in_grace_period_and_active_siae(self, mocked_get_response_for_middlewaremixin):
+        factory = RequestFactory()
+        request = factory.get("/")
+        siae = SiaePendingGracePeriodFactory()
+        request.user = SiaeMembershipFactory(siae=siae).user
+        active_siae = SiaeMembershipFactory(user=request.user, siae__not_subject_to_eligibility=True).siae
+        SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
+        MessageMiddleware(get_response_for_middlewaremixin).process_request(request)
+        with assertNumQueries(
+            # Check if siae exists
+            1
+            # get the first active
+            + 1
+        ):
+            ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
+        assert mocked_get_response_for_middlewaremixin.call_count == 1
+        # Session updated
+        assert request.session[global_constants.ITOU_SESSION_CURRENT_SIAE_KEY] == active_siae.pk
+
+    def test_prescriber_no_organization(self, mocked_get_response_for_middlewaremixin):
+        factory = RequestFactory()
+        request = factory.get("/")
+        request.user = PrescriberFactory()
+        SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
+        with assertNumQueries(1):
+            ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
+        assert mocked_get_response_for_middlewaremixin.call_count == 1
+        # Session untouched
+        assert request.session.is_empty()
+
+    def test_prescriber_with_organization(self, mocked_get_response_for_middlewaremixin):
+        factory = RequestFactory()
+        request = factory.get("/")
+        organization = PrescriberOrganizationWithMembershipFactory()
+        request.user = organization.members.first()
+        SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
+        with assertNumQueries(
+            1  # is_prescriber_with_org
+            + 1  # get first active membership...
+            + 1  # ... and retrieve its organization pk
+        ):
+            ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
+        assert mocked_get_response_for_middlewaremixin.call_count == 1
+        # Session updated
+        assert request.session[global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY] == organization.pk
+
+    def test_prescriber_wrong_org_in_session(self, mocked_get_response_for_middlewaremixin):
+        factory = RequestFactory()
+        request = factory.get("/")
+        request.user = PrescriberFactory()
+        organization = PrescriberOrganizationFactory()
+        SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
+        request.session[global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY] = organization.pk
+        request.session.save()
+        with assertNumQueries(1):
+            ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
+        assert mocked_get_response_for_middlewaremixin.call_count == 1
+        # Session cleaned up
+        assert request.session.get(global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY) is None
+
+    def test_labor_inspector_admin_member(self, mocked_get_response_for_middlewaremixin):
+        factory = RequestFactory()
+        request = factory.get("/")
+        institution = InstitutionWithMembershipFactory()
+        request.user = institution.members.first()
+        SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
+        with assertNumQueries(
+            #  get first active membership...
+            1
+            # ... and retrieve its institution pk
+            + 1
+        ):
+            ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
+        assert mocked_get_response_for_middlewaremixin.call_count == 1
+        # Session updated
+        assert request.session[global_constants.ITOU_SESSION_CURRENT_INSTITUTION_KEY] == institution.pk
+
+    def test_labor_inspector_member_of_2_institutions(self, mocked_get_response_for_middlewaremixin):
+        factory = RequestFactory()
+        request = factory.get("/")
+        institution1 = InstitutionWithMembershipFactory()
+        request.user = institution1.members.first()
+        institution2 = InstitutionMembershipFactory(is_admin=False, user=request.user).institution
+        SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
+        request.session[global_constants.ITOU_SESSION_CURRENT_INSTITUTION_KEY] = institution2.pk
+        request.session.save()
+        with assertNumQueries(0):
+            ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
+        assert mocked_get_response_for_middlewaremixin.call_count == 1
+        # Session untouched
+        assert request.session[global_constants.ITOU_SESSION_CURRENT_INSTITUTION_KEY] == institution2.pk
+
+    def test_labor_inspector_no_member(self, mocked_get_response_for_middlewaremixin):
+        factory = RequestFactory()
+        request = factory.get("/")
+        request.user = LaborInspectorFactory()
+        SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
+        MessageMiddleware(get_response_for_middlewaremixin).process_request(request)
+        with assertNumQueries(1):
+            response = ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
+        assert mocked_get_response_for_middlewaremixin.call_count == 0
+        assertRedirects(response, reverse("account_logout"), fetch_redirect_response=False)
+        assertMessagesFromRequest(
+            request,
+            [
+                (
+                    "WARNING",
+                    (
+                        "Nous sommes désolés, votre compte n'est actuellement rattaché à aucune structure."
+                        "<br>Nous espérons cependant avoir l'occasion de vous accueillir de nouveau."
+                    ),
+                )
+            ],
+        )
+        # Session untouched
+        assert request.session.is_empty()
 
 
 class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
