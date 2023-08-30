@@ -30,17 +30,17 @@ urlpatterns = [
     path("prolongation/requests", views.prolongation_requests_list, name="prolongation_requests_list"),
     path(
         "prolongation/request/<int:prolongation_request_id>",
-        views.prolongation_request_show,
+        views.ProlongationRequestShowView.as_view(),
         name="prolongation_request_show",
     ),
     path(
         "prolongation/request/<int:prolongation_request_id>/grant",
-        views.prolongation_request_grant,
+        views.ProlongationRequestGrantView.as_view(),
         name="prolongation_request_grant",
     ),
     path(
         "prolongation/request/<int:prolongation_request_id>/deny",
-        views.prolongation_request_deny,
+        views.ProlongationRequestDenyView.as_view(),
         name="prolongation_request_deny",
     ),
     path("suspend/<int:approval_id>", views.suspend, name="suspend"),
