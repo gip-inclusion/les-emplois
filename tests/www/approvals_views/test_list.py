@@ -88,7 +88,6 @@ class TestApprovalsListView:
             + 1  # fetch django session
             + 1  # fetch user
             + 2  # fetch siae memberships & its active/grace_period (middleware)
-            + 1  # fetch SIAE (get_current_siae_or_404)
             + 1  # fetch job seekers (ApprovalForm._get_choices_for_job_seekers)
             + 1  # count (from paginator)
             + 1  # fetch approvals

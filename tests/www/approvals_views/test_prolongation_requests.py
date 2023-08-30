@@ -34,7 +34,6 @@ def test_list_view(snapshot, client):
         + 1  # fetch django session
         + 1  # fetch user
         + 1  # check user memberships
-        + 1  # fetch organization infos
         + 1  # fetch prolongation requests rows
         + 1  # count prolongation requests rows (from pager)
         + 3  # savepoint, update session, release savepoint

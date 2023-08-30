@@ -1,11 +1,7 @@
-from django.shortcuts import get_object_or_404
-
-from itou.institutions.models import Institution
-from itou.utils import constants as global_constants
+from django.http import Http404
 
 
 def get_current_institution_or_404(request):
-    pk = request.session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY)
-    queryset = Institution.objects.member_required(request.user)
-    institution = get_object_or_404(queryset, pk=pk)
-    return institution
+    if request.user.is_labor_inspector and request.current_organization:  # Set by middleware for labor_inspector
+        return request.current_organization
+    raise Http404("L'utilisateur n'est pas membre d'une organisation")

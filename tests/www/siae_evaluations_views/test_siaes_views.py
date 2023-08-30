@@ -89,7 +89,7 @@ class SiaeJobApplicationListViewTest(S3AccessingTestCase):
             + 1  # fetch django session
             + 1  # fetch user
             + 1  # verify user is active (middleware)
-            + 2  # fetch siae membership and siae infos
+            + 1  # fetch siae membership
             + 1  # fetch evaluated siae
             + 2  # fetch evaluatedjobapplication and its prefetched evaluatedadministrativecriteria
             # NOTE(vperron): the prefetch is necessary to check the SUBMITTABLE state of the evaluated siae
@@ -910,7 +910,7 @@ class SiaeSubmitProofsViewTest(TestCase):
             + 1  # fetch django session
             + 1  # fetch user
             + 1  # fetch siae membership
-            + 2  # fetch siae infos
+            + 1  # fetch siae infos
             + 3  # fetch evaluatedsiae, evaluatedjobapplication and evaluatedadministrativecriteria
             + 1  # update evaluatedadministrativecriteria
             + 1  # update evaluatedsiae submission_freezed_at
@@ -1004,7 +1004,7 @@ class SiaeSubmitProofsViewTest(TestCase):
             + 1  # fetch django session
             + 1  # fetch user
             + 1  # fetch siae membership
-            + 2  # fetch siae infos
+            + 1  # fetch siae infos
             + 1  # fetch evaluatedsiae and see that submission is freezed, abort
             + 3  # savepoint, update session, release savepoint
         ):
