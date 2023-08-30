@@ -116,4 +116,5 @@ restore_latest_backup:
 
 .PHONY: deploy_prod
 deploy_prod:
-	./scripts/deploy_prod.sh
+	git fetch origin  # Update our local to get the latest `master`
+	git push origin origin/master:master_clever  # Deploy by pushing the latest `master` to `master_clever`
