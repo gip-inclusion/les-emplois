@@ -43,7 +43,7 @@ def test_no_email_sent(client):
             "last_checked_at_0": naive_now.date(),
             "last_checked_at_1": naive_now.time(),
             # email was set by SSO.
-            "kind": UserKind.JOB_SEEKER,
+            # kind can not be submitted in a change
             "emailaddress_set-INITIAL_FORMS": "0",
             "emailaddress_set-TOTAL_FORMS": "0",
             "eligibility_diagnoses-INITIAL_FORMS": "0",
@@ -60,13 +60,13 @@ def test_no_email_sent(client):
         },
     )
     assertRedirects(response, reverse("admin:users_user_changelist"))
-    user_refreshed = User.objects.get(pk=user.pk)
-    assert user_refreshed.kind == UserKind.JOB_SEEKER
-    assert user_refreshed.first_name == user.first_name
-    assert user_refreshed.last_name == user.last_name
-    assert user_refreshed.date_joined == now
-    assert user_refreshed.last_checked_at == now
-    assert user_refreshed.identity_provider == IdentityProvider.FRANCE_CONNECT
+    user.refresh_from_db()
+    assert user.kind == UserKind.JOB_SEEKER
+    assert user.first_name == user.first_name
+    assert user.last_name == user.last_name
+    assert user.date_joined == now
+    assert user.last_checked_at == now
+    assert user.identity_provider == IdentityProvider.FRANCE_CONNECT
 
 
 def test_hijack_button(client):
