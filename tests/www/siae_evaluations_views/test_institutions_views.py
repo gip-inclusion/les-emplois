@@ -610,7 +610,6 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             BASE_NUM_QUERIES
             + 1  # django session
             + 2  # fetch user & its memberships (middleware)
-            + 1  # fetch institution membership
             + 1  # fetch evaluation campaign
             + 3  # fetch evaluated_siae and its prefetch_related eval_job_app & eval_admin_crit
             + 3  # savepoint, update session, release savepoint
@@ -1709,7 +1708,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             BASE_NUM_QUERIES
             + 1  # django session
             + 2  # fetch user & its memberships (middleware)
-            + 1  # fetch institution membership
             + 3  # fetch evaluated_siae, evaluated_jobapp & criteria
             + 3  # fetch jobapplication, approvals & users
             + 3  # savepoint, update session, release savepoint
@@ -1964,7 +1962,6 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
             BASE_NUM_QUERIES
             + 1  # Load session
             + 2  # Check user & its memberships
-            + 1  # Laod institution infos
             + 1  # Load evaluated siae infos
             + 1  # Load evaluated job applications
             + 3  # Load evaluated siae infos + job application + criteria for previous campaigns
@@ -3622,7 +3619,6 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
             BASE_NUM_QUERIES
             + 1  # django session
             + 2  # fetch user & its memberships (middleware)
-            + 1  # fetch institution membership
             + 3  # fetch evaluated_jobapp & criteria
             + 3  # jobapp, approvals & users
             + 2  # evaljobapp & its evalcriteria

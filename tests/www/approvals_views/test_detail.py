@@ -106,7 +106,6 @@ class TestApprovalDetailView:
             + 1  # verify user is active (middleware)
             + 1  # fetch siae membership and siae infos (middleware)
             + 1  # place savepoint right after the middlewares
-            + 1  # get_current_siae_or_404 (ApprovalBaseViewMixin.setup)
             + 1  # job_seeker.approval
             + 1  # select all latest suspensions to check their end date
             + 1  # job_application.with_accepted_at annotation coming from next query
@@ -184,7 +183,6 @@ class TestApprovalDetailView:
             + 1  # fetch authenticated user
             + 1  # verify user is active (middleware)
             + 1  # place savepoint right after the middlewares
-            + 1  # fetch siae infos
             + 1  # get approval infos (get_object)
             # get_context_data
             + 1  # select all latest suspensions to check their end date (with prefetch)

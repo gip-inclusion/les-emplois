@@ -1,15 +1,11 @@
 from django.db.models import Q
-from django.shortcuts import get_object_or_404
-
-from itou.prescribers.models import PrescriberOrganization
-from itou.utils import constants as global_constants
+from django.http import Http404
 
 
 def get_current_org_or_404(request):
-    pk = request.session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY)
-    queryset = PrescriberOrganization.objects.member_required(request.user)
-    organization = get_object_or_404(queryset, pk=pk)
-    return organization
+    if request.user.is_prescriber and request.current_organization:  # Set by middleware for prescriber users
+        return request.current_organization
+    raise Http404("L'utilisateur n'est pas membre d'une organisation")
 
 
 def get_all_available_job_applications_as_prescriber(request):

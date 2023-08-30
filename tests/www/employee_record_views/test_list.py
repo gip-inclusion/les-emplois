@@ -265,7 +265,6 @@ class ListEmployeeRecordsTest(TestCase):
         num_queries = BASE_NUM_QUERIES
         num_queries += 1  # Get django session
         num_queries += 3  # Get current user and siae
-        num_queries += 1  # get_current_siae_or_404
         num_queries += 1  # Select job seeker for filters
         num_queries += 1  # Select employee_records status count
         num_queries += 1  # Get Siae Convention

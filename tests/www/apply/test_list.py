@@ -216,7 +216,7 @@ class ProcessListSiaeTest(ProcessListTest):
             BASE_NUM_QUERIES
             + 1  # fetch django session
             + 1  # fetch user
-            + 3  # check for membership & infos
+            + 2  # check for membership & infos
             #
             # SiaeFilterJobApplicationsForm:
             + 1  # get list of senders (distinct sender_id)
