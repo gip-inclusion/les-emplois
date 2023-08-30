@@ -104,13 +104,14 @@ def test_show_view(snapshot, client):
         ("deny", ProlongationRequestStatus.DENIED, "refusée"),
     ],
 )
-def test_show_view_action(client, action, expected_status, expected_message):
+def test_grant_and_deny_view(client, action, expected_status, expected_message):
     prolongation_request = approvals_factories.ProlongationRequestFactory(approval__user__for_snapshot=True)
     client.force_login(prolongation_request.validated_by)
 
     response = client.post(
-        reverse("approvals:prolongation_request_show", kwargs={"prolongation_request_id": prolongation_request.pk}),
-        {"action": action},
+        reverse(
+            f"approvals:prolongation_request_{action}", kwargs={"prolongation_request_id": prolongation_request.pk}
+        ),
     )
     assertRedirects(response, reverse("approvals:prolongation_requests_list"), fetch_redirect_response=False)
     assertMessages(
@@ -121,15 +122,24 @@ def test_show_view_action(client, action, expected_status, expected_message):
     assert prolongation_request.status == expected_status
 
 
-def test_show_view_with_invalid_action(faker, client):
-    prolongation_request = approvals_factories.ProlongationRequestFactory(approval__user__for_snapshot=True)
+def test_grant_and_deny_view_is_not_accessible_by_get_method(client):
+    prolongation_request = approvals_factories.ProlongationRequestFactory()
     client.force_login(prolongation_request.validated_by)
 
-    response = client.post(
-        reverse("approvals:prolongation_request_show", kwargs={"prolongation_request_id": prolongation_request.pk}),
-        {"action": faker.sentence()},
+    assert (
+        client.get(
+            reverse(
+                "approvals:prolongation_request_grant", kwargs={"prolongation_request_id": prolongation_request.pk}
+            )
+        ).status_code
+        == 405
     )
-    assert response.status_code == 200
+    assert (
+        client.get(
+            reverse("approvals:prolongation_request_deny", kwargs={"prolongation_request_id": prolongation_request.pk})
+        ).status_code
+        == 405
+    )
 
 
 @pytest.mark.parametrize("status", ProlongationRequestStatus)
