@@ -324,6 +324,12 @@ class SiaeConventionAdmin(admin.ModelAdmin):
     search_fields = ("pk", "siret_signature", "asp_id")
     inlines = (FinancialAnnexesInline, SiaesInline, PkSupportRemarkInline)
 
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
     def save_model(self, request, obj, form, change):
         if change:
             old_obj = self.model.objects.get(id=obj.id)
