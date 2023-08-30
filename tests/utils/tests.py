@@ -23,7 +23,7 @@ from django.utils import timezone
 from django.utils.html import escape
 from factory import Faker
 from faker import Faker as fk
-from pytest_django.asserts import assertNumQueries, assertRedirects
+from pytest_django.asserts import assertContains, assertNumQueries, assertRedirects
 
 import itou.utils.json
 import itou.utils.session
@@ -507,6 +507,44 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
                     "account_current_institution_id": institution2.pk,
                 },
             }
+
+
+def test_logout_as_siae_multiple_memberships(client):
+    siae1 = SiaeFactory(name="1st siae", with_membership=True)
+    user = siae1.members.first()
+    assert siae1.has_admin(user)
+
+    siae2 = SiaeFactory(name="2nd siae")
+    siae2.members.add(user)
+    assert not siae2.has_admin(user)
+
+    client.force_login(user)
+    # Select the 1st SIAE as current one
+    session = client.session
+    session[global_constants.ITOU_SESSION_CURRENT_SIAE_KEY] = siae1.pk
+    session.save()
+
+    response = client.get(reverse("account_logout"))
+    # assert client.session.get(global_constants.ITOU_SESSION_CURRENT_SIAE_KEY) == siae1.pk
+    # The dropdown to switch to the 2nd SIAE is available on logout screen
+    assertContains(response, siae2.name)
+
+
+def test_logout_as_labor_inspector_multiple_institutions(client):
+    institution1 = InstitutionWithMembershipFactory(name="1st institution")
+    user = institution1.members.first()
+    institution2 = InstitutionFactory(name="2nd institution")
+    institution2.members.add(user)
+
+    client.force_login(user)
+    # Select the 1st institution as current
+    session = client.session
+    session[global_constants.ITOU_SESSION_CURRENT_INSTITUTION_KEY] = institution1.pk
+    session.save()
+
+    response = client.get(reverse("account_logout"))
+    # The dropdown to switch to the 2nd SIAE is available on logout screen
+    assertContains(response, institution2.name)
 
 
 class UtilsValidatorsTest(TestCase):
