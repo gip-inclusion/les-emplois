@@ -368,6 +368,8 @@ class ItouUserAdmin(UserAdmin):
             rof += ("username",)
             if obj.identity_provider != IdentityProvider.PE_CONNECT:
                 rof += ("first_name", "last_name", "email")
+        if obj:
+            rof += ("kind",)  # kind is never editable, but still addable
         return rof
 
     def get_search_fields(self, request):
