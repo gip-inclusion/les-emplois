@@ -102,7 +102,7 @@ class DashboardViewTest(TestCase):
         last_url = response.redirect_chain[-1][0]
         assert last_url == reverse("account_logout")
 
-        expected_message = "votre compte n'est malheureusement plus actif"
+        expected_message = "votre compte n&#x27;est malheureusement plus actif"
         self.assertContains(response, expected_message)
 
     def test_dashboard_eiti(self):
