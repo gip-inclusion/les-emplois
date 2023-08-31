@@ -262,7 +262,10 @@ class Migration(migrations.Migration):
                             ("CAP_EMPLOI", "Cap emploi"),
                             ("ML", "Mission locale"),
                             ("OIL", "Opérateur d'intermédiation locative"),
-                            ("ODC", "Organisation délégataire d'un CD"),
+                            (
+                                "ODC",
+                                "Organisation délégataire d'un Conseil Départemental (Orientation et suivi des BRSA)",
+                            ),
                             ("PENSION", "Pension de famille / résidence accueil"),
                             ("PE", "Pôle emploi"),
                             ("RS_FJT", "Résidence sociale / FJT - Foyer de Jeunes Travailleurs"),
