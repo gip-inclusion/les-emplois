@@ -5,7 +5,7 @@ class PrescriberOrganizationKind(models.TextChoices):
     CAP_EMPLOI = "CAP_EMPLOI", "Cap emploi"
     ML = "ML", "Mission locale"
     OIL = "OIL", "Opérateur d'intermédiation locative"
-    ODC = "ODC", "Organisation délégataire d'un CD"
+    ODC = "ODC", "Organisation délégataire d'un Conseil Départemental (Orientation et suivi des BRSA)"
     PENSION = "PENSION", "Pension de famille / résidence accueil"
     PE = "PE", "Pôle emploi"
     RS_FJT = "RS_FJT", "Résidence sociale / FJT - Foyer de Jeunes Travailleurs"
