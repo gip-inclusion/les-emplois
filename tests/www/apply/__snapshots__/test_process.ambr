@@ -111,7 +111,7 @@
   '''
   
   <div id="geiq_qualification_fields_block">
-      <div class="form-group form-group-required"><label for="id_qualification_type">Type de qualification</label><select name="qualification_type" hx-post="/apply/10/accept/reload_qualification_fields" hx-swap="outerHTML" hx-target="#geiq_qualification_fields_block" class="form-control" title="" required id="id_qualification_type">
+      <div class="form-group form-group-required"><label for="id_qualification_type">Type de qualification visé</label><select name="qualification_type" hx-post="/apply/10/accept/reload_qualification_fields" hx-swap="outerHTML" hx-target="#geiq_qualification_fields_block" class="form-control" title="" required id="id_qualification_type">
     <option value="">---------</option>
   
     <option value="STATE_DIPLOMA">Diplôme d&#x27;état ou titre homologué</option>
@@ -142,7 +142,7 @@
   '''
   
   <div id="geiq_qualification_fields_block">
-      <div class="form-group form-group-required"><label for="id_qualification_type">Type de qualification</label><select name="qualification_type" hx-post="/apply/10/accept/reload_qualification_fields" hx-swap="outerHTML" hx-target="#geiq_qualification_fields_block" class="form-control" title="" required id="id_qualification_type">
+      <div class="form-group form-group-required"><label for="id_qualification_type">Type de qualification visé</label><select name="qualification_type" hx-post="/apply/10/accept/reload_qualification_fields" hx-swap="outerHTML" hx-target="#geiq_qualification_fields_block" class="form-control" title="" required id="id_qualification_type">
     <option value="">---------</option>
   
     <option value="STATE_DIPLOMA">Diplôme d&#x27;état ou titre homologué</option>
@@ -173,7 +173,7 @@
   '''
   
   <div id="geiq_qualification_fields_block">
-      <div class="form-group form-group-required"><label for="id_qualification_type">Type de qualification</label><select name="qualification_type" hx-post="/apply/10/accept/reload_qualification_fields" hx-swap="outerHTML" hx-target="#geiq_qualification_fields_block" class="form-control" title="" required id="id_qualification_type">
+      <div class="form-group form-group-required"><label for="id_qualification_type">Type de qualification visé</label><select name="qualification_type" hx-post="/apply/10/accept/reload_qualification_fields" hx-swap="outerHTML" hx-target="#geiq_qualification_fields_block" class="form-control" title="" required id="id_qualification_type">
     <option value="">---------</option>
   
     <option value="STATE_DIPLOMA" selected>Diplôme d&#x27;état ou titre homologué</option>

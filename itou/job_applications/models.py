@@ -632,13 +632,13 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     contract_type_details = models.TextField(verbose_name="précisions sur le type de contrat", blank=True)
 
     qualification_type = models.CharField(
-        verbose_name="type de qualification",
+        verbose_name="type de qualification visé",
         max_length=20,
         choices=QualificationType.choices,
         blank=True,
     )
     qualification_level = models.CharField(
-        verbose_name="niveau de qualification",
+        verbose_name="niveau de qualification visé",
         max_length=40,
         choices=QualificationLevel.choices,
         blank=True,
