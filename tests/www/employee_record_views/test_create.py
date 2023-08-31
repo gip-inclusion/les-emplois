@@ -26,10 +26,10 @@ def _get_user_form_data(user):
         "last_name": user.last_name,
         "birthdate": user.birthdate.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
     }
-    if user.birth_country:
-        form_data["birth_country"] = user.birth_country_id
-    if user.birth_place:
-        form_data["insee_commune_code"] = user.birth_place.code
+    if user.jobseeker_profile.birth_country:
+        form_data["birth_country"] = user.jobseeker_profile.birth_country_id
+    if user.jobseeker_profile.birth_place:
+        form_data["insee_commune_code"] = user.jobseeker_profile.birth_place.code
     return form_data
 
 
@@ -419,7 +419,7 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
         super().setUp()
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
             to_siae=self.siae,
-            job_seeker=JobSeekerWithMockedAddressFactory(),
+            job_seeker=JobSeekerWithMockedAddressFactory(born_in_france=True),
         )
         self.job_seeker = self.job_application.job_seeker
         self.url = reverse("employee_record_views:create_step_3", args=(self.job_application.id,))
@@ -588,7 +588,7 @@ class CreateEmployeeRecordStep4Test(AbstractCreateEmployeeRecordTest):
         super().setUp()
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
             to_siae=self.siae,
-            job_seeker=JobSeekerWithMockedAddressFactory(),
+            job_seeker=JobSeekerWithMockedAddressFactory(born_in_france=True),
         )
         self.job_seeker = self.job_application.job_seeker
         self.url = reverse("employee_record_views:create_step_4", args=(self.job_application.id,))
@@ -618,7 +618,7 @@ class CreateEmployeeRecordStep5Test(AbstractCreateEmployeeRecordTest):
         super().setUp()
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
             to_siae=self.siae,
-            job_seeker=JobSeekerWithMockedAddressFactory(),
+            job_seeker=JobSeekerWithMockedAddressFactory(born_in_france=True),
         )
         self.job_seeker = self.job_application.job_seeker
         self.url = reverse("employee_record_views:create_step_5", args=(self.job_application.id,))
@@ -666,7 +666,7 @@ class UpdateRejectedEmployeeRecordTest(AbstractCreateEmployeeRecordTest):
         super().setUp()
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
             to_siae=self.siae,
-            job_seeker=JobSeekerWithMockedAddressFactory(),
+            job_seeker=JobSeekerWithMockedAddressFactory(born_in_france=True),
         )
         self.job_seeker = self.job_application.job_seeker
         self.url = reverse("employee_record_views:create_step_5", args=(self.job_application.id,))

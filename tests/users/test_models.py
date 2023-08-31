@@ -456,51 +456,6 @@ class ModelTest(TestCase):
         assert job_application_1 == user.last_accepted_job_application
         assert job_application_2 != user.last_accepted_job_application
 
-    def test_valid_birth_place_and_country(self):
-        """
-        Birth place and country are not mandatory except for ASP / FS
-        We must check that if the job seeker is born in France,
-        if the commune is provided
-
-        Otherwise, if the job seeker is born in another country,
-        the commune must remain empty.
-        """
-        job_seeker = JobSeekerFactory()
-
-        # Valid use cases:
-
-        # No commune and no country
-        assert job_seeker.clean() is None
-
-        # France and Commune filled
-        job_seeker = JobSeekerFactory()
-        job_seeker.birth_country = asp.CountryFranceFactory()
-        job_seeker.birth_place = asp.CommuneFactory()
-        assert job_seeker.clean() is None
-
-        # Europe and no commune
-        job_seeker = JobSeekerFactory()
-        job_seeker.birth_place = None
-        job_seeker.birth_country = asp.CountryEuropeFactory()
-        assert job_seeker.clean() is None
-
-        # Outside Europe and no commune
-        job_seeker.birth_country = asp.CountryOutsideEuropeFactory()
-        assert job_seeker.clean() is None
-
-        # Invalid use cases:
-
-        # Europe and Commune filled
-        job_seeker.birth_country = asp.CountryEuropeFactory()
-        job_seeker.birth_place = asp.CommuneFactory()
-        with pytest.raises(ValidationError):
-            job_seeker.clean()
-
-        # Outside Europe and Commune filled
-        job_seeker.birth_country = asp.CountryOutsideEuropeFactory()
-        with pytest.raises(ValidationError):
-            job_seeker.clean()
-
     def test_can_edit_email(self):
         user = PrescriberFactory()
         job_seeker = JobSeekerFactory()
@@ -1139,6 +1094,51 @@ class JobSeekerProfileModelTest(TestCase):
             self.profile.unemployed_since = AllocationDuration.MORE_THAN_24_MONTHS
             self.profile.previous_employer_kind = EmployerType.ACI
             self.profile._clean_job_seeker_situation()
+
+    def test_valid_birth_place_and_country(self):
+        """
+        Birth place and country are not mandatory except for ASP / FS
+        We must check that if the job seeker is born in France,
+        if the commune is provided
+
+        Otherwise, if the job seeker is born in another country,
+        the commune must remain empty.
+        """
+        profile = JobSeekerFactory().jobseeker_profile
+
+        # Valid use cases:
+
+        # No commune and no country
+        assert profile._clean_birth_fields() is None
+
+        # France and Commune filled
+        profile = JobSeekerFactory().jobseeker_profile
+        profile.birth_country = asp.CountryFranceFactory()
+        profile.birth_place = asp.CommuneFactory()
+        assert profile._clean_birth_fields() is None
+
+        # Europe and no commune
+        profile = JobSeekerFactory().jobseeker_profile
+        profile.birth_place = None
+        profile.birth_country = asp.CountryEuropeFactory()
+        assert profile._clean_birth_fields() is None
+
+        # Outside Europe and no commune
+        profile.birth_country = asp.CountryOutsideEuropeFactory()
+        assert profile._clean_birth_fields() is None
+
+        # Invalid use cases:
+
+        # Europe and Commune filled
+        profile.birth_country = asp.CountryEuropeFactory()
+        profile.birth_place = asp.CommuneFactory()
+        with pytest.raises(ValidationError):
+            profile._clean_birth_fields()
+
+        # Outside Europe and Commune filled
+        profile.birth_country = asp.CountryOutsideEuropeFactory()
+        with pytest.raises(ValidationError):
+            profile._clean_birth_fields()
 
 
 def user_with_approval_in_waiting_period():

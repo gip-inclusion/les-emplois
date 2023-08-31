@@ -1,11 +1,12 @@
 from django import forms
+from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator, RegexValidator
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django_select2.forms import Select2MultipleWidget
 
 from itou.asp.exceptions import CommuneUnknownInPeriodError, UnknownCommuneError
-from itou.asp.models import Commune, RSAAllocation
+from itou.asp.models import Commune, Country, RSAAllocation
 from itou.employee_record.enums import Status
 from itou.siaes.models import SiaeFinancialAnnex
 from itou.users.models import JobSeekerProfile, User
@@ -101,6 +102,9 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
         required=False, widget=forms.HiddenInput(attrs={"class": "js-commune-autocomplete-hidden"})
     )
 
+    # This is a JobSeekerProfile field
+    birth_country = forms.ModelChoiceField(Country.objects, label="pays de naissance")
+
     class Meta:
         model = User
         fields = [
@@ -110,8 +114,6 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
             "birthdate",
             "insee_commune",
             "insee_commune_code",
-            "birth_place",
-            "birth_country",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -128,14 +130,16 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
             }
         )
 
-        if self.instance.birth_place:
+        jobseeker_profile = self.instance.jobseeker_profile
+
+        if jobseeker_profile.birth_place:
             self.initial[
                 "insee_commune"
-            ] = f"{self.instance.birth_place.name} ({self.instance.birth_place.department_code})"
-            self.initial["insee_commune_code"] = self.instance.birth_place.code
+            ] = f"{jobseeker_profile.birth_place.name} ({jobseeker_profile.birth_place.department_code})"
+            self.initial["insee_commune_code"] = jobseeker_profile.birth_place.code
 
-        if self.instance.birth_country:
-            self.initial["birth_country"] = self.instance.birth_country_id
+        if jobseeker_profile.birth_country:
+            self.initial["birth_country"] = jobseeker_profile.birth_country_id
 
     def clean(self):
         super().clean()
@@ -154,6 +158,24 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
                 raise forms.ValidationError(
                     f"Le code INSEE {commune_code} n'est pas référencé en date du {birth_date:%d/%m/%Y}"
                 ) from ex
+
+    def _post_clean(self):
+        super()._post_clean()
+        jobseeker_profile = self.instance.jobseeker_profile
+        try:
+            jobseeker_profile.birth_place = self.cleaned_data.get("birth_place")
+            jobseeker_profile.birth_country = self.cleaned_data.get("birth_country")
+            jobseeker_profile._clean_birth_fields()
+        except ValidationError as e:
+            self._update_errors(e)
+
+    def save(self, commit=True):
+        instance = super().save(commit=commit)
+        if commit:
+            jobseeker_profile = self.instance.jobseeker_profile
+            # Fields were updated in _post_clean()
+            jobseeker_profile.save(update_fields=("birth_place", "birth_country"))
+        return instance
 
 
 class NewEmployeeRecordStep2Form(forms.ModelForm):
