@@ -187,20 +187,6 @@ class User(AbstractUser, AddressMixin):
         blank=True,
         validators=[validate_birthdate],
     )
-    birth_place = models.ForeignKey(
-        "asp.Commune",
-        verbose_name="commune de naissance",
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-    )
-    birth_country = models.ForeignKey(
-        "asp.Country",
-        verbose_name="pays de naissance",
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-    )
     email = CIEmailField(
         "adresse e-mail",
         blank=True,
