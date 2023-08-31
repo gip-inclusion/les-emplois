@@ -1066,3 +1066,53 @@ class SiaeSubmitProofsViewTest(TestCase):
         assert response.status_code == 404
         evaluated_administrative_criteria.refresh_from_db()
         assert evaluated_administrative_criteria.submitted_at is None
+
+
+class SiaeCalendarViewTest(TestCase):
+    def setUp(self):
+        membership = SiaeMembershipFactory()
+        self.user = membership.user
+        self.siae = membership.siae
+
+    def test_active_campaign_calendar(self):
+        calendar_html = """
+            <table class="table">
+                <thead class="thead-light">
+                    <tr>
+                        <th></th>
+                        <th scope="col">Dates</th>
+                        <th scope="col">Acteurs</th>
+                        <th scope="col">Actions attendues</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">Phase 1</th>
+                        <td>Du 15 mai 2023 au 11 juin 2023</td>
+
+                        <td>DDETS</td>
+                        <td>Sélection du taux de SIAE</td>
+                    </tr>
+                </tbody>
+            </table>
+        """
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign__calendar__html=calendar_html,
+            evaluation_campaign__evaluations_asked_at=timezone.now(),
+            siae=self.siae,
+        )
+        calendar_url = reverse(
+            "siae_evaluations_views:campaign_calendar", args=[evaluated_siae.evaluation_campaign.pk]
+        )
+
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertContains(response, calendar_url)
+
+        response = self.client.get(calendar_url)
+        self.assertContains(response, calendar_html)
+
+        # Old campaigns don't have a calendar.
+        evaluated_siae.evaluation_campaign.calendar.delete()
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertNotContains(response, calendar_url)
