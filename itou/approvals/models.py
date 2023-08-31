@@ -3,6 +3,7 @@ import functools
 import logging
 import operator
 
+import pgtrigger
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.postgres.constraints import ExclusionConstraint
@@ -306,6 +307,43 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
                 violation_error_message="Incohérence entre l'origine du PASS IAE "
                 "et la présence d'un diagnostic d'éligibilité",
             )
+        ]
+        triggers = [
+            pgtrigger.Trigger(
+                name="create_employee_record_notification",
+                when=pgtrigger.After,
+                operation=pgtrigger.UpdateOf("start_at", "end_at"),
+                condition=pgtrigger.Q(old__end_at__df=pgtrigger.F("new__end_at"))
+                | pgtrigger.Q(old__start_at__df=pgtrigger.F("new__start_at")),
+                func="""
+                    -- If there is an "UPDATE" action on 'approvals_approval' table (Approval model object):
+                    -- create an `EmployeeRecordUpdateNotification` object for each PROCESSED `EmployeeRecord`
+                    -- linked to this approval
+                    IF (TG_OP = 'UPDATE') THEN
+                        -- Only for update operations:
+                        -- iterate through processed employee records linked to this approval
+                        FOR current_employee_record_id IN
+                            SELECT id FROM employee_record_employeerecord
+                            WHERE approval_number = NEW.number
+                            AND status = 'PROCESSED'
+                            LOOP
+                                -- Create `EmployeeRecordUpdateNotification` object
+                                -- with the correct type and status
+                                INSERT INTO employee_record_employeerecordupdatenotification
+                                    (employee_record_id, created_at, updated_at, status)
+                                SELECT current_employee_record_id, NOW(), NOW(), 'NEW'
+                                -- Update it if already created (UPSERT)
+                                -- On partial indexes conflict, the where clause of the index must be added here
+                                ON conflict(employee_record_id) WHERE status = 'NEW'
+                                DO
+                                -- Not exactly the same syntax as a standard update op
+                                UPDATE SET updated_at = NOW();
+                            END LOOP;
+                    END IF;
+                    RETURN NULL;
+                """,
+                declare=[("current_employee_record_id", "INT")],
+            ),
         ]
 
     def __str__(self):
@@ -810,6 +848,46 @@ class Suspension(models.Model):
                 name="%(class)s_cannot_start_in_the_future",
             ),
         ]
+        triggers = [
+            pgtrigger.Trigger(
+                name="update_approval_end_at",
+                when=pgtrigger.After,
+                operation=pgtrigger.Insert | pgtrigger.Update | pgtrigger.Delete,
+                func="""
+                    --
+                    -- When a suspension is inserted/updated/deleted, the end date
+                    -- of its approval is automatically pushed back or forth.
+                    --
+                    -- See:
+                    -- https://www.postgresql.org/docs/12/triggers.html
+                    -- https://www.postgresql.org/docs/12/plpgsql-trigger.html#PLPGSQL-TRIGGER-AUDIT-EXAMPLE
+                    --
+                    IF (TG_OP = 'DELETE') THEN
+                        -- At delete time, the approval's end date is pushed back.
+                        UPDATE approvals_approval
+                        SET end_at = end_at - (OLD.end_at - OLD.start_at)
+                        WHERE id = OLD.approval_id;
+                    ELSIF (TG_OP = 'INSERT') THEN
+                        -- At insert time, the approval's end date is pushed forward.
+                        UPDATE approvals_approval
+                        SET end_at = end_at + (NEW.end_at - NEW.start_at)
+                        WHERE id = NEW.approval_id;
+                    ELSIF (TG_OP = 'UPDATE') THEN
+                        -- At update time, the approval's end date is first reset before
+                        -- being pushed forward, e.g.:
+                        --     * step 1 "create new 90 days suspension":
+                        --         * extend approval: approval.end_date + 90 days
+                        --     * step 2 "edit 60 days instead of 90 days":
+                        --         * reset approval: approval.end_date - 90 days
+                        --         * extend approval: approval.end_date + 60 days
+                        UPDATE approvals_approval
+                        SET end_at = end_at - (OLD.end_at - OLD.start_at) + (NEW.end_at - NEW.start_at)
+                        WHERE id = NEW.approval_id;
+                    END IF;
+                    RETURN NULL;
+                """,
+            ),
+        ]
 
     def __str__(self):
         return f"{self.pk} {self.start_at:%d/%m/%Y} - {self.end_at:%d/%m/%Y}"
@@ -926,7 +1004,7 @@ class CommonProlongation(models.Model):
 
     When a prolongation is saved/edited/deleted, the end date of its approval
     is automatically pushed back or forth with a PostgreSQL trigger:
-    `trigger_update_approval_end_at_for_prolongation`.
+    `update_approval_end_at`.
     """
 
     # Max duration: 10 years but it depends on the `reason` field, see `get_max_end_at`.
@@ -1273,6 +1351,43 @@ class Prolongation(CommonProlongation):
                     ("approval", RangeOperators.EQUAL),
                 ),
                 violation_error_message="La période chevauche une prolongation existante pour ce PASS IAE.",
+            ),
+        ]
+        triggers = [
+            pgtrigger.Trigger(
+                name="update_approval_end_at",
+                when=pgtrigger.After,
+                operation=pgtrigger.Insert | pgtrigger.Update | pgtrigger.Delete,
+                func="""
+                    --
+                    -- When a prolongation is inserted/updated/deleted, the end date
+                    -- of its approval is automatically pushed back or forth.
+                    --
+                    -- See:
+                    -- https://www.postgresql.org/docs/12/triggers.html
+                    -- https://www.postgresql.org/docs/12/plpgsql-trigger.html#PLPGSQL-TRIGGER-AUDIT-EXAMPLE
+                    --
+                    IF (TG_OP = 'DELETE') THEN
+                        -- At delete time, the approval's end date is pushed back if the prolongation
+                        -- was validated.
+                        UPDATE approvals_approval
+                        SET end_at = end_at - (OLD.end_at - OLD.start_at)
+                        WHERE id = OLD.approval_id;
+                    ELSIF (TG_OP = 'INSERT') THEN
+                        -- At insert time, the approval's end date is pushed forward if the prolongation
+                        -- is validated.
+                        UPDATE approvals_approval
+                        SET end_at = end_at + (NEW.end_at - NEW.start_at)
+                        WHERE id = NEW.approval_id;
+                    ELSIF (TG_OP = 'UPDATE') THEN
+                        -- At update time, the approval's end date is first reset before
+                        -- being pushed forward.
+                        UPDATE approvals_approval
+                        SET end_at = end_at - (OLD.end_at - OLD.start_at) + (NEW.end_at - NEW.start_at)
+                        WHERE id = NEW.approval_id;
+                    END IF;
+                    RETURN NULL;
+                """,
             ),
         ]
 

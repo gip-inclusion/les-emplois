@@ -1,6 +1,7 @@
 import re
 import string
 
+import pgtrigger
 from django.contrib.postgres.indexes import GinIndex
 from django.contrib.postgres.search import SearchQuery, SearchVectorField
 from django.db import models
@@ -83,8 +84,7 @@ class Appellation(models.Model):
     code = models.CharField(verbose_name="code", max_length=6, primary_key=True)
     name = models.CharField(verbose_name="nom", max_length=255, db_index=True)
     rome = models.ForeignKey(Rome, on_delete=models.CASCADE, null=True, related_name="appellations")
-    # A PostgreSQL trigger (defined in migrations) updates this field automatically.
-    full_text = SearchVectorField(null=True)
+    full_text = SearchVectorField(null=True)  # Updated by the UpdateSearchVector() trigger.
 
     objects = AppellationQuerySet.as_manager()
 
@@ -92,6 +92,14 @@ class Appellation(models.Model):
         verbose_name = "appellation"
         ordering = ["name"]
         indexes = [GinIndex(fields=["full_text"])]
+        triggers = [
+            pgtrigger.UpdateSearchVector(
+                name="jobs_appellation_full_text_trigger",
+                vector_field="full_text",
+                document_fields=["name", "rome_id"],
+                config_name="public.french_unaccent",
+            )
+        ]
 
     def __str__(self):
         return self.name

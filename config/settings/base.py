@@ -57,6 +57,7 @@ THIRD_PARTY_APPS = [
     "import_export",
     "hijack",
     "hijack.contrib.admin",
+    "pgtrigger",
 ]
 
 

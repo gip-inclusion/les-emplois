@@ -682,6 +682,7 @@ class Migration(migrations.Migration):
                 DROP TRIGGER IF EXISTS trigger_update_approval_end_at ON approvals_suspension;
                 DROP FUNCTION IF EXISTS update_approval_end_at();
             """,
+            elidable=True,
         ),
         migrations.RunSQL(
             sql="""
@@ -730,5 +731,6 @@ class Migration(migrations.Migration):
                 DROP TRIGGER IF EXISTS trigger_update_approval_end_at_for_prolongation ON approvals_prolongation;
                 DROP FUNCTION IF EXISTS update_approval_end_at_for_prolongation();
             """,
+            elidable=True,
         ),
     ]
