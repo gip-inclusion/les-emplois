@@ -7,7 +7,7 @@ import pgtrigger
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.postgres.constraints import ExclusionConstraint
-from django.contrib.postgres.fields import RangeBoundary, RangeOperators
+from django.contrib.postgres.fields import ArrayField, RangeBoundary, RangeOperators
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.db import models, transaction
@@ -1289,6 +1289,35 @@ class ProlongationRequest(CommonProlongation):
 
         notifications.ProlongationRequestDeniedEmployer(self).send()
         notifications.ProlongationRequestDeniedJobSeeker(self).send()
+
+
+class ProlongationRequestDenyInformation(models.Model):
+    request = models.OneToOneField(ProlongationRequest, related_name="deny_information", on_delete=models.CASCADE)
+    reason = models.CharField(
+        verbose_name="motif de refus",
+        choices=enums.ProlongationRequestDenyReason.choices,
+    )
+    reason_explanation = models.TextField(verbose_name="explications du motif de refus")
+
+    proposed_actions = ArrayField(
+        verbose_name="actions envisagées",
+        base_field=models.CharField(choices=enums.ProlongationRequestDenyProposedAction.choices),
+        null=True,
+        blank=True,
+    )
+    proposed_actions_explanation = models.TextField(verbose_name="explications des actions envisagées", blank=True)
+
+    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
+    updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                name="non_empty_proposed_actions",
+                check=~models.Q(proposed_actions__len=0),
+                violation_error_message="Les actions envisagées ne peuvent pas être vide",
+            ),
+        ]
 
 
 class ProlongationQuerySet(models.QuerySet):

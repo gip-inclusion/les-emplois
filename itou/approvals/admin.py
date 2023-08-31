@@ -6,7 +6,7 @@ from django.utils.safestring import mark_safe
 from itou.approvals import models
 from itou.approvals.admin_forms import ApprovalAdminForm
 from itou.approvals.admin_views import manually_add_approval, manually_refuse_approval
-from itou.approvals.enums import Origin
+from itou.approvals.enums import Origin, ProlongationRequestStatus
 from itou.employee_record import enums as employee_record_enums
 from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
 from itou.employee_record.models import EmployeeRecord
@@ -430,11 +430,42 @@ class ProlongationCommonAdmin(ItouModelAdmin):
 class ProlongationRequestAdmin(ProlongationCommonAdmin):
     list_display = ProlongationCommonAdmin.list_display + ("status", "processed_at")
     list_filter = ("status",) + ProlongationCommonAdmin.list_filter
-    readonly_fields = ProlongationCommonAdmin.readonly_fields + ("processed_at", "processed_by", "prolongation")
 
     @admin.display(description="prolongation créée")
     def prolongation(self, obj):
         return obj.prolongation
+
+    @admin.display(description="motif de refus")
+    def denied_reason(self, obj):
+        return obj.deny_information.reason
+
+    @admin.display(description="explications du motif de refus")
+    def denied_reason_explanation(self, obj):
+        return obj.deny_information.reason_explanation
+
+    @admin.display(description="actions envisagées")
+    def denied_proposed_actions(self, obj):
+        if obj.proposed_actions is None:
+            return "-"
+        return "\n".join(obj.deny_information.get_proposed_actions_display())
+
+    @admin.display(description="explications des actions envisagées")
+    def denied_proposed_actions_explanation(self, obj):
+        return obj.deny_information.proposed_actions_explanation
+
+    def get_readonly_fields(self, request, obj=None):
+        fields = ProlongationCommonAdmin.readonly_fields + ("processed_at", "processed_by", "prolongation")
+        if not obj:
+            return fields
+
+        if obj.status == ProlongationRequestStatus.DENIED:
+            fields += (
+                "denied_reason",
+                "denied_reason_explanation",
+                "denied_proposed_actions",
+                "denied_proposed_actions_explanation",
+            )
+        return fields
 
 
 @admin.register(models.Prolongation)

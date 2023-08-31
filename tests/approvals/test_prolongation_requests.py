@@ -27,6 +27,11 @@ def test_unique_approval_for_pending_constraint():
         ProlongationRequest(approval=prolongation_request.approval, status=ProlongationRequestStatus.PENDING).save()
 
 
+def test_non_empty_proposed_actions_constraint():
+    with pytest.raises(IntegrityError, match="non_empty_proposed_actions"):
+        ProlongationRequestDenyInformationFactory(proposed_actions=[])
+
+
 @pytest.mark.parametrize(
     "email,phone,expected",
     [

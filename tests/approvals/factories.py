@@ -6,8 +6,21 @@ from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 from faker import Faker
 
-from itou.approvals.enums import Origin, ProlongationReason
-from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, ProlongationRequest, Suspension
+from itou.approvals.enums import (
+    Origin,
+    ProlongationReason,
+    ProlongationRequestDenyProposedAction,
+    ProlongationRequestDenyReason,
+    ProlongationRequestStatus,
+)
+from itou.approvals.models import (
+    Approval,
+    PoleEmploiApproval,
+    Prolongation,
+    ProlongationRequest,
+    ProlongationRequestDenyInformation,
+    Suspension,
+)
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.enums import SiaeKind
 from tests.eligibility.factories import EligibilityDiagnosisFactory
@@ -124,6 +137,31 @@ class ProlongationRequestFactory(BaseProlongationFactory):
         for_snapshot = factory.Trait(
             **BaseProlongationFactory._meta.parameters["for_snapshot"].overrides,
             prescriber_organization__for_snapshot=True,
+        )
+
+
+class ProlongationRequestDenyInformationFactory(factory.django.DjangoModelFactory):
+    request = factory.SubFactory(ProlongationRequestFactory, status=ProlongationRequestStatus.DENIED, processed=True)
+    reason = factory.fuzzy.FuzzyChoice(ProlongationRequestDenyReason)
+    reason_explanation = factory.Faker("paragraph")
+
+    proposed_actions = factory.Maybe(
+        "with_proposed_actions",
+        yes_declaration=factory.fuzzy.FuzzyChoice(ProlongationRequestDenyProposedAction, getter=lambda c: [c]),
+    )
+    proposed_actions_explanation = factory.Maybe("proposed_actions", yes_declaration=factory.Faker("paragraph"))
+
+    class Meta:
+        model = ProlongationRequestDenyInformation
+
+    class Params:
+        with_proposed_actions = factory.LazyAttribute(lambda o: o.reason == ProlongationRequestDenyReason.IAE)
+        for_snapshot = factory.Trait(
+            request__for_snapshot=True,
+            reason=ProlongationRequestDenyReason.IAE,
+            reason_explanation="[reason_explanation]",
+            proposed_actions=list(ProlongationRequestDenyProposedAction),
+            proposed_actions_explanation="[proposed_actions_explanation]",
         )
 
 
