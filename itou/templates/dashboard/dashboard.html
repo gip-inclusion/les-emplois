@@ -322,6 +322,16 @@
                     {% endif %}
                 </div>
             {% endif %}
+
+            {% if user.is_siae_staff or user.is_prescriber %}
+                <h2>Actualités</h2>
+                <div class="row row-cols-1">
+                    <div class="container">
+                        <div class="js-tac-livestorm" data-url="https://app.livestorm.co/itou/upcoming?limit=3" title="Événements des emplois de l'inclusion | Livestorm">
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
         </div>
     </section>
 {% endblock %}
