@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
                     ("NOT_RELEVANT", "Non concerné"),
                 ],
                 max_length=40,
-                verbose_name="niveau de qualification",
+                verbose_name="niveau de qualification visé",
             ),
         ),
         migrations.AddField(
@@ -42,7 +42,7 @@ class Migration(migrations.Migration):
                     ("CCN", "Positionnement de CCN"),
                 ],
                 max_length=20,
-                verbose_name="type de qualification",
+                verbose_name="type de qualification visé",
             ),
         ),
         migrations.AddConstraint(
