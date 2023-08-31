@@ -89,6 +89,7 @@ class Migration(migrations.Migration):
                 END;
             $approval_notification$ LANGUAGE plpgsql;
             """,
+            elidable=True,
         ),
         migrations.RunSQL(
             sql="DROP INDEX IF EXISTS partial_unique_new_notification;",
@@ -97,5 +98,6 @@ class Migration(migrations.Migration):
             ON employee_record_employeerecordupdatenotification (employee_record_id, notification_type)
             WHERE status = 'NEW';
             """,
+            elidable=True,
         ),
     ]

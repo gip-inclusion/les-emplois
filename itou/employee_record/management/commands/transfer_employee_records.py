@@ -152,7 +152,7 @@ class Command(EmployeeRecordTransferCommand):
                             pass  # No point to send a notification about an approval if it doesn't exist
                         else:
                             if approval.suspension_set.exists() or approval.prolongation_set.exists():
-                                # Mimic the SQL function "create_employee_record_approval_notification()"
+                                # Mimic the SQL trigger function "create_employee_record_notification()"
                                 EmployeeRecordUpdateNotification.objects.update_or_create(
                                     employee_record=employee_record,
                                     defaults={"updated_at": timezone.now},

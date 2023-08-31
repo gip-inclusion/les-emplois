@@ -17,5 +17,6 @@ class Migration(migrations.Migration):
             reverse_sql="""
                 DROP TRIGGER IF EXISTS jobs_appellation_full_text_trigger ON jobs_appellation;
             """,
+            elidable=True,
         )
     ]

@@ -1312,12 +1312,12 @@ class ProlongationManagerTest(TestCase):
 
 class ProlongationModelTestTrigger(TestCase):
     """
-    Test `trigger_update_approval_end_at_for_prolongation`.
+    Test `update_approval_end_at`.
     """
 
     def test_save(self):
         """
-        Test `trigger_update_approval_end_at_for_prolongation` with SQL INSERT.
+        Test `update_approval_end_at` with SQL INSERT.
         An approval's `end_at` is automatically pushed forward when it is prolongated.
         """
         start_at = timezone.localdate()
@@ -1332,7 +1332,7 @@ class ProlongationModelTestTrigger(TestCase):
 
     def test_delete(self):
         """
-        Test `trigger_update_approval_end_at_for_prolongation` with SQL DELETE.
+        Test `update_approval_end_at` with SQL DELETE.
         An approval's `end_at` is automatically pushed back when its prolongation
         is deleted.
         """
@@ -1352,7 +1352,7 @@ class ProlongationModelTestTrigger(TestCase):
 
     def test_save_and_edit(self):
         """
-        Test `trigger_update_approval_end_at_for_prolongation` with SQL UPDATE.
+        Test `update_approval_end_at` with SQL UPDATE.
         An approval's `end_at` is automatically pushed back and forth when
         one of its valid prolongation is saved, then edited to be shorter.
         """

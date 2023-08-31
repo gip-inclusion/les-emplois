@@ -71,5 +71,6 @@ class Migration(migrations.Migration):
                         DROP FUNCTION IF EXISTS create_employee_record_approval_notification();
                         DROP INDEX IF EXISTS partial_unique_new_notification;
                         """,
+            elidable=True,
         )
     ]
