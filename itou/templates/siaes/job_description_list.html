@@ -22,10 +22,12 @@
                             </h3>
                             <div class="flex-column flex-md-row btn-group btn-group-sm btn-group-action" role="group" aria-label="Actions sur les candidatures">
                                 {% if job_pager %}
-                                    <form method="post" id="block_job_applications_form">
+                                    <form method="post" id="block_job_applications_form" hx-boost="true">
                                         {% csrf_token %}
-                                        <input class="sr-only invisible" type="checkbox" name="block_job_applications" id="block_job_applications" {% if siae.block_job_applications %}checked{% endif %} />
-                                        <label for="block_job_applications" class="d-block w-100 btn btn-sm btn-secondary btn-ico justify-content-center mt-3 mt-md-0 mb-0">
+
+                                        <input type="hidden" name="action" value="block_job_applications" />
+                                        <input type="hidden" name="block_job_applications" value="{% if siae.block_job_applications %}false{% else %}true{% endif %}">
+                                        <button for="block_job_applications" class="d-block w-100 btn btn-sm btn-secondary btn-ico justify-content-center mt-3 mt-md-0 mb-0">
                                             {% if siae.block_job_applications %}
                                                 <i class="ri-lock-unlock-line ri-lg" aria-hidden="true"></i>
                                                 <span>Débloquer l'envoi de candidatures</span>
@@ -33,7 +35,7 @@
                                                 <i class="ri-lock-line ri-lg" aria-hidden="true"></i>
                                                 <span>Bloquer l'envoi de candidatures</span>
                                             {% endif %}
-                                        </label>
+                                        </button>
                                     </form>
                                 {% endif %}
                                 <a class="btn btn-primary btn-ico justify-content-center mt-3 mt-md-0" href="{% url "siaes_views:edit_job_description" %}">
@@ -76,8 +78,9 @@
                                                 <td>{{ job_description.open_positions }}</td>
                                                 <td>
                                                     {# Change job description status form #}
-                                                    <form method="post" action="?action=toggle_active" id="toggle_job_description_form_{{ job_description.id }}" class="js-prevent-multiple-submit">
+                                                    <form method="post" hx-boost="true" hx-trigger="change" id="toggle_job_description_form_{{ job_description.id }}" class="js-prevent-multiple-submit">
                                                         {% csrf_token %}
+                                                        <input type="hidden" name="action" value="toggle_active" />
                                                         <input type="hidden" name="job_description_id" value="{{ job_description.id }}" />
                                                         <div class="custom-control custom-switch has-state-label">
                                                             <input type="checkbox"
@@ -109,8 +112,9 @@
                                                                     </p>
                                                                 </div>
                                                                 <div class="modal-footer">
-                                                                    <form method="post" action="?action=delete&page={{ page|default:1 }}" class="d-block js-prevent-multiple-submit">
+                                                                    <form method="post" hx-boost="true" class="d-block js-prevent-multiple-submit">
                                                                         {% csrf_token %}
+                                                                        <input type="hidden" name="action" value="delete" />
                                                                         <input type="hidden" name="job_description_id" value="{{ job_description.id }}" />
                                                                         <button class="btn btn-outline-primary btn-sm" data-dismiss="modal" aria-label="Annuler">Annuler</button>
                                                                         <button class="btn btn-primary btn-sm" aria-label="Supprimer">Supprimer</button>
@@ -125,7 +129,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                            {% include "includes/pagination.html" with page=job_pager %}
+                            {% include "includes/pagination.html" with page=job_pager boost=True %}
                         {% else %}
                             <p>Aucun poste enregistré pour cette structure.</p>
                         {% endif %}
@@ -134,17 +138,4 @@
             </div>
         </div>
     </section>
-{% endblock %}
-
-{% block script %}
-    {{ block.super }}
-    {# For auto-submit forms #}
-    <script nonce="{{ CSP_NONCE }}">
-        $("#block_job_applications_form").change(function() {
-            this.submit();
-        })
-        $("form[id^= 'toggle_job_description_form_']").change(function() {
-            this.submit();
-        })
-    </script>
 {% endblock %}

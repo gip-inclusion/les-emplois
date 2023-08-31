@@ -26,8 +26,6 @@ NB_ITEMS_PER_PAGE = 10
 
 ITOU_SESSION_EDIT_SIAE_KEY = "edit_siae_session_key"
 ITOU_SESSION_JOB_DESCRIPTION_KEY = "edit_job_description_key"
-ITOU_SESSION_CURRENT_PAGE_KEY = "current_page"
-
 
 ### Job description views
 
@@ -83,8 +81,7 @@ def job_description_list(request, template_name="siaes/job_description_list.html
         .prefetch_related("appellation", "appellation__rome", "siae")
         .order_by_most_recent()
     )
-    page = int(request.GET.get("page") or request.session.get(ITOU_SESSION_CURRENT_PAGE_KEY) or 1)
-    request.session[ITOU_SESSION_CURRENT_PAGE_KEY] = page
+    page = int(request.GET.get("page") or 1)
 
     # Remove possible obsolete session data when coming from breakcrumbs links and back buttons
     if request.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY):
@@ -93,36 +90,39 @@ def job_description_list(request, template_name="siaes/job_description_list.html
     form = siaes_forms.BlockJobApplicationsForm(instance=siae, data=request.POST or None)
 
     if request.method == "POST":
-        action = request.GET.get("action")
+        # note (fv): waiting for a proper htmx implementation, this will do meanwhile
+        job_description_id = request.POST.get("job_description_id")
+        match (request.POST.get("action")):
+            case "delete":
+                # delete method via htmx would be nice
+                job_description = SiaeJobDescription.objects.filter(siae_id=siae.pk, pk=job_description_id).first()
+                if job_description is not None:
+                    job_description.delete()
+                    messages.success(request, "La fiche de poste a été supprimée.")
+                else:
+                    messages.warning(request, "La fiche de poste que vous souhaitez supprimer n'existe plus.")
+            case "toggle_active":
+                is_active = bool(request.POST.get("job_description_is_active", False))
+                if job_description := SiaeJobDescription.objects.filter(
+                    siae_id=siae.pk, pk=job_description_id
+                ).first():
+                    job_description.is_active = is_active
+                    job_description.save(update_fields=["is_active"])
+                    messages.success(request, f"Le recrutement est maintenant {'ouvert' if is_active else 'fermé'}.")
+                else:
+                    messages.error(request, "La fiche de poste que vous souhaitiez modifier n'existe plus.")
+            case "block_job_applications":
+                siae = form.save()
+                messages.success(
+                    request,
+                    "La réception de candidature est temporairement bloquée."
+                    if siae.block_job_applications
+                    else "La structure peut recevoir des candidatures.",
+                )
+            case _:
+                messages.error(request, "Cette action n'est pas supportée")
 
-        if action == "delete":
-            job_description_id = request.POST.get("job_description_id")
-            job_description = SiaeJobDescription.objects.filter(siae_id=siae.pk, pk=job_description_id).first()
-            if job_description is not None:
-                job_description.delete()
-                messages.success(request, "La fiche de poste a été supprimée.")
-            else:
-                messages.warning(request, "La fiche de poste que vous souhaitez supprimer n'existe plus.")
-        elif action == "toggle_active":
-            job_description_id = request.POST.get("job_description_id")
-            is_active = bool(request.POST.get("job_description_is_active", False))
-            job_description = SiaeJobDescription.objects.filter(siae_id=siae.pk, pk=job_description_id).first()
-            if job_description is not None:
-                job_description.is_active = is_active
-                job_description.save(update_fields=["is_active"])
-                messages.success(request, f"Le recrutement est maintenant {'ouvert' if is_active else 'fermé'}.")
-            else:
-                messages.error(request, "La fiche de poste que vous souhaitiez modifier n'existe plus.")
-        elif form.is_valid():
-            siae = form.save()
-            messages.success(
-                request,
-                "La réception de candidature est temporairement bloquée."
-                if siae.block_job_applications
-                else "La structure peut recevoir des candidatures.",
-            )
-
-        return HttpResponseRedirect(reverse("siaes_views:job_description_list"))
+        return HttpResponseRedirect(f"{reverse('siaes_views:job_description_list')}?page={page}")
 
     job_pager = pager(job_descriptions, page, items_per_page=NB_ITEMS_PER_PAGE)
     breadcrumbs = {
