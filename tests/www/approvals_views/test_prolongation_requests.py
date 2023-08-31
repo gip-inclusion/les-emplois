@@ -5,7 +5,11 @@ from django.template import loader
 from django.urls import reverse
 from pytest_django.asserts import assertNumQueries, assertRedirects
 
-from itou.approvals.enums import ProlongationRequestStatus
+from itou.approvals.enums import (
+    ProlongationRequestDenyProposedAction,
+    ProlongationRequestDenyReason,
+    ProlongationRequestStatus,
+)
 from tests.approvals import factories as approvals_factories
 from tests.users import factories as users_factories
 from tests.utils.test import BASE_NUM_QUERIES, assertMessages, parse_response_to_soup
@@ -97,49 +101,102 @@ def test_show_view(snapshot, client):
     assert str(parse_response_to_soup(response, ".s-section .col-lg-8 .c-box:last-child")) == snapshot
 
 
-@pytest.mark.parametrize(
-    "action,expected_status,expected_message",
-    [
-        ("grant", ProlongationRequestStatus.GRANTED, "acceptée"),
-        ("deny", ProlongationRequestStatus.DENIED, "refusée"),
-    ],
-)
-def test_grant_and_deny_view(client, action, expected_status, expected_message):
+def test_grant_view(client):
     prolongation_request = approvals_factories.ProlongationRequestFactory(approval__user__for_snapshot=True)
     client.force_login(prolongation_request.validated_by)
 
     response = client.post(
-        reverse(
-            f"approvals:prolongation_request_{action}", kwargs={"prolongation_request_id": prolongation_request.pk}
-        ),
+        reverse("approvals:prolongation_request_grant", kwargs={"prolongation_request_id": prolongation_request.pk}),
     )
     assertRedirects(response, reverse("approvals:prolongation_requests_list"), fetch_redirect_response=False)
     assertMessages(
         response,
-        [(messages.SUCCESS, f"La prolongation de John DOE a bien été {expected_message}.")],
+        [(messages.SUCCESS, "La prolongation de John DOE a bien été acceptée.")],
     )
     prolongation_request.refresh_from_db()
-    assert prolongation_request.status == expected_status
+    assert prolongation_request.status == ProlongationRequestStatus.GRANTED
 
 
-def test_grant_and_deny_view_is_not_accessible_by_get_method(client):
+def test_grant_view_is_not_accessible_by_get_method(client):
     prolongation_request = approvals_factories.ProlongationRequestFactory()
     client.force_login(prolongation_request.validated_by)
 
-    assert (
-        client.get(
-            reverse(
-                "approvals:prolongation_request_grant", kwargs={"prolongation_request_id": prolongation_request.pk}
-            )
-        ).status_code
-        == 405
+    response = client.get(
+        reverse("approvals:prolongation_request_grant", kwargs={"prolongation_request_id": prolongation_request.pk})
     )
-    assert (
-        client.get(
-            reverse("approvals:prolongation_request_deny", kwargs={"prolongation_request_id": prolongation_request.pk})
-        ).status_code
-        == 405
+    assert response.status_code == 405
+
+
+@pytest.mark.parametrize("reason", ProlongationRequestDenyReason)
+def test_deny_view_for_reasons(snapshot, client, reason):
+    prolongation_request = approvals_factories.ProlongationRequestFactory(for_snapshot=True)
+    client.force_login(prolongation_request.validated_by)
+
+    # Reverse all needed URL
+    start_url = reverse(
+        "approvals:prolongation_request_deny", kwargs={"prolongation_request_id": prolongation_request.pk}
     )
+    reason_url = reverse(
+        "approvals:prolongation_request_deny",
+        kwargs={"prolongation_request_id": prolongation_request.pk, "step": "reason"},
+    )
+    reason_explanation_url = reverse(
+        "approvals:prolongation_request_deny",
+        kwargs={"prolongation_request_id": prolongation_request.pk, "step": "reason_explanation"},
+    )
+    proposed_actions_url = reverse(
+        "approvals:prolongation_request_deny",
+        kwargs={"prolongation_request_id": prolongation_request.pk, "step": "proposed_actions"},
+    )
+    end_url = reverse("approvals:prolongation_requests_list")
+
+    # Starting the tunnel should redirect to the first step
+    assertRedirects(client.get(start_url), reason_url)
+    # Checking the title at least once
+    assert str(parse_response_to_soup(client.get(reason_url), selector="#main .s-title-01")) == snapshot(name="title")
+
+    # Submit data for the "reason" step
+    assert str(parse_response_to_soup(client.get(reason_url), selector="#main .s-section")) == snapshot(name="reason")
+    response = client.post(
+        reason_url,
+        {"reason-reason": reason, "prolongation_request_deny_view-current_step": "reason"},
+    )
+    assertRedirects(response, reason_explanation_url)
+
+    # Submit data for the "reason_explanation" step
+    assert str(parse_response_to_soup(client.get(reason_url), selector="#main .s-section")) == snapshot(
+        name="reason_explanation"
+    )
+    response = client.post(
+        reason_url,
+        {
+            "reason_explanation-reason_explanation": "Lorem ipsum",
+            "prolongation_request_deny_view-current_step": "reason_explanation",
+        },
+        follow=True,
+    )
+
+    if reason is ProlongationRequestDenyReason.IAE:
+        assertRedirects(response, proposed_actions_url)
+        assert str(parse_response_to_soup(client.get(reason_url), selector="#main .s-section")) == snapshot(
+            name="proposed_actions"
+        )
+        # Submit data for the "proposed_actions" step
+        response = client.post(
+            reason_url,
+            {
+                "proposed_actions-proposed_actions": list(ProlongationRequestDenyProposedAction),
+                "proposed_actions-proposed_actions_explanation": "Lorem ipsum",
+                "prolongation_request_deny_view-current_step": "proposed_actions",
+            },
+            follow=True,  # formtools will redirect to "done" step to end the tunnel, then we redirect to another URL
+        )
+
+    assertRedirects(response, end_url)
+    assertMessages(response, [(messages.SUCCESS, "La prolongation de John DOE a bien été refusée.")])
+    prolongation_request.refresh_from_db()
+    assert prolongation_request.status == ProlongationRequestStatus.DENIED
+    assert prolongation_request.deny_information.reason == reason
 
 
 @pytest.mark.parametrize("status", ProlongationRequestStatus)

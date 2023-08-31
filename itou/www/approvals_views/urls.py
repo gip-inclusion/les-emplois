@@ -40,7 +40,12 @@ urlpatterns = [
     ),
     path(
         "prolongation/request/<int:prolongation_request_id>/deny",
-        views.ProlongationRequestDenyView.as_view(),
+        views.ProlongationRequestDenyView.as_view(url_name="approvals:prolongation_request_deny"),
+        name="prolongation_request_deny",
+    ),
+    path(
+        "prolongation/request/<int:prolongation_request_id>/deny/<slug:step>",
+        views.ProlongationRequestDenyView.as_view(url_name="approvals:prolongation_request_deny"),
         name="prolongation_request_deny",
     ),
     path("suspend/<int:approval_id>", views.suspend, name="suspend"),

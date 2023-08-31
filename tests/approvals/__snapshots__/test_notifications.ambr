@@ -121,6 +121,20 @@
   Numéro : 99999 99 99999
   Bénéficiaire : John DOE
   
+  Motif de refus :
+  - L’IAE ne correspond plus aux besoins / à la situation de la personne.
+  - Explications du prescripteur habilité : [reason_explanation]
+  
+  Actions envisagées par le prescripteur :
+  
+  - Accompagnement à la recherche d’emploi hors IAE et mobilisation de l’offre de services disponible au sein de votre structure ou celle d’un partenaire.
+  
+  - Orientation vers un partenaire de l’accompagnement social/professionnel.
+  
+  - Autre
+  
+  - Précisions : [proposed_actions_explanation]
+  
   Vous pouvez consulter la date de fin prévisionnelle du PASS IAE dans votre espace employeur sur les emplois de l’inclusion.
   
   ---
@@ -139,6 +153,20 @@
   L’employeur Acme inc. a sollicité un prescripteur habilité de l’organisation Pres. org.  pour demander une prolongation de votre PASS IAE.
   
   L’organisation Pres. org. a refusé la prolongation du PASS IAE.
+  
+  Motif de refus :
+  - L’IAE ne correspond plus aux besoins / à la situation de la personne.
+  - Explications du prescripteur habilité : [reason_explanation]
+  
+  Actions envisagées par le prescripteur :
+  
+  - Accompagnement à la recherche d’emploi hors IAE et mobilisation de l’offre de services disponible au sein de votre structure ou celle d’un partenaire.
+  
+  - Orientation vers un partenaire de l’accompagnement social/professionnel.
+  
+  - Autre
+  
+  - Précisions : [proposed_actions_explanation]
   
   Vous pouvez consulter la date de fin prévisionnelle de votre PASS IAE dans votre espace candidat sur les emplois de l’inclusion.
   

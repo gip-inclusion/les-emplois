@@ -8,5 +8,20 @@ L’employeur {{ prolongation_request.declared_by_siae.display_name }} a sollici
 
 L’organisation {{ prolongation_request.prescriber_organization.display_name }} a refusé la prolongation du PASS IAE.
 
+{% if prolongation_request.deny_information %}
+Motif de refus :
+- {{ prolongation_request.deny_information.get_reason_display }}
+- Explications du prescripteur habilité : {{ prolongation_request.deny_information.reason_explanation }}
+{% endif %}
+{% if prolongation_request.deny_information.proposed_actions %}
+Actions envisagées par le prescripteur :
+{% for proposed_action in prolongation_request.deny_information.get_proposed_actions_display %}
+- {{ proposed_action }}
+{% endfor %}
+{% if prolongation_request.deny_information.proposed_actions_explanation %}
+- Précisions : {{ prolongation_request.deny_information.proposed_actions_explanation }}
+{% endif %}
+{% endif %}
+
 Vous pouvez consulter la date de fin prévisionnelle de votre PASS IAE dans votre espace candidat sur les emplois de l’inclusion.
 {% endblock body %}

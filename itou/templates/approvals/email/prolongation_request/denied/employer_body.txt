@@ -9,5 +9,21 @@ Références :
 Numéro : {{ prolongation_request.approval.number_with_spaces }}
 Bénéficiaire : {{ prolongation_request.approval.user.get_full_name }}
 
+{% if prolongation_request.deny_information %}
+Motif de refus :
+- {{ prolongation_request.deny_information.get_reason_display }}
+- Explications du prescripteur habilité : {{ prolongation_request.deny_information.reason_explanation }}
+{% endif %}
+
+{% if prolongation_request.deny_information.proposed_actions %}
+Actions envisagées par le prescripteur :
+{% for proposed_action in prolongation_request.deny_information.get_proposed_actions_display %}
+- {{ proposed_action }}
+{% endfor %}
+{% if prolongation_request.deny_information.proposed_actions_explanation %}
+- Précisions : {{ prolongation_request.deny_information.proposed_actions_explanation }}
+{% endif %}
+{% endif %}
+
 Vous pouvez consulter la date de fin prévisionnelle du PASS IAE dans votre espace employeur sur les emplois de l’inclusion.
 {% endblock body %}

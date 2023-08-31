@@ -11,10 +11,17 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views import View
 from django.views.generic import DetailView, ListView, TemplateView
+from formtools.wizard.views import NamedUrlSessionWizardView
 
 from itou.approvals import enums as approvals_enums
 from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
-from itou.approvals.models import Approval, PoleEmploiApproval, ProlongationRequest, Suspension
+from itou.approvals.models import (
+    Approval,
+    PoleEmploiApproval,
+    ProlongationRequest,
+    ProlongationRequestDenyInformation,
+    Suspension,
+)
 from itou.files.models import File
 from itou.job_applications.enums import Origin, SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
@@ -29,6 +36,9 @@ from itou.www.apply.forms import UserExistsForm
 from itou.www.approvals_views.forms import (
     ApprovalForm,
     PoleEmploiApprovalSearchForm,
+    ProlongationRequestDenyInformationProposedActionsForm,
+    ProlongationRequestDenyInformationReasonExplanationForm,
+    ProlongationRequestDenyInformationReasonForm,
     ProlongationRequestFilterForm,
     SuspensionForm,
     get_prolongation_form,
@@ -356,7 +366,10 @@ class ProlongationRequestViewMixin(LoginRequiredMixin):
         super().setup(request, *args, **kwargs)
 
         self.prolongation_request = get_object_or_404(
-            ProlongationRequest.objects.filter(prescriber_organization=get_current_org_or_404(request)),
+            ProlongationRequest.objects.filter(prescriber_organization=get_current_org_or_404(request)).select_related(
+                "approval__user",
+                "deny_information",
+            ),
             pk=kwargs["prolongation_request_id"],
         )
 
@@ -384,17 +397,41 @@ class ProlongationRequestGrantView(ProlongationRequestViewMixin, View):
         return HttpResponseRedirect(reverse("approvals:prolongation_requests_list"))
 
 
-class ProlongationRequestDenyView(ProlongationRequestViewMixin, View):
-    http_method_names = ["post"]
+def _show_proposed_actions_form(wizard):
+    cleaned_data = wizard.get_cleaned_data_for_step("reason") or {}
+    return cleaned_data.get("reason") == approvals_enums.ProlongationRequestDenyReason.IAE
 
-    def post(self, request, *args, **kwargs):
-        self.prolongation_request.deny(self.request.user)
+
+class ProlongationRequestDenyView(ProlongationRequestViewMixin, NamedUrlSessionWizardView):
+    template_name = "approvals/prolongation_requests/deny.html"
+    form_list = [
+        ("reason", ProlongationRequestDenyInformationReasonForm),
+        ("reason_explanation", ProlongationRequestDenyInformationReasonExplanationForm),
+        ("proposed_actions", ProlongationRequestDenyInformationProposedActionsForm),
+    ]
+    condition_dict = {
+        "proposed_actions": _show_proposed_actions_form,
+    }
+
+    def get_form_kwargs(self, step=None):
+        if step == "reason":
+            return {"employee": self.prolongation_request.approval.user}
+        return {}
+
+    def done(self, form_list, *args, **kwargs):
+        self.prolongation_request.deny(
+            self.request.user,
+            ProlongationRequestDenyInformation(**self.get_all_cleaned_data()),
+        )
         messages.success(
             self.request,
             f"La prolongation de {self.prolongation_request.approval.user.get_full_name()} a bien été refusée.",
             extra_tags="toast",
         )
         return HttpResponseRedirect(reverse("approvals:prolongation_requests_list"))
+
+    def get_step_url(self, step):
+        return reverse(self.url_name, kwargs={"prolongation_request_id": self.prolongation_request.pk, "step": step})
 
 
 @login_required
