@@ -51,3 +51,19 @@ class ProlongationRequestStatus(models.TextChoices):
     PENDING = "PENDING", "À traiter"
     GRANTED = "GRANTED", "Acceptée"
     DENIED = "DENIED", "Refusée"
+
+
+class ProlongationRequestDenyReason(models.TextChoices):
+    IAE = "IAE", "L’IAE ne correspond plus aux besoins / à la situation de la personne."
+    SIAE = "SIAE", "La typologie de SIAE ne correspond plus aux besoins / à la situation de la personne."
+
+
+class ProlongationRequestDenyProposedAction(models.TextChoices):
+    # TODO: Clarify the actions to improve the naming
+    EXIT_IAE = (
+        "EXIT_IAE",
+        "Accompagnement à la recherche d’emploi hors IAE et mobilisation de l’offre "
+        "de services disponible au sein de votre structure ou celle d’un partenaire.",
+    )
+    SOCIAL_PARTNER = "SOCIAL_PARTNER", "Orientation vers un partenaire de l’accompagnement social/professionnel."
+    OTHER = "OTHER", "Autre"
