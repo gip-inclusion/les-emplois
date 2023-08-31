@@ -1956,7 +1956,7 @@ class DirectHireFullProcessTest(TestCase):
         # ----------------------------------------------------------------------
 
         response = self.client.get(next_url)
-        assert response.status_code == 200
+        self.assertTemplateUsed("approvals/includes/card.html")
 
         criterion1 = AdministrativeCriteria.objects.level1().get(pk=1)
         criterion2 = AdministrativeCriteria.objects.level2().get(pk=5)
@@ -1979,6 +1979,7 @@ class DirectHireFullProcessTest(TestCase):
         # Hire confirmation
         # ----------------------------------------------------------------------
         response = self.client.get(next_url)
+        self.assertTemplateUsed("approvals/includes/card.html")
         self.assertContains(response, "Valider l’embauche")
 
         hiring_start_at = timezone.localdate()
@@ -2048,7 +2049,7 @@ class DirectHireFullProcessTest(TestCase):
         # ----------------------------------------------------------------------
 
         response = self.client.get(check_infos_url)
-        assert response.status_code == 200
+        self.assertTemplateNotUsed("approvals/includes/card.html")
 
         prev_applicaitons_url = reverse(
             "apply:check_prev_applications_for_hire", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk}
@@ -2060,6 +2061,7 @@ class DirectHireFullProcessTest(TestCase):
         # ----------------------------------------------------------------------
 
         response = self.client.get(prev_applicaitons_url)
+        self.assertTemplateNotUsed("approvals/includes/card.html")
         geiq_eligibility_url = reverse(
             "apply:geiq_eligibility_for_hire", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk}
         )
@@ -2075,7 +2077,7 @@ class DirectHireFullProcessTest(TestCase):
         )
 
         response = self.client.get(geiq_eligibility_url)
-        assert response.status_code == 200
+        self.assertTemplateNotUsed("approvals/includes/card.html")
         response = self.client.post(
             geiq_eligibility_url,
             data={"choice": "True"},
@@ -2102,6 +2104,7 @@ class DirectHireFullProcessTest(TestCase):
         # Hire confirmation
         # ----------------------------------------------------------------------
         response = self.client.get(confirmation_url)
+        self.assertTemplateNotUsed("approvals/includes/card.html")
         self.assertContains(response, "Valider l’embauche")
 
         hiring_start_at = timezone.localdate()
@@ -3495,7 +3498,43 @@ class CheckJobSeekerInformationsForHireTestCase(TestCase):
             '<h1>Informations personnelles de <span class="text-muted">Son Prénom Son Nom De Famille</span></h1>',
             html=True,
         )
+        self.assertTemplateUsed("approvals/includes/card.html")
         self.assertContains(response, "Éligibilité IAE à valider")
+        self.assertContains(
+            response,
+            reverse(
+                "apply:update_job_seeker_step_1_for_hire", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk}
+            ),
+        )
+        self.assertContains(
+            response,
+            reverse(
+                "apply:check_prev_applications_for_hire", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk}
+            ),
+        )
+        self.assertContains(response, reverse("dashboard:index"))
+
+    def test_geiq(self):
+        siae = SiaeFactory(kind=SiaeKind.GEIQ, with_membership=True)
+        job_seeker = JobSeekerFactory(
+            first_name="Son prénom",
+            last_name="Son nom de famille",
+            nir="",
+            lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
+        )
+        self.client.force_login(siae.members.first())
+        response = self.client.get(
+            reverse(
+                "apply:check_job_seeker_info_for_hire",
+                kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk},
+            )
+        )
+        self.assertContains(
+            response,
+            '<h1>Informations personnelles de <span class="text-muted">Son Prénom Son Nom De Famille</span></h1>',
+            html=True,
+        )
+        self.assertTemplateNotUsed("approvals/includes/card.html")
         self.assertContains(
             response,
             reverse(
@@ -3532,6 +3571,7 @@ class CheckPreviousApplicationsForHireViewTestCase(TestCase):
         self.client.force_login(self.siae.members.first())
 
         response = self.client.get(self._reverse("apply:check_prev_applications_for_hire"))
+        self.assertTemplateUsed("approvals/includes/card.html")
         self.assertContains(response, "Le candidat a déjà postulé chez cet employeur le")
         response = self.client.post(
             self._reverse("apply:check_prev_applications_for_hire"), data={"force_new_application": "force"}
@@ -3552,6 +3592,7 @@ class CheckPreviousApplicationsForHireViewTestCase(TestCase):
 
         response = self.client.get(self._reverse("apply:check_prev_applications_for_hire"))
         self.assertContains(response, "Le candidat a déjà postulé chez cet employeur le")
+        self.assertTemplateNotUsed("approvals/includes/card.html")
         response = self.client.post(
             self._reverse("apply:check_prev_applications_for_hire"), data={"force_new_application": "force"}
         )

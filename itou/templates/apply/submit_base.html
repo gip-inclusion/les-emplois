@@ -11,7 +11,9 @@
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12 col-lg-8">
-                    {% include "approvals/includes/card.html" with common_approval=job_seeker.latest_common_approval %}
+                    {% if is_subject_to_eligibility_rules %}
+                        {% include "approvals/includes/card.html" with common_approval=job_seeker.latest_common_approval %}
+                    {% endif %}
 
                     {% block content_extend %}{% endblock %}
                 </div>
