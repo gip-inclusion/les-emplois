@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.utils.html import format_html
 
 from itou.siae_evaluations import models
-from itou.utils.admin import get_admin_view_link
+from itou.utils.admin import PkSupportRemarkInline, get_admin_view_link
 from itou.utils.export import to_streaming_response
 
 
@@ -204,6 +204,7 @@ class EvaluationCampaignAdmin(admin.ModelAdmin):
     )
     inlines = [
         EvaluatedSiaesInline,
+        PkSupportRemarkInline,
     ]
 
 
