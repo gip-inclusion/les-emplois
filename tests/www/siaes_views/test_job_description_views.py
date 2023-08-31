@@ -9,7 +9,7 @@ from itou.cities.models import City
 from itou.jobs.models import Appellation
 from itou.siaes.enums import ContractType, SiaeKind
 from itou.siaes.models import SiaeJobDescription
-from itou.www.siaes_views.views import ITOU_SESSION_CURRENT_PAGE_KEY, ITOU_SESSION_JOB_DESCRIPTION_KEY
+from itou.www.siaes_views.views import ITOU_SESSION_JOB_DESCRIPTION_KEY
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.siaes.factories import SiaeFactory, SiaeJobDescriptionFactory
@@ -74,7 +74,7 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
     def setUp(self):
         super().setUp()
 
-        self.url = self.list_url
+        self.url = self.list_url + "?page=1"
 
     def test_job_application_list_response_content(self):
         response = self._login(self.user)
@@ -87,7 +87,6 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
             count=1,
         )
         assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in self.client.session
-        assert ITOU_SESSION_CURRENT_PAGE_KEY in self.client.session
 
         for job in self.siae.job_description_through.all():
             with self.subTest(job.pk):
@@ -105,8 +104,9 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
         response = self._login(self.user)
 
         assert response.status_code == 200
+        post_data = {"action": "block_job_applications", "block_job_applications": "on"}
 
-        response = self.client.post(self.url, data={"block_job_applications": "on"})
+        response = self.client.post(self.url, data=post_data)
 
         self.assertRedirects(response, self.url)
         assert not self.siae.block_job_applications
@@ -124,10 +124,8 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
         assert response.status_code == 200
 
         job_description = self.siae.job_description_through.first()
-        post_data = {
-            "job_description_id": job_description.pk,
-        }
-        response = self.client.post(self.url + "?action=toggle_active", data=post_data)
+        post_data = {"job_description_id": job_description.pk, "action": "toggle_active"}
+        response = self.client.post(self.url, data=post_data)
         job_description.refresh_from_db()
 
         self.assertRedirects(response, self.url)
@@ -144,8 +142,9 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
         post_data = {
             "job_description_id": job_description.pk,
             "job_description_is_active": "on",
+            "action": "toggle_active",
         }
-        response = self.client.post(self.url + "?action=toggle_active", data=post_data)
+        response = self.client.post(self.url, data=post_data)
         job_description.refresh_from_db()
 
         self.assertRedirects(response, self.url)
@@ -169,17 +168,18 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
 
         # Check that we do not crash on unexisting job description
         job_description.delete()
-        response = self.client.post(self.url + "?action=toggle_active", data=post_data)
+        response = self.client.post(self.url, data=post_data)
         self.assertRedirects(response, self.url)
         assertMessages(response, [(messages.ERROR, "La fiche de poste que vous souhaitiez modifier n'existe plus.")])
 
         # Trying to update job description from an other SIAE does nothing
         other_siae_job_description = SiaeJobDescriptionFactory(is_active=False)
         response = self.client.post(
-            self.url + "?action=toggle_active",
+            self.url,
             data={
                 "job_description_id": other_siae_job_description.pk,
                 "job_description_is_active": "on",
+                "action": "toggle_active",
             },
         )
         self.assertRedirects(response, self.url)
@@ -195,8 +195,9 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
         job_description = self.siae.job_description_through.first()
         post_data = {
             "job_description_id": job_description.pk,
+            "action": "delete",
         }
-        response = self.client.post(self.url + "?action=delete", data=post_data)
+        response = self.client.post(self.url, data=post_data)
         self.assertRedirects(response, self.url)
         assertMessages(response, [(messages.SUCCESS, "La fiche de poste a été supprimée.")])
 
@@ -204,16 +205,17 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
             SiaeJobDescription.objects.get(pk=job_description.id)
 
         # Second delete does not crash (and simply does nothing)
-        response = self.client.post(self.url + "?action=delete", data=post_data)
+        response = self.client.post(self.url, data=post_data)
         self.assertRedirects(response, self.url)
         assertMessages(response, [(messages.WARNING, "La fiche de poste que vous souhaitez supprimer n'existe plus.")])
 
         # Trying to delete job description from an other SIAE does nothing
         other_siae_job_description = SiaeJobDescriptionFactory()
         response = self.client.post(
-            self.url + "?action=delete",
+            self.url,
             data={
                 "job_description_id": other_siae_job_description.pk,
+                "action": "delete",
             },
         )
         self.assertRedirects(response, self.url)
