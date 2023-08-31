@@ -12,6 +12,7 @@ from itou.siaes.enums import SiaeKind
 from itou.siaes.models import SiaeJobDescription
 from itou.utils.types import InclusiveDateRange
 from tests.approvals.factories import ApprovalFactory
+from tests.asp.factories import CommuneFactory, CountryFranceFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory
 from tests.prescribers.factories import (
     PrescriberOrganizationWithMembershipFactory,
@@ -201,5 +202,10 @@ class JobApplicationWithCompleteJobSeekerProfileFactory(JobApplicationWithApprov
         # forces us to have a JobSeekerProfile ready, immediately. We don't want to adapt the save() to handle a
         # case that can only happen in tests though.
         self.job_seeker.jobseeker_profile.delete()
-        self.job_seeker.jobseeker_profile = JobSeekerProfileWithHexaAddressFactory(user=self.job_seeker)
+        self.job_seeker.jobseeker_profile = JobSeekerProfileWithHexaAddressFactory(
+            user=self.job_seeker,
+            birth_place=CommuneFactory(),
+            birth_country=CountryFranceFactory(),
+        )
+
         self.job_seeker.save()

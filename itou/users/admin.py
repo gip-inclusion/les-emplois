@@ -261,11 +261,7 @@ class ItouUserAdmin(UserAdmin):
         "identity_provider",
     )
     ordering = ("-id",)
-    raw_id_fields = (
-        "created_by",
-        "birth_place",
-        "birth_country",
-    )
+    raw_id_fields = ("created_by",)
     readonly_fields = (
         "pk",
         "identity_provider",
@@ -282,8 +278,6 @@ class ItouUserAdmin(UserAdmin):
                     "asp_uid",
                     "title",
                     "birthdate",
-                    "birth_place",
-                    "birth_country",
                     "phone",
                     "resume_link",
                     "address_line_1",
@@ -449,6 +443,8 @@ class JobSeekerProfileAdmin(admin.ModelAdmin):
 
     raw_id_fields = (
         "user",
+        "birth_place",
+        "birth_country",
         "hexa_commune",
     )
 
@@ -489,6 +485,8 @@ class JobSeekerProfileAdmin(admin.ModelAdmin):
             {
                 "fields": (
                     "user",
+                    "birth_place",
+                    "birth_country",
                     "education_level",
                     "nir",
                     "pole_emploi_id",

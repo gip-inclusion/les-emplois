@@ -164,9 +164,6 @@ class User(AbstractUser, AddressMixin):
     More details in `itou.external_data.models` module
     """
 
-    # Used for validation of birth country / place
-    INSEE_CODE_FRANCE = Country._CODE_FRANCE
-
     REASON_FORGOTTEN = "FORGOTTEN"
     REASON_NOT_REGISTERED = "NOT_REGISTERED"
     REASON_CHOICES = (
@@ -175,10 +172,6 @@ class User(AbstractUser, AddressMixin):
     )
 
     ERROR_EMAIL_ALREADY_EXISTS = "Cet e-mail existe déjà."
-    ERROR_MUST_PROVIDE_BIRTH_PLACE = "Si le pays de naissance est la France, la commune de naissance est obligatoire"
-    ERROR_BIRTH_COMMUNE_WITH_FOREIGN_COUNTRY = (
-        "Il n'est pas possible de saisir une commune de naissance hors de France"
-    )
 
     title = models.CharField(
         max_length=3,
@@ -366,20 +359,6 @@ class User(AbstractUser, AddressMixin):
                 if getattr(self, field) != self._old_values[field]:
                     return True
         return False
-
-    def clean(self):
-        """
-        Validation for FS
-        Mainly coherence checks for birth country / place.
-        Must be non blocking if these fields are not provided.
-        """
-        # If birth country is France, then birth place must be provided
-        if self.birth_country and self.birth_country.code == self.INSEE_CODE_FRANCE and not self.birth_place:
-            raise ValidationError(self.ERROR_MUST_PROVIDE_BIRTH_PLACE)
-
-        # If birth country is not France, do not fill a birth place (no ref file)
-        if self.birth_country and self.birth_country.code != self.INSEE_CODE_FRANCE and self.birth_place:
-            raise ValidationError(self.ERROR_BIRTH_COMMUNE_WITH_FOREIGN_COUNTRY)
 
     def validate_identity_provider(self):
         if self.identity_provider == IdentityProvider.FRANCE_CONNECT and self.kind != UserKind.JOB_SEEKER:
@@ -1043,12 +1022,19 @@ class JobSeekerProfile(models.Model):
     with Hexa norms (but compliant enough to be accepted by ASP backend).
     """
 
+    # Used for validation of birth country / place
+    INSEE_CODE_FRANCE = Country._CODE_FRANCE
+
     ERROR_NOT_RESOURCELESS_IF_OETH_OR_RQTH = "La personne n'est pas considérée comme sans ressources si OETH ou RQTH"
     ERROR_EMPLOYEE_WITH_UNEMPLOYMENT_PERIOD = (
         "La personne ne peut avoir de période sans emploi si actuellement employée"
     )
     ERROR_UNEMPLOYED_BUT_RQTH_OR_OETH = (
         "La personne ne peut être considérée comme sans emploi si employée OETH ou RQTH"
+    )
+    ERROR_MUST_PROVIDE_BIRTH_PLACE = "Si le pays de naissance est la France, la commune de naissance est obligatoire"
+    ERROR_BIRTH_COMMUNE_WITH_FOREIGN_COUNTRY = (
+        "Il n'est pas possible de saisir une commune de naissance hors de France"
     )
 
     ERROR_HEXA_LANE_TYPE = "Le type de voie est obligatoire"
@@ -1229,8 +1215,8 @@ class JobSeekerProfile(models.Model):
         if not self.user.title:
             raise ValidationError(self.ERROR_JOBSEEKER_TITLE)
 
-        # Birth place an country are checked in User.clean()
-        self.user.clean()
+        # Check birth place and country
+        self._clean_birth_fields()
 
         if not self.education_level:
             raise ValidationError(self.ERROR_JOBSEEKER_EDUCATION_LEVEL)
@@ -1277,6 +1263,20 @@ class JobSeekerProfile(models.Model):
 
         if not self.hexa_commune:
             raise ValidationError(self.ERROR_HEXA_COMMUNE)
+
+    def _clean_birth_fields(self):
+        """
+        Validation for FS
+        Mainly coherence checks for birth country / place.
+        Must be non blocking if these fields are not provided.
+        """
+        # If birth country is France, then birth place must be provided
+        if self.birth_country and self.birth_country.code == self.INSEE_CODE_FRANCE and not self.birth_place:
+            raise ValidationError(self.ERROR_MUST_PROVIDE_BIRTH_PLACE)
+
+        # If birth country is not France, do not fill a birth place (no ref file)
+        if self.birth_country and self.birth_country.code != self.INSEE_CODE_FRANCE and self.birth_place:
+            raise ValidationError(self.ERROR_BIRTH_COMMUNE_WITH_FOREIGN_COUNTRY)
 
     #  This used to be the `clean` method for the global model validation
     #  when using forms.

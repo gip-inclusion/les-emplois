@@ -16,8 +16,8 @@ class ApplicantSerializer(serializers.ModelSerializer):
     code_postal = serializers.CharField(source="post_code")
     ville = serializers.CharField(source="city")
     date_naissance = serializers.DateField(source="birthdate")
-    lieu_naissance = serializers.CharField(source="birth_place")
-    pays_naissance = serializers.CharField(source="birth_country")
+    lieu_naissance = serializers.CharField(source="jobseeker_profile.birth_place")
+    pays_naissance = serializers.CharField(source="jobseeker_profile.birth_country")
     lien_cv = serializers.CharField(source="resume_link")
 
     class Meta:

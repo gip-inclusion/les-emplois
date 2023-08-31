@@ -128,11 +128,11 @@ class JobSeekerFactory(UserFactory):
         # Use `BUILD` strategy or `build()` method when creating these traits.
         # They are currently only used to test employee records, which is
         # the only part relying on ASP reference files / models.
-        with_birth_place = factory.Trait(birth_place=factory.SubFactory(CommuneFactory))
-        with_birth_country = factory.Trait(birth_country=factory.SubFactory(CountryFactory))
+        with_birth_place = factory.Trait(jobseeker_profile__birth_place=factory.SubFactory(CommuneFactory))
+        with_birth_country = factory.Trait(jobseeker_profile__birth_country=factory.SubFactory(CountryFactory))
         born_in_france = factory.Trait(
             with_birth_place=True,
-            birth_country=factory.SubFactory(CountryFranceFactory),
+            jobseeker_profile__birth_country=factory.SubFactory(CountryFranceFactory),
         )
 
     @factory.lazy_attribute
@@ -156,6 +156,8 @@ class JobSeekerFactory(UserFactory):
 
     @factory.post_generation
     def jobseeker_profile(obj, create, extracted, **kwargs):
+        if not create:
+            obj.jobseeker_profile = models.JobSeekerProfile(user=obj)
         for k, v in kwargs.items():
             if "__" in k:
                 raise ValueError("This is not a factory: __xxx are not supported")
@@ -251,10 +253,11 @@ class JobSeekerWithMockedAddressFactory(JobSeekerFactory):
         self.post_code = address.get("post_code")
         self.insee_code = address.get("insee_code")
         self.city = address.get("city")
-
-        self.birth_place = CommuneFactory()
-        self.birth_country = CountryFranceFactory()
         self.save()
+
+        self.jobseeker_profile.birth_place = CommuneFactory()
+        self.jobseeker_profile.birth_country = CountryFranceFactory()
+        self.jobseeker_profile.save()
 
 
 class JobSeekerProfileWithHexaAddressFactory(factory.django.DjangoModelFactory):

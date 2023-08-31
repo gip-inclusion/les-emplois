@@ -51,8 +51,8 @@ class _PersonSerializer(serializers.Serializer):
     dateNaissance = serializers.DateField(format="%d/%m/%Y", source="job_seeker.birthdate")
 
     codeDpt = serializers.CharField(source="job_seeker.birth_place.department_code", required=False)
-    codeInseePays = serializers.CharField(source="job_seeker.birth_country.code")
-    codeGroupePays = serializers.CharField(source="job_seeker.birth_country.group")
+    codeInseePays = serializers.CharField(source="job_seeker.jobseeker_profile.birth_country.code")
+    codeGroupePays = serializers.CharField(source="job_seeker.jobseeker_profile.birth_country.group")
 
     # codeComInsee is only mandatory if birth country is France
     codeComInsee = serializers.SerializerMethodField(required=False)
@@ -69,7 +69,7 @@ class _PersonSerializer(serializers.Serializer):
     def get_codeComInsee(self, obj: EmployeeRecord) -> CodeComInsee:
         # Another ASP subtlety, making top-level and children with the same name
         # The commune can be empty if the job seeker is not born in France
-        if birth_place := obj.job_seeker.birth_place:
+        if birth_place := obj.job_seeker.jobseeker_profile.birth_place:
             return {
                 "codeComInsee": birth_place.code,
                 "codeDpt": birth_place.department_code,

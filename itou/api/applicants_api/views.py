@@ -48,7 +48,7 @@ class ApplicantsView(generics.ListAPIView):
 
         return (
             User.objects.filter(job_applications__to_siae_id=siae_id, kind=UserKind.JOB_SEEKER)
-            .select_related("birth_place", "birth_country")
+            .select_related("jobseeker_profile__birth_place", "jobseeker_profile__birth_country")
             .prefetch_related("job_applications")
             .order_by("-pk")
         )
