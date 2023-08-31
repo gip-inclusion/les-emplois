@@ -18,6 +18,15 @@
                                 <span class="badge badge-xs badge-pill badge-warning-lighter text-warning"><i class="ri-error-warning-line" aria-hidden="true"></i>Action à faire</span>
                             {% endif %}
                         </li>
+                        {% if evaluated_siae.evaluation_campaign.calendar_id %}
+                            <li class="d-flex justify-content-between align-items-center mb-3">
+                                <a href="{% url 'siae_evaluations_views:campaign_calendar' evaluated_siae.evaluation_campaign.pk %}" class="btn-link btn-ico">
+                                    {% comment %} TODO(cms): change icon {% endcomment %}
+                                    <i class="ri-calendar-line ri-lg font-weight-normal"></i>
+                                    <span>Calendrier</span>
+                                </a>
+                            </li>
+                        {% endif %}
                     {% endfor %}
                 </ul>
             {% endif %}
