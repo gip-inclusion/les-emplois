@@ -23,6 +23,9 @@ django-allauth==0.51.0 # https://github.com/pennersr/django-allauth
 # django-anymail
 django-anymail  # https://github.com/anymail/django-anymail
 
+# django-pgtrigger (PostgresSQL triggers in models)
+django-pgtrigger  # https://github.com/Opus10/django-pgtrigger
+
 # Django-XWorkflows
 django-xworkflows  # https://github.com/rbarrois/django_xworkflows
 

@@ -261,6 +261,7 @@ django==4.2.5 \
     #   django-hijack
     #   django-htmx
     #   django-import-export
+    #   django-pgtrigger
     #   django-select2
     #   django-xworkflows
     #   djangorestframework
@@ -299,6 +300,10 @@ django-htmx==1.16.0 \
 django-import-export==3.2.0 \
     --hash=sha256:1d3f2cb2ee3cca0386ed60651fa1623be989f130d9fbdf98a67f7dc3a94b8a37 \
     --hash=sha256:38fd7b9439b9e3aa1a4747421c1087a5bc194e915a28d795fb8429a5f8028f2d
+    # via -r requirements/base.in
+django-pgtrigger==4.7.0 \
+    --hash=sha256:20a4139cccb17b75d065fbfd2cc8f47e3696379d7be4139ef6a67c8d14897a8d \
+    --hash=sha256:978e998f5c7bdfaf3edbb01c2075be329ce679bd87a89c5bfdf95405905885bd
     # via -r requirements/base.in
 django-select2==8.1.2 \
     --hash=sha256:dc09e09299988dd7cc1f31c27582976377f0e1479101be1f3bb0d1f24216477f \
