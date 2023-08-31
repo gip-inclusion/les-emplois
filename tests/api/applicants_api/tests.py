@@ -7,6 +7,7 @@ from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.siaes.factories import SiaeFactory
 from tests.users.factories import JobSeekerFactory
+from tests.utils.test import BASE_NUM_QUERIES
 
 
 class ApplicantsAPITest(APITestCase):
@@ -62,47 +63,75 @@ class ApplicantsAPITest(APITestCase):
         user = SiaeFactory(with_membership=True).members.first()
         self.client.force_authenticate(user)
 
-        response = self.client.get(self.url, format="json")
+        with self.assertNumQueries(
+            BASE_NUM_QUERIES
+            + 1  # siaemembership check (ApplicantsAPIPermission)
+            + 1  # siaes_siaemembership fetch for request.user (get_queryset)
+            + 1  # count users
+        ):
+            response = self.client.get(self.url, format="json")
         assert response.status_code == 200
         assert response.json().get("results") == []
 
     def test_applicant_data(self):
         siae = SiaeFactory(with_membership=True)
-        job_seeker = JobApplicationFactory(to_siae=siae).job_seeker
+        job_seeker1 = JobApplicationFactory(to_siae=siae).job_seeker
         # Will not refactor ASP factories:
         # - too long,
         # - not the point
         # - scheduled in a future PR
         # => will use some hard-coded values until then
-        job_seeker.address_line_1 = "address test"
-        job_seeker.address_line_2 = "address 2"
-        job_seeker.post_code = "37000"
-        job_seeker.city = "TOURS"
-        job_seeker.resume_link = "https://myresume.com/me"
-        job_seeker.birth_place = CommuneFactory()
-        job_seeker.birth_country = CountryFactory()
-        job_seeker.save()
+        job_seeker1.address_line_1 = "address test"
+        job_seeker1.address_line_2 = "address 2"
+        job_seeker1.post_code = "37000"
+        job_seeker1.city = "TOURS"
+        job_seeker1.resume_link = "https://myresume.com/me"
+        job_seeker1.birth_place = CommuneFactory()
+        job_seeker1.birth_country = CountryFactory()
+        job_seeker1.save()
+        job_seeker2 = JobApplicationFactory(to_siae=siae).job_seeker
+        job_seeker2.address_line_1 = "2nd address test"
+        job_seeker2.address_line_2 = "2nd address 2"
+        job_seeker2.post_code = "59000"
+        job_seeker2.city = "LILLE"
+        job_seeker2.resume_link = "https://myresume.com/you"
+        job_seeker2.birth_place = CommuneFactory()
+        job_seeker2.birth_country = CountryFactory()
+        job_seeker2.save()
         user = siae.members.first()
 
         self.client.force_authenticate(user)
-        response = self.client.get(self.url, format="json")
+        with self.assertNumQueries(
+            BASE_NUM_QUERIES
+            + 1  # siaemembership check (ApplicantsAPIPermission)
+            + 1  # siaes_siaemembership fetch for request.user (get_queryset)
+            + 1  # count users
+            + 1  # fetch users
+            + 1  # prefetch linked job applications
+        ):
+            response = self.client.get(self.url, format="json")
 
         assert response.status_code == 200
 
-        [result] = response.json().get("results")
+        # Ordered by decreasing pk, hence the swap
+        [result_for_jobseeker2, result_for_jobseeker1] = response.json().get("results")
 
-        assert {
-            "civilite": job_seeker.title,
-            "nom": job_seeker.first_name,
-            "prenom": job_seeker.last_name,
-            "courriel": job_seeker.email,
-            "telephone": job_seeker.phone,
-            "adresse": job_seeker.address_line_1,
-            "complement_adresse": job_seeker.address_line_2,
-            "code_postal": job_seeker.post_code,
-            "ville": job_seeker.city,
-            "date_naissance": str(job_seeker.birthdate),
-            "lieu_naissance": job_seeker.birth_place.name,
-            "pays_naissance": job_seeker.birth_country.name,
-            "lien_cv": job_seeker.resume_link,
-        } == result
+        for job_seeker, result in zip(
+            [job_seeker1, job_seeker2],
+            [result_for_jobseeker1, result_for_jobseeker2],
+        ):
+            assert {
+                "civilite": job_seeker.title,
+                "nom": job_seeker.first_name,
+                "prenom": job_seeker.last_name,
+                "courriel": job_seeker.email,
+                "telephone": job_seeker.phone,
+                "adresse": job_seeker.address_line_1,
+                "complement_adresse": job_seeker.address_line_2,
+                "code_postal": job_seeker.post_code,
+                "ville": job_seeker.city,
+                "date_naissance": str(job_seeker.birthdate),
+                "lieu_naissance": job_seeker.birth_place.name,
+                "pays_naissance": job_seeker.birth_country.name,
+                "lien_cv": job_seeker.resume_link,
+            } == result
