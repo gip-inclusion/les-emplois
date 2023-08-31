@@ -1280,12 +1280,16 @@ class ProlongationRequest(CommonProlongation):
 
         return prolongation
 
-    def deny(self, user):
+    def deny(self, user, information):
         self.status = enums.ProlongationRequestStatus.DENIED
         self.processed_by = user
         self.processed_at = timezone.now()
         self.updated_by = user
-        self.save()
+        information.request = self
+
+        with transaction.atomic():
+            information.save()
+            self.save()
 
         notifications.ProlongationRequestDeniedEmployer(self).send()
         notifications.ProlongationRequestDeniedJobSeeker(self).send()
@@ -1317,6 +1321,14 @@ class ProlongationRequestDenyInformation(models.Model):
                 check=~models.Q(proposed_actions__len=0),
                 violation_error_message="Les actions envisagées ne peuvent pas être vide",
             ),
+        ]
+
+    def get_proposed_actions_display(self):
+        if not self.proposed_actions:
+            return []
+        return [
+            enums.ProlongationRequestDenyProposedAction(proposed_action).label
+            for proposed_action in self.proposed_actions
         ]
 
 

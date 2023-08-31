@@ -10,8 +10,18 @@ from django.utils.safestring import mark_safe
 from django_select2.forms import Select2MultipleWidget
 
 from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
-from itou.approvals.enums import ProlongationReason
-from itou.approvals.models import Approval, Prolongation, ProlongationRequest, Suspension
+from itou.approvals.enums import (
+    ProlongationReason,
+    ProlongationRequestDenyProposedAction,
+    ProlongationRequestDenyReason,
+)
+from itou.approvals.models import (
+    Approval,
+    Prolongation,
+    ProlongationRequest,
+    ProlongationRequestDenyInformation,
+    Suspension,
+)
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import UserKind
@@ -350,6 +360,55 @@ class ProlongationRequestFilterForm(forms.Form):
         label_suffix="",
         required=False,
     )
+
+
+class ProlongationRequestDenyInformationReasonForm(forms.ModelForm):
+    reason = forms.ChoiceField(
+        choices=ProlongationRequestDenyReason.choices,
+        initial=None,  # Uncheck radio buttons.
+        widget=forms.RadioSelect(),
+    )
+
+    class Meta:
+        model = ProlongationRequestDenyInformation
+        fields = ["reason"]
+
+    def __init__(self, *args, employee, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields[
+            "reason"
+        ].label = f"Pour quel motif refusez-vous la prolongation du parcours IAE de {employee.get_full_name()} ?"
+
+
+class ProlongationRequestDenyInformationReasonExplanationForm(forms.ModelForm):
+    class Meta:
+        model = ProlongationRequestDenyInformation
+        fields = ["reason_explanation"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["reason_explanation"].widget.attrs["placeholder"] = "Message"
+
+
+class ProlongationRequestDenyInformationProposedActionsForm(forms.ModelForm):
+    proposed_actions = forms.MultipleChoiceField(
+        label="Quelle(s) action(s) envisagez-vous de proposer au candidat ?",
+        choices=ProlongationRequestDenyProposedAction.choices,
+        widget=forms.CheckboxSelectMultiple(),
+    )
+
+    class Meta:
+        model = ProlongationRequestDenyInformation
+        fields = ["proposed_actions", "proposed_actions_explanation"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["proposed_actions_explanation"].label = "Précisions"
+        self.fields["proposed_actions_explanation"].required = True
+        self.fields["proposed_actions_explanation"].widget.attrs["placeholder"] = "Message"
 
 
 class SuspensionForm(forms.ModelForm):

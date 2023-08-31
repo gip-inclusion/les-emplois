@@ -1,0 +1,80 @@
+{% extends "layout/base.html" %}
+{% load bootstrap4 %}
+{% load theme_inclusion %}
+
+{% block title %}
+    Refuser la demande de prolongation - {{ prolongation_request.approval.user.get_full_name }} {{ block.super }}
+{% endblock %}
+
+{% block content_title %}
+    <h1>Refuser la demande de prolongation pour {{ prolongation_request.approval.user.get_full_name }}</h1>
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    <div class="c-stepper mb-3 mb-lg-5">
+                        <div class="progress progress--emploi">
+                            <div class="progress-bar progress-bar-{{ wizard|stepper_progress }}" role="progressbar" aria-valuenow="{{ wizard|stepper_progress }}" aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                        <p>
+                            {% if wizard.steps.current == "reason" %}
+                                <strong>Étape 1</strong> : Motif du refus
+                            {% elif wizard.steps.current == "reason_explanation" %}
+                                <strong>Étape {{ wizard.steps.step1 }}</strong>/{{ wizard.steps.count }} : Explications supplémentaires
+                            {% elif wizard.steps.current == "proposed_actions" %}
+                                <strong>Étape {{ wizard.steps.step1 }}</strong>/{{ wizard.steps.count }} : Solution envisagée
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="c-form mb-3 mb-lg-5">
+                        <h2 class="h4">Réponse envoyée à l'employeur et au candidat</h2>
+                        {% block form_content %}
+                            <form method="post">
+                                {% csrf_token %}
+                                {{ wizard.management_form }}
+
+                                {% bootstrap_form wizard.form alert_error_type="non_fields" %}
+
+                                {% if wizard.steps.current == "reason" %}
+                                    <div class="c-info mb-4">
+                                        <button type="button" class="c-info__summary collapsed" data-toggle="collapse" data-target="#legalInformation" aria-expanded="false" aria-controls="legalInformation">
+                                            <span>Contexte légal</span>
+                                        </button>
+                                        <div class="c-info__detail collapse" id="legalInformation">
+                                            <p>
+                                                Conformément à l’article Art. R. 5132-1-8. du Décret n° 2021-1128 du 30 août 2021 relatif à l'insertion par l'activité économique, le refus de prolongation d'un prescripteur est motivé par écrit et notifié, par tout moyen donnant date certaine à la réception de cette notification, à la structure et à l'intéressé.
+                                            </p>
+                                            <a class="btn btn-link px-0" href="https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000043990367" aria-label="En savoir plus concernant le contexte légal" rel="noopener" target="_blank">
+                                                <span>En savoir plus</span>
+                                                <i class="ri-external-link-line ri-lg"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                {% endif %}
+
+                                <hr>
+                                <p class="fs-xs">* champ obligatoire</p>
+                                {% buttons %}
+                                    <div class="text-right">
+                                        {% if wizard.steps.prev %}
+                                            <button formnovalidate class="btn btn-outline-primary" name="wizard_goto_step" value="{{ wizard.steps.prev }}">
+                                                Retour
+                                            </button>
+                                        {% else %}
+                                            <a class="btn btn-link btn-outline-primary" href="{% url "approvals:prolongation_request_show" prolongation_request.pk %}">Annuler</a>
+                                        {% endif %}
+                                        <button class="btn btn-primary">{{ wizard.steps.next|yesno:"Suivant,Confirmer le refus" }}</button>
+                                    </div>
+                                {% endbuttons %}
+                            </form>
+                        {% endblock %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

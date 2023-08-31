@@ -3,7 +3,7 @@ import datetime
 from itou.approvals import notifications
 
 from ..users.factories import PrescriberFactory
-from .factories import ProlongationRequestFactory
+from .factories import ProlongationRequestDenyInformationFactory, ProlongationRequestFactory
 
 
 def test_prolongation_request_created(snapshot):
@@ -68,7 +68,7 @@ def test_prolongation_request_granted_jobseeker(snapshot):
 
 
 def test_prolongation_request_denied_employer(snapshot):
-    prolongation_request = ProlongationRequestFactory(for_snapshot=True)
+    prolongation_request = ProlongationRequestDenyInformationFactory(for_snapshot=True).request
     email = notifications.ProlongationRequestDeniedEmployer(prolongation_request).email
 
     assert email.to == [prolongation_request.declared_by.email]
@@ -77,7 +77,7 @@ def test_prolongation_request_denied_employer(snapshot):
 
 
 def test_prolongation_request_denied_jobseeker(snapshot):
-    prolongation_request = ProlongationRequestFactory(for_snapshot=True)
+    prolongation_request = ProlongationRequestDenyInformationFactory(for_snapshot=True).request
     email = notifications.ProlongationRequestDeniedJobSeeker(prolongation_request).email
 
     assert email.to == [prolongation_request.approval.user.email]

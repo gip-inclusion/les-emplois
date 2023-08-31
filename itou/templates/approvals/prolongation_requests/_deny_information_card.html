@@ -1,0 +1,26 @@
+{% if prolongation_request.deny_information %}
+    <div class="c-box mb-3 mb-lg-5">
+        <h2>Détail du refus</h2>
+        <hr>
+        <h3>Traitement de la demande</h3>
+        <p>
+            Demande refusée le {{ prolongation_request.processed_at|date:"d F Y" }} par {{ prolongation_request.processed_by.get_full_name }}
+        </p>
+        <h3>Motif du refus</h3>
+        <p>{{ prolongation_request.deny_information.get_reason_display }}</p>
+        <h3>Explications supplémentaires</h3>
+        <p>{{ prolongation_request.deny_information.reason_explanation }}</p>
+        {% if prolongation_request.deny_information.proposed_actions %}
+            <h3>Actions envisagées par le prescripteur habilité</h3>
+            <ul>
+                {% for proposed_action in prolongation_request.deny_information.get_proposed_actions_display %}
+                    <li>{{ proposed_action }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% if prolongation_request.deny_information.proposed_actions_explanation %}
+            <h3>Précisions</h3>
+            <p>{{ prolongation_request.deny_information.proposed_actions_explanation }}</p>
+        {% endif %}
+    </div>
+{% endif %}

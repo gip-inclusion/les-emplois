@@ -5,6 +5,7 @@ import itertools
 
 import pytest
 from dateutil.relativedelta import relativedelta
+from django.core import mail
 from django.db.utils import IntegrityError
 from django.utils import timezone
 from freezegun import freeze_time
@@ -12,7 +13,7 @@ from freezegun import freeze_time
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.management.commands import prolongation_requests_chores
 from itou.approvals.models import Prolongation, ProlongationRequest
-from tests.approvals.factories import ProlongationRequestFactory
+from tests.approvals.factories import ProlongationRequestDenyInformationFactory, ProlongationRequestFactory
 
 
 @pytest.fixture(name="command")
@@ -63,8 +64,9 @@ def test_grant():
 @freeze_time()
 def test_deny():
     prolongation_request = ProlongationRequestFactory()
+    deny_information = ProlongationRequestDenyInformationFactory.build(request=None)
 
-    prolongation_request.deny(prolongation_request.validated_by)
+    prolongation_request.deny(prolongation_request.validated_by, deny_information)
 
     prolongation_request.refresh_from_db()
     assert prolongation_request.status == ProlongationRequestStatus.DENIED
@@ -72,6 +74,17 @@ def test_deny():
     assert prolongation_request.processed_at == timezone.now()
     assert prolongation_request.updated_by == prolongation_request.validated_by
     assert prolongation_request.approval.prolongation_set.count() == 0
+    assert prolongation_request.deny_information.reason == deny_information.reason
+    assert prolongation_request.deny_information.reason_explanation == deny_information.reason_explanation
+    assert prolongation_request.deny_information.proposed_actions == deny_information.proposed_actions
+    assert (
+        prolongation_request.deny_information.proposed_actions_explanation
+        == deny_information.proposed_actions_explanation
+    )
+    assert [email.to for email in mail.outbox] == [
+        [prolongation_request.declared_by.email],
+        [prolongation_request.approval.user.email],
+    ]
 
 
 @pytest.mark.parametrize(
