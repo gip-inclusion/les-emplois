@@ -66,7 +66,7 @@ def get_org_last_job_application_creation_date(org):
     return None
 
 
-TABLE = MetabaseTable(name="organisations")
+TABLE = MetabaseTable(name="organisations_v0")
 TABLE.add_columns(
     [
         {"name": "id", "type": "integer", "comment": "ID organisation", "fn": lambda o: o.id},
