@@ -107,6 +107,7 @@ class Command(BaseCommand):
             "insee_codes": self.populate_insee_codes,
             "insee_codes_vs_post_codes": self.populate_insee_codes_vs_post_codes,
             "departments": self.populate_departments,
+            "enums": self.populate_enums,
             "final_tables": self.build_final_tables,
             "data_inconsistencies": self.report_data_inconsistencies,
         }
@@ -446,6 +447,16 @@ class Command(BaseCommand):
 
             rows.append(row)
 
+        df = get_df_from_rows(rows)
+        store_df(df=df, table_name=table_name)
+
+    def populate_enums(self):
+        # TODO(vperron,dejafait): This works as long as we don't have several table creations in the same call.
+        # If we someday want to create several tables, we will probably need to disable autocommit in our helper
+        # functions and make it manually at the end.
+        table_name = "c1_ref_origine_candidature"
+        self.stdout.write(f"Preparing content for {table_name} table...")
+        rows = [OrderedDict(code=str(item), label=item.label) for item in Origin]
         df = get_df_from_rows(rows)
         store_df(df=df, table_name=table_name)
 

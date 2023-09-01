@@ -433,7 +433,7 @@ def test_populate_job_applications():
                 "Nouvelle candidature",
                 "Orienteur",
                 "Orienteur sans organisation",
-                "Créée normalement via les emplois",
+                "default",
                 None,
                 None,
                 None,
@@ -839,6 +839,29 @@ def test_populate_users():
                 pro_user.kind,
                 datetime.date(2023, 2, 1),
             ),
+        ]
+
+
+@freeze_time("2023-02-02")
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.usefixtures("metabase")
+def test_populate_enums():
+    num_queries = 1  # COMMIT Create table
+    num_queries += 1  # COMMIT (inject_chunk)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    with assertNumQueries(num_queries):
+        management.call_command("populate_metabase_emplois", mode="enums")
+
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM c1_ref_origine_candidature ORDER BY code")
+        rows = cursor.fetchall()
+        assert rows == [
+            ("admin", "Créée depuis l'admin"),
+            ("ai_stock", "Créée lors de l'import du stock AI"),
+            ("default", "Créée normalement via les emplois"),
+            ("pe_approval", "Créée lors d'un import d'Agrément Pole Emploi"),
         ]
 
 
