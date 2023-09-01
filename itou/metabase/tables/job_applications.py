@@ -167,7 +167,7 @@ TABLE.add_columns(
                 "Parcours de création de la candidature "
                 "(Normale, reprise de stock AI, import agrément PE, action support...)"
             ),
-            "fn": lambda o: o.get_origin_display(),
+            "fn": lambda o: o.origin,
         },
         {
             "name": "délai_prise_en_compte",

@@ -45,6 +45,7 @@ elif [[ "$1" == "--monthly" ]]; then
     django-admin populate_metabase_emplois --mode=insee_codes |& tee -a "$OUTPUT_LOG"
     django-admin populate_metabase_emplois --mode=insee_codes_vs_post_codes |& tee -a "$OUTPUT_LOG"
     django-admin populate_metabase_emplois --mode=departments |& tee -a "$OUTPUT_LOG"
+    django-admin populate_metabase_emplois --mode=enums |& tee -a "$OUTPUT_LOG"
     django-admin populate_metabase_emplois --mode=final_tables |& tee -a "$OUTPUT_LOG"
     django-admin send_slack_message ":white_check_mark: succès mise à jour de données peu fréquentes C1 -> Metabase"
 else
