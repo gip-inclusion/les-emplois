@@ -1502,7 +1502,7 @@ class ProlongationModelTest(TestCase):
             reason,
             # Prolongation end date is exclusive, this is an empty day [2026-08-21,2026-08-21).
         ) == datetime.date(2026, 8, 21)
-        assert prolongation.has_reached_max_cumulative_duration(datetime.timedelta(days=0)) is True
+        assert prolongation.can_be_extended_for(datetime.timedelta(days=0)) is True
 
     def test_time_boundaries(self):
         """
@@ -1554,7 +1554,7 @@ class ProlongationModelTest(TestCase):
 
         assert approval.duration == initial_approval_duration + prolongation1.duration + prolongation2.duration
 
-    def test_has_reached_max_cumulative_duration_for_complete_training(self):
+    def test_can_be_extended_for_complete_training(self):
         approval = ApprovalFactory()
 
         duration = Prolongation.MAX_CUMULATIVE_DURATION[ProlongationReason.COMPLETE_TRAINING.value]["duration"]
@@ -1566,10 +1566,10 @@ class ProlongationModelTest(TestCase):
             reason=ProlongationReason.COMPLETE_TRAINING.value,
         )
 
-        assert prolongation.has_reached_max_cumulative_duration(datetime.timedelta(days=-1)) is False
-        assert prolongation.has_reached_max_cumulative_duration(datetime.timedelta(days=0)) is True
+        assert prolongation.can_be_extended_for(datetime.timedelta(days=-1)) is False
+        assert prolongation.can_be_extended_for(datetime.timedelta(days=0)) is True
 
-    def test_has_reached_max_cumulative_duration_for_particular_difficulties(self):
+    def test_can_be_extended_for_particular_difficulties(self):
         approval = ApprovalFactory()
 
         prolongation1 = ProlongationFactory(
@@ -1579,7 +1579,7 @@ class ProlongationModelTest(TestCase):
             reason=ProlongationReason.PARTICULAR_DIFFICULTIES.value,
         )
 
-        assert prolongation1.has_reached_max_cumulative_duration(datetime.timedelta(days=0)) is False
+        assert prolongation1.can_be_extended_for(datetime.timedelta(days=0)) is False
 
         prolongation2 = ProlongationFactory(
             approval=approval,
@@ -1588,8 +1588,8 @@ class ProlongationModelTest(TestCase):
             reason=ProlongationReason.PARTICULAR_DIFFICULTIES.value,
         )
 
-        assert prolongation2.has_reached_max_cumulative_duration(datetime.timedelta(days=-1)) is False
-        assert prolongation2.has_reached_max_cumulative_duration(datetime.timedelta(days=0)) is True
+        assert prolongation2.can_be_extended_for(datetime.timedelta(days=-1)) is False
+        assert prolongation2.can_be_extended_for(datetime.timedelta(days=0)) is True
 
 
 class ApprovalConcurrentModelTest(TransactionTestCase):
