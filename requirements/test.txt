@@ -263,9 +263,6 @@ colorama==0.4.6 \
     --hash=sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44 \
     --hash=sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6
     # via djlint
-colored==1.4.4 \
-    --hash=sha256:04ff4d4dd514274fe3b99a21bb52fb96f2688c01e93fba7bef37221e7cb56ce0
-    # via syrupy
 cryptography==41.0.3 \
     --hash=sha256:0d09fb5356f975974dbcb595ad2d178305e5050656affb7890a1583f5e02a306 \
     --hash=sha256:23c2d778cf829f7d0ae180600b17e9fceea3c2ef8b31a99e3c694cbbf3a24b84 \
@@ -1186,9 +1183,9 @@ sqlparse==0.4.4 \
     # via
     #   -r requirements/base.txt
     #   django
-syrupy==4.2.1 \
-    --hash=sha256:4054878270184979a20e78b17a19f5f19eb62c6cbdc3adac6f432a528ddeb099 \
-    --hash=sha256:8c2f4e0c4416780f21f3cd696c64b046d79ddff43522d6a9a4ad7a4f48e9a594
+syrupy==4.5.0 \
+    --hash=sha256:6e01fccb4cd5ad37ce54e8c265cde068fa9c37b7a0946c603c328e8a38a7330d \
+    --hash=sha256:ea6a237ef374bacebbdb4049f73bf48e3dda76eabd4621a6d104d43077529de6
     # via -r requirements/test.in
 tablib[html,ods,xls,xlsx,yaml]==3.5.0 \
     --hash=sha256:9821caa9eca6062ff7299fa645e737aecff982e6b2b42046928a6413c8dabfd9 \
