@@ -77,7 +77,7 @@ def preload_spatial_reference(django_db_setup, django_db_blocker):
 
 @pytest.fixture(autouse=True, scope="session")
 def test_settings():
-    with override_settings(S3_STORAGE_ENDPOINT_DOMAIN=None, S3_STORAGE_BUCKET_NAME=None):
+    with override_settings(S3_STORAGE_ENDPOINT_DOMAIN="localhost", S3_STORAGE_BUCKET_NAME="test"):
         yield
 
 
