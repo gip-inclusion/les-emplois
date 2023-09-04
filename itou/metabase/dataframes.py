@@ -2,8 +2,6 @@
 Helper methods for manipulating dataframes used by both populate_metabase_emplois and
 populate_metabase_fluxiae scripts.
 """
-import csv
-
 import numpy as np
 import pandas as pd
 from psycopg import sql
@@ -53,17 +51,21 @@ def store_df(df, table_name, max_attempts=5):
     new_table_name = get_new_table_name(table_name)
     while attempts < max_attempts:
         try:
+            columns = infer_columns_from_df(df)
             create_table(new_table_name, infer_columns_from_df(df), reset=True)
             for df_chunk in tqdm(df_chunks):
-                data = df_chunk.to_csv(header=False, index=False, sep="\t", quoting=csv.QUOTE_NONE, escapechar="\\")
+                rows = [tuple(x) for x in df_chunk.to_numpy(na_value=None)]
                 with MetabaseDatabaseCursor() as (cursor, conn):
                     with cursor.copy(
-                        sql.SQL("COPY {table_name} FROM STDIN (FORMAT CSV, DELIMITER '\t')").format(
+                        sql.SQL("COPY {table_name} FROM STDIN").format(
                             table_name=sql.Identifier(new_table_name),
+                            Fields=sql.SQL(",").join(
+                                [sql.Identifier(col[0]) for col in columns],
+                            ),
                         )
                     ) as copy:
-                        copy.write(data)
-                        # cursor.copy_from(buffer, new_table_name, sep="\t", null="")
+                        for row in rows:
+                            copy.write_row(row)
                     conn.commit()
             break
         except Exception as e:
