@@ -55,6 +55,8 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         data_dir_mock.start()
         cls.addClassCleanup(data_dir_mock.stop)
 
+        # Beware : fluxIAE_Structure_22022022_112211.csv.gz ends with .gz but is compressed with pkzip.
+        # Since it happened once, and the code now allows it, we also want to test it.
         files = [x for x in cls.app_dir_path.joinpath(cls.path_source).glob("fluxIAE_*.csv.gz") if x.is_file()]
         for file in files:
             shutil.copy(file, data_dir)
