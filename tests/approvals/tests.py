@@ -1502,7 +1502,7 @@ class ProlongationModelTest(TestCase):
             reason,
             # Prolongation end date is exclusive, this is an empty day [2026-08-21,2026-08-21).
         ) == datetime.date(2026, 8, 21)
-        assert prolongation.has_reached_max_cumulative_duration() is True
+        assert prolongation.has_reached_max_cumulative_duration(datetime.timedelta(days=0)) is True
 
     def test_time_boundaries(self):
         """
@@ -1566,10 +1566,8 @@ class ProlongationModelTest(TestCase):
             reason=ProlongationReason.COMPLETE_TRAINING.value,
         )
 
-        assert (
-            prolongation.has_reached_max_cumulative_duration(additional_duration=datetime.timedelta(days=-1)) is False
-        )
-        assert prolongation.has_reached_max_cumulative_duration() is True
+        assert prolongation.has_reached_max_cumulative_duration(datetime.timedelta(days=-1)) is False
+        assert prolongation.has_reached_max_cumulative_duration(datetime.timedelta(days=0)) is True
 
     def test_has_reached_max_cumulative_duration_for_particular_difficulties(self):
         approval = ApprovalFactory()
@@ -1581,7 +1579,7 @@ class ProlongationModelTest(TestCase):
             reason=ProlongationReason.PARTICULAR_DIFFICULTIES.value,
         )
 
-        assert prolongation1.has_reached_max_cumulative_duration() is False
+        assert prolongation1.has_reached_max_cumulative_duration(datetime.timedelta(days=0)) is False
 
         prolongation2 = ProlongationFactory(
             approval=approval,
@@ -1590,10 +1588,8 @@ class ProlongationModelTest(TestCase):
             reason=ProlongationReason.PARTICULAR_DIFFICULTIES.value,
         )
 
-        assert (
-            prolongation2.has_reached_max_cumulative_duration(additional_duration=datetime.timedelta(days=-1)) is False
-        )
-        assert prolongation2.has_reached_max_cumulative_duration() is True
+        assert prolongation2.has_reached_max_cumulative_duration(datetime.timedelta(days=-1)) is False
+        assert prolongation2.has_reached_max_cumulative_duration(datetime.timedelta(days=0)) is True
 
 
 class ApprovalConcurrentModelTest(TransactionTestCase):

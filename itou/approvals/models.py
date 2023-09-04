@@ -1108,7 +1108,7 @@ class CommonProlongation(models.Model):
                 f"« {self.approval.end_at:%d/%m/%Y} »."
             )
 
-        if self.has_reached_max_cumulative_duration(additional_duration=self.duration):
+        if self.has_reached_max_cumulative_duration(self.duration):
             raise ValidationError(
                 f"Vous ne pouvez pas cumuler des prolongations pendant plus de "
                 f'{self.MAX_CUMULATIVE_DURATION[self.reason]["label"]} '
@@ -1133,7 +1133,7 @@ class CommonProlongation(models.Model):
     def is_in_progress(self):
         return self.start_at <= timezone.now().date() <= self.end_at
 
-    def has_reached_max_cumulative_duration(self, additional_duration=None):
+    def has_reached_max_cumulative_duration(self, additional_duration):
         if self.reason not in [
             enums.ProlongationReason.COMPLETE_TRAINING.value,
             enums.ProlongationReason.PARTICULAR_DIFFICULTIES.value,
@@ -1141,8 +1141,7 @@ class CommonProlongation(models.Model):
             return False
 
         cumulative_duration = Prolongation.objects.get_cumulative_duration_for(self.approval, reason=self.reason)
-        if additional_duration:
-            cumulative_duration += additional_duration
+        cumulative_duration += additional_duration
 
         return cumulative_duration >= self.MAX_CUMULATIVE_DURATION[self.reason]["duration"]
 
