@@ -6,6 +6,7 @@ Various helpers shared by the import_siae, import_geiq and import_ea_eatt script
 import csv
 import gzip
 import os
+import zipfile
 
 import pandas as pd
 from django.utils import timezone
@@ -328,11 +329,21 @@ def get_fluxiae_df(
     # the rows in the CSV file beforehands instead. Always using the 'c' engine is proven to significantly reduce
     # the duration and frequency of the developer's headaches.
 
-    with gzip.open(filename) as f:
-        # Ignore 3 rows: the `DEB*` first row, the headers row, and the `FIN*` last row.
-        nrows = -3
-        for _line in f:
-            nrows += 1
+    try:
+        with gzip.open(filename) as f:
+            # Ignore 3 rows: the `DEB*` first row, the headers row, and the `FIN*` last row.
+            nrows = -3
+            for _line in f:
+                nrows += 1
+    except gzip.BadGzipFile:
+        with zipfile.ZipFile(filename) as f:
+            assert len(f.namelist()) == 1
+            with f.open(f.namelist()[0]) as ff:
+                # Ignore 3 rows: the `DEB*` first row, the headers row, and the `FIN*` last row.
+                nrows = -3
+                for _line in ff:
+                    nrows += 1
+        kwargs["compression"] = "zip"  # default compression infer does not detect correctly
 
     print(f"Loading {nrows} rows for {vue_name} ...")
 
