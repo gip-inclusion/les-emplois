@@ -54,7 +54,7 @@ def store_df(df, table_name, max_attempts=5):
             columns = infer_columns_from_df(df)
             create_table(new_table_name, infer_columns_from_df(df), reset=True)
             for df_chunk in tqdm(df_chunks):
-                rows = [tuple(x) for x in df_chunk.to_numpy(na_value=None)]
+                rows = df_chunk.replace({np.nan: None}).to_dict(orient="split")["data"]
                 with MetabaseDatabaseCursor() as (cursor, conn):
                     with cursor.copy(
                         sql.SQL("COPY {table_name} FROM STDIN").format(
