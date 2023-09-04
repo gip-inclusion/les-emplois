@@ -832,7 +832,7 @@ class SiaeUploadDocsViewTest(S3AccessingTestCase):
             self.assertContains(response, value)
 
         post_data = {
-            "proof_url": "https://server.com/rocky-balboa.pdf",
+            "proof_url": "http://localhost/rocky-balboa.pdf",
         }
         response = self.client.post(url, data=post_data)
         assert response.status_code == 302
