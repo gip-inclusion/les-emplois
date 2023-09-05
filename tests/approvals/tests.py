@@ -1430,6 +1430,35 @@ class ProlongationModelTest(TestCase):
             prolongation.clean()
         assert "La date de début doit être la même que la date de fin du PASS IAE" in error.value.message
 
+    def test_clean_end_at_do_not_block_edition(self):
+        max_cumulative_duration = Prolongation.MAX_CUMULATIVE_DURATION[ProlongationReason.SENIOR]["duration"]
+        first_prolongation = ProlongationFactory(
+            reason=ProlongationReason.SENIOR,
+        )
+        first_prolongation.clean()
+
+        # Create a second prolongation to max-out duration
+        second_prolongation = ProlongationFactory(
+            approval=first_prolongation.approval,
+            reason=ProlongationReason.SENIOR,
+            start_at=first_prolongation.end_at,
+            end_at=first_prolongation.start_at + max_cumulative_duration,
+        )
+        second_prolongation.clean()
+
+        # Edit last prolongation to make space for a new one
+        second_prolongation.end_at -= datetime.timedelta(days=30)
+        second_prolongation.clean()
+        second_prolongation.save()
+
+        third_prolongation = ProlongationFactory(
+            approval=first_prolongation.approval,
+            reason=ProlongationReason.SENIOR,
+            start_at=second_prolongation.end_at,
+            end_at=first_prolongation.start_at + max_cumulative_duration,
+        )
+        third_prolongation.clean()
+
     def test_get_max_end_at(self):
         start_at = datetime.date(2021, 2, 1)
         approval = ApprovalFactory()

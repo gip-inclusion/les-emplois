@@ -1076,7 +1076,7 @@ class CommonProlongation(models.Model):
             raise ValidationError({"end_at": "La durée minimale doit être d'au moins un jour."})
 
         # A prolongation cannot exceed max duration.
-        max_end_at = self.get_max_end_at(self.approval_id, self.start_at, self.reason)
+        max_end_at = self.get_max_end_at(self.approval_id, self.start_at, self.reason, ignore=[self.pk])
         if self.end_at > max_end_at:
             raise ValidationError(
                 {
@@ -1127,7 +1127,7 @@ class CommonProlongation(models.Model):
         return self.start_at <= timezone.now().date() <= self.end_at
 
     @staticmethod
-    def get_max_end_at(approval_id, start_at, reason):
+    def get_max_end_at(approval_id, start_at, reason, ignore=None):
         """
         Returns the maximum date on which a prolongation can end.
         """
@@ -1136,7 +1136,7 @@ class CommonProlongation(models.Model):
         except KeyError:
             max_end = start_at + Prolongation.MAX_DURATION
         else:
-            used = Prolongation.objects.get_cumulative_duration_for(approval_id, reason)
+            used = Prolongation.objects.get_cumulative_duration_for(approval_id, reason, ignore=ignore)
             remaining_days = max_cumulative_duration["duration"] - used
             max_end = start_at + remaining_days
         return max_end
@@ -1228,12 +1228,12 @@ class ProlongationQuerySet(models.QuerySet):
 
 
 class ProlongationManager(models.Manager):
-    def get_cumulative_duration_for(self, approval_id, reason):
+    def get_cumulative_duration_for(self, approval_id, reason, ignore=None):
         """
         Returns the total duration of all prolongations for the given approval and the given reason.
         """
         duration = datetime.timedelta(0)
-        for prolongation in self.filter(approval_id=approval_id, reason=reason):
+        for prolongation in self.filter(approval_id=approval_id, reason=reason).exclude(pk__in=ignore or []):
             duration += prolongation.duration
         return duration
 
