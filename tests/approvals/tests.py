@@ -4,6 +4,7 @@ import time
 import uuid
 from unittest import mock
 
+import factory
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
@@ -1430,6 +1431,39 @@ class ProlongationModelTest(TestCase):
             prolongation.clean()
         assert "La date de début doit être la même que la date de fin du PASS IAE" in error.value.message
 
+    def test_clean_minimum_duration_error(self):
+        prolongation = ProlongationFactory()
+
+        # When end_at before start_at
+        prolongation.end_at = prolongation.start_at - datetime.timedelta(days=1)
+        with pytest.raises(ValidationError) as error:
+            prolongation.clean()
+        assert error.match("La durée minimale doit être d'au moins un jour.")
+
+        # When end_at is the same day than start_at
+        prolongation.end_at = prolongation.start_at
+        with pytest.raises(ValidationError) as error:
+            prolongation.clean()
+        assert error.match("La durée minimale doit être d'au moins un jour.")
+
+        # When end_at if after start_at
+        prolongation.end_at = prolongation.start_at + datetime.timedelta(days=1)
+        prolongation.clean()
+
+    def test_clean_too_long_reason_duration_error(self):
+        for reason, info in Prolongation.MAX_CUMULATIVE_DURATION.items():
+            with self.subTest(reason=reason):
+                prolongation = ProlongationFactory(
+                    reason=reason,
+                    end_at=factory.LazyAttribute(
+                        lambda obj: obj.start_at + info["duration"] + datetime.timedelta(days=1)
+                    ),
+                    declared_by_siae__kind=SiaeKind.AI,
+                )
+                with pytest.raises(ValidationError) as error:
+                    prolongation.clean()
+                assert error.match("La durée totale est trop longue pour le motif")
+
     def test_clean_end_at_do_not_block_edition(self):
         max_cumulative_duration = Prolongation.MAX_CUMULATIVE_DURATION[ProlongationReason.SENIOR]["duration"]
         first_prolongation = ProlongationFactory(
@@ -1458,6 +1492,33 @@ class ProlongationModelTest(TestCase):
             end_at=first_prolongation.start_at + max_cumulative_duration,
         )
         third_prolongation.clean()
+
+    def test_clean_limit_particular_difficulties_to_some_siaes_error(self):
+        prolongation = ProlongationFactory(
+            reason=ProlongationReason.PARTICULAR_DIFFICULTIES,
+        )
+
+        for kind in SiaeKind:
+            with self.subTest(kind=kind):
+                prolongation.declared_by_siae.kind = kind
+                if kind in [SiaeKind.AI, SiaeKind.ACI]:
+                    prolongation.clean()
+                else:
+                    with pytest.raises(ValidationError) as error:
+                        prolongation.clean()
+                    assert error.match(r"Le motif .* est réservé aux AI et ACI.")
+
+    def test_clean_not_authorized_prescriber_error(self):
+        prolongation = ProlongationFactory()
+        prolongation.clean()  # With an authorized prescriber
+
+        # Unauthorize the prescriber organization
+        prolongation.validated_by.prescriberorganization_set.update(is_authorized=False)
+        del prolongation.validated_by.is_prescriber_with_authorized_org
+
+        with pytest.raises(ValidationError) as error:
+            prolongation.clean()
+        assert error.match("Cet utilisateur n'est pas un prescripteur habilité.")
 
     def test_get_max_end_at(self):
         start_at = datetime.date(2021, 2, 1)

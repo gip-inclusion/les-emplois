@@ -1072,7 +1072,7 @@ class CommonProlongation(models.Model):
             return
 
         # Min duration == 1 day.
-        if self.end_at <= self.start_at:
+        if self.duration < datetime.timedelta(days=1):
             raise ValidationError({"end_at": "La durée minimale doit être d'au moins un jour."})
 
         # A prolongation cannot exceed max duration.
