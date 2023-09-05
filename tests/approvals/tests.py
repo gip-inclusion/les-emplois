@@ -1273,40 +1273,7 @@ class ProlongationQuerySetTest(TestCase):
 
 
 class ProlongationManagerTest(TestCase):
-    def test_get_cumulative_duration_for_any_reasons(self):
-        """
-        It should return the cumulative duration of all prolongations of the given approval.
-        """
-
-        approval = ApprovalFactory()
-
-        prolongation1_days = 30
-
-        prolongation1 = ProlongationFactory(
-            approval=approval,
-            start_at=approval.end_at,
-            end_at=approval.end_at + relativedelta(days=prolongation1_days),
-            reason=ProlongationReason.COMPLETE_TRAINING.value,
-        )
-
-        prolongation2_days = 14
-
-        ProlongationFactory(
-            approval=approval,
-            start_at=prolongation1.end_at,
-            end_at=prolongation1.end_at + relativedelta(days=prolongation2_days),
-            reason=ProlongationReason.RQTH.value,
-        )
-
-        expected_duration = datetime.timedelta(days=prolongation1_days + prolongation2_days)
-        assert expected_duration == Prolongation.objects.get_cumulative_duration_for(approval)
-
-    def test_get_cumulative_duration_for_rqth(self):
-        """
-        It should return the cumulative duration of all prolongations of the given approval
-        only for the RQTH reason.
-        """
-
+    def test_get_cumulative_duration_for(self):
         approval = ApprovalFactory()
 
         prolongation1_days = 30
@@ -1338,7 +1305,7 @@ class ProlongationManagerTest(TestCase):
 
         expected_duration = datetime.timedelta(days=prolongation2_days + prolongation3_days)
         assert expected_duration == Prolongation.objects.get_cumulative_duration_for(
-            approval, reason=ProlongationReason.RQTH.value
+            approval, ProlongationReason.RQTH.value
         )
 
 
@@ -1475,7 +1442,7 @@ class ProlongationModelTest(TestCase):
             (ProlongationReason.HEALTH_CONTEXT, datetime.date(2022, 2, 1)),  # 365 days.
         ]:
             with self.subTest(reason):
-                assert Prolongation.get_max_end_at(approval.pk, start_at, reason=reason) == expected_max_end_at
+                assert Prolongation.get_max_end_at(approval.pk, start_at, reason) == expected_max_end_at
 
     @freeze_time("2023-08-21")
     def test_year_after_year_prolongation(self):

@@ -1140,13 +1140,13 @@ class CommonProlongation(models.Model):
         ]:
             return False
 
-        cumulative_duration = Prolongation.objects.get_cumulative_duration_for(self.approval, reason=self.reason)
+        cumulative_duration = Prolongation.objects.get_cumulative_duration_for(self.approval, self.reason)
         cumulative_duration += additional_duration
 
         return cumulative_duration >= self.MAX_CUMULATIVE_DURATION[self.reason]["duration"]
 
     @staticmethod
-    def get_max_end_at(approval_id, start_at, reason=None):
+    def get_max_end_at(approval_id, start_at, reason):
         """
         Returns the maximum date on which a prolongation can end.
         """
@@ -1155,7 +1155,7 @@ class CommonProlongation(models.Model):
         except KeyError:
             max_end = start_at + Prolongation.MAX_DURATION
         else:
-            used = Prolongation.objects.get_cumulative_duration_for(approval_id, reason=reason)
+            used = Prolongation.objects.get_cumulative_duration_for(approval_id, reason)
             remaining_days = max_cumulative_duration["duration"] - used
             max_end = start_at + remaining_days
         return max_end
@@ -1247,16 +1247,12 @@ class ProlongationQuerySet(models.QuerySet):
 
 
 class ProlongationManager(models.Manager):
-    def get_cumulative_duration_for(self, approval_id, reason=None):
+    def get_cumulative_duration_for(self, approval_id, reason):
         """
-        Returns the total duration of all prolongations of the given approval
-        for the given reason (if any).
+        Returns the total duration of all prolongations for the given approval and the given reason.
         """
-        kwargs = {"approval_id": approval_id}
-        if reason:
-            kwargs["reason"] = reason
         duration = datetime.timedelta(0)
-        for prolongation in self.filter(**kwargs):
+        for prolongation in self.filter(approval_id=approval_id, reason=reason):
             duration += prolongation.duration
         return duration
 
