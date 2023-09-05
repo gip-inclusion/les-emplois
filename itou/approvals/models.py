@@ -1108,13 +1108,6 @@ class CommonProlongation(models.Model):
                 f"« {self.approval.end_at:%d/%m/%Y} »."
             )
 
-        if self.can_be_extended_for(self.duration):
-            raise ValidationError(
-                f"Vous ne pouvez pas cumuler des prolongations pendant plus de "
-                f'{self.MAX_CUMULATIVE_DURATION[self.reason]["label"]} '
-                f'pour le motif "{self.get_reason_display()}".'
-            )
-
         # Contact fields coherence: can't use constraints on these ones
         if self.reason in PROLONGATION_REPORT_FILE_REASONS:
             if self.require_phone_interview and not (self.contact_email and self.contact_phone):
@@ -1132,18 +1125,6 @@ class CommonProlongation(models.Model):
     @property
     def is_in_progress(self):
         return self.start_at <= timezone.now().date() <= self.end_at
-
-    def can_be_extended_for(self, additional_duration):
-        if self.reason not in [
-            enums.ProlongationReason.COMPLETE_TRAINING.value,
-            enums.ProlongationReason.PARTICULAR_DIFFICULTIES.value,
-        ]:
-            return False
-
-        cumulative_duration = Prolongation.objects.get_cumulative_duration_for(self.approval, self.reason)
-        cumulative_duration += additional_duration
-
-        return cumulative_duration >= self.MAX_CUMULATIVE_DURATION[self.reason]["duration"]
 
     @staticmethod
     def get_max_end_at(approval_id, start_at, reason):
