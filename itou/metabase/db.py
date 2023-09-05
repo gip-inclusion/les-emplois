@@ -275,7 +275,7 @@ def populate_table(table, batch_size, querysets=None, extra_object=None):
         if c["type"] == "boolean":
             c["type"] = "integer"
             c["fn"] = compose(convert_boolean_to_int, c["fn"])
-        if c["type"] == "varchar":
+        elif c["type"] == "varchar":
             # Force uuid as strings as UUIDDUmper does not include hyphens
             c["fn"] = compose(convert_uuid_to_str, c["fn"])
 
@@ -289,13 +289,14 @@ def populate_table(table, batch_size, querysets=None, extra_object=None):
         def inject_chunk(table_columns, chunk, new_table_name):
             rows = [[c["fn"](row) for c in table_columns] for row in chunk]
             with cur.copy(
-                sql.SQL("COPY {new_table_name} ({fields}) FROM STDIN").format(
+                sql.SQL("COPY {new_table_name} ({fields}) FROM STDIN WITH (FORMAT BINARY)").format(
                     new_table_name=sql.Identifier(new_table_name),
                     fields=sql.SQL(",").join(
                         [sql.Identifier(c["name"]) for c in table_columns],
                     ),
                 )
             ) as copy:
+                copy.set_types([c["type"] for c in table_columns])
                 for row in rows:
                     copy.write_row(row)
             conn.commit()

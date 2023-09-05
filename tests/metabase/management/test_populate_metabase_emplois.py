@@ -13,6 +13,7 @@ from itou.common_apps.address.departments import DEPARTMENTS
 from itou.eligibility.models import AdministrativeCriteria
 from itou.geo.utils import coords_to_geometry
 from itou.metabase.tables.utils import hash_content
+from itou.siaes.models import SiaeJobDescription
 from itou.users.enums import IdentityProvider
 from tests.analytics.factories import DatumFactory, StatsDashboardVisitFactory
 from tests.approvals.factories import (
@@ -24,13 +25,14 @@ from tests.eligibility.factories import EligibilityDiagnosisFactory
 from tests.geo.factories import QPVFactory
 from tests.institutions.factories import InstitutionFactory
 from tests.job_applications.factories import JobApplicationFactory
+from tests.jobs.factories import create_test_romes_and_appellations
 from tests.siae_evaluations.factories import (
     EvaluatedAdministrativeCriteriaFactory,
     EvaluatedJobApplicationFactory,
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
 )
-from tests.siaes.factories import SiaeFactory
+from tests.siaes.factories import SiaeFactory, SiaeJobDescriptionFactory
 from tests.users.factories import JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
 
 
@@ -887,3 +889,77 @@ def test_data_inconsistencies(capsys):
         "Checking data for inconsistencies.",
         "FATAL ERROR: At least one user has an approval but is not a job seeker",
     ]
+
+
+@freeze_time("2023-02-02")
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.usefixtures("metabase")
+def test_populate_fiches_de_poste():
+    create_test_romes_and_appellations(["M1805"], appellations_per_rome=1)
+    siae = SiaeFactory(for_snapshot=True, siret="12989128580059")
+    job = SiaeJobDescriptionFactory(is_active=False, siae=siae)
+
+    # trigger the first .from_db() call and populate _old_is_active.
+    # please note that .refresh_from_db() would call .from_db() but _old_is_active
+    # would not be populated since the instances in memory would be different.
+    job = SiaeJobDescription.objects.get(pk=job.pk)
+    assert job._old_is_active is False
+    assert job.field_history == []
+
+    # modify the field
+    job.is_active = True
+    job.save(update_fields=["is_active"])
+    job = SiaeJobDescription.objects.get(pk=job.pk)
+    assert job.field_history == [
+        {
+            "field": "is_active",
+            "from": False,
+            "to": True,
+            "at": "2023-02-02T00:00:00Z",
+        }
+    ]
+
+    num_queries = 1  # get_active_siaes_pk()
+    num_queries = 1  # Count total rows for job descriptions
+    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
+    num_queries += 1  # COMMIT Create table
+    num_queries += 1  # Select all job descriptions
+    num_queries += 1  # Select job descriptions chunk
+    num_queries += 1  # Select job descriptions with columns
+    num_queries += 1  # Annotate job applications count
+    num_queries += 1  # COMMIT (inject_chunk)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    with assertNumQueries(num_queries):
+        management.call_command("populate_metabase_emplois", mode="job_descriptions")
+
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM fiches_de_poste ORDER BY id")
+        rows = cursor.fetchall()
+        assert rows == [
+            (
+                job.pk,
+                "M1805",
+                "Études et développement informatique",
+                1,
+                siae.pk,
+                "EI",
+                "12989128580059",
+                "Acme inc.",
+                '[{"at": "2023-02-02T00:00:00Z", "to": true, "from": false, "field": "is_active"}]',
+                "75",
+                "75 - Paris",
+                "Île-de-France",
+                0,
+                datetime.date(2023, 2, 2),
+                datetime.date(2023, 2, 2),
+                datetime.date(2023, 2, 1),
+            ),
+        ]
+
+    # ensure the JSON is readable and is not just a plain string
+    with connection.cursor() as cursor:
+        cursor.execute(f"SELECT id, mises_a_jour_champs->0->'to' from fiches_de_poste WHERE id = {job.pk}")
+        rows = cursor.fetchall()
+        assert rows == [(job.pk, "true")]

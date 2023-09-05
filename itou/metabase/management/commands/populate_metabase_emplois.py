@@ -197,7 +197,6 @@ class Command(BaseCommand):
             .with_job_applications_count()
             .all()
         )
-
         populate_table(job_descriptions.TABLE, batch_size=10_000, querysets=[queryset])
 
     def populate_organizations(self):
