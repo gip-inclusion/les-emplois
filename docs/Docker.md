@@ -7,7 +7,7 @@ le code plus facilement.
 ## Démarrage
 
 ```sh
-$ docker compose up
+$ docker compose --profile=django up
 ```
 
 ## Utilisation
@@ -62,7 +62,7 @@ Pour supprimer la base de données dans Docker vous devez supprimer les volumes
 de l'image docker, en exécutant la commande suivante :
 
 ```sh
-docker compose down --volumes
+docker compose --profile=django down --volumes
 ```
 
 ## Débogueur
@@ -72,5 +72,5 @@ interactif](https://github.com/docker/compose/issues/4677#issuecomment-320804194
 type `ipdb` :
 
 ```sh
-$ docker compose run --service-ports django
+$ docker compose --profile=django run --service-ports django
 ```

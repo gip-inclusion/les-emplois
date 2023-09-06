@@ -1,10 +1,13 @@
 import datetime
+import io
 import uuid
+from unittest import mock
 
 import pytest
 from dateutil.relativedelta import relativedelta
+from django.conf import settings
 from django.contrib import messages
-from django.test import override_settings
+from django.core.files.storage import default_storage
 from django.urls import resolve, reverse
 from django.utils import timezone
 from pytest_django.asserts import assertContains, assertRedirects
@@ -24,7 +27,6 @@ from itou.users.enums import LackOfNIRReason
 from itou.users.models import User
 from itou.utils.models import InclusiveDateRange
 from itou.utils.session import SessionNamespace
-from itou.utils.storage.s3 import S3Upload
 from itou.utils.urls import add_url_params
 from itou.utils.widgets import DuetDatePickerWidget
 from tests.approvals.factories import PoleEmploiApprovalFactory
@@ -137,71 +139,6 @@ class ApplyTest(S3AccessingTestCase):
             response = self.client.get(url)
             assert response.status_code == 404
 
-    @override_settings(S3_STORAGE_ENDPOINT_DOMAIN="foobar.com")
-    def test_resume_link_bad_host(self):
-        siae = SiaeFactory(with_jobs=True, with_membership=True)
-        job_seeker = JobSeekerFactory()
-        self.client.force_login(job_seeker)
-        response = self.client.post(
-            reverse("apply:application_resume", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk}),
-            {
-                "message": "Hire me?",
-                "resume_link": "https://www.evil.com/virus.pdf?txt=foobar.com",
-            },
-        )
-        self.assertContains(
-            response,
-            """
-            <div class="alert alert-danger" role="alert">
-                Le CV proposé ne provient pas d&#x27;une source de confiance.
-            </div>
-            """,
-            html=True,
-            count=1,
-        )
-
-    @override_settings(S3_STORAGE_ENDPOINT_DOMAIN="foobar.com")
-    def test_resume_link_sub_host(self):
-        siae = SiaeFactory(with_jobs=True, with_membership=True)
-        job_seeker = JobSeekerFactory()
-        self.client.force_login(job_seeker)
-        response = self.client.post(
-            reverse("apply:application_resume", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk}),
-            {
-                "message": "Hire me?",
-                "resume_link": "https://foobar.com.evil.bzh/virus.pdf",
-            },
-        )
-        self.assertContains(
-            response,
-            """
-            <div class="alert alert-danger" role="alert">
-                Le CV proposé ne provient pas d&#x27;une source de confiance.
-            </div>
-            """,
-            html=True,
-            count=1,
-        )
-
-    @override_settings(S3_STORAGE_ENDPOINT_DOMAIN="foobar.com")
-    def test_resume_link_good_host(self):
-        siae = SiaeFactory(with_jobs=True, with_membership=True)
-        job_seeker = JobSeekerFactory()
-        self.client.force_login(job_seeker)
-        response = self.client.post(
-            reverse("apply:application_resume", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk}),
-            {
-                "message": "Hire me?",
-                "resume_link": "https://foobar.com/safe.pdf",
-            },
-        )
-        job_application = JobApplication.objects.get()
-        self.assertRedirects(
-            response,
-            reverse("apply:application_end", kwargs={"siae_pk": siae.pk, "application_pk": job_application.pk}),
-        )
-
-    @override_settings(S3_STORAGE_ENDPOINT_DOMAIN="foobar.com")
     def test_resume_is_optional(self):
         siae = SiaeFactory(with_jobs=True, with_membership=True)
         job_seeker = JobSeekerFactory()
@@ -335,6 +272,7 @@ def test_check_nir_job_seeker_with_lack_of_nir_reason(client):
     assert user.lack_of_nir_reason == ""
 
 
+@pytest.mark.usefixtures("unittest_compatibility")
 class ApplyAsJobSeekerTest(S3AccessingTestCase):
     @property
     def default_session_data(self):
@@ -461,23 +399,18 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
         response = self.client.get(next_url)
         self.assertContains(response, "Envoyer la candidature")
 
-        # Test fields mandatory to upload to S3
-        s3_upload = S3Upload(kind="resume")
-        # Don't test S3 form fields as it led to flaky tests, it's already done by the Boto library.
-        self.assertContains(response, s3_upload.form_values["url"])
-        # Config variables
-        s3_upload.config.pop("upload_expiration")
-        for value in s3_upload.config.values():
-            self.assertContains(response, value)
-
-        response = self.client.post(
-            next_url,
-            data={
-                "selected_jobs": [siae.job_description_through.first().pk],
-                "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-                "resume_link": "http://localhost/rocky-balboa.pdf",
-            },
-        )
+        with mock.patch(
+            "itou.www.apply.views.submit_views.uuid.uuid4",
+            return_value=uuid.UUID("11111111-1111-1111-1111-111111111111"),
+        ):
+            response = self.client.post(
+                next_url,
+                data={
+                    "selected_jobs": [siae.job_description_through.first().pk],
+                    "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                    "resume": self.pdf_file,
+                },
+            )
         assert response.status_code == 302
 
         job_application = JobApplication.objects.get(sender=user, to_siae=siae)
@@ -488,7 +421,10 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
         assert job_application.state == job_application.state.workflow.STATE_NEW
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         assert list(job_application.selected_jobs.all()) == [siae.job_description_through.first()]
-        assert job_application.resume_link == "http://localhost/rocky-balboa.pdf"
+        assert job_application.resume_link == (
+            f"http://localhost:9000/tests/{default_storage.location}"
+            "/resume/11111111-1111-1111-1111-111111111111.pdf"
+        )
 
         assert f"job_application-{siae.pk}" not in self.client.session
 
@@ -547,7 +483,110 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
             response, reverse("apply:start", kwargs={"siae_pk": siae.pk}), fetch_redirect_response=False
         )
 
+    def test_apply_as_job_seeker_resume_not_pdf(self):
+        siae = SiaeWithMembershipAndJobsFactory(romes=("N1101"))
+        user = JobSeekerFactory()
+        self.client.force_login(user)
+        with io.BytesIO(b"Plain text") as text_file:
+            text_file.name = "cv.txt"
+            response = self.client.post(
+                reverse(
+                    "apply:application_resume",
+                    kwargs={
+                        "siae_pk": siae.pk,
+                        "job_seeker_pk": user.pk,
+                    },
+                ),
+                data={
+                    "selected_jobs": [siae.job_description_through.first().pk],
+                    "message": "Lorem ipsum dolor sit amet.",
+                    "resume": text_file,
+                },
+            )
+        self.assertContains(
+            response,
+            """
+            <div id="form_errors">
+                <div class="alert alert-danger" role="alert">
+                    Le fichier doit avoir l’extension “.pdf”.
+                </div>
+            </div>
+            """,
+            html=True,
+            count=1,
+        )
+        assert JobApplication.objects.exists() is False
 
+    def test_apply_as_job_seeker_resume_not_pdf_disguised_as_pdf(self):
+        siae = SiaeWithMembershipAndJobsFactory(romes=("N1101"))
+        user = JobSeekerFactory()
+        self.client.force_login(user)
+        with io.BytesIO(b"Plain text") as text_file:
+            text_file.name = "cv.pdf"
+            response = self.client.post(
+                reverse(
+                    "apply:application_resume",
+                    kwargs={
+                        "siae_pk": siae.pk,
+                        "job_seeker_pk": user.pk,
+                    },
+                ),
+                data={
+                    "selected_jobs": [siae.job_description_through.first().pk],
+                    "message": "Lorem ipsum dolor sit amet.",
+                    "resume": text_file,
+                },
+            )
+        self.assertContains(
+            response,
+            """
+            <div id="form_errors">
+                <div class="alert alert-danger" role="alert">
+                    Le fichier doit être un fichier PDF valide.
+                </div>
+            </div>
+            """,
+            html=True,
+            count=1,
+        )
+        assert JobApplication.objects.exists() is False
+
+    def test_apply_as_job_seeker_resume_too_large(self):
+        siae = SiaeWithMembershipAndJobsFactory(romes=("N1101"))
+        user = JobSeekerFactory()
+        self.client.force_login(user)
+        with io.BytesIO(b"A" * (5 * 1024 * 1024 + 1)) as text_file:
+            text_file.name = "cv.pdf"
+            response = self.client.post(
+                reverse(
+                    "apply:application_resume",
+                    kwargs={
+                        "siae_pk": siae.pk,
+                        "job_seeker_pk": user.pk,
+                    },
+                ),
+                data={
+                    "selected_jobs": [siae.job_description_through.first().pk],
+                    "message": "Lorem ipsum dolor sit amet.",
+                    "resume": text_file,
+                },
+            )
+        self.assertContains(
+            response,
+            """
+            <div id="form_errors">
+                <div class="alert alert-danger" role="alert">
+                    Le fichier doit faire moins de 5,0 Mo.
+                </div>
+            </div>
+            """,
+            html=True,
+            count=1,
+        )
+        assert JobApplication.objects.exists() is False
+
+
+@pytest.mark.usefixtures("unittest_compatibility")
 class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
     def setUp(self):
         super().setUp()
@@ -769,23 +808,18 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
         # ----------------------------------------------------------------------
         response = self.client.get(next_url)
 
-        # Test fields mandatory to upload to S3
-        s3_upload = S3Upload(kind="resume")
-        # Don't test S3 form fields as it led to flaky tests, it's already done by the Boto library.
-        self.assertContains(response, s3_upload.form_values["url"])
-        # Config variables
-        s3_upload.config.pop("upload_expiration")
-        for value in s3_upload.config.values():
-            self.assertContains(response, value)
-
-        response = self.client.post(
-            next_url,
-            data={
-                "selected_jobs": [siae.job_description_through.first().pk, siae.job_description_through.last().pk],
-                "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-                "resume_link": "http://localhost/rocky-balboa.pdf",
-            },
-        )
+        with mock.patch(
+            "itou.www.apply.views.submit_views.uuid.uuid4",
+            return_value=uuid.UUID("11111111-1111-1111-1111-111111111111"),
+        ):
+            response = self.client.post(
+                next_url,
+                data={
+                    "selected_jobs": [siae.job_description_through.first().pk, siae.job_description_through.last().pk],
+                    "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                    "resume": self.pdf_file,
+                },
+            )
         assert response.status_code == 302
 
         job_application = JobApplication.objects.get(sender=user, to_siae=siae)
@@ -799,7 +833,10 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
             siae.job_description_through.first(),
             siae.job_description_through.last(),
         ]
-        assert job_application.resume_link == "http://localhost/rocky-balboa.pdf"
+        assert (
+            job_application.resume_link == f"{settings.AWS_S3_ENDPOINT_URL}"
+            f"tests/{default_storage.location}/resume/11111111-1111-1111-1111-111111111111.pdf"
+        )
 
         assert f"job_application-{siae.pk}" not in self.client.session
 
@@ -1017,23 +1054,18 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
         # ----------------------------------------------------------------------
         response = self.client.get(next_url)
 
-        # Test fields mandatory to upload to S3
-        s3_upload = S3Upload(kind="resume")
-        # Don't test S3 form fields as it led to flaky tests, it's already done by the Boto library.
-        self.assertContains(response, s3_upload.form_values["url"])
-        # Config variables
-        s3_upload.config.pop("upload_expiration")
-        for value in s3_upload.config.values():
-            self.assertContains(response, value)
-
-        response = self.client.post(
-            next_url,
-            data={
-                "selected_jobs": [siae.job_description_through.first().pk, siae.job_description_through.last().pk],
-                "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-                "resume_link": "http://localhost/rocky-balboa.pdf",
-            },
-        )
+        with mock.patch(
+            "itou.www.apply.views.submit_views.uuid.uuid4",
+            return_value=uuid.UUID("11111111-1111-1111-1111-111111111111"),
+        ):
+            response = self.client.post(
+                next_url,
+                data={
+                    "selected_jobs": [siae.job_description_through.first().pk, siae.job_description_through.last().pk],
+                    "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                    "resume": self.pdf_file,
+                },
+            )
         assert response.status_code == 302
 
         job_application = JobApplication.objects.get(sender=user, to_siae=siae)
@@ -1047,7 +1079,10 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
             siae.job_description_through.first(),
             siae.job_description_through.last(),
         ]
-        assert job_application.resume_link == "http://localhost/rocky-balboa.pdf"
+        assert job_application.resume_link == (
+            f"http://localhost:9000/tests/{default_storage.location}"
+            "/resume/11111111-1111-1111-1111-111111111111.pdf"
+        )
 
         assert f"job_application-{siae.pk}" not in self.client.session
 
@@ -1060,6 +1095,7 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
         assert response.status_code == 200
 
 
+@pytest.mark.usefixtures("unittest_compatibility")
 class ApplyAsPrescriberTest(S3AccessingTestCase):
     def setUp(self):
         super().setUp()
@@ -1297,23 +1333,18 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
         # ----------------------------------------------------------------------
         response = self.client.get(next_url)
 
-        # Test fields mandatory to upload to S3
-        s3_upload = S3Upload(kind="resume")
-        # Don't test S3 form fields as it led to flaky tests, it's already done by the Boto library.
-        self.assertContains(response, s3_upload.form_values["url"])
-        # Config variables
-        s3_upload.config.pop("upload_expiration")
-        for value in s3_upload.config.values():
-            self.assertContains(response, value)
-
-        response = self.client.post(
-            next_url,
-            data={
-                "selected_jobs": [siae.job_description_through.first().pk, siae.job_description_through.last().pk],
-                "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-                "resume_link": "http://localhost/rocky-balboa.pdf",
-            },
-        )
+        with mock.patch(
+            "itou.www.apply.views.submit_views.uuid.uuid4",
+            return_value=uuid.UUID("11111111-1111-1111-1111-111111111111"),
+        ):
+            response = self.client.post(
+                next_url,
+                data={
+                    "selected_jobs": [siae.job_description_through.first().pk, siae.job_description_through.last().pk],
+                    "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                    "resume": self.pdf_file,
+                },
+            )
         assert response.status_code == 302
 
         job_application = JobApplication.objects.get(sender=user, to_siae=siae)
@@ -1327,7 +1358,10 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
             siae.job_description_through.first(),
             siae.job_description_through.last(),
         ]
-        assert job_application.resume_link == "http://localhost/rocky-balboa.pdf"
+        assert job_application.resume_link == (
+            f"http://localhost:9000/tests/{default_storage.location}"
+            "/resume/11111111-1111-1111-1111-111111111111.pdf"
+        )
 
         assert f"job_application-{siae.pk}" not in self.client.session
 
@@ -1488,6 +1522,7 @@ class ApplyAsPrescriberNirExceptionsTest(S3AccessingTestCase):
         assert job_seeker.lack_of_nir_reason == ""
 
 
+@pytest.mark.usefixtures("unittest_compatibility")
 class ApplyAsSiaeTest(S3AccessingTestCase):
     def setUp(self):
         super().setUp()
@@ -1726,23 +1761,18 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
         response = self.client.get(next_url)
         self.assertContains(response, "Enregistrer")
 
-        # Test fields mandatory to upload to S3
-        s3_upload = S3Upload(kind="resume")
-        # Don't test S3 form fields as it led to flaky tests, it's already done by the Boto library.
-        self.assertContains(response, s3_upload.form_values["url"])
-        # Config variables
-        s3_upload.config.pop("upload_expiration")
-        for value in s3_upload.config.values():
-            self.assertContains(response, value)
-
-        response = self.client.post(
-            next_url,
-            data={
-                "selected_jobs": [siae.job_description_through.first().pk, siae.job_description_through.last().pk],
-                "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-                "resume_link": "http://localhost/rocky-balboa.pdf",
-            },
-        )
+        with mock.patch(
+            "itou.www.apply.views.submit_views.uuid.uuid4",
+            return_value=uuid.UUID("11111111-1111-1111-1111-111111111111"),
+        ):
+            response = self.client.post(
+                next_url,
+                data={
+                    "selected_jobs": [siae.job_description_through.first().pk, siae.job_description_through.last().pk],
+                    "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                    "resume": self.pdf_file,
+                },
+            )
         assert response.status_code == 302
 
         job_application = JobApplication.objects.get(sender=user, to_siae=siae)
@@ -1756,7 +1786,10 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
             siae.job_description_through.first(),
             siae.job_description_through.last(),
         ]
-        assert job_application.resume_link == "http://localhost/rocky-balboa.pdf"
+        assert job_application.resume_link == (
+            f"http://localhost:9000/tests/{default_storage.location}"
+            "/resume/11111111-1111-1111-1111-111111111111.pdf"
+        )
 
         assert f"job_application-{siae.pk}" not in self.client.session
 
@@ -2234,7 +2267,7 @@ class ApplicationViewTest(S3AccessingTestCase):
             reverse("apply:application_resume", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk})
         )
         self.assertContains(response, 'name="selected_jobs"')
-        self.assertContains(response, 'name="resume_link"')
+        self.assertContains(response, 'name="resume"')
 
     def test_application_eligibility_is_bypassed_for_siae_not_subject_to_eligibility_rules(self):
         siae = SiaeFactory(not_subject_to_eligibility=True, with_membership=True)

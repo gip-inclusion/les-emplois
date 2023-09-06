@@ -3,6 +3,7 @@ psycopg[binary]  # https://github.com/psycopg/psycopg
 requests  # https://github.com/psf/requests
 python-dateutil  # https://pypi.org/project/python-dateutil/
 openpyxl  # https://openpyxl.readthedocs.io/en/stable/
+pypdf  # https://github.com/py-pdf/pypdf/
 
 # lxml improves performance of Excel file generation with openpyxl
 lxml  # https://lxml.de/
@@ -40,6 +41,8 @@ django-filter  # https://django-filter.readthedocs.io/en/stable/
 
 # Preview and multi-steps/wizard forms for Django
 django-formtools  # https://django-formtools.readthedocs.io/en/latest/
+# Django storages (storing files on S3-like services)
+django-storages  # https://github.com/jschneier/django-storages
 
 # Front-end
 # ------------------------------------------------------------------------------

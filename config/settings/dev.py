@@ -73,3 +73,5 @@ METABASE_PASSWORD = os.getenv("PGPASSWORD", "password")  # noqa: F405
 METABASE_DATABASE = os.getenv("PGDATABASE", "metabase")  # noqa: F405
 
 FORCE_IC_LOGIN = os.getenv("FORCE_IC_LOGIN", "True") == "True"
+
+AWS_STORAGE_BUCKET_NAME = "dev"

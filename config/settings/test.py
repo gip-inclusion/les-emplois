@@ -11,11 +11,7 @@ SECRET_KEY = "foobar"
 ALLOWED_HOSTS = []
 
 # `ManifestStaticFilesStorage` (used in base settings) requires `collectstatic` to be run.
-STORAGES = {
-    "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-    },
-}
+STORAGES["staticfiles"]["BACKEND"] = "django.contrib.staticfiles.storage.StaticFilesStorage"  # noqa: F405
 
 ASP_ITOU_PREFIX = "XXXXX"  # same as in our fixtures
 ITOU_PROTOCOL = "http"
@@ -29,3 +25,8 @@ DATABASES["default"]["PASSWORD"] = os.getenv("PGPASSWORD", "password")  # noqa: 
 
 MAILJET_API_KEY_PRINCIPAL = "API_MAILJET_KEY_PRINCIPAL"
 MAILJET_SECRET_KEY_PRINCIPAL = "API_MAILJET_SECRET_PRINCIPAL"
+
+AWS_S3_ENDPOINT_URL = f"http://{os.getenv('CELLAR_ADDON_HOST', 'localhost:9000')}/"
+AWS_S3_ACCESS_KEY_ID = "minioadmin"
+AWS_S3_SECRET_ACCESS_KEY = "minioadmin"
+AWS_STORAGE_BUCKET_NAME = "tests"

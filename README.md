@@ -24,33 +24,43 @@ sont définis dans le projet `itou-secrets`.
 ## Installation
 
 L’application est développée avec [Django](https://www.djangoproject.com/), la
-base de données est gérée par [PostgreSQL](https://www.postgresql.org/).
+base de données est gérée par [PostgreSQL](https://www.postgresql.org/) et le
+stockage objet type *S3* [MinIO](https://min.io/).
 
 _Les instructions ci-dessous vous permettront d’obtenir un environnement de
 développement pratique à utiliser au quotidien. Pour obtenir un environnement
 fonctionnel très rapidement, mais moins ouvert au développement, suivre les
 instructions [containerization](./docs/Docker.md)._
 
-### Docker
+### Services nécessaires
 
-Vous devez disposer sur votre machine du service `Docker` et de l'outil `Docker
-Compose`. Si ce n'est pas encore le cas :
+Les dépendances (base de données PostgreSQL et le stockage objet type *S3*)
+sont rendues disponibles par [Docker](https://docs.docker.com/) et
+[Docker Compose](https://docs.docker.com/compose/).
 
 - [Installer Docker](https://docs.docker.com/engine/install/)
 - [Installer Docker Compose](https://docs.docker.com/compose/install/)
 
-Vous pouvez également personnaliser la configuration de Docker Compose en
-créant [un fichier `.env`](https://docs.docker.com/compose/env-file/) à partir
-d'une copie du fichier racine `.env.template`. Le fichier `.env` doit être au
-même niveau que le fichier `README.md`.
+Démarrez les dépendances de développement avec la commande :
+```sh
+docker compose up
+```
 
-### Base de données
+**Note** : Vous pouvez personnaliser la configuration des dépendances gérées
+par Docker Compose en créant [un fichier
+`.env`](https://docs.docker.com/compose/env-file/) à partir d'une copie du
+fichier racine `.env.template`. Le fichier `.env` doit être au même niveau que
+le fichier [README.md](./README.md).
+
+### Dépendances Python
+
+#### Base de données
 
 L’adaptateur Python pour PostgreSQL, [psycopg](https://www.psycopg.org/), a
 quelques pré-requis auxquels votre système doit répondre.
 https://www.psycopg.org/docs/install.html#runtime-requirements
 
-### Dépendences Python (`virtualenv`)
+#### Virtualenv
 
 La commande `make` suivante crée un
 [`virtualenv`](https://docs.python.org/3/library/venv.html) et installe les
@@ -64,7 +74,21 @@ $ make venv
 Dans un `virtualenv`, vous pouvez utiliser les commandes Django habituelles
 (`./manage.py`) mais également les recettes du [Makefile](./Makefile).
 
-### Accéder au serveur de développement
+### Création des *buckets S3*
+
+Les fichiers téléversés sont enregistrés dans un stockage objet type *S3*. En
+local, le service est rendu par [MinIO](https://min.io/). Sa console
+d’administration est disponible à l’adresse http://localhost:9001/.
+
+Login : `minioadmin`
+Password : `minioadmin`
+
+Afin de créer les *buckets* nécessaires au développement et aux tests, lancer la commande :
+```sh
+$ make buckets
+```
+
+## Accéder au serveur de développement
 
 Démarrer le serveur de développement avec la commande :
 
@@ -74,13 +98,13 @@ $ make runserver
 
 Vous pouvez y accéder à l'adresse http://localhost:8000/.
 
-### Peupler la base de données
+## Peupler la base de données
 
 ```sh
 $ make populate_db
 ```
 
-### Charger une base de données de production
+## Charger une base de données de production
 
 Inspirez-vous de la suite de commandes suivante :
 

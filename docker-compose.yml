@@ -1,6 +1,18 @@
 version: "3.7"
 
 services:
+  minio:
+    image: bitnami/minio
+    container_name: itou_minio
+    restart: always
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+    ports:
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
+    volumes:
+      - itou_minio:/bitnami/minio/data
 
   # https://github.com/appropriate/docker-postgis
   # https://hub.docker.com/r/mdillon/postgis/tags
@@ -31,6 +43,7 @@ services:
       - "127.0.0.1:${POSTGRES_PORT_ON_DOCKER_HOST:-5432}:5432"
 
   django:
+    profiles: ["django"]
     container_name: itou_django
     environment:
       - PGHOST=postgres
@@ -38,6 +51,7 @@ services:
       - PGPASSWORD=password
       - PYTHONPATH=.
       - ITOU_LOG_LEVEL=DEBUG
+      - CELLAR_ADDON_HOST=minio:9000
     depends_on:
       - postgres
     build:
@@ -63,3 +77,4 @@ services:
 
 volumes:
   postgres_data:
+  itou_minio:

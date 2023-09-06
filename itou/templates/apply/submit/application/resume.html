@@ -2,12 +2,6 @@
 {% load bootstrap4 %}
 {% load static %}
 
-{% block extra_head %}
-    {{ block.super }}
-    <!-- Dropzone -->
-    <link rel="stylesheet" type="text/css" href='{% static "vendor/dropzone/dropzone.min.css" %}' />
-{% endblock extra_head %}
-
 {% block progress_title %}{{ block.super }} - Message & CV{% endblock %}
 {% block step_title %}Finaliser la candidature{% endblock %}
 {% block pre_step_title %}
@@ -202,49 +196,25 @@
     </div>
 
     <div class="col-12 col-lg-7 pl-0">
-        <div class="form-group">
-            <label for="resume_form" class="js-display-if-javascript-enabled">{{ form.resume_link.label }}</label>
-            {{ form.resume_link.as_hidden }}
-            {% include "storage/s3_upload_form.html" with dropzone_form_id="resume_form" %}
-            {% if resume_is_recommended %}
-                <div class="alert alert-warning">
-                    <div class="row">
-                        <div class="col-auto pr-0">
-                            <i class="ri-information-line ri-xl text-warning"></i>
-                        </div>
-                        <div class="col">
-                            <p class="mb-2">
-                                <strong>Le CV est fortement recommandé</strong>
-                            </p>
-                            <p class="mb-0">
-                                L’ajout du Curriculum Vitae (CV) est fortement recommandé pour que la candidature soit étudiée par ce recruteur.
-                            </p>
-                        </div>
+        {% bootstrap_field form.resume %}
+        {% if resume_is_recommended %}
+            <div class="alert alert-warning">
+                <div class="row">
+                    <div class="col-auto pr-0">
+                        <i class="ri-information-line ri-xl text-warning"></i>
+                    </div>
+                    <div class="col">
+                        <p class="mb-2">
+                            <strong>Le CV est fortement recommandé</strong>
+                        </p>
+                        <p class="mb-0">
+                            L’ajout du Curriculum Vitae (CV) est fortement recommandé pour que la candidature soit étudiée par ce recruteur.
+                        </p>
                     </div>
                 </div>
-            {% endif %}
-        </div>
+            </div>
+        {% endif %}
     </div>
-{% endblock %}
-
-{% block script %}
-    {{ block.super }}
-    <!-- Dropzone -->
-    <script src='{% static "vendor/dropzone/dropzone.min.js" %}'></script>
-    <script src='{% static "js/s3_upload.js" %}'></script>
-    {{ s3_upload.form_values|json_script:"s3-form-values" }}
-    {{ s3_upload.config|json_script:"s3-upload-config" }}
-    <script nonce="{{ CSP_NONCE }}">
-        s3UploadInit({
-            dropzoneSelector: "#resume_form",
-            callbackLocationSelector: "#{{ form.resume_link.id_for_label }}",
-            s3FormValuesId: "s3-form-values",
-            s3UploadConfigId: "s3-upload-config",
-            // Not really nice
-            sentryInternalUrl: "{% url 'home:sentry_debug' %}",
-            sentryCsrfToken: "{{ csrf_token }}"
-        });
-    </script>
 {% endblock %}
 
 {% block form_submit_button %}

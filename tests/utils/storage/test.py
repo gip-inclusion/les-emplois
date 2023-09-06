@@ -1,3 +1,6 @@
+import uuid
+
+from django.core.files.storage import default_storage
 from django.test import override_settings
 
 from tests.utils.test import TestCase
@@ -11,4 +14,12 @@ from tests.utils.test import TestCase
     S3_STORAGE_SECRET_ACCESS_KEY="minioadmin",
 )
 class S3AccessingTestCase(TestCase):
-    pass
+    def setUp(self):
+        super().setUp()
+        original_location = default_storage.location
+        default_storage.location = f"{uuid.uuid4()}"
+
+        def cleanup():
+            default_storage.location = original_location
+
+        self.addCleanup(cleanup)

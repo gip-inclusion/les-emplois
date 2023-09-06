@@ -94,6 +94,35 @@ duet-date-picker.is-invalid~.invalid-feedback {
     display: block;
 }
 
+.form-group.is-invalid > .file-dropzone {
+    border: 2px dashed var(--danger);
+}
+
+.file-dropzone {
+    width: 100%;
+    border: 2px dashed #80829c;
+    border-radius: .25rem;
+    text-align: center;
+    padding: 1rem;
+    margin-bottom: .5rem;
+}
+
+.file-dropzone.highlighted {
+    opacity: 0.5;
+}
+
+input[type=file] {
+    opacity: 0;
+    position: absolute;
+    z-index: -1;
+
+    /*
+     Limit the width the input so that it does not overflow its container.
+     Avoids using a zero width as this would remove it from screen readers.
+     */
+    width: 1px;
+}
+
 /* Dropdown menus.
 --------------------------------------------------------------------------- */
 
