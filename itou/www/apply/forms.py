@@ -1,11 +1,9 @@
 import contextlib
 import datetime
-from urllib.parse import urlparse
 
 import sentry_sdk
 from dateutil.relativedelta import relativedelta
 from django import forms
-from django.conf import settings
 from django.core.validators import MinLengthValidator
 from django.db.models import Q
 from django.db.models.fields import BLANK_CHOICE_DASH
@@ -21,6 +19,7 @@ from itou.common_apps.address.departments import DEPARTMENTS, department_from_po
 from itou.common_apps.address.forms import MandatoryAddressFormMixin
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
 from itou.eligibility.models import AdministrativeCriteria
+from itou.files.forms import ItouFileField
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow, PriorAction
 from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS, ContractType, SiaeKind
@@ -361,17 +360,21 @@ class SubmitJobApplicationForm(forms.Form):
     Submit a job application to an SIAE.
     """
 
+    resume = ItouFileField(
+        label="Curriculum Vitae (CV)",
+        required=False,
+        content_type="application/pdf",
+        max_upload_size=5 * global_constants.MB,
+    )
+
     def __init__(self, siae, user, *args, **kwargs):
         self.siae = siae
         super().__init__(*args, **kwargs)
-        self.fields.update(forms.fields_for_model(JobApplication, fields=["selected_jobs", "message", "resume_link"]))
+        self.fields.update(forms.fields_for_model(JobApplication, fields=["selected_jobs", "message"]))
         selected_jobs = self.fields["selected_jobs"]
         selected_jobs.queryset = siae.job_description_through.filter(is_active=True)
         selected_jobs.widgets = forms.CheckboxSelectMultiple()
         selected_jobs.label = "Métiers recherchés"
-
-        resume_link = self.fields["resume_link"]
-        resume_link.label = "Curriculum Vitae (CV)"
 
         message = self.fields["message"]
         message.required = not user.is_siae_staff
@@ -387,14 +390,7 @@ class SubmitJobApplicationForm(forms.Form):
             help_text = "Message obligatoire et non modifiable après l’envoi."
         message.help_text = help_text
 
-    def clean_resume_link(self):
-        resume_link = self.cleaned_data.get("resume_link")
-        # ensure the CV has been uploaded via our S3 platform and is not a link to a 3rd party website
-        if resume_link and not urlparse(resume_link).netloc == settings.S3_STORAGE_ENDPOINT_DOMAIN:
-            self.add_error(
-                "resume_link", forms.ValidationError("Le CV proposé ne provient pas d'une source de confiance.")
-            )
-        return resume_link
+        self.fields["resume"].widget.attrs["accept"] = "application/pdf"
 
 
 class RefusalForm(forms.Form):

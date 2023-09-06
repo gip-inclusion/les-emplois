@@ -20,7 +20,7 @@ export PATH := $(VIRTUAL_ENV)/bin:$(PATH)
 
 VENV_REQUIREMENT := $(VIRTUAL_ENV)
 
-.PHONY: runserver venv clean quality fix compile-deps
+.PHONY: runserver venv buckets clean quality fix compile-deps
 
 runserver: $(VIRTUAL_ENV)
 	python manage.py runserver $(RUNSERVER_DOMAIN)
@@ -32,6 +32,9 @@ $(VIRTUAL_ENV): $(REQUIREMENTS_PATH)
 	touch $@
 
 venv: $(VIRTUAL_ENV)
+
+buckets: $(VENV_REQUIREMENT)
+	python manage.py configure_bucket
 
 PIP_COMPILE_FLAGS := --allow-unsafe --generate-hashes $(PIP_COMPILE_OPTIONS)
 compile-deps: $(VENV_REQUIREMENT)

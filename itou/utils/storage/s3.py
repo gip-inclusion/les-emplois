@@ -5,15 +5,16 @@ Useful functions to interact with an S3 bucket.
 import boto3
 from botocore.client import Config
 from django.conf import settings
+from storages.backends.s3boto3 import S3Boto3Storage
 
 
 def s3_client():
     return boto3.client(
         "s3",
-        endpoint_url=f"https://{settings.S3_STORAGE_ENDPOINT_DOMAIN}",
-        aws_access_key_id=settings.S3_STORAGE_ACCESS_KEY_ID,
-        aws_secret_access_key=settings.S3_STORAGE_SECRET_ACCESS_KEY,
-        region_name=settings.S3_STORAGE_BUCKET_REGION,
+        endpoint_url=settings.AWS_S3_ENDPOINT_URL,
+        aws_access_key_id=settings.AWS_S3_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.AWS_S3_SECRET_ACCESS_KEY,
+        region_name=settings.AWS_S3_REGION_NAME,
         config=Config(signature_version="s3v4"),
     )
 
@@ -59,3 +60,8 @@ class S3Upload:
         config["allowed_mime_types"] = ",".join(config["allowed_mime_types"])
 
         return config
+
+
+class S3Storage(S3Boto3Storage):
+    # Don’t expose S3 credentials through the default_storage.url().
+    querystring_auth = False

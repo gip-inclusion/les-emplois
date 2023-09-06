@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.utils import timezone
 
 
 class File(models.Model):
@@ -8,7 +9,7 @@ class File(models.Model):
     # The name for a key is a sequence of Unicode characters whose UTF-8
     # encoding is at most 1024 bytes long.
     key = models.CharField(primary_key=True, max_length=1024)
-    last_modified = models.DateTimeField("dernière modification sur Cellar")
+    last_modified = models.DateTimeField("dernière modification sur Cellar", default=timezone.now)
 
     class Meta:
         verbose_name = "fichier"

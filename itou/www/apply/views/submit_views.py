@@ -1,10 +1,12 @@
 import logging
+import uuid
 
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
+from django.core.files.storage import default_storage
 from django.db import transaction
 from django.forms import ValidationError
 from django.http import Http404, HttpResponseRedirect
@@ -17,6 +19,7 @@ from django.views.generic import TemplateView
 from itou.approvals.models import Approval
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
+from itou.files.models import File
 from itou.job_applications.models import JobApplication
 from itou.job_applications.notifications import (
     NewQualifiedJobAppEmployersNotification,
@@ -29,7 +32,6 @@ from itou.users.models import JobSeekerProfile, User
 from itou.utils.apis.exceptions import AddressLookupError
 from itou.utils.emails import redact_email_address, send_email_messages
 from itou.utils.session import SessionNamespace, SessionNamespaceRequiredMixin
-from itou.utils.storage.s3 import S3Upload
 from itou.www.apply.forms import (
     ApplicationJobsForm,
     CheckJobSeekerInfoForm,
@@ -1003,7 +1005,6 @@ class ApplicationResumeView(ApplicationBaseView):
         super().__init__()
 
         self.form = None
-        self.s3_upload = None
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -1020,8 +1021,8 @@ class ApplicationResumeView(ApplicationBaseView):
             user=request.user,
             initial={"selected_jobs": self.apply_session.get("selected_jobs", [])},
             data=request.POST or None,
+            files=request.FILES or None,
         )
-        self.s3_upload = S3Upload(kind="resume")
 
     def post(self, request, *args, **kwargs):
         # Prevent multiple rapid clicks on the submit button to create multiple job applications.
@@ -1042,12 +1043,17 @@ class ApplicationResumeView(ApplicationBaseView):
                 sender=request.user,
                 sender_kind=request.user.kind,
                 message=self.form.cleaned_data["message"],
-                resume_link=self.form.cleaned_data["resume_link"],
             )
             if request.user.is_prescriber:
                 job_application.sender_prescriber_organization = request.current_organization
             if request.user.is_siae_staff:
                 job_application.sender_siae = request.current_organization
+
+            if resume := self.form.cleaned_data.get("resume"):
+                key = f"resume/{uuid.uuid4()}.pdf"
+                File.objects.create(key=key)
+                name = default_storage.save(key, resume)
+                job_application.resume_link = default_storage.url(name)
 
             # Save the job application
             with transaction.atomic():
@@ -1110,7 +1116,6 @@ class ApplicationResumeView(ApplicationBaseView):
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "form": self.form,
-            "s3_upload": self.s3_upload,
             "resume_is_recommended": any(
                 SiaeJobDescription.objects.filter(pk__in=self.apply_session.get("selected_jobs", [])).values_list(
                     "is_resume_mandatory", flat=True

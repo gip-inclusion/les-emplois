@@ -217,6 +217,9 @@ STATIC_ROOT = os.path.join(APPS_DIR, "static_collected")
 STATIC_URL = "/static/"
 
 STORAGES = {
+    "default": {
+        "BACKEND": "itou.utils.storage.s3.S3Storage",
+    },
     "staticfiles": {
         "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
     },
@@ -534,6 +537,16 @@ S3_STORAGE_SECRET_ACCESS_KEY = os.getenv("CELLAR_ADDON_KEY_SECRET")
 S3_STORAGE_ENDPOINT_DOMAIN = os.getenv("CELLAR_ADDON_HOST")
 S3_STORAGE_BUCKET_NAME = os.getenv("S3_STORAGE_BUCKET_NAME")
 S3_STORAGE_BUCKET_REGION = "eu-west-3"
+# django-storages
+AWS_S3_ACCESS_KEY_ID = os.getenv("CELLAR_ADDON_KEY_ID")
+AWS_S3_SECRET_ACCESS_KEY = os.getenv("CELLAR_ADDON_KEY_SECRET")
+AWS_STORAGE_BUCKET_NAME = os.getenv("S3_STORAGE_BUCKET_NAME")
+# The maximum amount of memory (in bytes) a file can take up before being rolled over into a temporary file on disk.
+# Picked 5 MB, the max size for a resume. Keep it fast for files under that size, and avoid filling up the RAM.
+AWS_S3_MAX_MEMORY_SIZE = 5 * 1024 * 1024
+AWS_S3_FILE_OVERWRITE = False
+AWS_S3_REGION_NAME = "eu-west-3"
+AWS_S3_ENDPOINT_URL = f"https://{os.getenv('CELLAR_ADDON_HOST')}/"
 
 STORAGE_UPLOAD_KINDS = {
     "default": {
@@ -543,9 +556,6 @@ STORAGE_UPLOAD_KINDS = {
         "max_files": 1,
         "max_file_size": 5,  # in mb
         "timeout": 20000,  # in ms
-    },
-    "resume": {
-        "key_path": "resume",
     },
     "evaluations": {
         "key_path": "evaluations",
@@ -630,6 +640,7 @@ if MATOMO_BASE_URL:
 CSP_WORKER_SRC = [
     "'self' blob:",  # Redoc seems to use blob:https://emplois.inclusion.beta.gouv.fr/some-ran-dom-uu-id
 ]
+# TODO: Remove with dropzone.js, once all documents transit through the application.
 if S3_STORAGE_ENDPOINT_DOMAIN:
     CSP_CONNECT_SRC += [
         f"https://{S3_STORAGE_ENDPOINT_DOMAIN}",

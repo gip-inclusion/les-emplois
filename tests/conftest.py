@@ -9,6 +9,7 @@ from django.conf import settings
 from django.contrib.gis.db.models.fields import get_srid_info
 from django.core import management
 from django.core.cache import cache
+from django.core.management import call_command
 from django.db import connection
 from django.template import base as base_template
 from django.test import override_settings
@@ -77,7 +78,13 @@ def preload_spatial_reference(django_db_setup, django_db_blocker):
 
 @pytest.fixture(autouse=True, scope="session")
 def test_settings():
-    with override_settings(S3_STORAGE_ENDPOINT_DOMAIN="localhost", S3_STORAGE_BUCKET_NAME="test"):
+    with override_settings(
+        S3_STORAGE_ENDPOINT_DOMAIN="localhost",
+        S3_STORAGE_BUCKET_NAME="test",
+        S3_STORAGE_ACCESS_KEY_ID="minioadmin",
+        S3_STORAGE_SECRET_ACCESS_KEY="minioadmin",
+    ):
+        call_command("configure_bucket", autoexpire=True)
         yield
 
 
@@ -114,8 +121,9 @@ def itou_faker_provider(_session_faker):
 
 
 @pytest.fixture(scope="function")
-def unittest_compatibility(request, faker, snapshot, mocker):
+def unittest_compatibility(request, faker, pdf_file, snapshot, mocker):
     request.instance.faker = faker
+    request.instance.pdf_file = pdf_file
     request.instance.snapshot = snapshot
     request.instance.mocker = mocker
 
@@ -234,3 +242,9 @@ def make_unordered_queries_randomly_ordered():
              else:
         """,
     )
+
+
+@pytest.fixture
+def pdf_file():
+    with open("tests/data/empty.pdf", "rb") as pdf:
+        yield pdf

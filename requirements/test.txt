@@ -325,6 +325,7 @@ django==4.2.6 \
     #   django-import-export
     #   django-pgtrigger
     #   django-select2
+    #   django-storages
     #   django-xworkflows
     #   djangorestframework
     #   drf-spectacular
@@ -376,6 +377,10 @@ django-pgtrigger==4.7.0 \
 django-select2==8.1.2 \
     --hash=sha256:dc09e09299988dd7cc1f31c27582976377f0e1479101be1f3bb0d1f24216477f \
     --hash=sha256:f44685ee1c39090aade01e3ebc256702f05620f3c78a3c268440ad9a66070876
+    # via -r requirements/base.txt
+django-storages==1.14.1 \
+    --hash=sha256:18cb6c305fbb2f114c11b5b7b647b6271aa251972dcd4a5651b9cee2b0bd3a8a \
+    --hash=sha256:a2c327d67792eec04c7f5f5bb2900b21f426de8a3a811cea85fac7904bdccf36
     # via -r requirements/base.txt
 django-xworkflows==1.0.0 \
     --hash=sha256:b233b5244fb864f95ba935bd3f2214c55600db6294dbca544a6f9eb14918fb06 \
@@ -805,6 +810,10 @@ pynacl==1.5.0 \
     # via
     #   -r requirements/base.txt
     #   paramiko
+pypdf==3.16.2 \
+    --hash=sha256:6e000281fd0f4cd32e6f1e75b05af0b6c0fbbd9777fa9a8e9d86e34cda65419d \
+    --hash=sha256:d132953be1e2af7b115fbfd445459fdfc601a845ca12379160e1b6afaa1fef2c
+    # via -r requirements/base.txt
 pyproject-hooks==1.0.0 \
     --hash=sha256:283c11acd6b928d2f6a7c73fa0d01cb2bdc5f07c57a2eeb6e83d5e56b97976f8 \
     --hash=sha256:f271b298b97f5955d53fb12b72c1fb1948c22c1a6b70b315c54cedaca0264ef5

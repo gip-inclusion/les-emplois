@@ -68,4 +68,55 @@ htmx.onLoad((target) => {
   $(".js-copy-to-clipboard", target).on("blur", function (event) {
     $(event.currentTarget).tooltip('hide')
   })
+
+  /*
+   * File selector.
+   */
+  function initDropZone(container) {
+    const selector = container.querySelector(".file-dropzone-selector");
+    const preview = container.querySelector(".file-dropzone-preview");
+    const fileInput = container.querySelector("input[type=file]");
+    const fileNameContainer = container.querySelector(".file-dropzone-filename");
+
+    function toggleFileView(container, force) {
+      selector.classList.toggle("d-none", force);
+      preview.classList.toggle("d-none", !force);
+    }
+
+    function handleFileChange() {
+      const fileName = fileInput.files[0].name;
+      fileNameContainer.textContent = fileName;
+      toggleFileView(container, true);
+    }
+
+    function handleFileClear() {
+      fileInput.value = null;
+      toggleFileView(container, false);
+    }
+
+    function handleDrag(e) {
+      e.preventDefault();
+      container.classList.add("highlighted");
+    }
+
+    function handleDragLeave(e) {
+      e.preventDefault();
+      container.classList.remove("highlighted");
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      fileInput.files = e.dataTransfer.files;
+      container.classList.remove("highlighted");
+      handleFileChange();
+    }
+
+    fileInput.addEventListener("change", handleFileChange);
+    container.addEventListener("dragenter", handleDrag);
+    container.addEventListener("dragover", handleDrag);
+    container.addEventListener("dragleave", handleDragLeave);
+    container.addEventListener("drop", handleDrop);
+    container.querySelector(".file-dropzone-clear").addEventListener("click", handleFileClear);
+  }
+  target.querySelectorAll(".file-dropzone").forEach(initDropZone);
 });
