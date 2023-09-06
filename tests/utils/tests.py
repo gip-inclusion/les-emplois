@@ -29,6 +29,7 @@ import itou.utils.json
 import itou.utils.session
 from itou.approvals.models import Suspension
 from itou.job_applications.models import JobApplicationWorkflow
+from itou.siaes.enums import SiaeKind
 from itou.siaes.models import Siae, SiaeMembership
 from itou.users.enums import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF, UserKind
 from itou.users.models import User
@@ -270,9 +271,11 @@ class TestItouCurrentOrganizationMiddleware:
     def test_siae_member_of_siae_in_grace_period_and_active_siae(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
         request = factory.get("/")
-        siae = SiaePendingGracePeriodFactory()
+        siae = SiaePendingGracePeriodFactory(name="1")
         request.user = SiaeMembershipFactory(siae=siae).user
-        active_siae = SiaeMembershipFactory(user=request.user, siae__not_subject_to_eligibility=True).siae
+        # OPCS ensures that the siae is active (since it is not subject to eligibility) and also that
+        # the ordering based on kind will put it in second position for request.organizations
+        active_siae = SiaeMembershipFactory(user=request.user, siae__kind=SiaeKind.OPCS, siae__name="2").siae
         SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
         MessageMiddleware(get_response_for_middlewaremixin).process_request(request)
         with assertNumQueries(
@@ -287,7 +290,7 @@ class TestItouCurrentOrganizationMiddleware:
         assert request.session[global_constants.ITOU_SESSION_CURRENT_SIAE_KEY] == active_siae.pk
         # Check new request attributes
         assert request.current_organization == active_siae
-        assert request.organizations == [active_siae, siae]
+        assert request.organizations == [siae, active_siae]
         assert request.is_current_organization_admin
 
     def test_prescriber_no_organization(self, mocked_get_response_for_middlewaremixin):
