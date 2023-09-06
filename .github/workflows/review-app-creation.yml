@@ -81,7 +81,13 @@ jobs:
     - name: 🍻 Add link to pull request
       uses: thollander/actions-comment-pull-request@main
       with:
-        message: "🥁 La recette jetable est prête ! [👉 Je veux tester cette PR !](https://${{ env.DEPLOY_URL }})"
+        message: |-
+          🥁 La recette jetable est prête ! [👉 Je veux tester cette PR !](https://${{ env.DEPLOY_URL }})
+
+          ---
+          Préciser comment accéder à la fonctionnalité pour le métier :
+
+            1. …
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   redeploy:
