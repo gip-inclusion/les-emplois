@@ -1,7 +1,7 @@
 import pytest
 from django.db import connection
 
-from itou.metabase import db
+from itou.metabase import dataframes, db
 from itou.metabase.tables.utils import get_insee_code_to_zrr_status_map, get_qpv_job_seeker_pks
 
 
@@ -31,6 +31,7 @@ def metabase_fixture(monkeypatch):
             if self.cursor:
                 self.cursor.close()
 
+    monkeypatch.setattr(dataframes, "MetabaseDatabaseCursor", FakeMetabase)
     monkeypatch.setattr(db, "MetabaseDatabaseCursor", FakeMetabase)
 
 
