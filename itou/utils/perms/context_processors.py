@@ -1,7 +1,3 @@
-def sort_organizations(collection):
-    return sorted(collection, key=lambda o: (o.kind, o.display_name))
-
-
 def get_current_organization_and_perms(request):
     context = {}
     if request.user.is_authenticated and getattr(request, "current_organization", None) is not None:
@@ -18,7 +14,7 @@ def get_context_siae(request):
     return {
         "current_siae": request.current_organization,
         "user_is_siae_admin": request.is_current_organization_admin,
-        "user_siaes": sort_organizations(request.organizations),
+        "user_siaes": request.organizations,
     }
 
 
@@ -26,7 +22,7 @@ def get_context_prescriber(request):
     return {
         "current_prescriber_organization": request.current_organization,
         "user_is_prescriber_org_admin": request.is_current_organization_admin,
-        "user_prescriberorganizations": sort_organizations(request.organizations),
+        "user_prescriberorganizations": request.organizations,
     }
 
 
@@ -34,5 +30,5 @@ def get_context_institution(request):
     return {
         "current_institution": request.current_organization,
         "user_is_institution_admin": request.is_current_organization_admin,
-        "user_institutions": sort_organizations(request.organizations),
+        "user_institutions": request.organizations,
     }

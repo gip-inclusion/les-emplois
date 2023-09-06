@@ -31,7 +31,11 @@ def extract_membership_infos_and_update_session(memberships, org_through_field, 
             # => No need to track the current org in session (none)
             # => Remove any old session entry if needed
             del session[session_key]
-    return orgs, current_org, current_org and admin_status[current_org.pk]
+    return (
+        sorted(orgs, key=lambda o: (o.kind, o.display_name)),
+        current_org,
+        current_org and admin_status[current_org.pk],
+    )
 
 
 class ItouCurrentOrganizationMiddleware:
