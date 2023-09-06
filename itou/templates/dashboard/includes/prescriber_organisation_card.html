@@ -11,7 +11,7 @@
         <div class="px-3 px-lg-4">
             <ul class="list-unstyled">
                 {% with card_url=current_prescriber_organization.get_card_url %}
-                    {% if user_is_prescriber_org_admin %}
+                    {% if request.is_current_organization_admin %}
                         <li class="d-flex justify-content-between align-items-center mb-3">
                             <a href="{% url 'prescribers_views:edit_organization' %}" class="btn-link btn-ico">
                                 <i class="ri-pencil-line ri-lg ri-lg font-weight-normal"></i>
@@ -34,7 +34,7 @@
                         <span>Gérer les collaborateurs</span>
                     </a>
                 </li>
-                {% if current_prescriber_organization.kind == precriber_kind_dept and user_is_prescriber_org_admin %}
+                {% if current_prescriber_organization.kind == precriber_kind_dept and request.is_current_organization_admin %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'prescribers_views:list_accredited_organizations' %}" class="btn-link btn-ico">
                             <i class="ri-list-unordered ri-lg ri-lg font-weight-normal"></i>

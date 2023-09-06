@@ -13,7 +13,6 @@ def get_current_organization_and_perms(request):
 def get_context_siae(request):
     return {
         "current_siae": request.current_organization,
-        "user_is_siae_admin": request.is_current_organization_admin,
         "user_siaes": request.organizations,
     }
 
@@ -21,7 +20,6 @@ def get_context_siae(request):
 def get_context_prescriber(request):
     return {
         "current_prescriber_organization": request.current_organization,
-        "user_is_prescriber_org_admin": request.is_current_organization_admin,
         "user_prescriberorganizations": request.organizations,
     }
 
@@ -29,6 +27,5 @@ def get_context_prescriber(request):
 def get_context_institution(request):
     return {
         "current_institution": request.current_organization,
-        "user_is_institution_admin": request.is_current_organization_admin,
         "user_institutions": request.organizations,
     }
