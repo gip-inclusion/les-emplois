@@ -108,8 +108,8 @@ Arguments:
                     <ul class="list-unstyled">
                         <li>
                             <b>du {{ suspensions.last_in_progress.start_at|date:"d/m/Y" }} au {{ suspensions.last_in_progress.end_at|date:"d/m/Y" }}</b>
-                            {% if current_siae %}
-                                <!-- djlint:off -->{% call_method suspensions.last_in_progress "can_be_handled_by_siae" current_siae as can_be_handled %}<!-- djlint:on -->
+                            {% if request.user.is_siae_staff and request.current_organization %}
+                                <!-- djlint:off -->{% call_method suspensions.last_in_progress "can_be_handled_by_siae" request.current_organization as can_be_handled %}<!-- djlint:on -->
                                 {% if can_be_handled %}
                                     <small>
                                         <a class="ml-3" href="{% url 'approvals:suspension_update' suspension_id=suspensions.last_in_progress.pk %}?back_url={{ request.get_full_path|urlencode }}">Modifier</a>

@@ -30,7 +30,7 @@
                                 {% endif %}
                             </div>
                             <p>
-                                Afin de le prolonger ou de le suspendre, nous vous invitons à <a href="{% url 'apply:start' siae_pk=current_siae.pk %}">réaliser une auto-prescription</a>.
+                                Afin de le prolonger ou de le suspendre, nous vous invitons à <a href="{% url 'apply:start' siae_pk=request.current_organization.pk %}">réaliser une auto-prescription</a>.
                             </p>
                             <a class="btn btn-outline-primary" href="{{ back_url }}">Retour</a>
                         {% else %}

@@ -5,12 +5,12 @@
                 <span class="h4 m-0">Organisation</span>
             </div>
             <div class="ml-2">
-                <span class="badge badge-pill badge-sm badge-primary">ID {{ current_prescriber_organization.id }}</span>
+                <span class="badge badge-pill badge-sm badge-primary">ID {{ request.current_organization.id }}</span>
             </div>
         </div>
         <div class="px-3 px-lg-4">
             <ul class="list-unstyled">
-                {% with card_url=current_prescriber_organization.get_card_url %}
+                {% with card_url=request.current_organization.get_card_url %}
                     {% if request.is_current_organization_admin %}
                         <li class="d-flex justify-content-between align-items-center mb-3">
                             <a href="{% url 'prescribers_views:edit_organization' %}" class="btn-link btn-ico">
@@ -34,7 +34,7 @@
                         <span>Gérer les collaborateurs</span>
                     </a>
                 </li>
-                {% if current_prescriber_organization.kind == precriber_kind_dept and request.is_current_organization_admin %}
+                {% if request.current_organization.kind == precriber_kind_dept and request.is_current_organization_admin %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'prescribers_views:list_accredited_organizations' %}" class="btn-link btn-ico">
                             <i class="ri-list-unordered ri-lg ri-lg font-weight-normal"></i>
@@ -43,13 +43,13 @@
                     </li>
                 {% endif %}
             </ul>
-            {% if current_prescriber_organization.is_authorized %}
+            {% if request.current_organization.is_authorized %}
                 <hr>
                 <ul class="list-unstyled mb-lg-5">
                     <li class="mb-2">
                         <span class="fs-sm">
                             <i class="ri-award-line ri-lg ri-lg font-weight-normal mr-1"></i>
-                            {{ current_prescriber_organization.display_name }} est une organisation habilitée. Vous pouvez réaliser le <a href="{{ ITOU_HELP_CENTER_URL }}/articles/14733750518161--Diagnostic-socio-professionnel-de-référence/"
+                            {{ request.current_organization.display_name }} est une organisation habilitée. Vous pouvez réaliser le <a href="{{ ITOU_HELP_CENTER_URL }}/articles/14733750518161--Diagnostic-socio-professionnel-de-référence/"
     target="_blank"
     aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel</a> des candidats que vous accompagnez.
                         </span>
