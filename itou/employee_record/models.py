@@ -98,18 +98,7 @@ class ASPExchangeInformation(models.Model):
 
 
 class EmployeeRecordQuerySet(models.QuerySet):
-    """
-    Queryset functions for EmployeeRecord model
-    """
-
     def full_fetch(self):
-        """
-        Also fetch main employee record related objects:
-        - financial annex
-        - job application
-        - job seeker
-        - job seeker profile
-        """
         return self.select_related(
             "financial_annex",
             "job_application",
@@ -120,6 +109,7 @@ class EmployeeRecordQuerySet(models.QuerySet):
             "job_application__job_seeker__birth_place",
             "job_application__job_seeker__jobseeker_profile",
             "job_application__job_seeker__jobseeker_profile__hexa_commune",
+            "job_application__sender_prescriber_organization",
         )
 
     # Search queries
