@@ -5,7 +5,7 @@
 
 {% block content_title %}
     <h1>Sélectionner une annexe financière</h1>
-    <h2>{{ current_siae.display_name }}</h2>
+    <h2>{{ request.current_organization.display_name }}</h2>
 {% endblock %}
 
 {% block content %}
@@ -28,7 +28,7 @@
                     </form>
 
                     <p>
-                        Si votre annexe financière correspond à un SIREN différent de {{ current_siae.siren }} ou à un type de structure différent de {{ current_siae.kind }}, ou bien si elle n'apparaît pas dans la liste ci-dessus, contactez-nous via la rubrique correspondant à votre structure sur <a href="{{ ITOU_HELP_CENTER_URL }}" target="_blank" rel="noopener" aria-label="{{ ITOU_HELP_CENTER_URL }} (ouverture dans un nouvel onglet)">{{ ITOU_HELP_CENTER_URL }}</a>
+                        Si votre annexe financière correspond à un SIREN différent de {{ request.current_organization.siren }} ou à un type de structure différent de {{ request.current_organization.kind }}, ou bien si elle n'apparaît pas dans la liste ci-dessus, contactez-nous via la rubrique correspondant à votre structure sur <a href="{{ ITOU_HELP_CENTER_URL }}" target="_blank" rel="noopener" aria-label="{{ ITOU_HELP_CENTER_URL }} (ouverture dans un nouvel onglet)">{{ ITOU_HELP_CENTER_URL }}</a>
                     </p>
                 </div>
             </div>

@@ -10,7 +10,7 @@
             </button>
             <div class="dropdown-menu" aria-labelledby="transfer_to_button">
                 {% for siae in user_siaes %}
-                    {% if siae != current_siae %}
+                    {% if siae != request.current_organization %}
                         <a class="dropdown-item" data-toggle="modal" data-target="#transfer_confirmation_modal_{{ siae.pk }}">
                             <div>
                                 <span class="badge badge-pill badge-primary">{{ siae.kind }}</span> <span>{{ siae.display_name }}</span>
@@ -28,7 +28,7 @@
           Not pretty, but if anybody has a cleaner solution...
         {% endcomment %}
         {% for siae in user_siaes %}
-            {% if siae != current_siae %}
+            {% if siae != request.current_organization %}
                 <div id="transfer_confirmation_modal_{{ siae.pk }}" class="modal" tabindex="-1" aria-labelledby="modal_title" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">

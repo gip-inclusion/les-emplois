@@ -5,13 +5,13 @@
                 <span class="h4 m-0">Structure</span>
             </div>
             <div class="ml-2">
-                <span class="badge badge-pill badge-sm badge-primary">{{ current_siae.kind }} - ID {{ current_siae.id }}</span>
+                <span class="badge badge-pill badge-sm badge-primary">{{ request.current_organization.kind }} - ID {{ request.current_organization.id }}</span>
             </div>
         </div>
         <div class="px-3 px-lg-4">
             <ul class="list-unstyled mb-lg-5">
                 <li class="d-flex justify-content-between align-items-center mb-3">
-                    <a href="{{ current_siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}" class="btn-link btn-ico">
+                    <a href="{{ request.current_organization.get_card_url }}?back_url={{ request.get_full_path|urlencode }}" class="btn-link btn-ico">
                         <i class="ri-eye-line ri-lg font-weight-normal"></i>
                         <span>Voir la fiche publique</span>
                     </a>
@@ -30,7 +30,7 @@
                         <span>Gérer les métiers et recrutements</span>
                     </a>
                 </li>
-                {% if current_siae.is_active %}
+                {% if request.current_organization.is_active %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'siaes_views:members' %}" class="btn-link btn-ico">
                             <i class="ri-team-line ri-lg font-weight-normal"></i>
@@ -52,7 +52,7 @@
                             <i class="ri-folder-chart-line ri-lg font-weight-normal"></i>
                             <span>Voir les annexes financières</span>
                         </a>
-                        {% if not current_siae.is_active %}
+                        {% if not request.current_organization.is_active %}
                             <span class="badge badge-xs badge-pill badge-warning-lighter text-warning"><i class="ri-error-warning-line" aria-hidden="true"></i>Action requise</span>
                         {% endif %}
                     </li>

@@ -5,7 +5,7 @@
 {% load list_filters %}
 {% load bootstrap4 %}
 
-{% block title %}Fiches salarié ASP - {{ current_siae.display_name }} {{ block.super }}{% endblock %}
+{% block title %}Fiches salarié ASP - {{ request.current_organization.display_name }} {{ block.super }}{% endblock %}
 
 {% block extra_head %}{{ filters_form.media.css }}{% endblock %}
 
@@ -35,7 +35,7 @@
 {% endblock %}
 
 {% block content_title %}
-    <h1>Fiches salarié ASP - {{ current_siae.display_name }}</h1>
+    <h1>Fiches salarié ASP - {{ request.current_organization.display_name }}</h1>
     <h2 class="h3">Nous transférons vos fiches salarié à l'ASP afin de vous faire gagner du temps</h2>
     <p>Une fois envoyées et validées, vous retrouverez directement vos données sur l'extranet de l'ASP.</p>
     <ul>

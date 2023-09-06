@@ -26,14 +26,14 @@
         {% if user.is_siae_staff and user_siaes|length > 1 %}
             <li class="dropdown">
                 <button type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown{% if is_mobile %}Mobile{% endif %}" aria-expanded="false">
-                    ({{ current_siae.kind }}) {{ current_siae.display_name|truncatechars:40 }}
+                    ({{ request.current_organization.kind }}) {{ request.current_organization.display_name|truncatechars:40 }}
                 </button>
                 <div class="dropdown-menu" id="switchUserDropdown{% if is_mobile %}Mobile{% endif %}">
                     <form action="{% url 'dashboard:switch_siae' %}" method="post">
                         {% csrf_token %}
                         <ul class="list-unstyled">
                             {% for s in user_siaes %}
-                                {% if s.pk != current_siae.pk %}
+                                {% if s.pk != request.current_organization.pk %}
                                     <li>
                                         <button class="dropdown-item font-weight-bold" name="siae_id" value="{{ s.pk }}">
                                             <span class="badge badge-pill badge-xs badge-primary mr-1">{{ s.kind }}</span>
@@ -50,14 +50,14 @@
         {% if user.is_prescriber and user_prescriberorganizations|length > 1 %}
             <li class="dropdown">
                 <button type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown{% if is_mobile %}Mobile{% endif %}" aria-expanded="false">
-                    ({{ current_prescriber_organization.kind }}) {{ current_prescriber_organization.display_name|truncatechars:40 }}
+                    ({{ request.current_organization.kind }}) {{ request.current_organization.display_name|truncatechars:40 }}
                 </button>
                 <div class="dropdown-menu" id="switchUserDropdown{% if is_mobile %}Mobile{% endif %}">
                     <form action="{% url 'dashboard:switch_prescriber_organization' %}" method="post">
                         {% csrf_token %}
                         <ul class="list-unstyled">
                             {% for po in user_prescriberorganizations %}
-                                {% if po.pk != current_prescriber_organization.pk %}
+                                {% if po.pk != request.current_organization.pk %}
                                     <li>
                                         <button class="dropdown-item font-weight-bold" name="prescriber_organization_id" value="{{ po.pk }}">
                                             <span class="badge badge-pill badge-xs badge-primary mr-1">{{ po.kind }}</span>
@@ -75,14 +75,14 @@
         {% if user.is_labor_inspector and user_institutions|length > 1 %}
             <li class="dropdown">
                 <button type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown{% if is_mobile %}Mobile{% endif %}" aria-expanded="false">
-                    ({{ current_institution.kind }}) {{ current_institution.display_name|truncatechars:40 }}
+                    ({{ request.current_organization.kind }}) {{ request.current_organization.display_name|truncatechars:40 }}
                 </button>
                 <div class="dropdown-menu" id="switchUserDropdown{% if is_mobile %}Mobile{% endif %}">
                     <form action="{% url 'dashboard:switch_institution' %}" method="post">
                         {% csrf_token %}
                         <ul class="list-unstyled">
                             {% for i in user_institutions %}
-                                {% if i.pk != current_institution.pk %}
+                                {% if i.pk != request.current_organization.pk %}
                                     <li>
                                         <button class="dropdown-item font-weight-bold" name="institution_id" value="{{ i.pk }}">
                                             <span class="badge badge-xs badge-pill badge-primary mr-1">{{ i.kind }}</span>

@@ -1397,12 +1397,12 @@ class SwitchSiaeTest(TestCase):
         url = reverse("dashboard:index")
         response = self.client.get(url)
         assert response.status_code == 200
-        assert response.context["current_siae"] == siae
+        assert response.context["request"].current_organization == siae
 
         url = reverse("siaes_views:card", kwargs={"siae_id": siae.pk})
         response = self.client.get(url)
         assert response.status_code == 200
-        assert response.context["current_siae"] == siae
+        assert response.context["request"].current_organization == siae
         assert response.context["siae"] == siae
 
         url = reverse("dashboard:switch_siae")
@@ -1412,23 +1412,23 @@ class SwitchSiaeTest(TestCase):
         url = reverse("dashboard:index")
         response = self.client.get(url)
         assert response.status_code == 200
-        assert response.context["current_siae"] == related_siae
+        assert response.context["request"].current_organization == related_siae
 
         url = reverse("siaes_views:card", kwargs={"siae_id": related_siae.pk})
         response = self.client.get(url)
         assert response.status_code == 200
-        assert response.context["current_siae"] == related_siae
+        assert response.context["request"].current_organization == related_siae
         assert response.context["siae"] == related_siae
 
         url = reverse("siaes_views:job_description_list")
         response = self.client.get(url)
         assert response.status_code == 200
-        assert response.context["current_siae"] == related_siae
+        assert response.context["request"].current_organization == related_siae
 
         url = reverse("apply:list_for_siae")
         response = self.client.get(url)
         assert response.status_code == 200
-        assert response.context["current_siae"] == related_siae
+        assert response.context["request"].current_organization == related_siae
 
     def test_can_still_switch_to_inactive_siae_during_grace_period(self):
         siae = SiaeFactory(with_membership=True)
@@ -1441,7 +1441,7 @@ class SwitchSiaeTest(TestCase):
         url = reverse("dashboard:index")
         response = self.client.get(url)
         assert response.status_code == 200
-        assert response.context["current_siae"] == siae
+        assert response.context["request"].current_organization == siae
 
         url = reverse("dashboard:switch_siae")
         response = self.client.post(url, data={"siae_id": related_siae.pk})
@@ -1451,7 +1451,7 @@ class SwitchSiaeTest(TestCase):
         url = reverse("dashboard:index")
         response = self.client.get(url)
         assert response.status_code == 200
-        assert response.context["current_siae"] == related_siae
+        assert response.context["request"].current_organization == related_siae
 
     def test_cannot_switch_to_inactive_siae_after_grace_period(self):
         siae = SiaeFactory(with_membership=True)
@@ -1464,7 +1464,7 @@ class SwitchSiaeTest(TestCase):
         url = reverse("dashboard:index")
         response = self.client.get(url)
         assert response.status_code == 200
-        assert response.context["current_siae"] == siae
+        assert response.context["request"].current_organization == siae
 
         # Switching to that siae is not even possible in practice because
         # it does not even show up in the menu.
@@ -1476,7 +1476,7 @@ class SwitchSiaeTest(TestCase):
         url = reverse("dashboard:index")
         response = self.client.get(url)
         assert response.status_code == 200
-        assert response.context["current_siae"] == siae
+        assert response.context["request"].current_organization == siae
 
 
 class EditUserPreferencesTest(TestCase):
