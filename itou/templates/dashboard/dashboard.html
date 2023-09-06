@@ -22,7 +22,7 @@
                 <br>
                 Cela peut affecter sa position dans les résultats de recherche.
                 <br>
-                {% if user_is_siae_admin %}
+                {% if request.is_current_organization_admin %}
                     <a href="{% url 'siaes_views:edit_siae_step_contact_infos' %}">Indiquez une autre adresse</a>
                 {% else %}
                     {% with current_siae.active_admin_members.first as admin %}
@@ -43,7 +43,7 @@
                 <br>
                 Cela peut affecter sa position dans les résultats de recherche.
                 <br>
-                {% if user_is_prescriber_org_admin %}
+                {% if request.is_current_organization_admin %}
                     <a href="{% url 'prescribers_views:edit_organization' %}">Indiquez une autre adresse</a>
                 {% else %}
                     {% with current_prescriber_organization.active_admin_members.first as admin %}
@@ -67,7 +67,7 @@
                 À compter du {{ current_siae.grace_period_end_date|date:"d F Y" }}, l'accès à ce tableau de bord ne sera plus possible.
                 <br>
 
-                {% if user_is_siae_admin %}
+                {% if request.is_current_organization_admin %}
                     Veuillez dès que possible régulariser votre situation
                     <a href="{% url 'siaes_views:show_financial_annexes' %}">en sélectionnant une annexe financière valide}</a>.
                     <br>

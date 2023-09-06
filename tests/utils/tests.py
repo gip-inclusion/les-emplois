@@ -474,7 +474,6 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
             result = get_current_organization_and_perms(request)
             assert result == {
                 "current_siae": siae,
-                "user_is_siae_admin": True,
                 "user_siaes": [siae],
             }
 
@@ -498,7 +497,6 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
             result = get_current_organization_and_perms(request)
             assert result == {
                 "current_siae": siae2,
-                "user_is_siae_admin": False,
                 "user_siaes": [siae1, siae2],
             }
 
@@ -518,7 +516,6 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
             assert result == {
                 "current_prescriber_organization": organization,
                 "user_prescriberorganizations": [organization],
-                "user_is_prescriber_org_admin": True,
             }
 
     def test_prescriber_organization_multiple_membership(self):
@@ -541,7 +538,6 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
             assert result == {
                 "current_prescriber_organization": organization1,
                 "user_prescriberorganizations": [organization1, organization2],
-                "user_is_prescriber_org_admin": True,
             }
 
     def test_labor_inspector_one_institution(self):
@@ -560,7 +556,6 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
             assert result == {
                 "current_institution": institution,
                 "user_institutions": [institution],
-                "user_is_institution_admin": True,
             }
 
     def test_labor_inspector_multiple_institutions(self):
@@ -583,7 +578,6 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
             assert result == {
                 "current_institution": institution2,
                 "user_institutions": [institution1, institution2],
-                "user_is_institution_admin": False,
             }
 
 

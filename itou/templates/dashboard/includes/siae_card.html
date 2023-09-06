@@ -16,7 +16,7 @@
                         <span>Voir la fiche publique</span>
                     </a>
                 </li>
-                {% if user_is_siae_admin %}
+                {% if request.is_current_organization_admin %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'siaes_views:edit_siae_step_contact_infos' %}" class="btn-link btn-ico">
                             <i class="ri-pencil-line ri-lg font-weight-normal"></i>
