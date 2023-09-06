@@ -472,9 +472,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
 
         with self.assertNumQueries(0):
             result = get_current_organization_and_perms(request)
-            assert result == {
-                "user_siaes": [siae],
-            }
+            assert result == {}
 
     def test_siae_multiple_memberships(self):
         # Specify name to ensure alphabetical sorting order.
@@ -494,9 +492,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
 
         with self.assertNumQueries(0):
             result = get_current_organization_and_perms(request)
-            assert result == {
-                "user_siaes": [siae1, siae2],
-            }
+            assert result == {}
 
     def test_prescriber_organization_one_membership(self):
         organization = PrescriberOrganizationWithMembershipFactory()
@@ -511,9 +507,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
 
         with self.assertNumQueries(0):
             result = get_current_organization_and_perms(request)
-            assert result == {
-                "user_prescriberorganizations": [organization],
-            }
+            assert result == {}
 
     def test_prescriber_organization_multiple_membership(self):
         # Specify name to ensure alphabetical sorting order.
@@ -532,9 +526,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
 
         with self.assertNumQueries(0):
             result = get_current_organization_and_perms(request)
-            assert result == {
-                "user_prescriberorganizations": [organization1, organization2],
-            }
+            assert result == {}
 
     def test_labor_inspector_one_institution(self):
         institution = InstitutionWithMembershipFactory()
@@ -549,9 +541,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
 
         with self.assertNumQueries(0):
             result = get_current_organization_and_perms(request)
-            assert result == {
-                "user_institutions": [institution],
-            }
+            assert result == {}
 
     def test_labor_inspector_multiple_institutions(self):
         # Specify name to ensure alphabetical sorting order.
@@ -570,9 +560,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
 
         with self.assertNumQueries(0):
             result = get_current_organization_and_perms(request)
-            assert result == {
-                "user_institutions": [institution1, institution2],
-            }
+            assert result == {}
 
 
 def test_logout_as_siae_multiple_memberships(client):
