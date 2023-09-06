@@ -154,7 +154,6 @@ TEMPLATES = [
                 # Django CSP
                 "csp.context_processors.nonce",
                 # Itou.
-                "itou.utils.perms.context_processors.get_current_organization_and_perms",
                 "itou.utils.settings_context_processors.expose_settings",
                 "itou.utils.context_processors.expose_enums",
                 "itou.utils.context_processors.matomo",

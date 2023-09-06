@@ -37,7 +37,6 @@ from itou.utils import constants as global_constants, pagination
 from itou.utils.emails import redact_email_address
 from itou.utils.models import PkSupportRemark
 from itou.utils.password_validation import CnilCompositionPasswordValidator
-from itou.utils.perms.context_processors import get_current_organization_and_perms
 from itou.utils.perms.middleware import ItouCurrentOrganizationMiddleware
 from itou.utils.perms.user import get_user_info
 from itou.utils.sync import DiffItem, DiffItemKind, yield_sync_diff
@@ -445,122 +444,6 @@ class TestItouCurrentOrganizationMiddleware:
         assert request.current_organization is None
         assert request.organizations == []
         assert not request.is_current_organization_admin
-
-
-class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
-    def go_to_dashboard(self, user, establishment_session_key, establishment_pk):
-        factory = RequestFactory()
-        request = factory.get("/")
-        request.user = user
-        middleware = SessionMiddleware(get_response_for_middlewaremixin)
-        middleware.process_request(request)
-        request.session[establishment_session_key] = establishment_pk
-        ItouCurrentOrganizationMiddleware(get_response_for_middlewaremixin)(request)
-        request.session.save()
-        return request
-
-    def test_siae_one_membership(self):
-        siae = SiaeFactory(with_membership=True)
-        user = siae.members.first()
-        assert siae.has_admin(user)
-
-        request = self.go_to_dashboard(
-            user=user,
-            establishment_session_key=global_constants.ITOU_SESSION_CURRENT_SIAE_KEY,
-            establishment_pk=siae.pk,
-        )
-
-        with self.assertNumQueries(0):
-            result = get_current_organization_and_perms(request)
-            assert result == {}
-
-    def test_siae_multiple_memberships(self):
-        # Specify name to ensure alphabetical sorting order.
-        siae1 = SiaeFactory(name="1", with_membership=True)
-        user = siae1.members.first()
-        assert siae1.has_admin(user)
-
-        siae2 = SiaeFactory(name="2")
-        siae2.members.add(user)
-        assert not siae2.has_admin(user)
-
-        request = self.go_to_dashboard(
-            user=user,
-            establishment_session_key=global_constants.ITOU_SESSION_CURRENT_SIAE_KEY,
-            establishment_pk=siae2.pk,
-        )
-
-        with self.assertNumQueries(0):
-            result = get_current_organization_and_perms(request)
-            assert result == {}
-
-    def test_prescriber_organization_one_membership(self):
-        organization = PrescriberOrganizationWithMembershipFactory()
-        user = organization.members.first()
-        assert user.prescribermembership_set.get(organization=organization).is_admin
-
-        request = self.go_to_dashboard(
-            user=user,
-            establishment_session_key=global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY,
-            establishment_pk=organization.pk,
-        )
-
-        with self.assertNumQueries(0):
-            result = get_current_organization_and_perms(request)
-            assert result == {}
-
-    def test_prescriber_organization_multiple_membership(self):
-        # Specify name to ensure alphabetical sorting order.
-        organization1 = PrescriberOrganizationWithMembershipFactory(name="1")
-        user = organization1.members.first()
-        assert user.prescribermembership_set.get(organization=organization1).is_admin
-
-        organization2 = PrescriberOrganizationWithMembershipFactory(name="2")
-        organization2.members.add(user)
-
-        request = self.go_to_dashboard(
-            user=user,
-            establishment_session_key=global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY,
-            establishment_pk=organization1.pk,
-        )
-
-        with self.assertNumQueries(0):
-            result = get_current_organization_and_perms(request)
-            assert result == {}
-
-    def test_labor_inspector_one_institution(self):
-        institution = InstitutionWithMembershipFactory()
-        user = institution.members.first()
-        assert user.institutionmembership_set.get(institution=institution).is_admin
-
-        request = self.go_to_dashboard(
-            user=user,
-            establishment_session_key=global_constants.ITOU_SESSION_CURRENT_INSTITUTION_KEY,
-            establishment_pk=institution.pk,
-        )
-
-        with self.assertNumQueries(0):
-            result = get_current_organization_and_perms(request)
-            assert result == {}
-
-    def test_labor_inspector_multiple_institutions(self):
-        # Specify name to ensure alphabetical sorting order.
-        institution1 = InstitutionWithMembershipFactory(name="1")
-        user = institution1.members.first()
-        assert user.institutionmembership_set.get(institution=institution1).is_admin
-        institution2 = InstitutionFactory(name="2")
-        institution2.members.add(user)
-        assert not institution2.has_admin(user)
-
-        request = self.go_to_dashboard(
-            user=user,
-            establishment_session_key=global_constants.ITOU_SESSION_CURRENT_INSTITUTION_KEY,
-            establishment_pk=institution2.pk,
-        )
-
-        with self.assertNumQueries(0):
-            result = get_current_organization_and_perms(request)
-            assert result == {}
 
 
 def test_logout_as_siae_multiple_memberships(client):
