@@ -895,8 +895,20 @@ def test_data_inconsistencies(capsys):
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
 def test_populate_fiches_de_poste():
+    # clear the active SIAE pks cache for now, is responsible for some flakyness.
+    # FIXME(dejafait,vperron): Find  a better system that does not give me a 4 hours headache.
+    from itou.metabase.tables.utils import get_active_siae_pks
+
+    get_active_siae_pks.cache_clear()
+
     create_test_romes_and_appellations(["M1805"], appellations_per_rome=1)
-    siae = SiaeFactory(for_snapshot=True, siret="12989128580059")
+    siae = SiaeFactory(
+        for_snapshot=True,
+        siret="12989128580059",
+        # also means that the SIAE will be active, thus the job description also will be.
+        # this would also be a source of flakyness if not enforced.
+        kind="GEIQ",
+    )
     job = SiaeJobDescriptionFactory(is_active=False, siae=siae)
 
     # trigger the first .from_db() call and populate _old_is_active.
@@ -944,7 +956,7 @@ def test_populate_fiches_de_poste():
                 "Études et développement informatique",
                 1,
                 siae.pk,
-                "EI",
+                "GEIQ",
                 "12989128580059",
                 "Acme inc.",
                 '[{"at": "2023-02-02T00:00:00Z", "to": true, "from": false, "field": "is_active"}]',
