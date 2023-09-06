@@ -8,7 +8,7 @@ DATUM_CHOICES = dict(DatumCode.choices)
 AnalyticsTable = MetabaseTable(name="c1_analytics_v0")
 AnalyticsTable.add_columns(
     [
-        {"name": "id", "type": "varchar", "comment": "ID du point de mesure", "fn": lambda o: o.pk},
+        {"name": "id", "type": "varchar", "comment": "ID du point de mesure", "fn": lambda o: str(o.pk)},
         {
             "name": "type",
             "type": "varchar",
@@ -17,7 +17,7 @@ AnalyticsTable.add_columns(
         },
         {
             "name": "date",
-            "type": "date",
+            "type": "varchar",
             "comment": "Date associée à la mesure",
             "fn": lambda o: o.bucket,
         },
@@ -34,10 +34,10 @@ AnalyticsTable.add_columns(
 DashboardVisitTable = MetabaseTable(name="c1_private_dashboard_visits_v0")
 DashboardVisitTable.add_columns(
     [
-        {"name": "id", "type": "varchar", "comment": "ID du point de mesure", "fn": lambda o: o.pk},
+        {"name": "id", "type": "integer", "comment": "ID du point de mesure", "fn": lambda o: o.pk},
         {
             "name": "measured_at",
-            "type": "timestamp",
+            "type": "timestamp with time zone",  # which is UTC
             "fn": lambda o: o.measured_at,
             "comment": "Date associée à la mesure",
         },
@@ -61,19 +61,19 @@ DashboardVisitTable.add_columns(
         },
         {
             "name": "current_siae_id",
-            "type": "varchar",
+            "type": "integer",
             "comment": "ID SIAE courante",
             "fn": lambda o: o.current_siae_id,
         },
         {
             "name": "current_prescriber_organization_id",
-            "type": "varchar",
+            "type": "integer",
             "comment": "ID organisation prescriptrice courante",
             "fn": lambda o: o.current_prescriber_organization_id,
         },
         {
             "name": "current_institution_id",
-            "type": "varchar",
+            "type": "integer",
             "comment": "ID institution courante",
             "fn": lambda o: o.current_institution_id,
         },
@@ -85,7 +85,7 @@ DashboardVisitTable.add_columns(
         },
         {
             "name": "user_id",
-            "type": "varchar",
+            "type": "integer",
             "comment": "ID utilisateur",
             "fn": lambda o: o.user_id,
         },
