@@ -1210,7 +1210,7 @@ class UserMembershipDeactivationTest(TestCase):
         assert response.status_code == 200
 
         # Check response context, only one SIAE should remain
-        assert len(response.context["user_siaes"]) == 1
+        assert len(response.context["request"].organizations) == 1
 
 
 class SIAEAdminMembersManagementTest(TestCase):

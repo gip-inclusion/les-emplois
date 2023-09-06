@@ -11,18 +11,12 @@ def get_current_organization_and_perms(request):
 
 
 def get_context_siae(request):
-    return {
-        "user_siaes": request.organizations,
-    }
+    return {}
 
 
 def get_context_prescriber(request):
-    return {
-        "user_prescriberorganizations": request.organizations,
-    }
+    return {}
 
 
 def get_context_institution(request):
-    return {
-        "user_institutions": request.organizations,
-    }
+    return {}

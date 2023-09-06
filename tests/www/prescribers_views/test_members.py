@@ -136,4 +136,4 @@ class UserMembershipDeactivationTest(TestCase):
         assert response.status_code == 200
 
         # Check response context, only one prescriber organization should remain
-        assert len(response.context["user_prescriberorganizations"]) == 1
+        assert len(response.context["request"].organizations) == 1

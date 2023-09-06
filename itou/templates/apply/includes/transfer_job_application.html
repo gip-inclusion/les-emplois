@@ -1,6 +1,6 @@
 {# Transfer job application to other SIAE #}
 {% if job_application.is_in_transferable_state %}
-    {% if user_siaes|length != 1 %}
+    {% if request.organizations|length != 1 %}
         <hr>
         <h3>Transférer vers une autre structure</h3>
         <p>Vous avez la possibilité de transférer cette candidature vers une des autres structures dont vous êtes membre.</p>
@@ -9,7 +9,7 @@
                 Transférer cette candidature vers
             </button>
             <div class="dropdown-menu" aria-labelledby="transfer_to_button">
-                {% for siae in user_siaes %}
+                {% for siae in request.organizations %}
                     {% if siae != request.current_organization %}
                         <a class="dropdown-item" data-toggle="modal" data-target="#transfer_confirmation_modal_{{ siae.pk }}">
                             <div>
@@ -27,7 +27,7 @@
           Hence a new loop to generate modals for each SIAE.
           Not pretty, but if anybody has a cleaner solution...
         {% endcomment %}
-        {% for siae in user_siaes %}
+        {% for siae in request.organizations %}
             {% if siae != request.current_organization %}
                 <div id="transfer_confirmation_modal_{{ siae.pk }}" class="modal" tabindex="-1" aria-labelledby="modal_title" aria-hidden="true">
                     <div class="modal-dialog">

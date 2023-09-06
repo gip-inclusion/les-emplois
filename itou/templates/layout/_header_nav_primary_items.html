@@ -23,7 +23,7 @@
         </div>
     </li>
     {% if user.is_authenticated %}
-        {% if user.is_siae_staff and user_siaes|length > 1 %}
+        {% if user.is_siae_staff and request.organizations|length > 1 %}
             <li class="dropdown">
                 <button type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown{% if is_mobile %}Mobile{% endif %}" aria-expanded="false">
                     ({{ request.current_organization.kind }}) {{ request.current_organization.display_name|truncatechars:40 }}
@@ -32,7 +32,7 @@
                     <form action="{% url 'dashboard:switch_siae' %}" method="post">
                         {% csrf_token %}
                         <ul class="list-unstyled">
-                            {% for s in user_siaes %}
+                            {% for s in request.organizations %}
                                 {% if s.pk != request.current_organization.pk %}
                                     <li>
                                         <button class="dropdown-item font-weight-bold" name="siae_id" value="{{ s.pk }}">
@@ -47,7 +47,7 @@
                 </div>
             </li>
         {% endif %}
-        {% if user.is_prescriber and user_prescriberorganizations|length > 1 %}
+        {% if user.is_prescriber and request.organizations|length > 1 %}
             <li class="dropdown">
                 <button type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown{% if is_mobile %}Mobile{% endif %}" aria-expanded="false">
                     ({{ request.current_organization.kind }}) {{ request.current_organization.display_name|truncatechars:40 }}
@@ -56,7 +56,7 @@
                     <form action="{% url 'dashboard:switch_prescriber_organization' %}" method="post">
                         {% csrf_token %}
                         <ul class="list-unstyled">
-                            {% for po in user_prescriberorganizations %}
+                            {% for po in request.organizations %}
                                 {% if po.pk != request.current_organization.pk %}
                                     <li>
                                         <button class="dropdown-item font-weight-bold" name="prescriber_organization_id" value="{{ po.pk }}">
@@ -72,7 +72,7 @@
             </li>
         {% endif %}
 
-        {% if user.is_labor_inspector and user_institutions|length > 1 %}
+        {% if user.is_labor_inspector and request.organizations|length > 1 %}
             <li class="dropdown">
                 <button type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown{% if is_mobile %}Mobile{% endif %}" aria-expanded="false">
                     ({{ request.current_organization.kind }}) {{ request.current_organization.display_name|truncatechars:40 }}
@@ -81,7 +81,7 @@
                     <form action="{% url 'dashboard:switch_institution' %}" method="post">
                         {% csrf_token %}
                         <ul class="list-unstyled">
-                            {% for i in user_institutions %}
+                            {% for i in request.organizations %}
                                 {% if i.pk != request.current_organization.pk %}
                                     <li>
                                         <button class="dropdown-item font-weight-bold" name="institution_id" value="{{ i.pk }}">
