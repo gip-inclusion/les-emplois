@@ -975,3 +975,78 @@ def test_populate_fiches_de_poste():
         cursor.execute(f"SELECT id, mises_a_jour_champs->0->'to' from fiches_de_poste WHERE id = {job.pk}")
         rows = cursor.fetchall()
         assert rows == [(job.pk, "true")]
+
+
+@freeze_time("2023-02-02")
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.usefixtures("metabase")
+def test_populate_siaes():
+    siae = SiaeFactory(
+        for_snapshot=True,
+        siret="17643069438162",
+        with_membership=True,
+        with_jobs=True,
+        coords="POINT (5.43567 12.123876)",
+    )
+
+    num_queries = 1  # Count Siaes
+    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
+    num_queries += 1  # COMMIT Create table
+    num_queries += 1  # Select active SIAES
+    num_queries += 1  # Select one chunk of siaes
+    num_queries += 1  # Select siaes with annotations and columns
+    num_queries += 1  # Select other siaes with the same convention
+    num_queries += 1  # Prefetch siae job descriptions
+    num_queries += 1  # Prefecth siae memberships
+    num_queries += 1  # Prefetch cities
+    num_queries += 1  # COMMIT (inject_chunk)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    with assertNumQueries(num_queries):
+        management.call_command("populate_metabase_emplois", mode="siaes")
+
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM structures ORDER BY id")
+        rows = cursor.fetchall()
+        assert len(rows) == 1
+        assert rows == [
+            (
+                siae.pk,
+                siae.convention.asp_id,
+                "Acme inc.",
+                f"EI - ID {siae.pk} - Acme inc.",
+                "",
+                "EI",
+                "17643069438162",
+                "Export ASP",
+                "112 rue de la Croix-Nivert",
+                "",
+                "75015",
+                None,
+                "Paris",
+                5.43567,
+                12.123876,
+                "75",
+                "75 - Paris",
+                "Île-de-France",
+                datetime.date(2023, 2, 2),
+                1,
+                0,
+                0,
+                0,
+                0,
+                0.0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                None,
+                0,
+                None,
+                4,
+                0,
+                datetime.date(2023, 2, 1),
+            ),
+        ]

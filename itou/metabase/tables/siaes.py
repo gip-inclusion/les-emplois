@@ -102,7 +102,7 @@ TABLE.add_columns(
         },
         {
             "name": "taux_conversion_30j",
-            "type": "float",
+            "type": "double precision",
             "comment": "Taux de conversion des candidatures en embauches dans les 30 jours glissants",
             "fn": lambda o: round(
                 1.0 * o.total_embauches_30j / o.total_candidatures_30j if o.total_candidatures_30j else 0.0,
