@@ -18,13 +18,13 @@ TABLE.add_columns(
         },
         {
             "name": "latitude",
-            "type": "float",
+            "type": "double precision",
             "comment": "Latitude",
             "fn": lambda o: o.latitude,
         },
         {
             "name": "longitude",
-            "type": "float",
+            "type": "double precision",
             "comment": "Longitude",
             "fn": lambda o: o.longitude,
         },

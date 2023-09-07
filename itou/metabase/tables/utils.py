@@ -217,13 +217,13 @@ def get_address_columns(name_suffix="", comment_suffix="", custom_fn=lambda o: o
             },
             {
                 "name": f"longitude{name_suffix}",
-                "type": "float",
+                "type": "double precision",
                 "comment": f"Longitude{comment_suffix}",
                 "fn": lambda o: custom_fn(o).longitude,
             },
             {
                 "name": f"latitude{name_suffix}",
-                "type": "float",
+                "type": "double precision",
                 "comment": f"Latitude{comment_suffix}",
                 "fn": lambda o: custom_fn(o).latitude,
             },
