@@ -103,13 +103,6 @@ l'adresse http://localhost:8000/.
 
     $ make populate_db
 
-### Créer un compte admin
-
-A noter qu'il existe déjà (juste après le `populate_db`) un compte super-utilisateur: `admin@test.com / password`
-
-    $ make shell_on_django_container
-    $ django-admin createsuperuser
-
 ### Avant un commit
 
     $ make quality  # Will run black, ruff and djlint
