@@ -1069,6 +1069,23 @@ class JobSeekerProfile(models.Model):
         related_name="jobseeker_profile",
     )
 
+    birth_place = models.ForeignKey(
+        "asp.Commune",
+        verbose_name="commune de naissance",
+        related_name="jobseeker_profiles_born_here",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+    birth_country = models.ForeignKey(
+        "asp.Country",
+        verbose_name="pays de naissance",
+        related_name="jobseeker_profiles_born_here",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+
     education_level = models.CharField(
         max_length=2,
         verbose_name="niveau de formation (ASP)",
