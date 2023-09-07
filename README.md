@@ -121,10 +121,6 @@ $ PIP_COMPILE_OPTIONS="-P flake8" make compile-deps
 Si les changements paraissent corrects, ils peuvent être ajoutés à `git` et
 *commit*.
 
-## Données de test
-
-Voir notre [documentation interne](https://team.inclusion.beta.gouv.fr/les-procedures/recette-test).
-
 ## Lancer les tests
 
 Le projet utilise [pytest](https://docs.pytest.org/).
