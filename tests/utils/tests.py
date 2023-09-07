@@ -498,7 +498,7 @@ def test_logout_as_siae_multiple_memberships(client):
     session.save()
 
     response = client.get(reverse("account_logout"))
-    # assert client.session.get(global_constants.ITOU_SESSION_CURRENT_SIAE_KEY) == siae1.pk
+    assert client.session.get(global_constants.ITOU_SESSION_CURRENT_SIAE_KEY) == siae1.pk
     # The dropdown to switch to the 2nd SIAE is available on logout screen
     assertContains(response, siae2.name)
 
