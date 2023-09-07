@@ -2,7 +2,7 @@ import re
 import string
 
 from django.contrib.postgres.indexes import GinIndex
-from django.contrib.postgres.search import SearchVectorField
+from django.contrib.postgres.search import SearchQuery, SearchVectorField
 from django.db import models
 
 
@@ -50,7 +50,7 @@ class AppellationQuerySet(models.QuerySet):
         words = re.sub(f"[{string.punctuation}]", " ", search_string).split()
         words = [word + ":*" for word in words]
         tsquery = " & ".join(words)
-        queryset = self.extra(where=["full_text @@ to_tsquery('french_unaccent', %s)"], params=[tsquery])
+        queryset = self.filter(full_text=SearchQuery(tsquery, config="french_unaccent", search_type="raw"))
         if rome_code:
             queryset = queryset.filter(rome__code=rome_code)
         queryset = queryset.select_related("rome")
