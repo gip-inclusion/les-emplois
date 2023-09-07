@@ -1,7 +1,10 @@
 from django.contrib import admin
+from django.utils.html import format_html
 
+from itou.approvals import models as approvals_models
 from itou.eligibility import models
-from itou.utils.admin import PkSupportRemarkInline
+from itou.job_applications import models as job_applications_models
+from itou.utils.admin import PkSupportRemarkInline, get_admin_view_link
 
 
 class AbstractAdministrativeCriteriaInline(admin.TabularInline):
@@ -16,6 +19,59 @@ class AdministrativeCriteriaInline(AbstractAdministrativeCriteriaInline):
 
 class GEIQAdministrativeCriteriaInline(AbstractAdministrativeCriteriaInline):
     model = models.GEIQEligibilityDiagnosis.administrative_criteria.through
+
+
+class ApprovalInline(admin.TabularInline):
+    model = approvals_models.Approval
+    extra = 0
+    can_delete = False
+    show_change_link = True
+    fields = (
+        "start_at",
+        "end_at",
+        "is_valid",
+    )
+    readonly_fields = fields
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    @admin.display(boolean=True, description="en cours de validité")
+    def is_valid(self, obj):
+        return obj.is_valid()
+
+
+class JobApplicationInline(admin.TabularInline):
+    model = job_applications_models.JobApplication
+    extra = 0
+    can_delete = False
+    show_change_link = True
+    fields = (
+        "job_seeker",
+        "to_siae_link",
+        "hiring_start_at",
+        "hiring_end_at",
+        "approval",
+    )
+    readonly_fields = fields
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    @admin.display(description="SIAE destinataire")
+    def to_siae_link(self, obj):
+        return format_html(
+            "{} — SIRET : {} ({})",
+            get_admin_view_link(obj.to_siae, content=obj.to_siae.display_name),
+            obj.to_siae.siret,
+            obj.to_siae.kind,
+        )
 
 
 class IsValidFilter(admin.SimpleListFilter):
@@ -93,6 +149,8 @@ class EligibilityDiagnosisAdmin(AbstractEligibilityDiagnosisAdmin):
     )
     inlines = (
         AdministrativeCriteriaInline,
+        JobApplicationInline,
+        ApprovalInline,
         PkSupportRemarkInline,
     )
 
@@ -127,6 +185,7 @@ class GEIQEligibilityDiagnosisAdmin(AbstractEligibilityDiagnosisAdmin):
     )
     inlines = (
         GEIQAdministrativeCriteriaInline,
+        JobApplicationInline,
         PkSupportRemarkInline,
     )
 
