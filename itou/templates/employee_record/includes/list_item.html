@@ -36,13 +36,13 @@
             <div class="col-12">
                 <ul class="list-unstyled fs-sm">
                     <li>
-                        Début de contrat :&nbsp;<b>{{ item.hiring_start_at|default_if_none:"Non renseigné" }}</b>
+                        Numéro de PASS IAE : <b>{{ item.approval.number|format_approval_number }}</b>
                     </li>
                     <li>
-                        Fin de contrat :&nbsp;<b>{{ item.hiring_end_at|default_if_none:"Non renseigné" }}</b>
+                        Date de début : <b>{{ item.approval.start_at|date:"d/m/Y" }}</b>
                     </li>
                     <li>
-                        Numéro de PASS IAE :&nbsp;<b>{{ item.approval.number|format_approval_number }}</b>
+                        Date de fin prévisionnelle : <b>{{ item.approval.end_at|date:"d/m/Y" }}</b>
                     </li>
                 </ul>
             </div>

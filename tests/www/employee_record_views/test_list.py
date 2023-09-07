@@ -1,3 +1,5 @@
+import datetime
+
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.test import override_settings
@@ -87,22 +89,17 @@ class ListEmployeeRecordsTest(TestCase):
         self.assertContains(response, approval_number_formatted)
         self.assertContains(response, other_approval_number_formatted)
 
-    def test_employee_records_with_hiring_end_at(self):
+    def test_employee_records_approval_display(self):
         self.client.force_login(self.user)
-        hiring_end_at = self.job_application.hiring_end_at
+        approval = self.job_application.approval
+        approval.start_at = datetime.date(2023, 9, 2)
+        approval.end_at = datetime.date(2024, 10, 11)
+        approval.save()
 
         response = self.client.get(self.url)
 
-        self.assertContains(response, f"Fin de contrat :&nbsp;<b>{hiring_end_at.strftime('%e').lstrip()}")
-
-    def test_employee_records_without_hiring_end_at(self):
-        self.client.force_login(self.user)
-        self.job_application.hiring_end_at = None
-        self.job_application.save()
-
-        response = self.client.get(self.url)
-
-        self.assertContains(response, "Fin de contrat :&nbsp;<b>Non renseigné")
+        self.assertContains(response, "Date de début : <b>02/09/2023</b>")
+        self.assertContains(response, "Date de fin prévisionnelle : <b>11/10/2024</b>")
 
     def test_employee_records_with_a_suspension_need_to_be_updated(self):
         self.client.force_login(self.user)
