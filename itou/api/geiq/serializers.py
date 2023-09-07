@@ -25,6 +25,19 @@ EMPLOIS_TO_LABEL_CIVILITE = {
 }
 
 
+class LabelSenderKind(models.TextChoices):
+    DEMANDEUR_EMPLOI = "DEMANDEUR_EMPLOI", "Demandeur d'emploi"
+    PRESCRIPTEUR = "PRESCRIPTEUR", "Prescripteur"
+    EMPLOYEUR = "EMPLOYEUR", "Employeur"
+
+
+EMPLOIS_TO_LABEL_SENDER_KIND = {
+    enums.SenderKind.JOB_SEEKER: LabelSenderKind.DEMANDEUR_EMPLOI,
+    enums.SenderKind.PRESCRIBER: LabelSenderKind.PRESCRIPTEUR,
+    enums.SenderKind.SIAE_STAFF: LabelSenderKind.EMPLOYEUR,
+}
+
+
 class LabelEducationLevel(models.TextChoices):
     LEVEL_3 = "LEVEL_3", "Niveau 3 (CAP, BEP)"
     LEVEL_4 = "LEVEL_4", "Niveau 4 (BP, Bac Général, Techno ou Pro, BT)"
@@ -99,7 +112,7 @@ class GeiqJobApplicationSerializer(serializers.ModelSerializer):
     adresse_ligne_2 = serializers.CharField(source="job_seeker.address_line_2")
     adresse_code_postal = serializers.CharField(source="job_seeker.post_code")
     adresse_ville = serializers.CharField(source="job_seeker.city")
-    source_orientation = serializers.ChoiceField(source="sender_kind", choices=sorted(enums.SenderKind.choices))
+    source_orientation = serializers.SerializerMethodField()
     type_prescripteur = serializers.ChoiceField(
         source="sender_prescriber_organization.kind",
         allow_null=True,
@@ -184,6 +197,10 @@ class GeiqJobApplicationSerializer(serializers.ModelSerializer):
     @extend_schema_field(serializers.ChoiceField(choices=sorted(LabelCivilite.choices)))
     def get_civilite(self, obj) -> str | None:
         return EMPLOIS_TO_LABEL_CIVILITE.get(obj.job_seeker.title, None)
+
+    @extend_schema_field(serializers.ChoiceField(choices=sorted(LabelSenderKind.choices)))
+    def get_source_orientation(self, obj) -> str | None:
+        return EMPLOIS_TO_LABEL_SENDER_KIND.get(obj.sender_kind, None)
 
     @extend_schema_field(serializers.ChoiceField(choices=sorted(LabelEducationLevel.choices)))
     def get_niveau_formation(self, obj) -> str | None:

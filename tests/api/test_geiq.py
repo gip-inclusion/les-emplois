@@ -173,9 +173,31 @@ def test_candidatures_geiq_nominal(snapshot):
 
 
 def test_serializer_method_defaults():
-    ja = JobApplicationFactory(
-        with_geiq_eligibility_diagnosis=False,
-    )
+    ja = JobApplicationFactory(with_geiq_eligibility_diagnosis=False)
     serializer = GeiqJobApplicationSerializer()
     assert serializer.get_criteres_eligibilite(ja) == []
     assert serializer.get_niveau_formation(ja) is None
+
+
+@pytest.mark.parametrize(
+    "title,outcome",
+    [("M", "H"), ("MME", "F"), ("FOO", None)],
+)
+def test_civilite_mapping(title, outcome):
+    serializer = GeiqJobApplicationSerializer()
+    ja = JobApplicationFactory.build(job_seeker__title=title)
+    assert serializer.get_civilite(ja) == outcome
+
+
+@pytest.mark.parametrize(
+    "source,outcome",
+    [
+        ("job_seeker", "DEMANDEUR_EMPLOI"),
+        ("prescriber", "PRESCRIPTEUR"),
+        ("siae_staff", "EMPLOYEUR"),
+    ],
+)
+def test_source_orientation_mapping(source, outcome):
+    serializer = GeiqJobApplicationSerializer()
+    ja = JobApplicationFactory.build(sender_kind=source)
+    assert serializer.get_source_orientation(ja) == outcome
