@@ -12,7 +12,7 @@ from django.conf import settings
 from django.utils import timezone
 from psycopg import sql
 
-from itou.metabase.utils import chunked_queryset, compose, convert_boolean_to_int, convert_uuid_to_str
+from itou.metabase.utils import chunked_queryset, compose, convert_boolean_to_int
 
 
 class MetabaseDatabaseCursor:
@@ -275,9 +275,6 @@ def populate_table(table, batch_size, querysets=None, extra_object=None):
         if c["type"] == "boolean":
             c["type"] = "integer"
             c["fn"] = compose(convert_boolean_to_int, c["fn"])
-        elif c["type"] == "varchar":
-            # Force uuid as strings as UUIDDUmper does not include hyphens
-            c["fn"] = compose(convert_uuid_to_str, c["fn"])
 
     print(f"Injecting {total_rows} rows with {len(table.columns)} columns into table {table_name}:")
 

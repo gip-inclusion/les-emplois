@@ -45,7 +45,7 @@ def get_field_type_from_field(field):
     if isinstance(field, AutoField) and field.name == "id":
         return "integer"
     if isinstance(field, UUIDField):
-        return "varchar"
+        return "uuid"
     if isinstance(field, DateField):
         return "date"
     if isinstance(field, ForeignKey):

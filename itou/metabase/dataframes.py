@@ -11,10 +11,10 @@ from itou.metabase.db import MetabaseDatabaseCursor, create_table, get_new_table
 
 
 PANDA_DATAFRAME_TO_PSQL_TYPES_MAPPING = {
-    np.int64: "BIGINT",
-    np.object_: "TEXT",
-    np.float64: "DOUBLE PRECISION",
-    np.bool_: "BOOLEAN",
+    np.int64: "bigint",
+    np.object_: "text",
+    np.float64: "double precision",
+    np.bool_: "boolean",
 }
 
 
@@ -52,18 +52,19 @@ def store_df(df, table_name, max_attempts=5):
     while attempts < max_attempts:
         try:
             columns = infer_columns_from_df(df)
-            create_table(new_table_name, infer_columns_from_df(df), reset=True)
+            create_table(new_table_name, columns, reset=True)
             for df_chunk in tqdm(df_chunks):
                 rows = df_chunk.replace({np.nan: None}).to_dict(orient="split")["data"]
                 with MetabaseDatabaseCursor() as (cursor, conn):
                     with cursor.copy(
-                        sql.SQL("COPY {table_name} FROM STDIN").format(
+                        sql.SQL("COPY {table_name} FROM STDIN WITH (FORMAT BINARY)").format(
                             table_name=sql.Identifier(new_table_name),
                             Fields=sql.SQL(",").join(
                                 [sql.Identifier(col[0]) for col in columns],
                             ),
                         )
                     ) as copy:
+                        copy.set_types([col[1] for col in columns])
                         for row in rows:
                             copy.write_row(row)
                     conn.commit()
