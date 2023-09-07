@@ -428,7 +428,7 @@ def test_populate_job_applications():
         assert len(rows) == 1
         assert rows == [
             (
-                str(ja.pk),
+                ja.pk,
                 hash_content(ja.pk),
                 ja.created_at.date(),
                 ja.hiring_start_at,
@@ -752,7 +752,7 @@ def test_populate_evaluated_job_applications():
         assert rows == [
             (
                 evaluated_job_application.id,
-                str(evaluated_job_application.job_application_id),
+                evaluated_job_application.job_application_id,
                 evaluated_job_application.evaluated_siae_id,
                 evaluated_job_application.compute_state(),
                 datetime.date(2023, 2, 1),

@@ -1,15 +1,6 @@
-import uuid
-
-
 def convert_boolean_to_int(b):
     # True => 1, False => 0, None => None.
     return None if b is None else int(b)
-
-
-def convert_uuid_to_str(value):
-    if isinstance(value, uuid.UUID):
-        return str(value)
-    return value
 
 
 def compose(f, g):

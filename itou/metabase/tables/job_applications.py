@@ -116,7 +116,7 @@ TABLE.add_columns(
     [
         {
             "name": "id",
-            "type": "varchar",
+            "type": "uuid",
             "comment": "ID C1 de la candidature",
             "fn": lambda o: o.pk,
         },
