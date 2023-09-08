@@ -5,6 +5,7 @@
 		"fields": {
 			"name": "Bénéficiaire du Revenu de Solidarité Active (RSA)",
 			"desc": "",
+			"api_code": "RSA",
 			"written_proof": "Attestation de bénéficiaire du RSA",
 			"written_proof_url": "",
 			"written_proof_validity": "",
@@ -23,6 +24,7 @@
 		"fields": {
 			"name": "Allocataire de l'Allocation de Solidarité Spécifique (ASS)",
 			"desc": "",
+			"api_code": "ASS",
 			"written_proof": "Attestation de bénéficiaire de l'ASS",
 			"written_proof_url": "",
 			"written_proof_validity": "",
@@ -41,6 +43,7 @@
 		"fields": {
 			"name": "Allocataire de l'Allocation aux Adultes Handicapés (AAH)",
 			"desc": "",
+			"api_code": "AAH",
 			"written_proof": "Attestation de bénéficiaire de l'AAH",
 			"written_proof_url": "",
 			"written_proof_validity": "",
@@ -59,6 +62,7 @@
 		"fields": {
 			"name": "Demandeur d'emploi de très longue durée (DETLD) (24 mois et plus)",
 			"desc": "Demandeur d'emploi de très longue durée (inscrit à Pôle emploi)",
+			"api_code": "DELD24+",
 			"written_proof": "",
 			"written_proof_url": "",
 			"written_proof_validity": "Avis de situation Pôle emploi ou récapitulatif des périodes d'inscription (en cas de radiation)",
@@ -77,6 +81,7 @@
 		"fields": {
 			"name": "Niveau d'étude 3 (CAP, BEP) ou infra",
 			"desc": "",
+			"api_code": "NE3I",
 			"written_proof": "Diplôme et/ou attestation sur l'honneur",
 			"written_proof_url": "https://www.service-public.fr/particuliers/vosdroits/F199",
 			"written_proof_validity": "",
@@ -95,6 +100,7 @@
 		"fields": {
 			"name": "Senior (+50 ans)",
 			"desc": "",
+			"api_code": "+50",
 			"written_proof": "Pièce d'identité (carte d'identité, passeport, permis de conduire)",
 			"written_proof_url": "",
 			"written_proof_validity": "",
@@ -113,6 +119,7 @@
 		"fields": {
 			"name": "Jeune (-26 ans)",
 			"desc": "",
+			"api_code": "-26",
 			"written_proof": "Pièce d'identité (carte d'identité, passeport, permis de conduire)",
 			"written_proof_url": "",
 			"written_proof_validity": "",
@@ -131,6 +138,7 @@
 		"fields": {
 			"name": "Sortant de l'Aide Sociale à l'Enfance (ASE)",
 			"desc": "",
+			"api_code": "ASE",
 			"written_proof": "Attestation sur l'honneur",
 			"written_proof_url": "",
 			"written_proof_validity": "",
@@ -149,6 +157,7 @@
 		"fields": {
 			"name": "Demandeur d'emploi de longue durée (DELD) (12 mois et plus)",
 			"desc": "Demandeur d'emploi de longue durée (inscrit à Pôle emploi)",
+			"api_code": "DELD12/24",
 			"written_proof": "Avis de situation Pôle emploi ou récapitulatif des périodes d'inscription (en cas de radiation)",
 			"written_proof_url": "",
 			"written_proof_validity": "",
@@ -167,6 +176,7 @@
 		"fields": {
 			"name": "Travailleur handicapé",
 			"desc": "",
+			"api_code": "TH",
 			"written_proof": "Notification de décision de la maison départementale des personnes handicapées (MDPH) ou attestation de demande de renouvellement",
 			"written_proof_url": "",
 			"written_proof_validity": "",
@@ -185,6 +195,7 @@
 		"fields": {
 			"name": "Parent isolé",
 			"desc": "",
+			"api_code": "PI",
 			"written_proof": "Attestation allocation de soutien familial (ASF)",
 			"written_proof_url": "",
 			"written_proof_validity": "",
@@ -203,6 +214,7 @@
 		"fields": {
 			"name": "Personne sans hébergement ou hébergée ou ayant un parcours de rue",
 			"desc": "",
+			"api_code": "PSH/PR",
 			"written_proof": "Certificat de domiciliation. À défaut : déclaration sur l'honneur d'un travailleur social ou d'une association",
 			"written_proof_url": "",
 			"written_proof_validity": "",
@@ -221,6 +233,7 @@
 		"fields": {
 			"name": "Réfugiés statutaire ou bénéficiaire de la protection subsidiaire",
 			"desc": "",
+			"api_code": "RS/PS/DA",
 			"written_proof": "Titre de séjour valide ou demande de renouvellement du titre de séjour. Pour les bénéficiaires d'une protection temporaire : autorisation provisoire de séjour.",
 			"written_proof_url": "",
 			"written_proof_validity": "",
@@ -239,6 +252,7 @@
 		"fields": {
 			"name": "Résident en zone de revitalisation rurale (ZRR)",
 			"desc": "",
+			"api_code": "ZRR",
 			"written_proof": "Justificatif de domicile (facture eau, électricité, internet, téléphone)",
 			"written_proof_url": "https://www.data.gouv.fr/fr/datasets/zones-de-revitalisation-rurale-zrr",
 			"written_proof_validity": "",
@@ -257,6 +271,7 @@
 		"fields": {
 			"name": "Résident en quartier prioritaire de la politique de la ville (QPV)",
 			"desc": "",
+			"api_code": "QPV",
 			"written_proof": "Justificatif de domicile (facture eau, électricité, internet, téléphone)",
 			"written_proof_url": "https://sig.ville.gouv.fr",
 			"written_proof_validity": "",
@@ -275,6 +290,7 @@
 		"fields": {
 			"name": "Sortant de détention ou personne placée sous main de justice",
 			"desc": "",
+			"api_code": "Detention/MJ",
 			"written_proof": "Billet de sortie ou attestation du juge d'application des peines",
 			"written_proof_url": "",
 			"written_proof_validity": "",
@@ -291,8 +307,9 @@
 		"model": "eligibility.geiqadministrativecriteria",
 		"pk": 17,
 		"fields": {
-			"name": "Maîtrise de la langue française",
+			"name": "Non-maîtrise de la langue française",
 			"desc": "",
+			"api_code": "FR non maitrisé",
 			"written_proof": "Evaluation FLE inférieure au niveau A1",
 			"written_proof_url": "",
 			"written_proof_validity": "",
@@ -309,8 +326,9 @@
 		"model": "eligibility.geiqadministrativecriteria",
 		"pk": 18,
 		"fields": {
-			"name": "Mobilité",
+			"name": "Problème de mobilité",
 			"desc": "",
+			"api_code": "PM",
 			"written_proof": "Diagnostic mobilité délivré par un prescripteur habilité",
 			"written_proof_url": "",
 			"written_proof_validity": "",
@@ -329,6 +347,7 @@
 		"fields": {
 			"name": "Jeune de moins de 26 ans sans qualification (niveau 4 maximum)",
 			"desc": "Disposant au plus d’une qualification de niveau 4 sans expérience professionnelle ou n’ayant pas exercé une activité professionnelle depuis au moins 2 ans en rapport avec leur qualification — sans emploi et ne suivant pas des études ou une formation",
+			"api_code": "-26 SQ",
 			"written_proof": "Justificatif de diplôme, attestation de non-indemnisation, certificats de travail ou attestation sur l'honneur",
 			"written_proof_url": "",
 			"written_proof_validity": "",
@@ -347,6 +366,7 @@
 		"fields": {
 			"name": "Bénéficiaire des minimas sociaux",
 			"desc": "",
+			"api_code": "MINSOC",
 			"written_proof": "Attestation de bénéficiaire",
 			"written_proof_url": "",
 			"written_proof_validity": "",
@@ -365,6 +385,7 @@
 		"fields": {
 			"name": "Personne éloignée du marché du travail (> 1 an)",
 			"desc": "Sans emploi, inscrit ou non chez Pôle emploi",
+			"api_code": "DELD",
 			"written_proof": "CV, attestation sur l'honneur",
 			"written_proof_url": "",
 			"written_proof_validity": "",
@@ -383,6 +404,7 @@
 		"fields": {
 			"name": "Demandeur d’emploi de 45 ans et plus",
 			"desc": "",
+			"api_code": "+45",
 			"written_proof": "Copie pièce d'identité (carte d'identité, passeport, permis de conduire) et attestation de Pôle emploi",
 			"written_proof_url": "",
 			"written_proof_validity": "",
@@ -401,6 +423,7 @@
 		"fields": {
 			"name": "Personne en reconversion professionnelle contrainte",
 			"desc": "",
+			"api_code": "Reconv.",
 			"written_proof": "Tout élément montrant le caractère contraint de la nouvelle qualification recherché telle que la circonstance d'un licenciement économique ou l'inaptitude professionnellee",
 			"written_proof_url": "",
 			"written_proof_validity": "",
@@ -419,6 +442,7 @@
 		"fields": {
 			"name": "Personne bénéficiant ou sortant d’un dispositif d’insertion",
 			"desc": "",
+			"api_code": "SIAE/CUI",
 			"written_proof": "Contrat ou attestation fournie par la structure d'accueil précédente",
 			"written_proof_url": "",
 			"written_proof_validity": "",
@@ -437,6 +461,7 @@
 		"fields": {
 			"name": "Demandeur d'asile",
 			"desc": "",
+			"api_code": "RS/PS/DA",
 			"written_proof": "Autorisation temporaire de travail.",
 			"written_proof_url": "",
 			"written_proof_validity": "",
@@ -455,6 +480,7 @@
 		"fields": {
 			"name": "Autre minima social",
 			"desc": "",
+			"api_code": "MINSOC",
 			"written_proof": "Attestation de l’organisme versant l’aide",
 			"written_proof_url": "",
 			"written_proof_validity": "",
@@ -473,6 +499,7 @@
 		"fields": {
 			"name": "Personne inscrite à Pôle emploi",
 			"desc": "",
+			"api_code": "Prescrit",
 			"written_proof": "Avis de situation Pôle emploi ou récapitulatif des périodes d'inscription (en cas de radiation)",
 			"written_proof_url": "",
 			"written_proof_validity": "",
@@ -491,6 +518,7 @@
 		"fields": {
 			"name": "Demandeur d'emploi inscrit depuis moins de 12 mois",
 			"desc": "",
+			"api_code": "Prescrit",
 			"written_proof": "",
 			"written_proof_url": "",
 			"written_proof_validity": "",
