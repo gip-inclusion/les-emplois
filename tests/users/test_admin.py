@@ -61,6 +61,7 @@ def test_get_fields_to_transfer_for_job_seekers():
         "created_follow_up_groups",  # gps.FollowUpGroupMembership.creator: creator of a follow up group of GPS
         "eligibilitydiagnosis",  # EligibilityDiagnosis.author
         "emailaddress",  # allauth.account.models.EmailAddress.user
+        "employmentcontract",  # EmploymentContract.employee
         "externaldataimport",  # ExternalDataImport.user: this seems largely unused
         "follow_up_group",  # gps.FollowUpGroup: do I have a GPS follow group as a jobseeker
         "follow_up_groups",  # gps.FollowUpGroupMembership.member: followup groups membership
