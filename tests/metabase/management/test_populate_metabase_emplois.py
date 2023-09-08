@@ -895,12 +895,6 @@ def test_data_inconsistencies(capsys):
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
 def test_populate_fiches_de_poste():
-    # clear the active SIAE pks cache for now, is responsible for some flakyness.
-    # FIXME(dejafait,vperron): Find  a better system that does not give me a 4 hours headache.
-    from itou.metabase.tables.utils import get_active_siae_pks
-
-    get_active_siae_pks.cache_clear()
-
     create_test_romes_and_appellations(["M1805"], appellations_per_rome=1)
     siae = SiaeFactory(
         for_snapshot=True,
