@@ -253,6 +253,7 @@ class GEIQAdministrativeCriteria(AbstractAdministrativeCriteria):
         blank=True,
     )
     slug = models.SlugField(verbose_name="référence courte", max_length=100, null=True, blank=True)
+    api_code = models.CharField(verbose_name="code API")
 
     class Meta:
         verbose_name = "critère administratif GEIQ"
