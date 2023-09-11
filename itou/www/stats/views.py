@@ -28,7 +28,6 @@ from itou.common_apps.address.departments import (
     format_region_and_department_for_matomo,
     format_region_for_matomo,
 )
-from itou.utils import constants as global_constants
 from itou.utils.apis import metabase as mb
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
@@ -113,9 +112,9 @@ def render_stats(request, context, params=None, template_name="stats/stats.html"
     base_context["matomo_custom_url"] = matomo_custom_url
 
     if request.user.is_authenticated and metabase_dashboard:
-        siae_pk = request.session.get(global_constants.ITOU_SESSION_CURRENT_SIAE_KEY)
-        prescriber_org_pk = request.session.get(global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY)
-        institution_pk = request.session.get(global_constants.ITOU_SESSION_CURRENT_INSTITUTION_KEY)
+        siae_pk = request.current_organization.pk if request.user.is_siae_staff else None
+        prescriber_org_pk = request.current_organization.pk if request.user.is_prescriber else None
+        institution_pk = request.current_organization.pk if request.user.is_labor_inspector else None
         user_kind = request.user.kind
         department = base_context.get("department")
         region = DEPARTMENT_TO_REGION[department] if department else base_context.get("region")
