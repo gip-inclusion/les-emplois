@@ -1,5 +1,29 @@
 # Journal des modifications
 
+## [70] - 2023-09-11
+
+### Ajouté
+- Candidatures : Ajout de la civilité dans les exports de candidatures
+- Contrôle a posteriori : Mettre à dispo le lien du calendrier de la campagne de contrôle côté SIAE
+- Déclaration d'embauche : Nouveau processus de déclaration d'embauche rapide
+- Demandes de prolongations : Ajout de filtres pour faciliter la navigation
+- UX : Ajout de la bannière livestorm au tableau de bord des prescripteurs et employeurs
+
+
+### Modifié
+- Admin : Ajout d'un champ commentaire sur la page d’une campagne de contrôle a posteriori
+- Admin : Permettre aux membres du support de transférer les objets d’un candidat vers un autre
+- Admin : Restriction de certaines opération dangereuses
+- Candidatures : Ne plus afficher le PASS IAE dans le parcours d'embauche pour les structures non concernées par l'IAE
+- Correction des exports vers Metabase
+- Prolongations : Renouvellement des prolongations par périodes d’un an
+- Prolongations : Amélioration du contenu de l'email de demande de prolongation
+- Stats : Utilisation de la nouvelle page de statistiques
+- Thème : MaJ du thème itou vers la version 0.7.5
+- UX : Correction du format des dates dans les messages d'erreur
+- UX : Harmoniser l'affichage du nom des utilisateurs
+
+
 ## [70] - 2023-08-28
 
 ### Ajouté
