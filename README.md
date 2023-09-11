@@ -86,6 +86,20 @@ docker volume rm itou_postgres_data_backup
 docker compose down -v
 ```
 
+#### Charger une base de données de production
+
+Inspirez-vous de la suite de commandes suivante :
+
+```sh
+$ rclone copy --max-age 24h --progress emplois:/encrypted-backups ./backups
+$ pg_restore --jobs=4 --no-owner backups/backup.dump
+$ python manage.py set_fake_passwords
+$ python manage.py shell --command 'from itou.users.models import User; print(User.objects.update(identity_provider="DJANGO"))'
+```
+
+Rendez-vous sur la doc de
+[itou-backups](https://github.com/betagouv/itou-backups) pour plus d’infos.
+
 #### Lancer le serveur de développement
 
 ```sh

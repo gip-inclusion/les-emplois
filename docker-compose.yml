@@ -6,6 +6,7 @@ services:
   # https://hub.docker.com/r/mdillon/postgis/tags
   postgres:
     container_name: itou_postgres
+    image: postgis/postgis:14-master
     # Disable some safety switches for a faster postgres: https://www.postgresql.org/docs/current/non-durability.html
     command: -c fsync=off -c full_page_writes=off -c synchronous_commit=off
     environment:
@@ -23,14 +24,8 @@ services:
     # The default memory setting (64M) is not enough anymore due to the size of the database we import
     # https://stackoverflow.com/questions/56839975/docker-shm-size-dev-shm-resizing-shared-memory
     shm_size: 1g
-    build:
-      context: .
-      dockerfile: ./docker/dev/postgres/Dockerfile
-      args:
-        PG_MAJOR: 14
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - postgres_data_backups:/backups
     restart: always
     ports:
       - "127.0.0.1:${POSTGRES_PORT_ON_DOCKER_HOST:-5432}:5432"
@@ -68,4 +63,3 @@ services:
 
 volumes:
   postgres_data:
-  postgres_data_backups:
