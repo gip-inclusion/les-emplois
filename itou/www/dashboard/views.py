@@ -321,6 +321,30 @@ def edit_job_seeker_info(
 
 @login_required
 @require_POST
+def switch_organization(request):
+    pk = request.POST["organization_id"]
+    match request.user.kind:
+        case UserKind.SIAE_STAFF:
+            queryset = Siae.objects.active_or_in_grace_period().member_required(request.user)
+            session_key = global_constants.ITOU_SESSION_CURRENT_SIAE_KEY
+        case UserKind.PRESCRIBER:
+            queryset = PrescriberOrganization.objects.member_required(request.user)
+            session_key = global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY
+        case UserKind.LABOR_INSPECTOR:
+            queryset = Institution.objects.member_required(request.user)
+            session_key = global_constants.ITOU_SESSION_CURRENT_INSTITUTION_KEY
+        case _:
+            raise Http404()
+
+    organization = get_object_or_404(queryset, pk=pk)
+    request.session[session_key] = organization.pk
+    return HttpResponseRedirect(reverse("dashboard:index"))
+
+
+# TODO(xfernandez): remove those switch_xxx views in a week when
+# most users will have reloaded their pages
+@login_required
+@require_POST
 def switch_siae(request):
     """
     Switch to the dashboard of another SIAE of the same SIREN.
