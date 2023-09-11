@@ -179,7 +179,7 @@ def get_job_seeker_qpv_info(job_seeker):
 
 
 def get_table():
-    job_seekers_table = MetabaseTable(name="candidats")
+    job_seekers_table = MetabaseTable(name="candidats_v0")
 
     job_seekers_table.add_columns(
         [
