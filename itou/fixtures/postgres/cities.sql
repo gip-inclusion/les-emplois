@@ -1,3 +1,6 @@
+-- Created with command:
+-- pg_dump --no-owner --no-privileges --data-only -d itou -t cities_city > itou/fixtures/postgres/cities.sql
+
 --
 -- PostgreSQL database dump
 --
