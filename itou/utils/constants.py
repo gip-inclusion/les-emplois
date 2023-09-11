@@ -13,6 +13,7 @@ POLE_EMPLOI_EMAIL_SUFFIX = "@pole-emploi.fr"
 ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY = "current_prescriber_organization"
 ITOU_SESSION_CURRENT_SIAE_KEY = "current_siae"
 ITOU_SESSION_CURRENT_INSTITUTION_KEY = "current_institution"
+ITOU_SESSION_CURRENT_ORGANIZATION_KEY = "current_organization"
 ITOU_SESSION_PRESCRIBER_SIGNUP_KEY = "prescriber_signup"
 ITOU_SESSION_NIR_KEY = "job_seeker_nir"
 
