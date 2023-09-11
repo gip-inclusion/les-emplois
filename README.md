@@ -28,7 +28,7 @@ L’adaptateur Python pour le système de gestion de bases de données PostgreSQ
 système doit répondre.
 https://www.psycopg.org/docs/install.html#build-prerequisites
 
-### Développement dans un Virtualenv
+### Développement dans un virtualenv
 
 La commande make suivante crée un virtualenv et installe les dépendances pour
 le développement. Elle peut être exécutée régulièrement pour s’assurer que les
@@ -38,7 +38,7 @@ dépendances sont bien à jour.
 $ make venv
 ```
 
-Dans un Virtualenv, vous pouvez utiliser les commandes Django habituelles
+Dans un virtualenv, vous pouvez utiliser les commandes Django habituelles
 (`./manage.py`) mais également certaines recettes du Makefile, celles-ci
 seront lancées directement dans votre venv si `USE_VENV=1` est utilisé.
 Cette variable devrait _normalement_ pouvoir être définie en global dans
@@ -49,7 +49,7 @@ Pour lancer le serveur de développement :
 $ make runserver`
 ```
 Cette commande est préférable à `python manage.py runserver`, car elle vérifie
-que le Virtualenv est à jour.
+que le virtualenv est à jour.
 
 ### Développement avec Docker
 
