@@ -326,18 +326,15 @@ def switch_organization(request):
     match request.user.kind:
         case UserKind.SIAE_STAFF:
             queryset = Siae.objects.active_or_in_grace_period().member_required(request.user)
-            session_key = global_constants.ITOU_SESSION_CURRENT_SIAE_KEY
         case UserKind.PRESCRIBER:
             queryset = PrescriberOrganization.objects.member_required(request.user)
-            session_key = global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY
         case UserKind.LABOR_INSPECTOR:
             queryset = Institution.objects.member_required(request.user)
-            session_key = global_constants.ITOU_SESSION_CURRENT_INSTITUTION_KEY
         case _:
             raise Http404()
 
     organization = get_object_or_404(queryset, pk=pk)
-    request.session[session_key] = organization.pk
+    request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = organization.pk
     return HttpResponseRedirect(reverse("dashboard:index"))
 
 
@@ -354,7 +351,7 @@ def switch_siae(request):
     pk = request.POST["siae_id"]
     queryset = Siae.objects.active_or_in_grace_period().member_required(request.user)
     siae = get_object_or_404(queryset, pk=pk)
-    request.session[global_constants.ITOU_SESSION_CURRENT_SIAE_KEY] = siae.pk
+    request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = siae.pk
 
     return HttpResponseRedirect(dashboard_url)
 
@@ -370,7 +367,7 @@ def switch_prescriber_organization(request):
     pk = request.POST["prescriber_organization_id"]
     queryset = PrescriberOrganization.objects.member_required(request.user)
     prescriber_organization = get_object_or_404(queryset, pk=pk)
-    request.session[global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY] = prescriber_organization.pk
+    request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = prescriber_organization.pk
 
     return HttpResponseRedirect(dashboard_url)
 
@@ -386,7 +383,7 @@ def switch_institution(request):
     pk = request.POST["institution_id"]
     queryset = Institution.objects.member_required(request.user)
     institution = get_object_or_404(queryset, pk=pk)
-    request.session[global_constants.ITOU_SESSION_CURRENT_INSTITUTION_KEY] = institution.pk
+    request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = institution.pk
 
     return HttpResponseRedirect(dashboard_url)
 
@@ -396,7 +393,7 @@ def edit_user_notifications(request, template_name="dashboard/edit_user_notifica
     if not request.user.is_siae_staff:
         raise PermissionDenied
 
-    current_siae_pk = request.session.get(global_constants.ITOU_SESSION_CURRENT_SIAE_KEY)
+    current_siae_pk = request.session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY)
     siae = get_object_or_404(Siae, pk=current_siae_pk)
     membership = request.user.siaemembership_set.get(siae=siae)
     new_job_app_notification_form = EditNewJobAppEmployersNotificationForm(

@@ -152,21 +152,21 @@ class DashboardViewTest(TestCase):
         session = self.client.session
 
         # select the first SIAE's in the session
-        session[global_constants.ITOU_SESSION_CURRENT_SIAE_KEY] = siae.pk
+        session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = siae.pk
         session.save()
         response = self.client.get(url)
         self.assertContains(response, "badge-danger")
         assert response.context["num_rejected_employee_records"] == 2
 
         # select the second SIAE's in the session
-        session[global_constants.ITOU_SESSION_CURRENT_SIAE_KEY] = other_siae.pk
+        session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = other_siae.pk
         session.save()
         response = self.client.get(url)
         self.assertContains(response, "badge-danger")
         assert response.context["num_rejected_employee_records"] == 1
 
         # select the third SIAE's in the session
-        session[global_constants.ITOU_SESSION_CURRENT_SIAE_KEY] = last_siae.pk
+        session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = last_siae.pk
         session.save()
         response = self.client.get(url)
         assert response.status_code == 200
@@ -623,7 +623,7 @@ class DashboardViewTest(TestCase):
         self.client.force_login(prescriber)
         response = self.client.get(reverse("dashboard:index"))
         assert org_1 == PrescriberOrganization.objects.get(
-            pk=self.client.session.get(global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY)
+            pk=self.client.session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY)
         )
         self.assertNotContains(response, "Votre compte utilisateur n’est rattaché à aucune organisation.")
 

@@ -423,7 +423,7 @@ def create_siae(request, template_name="siaes/create_siae.html"):
     if request.method == "POST" and form.is_valid():
         try:
             siae = form.save()
-            request.session[global_constants.ITOU_SESSION_CURRENT_SIAE_KEY] = siae.pk
+            request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = siae.pk
             return HttpResponseRedirect(reverse("dashboard:index"))
         except GeocodingDataError:
             messages.error(request, "L'adresse semble erronée. Veuillez la corriger avant de pouvoir « Enregistrer ».")

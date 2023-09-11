@@ -10,8 +10,15 @@ from itou.utils import constants as global_constants
 from itou.www.login import urls as login_urls
 
 
-def extract_membership_infos_and_update_session(memberships, org_through_field, session, session_key):
-    current_org_pk = session.get(session_key)
+def extract_membership_infos_and_update_session(memberships, org_through_field, session, old_session_key):
+    # TODO(xfernandez): remove old_session_key management in a few weeks
+    current_org_pk = session.get(old_session_key)
+    if current_org_pk:
+        # If old session key is still used, migrate to the new one
+        session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = current_org_pk
+        del session[old_session_key]
+
+    current_org_pk = session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY)
     orgs = []
     current_org = None
     admin_status = {}
@@ -25,12 +32,12 @@ def extract_membership_infos_and_update_session(memberships, org_through_field, 
         if orgs:
             # If an org exists, choose the first one
             current_org = orgs[0]
-            session[session_key] = current_org.pk
+            session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = current_org.pk
         elif current_org_pk:
             # If the user has not active membership anymore
             # => No need to track the current org in session (none)
             # => Remove any old session entry if needed
-            del session[session_key]
+            del session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY]
     return (
         sorted(orgs, key=lambda o: (o.kind, o.display_name)),
         current_org,

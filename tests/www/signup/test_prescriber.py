@@ -113,7 +113,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         self.assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
         # Organization
-        assert self.client.session.get(global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY) == organization.pk
+        assert self.client.session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY) == organization.pk
         response = self.client.get(reverse("dashboard:index"))
         self.assertContains(response, f"Code SAFIR {organization.code_safir_pole_emploi}")
 
@@ -1121,7 +1121,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
         )
 
         # Organization
-        assert not self.client.session.get(global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY)
+        assert not self.client.session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY)
         assert not User.objects.filter(email=pe_email).exists()
 
     def test_permission_denied_when_skiping_first_step(self):

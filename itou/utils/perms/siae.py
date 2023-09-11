@@ -5,7 +5,7 @@ from itou.utils import constants as global_constants
 
 
 def get_current_siae_or_404(request, with_job_descriptions=False) -> Siae:
-    pk = request.session.get(global_constants.ITOU_SESSION_CURRENT_SIAE_KEY)
+    pk = request.session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY)
     queryset = Siae.objects.member_required(request.user)
 
     if with_job_descriptions:

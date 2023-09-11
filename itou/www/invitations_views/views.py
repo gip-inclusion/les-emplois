@@ -187,7 +187,7 @@ def join_prescriber_organization(request, invitation_id):
     else:
         messages.error(request, "Cette invitation n'est plus valide.")
 
-    request.session[global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY] = invitation.organization.pk
+    request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = invitation.organization.pk
     url = get_adapter(request).get_login_redirect_url(request)
     return HttpResponseRedirect(url)
 
@@ -248,7 +248,7 @@ def join_siae(request, invitation_id):
     else:
         messages.error(request, "Cette invitation n'est plus valide.")
 
-    request.session[global_constants.ITOU_SESSION_CURRENT_SIAE_KEY] = invitation.siae.pk
+    request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = invitation.siae.pk
     url = get_adapter(request).get_login_redirect_url(request)
     return HttpResponseRedirect(url)
 
@@ -309,5 +309,5 @@ def join_institution(request, invitation_id):
     else:
         messages.error(request, "Cette invitation n'est plus valide.")
 
-    request.session[global_constants.ITOU_SESSION_CURRENT_INSTITUTION_KEY] = invitation.institution.pk
+    request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = invitation.institution.pk
     return redirect("dashboard:index")
