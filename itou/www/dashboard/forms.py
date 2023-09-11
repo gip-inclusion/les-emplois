@@ -93,12 +93,13 @@ class EditJobSeekerInfoForm(JobSeekerNIRUpdateMixin, MandatoryAddressFormMixin, 
         super().clean()
         self._meta.model.clean_pole_emploi_fields(self.cleaned_data)
 
-        # Update job seeker geolocation
-        try:
-            self.instance.set_coords(self.cleaned_data["address_line_1"], self.cleaned_data["post_code"])
-        except AddressLookupError:
-            # Nothing to do: re-raised and already logged as error
-            pass
+        if address_line_1 := self.cleaned_data.get("address_line_1"):
+            # Update job seeker geolocation
+            try:
+                self.instance.set_coords(address_line_1, self.cleaned_data["post_code"])
+            except AddressLookupError:
+                # Nothing to do: re-raised and already logged as error
+                pass
 
     def save(self, commit=True):
         self.instance.last_checked_at = timezone.now()

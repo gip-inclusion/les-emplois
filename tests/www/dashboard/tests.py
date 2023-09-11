@@ -1277,6 +1277,28 @@ class EditJobSeekerInfo(TestCase):
         assert job_seeker.phone == post_data["phone"]
         assert job_seeker.address_line_2 == post_data["address_line_2"]
 
+    def test_edit_no_address_does_not_crash(self):
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
+        user = job_application.sender
+
+        # Ensure that the job seeker is not autonomous (i.e. he did not register by himself).
+        job_application.job_seeker.created_by = user
+        job_application.job_seeker.save()
+
+        self.client.force_login(user)
+        url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_seeker_pk": job_application.job_seeker_id})
+        post_data = {
+            "email": user.email,
+            "birthdate": "20/12/1978",
+            "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
+            "address_line_1": "",
+            "post_code": "35400",
+            "city": "Saint-Malo",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertContains(response, "Ce champ est obligatoire.")
+        assert response.context["form"].errors["address_line_1"] == ["Ce champ est obligatoire."]
+
 
 class ChangeEmailViewTest(TestCase):
     def test_update_email(self):
