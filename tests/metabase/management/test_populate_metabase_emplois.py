@@ -405,7 +405,17 @@ def test_populate_criteria():
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
 def test_populate_job_applications():
+    create_test_romes_and_appellations(["M1805"], appellations_per_rome=1)
+    siae = SiaeFactory(
+        for_snapshot=True,
+        siret="12989128580059",
+        # also means that the SIAE will be active, thus the job description also will be.
+        # this would also be a source of flakyness if not enforced.
+        kind="GEIQ",
+    )
+    job = SiaeJobDescriptionFactory(is_active=True, siae=siae)
     ja = JobApplicationFactory()
+    ja.selected_jobs.add(job)
 
     num_queries = 1  # Select siaes for get_active_siae_pks()
     num_queries += 1  # Count job applications
@@ -455,6 +465,33 @@ def test_populate_job_applications():
                 None,
                 0,
                 "",
+                datetime.date(2023, 2, 1),
+            ),
+        ]
+
+    # no need for a cache clear for the active siae pks, has been done above
+    num_queries = 1  # Count job applications
+    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
+    num_queries += 1  # COMMIT Create table
+    num_queries += 1  # Select job application IDs
+    num_queries += 1  # Select one chunk of job application IDs
+    num_queries += 1  # Select job applications with columns
+    num_queries += 1  # COMMIT (inject_chunk)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    with assertNumQueries(num_queries):
+        management.call_command("populate_metabase_emplois", mode="selected_jobs")
+
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM fiches_de_poste_par_candidature ORDER BY id_candidature")
+        rows = cursor.fetchall()
+        assert len(rows) == 1
+        assert rows == [
+            (
+                job.pk,
+                ja.pk,
+                hash_content(ja.pk),
                 datetime.date(2023, 2, 1),
             ),
         ]
