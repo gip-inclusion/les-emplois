@@ -215,7 +215,7 @@ def test_populate_job_seekers():
         management.call_command("populate_metabase_emplois", mode="job_seekers")
 
     with connection.cursor() as cursor:
-        cursor.execute("SELECT * FROM candidats ORDER BY id")
+        cursor.execute("SELECT * FROM candidats_v0 ORDER BY id")
         rows = cursor.fetchall()
 
     assert rows == [
