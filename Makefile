@@ -32,6 +32,9 @@ endif
 run:
 	docker compose up
 
+runserver: $(VIRTUAL_ENV)
+	python manage.py runserver
+
 $(VIRTUAL_ENV): $(REQUIREMENTS_PATH)
 	$(PYTHON_VERSION) -m venv $@
 	$@/bin/pip install -r $^
