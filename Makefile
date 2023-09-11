@@ -126,68 +126,6 @@ shell_on_django_container_as_root:
 shell_on_postgres_container:
 	docker exec -ti itou_postgres /bin/bash
 
-# Postgres CLI.
-# =============================================================================
-
-.PHONY: psql_itou psql_root psql_to_csv
-
-# Connect to the `itou` database as the `itou` user.
-psql_itou:
-	docker exec -ti -e PGPASSWORD=password itou_postgres psql -U itou -d itou
-
-# Connect to postgres client as the `root` user.
-psql_root:
-	docker exec -ti itou_postgres psql -U postgres
-
-# Write query results to a CSV file.
-# --
-# make psql_to_csv FILEPATH=path/to/script.sql
-# make psql_to_csv FILEPATH=path/to/script.sql EXPORTNAME=extract.csv
-psql_to_csv:
-	docker cp $(FILEPATH) itou_postgres:/script.sql
-	docker exec -ti -e PGPASSWORD=password itou_postgres psql -U itou -d itou --csv -f /script.sql -o /export.csv
-	docker cp itou_postgres:/export.csv exports/$(EXPORTNAME)
-	docker exec -ti itou_postgres rm /script.sql /export.csv
-
-# Postgres (backup / restore).
-# Inspired by:
-# https://cookiecutter-django.readthedocs.io/en/latest/docker-postgres-backups.html
-# =============================================================================
-
-.PHONY: postgres_backup postgres_backups_cp_locally postgres_backups_list postgres_backup_restore postgres_restore_latest_backup postgres_backups_clean
-
-postgres_backup:
-	docker compose exec postgres backup
-
-postgres_backups_cp_locally:
-	docker cp itou_postgres:/backups ~/Desktop/backups
-
-postgres_backups_list:
-	docker compose exec postgres backups
-
-# - Note: Django must be stopped to avoid a "database "itou" is being accessed by other users" error.
-# make postgres_backup_restore FILE=backup_2019_10_08T12_33_00.sql.gz
-# - Second note: you might get this message: `pg_restore: warning: errors ignored on restore: 331`.
-# This is due to permissions on extensions and can be ignored.
-# Just check you have all the data you need.
-postgres_backup_restore:
-	# Copy the backup file in the container first.
-	# Example: docker cp FILE itou_postgres:/backups/
-	docker compose up -d --no-deps postgres && \
-	docker compose exec postgres restore $(FILE) && \
-	docker compose stop
-
-# Download last prod backup and inject it locally.
-# ----------------------------------------------------
-# Prerequisites:
-# - Clone the git `itou-backups` project first and run `make build`. https://github.com/betagouv/itou-backups
-# - Copy .env.template and set correct values.
-postgres_restore_latest_backup: ./scripts/import-latest-db-backup.sh
-	./scripts/import-latest-db-backup.sh
-
-postgres_backups_clean:
-	docker compose exec postgres clean
-
 # Itou theme
 # =============================================================================
 
