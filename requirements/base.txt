@@ -258,6 +258,7 @@ django==4.2.5 \
     #   django-bootstrap4
     #   django-csp
     #   django-filter
+    #   django-formtools
     #   django-hijack
     #   django-htmx
     #   django-import-export
@@ -288,6 +289,10 @@ django-csp==3.7 \
 django-filter==23.3 \
     --hash=sha256:015fe155582e1805b40629344e4a6cf3cc40450827d294d040b4b8c1749a9fa6 \
     --hash=sha256:65bc5d1d8f4fff3aaf74cb5da537b6620e9214fb4b3180f6c560776b1b6dccd0
+    # via -r requirements/base.in
+django-formtools==2.4.1 \
+    --hash=sha256:21f8d5dac737f1e636fa8a0a10969c1c32f525a6dfa27c29592827ba70d9643a \
+    --hash=sha256:49ea8a64ddef4728a558bf5f8f622c0f4053b979edcf193bf00dd80432ab2f12
     # via -r requirements/base.in
 django-hijack==3.4.1 \
     --hash=sha256:2bdd7ffa42198637f49c195468b8330ea51dc36b7c2bee0f3c220c9d7de78764 \

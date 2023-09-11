@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "anymail",
     "bootstrap4",
     "django_select2",
+    "formtools",
     "huey.contrib.djhuey",
     "rest_framework",
     "rest_framework.authtoken",
