@@ -1,5 +1,5 @@
 {% load bootstrap4 %}
-<form id="mainForm" method="post" action="" class="js-prevent-multiple-submit">
+<form id="mainForm" method="post" class="js-prevent-multiple-submit">
     {% csrf_token %}
 
     {% bootstrap_form_errors form type="non_fields" %}
