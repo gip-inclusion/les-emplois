@@ -38,6 +38,9 @@ drf-spectacular  # https://github.com/tfranzel/drf-spectacular
 # Django filter (filtering/ordering of API results)
 django-filter  # https://django-filter.readthedocs.io/en/stable/
 
+# Preview and multi-steps/wizard forms for Django
+django-formtools  # https://django-formtools.readthedocs.io/en/latest/
+
 # Front-end
 # ------------------------------------------------------------------------------
 
