@@ -465,6 +465,7 @@ def test_populate_job_applications():
                 None,
                 0,
                 "",
+                ja.contract_type,
                 datetime.date(2023, 2, 1),
             ),
         ]
