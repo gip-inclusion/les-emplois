@@ -284,5 +284,11 @@ TABLE.add_columns(
             "comment": "Mode d''attribution du PASS IAE",
             "fn": lambda o: o.get_approval_delivery_mode_display(),
         },
+        {
+            "name": "type_contrat",
+            "type": "varchar",
+            "comment": "Type de contrat",
+            "fn": lambda o: o.contract_type.label if o.contract_type else "",
+        },
     ]
 )

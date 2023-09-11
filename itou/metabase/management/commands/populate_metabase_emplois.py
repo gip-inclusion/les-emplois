@@ -331,6 +331,7 @@ class Command(BaseCommand):
                 "to_siae__department",
                 "approval_id",
                 "approval_delivery_mode",
+                "contract_type",
             )
             .exclude(origin=Origin.PE_APPROVAL)
             .filter(to_siae_id__in=get_active_siae_pks())
