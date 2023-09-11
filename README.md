@@ -44,6 +44,13 @@ seront lancées directement dans votre venv si `USE_VENV=1` est utilisé.
 Cette variable devrait _normalement_ pouvoir être définie en global dans
 votre environnement shell (`export`, `.env`, ...).
 
+Pour lancer le serveur de développement :
+```sh
+$ make runserver`
+```
+Cette commande est préférable à `python manage.py runserver`, car elle vérifie
+que le Virtualenv est à jour.
+
 ### Développement avec Docker
 
 Vous devez disposer sur votre machine d'un démon `Docker` et de l'outil `Docker
