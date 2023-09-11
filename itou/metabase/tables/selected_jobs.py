@@ -6,13 +6,13 @@ TABLE.add_columns(
     [
         {
             "name": "id_fiche_de_poste",
-            "type": "int",
+            "type": "integer",
             "comment": "ID fiche de poste",
             "fn": lambda o: o["selected_jobs__id"],
         },
         {
             "name": "id_candidature",
-            "type": "varchar",
+            "type": "uuid",
             "comment": "ID de la candidature",
             "fn": lambda o: o["pk"],
         },
