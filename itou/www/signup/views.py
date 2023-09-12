@@ -17,7 +17,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.http import urlencode
 from django.views.decorators.http import require_GET
-from django.views.generic import TemplateView, View
+from django.views.generic import FormView, TemplateView, View
 
 from itou.common_apps.address.models import lat_lon_to_coords
 from itou.openid_connect.inclusion_connect.enums import InclusionConnectChannel
@@ -26,7 +26,7 @@ from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.siaes.enums import SiaeKind
 from itou.siaes.models import Siae, SiaeMembership
 from itou.users.adapter import UserAdapter
-from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF
+from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF, UserKind
 from itou.utils import constants as global_constants
 from itou.utils.nav_history import get_prev_url_from_history, push_url_in_history
 from itou.utils.tokens import siae_signup_token_generator
@@ -68,6 +68,19 @@ def signup(request, template_name="signup/signup.html", redirect_field_name=REDI
         "redirect_field_value": get_safe_url(request, redirect_field_name),
     }
     return render(request, template_name, context)
+
+
+class ChooseUserKindSignupView(FormView):
+    template_name = "signup/choose_user_kind.html"
+    form_class = forms.ChooseUserKindSignupForm
+
+    def form_valid(self, form):
+        urls = {
+            UserKind.JOB_SEEKER: reverse("signup:job_seeker_situation"),
+            UserKind.PRESCRIBER: reverse("signup:prescriber_check_already_exists"),
+            UserKind.SIAE_STAFF: reverse("signup:siae_select"),
+        }
+        return HttpResponseRedirect(urls[form.cleaned_data["kind"]])
 
 
 class JobSeekerSignupView(SignupView):

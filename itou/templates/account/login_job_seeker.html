@@ -12,12 +12,12 @@
             <li class="breadcrumb-item">
                 <a href="{% url 'home:hp' %}">Accueil</a>
             </li>
-            <li class="breadcrumb-item active" aria-current="page">Se connecter / S'inscrire</li>
+            <li class="breadcrumb-item active" aria-current="page">Se connecter</li>
         </ol>
     </nav>
 {% endblock %}
 
-{% block content_title %}<h1>Se connecter / S'inscrire</h1>{% endblock %}
+{% block content_title %}<h1>Se connecter</h1>{% endblock %}
 
 {% block content %}
     <section class="s-section">
@@ -25,8 +25,7 @@
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-lg-6">
                     <div class="c-form mb-5">
-                        <h2>Se connecter</h2>
-                        <p class="h4">S’identifier avec FranceConnect</p>
+                        <p class="h4">FranceConnect</p>
                         {% if show_france_connect %}
                             <div class="mt-4">{% include "signup/includes/france_connect_button.html" %}</div>
                         {% else %}
@@ -36,7 +35,7 @@
                         {% endif %}
                         <hr class="my-5" data-text="ou">
 
-                        <p class="h4">S’identifier avec Pôle emploi</p>
+                        <p class="h4">Se connecter avec Pôle emploi</p>
                         {% if show_peamu %}
                             <div class="row mt-3">
                                 <div class="col-sm">
@@ -55,7 +54,7 @@
                             <fieldset>
                                 <div class="row">
                                     <div class="col-12">
-                                        <p class="h4">S’identifier avec vos identifiants</p>
+                                        <p class="h4">Se connecter avec vos identifiants</p>
                                         {% bootstrap_form_errors form type="all" %}
                                         {% redirection_input_field name=redirect_field_name value=redirect_field_value %}
                                         {% bootstrap_field form.login %}
@@ -73,25 +72,6 @@
                             </div>
                         </form>
                     </div>
-                </div>
-                <div class="s-section__col col-12 col-lg-6">
-                    <div class="c-form">
-                        <div class="row">
-                            <div class="col-12">
-                                <h2>S'inscrire</h2>
-                                <div class="form-row justify-content-end">
-                                    <div class="form-group col-12 col-lg-auto">
-                                        <a class="btn btn-primary btn-block" href="{% url 'signup:job_seeker_situation' %}{% redirection_url name=redirect_field_name value=redirect_field_value %}">
-                                            Créer un compte candidat
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <picture class="d-none d-lg-block text-center">
-                        <img class="img-fluid" src="{% static 'img/illustration-login.svg' %}" alt="" loading="lazy">
-                    </picture>
                 </div>
             </div>
         </div>

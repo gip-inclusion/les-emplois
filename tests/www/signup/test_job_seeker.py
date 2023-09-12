@@ -23,6 +23,14 @@ class JobSeekerSignupTest(TestCase):
         super().setUp()
         [self.city] = create_test_cities(["67"], num_per_department=1)
 
+    def test_choose_user_kind(self):
+        url = reverse("signup:choose_user_kind")
+        response = self.client.get(url)
+        self.assertContains(response, "Candidat")
+
+        response = self.client.post(url, data={"kind": UserKind.JOB_SEEKER})
+        self.assertRedirects(response, reverse("signup:job_seeker_situation"))
+
     def test_job_seeker_signup_situation(self):
         """
         Test the redirects according to the chosen situations

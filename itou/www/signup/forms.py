@@ -72,6 +72,13 @@ class FullnameFormMixin(forms.Form):
     )
 
 
+class ChooseUserKindSignupForm(forms.Form):
+    kind = forms.ChoiceField(
+        widget=forms.RadioSelect,
+        choices=[(e.value, e.label) for e in [UserKind.JOB_SEEKER, UserKind.PRESCRIBER, UserKind.SIAE_STAFF]],
+    )
+
+
 class JobSeekerNirForm(forms.Form):
     nir = forms.CharField(
         label="Numéro de sécurité sociale",

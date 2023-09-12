@@ -8,6 +8,7 @@ from itou.www.signup import views
 app_name = "signup"
 
 urlpatterns = [
+    path("", views.ChooseUserKindSignupView.as_view(), name="choose_user_kind"),
     # Job seeker.
     path("job_seeker", views.JobSeekerSignupView.as_view(), name="job_seeker"),
     path("job_seeker/nir", views.job_seeker_nir, name="job_seeker_nir"),
