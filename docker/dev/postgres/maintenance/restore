@@ -28,17 +28,17 @@ if [[ ! -f "${backup_filename}" ]]; then
     exit 1
 fi
 
-message_welcome "Restoring the '${ITOU_POSTGRES_DATABASE_NAME}' database from the '${backup_filename}' backup..."
+message_welcome "Restoring the '${POSTGRES_DB}' database from the '${backup_filename}' backup..."
 
-export PGDATABASE="${ITOU_POSTGRES_DATABASE_NAME}"
+export PGDATABASE="${POSTGRES_DB}"
 
 message_info "Dropping the database..."
-dropdb "${ITOU_POSTGRES_DATABASE_NAME}"
+dropdb "${POSTGRES_DB}"
 
 message_info "Creating a new database..."
 createdb
 
 message_info "Applying the backup to the new database..."
-pg_restore --dbname="${ITOU_POSTGRES_DATABASE_NAME}" --format=c --clean --no-owner --jobs=4 --verbose "${backup_filename}"
+pg_restore --dbname="${POSTGRES_DB}" --format=c --clean --no-owner --jobs=4 --verbose "${backup_filename}"
 
-message_success "The '${ITOU_POSTGRES_DATABASE_NAME}' database has been restored from the '${backup_filename}' backup."
+message_success "The '${POSTGRES_DB}' database has been restored from the '${backup_filename}' backup."
