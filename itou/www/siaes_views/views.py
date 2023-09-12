@@ -34,7 +34,9 @@ def job_description_card(request, job_description_id, template_name="siaes/job_d
     job_description = get_object_or_404(SiaeJobDescription, pk=job_description_id)
     back_url = get_safe_url(request, "back_url")
     siae = job_description.siae
-    can_update_job_description = request.user.is_authenticated and request.current_organization.pk == siae.pk
+    can_update_job_description = (
+        request.user.is_authenticated and request.user.is_siae_staff and request.current_organization.pk == siae.pk
+    )
 
     # select_related on siae, location useful for _list_siae_actives_jobs_row.html template
     others_active_jobs = (

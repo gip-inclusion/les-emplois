@@ -13,6 +13,7 @@ from itou.www.siaes_views.views import ITOU_SESSION_JOB_DESCRIPTION_KEY
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.siaes.factories import SiaeFactory, SiaeJobDescriptionFactory
+from tests.users.factories import JobSeekerFactory
 from tests.utils.test import BASE_NUM_QUERIES, TestCase, assertMessages
 
 
@@ -477,7 +478,7 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
             },
         )
 
-    def test_siae_card_actions(self):
+    def test_siae_staff_card_actions(self):
         # Checks if SIAE can update their job descriptions
         response = self._login(self.user)
 
@@ -493,7 +494,7 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
         self.assertContains(response, reverse("siaes_views:job_description_list"))
         self.assertNotContains(response, reverse("apply:start", kwargs={"siae_pk": self.siae.pk}))
 
-    def test_non_siae_card_actions(self):
+    def test_prescriber_card_actions(self):
         # Checks if non-SIAE can apply to opened job descriptions
         self.client.force_login(PrescriberOrganizationWithMembershipFactory().members.first())
 
@@ -509,6 +510,44 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
             + 3  # update session
         ):
             response = self.client.get(self.url)
+
+        self.assertContains(response, "Postuler auprès de l'employeur solidaire")
+        self.assertContains(response, reverse("apply:start", kwargs={"siae_pk": self.siae.pk}))
+        self.assertNotContains(
+            response,
+            reverse(
+                "siaes_views:update_job_description",
+                kwargs={"job_description_id": self.job_description.pk},
+            ),
+        )
+
+    def test_job_seeker_card_actions(self):
+        self.client.force_login(JobSeekerFactory())
+
+        with self.assertNumQueries(
+            BASE_NUM_QUERIES
+            + 1  # fetch django session
+            + 1  # fetch user
+            + 1  # fetch siaes_siaejobdescription
+            + 1  # fetch siaes infos
+            + 1  # fetch jobappelation
+            + 1  # fetch other job infos
+            + 3  # update session
+        ):
+            response = self.client.get(self.url)
+
+        self.assertContains(response, "Postuler auprès de l'employeur solidaire")
+        self.assertContains(response, reverse("apply:start", kwargs={"siae_pk": self.siae.pk}))
+        self.assertNotContains(
+            response,
+            reverse(
+                "siaes_views:update_job_description",
+                kwargs={"job_description_id": self.job_description.pk},
+            ),
+        )
+
+    def test_anonymous_card_actions(self):
+        response = self.client.get(self.url)
 
         self.assertContains(response, "Postuler auprès de l'employeur solidaire")
         self.assertContains(response, reverse("apply:start", kwargs={"siae_pk": self.siae.pk}))
