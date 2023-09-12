@@ -326,9 +326,6 @@ class JobApplicationQuerySet(models.QuerySet):
             approval__isnull=False,
             # Only for that SIAE
             to_siae=siae,
-            # Hiring structure must be one of those kinds
-            # FIXME(rsebille): should probably not be handled as SQL because we already have `siae`
-            to_siae__kind__in=Siae.ASP_EMPLOYEE_RECORD_KINDS,
             # Admin control: can prevent creation of employee record
             create_employee_record=True,
             # There must be **NO** employee record linked in this part
@@ -361,9 +358,6 @@ class JobApplicationQuerySet(models.QuerySet):
                 Q(has_recent_suspension=True) | Q(has_recent_prolongation=True),
                 # Only for that SIAE
                 to_siae=siae,
-                # Hiring structure must be one of those kinds
-                # FIXME(rsebille): should probably not be handled as SQL because we already have `siae`
-                to_siae__kind__in=Siae.ASP_EMPLOYEE_RECORD_KINDS,
                 # Admin control: can prevent creation of employee record
                 create_employee_record=True,
                 # There must be **NO** employee record linked in this part
@@ -393,6 +387,9 @@ class JobApplicationQuerySet(models.QuerySet):
             - adds correctness to result
         Each query is commented according to the newest Whimsical schemas.
         """
+        if siae.kind not in Siae.ASP_EMPLOYEE_RECORD_KINDS:
+            return self.none()
+
         eligible_job_applications = JobApplicationQuerySet.union(
             self._eligible_job_applications_with_employee_record(siae),
             self._eligible_job_applications_without_employee_record(siae),
