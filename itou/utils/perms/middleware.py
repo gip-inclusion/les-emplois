@@ -81,7 +81,7 @@ class ItouCurrentOrganizationMiddleware:
                 and not request.path.startswith("/inclusion_connect")  # Allow to access ic views
                 and not request.path.startswith("/hijack/release")  # Allow to release hijack
                 and settings.FORCE_IC_LOGIN  # Allow to disable on dev setup
-                and request != reverse("account_logout")
+                and request.path != reverse("account_logout")
             ):
                 # Add request.path as next param ?
                 return HttpResponseRedirect(reverse("dashboard:activate_ic_account"))
