@@ -1,24 +1,19 @@
 {% load bootstrap4 %}
 
-<div class="alert alert-warning">
-    <p>
-        <small>
-            Le Ministère du Travail (DGEFP) et Pôle emploi traitent vos données personnelles. Ce site est ouvert aux acteurs de l'inclusion et permet de simplifier le recrutement des personnes éligibles aux structures de l'Insertion par l'Activité Économique (IAE). Il est une composante du Pacte ambition IAE.
-        </small>
-    </p>
-    <p class="mb-0">
-        <small>
-            Pour plus d'information sur le traitement de vos données personnelles ou pour exercer vos droits, consultez
-            <a href="{% url 'legal-privacy' %}" rel="noopener" target="_blank" aria-label="Consultez la section Protection des données (ouverture dans une nouvel onglet)">
-                la section Protection des données
-            </a><i class="ri-external-link-line ml-1"></i>.
-            En cliquant sur le bouton "Inscription", vous acceptez
-            <a href="{% url 'legal-terms' %}" rel="noopener" target="_blank" aria-label="Acceptez les conditions générales d'utilisation (ouverture dans une nouvel onglet)">
-                les conditions générales d'utilisation
-            </a><i class="ri-external-link-line ml-1"></i>.
-        </small>
-    </p>
-</div>
+<p>
+    Pour plus d'information sur le traitement de vos données personnelles ou pour exercer vos droits, consultez
+    <a href="{% url 'legal-privacy' %}" rel="noopener" target="_blank" aria-label="Consultez la section Protection des données (ouverture dans une nouvel onglet)">
+        la section Protection des données
+    </a><i class="ri-external-link-line ml-1"></i>.
+</p>
+<p>
+    En cliquant sur le bouton "Inscription", vous acceptez
+    <a href="{% url 'legal-terms' %}" rel="noopener" target="_blank" aria-label="Acceptez les conditions générales d'utilisation (ouverture dans une nouvel onglet)">
+        les conditions générales d'utilisation
+    </a><i class="ri-external-link-line ml-1"></i>.
+</p>
 {% buttons %}
-    <button class="btn btn-primary">Inscription</button>
+    <div class="text-right">
+        <button class="btn btn-primary">Inscription</button>
+    </div>
 {% endbuttons %}
