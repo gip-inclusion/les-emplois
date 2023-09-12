@@ -31,36 +31,41 @@
 
 
                     {% if siren_form.cleaned_data and not siaes_without_members and not siaes_with_members %}
-                        <div class="alert alert-emploi mt-5" role="status">
+                        <div class="alert alert-warning mt-5" role="status">
                             <p class="mb-0">
-                                Aucun résultat pour <b>{{ siren_form.cleaned_data.siren }}</b>.
+                                <i class="ri-information-line ri-xl text-warning mr-2"></i>
+                                <strong>Aucun résultat pour {{ siren_form.cleaned_data.siren }}</strong>.
                             </p>
                         </div>
 
-                        <div class="alert alert-danger mt-2" role="status">
+                        <div>
+                            <h3>Si vous tentez d'inscrire :</h3>
                             <p>
-                                <strong>Si vous êtes une SIAE</strong> :
+                                <strong>Une SIAE</strong>
                                 <br>
-                                Merci de vérifier dans l’extranet IAE 2.0 de l’ASP si votre annexe financière “valide” ou “provisoire” est déjà enregistrée.
-                            </p>
-                            <p>
-                                <i>Si c’est le cas</i>, tentez de vous reconnecter dans une dizaine de jours, le temps que l’ASP nous transmette l’information.
-                            </p>
-                            <p>
-                                <i>Si ce n’est pas le cas</i>, demandez à votre DDETS d’enregistrer au plus vite l’annexe financière dans l’ASP.
-                            </p>
-                            <p>
-                                En cas de nécessité d’inscription rapide, demandez à votre DDETS de nous contacter via <a href="{{ ITOU_HELP_CENTER_URL }}/requests/new" target="_blank" rel="noopener" aria-label="lien de contact pour votre DDETS (ouverture dans un nouvel onglet)">ce formulaire</a>.
+                                Vérifier que l’annexe financière valide ou provisoire de la structure a bien été enregistrée dans l’extranet IAE 2.0 de l’ASP :
+                                <ul>
+                                    <li>
+                                        Si oui, le délai de réception des données de l’ASP peut prendre une dizaine de jours. Merci de retenter l’inscription après ce délai.
+                                    </li>
+                                    <li>Si non, faire une demande d’enregistrement de l’annexe financière dans l’ASP auprès de votre DDETS.</li>
+                                </ul>
+                                En cas de nécessité, contacter l’<a href="{{ ITOU_HELP_CENTER_URL }}/requests/new" target="_blank" rel="noopener" aria-label="lien de contact pour votre DDETS (ouverture dans un nouvel onglet)">Aide & Assistance</a>.
+                                <i class="ri-external-link-line ri-xl"></i>
                             </p>
 
                             <p>
-                                <strong>Si vous tentez d'inscrire une Entreprise Adaptée ou un GEIQ</strong> :
-                                Utilisez <a href="{% tally_form_url "wA799W" %}" target="_blank" rel="noopener" aria-label="lien pour une Entreprise Adaptée ou un GEIQ (ouverture dans un nouvel onglet)">ce formulaire</a>.
+                                <strong>Une Entreprise Adaptée & GEIQ</strong> :
+                                <br>
+                                Complétez <a href="{% tally_form_url "wA799W" %}" target="_blank" rel="noopener" aria-label="lien pour une Entreprise Adaptée ou un GEIQ (ouverture dans un nouvel onglet)">ce formulaire de demande d'inscription</a>.
+                                <i class="ri-external-link-line ri-xl"></i>
                             </p>
 
                             <p class="mb-0">
                                 <strong>Si votre organisation est porteuse de la clause sociale</strong> :
-                                Utilisez <a href="{% url "signup:facilitator_search" %}" rel="noopener" aria-label="lien pour une organisation porteuse de la clause sociale">ce formulaire</a>.
+                                <br>
+                                Complétez <a href="{% url "signup:facilitator_search" %}" rel="noopener" aria-label="lien pour une organisation porteuse de la clause sociale">ce formulaire de demande d'inscription</a>.
+                                <i class="ri-external-link-line ri-xl"></i>
                             </p>
                         </div>
                     {% endif %}
