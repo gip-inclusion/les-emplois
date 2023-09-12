@@ -1,0 +1,28 @@
+# serializer version: 1
+# name: test_sync_commune[modified_communes]
+  list([
+    '> successfully deleted count=0 communes insee_codes=[]',
+    '> successfully created count=2 new communes',
+    '> successfully updated count=2 communes',
+    '> found 19 communes without city, will match again.',
+    '> successfully updated count=0 cities in preexisting communes',
+  ])
+# ---
+# name: test_sync_commune[original_communes]
+  list([
+    "> successfully deleted count=50 communes insee_codes=['07141', '08488', '12176', '13200', '37273', '41269', '59183', '59291', '59350', '62215', '62525', '62570', '62758', '64483', '67152', '67482', '69256', '77284', '83100', '83136', '85146', '86194', '87114', '88160', '91432', '97108']",
+    '> successfully created count=35 new communes',
+    '> successfully updated count=0 communes',
+    '> found 20 communes without city, will match again.',
+    '> successfully updated count=0 cities in preexisting communes',
+  ])
+# ---
+# name: test_sync_commune[with_cities]
+  list([
+    '> successfully deleted count=0 communes insee_codes=[]',
+    '> successfully created count=0 new communes',
+    '> successfully updated count=0 communes',
+    '> found 20 communes without city, will match again.',
+    '> successfully updated count=1 cities in preexisting communes',
+  ])
+# ---
