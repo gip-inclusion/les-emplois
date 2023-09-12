@@ -1,5 +1,4 @@
 import datetime
-import logging
 import uuid
 
 from django.conf import settings
@@ -36,9 +35,6 @@ from itou.users.enums import UserKind
 from itou.utils.emails import get_email_message, send_email_messages
 from itou.utils.models import InclusiveDateRangeField
 from itou.utils.urls import get_absolute_url
-
-
-logger = logging.getLogger(__name__)
 
 
 class JobApplicationWorkflow(xwf_models.Workflow):
@@ -903,7 +899,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         ]
 
         # Send email to prescriber or orienter if any
-        if self.sender_kind == SenderKind.PRESCRIBER:
+        if self.sender_kind == SenderKind.PRESCRIBER and self.sender_id:  # Sender user may have been deleted.
             emails.append(self.get_email_transfer_prescriber(transferred_by, self.transferred_from, target_siae))
 
         send_email_messages(emails)
@@ -943,7 +939,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
         # Notification emails.
         emails = [self.email_accept_for_job_seeker]
-        if self.is_sent_by_proxy:
+        if self.is_sent_by_proxy and self.sender_id:  # Sender user may have been deleted.
             emails.append(self.email_accept_for_proxy)
 
         # Link to the job seeker's eligibility diagnosis.
@@ -1017,7 +1013,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def refuse(self, *args, **kwargs):
         # Send notification.
         emails = [self.email_refuse_for_job_seeker]
-        if self.is_sent_by_proxy:
+        if self.is_sent_by_proxy and self.sender_id:  # Sender user may have been deleted.
             emails.append(self.email_refuse_for_proxy)
         send_email_messages(emails)
 
@@ -1100,7 +1096,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def email_cancel(self, cancelled_by):
         to = [cancelled_by.email]
         bcc = []
-        if self.is_sent_by_proxy:
+        if self.is_sent_by_proxy and self.sender_id:  # Sender user may have been deleted.
             bcc.append(self.sender.email)
         context = {"job_application": self}
         subject = "apply/email/cancel_subject.txt"

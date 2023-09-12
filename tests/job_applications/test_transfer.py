@@ -115,6 +115,28 @@ class JobApplicationTransferModelTest(TestCase):
         assert job_application.eligibility_diagnosis is None
         assert not EligibilityDiagnosis.objects.filter(pk=eligibility_diagnosis_pk)
 
+    def test_transfer_to_without_sender(self):
+        origin_siae = SiaeFactory(with_membership=True)
+        target_siae = SiaeFactory(with_membership=True)
+        origin_user = origin_siae.members.first()
+        target_siae.members.first()
+        target_siae.members.add(origin_user)
+
+        job_application = JobApplicationFactory(
+            to_siae=origin_siae,
+            sent_by_authorized_prescriber_organisation=True,
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+        )
+        # Sender user account is deleted.
+        job_application.sender = None
+        job_application.save(update_fields=["sender"])
+
+        job_application.transfer_to(origin_user, target_siae)
+        job_application.refresh_from_db()
+
+        assert job_application.to_siae == target_siae
+        assert job_application.state == JobApplicationWorkflow.STATE_NEW
+
     def test_model_fields(self):
         # Check new fields in model
         origin_siae = SiaeFactory(with_membership=True)
