@@ -12,6 +12,7 @@ services:
       # Required by the "_/postgres" image used by "postgis/postgis"
       # https://registry.hub.docker.com/_/postgres/
       - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=${PGDATABASE:-itou}
       # Avoid a log error when starting the itou_postgres container:
       # > Role "root" does not exist.
       # Without this variable, the default Unix account ('root')
@@ -19,8 +20,6 @@ services:
       # https://www.postgresql.org/docs/current/libpq-envars.html
       - PGUSER=postgres
       - PGPASSWORD=password
-      # Set the name of the database, this used by the scripts we add to the image (ie. psql_init.sh, backup, ...)
-      - ITOU_POSTGRES_DATABASE_NAME=itou
     # The default memory setting (64M) is not enough anymore due to the size of the database we import
     # https://stackoverflow.com/questions/56839975/docker-shm-size-dev-shm-resizing-shared-memory
     shm_size: 1g
@@ -32,7 +31,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - postgres_data_backups:/backups
-      - ./docker/dev/postgres/psql_init.sh:/docker-entrypoint-initdb.d/postgres-init.sh
     restart: always
     ports:
       - "${POSTGRES_PORT_ON_DOCKER_HOST:-5432}:5432"

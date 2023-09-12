@@ -13,8 +13,8 @@ working_dir="$(dirname ${0})"
 source "${working_dir}/_sourced/constants.sh"
 source "${working_dir}/_sourced/messages.sh"
 
-message_welcome "Cleaning up '${ITOU_POSTGRES_DATABASE_NAME}' backups..."
+message_welcome "Cleaning up '${POSTGRES_DB}' backups..."
 
 find ${BACKUP_DIR_PATH} -ctime +7 -name "${BACKUP_FILE_PREFIX}*sql.gz" -delete
 
-message_success "'${ITOU_POSTGRES_DATABASE_NAME}' backups have been cleaned up."
+message_success "'${POSTGRES_DB}' backups have been cleaned up."
