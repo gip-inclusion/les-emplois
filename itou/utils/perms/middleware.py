@@ -55,7 +55,6 @@ class ItouCurrentOrganizationMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        # Before the view is called.
         user = request.user
 
         # Accepting an invitation to join a group is a two-step process.
@@ -173,8 +172,4 @@ class ItouCurrentOrganizationMiddleware:
                     messages.warning(request, message)
                     return redirect("account_logout")
 
-        response = self.get_response(request)
-
-        # After the view is called.
-
-        return response
+        return self.get_response(request)
