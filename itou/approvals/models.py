@@ -808,8 +808,7 @@ class Suspension(models.Model):
         on_delete=models.SET_NULL,
         related_name="approvals_suspended_set",
     )
-    # FIXME(rsebille): Remove the null=True. But beware, it will force PG to rewrite almost all the rows.
-    updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True, null=True)
+    updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="mis à jour par",
