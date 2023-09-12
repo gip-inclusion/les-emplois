@@ -649,6 +649,20 @@ class JobApplicationQuerySetTest(TestCase):
         assert JobApplication.objects.with_accepted_at().count() == JobApplication.objects.count()
         assert JobApplication.objects.with_accepted_at().first().accepted_at == expected_created_at
 
+    def test_accept_without_sender(self):
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
+        job_application.process()
+        # User account is deleted.
+        job_application.sender = None
+        job_application.save(update_fields=["sender"])
+        siae_member = job_application.to_siae.members.first()
+        job_application.accept(user=siae_member)
+        recipients = []
+        for email in mail.outbox:
+            [recipient] = email.to
+            recipients.append(recipient)
+        assert recipients == [job_application.job_seeker.email, siae_member.email]
+
     def test_with_accepted_at_default_value(self):
         job_application = JobApplicationSentBySiaeFactory()
 
@@ -879,6 +893,21 @@ class JobApplicationNotificationsTest(TestCase):
         assert job_application.answer in email.body
         assert job_application.answer_to_prescriber not in email.body
 
+    def test_refuse_without_sender(self):
+        # When sent by authorized prescriber.
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
+            refusal_reason=RefusalReason.DID_NOT_COME,
+            answer_to_prescriber="Le candidat n'est pas venu.",
+        )
+        job_application.process()
+        # User account is deleted.
+        job_application.sender = None
+        job_application.save(update_fields=["sender"])
+        job_application.refuse()
+        [email] = mail.outbox
+        assert email.to == [job_application.job_seeker.email]
+
     def test_email_deliver_approval(self):
         job_seeker = JobSeekerFactory()
         approval = ApprovalFactory(user=job_seeker)
@@ -1013,6 +1042,18 @@ class JobApplicationNotificationsTest(TestCase):
         email = job_application.email_cancel(cancelled_by=cancellation_user)
         # To.
         assert not email.bcc
+
+    def test_cancel_without_sender(self):
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True, state=JobApplicationWorkflow.STATE_ACCEPTED
+        )
+        # User account is deleted.
+        job_application.sender = None
+        job_application.save(update_fields=["sender"])
+        cancellation_user = job_application.to_siae.active_members.first()
+        job_application.cancel(user=cancellation_user)
+        [email] = mail.outbox
+        assert email.to == [cancellation_user.email]
 
 
 class NewQualifiedJobAppEmployersNotificationTest(TestCase):

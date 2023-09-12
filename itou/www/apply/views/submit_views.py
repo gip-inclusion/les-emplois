@@ -27,7 +27,7 @@ from itou.siaes.models import Siae, SiaeJobDescription
 from itou.users.enums import UserKind
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.apis.exceptions import AddressLookupError
-from itou.utils.emails import redact_email_address
+from itou.utils.emails import redact_email_address, send_email_messages
 from itou.utils.session import SessionNamespace, SessionNamespaceRequiredMixin
 from itou.utils.storage.s3 import S3Upload
 from itou.www.apply.forms import (
@@ -1065,10 +1065,14 @@ class ApplicationResumeView(ApplicationBaseView):
                     notification = NewQualifiedJobAppEmployersNotification(job_application=job_application)
 
                 notification.send()
-                job_application.email_new_for_job_seeker().send()
 
-                if job_application.is_sent_by_proxy:
-                    job_application.email_new_for_prescriber.send()
+                job_application_emails = [job_application.email_new_for_job_seeker()]
+
+                if request.user.is_prescriber:
+                    job_application_emails.append(job_application.email_new_for_prescriber)
+
+                send_email_messages(job_application_emails)
+
             finally:
                 # We are done, send to the (mostly) stateless final page as we now have no session.
                 # "siae_pk" is kinda useless with "application_pk" but is kept for URL consistency.
