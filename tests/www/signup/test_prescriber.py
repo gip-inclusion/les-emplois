@@ -48,6 +48,14 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
             return_value=httpx.Response(200, json=ETABLISSEMENT_API_RESULT_MOCK)
         )
 
+    def test_choose_user_kind(self):
+        url = reverse("signup:choose_user_kind")
+        response = self.client.get(url)
+        self.assertContains(response, "Prescripteur / Orienteur")
+
+        response = self.client.post(url, data={"kind": UserKind.PRESCRIBER})
+        self.assertRedirects(response, reverse("signup:prescriber_check_already_exists"))
+
     @respx.mock
     def test_create_user_prescriber_member_of_pole_emploi(self):
         """

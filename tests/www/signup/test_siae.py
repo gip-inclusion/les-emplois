@@ -28,6 +28,14 @@ from tests.utils.test import BASE_NUM_QUERIES, TestCase, assertMessages
 
 
 class SiaeSignupTest(InclusionConnectBaseTestCase):
+    def test_choose_user_kind(self):
+        url = reverse("signup:choose_user_kind")
+        response = self.client.get(url)
+        self.assertContains(response, "Employeur solidaire")
+
+        response = self.client.post(url, data={"kind": UserKind.SIAE_STAFF})
+        self.assertRedirects(response, reverse("signup:siae_select"))
+
     @freeze_time("2022-09-15 15:53:54")
     @respx.mock
     def test_join_an_siae_without_members(self):
