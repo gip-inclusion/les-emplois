@@ -2,7 +2,8 @@
     <h3 class="h4">Invitations en attente</h3>
     <div class="alert alert-warning">
         <p>
-            Chaque collaborateur invité reçoit son propre lien d'invitation, ce lien est valable 15 jours (lorsque le lien expire, l'invitation n'est plus affichée ci-dessus).
+            Chaque collaborateur invité reçoit son propre lien d'invitation.
+            Lorsque le lien expire, l'invitation n'est plus affichée ci-dessous.
             Ce lien d'invitation est transmis automatiquement par e-mail.
         </p>
         <p class="mb-0">En cas de besoin, vous pouvez également le copier depuis la colonne « Lien d'invitation ».</p>
@@ -17,6 +18,7 @@
                     <th scope="col">Nom</th>
                     <th scope="col">Email</th>
                     <th scope="col">Envoyée le</th>
+                    <th scope="col">Valable jusqu'au</th>
                     <th scope="col">Lien d'invitation</th>
                 </tr>
             </thead>
@@ -29,6 +31,7 @@
                             <a href="mailto:{{ invitation.email }}">{{ invitation.email }}</a>
                         </td>
                         <td>{{ invitation.sent_at|date:"d F Y à H:i" }}</td>
+                        <td>{{ invitation.expiration_date|date:"d F Y à H:i" }}</td>
                         <td>
                             {% include 'includes/copy_to_clipboard.html' with content=invitation.acceptance_link css_classes="btn-outline-primary btn-sm" %}
                         </td>
