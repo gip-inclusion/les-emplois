@@ -57,21 +57,6 @@ class ItouCurrentOrganizationMiddleware:
     def __call__(self, request):
         user = request.user
 
-        # Accepting an invitation to join a group is a two-step process.
-        # - View one: account creation or login.
-        # - View two: user is added to the group.
-        # In view two, the user is authenticated but he does not belong to any group.
-        # This raises an error so we skip the middleware only in this case.
-        login_routes = [reverse(f"login:{url.name}") for url in login_urls.urlpatterns] + [reverse("account_login")]
-        skip_middleware_conditions = [
-            request.path in login_routes,
-            request.path.startswith("/invitations/") and not request.path.startswith("/invitations/invite"),
-            request.path.startswith("/signup/siae/join"),  # siae staff about to join an siae
-            request.path.startswith("/signup/facilitator/join"),  # facilitator about to join an siae
-        ]
-        if any(skip_middleware_conditions):
-            return self.get_response(request)
-
         redirect_message = None
         if user.is_authenticated:
             if user.is_siae_staff:
@@ -155,6 +140,21 @@ class ItouCurrentOrganizationMiddleware:
                         "Nous espérons cependant avoir l'occasion de vous accueillir de "
                         "nouveau."
                     )
+
+        # Accepting an invitation to join a group is a two-step process.
+        # - View one: account creation or login.
+        # - View two: user is added to the group.
+        # In view two, the user is authenticated but he does not belong to any group.
+        # This raises an error so we skip the middleware only in this case.
+        login_routes = [reverse(f"login:{url.name}") for url in login_urls.urlpatterns] + [reverse("account_login")]
+        skip_middleware_conditions = [
+            request.path in login_routes,
+            request.path.startswith("/invitations/") and not request.path.startswith("/invitations/invite"),
+            request.path.startswith("/signup/siae/join"),  # siae staff about to join an siae
+            request.path.startswith("/signup/facilitator/join"),  # facilitator about to join an siae
+        ]
+        if any(skip_middleware_conditions):
+            return self.get_response(request)
 
         # Force Inclusion Connect
         if (
