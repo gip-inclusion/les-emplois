@@ -481,18 +481,21 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
         # Checks if SIAE can update their job descriptions
         response = self._login(self.user)
 
-        assert response.status_code == 200
-
-        response = self.client.get(self.url)
-
-        self.assertContains(response, "Modifier")
+        self.assertContains(response, "Modifier la fiche de poste")
+        self.assertContains(
+            response,
+            reverse(
+                "siaes_views:update_job_description",
+                kwargs={"job_description_id": self.job_description.pk},
+            ),
+        )
+        self.assertContains(response, "Retour vers la liste des postes")
+        self.assertContains(response, reverse("siaes_views:job_description_list"))
+        self.assertNotContains(response, reverse("apply:start", kwargs={"siae_pk": self.siae.pk}))
 
     def test_non_siae_card_actions(self):
         # Checks if non-SIAE can apply to opened job descriptions
-        user = PrescriberOrganizationWithMembershipFactory().members.first()
-        response = self._login(user)
-
-        assert response.status_code == 200
+        self.client.force_login(PrescriberOrganizationWithMembershipFactory().members.first())
 
         with self.assertNumQueries(
             BASE_NUM_QUERIES
@@ -503,14 +506,22 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
             + 1  # fetch siaes infos
             + 1  # fetch jobappelation
             + 1  # fetch other job infos
+            + 3  # update session
         ):
             response = self.client.get(self.url)
 
-        self.assertContains(response, "Postuler")
+        self.assertContains(response, "Postuler auprès de l'employeur solidaire")
+        self.assertContains(response, reverse("apply:start", kwargs={"siae_pk": self.siae.pk}))
+        self.assertNotContains(
+            response,
+            reverse(
+                "siaes_views:update_job_description",
+                kwargs={"job_description_id": self.job_description.pk},
+            ),
+        )
 
     def test_display_placeholder_for_empty_fields(self):
         response = self._login(self.user)
-        response = self.client.get(self.url)
 
         # Job description created in setup has empty description fields
         self.assertContains(response, "La structure n'a pas encore renseigné cette rubrique", count=2)
