@@ -3,6 +3,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum, auto
 
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Model, QuerySet
 
 
@@ -72,7 +73,12 @@ def yield_sync_diff(
     yield DiffItem(None, DiffItemKind.SUMMARY, f"count={len(added_by_coll)} label={label} added by collection")
     for key in sorted(added_by_coll):
         obj_coll = data_map[key]
-        yield DiffItem(key, DiffItemKind.ADDITION, f"\tADDED {json.dumps(obj_coll, ensure_ascii=False)}", obj_coll)
+        yield DiffItem(
+            key,
+            DiffItemKind.ADDITION,
+            f"\tADDED {json.dumps(obj_coll, ensure_ascii=False, cls=DjangoJSONEncoder)}",
+            obj_coll,
+        )
 
     yield DiffItem(None, DiffItemKind.SUMMARY, f"count={len(removed_in_coll)} label={label} removed by collection")
     for key in sorted(removed_in_coll):
