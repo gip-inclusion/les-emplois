@@ -5,9 +5,9 @@
 > l'emploi par le biais de tiers (prescripteurs habilités, orienteurs) ou en
 > autoprescription.
 
-## Environnement de développement
+# Environnement de développement
 
-### Définition des variables d'environnement
+## Définition des variables d'environnement
 
 Les valeurs par défaut de `dev.py` permettent de lancer un environnement fonctionnel.
 
@@ -21,72 +21,66 @@ Celles concernant notre hébergeur CleverCloud sont définis au niveau du déplo
 de l'app CleverCloud tandis que les autres paramètres applicatifs indépendants du PaaS
 sont définis dans le projet `itou-secrets`.
 
-### Psycopg
+## Installation
 
-L’adaptateur Python pour le système de gestion de bases de données PostgreSQL,
-[psycopg](https://www.psycopg.org/), a quelques pré-requis auxquels votre
-système doit répondre.
-https://www.psycopg.org/docs/install.html#build-prerequisites
+L’application est développée avec [Django](https://www.djangoproject.com/), la
+base de données est gérée par [PostgreSQL](https://www.postgresql.org/).
 
-### Développement dans un virtualenv
+_Les instructions ci-dessous vous permettront d’obtenir un environnement de
+développement pratique à utiliser au quotidien. Pour obtenir un environnement
+fonctionnel très rapidement, mais moins ouvert au développement, suivre les
+instructions [containerization](./docs/Docker.md)._
 
-La commande make suivante crée un virtualenv et installe les dépendances pour
-le développement. Elle peut être exécutée régulièrement pour s’assurer que les
-dépendances sont bien à jour.
+### Docker
 
-```bash
-$ make venv
-```
-
-Dans un virtualenv, vous pouvez utiliser les commandes Django habituelles
-(`./manage.py`) mais également certaines recettes du Makefile, celles-ci
-seront lancées directement dans votre venv si `USE_VENV=1` est utilisé.
-Cette variable devrait _normalement_ pouvoir être définie en global dans
-votre environnement shell (`export`, `.env`, ...).
-
-Pour lancer le serveur de développement :
-```sh
-$ make runserver`
-```
-Cette commande est préférable à `python manage.py runserver`, car elle vérifie
-que le virtualenv est à jour.
-
-### Développement avec Docker
-
-Vous devez disposer sur votre machine d'un démon `Docker` et de l'outil `Docker
+Vous devez disposer sur votre machine du service `Docker` et de l'outil `Docker
 Compose`. Si ce n'est pas encore le cas :
 
 - [Installer Docker](https://docs.docker.com/engine/install/)
 - [Installer Docker Compose](https://docs.docker.com/compose/install/)
 
-Vous pouvez également personnaliser la configuration Compose en créant [un
-fichier `.env`](https://docs.docker.com/compose/env-file/) à partir d'une copie
-du fichier racine `.env.template`. Le fichier `.env` doit être au même niveau
-que le fichier `README.md`.
+Vous pouvez également personnaliser la configuration de Docker Compose en
+créant [un fichier `.env`](https://docs.docker.com/compose/env-file/) à partir
+d'une copie du fichier racine `.env.template`. Le fichier `.env` doit être au
+même niveau que le fichier `README.md`.
 
-#### Mise à jour des dépendances Python
+### Base de données
 
-Lors des mises à jour Python (par ex. ajout d'un package à Django), vous devez
-reconstruire (*rebuild*) votre image Docker en exécutant la commande suivante :
+L’adaptateur Python pour PostgreSQL, [psycopg](https://www.psycopg.org/), a
+quelques pré-requis auxquels votre système doit répondre.
+https://www.psycopg.org/docs/install.html#runtime-requirements
+
+### Dépendences Python (`virtualenv`)
+
+La commande `make` suivante crée un
+[`virtualenv`](https://docs.python.org/3/library/venv.html) et installe les
+dépendances pour le développement. Elle peut être exécutée régulièrement pour
+s’assurer que les dépendances sont bien à jour.
 
 ```sh
-docker compose up --build
+$ make venv
 ```
 
-#### Effacer l'ancienne base de données
+Dans un `virtualenv`, vous pouvez utiliser les commandes Django habituelles
+(`./manage.py`) mais également les recettes du [Makefile](./Makefile).
 
-Pour supprimer la base de données dans Docker vous devez supprimer les volumes
-de l'image docker, en exécutant les commandes suivantes :
+### Accéder au serveur de développement
+
+Démarrer le serveur de développement avec la commande :
 
 ```sh
-docker volume rm itou_postgres_data
-docker volume rm itou_postgres_data_backup
-
-# ou
-docker compose down -v
+$ make runserver
 ```
 
-#### Charger une base de données de production
+Vous pouvez y accéder à l'adresse http://localhost:8000/.
+
+### Peupler la base de données
+
+```sh
+$ make populate_db
+```
+
+### Charger une base de données de production
 
 Inspirez-vous de la suite de commandes suivante :
 
@@ -100,47 +94,24 @@ $ python manage.py shell --command 'from itou.users.models import User; print(Us
 Rendez-vous sur la doc de
 [itou-backups](https://github.com/betagouv/itou-backups) pour plus d’infos.
 
-#### Lancer le serveur de développement
+## Qualité de code
 
 ```sh
-$ make run
-
-# Équivalent de :
-$ docker compose up
+make quality
 ```
 
-Ou pour utiliser [un débogueur interactif](https://github.com/docker/compose/issues/4677#issuecomment-320804194) type `ipdb` :
+### Automatiquement avant chaque commit
+
+[Pre-commit](https://pre-commit.com) est un outil qui gère des _hooks_ de
+pre-commit Git.
+
+Cela remplace les [configurations
+individuelles](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks) par un
+fichier de configuration présent dans le projet.
 
 ```sh
-$ docker compose run --service-ports django
+$ pre-commit install
 ```
-
-### Accéder au serveur de développement
-
-Une fois votre serveur de développement lancé, vous pouvez accéder au frontend à
-l'adresse http://localhost:8000/.
-
-### Peupler la base de données
-
-    $ make populate_db
-
-### Avant un commit
-
-    $ make quality  # Will run black, ruff and djlint
-
-### Mettre à jour les dépendances
-
-La version des dépendances est consignée dans les fichiers `requirements/*.in`.
-Une fois ces fichiers modifiés, les dépendances sont figées avec l’outil
-[pip-tools](https://pypi.org/project/pip-tools/). La commande suivante permet
-de mettre à jour une dépendance, par exemple `flake8` :
-
-```sh
-$ PIP_COMPILE_OPTIONS="-P flake8" make compile-deps
-```
-
-Si les changements paraissent corrects, ils peuvent être ajoutés à `git` et
-*commit*.
 
 ## Lancer les tests
 
@@ -172,6 +143,20 @@ deux options :
     ```sh
     pytest --timeout 60
     ```
+
+## Mettre à jour les dépendances Python
+
+La liste des dépendances est consignée dans les fichiers `requirements/*.in`.
+Une fois ces fichiers modifiés, les dépendances sont figées avec l’outil
+[pip-tools](https://pypi.org/project/pip-tools/). La commande suivante permet
+de mettre à jour une dépendance, par exemple `flake8` :
+
+```sh
+$ PIP_COMPILE_OPTIONS="-P flake8" make compile-deps
+```
+
+Si les changements paraissent corrects, ils peuvent être ajoutés à `git` et
+*commit*.
 
 ## Front-end
 

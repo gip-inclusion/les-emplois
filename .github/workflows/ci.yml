@@ -11,8 +11,6 @@ jobs:
     env:
       DJANGO_SETTINGS_MODULE: config.settings.test
       REQUIREMENTS_PATH: requirements/test.txt
-      PYTHONPATH: .
-      USE_VENV: 1
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
       cancel-in-progress: true
@@ -70,5 +68,3 @@ jobs:
       run: make quality
     - name: 🤹 Django tests
       run: make test
-      env:
-        USE_VENV: 1
