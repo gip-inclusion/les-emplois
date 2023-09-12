@@ -74,19 +74,6 @@ class ItouCurrentOrganizationMiddleware:
 
         redirect_message = None
         if user.is_authenticated:
-            # Force Inclusion Connect
-            if (
-                user.identity_provider != IdentityProvider.INCLUSION_CONNECT
-                and user.kind in [UserKind.PRESCRIBER, UserKind.SIAE_STAFF]
-                and not request.path.startswith("/dashboard/activate_ic_account")  # Allow to access ic activation view
-                and not request.path.startswith("/inclusion_connect")  # Allow to access ic views
-                and not request.path.startswith("/hijack/release")  # Allow to release hijack
-                and settings.FORCE_IC_LOGIN  # Allow to disable on dev setup
-                and request.path != reverse("account_logout")
-            ):
-                # Add request.path as next param ?
-                return HttpResponseRedirect(reverse("dashboard:activate_ic_account"))
-
             if user.is_siae_staff:
                 active_memberships = list(user.siaemembership_set.filter(is_active=True))
                 siaes = {
@@ -168,6 +155,20 @@ class ItouCurrentOrganizationMiddleware:
                         "Nous espérons cependant avoir l'occasion de vous accueillir de "
                         "nouveau."
                     )
+
+        # Force Inclusion Connect
+        if (
+            user.is_authenticated
+            and user.identity_provider != IdentityProvider.INCLUSION_CONNECT
+            and user.kind in [UserKind.PRESCRIBER, UserKind.SIAE_STAFF]
+            and not request.path.startswith("/dashboard/activate_ic_account")  # Allow to access ic activation view
+            and not request.path.startswith("/inclusion_connect")  # Allow to access ic views
+            and not request.path.startswith("/hijack/release")  # Allow to release hijack
+            and settings.FORCE_IC_LOGIN  # Allow to disable on dev setup
+            and request.path != reverse("account_logout")
+        ):
+            # Add request.path as next param ?
+            return HttpResponseRedirect(reverse("dashboard:activate_ic_account"))
 
         if redirect_message is not None and request.path != reverse("account_logout"):
             messages.warning(request, redirect_message)
