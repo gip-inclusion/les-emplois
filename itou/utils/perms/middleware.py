@@ -152,6 +152,7 @@ class ItouCurrentOrganizationMiddleware:
             request.path.startswith("/invitations/") and not request.path.startswith("/invitations/invite"),
             request.path.startswith("/signup/siae/join"),  # siae staff about to join an siae
             request.path.startswith("/signup/facilitator/join"),  # facilitator about to join an siae
+            request.path == reverse("account_logout"),
         ]
         if any(skip_middleware_conditions):
             return self.get_response(request)
@@ -165,12 +166,11 @@ class ItouCurrentOrganizationMiddleware:
             and not request.path.startswith("/inclusion_connect")  # Allow to access ic views
             and not request.path.startswith("/hijack/release")  # Allow to release hijack
             and settings.FORCE_IC_LOGIN  # Allow to disable on dev setup
-            and request.path != reverse("account_logout")
         ):
             # Add request.path as next param ?
             return HttpResponseRedirect(reverse("dashboard:activate_ic_account"))
 
-        if redirect_message is not None and request.path != reverse("account_logout"):
+        if redirect_message is not None:
             messages.warning(request, redirect_message)
             return redirect("account_logout")
 
