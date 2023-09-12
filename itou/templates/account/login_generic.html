@@ -48,9 +48,20 @@
                                 </div>
                             {% endif %}
                             <hr class="my-5" data-text="ou">
+                            <div class="text-center">
+                                <button class="btn btn-link collapseConnectionForm mb-3{% if form.errors %} d-none{% else %} show has-no-transition{% endif %}"
+                                        type="button"
+                                        data-toggle="collapse"
+                                        data-target=".collapseConnectionForm"
+                                        aria-expanded="false"
+                                        aria-controls="collapseConnectionForm">Utiliser mes identifiants</button>
+                            </div>
+                            <div class="collapse collapseConnectionForm{% if form.errors %} show{% endif %}" id="collapseConnectionForm">
+                                {% include "account/includes/login_form.html" %}
+                            </div>
+                        {% else %}
+                            {% include "account/includes/login_form.html" %}
                         {% endif %}
-
-                        {% include "account/includes/login_form.html" %}
                     </div>
                 </div>
             </div>
