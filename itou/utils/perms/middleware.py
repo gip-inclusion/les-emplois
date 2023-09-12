@@ -72,6 +72,7 @@ class ItouCurrentOrganizationMiddleware:
         if any(skip_middleware_conditions):
             return self.get_response(request)
 
+        redirect_message = None
         if user.is_authenticated:
             # Force Inclusion Connect
             if (
@@ -115,18 +116,18 @@ class ItouCurrentOrganizationMiddleware:
                     global_constants.ITOU_SESSION_CURRENT_SIAE_KEY,
                 )
 
-                if not request.current_organization and request.path != reverse("account_logout"):
+                if not request.current_organization:
                     # SIAE user has no active SIAE and thus must not be able to access any page,
                     # thus we force a logout with a few exceptions (cf skip_middleware_conditions)
                     if not active_memberships:
-                        message = format_html(
+                        redirect_message = format_html(
                             "Nous sommes désolés, votre compte n'est "
                             "actuellement rattaché à aucune structure.<br>"
                             "Nous espérons cependant avoir l'occasion de vous accueillir de "
                             "nouveau."
                         )
                     else:
-                        message = (
+                        redirect_message = (
                             "Nous sommes désolés, votre compte n'est "
                             "malheureusement plus actif car la ou les "
                             "structures associées ne sont plus "
@@ -134,8 +135,6 @@ class ItouCurrentOrganizationMiddleware:
                             "avoir l'occasion de vous accueillir de "
                             "nouveau."
                         )
-                    messages.warning(request, message)
-                    return redirect("account_logout")
 
             elif user.is_prescriber:
                 (
@@ -162,14 +161,16 @@ class ItouCurrentOrganizationMiddleware:
                     request.session,
                     global_constants.ITOU_SESSION_CURRENT_INSTITUTION_KEY,
                 )
-                if not request.current_organization and request.path != reverse("account_logout"):
-                    message = format_html(
+                if not request.current_organization:
+                    redirect_message = format_html(
                         "Nous sommes désolés, votre compte n'est "
                         "actuellement rattaché à aucune structure.<br>"
                         "Nous espérons cependant avoir l'occasion de vous accueillir de "
                         "nouveau."
                     )
-                    messages.warning(request, message)
-                    return redirect("account_logout")
+
+        if redirect_message is not None and request.path != reverse("account_logout"):
+            messages.warning(request, redirect_message)
+            return redirect("account_logout")
 
         return self.get_response(request)
