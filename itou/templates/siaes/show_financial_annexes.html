@@ -2,47 +2,39 @@
 
 {% block title %}Annexes financières {{ block.super }}{% endblock %}
 
-{% block messages %}
-    {{ block.super }}
-
-    <div class="alert alert-success">
-        <p class="mb-0">
-            Cette interface vous permet de vous assurer que votre structure est associée aux bonnes annexes financières. La gestion de vos annexes financières continue de se faire dans l'extranet 2.0 de l'ASP.
-        </p>
-    </div>
-
-    {% if siae.is_active %}
-        <div class="alert alert-success" role="status">
-            <p class="mb-0">
-                Votre structure est active car elle est associée à au moins une annexe financière valide listée ci-dessous ou bien elle a été manuellement activée par notre support. Vous n'avez rien à faire.
-            </p>
-        </div>
-    {% elif siae_is_asp %}
-        <div class="alert alert-danger" role="status">
-            <p class="mb-0">
-                {# Inactive siaes of ASP source cannot be fixed by user. #}
-                Votre structure est inactive car elle n'est associée à aucune annexe financière valide. Contactez-nous via la rubrique correspondant à votre structure sur
-                <a href="{{ ITOU_HELP_CENTER_URL }}" target="_blank" rel="noopener" aria-label="{{ ITOU_HELP_CENTER_URL }} (ouverture dans un nouvel onglet)">{{ ITOU_HELP_CENTER_URL }}</a>
-            </p>
-        </div>
-    {% elif siae_is_user_created %}
-        <div class="alert alert-danger" role="status">
-            <p class="mb-0">
-                {# Inactive user created siaes can be fixed by the user. #}
-                Votre structure sera prochainement désactivée car elle n'est associée à aucune annexe financière valide. Veuillez dès que possible procéder à la sélection d'une annexe financière valide ci-dessous.
-            </p>
-        </div>
-    {% endif %}
-{% endblock %}
 
 {% block content_title %}
     <h1>Annexes financières</h1>
-    <h2 class="text-muted">{{ siae.display_name }}</h2>
+    <p class="mb-0">
+        Cette interface vous permet de vous assurer que votre structure est associée aux bonnes annexes financières.
+        <br>
+        La gestion de vos annexes financières continue de se faire dans l'extranet 2.0 de l'ASP.
+    </p>
 {% endblock %}
 
 {% block content %}
+
     <section class="s-section">
         <div class="s-section__container container">
+            {% if not siae.is_active %}
+                {% if siae_is_asp %}
+                    <div class="alert alert-danger" role="status">
+                        <p class="mb-0">
+                            {# Inactive siaes of ASP source cannot be fixed by user. #}
+                            Votre structure est inactive car elle n'est associée à aucune annexe financière valide. Contactez-nous via la rubrique correspondant à votre structure sur
+                            <a href="{{ ITOU_HELP_CENTER_URL }}" target="_blank" rel="noopener" aria-label="{{ ITOU_HELP_CENTER_URL }} (ouverture dans un nouvel onglet)">{{ ITOU_HELP_CENTER_URL }}</a>
+                        </p>
+                    </div>
+                {% elif siae_is_user_created %}
+                    <div class="alert alert-danger" role="status">
+                        <p class="mb-0">
+                            {# Inactive user created siaes can be fixed by the user. #}
+                            Votre structure sera prochainement désactivée car elle n'est associée à aucune annexe financière valide. Veuillez dès que possible procéder à la sélection d'une annexe financière valide ci-dessous.
+                        </p>
+                    </div>
+                {% endif %}
+            {% endif %}
+            <h2 class="text-muted">{{ siae.display_name }}</h2>
             <div class="row">
                 <div class="col-12">
                     <div class="table-responsive">
