@@ -375,6 +375,15 @@ class Commune(PrettyPrintMixin, AbstractPeriod):
 
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
 
+    # A corresponding INSEE City is associated in order to also get the current display name and post codes.
+    # Our research concluded that with the latest (December 2022) ASP reference file,
+    # - All the INSEE cities have a corresponding ASP commune
+    # - Some "active" ASP communes don't have a corresponding INSEE city; when we check, the INSEE city is "inactive"
+    #   which means that there has been some changes on the INSEE side since.
+    # What does it mean ? When we autocomplete for an address on the BAN, in 100% of the cases we'll have
+    # an INSEE City, thus an ASP Commune and it can be safely used for the employee records.
+    city = models.ForeignKey("cities.City", on_delete=models.SET_NULL, verbose_name="ville INSEE", null=True)
+
     objects = CommuneQuerySet.as_manager()
 
     class Meta:
