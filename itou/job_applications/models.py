@@ -602,8 +602,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     )
 
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now, db_index=True)
-    # FIXME(rsebille): Remove the null=True. But beware, it will force PG to rewrite almost all the rows.
-    updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True, db_index=True, null=True)
+    updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True, db_index=True)
 
     # GEIQ only
     prehiring_guidance_days = models.PositiveSmallIntegerField(
