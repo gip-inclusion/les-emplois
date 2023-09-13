@@ -1009,6 +1009,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             else:
                 raise xwf_models.AbortTransition("Job seeker has an invalid PE status, cannot issue approval.")
 
+        # Create related EmploymentContract
+        self.employment_contracts.create(employee=self.job_seeker, employer=self.to_siae)
+
         # Mark other related job applications as obsolete.
         for job_application in self.job_seeker.job_applications.exclude(pk=self.pk).pending():
             job_application.render_obsolete(user=user)
@@ -1052,6 +1055,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             self.approval_number_sent_at = None
             self.approval_delivery_mode = ""
             self.approval_manually_delivered_by = None
+
+        for contract in self.employment_contracts.all():
+            contract.delete()
 
         # Send notification.
         self.notifications_cancel_for_employer(user).send()
