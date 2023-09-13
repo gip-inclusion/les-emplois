@@ -18,8 +18,6 @@ from itou.siae_evaluations.models import (
     EvaluationCampaign,
     Sanctions,
 )
-from itou.users.enums import KIND_SIAE_STAFF
-from itou.utils.perms.user import UserInfo
 from itou.utils.templatetags.format_filters import format_approval_number
 from itou.utils.types import InclusiveDateRange
 from itou.www.siae_evaluations_views.forms import LaborExplanationForm, SetChosenPercentForm
@@ -44,13 +42,9 @@ def create_evaluated_siae_consistent_datas(evaluation_campaign, extra_evaluated_
 
     job_seeker = JobSeekerFactory()
 
-    user_info = UserInfo(
-        user=user, kind=KIND_SIAE_STAFF, siae=siae, prescriber_organization=None, is_authorized_prescriber=False
-    )
-
     administrative_criteria = AdministrativeCriteria.objects.get(pk=1)
     eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
-        job_seeker, user_info, administrative_criteria=[administrative_criteria]
+        job_seeker, author=user, author_organization=siae, administrative_criteria=[administrative_criteria]
     )
 
     job_application = JobApplicationFactory(

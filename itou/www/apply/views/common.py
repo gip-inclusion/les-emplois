@@ -18,7 +18,6 @@ from itou.users.enums import UserKind
 from itou.users.models import ApprovalAlreadyExistsError
 from itou.utils import constants as global_constants
 from itou.utils.htmx import hx_trigger_modal_control
-from itou.utils.perms.user import get_user_info
 from itou.utils.urls import add_url_params, get_external_link_markup
 from itou.www.apply.forms import (
     AcceptForm,
@@ -208,9 +207,11 @@ def _eligibility(request, siae, job_seeker, cancel_url, next_url, template_name,
 
     form_administrative_criteria = AdministrativeCriteriaForm(request.user, siae=siae, data=request.POST or None)
     if request.method == "POST" and form_administrative_criteria.is_valid():
-        user_info = get_user_info(request)
         EligibilityDiagnosis.create_diagnosis(
-            job_seeker, user_info, administrative_criteria=form_administrative_criteria.cleaned_data
+            job_seeker,
+            author=request.user,
+            author_organization=request.current_organization,
+            administrative_criteria=form_administrative_criteria.cleaned_data,
         )
         messages.success(request, "Éligibilité confirmée !")
         return HttpResponseRedirect(next_url)

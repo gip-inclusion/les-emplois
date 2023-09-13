@@ -4,8 +4,6 @@ from django.utils import timezone
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.siaes.enums import SiaeKind
-from itou.users.enums import KIND_SIAE_STAFF
-from itou.utils.perms.user import UserInfo
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm, AdministrativeCriteriaOfJobApplicationForm
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
@@ -192,13 +190,10 @@ class AdministrativeCriteriaOfJobApplicationFormTest(TestCase):
 
         job_seeker = JobSeekerFactory()
 
-        user_info = UserInfo(
-            user=user, kind=KIND_SIAE_STAFF, siae=siae, prescriber_organization=None, is_authorized_prescriber=False
-        )
-
         eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
             job_seeker,
-            user_info,
+            author=user,
+            author_organization=siae,
             administrative_criteria=[
                 AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_1).first()
             ]

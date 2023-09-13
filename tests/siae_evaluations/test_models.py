@@ -28,9 +28,7 @@ from itou.siae_evaluations.models import (
     validate_institution,
 )
 from itou.siaes.enums import SiaeKind
-from itou.users.enums import KIND_SIAE_STAFF
 from itou.utils.models import InclusiveDateRange
-from itou.utils.perms.user import UserInfo
 from tests.approvals.factories import ApprovalFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionWith2MembershipFactory
@@ -375,14 +373,11 @@ class EvaluationCampaignManagerTest(TestCase):
         siae = SiaeFactory(department=evaluation_campaign.institution.department, with_membership=True)
         job_seeker = JobSeekerFactory()
         user = siae.members.first()
-        user_info = UserInfo(
-            user=user, kind=KIND_SIAE_STAFF, siae=siae, prescriber_organization=None, is_authorized_prescriber=False
-        )
         criteria1 = AdministrativeCriteria.objects.get(
             level=AdministrativeCriteriaLevel.LEVEL_1, name="Bénéficiaire du RSA"
         )
         eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
-            job_seeker, user_info, administrative_criteria=[criteria1]
+            job_seeker, author=user, author_organization=siae, administrative_criteria=[criteria1]
         )
         JobApplicationFactory.create_batch(
             evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN,
