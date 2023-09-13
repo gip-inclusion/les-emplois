@@ -31,14 +31,13 @@ from itou.approvals.models import Suspension
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.enums import SiaeKind
 from itou.siaes.models import Siae, SiaeMembership
-from itou.users.enums import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF, UserKind
+from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants, pagination
 from itou.utils.emails import redact_email_address
 from itou.utils.models import PkSupportRemark
 from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.perms.middleware import ItouCurrentOrganizationMiddleware
-from itou.utils.perms.user import get_user_info
 from itou.utils.sync import DiffItem, DiffItemKind, yield_sync_diff
 from itou.utils.tasks import sanitize_mailjet_recipients
 from itou.utils.templatetags import dict_filters, format_filters, job_applications
@@ -958,102 +957,6 @@ class UtilsUrlsTestCase(TestCase):
             f'<a href="{url}" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">{text}</a>'
         )
         assert get_external_link_markup(url=url, text=text) == expected
-
-
-class PermsUserTest(TestCase):
-    def test_get_user_info_for_siae_staff(self):
-        siae = SiaeFactory(with_membership=True)
-        user = siae.members.first()
-
-        factory = RequestFactory()
-        request = factory.get("/")
-        request.user = user
-        middleware = SessionMiddleware(get_response_for_middlewaremixin)
-        middleware.process_request(request)
-        # Simulate ItouCurrentOrganizationMiddleware.
-        request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = siae.pk
-        request.session.save()
-
-        user_info = get_user_info(request)
-        assert user_info.user == user
-        assert user_info.kind == KIND_SIAE_STAFF
-        assert user_info.prescriber_organization is None
-        assert user_info.is_authorized_prescriber is False
-        assert user_info.siae == siae
-
-    def test_get_user_info_for_prescriber(self):
-        prescriber_organization = PrescriberOrganizationWithMembershipFactory()
-        user = prescriber_organization.members.first()
-
-        factory = RequestFactory()
-        request = factory.get("/")
-        request.user = user
-        middleware = SessionMiddleware(get_response_for_middlewaremixin)
-        middleware.process_request(request)
-        # Simulate ItouCurrentOrganizationMiddleware.
-        request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = prescriber_organization.pk
-        request.session.save()
-
-        user_info = get_user_info(request)
-        assert user_info.user == user
-        assert user_info.kind == KIND_PRESCRIBER
-        assert user_info.prescriber_organization == prescriber_organization
-        assert user_info.is_authorized_prescriber is False
-        assert user_info.siae is None
-
-    def test_get_user_info_for_authorized_prescriber(self):
-        prescriber_organization = PrescriberOrganizationWithMembershipFactory(is_authorized=True)
-        user = prescriber_organization.members.first()
-
-        factory = RequestFactory()
-        request = factory.get("/")
-        request.user = user
-        middleware = SessionMiddleware(get_response_for_middlewaremixin)
-        middleware.process_request(request)
-        # Simulate ItouCurrentOrganizationMiddleware.
-        request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = prescriber_organization.pk
-        request.session.save()
-
-        user_info = get_user_info(request)
-        assert user_info.user == user
-        assert user_info.kind == KIND_PRESCRIBER
-        assert user_info.prescriber_organization == prescriber_organization
-        assert user_info.is_authorized_prescriber is True
-        assert user_info.siae is None
-
-    def test_get_user_info_for_prescriber_without_organisation(self):
-        user = PrescriberFactory()
-
-        factory = RequestFactory()
-        request = factory.get("/")
-        request.user = user
-        middleware = SessionMiddleware(get_response_for_middlewaremixin)
-        middleware.process_request(request)
-        request.session.save()
-
-        user_info = get_user_info(request)
-        assert user_info.user == user
-        assert user_info.kind == KIND_PRESCRIBER
-        assert user_info.prescriber_organization is None
-        assert user_info.is_authorized_prescriber is False
-        assert user_info.siae is None
-
-    def test_get_user_info_for_job_seeker(self):
-        user = JobSeekerFactory()
-
-        factory = RequestFactory()
-        request = factory.get("/")
-        request.user = user
-        middleware = SessionMiddleware(get_response_for_middlewaremixin)
-        middleware.process_request(request)
-        request.session.save()
-
-        user_info = get_user_info(request)
-        assert user_info.user == user
-        assert user_info.kind == KIND_JOB_SEEKER
-        assert user_info.prescriber_organization is None
-        assert user_info.is_authorized_prescriber is False
-        assert user_info.siae is None
 
 
 class MockedSiaeSignupTokenGenerator(SiaeSignupTokenGenerator):
