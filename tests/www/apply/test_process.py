@@ -143,11 +143,12 @@ class ProcessViewsTest(TestCase):
         self.assertContains(response, resume_link)
 
         # 2/ Job application was sent with an attached resume
-        resume_link = "https://server.com/rockie-balboa.pdf"
-        job_application = JobApplicationSentByJobSeekerFactory(to_siae=siae)
+        new_resume_link = "https://server.com/sylvester-stallone.pdf"
+        job_application = JobApplicationSentByJobSeekerFactory(to_siae=siae, resume_link=new_resume_link)
         url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
-        self.assertContains(response, resume_link)
+        self.assertContains(response, new_resume_link)
+        self.assertNotContains(response, resume_link)
 
     def test_details_for_siae_hidden(self, *args, **kwargs):
         """A hidden job_application is not displayed."""
