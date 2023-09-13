@@ -26,6 +26,7 @@ class _GoodCoordsType:
 
 class QPVModelTest(TestCase):
     def setUp(self) -> None:
+        super().setUp()
         for code in ["QP093028", "QP075019"]:
             QPVFactory(code=code)
 

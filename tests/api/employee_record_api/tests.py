@@ -22,6 +22,7 @@ class EmployeeRecordAPIPermissionsTest(APITestCase):
     token_url = reverse("v1:token-auth")
 
     def setUp(self):
+        super().setUp()
         self.client = APIClient()
 
         # We only care about status filtering: no coherence check on ASP return values
@@ -88,6 +89,7 @@ class EmployeeRecordAPIFetchListTest(APITestCase):
         side_effect=mock_get_geocoding_data,
     )
     def setUp(self, _mock):
+        super().setUp()
         # We only care about status filtering: no coherence check on ASP return values
         job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
         self.employee_record = EmployeeRecord.from_job_application(job_application)

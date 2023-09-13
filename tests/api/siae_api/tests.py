@@ -15,6 +15,7 @@ ENDPOINT_URL = reverse("v1:siaes-list")
 
 class SiaeAPIFetchListTest(APITestCase):
     def setUp(self):
+        super().setUp()
         self.client = APIClient()
         self.user = SiaeStaffFactory()
 

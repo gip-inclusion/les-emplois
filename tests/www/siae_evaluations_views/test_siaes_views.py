@@ -72,6 +72,7 @@ class SiaeJobApplicationListViewTest(S3AccessingTestCase):
         </p>"""
 
     def setUp(self):
+        super().setUp()
         membership = SiaeMembershipFactory()
         self.user = membership.user
         self.siae = membership.siae
@@ -530,6 +531,7 @@ class SiaeJobApplicationListViewTest(S3AccessingTestCase):
 
 class SiaeSelectCriteriaViewTest(TestCase):
     def setUp(self):
+        super().setUp()
         membership = SiaeMembershipFactory()
         self.user = membership.user
         self.siae = membership.siae
@@ -702,6 +704,7 @@ class SiaeSelectCriteriaViewTest(TestCase):
 
 class SiaeUploadDocsViewTest(S3AccessingTestCase):
     def setUp(self):
+        super().setUp()
         membership = SiaeMembershipFactory()
         self.user = membership.user
         self.siae = membership.siae
@@ -888,6 +891,7 @@ class SiaeUploadDocsViewTest(S3AccessingTestCase):
 
 class SiaeSubmitProofsViewTest(TestCase):
     def setUp(self):
+        super().setUp()
         membership = SiaeMembershipFactory()
         self.user = membership.user
         self.siae = membership.siae
@@ -1070,6 +1074,7 @@ class SiaeSubmitProofsViewTest(TestCase):
 
 class SiaeCalendarViewTest(TestCase):
     def setUp(self):
+        super().setUp()
         membership = SiaeMembershipFactory()
         self.user = membership.user
         self.siae = membership.siae

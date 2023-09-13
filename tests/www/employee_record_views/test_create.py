@@ -35,6 +35,7 @@ def _get_user_form_data(user):
 
 class AbstractCreateEmployeeRecordTest(TestCase):
     def setUp(self):
+        super().setUp()
         self.siae = SiaeWithMembershipAndJobsFactory(
             name="Evil Corp.", membership__user__first_name="Elliot", kind="EI"
         )

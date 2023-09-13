@@ -95,6 +95,7 @@ class ProbeStatusModelTest(TestCase):
 
 class RunStatusProbesCommandTest(TestCase):
     def setUp(self):
+        super().setUp()
         self.cmd = run_status_probes.Command(stdout=io.StringIO(), stderr=io.StringIO())
 
     @mock.patch("itou.status.probes.get_probes_classes", mock.Mock(return_value=[]))

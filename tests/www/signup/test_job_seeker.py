@@ -20,6 +20,7 @@ from tests.utils.test import TestCase, reload_module
 
 class JobSeekerSignupTest(TestCase):
     def setUp(self):
+        super().setUp()
         [self.city] = create_test_cities(["67"], num_per_department=1)
 
     def test_job_seeker_signup_situation(self):

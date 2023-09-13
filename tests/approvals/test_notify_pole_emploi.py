@@ -37,6 +37,7 @@ from tests.utils.test import TestCase
 )
 class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
     def setUp(self):
+        super().setUp()
         respx.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").respond(
             200, json={"token_type": "foo", "access_token": "batman", "expires_in": 3600}
         )

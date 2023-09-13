@@ -12,6 +12,7 @@ from tests.utils.test import BASE_NUM_QUERIES
 
 class ApplicantsAPITest(APITestCase):
     def setUp(self):
+        super().setUp()
         self.client = APIClient()
         self.url = reverse("v1:applicants-list")
 

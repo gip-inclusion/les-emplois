@@ -6,6 +6,7 @@ from tests.geo.factories import ZRRFactory
 
 class ZRRModelTest(TestCase):
     def setUp(self) -> None:
+        super().setUp()
         self.in_zrr = ZRRFactory(in_zrr=True)
         self.not_in_zrr = ZRRFactory(not_in_zrr=True)
         self.partially_in_zrr = ZRRFactory(partially_in_zrr=True)

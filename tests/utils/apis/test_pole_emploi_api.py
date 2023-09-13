@@ -21,6 +21,7 @@ from tests.utils.test import TestCase
 
 class PoleEmploiAPIClientTest(TestCase):
     def setUp(self) -> None:
+        super().setUp()
         self.api_client = PoleEmploiApiClient("https://pe.fake", "https://auth.fr", "foobar", "pe-secret")
         respx.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").respond(
             200, json={"token_type": "foo", "access_token": "batman", "expires_in": 3600}

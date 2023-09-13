@@ -47,6 +47,7 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         """We need to setup fake files before loading any `import_siae` related script,
         since it does rely on dynamic file loading upon startup (!)
         """
+        super().setUpClass()
         path_dest = tempfile.mkdtemp()
         cls.addClassCleanup(shutil.rmtree, path_dest)
         data_dir = Path(path_dest) / "data"
@@ -65,6 +66,7 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
 
     @classmethod
     def tearDownClass(cls):
+        super().tearDownClass()
         cls.mod = None
 
     def test_uncreatable_conventions_for_active_siae_with_active_convention(self):

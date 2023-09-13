@@ -16,6 +16,7 @@ class EmployeeRecordThrottleTest(APITestCase):
     # This a simple smoke test, goal is *not* testing DRF throttling
 
     def setUp(self):
+        super().setUp()
         cache.clear()
 
     def test_basic_ko_throttling(self):

@@ -31,6 +31,7 @@ class DataInclusionSiaeStructureTest(APITestCase):
     maxDiff = None
 
     def setUp(self):
+        super().setUp()
         self.user = SiaeStaffFactory()
         self.client = APIClient()
         self.authenticated_client = APIClient()
@@ -216,6 +217,7 @@ class DataInclusionPrescriberStructureTest(APITestCase):
     maxDiff = None
 
     def setUp(self):
+        super().setUp()
         self.user = PrescriberFactory()
         self.client = APIClient()
         self.authenticated_client = APIClient()
