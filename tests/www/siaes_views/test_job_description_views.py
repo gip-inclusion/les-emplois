@@ -19,6 +19,7 @@ from tests.utils.test import BASE_NUM_QUERIES, TestCase, assertMessages
 
 class JobDescriptionAbstractTest(TestCase):
     def setUp(self):
+        super().setUp()
         city_slug = "paris-75"
         self.paris_city = City.objects.create(
             name="Paris", slug=city_slug, department="75", post_codes=["75001"], coords=Point(5, 23)

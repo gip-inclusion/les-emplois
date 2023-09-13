@@ -246,6 +246,7 @@ class PrescriberOrganizationAdminTest(TestCase):
     ACCEPT_AFTER_REFUSAL_BUTTON_LABEL = "Annuler le refus et valider l'habilitation"
 
     def setUp(self):
+        super().setUp()
         # super user
         self.superuser = ItouStaffFactory(is_superuser=True)
 

@@ -40,6 +40,7 @@ from tests.utils.test import TestCase
 @pytest.mark.usefixtures("unittest_compatibility")
 class EmployeeRecordModelTest(TestCase):
     def setUp(self):
+        super().setUp()
         self.employee_record = EmployeeRecordFactory()
 
     # Validation tests
@@ -356,6 +357,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
         side_effect=mock_get_geocoding_data,
     )
     def setUp(self, mock):
+        super().setUp()
         job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
         employee_record = EmployeeRecord.from_job_application(job_application)
         self.employee_record = employee_record
@@ -644,6 +646,7 @@ class EmployeeRecordJobApplicationConstraintsTest(TestCase):
         side_effect=mock_get_geocoding_data,
     )
     def setUp(self, _mock):
+        super().setUp()
         # Make job application cancellable
         hiring_date = date.today() + timedelta(days=7)
 

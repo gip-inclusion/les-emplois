@@ -38,6 +38,7 @@ INVITATION_URL = reverse("invitations_views:invite_prescriber_with_org")
 
 class TestSendPrescriberWithOrgInvitation(TestCase):
     def setUp(self):
+        super().setUp()
         self.organization = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganizationKind.CAP_EMPLOI)
         self.sender = self.organization.members.first()
         self.guest_data = {"first_name": "Léonie", "last_name": "Bathiat", "email": "leonie@example.com"}
@@ -105,6 +106,7 @@ class TestSendPrescriberWithOrgInvitation(TestCase):
 
 class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
     def setUp(self):
+        super().setUp()
         self.organization = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganizationKind.CAP_EMPLOI)
         self.sender = self.organization.members.first()
         self.post_data = POST_DATA
@@ -149,6 +151,7 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
 
 class TestPEOrganizationInvitation(TestCase):
     def setUp(self):
+        super().setUp()
         self.organization = PrescriberPoleEmploiFactory()
         self.organization.members.add(PrescriberFactory())
         self.sender = self.organization.members.first()
@@ -432,6 +435,7 @@ class TestAcceptPrescriberWithOrgInvitation(InclusionConnectBaseTestCase):
 
 class TestAcceptPrescriberWithOrgInvitationExceptions(TestCase):
     def setUp(self):
+        super().setUp()
         self.organization = PrescriberOrganizationWithMembershipFactory()
         self.sender = self.organization.members.first()
 

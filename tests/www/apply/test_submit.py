@@ -546,6 +546,7 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
 
 class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
     def setUp(self):
+        super().setUp()
         [self.city] = create_test_cities(["67"], num_per_department=1)
 
     @property
@@ -1057,6 +1058,7 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
 
 class ApplyAsPrescriberTest(S3AccessingTestCase):
     def setUp(self):
+        super().setUp()
         cities = create_test_cities(["67"], num_per_department=10)
         self.city = cities[0]
 
@@ -1484,6 +1486,7 @@ class ApplyAsPrescriberNirExceptionsTest(S3AccessingTestCase):
 
 class ApplyAsSiaeTest(S3AccessingTestCase):
     def setUp(self):
+        super().setUp()
         [self.city] = create_test_cities(["67"], num_per_department=1)
 
     @property
@@ -1764,6 +1767,7 @@ class ApplyAsSiaeTest(S3AccessingTestCase):
 
 class DirectHireFullProcessTest(TestCase):
     def setUp(self):
+        super().setUp()
         [self.city] = create_test_cities(["67"], num_per_department=1)
 
     def test_perms_for_siae(self):

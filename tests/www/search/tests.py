@@ -17,6 +17,7 @@ from tests.utils.test import BASE_NUM_QUERIES, TestCase
 
 class SearchSiaeTest(TestCase):
     def setUp(self):
+        super().setUp()
         self.url = reverse("search:siaes_results")
 
     def test_not_existing(self):
@@ -265,6 +266,7 @@ class SearchPrescriberTest(TestCase):
 
 class JobDescriptionSearchViewTest(TestCase):
     def setUp(self):
+        super().setUp()
         self.url = reverse("search:job_descriptions_results")
 
     def test_not_existing(self):

@@ -84,6 +84,7 @@ def get_evaluated_administrative_criteria(institution):
 
 class SamplesSelectionViewTest(TestCase):
     def setUp(self):
+        super().setUp()
         membership = InstitutionMembershipFactory(institution__name="DDETS Ille et Vilaine")
         self.user = membership.user
         self.institution = membership.institution
@@ -172,6 +173,7 @@ class SamplesSelectionViewTest(TestCase):
 @pytest.mark.usefixtures("unittest_compatibility")
 class InstitutionEvaluatedSiaeListViewTest(TestCase):
     def setUp(self):
+        super().setUp()
         membership = InstitutionMembershipFactory()
         self.user = membership.user
         self.institution = membership.institution
@@ -640,6 +642,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
     )
 
     def setUp(self):
+        super().setUp()
         membership = InstitutionMembershipFactory(institution__name="DDETS 14")
         self.user = membership.user
         self.institution = membership.institution
@@ -3213,6 +3216,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
     save_text = "Enregistrer le commentaire"
 
     def setUp(self):
+        super().setUp()
         membership = InstitutionMembershipFactory()
         self.user = membership.user
         self.institution = membership.institution
@@ -3668,6 +3672,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
 
 class InstitutionEvaluatedAdministrativeCriteriaViewTest(TestCase):
     def setUp(self):
+        super().setUp()
         membership = InstitutionMembershipFactory()
         self.user = membership.user
         self.institution = membership.institution
@@ -4056,6 +4061,7 @@ class InstitutionEvaluatedSiaeValidationViewTest(TestCase):
 
 class InstitutionCalendarViewTest(TestCase):
     def setUp(self):
+        super().setUp()
         membership = InstitutionMembershipFactory(institution__name="DDETS Ille et Vilaine")
         self.user = membership.user
         self.institution = membership.institution

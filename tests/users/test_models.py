@@ -957,6 +957,7 @@ def mock_get_geocoding_data(address, post_code=None, limit=1):
 
 class JobSeekerProfileModelTest(TestCase):
     def setUp(self):
+        super().setUp()
         self.user = JobSeekerWithAddressFactory(
             address_line_1=BAN_GEOCODING_API_RESULTS_MOCK[0]["address_line_1"],
             jobseeker_profile__education_level=random.choice(EducationLevel.values),

@@ -13,6 +13,7 @@ from tests.utils.test import TestCase
 @pytest.mark.usefixtures("unittest_compatibility")
 class DisableEmployeeRecordsTest(TestCase):
     def setUp(self):
+        super().setUp()
         # User must be super user for UI first part (tmp)
         self.siae = SiaeWithMembershipAndJobsFactory(name="Wanna Corp.", membership__user__first_name="Billy")
         self.user = self.siae.members.get(first_name="Billy")

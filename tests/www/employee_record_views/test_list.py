@@ -19,6 +19,7 @@ from tests.utils.test import BASE_NUM_QUERIES, TestCase
 @pytest.mark.usefixtures("unittest_compatibility")
 class ListEmployeeRecordsTest(TestCase):
     def setUp(self):
+        super().setUp()
         # User must be super user for UI first part (tmp)
         self.siae = SiaeWithMembershipAndJobsFactory(name="Evil Corp.", membership__user__first_name="Elliot")
         self.siae_without_perms = SiaeWithMembershipAndJobsFactory(

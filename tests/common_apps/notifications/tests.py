@@ -10,6 +10,7 @@ class NotificationsBaseClassTest(TestCase):
     # Use a child class to test parent class. Maybe refactor that later.
 
     def setUp(self):
+        super().setUp()
         self.siae = SiaeFactory(with_membership=True)
         self.job_application = JobApplicationFactory(to_siae=self.siae)
         self.notification = NewSpontaneousJobAppEmployersNotification(job_application=self.job_application)

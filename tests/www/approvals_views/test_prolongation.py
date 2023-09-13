@@ -31,6 +31,7 @@ class ApprovalProlongationTest(S3AccessingTestCase):
         """
         Create test objects.
         """
+        super().setUp()
 
         self.prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
         self.prescriber = self.prescriber_organization.members.first()

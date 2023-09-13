@@ -1124,6 +1124,7 @@ class NewQualifiedJobAppEmployersNotificationTest(TestCase):
 @patch("itou.job_applications.models.huey_notify_pole_emploi")
 class JobApplicationWorkflowTest(TestCase):
     def setUp(self):
+        super().setUp()
         self.sent_pass_email_subject = "PASS IAE pour"
         self.accept_email_subject_proxy = "Candidature acceptée et votre avis sur les emplois de l'inclusion"
         self.accept_email_subject_job_seeker = "Candidature acceptée"

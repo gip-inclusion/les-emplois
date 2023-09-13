@@ -15,6 +15,7 @@ from tests.utils.test import TestCase, assertMessages
 
 class PoleEmploiApprovalSearchTest(TestCase):
     def setUp(self):
+        super().setUp()
         self.url = reverse("approvals:pe_approval_search")
 
     def set_up_pe_approval(self, with_job_application=True):
@@ -194,6 +195,7 @@ class PoleEmploiApprovalSearchUserTest(TestCase):
 
 class PoleEmploiApprovalCreateTest(TestCase):
     def setUp(self):
+        super().setUp()
         self.job_application = JobApplicationFactory(with_approval=True)
         self.siae = self.job_application.to_siae
         self.siae_user = self.job_application.to_siae.members.first()

@@ -6,6 +6,7 @@ from itou.utils.new_dns.middleware import NewDnsRedirectMiddleware
 
 class NewDnsRedirectMiddlewareTest(SimpleTestCase):
     def setUp(self):
+        super().setUp()
         self.request_factory = RequestFactory()
         self.middleware = NewDnsRedirectMiddleware(HttpResponse)
 

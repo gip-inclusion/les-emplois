@@ -17,6 +17,7 @@ class EditContractTest(TestCase):
     """
 
     def setUp(self):
+        super().setUp()
         siae1 = SiaeWithMembershipAndJobsFactory(name="Evil Corp.", membership__user__first_name="Elliot")
         siae2 = SiaeWithMembershipAndJobsFactory(name="Duke of Hazard Corp.", membership__user__first_name="Roscoe")
 

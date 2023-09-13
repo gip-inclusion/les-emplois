@@ -17,6 +17,7 @@ INVITATION_URL = reverse("invitations_views:invite_siae_staff")
 
 class TestSendSingleSiaeInvitation(TestCase):
     def setUp(self):
+        super().setUp()
         self.siae = SiaeFactory(with_membership=True)
         # The sender is a member of the SIAE
         self.sender = self.siae.members.first()
@@ -168,6 +169,7 @@ class TestSendMultipleSiaeInvitation(TestCase):
 
 class TestSendInvitationToSpecialGuest(TestCase):
     def setUp(self):
+        super().setUp()
         self.sender_siae = SiaeFactory(with_membership=True)
         self.sender = self.sender_siae.members.first()
         self.client.force_login(self.sender)
