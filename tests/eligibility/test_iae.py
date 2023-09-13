@@ -6,7 +6,6 @@ from django.utils import timezone
 from itou.eligibility.enums import AdministrativeCriteriaLevel, AuthorKind
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.eligibility.models.common import AdministrativeCriteriaQuerySet
-from itou.utils.perms.user import UserInfo
 from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from tests.eligibility.factories import (
     EligibilityDiagnosisFactory,
@@ -231,15 +230,8 @@ class EligibilityDiagnosisModelTest(TestCase):
         job_seeker = JobSeekerFactory()
         siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
-        user_info = UserInfo(
-            user=user,
-            kind=AuthorKind.SIAE_STAFF,
-            prescriber_organization=None,
-            is_authorized_prescriber=False,
-            siae=siae,
-        )
 
-        diagnosis = EligibilityDiagnosis.create_diagnosis(job_seeker, user_info)
+        diagnosis = EligibilityDiagnosis.create_diagnosis(job_seeker, author=user, author_organization=siae)
 
         assert diagnosis.job_seeker == job_seeker
         assert diagnosis.author == user
@@ -252,13 +244,6 @@ class EligibilityDiagnosisModelTest(TestCase):
         job_seeker = JobSeekerFactory()
         prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
         user = prescriber_organization.members.first()
-        user_info = UserInfo(
-            user=user,
-            kind=AuthorKind.PRESCRIBER,
-            prescriber_organization=prescriber_organization,
-            is_authorized_prescriber=True,
-            siae=None,
-        )
 
         level1 = AdministrativeCriteriaLevel.LEVEL_1
         level2 = AdministrativeCriteriaLevel.LEVEL_2
@@ -267,7 +252,10 @@ class EligibilityDiagnosisModelTest(TestCase):
         criteria3 = AdministrativeCriteria.objects.get(level=level2, name="Senior (+50 ans)")
 
         diagnosis = EligibilityDiagnosis.create_diagnosis(
-            job_seeker, user_info, administrative_criteria=[criteria1, criteria2, criteria3]
+            job_seeker,
+            author=user,
+            author_organization=prescriber_organization,
+            administrative_criteria=[criteria1, criteria2, criteria3],
         )
 
         assert diagnosis.job_seeker == job_seeker
@@ -284,22 +272,17 @@ class EligibilityDiagnosisModelTest(TestCase):
 
     def test_update_diagnosis(self):
         siae = SiaeFactory(with_membership=True)
-        user_info = UserInfo(
-            user=siae.members.first(),
-            kind=AuthorKind.SIAE_STAFF,
-            prescriber_organization=None,
-            is_authorized_prescriber=False,
-            siae=siae,
-        )
 
         current_diagnosis = EligibilityDiagnosisFactory()
-        new_diagnosis = EligibilityDiagnosis.update_diagnosis(current_diagnosis, user_info, [])
+        new_diagnosis = EligibilityDiagnosis.update_diagnosis(
+            current_diagnosis, author=siae.members.first(), author_organization=siae, administrative_criteria=[]
+        )
         current_diagnosis.refresh_from_db()
 
         # Some information should be copied...
         assert new_diagnosis.job_seeker == current_diagnosis.job_seeker
         # ... or updated.
-        assert new_diagnosis.author == user_info.user
+        assert new_diagnosis.author == siae.members.first()
         assert new_diagnosis.author_kind == AuthorKind.SIAE_STAFF
         assert new_diagnosis.author_siae == siae
         assert new_diagnosis.author_prescriber_organization is None
@@ -312,17 +295,18 @@ class EligibilityDiagnosisModelTest(TestCase):
 
     def test_update_diagnosis_extend_the_validity_only_when_we_have_the_same_author_and_the_same_criteria(self):
         first_diagnosis = EligibilityDiagnosisFactory()
-        user_info = UserInfo(
-            user=first_diagnosis.author,
-            kind=first_diagnosis.author_kind,
-            prescriber_organization=first_diagnosis.author_prescriber_organization,
-            is_authorized_prescriber=first_diagnosis.author_prescriber_organization.is_authorized,
-            siae=None,
-        )
 
         # Same author, same criteria
         previous_expires_at = first_diagnosis.expires_at
-        assert EligibilityDiagnosis.update_diagnosis(first_diagnosis, user_info, []) is first_diagnosis
+        assert (
+            EligibilityDiagnosis.update_diagnosis(
+                first_diagnosis,
+                author=first_diagnosis.author,
+                author_organization=first_diagnosis.author_prescriber_organization,
+                administrative_criteria=[],
+            )
+            is first_diagnosis
+        )
         first_diagnosis.refresh_from_db()
         assert first_diagnosis.expires_at > previous_expires_at
 
@@ -330,7 +314,12 @@ class EligibilityDiagnosisModelTest(TestCase):
             AdministrativeCriteria.objects.get(level=AdministrativeCriteriaLevel.LEVEL_1, name="Bénéficiaire du RSA"),
         ]
         # Same author, different criteria
-        second_diagnosis = EligibilityDiagnosis.update_diagnosis(first_diagnosis, user_info, criteria)
+        second_diagnosis = EligibilityDiagnosis.update_diagnosis(
+            first_diagnosis,
+            author=first_diagnosis.author,
+            author_organization=first_diagnosis.author_prescriber_organization,
+            administrative_criteria=criteria,
+        )
         first_diagnosis.refresh_from_db()
 
         assert second_diagnosis is not first_diagnosis
@@ -339,14 +328,12 @@ class EligibilityDiagnosisModelTest(TestCase):
 
         # Different author, same criteria
         other_prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
-        other_user_info = UserInfo(
-            user=other_prescriber_organization.members.first(),
-            kind=AuthorKind.PRESCRIBER,
-            prescriber_organization=other_prescriber_organization,
-            is_authorized_prescriber=other_prescriber_organization.is_authorized,
-            siae=None,
+        third_diagnosis = EligibilityDiagnosis.update_diagnosis(
+            second_diagnosis,
+            author=other_prescriber_organization.members.first(),
+            author_organization=other_prescriber_organization,
+            administrative_criteria=criteria,
         )
-        third_diagnosis = EligibilityDiagnosis.update_diagnosis(second_diagnosis, other_user_info, criteria)
         second_diagnosis.refresh_from_db()
 
         assert second_diagnosis is not third_diagnosis
@@ -395,19 +382,12 @@ class AdministrativeCriteriaModelTest(TestCase):
 
         job_seeker = JobSeekerFactory()
         user = siae.members.first()
-        user_info = UserInfo(
-            user=user,
-            kind=AuthorKind.SIAE_STAFF,
-            siae=siae,
-            prescriber_organization=None,
-            is_authorized_prescriber=False,
-        )
 
         criteria1 = AdministrativeCriteria.objects.get(
             level=AdministrativeCriteriaLevel.LEVEL_1, name="Bénéficiaire du RSA"
         )
         eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
-            job_seeker, user_info, administrative_criteria=[criteria1]
+            job_seeker, author=user, author_organization=siae, administrative_criteria=[criteria1]
         )
 
         job_application1 = JobApplicationFactory(

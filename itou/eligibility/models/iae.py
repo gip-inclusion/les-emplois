@@ -175,20 +175,21 @@ class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
 
     @classmethod
     @transaction.atomic()
-    def create_diagnosis(cls, job_seeker, user_info, administrative_criteria=None):
+    def create_diagnosis(cls, job_seeker, *, author, author_organization, administrative_criteria=None):
         """
         Arguments:
             job_seeker: User() object
-            user_info: UserInfo namedtuple (itou.utils.perms.user.get_user_info)
         Keyword arguments:
+            author: User() object, future diagnosis author
+            author_organization: either Siae, PrescriberOrganization or None, future diagnosis author organization
             administrative_criteria: an optional list of AdministrativeCriteria() objects
         """
         diagnosis = cls.objects.create(
             job_seeker=job_seeker,
-            author=user_info.user,
-            author_kind=user_info.kind,
-            author_siae=user_info.siae,
-            author_prescriber_organization=user_info.prescriber_organization,
+            author=author,
+            author_kind=author.kind,
+            author_siae=author_organization if author.is_siae_staff else None,
+            author_prescriber_organization=author_organization if author.is_prescriber else None,
         )
         if administrative_criteria:
             diagnosis.administrative_criteria.add(*administrative_criteria)
@@ -196,10 +197,10 @@ class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
 
     @classmethod
     @transaction.atomic()
-    def update_diagnosis(cls, eligibility_diagnosis, user_info, administrative_criteria):
+    def update_diagnosis(cls, eligibility_diagnosis, *, author, author_organization, administrative_criteria):
         # If we have the same author and the same criteria then extend the life of the current one
         extend_conditions = [
-            eligibility_diagnosis.author == user_info.user,
+            eligibility_diagnosis.author == author,
             set(eligibility_diagnosis.administrative_criteria.all()) == set(administrative_criteria),
         ]
         if all(extend_conditions):
@@ -211,7 +212,10 @@ class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
 
         # Otherwise, we create a new one...
         new_eligibility_diagnosis = cls.create_diagnosis(
-            eligibility_diagnosis.job_seeker, user_info, administrative_criteria
+            eligibility_diagnosis.job_seeker,
+            author=author,
+            author_organization=author_organization,
+            administrative_criteria=administrative_criteria,
         )
         # and mark the current one as expired
         eligibility_diagnosis.expires_at = new_eligibility_diagnosis.created_at

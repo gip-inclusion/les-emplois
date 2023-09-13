@@ -28,7 +28,6 @@ from itou.users.enums import UserKind
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.apis.exceptions import AddressLookupError
 from itou.utils.emails import redact_email_address
-from itou.utils.perms.user import get_user_info
 from itou.utils.session import SessionNamespace, SessionNamespaceRequiredMixin
 from itou.utils.storage.s3 import S3Upload
 from itou.www.apply.forms import (
@@ -887,11 +886,20 @@ class ApplicationEligibilityView(ApplicationBaseView):
 
     def post(self, request, *args, **kwargs):
         if self.form.is_valid():
-            user_info = get_user_info(request)
             if not self.eligibility_diagnosis:
-                EligibilityDiagnosis.create_diagnosis(self.job_seeker, user_info, self.form.cleaned_data)
+                EligibilityDiagnosis.create_diagnosis(
+                    self.job_seeker,
+                    author=request.user,
+                    author_organization=request.current_organization,
+                    administrative_criteria=self.form.cleaned_data,
+                )
             elif self.eligibility_diagnosis and not self.form.data.get("shrouded"):
-                EligibilityDiagnosis.update_diagnosis(self.eligibility_diagnosis, user_info, self.form.cleaned_data)
+                EligibilityDiagnosis.update_diagnosis(
+                    self.eligibility_diagnosis,
+                    author=request.user,
+                    author_organization=request.current_organization,
+                    administrative_criteria=self.form.cleaned_data,
+                )
             return HttpResponseRedirect(self.get_next_url())
 
         return self.render_to_response(self.get_context_data(**kwargs))

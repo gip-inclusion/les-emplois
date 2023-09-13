@@ -8,8 +8,6 @@ from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria
-from itou.users.enums import KIND_SIAE_STAFF
-from itou.utils.perms.user import UserInfo
 from itou.utils.storage.s3 import S3Upload
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -29,13 +27,10 @@ from tests.utils.test import BASE_NUM_QUERIES, TestCase, assertMessages
 def create_evaluated_siae_with_consistent_datas(siae, user, level_1=True, level_2=False, institution=None):
     job_seeker = JobSeekerFactory()
 
-    user_info = UserInfo(
-        user=user, kind=KIND_SIAE_STAFF, siae=siae, prescriber_organization=None, is_authorized_prescriber=False
-    )
-
     eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
         job_seeker,
-        user_info,
+        author=user,
+        author_organization=siae,
         administrative_criteria=list(
             AdministrativeCriteria.objects.filter(
                 level__in=[AdministrativeCriteriaLevel.LEVEL_1 if level_1 else None]
