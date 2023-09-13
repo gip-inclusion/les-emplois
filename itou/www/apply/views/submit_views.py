@@ -53,15 +53,14 @@ JOB_SEEKER_INFOS_CHECK_PERIOD = relativedelta(months=6)
 
 
 def _check_job_seeker_approval(request, job_seeker, siae):
-    user_info = get_user_info(request)
     if job_seeker.approval_can_be_renewed_by(
-        siae=siae, sender_prescriber_organization=user_info.prescriber_organization
+        siae=siae, sender_prescriber_organization=request.current_organization if request.user.is_prescriber else None
     ):
         # NOTE(vperron): We're using PermissionDenied in order to display a message to the end user
         # by reusing the 403 template and its logic. I'm not 100% sure that this is a good idea but,
         # it's not too bad so far. I'd personnally would have raised a custom base error and caught it
         # somewhere using a middleware to display an error page that is not linked to a 403.
-        if user_info.user == job_seeker:
+        if request.user == job_seeker:
             error = apply_view_constants.ERROR_CANNOT_OBTAIN_NEW_FOR_USER
         else:
             error = apply_view_constants.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY
@@ -72,7 +71,7 @@ def _check_job_seeker_approval(request, job_seeker, siae):
         # Ensure that an existing approval can be unsuspended.
         if approval.is_suspended and not approval.can_be_unsuspended:
             error = Approval.ERROR_PASS_IAE_SUSPENDED_FOR_PROXY
-            if user_info.user == job_seeker:
+            if request.user == job_seeker:
                 error = Approval.ERROR_PASS_IAE_SUSPENDED_FOR_USER
             raise PermissionDenied(error)
 
@@ -202,19 +201,22 @@ class StartView(ApplyStepBaseView):
             raise Http404("Cette organisation n'accepte plus de candidatures pour le moment.")
 
         # Create a sub-session for this job application process
-        user_info = get_user_info(request)
         self.apply_session.init(
             {
                 "selected_jobs": [request.GET["job_description_id"]] if "job_description_id" in request.GET else [],
             }
         )
         # Warn message if prescriber's authorization is pending
-        if user_info.prescriber_organization and user_info.prescriber_organization.has_pending_authorization():
+        if (
+            request.user.is_prescriber
+            and request.current_organization
+            and request.current_organization.has_pending_authorization()
+        ):
             return HttpResponseRedirect(
                 reverse("apply:pending_authorization_for_sender", kwargs={"siae_pk": self.siae.pk})
             )
 
-        tunnel = "job_seeker" if user_info.user.is_job_seeker else "sender"
+        tunnel = "job_seeker" if request.user.is_job_seeker else "sender"
         return HttpResponseRedirect(reverse(f"apply:check_nir_for_{tunnel}", kwargs={"siae_pk": self.siae.pk}))
 
 
@@ -870,7 +872,11 @@ class ApplicationEligibilityView(ApplicationBaseView):
                 # Don't perform an eligibility diagnosis is the SIAE doesn't need it,
                 not self.siae.is_subject_to_eligibility_rules,
                 # Only "authorized prescribers" can perform an eligibility diagnosis.
-                not get_user_info(request).is_authorized_prescriber,
+                not (
+                    request.user.is_prescriber
+                    and request.current_organization
+                    and request.current_organization.is_authorized
+                ),
                 # No need for eligibility diagnosis if the job seeker already have a PASS IAE
                 self.job_seeker.has_valid_common_approval,
             ]
@@ -964,12 +970,11 @@ class ApplicationGEIQEligibilityView(ApplicationBaseView):
                 request, "apply/includes/geiq/geiq_administrative_criteria_form.html", self.get_context_data(**kwargs)
             )
         elif self.form.is_valid():
-            user_info = get_user_info(request)
             if not self.geiq_eligibility_diagnosis:
                 GEIQEligibilityDiagnosis.create_eligibility_diagnosis(
                     self.job_seeker,
-                    user_info.user,
-                    user_info.prescriber_organization,
+                    request.user,
+                    request.current_organization if request.user.is_prescriber else None,
                     self.form.cleaned_data,
                 )
             else:
@@ -1028,13 +1033,12 @@ class ApplicationResumeView(ApplicationBaseView):
             job_application.job_seeker = self.job_seeker
             job_application.to_siae = self.siae
 
-            sender_info = get_user_info(request)
-            job_application.sender = sender_info.user
-            job_application.sender_kind = sender_info.kind
-            if sender_info.prescriber_organization:
-                job_application.sender_prescriber_organization = sender_info.prescriber_organization
-            if sender_info.siae:
-                job_application.sender_siae = sender_info.siae
+            job_application.sender = request.user
+            job_application.sender_kind = request.user.kind
+            if request.user.is_prescriber:
+                job_application.sender_prescriber_organization = request.current_organization
+            if request.user.is_siae_staff:
+                job_application.sender_siae = request.current_organization
 
             # Save the job application
             with transaction.atomic():
@@ -1074,7 +1078,11 @@ class ApplicationResumeView(ApplicationBaseView):
                 # Don't perform an eligibility diagnosis is the SIAE doesn't need it,
                 not self.siae.is_subject_to_eligibility_rules,
                 # Only "authorized prescribers" can perform an eligibility diagnosis.
-                not get_user_info(self.request).is_authorized_prescriber,
+                not (
+                    self.request.user.is_prescriber
+                    and self.request.current_organization
+                    and self.request.current_organization.is_authorized
+                ),
                 # No need for eligibility diagnosis if the job seeker already have a PASS IAE
                 self.job_seeker.has_valid_common_approval,
             ]
