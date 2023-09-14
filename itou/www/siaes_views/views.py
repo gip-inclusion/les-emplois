@@ -77,7 +77,7 @@ def job_description_card(request, job_description_id, template_name="siaes/job_d
 
 @login_required
 def job_description_list(request, template_name="siaes/job_description_list.html"):
-    siae = get_current_siae_or_404(request, with_job_descriptions=True)
+    siae = get_current_siae_or_404(request)
     job_descriptions = (
         SiaeJobDescription.objects.filter(siae__pk=siae.pk)
         .select_related("location")
