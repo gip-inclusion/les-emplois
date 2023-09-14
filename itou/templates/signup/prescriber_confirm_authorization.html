@@ -16,20 +16,30 @@
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12 col-lg-8">
-                    <form method="post" class="js-prevent-multiple-submit">
+                    <div class="c-card card">
+                        <div class="card-body">
+                            <form method="post" class="js-prevent-multiple-submit">
 
-                        {% csrf_token %}
+                                {% csrf_token %}
 
-                        {% include "signup/includes/authorization_proof.html" %}
+                                <p>
+                                    <strong>{{ form.confirm_authorization.label }}</strong>
+                                </p>
+                                <p>
+                                    L’arrêté préfectoral portant mention de cette habilitation vous sera demandé pour valider votre compte de prescripteur habilité.
+                                </p>
 
-                        {% bootstrap_form form alert_error_type="all" %}
+                                {% bootstrap_form_errors form type="all" %}
+                                {% bootstrap_field form.confirm_authorization show_label=False %}
 
-                        {% buttons %}
-                            <a class="btn btn-outline-secondary" href="{{ prev_url }}">Retour</a>
-                            <button class="btn btn-primary">Continuer</button>
-                        {% endbuttons %}
+                                {% buttons %}
+                                    <a class="btn btn-outline-secondary" href="{{ prev_url }}">Retour</a>
+                                    <button class="btn btn-primary">Continuer</button>
+                                {% endbuttons %}
 
-                    </form>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
