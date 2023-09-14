@@ -100,7 +100,6 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
             + 1  # count job descriptions
             + 1  # fetch job descriptions
             + 3  # prefetch appelation, rome & siae
-            + 2  # select city (job_description.display_location)
             + 3  # update session
         ):
             response = self.client.get(self.url)
@@ -531,7 +530,6 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
             + 1  # fetch siaes_siaejobdescription
             + 1  # fetch siaes infos
             + 1  # fetch jobappelation
-            + 1  # fetch city (job.display_location)
             + 1  # fetch other job infos
             + 3  # update session
         ):
@@ -557,7 +555,6 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
             + 1  # fetch siaes_siaejobdescription
             + 1  # fetch siaes infos
             + 1  # fetch jobappelation
-            + 1  # fetch city (job.display_location)
             + 1  # fetch other job infos
             + 3  # update session
         ):
