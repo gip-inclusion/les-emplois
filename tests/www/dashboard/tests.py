@@ -1,4 +1,3 @@
-from collections import namedtuple
 from datetime import date, datetime
 from functools import partial
 from urllib.parse import urlencode
@@ -33,8 +32,6 @@ from itou.users.enums import IdentityProvider, LackOfNIRReason, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.models import InclusiveDateRange
-from itou.utils.perms.institution import get_current_institution_or_404
-from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.templatetags.format_filters import format_approval_number, format_siret
 from itou.www.dashboard.forms import EditUserEmailForm
 from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactory
@@ -1647,9 +1644,6 @@ class EditUserPreferencesExceptionsTest(TestCase):
         assert response.status_code == 403
 
 
-FakeRequest = namedtuple("FakeRequest", ("user", "session"))
-
-
 class SwitchOrganizationTest:
     switch_view_name = None
     switch_POST_key = None
@@ -1676,11 +1670,17 @@ class SwitchOrganizationTest:
 
         response = self.client.post(url, data={self.switch_POST_key: orga1.pk})
         assert response.status_code == 302
-        assert get_current_org_or_404(FakeRequest(user, self.client.session)) == orga1
+
+        response = self.client.get(reverse("dashboard:index"))
+        assert response.status_code == 200
+        assert response.context["request"].current_organization == orga1
 
         response = self.client.post(url, data={self.switch_POST_key: orga2.pk})
         assert response.status_code == 302
-        assert get_current_org_or_404(FakeRequest(user, self.client.session)) == orga2
+
+        response = self.client.get(reverse("dashboard:index"))
+        assert response.status_code == 200
+        assert response.context["request"].current_organization == orga2
 
 
 class OldSwitchOrganizationTest(SwitchOrganizationTest, TestCase):
@@ -1721,11 +1721,17 @@ class SwitchInstitutionTest:
 
         response = self.client.post(url, data={self.switch_POST_key: institution1.pk})
         assert response.status_code == 302
-        assert get_current_institution_or_404(FakeRequest(user, self.client.session)) == institution1
+
+        response = self.client.get(reverse("dashboard:index"))
+        assert response.status_code == 200
+        assert response.context["request"].current_organization == institution1
 
         response = self.client.post(url, data={self.switch_POST_key: institution2.pk})
         assert response.status_code == 302
-        assert get_current_institution_or_404(FakeRequest(user, self.client.session)) == institution2
+
+        response = self.client.get(reverse("dashboard:index"))
+        assert response.status_code == 200
+        assert response.context["request"].current_organization == institution2
 
 
 class OldSwitchInstitutionTest(SwitchInstitutionTest, TestCase):
