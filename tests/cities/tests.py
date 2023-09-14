@@ -1,9 +1,11 @@
 from django.contrib.gis.geos import Point
 from django.core import management
+from django.core.management import call_command
 from pytest_django.asserts import assertQuerySetEqual
 
 from itou.cities.models import City, EditionModeChoices
 from tests.cities.factories import create_city_guerande, create_test_cities
+from tests.users.factories import JobSeekerFactory
 
 
 def test_create_test_cities():
@@ -206,3 +208,27 @@ def test_sync_cities(settings, capsys, respx_mock):
             city.edition_mode,
         ),
     )
+
+
+def test_resolve_insee_cities(capsys, snapshot):
+    guerande = create_city_guerande()  # Guérande, 44350
+    user = JobSeekerFactory(city="GUERAND", post_code="44350", geocoding_score=0.9)
+    non_resolved_user_1 = JobSeekerFactory(city="Guérande", post_code="54350", geocoding_score=0.9)
+    non_resolved_user_2 = JobSeekerFactory(city="ERAND", post_code="44350", geocoding_score=0.9)
+    call_command("resolve_insee_cities", wet_run=True, mode="job_seekers")
+    stdout, stderr = capsys.readouterr()
+    assert stderr == ""
+    assert stdout.splitlines() == snapshot(name="first_pass")
+
+    user.refresh_from_db()
+    assert user.insee_city == guerande
+    non_resolved_user_1.refresh_from_db()
+    non_resolved_user_1.geocoding_score = 0.0
+    non_resolved_user_2.refresh_from_db()
+    non_resolved_user_2.geocoding_score = 0.0
+
+    # no users selected: they either have a city or a low geocoding score.
+    call_command("resolve_insee_cities", wet_run=True, mode="job_seekers")
+    stdout, stderr = capsys.readouterr()
+    assert stderr == ""
+    assert stdout.splitlines() == snapshot(name="second_pass")
