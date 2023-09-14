@@ -12,6 +12,7 @@ docker/prod/
 itou/static_collected/
 itou/approvals/management/commands/data/
 itou/siaes/management/commands/data
+cached_assets_to_vendor
 
 # Import files
 imports

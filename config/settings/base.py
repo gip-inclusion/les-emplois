@@ -224,6 +224,7 @@ STORAGES = {
 }
 
 STATICFILES_FINDERS = (
+    "itou.utils.staticfiles.DownloadAndVendorStaticFilesFinder",
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
 )
