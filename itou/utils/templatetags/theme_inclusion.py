@@ -1,3 +1,5 @@
+import math
+
 from django import template
 from django.contrib.messages import constants as message_constants
 from django.templatetags.static import static
@@ -52,3 +54,8 @@ def itou_toast_content(message):
         return message.message.split("||", maxsplit=1)[1]
     except IndexError:
         return None
+
+
+@register.filter
+def stepper_progress(wizard):
+    return math.floor((wizard["steps"].step1 / wizard["steps"].count) * 100)
