@@ -2,6 +2,7 @@ import logging
 
 from django.contrib.gis.db import models as gis_models
 from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.postgres.search import TrigramSimilarity
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
@@ -9,6 +10,7 @@ from django.template.defaultfilters import slugify
 from django.utils import timezone
 from django.utils.functional import cached_property
 
+from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS, REGIONS, department_from_postcode
 from itou.geo.models import QPV, ZRR
 from itou.utils.apis.exceptions import AddressLookupError, GeocodingDataError
@@ -27,6 +29,20 @@ BAN_API_RELIANCE_SCORE = 0.8
 def lat_lon_to_coords(lat, lon):
     if lat is not None and lon is not None:
         return GEOSGeometry(f"POINT({lon} {lat})")
+    return None
+
+
+def resolve_insee_city(city_name, post_code):
+    if not city_name or not post_code:
+        return None
+    cities = sorted(
+        City.objects.annotate(similarity=TrigramSimilarity("name", city_name))
+        .filter(post_codes__contains=[post_code])
+        .filter(similarity__gt=0.3),
+        key=lambda c: (-c.similarity, len(c.post_codes)),
+    )
+    if cities:
+        return cities[0]  # keep the city with the shortest list of matching post codes, it will be the most specific
     return None
 
 
@@ -150,6 +166,8 @@ class AddressMixin(models.Model):
         blank=True,
         null=True,
     )
+
+    insee_city = models.ForeignKey("cities.City", null=True, blank=True, on_delete=models.SET_NULL)
 
     class Meta:
         abstract = True
