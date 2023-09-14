@@ -1,5 +1,6 @@
 import logging
 
+from django.db.models import Prefetch
 from django_filters.filters import OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend, FilterSet
 from drf_spectacular.types import OpenApiTypes
@@ -9,7 +10,7 @@ from rest_framework.authentication import SessionAuthentication, TokenAuthentica
 from rest_framework.exceptions import NotFound, ValidationError
 
 from itou.cities.models import City
-from itou.siaes.models import Siae
+from itou.siaes.models import Siae, SiaeJobDescription
 from itou.siaes.serializers import SiaeSerializer
 
 
@@ -81,7 +82,16 @@ class SiaeViewSet(viewsets.ReadOnlyModelViewSet):
     # No permission is required on this API and everybody can query anything − it’s read-only.
     permission_classes = []
 
-    queryset = Siae.objects.prefetch_job_description_through(with_is_popular=False)
+    queryset = Siae.objects.prefetch_related(
+        Prefetch(
+            "job_description_through",
+            queryset=(
+                SiaeJobDescription.objects.filter(is_active=True)
+                .select_related("appellation__rome")
+                .order_by("-updated_at", "-created_at")
+            ),
+        )
+    )
 
     NOT_FOUND_RESPONSE = OpenApiExample(
         "Not Found",

@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MaxValueValidator
 from django.db import models
-from django.db.models import BooleanField, Case, Count, Exists, F, OuterRef, Prefetch, Q, Subquery, When
+from django.db.models import BooleanField, Case, Count, Exists, F, OuterRef, Q, Subquery, When
 from django.db.models.constraints import UniqueConstraint
 from django.db.models.functions import Cast, Coalesce
 from django.urls import reverse
@@ -72,16 +72,6 @@ class SiaeQuerySet(OrganizationQuerySet):
 
     def within(self, point, distance_km):
         return self.filter(coords__dwithin=(point, D(km=distance_km)))
-
-    def prefetch_job_description_through(self, with_is_popular=True, **kwargs):
-        qs = (
-            SiaeJobDescription.objects.filter(is_active=True, **kwargs)
-            .select_related("appellation__rome")
-            .order_by("-updated_at", "-created_at")
-        )
-        if with_is_popular:
-            qs = qs.with_annotation_is_popular()
-        return self.prefetch_related(Prefetch("job_description_through", queryset=qs))
 
     def with_count_recent_received_job_apps(self):
         """
