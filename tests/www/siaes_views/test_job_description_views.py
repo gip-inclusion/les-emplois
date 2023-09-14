@@ -44,7 +44,7 @@ class JobDescriptionAbstractTest(TestCase):
         )
         siae.jobs.add(*self.appellations)
 
-        # Make sure at least one SiaeJobDescription has a location
+        # Make sure at least two SiaeJobDescription have a location
         SiaeJobDescription.objects.filter(pk=siae.job_description_through.last().pk).update(
             location=City.objects.create(
                 name="Rennes",
@@ -53,6 +53,16 @@ class JobDescriptionAbstractTest(TestCase):
                 post_codes=["35000"],
                 code_insee="35000",
                 coords=Point(-1.7, 45),
+            )
+        )
+        SiaeJobDescription.objects.filter(pk=siae.job_description_through.first().pk).update(
+            location=City.objects.create(
+                name="Lille",
+                slug="lille",
+                department="35",
+                post_codes=["59000"],
+                code_insee="59000",
+                coords=Point(3, 50.5),
             )
         )
 
@@ -90,7 +100,7 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
             + 1  # count job descriptions
             + 1  # fetch job descriptions
             + 3  # prefetch appelation, rome & siae
-            + 1  # select city (job_description.display_location)
+            + 2  # select city (job_description.display_location)
             + 3  # update session
         ):
             response = self.client.get(self.url)
@@ -521,6 +531,7 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
             + 1  # fetch siaes_siaejobdescription
             + 1  # fetch siaes infos
             + 1  # fetch jobappelation
+            + 1  # fetch city (job.display_location)
             + 1  # fetch other job infos
             + 3  # update session
         ):
@@ -546,6 +557,7 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
             + 1  # fetch siaes_siaejobdescription
             + 1  # fetch siaes infos
             + 1  # fetch jobappelation
+            + 1  # fetch city (job.display_location)
             + 1  # fetch other job infos
             + 3  # update session
         ):
