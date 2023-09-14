@@ -83,6 +83,7 @@ def geolocate_qs(qs, is_verbose=False):
             obj.geocoding_score = score
             obj.ban_api_resolved_address = geo_result["result_label"]
             obj.geocoding_updated_at = now
+            obj.address_resolved_at = now
             yield obj
 
 

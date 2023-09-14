@@ -285,6 +285,25 @@ class User(AbstractUser, AddressMixin):
         default=uuid.uuid4,
     )
 
+    # This field is used to know if and when an address has been validated by the BAN API.
+    # Either it has been autocompleted, or `update_job_seeker_coords` has been run and the
+    # address has been resolved (meaning the score was above the confidence threshold, 0.8)
+    # This means that if this field is not null, the address is of very high quality and we
+    # can use it to:
+    # - resolve the JobSeekerProfile's hexa format addresses in the User case
+    # - resolve the underlining City with a high degree of success
+    # This field is voided if a manual resolution has been saved or if suddenly the score drops
+    # below the threshold. In this case we will have to wait for the cron to resolve again, or
+    # for an user to try and autocomplete it again manually.
+    # The fact that it is a timestamp will be very handy when deciding which JobSeekerProfile to
+    # update, since they will also have an hexa address update timestamp that we can compare to.
+    address_resolved_at = models.DateTimeField(
+        blank=True,
+        null=True,
+        verbose_name="adresse résolue le",
+        help_text="Cette date est mise à jour lorsqu'un utilisateur utilise l'autocomplétion d'adresse.",
+    )
+
     objects = ItouUserManager()
 
     class Meta(AbstractUser.Meta):

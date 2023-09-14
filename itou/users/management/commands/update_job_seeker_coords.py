@@ -46,7 +46,13 @@ class Command(BaseCommand):
         if wet_run:
             User.objects.bulk_update(
                 users_to_save,
-                ["coords", "geocoding_score", "ban_api_resolved_address", "geocoding_updated_at"],
+                [
+                    "coords",
+                    "geocoding_score",
+                    "ban_api_resolved_address",
+                    "geocoding_updated_at",
+                    "address_resolved_at",
+                ],
                 batch_size=1000,
             )
             self.stdout.write(f"> count={len(users_to_save)} job seekers geolocated with a high score.")
