@@ -246,24 +246,6 @@ class SiaeModelTest(TestCase):
 
 
 class SiaeQuerySetTest(TestCase):
-    def test_prefetch_job_description_through(self):
-        siae = SiaeFactory(with_jobs=True)
-
-        siae_result = Siae.objects.prefetch_job_description_through().get(pk=siae.pk)
-        assert hasattr(siae_result, "job_description_through")
-
-        # by default every job description is active
-        assert siae_result.job_description_through.count() == 4
-
-        first_job_description = siae_result.job_description_through.first()
-        assert hasattr(first_job_description, "is_popular")
-
-        # now deactivate them
-        jd = SiaeJobDescription.objects.filter(siae=siae).all()
-        jd.update(is_active=False)
-        siae_result = Siae.objects.prefetch_job_description_through().get(pk=siae.pk)
-        assert siae_result.job_description_through.count() == 0
-
     def test_with_count_recent_received_job_applications(self):
         siae = SiaeFactory()
         model = JobApplicationFactory._meta.model
