@@ -31,7 +31,7 @@ ITOU_SESSION_JOB_DESCRIPTION_KEY = "edit_job_description_key"
 
 
 def job_description_card(request, job_description_id, template_name="siaes/job_description_card.html"):
-    job_description = get_object_or_404(SiaeJobDescription, pk=job_description_id)
+    job_description = get_object_or_404(SiaeJobDescription.objects.select_related("location"), pk=job_description_id)
     back_url = get_safe_url(request, "back_url")
     siae = job_description.siae
     can_update_job_description = (
@@ -80,6 +80,7 @@ def job_description_list(request, template_name="siaes/job_description_list.html
     siae = get_current_siae_or_404(request, with_job_descriptions=True)
     job_descriptions = (
         SiaeJobDescription.objects.filter(siae__pk=siae.pk)
+        .select_related("location")
         .prefetch_related("appellation", "appellation__rome", "siae")
         .order_by_most_recent()
     )
