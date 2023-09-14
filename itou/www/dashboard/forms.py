@@ -95,6 +95,9 @@ class JobSeekerAddressForm(forms.ModelForm):
         if city:
             # FIXME(vperron) : Someday, resolve every city name + post code into an actual cities.City.
             self.instance.city = city.name
+            # The INSEE code necessarily comes from the BAN and has been validated manually.
+            # Arriving here means we have correctly resolved an address, write that down.
+            self.instance.address_resolved_at = timezone.now()
         return insee_code
 
     def clean(self):
