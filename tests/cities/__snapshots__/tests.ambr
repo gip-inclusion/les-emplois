@@ -1,0 +1,13 @@
+# serializer version: 1
+# name: test_resolve_insee_cities[first_pass]
+  list([
+    "! failed to find matching city for item.city='ERAND' item.post_code='44350'",
+    "! failed to find matching city for item.city='Guérande' item.post_code='54350'",
+    '> count=1 JobSeeker updated. err_count=2 JobSeeker without a resolution.',
+  ])
+# ---
+# name: test_resolve_insee_cities[second_pass]
+  list([
+    '> count=0 JobSeeker updated. err_count=0 JobSeeker without a resolution.',
+  ])
+# ---
