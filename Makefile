@@ -75,7 +75,7 @@ fix: $(VENV_REQUIREMENT)
 # Django.
 # =============================================================================
 
-.PHONY: mgmt_cmd populate_db populate_db_with_cities populate_db_minimal graph_models_itou
+.PHONY: mgmt_cmd populate_db populate_db_with_cities populate_db_minimal
 
 # make mgmt_cmd
 # make mgmt_cmd COMMAND=dbshell
@@ -103,28 +103,6 @@ populate_db: populate_db_with_cities
 populate_db_minimal: populate_db_with_cities
 	# Load reference data used by ASP-related code
 	$(EXEC_CMD) bash -c "./manage.py loaddata_bulk itou/fixtures/django/*asp_INSEE*.json"
-
-COMMAND_GRAPH_MODELS := graph_models --group-models \
-	approvals \
-	asp \
-	cities \
-	eligibility \
-	employee_record \
-	external_data \
-	institutions \
-	invitations \
-	job_applications \
-	jobs \
-	prescribers \
-	siaes \
-	users \
-	--pygraphviz -o itou-graph-models.svg
-
-# Install these packages first:
-# apt-get install gcc graphviz graphviz-dev
-# pip install pygraphviz
-graph_models_itou:
-	$(EXEC_CMD) ./manage.py $(COMMAND_GRAPH_MODELS)
 
 # Tests.
 # =============================================================================
