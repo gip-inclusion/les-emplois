@@ -96,7 +96,6 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
             + 1  # fetch user
             + 2  # fetch user memberships (and if siae is active/in grace period)
             + 1  # get_current_siae_or_404
-            + 1  # with_job_descriptions=True
             + 1  # count job descriptions
             + 1  # fetch job descriptions
             + 3  # prefetch appelation, rome & siae
