@@ -265,12 +265,12 @@ class ListEmployeeRecordsTest(TestCase):
         num_queries = BASE_NUM_QUERIES
         num_queries += 1  # Get django session
         num_queries += 3  # Get current user and siae
+        num_queries += 1  # get_current_siae_or_404
         num_queries += 1  # Select job seeker for filters
         num_queries += 1  # Select employee_records status count
         num_queries += 1  # Get Siae Convention
         num_queries += 1  # Select ordered job applications
         num_queries += 1  # Select EmployeeRecords
-        num_queries += 1  # Select siae members
         with self.assertNumQueries(num_queries):
             self.client.get(self.url)
 
