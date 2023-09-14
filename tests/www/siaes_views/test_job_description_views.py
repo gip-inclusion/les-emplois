@@ -79,7 +79,21 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
         self.url = self.list_url + "?page=1"
 
     def test_job_application_list_response_content(self):
-        response = self._login(self.user)
+        self.client.force_login(self.user)
+        with self.assertNumQueries(
+            BASE_NUM_QUERIES
+            + 1  # fetch django session
+            + 1  # fetch user
+            + 2  # fetch user memberships (and if siae is active/in grace period)
+            + 1  # get_current_siae_or_404
+            + 1  # with_job_descriptions=True
+            + 1  # count job descriptions
+            + 1  # fetch job descriptions
+            + 3  # prefetch appelation, rome & siae
+            + 1  # select city (job_description.display_location)
+            + 3  # update session
+        ):
+            response = self.client.get(self.url)
 
         assert self.siae.job_description_through.count() == 4
         self.assertContains(
