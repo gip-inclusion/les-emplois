@@ -1,0 +1,25 @@
+{% load bootstrap4 %}
+{% load redirection_fields %}
+
+<form method="post" class="js-prevent-multiple-submit">
+    {% csrf_token %}
+    <fieldset>
+        <div class="row">
+            <div class="col-12">
+                <p class="h4">Se connecter avec vos identifiants</p>
+                {% bootstrap_form_errors form type="all" %}
+                {% redirection_input_field name=redirect_field_name value=redirect_field_value %}
+                {% bootstrap_field form.login %}
+                {% bootstrap_field form.password form_group_class="form-group mb-2" %}
+                <div class="form-group">
+                    <a href="{% url 'account_reset_password' %}" class="btn-link fs-sm">Mot de passe oublié ?</a>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+    <div class="form-row justify-content-end">
+        <div class="form-group col-12 col-lg-auto">
+            {% bootstrap_button "Se connecter" button_class="btn btn-primary btn-block" %}
+        </div>
+    </div>
+</form>
