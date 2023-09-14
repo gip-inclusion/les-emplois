@@ -9,17 +9,6 @@
         Inscription
         <small class="text-muted">Prescripteur/Orienteur</small>
     </h1>
-    <div class="alert alert-warning">
-        <p>
-            Les organisations habilitées permettent à leurs collaborateurs de valider l'éligibilité d'une personne candidate au dispositif d'Insertion par l'Activité Économique. Cette habilitation est officialisée par arrêté préfectoral.
-        </p>
-        <p class="mb-0">
-            <a href="{{ ITOU_HELP_CENTER_URL }}/articles/14741016074385--Les-prescripteurs-habilités"
-               rel="noopener"
-               target="_blank"
-               aria-label="En savoir plus sur les différents prescripteurs (ouverture dans un nouvel onglet)">En savoir plus sur les différents prescripteurs</a><i class="ri-external-link-line ml-1"></i>
-        </p>
-    </div>
 {% endblock %}
 
 {% block content %}
@@ -27,18 +16,35 @@
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12 col-lg-8">
-                    <form method="post" class="js-prevent-multiple-submit">
+                    <div class="c-card card">
+                        <div class="card-body">
+                            <p>
+                                Les organisations habilitées permettent à leurs collaborateurs de valider l'éligibilité d'une personne candidate au dispositif d'Insertion par l'Activité Économique. Cette habilitation est officialisée par arrêté préfectoral.
+                            </p>
 
-                        {% csrf_token %}
+                            <p>
+                                <a href="{{ ITOU_HELP_CENTER_URL }}/articles/14741016074385--Les-prescripteurs-habilités"
+                                   rel="noopener"
+                                   target="_blank"
+                                   aria-label="En savoir plus sur les différents prescripteurs (ouverture dans un nouvel onglet)">En savoir plus sur les différents prescripteurs</a><i class="ri-external-link-line ml-1"></i>
+                            </p>
+                            <form method="post" class="js-prevent-multiple-submit">
 
-                        {% bootstrap_form form alert_error_type="all" %}
+                                {% csrf_token %}
 
-                        {% buttons %}
-                            <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">Retour</a>
-                            <button class="btn btn-primary">Continuer</button>
-                        {% endbuttons %}
+                                {% bootstrap_form form alert_error_type="all" %}
 
-                    </form>
+                                {% buttons %}
+                                    <hr class="my-5">
+                                    <div class="text-right">
+                                        <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">Retour</a>
+                                        <button class="btn btn-primary">Continuer</button>
+                                    </div>
+                                {% endbuttons %}
+
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
