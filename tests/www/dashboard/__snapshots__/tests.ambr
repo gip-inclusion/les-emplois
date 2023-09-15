@@ -66,17 +66,29 @@
                                                       
                                                   
                                                       
+                                                  
+                                                      
+                                                  
+                                                      
+                                                  
+                                                      
+                                                  
+                                                      
+                                                  
+                                                      
+                                                  
+                                                      
+                                                  
+                                                      
+                                                  
+                                                      
+                                                  
+                                                      
+                                                  
+                                                      
                                                           <li>
                                                               <strong>Adresse</strong>
                                                           </li>
-                                                      
-                                                  
-                                                      
-                                                  
-                                                      
-                                                  
-                                                      
-                                                  
                                                       
                                                   
                                                       
@@ -152,10 +164,42 @@
                                                   
                                                       
                                                   
+                                                      
+                                                          <li>
+                                                              <strong>Adresse</strong>
+                                                          </li>
+                                                      
+                                                  
+                                                      
+                                                  
+                                                      
+                                                  
+                                                      
+                                                  
+                                                      
+                                                  
+                                                      
+                                                  
                                               </ul>
                                           <p></p>
                                       </div>
                                   </div>
                               </div>
+  '''
+# ---
+# name: EditUserInfoViewTest.test_update_address[user address input on error]
+  '''
+  <select class="form-select django-select2" data-ajax--url="http://ban-api/search/" data-allow-clear="false" data-minimum-input-length="3" data-placeholder="Ex. 102 Quai de Jemmapes 75010 Paris" data-theme="bootstrap-5" id="id_address_for_autocomplete" lang="fr" name="address_for_autocomplete">
+    <option value="0">37 B Rue du Général De Gaulle, 67118 Geispolsheim</option>
+  
+  </select>
+  '''
+# ---
+# name: EditUserInfoViewTest.test_update_address[user address input]
+  '''
+  <select class="form-select django-select2" data-ajax--url="http://ban-api/search/" data-allow-clear="false" data-minimum-input-length="3" data-placeholder="Ex. 102 Quai de Jemmapes 75010 Paris" data-theme="bootstrap-5" id="id_address_for_autocomplete" lang="fr" name="address_for_autocomplete">
+    <option selected="" value="0">37 B Rue du Général De Gaulle, 67118 Geispolsheim</option>
+  
+  </select>
   '''
 # ---

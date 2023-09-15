@@ -214,6 +214,12 @@ class User(AbstractUser, AddressMixin):
         default=uuid.uuid4,
     )
 
+    address_filled_at = models.DateTimeField(
+        verbose_name="date de dernier remplissage de l'adresse",
+        null=True,
+        help_text="Mise à jour par autocomplétion de l'utilisateur",
+    )
+
     objects = ItouUserManager()
 
     class Meta(AbstractUser.Meta):
