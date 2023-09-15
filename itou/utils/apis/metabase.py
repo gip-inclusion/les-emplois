@@ -112,6 +112,8 @@ METABASE_DASHBOARDS = {
     #
     "stats_ddets_log_state": {
         "dashboard_id": 310,
+        "tally_popup_form_id": "w2az2j",
+        "tally_embed_form_id": "3Nlvzl",
     },
     #
     # Institution stats - DREETS IAE - region level.
@@ -161,6 +163,8 @@ METABASE_DASHBOARDS = {
     #
     "stats_dihal_state": {
         "dashboard_id": 310,
+        "tally_popup_form_id": "w2az2j",
+        "tally_embed_form_id": "3Nlvzl",
     },
     #
     # Institution stats - IAE Network - nation level.
