@@ -35,4 +35,6 @@
 {% block script %}
     {{ block.super }}
     <script src="{% static 'js/split_nir.js' %}"></script>
+    {% comment %} Needed for the AddressAutocompleteWidget {% endcomment %}
+    {{ form.media.js }}
 {% endblock %}

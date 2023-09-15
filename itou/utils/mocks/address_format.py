@@ -6,6 +6,7 @@ from itou.asp.models import Commune
 BAN_GEOCODING_API_RESULTS_MOCK = [
     {
         "score": 0.8745736363636364,
+        "ban_api_resolved_address": "37 B Rue du Général De Gaulle, 67118 Geispolsheim",
         "address_line_1": "37 B Rue du Général De Gaulle",
         "number": "37b",
         "lane": "Rue du Général de Gaulle",
@@ -297,9 +298,18 @@ BAN_GEOCODING_API_RESULTS_MOCK = [
 # Revert lookup
 RESULTS_BY_ADDRESS = {elt["address_line_1"]: elt for elt in BAN_GEOCODING_API_RESULTS_MOCK}
 
+RESULTS_BY_BAN_API_RESOLVED_ADDRESS = {}
+for elt in BAN_GEOCODING_API_RESULTS_MOCK:
+    if "ban_api_resolved_address" in elt:
+        RESULTS_BY_BAN_API_RESOLVED_ADDRESS[elt["ban_api_resolved_address"]] = elt
+
 
 def mock_get_geocoding_data(address, **_):
     return RESULTS_BY_ADDRESS.get(address)
+
+
+def mock_get_geocoding_data_by_ban_api_resolved(address, **_):
+    return RESULTS_BY_BAN_API_RESOLVED_ADDRESS.get(address)
 
 
 def get_random_geocoding_api_result():

@@ -12,6 +12,7 @@
     {% csrf_token %}
 
     {% if form.nir_error %}{{ form.nir_error|safe }}{% endif %}
+
     {% bootstrap_form_errors form type='non_fields' %}
     {% bootstrap_field form.email %}
     {% bootstrap_field form.title %}
@@ -22,11 +23,15 @@
     {% bootstrap_field form.lack_of_nir_reason wrapper_class=form.lack_of_nir_reason.field.form_group_class %}
     {% bootstrap_field form.birthdate %}
     {% bootstrap_field form.phone %}
+    {% bootstrap_field form.address_for_autocomplete %}
     {% bootstrap_field form.address_line_1 %}
     {% bootstrap_field form.address_line_2 %}
     {% bootstrap_field form.post_code %}
     {% bootstrap_field form.city %}
-    {% bootstrap_field form.city_slug %}
+    {% bootstrap_field form.insee_code %}
+    {% bootstrap_field form.geocoding_score %}
+    {% bootstrap_field form.ban_api_resolved_address %}
+    {% bootstrap_field form.fill_mode %}
     {% bootstrap_field form.pole_emploi_id %}
     {% bootstrap_field form.lack_of_pole_emploi_id_reason %}
 

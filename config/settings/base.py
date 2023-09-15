@@ -619,6 +619,7 @@ CSP_CONNECT_SRC = [
     "*.hotjar.io",
     "wss://*.hotjar.com",
 ]
+
 CSP_OBJECT_SRC = ["'none'"]
 
 if MATOMO_BASE_URL:
@@ -629,6 +630,10 @@ if MATOMO_BASE_URL:
 CSP_WORKER_SRC = [
     "'self' blob:",  # Redoc seems to use blob:https://emplois.inclusion.beta.gouv.fr/some-ran-dom-uu-id
 ]
+
+if API_BAN_BASE_URL:
+    CSP_CONNECT_SRC.append(API_BAN_BASE_URL)
+
 CSP_INCLUDE_NONCE_IN = ["script-src", "script-src-elem"]
 CSP_REPORT_URI = os.getenv("CSP_REPORT_URI", None)
 
