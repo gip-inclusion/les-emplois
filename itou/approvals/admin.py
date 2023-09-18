@@ -429,6 +429,7 @@ class ProlongationRequestAdmin(ProlongationCommonAdmin):
 @admin.register(models.Prolongation)
 class ProlongationAdmin(ProlongationCommonAdmin):
     list_display = ProlongationCommonAdmin.list_display + ("is_in_progress", "from_prolongation_request")
+    list_select_related = ProlongationCommonAdmin.list_select_related + ("request",)
     raw_id_fields = ProlongationCommonAdmin.raw_id_fields + ("request",)
     list_filter = (
         IsInProgressFilter,
