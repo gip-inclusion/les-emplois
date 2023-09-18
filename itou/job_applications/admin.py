@@ -261,6 +261,7 @@ class JobApplicationTransitionLogAdmin(admin.ModelAdmin):
     date_hierarchy = "timestamp"
     list_display = ("job_application", "transition", "from_state", "to_state", "user", "timestamp")
     list_filter = ("transition",)
+    list_select_related = ("job_application", "user")
     raw_id_fields = ("job_application", "user")
     readonly_fields = ("job_application", "transition", "from_state", "to_state", "user", "timestamp")
     search_fields = ("transition", "user__username", "job_application__pk")

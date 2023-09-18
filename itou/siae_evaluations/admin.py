@@ -251,6 +251,7 @@ class EvaluatedSiaeAdmin(admin.ModelAdmin):
 class EvaluatedJobApplicationAdmin(admin.ModelAdmin):
     list_display = ("evaluated_siae", "job_application", "approval", "job_seeker")
     list_display_links = ("job_application",)
+    list_select_related = ("evaluated_siae__siae", "job_application__approval", "job_application__job_seeker")
     readonly_fields = ("evaluated_siae", "job_application", "approval", "job_seeker", "state")
     inlines = [
         EvaluatedAdministrativeCriteriaInline,
@@ -294,7 +295,7 @@ class SanctionsAdmin(admin.ModelAdmin):
         "evaluation_campaign",
         "institution",
     ]
-    list_select_related = ["evaluated_siae__evaluation_campaign__institution"]
+    list_select_related = ["evaluated_siae__evaluation_campaign__institution", "evaluated_siae__siae"]
     search_fields = ["evaluated_siae__siae__name"]
     readonly_fields = [
         "evaluated_siae",
