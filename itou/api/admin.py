@@ -1,6 +1,7 @@
 from django.contrib import admin
 from rest_framework.authtoken.admin import TokenAdmin
 
+from ..utils.admin import ItouModelAdmin
 from .models import SiaeApiToken
 
 
@@ -11,7 +12,7 @@ TokenAdmin.raw_id_fields = ("user",)
 
 
 @admin.register(SiaeApiToken)
-class SiaeApiTokenAdmin(admin.ModelAdmin):
+class SiaeApiTokenAdmin(ItouModelAdmin):
     list_display = ["key", "label", "created_at"]
     ordering = ["-created_at"]
     read_only_fields = ["key", "created_at"]

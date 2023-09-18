@@ -1,9 +1,10 @@
 from django.contrib import admin
 
+from ..utils.admin import ItouModelAdmin
 from . import models, views
 
 
-class SettingAdmin(admin.ModelAdmin):
+class SettingAdmin(ItouModelAdmin):
     """Admin View for settings"""
 
     def has_add_permission(self, request):

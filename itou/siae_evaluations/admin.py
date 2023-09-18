@@ -3,14 +3,14 @@ from django.utils import timezone
 from django.utils.html import format_html
 
 from itou.siae_evaluations import models
-from itou.utils.admin import PkSupportRemarkInline, get_admin_view_link
+from itou.utils.admin import ItouModelAdmin, ItouTabularInline, PkSupportRemarkInline, get_admin_view_link
 from itou.utils.export import to_streaming_response
 
 
 admin.site.register(models.Calendar)
 
 
-class EvaluatedSiaesInline(admin.TabularInline):
+class EvaluatedSiaesInline(ItouTabularInline):
     model = models.EvaluatedSiae
     fields = ("id_link", "reviewed_at", "state")
     readonly_fields = ("id_link", "reviewed_at", "state")
@@ -33,11 +33,12 @@ class EvaluatedSiaesInline(admin.TabularInline):
         return get_admin_view_link(obj, content=format_html("Lien vers la Siae évaluée <strong>{}</strong>", obj))
 
 
-class EvaluatedJobApplicationsInline(admin.TabularInline):
+class EvaluatedJobApplicationsInline(ItouTabularInline):
     model = models.EvaluatedJobApplication
     fields = ("id_link", "approval", "job_seeker", "state")
     readonly_fields = ("id_link", "approval", "job_seeker", "state")
     extra = 0
+    list_select_related = ("job_application__approval", "job_application__job_seeker")
 
     def get_queryset(self, request):
         return super().get_queryset(request).prefetch_related("evaluated_administrative_criteria")
@@ -62,7 +63,7 @@ class EvaluatedJobApplicationsInline(admin.TabularInline):
         return "-"
 
 
-class EvaluatedAdministrativeCriteriaInline(admin.TabularInline):
+class EvaluatedAdministrativeCriteriaInline(ItouTabularInline):
     model = models.EvaluatedAdministrativeCriteria
     fields = ("id_link", "uploaded_at", "submitted_at", "review_state")
     readonly_fields = ("id_link", "uploaded_at", "submitted_at", "review_state")
@@ -105,7 +106,7 @@ def _evaluated_siae_serializer(queryset):
 
 
 @admin.register(models.EvaluationCampaign)
-class EvaluationCampaignAdmin(admin.ModelAdmin):
+class EvaluationCampaignAdmin(ItouModelAdmin):
     @admin.action(description="Exporter les SIAE des campagnes sélectionnées")
     def export_siaes(self, request, queryset):
         export_qs = (
@@ -209,7 +210,7 @@ class EvaluationCampaignAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.EvaluatedSiae)
-class EvaluatedSiaeAdmin(admin.ModelAdmin):
+class EvaluatedSiaeAdmin(ItouModelAdmin):
     list_display = ["evaluation_campaign", "siae", "state", "reviewed_at"]
     list_display_links = ("siae",)
     readonly_fields = (
@@ -248,7 +249,7 @@ class EvaluatedSiaeAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.EvaluatedJobApplication)
-class EvaluatedJobApplicationAdmin(admin.ModelAdmin):
+class EvaluatedJobApplicationAdmin(ItouModelAdmin):
     list_display = ("evaluated_siae", "job_application", "approval", "job_seeker")
     list_display_links = ("job_application",)
     list_select_related = ("evaluated_siae__siae", "job_application__approval", "job_application__job_seeker")
@@ -275,7 +276,7 @@ class EvaluatedJobApplicationAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.EvaluatedAdministrativeCriteria)
-class EvaluatedAdministrativeCriteriaAdmin(admin.ModelAdmin):
+class EvaluatedAdministrativeCriteriaAdmin(ItouModelAdmin):
     list_display = ("evaluated_job_application", "administrative_criteria", "submitted_at", "review_state")
     list_display_links = ("administrative_criteria",)
     readonly_fields = (
@@ -289,7 +290,7 @@ class EvaluatedAdministrativeCriteriaAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.Sanctions)
-class SanctionsAdmin(admin.ModelAdmin):
+class SanctionsAdmin(ItouModelAdmin):
     list_display = [
         "evaluated_siae",
         "evaluation_campaign",

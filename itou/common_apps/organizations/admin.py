@@ -1,8 +1,10 @@
 from django.contrib import admin, messages
 from django.db.models import Count
 
+from itou.utils.admin import ItouModelAdmin, ItouTabularInline
 
-class MembersInline(admin.TabularInline):
+
+class MembersInline(ItouTabularInline):
     # Remember to specify the model in child class. Example:
     # model = models.Siae.members.through
     extra = 1
@@ -26,7 +28,7 @@ class HasMembersFilter(admin.SimpleListFilter):
         return queryset
 
 
-class OrganizationAdmin(admin.ModelAdmin):
+class OrganizationAdmin(ItouModelAdmin):
     @admin.display(ordering="_member_count")
     def member_count(self, obj):
         return obj._member_count

@@ -10,7 +10,13 @@ from import_export.fields import Field
 from itou.common_apps.organizations.admin import HasMembersFilter, MembersInline, OrganizationAdmin
 from itou.siaes import enums, models
 from itou.siaes.admin_forms import SiaeAdminForm
-from itou.utils.admin import ItouGISMixin, PkSupportRemarkInline, get_admin_view_link
+from itou.utils.admin import (
+    ItouGISMixin,
+    ItouModelAdmin,
+    ItouTabularInline,
+    PkSupportRemarkInline,
+    get_admin_view_link,
+)
 from itou.utils.apis.exceptions import GeocodingDataError
 
 
@@ -20,7 +26,7 @@ class SiaeMembersInline(MembersInline):
     raw_id_fields = ("user",)
 
 
-class JobsInline(admin.TabularInline):
+class JobsInline(ItouTabularInline):
     model = models.Siae.jobs.through
     extra = 1
     fields = (
@@ -45,7 +51,7 @@ class JobsInline(admin.TabularInline):
         return get_admin_view_link(obj, content=format_html("<strong>Fiche de poste ID: {}</strong>", obj.id))
 
 
-class FinancialAnnexesInline(admin.TabularInline):
+class FinancialAnnexesInline(ItouTabularInline):
     model = models.SiaeFinancialAnnex
     fields = ("number", "state", "start_at", "end_at", "is_active")
     readonly_fields = ("number", "state", "start_at", "end_at", "is_active")
@@ -64,7 +70,7 @@ class FinancialAnnexesInline(admin.TabularInline):
         return False
 
 
-class SiaesInline(admin.TabularInline):
+class SiaesInline(ItouTabularInline):
     model = models.Siae
     fields = ("siae_id_link", "kind", "siret", "source", "name", "brand")
     readonly_fields = ("siae_id_link", "kind", "siret", "source", "name", "brand")
@@ -242,7 +248,7 @@ class SiaeAdmin(ItouGISMixin, ExportActionMixin, OrganizationAdmin):
 
 
 @admin.register(models.SiaeJobDescription)
-class SiaeJobDescriptionAdmin(admin.ModelAdmin):
+class SiaeJobDescriptionAdmin(ItouModelAdmin):
     list_display = (
         "display_name",
         "siae",
@@ -275,7 +281,7 @@ class SiaeJobDescriptionAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.SiaeConvention)
-class SiaeConventionAdmin(admin.ModelAdmin):
+class SiaeConventionAdmin(ItouModelAdmin):
     list_display = ("kind", "siret_signature", "is_active")
     list_filter = ("kind", "is_active")
     raw_id_fields = ("reactivated_by",)
@@ -345,7 +351,7 @@ class SiaeConventionAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.SiaeFinancialAnnex)
-class SiaeFinancialAnnexAdmin(admin.ModelAdmin):
+class SiaeFinancialAnnexAdmin(ItouModelAdmin):
     list_display = ("number", "state", "start_at", "end_at")
     list_filter = ("state",)
     raw_id_fields = ("convention",)

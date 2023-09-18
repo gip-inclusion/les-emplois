@@ -1,7 +1,7 @@
 from django.contrib import admin, messages
 
 from itou.asp import models
-from itou.utils.admin import PkSupportRemarkInline
+from itou.utils.admin import ItouModelAdmin, PkSupportRemarkInline
 
 
 class PeriodFilter(admin.SimpleListFilter):
@@ -38,7 +38,7 @@ class CountryFilter(admin.SimpleListFilter):
         return queryset
 
 
-class ASPModelAdmin(admin.ModelAdmin):
+class ASPModelAdmin(ItouModelAdmin):
     list_display = ("pk", "code", "name", "start_date", "end_date")
     list_filter = (PeriodFilter,)
     readonly_fields = ("pk",)
@@ -75,7 +75,7 @@ class DepartmentAdmin(ASPModelAdmin):
 
 
 @admin.register(models.Country)
-class CountryAdmin(admin.ModelAdmin):
+class CountryAdmin(ItouModelAdmin):
     list_display = ("pk", "code", "name")
     readonly_fields = ("pk",)
     ordering = ("name",)

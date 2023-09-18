@@ -11,10 +11,16 @@ from itou.employee_record import enums as employee_record_enums
 from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
-from itou.utils.admin import PkSupportRemarkInline, get_admin_view_link
+from itou.utils.admin import (
+    ItouModelAdmin,
+    ItouStackedInline,
+    ItouTabularInline,
+    PkSupportRemarkInline,
+    get_admin_view_link,
+)
 
 
-class JobApplicationInline(admin.StackedInline):
+class JobApplicationInline(ItouStackedInline):
     model = JobApplication
     extra = 0
     show_change_link = True
@@ -35,6 +41,7 @@ class JobApplicationInline(admin.StackedInline):
         "job_seeker",
         "approval_manually_delivered_by",
     )
+    list_select_related = ("to_siae",)
 
     # Mandatory for "custom" inline fields
     readonly_fields = ("employee_record_status", "to_siae_link")
@@ -93,7 +100,7 @@ class JobApplicationInline(admin.StackedInline):
         return "-"
 
 
-class SuspensionInline(admin.TabularInline):
+class SuspensionInline(ItouTabularInline):
     model = models.Suspension
     extra = 0
     show_change_link = True
@@ -108,7 +115,7 @@ class SuspensionInline(admin.TabularInline):
         return False
 
 
-class ProlongationInline(admin.TabularInline):
+class ProlongationInline(ItouTabularInline):
     model = models.Prolongation
     extra = 0
     show_change_link = True
@@ -166,7 +173,7 @@ class StartDateFilter(admin.SimpleListFilter):
 
 
 @admin.register(models.Approval)
-class ApprovalAdmin(admin.ModelAdmin):
+class ApprovalAdmin(ItouModelAdmin):
     form = ApprovalAdminForm
     list_display = (
         "pk",
@@ -330,7 +337,7 @@ class FromProlongationRequest(admin.SimpleListFilter):
 
 
 @admin.register(models.Suspension)
-class SuspensionAdmin(admin.ModelAdmin):
+class SuspensionAdmin(ItouModelAdmin):
     list_display = (
         "pk",
         "approval",
@@ -363,7 +370,7 @@ class SuspensionAdmin(admin.ModelAdmin):
         super().save_model(request, obj, form, change)
 
 
-class ProlongationCommonAdmin(admin.ModelAdmin):
+class ProlongationCommonAdmin(ItouModelAdmin):
     list_display = (
         "pk",
         "approval",
@@ -444,7 +451,7 @@ class ProlongationAdmin(ProlongationCommonAdmin):
 
 
 @admin.register(models.PoleEmploiApproval)
-class PoleEmploiApprovalAdmin(admin.ModelAdmin):
+class PoleEmploiApprovalAdmin(ItouModelAdmin):
     list_display = (
         "pk",
         "pole_emploi_id",

@@ -10,11 +10,11 @@ from itou.job_applications import models
 from itou.job_applications.admin_forms import JobApplicationAdminForm
 from itou.job_applications.enums import Origin
 from itou.users.models import User
-from itou.utils.admin import UUIDSupportRemarkInline, get_admin_view_link
+from itou.utils.admin import ItouModelAdmin, ItouTabularInline, UUIDSupportRemarkInline, get_admin_view_link
 from itou.utils.templatetags.str_filters import pluralizefr
 
 
-class TransitionLogInline(admin.TabularInline):
+class TransitionLogInline(ItouTabularInline):
     model = models.JobApplicationTransitionLog
     extra = 0
     raw_id_fields = ("user",)
@@ -25,7 +25,7 @@ class TransitionLogInline(admin.TabularInline):
         return False
 
 
-class PriorActionInline(admin.TabularInline):
+class PriorActionInline(ItouTabularInline):
     model = models.PriorAction
     extra = 0
     can_delete = False
@@ -36,7 +36,7 @@ class PriorActionInline(admin.TabularInline):
         return False
 
 
-class JobsInline(admin.TabularInline):
+class JobsInline(ItouTabularInline):
     model = models.JobApplication.selected_jobs.through
     verbose_name_plural = "fiches de poste"
     extra = 1
@@ -58,7 +58,7 @@ class ManualApprovalDeliveryRequiredFilter(admin.SimpleListFilter):
 
 
 @admin.register(models.JobApplication)
-class JobApplicationAdmin(admin.ModelAdmin):
+class JobApplicationAdmin(ItouModelAdmin):
     form = JobApplicationAdminForm
     list_display = ("pk", "job_seeker", "state", "sender_kind", "created_at")
     show_full_result_count = False
@@ -256,7 +256,7 @@ class JobApplicationAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.JobApplicationTransitionLog)
-class JobApplicationTransitionLogAdmin(admin.ModelAdmin):
+class JobApplicationTransitionLogAdmin(ItouModelAdmin):
     actions = None
     date_hierarchy = "timestamp"
     list_display = ("job_application", "transition", "from_state", "to_state", "user", "timestamp")

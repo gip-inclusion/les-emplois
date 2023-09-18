@@ -2,11 +2,11 @@ from django.contrib import admin
 
 from itou.cities import models
 from itou.geo.models import ZRR
-from itou.utils.admin import ItouGISMixin
+from itou.utils.admin import ItouGISMixin, ItouModelAdmin
 
 
 @admin.register(models.City)
-class CityAdmin(ItouGISMixin, admin.ModelAdmin):
+class CityAdmin(ItouGISMixin, ItouModelAdmin):
     list_display = ("name", "department", "post_codes", "code_insee")
 
     list_filter = ("department",)
