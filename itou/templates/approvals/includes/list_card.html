@@ -8,9 +8,9 @@
                 <p class="fs-sm mb-0">Pass N° {{ approval|format_approval_number }}</p>
             </div>
             <div class="order-1 order-md-2 mb-2 mb-md-0">
-                <span class="badge badge-sm badge-pill text-wrap{% if approval.state == 'EXPIRED' %} badge-dark{% else %} badge-success{% endif %}">
-                    <i class="{% if approval.state == 'EXPIRED' %}ri-forbid-2-line{% elif approval.state == 'SUSPENDED' %}ri-error-warning-line{% else %}ri-checkbox-circle-line{% endif %} ri-xl" aria-hidden="true"></i>
-                    PASS IAE {{ approval.get_state_display }}
+                <span class="badge badge-sm badge-pill text-wrap {% if approval.state == 'EXPIRED' %} bg-emploi-light text-primary{% else %} badge-success-lighter text-success{% endif %}">
+                    <i class="{% if approval.state == 'EXPIRED' %}ri-pass-expired-line{% elif approval.state == 'SUSPENDED' %}ri-pass-pending-line{% else %}ri-pass-valid-line{% endif %} ri-xl" aria-hidden="true"></i>
+                    PASS IAE {{ approval.get_state_display|lower }}
                 </span>
             </div>
         </div>

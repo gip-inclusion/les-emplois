@@ -184,33 +184,33 @@ class TestApprovalsListView:
 
         assertContains(
             response,
-            """<span class="badge badge-sm badge-pill text-wrap badge-success">
-                <i class="ri-checkbox-circle-line ri-xl" aria-hidden="true"></i>
-                PASS IAE Valide
+            """<span class="badge badge-sm badge-pill text-wrap badge-success-lighter text-success">
+                <i class="ri-pass-valid-line ri-xl" aria-hidden="true"></i>
+                PASS IAE valide
             </span>""",
             html=True,
         )
         assertContains(
             response,
-            """<span class="badge badge-sm badge-pill text-wrap badge-success">
-                <i class="ri-checkbox-circle-line ri-xl" aria-hidden="true"></i>
-                PASS IAE Valide (non démarré)
+            """<span class="badge badge-sm badge-pill text-wrap badge-success-lighter text-success">
+                <i class="ri-pass-valid-line ri-xl" aria-hidden="true"></i>
+                PASS IAE valide (non démarré)
             </span>""",
             html=True,
         )
         assertContains(
             response,
-            """<span class="badge badge-sm badge-pill text-wrap badge-success">
-                <i class="ri-error-warning-line ri-xl" aria-hidden="true"></i>
-                PASS IAE Valide (suspendu)
+            """<span class="badge badge-sm badge-pill text-wrap badge-success-lighter text-success">
+                <i class="ri-pass-pending-line ri-xl" aria-hidden="true"></i>
+                PASS IAE valide (suspendu)
             </span>""",
             html=True,
         )
         assertContains(
             response,
-            """<span class="badge badge-sm badge-pill text-wrap badge-dark">
-                <i class="ri-forbid-2-line ri-xl" aria-hidden="true"></i>
-                PASS IAE Expiré
+            """<span class="badge badge-sm badge-pill text-wrap bg-emploi-light text-primary">
+                <i class="ri-pass-expired-line ri-xl" aria-hidden="true"></i>
+                PASS IAE expiré
             </span>""",
             html=True,
         )

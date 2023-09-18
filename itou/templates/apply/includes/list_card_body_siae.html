@@ -20,19 +20,19 @@
             {% if siae.is_subject_to_eligibility_rules %}
                 {% with approval=job_application.job_seeker.latest_common_approval %}
                     {% if approval %}
-                        <span class="badge badge-xs badge-pill{% if approval.state == 'EXPIRED' %} badge-emploi-light{% else %} badge-success-lighter{% endif %} text-primary">
-                            <i class="{% if approval.state == 'EXPIRED' %}ri-close-circle-line{% elif approval.state == 'SUSPENDED' %}ri-pause-circle-line{% else %}ri-checkbox-circle-line{% endif %}"></i>
+                        <span class="badge badge-xs badge-pill {% if approval.state == 'EXPIRED' %} bg-emploi-light text-primary{% else %} badge-success-lighter text-success{% endif %}">
+                            <i class="{% if approval.state == 'EXPIRED' %}ri-pass-expired-line{% elif approval.state == 'SUSPENDED' %}ri-pass-pending-line{% else %}ri-pass-valid-line{% endif %}" aria-hidden="true"></i>
                             PASS IAE {{ approval.get_state_display|lower }}
                         </span>
                     {% else %}
                         {% if job_application.eligibility_diagnosis_by_siae_required %}
-                            <span class="badge badge-xs badge-pill badge-accent-02-lighter text-primary">
-                                <i class="ri-error-warning-line"></i>
-                                Éligibilité à l’IAE à valider
+                            <span class="badge badge-base badge-pill badge-accent-02-lighter text-primary">
+                                <i class="ri-error-warning-line" aria-hidden="true"></i>
+                                Éligibilité IAE à valider
                             </span>
                         {% else %}
-                            <span class="badge badge-xs badge-pill badge-success-light text-primary">
-                                <i class="ri-check-line"></i>
+                            <span class="badge badge-base badge-pill badge-success-lighter text-success">
+                                <i class="ri-check-line" aria-hidden="true"></i>
                                 Éligible à l’IAE
                             </span>
                         {% endif %}
