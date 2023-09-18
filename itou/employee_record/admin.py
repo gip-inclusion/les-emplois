@@ -3,12 +3,12 @@ from django.utils import timezone
 
 import itou.employee_record.models as models
 
-from ..utils.admin import get_admin_view_link
+from ..utils.admin import ItouModelAdmin, ItouTabularInline, get_admin_view_link
 from ..utils.templatetags.str_filters import pluralizefr
 from .enums import Status
 
 
-class EmployeeRecordUpdateNotificationInline(admin.TabularInline):
+class EmployeeRecordUpdateNotificationInline(ItouTabularInline):
     model = models.EmployeeRecordUpdateNotification
 
     fields = (
@@ -27,7 +27,7 @@ class EmployeeRecordUpdateNotificationInline(admin.TabularInline):
 
 
 @admin.register(models.EmployeeRecord)
-class EmployeeRecordAdmin(admin.ModelAdmin):
+class EmployeeRecordAdmin(ItouModelAdmin):
     @admin.action(description="Marquer les fiches salarié selectionnées comme COMPLETÉES")
     def update_employee_record_as_ready(self, _request, queryset):
         queryset.update(status=Status.READY)
@@ -160,7 +160,7 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.EmployeeRecordUpdateNotification)
-class EmployeeRecordUpdateNotificationAdmin(admin.ModelAdmin):
+class EmployeeRecordUpdateNotificationAdmin(ItouModelAdmin):
     list_display = (
         "pk",
         "created_at",

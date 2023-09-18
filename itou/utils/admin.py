@@ -1,3 +1,6 @@
+from unittest import mock
+
+from django.contrib.admin import ModelAdmin, StackedInline, TabularInline
 from django.contrib.contenttypes.admin import GenericStackedInline
 from django.contrib.gis.forms import fields as gis_fields
 from django.urls import reverse
@@ -33,3 +36,45 @@ class ItouGISMixin:
         if isinstance(field, gis_fields.PointField):
             field.widget = OSMWidget(attrs={"map_width": 800, "map_height": 500, "CSP_NONCE": request.csp_nonce})
         return field
+
+
+class ItouTabularInline(TabularInline):
+    list_select_related = None
+
+    def get_queryset(self, request):
+        select_related_fields = set(self.list_select_related or [])
+        for field in {field for field in self.model._meta.get_fields() if field.name in self.get_fields(request)}:
+            if not field.is_relation or field.auto_created or field.many_to_many:
+                continue
+            select_related_fields.add(field.name)
+
+        return super().get_queryset(request).select_related(*select_related_fields)
+
+
+class ItouStackedInline(StackedInline, ItouTabularInline):
+    pass
+
+
+class ItouModelAdmin(ModelAdmin):
+    def __get_queryset_with_relations(self, request):
+        select_related_fields, prefetch_related_fields = set(), set()
+        for field in self.model._meta.get_fields():
+            if not field.is_relation or field.auto_created:
+                continue
+
+            if field.many_to_many:
+                prefetch_related_fields.add(field.name)
+            else:
+                select_related_fields.add(field.name)
+
+        return (
+            super()
+            .get_queryset(request)
+            .select_related(*select_related_fields)
+            .prefetch_related(*prefetch_related_fields)
+        )
+
+    def get_object(self, request, object_id, from_field=None):
+        # Eager-loading all relations, but only when editing one object because `list_select_related` exists
+        with mock.patch.object(self, "get_queryset", self.__get_queryset_with_relations):
+            return super().get_object(request, object_id, from_field)

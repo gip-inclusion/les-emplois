@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.gis.admin import GISModelAdmin
 
+from ..utils.admin import ItouModelAdmin
 from .models import QPV, ZRR
 
 
@@ -33,7 +34,7 @@ class QPVAdmin(GISModelAdmin):
 
 
 @admin.register(ZRR)
-class ZRRAdmin(admin.ModelAdmin):
+class ZRRAdmin(ItouModelAdmin):
     list_display = ("pk", "insee_code", "status")
     list_filter = ("status",)
 

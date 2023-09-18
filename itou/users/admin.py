@@ -22,11 +22,11 @@ from itou.siaes.models import SiaeMembership
 from itou.users import models
 from itou.users.admin_forms import ChooseFieldsToTransfer, ItouUserCreationForm, SelectTargetUserForm, UserAdminForm
 from itou.users.enums import IdentityProvider, UserKind
-from itou.utils.admin import PkSupportRemarkInline, get_admin_view_link
+from itou.utils.admin import ItouModelAdmin, ItouTabularInline, PkSupportRemarkInline, get_admin_view_link
 from itou.utils.models import PkSupportRemark
 
 
-class EmailAddressInline(admin.TabularInline):
+class EmailAddressInline(ItouTabularInline):
     model = EmailAddress
     extra = 0
     can_delete = False
@@ -44,7 +44,7 @@ class EmailAddressInline(admin.TabularInline):
         return get_admin_view_link(obj, content=obj.email)
 
 
-class SiaeMembershipInline(admin.TabularInline):
+class SiaeMembershipInline(ItouTabularInline):
     model = SiaeMembership
     extra = 0
     raw_id_fields = ("siae",)
@@ -72,7 +72,7 @@ class SiaeMembershipInline(admin.TabularInline):
         return get_admin_view_link(obj.siae)
 
 
-class PrescriberMembershipInline(admin.TabularInline):
+class PrescriberMembershipInline(ItouTabularInline):
     model = PrescriberMembership
     extra = 0
     raw_id_fields = ("organization",)
@@ -98,7 +98,7 @@ class PrescriberMembershipInline(admin.TabularInline):
         return get_admin_view_link(obj.organization)
 
 
-class InstitutionMembershipInline(admin.TabularInline):
+class InstitutionMembershipInline(ItouTabularInline):
     model = InstitutionMembership
     extra = 0
     raw_id_fields = (
@@ -128,13 +128,14 @@ class InstitutionMembershipInline(admin.TabularInline):
         return get_admin_view_link(obj.institution)
 
 
-class JobApplicationInline(admin.TabularInline):
+class JobApplicationInline(ItouTabularInline):
     model = JobApplication
     fk_name = "job_seeker"
     extra = 0
     can_delete = False
     fields = ("pk_link", "sender_kind", "to_siae_link", "state")
     readonly_fields = fields
+    list_select_related = ("to_siae",)
 
     def has_change_permission(self, request, obj=None):
         return False
@@ -167,7 +168,7 @@ class SentJobApplicationInline(JobApplicationInline):
         return get_admin_view_link(obj.job_seeker, content=obj.job_seeker.get_full_name())
 
 
-class EligibilityDiagnosisInline(admin.TabularInline):
+class EligibilityDiagnosisInline(ItouTabularInline):
     model = EligibilityDiagnosis
     fk_name = "job_seeker"
     extra = 0
@@ -199,7 +200,7 @@ class GEIQEligibilityDiagnosisInline(EligibilityDiagnosisInline):
     model = GEIQEligibilityDiagnosis
 
 
-class ApprovalInline(admin.TabularInline):
+class ApprovalInline(ItouTabularInline):
     model = Approval
     fk_name = "user"
     extra = 0
@@ -584,7 +585,7 @@ class IsPECertifiedFilter(admin.SimpleListFilter):
 
 
 @admin.register(models.JobSeekerProfile)
-class JobSeekerProfileAdmin(admin.ModelAdmin):
+class JobSeekerProfileAdmin(ItouModelAdmin):
     """
     Inlines would only be possible the other way around
     """

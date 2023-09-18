@@ -1,10 +1,11 @@
 from django.contrib import admin
 
+from ..utils.admin import ItouModelAdmin
 from .models import Datum, StatsDashboardVisit
 
 
 @admin.register(Datum)
-class DatumAdmin(admin.ModelAdmin):
+class DatumAdmin(ItouModelAdmin):
     list_display = ["pk", "code", "bucket", "value", "measured_at"]
     list_filter = ["code"]
     ordering = ["-measured_at", "code"]
@@ -21,7 +22,7 @@ class DatumAdmin(admin.ModelAdmin):
 
 
 @admin.register(StatsDashboardVisit)
-class StatsDashboardVisitAdmin(admin.ModelAdmin):
+class StatsDashboardVisitAdmin(ItouModelAdmin):
     list_display = [
         "measured_at",
         "dashboard_id",

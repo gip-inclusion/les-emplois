@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.db.models import Case, F, Q, When
 
 from itou.antivirus.models import Scan
+from itou.utils.admin import ItouModelAdmin
 
 
 class SuspiciousFilter(admin.SimpleListFilter):
@@ -22,7 +23,7 @@ class SuspiciousFilter(admin.SimpleListFilter):
 
 
 @admin.register(Scan)
-class ScanAdmin(admin.ModelAdmin):
+class ScanAdmin(ItouModelAdmin):
     list_display = ["file_id", "suspicious", "infected", "clamav_signature", "clamav_completed_at"]
     readonly_fields = ["clamav_completed_at", "clamav_signature"]
     fields = ["clamav_completed_at", "clamav_signature", "infected", "comment"]

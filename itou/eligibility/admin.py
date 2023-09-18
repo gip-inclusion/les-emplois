@@ -4,10 +4,10 @@ from django.utils.html import format_html
 from itou.approvals import models as approvals_models
 from itou.eligibility import models
 from itou.job_applications import models as job_applications_models
-from itou.utils.admin import PkSupportRemarkInline, get_admin_view_link
+from itou.utils.admin import ItouModelAdmin, ItouTabularInline, PkSupportRemarkInline, get_admin_view_link
 
 
-class AbstractAdministrativeCriteriaInline(admin.TabularInline):
+class AbstractAdministrativeCriteriaInline(ItouTabularInline):
     extra = 1
     raw_id_fields = ("administrative_criteria",)
     readonly_fields = ("created_at",)
@@ -21,7 +21,7 @@ class GEIQAdministrativeCriteriaInline(AbstractAdministrativeCriteriaInline):
     model = models.GEIQEligibilityDiagnosis.administrative_criteria.through
 
 
-class ApprovalInline(admin.TabularInline):
+class ApprovalInline(ItouTabularInline):
     model = approvals_models.Approval
     extra = 0
     can_delete = False
@@ -44,7 +44,7 @@ class ApprovalInline(admin.TabularInline):
         return obj.is_valid()
 
 
-class JobApplicationInline(admin.TabularInline):
+class JobApplicationInline(ItouTabularInline):
     model = job_applications_models.JobApplication
     extra = 0
     can_delete = False
@@ -57,6 +57,7 @@ class JobApplicationInline(admin.TabularInline):
         "approval",
     )
     readonly_fields = fields
+    list_select_related = ("to_siae",)
 
     def has_change_permission(self, request, obj=None):
         return False
@@ -106,7 +107,7 @@ class HasApprovalFilter(admin.SimpleListFilter):
         return queryset
 
 
-class AbstractEligibilityDiagnosisAdmin(admin.ModelAdmin):
+class AbstractEligibilityDiagnosisAdmin(ItouModelAdmin):
     list_display = (
         "pk",
         "job_seeker",
@@ -198,7 +199,7 @@ class GEIQEligibilityDiagnosisAdmin(AbstractEligibilityDiagnosisAdmin):
         return f"{obj.allowance_amount} EUR"
 
 
-class AbstractAdministrativeCriteriaAdmin(admin.ModelAdmin):
+class AbstractAdministrativeCriteriaAdmin(ItouModelAdmin):
     list_display_links = ("pk", "name")
     list_filter = ("level",)
     raw_id_fields = ("created_by",)
