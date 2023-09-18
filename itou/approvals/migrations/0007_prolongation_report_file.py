@@ -60,7 +60,8 @@ class Migration(migrations.Migration):
                     ("SENIOR", "50\u202fans et plus"),
                     (
                         "PARTICULAR_DIFFICULTIES",
-                        "Difficultés particulières qui font obstacle à l'insertion durable dans l’emploi",
+                        "Difficultés particulièrement importantes dont l'absence de prise en charge ferait "
+                        "obstacle à son insertion professionnelle",
                     ),
                     ("HEALTH_CONTEXT", "Contexte sanitaire"),
                 ],

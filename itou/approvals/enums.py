@@ -26,7 +26,8 @@ class ProlongationReason(models.TextChoices):
     # Exclusive to AI and ACI
     PARTICULAR_DIFFICULTIES = (
         "PARTICULAR_DIFFICULTIES",
-        "Difficultés particulières qui font obstacle à l'insertion durable dans l’emploi",
+        "Difficultés particulièrement importantes dont l'absence de prise en charge ferait "
+        "obstacle à son insertion professionnelle",
     )
     # Since December 1, 2021, health context reason can no longer be used
     HEALTH_CONTEXT = "HEALTH_CONTEXT", "Contexte sanitaire"
