@@ -1,0 +1,5 @@
+Contact: mailto:tech@inclusion.beta.gouv.fr
+Expires: 2024-03-19T12:00:00.000Z
+Preferred-Languages: fr,en
+Canonical: https://emplois.inclusion.beta.gouv.fr/.well-known/security.txt
+Policy: https://github.com/betagouv/itou/blob/master/.github/SECURITY.md
