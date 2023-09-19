@@ -1,5 +1,5 @@
 from django.urls import include, path
-from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView
+from drf_spectacular.views import SpectacularAPIView
 from rest_framework import routers
 
 from itou.api.data_inclusion_api.views import DataInclusionStructureView
@@ -10,6 +10,7 @@ from .employee_record_api.viewsets import (
     EmployeeRecordUpdateNotificationViewSet,
     EmployeeRecordViewSet,
 )
+from .redoc_views import ItouSpectacularRedocView
 from .siae_api.viewsets import SiaeViewSet
 from .token_auth.views import ObtainAuthToken
 
@@ -44,7 +45,7 @@ urlpatterns = [
     ),
     path(
         "redoc/",
-        SpectacularRedocView.as_view(url_name="v1:openapi_schema"),
+        ItouSpectacularRedocView.as_view(url_name="v1:openapi_schema"),
         name="redoc",
     ),
 ]
