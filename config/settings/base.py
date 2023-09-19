@@ -574,6 +574,7 @@ MATOMO_AUTH_TOKEN = os.getenv("MATOMO_AUTH_TOKEN")
 
 # Content Security Policy
 # Beware, some browser extensions may prevent the reports to be sent to sentry with CORS errors.
+CSP_BASE_URI = ["'none'"]  # We don't use any <base> element in our code, so let's forbid it
 CSP_DEFAULT_SRC = ["'self'"]
 CSP_FRAME_SRC = [
     "https://app.livestorm.co",  # Upcoming events from the homepage
