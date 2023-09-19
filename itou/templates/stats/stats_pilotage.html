@@ -35,7 +35,7 @@
                     targetOrigin: "{{ ITOU_PILOTAGE_URL }}"
                 }
             </script>
-            <script src="{% static "vendor/iframe-resizer-4.3.2/iframeResizer.contentWindow.min.js" %}"></script>
+            <script src="{% static "vendor/iframe-resizer/iframeResizer.contentWindow.min.js" %}"></script>
             {% comment %} we took the scripts from {{stats_base_url}} to always use the same version{% endcomment %}
             <script src="{{ stats_base_url }}/app/iframeResizer.js"></script>
             <iframe id="stats-iframe" src="{{ iframeurl }}">

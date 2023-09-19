@@ -104,6 +104,6 @@ class OSMWidget(gis_widgets.OSMWidget):
 
     class Media:
         css = {
-            "all": ["vendor/ol-7.2.2/ol.css"],
+            "all": ["vendor/ol/ol.css"],
         }
-        js = ["vendor/ol-7.2.2/ol.js"]
+        js = ["vendor/ol/ol.js"]

@@ -50,7 +50,7 @@ ASSET_INFOS = {
         },
         "extract": {
             "origin": "package/dist/duet",
-            "destination": "vendor/duetds-date-picker-1.4.0",
+            "destination": "vendor/duetds-date-picker",
             "files": [
                 "duet-date-picker.system.entry.js",
                 "duet.js",
@@ -67,7 +67,7 @@ ASSET_INFOS = {
         },
         "extract": {
             "origin": "bootstrap-4.6.2-dist/js",
-            "destination": "vendor/bootstrap-4.6.2",
+            "destination": "vendor/bootstrap",
             "files": [
                 "bootstrap.js",
                 "bootstrap.js.map",
@@ -97,7 +97,7 @@ ASSET_INFOS = {
         },
         "extract": {
             "origin": "package/dist",
-            "destination": "vendor/htmx-1.8.2",
+            "destination": "vendor/htmx",
             "files": [
                 "htmx.min.js",
                 "ext/*",
@@ -111,7 +111,7 @@ ASSET_INFOS = {
         },
         "extract": {
             "origin": "package/js",
-            "destination": "vendor/iframe-resizer-4.3.2",
+            "destination": "vendor/iframe-resizer",
             "files": [
                 "iframeResizer.contentWindow.map",
                 "iframeResizer.contentWindow.min.js",
@@ -125,7 +125,7 @@ ASSET_INFOS = {
         },
         "extract": {
             "origin": "package/dist",
-            "destination": "vendor/jquery-3.6.1",
+            "destination": "vendor/jquery",
             "files": [
                 "jquery.min.js",
             ],
@@ -154,7 +154,7 @@ ASSET_INFOS = {
         },
         "extract": {
             "origin": "jquery-ui-1.13.2.custom",
-            "destination": "vendor/jquery-ui-1.13.2",
+            "destination": "vendor/jquery-ui",
             "files": [
                 "jquery-ui.css",
                 "jquery-ui.js",
@@ -171,7 +171,7 @@ ASSET_INFOS = {
         },
         "extract": {
             "origin": "package",
-            "destination": "vendor/ol-7.2.2",
+            "destination": "vendor/ol",
             "files": [
                 "ol.css",
                 ("dist/ol.js", "ol.js"),
@@ -186,7 +186,7 @@ ASSET_INFOS = {
         },
         "extract": {
             "origin": "package/dist/umd",
-            "destination": "vendor/bootstrap-4.6.2",
+            "destination": "vendor/bootstrap",
             "files": [
                 "popper.js",
                 "popper.js.map",
@@ -200,14 +200,14 @@ ASSET_INFOS = {
             "url": "https://cdn.redoc.ly/redoc/v2.0.0/bundles/redoc.standalone.js",
             "sha256": "c7f107f5259486ec29f726db25e31a46a563b09f5209fd90c0371677e576d311",
         },
-        "target": "vendor/redoc-2.0.0/redoc.standalone.js",
+        "target": "vendor/redoc/redoc.standalone.js",
     },
     "redoc/map": {
         "download": {
             "url": "https://cdn.redoc.ly/redoc/v2.0.0/bundles/redoc.standalone.js.map",
             "sha256": "ae54c013193df71fe0a18ddddf20e8893b1c0c80b4a3ddcd8a969dae03fdf198",
         },
-        "target": "vendor/redoc-2.0.0/redoc.standalone.js.map",
+        "target": "vendor/redoc/redoc.standalone.js.map",
     },
     "tarteaucitronjs": {
         "download": {
