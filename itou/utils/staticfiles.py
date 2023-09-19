@@ -69,8 +69,6 @@ ASSET_INFOS = {
             "origin": "bootstrap-4.6.2-dist/js",
             "destination": "vendor/bootstrap",
             "files": [
-                "bootstrap.js",
-                "bootstrap.js.map",
                 "bootstrap.min.js",
                 "bootstrap.min.js.map",
             ],
@@ -100,7 +98,8 @@ ASSET_INFOS = {
             "destination": "vendor/htmx",
             "files": [
                 "htmx.min.js",
-                "ext/*",
+                "ext/debug.js",
+                "ext/event-header.js",
             ],
         },
     },
@@ -156,8 +155,6 @@ ASSET_INFOS = {
             "origin": "jquery-ui-1.13.2.custom",
             "destination": "vendor/jquery-ui",
             "files": [
-                "jquery-ui.css",
-                "jquery-ui.js",
                 "jquery-ui.min.css",
                 "jquery-ui.min.js",
                 "images/*",
@@ -188,8 +185,6 @@ ASSET_INFOS = {
             "origin": "package/dist/umd",
             "destination": "vendor/bootstrap",
             "files": [
-                "popper.js",
-                "popper.js.map",
                 "popper.min.js",
                 "popper.min.js.map",
             ],
