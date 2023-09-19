@@ -577,7 +577,7 @@
                   
                       
                           
-                              <span class="badge badge-base badge-pill badge-success-lighter text-success">
+                              <span class="badge badge-xs badge-pill badge-success-lighter text-success">
                                   <i aria-hidden="true" class="ri-check-line"></i>
                                   Éligible à l’IAE
                               </span>
@@ -679,7 +679,7 @@
                   
                       
                           
-                              <span class="badge badge-base badge-pill badge-success-lighter text-success">
+                              <span class="badge badge-xs badge-pill badge-success-lighter text-success">
                                   <i aria-hidden="true" class="ri-check-line"></i>
                                   Éligible à l’IAE
                               </span>
@@ -755,7 +755,7 @@
                   
                       
                           
-                              <span class="badge badge-base badge-pill badge-success-lighter text-success">
+                              <span class="badge badge-xs badge-pill badge-success-lighter text-success">
                                   <i aria-hidden="true" class="ri-check-line"></i>
                                   Éligible à l’IAE
                               </span>
