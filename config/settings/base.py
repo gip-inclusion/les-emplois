@@ -634,7 +634,6 @@ CSP_SCRIPT_SRC = [
     "'self'",
     "https://stats.inclusion.beta.gouv.fr",
     "*.hotjar.com",
-    "https://cdn.jsdelivr.net/npm/redoc@latest/bundles/redoc.standalone.js",
     "https://tally.so",
 ]
 # Some browsers don't seem to fallback on script-src if script-src-elem is not there
