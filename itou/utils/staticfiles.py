@@ -127,7 +127,7 @@ ASSET_INFOS = {
             "origin": "package/dist",
             "destination": "vendor/jquery-3.6.1",
             "files": [
-                ("jquery.min.js", "jquery-3.6.1.min.js"),
+                "jquery.min.js",
             ],
         },
     },
