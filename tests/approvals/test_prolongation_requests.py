@@ -99,9 +99,9 @@ def test_chores_send_reminder_to_prescriber_organization_other_members(
     parameters = itertools.product(
         ProlongationRequestStatus,
         [
-            timezone.now() - relativedelta(days=8),
-            timezone.now() - relativedelta(days=7),
-            timezone.now() - relativedelta(days=6),
+            timezone.now() - relativedelta(days=11),  # Check we catch up missed run
+            timezone.now() - relativedelta(days=10),  # On the day
+            timezone.now() - relativedelta(days=9),  # Not before
         ],
         [None, timezone.now()],
     )
@@ -113,3 +113,27 @@ def test_chores_send_reminder_to_prescriber_organization_other_members(
         assert len(mailoutbox) == expected
         assert ProlongationRequest.objects.filter(reminder_sent_at=timezone.now()).count() == expected
     assert command.stdout.getvalue() == snapshot
+
+
+def test_chores_send_reminder_to_prescriber_organization_other_members_every_ten_days_for_thirty_days(
+    mailoutbox, command
+):
+    prolongation_request = ProlongationRequestFactory()
+
+    specs = [
+        (0, 0),
+        (9, 0),
+        (10, 1),
+        (11, 1),
+        (19, 1),
+        (20, 2),
+        (21, 2),
+        (29, 2),
+        (30, 3),
+        (31, 3),
+        (40, 3),
+    ]
+    for days_ago, expected in specs:
+        with freeze_time(prolongation_request.created_at + relativedelta(days=days_ago)):
+            command.handle(command="email_reminder", wet_run=True)
+        assert len(mailoutbox) == expected
