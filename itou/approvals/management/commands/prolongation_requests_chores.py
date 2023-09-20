@@ -1,5 +1,6 @@
 from dateutil.relativedelta import relativedelta
 from django.core.management.base import BaseCommand
+from django.db.models import Q
 from django.template.defaultfilters import pluralize
 from django.utils import timezone
 
@@ -14,10 +15,14 @@ class Command(BaseCommand):
         parser.add_argument("--wet-run", dest="wet_run", action="store_true")
 
     def send_reminder_to_prescriber_organization_other_members(self, wet_run):
+        first_reminder = Q(reminder_sent_at=None, created_at__date__lte=timezone.localdate() - relativedelta(days=10))
+        subsequent_reminders = Q(reminder_sent_at__date__lte=timezone.localdate() - relativedelta(days=10))
+
         queryset = ProlongationRequest.objects.filter(
+            first_reminder | subsequent_reminders,
             status=ProlongationRequestStatus.PENDING,
-            created_at__date__lte=timezone.localdate() - relativedelta(days=7),
-            reminder_sent_at=None,
+            # Only send reminders in the first 30 days
+            created_at__date__gte=timezone.localdate() - relativedelta(days=30),
         )
         self.stdout.write(f"{len(queryset)} prolongation request{pluralize(queryset)} can be reminded")
 
