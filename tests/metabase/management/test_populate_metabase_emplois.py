@@ -13,6 +13,7 @@ from itou.common_apps.address.departments import DEPARTMENTS
 from itou.eligibility.models import AdministrativeCriteria
 from itou.geo.utils import coords_to_geometry
 from itou.metabase.tables.utils import hash_content
+from itou.siaes.enums import ContractType
 from itou.siaes.models import SiaeJobDescription
 from itou.users.enums import IdentityProvider
 from tests.analytics.factories import DatumFactory, StatsDashboardVisitFactory
@@ -414,7 +415,7 @@ def test_populate_job_applications():
         kind="GEIQ",
     )
     job = SiaeJobDescriptionFactory(is_active=True, siae=siae)
-    ja = JobApplicationFactory()
+    ja = JobApplicationFactory(with_geiq_eligibility_diagnosis=True, contract_type=ContractType.APPRENTICESHIP)
     ja.selected_jobs.add(job)
 
     num_queries = 1  # Select siaes for get_active_siae_pks()
