@@ -201,6 +201,7 @@ class EmployeeRecord(ASPExchangeInformation):
     # These fields are duplicated to act as constraint fields on DB level
     approval_number = models.CharField(max_length=12, verbose_name="numéro d'agrément")
     asp_id = models.PositiveIntegerField(verbose_name="identifiant ASP de la SIAE")
+    asp_measure = models.CharField(verbose_name="mesure ASP de la SIAE", choices=SiaeKind.choices, null=True)
 
     # If the SIAE is an "antenna",
     # we MUST provide the SIRET of the SIAE linked to the financial annex on ASP side (i.e. "parent/mother" SIAE)
@@ -275,6 +276,7 @@ class EmployeeRecord(ASPExchangeInformation):
         # If the SIAE is an antenna, the SIRET will be rejected by the ASP so we have to use the mother's one
         self.siret = self.siret_from_asp_source(self.job_application.to_siae)
         self.asp_id = self.job_application.to_siae.convention.asp_id
+        self.asp_measure = SiaeKind.from_siae_kind(self.job_application.to_siae.kind)
         self.approval_number = self.job_application.approval.number
 
     # Business methods
@@ -418,11 +420,9 @@ class EmployeeRecord(ASPExchangeInformation):
         er_copy = EmployeeRecord(
             status=Status.NEW,
             job_application=self.job_application,
-            approval_number=self.approval_number,
-            asp_id=self.job_application.to_siae.convention.asp_id,
-            siret=EmployeeRecord.siret_from_asp_source(self.job_application.to_siae),
             asp_processing_label=f"Fiche salarié clonée (pk origine: {self.pk})",
         )
+        er_copy._fill_denormalized_fields()
 
         try:
             with transaction.atomic():
@@ -570,11 +570,7 @@ class EmployeeRecord(ASPExchangeInformation):
         ).exists():
             raise ValidationError(EmployeeRecord.ERROR_EMPLOYEE_RECORD_IS_DUPLICATE)
 
-        fs.asp_id = job_application.to_siae.convention.asp_id
-        fs.approval_number = job_application.approval.number
-
-        # Fetch correct number if SIAE is an antenna
-        fs.siret = EmployeeRecord.siret_from_asp_source(job_application.to_siae)
+        fs._fill_denormalized_fields()
 
         return fs
 
