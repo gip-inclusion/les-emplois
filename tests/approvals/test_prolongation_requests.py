@@ -1,5 +1,4 @@
 import contextlib
-import datetime
 import io
 import itertools
 
@@ -12,7 +11,7 @@ from freezegun import freeze_time
 
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.management.commands import prolongation_requests_chores
-from itou.approvals.models import Prolongation, ProlongationRequest
+from itou.approvals.models import ProlongationRequest
 from tests.approvals.factories import ProlongationRequestDenyInformationFactory, ProlongationRequestFactory
 
 
@@ -85,29 +84,6 @@ def test_deny():
         [prolongation_request.declared_by.email],
         [prolongation_request.approval.user.email],
     ]
-
-
-@pytest.mark.parametrize(
-    "wet_run,expected",
-    [
-        (True, 1),  # Only the old PENDING will be granted
-        (False, 0),
-    ],
-)
-def test_chores_grant_older_pending_requests(faker, snapshot, command, wet_run, expected):
-    parameters = itertools.product(
-        ProlongationRequestStatus,
-        [
-            faker.date_time_between(end_date="-30d", tzinfo=datetime.UTC),
-            faker.date_time_between(start_date="-30d", tzinfo=datetime.UTC),
-        ],
-    )
-    for status, created_at in parameters:
-        ProlongationRequestFactory(status=status, created_at=created_at)
-
-    command.handle(command="auto_grant", wet_run=wet_run)
-    assert Prolongation.objects.count() == expected
-    assert command.stdout.getvalue() == snapshot
 
 
 @pytest.mark.parametrize(
