@@ -1047,7 +1047,7 @@ class JobSeekerProfile(models.Model):
         related_name="jobseeker_profiles_born_here",
         null=True,
         blank=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.RESTRICT,
     )
     birth_country = models.ForeignKey(
         "asp.Country",
@@ -1055,7 +1055,7 @@ class JobSeekerProfile(models.Model):
         related_name="jobseeker_profiles_born_here",
         null=True,
         blank=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.RESTRICT,
     )
 
     education_level = models.CharField(
@@ -1168,7 +1168,7 @@ class JobSeekerProfile(models.Model):
         verbose_name="commune (ref. ASP)",
         null=True,
         blank=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.RESTRICT,
     )
 
     pe_obfuscated_nir = models.CharField(
