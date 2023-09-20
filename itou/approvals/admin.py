@@ -445,7 +445,7 @@ class ProlongationRequestAdmin(ProlongationCommonAdmin):
 
     @admin.display(description="actions envisagées")
     def denied_proposed_actions(self, obj):
-        if obj.proposed_actions is None:
+        if obj.deny_information.proposed_actions is None:
             return "-"
         return "\n".join(obj.deny_information.get_proposed_actions_display())
 
