@@ -288,7 +288,7 @@ TABLE.add_columns(
             "name": "type_contrat",
             "type": "varchar",
             "comment": "Type de contrat",
-            "fn": lambda o: o.contract_type.label if o.contract_type else "",
+            "fn": lambda o: o.contract_type if o.contract_type else "",
         },
     ]
 )
