@@ -10,24 +10,8 @@ from itou.approvals.notifications import ProlongationRequestCreatedReminder
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
-        parser.add_argument("command", choices=["auto_grant", "email_reminder"])
+        parser.add_argument("command", choices=["email_reminder"])
         parser.add_argument("--wet-run", dest="wet_run", action="store_true")
-
-    def grant_older_pending_requests(self, wet_run):
-        queryset = ProlongationRequest.objects.filter(
-            status=ProlongationRequestStatus.PENDING,
-            created_at__date__lt=timezone.localdate() - relativedelta(days=30),
-        ).select_related("approval", "approval__user", "declared_by_siae", "validated_by", "prescriber_organization")
-        self.stdout.write(f"{len(queryset)} prolongation request{pluralize(queryset)} can be automatically granted")
-
-        prolongation_created = 0
-        for prolongation_request in queryset:
-            if wet_run:
-                prolongation_request.grant(prolongation_request.validated_by)
-                prolongation_created += 1
-        self.stdout.write(
-            f"{prolongation_created}/{len(queryset)} prolongation request{pluralize(queryset)} automatically granted"
-        )
 
     def send_reminder_to_prescriber_organization_other_members(self, wet_run):
         queryset = ProlongationRequest.objects.filter(
@@ -49,7 +33,5 @@ class Command(BaseCommand):
         )
 
     def handle(self, *, command, wet_run, **options):
-        if command == "auto_grant":
-            self.grant_older_pending_requests(wet_run=wet_run)
-        elif command == "email_reminder":
+        if command == "email_reminder":
             self.send_reminder_to_prescriber_organization_other_members(wet_run=wet_run)
