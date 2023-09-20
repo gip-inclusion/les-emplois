@@ -2,6 +2,7 @@ import datetime
 
 import factory
 
+from itou.asp import models as asp_models
 from itou.employee_record.enums import NotificationStatus, Status
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification
 from tests.job_applications.factories import (
@@ -29,6 +30,9 @@ class EmployeeRecordFactory(BareEmployeeRecordFactory):
         JobApplicationWithApprovalNotCancellableFactory, to_siae__use_employee_record=True
     )
     asp_id = factory.SelfAttribute(".job_application.to_siae.convention.asp_id")
+    asp_measure = factory.LazyAttribute(
+        lambda obj: asp_models.SiaeKind.from_siae_kind(obj.job_application.to_siae.kind)
+    )
     approval_number = factory.SelfAttribute(".job_application.approval.number")
     siret = factory.SelfAttribute(".job_application.to_siae.siret")
 
