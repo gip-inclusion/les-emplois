@@ -50,14 +50,15 @@ ASSET_INFOS = {
             "sha256": "35bacc775daa4e714c6d6adbaf6084ecbee52e0945d38e86c8e2e105fc7ce49e",
         },
         "extract": {
-            "origin": "package/dist/duet",
+            "origin": "package",
             "destination": "vendor/duetds-date-picker",
             "files": [
-                "duet-date-picker.system.entry.js",
-                "duet.js",
-                "duet.system.js",
-                "index-7f002a21.system.js",
-                "themes/default.css",
+                "LICENSE",
+                ("dist/duet/duet-date-picker.system.entry.js", "duet-date-picker.system.entry.js"),
+                ("dist/duet/duet.js", "duet.js"),
+                ("dist/duet/duet.system.js", "duet.system.js"),
+                ("dist/duet/index-7f002a21.system.js", "index-7f002a21.system.js"),
+                ("dist/duet/themes/default.css", "themes/default.css"),
             ],
         },
     },
@@ -81,11 +82,12 @@ ASSET_INFOS = {
             "sha256": "3f5a46d160faec41c834f00379444fe172b5b7793c3a4230307941728bd1a8f1",
         },
         "extract": {
-            "origin": "package/dist/min",
+            "origin": "package",
             "destination": "vendor/dropzone",
             "files": [
-                "dropzone.min.css",
-                "dropzone.min.js",
+                "LICENSE",
+                ("dist/min/dropzone.min.css", "dropzone.min.css"),
+                ("dist/min/dropzone.min.js", "dropzone.min.js"),
             ],
         },
     },
@@ -95,12 +97,13 @@ ASSET_INFOS = {
             "sha256": "e0e10e29d3033d98c15ad25d90608685a61b20e1d813f8b9c3c2e00b9055d525",
         },
         "extract": {
-            "origin": "package/dist",
+            "origin": "package",
             "destination": "vendor/htmx",
             "files": [
-                "htmx.min.js",
-                "ext/debug.js",
-                "ext/event-header.js",
+                "LICENSE",
+                ("dist/htmx.min.js", "htmx.min.js"),
+                ("dist/ext/debug.js", "ext/debug.js"),
+                ("dist/ext/event-header.js", "ext/event-header.js"),
             ],
         },
     },
@@ -110,11 +113,12 @@ ASSET_INFOS = {
             "sha256": "3dfa6c0986ba0ad5f74d0724480cc71620420f2658be5a17e586ee4ab988335e",
         },
         "extract": {
-            "origin": "package/js",
+            "origin": "package",
             "destination": "vendor/iframe-resizer",
             "files": [
-                "iframeResizer.contentWindow.map",
-                "iframeResizer.contentWindow.min.js",
+                "LICENSE",
+                ("js/iframeResizer.contentWindow.map", "iframeResizer.contentWindow.map"),
+                ("js/iframeResizer.contentWindow.min.js", "iframeResizer.contentWindow.min.js"),
             ],
         },
     },
@@ -124,10 +128,11 @@ ASSET_INFOS = {
             "sha256": "06be03afa548debcfef4f5773b044ed2a9ace7541b4d422a8c28cbb3498e900f",
         },
         "extract": {
-            "origin": "package/dist",
+            "origin": "package",
             "destination": "vendor/jquery",
             "files": [
-                "jquery.min.js",
+                "LICENSE.txt",
+                ("dist/jquery.min.js", "jquery.min.js"),
             ],
         },
     },
@@ -156,6 +161,7 @@ ASSET_INFOS = {
             "origin": "jquery-ui-1.13.2.custom",
             "destination": "vendor/jquery-ui",
             "files": [
+                "LICENSE.txt",
                 "jquery-ui.min.css",
                 "jquery-ui.min.js",
                 "images/*",
@@ -171,6 +177,7 @@ ASSET_INFOS = {
             "origin": "package",
             "destination": "vendor/ol",
             "files": [
+                "LICENSE.md",
                 "ol.css",
                 ("dist/ol.js", "ol.js"),
                 ("dist/ol.js.map", "ol.js.map"),
@@ -205,6 +212,13 @@ ASSET_INFOS = {
         },
         "target": "vendor/redoc/redoc.standalone.js.map",
     },
+    "redoc/LICENSE": {
+        "download": {
+            "url": "https://cdn.redoc.ly/redoc/v2.0.0/bundles/redoc.standalone.js.LICENSE.txt",
+            "sha256": "d346d7ec025844f5f7df51887302bb105782b8199eb9b382d9133435e348b9b2",
+        },
+        "target": "vendor/redoc/redoc.standalone.js.LICENSE.txt",
+    },
     "tarteaucitronjs": {
         "download": {
             "url": "https://registry.npmjs.org/tarteaucitronjs/-/tarteaucitronjs-1.11.0.tgz",
@@ -214,6 +228,7 @@ ASSET_INFOS = {
             "origin": "package",
             "destination": "vendor/tarteaucitron",
             "files": [
+                "LICENSE",
                 "tarteaucitron.js",
                 "tarteaucitron.services.js",
                 "lang/tarteaucitron.en.js",
