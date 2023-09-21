@@ -1,4 +1,4 @@
-from django.contrib import admin, messages
+from django.contrib import admin
 
 from itou.asp import models
 from itou.utils.admin import ItouModelAdmin, PkSupportRemarkInline
@@ -56,26 +56,19 @@ class ASPModelAdmin(ItouModelAdmin):
 
 @admin.register(models.Commune)
 class CommuneAdmin(ASPModelAdmin):
-    list_display = ("pk", "code", "name", "start_date", "end_date", "created_by")
+    list_display = (
+        "pk",
+        "code",
+        "name",
+        "start_date",
+        "end_date",
+    )
     search_fields = [
         "name",
         "code",
     ]
-    raw_id_fields = ("created_by",)
-    readonly_fields = ("created_by", "created_at")
+    readonly_fields = ("created_at",)
     inlines = (PkSupportRemarkInline,)
-
-    def save_model(self, request, obj, form, change):
-        if not change:
-            obj.created_by = request.user
-
-        if not models.Commune.objects.filter(code=form.cleaned_data["code"]).exists():
-            messages.error(
-                request,
-                "Le code INSEE n'existe pas encore dans la table. "
-                "Les fiches salarié utilisant ce code seront probablement rejetée par l'ASP.",
-            )
-        super().save_model(request, obj, form, change)
 
 
 @admin.register(models.Department)

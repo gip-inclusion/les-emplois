@@ -1,7 +1,6 @@
 import datetime as dt
 import re
 
-from django.conf import settings
 from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 from django.db.models import Q
@@ -346,19 +345,13 @@ class PrescriberType(models.TextChoices):
 
 
 class CommuneQuerySet(PeriodQuerySet):
-    def asp_imported(self):
-        # Don't check for manually created Communes since we split multiples
-        # Commune with the same INSEE as SAINT-DENIS/STE_CLOTILDE
-        return self.filter(created_by=None)
-
     def by_insee_code(self, insee_code: str):
-        return self.asp_imported().current().filter(code=insee_code).get()
+        return self.all().current().filter(code=insee_code).get()
 
     def by_insee_code_and_period(self, insee_code, period):
         "Lookup a Commune object by INSEE code and valid at the given period"
         return (
-            self.asp_imported()
-            .filter(code=insee_code, start_date__lte=period)
+            self.filter(code=insee_code, start_date__lte=period)
             .filter(Q(end_date=None) | Q(end_date__gt=period))
             .get()
         )
@@ -381,12 +374,6 @@ class Commune(PrettyPrintMixin, AbstractPeriod):
     name = models.CharField(max_length=50, verbose_name="nom de la commune")
 
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
-    created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        verbose_name="créé par",
-        null=True,
-        on_delete=models.SET_NULL,
-    )
 
     objects = CommuneQuerySet.as_manager()
 
