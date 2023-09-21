@@ -100,13 +100,6 @@ shell_on_django_container_as_root:
 shell_on_postgres_container:
 	docker exec -ti itou_postgres /bin/bash
 
-# Itou theme
-# =============================================================================
-
-.PHONY: update_itou_theme
-update_itou_theme:
-	./scripts/upload_itou_theme.sh
-
 # Deployment
 # =============================================================================
 
