@@ -204,7 +204,7 @@ def siae_select(request, template_name="signup/siae_select.html"):
             f"de réception."
         )
         messages.success(request, message)
-        return HttpResponseRedirect(next_url or "/")
+        return HttpResponseRedirect(next_url or reverse("search:siaes_home"))
 
     context = {
         "next_url": next_url,
@@ -273,7 +273,7 @@ class SiaeJoinView(LoginRequiredMixin, SiaeBaseView):
             messages.error(
                 request, "Vous ne pouvez pas rejoindre une SIAE avec ce compte car vous n'êtes pas employeur."
             )
-            return HttpResponseRedirect(reverse("home:hp"))
+            return HttpResponseRedirect(reverse("search:siaes_home"))
 
         SiaeMembership.objects.create(
             user=request.user,
@@ -395,7 +395,7 @@ def prescriber_request_invitation(request, membership_id, template_name="signup/
         )
         messages.success(request, message)
 
-        return redirect("home:hp")
+        return redirect("dashboard:index")
 
     context = {
         "prescriber": prescriber_membership.user,
@@ -706,7 +706,7 @@ def prescriber_join_org(request):
         messages.error(
             request, "Vous ne pouvez pas rejoindre une organisation avec ce compte car vous n'êtes pas prescripteur."
         )
-        return HttpResponseRedirect(reverse("home:hp"))
+        return HttpResponseRedirect(reverse("search:siaes_home"))
 
     # Get useful information from session.
     session_data = request.session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]

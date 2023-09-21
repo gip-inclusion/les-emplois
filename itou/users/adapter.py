@@ -40,7 +40,7 @@ class UserAdapter(DefaultAccountAdapter):
         authenticated user.
         Tests are in itou.inclusion_connect.tests.
         """
-        redirect_url = reverse("home:hp")
+        redirect_url = reverse("search:siaes_home")
         # Inclusion Connect
         ic_session = request.session.get(INCLUSION_CONNECT_SESSION_KEY)
         if ic_session:
@@ -59,8 +59,7 @@ class UserAdapter(DefaultAccountAdapter):
         # PE Connect
         if getattr(request.user, "kind", None) == IdentityProvider.PE_CONNECT:
             peamu_id_token = self.socialaccount_set.filter(provider="peamu").get().extra_data["id_token"]
-            hp_url = get_absolute_url(reverse("home:hp"))
-            params = {"id_token_hint": peamu_id_token, "redirect_uri": hp_url}
+            params = {"id_token_hint": peamu_id_token, "redirect_uri": get_absolute_url(redirect_url)}
             redirect_url = f"{settings.PEAMU_AUTH_BASE_URL}/compte/deconnexion?{urlencode(params)}"
         return redirect_url
 

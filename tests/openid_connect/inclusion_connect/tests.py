@@ -275,7 +275,7 @@ class InclusionConnectAuthorizeViewTest(InclusionConnectBaseTestCase):
     def test_authorize_endpoint(self):
         url = reverse("inclusion_connect:authorize")
         response = self.client.get(url, follow=False)
-        self.assertRedirects(response, reverse("home:hp"))
+        self.assertRedirects(response, reverse("search:siaes_home"))
 
         url = f"{reverse('inclusion_connect:authorize')}?user_kind={UserKind.PRESCRIBER}"
         response = self.client.get(url, follow=False)
@@ -285,7 +285,7 @@ class InclusionConnectAuthorizeViewTest(InclusionConnectBaseTestCase):
     def test_authorize_endpoint_for_registration(self):
         url = reverse("inclusion_connect:authorize")
         response = self.client.get(url, follow=False)
-        self.assertRedirects(response, reverse("home:hp"))
+        self.assertRedirects(response, reverse("search:siaes_home"))
 
         url = f"{reverse('inclusion_connect:authorize')}?user_kind={UserKind.PRESCRIBER}&register=true"
         response = self.client.get(url, follow=False)
@@ -309,14 +309,14 @@ class InclusionConnectAuthorizeViewTest(InclusionConnectBaseTestCase):
             with self.subTest(kind=kind):
                 url = f"{reverse('inclusion_connect:authorize')}?user_kind={kind}"
                 response = self.client.get(url)
-                self.assertRedirects(response, reverse("home:hp"))
+                self.assertRedirects(response, reverse("search:siaes_home"))
 
 
 class InclusionConnectResumeRegistrationViewTest(InclusionConnectBaseTestCase):
     def test_resume_endpoint_no_session(self):
         url = f"{reverse('inclusion_connect:resume_registration')}"
         response = self.client.get(url)
-        self.assertRedirects(response, reverse("home:hp"))
+        self.assertRedirects(response, reverse("search:siaes_home"))
         assertMessages(response, [(messages.ERROR, "Impossible de reprendre la création de compte.")])
 
     @respx.mock
@@ -324,7 +324,7 @@ class InclusionConnectResumeRegistrationViewTest(InclusionConnectBaseTestCase):
         mock_oauth_dance(self.client, UserKind.PRESCRIBER)
         url = f"{reverse('inclusion_connect:resume_registration')}"
         response = self.client.get(url)
-        self.assertRedirects(response, reverse("home:hp"))
+        self.assertRedirects(response, reverse("search:siaes_home"))
         assertMessages(response, [(messages.ERROR, "Impossible de reprendre la création de compte.")])
 
     def test_resume_endpoint(self):
@@ -489,10 +489,10 @@ class InclusionConnectCallbackViewTest(InclusionConnectBaseTestCase):
             self.client,
             UserKind.PRESCRIBER,
             expected_redirect_url=add_url_params(
-                reverse("inclusion_connect:logout"), {"redirect_url": reverse("home:hp")}
+                reverse("inclusion_connect:logout"), {"redirect_url": reverse("search:siaes_home")}
             ),
         )
-        response = self.client.get(reverse("home:hp"))
+        response = self.client.get(reverse("search:siaes_home"))
         self.assertContains(response, "existe déjà avec cette adresse e-mail")
         self.assertContains(response, "pour devenir prescripteur sur la plateforme")
         assert get_user(self.client).is_authenticated is False
@@ -511,10 +511,10 @@ class InclusionConnectCallbackViewTest(InclusionConnectBaseTestCase):
             self.client,
             UserKind.SIAE_STAFF,
             expected_redirect_url=add_url_params(
-                reverse("inclusion_connect:logout"), {"redirect_url": reverse("home:hp")}
+                reverse("inclusion_connect:logout"), {"redirect_url": reverse("search:siaes_home")}
             ),
         )
-        response = self.client.get(reverse("home:hp"))
+        response = self.client.get(reverse("search:siaes_home"))
         self.assertContains(response, "existe déjà avec cette adresse e-mail")
         self.assertContains(response, "pour devenir employeur sur la plateforme")
         assert get_user(self.client).is_authenticated is False
@@ -530,7 +530,7 @@ class InclusionConnectCallbackViewTest(InclusionConnectBaseTestCase):
         user = UserFactory(username=ic_user_data.username, email=ic_user_data.email, kind=UserKind.JOB_SEEKER)
 
         expected_redirect_url = add_url_params(
-            reverse("inclusion_connect:logout"), {"redirect_url": reverse("home:hp")}
+            reverse("inclusion_connect:logout"), {"redirect_url": reverse("search:siaes_home")}
         )
 
         mock_oauth_dance(self.client, UserKind.PRESCRIBER, expected_redirect_url=expected_redirect_url)
@@ -563,10 +563,10 @@ class InclusionConnectCallbackViewTest(InclusionConnectBaseTestCase):
                 self.client,
                 UserKind.PRESCRIBER,
                 expected_redirect_url=add_url_params(
-                    reverse("inclusion_connect:logout"), {"redirect_url": reverse("home:hp")}
+                    reverse("inclusion_connect:logout"), {"redirect_url": reverse("search:siaes_home")}
                 ),
             )
-            response = self.client.get(reverse("home:hp"))
+            response = self.client.get(reverse("search:siaes_home"))
             self.assertContains(response, "existe déjà avec cette adresse e-mail")
             self.assertContains(response, "pour devenir prescripteur sur la plateforme")
             user.delete()
@@ -582,10 +582,10 @@ class InclusionConnectCallbackViewTest(InclusionConnectBaseTestCase):
                 self.client,
                 UserKind.SIAE_STAFF,
                 expected_redirect_url=add_url_params(
-                    reverse("inclusion_connect:logout"), {"redirect_url": reverse("home:hp")}
+                    reverse("inclusion_connect:logout"), {"redirect_url": reverse("search:siaes_home")}
                 ),
             )
-            response = self.client.get(reverse("home:hp"))
+            response = self.client.get(reverse("search:siaes_home"))
             self.assertContains(response, "existe déjà avec cette adresse e-mail")
             self.assertContains(response, "pour devenir employeur sur la plateforme")
             user.delete()
@@ -660,7 +660,7 @@ class InclusionConnectAccountActivationTest(InclusionConnectBaseTestCase):
                 params = {"user_email": user.email, "user_kind": user_kind}
                 url = f"{reverse('inclusion_connect:activate_account')}?{urlencode(params)}"
                 response = self.client.get(url, follow=True)
-                self.assertRedirects(response, reverse("home:hp"))
+                self.assertRedirects(response, reverse("search:siaes_home"))
                 self.assertContains(response, "existe déjà avec cette adresse e-mail")
                 self.assertContains(
                     response, "Vous devez créer un compte Inclusion Connect avec une autre adresse e-mail"
@@ -669,8 +669,8 @@ class InclusionConnectAccountActivationTest(InclusionConnectBaseTestCase):
     def test_no_email(self):
         params = {"user_kind": UserKind.PRESCRIBER}
         url = f"{reverse('inclusion_connect:activate_account')}?{urlencode(params)}"
-        response = self.client.get(url, follow=True)
-        self.assertRedirects(response, reverse("home:hp"))
+        response = self.client.get(url)
+        self.assertRedirects(response, reverse("search:siaes_home"))
 
 
 class InclusionConnectSessionTest(InclusionConnectBaseTestCase):
@@ -771,7 +771,7 @@ class InclusionConnectLogoutTest(InclusionConnectBaseTestCase):
             response,
             add_url_params(
                 constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT,
-                {"id_token_hint": 123456, "post_logout_redirect_uri": get_absolute_url(reverse("home:hp"))},
+                {"id_token_hint": 123456, "post_logout_redirect_uri": get_absolute_url(reverse("search:siaes_home"))},
             ),
             fetch_redirect_response=False,
         )
@@ -825,8 +825,7 @@ class InclusionConnectLogoutTest(InclusionConnectBaseTestCase):
         user = PrescriberFactory()
         self.client.force_login(user)
         response = self.client.post(reverse("account_logout"))
-        expected_redirection = reverse("home:hp")
-        self.assertRedirects(response, expected_redirection)
+        self.assertRedirects(response, reverse("search:siaes_home"))
         assert not auth.get_user(self.client).is_authenticated
 
     @respx.mock
@@ -842,5 +841,4 @@ class InclusionConnectLogoutTest(InclusionConnectBaseTestCase):
         session.save()
 
         response = self.client.post(reverse("account_logout"))
-        expected_redirection = reverse("home:hp")
-        self.assertRedirects(response, expected_redirection)
+        self.assertRedirects(response, reverse("search:siaes_home"))

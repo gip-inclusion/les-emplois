@@ -133,7 +133,7 @@ class UserHijackPermTestCase(TestCase):
 def test_redirect_to_ic_activation_view(client, user_factory, identity_provider, is_redirected):
     user = user_factory(identity_provider=identity_provider)
     client.force_login(user)
-    response = client.get(reverse("home:hp"), follow=True)
+    response = client.get(reverse("search:siaes_home"), follow=True)
     if is_redirected:
         assertRedirects(response, reverse("dashboard:activate_ic_account"))
     else:

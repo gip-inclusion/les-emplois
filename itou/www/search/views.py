@@ -18,6 +18,11 @@ from itou.www.search.forms import JobDescriptionSearchForm, PrescriberSearchForm
 INSEE_CODES_WITH_DISTRICTS = {"13055", "75056", "69123"}
 
 
+def employer_search_home(request, template_name="search/siaes_search_home.html"):
+    context = {"siae_search_form": SiaeSearchForm()}
+    return render(request, template_name, context)
+
+
 class EmployerSearchBaseView(FormView):
     template_name = "search/siaes_search_results.html"
     form_class = SiaeSearchForm

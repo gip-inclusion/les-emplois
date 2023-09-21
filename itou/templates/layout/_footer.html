@@ -16,13 +16,9 @@
                             <li>
                                 <a href="{% url 'dashboard:index' %}">Tableau de bord</a>
                             </li>
-                        {% else %}
-                            <li>
-                                <a href="{% url 'home:hp' %}">Accueil</a>
-                            </li>
                         {% endif %}
                         <li>
-                            <a href="{% url 'home:hp' %}">Rechercher un emploi inclusif</a>
+                            <a href="{% url 'search:siaes_home' %}">Rechercher un emploi inclusif</a>
                         </li>
                         <li>
                             <a href="{% url 'search:prescribers_home' %}">Rechercher des prescripteurs habilités</a>
