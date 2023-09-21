@@ -359,11 +359,11 @@ def update(asset_key):
     path = download(asset_info["download"])
     # Either target or extract_infos
     if target := asset_info.get("target"):
-        move(path, target)
         assert not asset_info.get("extract")
+        move(path, target)
     else:
-        extract(path, asset_info["extract"])
         assert not asset_info.get("target")
+        extract(path, asset_info["extract"])
 
 
 def update_all():
