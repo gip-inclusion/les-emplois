@@ -68,7 +68,7 @@ def _redirect_to_login_page_on_error(error_msg=None, request=None):
         messages.error(request, "Une erreur technique est survenue. Merci de recommencer.")
     if error_msg:
         logger.error(error_msg, exc_info=True)
-    return HttpResponseRedirect(reverse("home:hp"))
+    return HttpResponseRedirect(reverse("search:siaes_home"))
 
 
 def _generate_inclusion_params_from_session(ic_data):
@@ -109,7 +109,7 @@ def _add_user_kind_error_message(request, existing_user, new_user_kind):
 def inclusion_connect_authorize(request):
     # Start a new session.
     user_kind = request.GET.get("user_kind")
-    previous_url = request.GET.get("previous_url", reverse("home:hp"))
+    previous_url = request.GET.get("previous_url", reverse("search:siaes_home"))
     next_url = request.GET.get("next_url")
     register = request.GET.get("register")
     if not user_kind:
@@ -158,7 +158,7 @@ def inclusion_connect_resume_registration(request):
     # If there's no session then the user never started a registration on this device : nothing to resume either.
     if not ic_session or ic_session["token"]:
         messages.error(request, "Impossible de reprendre la création de compte.")
-        return HttpResponseRedirect(reverse("home:hp"))
+        return HttpResponseRedirect(reverse("search:siaes_home"))
 
     ic_state = InclusionConnectState.get_from_state(ic_session["state"])
 
@@ -170,7 +170,7 @@ def inclusion_connect_resume_registration(request):
 
     if ic_state is None:
         messages.error(request, "Impossible de reprendre la création de compte.")
-        return HttpResponseRedirect(reverse("home:hp"))
+        return HttpResponseRedirect(reverse("search:siaes_home"))
 
     data = _generate_inclusion_params_from_session(ic_state.data)
     return HttpResponseRedirect(f"{constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE}?{urlencode(data)}")
@@ -180,7 +180,7 @@ def inclusion_connect_activate_account(request):
     params = request.GET.copy()
     email = params.get("user_email")
     if not email:
-        return HttpResponseRedirect(params.get("previous_url", reverse("home:hp")))
+        return HttpResponseRedirect(params.get("previous_url", reverse("search:siaes_home")))
 
     user_kind = params.get("user_kind")
     user = User.objects.filter(email=email).first()
@@ -192,7 +192,7 @@ def inclusion_connect_activate_account(request):
 
     if user.kind != user_kind:
         _add_user_kind_error_message(request, user, request.GET.get("user_kind"))
-        return HttpResponseRedirect(params.get("previous_url", reverse("home:hp")))
+        return HttpResponseRedirect(params.get("previous_url", reverse("search:siaes_home")))
 
     if user.identity_provider == IdentityProvider.INCLUSION_CONNECT:
         request.GET = params
@@ -346,7 +346,7 @@ def inclusion_connect_callback(request):
 
 def inclusion_connect_logout(request):
     token = request.GET.get("token")
-    post_logout_redirect_url = request.GET.get("redirect_url", reverse("home:hp"))
+    post_logout_redirect_url = request.GET.get("redirect_url", reverse("search:siaes_home"))
 
     # Fallback on session data.
     if not token:

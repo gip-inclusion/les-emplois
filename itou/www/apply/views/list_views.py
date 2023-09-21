@@ -2,6 +2,7 @@ from collections import defaultdict
 
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render
+from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.text import slugify
 
@@ -35,7 +36,7 @@ def _add_pending_for_weeks(job_applications):
 
 
 @login_required
-@user_passes_test(lambda u: u.is_job_seeker, login_url="/", redirect_field_name=None)
+@user_passes_test(lambda u: u.is_job_seeker, login_url=reverse_lazy("search:siaes_home"), redirect_field_name=None)
 def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html"):
     """
     List of applications for a job seeker.
@@ -65,7 +66,7 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
 
 
 @login_required
-@user_passes_test(lambda u: u.is_prescriber, login_url="/", redirect_field_name=None)
+@user_passes_test(lambda u: u.is_prescriber, login_url=reverse_lazy("search:siaes_home"), redirect_field_name=None)
 def list_for_prescriber(request, template_name="apply/list_for_prescriber.html"):
     """
     List of applications for a prescriber.
@@ -96,7 +97,7 @@ def list_for_prescriber(request, template_name="apply/list_for_prescriber.html")
 
 
 @login_required
-@user_passes_test(lambda u: u.is_prescriber, login_url="/", redirect_field_name=None)
+@user_passes_test(lambda u: u.is_prescriber, login_url=reverse_lazy("search:siaes_home"), redirect_field_name=None)
 def list_for_prescriber_exports(request, template_name="apply/list_of_available_exports.html"):
     """
     List of applications for a prescriber, sorted by month, displaying the count of applications per month
@@ -122,7 +123,7 @@ def list_for_prescriber_exports(request, template_name="apply/list_of_available_
 
 
 @login_required
-@user_passes_test(lambda u: u.is_prescriber, login_url="/", redirect_field_name=None)
+@user_passes_test(lambda u: u.is_prescriber, login_url=reverse_lazy("search:siaes_home"), redirect_field_name=None)
 def list_for_prescriber_exports_download(request, month_identifier=None):
     """
     List of applications for a prescriber for a given month identifier (YYYY-mm),

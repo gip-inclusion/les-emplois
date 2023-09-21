@@ -35,7 +35,7 @@ class ApprovalSuspendViewTest(TestCase):
         siae_user = job_application.to_siae.members.first()
         self.client.force_login(siae_user)
 
-        back_url = "/"
+        back_url = reverse("search:siaes_home")
         params = urlencode({"back_url": back_url})
         url = reverse("approvals:suspend", kwargs={"approval_id": approval.pk})
         url = f"{url}?{params}"
@@ -157,7 +157,7 @@ class ApprovalSuspendViewTest(TestCase):
 
         self.client.force_login(siae_user)
 
-        back_url = "/"
+        back_url = reverse("search:siaes_home")
         params = urlencode({"back_url": back_url})
         url = reverse("approvals:suspension_update", kwargs={"suspension_id": suspension.pk})
         url = f"{url}?{params}"
@@ -205,7 +205,7 @@ class ApprovalSuspendViewTest(TestCase):
 
         self.client.force_login(siae_user)
 
-        back_url = "/"
+        back_url = reverse("search:siaes_home")
         params = urlencode({"back_url": back_url})
         url = reverse("approvals:suspension_delete", kwargs={"suspension_id": suspension.pk})
         url = f"{url}?{params}"

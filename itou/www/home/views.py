@@ -1,16 +1,16 @@
 import logging
 
-from django.shortcuts import render
-
-from itou.www.search.forms import SiaeSearchForm
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 
 logger = logging.getLogger(__name__)
 
 
-def home(request, template_name="home/home.html"):
-    context = {"siae_search_form": SiaeSearchForm()}
-    return render(request, template_name, context)
+def home(request):
+    if request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("dashboard:index"))
+    return HttpResponseRedirect(reverse("search:siaes_home"))
 
 
 def trigger_error(request):

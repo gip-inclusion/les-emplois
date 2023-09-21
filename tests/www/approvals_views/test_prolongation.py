@@ -60,7 +60,7 @@ class ApprovalProlongationTest(S3AccessingTestCase):
 
         self.client.force_login(self.siae_user)
 
-        back_url = "/"
+        back_url = reverse("search:siaes_home")
         params = urlencode({"back_url": back_url})
         url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
         url = f"{url}?{params}"
@@ -267,7 +267,7 @@ class ApprovalProlongationTest(S3AccessingTestCase):
 
         self.client.force_login(self.siae_user)
 
-        back_url = "/"
+        back_url = reverse("search:siaes_home")
         params = urlencode({"back_url": back_url})
         url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
         url = f"{url}?{params}"

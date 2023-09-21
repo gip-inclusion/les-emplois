@@ -173,7 +173,7 @@ def france_connect_logout(request):
     params = {
         "id_token_hint": id_token,
         "state": state,
-        "post_logout_redirect_uri": get_absolute_url(reverse("home:hp")),
+        "post_logout_redirect_uri": get_absolute_url(reverse("search:siaes_home")),
     }
     url = constants.FRANCE_CONNECT_ENDPOINT_LOGOUT
     complete_url = f"{url}?{urlencode(params)}"

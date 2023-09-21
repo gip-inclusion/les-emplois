@@ -1714,7 +1714,7 @@ def test_api_token_view_for_siae_admin(client):
 
     assert not Token.objects.exists()
 
-    url = reverse("home:hp")
+    url = reverse("dashboard:index")
     response = client.get(url)
 
     url = reverse("dashboard:api_token")
@@ -1741,7 +1741,7 @@ def test_api_token_view_for_non_siae_admin(client):
 
     assert not Token.objects.exists()
 
-    url = reverse("home:hp")
+    url = reverse("dashboard:index")
     response = client.get(url)
 
     url = reverse("dashboard:api_token")
@@ -1757,7 +1757,7 @@ def test_api_token_view_for_non_siae_admin(client):
 def test_prescriber_using_django_has_to_activate_ic_account(client):
     user = PrescriberFactory(identity_provider=IdentityProvider.DJANGO, email=OIDC_USERINFO["email"])
     client.force_login(user)
-    url = reverse("home:hp")
+    url = reverse("dashboard:index")
     response = client.get(url, follow=True)
     activate_ic_account_url = reverse("dashboard:activate_ic_account")
     assertRedirects(response, activate_ic_account_url)
@@ -1782,7 +1782,7 @@ def test_prescriber_using_django_has_to_activate_ic_account(client):
 def test_siae_staff_using_django_has_to_activate_ic_account(client):
     user = SiaeStaffFactory(with_siae=True, identity_provider=IdentityProvider.DJANGO, email=OIDC_USERINFO["email"])
     client.force_login(user)
-    url = reverse("home:hp")
+    url = reverse("dashboard:index")
     response = client.get(url, follow=True)
     activate_ic_account_url = reverse("dashboard:activate_ic_account")
     assertRedirects(response, activate_ic_account_url)
