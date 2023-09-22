@@ -18,6 +18,7 @@ from django.test import TransactionTestCase
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
+from pytest_django.asserts import assertQuerySetEqual
 
 from itou.approvals.admin import JobApplicationInline
 from itou.approvals.admin_forms import ApprovalAdminForm
@@ -195,46 +196,47 @@ class ApprovalModelTest(TestCase):
         with pytest.raises(ValidationError):
             approval.save()
 
-    def test_get_next_number(self):
-        # No pre-existing objects.
+    def test_get_next_number_no_preexisting_approval(self):
         expected_number = f"{Approval.ASP_ITOU_PREFIX}0000001"
         next_number = Approval.get_next_number()
         assert next_number == expected_number
 
-        # With pre-existing objects.
+    def test_get_next_number_with_preexisting_approval(self):
         ApprovalFactory(number=f"{Approval.ASP_ITOU_PREFIX}0000040")
         expected_number = f"{Approval.ASP_ITOU_PREFIX}0000041"
         next_number = Approval.get_next_number()
         assert next_number == expected_number
-        Approval.objects.all().delete()
 
+    def test_get_next_number_with_preexisting_pe_approval(self):
         # With pre-existing Pôle emploi approval.
         ApprovalFactory(number="625741810182", origin_pe_approval=True)
         expected_number = f"{Approval.ASP_ITOU_PREFIX}0000001"
         next_number = Approval.get_next_number()
         assert next_number == expected_number
-        Approval.objects.all().delete()
 
-        # With various pre-existing objects.
+    def test_get_next_number_with_both_preexisting_objects(self):
         ApprovalFactory(number=f"{Approval.ASP_ITOU_PREFIX}8888882")
         ApprovalFactory(number="625741810182", origin_pe_approval=True)
         expected_number = f"{Approval.ASP_ITOU_PREFIX}8888883"
         next_number = Approval.get_next_number()
         assert next_number == expected_number
-        Approval.objects.all().delete()
 
+    def test_get_next_number_with_demo_prefix(self):
         demo_prefix = "XXXXX"
         with mock.patch.object(Approval, "ASP_ITOU_PREFIX", demo_prefix):
             ApprovalFactory(number=f"{demo_prefix}0044440")
             expected_number = f"{demo_prefix}0044441"
             next_number = Approval.get_next_number()
             assert next_number == expected_number
-            Approval.objects.all().delete()
 
+    def test_get_next_number_last_possible_number(self):
         ApprovalFactory(number=f"{Approval.ASP_ITOU_PREFIX}9999999")
         with pytest.raises(RuntimeError):
-            next_number = Approval.get_next_number()
-        Approval.objects.all().delete()
+            Approval.get_next_number()
+
+    def test_cannot_mass_delete_approvals(self):
+        with pytest.raises(NotImplementedError):
+            Approval.objects.all().delete()
 
     def test_is_valid(self):
         # Start today, end in 2 years.
@@ -614,6 +616,24 @@ class ApprovalModelTest(TestCase):
         with transaction.atomic():
             with pytest.raises(IntegrityError):
                 ApprovalFactory(eligibility_diagnosis=None, origin=Origin.ADMIN)
+
+    def test_deleting_an_approval_creates_a_deleted_one(self):
+        job_application = JobApplicationFactory(with_approval=True)
+        user = job_application.job_seeker
+        approval = job_application.approval
+
+        assert user.latest_common_approval == approval
+        assert job_application.approval == approval
+        assertQuerySetEqual(Approval.objects.all(), [approval])
+
+        approval.delete()
+
+        # pretty
+        assertQuerySetEqual(Approval.objects.all(), Approval.objects.none())
+        user.refresh_from_db()
+        assertQuerySetEqual(user.approvals.all(), Approval.objects.none())
+        job_application = JobApplication.objects.get(pk=job_application.pk)
+        assert job_application.approval is None
 
 
 class PoleEmploiApprovalModelTest(TestCase):

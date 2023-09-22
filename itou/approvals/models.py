@@ -169,6 +169,15 @@ class CommonApprovalQuerySet(models.QuerySet):
         return self.filter(Q(start_at__gt=now))
 
 
+class ApprovalQuerySet(CommonApprovalQuerySet):
+    def delete(self):
+        # NOTE(vperron): Deleting through a queryset method would not leave us the opportunity to
+        # create a CancelledApproval object for each deleted Approval. Let's disallow it for now
+        # and trace the errors to see it happens frequently enough to warrant the implementation
+        # of a proper handling method, through `post_delete` for example?
+        raise NotImplementedError("Supprimer des PASS IAE en masse est interdit, veuillez les annuler un par un.")
+
+
 class PENotificationMixin(models.Model):
     pe_notification_status = models.CharField(
         verbose_name="état de la notification à PE",
@@ -226,6 +235,46 @@ class PENotificationMixin(models.Model):
 
     def pe_save_success(self, at=None):
         self._pe_notification_update(api_enums.PEApiNotificationStatus.SUCCESS, at)
+
+
+class CancelledApproval(PENotificationMixin, CommonApprovalMixin):
+    number = models.CharField(
+        verbose_name="numéro",
+        max_length=12,
+        help_text="12 caractères alphanumériques.",
+        validators=[alphanumeric, MinLengthValidator(12)],
+        unique=True,
+    )
+
+    user_last_name = models.CharField(verbose_name="nom demandeur d'emploi")
+    user_first_name = models.CharField(verbose_name="prénom demandeur d'emploi")
+    user_nir = models.CharField(verbose_name="NIR demandeur d'emploi", blank=True)
+    user_birthdate = models.DateField(
+        verbose_name="date de naissance demandeur d'emploi",
+        null=True,
+        blank=True,
+    )
+    user_id_national_pe = models.CharField(verbose_name="identifiant national PE", blank=True, null=True)
+
+    siae_siret = models.CharField(verbose_name="siret siae", max_length=14)
+    siae_kind = models.CharField(verbose_name="type siae", choices=siae_enums.SiaeKind.choices)
+
+    sender_kind = models.CharField(
+        verbose_name="origine de la candidature",
+        choices=job_application_enums.SenderKind.choices,
+    )
+    prescriber_kind = models.CharField(
+        verbose_name="typologie prescripteur",
+        choices=prescribers_enums.PrescriberOrganizationKind.choices,
+    )
+
+    class Meta:
+        verbose_name = "PASS IAE annulé"
+        verbose_name_plural = "PASS IAE annulés"
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return self.number
 
 
 class Approval(PENotificationMixin, CommonApprovalMixin):
@@ -293,7 +342,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
     # 2023-08-17: An experiment to add a denormalized field “last_suspension_ended_at” did not exhibit large
     # performance improvements, nor huge readability boons. https://github.com/betagouv/itou/pull/2746
 
-    objects = CommonApprovalQuerySet.as_manager()
+    objects = ApprovalQuerySet.as_manager()
 
     class Meta:
         verbose_name = "PASS IAE"
@@ -358,6 +407,32 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             # Override any existing origin as a PE Approval converted from the admin is still a PE Approval
             self.origin = Origin.PE_APPROVAL
         super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        job_application = self.jobapplication_set.accepted().order_by("-created_at").first()
+        if not job_application:
+            # Try this first. If it raises too often, we'll have to find the root cause and fix it,
+            # or decide that our CancelledApprovals will have incomplete/erroneous data.
+            raise ValueError("Cannot delete an approval without an accepted job application.")
+        if prescriber_org := job_application.sender_prescriber_organization:
+            prescriber_kind = prescriber_org.kind
+        else:
+            prescriber_kind = ""
+        CancelledApproval(
+            start_at=self.start_at,
+            end_at=self.end_at,
+            number=self.number,
+            user_last_name=self.user.last_name,
+            user_first_name=self.user.first_name,
+            user_nir=self.user.nir,
+            user_birthdate=self.user.birthdate,
+            user_id_national_pe=self.user.jobseeker_profile.pe_obfuscated_nir,
+            siae_siret=job_application.to_siae.siret,
+            siae_kind=job_application.to_siae.kind,
+            sender_kind=job_application.sender_kind,
+            prescriber_kind=prescriber_kind,
+        ).save()
+        super().delete()
 
     def clean(self):
         try:
