@@ -1,62 +1,57 @@
 {# Transfer job application to other SIAE #}
-{% if job_application.is_in_transferable_state %}
-    {% if request.organizations|length != 1 %}
-        <hr>
-        <h3>Transférer vers une autre structure</h3>
-        <p>Vous avez la possibilité de transférer cette candidature vers une des autres structures dont vous êtes membre.</p>
-        <div class="text-right mb-3">
-            <button id="transfer_to_button" class="btn btn-outline-primary dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown">
-                Transférer cette candidature vers
-            </button>
-            <div class="dropdown-menu" aria-labelledby="transfer_to_button">
-                {% for siae in request.organizations %}
-                    {% if siae != request.current_organization %}
-                        <a class="dropdown-item" data-toggle="modal" data-target="#transfer_confirmation_modal_{{ siae.pk }}">
-                            <div>
-                                <span class="badge badge-pill badge-primary">{{ siae.kind }}</span> <span>{{ siae.display_name }}</span>
-                            </div>
-                        </a>
-                    {% endif %}
-                {% endfor %}
-            </div>
+{% if request.organizations|length != 1 %}
+    <div class="text-center">
+        <button id="transfer_to_button" class="btn btn-link dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown">
+            Transférer cette candidature vers
+        </button>
+        <div class="dropdown-menu" aria-labelledby="transfer_to_button">
+            {% for siae in request.organizations %}
+                {% if siae != request.current_organization %}
+                    <a class="dropdown-item" data-toggle="modal" data-target="#transfer_confirmation_modal_{{ siae.pk }}">
+                        <div>
+                            <span class="badge badge-pill badge-primary">{{ siae.kind }}</span> <span>{{ siae.display_name }}</span>
+                        </div>
+                    </a>
+                {% endif %}
+            {% endfor %}
         </div>
-        {% comment %}
+    </div>
+    {% comment %}
           Tranfer confirmation modal:
           Was supposed to be within the for-loop above.
           But apparently being in a dropdown-menu DIV prevents display of the modal.
           Hence a new loop to generate modals for each SIAE.
           Not pretty, but if anybody has a cleaner solution...
-        {% endcomment %}
-        {% for siae in request.organizations %}
-            {% if siae != request.current_organization %}
-                <div id="transfer_confirmation_modal_{{ siae.pk }}" class="modal" tabindex="-1" aria-labelledby="modal_title" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="modal_title">Confirmation du transfert</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <p>
-                                    Êtes-vous sûr de vouloir transférer la candidature de <b>{{ job_application.job_seeker.get_full_name }}</b> dans la structure suivante ?
-                                </p>
-                                {% include "siaes/includes/_siae_info.html" %}
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Retour</button>
-                                <form method="post" action="{% url 'apply:transfer' job_application_id=job_application.id %}">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="target_siae_id" value="{{ siae.pk }}" />
-                                    <input type="hidden" name="back_url" value="{{ back_url }}" />
-                                    <button class="btn btn-primary">Confirmer</button>
-                                </form>
-                            </div>
+    {% endcomment %}
+    {% for siae in request.organizations %}
+        {% if siae != request.current_organization %}
+            <div id="transfer_confirmation_modal_{{ siae.pk }}" class="modal" tabindex="-1" aria-labelledby="modal_title" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modal_title">Confirmation du transfert</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>
+                                Êtes-vous sûr de vouloir transférer la candidature de <b>{{ job_application.job_seeker.get_full_name }}</b> dans la structure suivante ?
+                            </p>
+                            {% include "siaes/includes/_siae_info.html" %}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Retour</button>
+                            <form method="post" action="{% url 'apply:transfer' job_application_id=job_application.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="target_siae_id" value="{{ siae.pk }}" />
+                                <input type="hidden" name="back_url" value="{{ back_url }}" />
+                                <button class="btn btn-primary">Confirmer</button>
+                            </form>
                         </div>
                     </div>
                 </div>
-            {% endif %}
-        {% endfor %}
-    {% endif %}
+            </div>
+        {% endif %}
+    {% endfor %}
 {% endif %}

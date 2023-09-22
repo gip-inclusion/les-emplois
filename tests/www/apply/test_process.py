@@ -1405,7 +1405,7 @@ class ProcessTemplatesTest(TestCase):
 
 @pytest.mark.usefixtures("unittest_compatibility")
 class ProcessTransferJobApplicationTest(TestCase):
-    TRANSFER_TO_OTHER_SIAE_SENTENCE = "Transférer vers une autre structure"
+    TRANSFER_TO_OTHER_SIAE_SENTENCE = "Transférer cette candidature vers"
 
     def test_job_application_transfer_disabled_for_lone_users(self):
         # A user member of only one SIAE
@@ -1570,7 +1570,10 @@ def test_accept_button(client):
         to_siae__kind=SiaeKind.GEIQ,
     )
     accept_url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-    DIRECT_ACCEPT_BUTTON = f"""<a href="{accept_url}" class="btn btn-primary btn-block">Je l'embauche</a>"""
+    DIRECT_ACCEPT_BUTTON = f"""<a href="{accept_url}" class="btn btn-primary btn-block btn-ico">
+            <i class="ri-check-line font-weight-medium" aria-hidden="true"></i>
+            <span>Accepter cette candidature</span>
+        </a>"""
     client.force_login(job_application.to_siae.members.first())
     response = client.get(reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk}))
     # GEIQ without GEIQ diagnosis: we get the modals

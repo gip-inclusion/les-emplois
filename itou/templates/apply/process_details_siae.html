@@ -45,20 +45,51 @@
 
         {# Negative answers ------------------------------------------------------------------------- #}
         {% include "apply/includes/job_application_answers.html" with job_application=job_application %}
-        {# Process ------------------------------------------------------------------------- #}
 
-        {% include "apply/includes/state_transition_siae.html" with job_application=job_application %}
-
-        {# Transfer ------------------------------------------------------ #}
-
-        {% include "apply/includes/transfer_job_application.html" with job_application=job_application %}
+        {# hiring details ------------------------------------------------------------------------ #}
+        {% include "apply/includes/siae_hiring_details.html" %}
 
         {# History ------------------------------------------------------ #}
-
         {% if transition_logs %}
             <hr>
             <h3>Historique des modifications</h3>
             {% include "apply/includes/transition_logs.html" with job_application=job_application transition_logs=transition_logs %}
         {% endif %}
     </div>
+{% endblock %}
+
+{% block actions %}
+    {% include "apply/includes/siae_hiring_actions.html" with job_application=job_application %}
+
+    {% if job_application.to_siae.is_subject_to_eligibility_rules and request.user.is_siae_staff and job_application.state.is_accepted and job_application.approval %}
+        <div class="c-box mb-4">
+            <p>
+                <b>PASS IAE</b>
+            </p>
+            <p>
+                La consultation et la gestion du PASS IAE (exemple : « suspendre » ou « prolonger » un PASS IAE) se fait depuis le profil salarié.
+            </p>
+            <a class="btn btn-block btn-primary matomo-event"
+               href="{% url 'approvals:detail' pk=job_application.approval.id %}"
+               data-matomo-category="salaries"
+               data-matomo-action="clic"
+               data-matomo-option="detail-salarie-depuis-candidature">Accéder au profil salarié</a>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+
+    <script nonce="{{ CSP_NONCE }}">
+        htmx.onLoad((target) => {
+            $(".hide-if-empty", target).each(function() {
+                if ($(this).children().length == 0) {
+                    $(this).hide();
+                } else {
+                    $(this).show();
+                }
+            })
+        })
+    </script>
 {% endblock %}

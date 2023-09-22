@@ -1,0 +1,75 @@
+{% load bootstrap4 %}
+{% load format_filters %}
+
+<div class="c-box mb-4 hide-if-empty" id="transition_buttons_{{ job_application.pk }}"{% if out_of_band_swap %} hx-swap-oob="true"{% endif %} data-disable-btn-if=".editing-prior-action">
+    {% if job_application.state.is_new %}
+        <form method="post" action="{% url 'apply:process' job_application_id=job_application.id %}" class="js-prevent-multiple-submit">
+            {% csrf_token %}
+            <button class="btn btn-primary btn-block">Étudier cette candidature</button>
+        </form>
+    {% endif %}
+
+    {# Possible next steps when the state is processing / prior_to_hire ------------------------------------- #}
+
+    {% if job_application.state.is_processing or job_application.state.is_prior_to_hire %}
+        {% if job_application.eligibility_diagnosis_by_siae_required %}
+            {% include "apply/includes/buttons/new_diagnosis.html" %}
+        {% else %}
+            {% include "apply/includes/buttons/accept.html" %}
+            {% include "apply/includes/buttons/postpone.html" %}
+        {% endif %}
+        {% include "apply/includes/buttons/refuse.html" %}
+    {% endif %}
+
+    {# Possible next steps when the state is postponed ------------------------------------------------------ #}
+
+    {% if job_application.state.is_postponed %}
+        {% if job_application.eligibility_diagnosis_by_siae_required %}
+            {% include "apply/includes/buttons/new_diagnosis.html" %}
+        {% else %}
+            {% include "apply/includes/buttons/accept.html" %}
+        {% endif %}
+        {% include "apply/includes/buttons/refuse.html" %}
+    {% endif %}
+
+
+    {# Possible next steps when the state is obsolete, refused or cancelled --------------------------------- #}
+
+    {% if job_application.state.is_obsolete or job_application.state.is_refused or job_application.state.is_cancelled %}
+        {% if job_application.eligibility_diagnosis_by_siae_required %}
+            {% include "apply/includes/buttons/new_diagnosis.html" %}
+        {% else %}
+            {% include "apply/includes/buttons/accept.html" %}
+        {% endif %}
+    {% endif %}
+
+    {# Job application accepted: cancel --------------------------------------------------------------------- #}
+    {% if job_application.state.is_accepted and job_application.can_be_cancelled %}
+        {% if job_application.to_siae.is_subject_to_eligibility_rules %}
+            <p>
+                <strong>Rétractation</strong>
+            </p>
+            <p>
+                Si vous annulez cette embauche, vous ne pourrez pas prétendre à l'aide au poste pour les jours éventuellement travaillés.
+            </p>
+            <p>
+                {{ job_application.job_seeker.get_full_name }} restera éligible à l'IAE et pourra de nouveau vous envoyer une candidature dans le futur.
+            </p>
+        {% endif %}
+        <a href="{% url 'apply:cancel' job_application_id=job_application.id %}" class="btn btn-danger btn-block btn-ico text-decoration-none">
+            <i class="ri-arrow-go-back-line font-weight-medium" aria-hidden="true"></i>
+            <span>Annuler l'embauche</span>
+        </a>
+    {% endif %}
+
+    {# Job application archival -------------------------------------------------------------------- #}
+
+    {% if job_application.can_be_archived %}
+        {% include "apply/includes/buttons/archive.html" with job_application=job_application %}
+    {% endif %}
+
+    {# Transfer ------------------------------------------------------ #}
+    {% if job_application.is_in_transferable_state %}
+        {% include "apply/includes/transfer_job_application.html" with job_application=job_application %}
+    {% endif %}
+</div>

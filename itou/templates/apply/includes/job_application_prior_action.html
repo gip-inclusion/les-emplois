@@ -69,5 +69,5 @@
     {% include "apply/includes/out_of_band_changes_on_job_application_state_update_siae.html" with job_application=job_application transition_logs=transition_logs %}
 {% elif add_prior_action_form %}
     {# If state has not changed, but a prior action has been added, we must bring the transition buttons back #}
-    {% include "apply/includes/state_transition_siae.html" with job_application=job_application out_of_band_swap=True %}
+    {% include "apply/includes/siae_hiring_actions.html" with job_application=job_application out_of_band_swap=True %}
 {% endif %}
