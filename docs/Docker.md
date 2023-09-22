@@ -51,11 +51,9 @@ $ docker cp backups/2023-09-12.dump itou_postgres:/backups/
 
 ## Mise à jour des dépendances Python
 
-Lors des mises à jour Python (par ex. ajout d'un package à Django), vous devez
-reconstruire (*rebuild*) votre image Docker en exécutant la commande suivante :
-
+**Dans le container `itou_django`**, lancer la commande :
 ```sh
-docker compose up --build
+make venv
 ```
 
 ## Effacer l'ancienne base de données
