@@ -30,7 +30,7 @@ RUN curl --silent https://www.postgresql.org/media/keys/ACCC4CF8.asc --output /e
 # Add PostgreSQL's repository. It contains the most recent stable release.
 RUN echo "deb [signed-by=/etc/apt/keyrings/postgresql.asc] http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list
 
-# Install system dependancies
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpq-dev \
@@ -39,15 +39,8 @@ RUN apt-get update && apt-get install -y \
     postgresql-client-$PG_MAJOR \
     jq \
     moreutils \
+    python3-venv \
     --no-install-recommends
-
-# Install python dependancies
-COPY ./requirements /requirements
-RUN pip install --upgrade pip \
-    && pip install --no-cache-dir -r /requirements/dev.txt \
-    && pip uninstall psycopg[binary] -y \
-    && pip install psycopg[binary] --no-binary psycopg[binary] \
-    && rm -rf /requirements
 
 # Add new user to run the whole thing as non-root.
 RUN set -ex \
