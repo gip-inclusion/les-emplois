@@ -1,4 +1,4 @@
 {% load job_applications %}
 {% state_badge job_application hx_swap_oob=True %}
-{% include "apply/includes/state_transition_siae.html" with job_application=job_application out_of_band_swap=True %}
+{% include "apply/includes/siae_hiring_actions.html" with job_application=job_application out_of_band_swap=True %}
 {% include "apply/includes/transition_logs.html" with job_application=job_application transition_logs=transition_logs out_of_band_swap=True %}
