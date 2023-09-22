@@ -51,6 +51,14 @@ class CommonApprovalMixin(models.Model):
     end_at = models.DateField(verbose_name="date de fin", default=timezone.localdate, db_index=True)
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
 
+    number = models.CharField(
+        verbose_name="numéro",
+        max_length=12,
+        help_text="12 caractères alphanumériques.",
+        validators=[alphanumeric, MinLengthValidator(12)],
+        unique=True,
+    )
+
     class Meta:
         abstract = True
 
@@ -238,14 +246,6 @@ class PENotificationMixin(models.Model):
 
 
 class CancelledApproval(PENotificationMixin, CommonApprovalMixin):
-    number = models.CharField(
-        verbose_name="numéro",
-        max_length=12,
-        help_text="12 caractères alphanumériques.",
-        validators=[alphanumeric, MinLengthValidator(12)],
-        unique=True,
-    )
-
     user_last_name = models.CharField(verbose_name="nom demandeur d'emploi")
     user_first_name = models.CharField(verbose_name="prénom demandeur d'emploi")
     user_nir = models.CharField(verbose_name="NIR demandeur d'emploi", blank=True)
@@ -308,13 +308,6 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         verbose_name="demandeur d'emploi",
         on_delete=models.CASCADE,
         related_name="approvals",
-    )
-    number = models.CharField(
-        verbose_name="numéro",
-        max_length=12,
-        help_text="12 caractères alphanumériques.",
-        validators=[alphanumeric, MinLengthValidator(12)],
-        unique=True,
     )
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
