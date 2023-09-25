@@ -3,6 +3,7 @@ from datetime import timedelta
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.core import mail
+from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import escape
@@ -18,13 +19,12 @@ from tests.approvals.factories import ProlongationFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.storage.test import S3AccessingTestCase
 from tests.utils.test import parse_response_to_soup
 
 
 @pytest.mark.usefixtures("unittest_compatibility")
 @freeze_time("2023-08-23")
-class ApprovalProlongationTest(S3AccessingTestCase):
+class ApprovalProlongationTest(TestCase):
     PROLONGATION_EMAIL_REPORT_TEXT = "- Fiche bilan :"
 
     def setUp(self):

@@ -1,11 +1,11 @@
 import pytest
 from django.conf import settings
+from django.test import TestCase
 
 from itou.utils.storage.s3 import S3Upload
-from tests.utils.storage.test import S3AccessingTestCase
 
 
-class S3Tests(S3AccessingTestCase):
+class S3Tests(TestCase):
     def test_generate_form_values(self):
         s3_upload = S3Upload()
         form_values = s3_upload.form_values

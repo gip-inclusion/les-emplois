@@ -46,14 +46,13 @@ from tests.users.factories import (
     PrescriberFactory,
     SiaeStaffFactory,
 )
-from tests.utils.storage.test import S3AccessingTestCase
 from tests.utils.test import TestCase, assertMessages
 
 
 pytestmark = pytest.mark.ignore_template_errors
 
 
-class ApplyTest(S3AccessingTestCase):
+class ApplyTest(TestCase):
     def test_siae_with_no_members(self):
         siae = SiaeFactory()
         user = JobSeekerFactory()
@@ -273,7 +272,7 @@ def test_check_nir_job_seeker_with_lack_of_nir_reason(client):
 
 
 @pytest.mark.usefixtures("unittest_compatibility")
-class ApplyAsJobSeekerTest(S3AccessingTestCase):
+class ApplyAsJobSeekerTest(TestCase):
     @property
     def default_session_data(self):
         return {
@@ -587,7 +586,7 @@ class ApplyAsJobSeekerTest(S3AccessingTestCase):
 
 
 @pytest.mark.usefixtures("unittest_compatibility")
-class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
+class ApplyAsAuthorizedPrescriberTest(TestCase):
     def setUp(self):
         super().setUp()
         [self.city] = create_test_cities(["67"], num_per_department=1)
@@ -1096,7 +1095,7 @@ class ApplyAsAuthorizedPrescriberTest(S3AccessingTestCase):
 
 
 @pytest.mark.usefixtures("unittest_compatibility")
-class ApplyAsPrescriberTest(S3AccessingTestCase):
+class ApplyAsPrescriberTest(TestCase):
     def setUp(self):
         super().setUp()
         cities = create_test_cities(["67"], num_per_department=10)
@@ -1385,7 +1384,7 @@ class ApplyAsPrescriberTest(S3AccessingTestCase):
         )
 
 
-class ApplyAsPrescriberNirExceptionsTest(S3AccessingTestCase):
+class ApplyAsPrescriberNirExceptionsTest(TestCase):
     """
     The following normal use cases are tested in tests above:
         - job seeker creation,
@@ -1523,7 +1522,7 @@ class ApplyAsPrescriberNirExceptionsTest(S3AccessingTestCase):
 
 
 @pytest.mark.usefixtures("unittest_compatibility")
-class ApplyAsSiaeTest(S3AccessingTestCase):
+class ApplyAsSiaeTest(TestCase):
     def setUp(self):
         super().setUp()
         [self.city] = create_test_cities(["67"], num_per_department=1)
@@ -2228,7 +2227,7 @@ class ApplyAsOtherTest(TestCase):
                 assert response.status_code == 403
 
 
-class ApplicationViewTest(S3AccessingTestCase):
+class ApplicationViewTest(TestCase):
     def test_application_jobs_use_previously_selected_jobs(self):
         siae = SiaeFactory(subject_to_eligibility=True, with_membership=True, with_jobs=True)
 
@@ -3085,7 +3084,7 @@ def test_detect_existing_job_seeker(client):
     assertContains(response, "wrong-email@example.com")
 
 
-class ApplicationGEIQEligibilityViewTest(S3AccessingTestCase):
+class ApplicationGEIQEligibilityViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.geiq = SiaeFactory(with_membership=True, with_jobs=True, kind=SiaeKind.GEIQ)
