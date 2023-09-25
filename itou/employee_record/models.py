@@ -201,7 +201,7 @@ class EmployeeRecord(ASPExchangeInformation):
     # These fields are duplicated to act as constraint fields on DB level
     approval_number = models.CharField(max_length=12, verbose_name="numéro d'agrément")
     asp_id = models.PositiveIntegerField(verbose_name="identifiant ASP de la SIAE")
-    asp_measure = models.CharField(verbose_name="mesure ASP de la SIAE", choices=SiaeKind.choices, null=True)
+    asp_measure = models.CharField(verbose_name="mesure ASP de la SIAE", choices=SiaeKind.choices)
 
     # If the SIAE is an "antenna",
     # we MUST provide the SIRET of the SIAE linked to the financial annex on ASP side (i.e. "parent/mother" SIAE)
@@ -229,9 +229,9 @@ class EmployeeRecord(ASPExchangeInformation):
         verbose_name_plural = "fiches salarié"
         constraints = ASPExchangeInformation.Meta.constraints + [
             models.UniqueConstraint(
-                fields=["asp_id", "approval_number"],
-                name="unique_asp_id_approval_number",
-            )
+                fields=["asp_id", "approval_number", "asp_measure"],
+                name="unique_asp_id_approval_number_asp_measure",
+            ),
         ]
 
     def __str__(self):
@@ -378,7 +378,7 @@ class EmployeeRecord(ASPExchangeInformation):
         self.status = Status.ARCHIVED
         self.archived_json = None
 
-        with transaction.atomic():  # In case we failed the "unique_asp_id_approval_number" constraint
+        with transaction.atomic():  # In case we failed a constraint (i.e: the unique one)
             self.save()
 
     def update_as_processed_as_duplicate(self, archive):
@@ -563,14 +563,13 @@ class EmployeeRecord(ASPExchangeInformation):
         if clean:
             fs.clean()
 
-        # Mandatory check, must be done only once
-        if EmployeeRecord.objects.filter(
-            asp_id=job_application.to_siae.convention.asp_id,
-            approval_number=job_application.approval.number,
-        ).exists():
-            raise ValidationError(EmployeeRecord.ERROR_EMPLOYEE_RECORD_IS_DUPLICATE)
-
         fs._fill_denormalized_fields()
+
+        try:
+            fs.validate_unique()
+            fs.validate_constraints()
+        except ValidationError:
+            raise ValidationError(EmployeeRecord.ERROR_EMPLOYEE_RECORD_IS_DUPLICATE)
 
         return fs
 
