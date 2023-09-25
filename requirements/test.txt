@@ -80,9 +80,9 @@ black==23.9.1 \
     --hash=sha256:cf99f3de8b3273a8317681d8194ea222f10e0133a24a7548c73ce44ea1679377 \
     --hash=sha256:d6bc09188020c9ac2555a498949401ab35bb6bf76d4e0f8ee251694664df6301
     # via -r requirements/test.in
-boto3==1.28.49 \
-    --hash=sha256:519639859a3c829ccf7073a58b3716cb26cb5906e306fe63eb4beab68bf9bfab \
-    --hash=sha256:c9fad1b01a1d7e7bd51150b3175b4c32b79d699ce94708082611f59fde2e097a
+boto3==1.28.53 \
+    --hash=sha256:b95b0cc39f08402029c3a2bb141e1775cfa46576ebe9f9916f79bde90e27f53f \
+    --hash=sha256:dc2da9aff7de359774030a243a09b74568664117e2afb77c6e4b90572ae3a6c3
     # via -r requirements/base.txt
 botocore==1.31.53 \
     --hash=sha256:905580ea724d74f11652bab63fcec6bf0d32f1cf8b2963f7388efc0ea406b69b \
