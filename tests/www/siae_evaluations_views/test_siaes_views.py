@@ -20,7 +20,6 @@ from tests.siae_evaluations.factories import (
 )
 from tests.siaes.factories import SiaeMembershipFactory
 from tests.users.factories import JobSeekerFactory
-from tests.utils.storage.test import S3AccessingTestCase
 from tests.utils.test import BASE_NUM_QUERIES, TestCase, assertMessages
 
 
@@ -64,7 +63,7 @@ def create_evaluated_siae_with_consistent_datas(siae, user, level_1=True, level_
     return evaluated_job_application
 
 
-class SiaeJobApplicationListViewTest(S3AccessingTestCase):
+class SiaeJobApplicationListViewTest(TestCase):
     refused_html = """\
         <p class="text-danger">
             <i class="ri-indeterminate-circle-line"></i> Refusé
@@ -701,7 +700,7 @@ class SiaeSelectCriteriaViewTest(TestCase):
                 assert "checked" not in response.context["level_2_fields"][i].subwidgets[0].data["attrs"]
 
 
-class SiaeUploadDocsViewTest(S3AccessingTestCase):
+class SiaeUploadDocsViewTest(TestCase):
     def setUp(self):
         super().setUp()
         membership = SiaeMembershipFactory()

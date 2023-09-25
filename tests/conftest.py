@@ -1,4 +1,5 @@
 import os
+import uuid
 
 # Workaround being able to use freezegun with pandas.
 # https://github.com/spulec/freezegun/issues/98
@@ -9,6 +10,7 @@ from django.conf import settings
 from django.contrib.gis.db.models.fields import get_srid_info
 from django.core import management
 from django.core.cache import cache
+from django.core.files.storage import default_storage
 from django.core.management import call_command
 from django.db import connection
 from django.template import base as base_template
@@ -86,6 +88,14 @@ def test_settings():
     ):
         call_command("configure_bucket", autoexpire=True)
         yield
+
+
+@pytest.fixture(autouse=True)
+def storage_prefix_per_test(test_settings):
+    original_location = default_storage.location
+    default_storage.location = f"{uuid.uuid4()}"
+    yield
+    default_storage.location = original_location
 
 
 @pytest.fixture(autouse=True, scope="session", name="django_loaddata")
