@@ -158,6 +158,9 @@ class EmployeeRecordAdmin(ItouModelAdmin):
             return "Intégrée par l'ASP"
         return "-"
 
+    def has_add_permission(self, request):
+        return False
+
 
 @admin.register(models.EmployeeRecordUpdateNotification)
 class EmployeeRecordUpdateNotificationAdmin(ItouModelAdmin):
