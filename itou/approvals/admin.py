@@ -89,7 +89,9 @@ class JobApplicationInline(ItouStackedInline):
         if obj.hiring_start_at and obj.hiring_start_at < EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE.date():
             return "Date de début du contrat avant l'interopérabilité"
 
-        already_exists = obj.candidate_has_employee_record
+        already_exists = (
+            EmployeeRecord.objects.for_siae(obj.to_siae).filter(approval_number=obj.approval.number).exists()
+        )
 
         if JobApplication.objects.eligible_as_employee_record(siae=obj.to_siae).filter(pk=obj.pk).exists():
             return "En attente de création" + (" (doublon)" if already_exists else "")

@@ -823,20 +823,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             return SenderKind(self.sender_kind).label
 
     @property
-    def candidate_has_employee_record(self):
-        if not self.approval:
-            return False
-
-        if self.employee_record.exists():
-            return True
-
-        # check if employee_record for the same approval in the same siae exists
-        return self.approval.jobapplication_set.filter(
-            employee_record__asp_id=self.to_siae.convention.asp_id,
-            employee_record__approval_number=self.approval.number,
-        ).exists()
-
-    @property
     def is_in_transferable_state(self):
         return self.state not in [JobApplicationWorkflow.STATE_ACCEPTED, JobApplicationWorkflow.STATE_NEW]
 

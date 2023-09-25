@@ -141,50 +141,6 @@ class JobApplicationModelTest(TestCase):
             job_application = JobApplicationFactory(state=state)
             assert job_application.can_be_archived
 
-    def test_candidate_has_employee_record(self):
-        # test job_application has no Approval
-        job_application = JobApplicationWithoutApprovalFactory()
-        assert not job_application.candidate_has_employee_record
-
-        # test job_application has one Approval and no EmployeeRecord
-        job_application = JobApplicationFactory(with_approval=True)
-        assert not job_application.candidate_has_employee_record
-
-        # test job_application has one Approval and one EmployeeRecord
-        job_application = JobApplicationFactory(
-            with_approval=True,
-        )
-        EmployeeRecordFactory(job_application=job_application)
-        assert job_application.candidate_has_employee_record
-
-        # test job_application has one Approval and no EmployeeRecord
-        # but an EmployeeRecord already exists for the same approval.number
-        # and the same Siae
-        job_application1 = JobApplicationFactory(with_approval=True)
-        EmployeeRecordFactory(
-            job_application=job_application1,
-            asp_id=job_application1.to_siae.convention.asp_id,
-            approval_number=job_application1.approval.number,
-        )
-        job_application2 = JobApplicationFactory(
-            with_approval=True, approval=job_application1.approval, to_siae=job_application1.to_siae
-        )
-        assert job_application1.candidate_has_employee_record
-        assert job_application2.candidate_has_employee_record
-
-        # test job_application has one Approval and no EmployeeRecord
-        # but an EmployeeRecord already exists for the same approval.number
-        # in an other Siae
-        job_application1 = JobApplicationFactory(with_approval=True)
-        EmployeeRecordFactory(
-            job_application=job_application1,
-            asp_id=job_application1.to_siae.convention.asp_id,
-            approval_number=job_application1.approval.number,
-        )
-        job_application2 = JobApplicationFactory(with_approval=True, approval=job_application1.approval)
-        assert job_application1.candidate_has_employee_record
-        assert not job_application2.candidate_has_employee_record
-
     def test_get_sender_kind_display(self):
         non_siae_items = [
             (JobApplicationSentBySiaeFactory(to_siae__kind=kind), "Employeur")
