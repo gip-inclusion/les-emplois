@@ -189,7 +189,6 @@ class User(AbstractUser, AddressMixin):
     )
     email = CIEmailField(
         "adresse e-mail",
-        blank=True,
         db_index=True,
         # Empty values are stored as NULL if both `null=True` and `unique=True` are set.
         # This avoids unique constraint violations when saving multiple objects with blank values.

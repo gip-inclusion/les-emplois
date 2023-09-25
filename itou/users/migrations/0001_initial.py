@@ -53,7 +53,6 @@ class Migration(migrations.Migration):
                 (
                     "email",
                     django.contrib.postgres.fields.citext.CIEmailField(
-                        blank=True,
                         db_index=True,
                         max_length=254,
                         null=True,

@@ -2,7 +2,7 @@ from collections import namedtuple
 
 from django import forms
 from django.contrib.admin import widgets
-from django.contrib.auth.forms import UserChangeForm, UserCreationForm
+from django.contrib.auth.forms import UserChangeForm
 from django.core.exceptions import ValidationError
 
 from itou.users.enums import UserKind
@@ -10,10 +10,10 @@ from itou.users.models import User
 from itou.utils.apis.exceptions import AddressLookupError
 
 
-class ItouUserCreationForm(UserCreationForm):
-    class Meta(UserCreationForm.Meta):
-        model = User
-        fields = UserCreationForm.Meta.fields + ("kind",)
+class ItouUserCreationForm(forms.ModelForm):
+    def save(self, commit=True):
+        self.instance.set_unusable_password()
+        return super().save(commit=commit)
 
 
 class UserAdminForm(UserChangeForm):

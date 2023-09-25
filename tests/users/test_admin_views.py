@@ -20,8 +20,7 @@ def test_add_user(client):
         reverse("admin:users_user_add"),
         {
             "username": "foo",
-            "password1": "Véry_$S3C®3T!",
-            "password2": "Véry_$S3C®3T!",
+            "email": "foo@mailinator.com",
             "kind": UserKind.JOB_SEEKER,
             "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": "0",
             "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": "0",

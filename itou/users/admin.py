@@ -333,7 +333,17 @@ class ItouUserAdmin(UserAdmin):
     assert "last_login" in fieldsets[-2][1]["fields"]
     fieldsets[-2][1]["fields"] += ("last_checked_at",)
 
-    add_fieldsets = UserAdmin.add_fieldsets + (
+    add_fieldsets = (
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": (
+                    "username",
+                    "email",
+                ),
+            },
+        ),
         (
             "Type d’utilisateur",
             {
