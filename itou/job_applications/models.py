@@ -392,11 +392,9 @@ class JobApplicationQuerySet(models.QuerySet):
             self._eligible_job_applications_with_a_suspended_or_extended_approval(siae),
         )
 
-        # Return the approvals that are already linked to an employee records of the SIAE (ASP ID)
+        # Return the approvals that are already linked to an employee records of the SIAE
         approvals_to_exclude = (
-            EmployeeRecord.objects.filter(
-                asp_id=siae.convention.asp_id,
-            )
+            EmployeeRecord.objects.for_siae(siae)
             # We need to exclude NEW employee records otherwise we are shooting ourselves in the foot by excluding
             # job applications selected in `._eligible_job_applications_with_employee_record()`
             .exclude(status__in=[employeerecord_enums.Status.NEW]).values("approval_number")
