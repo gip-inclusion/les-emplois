@@ -28,9 +28,7 @@ runserver: $(VIRTUAL_ENV)
 $(VIRTUAL_ENV): $(REQUIREMENTS_PATH)
 	$(PYTHON_VERSION) -m venv $@
 	$@/bin/pip install -r $^
-ifeq ($(shell uname -s),Linux)
 	$@/bin/pip-sync $^
-endif
 	touch $@
 
 venv: $(VIRTUAL_ENV)
