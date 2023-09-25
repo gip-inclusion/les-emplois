@@ -77,6 +77,33 @@ class PEAMUTests(OAuth2TestsMixin, TestCase):
         assert email_address.user.is_staff is False
 
     @mock.patch("itou.external_data.signals.import_user_pe_data_on_peamu_login")
+    def test_do_not_crash_if_user_already_exists(self, _mock_login_signal):
+        JobSeekerFactory(
+            username="user",
+            is_active=True,
+            email="john.doe@example.com",
+            kind=users_enums.UserKind.JOB_SEEKER,
+            with_verified_email=True,
+        )
+        self.login(self.get_mocked_response())
+        [email] = mail.outbox
+        assert email.to == ["john.doe@example.com"]
+        assert email.subject == "Ce compte existe déjà"
+        assert email.body == (
+            "Bonjour, c'est example.com !\n\n"
+            # https://github.com/pennersr/django-allauth/pull/3454
+            "Vous recevez cet email car vous ou quelqu'un d'autre a demandé à créer an\n"
+            "un compte en utilisant cette adresse email :\n\n"
+            "john.doe@example.com\n\n"
+            "Cependant, un compte utilisant cette adresse existe déjà. Au cas où vous auriez\n"
+            "oublié, merci d'utiliser la fonction de récupération de mot de passe pour\n"
+            "récupérer votre compte :\n\n"
+            "http://testserver/accounts/password/reset/\n\n"
+            "Merci d'utiliser example.com !\n"
+            "example.com"
+        )
+
+    @mock.patch("itou.external_data.signals.import_user_pe_data_on_peamu_login")
     def test_peamu_connection_for_existing_non_peamu_user(self, mock_login_signal):
         email = "user@example.com"
         user = User.objects.create(username="user", is_active=True, email=email, kind=users_enums.UserKind.JOB_SEEKER)
