@@ -1,6 +1,17 @@
 # Journal des modifications
 
-## [70] - 2023-09-11
+## [72] - 2023-09-25
+
+### Ajouté
+- Connexion : séparation de la connexion et de l’inscription
+- Demandes de prolongation : procédure de refus (motifs et actions proposées)
+
+### Modifié
+- Fiches salarié : amélioration de la page "fiches salarié à mettre à jour"
+- Fiches de poste : amélioration de l'interface de gestion
+- PASS IAE : retrait de l’acceptation automatique à J+30 et modification des relances par e-mail
+
+## [71] - 2023-09-11
 
 ### Ajouté
 - Candidatures : Ajout de la civilité dans les exports de candidatures
@@ -8,7 +19,6 @@
 - Déclaration d'embauche : Nouveau processus de déclaration d'embauche rapide
 - Demandes de prolongations : Ajout de filtres pour faciliter la navigation
 - UX : Ajout de la bannière livestorm au tableau de bord des prescripteurs et employeurs
-
 
 ### Modifié
 - Admin : Ajout d'un champ commentaire sur la page d’une campagne de contrôle a posteriori
