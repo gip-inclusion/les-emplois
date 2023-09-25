@@ -1,7 +1,9 @@
+from django import forms
 from django.contrib import admin, messages
 from django.utils import timezone
 
 import itou.employee_record.models as models
+from itou.siaes import models as siaes_models
 
 from ..utils.admin import ItouModelAdmin, ItouTabularInline, get_admin_view_link
 from ..utils.templatetags.str_filters import pluralizefr
@@ -26,8 +28,20 @@ class EmployeeRecordUpdateNotificationInline(ItouTabularInline):
     extra = 0
 
 
+class EmployeeRecordAdminForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["financial_annex"].required = False
+        self.fields["financial_annex"].queryset = siaes_models.SiaeFinancialAnnex.objects.filter(
+            convention=self.instance.job_application.to_siae.convention
+        ).order_by("-number")
+
+
 @admin.register(models.EmployeeRecord)
 class EmployeeRecordAdmin(ItouModelAdmin):
+    form = EmployeeRecordAdminForm
+
     @admin.action(description="Marquer les fiches salarié selectionnées comme COMPLETÉES")
     def update_employee_record_as_ready(self, _request, queryset):
         queryset.update(status=Status.READY)
@@ -80,10 +94,7 @@ class EmployeeRecordAdmin(ItouModelAdmin):
         "asp_batch_file",
     )
 
-    raw_id_fields = (
-        "job_application",
-        "financial_annex",
-    )
+    raw_id_fields = ("job_application",)
 
     readonly_fields = (
         "pk",
@@ -94,7 +105,6 @@ class EmployeeRecordAdmin(ItouModelAdmin):
         "job_seeker_link",
         "job_seeker_profile_link",
         "siret",
-        "financial_annex",
         "asp_id",
         "asp_processing_type",
         "asp_batch_file",
