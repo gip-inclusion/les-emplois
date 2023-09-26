@@ -155,6 +155,7 @@ def test_stats_siae_log_visit(client, view_name, settings):
     [
         "stats_ddets_iae_auto_prescription",
         "stats_ddets_iae_follow_siae_evaluation",
+        "stats_ddets_iae_follow_prolongation",
         "stats_ddets_iae_iae",
         "stats_ddets_iae_siae_evaluation",
         "stats_ddets_iae_hiring",
@@ -196,6 +197,7 @@ def test_stats_ddets_iae_log_visit(client, view_name):
     [
         "stats_dreets_iae_auto_prescription",
         "stats_dreets_iae_follow_siae_evaluation",
+        "stats_dreets_iae_follow_prolongation",
         "stats_dreets_iae_iae",
         "stats_dreets_iae_hiring",
     ],
