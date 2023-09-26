@@ -1501,11 +1501,6 @@ class SwitchSiaeTest:
         assert response.context["request"].current_organization == siae
 
 
-class OldSwitchSiaeTest(SwitchSiaeTest, TestCase):
-    switch_view_name = "dashboard:switch_siae"
-    switch_POST_key = "siae_id"
-
-
 class NewSwitchSiaeTest(SwitchSiaeTest, TestCase):
     switch_view_name = "dashboard:switch_organization"
     switch_POST_key = "organization_id"
@@ -1683,11 +1678,6 @@ class SwitchOrganizationTest:
         assert response.context["request"].current_organization == orga2
 
 
-class OldSwitchOrganizationTest(SwitchOrganizationTest, TestCase):
-    switch_view_name = "dashboard:switch_prescriber_organization"
-    switch_POST_key = "prescriber_organization_id"
-
-
 class NewSwitchOrganizationTest(SwitchOrganizationTest, TestCase):
     switch_view_name = "dashboard:switch_organization"
     switch_POST_key = "organization_id"
@@ -1732,11 +1722,6 @@ class SwitchInstitutionTest:
         response = self.client.get(reverse("dashboard:index"))
         assert response.status_code == 200
         assert response.context["request"].current_organization == institution2
-
-
-class OldSwitchInstitutionTest(SwitchInstitutionTest, TestCase):
-    switch_view_name = "dashboard:switch_institution"
-    switch_POST_key = "institution_id"
 
 
 class NewSwitchInstitutionTest(SwitchInstitutionTest, TestCase):

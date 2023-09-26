@@ -15,11 +15,6 @@ urlpatterns = [
     path("edit_job_seeker_info/<uuid:job_application_id>", views.edit_job_seeker_info, name="edit_job_seeker_info"),
     path("edit_job_seeker_info/<int:job_seeker_pk>", views.edit_job_seeker_info, name="edit_job_seeker_info"),
     path("switch-organization", views.switch_organization, name="switch_organization"),
-    path("switch_siae", views.switch_siae, name="switch_siae"),
-    path(
-        "switch_prescriber_organization", views.switch_prescriber_organization, name="switch_prescriber_organization"
-    ),
-    path("switch_institution", views.switch_institution, name="switch_institution"),
     path(
         "activate_ic_account",
         views.AccountMigrationView.as_view(),
