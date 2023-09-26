@@ -472,7 +472,8 @@ class EvaluatedSiae(models.Model):
     objects = EvaluatedSiaeQuerySet.as_manager()
 
     class Meta:
-        verbose_name = "entreprise"
+        verbose_name = "entreprise contrôlée"
+        verbose_name_plural = "entreprises contrôlées"
         unique_together = ("evaluation_campaign", "siae")
         constraints = [
             models.CheckConstraint(
