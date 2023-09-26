@@ -143,6 +143,35 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         ) == (ASP_ID, siae.kind, SIRET_SIGNATURE, False, datetime.datetime(2020, 2, 29, 0, 0))
         assert (siae.source, siae.siret, siae.kind) == (Siae.SOURCE_ASP, SIRET, SiaeKind.ACI)
 
+    def test_get_creatable_and_deletable_afs(self):
+        existing_convention = SiaeConventionFactory(kind=SiaeKind.ACI, asp_id=2855)
+        # Get AF created by SiaeConventionFactory
+        deletable_af = existing_convention.financial_annexes.first()
+        financial_annex = importlib.import_module("itou.siaes.management.commands._import_siae.financial_annex")
+        to_create, to_delete = financial_annex.get_creatable_and_deletable_afs()
+        assert to_delete == [deletable_af]
+        # This list comes from the fixture file
+        assert sorted((af.number, af.start_at.isoformat(), af.end_at.isoformat()) for af in to_create) == [
+            ("ACI972180023A0M0", "2018-01-07T00:00:00+01:00", "2018-12-31T00:00:00+01:00"),
+            ("ACI972180023A0M1", "2018-01-07T00:00:00+01:00", "2018-12-31T00:00:00+01:00"),
+            ("ACI972180024A0M0", "2018-01-07T00:00:00+01:00", "2018-12-31T00:00:00+01:00"),
+            ("ACI972180024A0M1", "2018-01-07T00:00:00+01:00", "2018-12-31T00:00:00+01:00"),
+            ("ACI972190114A0M0", "2019-01-01T00:00:00+01:00", "2019-12-31T00:00:00+01:00"),
+            ("ACI972190114A0M1", "2019-01-01T00:00:00+01:00", "2019-12-31T00:00:00+01:00"),
+            ("ACI972190114A1M0", "2020-01-01T00:00:00+01:00", "2020-12-31T00:00:00+01:00"),
+            ("ACI972190114A1M1", "2020-01-01T00:00:00+01:00", "2020-12-31T00:00:00+01:00"),
+            ("ACI972190115A0M0", "2019-01-05T00:00:00+01:00", "2019-12-31T00:00:00+01:00"),
+            ("ACI972190115A0M1", "2019-01-05T00:00:00+01:00", "2019-12-31T00:00:00+01:00"),
+            ("ACI972190115A1M0", "2020-01-01T00:00:00+01:00", "2020-12-31T00:00:00+01:00"),
+            ("ACI972190115A1M1", "2020-01-01T00:00:00+01:00", "2020-12-31T00:00:00+01:00"),
+            ("ACI972190115A2M0", "2022-01-01T00:00:00+01:00", "2022-12-31T00:00:00+01:00"),
+            ("ACI972190115A2M1", "2022-01-01T00:00:00+01:00", "2022-12-31T00:00:00+01:00"),
+            ("ACI972190115A2M2", "2021-01-01T00:00:00+01:00", "2021-12-31T00:00:00+01:00"),
+            ("ACI972190115A2M3", "2021-01-01T00:00:00+01:00", "2021-12-31T00:00:00+01:00"),
+            ("ACI972200037A0M0", "2020-01-01T00:00:00+01:00", "2020-12-31T00:00:00+01:00"),
+            ("ACI972200038A0M0", "2020-01-01T00:00:00+01:00", "2020-12-31T00:00:00+01:00"),
+        ]
+
     def test_check_signup_possible_for_a_siae_without_members_but_with_auth_email(self):
         instance = lazy_import_siae_command()
         SiaeFactory(auth_email="tadaaa")
