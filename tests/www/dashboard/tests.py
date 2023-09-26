@@ -1404,10 +1404,7 @@ class EditUserEmailFormTest(TestCase):
         assert form.is_valid()
 
 
-class SwitchSiaeTest:
-    switch_view_name = None
-    switch_POST_key = None
-
+class SwitchSiaeTest(TestCase):
     def test_switch_siae(self):
         siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
@@ -1427,8 +1424,8 @@ class SwitchSiaeTest:
         assert response.context["request"].current_organization == siae
         assert response.context["siae"] == siae
 
-        url = reverse(self.switch_view_name)
-        response = self.client.post(url, data={self.switch_POST_key: related_siae.pk})
+        url = reverse("dashboard:switch_organization")
+        response = self.client.post(url, data={"organization_id": related_siae.pk})
         assert response.status_code == 302
 
         url = reverse("dashboard:index")
@@ -1465,8 +1462,8 @@ class SwitchSiaeTest:
         assert response.status_code == 200
         assert response.context["request"].current_organization == siae
 
-        url = reverse(self.switch_view_name)
-        response = self.client.post(url, data={self.switch_POST_key: related_siae.pk})
+        url = reverse("dashboard:switch_organization")
+        response = self.client.post(url, data={"organization_id": related_siae.pk})
         assert response.status_code == 302
 
         # User has indeed switched.
@@ -1490,8 +1487,8 @@ class SwitchSiaeTest:
 
         # Switching to that siae is not even possible in practice because
         # it does not even show up in the menu.
-        url = reverse(self.switch_view_name)
-        response = self.client.post(url, data={self.switch_POST_key: related_siae.pk})
+        url = reverse("dashboard:switch_organization")
+        response = self.client.post(url, data={"organization_id": related_siae.pk})
         assert response.status_code == 404
 
         # User is still working on the main active siae.
@@ -1499,11 +1496,6 @@ class SwitchSiaeTest:
         response = self.client.get(url)
         assert response.status_code == 200
         assert response.context["request"].current_organization == siae
-
-
-class NewSwitchSiaeTest(SwitchSiaeTest, TestCase):
-    switch_view_name = "dashboard:switch_organization"
-    switch_POST_key = "organization_id"
 
 
 class EditUserPreferencesTest(TestCase):
@@ -1639,10 +1631,7 @@ class EditUserPreferencesExceptionsTest(TestCase):
         assert response.status_code == 403
 
 
-class SwitchOrganizationTest:
-    switch_view_name = None
-    switch_POST_key = None
-
+class SwitchOrganizationTest(TestCase):
     def test_not_allowed_user(self):
         organization = prescribers_factories.PrescriberOrganizationFactory()
 
@@ -1651,26 +1640,26 @@ class SwitchOrganizationTest:
             PrescriberFactory(),
         ):
             self.client.force_login(user)
-            url = reverse(self.switch_view_name)
-            response = self.client.post(url, data={self.switch_POST_key: organization.pk})
+            url = reverse("dashboard:switch_organization")
+            response = self.client.post(url, data={"organization_id": organization.pk})
             assert response.status_code == 404
 
     def test_usual_case(self):
-        url = reverse(self.switch_view_name)
+        url = reverse("dashboard:switch_organization")
 
         user = PrescriberFactory()
         orga1 = prescribers_factories.PrescriberMembershipFactory(user=user).organization
         orga2 = prescribers_factories.PrescriberMembershipFactory(user=user).organization
         self.client.force_login(user)
 
-        response = self.client.post(url, data={self.switch_POST_key: orga1.pk})
+        response = self.client.post(url, data={"organization_id": orga1.pk})
         assert response.status_code == 302
 
         response = self.client.get(reverse("dashboard:index"))
         assert response.status_code == 200
         assert response.context["request"].current_organization == orga1
 
-        response = self.client.post(url, data={self.switch_POST_key: orga2.pk})
+        response = self.client.post(url, data={"organization_id": orga2.pk})
         assert response.status_code == 302
 
         response = self.client.get(reverse("dashboard:index"))
@@ -1678,15 +1667,7 @@ class SwitchOrganizationTest:
         assert response.context["request"].current_organization == orga2
 
 
-class NewSwitchOrganizationTest(SwitchOrganizationTest, TestCase):
-    switch_view_name = "dashboard:switch_organization"
-    switch_POST_key = "organization_id"
-
-
-class SwitchInstitutionTest:
-    switch_view_name = None
-    switch_POST_key = None
-
+class SwitchInstitutionTest(TestCase):
     def test_not_allowed_user(self):
         institution = InstitutionFactory()
 
@@ -1697,36 +1678,31 @@ class SwitchInstitutionTest:
             InstitutionMembershipFactory().user,
         ):
             self.client.force_login(user)
-            url = reverse(self.switch_view_name)
-            response = self.client.post(url, data={self.switch_POST_key: institution.pk})
+            url = reverse("dashboard:switch_organization")
+            response = self.client.post(url, data={"organization_id": institution.pk})
             assert response.status_code == 404
 
     def test_usual_case(self):
-        url = reverse(self.switch_view_name)
+        url = reverse("dashboard:switch_organization")
 
         user = LaborInspectorFactory()
         institution1 = InstitutionMembershipFactory(user=user).institution
         institution2 = InstitutionMembershipFactory(user=user).institution
         self.client.force_login(user)
 
-        response = self.client.post(url, data={self.switch_POST_key: institution1.pk})
+        response = self.client.post(url, data={"organization_id": institution1.pk})
         assert response.status_code == 302
 
         response = self.client.get(reverse("dashboard:index"))
         assert response.status_code == 200
         assert response.context["request"].current_organization == institution1
 
-        response = self.client.post(url, data={self.switch_POST_key: institution2.pk})
+        response = self.client.post(url, data={"organization_id": institution2.pk})
         assert response.status_code == 302
 
         response = self.client.get(reverse("dashboard:index"))
         assert response.status_code == 200
         assert response.context["request"].current_organization == institution2
-
-
-class NewSwitchInstitutionTest(SwitchInstitutionTest, TestCase):
-    switch_view_name = "dashboard:switch_organization"
-    switch_POST_key = "organization_id"
 
 
 TOKEN_MENU_STR = "Accès aux APIs"
