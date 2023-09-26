@@ -36,5 +36,5 @@ def test_management_command_wet_run(command, snapshot):
     assert command.stdout.getvalue() == snapshot
 
 
-def test_management_command_name(faker):
+def test_management_command_name():
     call_command("archive_employee_records")
