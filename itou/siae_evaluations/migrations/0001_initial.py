@@ -118,7 +118,8 @@ class Migration(migrations.Migration):
                 ("reminder_sent_at", models.DateTimeField(blank=True, null=True, verbose_name="rappel envoyé le")),
             ],
             options={
-                "verbose_name": "entreprise",
+                "verbose_name": "entreprise contrôlée",
+                "verbose_name_plural": "entreprises contrôlées",
                 "unique_together": {("evaluation_campaign", "siae")},
             },
         ),
