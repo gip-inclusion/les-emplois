@@ -375,7 +375,10 @@ class Command(BaseCommand):
         populate_table(prolongations.TABLE, batch_size=1000, querysets=[queryset])
 
     def populate_prolongation_requests(self):
-        queryset = ProlongationRequest.objects.select_related("prolongation").all()
+        queryset = ProlongationRequest.objects.select_related(
+            "prolongation",
+            "deny_information",
+        ).all()
         populate_table(prolongation_requests.TABLE, batch_size=1000, querysets=[queryset])
 
     def populate_institutions(self):
