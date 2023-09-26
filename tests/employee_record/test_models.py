@@ -191,11 +191,16 @@ class EmployeeRecordModelTest(TestCase):
                 self.faker.date_time_between(start_date="-1y", end_date="-6M", tzinfo=datetime.UTC),
                 self.faker.date_time_between(start_date="-6M", tzinfo=datetime.UTC),
             ],
+            [
+                self.faker.date_time_between(start_date="-1y", end_date="-1M", tzinfo=datetime.UTC),
+                self.faker.date_time_between(start_date="-1M", tzinfo=datetime.UTC),
+            ],
         )
-        for expired, created_at in parameters:
+        for expired, created_at, updated_at in parameters:
             EmployeeRecordFactory(
                 job_application__approval__expired=expired,
                 created_at=created_at,
+                updated_at=updated_at,
             )
 
         assert EmployeeRecord.objects.archivable().count() == 1

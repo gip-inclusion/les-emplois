@@ -32,10 +32,24 @@ class EmployeeRecordFactory(BareEmployeeRecordFactory):
     approval_number = factory.SelfAttribute(".job_application.approval.number")
     siret = factory.SelfAttribute(".job_application.to_siae.siret")
 
+    @classmethod
+    def _create(cls, model_class, *args, **kwargs):
+        auto_now_desactivated = []
+        for field in model_class._meta.get_fields():
+            if getattr(field, "auto_now", False) and kwargs.get(field.name):
+                field.auto_now = False
+                auto_now_desactivated.append(field)
+        try:
+            return super()._create(model_class, *args, **kwargs)
+        finally:
+            for field in auto_now_desactivated:
+                field.auto_now = True
+
     class Params:
         archivable = factory.Trait(
             job_application__approval__expired=True,
             created_at=factory.Faker("date_time_between", end_date="-6M", tzinfo=datetime.UTC),
+            updated_at=factory.Faker("date_time_between", end_date="-3M", tzinfo=datetime.UTC),
         )
         orphan = factory.Trait(asp_id=0)
         with_batch_information = factory.Trait(
