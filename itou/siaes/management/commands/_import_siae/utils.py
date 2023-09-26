@@ -353,11 +353,14 @@ def get_fluxiae_df(
     if parse_dates:
         kwargs["parse_dates"] = parse_dates
 
-    # Removes warnings when autonatically parsing dates with pandas.read_csv
+    # Removes warnings when automatically parsing dates with pandas.read_csv
     # ex: UserWarning: Parsing '30/04/2023' in DD/MM/YYYY format. Provide format ...
     #     ... or specify infer_datetime_format=True for consistent parsing.
     # See: https://pandas.pydata.org/docs/reference/api/pandas.read_csv.html
     kwargs["infer_datetime_format"] = infer_datetime_format
+    # But when guessing, we are more likely to end up with European style dates than American
+    # in ASP files
+    kwargs["dayfirst"] = True
 
     df = pd.read_csv(
         filename,
