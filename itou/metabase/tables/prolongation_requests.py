@@ -33,6 +33,12 @@ TABLE.add_columns(
             "fn": lambda o: get_choice(choices=ProlongationRequestStatus.choices, key=o.status),
         },
         {
+            "name": "motif_de_refus",
+            "type": "varchar",
+            "comment": "Motif de refus de la demande",
+            "fn": lambda o: o.deny_information.reason,
+        },
+        {
             "name": "date_de_demande",
             "type": "date",
             "comment": "Date de la demande",

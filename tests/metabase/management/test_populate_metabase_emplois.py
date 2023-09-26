@@ -20,6 +20,7 @@ from tests.analytics.factories import DatumFactory, StatsDashboardVisitFactory
 from tests.approvals.factories import (
     ApprovalFactory,
     PoleEmploiApprovalFactory,
+    ProlongationRequestDenyInformationFactory,
     ProlongationWithRequestFactory,
 )
 from tests.eligibility.factories import EligibilityDiagnosisFactory
@@ -607,6 +608,7 @@ def test_populate_prolongations():
                 prolongation.declared_by_siae_id,
                 prolongation.validated_by_id,
                 prolongation.prescriber_organization_id,
+                prolongation.created_at.date(),
                 prolongation_request.pk,
                 datetime.date(2023, 2, 1),
             ),
@@ -619,6 +621,9 @@ def test_populate_prolongations():
 def test_populate_prolongation_requests():
     prolongation = ProlongationWithRequestFactory()
     prolongation_request = prolongation.request
+
+    deny_information = ProlongationRequestDenyInformationFactory.build(request=None)
+    prolongation_request.deny(prolongation_request.validated_by, deny_information)
 
     num_queries = 1  # Count prolongation_requests
     num_queries += 1  # COMMIT Queryset counts (autocommit mode)
@@ -649,6 +654,7 @@ def test_populate_prolongation_requests():
                 prolongation_request.prescriber_organization_id,
                 prolongation.pk,
                 prolongation_request.get_status_display(),
+                str(deny_information.reason),
                 prolongation_request.created_at.date(),
                 prolongation_request.processed_at,
                 prolongation_request.processed_by_id,
