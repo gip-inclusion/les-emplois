@@ -185,26 +185,27 @@ class EmployeeRecordModelTest(TestCase):
         assert result.id == employee_record.id
 
     def test_archivable(self):
-        # note (fV): test updated because prolongation validity period has changed (impacting approval validity dates)
         parameters = itertools.product(
             [False, True],
-            [
-                self.faker.date_time_between(start_date="-1y", end_date="-3M", tzinfo=datetime.UTC),
-                self.faker.date_time_between(start_date="-3M", tzinfo=datetime.UTC),
-            ],
             [
                 self.faker.date_time_between(start_date="-1y", end_date="-6M", tzinfo=datetime.UTC),
                 self.faker.date_time_between(start_date="-6M", tzinfo=datetime.UTC),
             ],
         )
-        for expired, end_at, created_at in parameters:
+        for expired, created_at in parameters:
             EmployeeRecordFactory(
                 job_application__approval__expired=expired,
-                job_application__approval__end_at=end_at,
                 created_at=created_at,
             )
 
-        assert EmployeeRecord.objects.archivable().count() == 2
+        assert EmployeeRecord.objects.archivable().count() == 1
+
+    def test_archivable_with_archived_employee_record(self):
+        EmployeeRecordFactory(
+            status=Status.ARCHIVED,
+            archivable=True,
+        )
+        assert EmployeeRecord.objects.archivable().count() == 0
 
 
 @pytest.mark.parametrize(
