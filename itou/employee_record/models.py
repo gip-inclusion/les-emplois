@@ -135,7 +135,8 @@ class EmployeeRecordQuerySet(models.QuerySet):
             )
             .filter(
                 approval_is_valid=False,
-                created_at__lt=timezone.now() - relativedelta(months=6),  # Keep them at least 6 months
+                created_at__lt=timezone.now() - relativedelta(months=6),  # 6-months grace period if recently created
+                updated_at__lt=timezone.now() - relativedelta(months=1),  # 1-month grace period if recently updated
             )
         )
 
