@@ -356,39 +356,36 @@ class ApplicationJobsForm(forms.ModelForm):
             )
 
 
-class SubmitJobApplicationForm(forms.ModelForm):
+class SubmitJobApplicationForm(forms.Form):
     """
     Submit a job application to an SIAE.
     """
 
-    resume_link = forms.URLField(
-        label="Curriculum Vitae (CV)",
-        required=False,
-    )
-
-    class Meta:
-        model = JobApplication
-        fields = ["selected_jobs", "message", "resume_link"]
-        widgets = {"selected_jobs": forms.CheckboxSelectMultiple()}
-        labels = {"selected_jobs": "Métiers recherchés"}
-
     def __init__(self, siae, user, *args, **kwargs):
         self.siae = siae
         super().__init__(*args, **kwargs)
-        self.fields["selected_jobs"].queryset = siae.job_description_through.filter(is_active=True)
+        self.fields.update(forms.fields_for_model(JobApplication, fields=["selected_jobs", "message", "resume_link"]))
+        selected_jobs = self.fields["selected_jobs"]
+        selected_jobs.queryset = siae.job_description_through.filter(is_active=True)
+        selected_jobs.widgets = forms.CheckboxSelectMultiple()
+        selected_jobs.label = "Métiers recherchés"
 
-        self.fields["message"].required = not user.is_siae_staff
-        self.fields["message"].widget.attrs["placeholder"] = ""
+        resume_link = self.fields["resume_link"]
+        resume_link.label = "Curriculum Vitae (CV)"
+
+        message = self.fields["message"]
+        message.required = not user.is_siae_staff
+        message.widget.attrs["placeholder"] = ""
         if user.is_job_seeker:
-            self.fields["message"].label = "Message à l’employeur"
+            message.label = "Message à l’employeur"
             help_text = "Message obligatoire à destination de l’employeur et non modifiable après l’envoi."
         elif user.is_siae_staff:
-            self.fields["message"].label = "Message d’information"
+            message.label = "Message d’information"
             help_text = "Ce message ne sera plus modifiable après l’envoi et une copie sera transmise au candidat."
         else:
-            self.fields["message"].label = "Message à l’employeur (avec copie transmise au candidat)"
+            message.label = "Message à l’employeur (avec copie transmise au candidat)"
             help_text = "Message obligatoire et non modifiable après l’envoi."
-        self.fields["message"].help_text = help_text
+        message.help_text = help_text
 
     def clean_resume_link(self):
         resume_link = self.cleaned_data.get("resume_link")

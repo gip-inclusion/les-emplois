@@ -1037,12 +1037,14 @@ class ApplicationResumeView(ApplicationBaseView):
             )
         if self.form.is_valid():
             # Fill the job application with the required information
-            job_application = self.form.save(commit=False)
-            job_application.job_seeker = self.job_seeker
-            job_application.to_siae = self.siae
-
-            job_application.sender = request.user
-            job_application.sender_kind = request.user.kind
+            job_application = JobApplication(
+                job_seeker=self.job_seeker,
+                to_siae=self.siae,
+                sender=request.user,
+                sender_kind=request.user.kind,
+                message=self.form.cleaned_data["message"],
+                resume_link=self.form.cleaned_data["resume_link"],
+            )
             if request.user.is_prescriber:
                 job_application.sender_prescriber_organization = request.current_organization
             if request.user.is_siae_staff:
