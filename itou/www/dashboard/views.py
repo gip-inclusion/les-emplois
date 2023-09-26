@@ -338,56 +338,6 @@ def switch_organization(request):
     return HttpResponseRedirect(reverse("dashboard:index"))
 
 
-# TODO(xfernandez): remove those switch_xxx views in a week when
-# most users will have reloaded their pages
-@login_required
-@require_POST
-def switch_siae(request):
-    """
-    Switch to the dashboard of another SIAE of the same SIREN.
-    """
-    dashboard_url = reverse_lazy("dashboard:index")
-
-    pk = request.POST["siae_id"]
-    queryset = Siae.objects.active_or_in_grace_period().member_required(request.user)
-    siae = get_object_or_404(queryset, pk=pk)
-    request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = siae.pk
-
-    return HttpResponseRedirect(dashboard_url)
-
-
-@login_required
-@require_POST
-def switch_prescriber_organization(request):
-    """
-    Switch prescriber organization for a user with multiple memberships.
-    """
-    dashboard_url = reverse_lazy("dashboard:index")
-
-    pk = request.POST["prescriber_organization_id"]
-    queryset = PrescriberOrganization.objects.member_required(request.user)
-    prescriber_organization = get_object_or_404(queryset, pk=pk)
-    request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = prescriber_organization.pk
-
-    return HttpResponseRedirect(dashboard_url)
-
-
-@login_required
-@require_POST
-def switch_institution(request):
-    """
-    Switch prescriber organization for a user with multiple memberships.
-    """
-    dashboard_url = reverse_lazy("dashboard:index")
-
-    pk = request.POST["institution_id"]
-    queryset = Institution.objects.member_required(request.user)
-    institution = get_object_or_404(queryset, pk=pk)
-    request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = institution.pk
-
-    return HttpResponseRedirect(dashboard_url)
-
-
 @login_required
 def edit_user_notifications(request, template_name="dashboard/edit_user_notifications.html"):
     if not request.user.is_siae_staff:
