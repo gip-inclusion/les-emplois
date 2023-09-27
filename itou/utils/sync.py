@@ -23,9 +23,16 @@ class DiffItem:
     db_obj: Model | None = None
 
 
+def hash_from_keys(keys, obj):
+    getattr if isinstance(obj, dict) else lambda o, k: getattr(o, k)
+    if isinstance(keys, str):
+        return obj[keys]
+    return ":".join(str(obj[k]) for k in keys)
+
+
 def yield_sync_diff(
     collection: list[dict],
-    collection_key: str,
+    collection_key: str | list[str],
     queryset: QuerySet,
     queryset_key: str,
     compared_keys: list[tuple[str | Callable, str]],
@@ -38,7 +45,7 @@ def yield_sync_diff(
     This function is thus handy as soon as we synchronize a DB collection with an external source of data.
     """
     label = queryset.model.__name__
-    data_map = {c[collection_key]: c for c in collection}
+    data_map = {hash_from_keys(collection_key, c): c for c in collection}
     db_map = {getattr(obj, queryset_key): obj for obj in queryset.only(*[db_key for _, db_key in compared_keys])}
 
     coll_codes = set(data_map.keys())

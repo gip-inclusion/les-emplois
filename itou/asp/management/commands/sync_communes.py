@@ -48,7 +48,7 @@ class Command(BaseCommand):
             communes_from_csv,
             "code",
             Commune.objects.all(),
-            "code",
+            ("code", "start_date"),
             [
                 ("name", "name"),
                 ("start_date", "start_date"),
