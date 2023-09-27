@@ -22,6 +22,7 @@ from itou.approvals.models import Approval, PoleEmploiApproval
 from itou.asp.models import (
     AllocationDuration,
     Commune,
+    CommuneV2,
     Country,
     EducationLevel,
     EmployerType,
@@ -1049,6 +1050,14 @@ class JobSeekerProfile(models.Model):
         blank=True,
         on_delete=models.RESTRICT,
     )
+    birth_place_v2 = models.ForeignKey(
+        "asp.CommuneV2",
+        verbose_name="commune de naissance (v2)",
+        related_name="jobseeker_profiles_born_here_v2",
+        null=True,
+        blank=True,
+        on_delete=models.RESTRICT,
+    )
     birth_country = models.ForeignKey(
         "asp.Country",
         verbose_name="pays de naissance",
@@ -1166,6 +1175,14 @@ class JobSeekerProfile(models.Model):
     hexa_commune = models.ForeignKey(
         Commune,
         verbose_name="commune (ref. ASP)",
+        null=True,
+        blank=True,
+        on_delete=models.RESTRICT,
+    )
+
+    hexa_commune_v2 = models.ForeignKey(
+        CommuneV2,
+        verbose_name="commune (ref. ASP V2)",
         null=True,
         blank=True,
         on_delete=models.RESTRICT,

@@ -444,6 +444,24 @@ class CommuneV2(PrettyPrintMixin, AbstractPeriod):
         indexes = [GinIndex(fields=["name"], name="aps_communes_v2_name_gin_trgm", opclasses=["gin_trgm_ops"])]
 
 
+def build_last_active_commune_v2_index():
+    """Enables us to fetch the latest "active" commune very efficiently through a preloaded map.
+    Will be removed in a very near commit (same PR)
+    """
+    from collections import defaultdict
+    from itertools import groupby
+
+    _commune_index = defaultdict(list)
+    for code, group in groupby(CommuneV2.objects.all(), key=lambda x: x.code):
+        prev_lst = _commune_index[code]
+        _commune_index[code] = sorted(
+            prev_lst + list(group),
+            key=lambda x: (x.end_date is None, x.end_date),
+        )
+
+    return {k: v[-1] for k, v in _commune_index.items()}
+
+
 class Department(PrettyPrintMixin, AbstractPeriod):
     """
     INSEE department code
