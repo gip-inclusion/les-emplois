@@ -1172,20 +1172,13 @@ class JobSeekerProfile(models.Model):
     hexa_lane_name = models.CharField(max_length=120, verbose_name="nom de la voie", blank=True)
     hexa_additional_address = models.CharField(max_length=32, verbose_name="complément d'adresse", blank=True)
     hexa_post_code = models.CharField(max_length=6, verbose_name="code postal", blank=True)
-    hexa_commune = models.ForeignKey(
-        Commune,
-        verbose_name="commune (ref. ASP)",
-        null=True,
-        blank=True,
-        on_delete=models.RESTRICT,
-    )
-
     hexa_commune_v2 = models.ForeignKey(
         CommuneV2,
         verbose_name="commune (ref. ASP V2)",
         null=True,
         blank=True,
         on_delete=models.RESTRICT,
+        db_column="hexa_commune_id",
     )
 
     pe_obfuscated_nir = models.CharField(
