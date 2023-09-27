@@ -428,6 +428,22 @@ class Commune(PrettyPrintMixin, AbstractPeriod):
         return f"0{self.code[0:2]}"
 
 
+class CommuneV2(PrettyPrintMixin, AbstractPeriod):
+    code = models.CharField(max_length=5, verbose_name="code commune INSEE", db_index=True)
+    name = models.CharField(max_length=50, verbose_name="nom de la commune")
+
+    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
+
+    city = models.ForeignKey("cities.City", on_delete=models.SET_NULL, verbose_name="ville INSEE", null=True)
+
+    objects = CommuneQuerySet.as_manager()
+
+    class Meta:
+        verbose_name = "commune v2"
+        unique_together = ["code", "start_date"]
+        indexes = [GinIndex(fields=["name"], name="aps_communes_v2_name_gin_trgm", opclasses=["gin_trgm_ops"])]
+
+
 class Department(PrettyPrintMixin, AbstractPeriod):
     """
     INSEE department code
