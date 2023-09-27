@@ -402,6 +402,7 @@ class ProlongationCommonAdmin(ItouModelAdmin):
     )
     inlines = (PkSupportRemarkInline,)
     list_select_related = ("approval", "declared_by", "validated_by")
+    search_fields = ["declared_by_siae__siret", "approval__number"]
 
     def get_list_display(self, request):
         return self.list_display + ("created_at",)  # Put the audit fields after the one added in subclasses
