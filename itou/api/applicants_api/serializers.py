@@ -7,8 +7,8 @@ class ApplicantSerializer(serializers.ModelSerializer):
     """Applicant serializer: job seeker field of a job application"""
 
     civilite = serializers.SerializerMethodField()
-    nom = serializers.CharField(source="first_name")
-    prenom = serializers.CharField(source="last_name")
+    nom = serializers.CharField(source="last_name")
+    prenom = serializers.CharField(source="first_name")
     courriel = serializers.CharField(source="email")
     telephone = serializers.CharField(source="phone")
     adresse = serializers.CharField(source="address_line_1")
