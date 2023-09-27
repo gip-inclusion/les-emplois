@@ -8,10 +8,8 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunSQL(
-            # TODO(francoisfreitag): Drop IF NOT EXISTS after migration is applied on production.
             """
             CREATE INDEX
-            IF NOT EXISTS
             account_emailaddress_email_upper
             ON account_emailaddress (UPPER(email) text_pattern_ops);
             """
