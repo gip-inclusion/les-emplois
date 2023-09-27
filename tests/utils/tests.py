@@ -4,6 +4,7 @@ import functools
 import importlib
 import json
 import uuid
+from datetime import date
 
 import faker
 import pytest
@@ -1428,6 +1429,50 @@ def test_yield_sync_diff():
         '\tADDED {"key": "HELLO", "label": "nouvel objet stylé !"}',
         "count=1 label=Rome removed by collection",
         "\tREMOVED Vas-y francky (BAZ)",
+    ]
+
+
+def test_yield_sync_diff_composite_keys():
+    from itou.asp.models import Commune
+
+    Commune.objects.all().delete()  # remove the communes from the fixtures
+
+    # 'code' isn't unique, only a combination of code and start_date is.
+    Commune(code="75000", name="PARIS", start_date=date(1900, 1, 1), end_date=date(1999, 12, 31)).save()
+    Commune(code="75000", name="PARIS", start_date=date(2000, 1, 1)).save()
+
+    lines = [
+        diff_item.label
+        for diff_item in yield_sync_diff(
+            [
+                {
+                    "key": "75000",
+                    "name": "PARIS",
+                    "start": date(1900, 1, 1),
+                    "end": date(1969, 12, 31),
+                },
+                {
+                    "code": "75000",
+                    "name": "PARIS",
+                    "start": date(1970, 1, 1),
+                    "end": date(1999, 12, 31),
+                },
+                {"code": "75000", "name": "PARIS_2", "start_date": date(2000, 1, 1)},
+            ],
+            ("key", "start"),
+            Commune.objects.all(),
+            ("code", "start_date"),
+            [("name", "name"), ("start", "start_date"), ("end", "end_date")],
+        )
+    ]
+    assert lines == [
+        "count=1 label=Commune had the same key in collection and queryset",
+        "\tCHANGED end_date=1999-12-31 changed to value=1969-12-31",
+        "count=2 label=Commune added by collection",
+        '\tADDED {"code": "75000", "name": "PARIS", "start": "1970-01-01", "end": ' '"1999-12-31"}',
+        '\tADDED {"code": "75000", "name": "PARIS_2", "start_date": "2000-01-01"}',
+        "count=1 label=Commune removed by collection",
+        "\tREMOVED PARIS",
     ]
 
 

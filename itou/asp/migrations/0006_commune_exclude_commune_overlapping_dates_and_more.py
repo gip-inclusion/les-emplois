@@ -3,6 +3,7 @@
 import django.contrib.postgres.constraints
 import django.contrib.postgres.fields.ranges
 from django.db import migrations
+
 import itou.utils.models
 
 

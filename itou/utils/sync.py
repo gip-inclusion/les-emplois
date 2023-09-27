@@ -23,11 +23,23 @@ class DiffItem:
     db_obj: Model | None = None
 
 
+def get_multiple_value(obj, keys):
+    def accessor(key):
+        if isinstance(obj, dict):
+            return obj.get(key)
+        return getattr(obj, key)
+
+    if isinstance(keys, str):
+        return accessor(keys)
+
+    return ":".join(str(accessor(k)) for k in keys)
+
+
 def yield_sync_diff(
     collection: list[dict],
-    collection_key: str,
+    collection_key: str | list[str],
     queryset: QuerySet,
-    queryset_key: str,
+    queryset_key: str | list[str],
     compared_keys: list[tuple[str | Callable, str]],
 ):
     """An utility function to yield human readable differences between:
@@ -38,11 +50,13 @@ def yield_sync_diff(
     This function is thus handy as soon as we synchronize a DB collection with an external source of data.
     """
     label = queryset.model.__name__
-    data_map = {c[collection_key]: c for c in collection}
-    db_map = {getattr(obj, queryset_key): obj for obj in queryset.only(*[db_key for _, db_key in compared_keys])}
+    data_map = {get_multiple_value(c, collection_key): c for c in collection}
+    db_map = {
+        get_multiple_value(obj, queryset_key): obj for obj in queryset.only(*[db_key for _, db_key in compared_keys])
+    }
 
     coll_codes = set(data_map.keys())
-    db_codes = set(queryset.values_list(queryset_key, flat=True))
+    db_codes = set(db_map.keys())
 
     added_by_coll = coll_codes - db_codes
     already_there = coll_codes.intersection(db_codes)
