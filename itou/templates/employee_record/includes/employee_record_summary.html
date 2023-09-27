@@ -6,10 +6,10 @@
         <ul class="list-unstyled">
             <li>{{ employee.get_title_display }} {{ employee.get_full_name }}</li>
             <li>Né(e) le : {{ employee.birthdate }}</li>
-            {% if employee.birth_place %}
-                <li>À : {{ employee.birth_place }} ({{ employee.birth_place.department_code }})</li>
+            {% if profile.birth_place %}
+                <li>À : {{ profile.birth_place }} ({{ profile.birth_place.department_code }})</li>
             {% endif %}
-            <li>Pays de naissance : {{ employee.birth_country }}</li>
+            <li>Pays de naissance : {{ profile.birth_country }}</li>
         </ul>
 
         <hr class="my-3 my-md-5">

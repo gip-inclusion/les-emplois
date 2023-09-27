@@ -22,6 +22,15 @@ class SummaryEmployeeRecordsTest(TestCase):
         response = self.client.get(self.url)
         assert response.status_code == 200
 
+    def test_check_job_seeker_infos(self):
+        # Must have access
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        profile = self.job_application.job_seeker.jobseeker_profile
+        self.assertContains(
+            response, f"<li>À : {profile.birth_place} ({profile.birth_place.department_code})</li>", count=1
+        )
+
     def test_asp_batch_file_infos(self):
         self.client.force_login(self.user)
         response = self.client.get(self.url)
