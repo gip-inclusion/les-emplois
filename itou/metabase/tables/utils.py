@@ -4,7 +4,15 @@ from operator import attrgetter
 
 from django.conf import settings
 from django.db.models import JSONField
-from django.db.models.fields import AutoField, CharField, DateField, PositiveIntegerField, TextField, UUIDField
+from django.db.models.fields import (
+    AutoField,
+    CharField,
+    DateField,
+    DateTimeField,
+    PositiveIntegerField,
+    TextField,
+    UUIDField,
+)
 from django.db.models.fields.related import ForeignKey
 from django.utils import timezone
 
@@ -46,6 +54,8 @@ def get_field_type_from_field(field):
         return "integer"
     if isinstance(field, UUIDField):
         return "uuid"
+    if isinstance(field, DateTimeField):
+        return "timestamp with time zone"
     if isinstance(field, DateField):
         return "date"
     if isinstance(field, ForeignKey):
