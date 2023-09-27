@@ -125,8 +125,8 @@ class ApplicantsAPITest(APITestCase):
         ):
             assert {
                 "civilite": job_seeker.title,
-                "nom": job_seeker.first_name,
-                "prenom": job_seeker.last_name,
+                "nom": job_seeker.last_name,
+                "prenom": job_seeker.first_name,
                 "courriel": job_seeker.email,
                 "telephone": job_seeker.phone,
                 "adresse": job_seeker.address_line_1,
