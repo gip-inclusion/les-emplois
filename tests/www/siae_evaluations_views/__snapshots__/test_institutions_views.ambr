@@ -6,8 +6,8 @@
               
               
                   
-                      <p class="badge badge-pill badge-accent-03 text-primary float-right">
-                          <i class="ri-arrow-right-circle-line mr-1"></i> Notification à faire
+                      <p class="badge rounded-pill bg-accent-03 text-primary float-end">
+                          <i class="ri-arrow-right-circle-line me-1"></i> Notification à faire
                       </p>
                   
               
@@ -22,7 +22,7 @@
               
                   
                   
-                      <p class="badge badge-pill badge-emploi float-right">
+                      <p class="badge rounded-pill bg-emploi float-end">
                           
                           En attente
                       </p>
@@ -39,8 +39,8 @@
               
               
                   
-                      <p class="badge badge-pill badge-danger float-right">
-                          <i class="ri-close-circle-line mr-1"></i> Résultat négatif
+                      <p class="badge rounded-pill bg-danger float-end">
+                          <i class="ri-close-circle-line me-1"></i> Résultat négatif
                       </p>
                   
               
@@ -54,8 +54,8 @@
           
               
               
-                  <p class="badge badge-pill badge-success float-right">
-                      <i class="ri-checkbox-circle-line mr-1"></i> Résultat positif
+                  <p class="badge rounded-pill bg-success float-end">
+                      <i class="ri-checkbox-circle-line me-1"></i> Résultat positif
                   </p>
               
           
@@ -69,8 +69,8 @@
               
               
                   
-                      <p class="badge badge-pill badge-accent-03 text-primary float-right">
-                          <i class="ri-arrow-right-circle-line mr-1"></i> Notification à faire
+                      <p class="badge rounded-pill bg-accent-03 text-primary float-end">
+                          <i class="ri-arrow-right-circle-line me-1"></i> Notification à faire
                       </p>
                   
               
@@ -85,8 +85,8 @@
               
               
                   
-                      <p class="badge badge-pill badge-accent-03 text-primary float-right">
-                          <i class="ri-arrow-right-circle-line mr-1"></i> Notification à faire
+                      <p class="badge rounded-pill bg-accent-03 text-primary float-end">
+                          <i class="ri-arrow-right-circle-line me-1"></i> Notification à faire
                       </p>
                   
               
@@ -99,7 +99,7 @@
   <div class="col-lg-3 col-md-3 col-4" id="state_of_evaluated_siae-1000">
           
               
-                  <p class="badge badge-pill badge-marche-light float-right">Phase contradictoire</p>
+                  <p class="badge rounded-pill bg-marche-light float-end">Phase contradictoire</p>
               
           
       </div>
@@ -110,7 +110,7 @@
   <div class="col-lg-3 col-md-3 col-4" id="state_of_evaluated_siae-1000">
           
               
-                  <p class="badge badge-pill badge-marche-light float-right">Phase contradictoire</p>
+                  <p class="badge rounded-pill bg-marche-light float-end">Phase contradictoire</p>
               
           
       </div>
@@ -121,7 +121,7 @@
   <div class="col-lg-3 col-md-3 col-4" id="state_of_evaluated_siae-1000">
           
               
-                  <p class="badge badge-pill badge-pilotage float-right">
+                  <p class="badge rounded-pill bg-pilotage float-end">
                       Phase contradictoire -
                       À traiter
                   </p>
@@ -137,7 +137,7 @@
               
                   
                   
-                      <p class="badge badge-pill badge-emploi float-right">
+                      <p class="badge rounded-pill bg-emploi float-end">
                           Phase contradictoire -
                           En attente
                       </p>
@@ -153,8 +153,8 @@
           
               
               
-                  <p class="badge badge-pill badge-success float-right">
-                      <i class="ri-checkbox-circle-line mr-1"></i> Résultat positif
+                  <p class="badge rounded-pill bg-success float-end">
+                      <i class="ri-checkbox-circle-line me-1"></i> Résultat positif
                   </p>
               
           
@@ -166,7 +166,7 @@
   <div class="col-lg-3 col-md-3 col-4" id="state_of_evaluated_siae-1000">
           
               
-                  <p class="badge badge-pill badge-pilotage float-right">En cours</p>
+                  <p class="badge rounded-pill bg-pilotage float-end">En cours</p>
               
           
       </div>
@@ -177,7 +177,7 @@
   <div class="col-lg-3 col-md-3 col-4" id="state_of_evaluated_siae-1000">
           
               
-                  <p class="badge badge-pill badge-pilotage float-right">
+                  <p class="badge rounded-pill bg-pilotage float-end">
                       
                       À traiter
                   </p>
@@ -193,7 +193,7 @@
               
                   
                   
-                      <p class="badge badge-pill badge-emploi float-right">
+                      <p class="badge rounded-pill bg-emploi float-end">
                           
                           En attente
                       </p>
@@ -210,7 +210,7 @@
               
                   
                   
-                      <p class="badge badge-pill badge-danger float-right">
+                      <p class="badge rounded-pill bg-danger float-end">
                           
                           Problème constaté
                       </p>
@@ -225,7 +225,7 @@
   <div class="col-lg-3 col-md-3 col-4" id="state_of_evaluated_siae-1000">
           
               
-                  <p class="badge badge-pill badge-pilotage float-right">
+                  <p class="badge rounded-pill bg-pilotage float-end">
                       
                       À traiter
                   </p>
@@ -241,8 +241,8 @@
               
               
                   
-                      <p class="badge badge-pill badge-accent-03 text-primary float-right">
-                          <i class="ri-arrow-right-circle-line mr-1"></i> Notification à faire
+                      <p class="badge rounded-pill bg-accent-03 text-primary float-end">
+                          <i class="ri-arrow-right-circle-line me-1"></i> Notification à faire
                       </p>
                   
               

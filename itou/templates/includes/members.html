@@ -1,7 +1,7 @@
 
 <div class="table-responsive-lg mt-3 mt-md-4">
     <table class="table">
-        <caption class="sr-only">Liste des collaborateurs</caption>
+        <caption class="visually-hidden">Liste des collaborateurs</caption>
         <thead>
             <tr>
                 <th scope="col">#</th>
@@ -18,7 +18,7 @@
                     <td>
                         {{ member.user.get_full_name }}
                         {% if member.user in active_admin_members %}
-                            <span class="badge badge-xs badge-pill badge-info" data-toggle="tooltip" title="Administrateur de la structure">admin</span>
+                            <span class="badge badge-xs rounded-pill bg-info" data-toggle="tooltip" title="Administrateur de la structure">admin</span>
                         {% endif %}
                     </td>
                     <td>

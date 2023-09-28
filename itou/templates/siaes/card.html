@@ -46,7 +46,7 @@
                     </div>
                 </div>
                 <div class="col-12 col-lg-4 order-1 order-lg-2 d-flex flex-column">
-                    <h2 class="sr-only">Actions rapides</h2>
+                    <h2 class="visually-hidden">Actions rapides</h2>
                     <div class="c-box mb-3 mb-lg-5{% if not siae.has_active_members %} bg-emploi-lightest border-info{% endif %}">
                         {% if not siae.has_active_members %}
                             <p class="mb-0">Cet employeur n'est pas inscrit, vous ne pouvez pas déposer de candidatures en ligne.</p>
@@ -68,27 +68,27 @@
                         <ul class="list-unstyled mb-0">
                             <li class="my-2">
                                 <div class="d-flex align-items-start">
-                                    <i class="ri-map-pin-2-line ri-xl mr-2"></i>
+                                    <i class="ri-map-pin-2-line ri-xl me-2"></i>
                                     <address class="font-weight-bold m-0">{{ siae.address_on_one_line }}</address>
                                 </div>
                             </li>
                             {% if siae.email %}
                                 <li class="my-2">
-                                    <i class="ri-mail-line ri-xl mr-2"></i>
+                                    <i class="ri-mail-line ri-xl me-2"></i>
                                     <a aria-label="Contact par mail" href="mailto:{{ siae.email }}" class="font-weight-bold">{{ siae.email }}</a>
                                 </li>
                             {% endif %}
 
                             {% if siae.phone %}
                                 <li class="my-2">
-                                    <i class="ri-phone-line ri-xl mr-2"></i>
+                                    <i class="ri-phone-line ri-xl me-2"></i>
                                     <a aria-label="Contact téléphonique" href="tel:{{ siae.phone|cut:" " }}" class="font-weight-bold">{{ siae.phone|format_phone }}</a>
                                 </li>
                             {% endif %}
 
                             {% if siae.website %}
                                 <li class="my-2">
-                                    <i class="ri-global-line ri-xl mr-2"></i>
+                                    <i class="ri-global-line ri-xl me-2"></i>
                                     <a aria-label="Site web (ouverture dans un nouvel onglet)" href="{{ siae.website }}" rel="noopener" target="_blank" class="font-weight-bold">{{ siae.website }}</a>
                                 </li>
                             {% endif %}
@@ -103,23 +103,23 @@
         <div class="s-tabs-01__container container">
             <div class="s-tabs-01__row row">
                 <div class="s-tabs-01__col col-12">
-                    <h2 class="sr-only" id="metiers-title">Métiers de la structure</h2>
+                    <h2 class="visually-hidden" id="metiers-title">Métiers de la structure</h2>
                     <ul class="s-tabs-01__nav nav nav-tabs" role="tablist" aria-labelledby="metiers-title">
                         <li class="nav-item" role="presentation">
                             <a id="recrutements-en-cours-tab" class="nav-link active" role="tab" href="#recrutements-en-cours" data-toggle="tab" aria-selected="true" aria-controls="recrutements-en-cours">
-                                Recrutement{{ active_jobs_descriptions|pluralizefr }} en cours <span class="badge badge-sm badge-primary badge-pill text-white ml-2">{{ active_jobs_descriptions|length }}</span>
+                                Recrutement{{ active_jobs_descriptions|pluralizefr }} en cours <span class="badge badge-sm bg-primary rounded-pill text-white ms-2">{{ active_jobs_descriptions|length }}</span>
                             </a>
                         </li>
                         {% if other_jobs_descriptions %}
                             <li class="nav-item" role="presentation">
                                 <a id="autres-metiers-tab" class="nav-link" role="tab" href="#autres-metiers" data-toggle="tab" aria-selected="false" aria-controls="autres-metiers">
-                                    Autre{{ other_jobs_descriptions|pluralizefr }} métier{{ other_jobs_descriptions|pluralizefr }} exercé{{ other_jobs_descriptions|pluralizefr }} <span class="badge badge-sm badge-pill badge-info-light text-dark ml-2">{{ other_jobs_descriptions|length }}</span>
+                                    Autre{{ other_jobs_descriptions|pluralizefr }} métier{{ other_jobs_descriptions|pluralizefr }} exercé{{ other_jobs_descriptions|pluralizefr }} <span class="badge badge-sm rounded-pill bg-info-light text-dark ms-2">{{ other_jobs_descriptions|length }}</span>
                                 </a>
                             </li>
                         {% endif %}
                         <li class="nav-item-dropdown dropdown" role="presentation">
                             <a class="nav-link dropdown-toggle" href="#" role="button" id="sTabs01DropdownMoreLink" data-toggle="dropdown" aria-expanded="false"><i class="ri-more-line"></i></a>
-                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="sTabs01DropdownMoreLink"></div>
+                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="sTabs01DropdownMoreLink"></div>
                         </li>
                     </ul>
                     <div class="tab-content">

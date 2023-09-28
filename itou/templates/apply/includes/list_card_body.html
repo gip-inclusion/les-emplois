@@ -31,7 +31,7 @@
                         <b>{{ job_application.sender_prescriber_organization.display_name }}</b>
                         {% if job_application.is_sent_by_authorized_prescriber %}
                             <br>
-                            <span class="badge badge-pill badge-sm badge-warning">Prescripteur habilité</span>
+                            <span class="badge rounded-pill badge-sm bg-warning">Prescripteur habilité</span>
                         {% endif %}
                     {% endif %}
                 {% endif %}
@@ -41,7 +41,7 @@
                     <b>{{ job_application.sender_siae.display_name }}</b>
                     {% if request.user.is_employer %}
                         <br>
-                        <span class="badge badge-pill badge-sm badge-info">
+                        <span class="badge rounded-pill badge-sm bg-info">
                             {% if job_application.origin == JobApplicationOrigin.PE_APPROVAL %}
                                 Import agrément Pôle emploi
                             {% else %}
@@ -52,13 +52,13 @@
                 {% endif %}
             </p>
         </div>
-        <div class="col-12 col-md-12 col-lg-4 pl-lg-0">
+        <div class="col-12 col-md-12 col-lg-4 ps-lg-0">
             <p class="font-weight-bold mb-1">Statut :</p>
             <p class="fs-sm card-text">
                 {% state_badge job_application %}
                 {% if job_application.has_suspended_approval %}
                     <br>
-                    <span class="badge badge-sm badge-pill badge-success-lighter text-success">
+                    <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                         <i class="ri-pass-pending-line" aria-hidden="true"></i>
                         PASS IAE valide (suspendu)
                     </span>

@@ -20,18 +20,18 @@
             {% if siae.is_subject_to_eligibility_rules %}
                 {% with approval=job_application.job_seeker.latest_common_approval %}
                     {% if approval %}
-                        <span class="badge badge-xs badge-pill {% if approval.state == 'EXPIRED' %} bg-emploi-light text-primary{% else %} badge-success-lighter text-success{% endif %}">
+                        <span class="badge badge-xs rounded-pill {% if approval.state == 'EXPIRED' %} bg-emploi-light text-primary{% else %} bg-success-lighter text-success{% endif %}">
                             <i class="{% if approval.state == 'EXPIRED' %}ri-pass-expired-line{% elif approval.state == 'SUSPENDED' %}ri-pass-pending-line{% else %}ri-pass-valid-line{% endif %}" aria-hidden="true"></i>
                             PASS IAE {{ approval.get_state_display|lower }}
                         </span>
                     {% else %}
                         {% if job_application.eligibility_diagnosis_by_siae_required %}
-                            <span class="badge badge-xs badge-pill badge-accent-02-lighter text-primary">
+                            <span class="badge badge-xs rounded-pill bg-accent-02-lighter text-primary">
                                 <i class="ri-error-warning-line" aria-hidden="true"></i>
                                 Éligibilité IAE à valider
                             </span>
                         {% else %}
-                            <span class="badge badge-xs badge-pill badge-success-lighter text-success">
+                            <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                                 <i class="ri-check-line" aria-hidden="true"></i>
                                 Éligible à l’IAE
                             </span>

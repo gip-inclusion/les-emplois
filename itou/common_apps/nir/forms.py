@@ -42,7 +42,7 @@ class JobSeekerNIRUpdateMixin:
 
         self.fields["lack_of_nir_reason"].label = "Sélectionner un motif"
         # This is a hack to easily tweak this field bootstrap form_group_class
-        self.fields["lack_of_nir_reason"].form_group_class = "form-group ml-4 collapse lack_of_nir_reason_group"
+        self.fields["lack_of_nir_reason"].form_group_class = "form-group ms-4 collapse lack_of_nir_reason_group"
 
         tally_url = get_tally_form_url("wzxQlg")
         if tally_form_query is not None:
@@ -117,7 +117,7 @@ class JobSeekerNIRUpdateMixin:
         return f"""
             <div class="alert alert-danger" role="alert">
                 <div class="row">
-                    <div class="col-auto pr-0">
+                    <div class="col-auto pe-0">
                         <i class="ri-information-line ri-xl text-danger"></i>
                     </div>
                     <div class="col">

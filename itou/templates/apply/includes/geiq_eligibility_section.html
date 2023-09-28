@@ -16,7 +16,7 @@
 <section class="s-section">
     <div class="s-section__container container">
         <div class="c-box">
-            <div class="col-12 pl-lg-0">
+            <div class="col-12 ps-lg-0">
                 <div class="container">
                     <div class="row">
                         <div class="col-7 pt-4">
@@ -33,7 +33,7 @@
                             </p>
                             <form id="check_geiq_eligibility" hx-target="#geiq_form">
                                 {% csrf_token %}
-                                {% bootstrap_field form.choice form_check_class="form-check-inline mr-4" show_label=False %}
+                                {% bootstrap_field form.choice form_check_class="form-check-inline me-4" show_label=False %}
                             </form>
                         </div>
                         <div class="col">{% include "apply/includes/geiq/legislative_text_link.html" %}</div>
@@ -45,7 +45,7 @@
                                 {% csrf_token %}
                                 <div id="geiq_form">
                                     <hr>
-                                    <div class="text-right">
+                                    <div class="text-end">
                                         <a href="{{ back_url }}" class="btn btn-link mb-2">Annuler</a>
                                     </div>
                                 </div>

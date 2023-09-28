@@ -98,10 +98,10 @@
                             {% for job_application in job_applications_page %}
                                 <div class="c-card card my-3 my-md-4 has-links-inside">
                                     {% include "apply/includes/list_card_body_siae.html" %}
-                                    <div class="card-footer text-right bg-light">
+                                    <div class="card-footer text-end bg-light">
                                         {% if job_application.pending_for_weeks >= job_application.WEEKS_BEFORE_CONSIDERED_OLD %}
                                             <span class="d-inline-flex align-items-center text-warning fs-sm">
-                                                <i class="ri-time-line ri-lg mr-1"></i>
+                                                <i class="ri-time-line ri-lg me-1"></i>
                                                 En attente de réponse depuis {{ job_application.pending_for_weeks }} semaines.
                                             </span>
                                         {% endif %}

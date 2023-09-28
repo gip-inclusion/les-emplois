@@ -1,13 +1,13 @@
 {# Transfer job application to other SIAE #}
 {% if request.organizations|length != 1 %}
     <div class="text-center">
-        <button id="transfer_to_button" class="btn btn-link dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown">
+        <button id="transfer_to_button" class="btn btn-link dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false" data-bs-toggle="dropdown">
             Transférer cette candidature vers
         </button>
         <div class="dropdown-menu" aria-labelledby="transfer_to_button">
             {% for siae in request.organizations %}
                 {% if siae != request.current_organization %}
-                    <a class="dropdown-item" data-toggle="modal" data-target="#transfer_confirmation_modal_{{ siae.pk }}">
+                    <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#transfer_confirmation_modal_{{ siae.pk }}">
                         <div>
                             <span class="badge badge-pill badge-primary">{{ siae.kind }}</span> <span>{{ siae.display_name }}</span>
                         </div>
@@ -30,7 +30,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="modal_title">Confirmation du transfert</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+                            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Fermer">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -41,7 +41,7 @@
                             {% include "siaes/includes/_siae_info.html" %}
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Retour</button>
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Retour</button>
                             <form method="post" action="{% url 'apply:transfer' job_application_id=job_application.id %}">
                                 {% csrf_token %}
                                 <input type="hidden" name="target_siae_id" value="{{ siae.pk }}" />

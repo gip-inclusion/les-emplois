@@ -214,7 +214,7 @@
                                   <hr/>
                                   <p class="fs-xs">* champ obligatoire</p>
                                   <div class="form-group">
-                                      <div class="text-right">
+                                      <div class="text-end">
                                           
                                               <a class="btn btn-link btn-outline-primary" href="/approvals/prolongation/request/666">Annuler</a>
                                           
@@ -286,7 +286,7 @@
                                   <hr/>
                                   <p class="fs-xs">* champ obligatoire</p>
                                   <div class="form-group">
-                                      <div class="text-right">
+                                      <div class="text-end">
                                           
                                               <a class="btn btn-link btn-outline-primary" href="/approvals/prolongation/request/666">Annuler</a>
                                           
@@ -358,7 +358,7 @@
                                   <hr/>
                                   <p class="fs-xs">* champ obligatoire</p>
                                   <div class="form-group">
-                                      <div class="text-right">
+                                      <div class="text-end">
                                           
                                               <a class="btn btn-link btn-outline-primary" href="/approvals/prolongation/request/666">Annuler</a>
                                           
@@ -445,7 +445,7 @@
                                   <hr/>
                                   <p class="fs-xs">* champ obligatoire</p>
                                   <div class="form-group">
-                                      <div class="text-right">
+                                      <div class="text-end">
                                           
                                               <a class="btn btn-link btn-outline-primary" href="/approvals/prolongation/request/666">Annuler</a>
                                           
@@ -517,7 +517,7 @@
                                   <hr/>
                                   <p class="fs-xs">* champ obligatoire</p>
                                   <div class="form-group">
-                                      <div class="text-right">
+                                      <div class="text-end">
                                           
                                               <a class="btn btn-link btn-outline-primary" href="/approvals/prolongation/request/666">Annuler</a>
                                           
@@ -555,7 +555,7 @@
                               <h3 class="mb-0">1 résultat</h3>
                           </div>
                           <div class="d-flex flex-column flex-md-row mt-3 mt-md-4">
-                              <h4 class="mr-4">Filtres :</h4>
+                              <h4 class="me-4">Filtres :</h4>
                               <form action="/approvals/prolongation/requests" hx-boost="true" hx-trigger="change">
                                   <input id="id_only_pending" name="only_pending" type="checkbox"/>
                                   <label for="id_only_pending">Voir uniquement les demandes à traiter</label>
@@ -564,7 +564,7 @@
   
                           <div class="table-responsive-lg mt-3 mt-md-4">
                               <table class="table">
-                                  <caption class="sr-only">Liste des prolongations de PASS IAE</caption>
+                                  <caption class="visually-hidden">Liste des prolongations de PASS IAE</caption>
                                   <thead>
                                       <tr>
                                           <th scope="col">#</th>
@@ -585,13 +585,13 @@
                                           <tr>
                                               <th scope="row">1</th>
                                               <td class="font-weight-bold">John DOE</td>
-                                              <td><span>99999</span><span class="ml-1">99</span><span class="ml-1">99999</span></td>
+                                              <td><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></td>
                                               <td>ACME Inc.</td>
                                               <td>01/01/2000</td>
                                               <td>John DOE</td>
                                               <td>
       
-          <span class="badge badge-xs badge-pill badge-accent-03 text-primary">À traiter</span>
+          <span class="badge badge-xs rounded-pill bg-accent-03 text-primary">À traiter</span>
       
   
   </td>
@@ -650,7 +650,7 @@
                               </p>
                               <p>
                                   <i class="ri-mail-line"></i>
-                                  <a class="btn-link mr-3" href="mailto:email@example.com">email@example.com</a>
+                                  <a class="btn-link me-3" href="mailto:email@example.com">email@example.com</a>
                                   <button class="js-copy-to-clipboard btn btn-ico btn-secondary" data-copy-to-clipboard="email@example.com" data-original-title="Copié !" data-placement="top" data-toggle="tooltip" data-trigger="manual">
       <i class="ri-file-copy-line ri-lg font-weight-normal"></i>
       <span>Copier</span>

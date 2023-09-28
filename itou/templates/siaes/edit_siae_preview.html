@@ -42,7 +42,7 @@
                         <div class="card c-card c-card--emploi my-3 my-lg-5">
                             <div class="card-body">
                                 <p>
-                                    <i class="ri-home-7-line ri-xl mr-2"></i>{{ siae.kind }} - {{ siae.get_kind_display }}
+                                    <i class="ri-home-7-line ri-xl me-2"></i>{{ siae.kind }} - {{ siae.get_kind_display }}
                                 </p>
                                 <hr>
                                 <h2 class="h2">{{ siae.display_name }}</h2>
@@ -72,21 +72,21 @@
 
                                 {% if siae.email %}
                                     <p>
-                                        <i class="ri-mail-line ri-xl mr-2"></i>
+                                        <i class="ri-mail-line ri-xl me-2"></i>
                                         <a aria-label="Contact par mail" href="mailto:{{ siae.email }}" class="font-weight-bold">{{ siae.email }}</a>
                                     </p>
                                 {% endif %}
 
                                 {% if siae.phone %}
                                     <p>
-                                        <i class="ri-phone-line ri-xl mr-2"></i>
+                                        <i class="ri-phone-line ri-xl me-2"></i>
                                         <a aria-label="Contact téléphonique" href="tel:{{ siae.phone|cut:' ' }}" class="font-weight-bold">{{ siae.phone|format_phone }}</a>
                                     </p>
                                 {% endif %}
 
                                 {% if siae.website %}
                                     <p>
-                                        <i class="ri-global-line ri-xl mr-2"></i>
+                                        <i class="ri-global-line ri-xl me-2"></i>
                                         <a aria-label="Site web (ouverture dans un nouvel onglet)" href="{{ siae.website }}" rel="noopener" target="_blank" class="font-weight-bold">{{ siae.website }}</a>
                                     </p>
                                 {% endif %}
@@ -96,7 +96,7 @@
 
                             <div class="alert alert-warning">
                                 <div class="row">
-                                    <div class="col-auto pr-0">
+                                    <div class="col-auto pe-0">
                                         <i class="ri-information-line ri-xl text-warning"></i>
                                     </div>
                                     <div class="col">
@@ -112,7 +112,7 @@
                                     <a class="btn btn-link" aria-label="Retourner à l'édition de la description" href="{{ prev_url }}">Retour</a>
                                 </div>
                                 <div class="col-6 col-lg-auto">
-                                    <button aria-label="Publier le formulaire" class="btn btn-primary float-right">Publier</button>
+                                    <button aria-label="Publier le formulaire" class="btn btn-primary float-end">Publier</button>
                                 </div>
                             </div>
                         </form>

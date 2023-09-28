@@ -2,7 +2,7 @@
 # name: CardViewTest.test_card_no_active_members
   '''
   <main class="s-main bg-gray-400" id="main" role="main">
-              <div aria-atomic="true" aria-live="polite" class="toast-placement-wrapper">
+              <div aria-atomic="true" aria-live="polite" class="toast-container">
   
   </div>
               <div class="container container-messages">
@@ -67,7 +67,7 @@
                       </div>
                   </div>
                   <div class="col-12 col-lg-4 order-1 order-lg-2 d-flex flex-column">
-                      <h2 class="sr-only">Actions rapides</h2>
+                      <h2 class="visually-hidden">Actions rapides</h2>
                       <div class="c-box mb-3 mb-lg-5 bg-emploi-lightest border-info">
                           
                               <p class="mb-0">Cet employeur n'est pas inscrit, vous ne pouvez pas déposer de candidatures en ligne.</p>
@@ -79,20 +79,20 @@
                           <ul class="list-unstyled mb-0">
                               <li class="my-2">
                                   <div class="d-flex align-items-start">
-                                      <i class="ri-map-pin-2-line ri-xl mr-2"></i>
+                                      <i class="ri-map-pin-2-line ri-xl me-2"></i>
                                       <address class="font-weight-bold m-0">112 rue de la Croix-Nivert, 75015 Paris</address>
                                   </div>
                               </li>
                               
                                   <li class="my-2">
-                                      <i class="ri-mail-line ri-xl mr-2"></i>
+                                      <i class="ri-mail-line ri-xl me-2"></i>
                                       <a aria-label="Contact par mail" class="font-weight-bold" href="mailto:contact@acmeinc.com">contact@acmeinc.com</a>
                                   </li>
                               
   
                               
                                   <li class="my-2">
-                                      <i class="ri-phone-line ri-xl mr-2"></i>
+                                      <i class="ri-phone-line ri-xl me-2"></i>
                                       <a aria-label="Contact téléphonique" class="font-weight-bold" href="tel:0612345678">06 12 34 56 78</a>
                                   </li>
                               
@@ -109,17 +109,17 @@
           <div class="s-tabs-01__container container">
               <div class="s-tabs-01__row row">
                   <div class="s-tabs-01__col col-12">
-                      <h2 class="sr-only" id="metiers-title">Métiers de la structure</h2>
+                      <h2 class="visually-hidden" id="metiers-title">Métiers de la structure</h2>
                       <ul aria-labelledby="metiers-title" class="s-tabs-01__nav nav nav-tabs" role="tablist">
                           <li class="nav-item" role="presentation">
                               <a aria-controls="recrutements-en-cours" aria-selected="true" class="nav-link active" data-toggle="tab" href="#recrutements-en-cours" id="recrutements-en-cours-tab" role="tab">
-                                  Recrutement en cours <span class="badge badge-sm badge-primary badge-pill text-white ml-2">0</span>
+                                  Recrutement en cours <span class="badge badge-sm bg-primary rounded-pill text-white ms-2">0</span>
                               </a>
                           </li>
                           
                           <li class="nav-item-dropdown dropdown" role="presentation">
                               <a aria-expanded="false" class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" id="sTabs01DropdownMoreLink" role="button"><i class="ri-more-line"></i></a>
-                              <div aria-labelledby="sTabs01DropdownMoreLink" class="dropdown-menu dropdown-menu-right"></div>
+                              <div aria-labelledby="sTabs01DropdownMoreLink" class="dropdown-menu dropdown-menu-end"></div>
                           </li>
                       </ul>
                       <div class="tab-content">

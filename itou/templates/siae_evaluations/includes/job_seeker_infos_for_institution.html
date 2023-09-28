@@ -9,36 +9,36 @@
             PASS IAE :&nbsp;<b>{{ approval.number|format_approval_number }}</b> délivré le {{ approval.start_at|date:"d E Y" }}
         </p>
     </div>
-    <div class="col-md-4 text-right">
+    <div class="col-md-4 text-end">
         {% if evaluated_siae.evaluation_is_final %}
             {% if state == "PENDING" %}
-                <p class="badge badge-pill badge-danger float-right">Non téléversés</p>
+                <p class="badge rounded-pill bg-danger float-end">Non téléversés</p>
             {% elif state == "PROCESSING" %}
-                <p class="badge badge-pill badge-warning float-right">Téléversement incomplet</p>
+                <p class="badge rounded-pill bg-warning float-end">Téléversement incomplet</p>
             {% elif state == "UPLOADED" %}
-                <p class="badge badge-pill badge-warning float-right">Justificatifs téléversés</p>
+                <p class="badge rounded-pill bg-warning float-end">Justificatifs téléversés</p>
             {% elif state == "SUBMITTED" %}
-                <p class="badge badge-pill badge-info-light text-primary float-right">Justificatifs non contrôlés</p>
+                <p class="badge rounded-pill bg-info-light text-primary float-end">Justificatifs non contrôlés</p>
             {% elif state == "ACCEPTED" %}
-                <p class="badge badge-pill badge-success float-right">Validé</p>
+                <p class="badge rounded-pill bg-success float-end">Validé</p>
             {% elif state == "REFUSED" or state == "REFUSED_2" %}
-                <p class="badge badge-pill badge-danger float-right">Problème constaté</p>
+                <p class="badge rounded-pill bg-danger float-end">Problème constaté</p>
             {% endif %}
         {% else %}
             {% if state == "PENDING" or state == "PROCESSING" %}
                 {% if evaluated_siae.submission_freezed_at %}
-                    <p class="badge badge-pill badge-danger float-right">Justificatifs non transmis</p>
+                    <p class="badge rounded-pill bg-danger float-end">Justificatifs non transmis</p>
                 {% else %}
-                    <p class="badge badge-pill badge-emploi float-right">En attente</p>
+                    <p class="badge rounded-pill bg-emploi float-end">En attente</p>
                 {% endif %}
             {% elif state == "UPLOADED" %}
                 {% if evaluated_siae.submission_freezed_at %}
-                    <p class="badge badge-pill badge-danger float-right">Justificatifs non transmis</p>
+                    <p class="badge rounded-pill bg-danger float-end">Justificatifs non transmis</p>
                 {% else %}
-                    <p class="badge badge-pill badge-pilotage float-right">Justificatifs téléversés</p>
+                    <p class="badge rounded-pill bg-pilotage float-end">Justificatifs téléversés</p>
                 {% endif %}
             {% elif state == "SUBMITTED" %}
-                <p class="badge badge-pill badge-pilotage float-right">
+                <p class="badge rounded-pill bg-pilotage float-end">
                     {% if reviewed_at %}
                         Nouveaux justificatifs à traiter
                     {% else %}
@@ -46,19 +46,19 @@
                     {% endif %}
                 </p>
             {% elif state == "ACCEPTED" %}
-                <p class="badge badge-pill badge-success float-right">Validé</p>
+                <p class="badge rounded-pill bg-success float-end">Validé</p>
             {% elif state == "REFUSED" %}
                 {% if reviewed_at %}
-                    <p class="badge badge-pill badge-emploi float-right">Phase contradictoire - En attente</p>
+                    <p class="badge rounded-pill bg-emploi float-end">Phase contradictoire - En attente</p>
                 {% else %}
                     {% comment %}
                     Show “Problème constaté” until the review is submitted, which starts the “phase contradictoire”
                     (tracked by the reviewed_at field).
                     {% endcomment %}
-                    <p class="badge badge-pill badge-danger float-right">Problème constaté</p>
+                    <p class="badge rounded-pill bg-danger float-end">Problème constaté</p>
                 {% endif %}
             {% elif state == "REFUSED_2" %}
-                <p class="badge badge-pill badge-danger float-right">Problème constaté</p>
+                <p class="badge rounded-pill bg-danger float-end">Problème constaté</p>
             {% endif %}
         {% endif %}
     </div>

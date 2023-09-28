@@ -2,26 +2,26 @@
 {% load str_filters %}
 
 {% bootstrap_form_errors form type="all" %}
-<div class="row no-gutters{% if align == 'center' %} justify-content-sm-center{% endif %}">
+<div class="row g-0{% if align == 'center' %} justify-content-sm-center{% endif %}">
     <div class="col-12 col-md mb-2">
         {{ form.city }}
         <div class="input-group">
             <div class="input-group-prepend bg-white">
                 {# No loading #}
-                <span class="input-group-text js-city-autocomplete-no-loading rounded-left">
+                <span class="input-group-text js-city-autocomplete-no-loading rounded-start">
                     <i class="ri-map-pin-line"></i>
                 </span>
                 {# Loading #}
                 <span class="input-group-text js-city-autocomplete-loading d-none">
                     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                    <span class="sr-only">Chargement...</span>
+                    <span class="visually-hidden">Chargement...</span>
                 </span>
             </div>
-            <label for="{{ form.city_name.id_for_label }}" class="sr-only">{{ form.city_name.label }}</label>
+            <label for="{{ form.city_name.id_for_label }}" class="visually-hidden">{{ form.city_name.label }}</label>
             {{ form.city_name }}
         </div>
     </div>
-    <div class="col-12 col-md-3 col-lg-2 mb-2 pl-md-3">
+    <div class="col-12 col-md-3 col-lg-2 mb-2 ps-md-3">
         <button class="btn btn-primary btn-block js-search-button" aria-label="Rechercher">Rechercher</button>
     </div>
 </div>

@@ -101,9 +101,9 @@
                         </div>
                         <div class="card-body">
                             {% if is_siae %}
-                                <a class="btn btn-primary float-right" href="{% url "dashboard:index" %}">Retour au Tableau de bord</a>
+                                <a class="btn btn-primary float-end" href="{% url "dashboard:index" %}">Retour au Tableau de bord</a>
                             {% else %}
-                                <a class="btn btn-primary float-right" href="{% url 'siae_evaluations_views:institution_evaluated_siae_list' evaluated_siae.evaluation_campaign_id %}">Revenir à la liste des SIAE</a>
+                                <a class="btn btn-primary float-end" href="{% url 'siae_evaluations_views:institution_evaluated_siae_list' evaluated_siae.evaluation_campaign_id %}">Revenir à la liste des SIAE</a>
                             {% endif %}
                         </div>
                     </div>

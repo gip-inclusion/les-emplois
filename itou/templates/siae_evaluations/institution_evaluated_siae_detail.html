@@ -65,7 +65,7 @@
                                     <div class="col-4">
                                         <form method="post" action="{% url 'siae_evaluations_views:institution_evaluated_siae_validation' evaluated_siae.pk %}">
                                             {% csrf_token %}
-                                            <button class="btn {% if evaluated_siae.can_review %}btn-primary {% else %}btn-outline-primary disabled {% endif %}btn-sm float-right">
+                                            <button class="btn {% if evaluated_siae.can_review %}btn-primary {% else %}btn-outline-primary disabled {% endif %}btn-sm float-end">
                                                 Valider
                                             </button>
                                         </form>
@@ -87,11 +87,11 @@
                                     <div class="card-body">
                                         {% with evaluated_job_application_state=evaluated_job_application.compute_state %}
                                             {% if not evaluated_siae.evaluation_is_final and evaluated_job_application_state == "SUBMITTED" %}
-                                                <a href="{% url 'siae_evaluations_views:institution_evaluated_job_application' evaluated_job_application.pk %}" class="btn btn-outline-primary btn-sm float-right">
+                                                <a href="{% url 'siae_evaluations_views:institution_evaluated_job_application' evaluated_job_application.pk %}" class="btn btn-outline-primary btn-sm float-end">
                                                     Contrôler cette auto-prescription
                                                 </a>
                                             {% elif evaluated_job_application_state != "PENDING" and evaluated_job_application_state != "PROCESSING" %}
-                                                <a href="{% url 'siae_evaluations_views:institution_evaluated_job_application' evaluated_job_application.pk %}" class="btn btn-outline-primary btn-sm float-right">
+                                                <a href="{% url 'siae_evaluations_views:institution_evaluated_job_application' evaluated_job_application.pk %}" class="btn btn-outline-primary btn-sm float-end">
                                                     Revoir ses justificatifs
                                                 </a>
                                             {% endif %}
@@ -114,7 +114,7 @@
                             <div class="col-4">
                                 <form method="post" action="{% url 'siae_evaluations_views:institution_evaluated_siae_validation' evaluated_siae.pk %}">
                                     {% csrf_token %}
-                                    <button class="btn btn-primary btn-sm float-right">Valider</button>
+                                    <button class="btn btn-primary btn-sm float-end">Valider</button>
                                 </form>
                             </div>
                         </div>

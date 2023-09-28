@@ -1,6 +1,6 @@
 {% load job_applications %}
 <div class="fs-sm d-flex flex-column flex-md-row align-items-center mb-3">
-    <span class="text-secondary order-2 order-md-1 mr-auto">
+    <span class="text-secondary order-2 order-md-1 me-auto">
         Émise le {{ job_application.created_at|date:"d F Y" }} par
 
         {% if request.user == job_application.sender %}
@@ -11,40 +11,40 @@
             <strong class="mr-2">{{ job_application.sender_siae.display_name }}</strong>
             {% if request.user.is_employer %}
                 {% if job_application.origin == JobApplicationOrigin.PE_APPROVAL %}
-                    <i class="ri-community-line mr-2" aria-hidden="true"></i>Employeur (Import agrément Pôle emploi)
+                    <i class="ri-community-line me-2" aria-hidden="true"></i>Employeur (Import agrément Pôle emploi)
                 {% else %}
-                    <i class="ri-community-line mr-2" aria-hidden="true"></i>Employeur (Auto-prescription)
+                    <i class="ri-community-line me-2" aria-hidden="true"></i>Employeur (Auto-prescription)
                 {% endif %}
             {% endif %}
         {% elif job_application.sender_kind == SenderKind.PRESCRIBER %}
             {% if job_application.sender_prescriber_organization %}
-                <strong class="mr-2">{{ job_application.sender_prescriber_organization.display_name }}</strong>
+                <strong class="me-2">{{ job_application.sender_prescriber_organization.display_name }}</strong>
             {% else %}
-                <strong class="mr-2">{{ job_application.sender.get_full_name }}</strong>
+                <strong class="me-2">{{ job_application.sender.get_full_name }}</strong>
             {% endif %}
             {% if job_application.is_sent_by_authorized_prescriber %}
-                <i class="ri-group-line mr-2" aria-hidden="true"></i>Prescripteur habilité
+                <i class="ri-group-line me-2" aria-hidden="true"></i>Prescripteur habilité
             {% else %}
-                <i class="ri-group-line mr-2" aria-hidden="true"></i>Orienteur
+                <i class="ri-group-line me-2" aria-hidden="true"></i>Orienteur
             {% endif %}
         {% endif %}
 
     </span>
     {# élément à passer au dessus du précédent en vue mobile #}
-    <span class="order-1 order-md-2 ml-auto">{% state_badge job_application %}</span>
+    <span class="order-1 order-md-2 ms-auto">{% state_badge job_application %}</span>
 </div>
 <hr class="my-3">
 {% with all_jobs=job_application.selected_jobs.all %}
     <div>
         {% if all_jobs|length == 0 %}
-            <i class="ri-briefcase-line ri-xl mr-1"></i><span class="font-weight-bold mr-1 mr-md-2">Candidature spontanée</span>
+            <i class="ri-briefcase-line ri-xl me-1"></i><span class="font-weight-bold me-1 me-md-2">Candidature spontanée</span>
         {% elif all_jobs|length == 1 %}
             {% with job=all_jobs.0 %}
-                <i class="ri-briefcase-line ri-xl mr-1"></i>
-                <span class="font-weight-bold mr-1 mr-md-2">{{ job.display_name }}</span>
+                <i class="ri-briefcase-line ri-xl me-1"></i>
+                <span class="font-weight-bold me-1 me-md-2">{{ job.display_name }}</span>
                 {% if job.location %}
                     <span class="fs-sm text-nowrap">
-                        <i class="ri-map-pin-2-line ri-sm mr-1"></i>
+                        <i class="ri-map-pin-2-line ri-sm me-1"></i>
                         {{ first_job.location }}
                     </span>
                 {% endif %}
@@ -56,18 +56,18 @@
                role="button"
                aria-expanded="false"
                aria-controls="collapse-job-application-{{ job_application.id }}">
-                <i class="ri-briefcase-line ri-xl mr-1"></i>
-                <span class="font-weight-bold mr-1 mr-md-2">Voir les {{ all_jobs|length }} postes</span>
+                <i class="ri-briefcase-line ri-xl me-1"></i>
+                <span class="font-weight-bold me-1 me-md-2">Voir les {{ all_jobs|length }} postes</span>
             </a>
             <ul class="list-group list-group-sm list-group-flush collapse" id="collapse-job-application-{{ job_application.id }}">
                 {% for job in all_jobs %}
                     <li class="list-group-item list-group-item-action">
                         <span class="d-flex flex-wrap align-items-center text-decoration-none">
-                            <span class="font-weight-bold mr-1 mr-md-2">{{ job.display_name }}</span>
+                            <span class="font-weight-bold me-1 me-md-2">{{ job.display_name }}</span>
 
                             {% if job.location %}
-                                <span class="ml-auto fs-sm text-nowrap">
-                                    <i class="ri-map-pin-2-line ri-sm mr-1"></i>
+                                <span class="ms-auto fs-sm text-nowrap">
+                                    <i class="ri-map-pin-2-line ri-sm me-1"></i>
                                     {{ job.location }}
                                 </span>
 

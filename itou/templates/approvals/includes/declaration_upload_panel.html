@@ -4,7 +4,7 @@
     {% if unfold_details %}
         {% if can_upload_prolongation_report %}
             <hr />
-            <span class="badge badge-base badge-pill badge-important my-3">Nouveau</span>
+            <span class="badge badge-base rounded-pill bg-important my-3">Nouveau</span>
 
             <div id="file_upload_part">
                 <h4>Bilan à renseigner : le motif selectionné nécessite l'accord d'un prescripteur habilité</h4>
@@ -30,7 +30,7 @@
             {# HTMX: confirm prescriber organization if many #}
             {% include "approvals/includes/declaration_prescriber_email.html" %}
             <p>
-                <a href="{% url 'search:prescribers_home' %}" rel="noopener" target="_blank" aria-label="Rechercher des prescripteurs (ouverture dans une nouvelle fenêtre)">Rechercher des prescripteurs</a> <i class="ri-external-link-line ml-1"></i>
+                <a href="{% url 'search:prescribers_home' %}" rel="noopener" target="_blank" aria-label="Rechercher des prescripteurs (ouverture dans une nouvelle fenêtre)">Rechercher des prescripteurs</a> <i class="ri-external-link-line ms-1"></i>
             </p>
         </div>
 

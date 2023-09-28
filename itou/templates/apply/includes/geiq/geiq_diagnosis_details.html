@@ -32,7 +32,7 @@
         {% if request.user.is_employer %}
             <div class="alert alert-info" role="status">
                 <div class="row">
-                    <div class="col-auto pr-0">
+                    <div class="col-auto pe-0">
                         <i class="ri-information-line ri-xl text-info"></i>
                     </div>
                     <div class="col">
@@ -55,7 +55,7 @@
         {# Existing GEIQ, diagnosis but no allowance #}
         <div class="alert alert-warning mt-4">
             <div class="row">
-                <div class="col-auto pr-0">
+                <div class="col-auto pe-0">
                     <i class="ri-alert-line ri-xl text-warning"></i>
                 </div>
                 <div class="col">
@@ -66,7 +66,7 @@
                         <div class="col">
                             <p>Les critères que vous avez sélectionnés ne vous permettent pas de bénéficier d’une aide financière de l’État.</p>
                         </div>
-                        <div class="col-auto pl-0">
+                        <div class="col-auto ps-0">
                             <a href="{% url 'apply:geiq_eligibility' job_application_id=job_application.pk %}?next_url={% url 'apply:details_for_siae' job_application_id=job_application.pk %}" class="btn btn-primary">Mettre à jour</a>
                         </div>
                     </div>
@@ -82,7 +82,7 @@
             <div class="col-auto pt-2">
                 <h3>Éligibilité public prioritaire GEIQ non confirmée</h3>
             </div>
-            <div class="col text-right">
+            <div class="col text-end">
                 {% with back_and_next_url=request.get_full_path|urlencode %}
                     <a href="{% url 'apply:geiq_eligibility' job_application_id=job_application.pk %}?back_url={{ back_and_next_url }}&next_url={{ back_and_next_url }}" class="btn btn-outline-primary">
                         Vérifier
@@ -94,7 +94,7 @@
         {% if diagnosis and not diagnosis.is_valid %}
             <div class="alert alert-warning mt-4">
                 <div class="row">
-                    <div class="col-auto pr-0">
+                    <div class="col-auto pe-0">
                         <i class="ri-alert-line ri-xl text-warning"></i>
                     </div>
                     <div class="col">

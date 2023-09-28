@@ -1,14 +1,14 @@
 # serializer version: 1
 # name: TestApprovalDetailView.test_approval_status_includes[Approval prolongations list]
   '''
-  <div class="pl-2 border-left approval-left-border" id="prolongations-list">
+  <div class="ps-2 border-start approval-left-border" id="prolongations-list">
                   
                       <p class="mb-1">Prolongation en cours :</p>
                       <ul class="list-unstyled">
       
           <li>
               du 19/04/2023 au 29/04/2023
-              <small class="ml-3">Fin d'une formation</small>
+              <small class="ms-3">Fin d'une formation</small>
               
           </li>
       
@@ -23,19 +23,19 @@
       
           <li>
               du 09/05/2023 au 14/05/2023
-              <small class="ml-3">Fin d'une formation</small>
+              <small class="ms-3">Fin d'une formation</small>
               
           </li>
       
           <li>
               du 27/03/2023 au 06/04/2023
-              <small class="ml-3">Fin d'une formation</small>
+              <small class="ms-3">Fin d'une formation</small>
               
           </li>
       
           <li>
               du 25/02/2023 au 07/03/2023
-              <small class="ml-3">Fin d'une formation</small>
+              <small class="ms-3">Fin d'une formation</small>
               
           </li>
       
@@ -48,7 +48,7 @@
 # ---
 # name: TestApprovalDetailView.test_approval_status_includes[Approval suspensions list]
   '''
-  <div class="pl-2 border-left approval-left-border" id="suspensions-list">
+  <div class="ps-2 border-start approval-left-border" id="suspensions-list">
                   
                       <p class="mb-1">Suspension en cours :</p>
                       <ul class="list-unstyled">
@@ -58,8 +58,8 @@
                                   <!-- djlint:off --><!-- djlint:on -->
                                   
                                       <small>
-                                          <a class="ml-3" href="/approvals/suspension/1/edit?back_url=/approvals/detail/1">Modifier</a>
-                                          <a class="ml-3" href="/approvals/suspension/1/delete?back_url=/approvals/detail/1">Annuler</a>
+                                          <a class="ms-3" href="/approvals/suspension/1/edit?back_url=/approvals/detail/1">Modifier</a>
+                                          <a class="ms-3" href="/approvals/suspension/1/delete?back_url=/approvals/detail/1">Annuler</a>
                                       </small>
                                   
                               

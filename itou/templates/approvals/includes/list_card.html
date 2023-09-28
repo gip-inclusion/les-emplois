@@ -8,7 +8,7 @@
                 <p class="fs-sm mb-0">Pass N° {{ approval|format_approval_number }}</p>
             </div>
             <div class="order-1 order-md-2 mb-2 mb-md-0">
-                <span class="badge badge-sm badge-pill text-wrap {% if approval.state == 'EXPIRED' %} bg-emploi-light text-primary{% else %} badge-success-lighter text-success{% endif %}">
+                <span class="badge badge-sm rounded-pill text-wrap {% if approval.state == 'EXPIRED' %} bg-emploi-light text-primary{% else %} bg-success-lighter text-success{% endif %}">
                     <i class="{% if approval.state == 'EXPIRED' %}ri-pass-expired-line{% elif approval.state == 'SUSPENDED' %}ri-pass-pending-line{% else %}ri-pass-valid-line{% endif %} ri-xl" aria-hidden="true"></i>
                     PASS IAE {{ approval.get_state_display|lower }}
                 </span>
@@ -16,7 +16,7 @@
         </div>
     </div>
 
-    <div class="card-footer text-right bg-light">
+    <div class="card-footer text-end bg-light">
         <a href="{% url 'approvals:detail' pk=approval.id %}"
            class="btn btn-sm btn-outline-primary bg-white matomo-event"
            data-matomo-category="salaries"

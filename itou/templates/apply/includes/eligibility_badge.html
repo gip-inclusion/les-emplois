@@ -1,28 +1,28 @@
 {% if is_subject_to_eligibility_rules %}
     {% if job_seeker.has_valid_common_approval %}
-        <span class="badge badge-base badge-pill badge-success-lighter text-success">
+        <span class="badge badge-base rounded-pill bg-success-lighter text-success">
             <i class="ri-pass-valid-line" aria-hidden="true"></i>
             PASS IAE valide
         </span>
     {% elif eligibility_diagnosis %}
-        <span class="badge badge-base badge-pill badge-success-lighter text-success">
+        <span class="badge badge-base rounded-pill bg-success-lighter text-success">
             <i class="ri-check-line" aria-hidden="true"></i>
             Éligible à l’IAE
         </span>
     {% else %}
-        <span class="badge badge-base badge-pill badge-accent-02-lighter text-primary">
+        <span class="badge badge-base rounded-pill bg-accent-02-lighter text-primary">
             <i class="ri-error-warning-line" aria-hidden="true"></i>
             Éligibilité IAE à valider
         </span>
     {% endif %}
 {% elif is_subject_to_geiq_eligibility_rules %}
     {% if geiq_eligibility_diagnosis.eligibility_confirmed %}
-        <span class="badge badge-base badge-pill badge-success-lighter text-success">
+        <span class="badge badge-base rounded-pill bg-success-lighter text-success">
             <i class="ri-check-line" aria-hidden="true"></i>
             Éligibilité GEIQ confirmée
         </span>
     {% else %}
-        <span class="badge badge-base badge-pill badge-accent-02-lighter text-primary">
+        <span class="badge badge-base rounded-pill bg-accent-02-lighter text-primary">
             <i class="ri-error-warning-line" aria-hidden="true"></i>
             Éligibilité GEIQ non confirmée
         </span>

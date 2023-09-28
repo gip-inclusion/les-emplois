@@ -18,7 +18,7 @@
 {# A "parent" criterion, controls the visibility and filling of "children" criteria #}
 {% bootstrap_field form.beneficiaire_des_minimas_sociaux %}
 {% if form.beneficiaire_des_minimas_sociaux.value %}
-    <div class="pl-4 text-primary">
+    <div class="ps-4 text-primary">
         {% bootstrap_field form.beneficiaire_du_rsa %}
         {% bootstrap_field form.allocataire_ass %}
         {% bootstrap_field form.allocataire_aah %}
@@ -29,7 +29,7 @@
 <h3 class="h5">Critères liés à l'âge du candidat</h3>
 {% bootstrap_field form.jeune_26_ans field_class="text-primary" %}
 {% if form.jeune_26_ans.value %}
-    <div class="pl-4 text-primary">{% bootstrap_field form.jeune_de_moins_de_26_ans_sans_qualification %}</div>
+    <div class="ps-4 text-primary">{% bootstrap_field form.jeune_de_moins_de_26_ans_sans_qualification %}</div>
 {% endif %}
 {% bootstrap_field form.senior_50_ans field_class="text-primary" %}
 
@@ -40,9 +40,9 @@
 <h3 class="h5">Situation professionnelle</h3>
 {% bootstrap_field form.personne_eloignee_du_marche_du_travail field_class="text-primary" %}
 {% if form.personne_eloignee_du_marche_du_travail.value %}
-    <div class="pl-4 text-primary">
+    <div class="ps-4 text-primary">
         {% bootstrap_field form.personne_inscrite_a_pole_emploi %}
-        {% if form.personne_inscrite_a_pole_emploi.value %}<div class="pl-4">{{ form.pole_emploi_related }}</div>{% endif %}
+        {% if form.personne_inscrite_a_pole_emploi.value %}<div class="ps-4">{{ form.pole_emploi_related }}</div>{% endif %}
     </div>
 {% endif %}
 {% bootstrap_field form.de_45_ans_et_plus field_class="text-primary" %}

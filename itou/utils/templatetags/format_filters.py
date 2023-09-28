@@ -56,7 +56,7 @@ def format_nir(nir):
         with io.StringIO() as formatted:
             formatted.write(f"<span>{groups[0]}</span>")
             for group in groups[1:]:
-                formatted.write(f'<span class="ml-1">{group}</span>')
+                formatted.write(f'<span class="ms-1">{group}</span>')
             return mark_safe(formatted.getvalue())
     else:
         # Some NIRs do not match the pattern (they can be NTT/NIA) so we can’t format them
@@ -73,7 +73,7 @@ def format_approval_number(number, autoescape=True):
     escape = conditional_escape if autoescape else lambda text: text
     parts = [escape(number[start:end]) for start, end in group_indices]
     return mark_safe(
-        f'<span>{parts[0]}</span><span class="ml-1">{parts[1]}</span><span class="ml-1">{parts[2]}</span>'
+        f'<span>{parts[0]}</span><span class="ms-1">{parts[1]}</span><span class="ms-1">{parts[2]}</span>'
     )
 
 

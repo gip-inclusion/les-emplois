@@ -7,15 +7,15 @@
        data-matomo-action="clic"
        data-matomo-option="clic-metiers">
         <div class="d-inline">
-            <span class="font-weight-bold mr-1 mr-md-2">{{ job.display_name }}</span>
+            <span class="font-weight-bold me-1 me-md-2">{{ job.display_name }}</span>
             {% if job.is_popular %}
-                <span class="badge badge-sm badge-pill badge-pilotage text-primary">
-                    <i class="ri-group-line mr-1"></i>
-                    {{ job.POPULAR_THRESHOLD }}+<span class="ml-1">candidatures</span>
+                <span class="badge badge-sm rounded-pill bg-pilotage text-primary">
+                    <i class="ri-group-line me-1"></i>
+                    {{ job.POPULAR_THRESHOLD }}+<span class="ms-1">candidatures</span>
                 </span>
             {% endif %}
         </div>
-        <div class="d-inline ml-lg-auto">
+        <div class="d-inline ms-lg-auto">
             <span class="fs-sm text-nowrap">
                 <i class="ri-map-pin-2-line ri-sm"></i>
                 {% if job.location %}

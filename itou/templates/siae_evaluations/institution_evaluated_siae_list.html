@@ -34,9 +34,9 @@
                                         {% include "siae_evaluations/includes/siae_infos.html" with evaluated_siae=evaluated_siae %}
                                     </div>
                                     <div class="card-body">
-                                        <div class="float-right">
+                                        <div class="float-end">
                                             {% if evaluated_siae.state == "REFUSED" and evaluated_siae.notified_at %}
-                                                <a class="btn btn-outline-primary btn-sm mr-1" href="{% url "siae_evaluations_views:institution_evaluated_siae_sanction" evaluated_siae.pk %}">Voir la notification de sanction</a>
+                                                <a class="btn btn-outline-primary btn-sm me-1" href="{% url "siae_evaluations_views:institution_evaluated_siae_sanction" evaluated_siae.pk %}">Voir la notification de sanction</a>
                                             {% endif %}
                                             <a href="{% url 'siae_evaluations_views:institution_evaluated_siae_detail' evaluated_siae.pk %}" class="btn btn-outline-primary btn-sm">
                                                 {% if evaluated_siae.evaluation_is_final %}
@@ -52,7 +52,7 @@
                                                 {% endif %}
                                             </a>
                                             {% if evaluated_siae.state == "REFUSED" and not evaluated_siae.notified_at and evaluated_siae.evaluation_is_final %}
-                                                <a class="btn btn-primary btn-sm ml-1" href="{% url "siae_evaluations_views:institution_evaluated_siae_notify_step1" evaluated_siae.pk %}">
+                                                <a class="btn btn-primary btn-sm ms-1" href="{% url "siae_evaluations_views:institution_evaluated_siae_notify_step1" evaluated_siae.pk %}">
                                                     <i class="ri-notification-4-line"></i> Notifier la sanction
                                                 </a>
                                             {% endif %}

@@ -3,7 +3,7 @@
         {% include "approvals/includes/job_description_list.html" with job_application=job_application %}
     </div>
 
-    <div class="card-footer text-right bg-light">
+    <div class="card-footer text-end bg-light">
         <a href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}"
            class="btn btn-sm btn-outline-primary bg-white matomo-event"
            data-matomo-category="salaries"

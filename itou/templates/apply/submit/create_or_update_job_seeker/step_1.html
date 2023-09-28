@@ -6,7 +6,7 @@
 
 {% block form_content %}
     <fieldset>
-        <legend class="sr-only">État civil du candidat</legend>
+        <legend class="visually-hidden">État civil du candidat</legend>
         {% bootstrap_field form.title %}
         {% bootstrap_field form.first_name %}
         {% bootstrap_field form.last_name %}
@@ -23,9 +23,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h3 class="modal-title" id="email-confirmation-label">Attention</h3>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
-                            <i class="ri-close-line"></i>
-                        </button>
+                        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Fermer"></button>
                     </div>
                     <div class="modal-body">
                         <p>

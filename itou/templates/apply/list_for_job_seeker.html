@@ -42,7 +42,7 @@
                             <div>
                                 {% include "apply/includes/job_applications_export_button.html" %}
                                 {% if filters_counter > 0 %}
-                                    <a href="{% url 'apply:list_for_job_seeker' %}" class="btn btn-link btn-ico pl-0">
+                                    <a href="{% url 'apply:list_for_job_seeker' %}" class="btn btn-link btn-ico ps-0">
                                         <i class="ri-close-fill"></i>
                                         <span>Réinitialiser les filtres ({{ filters_counter }})</span>
                                     </a>
@@ -85,7 +85,7 @@
                                             <div class="fs-sm">{{ job_application.answer|linebreaks }}</div>
                                         {% endif %}
                                     </div>
-                                    <div class="card-footer text-right">
+                                    <div class="card-footer text-end">
                                         <a href="#"
                                            class="btn btn-sm btn-outline-primary"
                                            data-toggle="collapse"

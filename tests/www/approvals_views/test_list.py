@@ -184,7 +184,7 @@ class TestApprovalsListView:
 
         assertContains(
             response,
-            """<span class="badge badge-sm badge-pill text-wrap badge-success-lighter text-success">
+            """<span class="badge badge-sm rounded-pill text-wrap bg-success-lighter text-success">
                 <i class="ri-pass-valid-line ri-xl" aria-hidden="true"></i>
                 PASS IAE valide
             </span>""",
@@ -192,7 +192,7 @@ class TestApprovalsListView:
         )
         assertContains(
             response,
-            """<span class="badge badge-sm badge-pill text-wrap badge-success-lighter text-success">
+            """<span class="badge badge-sm rounded-pill text-wrap bg-success-lighter text-success">
                 <i class="ri-pass-valid-line ri-xl" aria-hidden="true"></i>
                 PASS IAE valide (non démarré)
             </span>""",
@@ -200,7 +200,7 @@ class TestApprovalsListView:
         )
         assertContains(
             response,
-            """<span class="badge badge-sm badge-pill text-wrap badge-success-lighter text-success">
+            """<span class="badge badge-sm rounded-pill text-wrap bg-success-lighter text-success">
                 <i class="ri-pass-pending-line ri-xl" aria-hidden="true"></i>
                 PASS IAE valide (suspendu)
             </span>""",
@@ -208,7 +208,7 @@ class TestApprovalsListView:
         )
         assertContains(
             response,
-            """<span class="badge badge-sm badge-pill text-wrap bg-emploi-light text-primary">
+            """<span class="badge badge-sm rounded-pill text-wrap bg-emploi-light text-primary">
                 <i class="ri-pass-expired-line ri-xl" aria-hidden="true"></i>
                 PASS IAE expiré
             </span>""",

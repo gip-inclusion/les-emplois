@@ -34,7 +34,7 @@
 
                         <div class="alert alert-emploi mb-4">
                             <div class="row">
-                                <div class="col-auto pr-0">
+                                <div class="col-auto pe-0">
                                     <i class="ri-information-line ri-xl"></i>
                                 </div>
                                 <div class="col">
@@ -46,7 +46,7 @@
                         <form method="post" class="js-prevent-multiple-submit">
                             {% csrf_token %}
                             {% buttons %}
-                                <div class="text-right">
+                                <div class="text-end">
                                     <a class="btn btn-outline-primary" aria-label="Retour à la page précédente" href="{% url "siaes_views:edit_job_description_details" %}">Retour</a>
                                     <button class="btn btn-primary" aria-label="Publier la fiche de poste">Publier la fiche de poste</button>
                                 </div>

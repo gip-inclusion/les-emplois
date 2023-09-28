@@ -88,7 +88,7 @@
     {% if need_manual_regularization %}
         <div class="alert alert-warning">
             <div class="row">
-                <div class="col-auto pr-0">
+                <div class="col-auto pe-0">
                     <i class="ri-error-warning-line ri-xl text-danger"></i>
                 </div>
                 <div class="col">
@@ -124,7 +124,7 @@
                                                 <div class="d-flex mb-2">
                                                     <div class="flex-grow-1">{{ status }}</div>
                                                     <div>
-                                                        <span class="badge badge-pill badge-sm badge-{{ badge.1 }}">{{ badge.0 }}</span>
+                                                        <span class="badge rounded-pill badge-sm badge-{{ badge.1 }}">{{ badge.0 }}</span>
                                                     </div>
                                                 </div>
                                             {% endfor %}
@@ -156,7 +156,7 @@
                                 <button type="button" class="btn btn-sm btn-link dropdown-toggle p-0" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     {{ ordered_by_label }}
                                 </button>
-                                <div class="dropdown-menu dropdown-menu-right" id="order-form-group">
+                                <div class="dropdown-menu dropdown-menu-end" id="order-form-group">
                                     {% for order_value, order_label in form.order.field.choices %}
                                         <button class="dropdown-item {% if order_value == form.order.value %}active{% endif %}" type="button" value="{{ order_value }}">
                                             {{ order_label }}
@@ -184,7 +184,7 @@
 
                         {% if not navigation_pages %}
                             <p class="my-3 my-md-4">
-                                <i class="ri-forbid-line ri-lg mr-1" aria-hidden="true"></i>
+                                <i class="ri-forbid-line ri-lg me-1" aria-hidden="true"></i>
                                 <span>Aucune fiche salarié avec le statut selectionné ...</span>
                             </p>
                         {% endif %}

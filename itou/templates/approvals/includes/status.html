@@ -18,7 +18,7 @@ Arguments:
         {% if common_approval.is_suspended %}
             <img src="{% static 'img/pass_iae/logo_pass_iae_suspended.svg' %}" alt="Logo du PASS IAE">
             <br>
-            <span class="badge badge-base badge-pill badge-success-lighter text-success">
+            <span class="badge badge-base rounded-pill bg-success-lighter text-success">
                 <i class="ri-pass-pending-line" aria-hidden="true"></i>
                 Valide (suspendu)
             </span>
@@ -28,7 +28,7 @@ Arguments:
     </p>
 {% endif %}
 
-<div class="pl-3 border-left approval-left-border">
+<div class="ps-3 border-start approval-left-border">
     <p class="mb-1">
         {% if common_approval.is_pass_iae %}
             Numéro de PASS IAE :
@@ -102,7 +102,7 @@ Arguments:
     {# Suspensions history. #}
     {% with common_approval.suspensions_for_status_card as suspensions %}
         {% if suspensions.last_in_progress or suspensions.older %}
-            <div id="suspensions-list" class="pl-2 border-left approval-left-border">
+            <div id="suspensions-list" class="ps-2 border-start approval-left-border">
                 {% if suspensions.last_in_progress %}
                     <p class="mb-1">Suspension en cours :</p>
                     <ul class="list-unstyled">
@@ -112,8 +112,8 @@ Arguments:
                                 <!-- djlint:off -->{% call_method suspensions.last_in_progress "can_be_handled_by_siae" request.current_organization as can_be_handled %}<!-- djlint:on -->
                                 {% if can_be_handled %}
                                     <small>
-                                        <a class="ml-3" href="{% url 'approvals:suspension_update' suspension_id=suspensions.last_in_progress.pk %}?back_url={{ request.get_full_path|urlencode }}">Modifier</a>
-                                        <a class="ml-3" href="{% url 'approvals:suspension_delete' suspension_id=suspensions.last_in_progress.pk %}?back_url={{ request.get_full_path|urlencode }}">Annuler</a>
+                                        <a class="ms-3" href="{% url 'approvals:suspension_update' suspension_id=suspensions.last_in_progress.pk %}?back_url={{ request.get_full_path|urlencode }}">Modifier</a>
+                                        <a class="ms-3" href="{% url 'approvals:suspension_delete' suspension_id=suspensions.last_in_progress.pk %}?back_url={{ request.get_full_path|urlencode }}">Annuler</a>
                                     </small>
                                 {% endif %}
                             {% endif %}
@@ -137,7 +137,7 @@ Arguments:
     {# Prolongations history. #}
     {% with prolongations=common_approval.prolongations_for_status_card prolongation_requests=common_approval.prolongation_requests_for_status_card %}
         {% if prolongations or prolongation_requests %}
-            <div id="prolongations-list" class="pl-2 border-left approval-left-border">
+            <div id="prolongations-list" class="ps-2 border-start approval-left-border">
                 {% if prolongations.in_progress %}
                     <p class="mb-1">Prolongation en cours :</p>
                     {% include "approvals/includes/prolongations_list.html" with prolongations=prolongations.in_progress %}
@@ -154,7 +154,7 @@ Arguments:
                         {% for prolongation_request in prolongation_requests %}
                             <li>
                                 du {{ prolongation_request.start_at|date:"d/m/Y" }} au {{ prolongation_request.end_at|date:"d/m/Y" }}
-                                <small class="ml-3">{{ prolongation_request.get_reason_display }}</small>
+                                <small class="ms-3">{{ prolongation_request.get_reason_display }}</small>
                                 <small class="d-block mb-2">
                                     {% if prolongation_request.status == ProlongationRequestStatus.PENDING %}
                                         En cours

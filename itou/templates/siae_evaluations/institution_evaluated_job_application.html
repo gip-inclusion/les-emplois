@@ -40,7 +40,7 @@
 
                                                     {% bootstrap_form form alert_error_type="all" %}
                                                     {% with evaluated_job_application_state=evaluated_job_application.compute_state %}
-                                                        <button class="btn {% if evaluated_job_application_state == 'ACCEPTED' or evaluated_job_application_state == 'REFUSED' or evaluated_job_application_state == 'REFUSED_2' %}btn-primary {% else %}btn-outline-primary {% endif %}float-right">
+                                                        <button class="btn {% if evaluated_job_application_state == 'ACCEPTED' or evaluated_job_application_state == 'REFUSED' or evaluated_job_application_state == 'REFUSED_2' %}btn-primary {% else %}btn-outline-primary {% endif %}float-end">
                                                             Enregistrer le commentaire et retourner à la liste des auto-prescriptions
                                                         </button>
                                                     {% endwith %}

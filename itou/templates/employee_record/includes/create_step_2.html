@@ -25,7 +25,7 @@
                                 </ul>
                                 {% if profile.hexa_address_filled %}
                                     <p class="mb-0">
-                                        <i class="ri-error-warning-line ri-lg mr-1"></i><strong>Une saisie incorrecte de l'adresse peut mener à une erreur de traitement de la fiche salarié.</strong>
+                                        <i class="ri-error-warning-line ri-lg me-1"></i><strong>Une saisie incorrecte de l'adresse peut mener à une erreur de traitement de la fiche salarié.</strong>
                                     </p>
                                 {% else %}
                                     <div class="alert alert-danger">
@@ -68,7 +68,7 @@
                             <div class="c-form-conseil">
                                 <div>
                                     <p>
-                                        <i class="ri-lightbulb-line ri-lg mr-1"></i><strong>Rappel de l’adresse du salarié renseignée sur Les emplois de l’inclusion</strong>
+                                        <i class="ri-lightbulb-line ri-lg me-1"></i><strong>Rappel de l’adresse du salarié renseignée sur Les emplois de l’inclusion</strong>
                                     </p>
                                     {% if address_filled %}
                                         <ul class="list-unstyled mb-0 mt-2">
@@ -99,7 +99,7 @@
                             <div class="col-12">
                                 <div class="form-row align-items-center justify-content-lg-between">
                                     <div class="form-group col-12 col-md-6 col-lg-auto order-3 order-md-1">
-                                        <a href="{% url "employee_record_views:create" job_application.id %}" class="btn btn-block btn-ico btn-link pl-0 justify-content-center" aria-label="Retour à l'étape précédente">
+                                        <a href="{% url "employee_record_views:create" job_application.id %}" class="btn btn-block btn-ico btn-link ps-0 justify-content-center" aria-label="Retour à l'étape précédente">
                                             <i class="ri-arrow-left-line ri-lg"></i>
                                             <span>Étape précédente</span>
                                         </a>

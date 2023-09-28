@@ -31,9 +31,9 @@
                                    data-matomo-action="clic"
                                    data-matomo-option="clic-onglet-employeur"
                                    href="{% url "search:siaes_results" %}?{{ filters_query_string }}">
-                                    <i class="ri-hotel-line ri-xl font-weight-normal mr-1"></i>
+                                    <i class="ri-hotel-line ri-xl font-weight-normal me-1"></i>
                                     <span>
-                                        Employeur{{ siaes_count|pluralizefr }} <span class="badge badge-sm badge-pill badge-info-lighter text-info">{{ siaes_count }}</span>
+                                        Employeur{{ siaes_count|pluralizefr }} <span class="badge badge-sm rounded-pill bg-info-lighter text-info">{{ siaes_count }}</span>
                                     </span>
                                 </a>
                             </li>
@@ -43,20 +43,20 @@
                                    data-matomo-action="clic"
                                    data-matomo-option="clic-onglet-fichesdeposte"
                                    href="{% url "search:job_descriptions_results" %}?{{ filters_query_string }}">
-                                    <i class="ri-briefcase-4-line ri-xl font-weight-normal mr-1"></i>
+                                    <i class="ri-briefcase-4-line ri-xl font-weight-normal me-1"></i>
                                     <span class="d-inline d-lg-none">
                                         Poste{{ job_descriptions_count|pluralizefr }}
-                                        <span class="badge badge-sm badge-pill badge-info-lighter text-info">{{ job_descriptions_count }}</span>
+                                        <span class="badge badge-sm rounded-pill bg-info-lighter text-info">{{ job_descriptions_count }}</span>
                                     </span>
                                     <span class="d-none d-lg-inline">
                                         Poste{{ job_descriptions_count|pluralizefr }} ouvert{{ job_descriptions_count|pluralizefr }} au recrutement
-                                        <span class="badge badge-sm badge-pill badge-info-lighter text-info">{{ job_descriptions_count }}</span>
+                                        <span class="badge badge-sm rounded-pill bg-info-lighter text-info">{{ job_descriptions_count }}</span>
                                     </span>
                                 </a>
                             </li>
                             <li class="nav-item-dropdown dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" role="button" id="sTabs01DropdownMoreLink" data-toggle="dropdown" aria-expanded="false"><i class="ri-more-line"></i></a>
-                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="sTabs01DropdownMoreLink"></div>
+                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="sTabs01DropdownMoreLink"></div>
                             </li>
                         </ul>
                         <div class="tab-content">

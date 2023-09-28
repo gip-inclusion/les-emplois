@@ -8,10 +8,10 @@
                 {% if job_description.is_from_pole_emploi %}
                     <span class="font-weight-bold">{{ job_description.market_context_description | default:"Entreprise anonyme" }}</span>
                     {% if job_description.is_pec_offer %}
-                        <span class="badge badge-pill badge-sm bg-accent-02-lighter font-weight-normal">Réservé au public éligible au contrat PEC</span>
+                        <span class="badge rounded-pill badge-sm bg-accent-02-lighter font-weight-normal">Réservé au public éligible au contrat PEC</span>
                     {% endif %}
                 {% else %}
-                    <a class="matomo-event btn btn-sm btn-ico btn-link text-left p-0 mh-auto"
+                    <a class="matomo-event btn btn-sm btn-ico btn-link text-start p-0 mh-auto"
                        href="{{ job_description.siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}"
                        data-matomo-category="candidature"
                        data-matomo-action="clic"
@@ -25,7 +25,7 @@
             </div>
             {% if job_description.siae.kind in ea_eatt_kinds %}
                 <div>
-                    <span class="badge badge-pill badge-sm badge-accent-01-lightest text-accent-01">Priorité aux bénéficiaires de la RQTH</span>
+                    <span class="badge rounded-pill badge-sm bg-accent-01-lightest text-accent-01">Priorité aux bénéficiaires de la RQTH</span>
                 </div>
             {% endif %}
         </div>
@@ -33,7 +33,7 @@
     <div class="card-body">
         {% if job_description.is_popular %}
             <div class="mb-2">
-                <span class="badge badge-sm badge-pill badge-accent-03 text-primary"><i class="ri-group-line"></i>{{ job_description.POPULAR_THRESHOLD }}+ candidatures</span>
+                <span class="badge badge-sm rounded-pill bg-accent-03 text-primary"><i class="ri-group-line"></i>{{ job_description.POPULAR_THRESHOLD }}+ candidatures</span>
             </div>
         {% endif %}
         <div class="mb-3">
@@ -45,28 +45,28 @@
                data-matomo-action="clic"
                {% if job_description.is_external %} rel="noopener" target="_blank" data-matomo-option="clic-card-fichedeposte-externe" aria-label="Visiter l'offre sur le site d'origine" {% else %} data-matomo-option="clic-card-fichedeposte" aria-label="Aller vers la description de ce poste"  {% endif %}>
                 {{ job_description.display_name | capfirst }}
-                {% if job_description.is_external %}<i class="ri-external-link-line ri-lg ml-1"></i>{% endif %}
+                {% if job_description.is_external %}<i class="ri-external-link-line ri-lg ms-1"></i>{% endif %}
             </a>
             {% if job_description.display_contract_type or job_description.hours_per_week %}
                 {% if job_description.display_contract_type %}
-                    <span class="badge badge-xs badge-pill badge-emploi-light text-primary">{{ job_description.display_contract_type }}</span>
+                    <span class="badge badge-xs rounded-pill bg-emploi-light text-primary">{{ job_description.display_contract_type }}</span>
                 {% endif %}
                 {% if job_description.hours_per_week %}
-                    <span class="badge badge-xs badge-pill badge-emploi-light text-primary">{{ job_description.hours_per_week }}h/semaine</span>
+                    <span class="badge badge-xs rounded-pill bg-emploi-light text-primary">{{ job_description.hours_per_week }}h/semaine</span>
                 {% endif %}
             {% endif %}
         </div>
         <div class="fs-sm d-flex flex-column flex-lg-row align-items-lg-center">
-            <span class="mr-3">
-                <i class="ri-map-pin-2-line mr-1"></i>
+            <span class="me-3">
+                <i class="ri-map-pin-2-line me-1"></i>
                 {% if job_description.location %}
                     {{ job_description.location }}
                 {% else %}
                     {{ job_description.siae.city | title }} ({{ job_description.siae.department }})
                 {% endif %}
             </span>
-            <span class="mr-3 flex-md-grow-1">
-                <i class="ri-navigation-line mr-1"></i>à <b>{{ job_description.distance | floatformat:"-1" }}&nbsp;km</b> de votre lieu de recherche
+            <span class="me-3 flex-md-grow-1">
+                <i class="ri-navigation-line me-1"></i>à <b>{{ job_description.distance | floatformat:"-1" }}&nbsp;km</b> de votre lieu de recherche
             </span>
             {% if job_description.is_from_pole_emploi %}
                 <span class="d-none d-lg-inline-flex">

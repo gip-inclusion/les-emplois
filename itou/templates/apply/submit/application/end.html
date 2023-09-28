@@ -38,7 +38,7 @@
                                     <h2 class="mb-0 flex-grow-1">{{ job_application.job_seeker.get_full_name }}</h2>
                                     {% if request.user.is_job_seeker %}
                                         <a class="btn btn-outline-primary btn-ico btn-sm" href="{% url 'dashboard:edit_user_info' %}">
-                                            <i class="ri-pencil-line mr-2"></i>Modifier
+                                            <i class="ri-pencil-line me-2"></i>Modifier
                                         </a>
                                     {% elif can_edit_personal_information %}
                                         <span class="btn btn-outline-primary btn-ico btn-sm" data-swap-element="#informations">
@@ -62,8 +62,8 @@
                                     </p>
                                 </div>
                             </div>
-                            <div class="text-right pt-5">
-                                <a class="btn btn-link mr-3" href="{% url "search:siaes_home" %}">Revenir à la recherche</a>
+                            <div class="text-end pt-5">
+                                <a class="btn btn-link me-3" href="{% url "search:siaes_home" %}">Revenir à la recherche</a>
                                 <a class="btn btn-primary" href="{% url "dashboard:index" %}">Tableau de bord</a>
                             </div>
                         </div>
@@ -87,7 +87,7 @@
 
                                     <hr class="my-5">
                                     {% buttons %}
-                                        <div class="text-right">
+                                        <div class="text-end">
                                             <button type="reset" class="btn btn-link" data-swap-element=".c-form">Annuler</button>
                                             <button class="btn btn-primary">Enregistrer</button>
                                         </div>
@@ -96,8 +96,8 @@
                             </div>
                         {% endif %}
                     {% else %}
-                        <div class="text-right pt-5">
-                            <a class="btn btn-link mr-3" href="{% url "search:siaes_home" %}">Revenir à la recherche</a>
+                        <div class="text-end pt-5">
+                            <a class="btn btn-link me-3" href="{% url "search:siaes_home" %}">Revenir à la recherche</a>
                             <a class="btn btn-primary" href="{% url "dashboard:index" %}">Tableau de bord</a>
                         </div>
                     {% endif %}

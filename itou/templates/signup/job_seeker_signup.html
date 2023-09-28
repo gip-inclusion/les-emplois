@@ -11,7 +11,7 @@
     <section class="s-section s-section-lg-with-background">
         <div class="s-section__container container">
             <div class="row">
-                <div class="col-12 order-md-2 pl-lg-5 col-lg-6">
+                <div class="col-12 order-md-2 ps-lg-5 col-lg-6">
                     <div class="py-5 py-lg-7">
                         <h1>
                             Inscription <span class="text-muted">candidat</span>
@@ -52,7 +52,7 @@
                             {# bootstrap_form_errors form alert_error_type="all" #}
 
                             {% bootstrap_field form.email form_group_class="form-group mb-1" %}
-                            <div class="text-right small font-italic mb-0">{% include "signup/includes/no_email_link.html" %}</div>
+                            <div class="text-end small font-italic mb-0">{% include "signup/includes/no_email_link.html" %}</div>
 
                             {% bootstrap_field form.title form_group_class="form-group mt-1" %}
                             {% bootstrap_field form.last_name %}
@@ -72,14 +72,14 @@
 
                         </form>
 
-                        <div class="mt-5 mb-5 text-right">
+                        <div class="mt-5 mb-5 text-end">
                             <p>
                                 Vous avez déjà un compte ? <a href="{% url 'login:job_seeker' %}">Connexion</a>
                             </p>
                         </div>
                     </div>
                 </div>
-                <div class="col-12 order-md-1 pr-lg-5 col-lg-6 bg-emploi-lightest">
+                <div class="col-12 order-md-1 pe-lg-5 col-lg-6 bg-emploi-lightest">
                     <!-- Hide left column on small devices. -->
                     <div class="d-none d-md-block py-md-5 py-lg-7 text-center">
                         <p class="display-1 ff-extra-01 mb-5">Vos informations de connexion</p>

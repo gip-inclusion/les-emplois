@@ -9,23 +9,23 @@
             {# Statuses #}
             <div class="col-12 col-md-auto">
                 {% if form.status.value == "SENT" %}
-                    <span class="badge badge-pill badge-sm badge-warning">
+                    <span class="badge rounded-pill badge-sm bg-warning">
                         Transmise à l'ASP le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
                     </span>
                 {% elif form.status.value == "REJECTED" %}
-                    <span class="badge badge-pill badge-sm badge-danger">
+                    <span class="badge rounded-pill badge-sm bg-danger">
                         Retour en erreur le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
                     </span>
                 {% elif form.status.value == "PROCESSED" %}
-                    <span class="badge badge-pill badge-sm badge-success">
+                    <span class="badge rounded-pill badge-sm bg-success">
                         Intégrée ASP le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
                     </span>
                 {% elif form.status.value == "READY" %}
-                    <span class="badge badge-pill badge-sm badge-secondary">
+                    <span class="badge rounded-pill badge-sm bg-secondary">
                         Complétée le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
                     </span>
                 {% elif form.status.value == "DISABLED" %}
-                    <span class="badge badge-pill badge-sm badge-emploi-lightest">
+                    <span class="badge rounded-pill badge-sm bg-emploi-lightest">
                         Désactivée le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
                     </span>
                 {% endif %}
@@ -110,7 +110,7 @@
             {% if item.job_seeker.lack_of_nir_reason == "NIR_ASSOCIATED_TO_OTHER" %}
                 <div class="alert alert-warning" role="status">
                     <div class="row">
-                        <div class="col-auto pr-0">
+                        <div class="col-auto pe-0">
                             <i class="ri-error-warning-line ri-xl text-warning"></i>
                         </div>
                         <div class="col">
@@ -127,7 +127,7 @@
             {% elif item.has_suspension or item.has_prolongation %}
                 <div class="alert alert-warning" role="status">
                     <div class="row">
-                        <div class="col-auto pr-0">
+                        <div class="col-auto pe-0">
                             <i class="ri-error-warning-line ri-xl text-warning"></i>
                         </div>
                         <div class="col">
@@ -145,7 +145,7 @@
                     </div>
                 </div>
             {% else %}
-                <div class="text-right">
+                <div class="text-end">
                     {% if item.employee_record_new %}
                         <a href="{% url "employee_record_views:disable" item.employee_record_new.id %}" class="btn btn-sm btn-outline-primary mt-2">Désactiver la fiche salarié</a>
                     {% endif %}
@@ -153,7 +153,7 @@
                 </div>
             {% endif %}
         {% else %}
-            <div class="text-right">
+            <div class="text-end">
                 {% if form.status.value == "REJECTED" or form.status.value == "PROCESSED" %}
                     <a href="{% url "employee_record_views:disable" employee_record.id %}" class="btn btn-sm btn-outline-primary mt-2">Désactiver la fiche salarié</a>
                 {% endif %}

@@ -135,7 +135,7 @@ class DashboardViewTest(TestCase):
         url = reverse("dashboard:index")
         response = self.client.get(url)
         self.assertContains(response, "Gérer les fiches salarié")
-        self.assertNotContains(response, "badge-danger")
+        self.assertNotContains(response, "bg-danger")
         assert response.context["num_rejected_employee_records"] == 0
 
         # create rejected job applications
@@ -155,14 +155,14 @@ class DashboardViewTest(TestCase):
         session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = siae.pk
         session.save()
         response = self.client.get(url)
-        self.assertContains(response, "badge-danger")
+        self.assertContains(response, "bg-danger")
         assert response.context["num_rejected_employee_records"] == 2
 
         # select the second SIAE's in the session
         session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = other_siae.pk
         session.save()
         response = self.client.get(url)
-        self.assertContains(response, "badge-danger")
+        self.assertContains(response, "bg-danger")
         assert response.context["num_rejected_employee_records"] == 1
 
         # select the third SIAE's in the session
@@ -509,7 +509,7 @@ class DashboardViewTest(TestCase):
         response = self.client.get(reverse("dashboard:index"))
         self.assertContains(response, "Contrôle a posteriori")
         TODO_BADGE = (
-            '<span class="badge badge-xs badge-pill badge-warning-lighter text-warning">'
+            '<span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">'
             '<i class="ri-error-warning-line" aria-hidden="true"></i>'
             "Action à faire</span>"
         )

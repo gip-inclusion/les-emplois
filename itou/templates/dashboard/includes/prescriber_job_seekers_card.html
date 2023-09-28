@@ -11,15 +11,14 @@
                         <span>Gérer mes prolongations de PASS IAE</span>
                     </a>
                     {% if pending_prolongation_requests %}
-                        <span class="badge badge-pill badge-xs badge-warning">{{ pending_prolongation_requests }}</span>
+                        <span class="badge rounded-pill badge-xs bg-info-lighter text-info">{{ pending_prolongation_requests }}</span>
                     {% endif %}
                 </li>
                 {% if request.current_organization.kind == precriber_kind_pe %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
-                        <a href="https://tally.so/r/w2Ex0M" aria-label="Suspendre un PASS IAE (ouverture dans un nouvel onglet)" target="_blank" class="btn-link btn-ico">
+                        <a href="https://tally.so/r/w2Ex0M" aria-label="Suspendre un PASS IAE (ouverture dans un nouvel onglet)" target="_blank" class="btn-link btn-ico has-external-link">
                             <i class="ri-pause-circle-line ri-lg font-weight-normal"></i>
                             <span>Suspendre un PASS IAE</span>
-                            <i class="ri-external-link-line ml-1 ri-lg font-weight-normal"></i>
                         </a>
                     </li>
                 {% endif %}

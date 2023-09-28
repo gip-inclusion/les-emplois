@@ -48,7 +48,7 @@
                         {% if job_pager %}
                             <div class="table-responsive-lg">
                                 <table class="table mt-3 mt-md-4">
-                                    <caption class="sr-only">Liste des métiers exercés</caption>
+                                    <caption class="visually-hidden">Liste des métiers exercés</caption>
                                     <thead>
                                         <tr>
                                             <th scope="col">Métiers</th>
@@ -71,7 +71,7 @@
                                                 </td>
                                                 <td>
                                                     <span class="d-flex align-items-center">
-                                                        <i class="ri-map-pin-line mr-1" aria-hidden="true"></i>
+                                                        <i class="ri-map-pin-line me-1" aria-hidden="true"></i>
                                                         <span aria-label="{{ job_description.display_location }}" title="{{ job_description.display_location }}">{{ job_description.display_location|truncatechars:20 }}</span>
                                                     </span>
                                                 </td>
@@ -82,14 +82,14 @@
                                                         {% csrf_token %}
                                                         <input type="hidden" name="action" value="toggle_active" />
                                                         <input type="hidden" name="job_description_id" value="{{ job_description.id }}" />
-                                                        <div class="custom-control custom-switch has-state-label">
+                                                        <div class="form-check form-switch has-state-label">
                                                             <input type="checkbox"
-                                                                   class="custom-control-input"
+                                                                   class="form-check-input"
                                                                    name="job_description_is_active"
                                                                    id="job_description_is_active_{{ job_description.id }}"
                                                                    {% if job_description.is_active %}checked{% endif %}
                                                                    {% if siae.block_job_applications %}disabled{% endif %} />
-                                                            <label class="custom-control-label" for="job_description_is_active_{{ job_description.id }}" data-state-label-off="Fermé" data-state-label-on="Ouvert">
+                                                            <label class="form-check-label" for="job_description_is_active_{{ job_description.id }}" data-state-label-off="Fermé" data-state-label-on="Ouvert">
                                                             </label>
                                                         </div>
                                                     </form>
@@ -102,9 +102,7 @@
                                                             <div class="modal-content">
                                                                 <div class="modal-header">
                                                                     <h3 class="modal-title" id="confirmDeleteModal{{ job_description.id }}">Supprimer la fiche de poste</h3>
-                                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
-                                                                        <i class="ri-close-line"></i>
-                                                                    </button>
+                                                                    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Fermer"></button>
                                                                 </div>
                                                                 <div class="modal-body">
                                                                     <p>

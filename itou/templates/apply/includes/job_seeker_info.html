@@ -8,7 +8,7 @@
         Nom : <b>{{ job_seeker.last_name|mask_unless:can_view_personal_information }}</b>
     </li>
     <li>
-        Numéro de sécurité sociale : 
+        Numéro de sécurité sociale :
         {% if job_seeker.nir %}
             <b>{{ job_seeker.nir|format_nir }}</b>
         {% elif job_seeker.lack_of_nir_reason %}
@@ -26,7 +26,7 @@
         </li>
 
         <li>
-            Téléphone : 
+            Téléphone :
             {% if job_seeker.phone %}
                 <a href="tel:{{ job_seeker.phone|cut:" " }}">{{ job_seeker.phone|format_phone }}</a>
             {% else %}
@@ -35,7 +35,7 @@
         </li>
 
         <li>
-            Adresse : 
+            Adresse :
             {% if job_seeker.address_on_one_line %}
                 <b>{{ job_seeker.address_on_one_line }}</b>
             {% else %}
@@ -44,7 +44,7 @@
         </li>
 
         <li>
-            Identifiant Pôle emploi : 
+            Identifiant Pôle emploi :
             {% if job_seeker.pole_emploi_id %}
                 <b>{{ job_seeker.pole_emploi_id }}</b>
             {% else %}
@@ -53,7 +53,7 @@
         </li>
 
         <li>
-            CV : 
+            CV :
             {% if job_application.get_resume_link %}
                 <a href="{{ job_application.get_resume_link }}">Télécharger le CV</a>
             {% else %}
@@ -70,7 +70,7 @@
         Modifier les informations personnelles
     </a>
     {% if not can_edit_personal_information %}
-        <i class="ri-information-line ri-xl text-info ml-1"
+        <i class="ri-information-line ri-xl text-info ms-1"
            data-toggle="tooltip"
            data-placement="top"
            title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations."></i>
