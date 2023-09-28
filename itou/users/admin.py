@@ -299,6 +299,7 @@ class ItouUserAdmin(UserAdmin):
         "identity_provider",
         "address_in_qpv",
         "is_staff",
+        "jobseeker_profile_link",
     )
 
     fieldsets = UserAdmin.fieldsets + (
@@ -325,6 +326,7 @@ class ItouUserAdmin(UserAdmin):
                     "lack_of_pole_emploi_id_reason",
                     "created_by",
                     "identity_provider",
+                    "jobseeker_profile_link",
                 )
             },
         ),
@@ -378,6 +380,10 @@ class ItouUserAdmin(UserAdmin):
             return get_admin_view_link(qpv, content=qpv)
 
         return "Adresse hors QPV"
+
+    @admin.display(description="profil de demandeur d'emploi")
+    def jobseeker_profile_link(self, obj):
+        return get_admin_view_link(obj.jobseeker_profile) if obj.is_job_seeker else None
 
     def get_queryset(self, request):
         """
