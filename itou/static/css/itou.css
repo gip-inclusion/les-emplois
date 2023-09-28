@@ -58,12 +58,6 @@
     background: transparent;
 }
 
-/* Footer without the blue line
---------------------------------------------------------------------------- */
-.s-prefooter {
-    border: none !important;
-}
-
 /* Forms.
 --------------------------------------------------------------------------- */
 
@@ -150,29 +144,6 @@ Credits go to https://stackoverflow.com/a/19229738
         bottom: 0;
         z-index: 1030;
     }
-
-    /* Set width depending on a breaking point. */
-    .w-sm-25 {
-        width: 25% !important;
-    }
-
-    .w-sm-33 {
-        width: 33% !important;
-    }
-
-    .w-sm-50 {
-        width: 50% !important;
-    }
-
-    .w-sm-75 {
-        width: 75% !important;
-    }
-
-    /* Reset width */
-    /* To be used with, for example, w-100 to have a with: 100%; only on mobile. */
-    .w-sm-auto {
-        width: auto !important;
-    }
 }
 
 .border-dashed {
@@ -234,86 +205,6 @@ _:-ms-fullscreen,
     z-index: 4;
 }
 
-/* Responsive Multi-Step Progress Bar.
-https://codepen.io/athimannil/pen/wWPYkQ
-
-Usage:
-    <ul class="list-unstyled multi-steps">
-        <li>Type de prescripteur</li>
-        <li class="is-active">SIRET</li>
-        <li>Vos informations</li>
-    </ul>
---------------------------------------------------------------------------- */
-
-.multi-steps>li.is-active:before,
-.multi-steps>li.is-active~li:before {
-    content: counter(stepNum);
-}
-
-.multi-steps>li.is-active:after,
-.multi-steps>li.is-active~li:after {
-    background-color: #ededed;
-}
-
-.multi-steps {
-    display: table;
-    table-layout: fixed;
-    width: 100%;
-}
-
-.multi-steps>li {
-    counter-increment: stepNum;
-    text-align: center;
-    display: table-cell;
-    position: relative;
-    color: #28a745;
-    z-index: 1;
-}
-
-.multi-steps>li:before {
-    content: "\2713";
-    /* Check mark symbol. */
-    display: block;
-    margin: 0 auto 4px;
-    background: #fff;
-    width: 36px;
-    height: 36px;
-    line-height: 32px;
-    text-align: center;
-    font-weight: bold;
-    border: 2px solid #28a745;
-    border-radius: 50%;
-}
-
-.multi-steps>li:after {
-    content: "";
-    height: 2px;
-    width: 100%;
-    background-color: #28a745;
-    position: absolute;
-    top: 16px;
-    left: 50%;
-    z-index: -1;
-}
-
-.multi-steps>li:last-child:after {
-    display: none;
-}
-
-.multi-steps>li.is-active:before {
-    background-color: #fff;
-    border-color: #28a745;
-}
-
-.multi-steps>li.is-active~li {
-    color: #808080;
-}
-
-.multi-steps>li.is-active~li:before {
-    background-color: #ededed;
-    border-color: #ededed;
-}
-
 /* Dropzone component used to upload files to an S3 bucket.
 --------------------------------------------------------------------------- */
 
@@ -345,47 +236,12 @@ Usage:
     background-color: transparent;
 }
 
-.font-size-hat {
-    font-size: 1.25rem;
-}
-
-.title-with-badge .badge {
-    font-size: 1rem;
-}
-
 /* To be discussed.
 --------------------------------------------------------------------------- */
-
-.collapse-caret,
-.collapse-caret:hover {
-    position: relative;
-    text-decoration: none !important;
-}
-
-.collapse-caret>*::after {
-    content: "\ea4e";
-    font-family: remixicon !important;
-    font-style: normal;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    line-height: 1;
-    vertical-align: text-bottom;
-    font-size: 1.25rem;
-    font-weight: 700;
-    margin-left: 0.5rem;
-}
-
-.collapse-caret[aria-expanded="true"]>*::after {
-    content: "\ea78";
-}
 
 .employee-records-list .badge {
     white-space: normal;
     margin: 0;
-}
-
-.text-with-btn span {
-    line-height: 2.2;
 }
 
 .itou-france-connect {
