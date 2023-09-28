@@ -53,6 +53,7 @@ PUBLIC_DASHBOARDS = {
     "suivi-pass-iae": "tb 217 - Suivi pass IAE",
     "cartographies-iae": "tb 218 - Cartographie de l'IAE",
     "suivi-controle-a-posteriori": "tb 144 - Contrôle à posteriori",
+    "suivi-demandes-prolongation": "tb 336 - Suivi des prolongations",
     # Note: keep those commented for reference. They're not used anymore but if we ever
     # need to regenerate values for the Q1 2022 or before, they're going to be required.
     # "recrutement": "tb 116 - Recrutement",
