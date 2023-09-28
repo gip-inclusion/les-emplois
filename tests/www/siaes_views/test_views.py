@@ -78,7 +78,7 @@ class CardViewTest(TestCase):
                  id="recrutements-en-cours-tab"
                  role="tab">
                Recrutement en cours
-               <span class="badge badge-sm badge-primary badge-pill text-white ml-2">
+               <span class="badge badge-sm bg-primary rounded-pill text-white ms-2">
                 0
                </span>
               </a>
@@ -92,7 +92,7 @@ class CardViewTest(TestCase):
                  id="autres-metiers-tab"
                  role="tab">
                Autre m&eacute;tier exerc&eacute;
-               <span class="badge badge-sm badge-pill badge-info-light text-dark ml-2">
+               <span class="badge badge-sm rounded-pill bg-info-light text-dark ms-2">
                 1
                </span>
               </a>
@@ -107,7 +107,7 @@ class CardViewTest(TestCase):
                <i class="ri-more-line">
                </i>
               </a>
-              <div aria-labelledby="sTabs01DropdownMoreLink" class="dropdown-menu dropdown-menu-right">
+              <div aria-labelledby="sTabs01DropdownMoreLink" class="dropdown-menu dropdown-menu-end">
               </div>
              </li>
             </ul>
@@ -142,13 +142,13 @@ class CardViewTest(TestCase):
                    </a>
                   </div>
                   <span class="fs-sm mt-1 d-flex align-items-center">
-                   <i class="ri-map-pin-2-line ri-sm mr-1">
+                   <i class="ri-map-pin-2-line ri-sm me-1">
                    </i>
                    Vannes (56)
                   </span>
                  </div>
-                 <div class="mt-lg-0 ml-auto d-flex flex-column align-items-end justify-content-center">
-                  <span class="badge badge-xs badge-pill badge-accent-02-light text-primary">
+                 <div class="mt-lg-0 ms-auto d-flex flex-column align-items-end justify-content-center">
+                  <span class="badge badge-xs rounded-pill bg-accent-02-light text-primary">
                    CDI
                   </span>
                  </div>
@@ -197,7 +197,7 @@ class CardViewTest(TestCase):
                  id="recrutements-en-cours-tab"
                  role="tab">
                Recrutement en cours
-               <span class="badge badge-sm badge-primary badge-pill text-white ml-2">
+               <span class="badge badge-sm bg-primary rounded-pill text-white ms-2">
                 1
                </span>
               </a>
@@ -212,7 +212,7 @@ class CardViewTest(TestCase):
                <i class="ri-more-line">
                </i>
               </a>
-              <div aria-labelledby="sTabs01DropdownMoreLink" class="dropdown-menu dropdown-menu-right">
+              <div aria-labelledby="sTabs01DropdownMoreLink" class="dropdown-menu dropdown-menu-end">
               </div>
              </li>
             </ul>
@@ -242,13 +242,13 @@ class CardViewTest(TestCase):
                    </a>
                   </div>
                   <span class="fs-sm mt-1 d-flex align-items-center">
-                   <i class="ri-map-pin-2-line ri-sm mr-1">
+                   <i class="ri-map-pin-2-line ri-sm me-1">
                    </i>
                    Vannes (56)
                   </span>
                  </div>
-                 <div class="mt-lg-0 ml-auto d-flex flex-column align-items-end justify-content-center">
-                  <span class="badge badge-xs badge-pill badge-accent-02-light text-primary">
+                 <div class="mt-lg-0 ms-auto d-flex flex-column align-items-end justify-content-center">
+                  <span class="badge badge-xs rounded-pill bg-accent-02-light text-primary">
                    CDI
                   </span>
                  </div>
@@ -308,7 +308,7 @@ class CardViewTest(TestCase):
                  id="recrutements-en-cours-tab"
                  role="tab">
                Recrutement en cours
-               <span class="badge badge-sm badge-primary badge-pill text-white ml-2">
+               <span class="badge badge-sm bg-primary rounded-pill text-white ms-2">
                 1
                </span>
               </a>
@@ -322,7 +322,7 @@ class CardViewTest(TestCase):
                  id="autres-metiers-tab"
                  role="tab">
                Autre m&eacute;tier exerc&eacute;
-               <span class="badge badge-sm badge-pill badge-info-light text-dark ml-2">
+               <span class="badge badge-sm rounded-pill bg-info-light text-dark ms-2">
                 1
                </span>
               </a>
@@ -337,7 +337,7 @@ class CardViewTest(TestCase):
                <i class="ri-more-line">
                </i>
               </a>
-              <div aria-labelledby="sTabs01DropdownMoreLink" class="dropdown-menu dropdown-menu-right">
+              <div aria-labelledby="sTabs01DropdownMoreLink" class="dropdown-menu dropdown-menu-end">
               </div>
              </li>
             </ul>
@@ -367,13 +367,13 @@ class CardViewTest(TestCase):
                    </a>
                   </div>
                   <span class="fs-sm mt-1 d-flex align-items-center">
-                   <i class="ri-map-pin-2-line ri-sm mr-1">
+                   <i class="ri-map-pin-2-line ri-sm me-1">
                    </i>
                    Vannes (56)
                   </span>
                  </div>
-                 <div class="mt-lg-0 ml-auto d-flex flex-column align-items-end justify-content-center">
-                  <span class="badge badge-xs badge-pill badge-accent-02-light text-primary">
+                 <div class="mt-lg-0 ms-auto d-flex flex-column align-items-end justify-content-center">
+                  <span class="badge badge-xs rounded-pill bg-accent-02-light text-primary">
                    CDI
                   </span>
                  </div>
@@ -396,13 +396,13 @@ class CardViewTest(TestCase):
                    </a>
                   </div>
                   <span class="fs-sm mt-1 d-flex align-items-center">
-                   <i class="ri-map-pin-2-line ri-sm mr-1">
+                   <i class="ri-map-pin-2-line ri-sm me-1">
                    </i>
                    Vannes (56)
                   </span>
                  </div>
-                 <div class="mt-lg-0 ml-auto d-flex flex-column align-items-end justify-content-center">
-                  <span class="badge badge-xs badge-pill badge-accent-02-light text-primary">
+                 <div class="mt-lg-0 ms-auto d-flex flex-column align-items-end justify-content-center">
+                  <span class="badge badge-xs rounded-pill bg-accent-02-light text-primary">
                    CDI
                   </span>
                  </div>
@@ -451,7 +451,7 @@ class CardViewTest(TestCase):
                  id="recrutements-en-cours-tab"
                  role="tab">
                Recrutement en cours
-               <span class="badge badge-sm badge-primary badge-pill text-white ml-2">
+               <span class="badge badge-sm bg-primary rounded-pill text-white ms-2">
                 0
                </span>
               </a>
@@ -465,7 +465,7 @@ class CardViewTest(TestCase):
                  id="autres-metiers-tab"
                  role="tab">
                Autre m&eacute;tier exerc&eacute;
-               <span class="badge badge-sm badge-pill badge-info-light text-dark ml-2">
+               <span class="badge badge-sm rounded-pill bg-info-light text-dark ms-2">
                 1
                </span>
               </a>
@@ -480,7 +480,7 @@ class CardViewTest(TestCase):
                <i class="ri-more-line">
                </i>
               </a>
-              <div aria-labelledby="sTabs01DropdownMoreLink" class="dropdown-menu dropdown-menu-right">
+              <div aria-labelledby="sTabs01DropdownMoreLink" class="dropdown-menu dropdown-menu-end">
               </div>
              </li>
             </ul>
@@ -515,13 +515,13 @@ class CardViewTest(TestCase):
                    </a>
                   </div>
                   <span class="fs-sm mt-1 d-flex align-items-center">
-                   <i class="ri-map-pin-2-line ri-sm mr-1">
+                   <i class="ri-map-pin-2-line ri-sm me-1">
                    </i>
                    Vannes (56)
                   </span>
                  </div>
-                 <div class="mt-lg-0 ml-auto d-flex flex-column align-items-end justify-content-center">
-                  <span class="badge badge-xs badge-pill badge-accent-02-light text-primary">
+                 <div class="mt-lg-0 ms-auto d-flex flex-column align-items-end justify-content-center">
+                  <span class="badge badge-xs rounded-pill bg-accent-02-light text-primary">
                    CDI
                   </span>
                  </div>

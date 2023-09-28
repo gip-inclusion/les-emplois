@@ -11,7 +11,7 @@
             {% with job_description=job_descriptions_by_pk|get_dict_item:choice.data.value %}
                 <li class="list-group-item list-group-item-action">
                     <div class="d-flex align-items-start">
-                        <div class="d-inline-flex mt-1 mr-2">{{ choice.tag }}</div>
+                        <div class="d-inline-flex mt-1 me-2">{{ choice.tag }}</div>
                         <div>
                             <div class="d-flex flex-column flex-lg-row align-items-lg-center">
                                 <label class="font-weight-bold stretched-link order-2 order-md-1 m-0" for="{{ choice.id_for_label }}">
@@ -19,20 +19,20 @@
                                 </label>
                                 {% if job_description.is_popular %}
                                     <div class="order-1 order-md-2">
-                                        <span class="badge badge-sm badge-pill badge-accent-03 text-primary ml-0 ml-lg-2 mt-1 mt-lg-0"><i class="ri-group-line"></i>20+ candidatures</span>
+                                        <span class="badge badge-sm rounded-pill bg-accent-03 text-primary ms-0 ms-lg-2 mt-1 mt-lg-0"><i class="ri-group-line"></i>20+ candidatures</span>
                                     </div>
                                 {% endif %}
                             </div>
                             <span class="fs-sm mt-1 d-flex align-items-center">
-                                <i class="ri-map-pin-2-line ri-sm mr-1"></i>{{ job_description.display_location }}
+                                <i class="ri-map-pin-2-line ri-sm me-1"></i>{{ job_description.display_location }}
                             </span>
                         </div>
-                        <div class="mt-lg-0 ml-auto d-flex flex-column align-items-end justify-content-center">
+                        <div class="mt-lg-0 ms-auto d-flex flex-column align-items-end justify-content-center">
                             {% if job_description.display_contract_type %}
-                                <span class="badge badge-xs badge-pill badge-accent-02-light text-primary">{{ job_description.display_contract_type }}</span>
+                                <span class="badge badge-xs rounded-pill bg-accent-02-light text-primary">{{ job_description.display_contract_type }}</span>
                             {% endif %}
                             {% if job_description.hours_per_week %}
-                                <span class="badge badge-xs badge-pill badge-accent-02-light text-primary mt-1">{{ job_description.hours_per_week }}h/semaine</span>
+                                <span class="badge badge-xs rounded-pill bg-accent-02-light text-primary mt-1">{{ job_description.hours_per_week }}h/semaine</span>
                             {% endif %}
                         </div>
                     </div>
@@ -41,7 +41,7 @@
         {% endfor %}
         <li class="list-group-item list-group-item-action">
             <div class="d-flex align-items-start">
-                <div class="d-inline-flex mt-1 mr-2">{{ form.spontaneous_application }}</div>
+                <div class="d-inline-flex mt-1 me-2">{{ form.spontaneous_application }}</div>
                 <div>
                     <div class="d-flex flex-column flex-lg-row align-items-lg-center">
                         <label class="font-weight-bold stretched-link m-0" for="{{ form.spontaneous_application.id_for_label }}">

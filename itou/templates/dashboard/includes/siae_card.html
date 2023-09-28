@@ -4,8 +4,8 @@
             <div class="flex-grow-1">
                 <span class="h4 m-0">Structure</span>
             </div>
-            <div class="ml-2">
-                <span class="badge badge-pill badge-sm badge-primary">{{ request.current_organization.kind }} - ID {{ request.current_organization.id }}</span>
+            <div class="ms-2">
+                <span class="badge rounded-pill badge-sm bg-primary">{{ request.current_organization.kind }} - ID {{ request.current_organization.id }}</span>
             </div>
         </div>
         <div class="px-3 px-lg-4">
@@ -53,7 +53,7 @@
                             <span>Voir les annexes financières</span>
                         </a>
                         {% if not request.current_organization.is_active %}
-                            <span class="badge badge-xs badge-pill badge-warning-lighter text-warning"><i class="ri-error-warning-line" aria-hidden="true"></i>Action requise</span>
+                            <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning"><i class="ri-error-warning-line" aria-hidden="true"></i>Action requise</span>
                         {% endif %}
                     </li>
                 {% endif %}

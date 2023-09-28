@@ -1,18 +1,4 @@
 # serializer version: 1
-# name: test_chores_grant_older_pending_requests[False-0]
-  '''
-  1 prolongation request can be automatically granted
-  0/1 prolongation request automatically granted
-  
-  '''
-# ---
-# name: test_chores_grant_older_pending_requests[True-1]
-  '''
-  1 prolongation request can be automatically granted
-  1/1 prolongation request automatically granted
-  
-  '''
-# ---
 # name: test_chores_send_reminder_to_prescriber_organization_other_members[False-0]
   '''
   2 prolongation requests can be reminded

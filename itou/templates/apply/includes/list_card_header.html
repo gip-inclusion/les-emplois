@@ -10,7 +10,7 @@
             </a>
         </b>
         {% if job_application.to_siae.grace_period_has_expired %}
-            <span class="badge badge-sm badge-pill badge-danger">
+            <span class="badge badge-sm rounded-pill bg-danger">
                 Structure déconventionnée depuis le
                 {{ job_application.to_siae.grace_period_end_date|date:"d F Y" }}
             </span>

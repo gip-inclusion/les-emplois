@@ -21,7 +21,7 @@
             {% with eligibility_diagnosis.administrative_criteria.all as administrative_criteria %}
                 {% if administrative_criteria %}
                     <p>
-                        <span class="badge badge-sm badge-pill badge-secondary">Situation administrative du candidat</span>
+                        <span class="badge badge-sm rounded-pill bg-secondary">Situation administrative du candidat</span>
                     </p>
                     {# https://docs.djangoproject.com/en/dev/ref/templates/builtins/#regroup #}
                     {% regroup administrative_criteria|dictsort:"level" by get_level_display as levels %}
@@ -58,7 +58,7 @@
                 {% with eligibility_diagnosis.administrative_criteria.all as administrative_criteria %}
                     {% if administrative_criteria %}
                         <p>
-                            <span class="badge badge-sm badge-pill badge-secondary">Critères administratifs</span>
+                            <span class="badge badge-sm rounded-pill bg-secondary">Critères administratifs</span>
                         </p>
                         {# https://docs.djangoproject.com/en/dev/ref/templates/builtins/#regroup #}
                         {% regroup administrative_criteria|dictsort:"level" by get_level_display as levels %}

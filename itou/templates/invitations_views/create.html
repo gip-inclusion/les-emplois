@@ -28,12 +28,12 @@
                             <fieldset class="mt-4">
                                 {% for form in formset %}
                                     {% bootstrap_form_errors form type="non_field_errors" %}
-                                    <div class="inline-form-row row align-items-top mb-2 no-gutters">
-                                        {% bootstrap_form form show_label=False form_group_class="col-md pr-md-3 mb-2 inline-col" %}
+                                    <div class="inline-form-row row align-items-top mb-2 g-0">
+                                        {% bootstrap_form form show_label=False form_group_class="col-md pe-md-3 mb-2 inline-col" %}
                                     </div>
                                 {% endfor %}
                             </fieldset>
-                            <button type="button" class="btn btn-link btn-ico justify-content-center mb-3 pl-0 pt-0 add-form-row">
+                            <button type="button" class="btn btn-link btn-ico justify-content-center mb-3 ps-0 pt-0 add-form-row">
                                 <i class="ri-user-add-line ri-lg"></i>
                                 <span>Ajouter un autre collaborateur</span>
                             </button>
@@ -43,7 +43,7 @@
                                 <div class="col-12">
                                     <div class="form-row align-items-center justify-content-end">
                                         <div class="form-group col-12 col-lg-auto order-2 order-lg-1">
-                                            <a href="{{ back_url }}" class="btn btn-link btn-block btn-ico pl-0 justify-content-center" aria-label="Retour à l'étape précédente">
+                                            <a href="{{ back_url }}" class="btn btn-link btn-block btn-ico ps-0 justify-content-center" aria-label="Retour à l'étape précédente">
                                                 <i class="ri-arrow-go-back-line ri-lg"></i>
                                                 <span>Retour</span>
                                             </a>
@@ -65,7 +65,7 @@
                             <h3 class="h4">Invitations en attente</h3>
                             <div class="table-responsive-lg mt-3">
                                 <table class="table">
-                                    <caption class="sr-only">Liste des invitations en attente</caption>
+                                    <caption class="visually-hidden">Liste des invitations en attente</caption>
                                     <thead>
                                         <tr>
                                             <th scope="col">Prénom</th>

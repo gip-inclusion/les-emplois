@@ -16,13 +16,13 @@
                         <div role="button" data-toggle="collapse" data-target="#collapse_pole_emploi" aria-controls="collapse_pole_emploi">
                             {% bootstrap_field form.pole_emploi %}
                         </div>
-                        <div id="collapse_pole_emploi" class="pl-3 pb-1 mb-3 border-left border-primary collapse{% if form.pole_emploi.value %} show{% endif %}">
+                        <div id="collapse_pole_emploi" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.pole_emploi.value %} show{% endif %}">
                             {% bootstrap_field form.pole_emploi_id %}
                             {% bootstrap_field form.pole_emploi_since %}
                         </div>
                     {% else %}
                         <p>Inscrit à Pôle emploi, merci de préciser la durée d'inscription :</p>
-                        <div class="pl-3 pb-1 mb-3 border-left border-primary">
+                        <div class="ps-3 pb-1 mb-3 border-start border-primary">
                             {% bootstrap_field form.pole_emploi_id %}
                             {% bootstrap_field form.pole_emploi_since %}
                         </div>
@@ -34,7 +34,7 @@
                         {% bootstrap_field form.unemployed %}
                     </div>
 
-                    <div id="collapse_unemployed" class="pl-3 pb-1 mb-3 border-left border-primary collapse{% if form.unemployed.value %} show{% endif %}">
+                    <div id="collapse_unemployed" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.unemployed.value %} show{% endif %}">
                         {% bootstrap_field form.unemployed_since %}
                     </div>
 
@@ -45,7 +45,7 @@
                         {% bootstrap_field form.rsa_allocation %}
                     </div>
 
-                    <div id="collapse_rsa_allocation" class="pl-3 pb-1 mb-3 border-left border-primary collapse{% if form.rsa_allocation.value %} show{% endif %}">
+                    <div id="collapse_rsa_allocation" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.rsa_allocation.value %} show{% endif %}">
                         {% bootstrap_field form.rsa_markup %}
                         {% bootstrap_field form.rsa_allocation_since %}
                     </div>
@@ -54,7 +54,7 @@
                         {% bootstrap_field form.ass_allocation %}
                     </div>
 
-                    <div id="collapse_ass_allocation" class="pl-3 pb-1 mb-3 border-left border-primary collapse{% if form.ass_allocation.value %} show{% endif %}">
+                    <div id="collapse_ass_allocation" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.ass_allocation.value %} show{% endif %}">
                         {% bootstrap_field form.ass_allocation_since %}
                     </div>
 
@@ -62,7 +62,7 @@
                         {% bootstrap_field form.aah_allocation %}
                     </div>
 
-                    <div id="collapse_aah_allocation" class="pl-3 pb-1 mb-3 border-left border-primary collapse{% if form.aah_allocation.value %} show{% endif %}">
+                    <div id="collapse_aah_allocation" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.aah_allocation.value %} show{% endif %}">
                         {% bootstrap_field form.aah_allocation_since %}
                     </div>
                 </fieldset>
@@ -74,7 +74,7 @@
                     <div class="col-12">
                         <div class="form-row align-items-center justify-content-lg-between">
                             <div class="form-group col-12 col-md-6 col-lg-auto order-3 order-md-1">
-                                <a href="{% url "employee_record_views:create_step_2" job_application.id %}" class="btn btn-block btn-ico btn-link pl-0 justify-content-center" aria-label="Retour à l'étape précédente">
+                                <a href="{% url "employee_record_views:create_step_2" job_application.id %}" class="btn btn-block btn-ico btn-link ps-0 justify-content-center" aria-label="Retour à l'étape précédente">
                                     <i class="ri-arrow-left-line ri-lg"></i>
                                     <span>Étape précédente</span>
                                 </a>

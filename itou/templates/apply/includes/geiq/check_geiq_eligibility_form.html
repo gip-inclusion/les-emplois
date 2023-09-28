@@ -5,7 +5,7 @@
 <div class="text-primary">{% bootstrap_field form.proof_of_eligibility %}</div>
 <hr>
 
-<div class="my-4 text-right">
+<div class="my-4 text-end">
     <a href="{{ back_url }}" class="btn btn-link">Annuler</a>
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirm_geiq_eligibility_modal" {% if not form.proof_of_eligibility.value or form.errors %}disabled{% endif %}>
         Valider les critères d'éligibilité GEIQ

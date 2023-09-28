@@ -42,9 +42,9 @@
                                     <p class="card-text">{{ form.instance.get_reason_display }}</p>
                                     <p class="card-text text-success">
                                         À partir du
-                                        <span class="badge badge-pill badge-success">{{ form.instance.start_at|date:"d/m/Y" }}</span>
+                                        <span class="badge rounded-pill bg-success">{{ form.instance.start_at|date:"d/m/Y" }}</span>
                                         jusqu'au
-                                        <span class="badge badge-pill badge-success">{{ form.instance.end_at|date:"d/m/Y" }}</span>
+                                        <span class="badge rounded-pill bg-success">{{ form.instance.end_at|date:"d/m/Y" }}</span>
                                     </p>
                                     {% if form.instance.validated_by.email %}
                                         <p class="card-text">

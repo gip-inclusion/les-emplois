@@ -118,9 +118,7 @@
                 <div class="s-banner-01__row row">
                     <div class="s-banner-01__col col-12">
                         <div class="bg-white">
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
-                                <i class="ri-close-line"></i>
-                            </button>
+                            <button type="button" class="btn-close" data-dismiss="alert" aria-label="Fermer"></button>
                             <div class="row align-items-center">
                                 <div class="d-none d-lg-block col-lg-2">
                                     <img src="{% static "img/illustration-bg-mini-ic.svg" %}" class="img-fluid img-fitcover" alt="">
@@ -133,7 +131,7 @@
                                     <p class="text-danger">
                                         <i class="ri-information-line ri-xxl"></i> <strong>A partir du 2 Mai 2023</strong>, la connexion au site des emplois de l’inclusion se fera exclusivement via Inclusion Connect.
                                     </p>
-                                    <div class="row no-gutters">
+                                    <div class="row g-0">
                                         <div class="col-12 col-md-auto mt-2">
                                             <a href="{{ ic_activate_url }}"
                                                class="btn btn-primary btn-block matomo-event"
@@ -171,7 +169,7 @@
                                 <p>
                                     <strong>DORA</strong> vous aide dans la levée des freins périphériques bloquant le retour à l'emploi des bénéficiaires en facilitant l’identification des services d’insertion adaptés.
                                 </p>
-                                <div class="row no-gutters">
+                                <div class="row g-0">
                                     <div class="col-12 col-md-auto mt-2">
                                         <a class="btn btn-primary btn-block btn-ico"
                                            href="https://dora.fabrique.social.gouv.fr/?utm_source=LesEmplois&utm_medium=banniereLesEmplois&utm_campaign=dashboard"
@@ -198,7 +196,7 @@
                                 <p>
                                     <strong>DORA</strong> est une cartographie numérique de l'offre d'insertion nationale. Rendez vos services visibles sur votre territoire et sur tous les sites partenaires, grâce à notre démarche collective d'ouverture des données.
                                 </p>
-                                <div class="row no-gutters">
+                                <div class="row g-0">
                                     <div class="col-12 col-md-auto mt-2">
                                         <a class="btn btn-primary btn-block btn-ico"
                                            href="https://dora.fabrique.social.gouv.fr/auth/rattachement?siret={{ current_org.siret }}&utm_source=LesEmplois&utm_medium=banniereLesEmplois&utm_campaign=dashboard"
@@ -241,13 +239,13 @@
                         {% if user.is_prescriber and request.current_organization %}
                             <p class="my-1">
                                 {% if request.current_organization.is_authorized %}
-                                    <span class="badge badge-pill badge-sm badge-warning">Prescripteur habilité</span>
+                                    <span class="badge rounded-pill badge-sm bg-warning">Prescripteur habilité</span>
                                 {% endif %}
                                 {% if request.current_organization.code_safir_pole_emploi %}
-                                    <span class="badge badge-pill badge-sm badge-light">Code SAFIR {{ request.current_organization.code_safir_pole_emploi }}</span>
+                                    <span class="badge rounded-pill badge-sm bg-light">Code SAFIR {{ request.current_organization.code_safir_pole_emploi }}</span>
                                 {% endif %}
                                 {% if request.current_organization.siret %}
-                                    <span class="badge badge-pill badge-sm badge-light">SIRET {{ request.current_organization.siret|format_siret }}</span>
+                                    <span class="badge rounded-pill badge-sm bg-light">SIRET {{ request.current_organization.siret|format_siret }}</span>
                                 {% endif %}
                             </p>
                         {% endif %}

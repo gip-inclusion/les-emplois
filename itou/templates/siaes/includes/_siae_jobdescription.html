@@ -9,12 +9,12 @@
                    data-matomo-option="clic-metiers">{{ job.display_name }}</a>
                 {% if job.is_popular %}
                     <div class="order-1 order-md-2">
-                        <span class="badge badge-sm badge-pill badge-accent-03 text-primary ml-0 ml-lg-2 mt-1 mt-lg-0"><i class="ri-group-line"></i>{{ job.POPULAR_THRESHOLD }}+ candidatures</span>
+                        <span class="badge badge-sm rounded-pill bg-accent-03 text-primary ms-0 ms-lg-2 mt-1 mt-lg-0"><i class="ri-group-line"></i>{{ job.POPULAR_THRESHOLD }}+ candidatures</span>
                     </div>
                 {% endif %}
             </div>
             <span class="fs-sm mt-1 d-flex align-items-center">
-                <i class="ri-map-pin-2-line ri-sm mr-1"></i>
+                <i class="ri-map-pin-2-line ri-sm me-1"></i>
                 {% if job.location %}
                     {{ job.location }}
                 {% else %}
@@ -22,14 +22,12 @@
                 {% endif %}
             </span>
         </div>
-        <div class="mt-lg-0 ml-auto d-flex flex-column align-items-end justify-content-center">
+        <div class="mt-lg-0 ms-auto d-flex flex-column align-items-end justify-content-center">
             {% if job.display_contract_type %}
-                <span class="badge badge-xs badge-pill badge-accent-02-light text-primary">{{ job.display_contract_type }}</span>
+                <span class="badge badge-xs rounded-pill bg-accent-02-light text-primary">{{ job.display_contract_type }}</span>
             {% endif %}
             {% if job.hours_per_week %}
-                <span class="badge badge-xs badge-pill badge-accent-02-light text-primary mt-1">
-                    {{ job.hours_per_week }}h/semaine
-                </span>
+                <span class="badge badge-xs rounded-pill bg-accent-02-light text-primary mt-1">{{ job.hours_per_week }}h/semaine</span>
             {% endif %}
         </div>
     </div>

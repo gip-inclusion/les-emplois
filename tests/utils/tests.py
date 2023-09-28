@@ -787,15 +787,15 @@ class UtilsTemplateFiltersTestCase(TestCase):
         test_cases = [
             (
                 "141068078200557",
-                '<span>1</span><span class="ml-1">41</span><span class="ml-1">06</span>'
-                '<span class="ml-1">80</span><span class="ml-1">782</span><span class="ml-1">005</span>'
-                '<span class="ml-1">57</span>',
+                '<span>1</span><span class="ms-1">41</span><span class="ms-1">06</span>'
+                '<span class="ms-1">80</span><span class="ms-1">782</span><span class="ms-1">005</span>'
+                '<span class="ms-1">57</span>',
             ),
             (
                 " 1 41 06 80 782 005 57",
-                '<span>1</span><span class="ml-1">41</span><span class="ml-1">06</span>'
-                '<span class="ml-1">80</span><span class="ml-1">782</span><span class="ml-1">005</span>'
-                '<span class="ml-1">57</span>',
+                '<span>1</span><span class="ms-1">41</span><span class="ms-1">06</span>'
+                '<span class="ms-1">80</span><span class="ms-1">782</span><span class="ms-1">005</span>'
+                '<span class="ms-1">57</span>',
             ),
             ("", ""),
             ("12345678910", "12345678910"),
@@ -807,9 +807,9 @@ class UtilsTemplateFiltersTestCase(TestCase):
     def test_format_approval_number(self):
         test_cases = [
             ("", ""),
-            ("XXXXX3500001", '<span>XXXXX</span><span class="ml-1">35</span><span class="ml-1">00001</span>'),
+            ("XXXXX3500001", '<span>XXXXX</span><span class="ms-1">35</span><span class="ms-1">00001</span>'),
             # Actual formatting does not really matter, just verify it does not crash.
-            ("foo", '<span>foo</span><span class="ml-1"></span><span class="ml-1"></span>'),
+            ("foo", '<span>foo</span><span class="ms-1"></span><span class="ms-1"></span>'),
         ]
         for number, expected in test_cases:
             with self.subTest(number):

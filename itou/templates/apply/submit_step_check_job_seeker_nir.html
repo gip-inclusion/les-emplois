@@ -9,9 +9,7 @@
     {% if request.user.is_employer %}
         {% if siae.is_subject_to_eligibility_rules or siae.kind == SiaeKind.GEIQ %}
             <div class="alert alert-info alert-dismissible fade show">
-                <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
-                    <i class="ri-close-line"></i>
-                </button>
+                <button type="button" class="btn-close" data-dismiss="alert" aria-label="Fermer"></button>
                 <p class="mb-2">
                     <strong>Nouveauté</strong>
                 </p>
@@ -50,7 +48,7 @@
             {% if form.errors %}
                 <div class="alert alert-info">
                     <div class="row">
-                        <div class="col-auto pr-0">
+                        <div class="col-auto pe-0">
                             <i class="ri-information-line ri-xl text-info"></i>
                         </div>
                         <div class="col">
@@ -66,7 +64,7 @@
             {% else %}
                 <div class="alert alert-info">
                     <div class="row">
-                        <div class="col-auto pr-0">
+                        <div class="col-auto pe-0">
                             <i class="ri-information-line ri-xl text-info"></i>
                         </div>
                         <div class="col">
@@ -81,7 +79,7 @@
                                 <a href="https://www.ameli.fr/assure/droits-demarches/principes/numero-securite-sociale"
                                    aria-label="ameli.fr, article concernant le numéro de sécurité sociale (ouverture dans un nouvel onglet)"
                                    rel="noopener"
-                                   target="_blank">ameli.fr</a><i class="ri-external-link-line ml-1"></i>, le site de l'assurance maladie, vous explique comment l'obtenir.
+                                   target="_blank">ameli.fr</a><i class="ri-external-link-line ms-1"></i>, le site de l'assurance maladie, vous explique comment l'obtenir.
                             </p>
                         </div>
                     </div>
@@ -107,9 +105,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h3 class="modal-title" id="nir-confirmation-label">Utilisateur trouvé</h3>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
-                                <i class="ri-close-line"></i>
-                            </button>
+                            <button type="button" class="btn-close" data-dismiss="modal" aria-label="Fermer"></button>
                         </div>
                         <div class="modal-body">
                             <p>

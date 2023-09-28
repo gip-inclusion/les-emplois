@@ -20,7 +20,7 @@
                             {% csrf_token %}
 
                             {% bootstrap_form_errors new_job_app_notification_form type="all" %}
-                            {% bootstrap_form new_job_app_notification_form field_class="custom-control custom-switch" show_label=False %}
+                            {% bootstrap_form new_job_app_notification_form field_class="form-check form-switch" show_label=False %}
 
                             {% buttons %}
                                 <a class="btn btn-outline-primary" href="{{ back_url }}">Annuler</a>

@@ -21,7 +21,7 @@
 
                         {% bootstrap_form siren_form alert_error_type="all" %}
 
-                        <div class="text-right">
+                        <div class="text-end">
                             {% buttons %}
                                 <button class="btn btn-primary">Rechercher</button>
                             {% endbuttons %}
@@ -33,7 +33,7 @@
                     {% if siren_form.cleaned_data and not siaes_without_members and not siaes_with_members %}
                         <div class="alert alert-warning mt-5" role="status">
                             <p class="mb-0">
-                                <i class="ri-information-line ri-xl text-warning mr-2"></i>
+                                <i class="ri-information-line ri-xl text-warning me-2"></i>
                                 <strong>Aucun résultat pour {{ siren_form.cleaned_data.siren }}</strong>.
                             </p>
                         </div>
@@ -114,7 +114,7 @@
                                     <br>
                                     - Pour les GEIQ, il s’agit du correspondant enregistré dans la liste des GEIQ transmises par la FFGEIQ.
                                 </p>
-                                <div class="text-right">
+                                <div class="text-end">
                                     {% buttons %}
                                         <button class="btn btn-primary">Envoyer ma demande de validation</button>
                                     {% endbuttons %}
@@ -168,7 +168,7 @@
 
 
                     {% if siaes_without_members or siaes_with_members %}
-                        <div class="mt-5 text-right">
+                        <div class="mt-5 text-end">
                             <p>
                                 En cas de problème, <a href="{{ ITOU_HELP_CENTER_URL }}" target="_blank" rel="noopener" aria-label="{{ ITOU_HELP_CENTER_URL }} (ouverture dans un nouvel onglet)">contactez-nous</a>.
                             </p>

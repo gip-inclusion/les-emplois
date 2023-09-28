@@ -67,8 +67,8 @@ class TestApprovalDetailView:
         assertNotContains(
             response, reverse("apply:details_for_siae", kwargs={"job_application_id": other_siae_job_application.pk})
         )
-        assertContains(response, '<i class="ri-group-line mr-2" aria-hidden="true"></i>Prescripteur habilité', count=1)
-        assertContains(response, '<i class="ri-group-line mr-2" aria-hidden="true"></i>Orienteur', count=1)
+        assertContains(response, '<i class="ri-group-line me-2" aria-hidden="true"></i>Prescripteur habilité', count=1)
+        assertContains(response, '<i class="ri-group-line me-2" aria-hidden="true"></i>Orienteur', count=1)
 
     def test_detail_view_no_job_application(self, client):
         siae = SiaeFactory(with_membership=True)

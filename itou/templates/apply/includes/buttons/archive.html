@@ -3,19 +3,17 @@
     <span>Supprimer cette candidature</span>
 </button>
 
-<div class="modal fade text-left" id="delete-job-application" tabindex="-1" role="dialog" aria-labelledby="no-email-modal-label" aria-modal="true">
+<div class="modal fade text-start" id="delete-job-application" tabindex="-1" role="dialog" aria-labelledby="no-email-modal-label" aria-modal="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <form method="post" action="{% url 'apply:archive' job_application_id=job_application.pk %}">
                 {% csrf_token %}
                 <div class="modal-header">
                     <h3 class="modal-title" id="no-email-modal-label">
-                        <i class="ri-delete-bin-line ri-lg mr-1"></i>
+                        <i class="ri-delete-bin-line ri-lg me-1"></i>
                         Supprimer cette candidature de mon tableau de bord
                     </h3>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
-                        <i class="ri-close-line"></i>
-                    </button>
+                    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Fermer"></button>
                 </div>
                 <div class="modal-body">
                     <div class="container">

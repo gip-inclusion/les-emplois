@@ -20,7 +20,7 @@
                     <div class="col-md-12 mt-3">
                         {% if evaluated_administrative_criteria.can_upload %}
                             <a href="{% url 'siae_evaluations_views:siae_upload_doc' evaluated_administrative_criteria.pk %}"
-                               class="btn {% if evaluated_administrative_criteria.proof_id and criteria_review_state == 'PENDING' %}btn-outline-primary {% else %}btn-primary {% endif %}float-right">
+                               class="btn {% if evaluated_administrative_criteria.proof_id and criteria_review_state == 'PENDING' %}btn-outline-primary {% else %}btn-primary {% endif %}float-end">
                                 {% if evaluated_administrative_criteria.proof_id %}
                                     Modifier le justificatif
                                 {% else %}
@@ -28,7 +28,7 @@
                                 {% endif %}
                             </a>
                         {% elif evaluated_administrative_criteria.proof_id %}
-                            <a href="{% url "siae_evaluations_views:view_proof" evaluated_administrative_criteria_id=evaluated_administrative_criteria.pk %}" target="_blank" class="btn btn-outline-primary float-right">Visualiser le justificatif soumis</a>
+                            <a href="{% url "siae_evaluations_views:view_proof" evaluated_administrative_criteria_id=evaluated_administrative_criteria.pk %}" target="_blank" class="btn btn-outline-primary float-end">Visualiser le justificatif soumis</a>
                         {% endif %}
                     </div>
                 </div>

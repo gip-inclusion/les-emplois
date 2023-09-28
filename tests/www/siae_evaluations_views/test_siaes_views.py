@@ -248,8 +248,8 @@ class SiaeJobApplicationListViewTest(TestCase):
                                 Auto-prescription pour <span class="text-muted">Manny CALAVERA</span>
                             </h3>
                         </div>
-                        <div class="col-lg-4 col-md-5 col-12 text-right">
-                            <p class="badge badge-pill badge-communaute-light float-right">transmis</p>
+                        <div class="col-lg-4 col-md-5 col-12 text-end">
+                            <p class="badge rounded-pill bg-communaute-light float-end">transmis</p>
                         </div>
                     </div>
                     """,
@@ -263,12 +263,12 @@ class SiaeJobApplicationListViewTest(TestCase):
         test_data = [
             (
                 evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
-                '<p class="badge badge-pill badge-success float-right">validé</p>',
+                '<p class="badge rounded-pill bg-success float-end">validé</p>',
                 """
                 <div class="col-md-9 mt-1">
                     <h3>Bénéficiaire du RSA</h3>
                 </div>
-                <div class="col-md-3 mt-1 text-right">
+                <div class="col-md-3 mt-1 text-end">
                     <p class="text-success">
                         <i class="ri-checkbox-circle-line"></i> Validé
                     </p>
@@ -277,12 +277,12 @@ class SiaeJobApplicationListViewTest(TestCase):
             ),
             (
                 evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
-                '<p class="badge badge-pill badge-danger float-right">problème constaté</p>',
+                '<p class="badge rounded-pill bg-danger float-end">problème constaté</p>',
                 f"""
                 <div class="col-md-9 mt-1">
                     <h3>Bénéficiaire du RSA</h3>
                 </div>
-                <div class="col-md-3 mt-1 text-right">
+                <div class="col-md-3 mt-1 text-end">
                     {self.refused_html}
                 </div>
                 """,
@@ -323,7 +323,7 @@ class SiaeJobApplicationListViewTest(TestCase):
                                 Auto-prescription pour <span class="text-muted">Manny CALAVERA</span>
                             </h3>
                         </div>
-                        <div class="col-lg-4 col-md-5 col-12 text-right">
+                        <div class="col-lg-4 col-md-5 col-12 text-end">
                         {expected_jobapp_html}
                         </div>
                     </div>
@@ -355,8 +355,8 @@ class SiaeJobApplicationListViewTest(TestCase):
                         Auto-prescription pour <span class="text-muted">Manny CALAVERA</span>
                     </h3>
                 </div>
-                <div class="col-lg-4 col-md-5 col-12 text-right">
-                    <p class="badge badge-pill badge-pilotage float-right">à traiter</p>
+                <div class="col-lg-4 col-md-5 col-12 text-end">
+                    <p class="badge rounded-pill bg-pilotage float-end">à traiter</p>
                 </div>
             </div>
             """,
@@ -413,12 +413,12 @@ class SiaeJobApplicationListViewTest(TestCase):
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
 
         submit_disabled = """
-            <button class="btn btn-outline-primary disabled float-right">
+            <button class="btn btn-outline-primary disabled float-end">
                 Soumettre à validation
             </button>
         """
         submit_active = """
-            <button class="btn btn-primary float-right">
+            <button class="btn btn-primary float-end">
                 Soumettre à validation
             </button>
         """
@@ -455,7 +455,7 @@ class SiaeJobApplicationListViewTest(TestCase):
         self.assertContains(response, select_criteria)
         self.assertContains(response, upload_proof)
         self.assertContains(
-            response, '<p class="badge badge-pill badge-success float-right">justificatifs téléversés</p>'
+            response, '<p class="badge rounded-pill bg-success float-end">justificatifs téléversés</p>'
         )
 
         # criterion submitted
@@ -478,12 +478,12 @@ class SiaeJobApplicationListViewTest(TestCase):
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
 
         submit_disabled = """
-            <button class="btn btn-outline-primary disabled float-right">
+            <button class="btn btn-outline-primary disabled float-end">
                 Soumettre à validation
             </button>
         """
         submit_active = """
-            <button class="btn btn-primary float-right">
+            <button class="btn btn-primary float-end">
                 Soumettre à validation
             </button>
         """

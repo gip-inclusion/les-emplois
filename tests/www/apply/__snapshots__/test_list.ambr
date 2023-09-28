@@ -3,7 +3,7 @@
   '''
   <div class="alert alert-info mt-3" id="besoin-dun-chiffre">
               <p class="mb-0">
-                  <i aria-hidden="true" class="ri-information-line mr-1"></i>
+                  <i aria-hidden="true" class="ri-information-line me-1"></i>
                   <b>Besoin d'un chiffre ?</b>
               </p>
               
@@ -18,7 +18,7 @@
   '''
   <div class="alert alert-info mt-3" id="besoin-dun-chiffre">
               <p class="mb-0">
-                  <i aria-hidden="true" class="ri-information-line mr-1"></i>
+                  <i aria-hidden="true" class="ri-information-line me-1"></i>
                   <b>Besoin d'un chiffre ?</b>
               </p>
               
@@ -103,10 +103,10 @@
                   
               </p>
           </div>
-          <div class="col-12 col-md-12 col-lg-4 pl-lg-0">
+          <div class="col-12 col-md-12 col-lg-4 ps-lg-0">
               <p class="font-weight-bold mb-1">Statut :</p>
               <p class="fs-sm card-text">
-                  <span class="badge badge-sm badge-pill text-wrap mb-1 badge-info" id="state_11111111-1111-1111-1111-111111111111">Nouvelle candidature</span>
+                  <span class="badge badge-sm rounded-pill text-wrap mb-1 bg-info" id="state_11111111-1111-1111-1111-111111111111">Nouvelle candidature</span>
                   
               </p>
           </div>
@@ -118,7 +118,7 @@
                                           <div class="fs-sm"><p>Third application</p></div>
                                           
                                       </div>
-                                      <div class="card-footer text-right">
+                                      <div class="card-footer text-end">
                                           <a aria-controls="answer0" aria-expanded="false" aria-label="Plus d'informations sur cette candidature" class="btn btn-sm btn-outline-primary" data-target="#answer0" data-toggle="collapse" href="#">Plus d'informations</a>
                                       </div>
                                   </div>
@@ -171,10 +171,10 @@
                   
               </p>
           </div>
-          <div class="col-12 col-md-12 col-lg-4 pl-lg-0">
+          <div class="col-12 col-md-12 col-lg-4 ps-lg-0">
               <p class="font-weight-bold mb-1">Statut :</p>
               <p class="fs-sm card-text">
-                  <span class="badge badge-sm badge-pill text-wrap mb-1 badge-info" id="state_22222222-2222-2222-2222-222222222222">Nouvelle candidature</span>
+                  <span class="badge badge-sm rounded-pill text-wrap mb-1 bg-info" id="state_22222222-2222-2222-2222-222222222222">Nouvelle candidature</span>
                   
               </p>
           </div>
@@ -186,7 +186,7 @@
                                           <div class="fs-sm"><p>Second application</p></div>
                                           
                                       </div>
-                                      <div class="card-footer text-right">
+                                      <div class="card-footer text-end">
                                           <a aria-controls="answer1" aria-expanded="false" aria-label="Plus d'informations sur cette candidature" class="btn btn-sm btn-outline-primary" data-target="#answer1" data-toggle="collapse" href="#">Plus d'informations</a>
                                       </div>
                                   </div>
@@ -239,10 +239,10 @@
                   
               </p>
           </div>
-          <div class="col-12 col-md-12 col-lg-4 pl-lg-0">
+          <div class="col-12 col-md-12 col-lg-4 ps-lg-0">
               <p class="font-weight-bold mb-1">Statut :</p>
               <p class="fs-sm card-text">
-                  <span class="badge badge-sm badge-pill text-wrap mb-1 badge-info" id="state_33333333-3333-3333-3333-333333333333">Nouvelle candidature</span>
+                  <span class="badge badge-sm rounded-pill text-wrap mb-1 bg-info" id="state_33333333-3333-3333-3333-333333333333">Nouvelle candidature</span>
                   
               </p>
           </div>
@@ -254,7 +254,7 @@
                                           <div class="fs-sm"><p>First application</p></div>
                                           
                                       </div>
-                                      <div class="card-footer text-right">
+                                      <div class="card-footer text-end">
                                           <a aria-controls="answer2" aria-expanded="false" aria-label="Plus d'informations sur cette candidature" class="btn btn-sm btn-outline-primary" data-target="#answer2" data-toggle="collapse" href="#">Plus d'informations</a>
                                       </div>
                                   </div>
@@ -341,17 +341,17 @@
                   
               </p>
           </div>
-          <div class="col-12 col-md-12 col-lg-4 pl-lg-0">
+          <div class="col-12 col-md-12 col-lg-4 ps-lg-0">
               <p class="font-weight-bold mb-1">Statut :</p>
               <p class="fs-sm card-text">
-                  <span class="badge badge-sm badge-pill text-wrap mb-1 badge-info" id="state_11111111-1111-1111-1111-111111111111">Nouvelle candidature</span>
+                  <span class="badge badge-sm rounded-pill text-wrap mb-1 bg-info" id="state_11111111-1111-1111-1111-111111111111">Nouvelle candidature</span>
                   
               </p>
           </div>
       </div>
   </div>
   
-                                      <div class="card-footer text-right">
+                                      <div class="card-footer text-end">
                                           <a aria-label="Plus d’informations sur la candidature de J… H…" class="btn btn-sm btn-outline-primary" href="/apply/11111111-1111-1111-1111-111111111111/prescriber/details?back_url=/apply/prescriber/list">
                                               Plus d’informations
                                           </a>
@@ -411,17 +411,17 @@
                   
               </p>
           </div>
-          <div class="col-12 col-md-12 col-lg-4 pl-lg-0">
+          <div class="col-12 col-md-12 col-lg-4 ps-lg-0">
               <p class="font-weight-bold mb-1">Statut :</p>
               <p class="fs-sm card-text">
-                  <span class="badge badge-sm badge-pill text-wrap mb-1 badge-info" id="state_22222222-2222-2222-2222-222222222222">Nouvelle candidature</span>
+                  <span class="badge badge-sm rounded-pill text-wrap mb-1 bg-info" id="state_22222222-2222-2222-2222-222222222222">Nouvelle candidature</span>
                   
               </p>
           </div>
       </div>
   </div>
   
-                                      <div class="card-footer text-right">
+                                      <div class="card-footer text-end">
                                           <a aria-label="Plus d’informations sur la candidature de J… H…" class="btn btn-sm btn-outline-primary" href="/apply/22222222-2222-2222-2222-222222222222/prescriber/details?back_url=/apply/prescriber/list">
                                               Plus d’informations
                                           </a>
@@ -481,17 +481,17 @@
                   
               </p>
           </div>
-          <div class="col-12 col-md-12 col-lg-4 pl-lg-0">
+          <div class="col-12 col-md-12 col-lg-4 ps-lg-0">
               <p class="font-weight-bold mb-1">Statut :</p>
               <p class="fs-sm card-text">
-                  <span class="badge badge-sm badge-pill text-wrap mb-1 badge-info" id="state_33333333-3333-3333-3333-333333333333">Nouvelle candidature</span>
+                  <span class="badge badge-sm rounded-pill text-wrap mb-1 bg-info" id="state_33333333-3333-3333-3333-333333333333">Nouvelle candidature</span>
                   
               </p>
           </div>
       </div>
   </div>
   
-                                      <div class="card-footer text-right">
+                                      <div class="card-footer text-end">
                                           <a aria-label="Plus d’informations sur la candidature de J… H…" class="btn btn-sm btn-outline-primary" href="/apply/33333333-3333-3333-3333-333333333333/prescriber/details?back_url=/apply/prescriber/list">
                                               Plus d’informations
                                           </a>
@@ -539,27 +539,27 @@
   
       
   <div class="fs-sm d-flex flex-column flex-md-row align-items-center mb-3">
-      <span class="text-secondary order-2 order-md-1 mr-auto">
+      <span class="text-secondary order-2 order-md-1 me-auto">
           Émise le 30 mars 2023 par
   
           
               
-                  <strong class="mr-2">Max THROUGHPUT</strong>
+                  <strong class="me-2">Max THROUGHPUT</strong>
               
               
-                  <i aria-hidden="true" class="ri-group-line mr-2"></i>Orienteur
+                  <i aria-hidden="true" class="ri-group-line me-2"></i>Orienteur
               
           
   
       </span>
       
-      <span class="order-1 order-md-2 ml-auto"><span class="badge badge-sm badge-pill text-wrap mb-1 badge-info" id="state_11111111-1111-1111-1111-111111111111">Nouvelle candidature</span></span>
+      <span class="order-1 order-md-2 ms-auto"><span class="badge badge-sm rounded-pill text-wrap mb-1 bg-info" id="state_11111111-1111-1111-1111-111111111111">Nouvelle candidature</span></span>
   </div>
   <hr class="my-3"/>
   
       <div>
           
-              <i class="ri-briefcase-line ri-xl mr-1"></i><span class="font-weight-bold mr-1 mr-md-2">Candidature spontanée</span>
+              <i class="ri-briefcase-line ri-xl me-1"></i><span class="font-weight-bold me-1 me-md-2">Candidature spontanée</span>
           
       </div>
   
@@ -577,7 +577,7 @@
                   
                       
                           
-                              <span class="badge badge-xs badge-pill badge-success-lighter text-success">
+                              <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                                   <i aria-hidden="true" class="ri-check-line"></i>
                                   Éligible à l’IAE
                               </span>
@@ -592,7 +592,7 @@
   
   </div>
   
-                                      <div class="card-footer text-right bg-light">
+                                      <div class="card-footer text-end bg-light">
                                           
                                           <a aria-label="Gérer la candidature de Jacques HENRY" class="btn btn-sm btn-outline-primary bg-white" href="/apply/11111111-1111-1111-1111-111111111111/siae/details?back_url=/apply/siae/list">
                                               Voir sa candidature
@@ -610,10 +610,8 @@
           </div>
           <div class="col-12 col-md p-0">
               <div class="card-header pt-4">
-                  <span class="badge badge-pill badge-important badge-xs">Nouveau service</span>
-                  <button aria-label="Fermer" class="close" data-dismiss="alert" data-target="#rdvi-promo" type="button">
-                      <i class="ri-close-line"></i>
-                  </button>
+                  <span class="badge rounded-pill bg-important badge-xs">Nouveau service</span>
+                  <button aria-label="Fermer" class="btn-close" data-dismiss="alert" data-target="#rdvi-promo" type="button"></button>
               </div>
               <div class="card-body pb-4">
                   <h4>RDV-Insertion simplifie les rendez-vous avec vos candidats</h4>
@@ -641,27 +639,27 @@
   
       
   <div class="fs-sm d-flex flex-column flex-md-row align-items-center mb-3">
-      <span class="text-secondary order-2 order-md-1 mr-auto">
+      <span class="text-secondary order-2 order-md-1 me-auto">
           Émise le 18 mars 2023 par
   
           
               
-                  <strong class="mr-2">Max THROUGHPUT</strong>
+                  <strong class="me-2">Max THROUGHPUT</strong>
               
               
-                  <i aria-hidden="true" class="ri-group-line mr-2"></i>Orienteur
+                  <i aria-hidden="true" class="ri-group-line me-2"></i>Orienteur
               
           
   
       </span>
       
-      <span class="order-1 order-md-2 ml-auto"><span class="badge badge-sm badge-pill text-wrap mb-1 badge-info" id="state_22222222-2222-2222-2222-222222222222">Nouvelle candidature</span></span>
+      <span class="order-1 order-md-2 ms-auto"><span class="badge badge-sm rounded-pill text-wrap mb-1 bg-info" id="state_22222222-2222-2222-2222-222222222222">Nouvelle candidature</span></span>
   </div>
   <hr class="my-3"/>
   
       <div>
           
-              <i class="ri-briefcase-line ri-xl mr-1"></i><span class="font-weight-bold mr-1 mr-md-2">Candidature spontanée</span>
+              <i class="ri-briefcase-line ri-xl me-1"></i><span class="font-weight-bold me-1 me-md-2">Candidature spontanée</span>
           
       </div>
   
@@ -679,7 +677,7 @@
                   
                       
                           
-                              <span class="badge badge-xs badge-pill badge-success-lighter text-success">
+                              <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                                   <i aria-hidden="true" class="ri-check-line"></i>
                                   Éligible à l’IAE
                               </span>
@@ -694,10 +692,10 @@
   
   </div>
   
-                                      <div class="card-footer text-right bg-light">
+                                      <div class="card-footer text-end bg-light">
                                           
                                               <span class="d-inline-flex align-items-center text-warning fs-sm">
-                                                  <i class="ri-time-line ri-lg mr-1"></i>
+                                                  <i class="ri-time-line ri-lg me-1"></i>
                                                   En attente de réponse depuis 3 semaines.
                                               </span>
                                           
@@ -717,27 +715,27 @@
   
       
   <div class="fs-sm d-flex flex-column flex-md-row align-items-center mb-3">
-      <span class="text-secondary order-2 order-md-1 mr-auto">
+      <span class="text-secondary order-2 order-md-1 me-auto">
           Émise le 16 février 2023 par
   
           
               
-                  <strong class="mr-2">Max THROUGHPUT</strong>
+                  <strong class="me-2">Max THROUGHPUT</strong>
               
               
-                  <i aria-hidden="true" class="ri-group-line mr-2"></i>Orienteur
+                  <i aria-hidden="true" class="ri-group-line me-2"></i>Orienteur
               
           
   
       </span>
       
-      <span class="order-1 order-md-2 ml-auto"><span class="badge badge-sm badge-pill text-wrap mb-1 badge-info" id="state_33333333-3333-3333-3333-333333333333">Nouvelle candidature</span></span>
+      <span class="order-1 order-md-2 ms-auto"><span class="badge badge-sm rounded-pill text-wrap mb-1 bg-info" id="state_33333333-3333-3333-3333-333333333333">Nouvelle candidature</span></span>
   </div>
   <hr class="my-3"/>
   
       <div>
           
-              <i class="ri-briefcase-line ri-xl mr-1"></i><span class="font-weight-bold mr-1 mr-md-2">Candidature spontanée</span>
+              <i class="ri-briefcase-line ri-xl me-1"></i><span class="font-weight-bold me-1 me-md-2">Candidature spontanée</span>
           
       </div>
   
@@ -755,7 +753,7 @@
                   
                       
                           
-                              <span class="badge badge-xs badge-pill badge-success-lighter text-success">
+                              <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
                                   <i aria-hidden="true" class="ri-check-line"></i>
                                   Éligible à l’IAE
                               </span>
@@ -770,10 +768,10 @@
   
   </div>
   
-                                      <div class="card-footer text-right bg-light">
+                                      <div class="card-footer text-end bg-light">
                                           
                                               <span class="d-inline-flex align-items-center text-warning fs-sm">
-                                                  <i class="ri-time-line ri-lg mr-1"></i>
+                                                  <i class="ri-time-line ri-lg me-1"></i>
                                                   En attente de réponse depuis 8 semaines.
                                               </span>
                                           

@@ -16,7 +16,7 @@
         {% if not request.user.is_employer or job_seeker.has_valid_common_approval or eligibility_diagnosis %}
             <div class="alert alert-info mb-5">
                 <div class="row">
-                    <div class="col-auto pr-0">
+                    <div class="col-auto pe-0">
                         <i class="ri-information-line ri-xl"></i>
                     </div>
                     <div class="col">
@@ -74,7 +74,7 @@
         {% if not request.user.is_employer or geiq_eligibility_diagnosis %}
             <div class="alert alert-info mb-5">
                 <div class="row">
-                    <div class="col-auto pr-0">
+                    <div class="col-auto pe-0">
                         <i class="ri-information-line ri-xl"></i>
                     </div>
                     <div class="col">
@@ -116,11 +116,11 @@
 {% block form_content %}
     {{ form.selected_jobs.as_hidden }}
     <div class="d-flex flex-column flex-lg-row">
-        <div class="col-12 col-lg-7 pl-0">{% bootstrap_field form.message %}</div>
+        <div class="col-12 col-lg-7 ps-0">{% bootstrap_field form.message %}</div>
         <div>
             <div class="alert alert-primary bg-white mt-5 py-0">
                 <div class="row">
-                    <div class="col-auto pr-0">
+                    <div class="col-auto pe-0">
                         <i class="ri-lightbulb-line ri-xl"></i>
                     </div>
                     <div class="col">
@@ -195,7 +195,7 @@
         </div>
     </div>
 
-    <div class="col-12 col-lg-7 pl-0">
+    <div class="col-12 col-lg-7 ps-0">
         {% bootstrap_field form.resume %}
         {% if resume_is_recommended %}
             <div class="alert alert-warning">

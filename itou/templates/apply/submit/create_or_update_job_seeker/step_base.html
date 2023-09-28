@@ -26,8 +26,8 @@
     <section class="s-section-twocolumns s-section">
         <div class="container">
             <div class="row">
-                <div class="col-12 col-lg-4 order-md-2 pl-lg-5 d-none d-lg-block mb-6"></div>
-                <div class="col-12 col-lg-8 order-md-1 pr-lg-5">
+                <div class="col-12 col-lg-4 order-md-2 ps-lg-5 d-none d-lg-block mb-6"></div>
+                <div class="col-12 col-lg-8 order-md-1 pe-lg-5">
                     <div class="c-stepper mb-4">
                         <div class="progress progress--emploi mb-2">
                             <div class="progress-bar progress-bar-{{ progress }}" role="progressbar" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100">
@@ -43,11 +43,9 @@
                         </h2>
                         {% if readonly_form %}
                             <div class="alert alert-warning alert-dismissible fade show mb-4">
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
-                                    <i class="ri-close-line"></i>
-                                </button>
+                                <button type="button" class="btn-close" data-dismiss="alert" aria-label="Fermer"></button>
                                 <div class="row">
-                                    <div class="col-auto pr-0">
+                                    <div class="col-auto pe-0">
                                         <i class="ri-information-line ri-xl text-warning"></i>
                                     </div>
                                     <div class="col">
@@ -69,7 +67,7 @@
 
                             <hr class="my-5">
                             {% buttons %}
-                                <div class="text-right">
+                                <div class="text-end">
                                     {% if back_url %}<a class="btn btn-link" href="{{ back_url }}">Retour</a>{% endif %}
                                     <button class="btn btn-primary">Suivant</button>
                                 </div>

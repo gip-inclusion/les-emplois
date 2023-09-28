@@ -45,12 +45,12 @@ class EvaluatedSiaeSanctionViewTest(TestCase):
             training_session="RDV le 18 avril à 14h dans les locaux de Pôle Emploi.",
         )
         cls.return_evaluated_siae_list_link_html = (
-            '<a class="btn btn-primary float-right" '
+            '<a class="btn btn-primary float-end" '
             f'href="/siae_evaluation/institution_evaluated_siae_list/{cls.evaluated_siae.evaluation_campaign_id}/">'
             "Revenir à la liste des SIAE</a>"
         )
         cls.return_dashboard_link_html = (
-            '<a class="btn btn-primary float-right" href="/dashboard/">Retour au Tableau de bord</a>'
+            '<a class="btn btn-primary float-end" href="/dashboard/">Retour au Tableau de bord</a>'
         )
 
     def assertSanctionContent(self, response):

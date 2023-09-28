@@ -38,7 +38,7 @@
                             {# Bug or feature, django_bootstrap4 does not render errors raised from hidden fields validation #}
                             {% if form.errors.job_appellation_code %}
                                 <div class="alert alert-danger alert-dismissible" role="alert">
-                                    <button class="close" type="button" data-dismiss="alert" aria-label="Fermer">&#215;</button>
+                                    <button class="btn-close" data-dismiss="alert" aria-label="Fermer"></button>
                                     {{ form.errors.job_appellation_code }}
                                 </div>
                             {% endif %}
@@ -60,7 +60,7 @@
                             {% bootstrap_field form.open_positions %}
 
                             {% buttons %}
-                                <div class="pt-3 text-right">
+                                <div class="pt-3 text-end">
                                     <a class="btn btn-outline-primary" href="{% url "siaes_views:job_description_list" %}" aria-label="Retour à la liste des métiers">Retour</a>
                                     <button class="btn btn-primary" aria-label="Passer à l'étape suivante">Suivant</button>
                                 </div>

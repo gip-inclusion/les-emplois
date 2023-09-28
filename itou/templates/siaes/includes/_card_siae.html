@@ -10,7 +10,7 @@
                 {% endif %}
             </span>
             {% if siae.kind in ea_eatt_kinds %}
-                <span class="badge badge-pill badge-xs badge-accent-01-lighter text-accent-01"><b>Priorité aux bénéficiaires de la RQTH</b></span>
+                <span class="badge rounded-pill badge-xs bg-accent-01-lighter text-accent-01"><b>Priorité aux bénéficiaires de la RQTH</b></span>
             {% endif %}
         </p>
         <h3 class="mb-2">
@@ -23,7 +23,7 @@
         <p class="mb-2 text-muted">{{ siae.address_on_one_line }}</p>
         <p class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center mb-0">
             <span class="align-self-start">
-                <span class="badge badge-sm badge-pill badge-primary">à {{ siae.distance|floatformat:"-1"|default:"12" }} km</span>
+                <span class="badge badge-sm rounded-pill bg-primary">à {{ siae.distance|floatformat:"-1"|default:"12" }} km</span>
                 {% comment %}
                 The "default" distance of 12 kms above seems a little weird.
                 Having a default distance to any point does not make a lot of sense, either we have one between point A and B, or nothing.
@@ -31,7 +31,7 @@
                 We should have a chat someday with the designers to remove it, as it is probably confusing to just say 12kms from
                 no given point, all the time.
                 {% endcomment %}
-                <span class="text-muted fs-sm ml-1">de votre lieu de recherche.</span>
+                <span class="text-muted fs-sm ms-1">de votre lieu de recherche.</span>
             </span>
             {% if siae.active_job_descriptions %}
                 <a class="d-none d-md-inline font-weight-bold matomo-event mt-3 mt-md-0"

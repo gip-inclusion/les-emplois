@@ -36,7 +36,7 @@
                                 {% if org.pk != request.current_organization.pk %}
                                     <li>
                                         <button class="dropdown-item font-weight-bold" name="organization_id" value="{{ org.pk }}">
-                                            <span class="badge badge-pill badge-xs badge-primary mr-1">{{ org.kind }}</span>
+                                            <span class="badge rounded-pill badge-xs bg-primary me-1">{{ org.kind }}</span>
                                             {{ org.display_name|truncatechars:50 }}
                                         </button>
                                     </li>
@@ -56,9 +56,9 @@
                 <ul class="list-unstyled">
                     <li>
                         <div class="dropdown-item">
-                            <div class="media align-items-center">
-                                <span class="mr-2"><i class="ri-user-line ri-2x"></i></span>
-                                <div class="media-body">
+                            <div class="d-flex align-items-center">
+                                <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
+                                <div class="flex-grow-1 ms-2 lh-sm">
                                     {% if user.get_full_name %}
                                         <span>{{ user.get_full_name }}</span>
                                         <br>

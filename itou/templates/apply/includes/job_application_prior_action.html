@@ -23,9 +23,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h3 id="delete_prior_action_{{ prior_action.pk }}_title">Suppression de l'action préalable à l'embauche</h3>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
-                                <i class="ri-close-line"></i>
-                            </button>
+                            <button type="button" class="btn-close" data-dismiss="modal" aria-label="Fermer"></button>
                         </div>
                         <div class="modal-body">
                             <div class="row">
@@ -41,7 +39,7 @@
                                   hx-swap="outerHTML"
                                   class="d-block js-prevent-multiple-submit">
                                 {% csrf_token %}
-                                <div class="text-right">
+                                <div class="text-end">
                                     <button class="btn btn-outline-primary btn-sm" data-dismiss="modal" aria-label="Annuler">Annuler</button>
                                     <button class="btn btn-danger btn-sm" aria-label="Supprimer">Supprimer</button>
                                 </div>

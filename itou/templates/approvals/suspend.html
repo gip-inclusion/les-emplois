@@ -39,7 +39,7 @@
 
                                 <div class="alert alert-warning">
                                     <div class="row">
-                                        <div class="col-auto pr-0">
+                                        <div class="col-auto pe-0">
                                             <i class="ri-information-line ri-xl text-warning"></i>
                                         </div>
                                         <div class="col">
@@ -84,9 +84,9 @@
                                         <p class="card-text">{{ form.instance.get_reason_display }}</p>
                                         <p class="card-text text-success">
                                             À partir du
-                                            <span class="badge badge-pill badge-success">{{ form.instance.start_at|date:"d/m/Y" }}</span>
+                                            <span class="badge rounded-pill bg-success">{{ form.instance.start_at|date:"d/m/Y" }}</span>
                                             jusqu'au
-                                            <span class="badge badge-pill badge-success">{{ form.instance.end_at|date:"d/m/Y" }}</span>
+                                            <span class="badge rounded-pill bg-success">{{ form.instance.end_at|date:"d/m/Y" }}</span>
                                         </p>
                                     </div>
                                 </div>

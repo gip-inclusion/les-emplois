@@ -14,7 +14,7 @@
     {% if export_for == "siae" or can_view_stats_pe %}
         <div class="alert alert-info mt-3" id="besoin-dun-chiffre">
             <p class="mb-0">
-                <i class="ri-information-line mr-1" aria-hidden="true"></i>
+                <i class="ri-information-line me-1" aria-hidden="true"></i>
                 <b>Besoin d'un chiffre ?</b>
             </p>
             {% if export_for == "siae" %}
@@ -50,7 +50,7 @@
                             <h2 class="h4">Candidatures reçues</h2>
                             <div class="table-responsive-lg mt-3">
                                 <table class="table">
-                                    <caption class="sr-only">Liste des candidatures reçues</caption>
+                                    <caption class="visually-hidden">Liste des candidatures reçues</caption>
                                     <thead>
                                         <tr>
                                             <th scope="col">Contenu du fichier</th>
@@ -70,7 +70,7 @@
                                                        data-matomo-option="export-siae"
                                                        aria-label="Télécharger cet export SIAE"
                                                        href="{% url 'apply:list_for_siae_exports_download' %}">
-                                                        <i class="ri-download-line mr-1" aria-hidden="true"></i>
+                                                        <i class="ri-download-line me-1" aria-hidden="true"></i>
                                                         Télécharger
                                                     </a>
                                                 {% else %}
@@ -80,7 +80,7 @@
                                                        data-matomo-option="export-prescripteur"
                                                        aria-label="Télécharger cet export prescripteur"
                                                        href="{% url 'apply:list_for_prescriber_exports_download' %}">
-                                                        <i class="ri-download-line mr-1" aria-hidden="true"></i>
+                                                        <i class="ri-download-line me-1" aria-hidden="true"></i>
                                                         Télécharger
                                                     </a>
                                                 {% endif %}
@@ -98,7 +98,7 @@
                                                            data-matomo-option="export-siae"
                                                            aria-label="Télécharger cet export SIAE"
                                                            href="{% url 'apply:list_for_siae_exports_download' month_identifier=month.month|date:"Y-m" %}">
-                                                            <i class="ri-download-line mr-1" aria-hidden="true"></i>
+                                                            <i class="ri-download-line me-1" aria-hidden="true"></i>
                                                             Télécharger
                                                         </a>
                                                     {% else %}
@@ -108,7 +108,7 @@
                                                            data-matomo-option="export-prescripteur"
                                                            aria-label="Télécharger cet export prescripteur"
                                                            href="{% url 'apply:list_for_prescriber_exports_download' month_identifier=month.month|date:"Y-m" %}">
-                                                            <i class="ri-download-line mr-1" aria-hidden="true"></i>
+                                                            <i class="ri-download-line me-1" aria-hidden="true"></i>
                                                             Télécharger
                                                         </a>
                                                     {% endif %}

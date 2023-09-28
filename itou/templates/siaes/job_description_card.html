@@ -40,7 +40,7 @@
                                         {% include 'includes/copy_to_clipboard.html' with content=job.get_absolute_url text="Copier le lien de cette fiche métier" css_classes="btn-outline-primary btn-sm" %}
                                     </div>
                                     {% if job.is_active and not siae.block_job_applications %}
-                                        <div class="col-auto text-right">
+                                        <div class="col-auto text-end">
                                             <a href="{% url "apply:start" siae_pk=siae.pk %}?job_description_id={{ job.pk }}"
                                                class="matomo-event btn btn-sm btn-primary"
                                                data-matomo-category="candidature"

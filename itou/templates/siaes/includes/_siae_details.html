@@ -4,21 +4,21 @@
 
 {% if siae.email %}
     <p>
-        <i class="ri-mail-line ri-xl mr-2"></i>
+        <i class="ri-mail-line ri-xl me-2"></i>
         <a aria-label="Contact par mail" href="mailto:{{ siae.email }}" class="font-weight-bold">{{ siae.email }}</a>
     </p>
 {% endif %}
 
 {% if siae.phone %}
     <p>
-        <i class="ri-phone-line ri-xl mr-2"></i>
+        <i class="ri-phone-line ri-xl me-2"></i>
         <a aria-label="Contact téléphonique" href="tel:{{ siae.phone|cut:" " }}" class="font-weight-bold">{{ siae.phone|format_phone }}</a>
     </p>
 {% endif %}
 
 {% if siae.website %}
     <p>
-        <i class="ri-global-line ri-xl mr-2"></i>
+        <i class="ri-global-line ri-xl me-2"></i>
         <a aria-label="Site web (ouverture dans un nouvel onglet)" href="{{ siae.website }}" rel="noopener" target="_blank" class="font-weight-bold">{{ siae.website }}</a>
     </p>
 {% endif %}

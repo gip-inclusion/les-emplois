@@ -1,7 +1,7 @@
 {# Based on django/forms/templates/django/forms/widgets/attrs.html #}
 {% for name, value in widget.attrs.items %}
     {% if name == "class" %}
-        class="custom-control-input {{ value|stringformat:'s' }}"
+        class="form-check-input {{ value|stringformat:'s' }}"
     {% else %}
         {% if value is not False %}
             {{ name }}

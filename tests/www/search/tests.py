@@ -63,7 +63,7 @@ class SearchSiaeTest(TestCase):
         self.assertContains(response, "Recherche d&#x27;employeurs solidaires")
         self.assertContains(
             response,
-            """Employeurs <span class="badge badge-sm badge-pill badge-info-lighter text-info">2</span>""",
+            """Employeurs <span class="badge badge-sm rounded-pill bg-info-lighter text-info">2</span>""",
             html=True,
         )
         self.assertContains(response, "Arrondissements de Paris")
@@ -72,7 +72,7 @@ class SearchSiaeTest(TestCase):
         response = self.client.get(self.url, {"city": city_slug, "districts_75": ["75001"]})
         self.assertContains(
             response,
-            """Employeur <span class="badge badge-sm badge-pill badge-info-lighter text-info">1</span>""",
+            """Employeur <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>""",
             html=True,
         )
         self.assertContains(response, siae_1.display_name)
@@ -88,7 +88,7 @@ class SearchSiaeTest(TestCase):
         response = self.client.get(self.url, {"city": city.slug, "kinds": [SiaeKind.AI]})
         self.assertContains(
             response,
-            """Employeur <span class="badge badge-sm badge-pill badge-info-lighter text-info">1</span>""",
+            """Employeur <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>""",
             html=True,
         )
 
@@ -114,7 +114,7 @@ class SearchSiaeTest(TestCase):
         response = self.client.get(self.url, {"city": guerande.slug, "distance": 100})
         self.assertContains(
             response,
-            """Employeurs <span class="badge badge-sm badge-pill badge-info-lighter text-info">3</span>""",
+            """Employeurs <span class="badge badge-sm rounded-pill bg-info-lighter text-info">3</span>""",
             html=True,
         )
         self.assertContains(response, SIAE_VANNES.capitalize())
@@ -125,7 +125,7 @@ class SearchSiaeTest(TestCase):
         response = self.client.get(self.url, {"city": guerande.slug, "distance": 15})
         self.assertContains(
             response,
-            """Employeurs <span class="badge badge-sm badge-pill badge-info-lighter text-info">2</span>""",
+            """Employeurs <span class="badge badge-sm rounded-pill bg-info-lighter text-info">2</span>""",
             html=True,
         )
         self.assertContains(response, SIAE_GUERANDE.capitalize())
@@ -135,7 +135,7 @@ class SearchSiaeTest(TestCase):
         response = self.client.get(self.url, {"city": guerande.slug, "distance": 100, "departments": ["44"]})
         self.assertContains(
             response,
-            """Employeurs <span class="badge badge-sm badge-pill badge-info-lighter text-info">2</span>""",
+            """Employeurs <span class="badge badge-sm rounded-pill bg-info-lighter text-info">2</span>""",
             html=True,
         )
         self.assertContains(response, SIAE_GUERANDE.capitalize())
@@ -145,7 +145,7 @@ class SearchSiaeTest(TestCase):
         response = self.client.get(self.url, {"city": vannes.slug, "distance": 100, "departments": ["56"]})
         self.assertContains(
             response,
-            """Employeur <span class="badge badge-sm badge-pill badge-info-lighter text-info">1</span>""",
+            """Employeur <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>""",
             html=True,
         )
         self.assertContains(response, SIAE_VANNES.capitalize())
@@ -202,7 +202,7 @@ class SearchSiaeTest(TestCase):
         response = self.client.get(self.url, {"city": city.slug})
         self.assertContains(
             response,
-            """Employeur <span class="badge badge-sm badge-pill badge-info-lighter text-info">1</span>""",
+            """Employeur <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>""",
             html=True,
         )
         self.assertContains(response, "Offres clauses sociales")
@@ -214,16 +214,16 @@ class SearchSiaeTest(TestCase):
         job = SiaeJobDescriptionFactory(siae=siae)
         JobApplicationFactory.create_batch(20, to_siae=siae, selected_jobs=[job], state="new")
         response = self.client.get(self.url, {"city": city.slug})
-        self.assertNotContains(response, """20+<span class="ml-1">candidatures</span>""", html=True)
+        self.assertNotContains(response, """20+<span class="ms-1">candidatures</span>""", html=True)
 
         JobApplicationFactory(to_siae=siae, selected_jobs=[job], state="new")
         response = self.client.get(self.url, {"city": city.slug})
         self.assertContains(
             response,
             """
-            <span class="badge badge-sm badge-pill badge-pilotage text-primary">
-                <i class="ri-group-line mr-1"></i>
-                20+<span class="ml-1">candidatures</span>
+            <span class="badge badge-sm rounded-pill bg-pilotage text-primary">
+                <i class="ri-group-line me-1"></i>
+                20+<span class="ms-1">candidatures</span>
             </span>
             """,
             html=True,
@@ -303,7 +303,7 @@ class JobDescriptionSearchViewTest(TestCase):
             """
             <span class="d-none d-lg-inline">
                 Poste ouvert au recrutement
-                <span class="badge badge-sm badge-pill badge-info-lighter text-info">1</span>
+                <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>
             </span>
             """,
             html=True,
@@ -311,7 +311,7 @@ class JobDescriptionSearchViewTest(TestCase):
         )
         self.assertContains(
             response,
-            """Employeur <span class="badge badge-sm badge-pill badge-info-lighter text-info">1</span>""",
+            """Employeur <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>""",
             html=True,
         )
 
@@ -328,7 +328,7 @@ class JobDescriptionSearchViewTest(TestCase):
         response = self.client.get(self.url, {"city": city.slug, "kinds": [SiaeKind.AI, SiaeKind.ETTI]})
         self.assertContains(
             response,
-            """Employeur <span class="badge badge-sm badge-pill badge-info-lighter text-info">1</span>""",
+            """Employeur <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>""",
             html=True,
         )
 
@@ -374,7 +374,7 @@ class JobDescriptionSearchViewTest(TestCase):
         response = self.client.get(self.url, {"city": guerande.slug, "distance": 100})
         self.assertContains(
             response,
-            """Employeurs <span class="badge badge-sm badge-pill badge-info-lighter text-info">3</span>""",
+            """Employeurs <span class="badge badge-sm rounded-pill bg-info-lighter text-info">3</span>""",
             html=True,
         )
         self.assertContains(response, SIAE_VANNES.capitalize())
@@ -385,7 +385,7 @@ class JobDescriptionSearchViewTest(TestCase):
         response = self.client.get(self.url, {"city": guerande.slug, "distance": 15})
         self.assertContains(
             response,
-            """Employeurs <span class="badge badge-sm badge-pill badge-info-lighter text-info">2</span>""",
+            """Employeurs <span class="badge badge-sm rounded-pill bg-info-lighter text-info">2</span>""",
             html=True,
         )
         self.assertContains(response, SIAE_GUERANDE.capitalize())
@@ -395,7 +395,7 @@ class JobDescriptionSearchViewTest(TestCase):
         response = self.client.get(self.url, {"city": guerande.slug, "distance": 100, "departments": ["44"]})
         self.assertContains(
             response,
-            """Employeurs <span class="badge badge-sm badge-pill badge-info-lighter text-info">2</span>""",
+            """Employeurs <span class="badge badge-sm rounded-pill bg-info-lighter text-info">2</span>""",
             html=True,
         )
         self.assertContains(response, SIAE_GUERANDE.capitalize())
@@ -406,7 +406,7 @@ class JobDescriptionSearchViewTest(TestCase):
         response = self.client.get(self.url, {"city": vannes.slug, "distance": 100, "departments": ["56"]})
         self.assertContains(
             response,
-            """Employeur <span class="badge badge-sm badge-pill badge-info-lighter text-info">1</span>""",
+            """Employeur <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>""",
             html=True,
         )
         self.assertContains(response, SIAE_VANNES.capitalize())
@@ -445,14 +445,14 @@ class JobDescriptionSearchViewTest(TestCase):
         job = SiaeJobDescriptionFactory(siae=siae)
         JobApplicationFactory.create_batch(20, to_siae=siae, selected_jobs=[job], state="new")
         response = self.client.get(self.url, {"city": city.slug})
-        self.assertNotContains(response, """20+<span class="ml-1">candidatures</span>""", html=True)
+        self.assertNotContains(response, """20+<span class="ms-1">candidatures</span>""", html=True)
 
         JobApplicationFactory(to_siae=siae, selected_jobs=[job], state="new")
         response = self.client.get(self.url, {"city": city.slug})
         self.assertContains(
             response,
             """
-            <span class="badge badge-sm badge-pill badge-accent-03 text-primary">
+            <span class="badge badge-sm rounded-pill bg-accent-03 text-primary">
                 <i class="ri-group-line"></i>
                 20+ candidatures
             </span>
@@ -501,7 +501,7 @@ class JobDescriptionSearchViewTest(TestCase):
             response,
             """
             <span class="d-inline d-lg-none">
-                Postes <span class="badge badge-sm badge-pill badge-info-lighter text-info">2</span>
+                Postes <span class="badge badge-sm rounded-pill bg-info-lighter text-info">2</span>
             </span>
             """,
             html=True,
@@ -520,7 +520,7 @@ class JobDescriptionSearchViewTest(TestCase):
             response,
             """
             <span class="d-inline d-lg-none">
-                Postes <span class="badge badge-sm badge-pill badge-info-lighter text-info">2</span>
+                Postes <span class="badge badge-sm rounded-pill bg-info-lighter text-info">2</span>
             </span>
             """,
             html=True,
@@ -539,7 +539,7 @@ class JobDescriptionSearchViewTest(TestCase):
             response,
             """
             <span class="d-inline d-lg-none">
-                Poste <span class="badge badge-sm badge-pill badge-info-lighter text-info">1</span>
+                Poste <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>
             </span>
             """,
             html=True,
@@ -597,7 +597,7 @@ class JobDescriptionSearchViewTest(TestCase):
             response,
             """
             <span class="d-inline d-lg-none">
-                Postes <span class="badge badge-sm badge-pill badge-info-lighter text-info">2</span>
+                Postes <span class="badge badge-sm rounded-pill bg-info-lighter text-info">2</span>
             </span>
             """,
             html=True,
@@ -613,7 +613,7 @@ class JobDescriptionSearchViewTest(TestCase):
             response,
             """
             <span class="d-inline d-lg-none">
-                Postes <span class="badge badge-sm badge-pill badge-info-lighter text-info">2</span>
+                Postes <span class="badge badge-sm rounded-pill bg-info-lighter text-info">2</span>
             </span>
             """,
             html=True,
@@ -629,7 +629,7 @@ class JobDescriptionSearchViewTest(TestCase):
             response,
             """
             <span class="d-inline d-lg-none">
-                Poste <span class="badge badge-sm badge-pill badge-info-lighter text-info">1</span>
+                Poste <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>
             </span>
             """,
             html=True,
@@ -679,7 +679,7 @@ class JobDescriptionSearchViewTest(TestCase):
             response,
             """
             <span class="d-inline d-lg-none">
-                Postes <span class="badge badge-sm badge-pill badge-info-lighter text-info">2</span>
+                Postes <span class="badge badge-sm rounded-pill bg-info-lighter text-info">2</span>
             </span>
             """,
             html=True,
@@ -717,7 +717,7 @@ class JobDescriptionSearchViewTest(TestCase):
             response,
             """
             <span class="d-inline d-lg-none">
-                Poste <span class="badge badge-sm badge-pill badge-info-lighter text-info">1</span>
+                Poste <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>
             </span>
             """,
             html=True,
@@ -735,7 +735,7 @@ class JobDescriptionSearchViewTest(TestCase):
             response,
             """
             <span class="d-inline d-lg-none">
-                Postes <span class="badge badge-sm badge-pill badge-info-lighter text-info">2</span>
+                Postes <span class="badge badge-sm rounded-pill bg-info-lighter text-info">2</span>
             </span>
             """,
             html=True,
@@ -753,7 +753,7 @@ class JobDescriptionSearchViewTest(TestCase):
             response,
             """
             <span class="d-inline d-lg-none">
-                Poste <span class="badge badge-sm badge-pill badge-info-lighter text-info">1</span>
+                Poste <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>
             </span>
             """,
             html=True,
@@ -771,7 +771,7 @@ class JobDescriptionSearchViewTest(TestCase):
             response,
             """
             <span class="d-inline d-lg-none">
-                Poste <span class="badge badge-sm badge-pill badge-info-lighter text-info">1</span>
+                Poste <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>
             </span>
             """,
             html=True,
@@ -791,7 +791,7 @@ class JobDescriptionSearchViewTest(TestCase):
             response,
             """
             <span class="d-inline d-lg-none">
-                Postes <span class="badge badge-sm badge-pill badge-info-lighter text-info">2</span>
+                Postes <span class="badge badge-sm rounded-pill bg-info-lighter text-info">2</span>
             </span>
             """,
             html=True,

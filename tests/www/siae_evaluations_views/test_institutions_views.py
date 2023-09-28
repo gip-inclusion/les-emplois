@@ -278,7 +278,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         self.assertContains(
             response,
             f"""
-            <a class="btn btn-primary btn-sm ml-1" href="{notify_url}">
+            <a class="btn btn-primary btn-sm ms-1" href="{notify_url}">
                 <i class="ri-notification-4-line"></i> Notifier la sanction
             </a>
             """,
@@ -320,7 +320,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         self.assertContains(
             response,
             f"""
-            <a class="btn btn-primary btn-sm ml-1" href="{notify_url}">
+            <a class="btn btn-primary btn-sm ms-1" href="{notify_url}">
                 <i class="ri-notification-4-line"></i> Notifier la sanction
             </a>
             """,
@@ -363,7 +363,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         self.assertContains(
             response,
             f"""
-            <a class="btn btn-primary btn-sm ml-1" href="{notify_url}">
+            <a class="btn btn-primary btn-sm ms-1" href="{notify_url}">
                 <i class="ri-notification-4-line"></i> Notifier la sanction
             </a>
             """,
@@ -412,7 +412,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         self.assertContains(
             response,
             f"""
-            <a class="btn btn-outline-primary btn-sm mr-1" href="{sanction_url}">
+            <a class="btn btn-outline-primary btn-sm me-1" href="{sanction_url}">
                 Voir la notification de sanction
             </a>
             <a class="btn btn-outline-primary btn-sm" href="{url}">
@@ -697,13 +697,13 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         self.assertContains(
             response,
-            '<p class="badge badge-pill badge-success float-right">Validé</p>',
+            '<p class="badge rounded-pill bg-success float-end">Validé</p>',
             count=1,
         )
         self.assertContains(
             response,
             f"""
-            <a href="{url}" class="btn btn-outline-primary btn-sm float-right">
+            <a href="{url}" class="btn btn-outline-primary btn-sm float-end">
                 Revoir ses justificatifs
             </a>
             """,
@@ -742,7 +742,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         self.assertContains(
             response,
-            '<p class="badge badge-pill badge-danger float-right">Problème constaté</p>',
+            '<p class="badge rounded-pill bg-danger float-end">Problème constaté</p>',
             html=True,
             count=1,
         )
@@ -779,7 +779,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(
             response,
             """
-            <p class="badge badge-pill badge-info-light text-primary float-right">
+            <p class="badge rounded-pill bg-info-light text-primary float-end">
              Justificatifs non contrôlés
             </p>
             """,
@@ -824,7 +824,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         self.assertContains(
             response,
-            '<p class="badge badge-pill badge-danger float-right">Problème constaté</p>',
+            '<p class="badge rounded-pill bg-danger float-end">Problème constaté</p>',
             html=True,
             count=1,
         )
@@ -864,7 +864,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(
             response,
             """
-            <p class="badge badge-pill badge-info-light text-primary float-right">
+            <p class="badge rounded-pill bg-info-light text-primary float-end">
              Justificatifs non contrôlés
             </p>
             """,
@@ -898,7 +898,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         self.assertContains(
             response,
-            '<p class="badge badge-pill badge-danger float-right">Non téléversés</p>',
+            '<p class="badge rounded-pill bg-danger float-end">Non téléversés</p>',
             html=True,
             count=1,
         )
@@ -944,11 +944,11 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
         validation_button_disabled = f"""
-            <button class="btn btn-outline-primary disabled btn-sm float-right">
+            <button class="btn btn-outline-primary disabled btn-sm float-end">
                 {self.submit_text}
             </button>"""
         validation_button = f"""
-            <button class="btn btn-primary btn-sm float-right">
+            <button class="btn btn-primary btn-sm float-end">
                 {self.submit_text}
             </button>"""
         back_url = reverse(
@@ -974,7 +974,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(
             response,
             f"""
-            <p class="badge badge-pill badge-emploi float-right">
+            <p class="badge rounded-pill bg-emploi float-end">
              {pending_status}
             </p>
             """,
@@ -1009,7 +1009,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(
             response,
             f"""
-            <p class="badge badge-pill badge-pilotage float-right">
+            <p class="badge rounded-pill bg-pilotage float-end">
              {submitted_status}
             </p>
             """,
@@ -1030,7 +1030,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(
             response,
             """
-            <p class="badge badge-pill badge-success float-right">
+            <p class="badge rounded-pill bg-success float-end">
              Validé
             </p>
             """,
@@ -1051,7 +1051,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(
             response,
             """
-            <p class="badge badge-pill badge-success float-right">
+            <p class="badge rounded-pill bg-success float-end">
              Validé
             </p>
             """,
@@ -1075,7 +1075,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(
             response,
             f"""
-            <p class="badge badge-pill badge-danger float-right">
+            <p class="badge rounded-pill bg-danger float-end">
              {refused_status}
             </p>
             """,
@@ -1095,7 +1095,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(
             response,
             """
-            <p class="badge badge-pill badge-emploi float-right">
+            <p class="badge rounded-pill bg-emploi float-end">
              Phase contradictoire - En attente
             </p>
             """,
@@ -1145,7 +1145,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(
             response,
             """
-            <p class="badge badge-pill badge-success float-right">
+            <p class="badge rounded-pill bg-success float-end">
              Validé
             </p>
             """,
@@ -1167,7 +1167,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(
             response,
             """
-            <p class="badge badge-pill badge-success float-right">
+            <p class="badge rounded-pill bg-success float-end">
              Validé
             </p>
             """,
@@ -1192,7 +1192,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(
             response,
             f"""
-            <p class="badge badge-pill badge-danger float-right">
+            <p class="badge rounded-pill bg-danger float-end">
              {refused_status}
             </p>
             """,
@@ -1212,7 +1212,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(
             response,
             f"""
-            <p class="badge badge-pill badge-danger float-right">
+            <p class="badge rounded-pill bg-danger float-end">
              {refused_status}
             </p>
             """,
@@ -1242,7 +1242,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
         validation_button_disabled = f"""
-            <button class="btn btn-outline-primary disabled btn-sm float-right">
+            <button class="btn btn-outline-primary disabled btn-sm float-end">
                 {self.submit_text}
             </button>"""
         back_url = reverse(
@@ -1268,7 +1268,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(
             response,
             f"""
-            <p class="badge badge-pill badge-danger float-right">
+            <p class="badge rounded-pill bg-danger float-end">
              {not_transmitted_status}
             </p>
             """,
@@ -1285,7 +1285,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(
             response,
             f"""
-            <p class="badge badge-pill badge-danger float-right">
+            <p class="badge rounded-pill bg-danger float-end">
              {not_transmitted_status}
             </p>
             """,
@@ -1310,7 +1310,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(
             response,
             f"""
-            <p class="badge badge-pill badge-pilotage float-right">
+            <p class="badge rounded-pill bg-pilotage float-end">
              {submitted_status}
             </p>
             """,
@@ -1363,7 +1363,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         self.assertContains(
             response,
-            '<p class="badge badge-pill badge-danger float-right">Non téléversés</p>',
+            '<p class="badge rounded-pill bg-danger float-end">Non téléversés</p>',
             count=1,
         )
 
@@ -1386,7 +1386,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         self.assertContains(
             response,
-            '<p class="badge badge-pill badge-warning float-right">Téléversement incomplet</p>',
+            '<p class="badge rounded-pill bg-warning float-end">Téléversement incomplet</p>',
             count=1,
         )
 
@@ -1408,7 +1408,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         self.assertContains(
             response,
-            '<p class="badge badge-pill badge-warning float-right">Justificatifs téléversés</p>',
+            '<p class="badge rounded-pill bg-warning float-end">Justificatifs téléversés</p>',
             count=1,
         )
 
@@ -1433,7 +1433,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         self.assertContains(
             response,
-            '<p class="badge badge-pill badge-info-light text-primary float-right">Justificatifs non contrôlés</p>',
+            '<p class="badge rounded-pill bg-info-light text-primary float-end">Justificatifs non contrôlés</p>',
             count=1,
         )
 
@@ -1463,7 +1463,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         self.assertContains(
             response,
-            '<p class="badge badge-pill badge-success float-right">Validé</p>',
+            '<p class="badge rounded-pill bg-success float-end">Validé</p>',
             count=1,
         )
 
@@ -1493,7 +1493,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         self.assertContains(
             response,
-            '<p class="badge badge-pill badge-danger float-right">Problème constaté</p>',
+            '<p class="badge rounded-pill bg-danger float-end">Problème constaté</p>',
             count=1,
         )
 
@@ -1523,7 +1523,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         self.assertContains(
             response,
-            '<p class="badge badge-pill badge-danger float-right">Problème constaté</p>',
+            '<p class="badge rounded-pill bg-danger float-end">Problème constaté</p>',
             count=1,
         )
 
@@ -1548,7 +1548,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(
             response,
             f"""
-            <a href="{evaluated_job_application_url}" class="btn btn-outline-primary btn-sm float-right">
+            <a href="{evaluated_job_application_url}" class="btn btn-outline-primary btn-sm float-end">
                 Revoir ses justificatifs
             </a>
             """,
@@ -3198,7 +3198,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
 
 class InstitutionEvaluatedJobApplicationViewTest(TestCase):
     btn_modifier_html = """
-        <button class="btn btn-outline-primary btn-sm float-right" aria-label="Modifier l'état de ce justificatif">
+        <button class="btn btn-outline-primary btn-sm float-end" aria-label="Modifier l'état de ce justificatif">
             Modifier
         </button>
     """
@@ -3650,21 +3650,21 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
 
         # Unset
         response = self.client.get(url_view)
-        self.assertContains(response, "badge-pilotage")
+        self.assertContains(response, "bg-pilotage")
         self.assertContains(response, "À traiter")
 
         # Refused
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
         evaluated_administrative_criteria.save(update_fields=["review_state"])
         response = self.client.get(url_view)
-        self.assertContains(response, "badge-danger")
+        self.assertContains(response, "bg-danger")
         self.assertContains(response, "Problème constaté")
 
         # Accepted
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
         evaluated_administrative_criteria.save(update_fields=["review_state"])
         response = self.client.get(url_view)
-        self.assertContains(response, "badge-success")
+        self.assertContains(response, "bg-success")
         self.assertContains(response, "Validé")
 
 

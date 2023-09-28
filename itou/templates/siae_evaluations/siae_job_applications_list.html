@@ -42,7 +42,7 @@
                         <div class="col-md-4">
                             <form method="post" action="{% url 'siae_evaluations_views:siae_submit_proofs' evaluated_siae.pk %}">
                                 {% csrf_token %}
-                                <button class="btn {% if is_submittable %}btn-primary {% else %}btn-outline-primary disabled {% endif %}float-right">
+                                <button class="btn {% if is_submittable %}btn-primary {% else %}btn-outline-primary disabled {% endif %}float-end">
                                     Soumettre à validation
                                 </button>
                             </form>
@@ -68,7 +68,7 @@
                             <div class="col-4">
                                 <form method="post" action="{% url 'siae_evaluations_views:siae_submit_proofs' evaluated_siae.pk %}">
                                     {% csrf_token %}
-                                    <button class="btn {% if is_submittable %}btn-primary {% else %}btn-outline-primary disabled {% endif %}float-right">
+                                    <button class="btn {% if is_submittable %}btn-primary {% else %}btn-outline-primary disabled {% endif %}float-end">
                                         Soumettre à validation
                                     </button>
                                 </form>

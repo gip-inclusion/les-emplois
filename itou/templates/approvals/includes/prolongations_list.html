@@ -2,7 +2,7 @@
     {% for p in prolongations %}
         <li>
             du {{ p.start_at|date:"d/m/Y" }} au {{ p.end_at|date:"d/m/Y" }}
-            <small class="ml-3">{{ p.get_reason_display }}</small>
+            <small class="ms-3">{{ p.get_reason_display }}</small>
             {% if p.validated_by %}
                 <small class="d-block mb-2">
                     Autorisée par <i>{{ p.validated_by.get_full_name }}</i>

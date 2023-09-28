@@ -70,7 +70,7 @@ class SwitchCheckboxWidget(forms.CheckboxInput):
 
     Usage :
     - Add it to a form
-    - Add the "custom-control custom-switch" classes to the div containing the input.
+    - Add the "form-check form-switch" classes to the div containing the input.
 
     Example:
     ```
@@ -78,7 +78,7 @@ class SwitchCheckboxWidget(forms.CheckboxInput):
     my_field = forms.BooleanField(widget=SwitchCheckboxWidget())
 
     # Template
-    {% bootstrap_form form field_class="custom-control custom-switch" %}
+    {% bootstrap_form form field_class="form-check form-switch" %}
     ```
     """
 

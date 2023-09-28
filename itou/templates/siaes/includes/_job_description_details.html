@@ -3,7 +3,7 @@
 {% include "siaes/includes/_siae_info.html" %}
 
 {% if job.is_active %}
-    <p class="badge badge-pill badge-success mb-4">
+    <p class="badge rounded-pill bg-success mb-4">
         {{ job.open_positions }} poste{{ job.open_positions|pluralizefr }} ouvert{{ job.open_positions|pluralizefr }} au recrutement
     </p>
 {% endif %}
@@ -12,10 +12,10 @@
 
 <div class="mb-4">
     {% if job.display_contract_type %}
-        <span class="badge badge-pill badge-emploi-light">{{ job.display_contract_type }}</span>
+        <span class="badge rounded-pill bg-emploi-light">{{ job.display_contract_type }}</span>
     {% endif %}
     {% if job.hours_per_week %}
-        <span class="badge badge-pill badge-emploi-light">{{ job.hours_per_week }}h / semaine</span>
+        <span class="badge rounded-pill bg-emploi-light">{{ job.hours_per_week }}h / semaine</span>
     {% endif %}
 </div>
 
@@ -42,7 +42,7 @@
 {% if job.is_resume_mandatory %}
     <div class="alert alert-warning mb-4">
         <div class="row">
-            <div class="col-auto pr-0">
+            <div class="col-auto pe-0">
                 <i class="ri-file-list-3-line ri-xl text-warning"></i>
             </div>
             <div class="col">
@@ -57,7 +57,7 @@
 {% if siae.is_opcs and job.is_qpv_mandatory %}
     <div class="alert alert-warning mb-4">
         <div class="row">
-            <div class="col-auto pr-0">
+            <div class="col-auto pe-0">
                 <i class="ri-information-line ri-xl text-warning"></i>
             </div>
             <div class="col">

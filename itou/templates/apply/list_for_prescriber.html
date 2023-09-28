@@ -60,7 +60,7 @@
                             <div>
                                 {% include "apply/includes/job_applications_export_button.html" %}
                                 {% if filters_counter > 0 %}
-                                    <a href="{% url 'apply:list_for_prescriber' %}" class="btn btn-link btn-ico pl-0">
+                                    <a href="{% url 'apply:list_for_prescriber' %}" class="btn btn-link btn-ico ps-0">
                                         <i class="ri-close-fill"></i>
                                         <span>Réinitialiser les filtres ({{ filters_counter }})</span>
                                     </a>
@@ -92,7 +92,7 @@
                                     {# TODO: when working on this template in the near future, try to refactor with list_card_body_siae.html #}
                                     {% include "apply/includes/list_card_header.html" with job_application=job_application %}
                                     {% include "apply/includes/list_card_body.html" with job_application=job_application %}
-                                    <div class="card-footer text-right">
+                                    <div class="card-footer text-end">
                                         <a href="{% url 'apply:details_for_prescriber' job_application_id=job_application.id %}?back_url={{ request.get_full_path|urlencode }}"
                                            class="btn btn-sm btn-outline-primary"
                                            aria-label="Plus d’informations sur la candidature de {{ job_application.job_seeker.get_full_name|mask_unless:job_application.user_can_view_personal_information }}">
