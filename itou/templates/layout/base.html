@@ -9,9 +9,10 @@
             {% block title %}- Les emplois de l'inclusion{% endblock %}
         </title>
         {% block meta_description %}
-            <meta name="description" content="Les emplois de l'inclusion facilitent le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)">
+            <meta name="description"
+                  content="Les emplois de l'inclusion facilitent le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)">
         {% endblock %}
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
         {# https://metatags.io #}
         <meta name="title" content="Les emplois de l'inclusion">
@@ -21,13 +22,15 @@
         <meta property="og:type" content="website">
         <meta property="og:url" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}">
         <meta property="og:title" content="Les emplois de l'inclusion">
-        <meta property="og:description" content="Les emplois de l'inclusion facilitent le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)">
+        <meta property="og:description"
+              content="Les emplois de l'inclusion facilitent le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)">
         <meta property="og:image" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}{% static "img/logo_metatags.png" %}">
         {# https://metatags.io Twitter #}
         <meta property="twitter:card" content="summary_large_image">
-        <meta property="twitter:url" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}/">
+        <meta property="twitter:url" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}">
         <meta property="twitter:title" content="Les emplois de l'inclusion">
-        <meta property="twitter:description" content="Les emplois de l'inclusion facilitent le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)">
+        <meta property="twitter:description"
+              content="Les emplois de l'inclusion facilitent le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)">
         <meta property="twitter:image" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}{% static "img/logo_metatags.png" %}">
 
         <link rel="shortcut icon" href="{% static_theme_images "favicon.ico" %}" type="image/ico">
@@ -37,7 +40,7 @@
         {% block extra_head %}{% endblock %}
     </head>
     <body class="{% block body_class %}{% endblock %}">
-        <nav role="navigation" aria-label="Accès rapide" tabindex="0" class="sr-only">
+        <nav role="navigation" aria-label="Accès rapide" tabindex="0" class="visually-hidden">
             <ul>
                 <li>
                     <a href="#nav-primary">Aller au menu principal</a>
@@ -52,7 +55,7 @@
         {% include "layout/_header.html" %}
 
         <main id="main" role="main" class="s-main bg-gray-400">
-            <div class="toast-placement-wrapper" aria-live="polite" aria-atomic="true">{% include "utils/toasts.html" %}</div>
+            <div class="toast-container" aria-live="polite" aria-atomic="true">{% include "utils/toasts.html" %}</div>
             <div class="container container-messages">
                 {% block messages %}
 
@@ -92,7 +95,7 @@
 
         {% include "layout/_footer.html" %}
 
-        <div class="sr-only">
+        <div class="visually-hidden">
             <a href="#header">Retour au début de la page</a>
         </div>
 
@@ -256,7 +259,7 @@
         {# The rationale behind it: "Je donne mon avis" is imposed by DINUM but is redundant with Hotjar. #}
         {# Hotjar is way more powerful. Compromise: display "Je donne mon avis" only on HP. #}
         {% if request.path == "/" %}
-            <div class="fixed-sm-bottom text-center text-sm-right p-3 pr-sm-2 pb-sm-2">
+            <div class="fixed-sm-bottom text-center text-sm-right p-3 pe-sm-2 pb-sm-2">
                 <a href="https://voxusagers.numerique.gouv.fr/Demarches/2436?&view-mode=formulaire-avis&nd_mode=en-ligne-enti%C3%A8rement&nd_source=button&key=ca117c905602fb63fda68b31ee0f5bdd" target="_blank">
                     <img class="give-my-advice" src="{% static 'img/je-donne-mon-avis.svg' %}" alt="Je donne mon avis sur cette démarche">
                 </a>
