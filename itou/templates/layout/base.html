@@ -9,8 +9,7 @@
             {% block title %}- Les emplois de l'inclusion{% endblock %}
         </title>
         {% block meta_description %}
-            <meta name="description"
-                  content="Les emplois de l'inclusion facilitent le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)">
+            <meta name="description" content="Les emplois de l'inclusion facilitent le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)">
         {% endblock %}
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -22,22 +21,19 @@
         <meta property="og:type" content="website">
         <meta property="og:url" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}">
         <meta property="og:title" content="Les emplois de l'inclusion">
-        <meta property="og:description"
-              content="Les emplois de l'inclusion facilitent le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)">
+        <meta property="og:description" content="Les emplois de l'inclusion facilitent le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)">
         <meta property="og:image" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}{% static "img/logo_metatags.png" %}">
         {# https://metatags.io Twitter #}
         <meta property="twitter:card" content="summary_large_image">
         <meta property="twitter:url" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}/">
         <meta property="twitter:title" content="Les emplois de l'inclusion">
-        <meta property="twitter:description"
-              content="Les emplois de l'inclusion facilitent le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)">
+        <meta property="twitter:description" content="Les emplois de l'inclusion facilitent le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)">
         <meta property="twitter:image" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}{% static "img/logo_metatags.png" %}">
 
         <link rel="shortcut icon" href="{% static_theme_images "favicon.ico" %}" type="image/ico">
         <link rel="stylesheet" href="{% static "vendor/jquery-ui/jquery-ui.min.css" %}" type="text/css">
         <link rel="stylesheet" href="{% static "vendor/theme-inclusion/stylesheets/app.css" %}" type="text/css">
         <link rel="stylesheet" href="{% static "css/itou.css" %}" type="text/css">
-        <link rel="stylesheet" href="{% static "vendor/duetds-date-picker/themes/default.css" %}" type="text/css">
         {% block extra_head %}{% endblock %}
     </head>
     <body class="{% block body_class %}{% endblock %}">
