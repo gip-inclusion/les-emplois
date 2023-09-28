@@ -1,6 +1,7 @@
 from unittest import mock
 
 import httpx
+import pytest
 import respx
 from django.conf import settings
 from django.contrib import messages
@@ -25,6 +26,9 @@ from tests.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oau
 from tests.siaes.factories import SiaeFactory, SiaeMembershipFactory, SiaeWithMembershipAndJobsFactory
 from tests.users.factories import DEFAULT_PASSWORD, PrescriberFactory, SiaeStaffFactory
 from tests.utils.test import BASE_NUM_QUERIES, TestCase, assertMessages
+
+
+pytestmark = pytest.mark.ignore_template_errors
 
 
 class SiaeSignupTest(InclusionConnectBaseTestCase):

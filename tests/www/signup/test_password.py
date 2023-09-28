@@ -1,3 +1,4 @@
+import pytest
 from allauth.account.forms import default_token_generator
 from allauth.account.utils import user_pk_to_url_str
 from django.conf import settings
@@ -7,6 +8,9 @@ from django.utils.http import urlencode
 
 from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from tests.utils.test import TestCase
+
+
+pytestmark = pytest.mark.ignore_template_errors
 
 
 class PasswordResetTest(TestCase):

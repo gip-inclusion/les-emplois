@@ -3,6 +3,7 @@ import textwrap
 from unittest import mock
 
 import factory
+import pytest
 from django import urls
 from django.core import management
 from django.utils import timezone
@@ -13,6 +14,8 @@ from itou.status.management.commands import run_status_probes
 from tests.status import factories
 from tests.utils.test import TestCase
 
+
+pytestmark = pytest.mark.ignore_template_errors
 
 fake = Faker()
 

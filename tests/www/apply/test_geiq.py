@@ -1,3 +1,4 @@
+import pytest
 from dateutil.relativedelta import relativedelta
 from django.test import TestCase
 from django.urls import reverse
@@ -11,6 +12,9 @@ from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.siaes.factories import SiaeWithMembershipAndJobsFactory
 from tests.users.factories import JobSeekerFactory, JobSeekerWithAddressFactory
+
+
+pytestmark = pytest.mark.ignore_template_errors
 
 
 class JobApplicationGEIQEligibilityDetailsTest(TestCase):

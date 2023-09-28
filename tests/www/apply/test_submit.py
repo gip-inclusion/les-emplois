@@ -1,6 +1,7 @@
 import datetime
 import uuid
 
+import pytest
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.test import override_settings
@@ -45,6 +46,9 @@ from tests.users.factories import (
 )
 from tests.utils.storage.test import S3AccessingTestCase
 from tests.utils.test import TestCase, assertMessages
+
+
+pytestmark = pytest.mark.ignore_template_errors
 
 
 class ApplyTest(S3AccessingTestCase):

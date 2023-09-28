@@ -61,6 +61,9 @@ from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, Prescriber
 from tests.utils.test import TestCase, parse_response_to_soup
 
 
+pytestmark = pytest.mark.ignore_template_errors
+
+
 class DashboardViewTest(TestCase):
     NO_PRESCRIBER_ORG_MSG = "Votre compte utilisateur n’est rattaché à aucune organisation."
     NO_PRESCRIBER_ORG_FOR_PE_MSG = (

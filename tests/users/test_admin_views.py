@@ -1,3 +1,4 @@
+import pytest
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
@@ -11,6 +12,9 @@ from itou.utils.models import PkSupportRemark
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import ItouStaffFactory, JobSeekerFactory
 from tests.utils.test import assertMessages
+
+
+pytestmark = pytest.mark.ignore_template_errors
 
 
 def test_add_user(client):

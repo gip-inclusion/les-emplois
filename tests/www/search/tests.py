@@ -1,3 +1,4 @@
+import pytest
 from django.contrib.gis.geos import Point
 from django.template.defaultfilters import capfirst
 from django.test import override_settings
@@ -13,6 +14,9 @@ from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.siaes.factories import SiaeFactory, SiaeJobDescriptionFactory, SiaeMembershipFactory
 from tests.utils.test import BASE_NUM_QUERIES, TestCase
+
+
+pytestmark = pytest.mark.ignore_template_errors
 
 
 class SearchSiaeTest(TestCase):

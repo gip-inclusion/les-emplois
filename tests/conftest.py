@@ -3,14 +3,18 @@ import os
 # Workaround being able to use freezegun with pandas.
 # https://github.com/spulec/freezegun/issues/98
 import pandas  # noqa F401
+import patchy
 import pytest
 from django.conf import settings
 from django.contrib.gis.db.models.fields import get_srid_info
 from django.core import management
 from django.core.cache import cache
 from django.db import connection
+from django.template import base as base_template
 from django.test import override_settings
 from factory import Faker
+from pytest_django.lazy_django import django_settings_is_configured
+from pytest_django.plugin import INVALID_TEMPLATE_VARS_ENV
 
 
 # Rewrite before importing itou code.
@@ -154,3 +158,49 @@ def django_ensure_matomo_titles(monkeypatch) -> None:
         return original_render(template_name, context, request, using)
 
     monkeypatch.setattr(loader, "render_to_string", assertive_render)
+
+
+@pytest.fixture(autouse=True, scope="session")
+def _fail_for_invalid_template_variable_improved(_fail_for_invalid_template_variable):
+    # Workaround following https://github.com/pytest-dev/pytest-django/issues/1059#issue-1665002785
+    # rationale to better handle OneToOne field
+    if os.environ.get(INVALID_TEMPLATE_VARS_ENV, "false") == "true" and django_settings_is_configured():
+        from django.conf import settings as dj_settings
+
+        invalid_var_exception = dj_settings.TEMPLATES[0]["OPTIONS"]["string_if_invalid"]
+
+        # Make InvalidVarException falsy to keep the behavior consistent for OneToOneField
+        invalid_var_exception.__class__.__bool__ = lambda self: False
+
+        # but adapt Django's template code to behave as if it was truthy in resolve
+        # (except when the default filter is used)
+        patchy.patch(
+            base_template.FilterExpression.resolve,
+            """\
+            @@ -7,7 +7,8 @@
+                             obj = None
+                         else:
+                             string_if_invalid = context.template.engine.string_if_invalid
+            -                if string_if_invalid:
+            +                from django.template.defaultfilters import default as default_filter
+            +                if default_filter not in {func for func, _args in self.filters}:
+                                 if "%s" in string_if_invalid:
+                                     return string_if_invalid % self.var
+                                 else:
+            """,
+        )
+
+        # By default, Django uses "" as string_if_invalid
+        # when fail is set to False, try to mimic Django
+        patchy.patch(
+            invalid_var_exception.__class__.__mod__,
+            """\
+            @@ -7,4 +7,5 @@
+                 if self.fail:
+                     pytest.fail(msg)
+                 else:
+            -        return msg
+            +        # If self.fail is desactivated, try to be discreet
+            +        return ""
+            """,
+        )

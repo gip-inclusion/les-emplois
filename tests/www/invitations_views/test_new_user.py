@@ -1,6 +1,10 @@
 import uuid
 
+import pytest
 from django.shortcuts import reverse
+
+
+pytestmark = pytest.mark.ignore_template_errors
 
 
 class TestNewUser:

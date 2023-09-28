@@ -1,7 +1,11 @@
+import pytest
 from django.urls import reverse
 
 from tests.users.factories import PrescriberFactory
 from tests.utils.test import TestCase
+
+
+pytestmark = pytest.mark.ignore_template_errors
 
 
 class SearchSiaeTest(TestCase):

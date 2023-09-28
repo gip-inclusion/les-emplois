@@ -1,6 +1,7 @@
 from datetime import timedelta
 from urllib.parse import urlencode
 
+import pytest
 import respx
 from allauth.account.models import EmailAddress
 from django.conf import settings
@@ -24,6 +25,9 @@ from tests.prescribers.factories import PrescriberOrganizationWithMembershipFact
 from tests.siaes.factories import SiaeFactory
 from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory
 from tests.utils.test import TestCase, assertMessages
+
+
+pytestmark = pytest.mark.ignore_template_errors
 
 
 POST_DATA = {

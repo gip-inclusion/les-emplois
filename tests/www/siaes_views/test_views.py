@@ -23,6 +23,9 @@ from tests.siaes.factories import (
 from tests.utils.test import TestCase, parse_response_to_soup
 
 
+pytestmark = pytest.mark.ignore_template_errors
+
+
 @pytest.mark.usefixtures("unittest_compatibility")
 class CardViewTest(TestCase):
     OTHER_TAB_ID = "autres-metiers"

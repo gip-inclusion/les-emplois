@@ -14,6 +14,7 @@ shellcheck-py  # https://github.com/shellcheck-py/shellcheck-py
 beautifulsoup4  # https://code.launchpad.net/beautifulsoup
 factory-boy  # https://github.com/FactoryBoy/factory_boy
 freezegun  # https://github.com/spulec/freezegun
+patchy  # https://github.com/adamchainz/patchy
 pytest  # https://github.com/pytest-dev/pytest
 pytest-django # https://github.com/pytest-dev/pytest-django/
 pytest-mock  # https://github.com/pytest-dev/pytest-mock/

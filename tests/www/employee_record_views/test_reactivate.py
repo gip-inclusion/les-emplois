@@ -9,6 +9,9 @@ from tests.siaes.factories import SiaeWithMembershipAndJobsFactory
 from tests.utils.test import TestCase
 
 
+pytestmark = pytest.mark.ignore_template_errors
+
+
 @pytest.mark.usefixtures("unittest_compatibility")
 class ReactivateEmployeeRecordsTest(TestCase):
     def setUp(self):

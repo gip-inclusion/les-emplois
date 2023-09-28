@@ -82,6 +82,9 @@ from tests.users.factories import (
 from tests.utils.test import TestCase, assertMessagesFromRequest, parse_response_to_soup
 
 
+pytestmark = pytest.mark.ignore_template_errors
+
+
 def get_response_for_middlewaremixin(request):
     """
     `SessionMiddleware` inherits from `MiddlewareMixin` which requires

@@ -17,6 +17,9 @@ from tests.users.factories import PrescriberFactory
 from tests.utils.test import TestCase
 
 
+pytestmark = pytest.mark.ignore_template_errors
+
+
 class StatsViewTest(TestCase):
     @override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
     def test_stats_public(self):

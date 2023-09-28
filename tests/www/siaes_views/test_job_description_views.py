@@ -17,6 +17,9 @@ from tests.users.factories import JobSeekerFactory
 from tests.utils.test import BASE_NUM_QUERIES, TestCase, assertMessages
 
 
+pytestmark = pytest.mark.ignore_template_errors
+
+
 class JobDescriptionAbstractTest(TestCase):
     def setUp(self):
         super().setUp()
