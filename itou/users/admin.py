@@ -465,6 +465,11 @@ class ItouUserAdmin(UserAdmin):
             ),
         ] + urls
 
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        if not change:
+            EmailAddress.objects.create(user=obj, email=obj.email, primary=True, verified=False)
+
     def transfer_view(self, request, from_user_pk, to_user_pk=None):
         if not self.has_change_permission(request):
             raise PermissionDenied

@@ -1,3 +1,4 @@
+from allauth.account.models import EmailAddress
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
@@ -30,6 +31,11 @@ def test_add_user(client):
     user = User.objects.get(username="foo")
     assertRedirects(response, reverse("admin:users_user_change", kwargs={"object_id": user.pk}))
     assert user.kind == UserKind.JOB_SEEKER
+    email_address = EmailAddress.objects.get()
+    assert email_address.email == user.email
+    assert email_address.user_id == user.pk
+    assert email_address.primary is True
+    assert email_address.verified is False
 
 
 def test_no_email_sent(client):
