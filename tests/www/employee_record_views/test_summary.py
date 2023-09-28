@@ -1,9 +1,13 @@
+import pytest
 from django.urls import reverse
 
 from tests.employee_record.factories import EmployeeRecordUpdateNotificationFactory, EmployeeRecordWithProfileFactory
 from tests.job_applications.factories import JobApplicationWithCompleteJobSeekerProfileFactory
 from tests.siaes.factories import SiaeWithMembershipAndJobsFactory
 from tests.utils.test import TestCase
+
+
+pytestmark = pytest.mark.ignore_template_errors
 
 
 class SummaryEmployeeRecordsTest(TestCase):

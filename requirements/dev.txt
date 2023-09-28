@@ -786,6 +786,10 @@ parso==0.8.3 \
     --hash=sha256:8c07be290bb59f03588915921e29e8a50002acaf2cdc5fa0e0114f91709fafa0 \
     --hash=sha256:c001d4636cd3aecdaf33cbb40aebb59b094be2a74c556778ef5576c175e19e75
     # via jedi
+patchy==2.8.0 \
+    --hash=sha256:0b7837f90f9729361a2a8ae7daef3a42bb81a8346d27945c125e312c3fe0fd05 \
+    --hash=sha256:ae7fbcdde436272fb32485e4392c2b3cd2d0c1ac91b0af76b41242e92ff084ec
+    # via -r requirements/test.txt
 pathspec==0.11.1 \
     --hash=sha256:2798de800fa92780e33acca925945e9a19a133b715067cf165b8866c15a31687 \
     --hash=sha256:d8af70af76652554bd134c22b3e8a1cc46ed7d91edcdd721ef1a0c51a84a5293

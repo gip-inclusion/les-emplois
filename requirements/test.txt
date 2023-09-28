@@ -695,6 +695,10 @@ paramiko==3.3.1 \
     --hash=sha256:6a3777a961ac86dbef375c5f5b8d50014a1a96d0fd7f054a43bc880134b0ff77 \
     --hash=sha256:b7bc5340a43de4287bbe22fe6de728aa2c22468b2a849615498dd944c2f275eb
     # via -r requirements/base.txt
+patchy==2.8.0 \
+    --hash=sha256:0b7837f90f9729361a2a8ae7daef3a42bb81a8346d27945c125e312c3fe0fd05 \
+    --hash=sha256:ae7fbcdde436272fb32485e4392c2b3cd2d0c1ac91b0af76b41242e92ff084ec
+    # via -r requirements/test.in
 pathspec==0.11.1 \
     --hash=sha256:2798de800fa92780e33acca925945e9a19a133b715067cf165b8866c15a31687 \
     --hash=sha256:d8af70af76652554bd134c22b3e8a1cc46ed7d91edcdd721ef1a0c51a84a5293

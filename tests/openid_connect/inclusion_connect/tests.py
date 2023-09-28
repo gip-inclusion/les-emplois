@@ -44,6 +44,8 @@ from tests.users.factories import (
 from tests.utils.test import assertMessages
 
 
+pytestmark = pytest.mark.ignore_template_errors
+
 OIDC_USERINFO = {
     "given_name": "Michel",
     "family_name": "AUDIARD",

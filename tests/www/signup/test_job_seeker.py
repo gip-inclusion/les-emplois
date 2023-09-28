@@ -1,5 +1,6 @@
 import uuid
 
+import pytest
 import respx
 from allauth.account.models import EmailConfirmationHMAC
 from django.conf import settings
@@ -16,6 +17,9 @@ from tests.cities.factories import create_test_cities
 from tests.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance
 from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from tests.utils.test import TestCase, reload_module
+
+
+pytestmark = pytest.mark.ignore_template_errors
 
 
 class JobSeekerSignupTest(TestCase):

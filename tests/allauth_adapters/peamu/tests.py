@@ -2,6 +2,7 @@
 # https://github.com/pennersr/django-allauth/blob/master/allauth/socialaccount/providers/google/tests.py
 from unittest import mock
 
+import pytest
 from allauth.account.models import EmailAddress, EmailConfirmation
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.models import SocialAccount
@@ -17,6 +18,9 @@ from itou.users.models import User
 from itou.utils import constants as global_constants
 from tests.users.factories import JobSeekerFactory
 from tests.utils.test import TestCase
+
+
+pytestmark = pytest.mark.ignore_template_errors
 
 
 @override_settings(

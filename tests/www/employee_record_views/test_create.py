@@ -18,6 +18,9 @@ from tests.users.factories import JobSeekerWithAddressFactory, JobSeekerWithMock
 from tests.utils.test import TestCase
 
 
+pytestmark = pytest.mark.ignore_template_errors
+
+
 # Helper functions
 def _get_user_form_data(user):
     form_data = {

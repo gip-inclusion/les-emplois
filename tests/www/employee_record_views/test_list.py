@@ -16,6 +16,9 @@ from tests.siaes.factories import SiaeWithMembershipAndJobsFactory
 from tests.utils.test import BASE_NUM_QUERIES, TestCase
 
 
+pytestmark = pytest.mark.ignore_template_errors
+
+
 @pytest.mark.usefixtures("unittest_compatibility")
 class ListEmployeeRecordsTest(TestCase):
     def setUp(self):

@@ -6,6 +6,9 @@ from pytest_django.asserts import assertContains, assertNotContains
 from tests.users.factories import ItouStaffFactory
 
 
+pytestmark = pytest.mark.ignore_template_errors
+
+
 @pytest.mark.filterwarnings(
     "ignore:"
     "The DEFAULT_FILE_STORAGE setting is deprecated. Use STORAGES instead.:"

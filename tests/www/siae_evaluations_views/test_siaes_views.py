@@ -1,3 +1,4 @@
+import pytest
 from dateutil.relativedelta import relativedelta
 from django.core import mail
 from django.urls import reverse
@@ -21,6 +22,9 @@ from tests.siaes.factories import SiaeMembershipFactory
 from tests.users.factories import JobSeekerFactory
 from tests.utils.storage.test import S3AccessingTestCase
 from tests.utils.test import BASE_NUM_QUERIES, TestCase, assertMessages
+
+
+pytestmark = pytest.mark.ignore_template_errors
 
 
 # fixme vincentporte : convert this method into factory

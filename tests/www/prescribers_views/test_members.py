@@ -1,3 +1,4 @@
+import pytest
 from django.core import mail
 from django.urls import reverse
 
@@ -7,6 +8,9 @@ from tests.prescribers.factories import (
     PrescriberOrganizationWithMembershipFactory,
 )
 from tests.utils.test import TestCase
+
+
+pytestmark = pytest.mark.ignore_template_errors
 
 
 class MembersTest(TestCase):

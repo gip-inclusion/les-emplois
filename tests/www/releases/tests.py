@@ -1,6 +1,10 @@
+import pytest
 from django.urls import reverse
 
 from tests.utils.test import TestCase
+
+
+pytestmark = pytest.mark.ignore_template_errors
 
 
 class ReleaseTest(TestCase):

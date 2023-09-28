@@ -1,6 +1,7 @@
 from unittest import mock
 
 import httpx
+import pytest
 import respx
 from django.conf import settings
 from django.contrib import auth, messages
@@ -29,6 +30,9 @@ from tests.prescribers.factories import (
 )
 from tests.users.factories import PrescriberFactory, SiaeStaffFactory
 from tests.utils.test import assertMessages
+
+
+pytestmark = pytest.mark.ignore_template_errors
 
 
 @override_settings(
