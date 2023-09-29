@@ -36,6 +36,10 @@
                                         <th scope="col">Numéro de PASS IAE</th>
                                         <th scope="col">Structure</th>
                                         <th scope="col">Demandée le</th>
+                                        <th scope="col">
+                                            Adressée à
+                                            <i class="ri-information-line text-info" data-toggle="tooltip" title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande."></i>
+                                        </th>
                                         <th scope="col">Statut</th>
                                         <th scope="col">Action</th>
                                     </tr>
@@ -48,6 +52,7 @@
                                             <td>{{ prolongation_request.approval.number|format_approval_number }}</td>
                                             <td>{{ prolongation_request.declared_by_siae }}</td>
                                             <td>{{ prolongation_request.created_at|date:"d/m/Y" }}</td>
+                                            <td>{{ prolongation_request.validated_by.get_full_name }}</td>
                                             <td>{% include "approvals/prolongation_requests/_status_badge.html" %}</td>
                                             <td>
                                                 <a class="btn btn-link btn-outline-primary btn-sm" href="{% url "approvals:prolongation_request_show" prolongation_request.pk %}">
