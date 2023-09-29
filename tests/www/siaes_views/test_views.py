@@ -73,7 +73,7 @@ class CardViewTest(TestCase):
               <a aria-controls="recrutements-en-cours"
                  aria-selected="true"
                  class="nav-link active"
-                 data-toggle="tab"
+                 data-bs-toggle="tab"
                  href="#recrutements-en-cours"
                  id="recrutements-en-cours-tab"
                  role="tab">
@@ -87,7 +87,7 @@ class CardViewTest(TestCase):
               <a aria-controls="autres-metiers"
                  aria-selected="false"
                  class="nav-link"
-                 data-toggle="tab"
+                 data-bs-toggle="tab"
                  href="#autres-metiers"
                  id="autres-metiers-tab"
                  role="tab">
@@ -100,7 +100,7 @@ class CardViewTest(TestCase):
              <li class="nav-item-dropdown dropdown" role="presentation">
               <a aria-expanded="false"
                  class="nav-link dropdown-toggle"
-                 data-toggle="dropdown"
+                 data-bs-toggle="dropdown"
                  href="#"
                  id="sTabs01DropdownMoreLink"
                  role="button">
@@ -192,7 +192,7 @@ class CardViewTest(TestCase):
               <a aria-controls="recrutements-en-cours"
                  aria-selected="true"
                  class="nav-link active"
-                 data-toggle="tab"
+                 data-bs-toggle="tab"
                  href="#recrutements-en-cours"
                  id="recrutements-en-cours-tab"
                  role="tab">
@@ -205,7 +205,7 @@ class CardViewTest(TestCase):
              <li class="nav-item-dropdown dropdown" role="presentation">
               <a aria-expanded="false"
                  class="nav-link dropdown-toggle"
-                 data-toggle="dropdown"
+                 data-bs-toggle="dropdown"
                  href="#"
                  id="sTabs01DropdownMoreLink"
                  role="button">
@@ -303,7 +303,7 @@ class CardViewTest(TestCase):
               <a aria-controls="recrutements-en-cours"
                  aria-selected="true"
                  class="nav-link active"
-                 data-toggle="tab"
+                 data-bs-toggle="tab"
                  href="#recrutements-en-cours"
                  id="recrutements-en-cours-tab"
                  role="tab">
@@ -317,7 +317,7 @@ class CardViewTest(TestCase):
               <a aria-controls="autres-metiers"
                  aria-selected="false"
                  class="nav-link"
-                 data-toggle="tab"
+                 data-bs-toggle="tab"
                  href="#autres-metiers"
                  id="autres-metiers-tab"
                  role="tab">
@@ -330,7 +330,7 @@ class CardViewTest(TestCase):
              <li class="nav-item-dropdown dropdown" role="presentation">
               <a aria-expanded="false"
                  class="nav-link dropdown-toggle"
-                 data-toggle="dropdown"
+                 data-bs-toggle="dropdown"
                  href="#"
                  id="sTabs01DropdownMoreLink"
                  role="button">
@@ -446,7 +446,7 @@ class CardViewTest(TestCase):
               <a aria-controls="recrutements-en-cours"
                  aria-selected="true"
                  class="nav-link active"
-                 data-toggle="tab"
+                 data-bs-toggle="tab"
                  href="#recrutements-en-cours"
                  id="recrutements-en-cours-tab"
                  role="tab">
@@ -460,7 +460,7 @@ class CardViewTest(TestCase):
               <a aria-controls="autres-metiers"
                  aria-selected="false"
                  class="nav-link"
-                 data-toggle="tab"
+                 data-bs-toggle="tab"
                  href="#autres-metiers"
                  id="autres-metiers-tab"
                  role="tab">
@@ -473,7 +473,7 @@ class CardViewTest(TestCase):
              <li class="nav-item-dropdown dropdown" role="presentation">
               <a aria-expanded="false"
                  class="nav-link dropdown-toggle"
-                 data-toggle="dropdown"
+                 data-bs-toggle="dropdown"
                  href="#"
                  id="sTabs01DropdownMoreLink"
                  role="button">

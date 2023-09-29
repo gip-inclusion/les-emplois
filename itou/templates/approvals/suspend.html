@@ -32,7 +32,7 @@
                                 <div id="collapse_end_at" class="collapse{% if not form.set_default_end_date.value %} show{% endif %}">
                                     {% bootstrap_field form.end_at %}
                                 </div>
-                                <div role="button" data-toggle="collapse" data-target="#collapse_end_at" aria-controls="collapse_end_at">
+                                <div role="button" data-bs-toggle="collapse" data-bs-target="#collapse_end_at" aria-controls="collapse_end_at">
                                     {% bootstrap_field form.set_default_end_date %}
                                 </div>
                                 {% bootstrap_field form.reason %}

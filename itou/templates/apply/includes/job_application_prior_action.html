@@ -14,7 +14,7 @@
     {% if job_application.can_change_prior_actions %}
         <div class="my-3">
             {# Delete button with its confirmation modal #}
-            <button class="btn btn-link" data-toggle="modal" data-target="#delete_prior_action_{{ prior_action.pk }}_modal">
+            <button class="btn btn-link" data-bs-toggle="modal" data-bs-target="#delete_prior_action_{{ prior_action.pk }}_modal">
                 Supprimer
             </button>
 
@@ -23,7 +23,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h3 id="delete_prior_action_{{ prior_action.pk }}_title">Suppression de l'action préalable à l'embauche</h3>
-                            <button type="button" class="btn-close" data-dismiss="modal" aria-label="Fermer"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                         </div>
                         <div class="modal-body">
                             <div class="row">
@@ -40,7 +40,7 @@
                                   class="d-block js-prevent-multiple-submit">
                                 {% csrf_token %}
                                 <div class="text-end">
-                                    <button class="btn btn-outline-primary btn-sm" data-dismiss="modal" aria-label="Annuler">Annuler</button>
+                                    <button class="btn btn-outline-primary btn-sm" data-bs-dismiss="modal" aria-label="Annuler">Annuler</button>
                                     <button class="btn btn-danger btn-sm" aria-label="Supprimer">Supprimer</button>
                                 </div>
                             </form>

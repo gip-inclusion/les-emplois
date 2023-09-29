@@ -56,7 +56,7 @@ Arguments:
             <li class="h4 mt-4 mb-2">
                 Nombre de jours restants sur le PASS IAE : {{ common_approval.remainder.days }} jour{{ common_approval.remainder.days|pluralizefr }}
                 <i class="ri-information-line ri-xl"
-                   data-toggle="tooltip"
+                   data-bs-toggle="tooltip"
                    title="Le reliquat est calculé sur la base d'un nombre de jours calendaires. Si le PASS IAE n'est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i>
             </li>
 
@@ -69,7 +69,7 @@ Arguments:
             {% if not hiring_pending %}
                 <li class="pb-2">
                     Date de fin prévisionnelle : {{ common_approval.end_at|date:"d/m/Y" }}
-                    <i class="ri-information-line ri-xl" data-toggle="tooltip" title="Cette date de fin est susceptible d'évoluer avec les éventuelles suspensions et prolongations du PASS IAE."></i>
+                    <i class="ri-information-line ri-xl" data-bs-toggle="tooltip" title="Cette date de fin est susceptible d'évoluer avec les éventuelles suspensions et prolongations du PASS IAE."></i>
                 </li>
             {% endif %}
         </ul>

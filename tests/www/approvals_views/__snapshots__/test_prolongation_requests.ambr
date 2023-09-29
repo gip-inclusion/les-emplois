@@ -196,7 +196,7 @@
   
                                   
                                       <div class="c-info mb-4">
-                                          <button aria-controls="legalInformation" aria-expanded="false" class="c-info__summary collapsed" data-target="#legalInformation" data-toggle="collapse" type="button">
+                                          <button aria-controls="legalInformation" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#legalInformation" data-bs-toggle="collapse" type="button">
                                               <span>Contexte légal</span>
                                           </button>
                                           <div class="c-info__detail collapse" id="legalInformation">
@@ -268,7 +268,7 @@
   
                                   
                                       <div class="c-info mb-4">
-                                          <button aria-controls="legalInformation" aria-expanded="false" class="c-info__summary collapsed" data-target="#legalInformation" data-toggle="collapse" type="button">
+                                          <button aria-controls="legalInformation" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#legalInformation" data-bs-toggle="collapse" type="button">
                                               <span>Contexte légal</span>
                                           </button>
                                           <div class="c-info__detail collapse" id="legalInformation">
@@ -340,7 +340,7 @@
   
                                   
                                       <div class="c-info mb-4">
-                                          <button aria-controls="legalInformation" aria-expanded="false" class="c-info__summary collapsed" data-target="#legalInformation" data-toggle="collapse" type="button">
+                                          <button aria-controls="legalInformation" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#legalInformation" data-bs-toggle="collapse" type="button">
                                               <span>Contexte légal</span>
                                           </button>
                                           <div class="c-info__detail collapse" id="legalInformation">
@@ -427,7 +427,7 @@
   
                                   
                                       <div class="c-info mb-4">
-                                          <button aria-controls="legalInformation" aria-expanded="false" class="c-info__summary collapsed" data-target="#legalInformation" data-toggle="collapse" type="button">
+                                          <button aria-controls="legalInformation" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#legalInformation" data-bs-toggle="collapse" type="button">
                                               <span>Contexte légal</span>
                                           </button>
                                           <div class="c-info__detail collapse" id="legalInformation">
@@ -499,7 +499,7 @@
   
                                   
                                       <div class="c-info mb-4">
-                                          <button aria-controls="legalInformation" aria-expanded="false" class="c-info__summary collapsed" data-target="#legalInformation" data-toggle="collapse" type="button">
+                                          <button aria-controls="legalInformation" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#legalInformation" data-bs-toggle="collapse" type="button">
                                               <span>Contexte légal</span>
                                           </button>
                                           <div class="c-info__detail collapse" id="legalInformation">
@@ -651,7 +651,7 @@
                               <p>
                                   <i class="ri-mail-line"></i>
                                   <a class="btn-link me-3" href="mailto:email@example.com">email@example.com</a>
-                                  <button class="js-copy-to-clipboard btn btn-ico btn-secondary" data-copy-to-clipboard="email@example.com" data-original-title="Copié !" data-placement="top" data-toggle="tooltip" data-trigger="manual">
+                                  <button class="js-copy-to-clipboard btn btn-ico btn-secondary" data-bs-original-title="Copié !" data-bs-placement="top" data-bs-toggle="tooltip" data-bs-trigger="manual" data-copy-to-clipboard="email@example.com">
       <i class="ri-file-copy-line ri-lg font-weight-normal"></i>
       <span>Copier</span>
   </button>

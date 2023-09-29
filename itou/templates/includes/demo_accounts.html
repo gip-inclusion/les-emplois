@@ -14,7 +14,7 @@
                 </p>
                 {% if not user.is_authenticated %}
                     <div>
-                        <button class="btn btn-sm btn-light border" data-toggle="modal" data-target="#testAccountsModal">
+                        <button class="btn btn-sm btn-light border" data-bs-toggle="modal" data-bs-target="#testAccountsModal">
                             Voir les comptes de démonstration
                         </button>
                     </div>
@@ -28,7 +28,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h3 class="modal-title" id="testAccountsModalTitle">Comptes de démonstration</h3>
-                    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Fermer"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                 </div>
                 <div class="modal-body">
 
@@ -110,7 +110,7 @@
 
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-sm btn-primary" data-dismiss="modal">Fermer</button>
+                    <button class="btn btn-sm btn-primary" data-bs-dismiss="modal">Fermer</button>
                 </div>
 
                 <div class="d-none">

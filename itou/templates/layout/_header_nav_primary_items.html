@@ -4,7 +4,7 @@
     <li class="dropdown">
         <button type="button"
                 class="btn btn-link dropdown-toggle {% if is_mobile %}mh-auto p-0{% endif %}"
-                data-toggle="dropdown"
+                data-bs-toggle="dropdown"
                 aria-haspopup="true"
                 aria-controls="helpDropdown{% if is_mobile %}Mobile{% endif %}"
                 aria-expanded="false">Besoin d'aide ?</button>
@@ -25,7 +25,12 @@
     {% if user.is_authenticated %}
         {% if request.organizations|length > 1 %}
             <li class="dropdown">
-                <button type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown{% if is_mobile %}Mobile{% endif %}" aria-expanded="false">
+                <button type="button"
+                        class="btn btn-outline-primary dropdown-toggle"
+                        data-bs-toggle="dropdown"
+                        aria-haspopup="true"
+                        aria-controls="switchUserDropdown{% if is_mobile %}Mobile{% endif %}"
+                        aria-expanded="false">
                     ({{ request.current_organization.kind }}) {{ request.current_organization.display_name|truncatechars:40 }}
                 </button>
                 <div class="dropdown-menu" id="switchUserDropdown{% if is_mobile %}Mobile{% endif %}">
@@ -49,7 +54,7 @@
         {% endif %}
 
         <li class="dropdown">
-            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-controls="dashboardUserDropdown{% if is_mobile %}Mobile{% endif %}" aria-expanded="false">
+            <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-controls="dashboardUserDropdown{% if is_mobile %}Mobile{% endif %}" aria-expanded="false">
                 Mon espace
             </button>
             <div class="dropdown-menu" id="dashboardUserDropdown{% if is_mobile %}Mobile{% endif %}">
@@ -121,7 +126,7 @@
             </a>
         </li>
         <li class="dropdown">
-            <button class="btn btn-icon btn-primary" data-toggle="dropdown" aria-haspopup="true" aria-controls="loginUserDropdown{% if is_mobile %}Mobile{% endif %}" aria-expanded="false">
+            <button class="btn btn-icon btn-primary" data-bs-toggle="dropdown" aria-haspopup="true" aria-controls="loginUserDropdown{% if is_mobile %}Mobile{% endif %}" aria-expanded="false">
                 <i class="ri-login-box-line" aria-hidden="true"></i>
                 <span>Se connecter</span>
             </button>

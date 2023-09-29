@@ -31,8 +31,8 @@
                 {% if request.current_organization.is_subject_to_eligibility_rules or request.current_organization.kind == SiaeKind.GEIQ %}
                     {% if siae_suspension_text_with_dates %}
                         <span class="btn-link btn-ico"
-                              data-toggle="tooltip"
-                              data-placement="top"
+                              data-bs-toggle="tooltip"
+                              data-bs-placement="top"
                               title="Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle a posteriori. {{ siae_suspension_text_with_dates }}">
                             <i class="ri-user-follow-line ri-lg font-weight-normal disabled"></i>
                             <span class="disabled">Enregistrer une candidature</span>

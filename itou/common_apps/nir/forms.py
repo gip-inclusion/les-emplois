@@ -24,8 +24,8 @@ class JobSeekerNIRUpdateMixin:
                 attrs={
                     "aria-expanded": "false",
                     "aria-controls": "id_lack_of_nir_reason",
-                    "data-target": ".lack_of_nir_reason_group",
-                    "data-toggle": "collapse",
+                    "data-bs-target": ".lack_of_nir_reason_group",
+                    "data-bs-toggle": "collapse",
                     "data-disable-target": "#id_nir",
                 }
             ),
