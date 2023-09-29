@@ -24,6 +24,11 @@
                     <div class="c-box mb-3 mb-lg-5">
                         <h2>Détail de la demande</h2>
                         <hr>
+                        <h3>
+                            Adressé à
+                            <i class="ri-information-line ri-xl" data-toggle="tooltip" title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande."></i>
+                        </h3>
+                        <p>{{ prolongation_request.validated_by.get_full_name }} a été sollicité pour cette demande.</p>
                         <h3>Date de fin de PASS IAE demandée : {{ prolongation_request.end_at|date:"d/m/Y" }}</h3>
                         <p>
                             La prolongation est demandée pour une durée de {{ prolongation_request.duration.days }} jour{{ prolongation_request.duration.days|pluralizefr }}.

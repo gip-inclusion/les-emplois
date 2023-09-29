@@ -398,6 +398,10 @@
                                           <th scope="col">Numéro de PASS IAE</th>
                                           <th scope="col">Structure</th>
                                           <th scope="col">Demandée le</th>
+                                          <th scope="col">
+                                              Adressée à
+                                              <i class="ri-information-line text-info" data-toggle="tooltip" title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande."></i>
+                                          </th>
                                           <th scope="col">Statut</th>
                                           <th scope="col">Action</th>
                                       </tr>
@@ -410,6 +414,7 @@
                                               <td><span>99999</span><span class="ml-1">99</span><span class="ml-1">99999</span></td>
                                               <td>ACME Inc.</td>
                                               <td>01/01/2000</td>
+                                              <td>John DOE</td>
                                               <td>
       
           <span class="badge badge-xs badge-pill badge-accent-03 text-primary">À traiter</span>
@@ -441,6 +446,11 @@
   <div class="c-box mb-3 mb-lg-5">
                           <h2>Détail de la demande</h2>
                           <hr/>
+                          <h3>
+                              Adressé à
+                              <i class="ri-information-line ri-xl" data-toggle="tooltip" title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande."></i>
+                          </h3>
+                          <p>John DOE a été sollicité pour cette demande.</p>
                           <h3>Date de fin de PASS IAE demandée : 31/01/2000</h3>
                           <p>
                               La prolongation est demandée pour une durée de 30 jours.

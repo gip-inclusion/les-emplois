@@ -347,7 +347,7 @@ def prolongation_requests_list(request, template_name="approvals/prolongation_re
         raise Http404()
 
     queryset = ProlongationRequest.objects.filter(prescriber_organization=current_organization).select_related(
-        "approval__user", "declared_by_siae"
+        "approval__user", "declared_by_siae", "validated_by"
     )
 
     form = ProlongationRequestFilterForm(data=request.GET)
