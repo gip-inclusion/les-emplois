@@ -112,13 +112,13 @@
                       <h2 class="visually-hidden" id="metiers-title">Métiers de la structure</h2>
                       <ul aria-labelledby="metiers-title" class="s-tabs-01__nav nav nav-tabs" role="tablist">
                           <li class="nav-item" role="presentation">
-                              <a aria-controls="recrutements-en-cours" aria-selected="true" class="nav-link active" data-toggle="tab" href="#recrutements-en-cours" id="recrutements-en-cours-tab" role="tab">
+                              <a aria-controls="recrutements-en-cours" aria-selected="true" class="nav-link active" data-bs-toggle="tab" href="#recrutements-en-cours" id="recrutements-en-cours-tab" role="tab">
                                   Recrutement en cours <span class="badge badge-sm bg-primary rounded-pill text-white ms-2">0</span>
                               </a>
                           </li>
                           
                           <li class="nav-item-dropdown dropdown" role="presentation">
-                              <a aria-expanded="false" class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" id="sTabs01DropdownMoreLink" role="button"><i class="ri-more-line"></i></a>
+                              <a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="sTabs01DropdownMoreLink" role="button"><i class="ri-more-line"></i></a>
                               <div aria-labelledby="sTabs01DropdownMoreLink" class="dropdown-menu dropdown-menu-end"></div>
                           </li>
                       </ul>

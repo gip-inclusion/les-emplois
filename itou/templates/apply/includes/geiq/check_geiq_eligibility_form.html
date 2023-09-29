@@ -7,7 +7,7 @@
 
 <div class="my-4 text-end">
     <a href="{{ back_url }}" class="btn btn-link">Annuler</a>
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirm_geiq_eligibility_modal" {% if not form.proof_of_eligibility.value or form.errors %}disabled{% endif %}>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirm_geiq_eligibility_modal" {% if not form.proof_of_eligibility.value or form.errors %}disabled{% endif %}>
         Valider les critères d'éligibilité GEIQ
     </button>
 </div>
@@ -31,7 +31,7 @@
                 {% endif %}
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-sm btn-outline-primary" data-dismiss="modal">Retour</button>
+                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>
                 <button class="btn btn-sm btn-primary">Confirmer</button>
             </div>
         </div>

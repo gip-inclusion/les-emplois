@@ -9,7 +9,7 @@
     {% if request.user.is_employer %}
         {% if siae.is_subject_to_eligibility_rules or siae.kind == SiaeKind.GEIQ %}
             <div class="alert alert-info alert-dismissible fade show">
-                <button type="button" class="btn-close" data-dismiss="alert" aria-label="Fermer"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
                 <p class="mb-2">
                     <strong>Nouveauté</strong>
                 </p>
@@ -105,7 +105,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h3 class="modal-title" id="nir-confirmation-label">Utilisateur trouvé</h3>
-                            <button type="button" class="btn-close" data-dismiss="modal" aria-label="Fermer"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                         </div>
                         <div class="modal-body">
                             <p>

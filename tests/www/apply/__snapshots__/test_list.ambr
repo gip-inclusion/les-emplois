@@ -119,7 +119,7 @@
                                           
                                       </div>
                                       <div class="card-footer text-end">
-                                          <a aria-controls="answer0" aria-expanded="false" aria-label="Plus d'informations sur cette candidature" class="btn btn-sm btn-outline-primary" data-target="#answer0" data-toggle="collapse" href="#">Plus d'informations</a>
+                                          <a aria-controls="answer0" aria-expanded="false" aria-label="Plus d'informations sur cette candidature" class="btn btn-sm btn-outline-primary" data-bs-target="#answer0" data-bs-toggle="collapse" href="#">Plus d'informations</a>
                                       </div>
                                   </div>
                               
@@ -187,7 +187,7 @@
                                           
                                       </div>
                                       <div class="card-footer text-end">
-                                          <a aria-controls="answer1" aria-expanded="false" aria-label="Plus d'informations sur cette candidature" class="btn btn-sm btn-outline-primary" data-target="#answer1" data-toggle="collapse" href="#">Plus d'informations</a>
+                                          <a aria-controls="answer1" aria-expanded="false" aria-label="Plus d'informations sur cette candidature" class="btn btn-sm btn-outline-primary" data-bs-target="#answer1" data-bs-toggle="collapse" href="#">Plus d'informations</a>
                                       </div>
                                   </div>
                               
@@ -255,7 +255,7 @@
                                           
                                       </div>
                                       <div class="card-footer text-end">
-                                          <a aria-controls="answer2" aria-expanded="false" aria-label="Plus d'informations sur cette candidature" class="btn btn-sm btn-outline-primary" data-target="#answer2" data-toggle="collapse" href="#">Plus d'informations</a>
+                                          <a aria-controls="answer2" aria-expanded="false" aria-label="Plus d'informations sur cette candidature" class="btn btn-sm btn-outline-primary" data-bs-target="#answer2" data-bs-toggle="collapse" href="#">Plus d'informations</a>
                                       </div>
                                   </div>
                               
@@ -611,7 +611,8 @@
           <div class="col-12 col-md p-0">
               <div class="card-header pt-4">
                   <span class="badge rounded-pill bg-important badge-xs">Nouveau service</span>
-                  <button aria-label="Fermer" class="btn-close" data-dismiss="alert" data-target="#rdvi-promo" type="button"></button>
+                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" data-bs-target="#rdvi-promo" type="button">
+                  </button>
               </div>
               <div class="card-body pb-4">
                   <h4>RDV-Insertion simplifie les rendez-vous avec vos candidats</h4>

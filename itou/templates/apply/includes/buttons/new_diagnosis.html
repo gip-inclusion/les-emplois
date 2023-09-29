@@ -2,8 +2,8 @@
     {% with suspension=job_application.to_siae.get_active_suspension_text_with_dates %}
         {% if suspension %}
             <button class="btn btn-primary btn-block btn-ico disabled"
-                    data-toggle="tooltip"
-                    data-placement="top"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
                     title="Vous ne pouvez pas valider les critères d'éligibilité suite aux mesures prises dans le cadre du contrôle a posteriori. {{ suspension }}">
                 <i class="ri-check-line font-weight-medium" aria-hidden="true"></i>
                 <span>Accepter cette candidature</span>

@@ -26,7 +26,7 @@
                                     </a>
                                 {% elif hire_by_other_siae %}
                                     <span class="btn btn-link disabled text-muted">Suspendre</span>
-                                    <i class="btn btn-link ri-information-line ri-xl text-info ps-2 pe-3 font-weight-medium" data-toggle="tooltip" title="La suspension n’est pas possible car un autre employeur a embauché le candidat."></i>
+                                    <i class="btn btn-link ri-information-line ri-xl text-info ps-2 pe-3 font-weight-medium" data-bs-toggle="tooltip" title="La suspension n’est pas possible car un autre employeur a embauché le candidat."></i>
                                 {% endif %}
                                 {% if approval_can_be_prolonged %}
                                     <a href="{% url 'approvals:declare_prolongation' approval_id=approval.id %}?back_url={{ request.get_full_path|urlencode }}"

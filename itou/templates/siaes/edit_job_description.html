@@ -38,7 +38,7 @@
                             {# Bug or feature, django_bootstrap4 does not render errors raised from hidden fields validation #}
                             {% if form.errors.job_appellation_code %}
                                 <div class="alert alert-danger alert-dismissible" role="alert">
-                                    <button class="btn-close" data-dismiss="alert" aria-label="Fermer"></button>
+                                    <button class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
                                     {{ form.errors.job_appellation_code }}
                                 </div>
                             {% endif %}

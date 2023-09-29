@@ -17,7 +17,12 @@
         {% endfor %}
     </ul>
     <div class="mt-3 text-center">
-        <button type="button" class="btn collapsed has-collapse-caret p-0" data-toggle="collapse" data-target="#collapse_{{ forloop.counter0 }}" aria-expanded="false" aria-controls="collapse_{{ forloop.counter0 }}">
+        <button type="button"
+                class="btn collapsed has-collapse-caret p-0"
+                data-bs-toggle="collapse"
+                data-bs-target="#collapse_{{ forloop.counter0 }}"
+                aria-expanded="false"
+                aria-controls="collapse_{{ forloop.counter0 }}">
             <span>Afficher tout</span>
         </button>
     </div>

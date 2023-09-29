@@ -1,11 +1,11 @@
 {% load theme_inclusion %}
 {% for message in messages %}
     {% if "toast" in message.tags %}
-        <div class="toast {{ message|itou_toast_classes }}" role="status" aria-live="assertive" aria-atomic="true" data-autohide="false">
+        <div class="toast {{ message|itou_toast_classes }}" role="status" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
             <div class="toast-header">
                 <i class="ri-check-line ri-lg me-1" aria-hidden="true"></i>
                 <strong class="me-auto">{{ message|itou_toast_title }}</strong>
-                <button type="button" class="btn-close" data-dismiss="toast" aria-label="Fermer">
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Fermer">
                     <span class="visually-hidden">J'ai compris</span>
                 </button>
             </div>
@@ -13,7 +13,7 @@
                 {% if toast_message %}
                     <div class="toast-body">
                         {{ toast_message }}
-                        <button class="btn btn-block btn-outline-primary mt-3 d-block d-sm-none" data-dismiss="toast" aria-label="Fermer">
+                        <button class="btn btn-block btn-outline-primary mt-3 d-block d-sm-none" data-bs-dismiss="toast" aria-label="Fermer">
                             J'ai compris
                         </button>
                     </div>

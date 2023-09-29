@@ -1,6 +1,6 @@
 {% load static %}
 
-<a href="#" data-toggle="modal" data-target="#no-email-modal">
+<a href="#" data-bs-toggle="modal" data-bs-target="#no-email-modal">
     {% if link_text %}
         {{ link_text }}
     {% else %}
@@ -13,7 +13,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title" id="no-email-modal-label">Créer une adresse e-mail</h3>
-                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Fermer"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
             </div>
             <div class="modal-body">
                 <div class="container">

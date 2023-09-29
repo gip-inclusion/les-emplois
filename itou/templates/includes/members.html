@@ -18,7 +18,7 @@
                     <td>
                         {{ member.user.get_full_name }}
                         {% if member.user in active_admin_members %}
-                            <span class="badge badge-xs rounded-pill bg-info" data-toggle="tooltip" title="Administrateur de la structure">admin</span>
+                            <span class="badge badge-xs rounded-pill bg-info" data-bs-toggle="tooltip" title="Administrateur de la structure">admin</span>
                         {% endif %}
                     </td>
                     <td>
@@ -29,7 +29,7 @@
                         <td class="text-center">
                             <div>
                                 {% if member.user != user %}
-                                    <button id="dropdown_{{ forloop.counter }}_action_menu" class="btn btn-link btn-ico-only btn-sm" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Plus d'actions">
+                                    <button id="dropdown_{{ forloop.counter }}_action_menu" class="btn btn-link btn-ico-only btn-sm" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Plus d'actions">
                                         <i class="ri-more-2-fill" aria-hidden="true"></i>
                                     </button>
                                     <div class="dropdown-menu" aria-labelledby="dropdown_{{ forloop.counter }}_action_menu">
