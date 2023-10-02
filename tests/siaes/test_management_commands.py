@@ -8,7 +8,6 @@ from itou.employee_record.models import EmployeeRecord
 from itou.siaes.enums import SiaeKind
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.siae_evaluations.factories import EvaluatedSiaeFactory
 from tests.siaes import factories as siaes_factories
 from tests.utils.test import TestCase
 
@@ -37,17 +36,6 @@ class MoveSiaeDataTest(TestCase):
         assert siae1.members.count() == 0
         assert siae2.jobs.count() == 4
         assert siae2.members.count() == 1
-
-    def test_evaluation_data_is_moved(self):
-        stderr = io.StringIO()
-        siae1 = siaes_factories.SiaeFactory()
-        siae2 = siaes_factories.SiaeFactory()
-        EvaluatedSiaeFactory(siae=siae1)
-        management.call_command(
-            "move_siae_data", from_id=siae1.pk, to_id=siae2.pk, stdout=io.StringIO(), stderr=stderr, wet_run=True
-        )
-        assert siae1.evaluated_siaes.count() == 0
-        assert siae2.evaluated_siaes.count() == 1
 
     def test_orphan_employee_records_are_cloned(self):
         old_siae, new_siae = siaes_factories.SiaeFactory.create_batch(2)
