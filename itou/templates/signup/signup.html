@@ -11,38 +11,44 @@
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12">
-                    <div class="card-deck align-items-stretch text-center">
-                        <div class="card c-card p-md-5 has-one-link-inside w-100">
-                            <div class="card-body">
-                                <h3 class="h4 card-title font-weight-light">
-                                    <span class="d-block">Vous êtes un employeur solidaire</span>
-                                    <span class="d-block">(SIAE, GEIQ, EA, ...)</span>
-                                </h3>
-                            </div>
-                            <div class="card-footer">
-                                <a class="btn btn-primary stretched-link" href="{% url 'signup:siae_select' %}{% redirection_url value=redirect_field_value %}">
-                                    Créer un compte
-                                </a>
-                            </div>
-                        </div>
-                        <div class="card c-card p-md-5 has-one-link-inside w-100">
-                            <div class="card-body">
-                                <h3 class="h4 card-title font-weight-light">Vous êtes prescripteur ou orienteur</h3>
-                            </div>
-                            <div class="card-footer">
-                                <a class="btn btn-primary stretched-link" href="{% url 'signup:prescriber_check_already_exists' %}{% redirection_url value=redirect_field_value %}">
-                                    Créer un compte
-                                </a>
+                    <div class="row row-cols-1 row-cols-md-3 align-items-stretch text-center mt-5 g-5">
+                        <div class="col">
+                            <div class="card c-card has-one-link-inside h-100 w-100">
+                                <div class="card-body">
+                                    <h3 class="h4 card-title font-weight-light">
+                                        <span class="d-block">Vous êtes un employeur solidaire</span>
+                                        <span class="d-block">(SIAE, GEIQ, EA, ...)</span>
+                                    </h3>
+                                </div>
+                                <div class="card-footer">
+                                    <a class="btn btn-primary stretched-link" href="{% url 'signup:siae_select' %}{% redirection_url value=redirect_field_value %}">
+                                        Créer un compte
+                                    </a>
+                                </div>
                             </div>
                         </div>
-                        <div class="card c-card p-md-5 has-one-link-inside w-100">
-                            <div class="card-body">
-                                <h3 class="h4 card-title font-weight-light">Vous êtes en recherche d'un emploi et souhaitez postuler</h3>
+                        <div class="col">
+                            <div class="card c-card has-one-link-inside h-100 w-100">
+                                <div class="card-body">
+                                    <h3 class="h4 card-title font-weight-light">Vous êtes prescripteur ou orienteur</h3>
+                                </div>
+                                <div class="card-footer">
+                                    <a class="btn btn-primary stretched-link" href="{% url 'signup:prescriber_check_already_exists' %}{% redirection_url value=redirect_field_value %}">
+                                        Créer un compte
+                                    </a>
+                                </div>
                             </div>
-                            <div class="card-footer">
-                                <a class="btn btn-primary stretched-link" href="{% url 'signup:job_seeker_situation' %}{% redirection_url value=redirect_field_value %}">
-                                    Créer un compte
-                                </a>
+                        </div>
+                        <div class="col">
+                            <div class="card c-card has-one-link-inside h-100 w-100">
+                                <div class="card-body">
+                                    <h3 class="h4 card-title font-weight-light">Vous êtes en recherche d'un emploi et souhaitez postuler</h3>
+                                </div>
+                                <div class="card-footer">
+                                    <a class="btn btn-primary stretched-link" href="{% url 'signup:job_seeker_situation' %}{% redirection_url value=redirect_field_value %}">
+                                        Créer un compte
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>

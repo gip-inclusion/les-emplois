@@ -14,7 +14,7 @@
                 </p>
                 {% if not user.is_authenticated %}
                     <div>
-                        <button class="btn btn-sm btn-light border" data-bs-toggle="modal" data-bs-target="#testAccountsModal">
+                        <button class="btn btn-sm btn-outline-primary bg-white" data-bs-toggle="modal" data-bs-target="#testAccountsModal">
                             Voir les comptes de démonstration
                         </button>
                     </div>
@@ -40,26 +40,28 @@
                     </p>
 
                     <div class="pt-2 pb-5">
-                        <h4 class="h3 text-center pb-3">Employeurs</h4>
-                        <div class="card-deck">
+                        <h4 class="h3 text-center">Employeurs</h4>
+                        <div class="row row-cols-1 row-cols-md-3 row-cols-lg-5 text-center g-3">
                             {% employers_accounts_tag as employers_accounts %}
                             {% for account in employers_accounts %}
-                                <div class="card has-links-inside">
-                                    <div class="card-body mb-auto py-0">
-                                        <img src="{% static '/img/demo_accounts/' %}{{ account.image }}" class="card-img-top p-2 test-accounts-image-menu" alt="">
-                                        <h5 class="h5 card-title font-weight-bold text-center">{{ account.title }}</h5>
-                                    </div>
-                                    <div class="p-3 text-center">
-                                        <p class="card-text">{{ account.description }}</p>
-                                        <p class="m-auto card-text">
-                                            <i class="ri-map-line me-1"></i>
-                                            {{ account.location }}
-                                        </p>
-                                    </div>
-                                    <div class="card-footer text-center">
-                                        <a href="#" class="postLogin btn btn-link stretched-link" data-email="{{ account.email }}" data-action-url="{{ account.action_url }}">
-                                            Utiliser ce compte
-                                        </a>
+                                <div class="col">
+                                    <div class="c-card card has-links-inside w-100 h-100">
+                                        <div class="card-body mb-auto py-0">
+                                            <img src="{% static '/img/demo_accounts/' %}{{ account.image }}" class="card-img-top p-2 test-accounts-image-menu" alt="">
+                                            <h5 class="h5 card-title font-weight-bold text-center">{{ account.title }}</h5>
+                                        </div>
+                                        <div class="p-3 text-center">
+                                            <p class="card-text">{{ account.description }}</p>
+                                            <p class="m-auto card-text">
+                                                <i class="ri-map-line me-1"></i>
+                                                {{ account.location }}
+                                            </p>
+                                        </div>
+                                        <div class="card-footer text-center">
+                                            <a href="#" class="postLogin btn btn-link stretched-link" data-email="{{ account.email }}" data-action-url="{{ account.action_url }}">
+                                                Utiliser ce compte
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             {% endfor %}
@@ -67,20 +69,22 @@
                     </div>
 
                     <div class="pb-5">
-                        <h4 class="h3 text-center pb-3">Prescripteurs</h4>
-                        <div class="card-deck">
+                        <h4 class="h3 text-center">Prescripteurs</h4>
+                        <div class="row row-cols-1 row-cols-md-3 text-center g-3">
                             {% prescribers_accounts_tag as prescribers_accounts %}
                             {% for account in prescribers_accounts %}
-                                <div class="card has-links-inside">
-                                    <img src="{% static '/img/demo_accounts/' %}{{ account.image }}" class="card-img-top p-2 test-accounts-image-menu" alt="">
-                                    <div class="card-body">
-                                        <h5 class="h5 card-title h6 font-weight-bold text-center">{{ account.title|safe }}</h5>
-                                        <p class="card-text">{{ account.description }}</p>
-                                    </div>
-                                    <div class="card-footer text-center">
-                                        <a href="#" class="postLogin btn btn-link stretched-link" data-email="{{ account.email }}" data-action-url="{{ account.action_url }}">
-                                            Utiliser ce compte
-                                        </a>
+                                <div class="col">
+                                    <div class="c-card card has-links-inside w-100 h-100">
+                                        <img src="{% static '/img/demo_accounts/' %}{{ account.image }}" class="card-img-top p-2 test-accounts-image-menu" alt="">
+                                        <div class="card-body">
+                                            <h5 class="h5 card-title h6 font-weight-bold text-center">{{ account.title|safe }}</h5>
+                                            <p class="card-text">{{ account.description }}</p>
+                                        </div>
+                                        <div class="card-footer text-center">
+                                            <a href="#" class="postLogin btn btn-link stretched-link" data-email="{{ account.email }}" data-action-url="{{ account.action_url }}">
+                                                Utiliser ce compte
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             {% endfor %}
@@ -88,20 +92,22 @@
                     </div>
 
                     <div class="pb-5">
-                        <h4 class="h3 text-center pb-3">Candidat</h4>
-                        <div class="card-deck w-sm-33 m-auto">
+                        <h4 class="h3 text-center">Candidat</h4>
+                        <div class="row row-cols-1 row-cols-md-3 justify-content-center text-center g-3">
                             {% job_seekers_accounts_tag as job_seekers_accounts %}
                             {% for account in job_seekers_accounts %}
-                                <div class="card has-links-inside">
-                                    <img src="{% static '/img/demo_accounts/' %}{{ account.image }}" class="card-img-top p-2 test-accounts-image-menu" alt="">
-                                    <div class="card-body">
-                                        <h5 class="h5 card-title font-weight-bold text-center mb-0">{{ account.title }}</h5>
-                                        <p class="card-text">{{ account.description }}</p>
-                                    </div>
-                                    <div class="card-footer text-center">
-                                        <a href="#" class="postLogin btn btn-link stretched-link" data-email="{{ account.email }}" data-action-url="{{ account.action_url }}">
-                                            Utiliser ce compte
-                                        </a>
+                                <div class="col">
+                                    <div class="c-card card has-links-inside w-100 h-100">
+                                        <img src="{% static '/img/demo_accounts/' %}{{ account.image }}" class="card-img-top p-2 test-accounts-image-menu" alt="">
+                                        <div class="card-body">
+                                            <h5 class="h5 card-title font-weight-bold text-center mb-0">{{ account.title }}</h5>
+                                            <p class="card-text">{{ account.description }}</p>
+                                        </div>
+                                        <div class="card-footer text-center">
+                                            <a href="#" class="postLogin btn btn-link stretched-link" data-email="{{ account.email }}" data-action-url="{{ account.action_url }}">
+                                                Utiliser ce compte
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             {% endfor %}
