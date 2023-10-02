@@ -83,44 +83,46 @@
 {% block script %}
     {{ block.super }}
     <!-- Dropzone -->
-    <script src='{% static "vendor/dropzone/dropzone.min.js" %}'></script>
-    <script src='{% static "js/s3_upload.js" %}'></script>
-    {{ s3_upload.form_values|json_script:"s3-form-values" }}
-    {{ s3_upload.config|json_script:"s3-upload-config" }}
-    <script nonce="{{ CSP_NONCE }}">
-        function _onLoad(target) {
-            if (!$("#report_file_form", target).length) {
-                // Upload form is not there, no dropzone init needed
-                return;
+    {% if s3_upload %}
+        <script src='{% static "vendor/dropzone/dropzone.min.js" %}'></script>
+        <script src='{% static "js/s3_upload.js" %}'></script>
+        {{ s3_upload.form_values|json_script:"s3-form-values" }}
+        {{ s3_upload.config|json_script:"s3-upload-config" }}
+        <script nonce="{{ CSP_NONCE }}">
+            function _onLoad(target) {
+                if (!$("#report_file_form", target).length) {
+                    // Upload form is not there, no dropzone init needed
+                    return;
+                }
+
+                dropzone = s3UploadInit({
+                    dropzoneSelector: "#report_file_form",
+                    callbackLocationSelector: "#id_report_file_path",
+                    s3FormValuesId: "s3-form-values",
+                    s3UploadConfigId: "s3-upload-config",
+                    sentryInternalUrl: "{% url 'home:sentry_debug' %}",
+                    sentryCsrfToken: "{{ csrf_token }}",
+                    returnPath: true,
+                });
+
+                // Listening on hidden fields change does not work, so:
+                const uploadedFileName = $("#id_uploaded_file_name");
+                const uploadedFileNameDisplay = $("#uploaded_file_name_display");
+                const resetFileName = file => {
+                    uploadedFileName.val("");
+                    uploadedFileNameDisplay.text("Aucun");
+                };
+                dropzone.on("success", file => {
+                    uploadedFileName.val(file.name);
+                    uploadedFileNameDisplay.text(file.name);
+                });
+                dropzone.on("error", resetFileName);
+                dropzone.on("removedfile", resetFileName);
             }
 
-            dropzone = s3UploadInit({
-                dropzoneSelector: "#report_file_form",
-                callbackLocationSelector: "#id_report_file_path",
-                s3FormValuesId: "s3-form-values",
-                s3UploadConfigId: "s3-upload-config",
-                sentryInternalUrl: "{% url 'home:sentry_debug' %}",
-                sentryCsrfToken: "{{ csrf_token }}",
-                returnPath: true,
-            });
-
-            // Listening on hidden fields change does not work, so:
-            const uploadedFileName = $("#id_uploaded_file_name");
-            const uploadedFileNameDisplay = $("#uploaded_file_name_display");
-            const resetFileName = file => {
-                uploadedFileName.val("");
-                uploadedFileNameDisplay.text("Aucun");
-            };
-            dropzone.on("success", file => {
-                uploadedFileName.val(file.name);
-                uploadedFileNameDisplay.text(file.name);
-            });
-            dropzone.on("error", resetFileName);
-            dropzone.on("removedfile", resetFileName);
-        }
-
-        htmx.onLoad(_onLoad);
-        // or, on regular loading:
-        _onLoad()
-    </script>
+            htmx.onLoad(_onLoad);
+            // or, on regular loading:
+            _onLoad()
+        </script>
+    {% endif %}
 {% endblock %}
