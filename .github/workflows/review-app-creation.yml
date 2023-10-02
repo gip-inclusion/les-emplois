@@ -58,7 +58,7 @@ jobs:
 
     - name: 🗃 Create database addon
       run: |
-        $CLEVER_CLI addon create postgresql-addon $REVIEW_APP_DB_NAME --org itou_review_apps --plan xxs_sml --yes
+        $CLEVER_CLI addon create postgresql-addon $REVIEW_APP_DB_NAME --org itou_review_apps --plan xxs_sml --yes --addon-version 15
         $CLEVER_CLI service link-addon $REVIEW_APP_DB_NAME
 
     - name: 🤝 Link addons & add environment variables
