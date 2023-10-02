@@ -400,6 +400,14 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
 
     @cached_property
     def is_suspended(self):
+        # Don't make a query if suspensions were prefetched
+        if hasattr(self, "_prefetched_objects_cache") and "suspension_set" in self._prefetched_objects_cache:
+            today = timezone.localdate()
+            for suspension in self._prefetched_objects_cache["suspension_set"]:
+                if suspension.start_at <= today <= suspension.end_at:
+                    return True
+            return False
+
         return self.suspension_set.in_progress().exists()
 
     @cached_property
@@ -1335,6 +1343,7 @@ class ProlongationRequestDenyInformation(models.Model):
 class ProlongationQuerySet(models.QuerySet):
     @property
     def in_progress_lookup(self):
+        # This logic was duplicated in Approval.is_suspended for performance issues
         now = timezone.now().date()
         return models.Q(start_at__lte=now, end_at__gte=now)
 

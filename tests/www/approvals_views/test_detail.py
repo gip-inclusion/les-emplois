@@ -103,11 +103,9 @@ class TestApprovalDetailView:
         expected_num_queries = (
             1  # fetch django session
             + 1  # fetch authenticated user
-            + 1  # verify user is active (middleware)
-            + 1  # fetch siae membership and siae infos (middleware)
+            + 2  # fetch siae membership and siae infos (middleware)
             + 1  # place savepoint right after the middlewares
             + 1  # job_seeker.approval
-            + 1  # select all latest suspensions to check their end date
             + 1  # job_application.with_accepted_at annotation coming from next query
             + 1  # approval.suspension active today
             + 1  # Suspension.can_be_handled_by_siae >> User.last_accepted_job_application
@@ -181,11 +179,10 @@ class TestApprovalDetailView:
         expected_num_queries = (
             1  # fetch django session
             + 1  # fetch authenticated user
-            + 1  # verify user is active (middleware)
+            + 1  # fetch siae membership and siae infos (middleware)
             + 1  # place savepoint right after the middlewares
             + 1  # get approval infos (get_object)
             # get_context_data
-            + 1  # select all latest suspensions to check their end date (with prefetch)
             + 1  # for every *active* suspension, check if there is an accepted job application after it
             + 1  # approval.suspension_set.end_at >= today >= approval.suspension_set.start_at (.can_be_suspended)
             + 1  # job_application.with_accepted_at annotation coming from (.last_hire_was_made_by_siae)

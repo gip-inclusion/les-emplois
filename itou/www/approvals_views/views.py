@@ -163,7 +163,7 @@ class ApprovalListView(ApprovalBaseViewMixin, ListView):
         form_filters = []
         if self.form.is_valid():
             form_filters = self.form.get_qs_filters()
-        return super().get_queryset().filter(*form_filters).select_related("user")
+        return super().get_queryset().filter(*form_filters).select_related("user").prefetch_related("suspension_set")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
