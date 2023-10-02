@@ -64,7 +64,13 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         can_show_financial_annexes = current_org.convention_can_be_accessed_by(request.user)
         can_show_employee_records = current_org.can_use_employee_record
         active_campaigns = (
-            EvaluatedSiae.objects.for_siae(current_org).in_progress().select_related("evaluation_campaign")
+            EvaluatedSiae.objects.for_siae(current_org)
+            .in_progress()
+            .select_related("evaluation_campaign")
+            .prefetch_related(
+                "evaluated_job_applications",
+                "evaluated_job_applications__evaluated_administrative_criteria",
+            )
         )
         evaluated_siae_notifications = (
             EvaluatedSiae.objects.for_siae(current_org)
