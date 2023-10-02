@@ -68,7 +68,7 @@ class ItouCurrentOrganizationMiddleware:
                         really_active_memberships.append(membership)
                 # If there is no current siae, we want to default to the first active one
                 # (and preferably not one in grace period)
-                really_active_memberships.sort(key=lambda m: m.siae.has_convention_in_grace_period)
+                really_active_memberships.sort(key=lambda m: (m.siae.has_convention_in_grace_period, m.created_at))
 
                 (
                     request.organizations,

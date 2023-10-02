@@ -204,3 +204,32 @@ def _fail_for_invalid_template_variable_improved(_fail_for_invalid_template_vari
             +        return ""
             """,
         )
+
+
+@pytest.fixture(scope="session", autouse=True)
+def make_unordered_queries_randomly_ordered():
+    """
+    Patch Django’s ORM to randomly order all queries without a specified
+    order.
+
+    This discovers problems where code expects a given order but the
+    database doesn’t guarantee one.
+
+    https://adamj.eu/tech/2023/07/04/django-test-random-order-querysets/
+    """
+    from django.db.models.sql.compiler import SQLCompiler
+
+    patchy.patch(
+        SQLCompiler._order_by_pairs,
+        """\
+        @@ -9,7 +9,7 @@
+                 ordering = meta.ordering
+                 self._meta_ordering = ordering
+             else:
+        -        ordering = []
+        +        ordering = ["?"] if not self.query.distinct else []
+             if self.query.standard_ordering:
+                 default_order, _ = ORDER_DIR["ASC"]
+             else:
+        """,
+    )

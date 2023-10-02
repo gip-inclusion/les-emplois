@@ -183,8 +183,7 @@ class TestSyncPermsTestCase(TestCase):
             "All done!\n",
         ]
         assert Group.objects.all().count() == 2
-        admin_group = Group.objects.all()[0]
-        assert admin_group.name == "itou-admin"
+        admin_group = Group.objects.get(name="itou-admin")
         assert [perm.codename for perm in admin_group.permissions.all()] == [
             "add_emailaddress",
             "change_emailaddress",
@@ -274,8 +273,7 @@ class TestSyncPermsTestCase(TestCase):
             "change_user",
             "view_user",
         ]
-        support_group = Group.objects.all()[1]
-        assert support_group.name == "itou-support-externe"
+        support_group = Group.objects.get(name="itou-support-externe")
         assert [perm.codename for perm in support_group.permissions.all()] == [
             "view_emailaddress",
             "view_approval",

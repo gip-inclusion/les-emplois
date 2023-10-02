@@ -190,9 +190,9 @@ class RunStatusProbesCommandTest(TestCase):
 
         self.cmd._check_and_remove_dangling_probes(non_dangling_probes)
 
-        assert list(models.ProbeStatus.objects.values_list("name", flat=True)) == [
+        assert set(models.ProbeStatus.objects.values_list("name", flat=True)) == {
             probe.name for probe in non_dangling_probes
-        ]
+        }
         assert self.cmd.stdout.getvalue() == "Check dangling probes\nNo dangling probes found\n"
 
     def test_check_and_remove_dangling_probes_when_adding_probes(self):
@@ -201,7 +201,7 @@ class RunStatusProbesCommandTest(TestCase):
 
         self.cmd._check_and_remove_dangling_probes(old_probes + new_probes)
 
-        assert list(models.ProbeStatus.objects.values_list("name", flat=True)) == [probe.name for probe in old_probes]
+        assert set(models.ProbeStatus.objects.values_list("name", flat=True)) == {probe.name for probe in old_probes}
         assert self.cmd.stdout.getvalue() == "Check dangling probes\nNo dangling probes found\n"
 
     def test_check_and_remove_dangling_probes_when_removing_probes(self):
@@ -210,7 +210,7 @@ class RunStatusProbesCommandTest(TestCase):
 
         self.cmd._check_and_remove_dangling_probes(probes_kept)
 
-        assert list(models.ProbeStatus.objects.values_list("name", flat=True)) == [probe.name for probe in probes_kept]
+        assert set(models.ProbeStatus.objects.values_list("name", flat=True)) == {probe.name for probe in probes_kept}
         expected_dangling_names = set(sorted({probe.name for probe in probes_removed}))
         assert (
             self.cmd.stdout.getvalue()

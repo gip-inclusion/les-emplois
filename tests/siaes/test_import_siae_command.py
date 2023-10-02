@@ -1,3 +1,4 @@
+import collections
 import datetime
 import importlib
 import os
@@ -221,10 +222,10 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         instance = lazy_import_siae_command()
         instance.create_new_siaes()
         assert reverse("signup:siae_select") in mail.outbox[0].body
-        assert [mail.subject for mail in mail.outbox] == [
+        assert collections.Counter(mail.subject for mail in mail.outbox) == collections.Counter(
             f"Activez le compte de votre {kind} {name} sur les emplois de l'inclusion"
             for (kind, name) in Siae.objects.values_list("kind", "name")
-        ]
+        )
 
 
 @override_settings(METABASE_HASH_SALT="foobar2000")

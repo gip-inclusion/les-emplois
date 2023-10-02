@@ -120,7 +120,7 @@ class Command(BaseCommand):
 
     @transaction.atomic
     def handle(self, **options):
-        for group, raw_permissions in get_permissions_dict().items():
+        for group, raw_permissions in sorted(get_permissions_dict().items()):
             all_codenames = [
                 perm_code for model, perms in raw_permissions.items() for perm_code in to_perm_codenames(model, perms)
             ]

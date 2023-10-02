@@ -35,7 +35,7 @@ def test_filter():
         admin.JobSeekerProfileAdmin,
     )
     profiles = filter.queryset(None, JobSeekerProfile.objects.all())
-    assert list(profiles) == list(JobSeekerProfile.objects.all())
+    assert set(profiles) == {js_certified.jobseeker_profile, js_non_certified.jobseeker_profile}
 
 
 def test_get_fields_to_transfer_for_job_seekers():
