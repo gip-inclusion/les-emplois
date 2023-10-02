@@ -7,10 +7,16 @@ from itou.siaes.models import Siae
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.siaes.factories import SiaeConventionFactory, SiaeFactory
 from tests.users.factories import PrescriberFactory, SiaeStaffFactory
+from tests.utils.test import BASE_NUM_QUERIES
 
 
 def _str_with_tz(dt):
     return dt.astimezone(timezone.get_current_timezone()).isoformat()
+
+
+NUM_QUERIES = BASE_NUM_QUERIES
+NUM_QUERIES += 1  # count
+NUM_QUERIES += 1  # get siae / organization
 
 
 class DataInclusionStructureTest(APITestCase):
@@ -44,11 +50,12 @@ class DataInclusionSiaeStructureTest(APITestCase):
     def test_list_structures(self):
         siae = SiaeFactory(siret="10000000000001")
 
-        response = self.authenticated_client.get(
-            self.url,
-            format="json",
-            data={"type": "siae"},
-        )
+        with self.assertNumQueries(NUM_QUERIES):
+            response = self.authenticated_client.get(
+                self.url,
+                format="json",
+                data={"type": "siae"},
+            )
         assert response.status_code == 200
         assert response.json()["results"] == [
             {
@@ -86,12 +93,13 @@ class DataInclusionSiaeStructureTest(APITestCase):
         siae_2 = SiaeFactory(siret="10000000000002", convention=siae_1.convention)
         siae_3 = SiaeFactory(siret="10000000000003", source=Siae.SOURCE_USER_CREATED, convention=siae_1.convention)
 
-        response = self.authenticated_client.get(
-            self.url,
-            format="json",
-            data={"type": "siae"},
-        )
-        assert response.status_code == 200
+        with self.assertNumQueries(NUM_QUERIES):
+            response = self.authenticated_client.get(
+                self.url,
+                format="json",
+                data={"type": "siae"},
+            )
+            assert response.status_code == 200
 
         structure_data_list = response.json()["results"]
 
@@ -116,11 +124,14 @@ class DataInclusionSiaeStructureTest(APITestCase):
         siae_2 = SiaeFactory(siret="10000000000002", source=Siae.SOURCE_ASP, convention=siae_1.convention)
         siae_3 = SiaeFactory(siret="10000000099991", source=Siae.SOURCE_USER_CREATED, convention=siae_1.convention)
 
-        response = self.authenticated_client.get(
-            self.url,
-            format="json",
-            data={"type": "siae"},
-        )
+        num_queries = NUM_QUERIES
+        num_queries += 1  # get parent siae
+        with self.assertNumQueries(num_queries):
+            response = self.authenticated_client.get(
+                self.url,
+                format="json",
+                data={"type": "siae"},
+            )
         assert response.status_code == 200
 
         structure_data_list = response.json()["results"]
@@ -143,11 +154,14 @@ class DataInclusionSiaeStructureTest(APITestCase):
     def test_list_structures_siret_with_999_and_no_other_siret_available(self):
         siae = SiaeFactory(siret="10000000099991", source=Siae.SOURCE_USER_CREATED)
 
-        response = self.authenticated_client.get(
-            self.url,
-            format="json",
-            data={"type": "siae"},
-        )
+        num_queries = NUM_QUERIES
+        num_queries += 1  # get parent siae
+        with self.assertNumQueries(num_queries):
+            response = self.authenticated_client.get(
+                self.url,
+                format="json",
+                data={"type": "siae"},
+            )
         assert response.status_code == 200
 
         structure_data_list = response.json()["results"]
@@ -159,11 +173,12 @@ class DataInclusionSiaeStructureTest(APITestCase):
         siae_1 = SiaeFactory(siret="10000000000001", kind=SiaeKind.ACI)
         siae_2 = SiaeFactory(siret=siae_1.siret, kind=SiaeKind.EI)
 
-        response = self.authenticated_client.get(
-            self.url,
-            format="json",
-            data={"type": "siae"},
-        )
+        with self.assertNumQueries(NUM_QUERIES):
+            response = self.authenticated_client.get(
+                self.url,
+                format="json",
+                data={"type": "siae"},
+            )
         assert response.status_code == 200
 
         structure_data_list = response.json()["results"]
@@ -187,11 +202,12 @@ class DataInclusionSiaeStructureTest(APITestCase):
     def test_list_structures_description_longer_than_280(self):
         siae = SiaeFactory(description="a" * 300)
 
-        response = self.authenticated_client.get(
-            self.url,
-            format="json",
-            data={"type": "siae"},
-        )
+        with self.assertNumQueries(NUM_QUERIES):
+            response = self.authenticated_client.get(
+                self.url,
+                format="json",
+                data={"type": "siae"},
+            )
 
         assert response.status_code == 200
         structure_data = response.json()["results"][0]
@@ -202,11 +218,14 @@ class DataInclusionSiaeStructureTest(APITestCase):
         convention = SiaeConventionFactory(is_active=False)
         SiaeFactory(convention=convention)
 
-        response = self.authenticated_client.get(
-            self.url,
-            format="json",
-            data={"type": "siae"},
-        )
+        num_queries = NUM_QUERIES
+        num_queries -= 1  # no siae to fetch
+        with self.assertNumQueries(num_queries):
+            response = self.authenticated_client.get(
+                self.url,
+                format="json",
+                data={"type": "siae"},
+            )
 
         assert response.status_code == 200
         assert response.json()["results"] == []
@@ -230,11 +249,12 @@ class DataInclusionPrescriberStructureTest(APITestCase):
     def test_list_structures(self):
         orga = PrescriberOrganizationFactory(is_authorized=True)
 
-        response = self.authenticated_client.get(
-            self.url,
-            format="json",
-            data={"type": "orga"},
-        )
+        with self.assertNumQueries(NUM_QUERIES):
+            response = self.authenticated_client.get(
+                self.url,
+                format="json",
+                data={"type": "orga"},
+            )
         assert response.status_code == 200
         assert response.json()["results"] == [
             {
@@ -270,11 +290,12 @@ class DataInclusionPrescriberStructureTest(APITestCase):
     def test_list_structures_date_maj_value(self):
         orga = PrescriberOrganizationFactory()
 
-        response = self.authenticated_client.get(
-            self.url,
-            format="json",
-            data={"type": "orga"},
-        )
+        with self.assertNumQueries(NUM_QUERIES):
+            response = self.authenticated_client.get(
+                self.url,
+                format="json",
+                data={"type": "orga"},
+            )
 
         assert response.status_code == 200
         structure_data = response.json()["results"][0]
@@ -295,11 +316,12 @@ class DataInclusionPrescriberStructureTest(APITestCase):
     def test_list_structures_description_longer_than_280(self):
         orga = PrescriberOrganizationFactory(description="a" * 300)
 
-        response = self.authenticated_client.get(
-            self.url,
-            format="json",
-            data={"type": "orga"},
-        )
+        with self.assertNumQueries(NUM_QUERIES):
+            response = self.authenticated_client.get(
+                self.url,
+                format="json",
+                data={"type": "orga"},
+            )
 
         assert response.status_code == 200
         structure_data = response.json()["results"][0]

@@ -110,7 +110,7 @@ class SiaeStructureSerializer(serializers.ModelSerializer):
         if obj.source == Siae.SOURCE_USER_CREATED and re.search(r"999\d\d$", obj.siret) is not None:
             return True
 
-        return Siae.objects.filter(siret=obj.siret).count() >= 2
+        return obj.same_siret_count >= 2
 
     def get_date_maj(self, obj) -> str:
         dt = obj.updated_at or obj.created_at
