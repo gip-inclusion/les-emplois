@@ -106,7 +106,7 @@ class Calendar(models.Model):
 
     name = models.CharField(verbose_name="nom", max_length=100, null=True)
     adversarial_stage_start = models.DateField(verbose_name="début de la phase contradictoire")
-    html = models.TextField(verbose_name="contenu")
+    html = models.TextField(verbose_name="contenu", validators=[validate_html])
 
     class Meta:
         verbose_name = "calendrier"
@@ -193,9 +193,6 @@ class EvaluationCampaign(models.Model):
     calendar = models.ForeignKey(
         Calendar,
         on_delete=models.SET_NULL,
-        validators=[
-            validate_html,
-        ],
         verbose_name="calendrier",
         null=True,
     )
