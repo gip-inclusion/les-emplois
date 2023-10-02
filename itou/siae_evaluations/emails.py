@@ -44,7 +44,7 @@ class CampaignEmailFactory:
         return get_email_message(self.recipients, {}, subject, body)
 
     def submission_frozen_reminder(self):
-        context = {"campaign": self.evaluation_campaign.institution.name}
+        context = {"institution_name": self.evaluation_campaign.institution.name}
         subject = "siae_evaluations/email/to_institution_siaes_submission_frozen_reminder_subject.txt"
         body = "siae_evaluations/email/to_institution_siaes_submission_frozen_reminder_body.txt"
         return get_email_message(self.recipients, context, subject, body)
