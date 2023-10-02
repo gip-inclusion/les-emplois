@@ -4,7 +4,7 @@ Bonjour,
 
 Une ou plusieurs SIAE qui ont transmis leurs justificatifs n’ont pas encore été contrôlée(s) par vos services.
 
-En tant que membre de l’organisation {{ campaign.institution.name }}, nous vous invitons à finaliser ce contrôle. Sans réponse de votre part avant la fin de cette phase*, le résultat du contrôle des SIAE non contrôlées sera par défaut positif.
+En tant que membre de l’organisation {{ institution_name }}, nous vous invitons à finaliser ce contrôle. Sans réponse de votre part avant la fin de cette phase*, le résultat du contrôle des SIAE non contrôlées sera par défaut positif.
 
 * Pour plus de détails sur la durée de chaque phase, vous pouvez consulter le calendrier disponible dans votre espace professionnel des emplois de l’inclusion.
 
