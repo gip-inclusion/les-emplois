@@ -926,7 +926,6 @@ class ApplicationGEIQEligibilityView(ApplicationBaseView):
         super().__init__()
 
         self.form = None
-        self.geiq_author_structure = None
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
