@@ -41,7 +41,7 @@ def deactivate_member(request, user_id, template_name="institutions/deactivate_m
     institution = get_current_institution_or_404(request)
     target_member = User.objects.get(pk=user_id)
 
-    if deactivate_org_member(request=request, target_member=target_member, organization=institution):
+    if deactivate_org_member(request=request, target_member=target_member):
         return HttpResponseRedirect(reverse_lazy("institutions_views:members"))
 
     context = {
@@ -57,7 +57,7 @@ def update_admin_role(request, action, user_id, template_name="institutions/upda
     institution = get_current_institution_or_404(request)
     target_member = User.objects.get(pk=user_id)
 
-    if update_org_admin_role(request=request, organization=institution, target_member=target_member, action=action):
+    if update_org_admin_role(request=request, target_member=target_member, action=action):
         return HttpResponseRedirect(reverse_lazy("institutions_views:members"))
 
     context = {
