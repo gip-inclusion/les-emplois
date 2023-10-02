@@ -11,7 +11,6 @@ from itou.employee_record.exceptions import DuplicateCloningError
 from itou.employee_record.models import EmployeeRecord
 from itou.invitations import models as invitations_models
 from itou.job_applications import models as job_applications_models
-from itou.siae_evaluations.models import EvaluatedSiae
 from itou.siaes import models as siaes_models
 from itou.users import models as users_models
 
@@ -152,9 +151,6 @@ class Command(BaseCommand):
             )
             self.stdout.write(f"| Invitations: {invitations.count()}\n")
 
-            evaluated_siaes = EvaluatedSiae.objects.filter(siae_id=from_id)
-            self.stdout.write(f"| Evaluated siaes: {evaluated_siaes.count()}\n")
-
         self.stdout.write(f"INTO siae.id={to_siae.pk} - {to_siae.kind} {to_siae.siret} - {to_siae.display_name}\n")
 
         dest_siae_job_applications_sent = job_applications_models.JobApplication.objects.filter(sender_siae_id=to_id)
@@ -242,7 +238,6 @@ class Command(BaseCommand):
                 prolongations.update(declared_by_siae_id=to_id)
                 suspensions.update(siae_id=to_id)
                 invitations.update(siae_id=to_id)
-                evaluated_siaes.update(siae_id=to_id)
                 if preserve_to_siae_data:
                     to_siae_qs.update(
                         brand=from_siae.display_name,
