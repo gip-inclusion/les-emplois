@@ -68,8 +68,10 @@ populate_db_with_cities:
 
 populate_db: populate_db_with_cities
 	# Split loaddata_bulk into parts to avoid OOM errors in review apps
-	python manage.py loaddata_bulk itou/fixtures/django/0*.json
-	python manage.py loaddata_bulk itou/fixtures/django/1*.json itou/fixtures/django/2*.json
+	python manage.py loaddata_bulk itou/fixtures/django/0[0-4]*.json
+	python manage.py loaddata_bulk itou/fixtures/django/0[5-9]*.json
+	python manage.py loaddata_bulk itou/fixtures/django/1*.json
+	python manage.py loaddata_bulk itou/fixtures/django/2*.json
 	python manage.py shell -c 'from itou.siae_evaluations import fixtures;fixtures.load_data()'
 
 populate_db_minimal: populate_db_with_cities
