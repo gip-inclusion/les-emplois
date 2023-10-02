@@ -32,10 +32,11 @@ class EmployeeRecordAdminForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields["financial_annex"].required = False
-        self.fields["financial_annex"].queryset = siaes_models.SiaeFinancialAnnex.objects.filter(
-            convention=self.instance.job_application.to_siae.convention
-        ).order_by("-number")
+        if "financial_annex" in self.fields:
+            self.fields["financial_annex"].required = False
+            self.fields["financial_annex"].queryset = siaes_models.SiaeFinancialAnnex.objects.filter(
+                convention=self.instance.job_application.to_siae.convention
+            ).order_by("-number")
 
 
 @admin.register(models.EmployeeRecord)
