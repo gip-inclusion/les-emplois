@@ -1,12 +1,16 @@
 import datetime as dt
 import re
 
+from django.contrib.postgres.constraints import ExclusionConstraint
+from django.contrib.postgres.fields import RangeBoundary, RangeOperators
 from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 from django.db.models import Q
 from django.utils import timezone
 from django.utils.functional import cached_property
 from unidecode import unidecode
+
+from itou.utils.models import DateRange
 
 from .exceptions import CommuneUnknownInPeriodError, UnknownCommuneError
 
@@ -206,11 +210,29 @@ class AbstractPeriod(models.Model):
 
     start_date = models.DateField(verbose_name="début de validité")
     end_date = models.DateField(verbose_name="fin de validité", null=True, blank=True)
+    # AbstractPeriod objects also have a code, not present here but detailed in subclasses.
 
     objects = PeriodQuerySet.as_manager()
 
     class Meta:
         abstract = True
+        constraints = [
+            ExclusionConstraint(
+                name="exclude_%(class)s_overlapping_dates",
+                expressions=(
+                    (
+                        DateRange(
+                            "start_date",
+                            "end_date",
+                            RangeBoundary(inclusive_lower=True, inclusive_upper=True),
+                        ),
+                        RangeOperators.OVERLAPS,
+                    ),
+                    ("code", RangeOperators.EQUAL),
+                ),
+                violation_error_message="La période chevauche une autre période existante pour ce même code INSEE.",
+            ),
+        ]
 
 
 class PrettyPrintMixin:
@@ -386,7 +408,7 @@ class Commune(PrettyPrintMixin, AbstractPeriod):
 
     objects = CommuneQuerySet.as_manager()
 
-    class Meta:
+    class Meta(AbstractPeriod.Meta):
         verbose_name = "commune"
         indexes = [GinIndex(fields=["name"], name="aps_communes_name_gin_trgm", opclasses=["gin_trgm_ops"])]
 
@@ -440,7 +462,7 @@ class Department(PrettyPrintMixin, AbstractPeriod):
     code = models.CharField(max_length=3, verbose_name="code département INSEE")
     name = models.CharField(max_length=50, verbose_name="nom du département")
 
-    class Meta:
+    class Meta(AbstractPeriod.Meta):
         verbose_name = "département"
 
 
