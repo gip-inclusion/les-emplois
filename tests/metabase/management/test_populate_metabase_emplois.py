@@ -625,6 +625,8 @@ def test_populate_prolongation_requests():
     deny_information = ProlongationRequestDenyInformationFactory.build(request=None)
     prolongation_request.deny(prolongation_request.validated_by, deny_information)
 
+    ProlongationWithRequestFactory()  # add another one to ensure we don't fail without a deny_information
+
     num_queries = 1  # Count prolongation_requests
     num_queries += 1  # COMMIT Queryset counts (autocommit mode)
     num_queries += 1  # COMMIT Create table
@@ -641,27 +643,26 @@ def test_populate_prolongation_requests():
     with connection.cursor() as cursor:
         cursor.execute("SELECT * FROM demandes_de_prolongation ORDER BY id")
         rows = cursor.fetchall()
-        assert rows == [
-            (
-                prolongation_request.id,
-                prolongation_request.approval_id,
-                prolongation_request.start_at,
-                prolongation_request.end_at,
-                prolongation_request.get_reason_display(),
-                prolongation_request.declared_by_id,
-                prolongation_request.declared_by_siae_id,
-                prolongation_request.validated_by_id,
-                prolongation_request.prescriber_organization_id,
-                prolongation.pk,
-                prolongation_request.get_status_display(),
-                str(deny_information.reason),
-                prolongation_request.created_at.date(),
-                prolongation_request.processed_at,
-                prolongation_request.processed_by_id,
-                prolongation_request.reminder_sent_at,
-                datetime.date(2023, 2, 1),
-            ),
-        ]
+        assert len(rows) == 2
+        assert rows[0] == (
+            prolongation_request.id,
+            prolongation_request.approval_id,
+            prolongation_request.start_at,
+            prolongation_request.end_at,
+            prolongation_request.get_reason_display(),
+            prolongation_request.declared_by_id,
+            prolongation_request.declared_by_siae_id,
+            prolongation_request.validated_by_id,
+            prolongation_request.prescriber_organization_id,
+            prolongation.pk,
+            prolongation_request.get_status_display(),
+            str(deny_information.reason),
+            prolongation_request.created_at.date(),
+            prolongation_request.processed_at,
+            prolongation_request.processed_by_id,
+            prolongation_request.reminder_sent_at,
+            datetime.date(2023, 2, 1),
+        )
 
 
 @freeze_time("2023-02-02")

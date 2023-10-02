@@ -36,7 +36,7 @@ TABLE.add_columns(
             "name": "motif_de_refus",
             "type": "varchar",
             "comment": "Motif de refus de la demande",
-            "fn": lambda o: o.deny_information.reason,
+            "fn": lambda o: o.deny_information.reason if hasattr(o, "deny_information") else None,
         },
         {
             "name": "date_de_demande",
