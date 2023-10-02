@@ -254,10 +254,8 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
         "preview": preview,
         "unfold_details": form.data.get("reason") in PROLONGATION_REPORT_FILE_REASONS,
         "can_upload_prolongation_report": siae.can_upload_prolongation_report,
+        "s3_upload": S3Upload(kind="prolongation_report") if siae.can_upload_prolongation_report else None,
     }
-
-    if siae.can_upload_prolongation_report:
-        context |= {"s3_upload": S3Upload(kind="prolongation_report")}
 
     return render(request, template_name, context)
 
@@ -292,11 +290,8 @@ class DeclareProlongationHTMXFragmentView(TemplateView):
         context |= {
             "approval": self.approval,
             "form": self.form,
+            "s3_upload": S3Upload(kind="prolongation_report") if self.siae.can_upload_prolongation_report else None,
         }
-
-        if self.siae.can_upload_prolongation_report:
-            context |= {"s3_upload": S3Upload(kind="prolongation_report")}
-
         return context
 
     def post(self, request, *args, **kwargs):
