@@ -2,22 +2,23 @@
 {% load str_filters %}
 
 {% bootstrap_form_errors form type="all" %}
+
 <div class="row g-0{% if align == 'center' %} justify-content-sm-center{% endif %}">
     <div class="col-12 col-md mb-2">
         {{ form.city }}
+        <label for="{{ form.city_name.id_for_label }}" class="visually-hidden">{{ form.city_name.label }}</label>
         <div class="input-group">
-            <div class="input-group-prepend bg-white">
+            <div class="input-group-text bg-white rounded-start">
                 {# No loading #}
-                <span class="input-group-text js-city-autocomplete-no-loading rounded-start">
-                    <i class="ri-map-pin-line"></i>
+                <span class="js-city-autocomplete-no-loading">
+                    <i class="ri-map-pin-line" aria-hidden="true"></i>
                 </span>
                 {# Loading #}
-                <span class="input-group-text js-city-autocomplete-loading d-none">
-                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                <span class="js-city-autocomplete-loading d-none">
+                    <i class="ri-restart-line ri-spinner" role="status" aria-hidden="true"></i>
                     <span class="visually-hidden">Chargement...</span>
                 </span>
             </div>
-            <label for="{{ form.city_name.id_for_label }}" class="visually-hidden">{{ form.city_name.label }}</label>
             {{ form.city_name }}
         </div>
     </div>

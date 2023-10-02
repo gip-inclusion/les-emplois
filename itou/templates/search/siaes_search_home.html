@@ -20,39 +20,44 @@
                     Il offre aux utilisateurs un outil mutualisé pour simplifier les procédures, fluidifier les parcours d'insertion entre professionnels et renforcer la qualité de l'accompagnement des personnes.
                 </p>
 
-                <div class="card-deck align-items-stretch text-center mt-5">
-                    <div class="card c-card p-md-5 has-one-link-inside w-100">
-                        <div class="card-body">
-                            <h3 class="h4 card-title font-weight-light">Inscrivez-vous pour commencer à utiliser la plateforme</h3>
-                        </div>
-                        <div class="card-footer">
-                            <a class="btn btn-primary stretched-link" href="{% url 'account_signup' %}{% redirection_url value=redirect_field_value %}">
-                                Créer un compte
-                            </a>
-                        </div>
-                    </div>
-                    <div class="card c-card p-md-5 has-one-link-inside w-100">
-                        <div class="card-body">
-                            <h3 class="h4 card-title font-weight-light">Discutez entre professionnels sur La communauté de l'inclusion</h3>
-                        </div>
-                        <div class="card-footer">
-                            <a class="btn btn-primary stretched-link" href="https://communaute.inclusion.beta.gouv.fr/">Accéder à La communauté</a>
+                <div class="row row-cols-1 row-cols-md-3 text-center mt-5 g-5">
+                    <div class="col">
+                        <div class="card c-card p-md-5 has-one-link-inside h-100 w-100">
+                            <div class="card-body">
+                                <h3 class="h4 card-title font-weight-light">Inscrivez-vous pour commencer à utiliser la plateforme</h3>
+                            </div>
+                            <div class="card-footer">
+                                <a class="btn btn-primary stretched-link" href="{% url 'account_signup' %}{% redirection_url value=redirect_field_value %}">
+                                    Créer un compte
+                                </a>
+                            </div>
                         </div>
                     </div>
-                    <div class="card c-card p-md-5 has-one-link-inside w-100">
-                        <div class="card-body">
-                            <h3 class="h4 card-title font-weight-light">Découvrez l'espace de documentation pour tout comprendre</h3>
+                    <div class="col">
+                        <div class="card c-card p-md-5 has-one-link-inside h-100 w-100">
+                            <div class="card-body">
+                                <h3 class="h4 card-title font-weight-light">Discutez entre professionnels sur La communauté de l'inclusion</h3>
+                            </div>
+                            <div class="card-footer">
+                                <a class="btn btn-primary stretched-link" href="https://communaute.inclusion.beta.gouv.fr/">Accéder à La communauté</a>
+                            </div>
                         </div>
-                        <div class="card-footer">
-                            <a class="btn btn-primary stretched-link" href="{{ ITOU_HELP_CENTER_URL }}" target="_blank" aria-label="En savoir plus (ouverture dans un nouvel onglet)">
-                                En savoir plus
-                            </a>
+                    </div>
+                    <div class="col">
+                        <div class="card c-card p-md-5 has-one-link-inside h-100 w-100">
+                            <div class="card-body">
+                                <h3 class="h4 card-title font-weight-light">Découvrez l'espace de documentation pour tout comprendre</h3>
+                            </div>
+                            <div class="card-footer">
+                                <a class="btn btn-primary stretched-link" href="{{ ITOU_HELP_CENTER_URL }}" target="_blank" aria-label="En savoir plus (ouverture dans un nouvel onglet)">
+                                    En savoir plus
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
-
     {% endif %}
 
     <section class="bg-gray-400 pt-5 pb-6">

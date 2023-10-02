@@ -19,12 +19,12 @@ htmx.onLoad((target) => {
         }
       },
       search: (event, ui) => {
-        loading.addClass('d-block')
-        noLoading.addClass('d-none')
+        loading.toggleClass("d-none");
+        noLoading.toggleClass("d-none");
       },
       response: (event, ui) => {
-        loading.removeClass('d-block')
-        noLoading.removeClass('d-none')
+        loading.toggleClass("d-none");
+        noLoading.toggleClass("d-none");
       }
 
     }).keydown(e => {
