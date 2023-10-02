@@ -1,6 +1,6 @@
 name: Git Checks
 
-on: [merge_group]
+on: [pull_request]
 
 jobs:
   block-fixup:
