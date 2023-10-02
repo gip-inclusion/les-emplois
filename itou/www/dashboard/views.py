@@ -376,8 +376,7 @@ def edit_user_notifications(request, template_name="dashboard/edit_user_notifica
 @login_required
 def api_token(request, template_name="dashboard/api_token.html"):
     if request.user.is_siae_staff:
-        siae = get_current_siae_or_404(request)
-        if not siae.has_admin(request.user):
+        if not request.is_current_organization_admin:
             raise PermissionDenied
 
     else:

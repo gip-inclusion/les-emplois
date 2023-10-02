@@ -74,7 +74,7 @@ def deactivate_member(request, user_id, template_name="prescribers/deactivate_me
     organization = get_current_org_or_404(request)
     target_member = User.objects.get(pk=user_id)
 
-    if deactivate_org_member(request=request, target_member=target_member, organization=organization):
+    if deactivate_org_member(request=request, target_member=target_member):
         return HttpResponseRedirect(reverse_lazy("prescribers_views:members"))
 
     context = {
@@ -90,7 +90,7 @@ def update_admin_role(request, action, user_id, template_name="prescribers/updat
     organization = get_current_org_or_404(request)
     target_member = User.objects.get(pk=user_id)
 
-    if update_org_admin_role(request=request, organization=organization, target_member=target_member, action=action):
+    if update_org_admin_role(request=request, target_member=target_member, action=action):
         return HttpResponseRedirect(reverse_lazy("prescribers_views:members"))
 
     context = {
@@ -112,7 +112,7 @@ def list_accredited_organizations(request, template_name="prescribers/list_accre
     required_permissions = [
         prescriber_org.is_authorized,
         prescriber_org.kind == PrescriberOrganizationKind.DEPT,
-        prescriber_org.has_admin(request.user),
+        request.is_current_organisation_admin,
     ]
 
     if not all(required_permissions):
