@@ -17,7 +17,13 @@ class Migration(migrations.Migration):
             fields=[
                 ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 ("name", models.CharField(max_length=100, null=True, verbose_name="nom")),
-                ("html", models.TextField(verbose_name="contenu")),
+                (
+                    "html",
+                    models.TextField(
+                        verbose_name="contenu",
+                        validators=[itou.utils.validators.validate_html],
+                    ),
+                ),
             ],
             options={
                 "verbose_name": "calendrier",
@@ -30,7 +36,6 @@ class Migration(migrations.Migration):
                 null=True,
                 on_delete=django.db.models.deletion.SET_NULL,
                 to="siae_evaluations.calendar",
-                validators=[itou.utils.validators.validate_html],
                 verbose_name="calendrier",
             ),
         ),
