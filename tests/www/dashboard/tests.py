@@ -58,7 +58,7 @@ from tests.siaes.factories import (
     SiaeWithMembershipAndJobsFactory,
 )
 from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
-from tests.utils.test import TestCase, parse_response_to_soup
+from tests.utils.test import BASE_NUM_QUERIES, TestCase, parse_response_to_soup
 
 
 pytestmark = pytest.mark.ignore_template_errors
@@ -400,11 +400,18 @@ class DashboardViewTest(TestCase):
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat. Séparé de son chat pendant une journée.",
         )
-        EvaluatedSiaeFactory(
+        evaluated_siae = EvaluatedSiaeFactory(
             evaluation_campaign__name="In progress",
             siae=membership.siae,
             evaluation_campaign__evaluations_asked_at=timezone.now(),
         )
+        # Add jb applications and criterias to check for 1+N
+        evaluated_job_app_1 = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_app_1)
+        EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_app_1)
+        evaluated_job_app_2 = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_app_2)
+        EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_app_2)
         EvaluatedSiaeFactory(
             evaluation_campaign__name="Not notified",
             complete=True,
@@ -432,7 +439,24 @@ class DashboardViewTest(TestCase):
         )
 
         self.client.force_login(membership.user)
-        response = self.client.get(reverse("dashboard:index"))
+        num_queries = BASE_NUM_QUERIES
+        num_queries += 1  #  get django session
+        num_queries += 1  #  get user (middleware)
+        num_queries += 2  #  get siae memberships (middleware)
+        num_queries += 1  #  OrganizationAbstract.has_admin()
+        num_queries += 1  #  select job applications states
+        num_queries += 1  #  count employee records
+        num_queries += 1  #  check if evaluations sanctions exists
+        num_queries += 1  #  check siae conventions
+        num_queries += 1  #  OrganizationAbstract.has_member()
+        num_queries += 1  #  select job_appelation
+        num_queries += 1  #  select siae_evaluations + evaluation campaigns
+        num_queries += 1  #  prefetch evaluated job application
+        num_queries += 1  #  prefetch evaluated administrative criterias
+        num_queries += 1  #  select siae_evaluations for evaluated_siae_notifications
+        num_queries += 3  #  update session + savepoints
+        with self.assertNumQueries(num_queries):
+            response = self.client.get(reverse("dashboard:index"))
         self.assertContains(
             response,
             """
