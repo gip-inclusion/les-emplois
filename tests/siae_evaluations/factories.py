@@ -88,6 +88,7 @@ class EvaluatedJobApplicationFactory(factory.django.DjangoModelFactory):
     job_application = factory.SubFactory(
         JobApplicationFactory,
         to_siae=factory.SelfAttribute("..evaluated_siae.siae"),
+        with_approval=True,
     )
 
 
