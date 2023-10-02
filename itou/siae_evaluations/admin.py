@@ -78,7 +78,7 @@ class EvaluatedAdministrativeCriteriaInline(ItouTabularInline):
 
 def _evaluated_siae_serializer(queryset):
     def _get_active_admin(siae):
-        return [p.user.email for p in siae.memberships.all() if p.is_admin and p.user.is_active]
+        return sorted(p.user.email for p in siae.memberships.all() if p.is_admin and p.user.is_active)
 
     def _get_stage(evaluated_siae):
         if evaluated_siae.evaluation_campaign.ended_at:
