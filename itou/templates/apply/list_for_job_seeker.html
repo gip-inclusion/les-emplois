@@ -12,11 +12,11 @@
             <div class="row">
                 <div class="col-12 col-md-4 mb-3 mb-md-5">
                     <aside class="c-aside-filters">
-                        <button class="c-aside-filters__btn__collapse" data-bs-toggle="collapse" data-bs-target="#job-aside-filters-form" aria-expanded="false" aria-controls="job-aside-filters-form">
+                        <button class="c-aside-filters__btn__collapse" data-bs-toggle="collapse" data-bs-target="#asideFiltersCollapse" aria-expanded="true" aria-controls="asideFiltersCollapse">
                             <i class="ri-filter-line" aria-hidden="true"></i>
                             <span>Filtrer les candidatures</span>
                         </button>
-                        <div class="c-aside-filters__card collapse" id="job-aside-filters-form">
+                        <div class="c-aside-filters__card collapse show" id="asideFiltersCollapse">
                             <form method="get" id="js-job-applications-filters-form">
                                 <div class="c-aside-filters__card__body">
                                     {% include "apply/includes/job_applications_filters/statut.html" %}
@@ -109,5 +109,4 @@
 {% block script %}
     {{ block.super }}
     <script src='{% static "js/job_applications_filters.js" %}'></script>
-    <script src='{% static "js/job_aside_collapse_filters.js" %}'></script>
 {% endblock %}

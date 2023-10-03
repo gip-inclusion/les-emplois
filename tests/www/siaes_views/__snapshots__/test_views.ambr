@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: CardViewTest.test_card_no_active_members
   '''
-  <main class="s-main bg-gray-400" id="main" role="main">
+  <main class="s-main bg-light" id="main" role="main">
               <div aria-atomic="true" aria-live="polite" class="toast-container">
   
   </div>
