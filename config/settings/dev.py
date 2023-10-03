@@ -30,6 +30,7 @@ INSTALLED_APPS.extend(  # noqa: F405
 )
 
 INTERNAL_IPS = ["127.0.0.1"]
+ITOU_FQDN = "127.0.0.1:8000"  # localhost doesn't work with PEAMU
 
 # Enable django-debug-toolbar with Docker.
 # Hack is coming from https://stackoverflow.com/a/45624773

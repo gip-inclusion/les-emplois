@@ -74,6 +74,7 @@ INSTALLED_APPS = [
     "itou.eligibility",
     "itou.openid_connect.france_connect",
     "itou.openid_connect.inclusion_connect",
+    "itou.openid_connect.pe_connect",
     "itou.invitations",
     "itou.external_data",
     "itou.metabase",
@@ -382,13 +383,6 @@ API_ESD = {
 # To avoid confusion between the two when contacting ESD support,
 # we get the habit to always explicitely state that we are using PEAM*U*.
 PEAMU_AUTH_BASE_URL = os.getenv("PEAMU_AUTH_BASE_URL")
-SOCIALACCOUNT_PROVIDERS = {
-    "peamu": {
-        "APP": {"key": "peamu", "client_id": API_ESD["KEY"], "secret": API_ESD["SECRET"]},
-    },
-}
-SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
-SOCIALACCOUNT_ADAPTER = "itou.allauth_adapters.peamu.adapter.PEAMUSocialAccountAdapter"
 
 # France Connect https://partenaires.franceconnect.gouv.fr/
 FRANCE_CONNECT_BASE_URL = os.getenv("FRANCE_CONNECT_BASE_URL")

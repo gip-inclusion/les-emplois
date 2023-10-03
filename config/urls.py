@@ -41,7 +41,7 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),
     # --------------------------------------------------------------------------------------
     # PEAMU URLs.
-    path("accounts/", include("itou.allauth_adapters.peamu.urls")),
+    path("pe_connect/", include("itou.openid_connect.pe_connect.urls")),
     # FranceConnect URLs.
     path("franceconnect/", include("itou.openid_connect.france_connect.urls")),
     # Inclusion Connect URLs.

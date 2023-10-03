@@ -5,8 +5,8 @@ from django.utils.http import urlencode
 
 from itou.openid_connect.france_connect.constants import FRANCE_CONNECT_SESSION_STATE, FRANCE_CONNECT_SESSION_TOKEN
 from itou.openid_connect.inclusion_connect.constants import INCLUSION_CONNECT_SESSION_KEY
-from itou.users.enums import IdentityProvider
-from itou.utils.urls import get_absolute_url, get_safe_url
+from itou.openid_connect.pe_connect.constants import PE_CONNECT_SESSION_TOKEN
+from itou.utils.urls import get_safe_url
 
 
 class UserAdapter(DefaultAccountAdapter):
@@ -48,19 +48,20 @@ class UserAdapter(DefaultAccountAdapter):
             if token:
                 params = {"token": token}
                 ic_base_logout_url = reverse("inclusion_connect:logout")
-                redirect_url = f"{ic_base_logout_url}?{urlencode(params)}"
+                return f"{ic_base_logout_url}?{urlencode(params)}"
         # France Connect
         fc_token = request.session.get(FRANCE_CONNECT_SESSION_TOKEN)
         fc_state = request.session.get(FRANCE_CONNECT_SESSION_STATE)
         if fc_token:
             params = {"id_token": fc_token, "state": fc_state}
             fc_base_logout_url = reverse("france_connect:logout")
-            redirect_url = f"{fc_base_logout_url}?{urlencode(params)}"
+            return f"{fc_base_logout_url}?{urlencode(params)}"
         # PE Connect
-        if getattr(request.user, "kind", None) == IdentityProvider.PE_CONNECT:
-            peamu_id_token = self.socialaccount_set.filter(provider="peamu").get().extra_data["id_token"]
-            params = {"id_token_hint": peamu_id_token, "redirect_uri": get_absolute_url(redirect_url)}
-            redirect_url = f"{settings.PEAMU_AUTH_BASE_URL}/compte/deconnexion?{urlencode(params)}"
+        pe_token = request.session.get(PE_CONNECT_SESSION_TOKEN)
+        if pe_token:
+            params = {"id_token": pe_token}
+            pe_base_logout_url = reverse("pe_connect:logout")
+            return f"{pe_base_logout_url}?{urlencode(params)}"
         return redirect_url
 
     def get_email_confirmation_url(self, request, emailconfirmation):
