@@ -1,11 +1,11 @@
 {% load bootstrap4 %}
 
 <aside class="c-aside-filters">
-    <a class="c-aside-filters__btn__collapse" data-bs-toggle="collapse" href="#search-filter-form" aria-expanded="false" aria-controls="search-filter-form">
-        <i class="ri-filter-line"></i>
+    <a href="#" class="c-aside-filters__btn__collapse" data-bs-toggle="collapse" data-bs-target="#asideFiltersCollapse" aria-expanded="true" aria-controls="asideFiltersCollapse">
+        <i class="ri-filter-line" aria-hidden="true"></i>
         <span>Filtres des résultats</span>
     </a>
-    <div class="c-aside-filters__card collapse" id="search-filter-form">
+    <div class="c-aside-filters__card collapse show" id="asideFiltersCollapse">
         <div class="c-aside-filters__card__body">
             <fieldset>
                 {% bootstrap_field form.distance form_group_class="form-group mb-0" label_class="d-block font-weight-bold mb-3" %}

@@ -18,7 +18,7 @@
 
 .container-breadcrumb:empty {
     background-color: red;
-    display:none !important;
+    display: none !important;
 }
 
 /* Spacing.
@@ -42,28 +42,24 @@
     justify-content: space-between;
 }
 
-.card-deck-itou>.card {
+.card-deck-itou > .card {
     /* flex: 0 0 26%; */
     position: relative;
     padding: 1.5rem;
 }
 
-.card-deck-itou>.card>.card-body {
+.card-deck-itou > .card > .card-body {
     align-items: center;
     justify-content: center;
     display: flex;
 }
 
-.card-deck-itou>.card>.card-footer {
+.card-deck-itou > .card > .card-footer {
     background: transparent;
 }
 
 /* Forms.
 --------------------------------------------------------------------------- */
-
-.select2-container {
-    display: block !important;
-}
 
 .select2-dropdown {
     z-index: 4051 !important;
@@ -74,8 +70,9 @@
     margin-left: 2px;
 }
 
-.c-aside-filters .select2.select2-container.select2-container--default {
-    width: 100% !important;
+.c-aside-filters .select2-container--bootstrap-5 {
+    width: auto !important;
+    display: block !important;
 }
 
 /*
@@ -84,7 +81,7 @@ See also `duet_date_picker.html`.
 https://getbootstrap.com/docs/4.6/components/forms/#server-side
 */
 
-duet-date-picker.is-invalid~.invalid-feedback {
+duet-date-picker.is-invalid ~ .invalid-feedback {
     display: block;
 }
 
@@ -391,7 +388,7 @@ _:-ms-fullscreen,
 --------------------------------------------------------------------------- */
 .p-inclusion-connect .s-main {
     background-color: #fff !important;
-    background-image: url('../img/illustration-bg-ic.svg');
+    background-image: url("../img/illustration-bg-ic.svg");
     background-repeat: no-repeat;
     background-position: top -120px left;
 }
@@ -402,19 +399,19 @@ _:-ms-fullscreen,
 /* Dashboard
 --------------------------------------------------------------------------- */
 .c-box__header--dora {
-    background-image: url('../img/dashboard/card-header-bg-dora.png');
+    background-image: url("../img/dashboard/card-header-bg-dora.png");
     background-repeat: no-repeat;
     background-position: center right;
-    background-size: 100%  auto;
-    border-top-left-radius: .5rem;
-    border-top-right-radius: .5rem;
+    background-size: 100% auto;
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
 }
 
 .c-box__header--pilotage {
-    background-image: url('../img/dashboard/card-header-bg-pilotage.png');
+    background-image: url("../img/dashboard/card-header-bg-pilotage.png");
     background-repeat: no-repeat;
     background-position: center right;
-    background-size: 100%  auto;
-    border-top-left-radius: .5rem;
-    border-top-right-radius: .5rem;
+    background-size: 100% auto;
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
 }

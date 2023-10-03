@@ -338,6 +338,7 @@ BOOTSTRAP4 = {
     "success_css_class": "",
 }
 
+SELECT2_THEME = "bootstrap-5"
 
 # ITOU settings
 # -------------
