@@ -1,6 +1,6 @@
 {% load static %}
 
-<form method="post" action="{% url 'peamu_login' %}">
+<form method="post" action="{% url 'pe_connect:authorize' %}">
     {% csrf_token %}
     <input type="image"
            src="{% static 'img/peamu_btn.svg' %}"

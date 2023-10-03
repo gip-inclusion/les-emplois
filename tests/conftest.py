@@ -114,9 +114,10 @@ def itou_faker_provider(_session_faker):
 
 
 @pytest.fixture(scope="function")
-def unittest_compatibility(request, faker, snapshot):
+def unittest_compatibility(request, faker, snapshot, mocker):
     request.instance.faker = faker
     request.instance.snapshot = snapshot
+    request.instance.mocker = mocker
 
 
 @pytest.fixture(autouse=True)

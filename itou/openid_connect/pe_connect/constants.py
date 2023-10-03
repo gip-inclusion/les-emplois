@@ -1,11 +1,7 @@
-from allauth.socialaccount.providers.base import ProviderAccount
-from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
 from django.conf import settings
 
 
-# OIDC scopes
-
-BASIC_SCOPES = [
+PE_BASIC_SCOPES = [
     # API Se connecter avec Pôle emploi (individu) v1
     # https://www.emploi-store-dev.fr/portail-developpeur-cms/home/catalogue-des-api/documentation-des-api/api/api-pole-emploi-connect/api-peconnect-individu-v1.html
     "openid",
@@ -14,7 +10,7 @@ BASIC_SCOPES = [
     "profile",
 ]
 
-EXTRA_SCOPES = [
+PE_EXTRA_SCOPES = [
     # API Coordonnées v1
     # https://www.emploi-store-dev.fr/portail-developpeur-cms/home/catalogue-des-api/documentation-des-api/api/api-pole-emploi-connect/api-peconnect-coordonnees-v1.html
     "api_peconnect-coordonneesv1",
@@ -52,24 +48,12 @@ EXTRA_SCOPES = [
     # "pfccentresinteret",
 ]
 
+PE_CONNECT_SCOPES = " ".join(PE_BASIC_SCOPES + PE_EXTRA_SCOPES)
 
-class PEAMUProvider(OAuth2Provider):
-    id = "peamu"
-    name = "PEAMU"
-    account_class = ProviderAccount
+PE_CONNECT_ENDPOINT_AUTHORIZE = f"{settings.PEAMU_AUTH_BASE_URL}/connexion/oauth2/authorize"
+PE_CONNECT_ENDPOINT_TOKEN = f"{settings.PEAMU_AUTH_BASE_URL}/connexion/oauth2/access_token"
+PE_CONNECT_ENDPOINT_USERINFO = f"{settings.API_ESD['BASE_URL']}/peconnect-individu/v1/userinfo"
+PE_CONNECT_ENDPOINT_LOGOUT = f"{settings.PEAMU_AUTH_BASE_URL}/compte/deconnexion"
 
-    def get_default_scope(self):
-        client_id = settings.SOCIALACCOUNT_PROVIDERS["peamu"]["APP"]["client_id"]
-        scope = [f"application_{client_id}"] + BASIC_SCOPES + EXTRA_SCOPES
-        return scope
-
-    def get_auth_params(self, request, action):
-        ret = super().get_auth_params(request, action)
-        ret["realm"] = "/individu"
-        return ret
-
-    def extract_uid(self, data):
-        return str(data["sub"])
-
-    def extract_common_fields(self, data):
-        return dict(email=data.get("email"), last_name=data.get("family_name"), first_name=data.get("given_name"))
+PE_CONNECT_SESSION_TOKEN = "PE_ID_TOKEN"
+PE_CONNECT_SESSION_STATE = "PE_STATE"
