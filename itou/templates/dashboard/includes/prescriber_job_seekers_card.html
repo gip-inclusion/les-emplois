@@ -12,7 +12,7 @@
                         <span>Gérer mes prolongations de PASS IAE</span>
                     </a>
                     {% if pending_prolongation_requests %}
-                        <span class="badge badge-pill badge-xs badge-info-lighter text-info">{{ pending_prolongation_requests }}</span>
+                        <span class="badge badge-pill badge-xs badge-warning">{{ pending_prolongation_requests }}</span>
                     {% endif %}
                 </li>
                 {% if request.current_organization.kind == precriber_kind_pe %}
