@@ -8,7 +8,6 @@ from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
-from django.utils import timezone
 from django.views import View
 from django.views.generic import DetailView, ListView, TemplateView
 from formtools.wizard.views import NamedUrlSessionWizardView
@@ -239,7 +238,7 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
         elif request.POST.get("save"):
             if siae.can_upload_prolongation_report:
                 if key := form.cleaned_data.get("report_file_path"):
-                    prolongation.report_file = File(key, timezone.now())
+                    prolongation.report_file = File(key)
                     prolongation.report_file.save()
 
             prolongation.save()
