@@ -702,7 +702,6 @@ def prescriber_join_org(request):
     This is the last step of the signup path.
     """
     if not request.user.is_prescriber:
-        logger.error("A non prescriber user tried to join a Organisation")
         messages.error(
             request, "Vous ne pouvez pas rejoindre une organisation avec ce compte car vous n'êtes pas prescripteur."
         )
