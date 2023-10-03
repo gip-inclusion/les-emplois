@@ -365,13 +365,16 @@ class ProlongationRequestViewMixin(LoginRequiredMixin):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
-        self.prolongation_request = get_object_or_404(
-            ProlongationRequest.objects.filter(prescriber_organization=get_current_org_or_404(request)).select_related(
-                "approval__user",
-                "deny_information",
-            ),
-            pk=kwargs["prolongation_request_id"],
-        )
+        if request.user.is_authenticated:
+            self.prolongation_request = get_object_or_404(
+                ProlongationRequest.objects.filter(
+                    prescriber_organization=get_current_org_or_404(request)
+                ).select_related(
+                    "approval__user",
+                    "deny_information",
+                ),
+                pk=kwargs["prolongation_request_id"],
+            )
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {

@@ -71,8 +71,12 @@ def test_list_view_only_pending_filter(client):
 def test_show_view_access(client):
     prolongation_request, other_prolongation_request = approvals_factories.ProlongationRequestFactory.create_batch(2)
 
-    # When the prolongation request is for the current prescriber organization
+    # When we are not yet connected
+    url = reverse("approvals:prolongation_request_show", kwargs={"prolongation_request_id": prolongation_request.pk})
+    assertRedirects(client.get(url), reverse("account_login") + f"?next={url}")
+
     client.force_login(prolongation_request.validated_by)
+    # When the prolongation request is for the current prescriber organization
     response = client.get(
         reverse("approvals:prolongation_request_show", kwargs={"prolongation_request_id": prolongation_request.pk})
     )
