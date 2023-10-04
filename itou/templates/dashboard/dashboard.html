@@ -26,7 +26,7 @@
                     <a href="{% url 'siaes_views:edit_siae_step_contact_infos' %}">Indiquez une autre adresse</a>
                 {% else %}
                     {% with request.current_organization.active_admin_members.first as admin %}
-                        Veuillez contacter un de vos administrateurs (par exemple {{ admin.first_name.get_full_name }}) pour qu'il ou elle indique une autre adresse
+                        Veuillez contacter un de vos administrateurs (par exemple {{ admin.get_full_name }}) pour qu'il ou elle indique une autre adresse
                     {% endwith %}
                 {% endif %}
                 ou <a href="{{ ITOU_HELP_CENTER_URL }}" target="_blank" rel="noopener" aria-label="Contactez-nous en cas de problème (ouverture dans un nouvel onglet)">contactez-nous</a> en cas de problème.
@@ -47,7 +47,7 @@
                     <a href="{% url 'prescribers_views:edit_organization' %}">Indiquez une autre adresse</a>
                 {% else %}
                     {% with request.current_organization.active_admin_members.first as admin %}
-                        Veuillez contacter un de vos administrateurs (par exemple {{ admin.first_name.get_full_name }}) pour qu'il ou elle indique une autre adresse
+                        Veuillez contacter un de vos administrateurs (par exemple {{ admin.get_full_name }}) pour qu'il ou elle indique une autre adresse
                     {% endwith %}
                 {% endif %}
                 ou <a href="{{ ITOU_HELP_CENTER_URL }}" target="_blank" rel="noopener" aria-label="Contactez-nous en cas de problème (ouverture dans un nouvel onglet)">contactez-nous</a> en cas de problème.
@@ -75,7 +75,7 @@
                     <br>
                 {% else %}
                     {% with request.current_organization.active_admin_members.first as admin %}
-                        Veuillez contacter un de vos administrateurs (par exemple {{ admin.first_name.get_full_name }}) pour qu'il ou elle régularise la situation de votre structure.
+                        Veuillez contacter un de vos administrateurs (par exemple {{ admin.get_full_name }}) pour qu'il ou elle régularise la situation de votre structure.
                     {% endwith %}
                 {% endif %}
             </p>
