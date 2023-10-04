@@ -508,14 +508,6 @@ class Country(PrettyPrintMixin, models.Model):
         verbose_name_plural = "pays"
         ordering = ["name"]
 
-    @property
-    def is_france(self):
-        """
-        Check if provided country is France
-        Polynesian islands are considered as a distinct country but are french in-fine
-        """
-        return self.group == self.Group.FRANCE
-
 
 class SiaeMeasure(models.TextChoices):
     """
@@ -537,14 +529,6 @@ class SiaeMeasure(models.TextChoices):
     FDI = "FDI_DC", "Droit Commun -  Fonds Départemental pour l'Insertion"
     EI_MP = "EI_MP", "Milieu Pénitentiaire - Entreprise d'Insertion"
     ACI_MP = "ACI_MP", "Milieu Pénitentiaire - Atelier et Chantier d'Insertion"
-
-    @property
-    def valid_kind_for_employee_record(self):
-        """
-        The ASP SIAE kind ("Mesure") must be one of the following
-        to be eligible for ASP employee record processing
-        """
-        return self.value in ["AI_DC", "ACI_DC", "ETTI_DC", "EI_DC"]
 
     @classmethod
     def from_siae_kind(cls, kind):
