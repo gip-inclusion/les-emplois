@@ -166,19 +166,17 @@ TEMPLATES = [
 # https://timonweb.com/django/overriding-field-widgets-in-django-doesnt-work-template-not-found-the-solution/
 FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
-# Note how we use Clever Cloud environment variables here. No way for now to alias them :/
 DATABASES = {
     "default": {
         "ATOMIC_REQUESTS": True,
         "ENGINE": "django.contrib.gis.db.backends.postgis",
         "NAME": os.getenv("POSTGRESQL_ADDON_DB"),
-        # FIXME(vperron): We should get rid of those Clever Cloud proprietary values in our code
-        # and alias them as soon as we can in our pre-build and pre-run scripts. But those scripts
-        # will be defined in a later PR.
+        # The custom iptables rules forces us to use the direct host and port in production, the
+        # usual one is unreachable.
         "HOST": os.getenv("POSTGRESQL_ADDON_DIRECT_HOST") or os.getenv("POSTGRESQL_ADDON_HOST"),
         "PORT": os.getenv("POSTGRESQL_ADDON_DIRECT_PORT") or os.getenv("POSTGRESQL_ADDON_PORT"),
-        "USER": os.getenv("POSTGRESQL_ADDON_CUSTOM_USER") or os.getenv("POSTGRESQL_ADDON_USER"),
-        "PASSWORD": os.getenv("POSTGRESQL_ADDON_CUSTOM_PASSWORD") or os.getenv("POSTGRESQL_ADDON_PASSWORD"),
+        "USER": os.getenv("POSTGRESQL_ADDON_USER"),
+        "PASSWORD": os.getenv("POSTGRESQL_ADDON_PASSWORD"),
         "OPTIONS": {
             "connect_timeout": 5,
         },
