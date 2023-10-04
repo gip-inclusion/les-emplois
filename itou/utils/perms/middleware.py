@@ -60,7 +60,7 @@ class ItouCurrentOrganizationMiddleware:
         redirect_message = None
         if user.is_authenticated:
             if user.is_siae_staff:
-                active_memberships = list(user.siaemembership_set.filter(is_active=True))
+                active_memberships = list(user.siaemembership_set.filter(is_active=True).order_by("created_at"))
                 siaes = {
                     siae.pk: siae
                     for siae in user.siae_set.filter(
@@ -128,7 +128,9 @@ class ItouCurrentOrganizationMiddleware:
                     request.current_organization,
                     request.is_current_organization_admin,
                 ) = extract_membership_infos_and_update_session(
-                    user.institutionmembership_set.filter(is_active=True).select_related("institution"),
+                    user.institutionmembership_set.filter(is_active=True)
+                    .order_by("created_at")
+                    .select_related("institution"),
                     "institution",
                     request.session,
                     global_constants.ITOU_SESSION_CURRENT_INSTITUTION_KEY,
