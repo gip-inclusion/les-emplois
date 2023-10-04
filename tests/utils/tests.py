@@ -216,33 +216,6 @@ class TestItouCurrentOrganizationMiddleware:
         assert request.organizations == [siae1, siae2]
         assert not request.is_current_organization_admin
 
-    def test_siae_member_multiple_memberships_and_one_active_old_key(self, mocked_get_response_for_middlewaremixin):
-        factory = RequestFactory()
-        request = factory.get("/")
-        siae1 = SiaeMembershipFactory(siae__name="1").siae
-        request.user = siae1.members.first()
-        siae2 = SiaeFactory(name="2")
-        siae2.members.add(request.user)
-
-        SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
-        request.session[global_constants.ITOU_SESSION_CURRENT_SIAE_KEY] = siae2.pk
-        request.session.save()
-        with assertNumQueries(
-            # Retrieve user memberships
-            1
-            # Check if siaes are active or in grace period
-            + 1
-        ):
-            ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
-        assert mocked_get_response_for_middlewaremixin.call_count == 1
-        # Session updated
-        assert request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] == siae2.pk
-        assert request.session.get(global_constants.ITOU_SESSION_CURRENT_SIAE_KEY) is None
-        # Check new request attributes
-        assert request.current_organization == siae2
-        assert request.organizations == [siae1, siae2]
-        assert not request.is_current_organization_admin
-
     def test_siae_member_of_inactive_siae(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
         request = factory.get("/")
@@ -391,29 +364,6 @@ class TestItouCurrentOrganizationMiddleware:
         assert request.organizations == [organization1, organization2]
         assert not request.is_current_organization_admin
 
-    def test_prescriber_with_multiple_memberships_and_one_active_old_key(
-        self, mocked_get_response_for_middlewaremixin
-    ):
-        factory = RequestFactory()
-        request = factory.get("/")
-        organization1 = PrescriberOrganizationWithMembershipFactory(name="1")
-        request.user = organization1.members.first()
-        organization2 = PrescriberOrganizationFactory(name="2")
-        organization2.members.add(request.user)
-        SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
-        request.session[global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY] = organization2.pk
-        request.session.save()
-        with assertNumQueries(1):  # retrieve user memberships
-            ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
-        assert mocked_get_response_for_middlewaremixin.call_count == 1
-        # Session updated
-        assert request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] == organization2.pk
-        assert request.session.get(global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY) is None
-        # Check new request attributes
-        assert request.current_organization == organization2
-        assert request.organizations == [organization1, organization2]
-        assert not request.is_current_organization_admin
-
     def test_prescriber_wrong_org_in_session(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
         request = factory.get("/")
@@ -464,28 +414,6 @@ class TestItouCurrentOrganizationMiddleware:
         assert mocked_get_response_for_middlewaremixin.call_count == 1
         # Session untouched
         assert request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] == institution2.pk
-        # Check new request attributes
-        assert request.current_organization == institution2
-        assert request.organizations == [institution1, institution2]
-        assert not request.is_current_organization_admin
-
-    def test_labor_inspector_member_of_2_institutions_old_key(self, mocked_get_response_for_middlewaremixin):
-        factory = RequestFactory()
-        request = factory.get("/")
-        institution1 = InstitutionWithMembershipFactory(name="1")
-        request.user = institution1.members.first()
-        institution2 = InstitutionMembershipFactory(
-            is_admin=False, user=request.user, institution__name="2"
-        ).institution
-        SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
-        request.session[global_constants.ITOU_SESSION_CURRENT_INSTITUTION_KEY] = institution2.pk
-        request.session.save()
-        with assertNumQueries(1):  # retrieve user memberships
-            ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
-        assert mocked_get_response_for_middlewaremixin.call_count == 1
-        # Session untouched
-        assert request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] == institution2.pk
-        assert request.session.get(global_constants.ITOU_SESSION_CURRENT_INSTITUTION_KEY) is None
         # Check new request attributes
         assert request.current_organization == institution2
         assert request.organizations == [institution1, institution2]

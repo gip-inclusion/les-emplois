@@ -10,14 +10,7 @@ from itou.utils import constants as global_constants
 from itou.www.login import urls as login_urls
 
 
-def extract_membership_infos_and_update_session(memberships, org_through_field, session, old_session_key):
-    # TODO(xfernandez): remove old_session_key management in a few weeks
-    current_org_pk = session.get(old_session_key)
-    if current_org_pk:
-        # If old session key is still used, migrate to the new one
-        session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = current_org_pk
-        del session[old_session_key]
-
+def extract_membership_infos_and_update_session(memberships, org_through_field, session):
     current_org_pk = session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY)
     orgs = []
     current_org = None
@@ -85,7 +78,6 @@ class ItouCurrentOrganizationMiddleware:
                     really_active_memberships,
                     "siae",
                     request.session,
-                    global_constants.ITOU_SESSION_CURRENT_SIAE_KEY,
                 )
 
                 if not request.current_organization:
@@ -119,7 +111,6 @@ class ItouCurrentOrganizationMiddleware:
                     .select_related("organization"),
                     "organization",
                     request.session,
-                    global_constants.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY,
                 )
 
             elif user.is_labor_inspector:
@@ -133,7 +124,6 @@ class ItouCurrentOrganizationMiddleware:
                     .select_related("institution"),
                     "institution",
                     request.session,
-                    global_constants.ITOU_SESSION_CURRENT_INSTITUTION_KEY,
                 )
                 if not request.current_organization:
                     redirect_message = format_html(
