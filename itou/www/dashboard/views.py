@@ -164,7 +164,6 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                 closed_campaigns.append(campaign)
 
     context = {
-        "current_org": current_org,
         "job_applications_categories": job_applications_categories,
         # FIXME(vperron): I think there's a rising need for a revamped permission system.
         "can_create_siae_antenna": request.user.can_create_siae_antenna(parent_siae=current_org),
