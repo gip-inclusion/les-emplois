@@ -31,7 +31,7 @@ class EmployeeRecordFactory(BareEmployeeRecordFactory):
     )
     asp_id = factory.SelfAttribute(".job_application.to_siae.convention.asp_id")
     asp_measure = factory.LazyAttribute(
-        lambda obj: asp_models.SiaeKind.from_siae_kind(obj.job_application.to_siae.kind)
+        lambda obj: asp_models.SiaeMeasure.from_siae_kind(obj.job_application.to_siae.kind)
     )
     approval_number = factory.SelfAttribute(".job_application.approval.number")
     siret = factory.SelfAttribute(".job_application.to_siae.siret")

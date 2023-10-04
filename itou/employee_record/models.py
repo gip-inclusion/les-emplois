@@ -12,7 +12,7 @@ from django.utils import timezone
 from rest_framework.authtoken.admin import User
 
 from itou.approvals.models import Approval
-from itou.asp.models import EmployerType, PrescriberType, SiaeKind
+from itou.asp.models import EmployerType, PrescriberType, SiaeMeasure
 from itou.job_applications.enums import SenderKind
 from itou.siaes.models import Siae, SiaeFinancialAnnex
 from itou.users.models import JobSeekerProfile
@@ -201,7 +201,7 @@ class EmployeeRecord(ASPExchangeInformation):
     # These fields are duplicated to act as constraint fields on DB level
     approval_number = models.CharField(max_length=12, verbose_name="numéro d'agrément")
     asp_id = models.PositiveIntegerField(verbose_name="identifiant ASP de la SIAE")
-    asp_measure = models.CharField(verbose_name="mesure ASP de la SIAE", choices=SiaeKind.choices)
+    asp_measure = models.CharField(verbose_name="mesure ASP de la SIAE", choices=SiaeMeasure.choices)
 
     # If the SIAE is an "antenna",
     # we MUST provide the SIRET of the SIAE linked to the financial annex on ASP side (i.e. "parent/mother" SIAE)
@@ -276,7 +276,7 @@ class EmployeeRecord(ASPExchangeInformation):
         # If the SIAE is an antenna, the SIRET will be rejected by the ASP so we have to use the mother's one
         self.siret = self.siret_from_asp_source(self.job_application.to_siae)
         self.asp_id = self.job_application.to_siae.convention.asp_id
-        self.asp_measure = SiaeKind.from_siae_kind(self.job_application.to_siae.kind)
+        self.asp_measure = SiaeMeasure.from_siae_kind(self.job_application.to_siae.kind)
         self.approval_number = self.job_application.approval.number
 
     # Business methods
@@ -526,7 +526,7 @@ class EmployeeRecord(ASPExchangeInformation):
         """
         Mapping between ASP and itou models for SIAE kind ("Mesure")
         """
-        return SiaeKind.from_siae_kind(self.job_application.to_siae.kind)
+        return SiaeMeasure.from_siae_kind(self.job_application.to_siae.kind)
 
     @property
     def is_orphan(self):

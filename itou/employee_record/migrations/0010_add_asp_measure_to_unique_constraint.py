@@ -1,6 +1,6 @@
 from django.db import migrations, models
 
-from itou.asp.models import SiaeKind
+from itou.asp.models import SiaeMeasure
 
 
 def _fill_asp_measure(apps, schema_editor):
@@ -13,7 +13,7 @@ def _fill_asp_measure(apps, schema_editor):
 
     batch = []
     for er in objects_to_migrate:
-        er.asp_measure = SiaeKind.from_siae_kind(er.job_application.to_siae.kind)
+        er.asp_measure = SiaeMeasure.from_siae_kind(er.job_application.to_siae.kind)
         batch.append(er)
     EmployeeRecord.objects.bulk_update(batch, fields=["asp_measure"])
 
