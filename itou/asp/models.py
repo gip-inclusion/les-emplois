@@ -517,7 +517,7 @@ class Country(PrettyPrintMixin, models.Model):
         return self.group == self.Group.FRANCE
 
 
-class SiaeKind(models.TextChoices):
+class SiaeMeasure(models.TextChoices):
     """
     ASP SIAE kind (mesure)
 
