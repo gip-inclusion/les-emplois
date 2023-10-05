@@ -260,6 +260,64 @@ class PENotificationMixin(models.Model):
     def pe_save_success(self, at=None):
         self._pe_notification_update(api_enums.PEApiNotificationStatus.SUCCESS, at)
 
+    def _pe_log(self, prefix, fmt, *args, **kwargs):
+        logger.info(
+            "%s notify_pole_emploi %s=%s %s",
+            prefix,
+            self._meta.model_name,
+            self,
+            fmt.format(*args, **kwargs),
+        )
+
+    def pe_log_info(self, fmt, *args, **kwargs):
+        self._pe_log(">", fmt, *args, **kwargs)
+
+    def pe_log_err(self, fmt, *args, **kwargs):
+        self._pe_log("!", fmt, *args, **kwargs)
+
+    def pe_rech_individu(self, first_name, last_name, nir, birthdate, at):
+        pe_client = pole_emploi_api_client()
+        try:
+            return pe_client.recherche_individu_certifie(first_name, last_name, birthdate, nir)
+        except PoleEmploiAPIException:
+            self.pe_log_err("got a recoverable error in recherche_individu")
+            self.pe_save_should_retry(at)
+        except PoleEmploiAPIBadResponse as exc:
+            self.pe_log_err("got an unrecoverable error={} in recherche_individu", exc.response_code)
+            self.pe_save_error(api_enums.PEApiEndpoint.RECHERCHE_INDIVIDU, exc.response_code, at)
+
+    def pe_maj_pass(self, id_national_pe, siae_siret, siae_kind, sender_kind, prescriber_kind=None, at=None):
+        pe_client = pole_emploi_api_client()
+
+        typologie_prescripteur = None
+        if prescriber_kind:
+            typologie_prescripteur = prescribers_enums.PrescriberOrganizationKind(
+                prescriber_kind
+            ).to_PE_typologie_prescripteur()
+
+        origine_candidature = job_application_enums.sender_kind_to_pe_origine_candidature(sender_kind)
+
+        try:
+            pe_client.mise_a_jour_pass_iae(
+                self,
+                id_national_pe,
+                siae_siret,
+                siae_enums.siae_kind_to_pe_type_siae(siae_kind),
+                origine_candidature=origine_candidature,
+                typologie_prescripteur=typologie_prescripteur,
+            )
+        except PoleEmploiAPIException:
+            self.pe_log_err("got a recoverable error in maj_pass_iae")
+            self.pe_save_should_retry(at)
+            return
+        except PoleEmploiAPIBadResponse as exc:
+            self.pe_log_err("got an unrecoverable error={} in maj_pass_iae", exc.response_code)
+            self.pe_save_error(api_enums.PEApiEndpoint.MISE_A_JOUR_PASS_IAE, exc.response_code, at)
+            return
+        else:
+            self.pe_log_info("got success in maj_pass_iae")
+            self.pe_save_success(at)
+
 
 class CancelledApproval(PENotificationMixin, CommonApprovalMixin):
     user_last_name = models.CharField(verbose_name="nom demandeur d'emploi")
@@ -674,12 +732,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         if not at:
             at = timezone.now()
         if self.start_at > at.date():
-            logger.info(
-                "! notify_pole_emploi approval=%s start_at=%s starts after today=%s.",
-                self,
-                self.start_at,
-                at.date(),
-            )
+            self.pe_log_err("start_at={} starts after today={}", self.start_at, at.date())
             self.pe_save_pending(
                 api_enums.PEApiPreliminaryCheckFailureReason.STARTS_IN_FUTURE,
                 at,
@@ -688,7 +741,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
 
         job_application = self.jobapplication_set.accepted().order_by("-created_at").first()
         if not job_application:
-            logger.info("! notify_pole_emploi approval=%s had no accepted job application", self)
+            self.pe_log_err("had no accepted job application")
             self.pe_save_pending(
                 api_enums.PEApiPreliminaryCheckFailureReason.NO_JOB_APPLICATION,
                 at,
@@ -698,12 +751,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         siae = job_application.to_siae
         type_siae = siae_enums.siae_kind_to_pe_type_siae(siae.kind)
         if not type_siae:
-            logger.info(
-                "! notify_pole_emploi approval=%s could not find PE type for siae=%s siae_kind=%s",
-                self,
-                siae,
-                siae.kind,
-            )
+            self.pe_log_err("could not find PE type for siae={} siae_kind={}", siae, siae.kind)
             self.pe_save_error(
                 None,
                 api_enums.PEApiPreliminaryCheckFailureReason.INVALID_SIAE_KIND,
@@ -719,12 +767,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
                 self.user.birthdate,
             ]
         ):
-            logger.info(
-                "! notify_pole_emploi approval=%s had an invalid user=%s nir=%s",
-                self,
-                self.user,
-                self.user.nir,
-            )
+            self.pe_log_err("had an invalid user={} nir={}", self.user, self.user.nir)
             # we save those as pending since the cron will ignore those cases anyway and thus has
             # no chance to block itself.
             self.pe_save_pending(
@@ -733,62 +776,32 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             )
             return
 
-        pe_client = pole_emploi_api_client()
-
         if not self.user.jobseeker_profile.pe_obfuscated_nir:
-            try:
-                self.user.jobseeker_profile.pe_obfuscated_nir = pe_client.recherche_individu_certifie(
-                    self.user.first_name, self.user.last_name, self.user.birthdate, self.user.nir
-                )
-            except PoleEmploiAPIException:
-                logger.info("! notify_pole_emploi approval=%s got a recoverable error in recherche_individu", self)
-                self.pe_save_should_retry(at)
+            id_national = self.pe_rech_individu(
+                self.user.first_name,
+                self.user.last_name,
+                self.user.nir,
+                self.user.birthdate,
+                at,
+            )
+            if not id_national:
                 return
-            except PoleEmploiAPIBadResponse as exc:
-                logger.info("! notify_pole_emploi approval=%s got an unrecoverable error in recherche_individu", self)
-                self.pe_save_error(api_enums.PEApiEndpoint.RECHERCHE_INDIVIDU, exc.response_code, at)
-                return
-            else:
-                self.user.jobseeker_profile.pe_last_certification_attempt_at = timezone.now()
-                self.user.jobseeker_profile.save(
-                    update_fields=["pe_obfuscated_nir", "pe_last_certification_attempt_at"]
-                )
+            self.user.jobseeker_profile.pe_obfuscated_nir = id_national
+            self.user.jobseeker_profile.pe_last_certification_attempt_at = timezone.now()
+            self.user.jobseeker_profile.save(update_fields=["pe_obfuscated_nir", "pe_last_certification_attempt_at"])
 
-        typologie_prescripteur = None
+        prescriber_kind = None
         if prescriber_org := job_application.sender_prescriber_organization:
-            typologie_prescripteur = prescribers_enums.PrescriberOrganizationKind(
-                prescriber_org.kind
-            ).to_PE_typologie_prescripteur()
+            prescriber_kind = prescriber_org.kind
 
-        try:
-            pe_client.mise_a_jour_pass_iae(
-                self,
-                self.user.jobseeker_profile.pe_obfuscated_nir,
-                siae.siret,
-                type_siae,
-                origine_candidature=job_application_enums.sender_kind_to_pe_origine_candidature(
-                    job_application.sender_kind
-                ),
-                typologie_prescripteur=typologie_prescripteur,
-            )
-        except PoleEmploiAPIException:
-            logger.info(
-                "! notify_pole_emploi approval=%s got a recoverable error in maj_pass_iae",
-                self,
-            )
-            self.pe_save_should_retry(at)
-            return
-        except PoleEmploiAPIBadResponse as exc:
-            logger.info(
-                "! notify_pole_emploi approval=%s got an unrecoverable error=%s in maj_pass_iae",
-                self,
-                exc.response_code,
-            )
-            self.pe_save_error(api_enums.PEApiEndpoint.MISE_A_JOUR_PASS_IAE, exc.response_code, at)
-            return
-        else:
-            logger.info("> notify_pole_emploi approval=%s got success in maj_pass_iae!", self)
-            self.pe_save_success(at)
+        self.pe_maj_pass(
+            id_national_pe=self.user.jobseeker_profile.pe_obfuscated_nir,
+            siae_siret=siae.siret,
+            siae_kind=siae.kind,
+            sender_kind=job_application.sender_kind,
+            prescriber_kind=prescriber_kind,
+            at=at,
+        )
 
 
 class SuspensionQuerySet(models.QuerySet):
@@ -1700,69 +1713,24 @@ class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
         return f"{self.number[:5]} {self.number[5:7]} {self.number[7:]}"
 
     def notify_pole_emploi(self, at=None):
-        pe_client = pole_emploi_api_client()
-        try:
-            encrypted_nir = pe_client.recherche_individu_certifie(
-                self.first_name, self.last_name, self.birthdate, self.nir
+        if not at:
+            at = timezone.now()
+        id_national = self.pe_rech_individu(
+            first_name=self.first_name,
+            last_name=self.last_name,
+            birthdate=self.birthdate,
+            nir=self.nir,
+            at=at,
+        )
+        if id_national:
+            self.pe_maj_pass(
+                id_national_pe=id_national,
+                siae_siret=self.siae_siret,
+                siae_kind=self.siae_kind,
+                sender_kind=job_application_enums.SenderKind.PRESCRIBER,
+                prescriber_kind=prescribers_enums.PrescriberOrganizationKind.PE,
+                at=at,
             )
-        except PoleEmploiAPIException:
-            logger.info("! notify_pole_emploi pe_approval=%s got a recoverable error in recherche_individu", self)
-            self.pe_save_should_retry(at)
-            return
-        except PoleEmploiAPIBadResponse as exc:
-            logger.info(
-                "! notify_pole_emploi pe_approval=%s got an unrecoverable error=%s in recherche_individu",
-                self,
-                exc.response_code,
-            )
-            self.pe_save_error(api_enums.PEApiEndpoint.RECHERCHE_INDIVIDU, exc.response_code, at)
-            return
-
-        type_siae = siae_enums.siae_kind_to_pe_type_siae(self.siae_kind)
-        if not type_siae:
-            logger.info(
-                "! notify_pole_emploi pe_approval=%s could not find PE type for siae_siret=%s siae_kind=%s",
-                self,
-                self.siae_siret,
-                self.siae_kind,
-            )
-            self.pe_save_error(
-                api_enums.PEApiEndpoint.MISE_A_JOUR_PASS_IAE,
-                api_enums.PEApiMiseAJourPassExitCode.INVALID_SIAE_KIND,
-                at,
-            )
-            return
-
-        try:
-            pe_client.mise_a_jour_pass_iae(
-                self,
-                encrypted_nir,
-                self.siae_siret,
-                type_siae,
-                # hardcoded, PE approvals are assumed as coming from prescribers
-                origine_candidature=job_application_enums.sender_kind_to_pe_origine_candidature(
-                    job_application_enums.SenderKind.PRESCRIBER
-                ),
-                typologie_prescripteur=prescribers_enums.PrescriberOrganizationKind.PE,
-            )
-        except PoleEmploiAPIException:
-            logger.info(
-                "! notify_pole_emploi pe_approval=%s got a recoverable error in maj_pass_iae",
-                self,
-            )
-            self.pe_save_should_retry(at)
-            return
-        except PoleEmploiAPIBadResponse as exc:
-            logger.info(
-                "! notify_pole_emploi pe_approval=%s got an unrecoverable error=%s in maj_pass_iae",
-                self,
-                exc.response_code,
-            )
-            self.pe_save_error(api_enums.PEApiEndpoint.MISE_A_JOUR_PASS_IAE, exc.response_code, at)
-            return
-        else:
-            logger.info("> notify_pole_emploi pe_approval=%s got success in maj_pass_iae!", self)
-            self.pe_save_success(at)
 
 
 class OriginalPoleEmploiApproval(CommonApprovalMixin):
