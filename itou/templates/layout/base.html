@@ -17,7 +17,7 @@
         {# https://metatags.io #}
         <meta name="title" content="Les emplois de l'inclusion">
         {# Project uses custom styles for indicators, CSP compatibility #}
-        <meta name="htmx-config" content='{"includeIndicatorStyles": false}'>
+        <meta name="htmx-config" content='{"includeIndicatorStyles": false, "allowScriptTags":false}'>
         {# https://metatags.io Open Graph / Facebook #}
         <meta property="og:type" content="website">
         <meta property="og:url" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}">
@@ -108,14 +108,6 @@
         <script src="{% static "vendor/jquery-ui/jquery-ui.min.js" %}"></script>
         <script src="{% static "vendor/theme-inclusion/javascripts/app.js" %}"></script>
 
-        <script nonce="{{ CSP_NONCE }}">
-            // Show any toasts that is already present in the DOM
-            $(document).ready(() => {
-                $(".toast-placement-wrapper").children(".toast").each(function() {
-                    $(this).toast("show");
-                });
-            });
-        </script>
 
         <script nonce="{{ CSP_NONCE }}">
             // Tarteaucitron's language is set according to the browser configuration
@@ -225,6 +217,16 @@
             {% if SHOW_DEMO_ACCOUNTS_BANNER %}
                 <script src="{% static 'js/demo_accounts.js'%}"></script>
             {% endif %}
+
+            <script nonce="{{ CSP_NONCE }}">
+                // Show any toasts that is already present in the DOM
+                htmx.onLoad(() => {
+                    $(".toast-placement-wrapper").children(".toast").each(function() {
+                        $(this).toast("show");
+                    });
+                });
+            </script>
+
         {% endblock %}
 
         {% if MATOMO_BASE_URL %}
