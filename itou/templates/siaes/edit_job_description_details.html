@@ -1,6 +1,6 @@
 {% extends "layout/base.html" %}
 {% load static %}
-{% load bootstrap4 %}
+{% load django_bootstrap5 %}
 
 {% block title %}Modifier les détails de la fiche de poste {{ block.super }}{% endblock %}
 
@@ -79,12 +79,11 @@
                                 {% bootstrap_field form.is_qpv_mandatory %}
                             {% endif %}
 
-                            {% buttons %}
-                                <div class="pt-3 text-end">
-                                    <a class="btn btn-outline-primary" href="{% url "siaes_views:edit_job_description" %}" aria-label="Retour à la page précédente">Retour</a>
-                                    <button class="btn btn-primary" aria-label="Passer à l'étape suivante">Suivant</button>
-                                </div>
-                            {% endbuttons %}
+                            <div class="pt-3 text-end">
+                                <a class="btn btn-outline-primary" href="{% url "siaes_views:edit_job_description" %}" aria-label="Retour à la page précédente">Retour</a>
+                                {# FIXME Find how to put back aria-label="Passer à l'étape suivante" #}
+                                {% bootstrap_button "Suivant" button_type="submit" button_class="btn btn-primary" %}
+                            </div>
                         </form>
                     </div>
                 </div>

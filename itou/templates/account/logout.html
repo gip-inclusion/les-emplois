@@ -1,6 +1,6 @@
 {# django-allauth template override. #}
 {% extends "layout/base.html" %}
-{% load bootstrap4 %}
+{% load django_bootstrap5 %}
 {% load redirection_fields %}
 
 {% block title %}Déconnexion {{ block.super }}{% endblock %}
@@ -21,9 +21,7 @@
 
                             {% redirection_input_field value=redirect_field_value %}
 
-                            {% buttons %}
-                                <button class="btn btn-primary">Se déconnecter</button>
-                            {% endbuttons %}
+                            {% bootstrap_button "Se déconnecter" button_type="submit" button_class="btn btn-primary" %}
 
                         </form>
                     </div>

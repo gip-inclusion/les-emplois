@@ -1,4 +1,4 @@
-{% load bootstrap4 %}
+{% load django_bootstrap5 %}
 
 <p>
     Pour plus d'information sur le traitement de vos données personnelles ou pour exercer vos droits, consultez
@@ -12,8 +12,4 @@
         les conditions générales d'utilisation
     </a><i class="ri-external-link-line ms-1"></i>.
 </p>
-{% buttons %}
-    <div class="text-end">
-        <button class="btn btn-primary">Inscription</button>
-    </div>
-{% endbuttons %}
+<div class="text-end">{% bootstrap_button "Inscription" button_type="submit" button_class="btn btn-primary" %}</div>

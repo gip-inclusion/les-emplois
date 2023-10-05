@@ -1,5 +1,5 @@
 {% extends "layout/base.html" %}
-{% load bootstrap4 %}
+{% load django_bootstrap5 %}
 
 {% block title %}Annuler la suspension de PASS IAE {{ block.super }}{% endblock %}
 
@@ -35,10 +35,8 @@
 
                         <input type="hidden" name="confirm" value="true">
 
-                        {% buttons %}
-                            <a class="btn btn-outline-primary" href="{{ back_url }}">Retour</a>
-                            <button class="btn btn-danger">Confirmer l'annulation de la suspension</button>
-                        {% endbuttons %}
+                        <a class="btn btn-outline-primary" href="{{ back_url }}">Retour</a>
+                        {% bootstrap_button "Confirmer l'annulation de la suspension" button_type="submit" button_class="btn btn-danger" %}
 
                     </form>
                 </div>

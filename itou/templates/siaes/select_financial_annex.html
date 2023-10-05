@@ -1,5 +1,5 @@
 {% extends "layout/base.html" %}
-{% load bootstrap4 %}
+{% load django_bootstrap5 %}
 
 {% block title %}Sélectionner une annexe financière {{ block.super }}{% endblock %}
 
@@ -21,9 +21,7 @@
 
                         {% bootstrap_field select_form.financial_annexes %}
 
-                        {% buttons %}
-                            <button class="btn btn-primary">Continuer</button>
-                        {% endbuttons %}
+                        {% bootstrap_button "Continuer" button_type="submit" button_class="btn btn-primary" %}
 
                     </form>
 

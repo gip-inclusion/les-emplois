@@ -1,5 +1,5 @@
 {% extends "apply/process_base.html" %}
-{% load bootstrap4 %}
+{% load django_bootstrap5 %}
 {% load str_filters %}
 
 {% block content_extend %}
@@ -10,19 +10,16 @@
 
             {% bootstrap_form form alert_error_type="all" %}
 
-            {% buttons %}
-                <hr>
-                <div class="form-row align-items-center justify-content-end">
-                    <div class="form-group mb-0 col-6 col-lg-auto">
-                        <a class="btn btn-outline-primary btn-block" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">Annuler</a>
-                    </div>
-                    <div class="form-group mb-0 col-6 col-lg-auto">
-                        <button class="btn btn-block btn-success" aria-label="Mettre la candidature de {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }} en liste d'attente">
-                            Mettre en liste d'attente
-                        </button>
-                    </div>
+            <hr>
+            <div class="form-row align-items-center justify-content-end">
+                <div class="form-group mb-0 col-6 col-lg-auto">
+                    <a class="btn btn-outline-primary btn-block" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">Annuler</a>
                 </div>
-            {% endbuttons %}
+                <div class="form-group mb-0 col-6 col-lg-auto">
+                    {# FIXME find how to put back aria-label="Mettre la candidature de {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }} en liste d'attente"#}
+                    {% bootstrap_button "Mettre en liste d'attente" button_type="submit" button_class="btn btn-block btn-success" %}
+                </div>
+            </div>
 
         </form>
     </div>

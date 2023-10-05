@@ -1,5 +1,5 @@
 {% extends "apply/process_base.html" %}
-{% load bootstrap4 %}
+{% load django_bootstrap5 %}
 
 {% block content_extend %}
     <div class="c-form">
@@ -11,7 +11,7 @@
             {% bootstrap_form_errors form type="all" %}
 
             {# TODO: Fix incorrect rendering of form with radio buttons #}
-            {# https://github.com/zostera/django-bootstrap4/issues/126 #}
+            {# https://github.com/zostera/django-django_bootstrap5/issues/126 #}
             <div class="form-group{% if form.refusal_reason.field.required %} form-group-required{% endif %} js-refusal-reasons">
                 {{ form.refusal_reason.label_tag }}
                 <ul class="list-unstyled">
@@ -42,17 +42,15 @@
 
             {% bootstrap_field form.answer %}
 
-            {% buttons %}
-                <hr>
-                <div class="form-row align-items-center justify-content-end">
-                    <div class="form-group mb-0 col-6 col-lg-auto">
-                        <a class="btn btn-outline-primary btn-block" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">Annuler</a>
-                    </div>
-                    <div class="form-group mb-0 col-6 col-lg-auto">
-                        <button class="btn btn-block btn-danger">Confirmer le refus</button>
-                    </div>
+            <hr>
+            <div class="form-row align-items-center justify-content-end">
+                <div class="form-group mb-0 col-6 col-lg-auto">
+                    <a class="btn btn-outline-primary btn-block" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">Annuler</a>
                 </div>
-            {% endbuttons %}
+                <div class="form-group mb-0 col-6 col-lg-auto">
+                    {% bootstrap_button "Confirmer le refus" button_type="submit" button_class="btn btn-block btn-danger" %}
+                </div>
+            </div>
 
         </form>
     </div>

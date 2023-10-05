@@ -1,5 +1,5 @@
 {% extends "layout/base.html" %}
-{% load bootstrap4 %}
+{% load django_bootstrap5 %}
 {% load static %}
 
 {% block title %}Déclarer une prolongation de PASS IAE {{ block.super }}{% endblock %}
@@ -60,12 +60,10 @@
                                 <p>
                                     En confirmant cette déclaration je certifie sur l'honneur que le motif de prolongation choisi correspond à la situation du salarié.
                                 </p>
-                                {% buttons %}
-                                    {# Allow the user to modify the prolongation: edit=1. #}
-                                    <button name="edit" value="1" class="btn btn-secondary">Annuler</button>
-                                    {# Create a prolongation: save=1. #}
-                                    <button name="save" value="1" class="btn btn-primary">Confirmer la déclaration</button>
-                                {% endbuttons %}
+                                {# Allow the user to modify the prolongation: edit=1. #}
+                                {% bootstrap_button "Annuler" button_type="submit" button_class="btn btn-secondary" name="edit" value="1" %}
+                                {# Create a prolongation: save=1. #}
+                                {% bootstrap_button "Confirmer la déclaration" button_type="submit" button_class="btn btn-primary" name="save" value="1" %}
                             </div>
                         </form>
                     {% endif %}

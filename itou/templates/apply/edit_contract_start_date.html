@@ -1,5 +1,5 @@
 {% extends "layout/base.html" %}
-{% load bootstrap4 %}
+{% load django_bootstrap5 %}
 
 {% block title %}Modification de la date de contrat {{ block.super }}{% endblock %}
 
@@ -22,19 +22,16 @@
 
                             {% bootstrap_form form alert_error_type="all" %}
 
-                            {% buttons %}
-                                <hr>
-                                <div class="form-row align-items-center justify-content-end">
-                                    <div class="form-group mb-0 col-6 col-lg-auto">
-                                        <a class="btn btn-outline-primary" href="{{ prev_url }}" aria-label="Annuler la modification de la date de contrat">Annuler</a>
-                                    </div>
-                                    <div class="form-group mb-0 col-6 col-lg-auto">
-                                        <button class="btn btn-block btn-primary" aria-label="Enregistrer la modification de la date de contrat">
-                                            Enregistrer
-                                        </button>
-                                    </div>
+                            <hr>
+                            <div class="form-row align-items-center justify-content-end">
+                                <div class="form-group mb-0 col-6 col-lg-auto">
+                                    <a class="btn btn-outline-primary" href="{{ prev_url }}" aria-label="Annuler la modification de la date de contrat">Annuler</a>
                                 </div>
-                            {% endbuttons %}
+                                <div class="form-group mb-0 col-6 col-lg-auto">
+                                    {# FIXME: find how to put back aria-label="Enregistrer la modification de la date de contrat" #}
+                                    {% bootstrap_button "Enregistrer" button_type="submit" button_class="btn btn-block btn-primary" %}
+                                </div>
+                            </div>
 
                         </form>
                     </div>

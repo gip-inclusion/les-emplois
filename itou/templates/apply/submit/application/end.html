@@ -1,5 +1,5 @@
 {% extends "layout/base.html" %}
-{% load bootstrap4 %}
+{% load django_bootstrap5 %}
 {% load format_filters %}
 {% load str_filters %}
 
@@ -86,12 +86,10 @@
                                     </fieldset>
 
                                     <hr class="my-5">
-                                    {% buttons %}
-                                        <div class="text-end">
-                                            <button type="reset" class="btn btn-link" data-swap-element=".c-form">Annuler</button>
-                                            <button class="btn btn-primary">Enregistrer</button>
-                                        </div>
-                                    {% endbuttons %}
+                                    <div class="text-end">
+                                        {% bootstrap_button "Annuler" button_type="reset" button_class="btn btn-link" data-swap-element=".c-form" %}
+                                        {% bootstrap_button "Enregistrer" button_type="submit" button_class="btn btn-primary" %}
+                                    </div>
                                 </form>
                             </div>
                         {% endif %}

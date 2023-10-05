@@ -1,5 +1,5 @@
 {% extends "layout/base.html" %}
-{% load bootstrap4 %}
+{% load django_bootstrap5 %}
 
 {% block title %}Mes notifications {{ block.super }}{% endblock %}
 
@@ -22,10 +22,8 @@
                             {% bootstrap_form_errors new_job_app_notification_form type="all" %}
                             {% bootstrap_form new_job_app_notification_form field_class="form-check form-switch" show_label=False %}
 
-                            {% buttons %}
-                                <a class="btn btn-outline-primary" href="{{ back_url }}">Annuler</a>
-                                <button class="btn btn-primary">Enregistrer</button>
-                            {% endbuttons %}
+                            <a class="btn btn-outline-primary" href="{{ back_url }}">Annuler</a>
+                            {% bootstrap_button "Enregistrer" button_type="submit" button_class="btn btn-primary" %}
 
                         </form>
                     </div>

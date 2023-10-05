@@ -1,4 +1,4 @@
-{% load bootstrap4 %}
+{% load django_bootstrap5 %}
 
 <form method="post" role="form" class="js-prevent-multiple-submit">
 
@@ -29,7 +29,5 @@
         {% endfor %}
     {% endif %}
 
-    {% buttons %}
-        <button class="btn btn-primary float-end">Enregistrer ce(s) critère(s)</button>
-    {% endbuttons %}
+    {% bootstrap_button "Enregistrer ce(s) critère(s)" button_type="submit" button_class="btn btn-primary float-end" %}
 </form>

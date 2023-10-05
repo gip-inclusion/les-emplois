@@ -1,5 +1,5 @@
 {% extends "apply/submit_base_two_columns.html" %}
-{% load bootstrap4 %}
+{% load django_bootstrap5 %}
 {% load format_filters %}
 {% load str_filters %}
 {% load static %}
@@ -85,18 +85,16 @@
                     </div>
                 </div>
             {% endif %}
-            {% buttons %}
-                {# Reload this page and show a modal containing more information about the job seeker. #}
-                <hr>
-                <div class="form-row align-items-center justify-content-end">
-                    <div class="form-group mb-0 col-6 col-lg-auto">
-                        <a class="btn btn-link btn-block" aria-label="Retourner au tableau de bord" href="{% url 'dashboard:index' %}">Retour</a>
-                    </div>
-                    <div class="form-group mb-0 col-6 col-lg-auto">
-                        <button name="preview" value="1" class="btn btn-primary btn-block">Suivant</button>
-                    </div>
+            {# Reload this page and show a modal containing more information about the job seeker. #}
+            <hr>
+            <div class="form-row align-items-center justify-content-end">
+                <div class="form-group mb-0 col-6 col-lg-auto">
+                    <a class="btn btn-link btn-block" aria-label="Retourner au tableau de bord" href="{% url 'dashboard:index' %}">Retour</a>
                 </div>
-            {% endbuttons %}
+                <div class="form-group mb-0 col-6 col-lg-auto">
+                    {% bootstrap_button "Suivant" button_type="submit" button_class="btn btn-primary btn-block" name="preview" value="1" %}
+                </div>
+            </div>
         </div>
         {% if preview_mode %}
             <!-- Modal -->
@@ -116,12 +114,10 @@
                             </p>
                         </div>
                         <div class="modal-footer">
-                            {% buttons %}
-                                {# Reload this page with a new form. #}
-                                <button name="cancel" value="1" class="btn btn-sm btn-secondary">Ce n'est pas mon candidat</button>
-                                {# Go to the next step. #}
-                                <button name="confirm" value="1" class="btn btn-sm btn-primary">Continuer</button>
-                            {% endbuttons %}
+                            {# Reload this page with a new form. #}
+                            {% bootstrap_button "Ce n'est pas mon candidat" button_type="submit" button_class="btn btn-sm btn-secondary" name="cancel" value="1" %}
+                            {# Go to the next step. #}
+                            {% bootstrap_button "Continuer" button_type="submit" button_class="btn btn-sm btn-primary" name="confirm" value="1" %}
                         </div>
                     </div>
                 </div>

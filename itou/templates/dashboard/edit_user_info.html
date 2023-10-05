@@ -1,5 +1,5 @@
 {% extends "layout/base.html" %}
-{% load bootstrap4 %}
+{% load django_bootstrap5 %}
 {% load static %}
 
 {% block title %}Modifier votre profil {{ block.super }}{% endblock %}
@@ -60,12 +60,10 @@
                                         </div>
 
                                         <hr class="my-4">
-                                        {% buttons %}
-                                            <div class="text-end mb-4">
-                                                <a class="btn btn-link" href="{{ prev_url }}">Annuler</a>
-                                                <button class="btn btn-primary">Enregistrer et quitter</button>
-                                            </div>
-                                        {% endbuttons %}
+                                        <div class="text-end mb-4">
+                                            <a class="btn btn-link" href="{{ prev_url }}">Annuler</a>
+                                            {% bootstrap_button "Enregistrer et quitter" button_type="submit" button_class="btn btn-primary" %}
+                                        </div>
                                     </form>
                                 {% endif %}
                             </div>

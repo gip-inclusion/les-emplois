@@ -1,5 +1,5 @@
 {% extends "layout/base.html" %}
-{% load bootstrap4 %}
+{% load django_bootstrap5 %}
 {% load redirection_fields %}
 {% load static %}
 
@@ -35,9 +35,7 @@
                                 </div>
                             {% endif %}
 
-                            {% buttons %}
-                                <button class="btn btn-primary">Suivant</button>
-                            {% endbuttons %}
+                            {% bootstrap_button "Suivant" button_type="submit" button_class="btn btn-primary" %}
 
                         </form>
                         <p class="mt-5">

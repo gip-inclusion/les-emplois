@@ -186,6 +186,6 @@ Si les changements paraissent corrects, ils peuvent être ajoutés à `git` et
 
 - https://getbootstrap.com/docs/4.3/getting-started/introduction/
 
-- https://django-bootstrap4.readthedocs.io/en/latest/index.html
+- https://django-bootstrap5.readthedocs.io/en/latest/index.html
 
 - http://remixicon.com/

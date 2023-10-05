@@ -1,5 +1,5 @@
 {% extends "layout/base.html" %}
-{% load bootstrap4 %}
+{% load django_bootstrap5 %}
 {% load theme_inclusion %}
 
 {% block title %}
@@ -58,18 +58,14 @@
 
                                 <hr>
                                 <p class="fs-xs">* champ obligatoire</p>
-                                {% buttons %}
-                                    <div class="text-end">
-                                        {% if wizard.steps.prev %}
-                                            <button formnovalidate class="btn btn-outline-primary" name="wizard_goto_step" value="{{ wizard.steps.prev }}">
-                                                Retour
-                                            </button>
-                                        {% else %}
-                                            <a class="btn btn-link btn-outline-primary" href="{% url "approvals:prolongation_request_show" prolongation_request.pk %}">Annuler</a>
-                                        {% endif %}
-                                        <button class="btn btn-primary">{{ wizard.steps.next|yesno:"Suivant,Confirmer le refus" }}</button>
-                                    </div>
-                                {% endbuttons %}
+                                <div class="text-end">
+                                    {% if wizard.steps.prev %}
+                                        {% bootstrap_button "Retour" button_type="submit" button_class="btn btn-outline-primary" name="wizard_goto_step" value=wizard.steps.prev %}
+                                    {% else %}
+                                        <a class="btn btn-link btn-outline-primary" href="{% url "approvals:prolongation_request_show" prolongation_request.pk %}">Annuler</a>
+                                    {% endif %}
+                                    {% bootstrap_button wizard.steps.next|yesno:"Suivant,Confirmer le refus" button_type="submit" button_class="btn btn-primary" %}
+                                </div>
                             </form>
                         {% endblock %}
                     </div>

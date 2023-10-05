@@ -1,4 +1,4 @@
-{% load bootstrap4 %}
+{% load django_bootstrap5 %}
 <form id="mainForm" method="post" class="js-prevent-multiple-submit"{% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
     {% csrf_token %}
 
@@ -11,11 +11,9 @@
 
     <hr />
 
-    {% buttons %}
-        <div class="text-end">
-            <a class="btn btn-outline-primary" href="{{ back_url }}">Retour</a>
-            {# Enable preview mode: preview=1. #}
-            <button name="preview" value="1" class="btn btn-primary">Valider la déclaration</button>
-        </div>
-    {% endbuttons %}
+    <div class="text-end">
+        <a class="btn btn-outline-primary" href="{{ back_url }}">Retour</a>
+        {# Enable preview mode: preview=1. #}
+        {% bootstrap_button "Valider la déclaration" button_type="submit" button_class="btn btn-primary" name="preview" value="1" %}
+    </div>
 </form>

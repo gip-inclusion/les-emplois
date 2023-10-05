@@ -1,5 +1,5 @@
 {% extends "apply/submit_base.html" %}
-{% load bootstrap4 %}
+{% load django_bootstrap5 %}
 
 {% block content_extend %}
     <div class="alert alert-warning">
@@ -11,14 +11,12 @@
 
         {% bootstrap_form form alert_error_type="all" %}
 
-        {% buttons %}
-            <hr>
-            <div class="form-row align-items-center justify-content-end">
-                <div class="form-group mb-0 col-12 col-lg-auto">
-                    <button class="btn btn-primary btn-block">Continuer</button>
-                </div>
+        <hr>
+        <div class="form-row align-items-center justify-content-end">
+            <div class="form-group mb-0 col-12 col-lg-auto">
+                {% bootstrap_button "Continuer" button_type="submit" button_class="btn btn-primary btn-block" %}
             </div>
-        {% endbuttons %}
+        </div>
     </form>
 
 {% endblock %}

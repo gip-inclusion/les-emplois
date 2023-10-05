@@ -1,5 +1,5 @@
 {% extends "layout/base.html" %}
-{% load bootstrap4 %}
+{% load django_bootstrap5 %}
 {% load format_filters %}
 
 {% block title %}
@@ -42,18 +42,14 @@
                             {% include "apply/includes/profile_infos.html" %}
 
                             <hr class="my-4">
-                            {% buttons %}
-                                <div class="text-end">
-                                    <a class="btn btn-link" href="{{ back_url }}" aria-label="Retourner à l'étape précédente">Retour</a>
-                                    <button class="btn btn-primary">
-                                        {% if update_job_seeker %}
-                                            Valider les informations
-                                        {% else %}
-                                            Créer le compte candidat
-                                        {% endif %}
-                                    </button>
-                                </div>
-                            {% endbuttons %}
+                            <div class="text-end">
+                                <a class="btn btn-link" href="{{ back_url }}" aria-label="Retourner à l'étape précédente">Retour</a>
+                                {% if update_job_seeker %}
+                                    {% bootstrap_button "Valider les informations" button_type="submit" button_class="btn btn-primary" %}
+                                {% else %}
+                                    {% bootstrap_button "Créer le compte candidat" button_type="submit" button_class="btn btn-primary" %}
+                                {% endif %}
+                            </div>
                         </form>
                     </div>
                 </div>

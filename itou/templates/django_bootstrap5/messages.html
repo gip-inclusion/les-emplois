@@ -1,7 +1,7 @@
-{% load i18n bootstrap4 %}
+{% load i18n django_bootstrap5 %}
 {% for message in messages %}
     {% if "toast" not in message.tags %}
-        <div class="{{ message|bootstrap_message_classes }} alert-dismissible fade show" role="alert">
+        <div class="{{ message|bootstrap_message_alert_type }} alert-dismissible fade show" role="alert">
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{% trans 'close' %}">&#215;</button>
             {{ message }}
         </div>
