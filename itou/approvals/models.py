@@ -66,6 +66,22 @@ class CommonApprovalMixin(models.Model):
         now = timezone.now().date()
         return (self.start_at <= now <= self.end_at) or (self.start_at >= now)
 
+    @classmethod
+    def last_number(cls):
+        # Lock the table's first row until the end of the transaction, effectively acting as a
+        # poor man's semaphore.
+        cls.objects.order_by("pk").select_for_update().first()
+        # Now we can do a whole new SELECT that will take into account eventual new rows.
+        number = (
+            cls.objects.filter(number__startswith=Approval.ASP_ITOU_PREFIX)
+            .order_by("number")
+            .values_list("number", flat=True)
+            .last()
+        )
+        if number:
+            return int(number.removeprefix(Approval.ASP_ITOU_PREFIX))
+        return 0
+
     @property
     def is_in_progress(self):
         return self.start_at <= timezone.now().date() <= self.end_at
@@ -618,21 +634,32 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             - YEAR WITHOUT CENTURY is equal to the start year of the `JobApplication.hiring_start_at`
             - A max of 99999 approvals could be issued by year
             - We would have gone beyond, we would never have thought we could go that far
+
+        For future reference:
+            An advisory lock would be safer than the dual select_for_update() performed here.
+            Code sample (courtesy of @ffreitag):
+
+            def acquire_lock(name):
+                if not connection.in_atomic_block:
+                    raise RuntimeError("Database is not in a transaction.")
+
+                key = zlib.crc32(name.encode())
+                with conn.cursor() as cursor:
+                    cursor.execute("SELECT pg_try_advisory_xact_lock(%s)", (key,))
+                    (acquired,) = cursor.fetchone()
+                return acquired
+
+            The difficult part would be to implement the tests properly, meaning to reproduce the
+            problems met in production (namely, deadlocks or holes/duplicate numbers)
+
+            Keep the "poor man's version" for now as it's probably enough (and tested) but keep an eye on:
+            - deadlocks (cancelling an approval never finishes and eventually fails)
+            - holes/duplicates in the combined sequence of Approval + CancelledApproval
         """
-        # Lock the table's first row until the end of the transaction, effectively acting as a
-        # poor man's semaphore.
-        Approval.objects.order_by("pk").select_for_update().first()
-        # Now we can do a whole new SELECT that will take into account eventual new rows.
-        last_itou_approval = (
-            Approval.objects.filter(number__startswith=Approval.ASP_ITOU_PREFIX).order_by("number").last()
-        )
-        if last_itou_approval:
-            raw_number = last_itou_approval.number.removeprefix(Approval.ASP_ITOU_PREFIX)
-            next_number = int(raw_number) + 1
-            if next_number > 9999999:
-                raise RuntimeError("The maximum number of PASS IAE has been reached.")
-            return f"{Approval.ASP_ITOU_PREFIX}{next_number:07d}"
-        return f"{Approval.ASP_ITOU_PREFIX}0000001"
+        next_number = max(Approval.last_number(), CancelledApproval.last_number()) + 1
+        if next_number > 9999999:
+            raise RuntimeError("The maximum number of PASS IAE has been reached.")
+        return f"{Approval.ASP_ITOU_PREFIX}{next_number:07d}"
 
     @staticmethod
     def get_default_end_date(start_at):

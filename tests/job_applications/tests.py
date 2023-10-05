@@ -14,6 +14,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
 
+from itou.approvals.models import CancelledApproval
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.employee_record.enums import Status
@@ -596,9 +597,15 @@ class JobApplicationQuerySetTest(TestCase):
         job_application = JobApplicationSentBySiaeFactory()
         job_application.process()
         job_application.accept(user=job_application.sender)
+        assert job_application.approval.number == "XXXXX0000001"
         job_application.cancel(user=job_application.sender)
         job_application.accept(user=job_application.sender)
+        assert job_application.approval.number == "XXXXX0000002"
         job_application.cancel(user=job_application.sender)
+        assert list(CancelledApproval.objects.order_by("number").values_list("number", flat=True)) == [
+            "XXXXX0000001",
+            "XXXXX0000002",
+        ]
 
         expected_created_at = JobApplicationTransitionLog.objects.filter(
             job_application=job_application,
