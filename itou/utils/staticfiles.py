@@ -257,7 +257,8 @@ ASSET_INFOS = {
 }
 
 
-def download(download_infos):
+def download(asset_key, download_infos):
+    prefix = f"Updating {asset_key}"
     file_to_download = download_infos["url"]
     filename = download_infos.get("filename", os.path.basename(urlparse(file_to_download).path))
     filepath = WORKING_DIR / filename
@@ -266,16 +267,16 @@ def download(download_infos):
         if expected_hash_value is not None:
             hash_value = hashlib.sha256(filepath.read_bytes()).hexdigest()
             if hash_value != expected_hash_value:
-                print(f"{filepath} found - hash {hash_value} KO (expected: {expected_hash_value}) - deleting")
+                print(
+                    f"{prefix} - {filepath} found - hash {hash_value} KO (expected: {expected_hash_value}) - deleting"
+                )
                 filepath.unlink()
-            else:
-                print(f"{filepath} found - hash OK")
         else:
-            print(f"{filepath} found - no hash verification - keeping file")
+            print(f"{prefix} - {filepath} found - no hash verification - keeping file")
 
     if not filepath.exists():
         filepath.parent.mkdir(exist_ok=True)
-        print(f"Downloading {filepath}")
+        print(f"{prefix} - Downloading {filepath}")
 
         stream_kwargs = {
             "url": download_infos["url"],
@@ -290,7 +291,7 @@ def download(download_infos):
                 f.write(data)
                 hash_value.update(data)
         hash_value = hash_value.hexdigest()
-        print(f"Hash value for downloaded file: {hash_value}")
+        print(f"{prefix} - Hash value for downloaded file: {hash_value}")
         if expected_hash_value is not None and hash_value != expected_hash_value:
             raise ValueError(f"Downloaded {filepath} - hash {hash_value} KO (expected: {expected_hash_value})")
     return filepath
@@ -355,9 +356,8 @@ def extract(filepath: pathlib.Path, extract_infos):
 
 
 def update(asset_key):
-    print(f"Updating {asset_key}")
     asset_info = ASSET_INFOS[asset_key]
-    path = download(asset_info["download"])
+    path = download(asset_key, asset_info["download"])
     # Either target or extract_infos
     if target := asset_info.get("target"):
         assert not asset_info.get("extract")
@@ -368,7 +368,6 @@ def update(asset_key):
 
 
 def update_all():
-    print(f"Using cache directory: {WORKING_DIR}")
     for asset_key in ASSET_INFOS:
         update(asset_key)
 
