@@ -42,6 +42,7 @@ from itou.www.dashboard.forms import (
     EditUserEmailForm,
     EditUserInfoForm,
 )
+from itou.www.stats import utils as stats_utils
 
 
 @login_required
@@ -169,18 +170,18 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "can_create_siae_antenna": request.user.can_create_siae_antenna(parent_siae=current_org),
         "can_show_financial_annexes": can_show_financial_annexes,
         "can_show_employee_records": can_show_employee_records,
-        "can_view_stats_dashboard_widget": request.user.can_view_stats_dashboard_widget(current_org=current_org),
-        "can_view_stats_siae": request.user.can_view_stats_siae(current_org=current_org),
-        "can_view_stats_siae_aci": request.user.can_view_stats_siae_aci(current_org=current_org),
-        "can_view_stats_siae_etp": request.user.can_view_stats_siae_etp(current_org=current_org),
-        "can_view_stats_cd": request.user.can_view_stats_cd(current_org=current_org),
-        "can_view_stats_pe": request.user.can_view_stats_pe(current_org=current_org),
-        "can_view_stats_ddets_iae": request.user.can_view_stats_ddets_iae(current_org=current_org),
-        "can_view_stats_ddets_log": request.user.can_view_stats_ddets_log(current_org=current_org),
-        "can_view_stats_dreets_iae": request.user.can_view_stats_dreets_iae(current_org=current_org),
-        "can_view_stats_dgefp": request.user.can_view_stats_dgefp(current_org=current_org),
-        "can_view_stats_dihal": request.user.can_view_stats_dihal(current_org=current_org),
-        "can_view_stats_iae_network": request.user.can_view_stats_iae_network(current_org=current_org),
+        "can_view_stats_dashboard_widget": stats_utils.can_view_stats_dashboard_widget(request),
+        "can_view_stats_siae": stats_utils.can_view_stats_siae(request),
+        "can_view_stats_siae_aci": stats_utils.can_view_stats_siae_aci(request),
+        "can_view_stats_siae_etp": stats_utils.can_view_stats_siae_etp(request),
+        "can_view_stats_cd": stats_utils.can_view_stats_cd(request),
+        "can_view_stats_pe": stats_utils.can_view_stats_pe(request),
+        "can_view_stats_ddets_iae": stats_utils.can_view_stats_ddets_iae(request),
+        "can_view_stats_ddets_log": stats_utils.can_view_stats_ddets_log(request),
+        "can_view_stats_dreets_iae": stats_utils.can_view_stats_dreets_iae(request),
+        "can_view_stats_dgefp": stats_utils.can_view_stats_dgefp(request),
+        "can_view_stats_dihal": stats_utils.can_view_stats_dihal(request),
+        "can_view_stats_iae_network": stats_utils.can_view_stats_iae_network(request),
         "num_rejected_employee_records": num_rejected_employee_records,
         "pending_prolongation_requests": pending_prolongation_requests,
         "active_campaigns": active_campaigns,
@@ -375,11 +376,7 @@ def edit_user_notifications(request, template_name="dashboard/edit_user_notifica
 
 @login_required
 def api_token(request, template_name="dashboard/api_token.html"):
-    if request.user.is_siae_staff:
-        if not request.is_current_organization_admin:
-            raise PermissionDenied
-
-    else:
+    if not (request.user.is_siae_staff and request.is_current_organization_admin):
         raise PermissionDenied
 
     if request.method == "POST":

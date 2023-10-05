@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.contrib.postgres.fields import CIEmailField
 from django.contrib.postgres.indexes import OpClass
-from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MinLengthValidator
 from django.db import models
@@ -29,19 +29,10 @@ from itou.asp.models import (
     LaneType,
     RSAAllocation,
 )
-from itou.common_apps.address.departments import DEPARTMENTS, REGIONS, department_from_postcode
+from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.address.format import format_address
 from itou.common_apps.address.models import AddressMixin
-from itou.institutions.enums import InstitutionKind
-from itou.institutions.models import Institution
-from itou.prescribers.enums import (
-    DTPE_SAFIR_CODE_TO_DEPARTMENTS,
-    PrescriberAuthorizationStatus,
-    PrescriberOrganizationKind,
-)
-from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.enums import SiaeKind
-from itou.siaes.models import Siae
 from itou.utils.apis.exceptions import AddressLookupError
 from itou.utils.models import UniqueConstraintWithErrorCode
 from itou.utils.validators import validate_birthdate, validate_nir, validate_pole_emploi_id
@@ -675,152 +666,6 @@ class User(AbstractUser, AddressMixin):
                 parent_siae.kind == SiaeKind.GEIQ
                 or (parent_siae.should_have_convention and parent_siae.convention is not None)
             )
-        )
-
-    def can_view_stats_dashboard_widget(self, current_org):
-        """
-        Whether a stats section should be displayed on the user's dashboard.
-
-        It should be displayed if one or more stats sections are available for the user.
-        """
-        return (
-            self.can_view_stats_siae(current_org=current_org)
-            or self.can_view_stats_cd(current_org=current_org)
-            or self.can_view_stats_pe(current_org=current_org)
-            or self.can_view_stats_ddets_iae(current_org=current_org)
-            or self.can_view_stats_ddets_log(current_org=current_org)
-            or self.can_view_stats_dreets_iae(current_org=current_org)
-            or self.can_view_stats_dgefp(current_org=current_org)
-            or self.can_view_stats_dihal(current_org=current_org)
-            or self.can_view_stats_iae_network(current_org=current_org)
-        )
-
-    def can_view_stats_siae(self, current_org):
-        """
-        General access rights for most SIAE stats.
-        Users of a SIAE can view their SIAE data and only theirs.
-        """
-        return (
-            self.is_siae_staff
-            and isinstance(current_org, Siae)
-            and current_org.has_member(self)
-            # Metabase expects a filter on the SIAE ASP id (technically `siae.convention.asp_id`) which is why
-            # we require a convention object to exist here.
-            # Some SIAE don't have a convention (SIAE created by support, GEIQ, EA...).
-            and current_org.convention is not None
-        )
-
-    def can_view_stats_siae_aci(self, current_org):
-        """
-        Non official stats with very specific access rights.
-        """
-        return (
-            self.can_view_stats_siae(current_org)
-            and current_org.kind == SiaeKind.ACI
-            and current_org.convention is not None
-            and current_org.convention.asp_id in settings.STATS_SIAE_ASP_ID_WHITELIST
-        )
-
-    def can_view_stats_siae_etp(self, current_org):
-        """
-        Non official stats with very specific access rights.
-        """
-        return self.can_view_stats_siae(current_org) and self.pk in settings.STATS_SIAE_USER_PK_WHITELIST
-
-    def can_view_stats_cd(self, current_org):
-        """
-        Users of a real CD can view the confidential CD stats for their department only.
-
-        CD as in "Conseil Départemental".
-
-        Unfortunately the `PrescriberOrganizationKind.DEPT` kind contains not only the real CD but also some random
-        organizations authorized by some CD.
-        When such a random non-CD org is registered, it is not authorized yet, thus will be filtered out correctly.
-        Later, our staff will authorize the random non-CD org, flag it as `is_brsa` and change its kind to `OTHER`.
-        Sometimes our staff makes human errors and forgets to flag it as `is_brsa` or to change its kind.
-        Hence we take extra precautions to filter out these edge cases to ensure we never ever show sensitive stats to
-        a non-CD organization of the `DEPT` kind.
-        """
-        return (
-            self.is_prescriber
-            and isinstance(current_org, PrescriberOrganization)
-            and current_org.kind == PrescriberOrganizationKind.DEPT
-            and current_org.is_authorized
-            and current_org.authorization_status == PrescriberAuthorizationStatus.VALIDATED
-            and not current_org.is_brsa
-            and current_org.department in settings.STATS_CD_DEPARTMENT_WHITELIST
-        )
-
-    def can_view_stats_pe(self, current_org):
-        return (
-            self.is_prescriber
-            and isinstance(current_org, PrescriberOrganization)
-            and current_org.kind == PrescriberOrganizationKind.PE
-            and current_org.is_authorized
-            and current_org.authorization_status == PrescriberAuthorizationStatus.VALIDATED
-        )
-
-    def get_stats_pe_departments(self, current_org):
-        if not self.can_view_stats_pe(current_org=current_org):
-            raise PermissionDenied
-        if current_org.is_dgpe:
-            return DEPARTMENTS.keys()
-        if current_org.is_drpe:
-            return REGIONS[current_org.region]
-        if current_org.is_dtpe:
-            departments = DTPE_SAFIR_CODE_TO_DEPARTMENTS[current_org.code_safir_pole_emploi]
-            return [current_org.department] if departments is None else departments
-        return [current_org.department]
-
-    def can_view_stats_ddets_iae(self, current_org):
-        """
-        Users of a DDETS IAE can view the confidential DDETS IAE stats of their department only.
-        """
-        return (
-            self.is_labor_inspector
-            and isinstance(current_org, Institution)
-            and current_org.kind == InstitutionKind.DDETS_IAE
-        )
-
-    def can_view_stats_ddets_log(self, current_org):
-        return (
-            self.is_labor_inspector
-            and isinstance(current_org, Institution)
-            and current_org.kind == InstitutionKind.DDETS_LOG
-        )
-
-    def can_view_stats_dreets_iae(self, current_org):
-        """
-        Users of a DREETS IAE can view the confidential DREETS IAE stats of their region only.
-        """
-        return (
-            self.is_labor_inspector
-            and isinstance(current_org, Institution)
-            and current_org.kind == InstitutionKind.DREETS_IAE
-        )
-
-    def can_view_stats_dgefp(self, current_org):
-        """
-        Users of the DGEFP institution can view the confidential DGEFP stats for all regions and departments.
-        """
-        return (
-            self.is_labor_inspector
-            and isinstance(current_org, Institution)
-            and current_org.kind == InstitutionKind.DGEFP
-        )
-
-    def can_view_stats_dihal(self, current_org):
-        return (
-            self.is_labor_inspector
-            and isinstance(current_org, Institution)
-            and current_org.kind == InstitutionKind.DIHAL
-        )
-
-    def can_view_stats_iae_network(self, current_org):
-        return (
-            self.is_labor_inspector
-            and isinstance(current_org, Institution)
-            and current_org.kind == InstitutionKind.IAE_NETWORK
         )
 
     def update_external_data_source_history_field(self, provider, field, value) -> bool:
