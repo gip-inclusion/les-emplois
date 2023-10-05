@@ -11,13 +11,14 @@ from itou.job_applications.export import stream_xlsx_export
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS
 from itou.utils.pagination import pager
-from itou.utils.perms.prescriber import get_all_available_job_applications_as_prescriber, get_current_org_or_404
+from itou.utils.perms.prescriber import get_all_available_job_applications_as_prescriber
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.www.apply.forms import (
     FilterJobApplicationsForm,
     PrescriberFilterJobApplicationsForm,
     SiaeFilterJobApplicationsForm,
 )
+from itou.www.stats.utils import can_view_stats_pe
 
 
 def _add_user_can_view_personal_information(job_applications, can_view):
@@ -103,12 +104,6 @@ def list_for_prescriber_exports(request, template_name="apply/list_of_available_
     List of applications for a prescriber, sorted by month, displaying the count of applications per month
     with the possibiliy to download those applications as a CSV file.
     """
-    if not request.user.is_prescriber_with_org:
-        can_view_stats_pe = None
-    else:
-        current_org = get_current_org_or_404(request)
-        can_view_stats_pe = request.user.can_view_stats_pe(current_org=current_org)
-
     job_applications = get_all_available_job_applications_as_prescriber(request)
     total_job_applications = job_applications.count()
     job_applications_by_month = job_applications.with_monthly_counts()
@@ -117,7 +112,7 @@ def list_for_prescriber_exports(request, template_name="apply/list_of_available_
         "job_applications_by_month": job_applications_by_month,
         "total_job_applications": total_job_applications,
         "export_for": "prescriber",
-        "can_view_stats_pe": can_view_stats_pe,
+        "can_view_stats_pe": can_view_stats_pe(request),
     }
     return render(request, template_name, context)
 

@@ -33,31 +33,33 @@ from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
 
+from . import utils
+
 
 def get_stats_siae_current_org(request):
     current_org = get_current_siae_or_404(request)
-    if not request.user.can_view_stats_siae(current_org=current_org):
+    if not utils.can_view_stats_siae(request):
         raise PermissionDenied
     return current_org
 
 
 def get_stats_ddets_iae_department(request):
     current_org = get_current_institution_or_404(request)
-    if not request.user.can_view_stats_ddets_iae(current_org=current_org):
+    if not utils.can_view_stats_ddets_iae(request):
         raise PermissionDenied
     return current_org.department
 
 
 def get_stats_dreets_iae_region(request):
     current_org = get_current_institution_or_404(request)
-    if not request.user.can_view_stats_dreets_iae(current_org=current_org):
+    if not utils.can_view_stats_dreets_iae(request):
         raise PermissionDenied
     return current_org.region
 
 
 def ensure_stats_dgefp_permission(request):
-    current_org = get_current_institution_or_404(request)
-    if not request.user.can_view_stats_dgefp(current_org=current_org):
+    get_current_institution_or_404(request)
+    if not utils.can_view_stats_dgefp(request):
         raise PermissionDenied
 
 
@@ -168,7 +170,7 @@ def stats_siae_aci(request):
     They can only view data for their own ACI.
     """
     current_org = get_stats_siae_current_org(request)
-    if not request.user.can_view_stats_siae_aci(current_org=current_org):
+    if not utils.can_view_stats_siae_aci(request):
         raise PermissionDenied
     context = {
         "page_title": "Suivi du cofinancement de mon ACI",
@@ -190,7 +192,7 @@ def stats_siae_etp(request):
     These stats are about ETP data from the ASP.
     """
     current_org = get_stats_siae_current_org(request)
-    if not request.user.can_view_stats_siae_etp(current_org=current_org):
+    if not utils.can_view_stats_siae_etp(request):
         raise PermissionDenied
     context = {
         "page_title": "Données de ma structure (extranet ASP)",
@@ -248,7 +250,7 @@ def render_stats_cd(request, page_title):
     They can only view data for their own departement.
     """
     current_org = get_current_org_or_404(request)
-    if not request.user.can_view_stats_cd(current_org=current_org):
+    if not utils.can_view_stats_cd(request):
         raise PermissionDenied
     department = current_org.department
     params = get_params_for_departement(department)
@@ -280,9 +282,9 @@ def render_stats_pe(request, page_title, extra_params=None):
     `*_raw` views are not directly visible on the C1 dashboard but are linked from within their `*_main` counterpart.
     """
     current_org = get_current_org_or_404(request)
-    if not request.user.can_view_stats_pe(current_org=current_org):
+    if not utils.can_view_stats_pe(request):
         raise PermissionDenied
-    departments = request.user.get_stats_pe_departments(current_org=current_org)
+    departments = utils.get_stats_pe_departments(request)
     params = {
         mb.DEPARTMENT_FILTER_KEY: [DEPARTMENTS[d] for d in departments],
     }
@@ -447,7 +449,7 @@ def stats_ddets_iae_hiring(request):
 @login_required
 def stats_ddets_log_state(request):
     current_org = get_current_institution_or_404(request)
-    if not request.user.can_view_stats_ddets_log(current_org=current_org):
+    if not utils.can_view_stats_ddets_log(request):
         raise PermissionDenied
     department = current_org.department
     region = current_org.region
@@ -558,8 +560,8 @@ def stats_dgefp_af(request):
 
 @login_required
 def stats_dihal_state(request):
-    current_org = get_current_institution_or_404(request)
-    if not request.user.can_view_stats_dihal(current_org=current_org):
+    get_current_institution_or_404(request)
+    if not utils.can_view_stats_dihal(request):
         raise PermissionDenied
     context = {
         "page_title": "Suivi des prescriptions des AHI",
@@ -570,7 +572,7 @@ def stats_dihal_state(request):
 @login_required
 def stats_iae_network_hiring(request):
     current_org = get_current_institution_or_404(request)
-    if not request.user.can_view_stats_iae_network(current_org=current_org):
+    if not utils.can_view_stats_iae_network(request):
         raise PermissionDenied
     context = {
         "page_title": "Données de candidatures des adhérents de mon réseau IAE",
