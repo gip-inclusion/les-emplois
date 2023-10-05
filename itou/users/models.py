@@ -226,7 +226,7 @@ class User(AbstractUser, AddressMixin):
     created_by = models.ForeignKey(
         "self",
         verbose_name="créé par",
-        on_delete=models.SET_NULL,
+        on_delete=models.RESTRICT,  # For traceability and accountability
         null=True,
         blank=True,
     )

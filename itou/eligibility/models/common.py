@@ -34,7 +34,7 @@ class AbstractEligibilityDiagnosisModel(models.Model):
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="auteur",
-        on_delete=models.CASCADE,
+        on_delete=models.RESTRICT,  # For traceability and accountability
         # removed clashing on former unused related_name `eligibility_diagnoses_made`
     )
     author_kind = models.CharField(
@@ -49,7 +49,7 @@ class AbstractEligibilityDiagnosisModel(models.Model):
         verbose_name="organisation du prescripteur de l'auteur",
         null=True,
         blank=True,
-        on_delete=models.CASCADE,
+        on_delete=models.RESTRICT,  # For traceability and accountability
     )
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now, db_index=True)
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True, db_index=True)
@@ -122,7 +122,11 @@ class AbstractAdministrativeCriteria(models.Model):
     ui_rank = models.PositiveSmallIntegerField(default=MAX_UI_RANK)
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, verbose_name="créé par", null=True, blank=True, on_delete=models.SET_NULL
+        settings.AUTH_USER_MODEL,
+        verbose_name="créé par",
+        null=True,
+        blank=True,
+        on_delete=models.RESTRICT,  # For traceability and accountability
     )
 
     class Meta:
