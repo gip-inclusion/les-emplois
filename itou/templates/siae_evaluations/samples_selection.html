@@ -1,6 +1,6 @@
 {% extends "layout/base.html" %}
 {% load format_filters %}
-{% load bootstrap4 %}
+{% load django_bootstrap5 %}
 {% load static %}
 
 {% block title %}Sélectionner l’échantillon pour {{ evaluation_campaign }} {{ block.super }}{% endblock %}
@@ -85,9 +85,7 @@
                                         <p>{{ min }}% {{ form.chosen_percent }} {{ max }}%</p>
                                     </div>
 
-                                    {% buttons %}
-                                        <button class="btn btn-primary float-end">Valider</button>
-                                    {% endbuttons %}
+                                    {% bootstrap_button "Valider" button_type="submit" button_class="btn btn-primary float-end" %}
                                 </form>
                             {% endif %}
                         </div>

@@ -1,5 +1,5 @@
 {% extends "layout/base.html" %}
-{% load bootstrap4 %}
+{% load django_bootstrap5 %}
 
 {% block title %}Créer une nouvelle structure {{ block.super }}{% endblock %}
 
@@ -48,11 +48,8 @@
                                 En cliquant sur le bouton "Enregistrer", vous acceptez que vos informations et coordonnées ci-dessus soient rendues publiques.
                             </p>
 
-                            {% buttons %}
-                                <a class="btn btn-outline-primary" href="{% url 'dashboard:index' %}">Annuler</a>
-
-                                <button class="btn btn-primary">Enregistrer</button>
-                            {% endbuttons %}
+                            <a class="btn btn-outline-primary" href="{% url 'dashboard:index' %}">Annuler</a>
+                            {% bootstrap_button "Enregistrer" button_type="submit" button_class="btn btn-primary" %}
                         </form>
                     </div>
                 </div>

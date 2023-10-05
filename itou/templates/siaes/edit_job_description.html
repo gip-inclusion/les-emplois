@@ -1,6 +1,6 @@
 {% extends "layout/base.html" %}
 {% load static %}
-{% load bootstrap4 %}
+{% load django_bootstrap5 %}
 
 {% block title %}Enregistrer une fiche de poste {{ block.super }}{% endblock %}
 
@@ -35,6 +35,7 @@
                         <form method="post" action="?step={{ step }}" class="js-prevent-multiple-submit">
                             {% bootstrap_form_errors form alert_error_type="all" %}
 
+                            {# FIXME : is it still true with django-bootstrap5 ? #}
                             {# Bug or feature, django_bootstrap4 does not render errors raised from hidden fields validation #}
                             {% if form.errors.job_appellation_code %}
                                 <div class="alert alert-danger alert-dismissible" role="alert">
@@ -59,12 +60,11 @@
                             {% bootstrap_field form.hours_per_week %}
                             {% bootstrap_field form.open_positions %}
 
-                            {% buttons %}
-                                <div class="pt-3 text-end">
-                                    <a class="btn btn-outline-primary" href="{% url "siaes_views:job_description_list" %}" aria-label="Retour à la liste des métiers">Retour</a>
-                                    <button class="btn btn-primary" aria-label="Passer à l'étape suivante">Suivant</button>
-                                </div>
-                            {% endbuttons %}
+                            <div class="pt-3 text-end">
+                                <a class="btn btn-outline-primary" href="{% url "siaes_views:job_description_list" %}" aria-label="Retour à la liste des métiers">Retour</a>
+                                {# FIXME Find how to put back aria-label="Passer à l'étape suivante" #}
+                                {% bootstrap_button "Suivant" button_type="submit" button_class="btn btn-primary" %}
+                            </div>
                         </form>
                     </div>
                 </div>

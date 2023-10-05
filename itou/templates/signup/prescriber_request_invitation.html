@@ -1,5 +1,5 @@
 {% extends "layout/base.html" %}
-{% load bootstrap4 %}
+{% load django_bootstrap5 %}
 {% load static %}
 {% load format_filters %}
 
@@ -27,10 +27,8 @@
 
                         {% bootstrap_form form alert_error_type="all" %}
 
-                        {% buttons %}
-                            <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">Retour</a>
-                            <button class="btn btn-primary">Valider la demande</button>
-                        {% endbuttons %}
+                        <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">Retour</a>
+                        {% bootstrap_button "Valider la demande" button_type="submit" button_class="btn btn-primary" %}
                     </form>
                 </div>
             </div>

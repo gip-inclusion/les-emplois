@@ -1,5 +1,5 @@
 {% extends "layout/base.html" %}
-{% load bootstrap4 %}
+{% load django_bootstrap5 %}
 
 {% block title %}Postuler {{ block.super }}{% endblock %}
 
@@ -91,21 +91,20 @@
 
                             {% block form_content %}{% endblock %}
 
-                            {% buttons %}
-                                <hr>
-                                <div class="form-row align-items-center justify-content-end">
-                                    {% if back_url %}
-                                        <div class="form-group mb-0 col-6 col-lg-auto">
-                                            <a class="btn btn-link btn-block" href="{{ back_url }}" aria-label="Retourner à l'étape précédente">Retour</a>
-                                        </div>
-                                    {% endif %}
-                                    {% block form_submit_button %}
-                                        <div class="form-group mb-0 col-6 col-lg-auto">
-                                            <button class="btn btn-primary btn-block" aria-label="Passer à l'étape suivante">Suivant</button>
-                                        </div>
-                                    {% endblock %}
-                                </div>
-                            {% endbuttons %}
+                            <hr>
+                            <div class="form-row align-items-center justify-content-end">
+                                {% if back_url %}
+                                    <div class="form-group mb-0 col-6 col-lg-auto">
+                                        <a class="btn btn-link btn-block" href="{{ back_url }}" aria-label="Retourner à l'étape précédente">Retour</a>
+                                    </div>
+                                {% endif %}
+                                {% block form_submit_button %}
+                                    <div class="form-group mb-0 col-6 col-lg-auto">
+                                        {# FIXME Find how to put back  aria-label="Passer à l'étape suivante" #}
+                                        {% bootstrap_button "Suivant" button_type="submit" button_class="btn btn-primary btn-block" %}
+                                    </div>
+                                {% endblock %}
+                            </div>
                         </form>
                     </div>
                 </div>

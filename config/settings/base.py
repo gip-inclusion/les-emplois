@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     "django.forms",  # Required to override default Django widgets. See FORM_RENDERER
     # Third party apps.
     "anymail",
-    "bootstrap4",
+    "django_bootstrap5",
     "django_select2",
     "formtools",
     "huey.contrib.djhuey",
@@ -330,12 +330,10 @@ ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_USER_DISPLAY = "itou.users.models.get_allauth_account_user_display"
 
-BOOTSTRAP4 = {
+BOOTSTRAP5 = {
     "required_css_class": "form-group-required",
-    # Remove the default `.is-valid` class that Bootstrap will style in green
-    # otherwise empty required fields will be marked as valid. This might be
-    # a bug in django-bootstrap4, it should be investigated.
-    "success_css_class": "",
+    # Fix https://github.com/zostera/django-bootstrap5/issues/287
+    "field_renderers": {"default": "itou.utils.custom_renderer.CustomFieldRenderer"},
 }
 
 SELECT2_THEME = "bootstrap-5"
@@ -580,7 +578,7 @@ CSP_FRAME_ANCESTORS = [
 ]
 CSP_IMG_SRC = [
     "'self'",
-    "data:",  # Because of tarteaucitron.js
+    "data:",  # Because of tarteaucitron.js and bootstrap5
     # OpenStreetMap tiles for django admin maps: both tile. and *.tile are used
     "https://tile.openstreetmap.org",
     "https://*.tile.openstreetmap.org",

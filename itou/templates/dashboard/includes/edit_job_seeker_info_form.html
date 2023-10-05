@@ -5,7 +5,7 @@
 
 {% endcomment %}
 
-{% load bootstrap4 %}
+{% load django_bootstrap5 %}
 <form method="post" class="js-prevent-multiple-submit js-format-nir">
     {% csrf_token %}
 
@@ -28,11 +28,9 @@
     {% bootstrap_field form.lack_of_pole_emploi_id_reason %}
 
     <hr class="my-4">
-    {% buttons %}
-        <div class="text-end mb-4">
-            <a class="btn btn-link" href="{{ prev_url }}">Annuler</a>
-            <button class="btn btn-primary">{{ submit_label }}</button>
-        </div>
-    {% endbuttons %}
+    <div class="text-end mb-4">
+        <a class="btn btn-link" href="{{ prev_url }}">Annuler</a>
+        {% bootstrap_button "{{ submit_label }}" button_type="submit" button_class="btn btn-primary" %}
+    </div>
 
 </form>

@@ -1,5 +1,5 @@
 {% extends "apply/submit_base.html" %}
-{% load bootstrap4 %}
+{% load django_bootstrap5 %}
 
 {% block content_title %}
     <h1>
@@ -20,12 +20,10 @@
 
         <hr class="my-4">
 
-        {% buttons %}
-            <div class="text-end">
-                <a class="btn btn-link" href="{% url "dashboard:index" %}">Retour au Tableau de bord</a>
-                <a class="btn btn-primary" href="{% url 'apply:check_prev_applications_for_hire' siae_pk=siae.pk job_seeker_pk=job_seeker.pk %}">Poursuivre l’embauche</a>
-            </div>
-        {% endbuttons %}
+        <div class="text-end">
+            <a class="btn btn-link" href="{% url "dashboard:index" %}">Retour au Tableau de bord</a>
+            <a class="btn btn-primary" href="{% url 'apply:check_prev_applications_for_hire' siae_pk=siae.pk job_seeker_pk=job_seeker.pk %}">Poursuivre l’embauche</a>
+        </div>
     </div>
 
 {% endblock %}

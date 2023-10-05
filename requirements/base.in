@@ -47,8 +47,8 @@ django-storages  # https://github.com/jschneier/django-storages
 # Front-end
 # ------------------------------------------------------------------------------
 
-# Bootstrap 4 for Django
-django-bootstrap4==22.1  # https://github.com/zostera/django-bootstrap4
+# Bootstrap 5 for Django
+django-bootstrap5  # https://github.com/zostera/django-bootstrap5
 
 # Enhance select fields in forms with jQuery Select plugin
 django-select2  # https://github.com/codingjoe/django-select2

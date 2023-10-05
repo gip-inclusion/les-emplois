@@ -1,4 +1,4 @@
-{% load bootstrap4 %}
+{% load django_bootstrap5 %}
 <div id="check_prescriber_email">
     {% bootstrap_field form.email %}
     <button class="btn btn-secondary mt-2 mb-4" hx-post="{% url "approvals:check_prescriber_email" approval_id=approval.pk %}" hx-select="#check_prescriber_email" hx-target="#check_prescriber_email">

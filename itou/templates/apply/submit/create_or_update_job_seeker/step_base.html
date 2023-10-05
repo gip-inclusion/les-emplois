@@ -1,5 +1,5 @@
 {% extends "layout/base.html" %}
-{% load bootstrap4 %}
+{% load django_bootstrap5 %}
 {% load static %}
 
 {% block title %}
@@ -66,12 +66,10 @@
                             {% block form_content %}{% endblock %}
 
                             <hr class="my-5">
-                            {% buttons %}
-                                <div class="text-end">
-                                    {% if back_url %}<a class="btn btn-link" href="{{ back_url }}">Retour</a>{% endif %}
-                                    <button class="btn btn-primary">Suivant</button>
-                                </div>
-                            {% endbuttons %}
+                            <div class="text-end">
+                                {% if back_url %}<a class="btn btn-link" href="{{ back_url }}">Retour</a>{% endif %}
+                                {% bootstrap_button "Suivant" button_type="submit" button_class="btn btn-primary" %}
+                            </div>
                         </form>
                     </div>
                 </div>

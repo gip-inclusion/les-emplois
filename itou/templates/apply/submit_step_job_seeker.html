@@ -1,5 +1,5 @@
 {% extends "apply/submit_base_two_columns.html" %}
-{% load bootstrap4 %}
+{% load django_bootstrap5 %}
 {% load format_filters %}
 {% load static %}
 {% load str_filters %}
@@ -38,20 +38,17 @@
                 {% include "signup/includes/no_email_link.html" with link_text="Le candidat n'a pas d'e-mail ?" %}
             </div>
 
-            {% buttons %}
-                <hr>
-                <div class="form-row align-items-center justify-content-end">
-                    <div class="form-group mb-0 col-6 col-lg-auto">
-                        <a href="{{ back_url }}" class="btn btn-link btn-block" aria-label="Retourner à l'étape précédente">Retour</a>
-                    </div>
-                    <div class="form-group mb-0 col-6 col-lg-auto">
-                        {# Reload this page and show a modal containing more information about the job seeker. #}
-                        <button name="preview" value="1" class="btn btn-primary btn-block" aria-label="Passer à l'étape suivante">
-                            Suivant
-                        </button>
-                    </div>
+            <hr>
+            <div class="form-row align-items-center justify-content-end">
+                <div class="form-group mb-0 col-6 col-lg-auto">
+                    <a href="{{ back_url }}" class="btn btn-link btn-block" aria-label="Retourner à l'étape précédente">Retour</a>
                 </div>
-            {% endbuttons %}
+                <div class="form-group mb-0 col-6 col-lg-auto">
+                    {# Reload this page and show a modal containing more information about the job seeker. #}
+                    {# FIXME Find how to put back aria-label="Passer à l'étape suivante"#}
+                    {% bootstrap_button "Suivant" button_type="submit" button_class="btn btn-primary btn-block" name="preview" value="1" %}
+                </div>
+            </div>
         </div>
         {% if preview_mode %}
             <!-- Modal -->
@@ -79,12 +76,10 @@
                             {% endif %}
                         </div>
                         <div class="modal-footer">
-                            {% buttons %}
-                                {# Reload this page with a new form. #}
-                                <button name="cancel" value="1" class="btn btn-sm btn-secondary">Ce n'est pas mon candidat</button>
-                                {# Go to the next step. #}
-                                <button name="confirm" value="1" class="btn btn-sm btn-primary">Continuer</button>
-                            {% endbuttons %}
+                            {# Reload this page with a new form. #}
+                            {% bootstrap_button "Ce n'est pas mon candidat" button_type="submit" button_class="btn btn-sm btn-secondary" name="cancel" value="1" %}
+                            {# Go to the next step. #}
+                            {% bootstrap_button "Continuer" button_type="submit" button_class="btn btn-sm btn-primary" name="confirm" value="1" %}
                         </div>
                     </div>
                 </div>

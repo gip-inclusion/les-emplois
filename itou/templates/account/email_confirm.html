@@ -2,7 +2,7 @@
 {% extends "layout/base.html" %}
 
 {% load account %}
-{% load bootstrap4 %}
+{% load django_bootstrap5 %}
 
 {% block title %}Confirmer l'adresse e-mail {{ block.super }}{% endblock %}
 
@@ -32,9 +32,7 @@
                             {# See Allauth.account.adapter.DefaultAccountAdapter.is_safe_url #}
                             {% if request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
 
-                            {% buttons %}
-                                <button class="btn btn-primary">Confirmer</button>
-                            {% endbuttons %}
+                            {% bootstrap_button "Confirmer" button_type="submit" button_class="btn btn-primary" %}
 
                         </form>
 

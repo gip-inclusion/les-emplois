@@ -60,9 +60,7 @@ bcrypt==4.0.1 \
 beautifulsoup4==4.12.2 \
     --hash=sha256:492bbc69dca35d12daac71c4db1bfff0c876c00ef4a2ffacce226d4638eb72da \
     --hash=sha256:bd2520ca0d9d7d12694a53d44ac482d181b4ec1888909b035a3dbf40d0f57d4a
-    # via
-    #   -r requirements/test.txt
-    #   django-bootstrap4
+    # via -r requirements/test.txt
 black==23.9.1 \
     --hash=sha256:031e8c69f3d3b09e1aa471a926a1eeb0b9071f80b17689a655f7885ac9325a6f \
     --hash=sha256:13a2e4a93bb8ca74a749b6974925c27219bb3df4d42fc45e948a5d9feb5122b7 \
@@ -344,7 +342,7 @@ django==4.2.6 \
     #   django-allauth
     #   django-anymail
     #   django-appconf
-    #   django-bootstrap4
+    #   django-bootstrap5
     #   django-csp
     #   django-debug-toolbar
     #   django-extensions
@@ -372,9 +370,9 @@ django-appconf==1.0.5 \
     # via
     #   -r requirements/test.txt
     #   django-select2
-django-bootstrap4==22.1 \
-    --hash=sha256:b6da4cb54682012ff8baa1a1e672ba30cbfae82fb3d74f4b341109074e8e239f \
-    --hash=sha256:fc9984f7238fbcd330ec5111bf0435083caa7192b022eedd53bfa4128bee318f
+django-bootstrap5==23.3 \
+    --hash=sha256:21e1956a8a819370decc5d365ce4f4207761cb065afec5a7df8c4c8c49507f2e \
+    --hash=sha256:ca1bb2f40175ed1c1725f52f249a574bf629b33b5a0af3bec0eab1de6d72836c
     # via -r requirements/test.txt
 django-csp==3.7 \
     --hash=sha256:01443a07723f9a479d498bd7bb63571aaa771e690f64bde515db6cdb76e8041a \
