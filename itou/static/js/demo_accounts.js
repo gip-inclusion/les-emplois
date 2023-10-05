@@ -11,7 +11,7 @@ $(document).ready(function(){
         infoKey = localStorage.getItem("testAccountsModal");
         if (!infoKey) {
             localStorage.setItem("testAccountsModal", true);
-            $('#testAccountsModal').modal();
+            const testAccountsModal = new bootstrap.Modal("#testAccountsModal");
         }
     }
 
