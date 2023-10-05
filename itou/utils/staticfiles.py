@@ -93,8 +93,8 @@ ASSET_INFOS = {
     },
     "htmx.org": {
         "download": {
-            "url": "https://registry.npmjs.org/htmx.org/-/htmx.org-1.8.2.tgz",
-            "sha256": "e0e10e29d3033d98c15ad25d90608685a61b20e1d813f8b9c3c2e00b9055d525",
+            "url": "https://registry.npmjs.org/htmx.org/-/htmx.org-1.9.6.tgz",
+            "sha256": "061fbce477f32ed1141f69fe449c47c7395725d39e739fe27f7fd5a617d5efe8",
         },
         "extract": {
             "origin": "package",
