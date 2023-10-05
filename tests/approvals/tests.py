@@ -343,38 +343,6 @@ class ApprovalModelTest(TestCase):
         assert isinstance(approval, Approval)
         assert approval == valid_approval
 
-    def test_is_open_to_application_process_with_suspension(self):
-        today = timezone.localdate()
-        approval_start_at = today - relativedelta(months=3)
-        reasons_to_not_open_process = [
-            reason.value for reason in Suspension.Reason if reason.value not in Suspension.REASONS_ALLOWING_UNSUSPEND
-        ]
-
-        for reason_to_refuse in reasons_to_not_open_process:
-            approval = ApprovalFactory(start_at=approval_start_at)
-            suspension = SuspensionFactory(
-                approval=approval,
-                start_at=today - relativedelta(days=1),
-                end_at=today + relativedelta(months=1),
-                reason=reason_to_refuse,
-            )
-            assert not approval.can_be_unsuspended
-            suspension.delete()
-            approval.delete()
-
-        for reason in Suspension.REASONS_ALLOWING_UNSUSPEND:
-            approval = ApprovalFactory(start_at=approval_start_at)
-            suspension = SuspensionFactory(
-                approval=approval,
-                start_at=today - relativedelta(days=1),
-                end_at=today + relativedelta(months=1),
-                reason=reason,
-            )
-
-            assert approval.can_be_unsuspended
-            suspension.delete()
-            approval.delete()
-
     def test_can_be_unsuspended_without_suspension(self):
         today = timezone.localdate()
         approval_start_at = today - relativedelta(months=3)
@@ -1880,3 +1848,33 @@ def test_prolongation_from_prolongation_request():
     assert prolongation.require_phone_interview == prolongation_request.require_phone_interview
     assert prolongation.contact_email == prolongation_request.contact_email
     assert prolongation.contact_phone == prolongation_request.contact_phone
+
+
+@pytest.mark.parametrize(
+    "reason,outcome",
+    [
+        ("DETOXIFICATION", False),
+        ("FORCE_MAJEURE", False),
+        ("INCARCERATION", False),
+        ("MATERNITY", False),
+        ("SICKNESS", False),
+        ("TRIAL_OUTSIDE_IAE", False),
+        ("CONTRACT_SUSPENDED", True),
+        ("APPROVAL_BETWEEN_CTA_MEMBERS", True),
+        ("CONTRACT_BROKEN", True),
+        ("CONTRAT_PASSERELLE", True),
+        ("FINISHED_CONTRACT", True),
+    ],
+)
+def test_approval_can_be_unsuspended(reason, outcome):
+    today = timezone.localdate()
+    approval_start_at = today - relativedelta(months=3)
+
+    ja = JobApplicationFactory(with_approval=True, approval__start_at=approval_start_at)
+    SuspensionFactory(
+        approval=ja.approval,
+        start_at=today - relativedelta(days=1),
+        end_at=today + relativedelta(months=1),
+        reason=reason,
+    )
+    assert ja.approval.can_be_unsuspended is outcome
