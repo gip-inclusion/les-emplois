@@ -121,7 +121,7 @@ class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
         verbose_name="SIAE de l'auteur",
         null=True,
         blank=True,
-        on_delete=models.CASCADE,
+        on_delete=models.RESTRICT,  # For traceability and accountability
     )
     # Administrative criteria are mandatory only when an SIAE is performing an eligibility diagnosis.
     administrative_criteria = models.ManyToManyField(
@@ -242,7 +242,11 @@ class AdministrativeCriteria(AbstractAdministrativeCriteria):
     ui_rank = models.PositiveSmallIntegerField(default=MAX_UI_RANK)
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, verbose_name="créé par", null=True, blank=True, on_delete=models.SET_NULL
+        settings.AUTH_USER_MODEL,
+        verbose_name="créé par",
+        null=True,
+        blank=True,
+        on_delete=models.RESTRICT,  # For traceability and accountability
     )
 
     objects = AdministrativeCriteriaQuerySet.as_manager()
@@ -267,7 +271,7 @@ class SelectedAdministrativeCriteria(models.Model):
     eligibility_diagnosis = models.ForeignKey(EligibilityDiagnosis, on_delete=models.CASCADE)
     administrative_criteria = models.ForeignKey(
         AdministrativeCriteria,
-        on_delete=models.CASCADE,
+        on_delete=models.RESTRICT,
         related_name="administrative_criteria_through",
     )
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
