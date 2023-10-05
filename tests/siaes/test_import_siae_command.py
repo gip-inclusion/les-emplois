@@ -226,6 +226,34 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
             for (kind, name) in Siae.objects.values_list("kind", "name")
         ]
 
+    def test_update_siret_and_auth_email_of_existing_siaes_fill_siret_history_without_history(self):
+        siae = SiaeFactory(siret_history=[], siret="34950857200000", kind=SiaeKind.AI, convention__asp_id=768)
+        instance = lazy_import_siae_command()
+
+        instance.update_siret_and_auth_email_of_existing_siaes()
+        siae.refresh_from_db()
+        assert siae.siret_history == ["34950857200000"]
+
+    def test_update_siret_and_auth_email_of_existing_siaes_fill_siret_history_with_history(self):
+        siae = SiaeFactory(
+            siret_history=["00000000000000"], siret="34950857200000", kind=SiaeKind.AI, convention__asp_id=768
+        )
+        instance = lazy_import_siae_command()
+
+        instance.update_siret_and_auth_email_of_existing_siaes()
+        siae.refresh_from_db()
+        assert siae.siret_history == ["00000000000000", "34950857200000"]
+
+    def test_update_siret_and_auth_email_of_existing_siaes_fill_siret_history_if_the_last_one_is_not_the_same(self):
+        siae = SiaeFactory(
+            siret_history=["34950857200000"], siret="34950857200000", kind=SiaeKind.AI, convention__asp_id=768
+        )
+        instance = lazy_import_siae_command()
+
+        instance.update_siret_and_auth_email_of_existing_siaes()
+        siae.refresh_from_db()
+        assert siae.siret_history == ["34950857200000"]
+
 
 @override_settings(METABASE_HASH_SALT="foobar2000")
 def test_hashed_approval_number():

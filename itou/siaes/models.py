@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.gis.measure import D
+from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MaxValueValidator
@@ -208,6 +209,9 @@ class Siae(AddressMixin, OrganizationAbstract):
     # almost never changes.
     # Both SIRET numbers are kept up to date by the weekly `import_siae.py` script.
     siret = models.CharField(verbose_name="siret", max_length=14, validators=[validate_siret], db_index=True)
+    siret_history = ArrayField(
+        models.CharField(max_length=14, validators=[validate_siret]), verbose_name="historique des siret", default=list
+    )
     naf = models.CharField(verbose_name="naf", max_length=5, validators=[validate_naf], blank=True)
     kind = models.CharField(verbose_name="type", max_length=8, choices=SiaeKind.choices, default=SiaeKind.EI)
     # `brand` (or `enseigne` in French) is used to override `name` if needed.

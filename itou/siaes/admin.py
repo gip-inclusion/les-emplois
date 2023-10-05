@@ -143,6 +143,7 @@ class SiaeAdmin(ItouGISMixin, ExportActionMixin, OrganizationAdmin):
                 "fields": (
                     "pk",
                     "siret",
+                    "siret_history",
                     "naf",
                     "kind",
                     "name",
@@ -188,6 +189,7 @@ class SiaeAdmin(ItouGISMixin, ExportActionMixin, OrganizationAdmin):
     def get_readonly_fields(self, request, obj=None):
         readonly_fields = [
             "pk",
+            "siret_history",
             "source",
             "created_by",
             "created_at",
@@ -217,6 +219,9 @@ class SiaeAdmin(ItouGISMixin, ExportActionMixin, OrganizationAdmin):
                 obj.set_coords(obj.geocoding_address, post_code=obj.post_code)
             except GeocodingDataError:
                 messages.error(request, "L'adresse semble erronée car le geocoding n'a pas pu être recalculé.")
+
+        if change and (not obj.siret_history or obj.siret != obj.siret_history[-1]):
+            obj.siret_history.append(obj.siret)
 
         # Pulled-up the save action:
         # many-to-many relationships / cross-tables references
