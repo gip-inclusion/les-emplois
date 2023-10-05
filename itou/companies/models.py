@@ -247,7 +247,7 @@ class Company(AddressMixin, OrganizationAbstract):
         related_name="created_company_set",
         null=True,
         blank=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.RESTRICT,  # For traceability and accountability
     )
 
     # Ability to block new job applications
@@ -256,10 +256,9 @@ class Company(AddressMixin, OrganizationAbstract):
         verbose_name="date du dernier blocage de candidatures", blank=True, null=True
     )
 
-    # A convention can only be deleted if it is no longer linked to any siae.
     convention = models.ForeignKey(
         "SiaeConvention",
-        on_delete=models.RESTRICT,
+        on_delete=models.RESTRICT,  # A convention should only be deleted if it is no longer linked to any siae.
         blank=True,
         null=True,
         related_name="siaes",
@@ -507,7 +506,7 @@ class CompanyMembership(MembershipAbstract):
         settings.AUTH_USER_MODEL,
         related_name="updated_companymembership_set",
         null=True,
-        on_delete=models.CASCADE,
+        on_delete=models.RESTRICT,  # For traceability and accountability
         verbose_name="mis à jour par",
     )
     notifications = models.JSONField(verbose_name="notifications", default=dict, blank=True)
@@ -584,7 +583,7 @@ class JobDescription(models.Model):
     # Max number or workable hours per week in France (Code du Travail)
     MAX_WORKED_HOURS_PER_WEEK = 48
 
-    appellation = models.ForeignKey("jobs.Appellation", on_delete=models.CASCADE)
+    appellation = models.ForeignKey("jobs.Appellation", on_delete=models.RESTRICT)
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="job_description_through")
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True, db_index=True)
@@ -602,7 +601,7 @@ class JobDescription(models.Model):
     )
     location = models.ForeignKey(
         "cities.City",
-        on_delete=models.SET_NULL,
+        on_delete=models.RESTRICT,
         null=True,
         blank=True,
         verbose_name="localisation du poste",
@@ -829,7 +828,7 @@ class SiaeConvention(models.Model):
         related_name="reactivated_siae_convention_set",
         null=True,
         blank=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.RESTRICT,  # Only staff can update it, and we shouldn't delete one of those accounts
     )
     reactivated_at = models.DateTimeField(verbose_name="date de réactivation manuelle", blank=True, null=True)
 
@@ -923,11 +922,9 @@ class SiaeFinancialAnnex(models.Model):
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
 
-    # A financial annex cannot exist without a convention, and
-    # deleting a convention will delete all its financial annexes.
     convention = models.ForeignKey(
         "SiaeConvention",
-        on_delete=models.CASCADE,
+        on_delete=models.CASCADE,  # A financial annex cannot exist without a convention
         related_name="financial_annexes",
     )
 

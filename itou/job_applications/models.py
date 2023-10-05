@@ -506,7 +506,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     job_seeker = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="demandeur d'emploi",
-        on_delete=models.CASCADE,
+        on_delete=models.RESTRICT,  # This object is central to us and the SIAE
         related_name="job_applications",
     )
 
@@ -520,7 +520,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         verbose_name="diagnostic d'éligibilité",
         null=True,
         blank=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.RESTRICT,
     )
 
     geiq_eligibility_diagnosis = models.ForeignKey(
@@ -528,7 +528,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         verbose_name="diagnostic d'éligibilité GEIQ",
         null=True,
         blank=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.RESTRICT,
         related_name="job_applications",
     )
 
@@ -544,7 +544,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     sender = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="utilisateur émetteur",
-        on_delete=models.SET_NULL,
+        on_delete=models.RESTRICT,  # For traceability and accountability
         null=True,
         blank=True,
         related_name="job_applications_sent",
@@ -559,7 +559,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     # When the sender is an employer, keep a track of his current company.
     sender_company = models.ForeignKey(
-        "companies.Company", verbose_name="entreprise émettrice", null=True, blank=True, on_delete=models.CASCADE
+        "companies.Company", verbose_name="entreprise émettrice", null=True, blank=True, on_delete=models.RESTRICT
     )
 
     # When the sender is a prescriber, keep a track of his current organization (if any).
@@ -568,13 +568,13 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         verbose_name="organisation du prescripteur émettrice",
         null=True,
         blank=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.RESTRICT,  # For traceability and accountability
     )
 
     to_company = models.ForeignKey(
         "companies.Company",
         verbose_name="entreprise destinataire",
-        on_delete=models.CASCADE,
+        on_delete=models.RESTRICT,
         related_name="job_applications_received",
     )
 
@@ -588,7 +588,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         verbose_name="poste retenu",
         blank=True,
         null=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.SET_NULL,  # SET_NULL so employers can delete job descriptions in their dashboards
         related_name="hired_job_applications",
     )
 
@@ -616,7 +616,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     # Job applications sent to SIAEs subject to eligibility rules can obtain an
     # Approval after being accepted.
     approval = models.ForeignKey(
-        "approvals.Approval", verbose_name="PASS IAE", null=True, blank=True, on_delete=models.SET_NULL
+        "approvals.Approval", verbose_name="PASS IAE", null=True, blank=True, on_delete=models.RESTRICT
     )
     approval_delivery_mode = models.CharField(
         verbose_name="mode d'attribution du PASS IAE",
@@ -633,7 +633,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     approval_manually_delivered_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="PASS IAE délivré manuellement par",
-        on_delete=models.SET_NULL,
+        on_delete=models.RESTRICT,  # For traceability and accountability
         null=True,
         blank=True,
         related_name="approval_manually_delivered",
@@ -641,7 +641,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     approval_manually_refused_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="PASS IAE refusé manuellement par",
-        on_delete=models.SET_NULL,
+        on_delete=models.RESTRICT,  # For traceability and accountability
         null=True,
         blank=True,
         related_name="approval_manually_refused",
@@ -654,14 +654,18 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     transferred_at = models.DateTimeField(verbose_name="date de transfert", null=True, blank=True)
     transferred_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, verbose_name="transférée par", null=True, blank=True, on_delete=models.SET_NULL
+        settings.AUTH_USER_MODEL,
+        verbose_name="transférée par",
+        null=True,
+        blank=True,
+        on_delete=models.RESTRICT,  # For traceability and accountability
     )
     transferred_from = models.ForeignKey(
         "companies.Company",
         verbose_name="entreprise d'origine",
         null=True,
         blank=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.RESTRICT,  # For traceability and accountability
         related_name="job_application_transferred",
     )
 
@@ -978,10 +982,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         )
         if is_eligibility_diagnosis_made_by_siae:
             self.eligibility_diagnosis = None
-
-        # As 1:N or 1:1 objects must have a pk before being saved,
-        # eligibility diagnosis must be deleted after saving current object.
-        if is_eligibility_diagnosis_made_by_siae:
+            self.save(update_fields={"eligibility_diagnosis"})
             eligibility_diagnosis.delete()
 
         notification_context = {
@@ -1303,7 +1304,12 @@ class JobApplicationTransitionLog(xwf_models.BaseTransitionLog):
         ("target_company", "target_company", None),  # used in external transfer and transfer
     )
     job_application = models.ForeignKey(JobApplication, related_name="logs", on_delete=models.CASCADE)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        blank=True,
+        null=True,
+        on_delete=models.RESTRICT,  # For traceability and accountability
+    )
     target_company = models.ForeignKey(
         "companies.Company",
         verbose_name="entreprise destinataire",

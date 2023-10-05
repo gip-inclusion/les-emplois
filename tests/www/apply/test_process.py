@@ -1921,8 +1921,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         assertNotContains(response, "Préciser le nom du poste (code ROME)")
 
     def test_no_job_description_for_job_application(self):
-        job_descriptions = self.company.jobs.all()
-        job_descriptions.delete()
+        self.company.jobs.clear()
         job_application = self.create_job_application()
         employer = self.company.members.first()
         self.client.force_login(employer)
@@ -1985,26 +1984,25 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
             response.context["form_user_address"], "address_for_autocomplete", "Ce champ est obligatoire."
         )
 
-    def test_no_diagnosis(self):
+    def test_no_diagnosis_on_job_application(self):
         diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
-        job_application = self.create_job_application()
+        job_application = self.create_job_application(with_iae_eligibility_diagnosis=False)
         self.job_seeker.eligibility_diagnoses.add(diagnosis)
         # No eligibility diagnosis -> if job_seeker has a valid eligibility diagnosis, it's OK
-        job_application.eligibility_diagnosis = None
-        job_application.save()
+        assert job_application.eligibility_diagnosis is None
 
         employer = self.company.members.first()
         self.client.force_login(employer)
         self.accept_job_application(job_application=job_application, assert_successful=True, post_data={})
 
+    def test_no_diagnosis(self):
         # if no, should not see the confirm button, nor accept posted data
-        job_application = self.create_job_application()
-        job_application.eligibility_diagnosis = None
-        job_application.save()
-        for approval in job_application.job_seeker.approvals.all():
-            approval.delete()
+        job_application = self.create_job_application(with_iae_eligibility_diagnosis=False)
+        assert job_application.eligibility_diagnosis is None
         job_application.job_seeker.eligibility_diagnoses.all().delete()
 
+        employer = self.company.members.first()
+        self.client.force_login(employer)
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url_accept, follow=True)
         self.assertRedirects(

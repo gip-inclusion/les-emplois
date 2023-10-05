@@ -175,7 +175,7 @@ class AddressMixin(models.Model):
         null=True,
     )
 
-    insee_city = models.ForeignKey("cities.City", null=True, blank=True, on_delete=models.SET_NULL)
+    insee_city = models.ForeignKey("cities.City", null=True, blank=True, on_delete=models.RESTRICT)
 
     class Meta:
         abstract = True

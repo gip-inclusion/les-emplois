@@ -58,7 +58,7 @@ class ImplementationAssessment(models.Model):
         related_name="submitted_geiq_assessment_set",
         null=True,
         blank=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.RESTRICT,  # For traceability and accountability
     )
 
     reviewed_at = models.DateTimeField("date de contrôle", blank=True, null=True)
@@ -74,7 +74,7 @@ class ImplementationAssessment(models.Model):
         related_name="reviewed_geiq_assessment_set",
         null=True,
         blank=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.RESTRICT,  # For traceability and accountability
     )
     review_institution = models.ForeignKey(
         Institution,

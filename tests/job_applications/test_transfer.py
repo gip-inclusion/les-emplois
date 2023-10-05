@@ -176,6 +176,7 @@ def test_model_fields():
     ContentType.objects.get_for_model(target_company)
     with assertNumQueries(
         2  # Check user is in both origin and dest siae
+        + 1  # Update job application to dereference eligibility diagnosis
         + 4  # Delete (+ SET_NULL) diagnosis and criteria made by the SIAE
         + 1  # Select user for email
         + 1  # Select employer notification settings
