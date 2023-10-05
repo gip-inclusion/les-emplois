@@ -3,6 +3,7 @@ import datetime
 import httpx
 import pytest
 import respx
+from django.contrib import auth
 from django.core.exceptions import ValidationError
 from django.test import override_settings
 from django.urls import reverse
@@ -304,3 +305,27 @@ class FranceConnectTest(TestCase):
             "post_logout_redirect_uri=http%3A%2F%2Flocalhost:8000%2Fsearch%2Femployers"
         )
         self.assertRedirects(response, expected_url, fetch_redirect_response=False)
+
+    @respx.mock
+    def test_django_account_logout_from_fc(self):
+        """
+        When ac IC user wants to log out from his local account,
+        he should be logged out too from IC.
+        """
+        response = mock_oauth_dance(self.client)
+        assert auth.get_user(self.client).is_authenticated
+        # Follow the redirection.
+        response = self.client.get(response.url)
+        logout_url = reverse("account_logout")
+        self.assertContains(response, logout_url)
+        assert self.client.session.get(constants.FRANCE_CONNECT_SESSION_TOKEN)
+
+        response = self.client.post(logout_url)
+        expected_redirection = reverse("france_connect:logout")
+        # For simplicity, exclude GET params. They are tested elsewhere anyway..
+        assert response.url.startswith(expected_redirection)
+
+        response = self.client.get(response.url)
+        # The following redirection is tested in self.test_logout_with_redirection
+        assert response.status_code == 302
+        assert not auth.get_user(self.client).is_authenticated
