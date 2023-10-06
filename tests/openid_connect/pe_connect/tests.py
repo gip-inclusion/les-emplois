@@ -240,6 +240,7 @@ class TestPoleEmploiConnect:
         response = client.get(url, data={"code": "123", "state": "000"})
         assert response.status_code == 302
 
+    @pytest.mark.django_db(transaction=True)
     @respx.mock
     def test_callback(self, client):
         response = mock_oauth_dance(client)
