@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+
+import os
+import shlex
+import subprocess
+
+import boto3
+
+
+def main():
+    output = subprocess.run([os.environ["CLEVER_CLI"], "env"], check=True, capture_output=True, text=True)
+    envlines = shlex.split(
+        "\n".join(
+            (line for line in output.stdout.splitlines() if not line.startswith("#")),
+        )
+    )
+
+    cred_keys = ["CELLAR_ADDON_HOST", "CELLAR_ADDON_KEY_ID", "CELLAR_ADDON_KEY_SECRET", "S3_STORAGE_BUCKET_NAME"]
+    verif_key = "ITOU_ENVIRONMENT"
+    keys_to_find = set(cred_keys)
+    keys_to_find.add(verif_key)
+    creds = {}
+    for envline in envlines:
+        key, value = envline.split("=", maxsplit=1)
+        if key in cred_keys:
+            creds[key] = value
+            keys_to_find.remove(key)
+        if key == verif_key:
+            assert value == "REVIEW-APP"
+            keys_to_find.remove(key)
+    assert keys_to_find == set(), keys_to_find
+
+    session = boto3.session.Session()
+    s3_client = session.client(
+        service_name="s3",
+        aws_access_key_id=creds["CELLAR_ADDON_KEY_ID"],
+        aws_secret_access_key=creds["CELLAR_ADDON_KEY_SECRET"],
+        endpoint_url=f"https://{creds['CELLAR_ADDON_HOST']}",
+    )
+    bucket_name = creds["S3_STORAGE_BUCKET_NAME"]
+    paginator = s3_client.get_paginator("list_objects_v2")
+    try:
+        for page in paginator.paginate(Bucket=bucket_name):
+            s3_client.delete_objects(
+                Bucket=bucket_name,
+                Delete={"Objects": [{"Key": obj["Key"]} for obj in page["Contents"]]},
+            )
+        s3_client.delete_bucket(Bucket=bucket_name)
+    except s3_client.exceptions.NoSuchBucket:
+        pass
+
+
+if __name__ == "__main__":
+    main()
