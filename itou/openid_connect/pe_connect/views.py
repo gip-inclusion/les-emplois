@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
 from django.http import HttpResponseRedirect, JsonResponse
+from django.shortcuts import render
 from django.urls import reverse
 from django.utils import crypto
 from django.utils.http import urlencode
@@ -114,7 +115,13 @@ def pe_connect_callback(request):
         logger.error(error_msg)
         return _redirect_to_job_seeker_login_on_error(error_msg)
 
-    pe_user_data = PoleEmploiConnectUserData.from_user_info(user_data)
+    try:
+        pe_user_data = PoleEmploiConnectUserData.from_user_info(user_data)
+    except KeyError as e:
+        if "email" in e.args:
+            return HttpResponseRedirect(reverse("pe_connect:no_email"))
+        messages.error(request, "Une erreur technique est survenue, impossible de vous connecter avec Pôle Emploi.")
+        return HttpResponseRedirect("search:siaes_home")
 
     try:
         # At this step, we can update the user's fields in DB and create a session if required
@@ -159,6 +166,10 @@ def pe_connect_callback(request):
 
     next_url = reverse("dashboard:index")
     return HttpResponseRedirect(next_url)
+
+
+def pe_connect_no_email(request, template_name="account/peamu_no_email.html"):
+    return render(request, template_name)
 
 
 def pe_connect_logout(request):
