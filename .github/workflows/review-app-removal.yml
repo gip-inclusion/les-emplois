@@ -38,6 +38,16 @@ jobs:
         $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
         $CLEVER_CLI link $REVIEW_APP_NAME --org itou_review_apps
 
+    - name: 💂 Install Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+
+    - name: 🗑 Delete S3 bucket
+      run: |
+        pip install boto3
+        scripts/delete-bucket
+
     - name: 🗑 Delete the review app
       run: |
         $CLEVER_CLI delete --yes

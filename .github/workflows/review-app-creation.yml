@@ -65,7 +65,7 @@ jobs:
       run: |
         $CLEVER_CLI link $REVIEW_APP_NAME --org itou_review_apps
         $CLEVER_CLI env set ITOU_ENVIRONMENT "REVIEW-APP"
-        $CLEVER_CLI env set S3_STORAGE_BUCKET_NAME c1-review-apps-bucket
+        $CLEVER_CLI env set S3_STORAGE_BUCKET_NAME $REVIEW_APP_NAME
         $CLEVER_CLI env set ITOU_FQDN $DEPLOY_URL
         $CLEVER_CLI service link-addon c1-s3
         $CLEVER_CLI service link-addon c1-deployment-config
