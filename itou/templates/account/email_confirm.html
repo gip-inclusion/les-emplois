@@ -32,7 +32,7 @@
                             {# See Allauth.account.adapter.DefaultAccountAdapter.is_safe_url #}
                             {% if request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
 
-                            {% bootstrap_button "Confirmer" button_type="submit" button_class="btn btn-primary" %}
+                            <div class="form-group">{% bootstrap_button "Confirmer" button_type="submit" button_class="btn btn-primary" %}</div>
 
                         </form>
 

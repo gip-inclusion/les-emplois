@@ -24,8 +24,10 @@
 
                         {% bootstrap_form form %}
 
-                        <a class="btn btn-outline-primary" href="{{ back_url }}">Retour</a>
-                        {% bootstrap_button "Valider" button_type="submit" button_class="btn btn-primary" %}
+                        <div class="form-group">
+                            <a class="btn btn-outline-primary" href="{{ back_url }}">Retour</a>
+                            {% bootstrap_button "Valider" button_type="submit" button_class="btn btn-primary" %}
+                        </div>
 
                     </form>
                 </div>

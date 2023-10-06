@@ -7,60 +7,46 @@
 # ---
 # name: ApprovalProlongationTest.test_end_at_limits[COMPLETE_TRAINING]
   '''
-  <div class="form-group form-group-required"><label for="id_end_at">Du 23/10/2023 au</label><duet-date-picker class="" identifier="id_end_at" max="2024-10-22" min="2023-10-23" name="end_at" placeholder="Du 23/10/2023 au" required="" title="12 mois (365 jours) maximum pour chaque demande. Renouvellements possibles jusqu’à la fin de l’action de formation." value="2024-10-22"></duet-date-picker>
-      <small class="form-text text-muted">12 mois (365 jours) maximum pour chaque demande.<br/> Renouvellements possibles jusqu’à la fin de l’action de formation.</small>
-  
+  <div class="form-group form-group-required"><label class="form-label" for="id_end_at">Du 23/10/2023 au</label><duet-date-picker class="" identifier="id_end_at" max="2024-10-22" min="2023-10-23" name="end_at" placeholder="Du 23/10/2023 au" required="" value="2024-10-22"></duet-date-picker><div class="form-text">12 mois (365 jours) maximum pour chaque demande.<br/> Renouvellements possibles jusqu’à la fin de l’action de formation.</div>
   </div>
   '''
 # ---
 # name: ApprovalProlongationTest.test_end_at_limits[PARTICULAR_DIFFICULTIES]
   '''
-  <div class="form-group form-group-required"><label for="id_end_at">Du 23/10/2023 au</label><duet-date-picker class="" identifier="id_end_at" max="2024-10-22" min="2023-10-23" name="end_at" placeholder="Du 23/10/2023 au" required="" title="12 mois (365 jours) maximum pour chaque demande. Renouvellements possibles dans la limite de 5 ans de parcours IAE (2 ans de parcours initial + 3 ans (1095 jours))." value="2024-10-22"></duet-date-picker>
-      <small class="form-text text-muted">12 mois (365 jours) maximum pour chaque demande.<br/> Renouvellements possibles dans la limite de 5 ans de parcours IAE (2 ans de parcours initial + 3 ans (1095 jours)).</small>
-  
+  <div class="form-group form-group-required"><label class="form-label" for="id_end_at">Du 23/10/2023 au</label><duet-date-picker class="" identifier="id_end_at" max="2024-10-22" min="2023-10-23" name="end_at" placeholder="Du 23/10/2023 au" required="" value="2024-10-22"></duet-date-picker><div class="form-text">12 mois (365 jours) maximum pour chaque demande.<br/> Renouvellements possibles dans la limite de 5 ans de parcours IAE (2 ans de parcours initial + 3 ans (1095 jours)).</div>
   </div>
   '''
 # ---
 # name: ApprovalProlongationTest.test_end_at_limits[RQTH]
   '''
-  <div class="form-group form-group-required"><label for="id_end_at">Du 23/10/2023 au</label><duet-date-picker class="" identifier="id_end_at" max="2024-10-22" min="2023-10-23" name="end_at" placeholder="Du 23/10/2023 au" required="" title="12 mois (365 jours) maximum pour chaque demande. Renouvellements possibles dans la limite de 5 ans de parcours IAE (2 ans de parcours initial + 3 ans (1095 jours))." value="2024-10-22"></duet-date-picker>
-      <small class="form-text text-muted">12 mois (365 jours) maximum pour chaque demande.<br/> Renouvellements possibles dans la limite de 5 ans de parcours IAE (2 ans de parcours initial + 3 ans (1095 jours)).</small>
-  
+  <div class="form-group form-group-required"><label class="form-label" for="id_end_at">Du 23/10/2023 au</label><duet-date-picker class="" identifier="id_end_at" max="2024-10-22" min="2023-10-23" name="end_at" placeholder="Du 23/10/2023 au" required="" value="2024-10-22"></duet-date-picker><div class="form-text">12 mois (365 jours) maximum pour chaque demande.<br/> Renouvellements possibles dans la limite de 5 ans de parcours IAE (2 ans de parcours initial + 3 ans (1095 jours)).</div>
   </div>
   '''
 # ---
 # name: ApprovalProlongationTest.test_end_at_limits[SENIOR]
   '''
-  <div class="form-group form-group-required"><label for="id_end_at">Du 23/10/2023 au</label><duet-date-picker class="" identifier="id_end_at" max="2024-10-22" min="2023-10-23" name="end_at" placeholder="Du 23/10/2023 au" required="" title="12 mois (365 jours) maximum pour chaque demande. Renouvellements possibles dans la limite de 7 ans de parcours IAE (2 ans de parcours initial + 5 ans (1825 jours))." value="2024-10-22"></duet-date-picker>
-      <small class="form-text text-muted">12 mois (365 jours) maximum pour chaque demande.<br/> Renouvellements possibles dans la limite de 7 ans de parcours IAE (2 ans de parcours initial + 5 ans (1825 jours)).</small>
-  
+  <div class="form-group form-group-required"><label class="form-label" for="id_end_at">Du 23/10/2023 au</label><duet-date-picker class="" identifier="id_end_at" max="2024-10-22" min="2023-10-23" name="end_at" placeholder="Du 23/10/2023 au" required="" value="2024-10-22"></duet-date-picker><div class="form-text">12 mois (365 jours) maximum pour chaque demande.<br/> Renouvellements possibles dans la limite de 7 ans de parcours IAE (2 ans de parcours initial + 5 ans (1825 jours)).</div>
   </div>
   '''
 # ---
 # name: ApprovalProlongationTest.test_end_at_limits[SENIOR_CDI]
   '''
-  <div class="form-group form-group-required"><label for="id_end_at">Du 23/10/2023 au</label><duet-date-picker class="" identifier="id_end_at" max="2033-10-20" min="2023-10-23" name="end_at" placeholder="Du 23/10/2023 au" required="" title="Pour le CDI Inclusion, jusqu’à la retraite (pour des raisons techniques, une durée de 10 ans (3650 jours) est appliquée par défaut)." value="2033-10-20"></duet-date-picker>
-      <small class="form-text text-muted">Pour le CDI Inclusion, jusqu’à la retraite (pour des raisons techniques, une durée de 10 ans (3650 jours) est appliquée par défaut).</small>
-  
+  <div class="form-group form-group-required"><label class="form-label" for="id_end_at">Du 23/10/2023 au</label><duet-date-picker class="" identifier="id_end_at" max="2033-10-20" min="2023-10-23" name="end_at" placeholder="Du 23/10/2023 au" required="" value="2033-10-20"></duet-date-picker><div class="form-text">Pour le CDI Inclusion, jusqu’à la retraite (pour des raisons techniques, une durée de 10 ans (3650 jours) est appliquée par défaut).</div>
   </div>
   '''
 # ---
 # name: ApprovalProlongationTest.test_prolong_approval_view_no_end_at
   '''
-  <div class="form-group is-invalid form-group-required"><label for="id_end_at">Du 23/10/2023 au</label><duet-date-picker class="is-invalid" identifier="id_end_at" max="2024-10-22" min="2023-10-23" name="end_at" placeholder="Du 23/10/2023 au" required="" title="12 mois (365 jours) maximum pour chaque demande. Renouvellements possibles dans la limite de 7 ans de parcours IAE (2 ans de parcours initial + 5 ans (1825 jours))."></duet-date-picker>
+  <div class="form-group is-invalid form-group-required"><label class="form-label" for="id_end_at">Du 23/10/2023 au</label><duet-date-picker class="is-invalid" identifier="id_end_at" max="2024-10-22" min="2023-10-23" name="end_at" placeholder="Du 23/10/2023 au" required=""></duet-date-picker>
       <div class="invalid-feedback">Ce champ est obligatoire.</div>
   
-  
-      <small class="form-text text-muted">12 mois (365 jours) maximum pour chaque demande.<br/> Renouvellements possibles dans la limite de 7 ans de parcours IAE (2 ans de parcours initial + 5 ans (1825 jours)).</small>
-  
+  <div class="form-text">12 mois (365 jours) maximum pour chaque demande.<br/> Renouvellements possibles dans la limite de 7 ans de parcours IAE (2 ans de parcours initial + 5 ans (1825 jours)).</div>
   </div>
   '''
 # ---
 # name: ApprovalProlongationTest.test_prolong_approval_view_prepopulates_SENIOR_CDI[value is set to max_end_at]
   '''
-  <div class="form-group form-group-required"><label for="id_end_at">Du 23/10/2023 au</label><duet-date-picker class="" identifier="id_end_at" max="2033-10-20" min="2023-10-23" name="end_at" placeholder="Du 23/10/2023 au" required="" title="Pour le CDI Inclusion, jusqu’à la retraite (pour des raisons techniques, une durée de 10 ans (3650 jours) est appliquée par défaut)." value="2033-10-20"></duet-date-picker>
-      <small class="form-text text-muted">Pour le CDI Inclusion, jusqu’à la retraite (pour des raisons techniques, une durée de 10 ans (3650 jours) est appliquée par défaut).</small>
-  
+  <div class="form-group form-group-required"><label class="form-label" for="id_end_at">Du 23/10/2023 au</label><duet-date-picker class="" identifier="id_end_at" max="2033-10-20" min="2023-10-23" name="end_at" placeholder="Du 23/10/2023 au" required="" value="2033-10-20"></duet-date-picker><div class="form-text">Pour le CDI Inclusion, jusqu’à la retraite (pour des raisons techniques, une durée de 10 ans (3650 jours) est appliquée par défaut).</div>
   </div>
   '''
 # ---

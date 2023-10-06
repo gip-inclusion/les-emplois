@@ -48,8 +48,10 @@
                     <form method="post" class="js-prevent-multiple-submit">
                         {% csrf_token %}
                         <input type="hidden" name="confirm" value="true">
-                        <a class="btn btn-outline-primary" href="{% url "employee_record_views:list" %}?status={{ employee_record.status }}">Retour à la liste</a>
-                        {% bootstrap_button "Confirmer la réactivation" button_type="submit" button_class="btn btn-danger" %}
+                        <div class="form-group">
+                            <a class="btn btn-outline-primary" href="{% url "employee_record_views:list" %}?status={{ employee_record.status }}">Retour à la liste</a>
+                            {% bootstrap_button "Confirmer la réactivation" button_type="submit" button_class="btn btn-danger" %}
+                        </div>
                     </form>
                 </div>
             </div>

@@ -35,8 +35,10 @@
 
                         <input type="hidden" name="confirm" value="true">
 
-                        <a class="btn btn-outline-primary" href="{{ back_url }}">Retour</a>
-                        {% bootstrap_button "Confirmer l'annulation de la suspension" button_type="submit" button_class="btn btn-danger" %}
+                        <div class="form-group">
+                            <a class="btn btn-outline-primary" href="{{ back_url }}">Retour</a>
+                            {% bootstrap_button "Confirmer l'annulation de la suspension" button_type="submit" button_class="btn btn-danger" %}
+                        </div>
 
                     </form>
                 </div>

@@ -51,10 +51,12 @@
                                 {% bootstrap_field form.reason_explanation %}
 
                                 <hr class="my-4">
-                                <a class="btn btn-outline-primary" href="{{ back_url }}" aria-label="Retour à l'étape précédente">Retour</a>
-                                {# Enable preview mode: preview=1. #}
-                                {# FIXME find how to put back aria-label="Valider la suspension du PASS IAE de {{ approval.user.get_full_name }}" #}
-                                {% bootstrap_button "Valider la suspension" button_type="submit" button_class="btn btn-primary" name="preview" value="1" %}
+                                <div class="form-group">
+                                    <a class="btn btn-outline-primary" href="{{ back_url }}" aria-label="Retour à l'étape précédente">Retour</a>
+                                    {# Enable preview mode: preview=1. #}
+                                    {# FIXME find how to put back aria-label="Valider la suspension du PASS IAE de {{ approval.user.get_full_name }}" #}
+                                    {% bootstrap_button "Valider la suspension" button_type="submit" button_class="btn btn-primary" name="preview" value="1" %}
+                                </div>
 
                             </form>
                         </div>

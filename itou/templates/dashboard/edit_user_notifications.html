@@ -22,8 +22,10 @@
                             {% bootstrap_form_errors new_job_app_notification_form type="all" %}
                             {% bootstrap_form new_job_app_notification_form field_class="form-check form-switch" show_label=False %}
 
-                            <a class="btn btn-outline-primary" href="{{ back_url }}">Annuler</a>
-                            {% bootstrap_button "Enregistrer" button_type="submit" button_class="btn btn-primary" %}
+                            <div class="form-group">
+                                <a class="btn btn-outline-primary" href="{{ back_url }}">Annuler</a>
+                                {% bootstrap_button "Enregistrer" button_type="submit" button_class="btn btn-primary" %}
+                            </div>
 
                         </form>
                     </div>

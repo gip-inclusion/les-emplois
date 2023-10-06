@@ -18,7 +18,9 @@
                             {% include "signup/includes/user_kind_radio.html" with kind="prescriber" label="Prescripteur / Orienteur" description="Vous accompagnez des candidats dans leur recherche d’emploi inclusif" only %}
                             {% include "signup/includes/user_kind_radio.html" with kind="employer" label="Employeur solidaire" description="Vous travaillez dans une structure inclusive qui recrute et accompagne des candidats (SIAE, GEIQ, EA, EATT, OPCS)" only %}
 
-                            <div class="text-end">{% bootstrap_button "Suivant" button_type="submit" button_class="btn btn-primary" %}</div>
+                            <div class="form-group text-end">
+                                {% bootstrap_button "Suivant" button_type="submit" button_class="btn btn-primary" %}
+                            </div>
                         </form>
                     </div>
 

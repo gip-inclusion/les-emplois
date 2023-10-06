@@ -29,8 +29,10 @@
 
                         {% bootstrap_form form alert_error_type="all" %}
 
-                        <a class="btn btn-outline-primary" href="{% url 'dashboard:index' %}">Annuler</a>
-                        {% bootstrap_button "Enregistrer" button_type="submit" button_class="btn btn-primary" %}
+                        <div class="form-group">
+                            <a class="btn btn-outline-primary" href="{% url 'dashboard:index' %}">Annuler</a>
+                            {% bootstrap_button "Enregistrer" button_type="submit" button_class="btn btn-primary" %}
+                        </div>
 
                     </form>
                 </div>
