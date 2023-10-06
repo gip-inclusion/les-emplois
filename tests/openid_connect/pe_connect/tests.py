@@ -25,6 +25,8 @@ from tests.users.factories import JobSeekerFactory, UserFactory
 from tests.utils.test import reload_module
 
 
+pytestmark = pytest.mark.ignore_template_errors
+
 PEAMU_USERINFO = {
     "given_name": "Angela Claire Louise",
     "family_name": "DUBOIS",
@@ -36,14 +38,18 @@ PEAMU_USERINFO = {
 
 # Make sure this decorator is before test definition, not here.
 # @respx.mock
-def mock_oauth_dance(client, expected_route="dashboard:index"):
+def mock_oauth_dance(
+    client,
+    expected_route="dashboard:index",
+    user_info=None,
+):
     # No session is created with PEAMU in contrary to Inclusion Connect
     # so there's no use to go through pe_connect:authorize
 
     token_json = {"access_token": "7890123", "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
     respx.post(constants.PE_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
 
-    user_info = PEAMU_USERINFO.copy()
+    user_info = user_info or PEAMU_USERINFO
     respx.get(constants.PE_CONNECT_ENDPOINT_USERINFO).mock(return_value=httpx.Response(200, json=user_info))
 
     fake_api_data = {
@@ -256,6 +262,13 @@ class TestPoleEmploiConnect:
         response = mock_oauth_dance(client)
         assert user.externaldataimport_set.pe_sources().count() == 1
         assert user.birthdate == datetime.date(2001, 1, 1)
+
+    @respx.mock
+    def test_callback_no_email(self, client):
+        user_info = PEAMU_USERINFO.copy()
+        del user_info["email"]
+        mock_oauth_dance(client, user_info=user_info, expected_route="pe_connect:no_email")
+        assert not User.objects.exists()
 
     @respx.mock
     def test_callback_with_nir(self, client):
