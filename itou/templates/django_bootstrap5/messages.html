@@ -1,9 +1,11 @@
 {% load i18n django_bootstrap5 %}
 {% for message in messages %}
     {% if "toast" not in message.tags %}
-        <div class="{{ message|bootstrap_message_alert_type }} alert-dismissible fade show" role="alert">
+        <div class="alert alert-{{ message|bootstrap_message_alert_type }} alert-dismissible fade show" role="alert">
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{% trans 'close' %}"></button>
-            {{ message }}
+            <p class="mb-0">
+                {{ message }}
+            </p>
         </div>
     {% endif %}
 {% endfor %}

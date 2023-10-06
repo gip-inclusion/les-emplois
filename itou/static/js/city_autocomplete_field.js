@@ -13,22 +13,20 @@ htmx.onLoad((target) => {
       select: (event, ui) => {
         citySearchInput.val(ui.item.value)
         hiddenSlugInput.val(ui.item.slug)
-        searchButton.prop("disabled", false)
+        searchButton.prop('disabled', false)
         if (event.keyCode === 13) {
           citySearchInput.parents('form:first').submit()
         }
       },
       search: (event, ui) => {
-        loading.toggleClass("d-none");
-        noLoading.toggleClass("d-none");
+        loading.removeClass('d-none').addClass('d-block')
+        noLoading.removeClass('d-block').addClass('d-none')
       },
       response: (event, ui) => {
-        loading.toggleClass("d-none");
-        noLoading.toggleClass("d-none");
+        loading.removeClass('d-block').addClass('d-none')
+        noLoading.removeClass('d-none').addClass('d-block')
       }
-
     }).keydown(e => {
-      searchButton.prop("disabled", true)
+      searchButton.prop('"disabled', true)
     })
-
 });
