@@ -32,8 +32,10 @@
                                 {% bootstrap_form_errors form type="all" %}
                                 {% bootstrap_field form.confirm_authorization show_label=False %}
 
-                                <a class="btn btn-outline-secondary" href="{{ prev_url }}">Retour</a>
-                                {% bootstrap_button "Continuer" button_type="submit" button_class="btn btn-primary" %}
+                                <div class="form-group">
+                                    <a class="btn btn-outline-secondary" href="{{ prev_url }}">Retour</a>
+                                    {% bootstrap_button "Continuer" button_type="submit" button_class="btn btn-primary" %}
+                                </div>
 
                             </form>
                         </div>

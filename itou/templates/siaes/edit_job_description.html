@@ -15,7 +15,7 @@
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12 col-lg-8">
-                    <div class="c-stepper my-3 my-lg-6">
+                    <div class="c-stepper mb-3 mb-lg-5">
                         <div class="progress progress--emploi">
                             <div class="progress-bar progress-bar-33" role="progressbar" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100">
                             </div>
@@ -60,7 +60,7 @@
                             {% bootstrap_field form.hours_per_week %}
                             {% bootstrap_field form.open_positions %}
 
-                            <div class="pt-3 text-end">
+                            <div class="form-group pt-3 text-end">
                                 <a class="btn btn-outline-primary" href="{% url "siaes_views:job_description_list" %}" aria-label="Retour à la liste des métiers">Retour</a>
                                 {# FIXME Find how to put back aria-label="Passer à l'étape suivante" #}
                                 {% bootstrap_button "Suivant" button_type="submit" button_class="btn btn-primary" %}

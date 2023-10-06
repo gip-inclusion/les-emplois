@@ -3,9 +3,7 @@
     {% if "toast" not in message.tags %}
         <div class="alert alert-{{ message|bootstrap_message_alert_type }} alert-dismissible fade show" role="alert">
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{% trans 'close' %}"></button>
-            <p class="mb-0">
-                {{ message }}
-            </p>
+            {{ message }}
         </div>
     {% endif %}
 {% endfor %}

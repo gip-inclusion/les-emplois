@@ -47,9 +47,10 @@
                             <p>
                                 En cliquant sur le bouton "Enregistrer", vous acceptez que vos informations et coordonnées ci-dessus soient rendues publiques.
                             </p>
-
-                            <a class="btn btn-outline-primary" href="{% url 'dashboard:index' %}">Annuler</a>
-                            {% bootstrap_button "Enregistrer" button_type="submit" button_class="btn btn-primary" %}
+                            <div class="form-group">
+                                <a class="btn btn-outline-primary" href="{% url 'dashboard:index' %}">Annuler</a>
+                                {% bootstrap_button "Enregistrer" button_type="submit" button_class="btn btn-primary" %}
+                            </div>
                         </form>
                     </div>
                 </div>

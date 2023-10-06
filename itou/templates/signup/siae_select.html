@@ -21,7 +21,9 @@
 
                         {% bootstrap_form siren_form alert_error_type="all" %}
 
-                        <div class="text-end">{% bootstrap_button "Rechercher" button_type="submit" button_class="btn btn-primary" %}</div>
+                        <div class="form-group text-end">
+                            {% bootstrap_button "Rechercher" button_type="submit" button_class="btn btn-primary" %}
+                        </div>
 
                     </form>
 
@@ -110,7 +112,7 @@
                                     <br>
                                     - Pour les GEIQ, il s’agit du correspondant enregistré dans la liste des GEIQ transmises par la FFGEIQ.
                                 </p>
-                                <div class="text-end">
+                                <div class="form-group text-end">
                                     {% bootstrap_button "Envoyer ma demande de validation" button_type="submit" button_class="btn btn-primary" %}
                                 </div>
                             </form>

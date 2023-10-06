@@ -11,18 +11,18 @@
                               </div>
                           </div>
                           <p>
-                              
+
                                   <strong>Étape 1</strong> : Motif du refus
-                              
+
                           </p>
                       </div>
                       <div class="c-form mb-3 mb-lg-5">
                           <h2 class="h4">Réponse envoyée à l'employeur et au candidat</h2>
-                          
+
                               <form method="post">
                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                   <input id="id_prolongation_request_deny_view-current_step" name="prolongation_request_deny_view-current_step" type="hidden" value="reason"/>
-  
+
                                   <div class="form-group form-group-required"><label>Pour quel motif refusez-vous la prolongation du parcours IAE de John DOE ?</label><div class="radio radio-success" id="id_reason-reason"><div class="form-check">
   <label class="form-check-label" for="id_reason-reason_0"><input class="form-check-input" id="id_reason-reason_0" name="reason-reason" required="" title="" type="radio" value="IAE"/>
    L’IAE ne correspond plus aux besoins / à la situation de la personne.</label>
@@ -34,8 +34,8 @@
    La durée de prolongation demandée n’est pas adaptée à la situation du candidat.</label>
   </div>
   </div></div>
-  
-                                  
+
+
                                       <div class="c-info mb-4">
                                           <button aria-controls="legalInformation" aria-expanded="false" class="c-info__summary collapsed" data-target="#legalInformation" data-toggle="collapse" type="button">
                                               <span>Contexte légal</span>
@@ -50,20 +50,20 @@
                                               </a>
                                           </div>
                                       </div>
-                                  
-  
+
+
                                   <hr/>
                                   <p class="fs-xs">* champ obligatoire</p>
                                   <div class="form-group">
                                       <div class="text-right">
-                                          
+
                                               <a class="btn btn-link btn-outline-primary" href="/approvals/prolongation/request/666">Annuler</a>
-                                          
+
                                           <button class="btn btn-primary">Suivant</button>
                                       </div>
                                   </div>
                               </form>
-                          
+
                       </div>
                   </div>
               </div>
@@ -83,18 +83,18 @@
                               </div>
                           </div>
                           <p>
-                              
+
                                   <strong>Étape 1</strong> : Motif du refus
-                              
+
                           </p>
                       </div>
                       <div class="c-form mb-3 mb-lg-5">
                           <h2 class="h4">Réponse envoyée à l'employeur et au candidat</h2>
-                          
+
                               <form method="post">
                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                   <input id="id_prolongation_request_deny_view-current_step" name="prolongation_request_deny_view-current_step" type="hidden" value="reason"/>
-  
+
                                   <div class="form-group form-group-required"><label>Pour quel motif refusez-vous la prolongation du parcours IAE de John DOE ?</label><div class="radio radio-success" id="id_reason-reason"><div class="form-check">
   <label class="form-check-label" for="id_reason-reason_0"><input class="form-check-input" id="id_reason-reason_0" name="reason-reason" required="" title="" type="radio" value="IAE"/>
    L’IAE ne correspond plus aux besoins / à la situation de la personne.</label>
@@ -106,8 +106,8 @@
    La durée de prolongation demandée n’est pas adaptée à la situation du candidat.</label>
   </div>
   </div></div>
-  
-                                  
+
+
                                       <div class="c-info mb-4">
                                           <button aria-controls="legalInformation" aria-expanded="false" class="c-info__summary collapsed" data-target="#legalInformation" data-toggle="collapse" type="button">
                                               <span>Contexte légal</span>
@@ -122,20 +122,20 @@
                                               </a>
                                           </div>
                                       </div>
-                                  
-  
+
+
                                   <hr/>
                                   <p class="fs-xs">* champ obligatoire</p>
                                   <div class="form-group">
                                       <div class="text-right">
-                                          
+
                                               <a class="btn btn-link btn-outline-primary" href="/approvals/prolongation/request/666">Annuler</a>
-                                          
+
                                           <button class="btn btn-primary">Suivant</button>
                                       </div>
                                   </div>
                               </form>
-                          
+
                       </div>
                   </div>
               </div>
@@ -149,9 +149,9 @@
                       <div class="s-title-01__container container">
                           <div class="s-title-01__row row">
                               <div class="s-title-01__col col-12">
-                                  
+
       <h1>Refuser la demande de prolongation pour John DOE</h1>
-  
+
                               </div>
                           </div>
                       </div>
@@ -170,18 +170,18 @@
                               </div>
                           </div>
                           <p>
-                              
+
                                   <strong>Étape 1</strong> : Motif du refus
-                              
+
                           </p>
                       </div>
                       <div class="c-form mb-3 mb-lg-5">
                           <h2 class="h4">Réponse envoyée à l'employeur et au candidat</h2>
-                          
+
                               <form method="post">
                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                   <input id="id_prolongation_request_deny_view-current_step" name="prolongation_request_deny_view-current_step" type="hidden" value="reason"/>
-  
+
                                   <div class="form-group form-group-required"><label>Pour quel motif refusez-vous la prolongation du parcours IAE de John DOE ?</label><div class="radio radio-success" id="id_reason-reason"><div class="form-check">
   <label class="form-check-label" for="id_reason-reason_0"><input checked="" class="form-check-input" id="id_reason-reason_0" name="reason-reason" required="" title="" type="radio" value="IAE"/>
    L’IAE ne correspond plus aux besoins / à la situation de la personne.</label>
@@ -193,8 +193,8 @@
    La durée de prolongation demandée n’est pas adaptée à la situation du candidat.</label>
   </div>
   </div></div>
-  
-                                  
+
+
                                       <div class="c-info mb-4">
                                           <button aria-controls="legalInformation" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#legalInformation" data-bs-toggle="collapse" type="button">
                                               <span>Contexte légal</span>
@@ -209,20 +209,18 @@
                                               </a>
                                           </div>
                                       </div>
-                                  
-  
+
+
                                   <hr/>
                                   <p class="fs-xs">* champ obligatoire</p>
-                                  <div class="form-group">
-                                      <div class="text-end">
-                                          
-                                              <a class="btn btn-link btn-outline-primary" href="/approvals/prolongation/request/666">Annuler</a>
-                                          
-                                          <button class="btn btn-primary">Suivant</button>
-                                      </div>
+                                  <div class="form-group text-end">
+
+                                          <a class="btn btn-link btn-outline-primary" href="/approvals/prolongation/request/666">Annuler</a>
+
+                                      <button class="btn btn-primary" type="submit">Suivant</button>
                                   </div>
                               </form>
-                          
+
                       </div>
                   </div>
               </div>
@@ -242,18 +240,18 @@
                               </div>
                           </div>
                           <p>
-                              
+
                                   <strong>Étape 1</strong> : Motif du refus
-                              
+
                           </p>
                       </div>
                       <div class="c-form mb-3 mb-lg-5">
                           <h2 class="h4">Réponse envoyée à l'employeur et au candidat</h2>
-                          
+
                               <form method="post">
                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                   <input id="id_prolongation_request_deny_view-current_step" name="prolongation_request_deny_view-current_step" type="hidden" value="reason"/>
-  
+
                                   <div class="form-group form-group-required"><label>Pour quel motif refusez-vous la prolongation du parcours IAE de John DOE ?</label><div class="radio radio-success" id="id_reason-reason"><div class="form-check">
   <label class="form-check-label" for="id_reason-reason_0"><input class="form-check-input" id="id_reason-reason_0" name="reason-reason" required="" title="" type="radio" value="IAE"/>
    L’IAE ne correspond plus aux besoins / à la situation de la personne.</label>
@@ -265,8 +263,8 @@
    La durée de prolongation demandée n’est pas adaptée à la situation du candidat.</label>
   </div>
   </div></div>
-  
-                                  
+
+
                                       <div class="c-info mb-4">
                                           <button aria-controls="legalInformation" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#legalInformation" data-bs-toggle="collapse" type="button">
                                               <span>Contexte légal</span>
@@ -281,20 +279,18 @@
                                               </a>
                                           </div>
                                       </div>
-                                  
-  
+
+
                                   <hr/>
                                   <p class="fs-xs">* champ obligatoire</p>
-                                  <div class="form-group">
-                                      <div class="text-end">
-                                          
-                                              <a class="btn btn-link btn-outline-primary" href="/approvals/prolongation/request/666">Annuler</a>
-                                          
-                                          <button class="btn btn-primary">Suivant</button>
-                                      </div>
+                                  <div class="form-group text-end">
+
+                                          <a class="btn btn-link btn-outline-primary" href="/approvals/prolongation/request/666">Annuler</a>
+
+                                      <button class="btn btn-primary" type="submit">Suivant</button>
                                   </div>
                               </form>
-                          
+
                       </div>
                   </div>
               </div>
@@ -314,18 +310,18 @@
                               </div>
                           </div>
                           <p>
-                              
+
                                   <strong>Étape 1</strong> : Motif du refus
-                              
+
                           </p>
                       </div>
                       <div class="c-form mb-3 mb-lg-5">
                           <h2 class="h4">Réponse envoyée à l'employeur et au candidat</h2>
-                          
+
                               <form method="post">
                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                   <input id="id_prolongation_request_deny_view-current_step" name="prolongation_request_deny_view-current_step" type="hidden" value="reason"/>
-  
+
                                   <div class="form-group form-group-required"><label>Pour quel motif refusez-vous la prolongation du parcours IAE de John DOE ?</label><div class="radio radio-success" id="id_reason-reason"><div class="form-check">
   <label class="form-check-label" for="id_reason-reason_0"><input checked="" class="form-check-input" id="id_reason-reason_0" name="reason-reason" required="" title="" type="radio" value="IAE"/>
    L’IAE ne correspond plus aux besoins / à la situation de la personne.</label>
@@ -337,8 +333,8 @@
    La durée de prolongation demandée n’est pas adaptée à la situation du candidat.</label>
   </div>
   </div></div>
-  
-                                  
+
+
                                       <div class="c-info mb-4">
                                           <button aria-controls="legalInformation" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#legalInformation" data-bs-toggle="collapse" type="button">
                                               <span>Contexte légal</span>
@@ -353,20 +349,18 @@
                                               </a>
                                           </div>
                                       </div>
-                                  
-  
+
+
                                   <hr/>
                                   <p class="fs-xs">* champ obligatoire</p>
-                                  <div class="form-group">
-                                      <div class="text-end">
-                                          
-                                              <a class="btn btn-link btn-outline-primary" href="/approvals/prolongation/request/666">Annuler</a>
-                                          
-                                          <button class="btn btn-primary">Suivant</button>
-                                      </div>
+                                  <div class="form-group text-end">
+
+                                          <a class="btn btn-link btn-outline-primary" href="/approvals/prolongation/request/666">Annuler</a>
+
+                                      <button class="btn btn-primary" type="submit">Suivant</button>
                                   </div>
                               </form>
-                          
+
                       </div>
                   </div>
               </div>
@@ -380,9 +374,9 @@
                       <div class="s-title-01__container container">
                           <div class="s-title-01__row row">
                               <div class="s-title-01__col col-12">
-                                  
+
       <h1>Refuser la demande de prolongation pour John DOE</h1>
-  
+
                               </div>
                           </div>
                       </div>
@@ -401,18 +395,18 @@
                               </div>
                           </div>
                           <p>
-                              
+
                                   <strong>Étape 1</strong> : Motif du refus
-                              
+
                           </p>
                       </div>
                       <div class="c-form mb-3 mb-lg-5">
                           <h2 class="h4">Réponse envoyée à l'employeur et au candidat</h2>
-                          
+
                               <form method="post">
                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                   <input id="id_prolongation_request_deny_view-current_step" name="prolongation_request_deny_view-current_step" type="hidden" value="reason"/>
-  
+
                                   <div class="form-group form-group-required"><label>Pour quel motif refusez-vous la prolongation du parcours IAE de John DOE ?</label><div class="radio radio-success" id="id_reason-reason"><div class="form-check">
   <label class="form-check-label" for="id_reason-reason_0"><input class="form-check-input" id="id_reason-reason_0" name="reason-reason" required="" title="" type="radio" value="IAE"/>
    L’IAE ne correspond plus aux besoins / à la situation de la personne.</label>
@@ -424,8 +418,8 @@
    La durée de prolongation demandée n’est pas adaptée à la situation du candidat.</label>
   </div>
   </div></div>
-  
-                                  
+
+
                                       <div class="c-info mb-4">
                                           <button aria-controls="legalInformation" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#legalInformation" data-bs-toggle="collapse" type="button">
                                               <span>Contexte légal</span>
@@ -440,20 +434,18 @@
                                               </a>
                                           </div>
                                       </div>
-                                  
-  
+
+
                                   <hr/>
                                   <p class="fs-xs">* champ obligatoire</p>
-                                  <div class="form-group">
-                                      <div class="text-end">
-                                          
-                                              <a class="btn btn-link btn-outline-primary" href="/approvals/prolongation/request/666">Annuler</a>
-                                          
-                                          <button class="btn btn-primary">Suivant</button>
-                                      </div>
+                                  <div class="form-group text-end">
+
+                                          <a class="btn btn-link btn-outline-primary" href="/approvals/prolongation/request/666">Annuler</a>
+
+                                      <button class="btn btn-primary" type="submit">Suivant</button>
                                   </div>
                               </form>
-                          
+
                       </div>
                   </div>
               </div>
@@ -473,18 +465,18 @@
                               </div>
                           </div>
                           <p>
-                              
+
                                   <strong>Étape 1</strong> : Motif du refus
-                              
+
                           </p>
                       </div>
                       <div class="c-form mb-3 mb-lg-5">
                           <h2 class="h4">Réponse envoyée à l'employeur et au candidat</h2>
-                          
+
                               <form method="post">
                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                   <input id="id_prolongation_request_deny_view-current_step" name="prolongation_request_deny_view-current_step" type="hidden" value="reason"/>
-  
+
                                   <div class="form-group form-group-required"><label>Pour quel motif refusez-vous la prolongation du parcours IAE de John DOE ?</label><div class="radio radio-success" id="id_reason-reason"><div class="form-check">
   <label class="form-check-label" for="id_reason-reason_0"><input class="form-check-input" id="id_reason-reason_0" name="reason-reason" required="" title="" type="radio" value="IAE"/>
    L’IAE ne correspond plus aux besoins / à la situation de la personne.</label>
@@ -496,8 +488,8 @@
    La durée de prolongation demandée n’est pas adaptée à la situation du candidat.</label>
   </div>
   </div></div>
-  
-                                  
+
+
                                       <div class="c-info mb-4">
                                           <button aria-controls="legalInformation" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#legalInformation" data-bs-toggle="collapse" type="button">
                                               <span>Contexte légal</span>
@@ -512,20 +504,18 @@
                                               </a>
                                           </div>
                                       </div>
-                                  
-  
+
+
                                   <hr/>
                                   <p class="fs-xs">* champ obligatoire</p>
-                                  <div class="form-group">
-                                      <div class="text-end">
-                                          
-                                              <a class="btn btn-link btn-outline-primary" href="/approvals/prolongation/request/666">Annuler</a>
-                                          
-                                          <button class="btn btn-primary">Suivant</button>
-                                      </div>
+                                  <div class="form-group text-end">
+
+                                          <a class="btn btn-link btn-outline-primary" href="/approvals/prolongation/request/666">Annuler</a>
+
+                                      <button class="btn btn-primary" type="submit">Suivant</button>
                                   </div>
                               </form>
-                          
+
                       </div>
                   </div>
               </div>
@@ -539,9 +529,9 @@
                       <div class="s-title-01__container container">
                           <div class="s-title-01__row row">
                               <div class="s-title-01__col col-12">
-                                  
+
       <h1>Refuser la demande de prolongation pour John DOE</h1>
-  
+
                               </div>
                           </div>
                       </div>
@@ -561,7 +551,7 @@
                                   <label for="id_only_pending">Voir uniquement les demandes à traiter</label>
                               </form>
                           </div>
-  
+
                           <div class="table-responsive-lg mt-3 mt-md-4">
                               <table class="table">
                                   <caption class="visually-hidden">Liste des prolongations de PASS IAE</caption>
@@ -581,7 +571,7 @@
                                       </tr>
                                   </thead>
                                   <tbody>
-                                      
+
                                           <tr>
                                               <th scope="row">1</th>
                                               <td class="font-weight-bold">John DOE</td>
@@ -590,28 +580,28 @@
                                               <td>01/01/2000</td>
                                               <td>John DOE</td>
                                               <td>
-      
+
           <span class="badge badge-xs rounded-pill bg-accent-03 text-primary">À traiter</span>
-      
-  
+
+
   </td>
                                               <td>
                                                   <a class="btn btn-link btn-outline-primary btn-sm" href="/approvals/prolongation/request/666">
-                                                      
+
                                                           Traiter
-                                                      
+
                                                   </a>
                                               </td>
                                           </tr>
-                                      
+
                                   </tbody>
                               </table>
                           </div>
-  
-                          
-  
-  
-  
+
+
+
+
+
                       </div>
   '''
 # ---
@@ -631,7 +621,7 @@
                           </p>
                           <h3>Motif sélectionné par l’employeur</h3>
                           <p>50 ans et plus</p>
-                          
+
                               <h3>Bilan des actions réalisées</h3>
                               <p>
                                   Le bilan des actions réalisées et actions prévues avec le salarié, rempli par l’employeur est présent sur le document excel téléchargeable ci-dessous.
@@ -642,8 +632,8 @@
                                       <span>Télécharger le bilan</span>
                                   </a>
                               </p>
-                          
-                          
+
+
                               <h3>Explications supplémentaires</h3>
                               <p>
                                   L’employeur a fait une demande d'entretien téléphonique pour vous apporter des explications supplémentaires pour cette prolongation. Voici ses coordonnées :
@@ -655,13 +645,13 @@
       <i class="ri-file-copy-line ri-lg font-weight-normal"></i>
       <span>Copier</span>
   </button>
-  
+
                               </p>
                               <p>
                                   <i class="ri-phone-line"></i>
                                   <a class="btn-link" href="tel:+33123456789">+33123456789</a>
                               </p>
-                          
+
                       </div>
   '''
 # ---
@@ -669,7 +659,7 @@
   '''
   <div class="c-card card rounded-lg mb-3 mb-lg-5">
       <div class="card-body">
-          
+
               <div class="card-title">
                   <h4>Pas de prolongation du PASS IAE</h4>
               </div>
@@ -678,17 +668,17 @@
                       Demande refusée le 01 janvier 2000 par John DOE
                   </p>
               </div>
-          
+
       </div>
   </div>
-  
+
   '''
 # ---
 # name: test_template_status_card[GRANTED]
   '''
   <div class="c-card card rounded-lg mb-3 mb-lg-5">
       <div class="card-body">
-          
+
               <div class="card-title">
                   <h4>Prolongation du PASS IAE jusqu’au 31/01/2000</h4>
               </div>
@@ -697,23 +687,23 @@
                       Demande acceptée le 01 janvier 2000 par John DOE
                   </p>
               </div>
-          
+
       </div>
   </div>
-  
+
   '''
 # ---
 # name: test_template_status_card[PENDING]
   '''
   <div class="c-card card rounded-lg mb-3 mb-lg-5">
       <div class="card-body">
-          
+
               <div class="card-title">
                   <h4>Prolonger le PASS IAE jusqu’au 31/01/2000</h4>
               </div>
               <div class="card-text">
                   <form method="post" action="/approvals/prolongation/request/666/grant">
-                      
+
                       <button class="btn btn-primary btn-block btn-ico justify-content-center">
                           <i class="ri-check-line"></i>
                           <span>Accepter</span>
@@ -726,9 +716,9 @@
                   <p class="font-weight-bold mt-3">Précision</p>
                   <p class="mb-2">En cas de refus, vous êtes tenu de proposer une solution au candidat.</p>
               </div>
-          
+
       </div>
   </div>
-  
+
   '''
 # ---

@@ -85,7 +85,9 @@
                                         <p>{{ min }}% {{ form.chosen_percent }} {{ max }}%</p>
                                     </div>
 
-                                    {% bootstrap_button "Valider" button_type="submit" button_class="btn btn-primary float-end" %}
+                                    <div class="form-group">
+                                        {% bootstrap_button "Valider" button_type="submit" button_class="btn btn-primary float-end" %}
+                                    </div>
                                 </form>
                             {% endif %}
                         </div>

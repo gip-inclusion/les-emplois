@@ -6,14 +6,12 @@
   '''
   
   <div id="geiq_contract_type_and_options_block">
-      <div class="form-group is-invalid form-group-required"><label for="id_prehiring_guidance_days">Nombre de jours d’accompagnement avant contrat</label><input type="number" name="prehiring_guidance_days" min="0" class="form-control is-invalid" placeholder="Nombre de jours d’accompagnement avant contrat" title="Laissez &quot;0&quot; si vous n&#x27;avez pas accompagné le candidat avant son embauche" required id="id_prehiring_guidance_days">
+      <div class="form-group is-invalid form-group-required"><label class="form-label" for="id_prehiring_guidance_days">Nombre de jours d’accompagnement avant contrat</label><input type="number" name="prehiring_guidance_days" min="0" class="form-control is-invalid" placeholder="Nombre de jours d’accompagnement avant contrat" required id="id_prehiring_guidance_days">
       <div class="invalid-feedback">Ce champ est obligatoire.</div>
   
-  
-      <small class="form-text text-muted">Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche</small>
-  
+  <div class="form-text">Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche</div>
   </div>
-      <div class="form-group form-group-required"><label for="id_contract_type">Type de contrat</label><select name="contract_type" hx-post="/apply/10/accept/reload_contract_type_and_options" hx-swap="outerHTML" hx-target="#geiq_contract_type_and_options_block" class="form-control" title="" required id="id_contract_type">
+      <div class="form-group form-group-required"><label class="form-label" for="id_contract_type">Type de contrat</label><select name="contract_type" hx-post="/apply/10/accept/reload_contract_type_and_options" hx-swap="outerHTML" hx-target="#geiq_contract_type_and_options_block" class="form-select" required id="id_contract_type">
     <option value="">---------</option>
   
     <option value="APPRENTICESHIP" selected>Contrat d&#x27;apprentissage</option>
@@ -25,13 +23,11 @@
   </select></div>
       <div class="form-group"><div class="form-check"><input type="checkbox" name="inverted_vae_contract" class="form-check-input" disabled id="id_inverted_vae_contract"><label class="form-check-label" for="id_inverted_vae_contract">Contrat associé à une VAE inversée</label></div></div>
       <div id="contractTypeDetails" class="d-none">
-          <div class="form-group"><label for="id_contract_type_details">Précisions sur le type de contrat</label><textarea name="contract_type_details" cols="40" rows="2" class="form-control" placeholder="Précisions sur le type de contrat" title="Si vous avez choisi un autre type de contrat, merci de bien vouloir fournir plus de précisions" id="id_contract_type_details">
-  </textarea>
-      <small class="form-text text-muted">Si vous avez choisi un autre type de contrat, merci de bien vouloir fournir plus de précisions</small>
-  
+          <div class="form-group"><label class="form-label" for="id_contract_type_details">Précisions sur le type de contrat</label><textarea name="contract_type_details" cols="40" rows="2" class="form-control" placeholder="Précisions sur le type de contrat" id="id_contract_type_details">
+  </textarea><div class="form-text">Si vous avez choisi un autre type de contrat, merci de bien vouloir fournir plus de précisions</div>
   </div>
       </div>
-      <div class="form-group form-group-required"><label for="id_nb_hours_per_week">Nombre d&#x27;heures par semaine</label><input type="number" name="nb_hours_per_week" min="0" class="form-control" placeholder="Nombre d&#x27;heures par semaine" title="" required id="id_nb_hours_per_week"></div>
+      <div class="form-group form-group-required"><label class="form-label" for="id_nb_hours_per_week">Nombre d&#x27;heures par semaine</label><input type="number" name="nb_hours_per_week" min="0" class="form-control" placeholder="Nombre d&#x27;heures par semaine" required id="id_nb_hours_per_week"></div>
   </div>
   
   '''
@@ -40,14 +36,12 @@
   '''
   
   <div id="geiq_contract_type_and_options_block">
-      <div class="form-group is-invalid form-group-required"><label for="id_prehiring_guidance_days">Nombre de jours d’accompagnement avant contrat</label><input type="number" name="prehiring_guidance_days" min="0" class="form-control is-invalid" placeholder="Nombre de jours d’accompagnement avant contrat" title="Laissez &quot;0&quot; si vous n&#x27;avez pas accompagné le candidat avant son embauche" required id="id_prehiring_guidance_days">
+      <div class="form-group is-invalid form-group-required"><label class="form-label" for="id_prehiring_guidance_days">Nombre de jours d’accompagnement avant contrat</label><input type="number" name="prehiring_guidance_days" min="0" class="form-control is-invalid" placeholder="Nombre de jours d’accompagnement avant contrat" required id="id_prehiring_guidance_days">
       <div class="invalid-feedback">Ce champ est obligatoire.</div>
   
-  
-      <small class="form-text text-muted">Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche</small>
-  
+  <div class="form-text">Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche</div>
   </div>
-      <div class="form-group form-group-required"><label for="id_contract_type">Type de contrat</label><select name="contract_type" hx-post="/apply/10/accept/reload_contract_type_and_options" hx-swap="outerHTML" hx-target="#geiq_contract_type_and_options_block" class="form-control" title="" required id="id_contract_type">
+      <div class="form-group form-group-required"><label class="form-label" for="id_contract_type">Type de contrat</label><select name="contract_type" hx-post="/apply/10/accept/reload_contract_type_and_options" hx-swap="outerHTML" hx-target="#geiq_contract_type_and_options_block" class="form-select" required id="id_contract_type">
     <option value="">---------</option>
   
     <option value="APPRENTICESHIP">Contrat d&#x27;apprentissage</option>
@@ -59,16 +53,14 @@
   </select></div>
       <div class="form-group"><div class="form-check"><input type="checkbox" name="inverted_vae_contract" class="form-check-input" disabled id="id_inverted_vae_contract"><label class="form-check-label" for="id_inverted_vae_contract">Contrat associé à une VAE inversée</label></div></div>
       <div id="contractTypeDetails" >
-          <div class="form-group is-invalid"><label for="id_contract_type_details">Précisions sur le type de contrat</label><textarea name="contract_type_details" cols="40" rows="2" class="form-control is-invalid" placeholder="Précisions sur le type de contrat" title="Si vous avez choisi un autre type de contrat, merci de bien vouloir fournir plus de précisions" id="id_contract_type_details">
+          <div class="form-group is-invalid"><label class="form-label" for="id_contract_type_details">Précisions sur le type de contrat</label><textarea name="contract_type_details" cols="40" rows="2" class="form-control is-invalid" placeholder="Précisions sur le type de contrat" id="id_contract_type_details">
   </textarea>
       <div class="invalid-feedback">Les précisions sont nécessaires pour ce type de contrat</div>
   
-  
-      <small class="form-text text-muted">Si vous avez choisi un autre type de contrat, merci de bien vouloir fournir plus de précisions</small>
-  
+  <div class="form-text">Si vous avez choisi un autre type de contrat, merci de bien vouloir fournir plus de précisions</div>
   </div>
       </div>
-      <div class="form-group form-group-required"><label for="id_nb_hours_per_week">Nombre d&#x27;heures par semaine</label><input type="number" name="nb_hours_per_week" min="0" class="form-control" placeholder="Nombre d&#x27;heures par semaine" title="" required id="id_nb_hours_per_week"></div>
+      <div class="form-group form-group-required"><label class="form-label" for="id_nb_hours_per_week">Nombre d&#x27;heures par semaine</label><input type="number" name="nb_hours_per_week" min="0" class="form-control" placeholder="Nombre d&#x27;heures par semaine" required id="id_nb_hours_per_week"></div>
   </div>
   
   '''
@@ -77,14 +69,12 @@
   '''
   
   <div id="geiq_contract_type_and_options_block">
-      <div class="form-group is-invalid form-group-required"><label for="id_prehiring_guidance_days">Nombre de jours d’accompagnement avant contrat</label><input type="number" name="prehiring_guidance_days" min="0" class="form-control is-invalid" placeholder="Nombre de jours d’accompagnement avant contrat" title="Laissez &quot;0&quot; si vous n&#x27;avez pas accompagné le candidat avant son embauche" required id="id_prehiring_guidance_days">
+      <div class="form-group is-invalid form-group-required"><label class="form-label" for="id_prehiring_guidance_days">Nombre de jours d’accompagnement avant contrat</label><input type="number" name="prehiring_guidance_days" min="0" class="form-control is-invalid" placeholder="Nombre de jours d’accompagnement avant contrat" required id="id_prehiring_guidance_days">
       <div class="invalid-feedback">Ce champ est obligatoire.</div>
   
-  
-      <small class="form-text text-muted">Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche</small>
-  
+  <div class="form-text">Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche</div>
   </div>
-      <div class="form-group form-group-required"><label for="id_contract_type">Type de contrat</label><select name="contract_type" hx-post="/apply/10/accept/reload_contract_type_and_options" hx-swap="outerHTML" hx-target="#geiq_contract_type_and_options_block" class="form-control" title="" required id="id_contract_type">
+      <div class="form-group form-group-required"><label class="form-label" for="id_contract_type">Type de contrat</label><select name="contract_type" hx-post="/apply/10/accept/reload_contract_type_and_options" hx-swap="outerHTML" hx-target="#geiq_contract_type_and_options_block" class="form-select" required id="id_contract_type">
     <option value="">---------</option>
   
     <option value="APPRENTICESHIP">Contrat d&#x27;apprentissage</option>
@@ -96,13 +86,11 @@
   </select></div>
       <div class="form-group"><div class="form-check"><input type="checkbox" name="inverted_vae_contract" class="form-check-input" id="id_inverted_vae_contract"><label class="form-check-label" for="id_inverted_vae_contract">Contrat associé à une VAE inversée</label></div></div>
       <div id="contractTypeDetails" class="d-none">
-          <div class="form-group"><label for="id_contract_type_details">Précisions sur le type de contrat</label><textarea name="contract_type_details" cols="40" rows="2" class="form-control" placeholder="Précisions sur le type de contrat" title="Si vous avez choisi un autre type de contrat, merci de bien vouloir fournir plus de précisions" id="id_contract_type_details">
-  </textarea>
-      <small class="form-text text-muted">Si vous avez choisi un autre type de contrat, merci de bien vouloir fournir plus de précisions</small>
-  
+          <div class="form-group"><label class="form-label" for="id_contract_type_details">Précisions sur le type de contrat</label><textarea name="contract_type_details" cols="40" rows="2" class="form-control" placeholder="Précisions sur le type de contrat" id="id_contract_type_details">
+  </textarea><div class="form-text">Si vous avez choisi un autre type de contrat, merci de bien vouloir fournir plus de précisions</div>
   </div>
       </div>
-      <div class="form-group form-group-required"><label for="id_nb_hours_per_week">Nombre d&#x27;heures par semaine</label><input type="number" name="nb_hours_per_week" min="0" class="form-control" placeholder="Nombre d&#x27;heures par semaine" title="" required id="id_nb_hours_per_week"></div>
+      <div class="form-group form-group-required"><label class="form-label" for="id_nb_hours_per_week">Nombre d&#x27;heures par semaine</label><input type="number" name="nb_hours_per_week" min="0" class="form-control" placeholder="Nombre d&#x27;heures par semaine" required id="id_nb_hours_per_week"></div>
   </div>
   
   '''
@@ -111,7 +99,7 @@
   '''
   
   <div id="geiq_qualification_fields_block">
-      <div class="form-group form-group-required"><label for="id_qualification_type">Type de qualification visé</label><select name="qualification_type" hx-post="/apply/10/accept/reload_qualification_fields" hx-swap="outerHTML" hx-target="#geiq_qualification_fields_block" class="form-control" title="" required id="id_qualification_type">
+      <div class="form-group form-group-required"><label class="form-label" for="id_qualification_type">Type de qualification visé</label><select name="qualification_type" hx-post="/apply/10/accept/reload_qualification_fields" hx-swap="outerHTML" hx-target="#geiq_qualification_fields_block" class="form-select" required id="id_qualification_type">
     <option value="">---------</option>
   
     <option value="STATE_DIPLOMA">Diplôme d&#x27;état ou titre homologué</option>
@@ -121,7 +109,7 @@
     <option value="CCN" selected>Positionnement de CCN</option>
   
   </select></div>
-      <div class="form-group form-group-required"><label for="id_qualification_level">Niveau de qualification</label><select name="qualification_level" class="form-control" title="" required id="id_qualification_level">
+      <div class="form-group form-group-required"><label class="form-label" for="id_qualification_level">Niveau de qualification</label><select name="qualification_level" class="form-select" required id="id_qualification_level">
     <option value="" selected>---------</option>
   
     <option value="LEVEL_3">Niveau 3 (CAP, BEP)</option>
@@ -133,7 +121,7 @@
     <option value="NOT_RELEVANT">Non concerné</option>
   
   </select></div>
-      <div class="form-group form-group-required"><label for="id_planned_training_hours">Nombre d&#x27;heures de formation prévues</label><input type="number" name="planned_training_hours" value="0" min="0" class="form-control" placeholder="Nombre d&#x27;heures de formation prévues" title="" required id="id_planned_training_hours"></div>
+      <div class="form-group form-group-required"><label class="form-label" for="id_planned_training_hours">Nombre d&#x27;heures de formation prévues</label><input type="number" name="planned_training_hours" value="0" min="0" class="form-control" placeholder="Nombre d&#x27;heures de formation prévues" required id="id_planned_training_hours"></div>
   </div>
   
   '''
@@ -142,7 +130,7 @@
   '''
   
   <div id="geiq_qualification_fields_block">
-      <div class="form-group form-group-required"><label for="id_qualification_type">Type de qualification visé</label><select name="qualification_type" hx-post="/apply/10/accept/reload_qualification_fields" hx-swap="outerHTML" hx-target="#geiq_qualification_fields_block" class="form-control" title="" required id="id_qualification_type">
+      <div class="form-group form-group-required"><label class="form-label" for="id_qualification_type">Type de qualification visé</label><select name="qualification_type" hx-post="/apply/10/accept/reload_qualification_fields" hx-swap="outerHTML" hx-target="#geiq_qualification_fields_block" class="form-select" required id="id_qualification_type">
     <option value="">---------</option>
   
     <option value="STATE_DIPLOMA">Diplôme d&#x27;état ou titre homologué</option>
@@ -152,7 +140,7 @@
     <option value="CCN">Positionnement de CCN</option>
   
   </select></div>
-      <div class="form-group form-group-required"><label for="id_qualification_level">Niveau de qualification</label><select name="qualification_level" class="form-control" title="" required id="id_qualification_level">
+      <div class="form-group form-group-required"><label class="form-label" for="id_qualification_level">Niveau de qualification</label><select name="qualification_level" class="form-select" required id="id_qualification_level">
     <option value="" selected>---------</option>
   
     <option value="LEVEL_3">Niveau 3 (CAP, BEP)</option>
@@ -164,7 +152,7 @@
     <option value="NOT_RELEVANT">Non concerné</option>
   
   </select></div>
-      <div class="form-group form-group-required"><label for="id_planned_training_hours">Nombre d&#x27;heures de formation prévues</label><input type="number" name="planned_training_hours" value="0" min="0" class="form-control" placeholder="Nombre d&#x27;heures de formation prévues" title="" required id="id_planned_training_hours"></div>
+      <div class="form-group form-group-required"><label class="form-label" for="id_planned_training_hours">Nombre d&#x27;heures de formation prévues</label><input type="number" name="planned_training_hours" value="0" min="0" class="form-control" placeholder="Nombre d&#x27;heures de formation prévues" required id="id_planned_training_hours"></div>
   </div>
   
   '''
@@ -173,7 +161,7 @@
   '''
   
   <div id="geiq_qualification_fields_block">
-      <div class="form-group form-group-required"><label for="id_qualification_type">Type de qualification visé</label><select name="qualification_type" hx-post="/apply/10/accept/reload_qualification_fields" hx-swap="outerHTML" hx-target="#geiq_qualification_fields_block" class="form-control" title="" required id="id_qualification_type">
+      <div class="form-group form-group-required"><label class="form-label" for="id_qualification_type">Type de qualification visé</label><select name="qualification_type" hx-post="/apply/10/accept/reload_qualification_fields" hx-swap="outerHTML" hx-target="#geiq_qualification_fields_block" class="form-select" required id="id_qualification_type">
     <option value="">---------</option>
   
     <option value="STATE_DIPLOMA" selected>Diplôme d&#x27;état ou titre homologué</option>
@@ -183,7 +171,7 @@
     <option value="CCN">Positionnement de CCN</option>
   
   </select></div>
-      <div class="form-group form-group-required"><label for="id_qualification_level">Niveau de qualification</label><select name="qualification_level" class="form-control" title="" required id="id_qualification_level">
+      <div class="form-group form-group-required"><label class="form-label" for="id_qualification_level">Niveau de qualification</label><select name="qualification_level" class="form-select" required id="id_qualification_level">
     <option value="" selected>---------</option>
   
     <option value="LEVEL_3">Niveau 3 (CAP, BEP)</option>
@@ -193,7 +181,7 @@
     <option value="LEVEL_5">Niveau 5 ou + (Bac+2 ou +)</option>
   
   </select></div>
-      <div class="form-group form-group-required"><label for="id_planned_training_hours">Nombre d&#x27;heures de formation prévues</label><input type="number" name="planned_training_hours" value="0" min="0" class="form-control" placeholder="Nombre d&#x27;heures de formation prévues" title="" required id="id_planned_training_hours"></div>
+      <div class="form-group form-group-required"><label class="form-label" for="id_planned_training_hours">Nombre d&#x27;heures de formation prévues</label><input type="number" name="planned_training_hours" value="0" min="0" class="form-control" placeholder="Nombre d&#x27;heures de formation prévues" required id="id_planned_training_hours"></div>
   </div>
   
   '''
