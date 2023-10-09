@@ -54,22 +54,20 @@ def resolve_insee_city(city_name, post_code):
     return None
 
 
-def geolocate_qs(qs, is_verbose=False):
+def geolocate_qs(qs, is_verbose=False, only_high_scores=True):
     now = timezone.now()
 
-    non_geolocated_qs = qs.filter(
-        Q(coords__isnull=True) | Q(geocoding_score__isnull=True) | Q(geocoding_score__lt=BAN_API_RELIANCE_SCORE)
-    )
+    if only_high_scores:
+        qs = qs.filter(
+            Q(coords__isnull=True) | Q(geocoding_score__isnull=True) | Q(geocoding_score__lt=BAN_API_RELIANCE_SCORE)
+        )
 
     if is_verbose:
-        print(
-            f"> about to geolocate count={non_geolocated_qs.count()} objects "
-            "without geolocation or with a low score."
-        )
+        print(f"> about to geolocate count={qs.count()} objects, {only_high_scores=}")
 
     # Note : we could also order by latest geolocalization attempt. An order is necessary though
     # for the zip() to work correctly later.
-    localizable_qs = non_geolocated_qs.exclude(Q(address_line_1="") | Q(post_code="")).order_by("pk")
+    localizable_qs = qs.exclude(Q(address_line_1="") | Q(post_code="")).order_by("pk")
 
     if is_verbose:
         print(f"> count={localizable_qs.count()} of these have an address and a post code.")
@@ -85,7 +83,7 @@ def geolocate_qs(qs, is_verbose=False):
                 f"searched_address='{obj.address_line_1} {obj.post_code}' object_pk={obj.pk}"
             )
         if score >= BAN_API_RELIANCE_SCORE:
-            if obj.geocoding_score and obj.geocoding_score > score:  # do not yield lower scores than the current
+            if only_high_scores and obj.geocoding_score and obj.geocoding_score > score:
                 continue
             obj.coords = lat_lon_to_coords(geo_result["latitude"], geo_result["longitude"])
             obj.geocoding_score = score

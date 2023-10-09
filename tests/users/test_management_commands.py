@@ -1000,8 +1000,8 @@ def test_update_job_seeker_coords(settings, capsys, respx_mock):
     stdout, stderr = capsys.readouterr()
     assert stderr == ""
     assert stdout.splitlines() == [
-        "> about to geolocate count=3 objects without geolocation or with a low " "score.",
-        "> count=3 of these have an address and a post code.",
+        "> about to geolocate count=4 objects, only_high_scores=False",
+        "> count=4 of these have an address and a post code.",
         "API result score=0.77 label='7 rue de Laroche' "
         f"searched_address='{js1.address_line_1} {js1.post_code}' object_pk={js1.id}",
         "API result score=0.32 label='5 rue Bigot' "
