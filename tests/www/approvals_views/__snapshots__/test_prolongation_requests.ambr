@@ -1,4 +1,163 @@
 # serializer version: 1
+# name: test_deny_view_for_reasons[DURATION][reason]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8">
+                      <div class="c-stepper mb-3 mb-lg-5">
+                          <div class="progress progress--emploi">
+                              <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="50" class="progress-bar progress-bar-50" role="progressbar">
+                              </div>
+                          </div>
+                          <p>
+                              
+                                  <strong>Étape 1</strong> : Motif du refus
+                              
+                          </p>
+                      </div>
+                      <div class="c-form mb-3 mb-lg-5">
+                          <h2 class="h4">Réponse envoyée à l'employeur et au candidat</h2>
+                          
+                              <form method="post">
+                                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                  <input id="id_prolongation_request_deny_view-current_step" name="prolongation_request_deny_view-current_step" type="hidden" value="reason"/>
+  
+                                  <div class="form-group form-group-required"><label>Pour quel motif refusez-vous la prolongation du parcours IAE de John DOE ?</label><div class="radio radio-success" id="id_reason-reason"><div class="form-check">
+  <label class="form-check-label" for="id_reason-reason_0"><input class="form-check-input" id="id_reason-reason_0" name="reason-reason" required="" title="" type="radio" value="IAE"/>
+   L’IAE ne correspond plus aux besoins / à la situation de la personne.</label>
+  </div><div class="form-check">
+  <label class="form-check-label" for="id_reason-reason_1"><input class="form-check-input" id="id_reason-reason_1" name="reason-reason" required="" title="" type="radio" value="SIAE"/>
+   La typologie de SIAE ne correspond plus aux besoins / à la situation de la personne.</label>
+  </div><div class="form-check">
+  <label class="form-check-label" for="id_reason-reason_2"><input class="form-check-input" id="id_reason-reason_2" name="reason-reason" required="" title="" type="radio" value="DURATION"/>
+   La durée de prolongation demandée n’est pas adaptée à la situation du candidat.</label>
+  </div>
+  </div></div>
+  
+                                  
+                                      <div class="c-info mb-4">
+                                          <button aria-controls="legalInformation" aria-expanded="false" class="c-info__summary collapsed" data-target="#legalInformation" data-toggle="collapse" type="button">
+                                              <span>Contexte légal</span>
+                                          </button>
+                                          <div class="c-info__detail collapse" id="legalInformation">
+                                              <p>
+                                                  Conformément à l’article Art. R. 5132-1-8. du Décret n° 2021-1128 du 30 août 2021 relatif à l'insertion par l'activité économique, le refus de prolongation d'un prescripteur est motivé par écrit et notifié, par tout moyen donnant date certaine à la réception de cette notification, à la structure et à l'intéressé.
+                                              </p>
+                                              <a aria-label="En savoir plus concernant le contexte légal" class="btn btn-link px-0" href="https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000043990367" rel="noopener" target="_blank">
+                                                  <span>En savoir plus</span>
+                                                  <i class="ri-external-link-line ri-lg"></i>
+                                              </a>
+                                          </div>
+                                      </div>
+                                  
+  
+                                  <hr/>
+                                  <p class="fs-xs">* champ obligatoire</p>
+                                  <div class="form-group">
+                                      <div class="text-right">
+                                          
+                                              <a class="btn btn-link btn-outline-primary" href="/approvals/prolongation/request/666">Annuler</a>
+                                          
+                                          <button class="btn btn-primary">Suivant</button>
+                                      </div>
+                                  </div>
+                              </form>
+                          
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  '''
+# ---
+# name: test_deny_view_for_reasons[DURATION][reason_explanation]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8">
+                      <div class="c-stepper mb-3 mb-lg-5">
+                          <div class="progress progress--emploi">
+                              <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="50" class="progress-bar progress-bar-50" role="progressbar">
+                              </div>
+                          </div>
+                          <p>
+                              
+                                  <strong>Étape 1</strong> : Motif du refus
+                              
+                          </p>
+                      </div>
+                      <div class="c-form mb-3 mb-lg-5">
+                          <h2 class="h4">Réponse envoyée à l'employeur et au candidat</h2>
+                          
+                              <form method="post">
+                                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                  <input id="id_prolongation_request_deny_view-current_step" name="prolongation_request_deny_view-current_step" type="hidden" value="reason"/>
+  
+                                  <div class="form-group form-group-required"><label>Pour quel motif refusez-vous la prolongation du parcours IAE de John DOE ?</label><div class="radio radio-success" id="id_reason-reason"><div class="form-check">
+  <label class="form-check-label" for="id_reason-reason_0"><input class="form-check-input" id="id_reason-reason_0" name="reason-reason" required="" title="" type="radio" value="IAE"/>
+   L’IAE ne correspond plus aux besoins / à la situation de la personne.</label>
+  </div><div class="form-check">
+  <label class="form-check-label" for="id_reason-reason_1"><input class="form-check-input" id="id_reason-reason_1" name="reason-reason" required="" title="" type="radio" value="SIAE"/>
+   La typologie de SIAE ne correspond plus aux besoins / à la situation de la personne.</label>
+  </div><div class="form-check">
+  <label class="form-check-label" for="id_reason-reason_2"><input checked="" class="form-check-input" id="id_reason-reason_2" name="reason-reason" required="" title="" type="radio" value="DURATION"/>
+   La durée de prolongation demandée n’est pas adaptée à la situation du candidat.</label>
+  </div>
+  </div></div>
+  
+                                  
+                                      <div class="c-info mb-4">
+                                          <button aria-controls="legalInformation" aria-expanded="false" class="c-info__summary collapsed" data-target="#legalInformation" data-toggle="collapse" type="button">
+                                              <span>Contexte légal</span>
+                                          </button>
+                                          <div class="c-info__detail collapse" id="legalInformation">
+                                              <p>
+                                                  Conformément à l’article Art. R. 5132-1-8. du Décret n° 2021-1128 du 30 août 2021 relatif à l'insertion par l'activité économique, le refus de prolongation d'un prescripteur est motivé par écrit et notifié, par tout moyen donnant date certaine à la réception de cette notification, à la structure et à l'intéressé.
+                                              </p>
+                                              <a aria-label="En savoir plus concernant le contexte légal" class="btn btn-link px-0" href="https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000043990367" rel="noopener" target="_blank">
+                                                  <span>En savoir plus</span>
+                                                  <i class="ri-external-link-line ri-lg"></i>
+                                              </a>
+                                          </div>
+                                      </div>
+                                  
+  
+                                  <hr/>
+                                  <p class="fs-xs">* champ obligatoire</p>
+                                  <div class="form-group">
+                                      <div class="text-right">
+                                          
+                                              <a class="btn btn-link btn-outline-primary" href="/approvals/prolongation/request/666">Annuler</a>
+                                          
+                                          <button class="btn btn-primary">Suivant</button>
+                                      </div>
+                                  </div>
+                              </form>
+                          
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  '''
+# ---
+# name: test_deny_view_for_reasons[DURATION][title]
+  '''
+  <section class="s-title-01">
+                      <div class="s-title-01__container container">
+                          <div class="s-title-01__row row">
+                              <div class="s-title-01__col col-12">
+                                  
+      <h1>Refuser la demande de prolongation pour John DOE</h1>
+  
+                              </div>
+                          </div>
+                      </div>
+                  </section>
+  '''
+# ---
 # name: test_deny_view_for_reasons[IAE][proposed_actions]
   '''
   <section class="s-section">
@@ -29,6 +188,9 @@
   </div><div class="form-check">
   <label class="form-check-label" for="id_reason-reason_1"><input class="form-check-input" id="id_reason-reason_1" name="reason-reason" required="" title="" type="radio" value="SIAE"/>
    La typologie de SIAE ne correspond plus aux besoins / à la situation de la personne.</label>
+  </div><div class="form-check">
+  <label class="form-check-label" for="id_reason-reason_2"><input class="form-check-input" id="id_reason-reason_2" name="reason-reason" required="" title="" type="radio" value="DURATION"/>
+   La durée de prolongation demandée n’est pas adaptée à la situation du candidat.</label>
   </div>
   </div></div>
   
@@ -98,6 +260,9 @@
   </div><div class="form-check">
   <label class="form-check-label" for="id_reason-reason_1"><input class="form-check-input" id="id_reason-reason_1" name="reason-reason" required="" title="" type="radio" value="SIAE"/>
    La typologie de SIAE ne correspond plus aux besoins / à la situation de la personne.</label>
+  </div><div class="form-check">
+  <label class="form-check-label" for="id_reason-reason_2"><input class="form-check-input" id="id_reason-reason_2" name="reason-reason" required="" title="" type="radio" value="DURATION"/>
+   La durée de prolongation demandée n’est pas adaptée à la situation du candidat.</label>
   </div>
   </div></div>
   
@@ -167,6 +332,9 @@
   </div><div class="form-check">
   <label class="form-check-label" for="id_reason-reason_1"><input class="form-check-input" id="id_reason-reason_1" name="reason-reason" required="" title="" type="radio" value="SIAE"/>
    La typologie de SIAE ne correspond plus aux besoins / à la situation de la personne.</label>
+  </div><div class="form-check">
+  <label class="form-check-label" for="id_reason-reason_2"><input class="form-check-input" id="id_reason-reason_2" name="reason-reason" required="" title="" type="radio" value="DURATION"/>
+   La durée de prolongation demandée n’est pas adaptée à la situation du candidat.</label>
   </div>
   </div></div>
   
@@ -251,6 +419,9 @@
   </div><div class="form-check">
   <label class="form-check-label" for="id_reason-reason_1"><input class="form-check-input" id="id_reason-reason_1" name="reason-reason" required="" title="" type="radio" value="SIAE"/>
    La typologie de SIAE ne correspond plus aux besoins / à la situation de la personne.</label>
+  </div><div class="form-check">
+  <label class="form-check-label" for="id_reason-reason_2"><input class="form-check-input" id="id_reason-reason_2" name="reason-reason" required="" title="" type="radio" value="DURATION"/>
+   La durée de prolongation demandée n’est pas adaptée à la situation du candidat.</label>
   </div>
   </div></div>
   
@@ -320,6 +491,9 @@
   </div><div class="form-check">
   <label class="form-check-label" for="id_reason-reason_1"><input checked="" class="form-check-input" id="id_reason-reason_1" name="reason-reason" required="" title="" type="radio" value="SIAE"/>
    La typologie de SIAE ne correspond plus aux besoins / à la situation de la personne.</label>
+  </div><div class="form-check">
+  <label class="form-check-label" for="id_reason-reason_2"><input class="form-check-input" id="id_reason-reason_2" name="reason-reason" required="" title="" type="radio" value="DURATION"/>
+   La durée de prolongation demandée n’est pas adaptée à la situation du candidat.</label>
   </div>
   </div></div>
   
