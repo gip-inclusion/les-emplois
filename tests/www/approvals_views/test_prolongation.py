@@ -183,7 +183,7 @@ class ApprovalProlongationTest(TestCase):
         )
         update_page_with_htmx(
             page,
-            "#id_reason_2",  # RQTH
+            "#id_reason",  # RQTH
             response,
         )
         response = self.client.post(
