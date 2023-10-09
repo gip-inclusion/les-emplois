@@ -176,8 +176,8 @@
     <!-- Needed to use Select2MultipleWidget. -->
     {{ filters_form.media.js }}
     <script nonce="{{ CSP_NONCE }}">
-        $("#status-filter-form :input").change(function() {
-            $("#status-filter-form form").submit();
+        $("#asideFiltersCollapse :input").change(function() {
+            $("#asideFiltersCollapse form").submit();
         });
         $("#order-form-group :input").click(function(event) {
             let input = $("#id_order")
