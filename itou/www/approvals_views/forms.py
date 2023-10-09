@@ -180,6 +180,7 @@ class CreateProlongationForm(forms.ModelForm):
         self.fields["reason"].choices = ProlongationReason.for_siae(self.instance.declared_by_siae)
         self.fields["reason"].widget.attrs.update(
             {
+                "hx-trigger": "change",
                 "hx-post": reverse(
                     "approvals:prolongation_form_for_reason",
                     kwargs={"approval_id": self.instance.approval_id},
@@ -293,6 +294,7 @@ class CreateProlongationRequestForm(CreateProlongationForm):
         self.fields["email"].widget.attrs.update({"placeholder": "Adresse e-mail du prescripteur habilité"})
         self.fields["prescriber_organization"].widget.attrs.update(
             {
+                "hx-trigger": "change",
                 "hx-post": reverse(
                     "approvals:check_prescriber_email", kwargs={"approval_id": self.instance.approval_id}
                 ),
@@ -320,6 +322,7 @@ class CreateProlongationRequestForm(CreateProlongationForm):
         # Customize "require_phone_interview", "contact_email" and "contact_phone" fields
         self.fields["require_phone_interview"].widget.attrs.update(
             {
+                "hx-trigger": "change",
                 "hx-post": reverse(
                     "approvals:check_contact_details", kwargs={"approval_id": self.instance.approval_id}
                 ),

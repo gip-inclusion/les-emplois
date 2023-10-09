@@ -61,8 +61,9 @@ class GEIQAdministrativeCriteriaForm(forms.Form):
             # Every criterion has the ability to reload the form via HTMX on value changed
             # `hx-post` is not inherited
             # see: https://htmx.org/docs/#parameters
-            self.fields[criterion.key].widget.attrs["hx-post"] = form_url
-            self.fields[criterion.key].widget.attrs.update({"class": "form-check-input"})
+            self.fields[criterion.key].widget.attrs.update(
+                {"hx-trigger": "change", "hx-post": form_url, "class": "form-check-input"}
+            )
 
             # Displayed for GEIQ, not for prescribers
             if not accept_no_criteria and criterion.written_proof:
@@ -78,7 +79,7 @@ class GEIQAdministrativeCriteriaForm(forms.Form):
             if c.slug in ("de-inscrit-depuis-moins-de-12-mois", "deld-12-24-mois", "detld-24-mois")
         ]
         self.fields["pole_emploi_related"].widget = forms.RadioSelect(choices=radio_choices)
-        self.fields["pole_emploi_related"].widget.attrs["hx-post"] = form_url
+        self.fields["pole_emploi_related"].widget.attrs.update({"hx-trigger": "change", "hx-post": form_url})
 
         for pk, _ in radio_choices:
             if pk in selected_pks:
@@ -154,7 +155,7 @@ class GEIQAdministrativeCriteriaForGEIQForm(GEIQAdministrativeCriteriaForm):
         super().__init__(siae, administrative_criteria, form_url, accept_no_criteria=False, **kwargs)
 
         proof_of_eligibility = self.fields["proof_of_eligibility"]
-        proof_of_eligibility.widget.attrs.update({"hx-post": form_url})
+        proof_of_eligibility.widget.attrs.update({"hx-trigger": "change", "hx-post": form_url})
         proof_of_eligibility.label = (
             "Si le candidat est éligible à l’aide à l’accompagnement GEIQ, "
             "je m'engage à conserver les justificatifs correspondants aux critères "

@@ -538,6 +538,7 @@ class AcceptForm(forms.ModelForm):
             # Dynamic selection of qualification level
             self.fields["qualification_type"].widget.attrs.update(
                 {
+                    "hx-trigger": "change",
                     "hx-post": reverse("apply:reload_qualification_fields", kwargs={"siae_pk": siae.pk}),
                     "hx-swap": "outerHTML",
                     "hx-target": "#geiq_qualification_fields_block",
@@ -564,6 +565,7 @@ class AcceptForm(forms.ModelForm):
             )
             self.fields["contract_type"].widget.attrs.update(
                 {
+                    "hx-trigger": "change",
                     "hx-post": reverse("apply:reload_contract_type_and_options", kwargs={"siae_pk": siae.pk}),
                     "hx-swap": "outerHTML",
                     "hx-target": "#geiq_contract_type_and_options_block",
@@ -1003,4 +1005,4 @@ class CheckJobSeekerGEIQEligibilityForm(forms.Form):
 
     def __init__(self, hx_post_url, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["choice"].widget.attrs.update({"hx-post": hx_post_url})
+        self.fields["choice"].widget.attrs.update({"hx-trigger": "change", "hx-post": hx_post_url})
