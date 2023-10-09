@@ -54,8 +54,9 @@
                                 <div class="form-group">
                                     <a class="btn btn-outline-primary" href="{{ back_url }}" aria-label="Retour à l'étape précédente">Retour</a>
                                     {# Enable preview mode: preview=1. #}
-                                    {# FIXME find how to put back aria-label="Valider la suspension du PASS IAE de {{ approval.user.get_full_name }}" #}
-                                    {% bootstrap_button "Valider la suspension" button_type="submit" button_class="btn btn-primary" name="preview" value="1" %}
+                                    <button type="submit" class="btn btn-primary" name="preview" value="1" aria-label="Valider la suspension du PASS IAE de {{ approval.user.get_full_name }}">
+                                        Valider la suspension
+                                    </button>
                                 </div>
 
                             </form>
@@ -95,11 +96,13 @@
                                         En confirmant cette demande je certifie sur l'honneur que le motif de suspension choisi correspond à la situation du salarié.
                                     </p>
                                     {# Allow the user to modify the suspension: edit=1. #}
-                                    {# FIXME Find how to put back aria-label="Annuler la suspension du PASS IAE de {{ approval.user.get_full_name }}" #}
-                                    {% bootstrap_button "Annuler" button_type="submit" button_class="btn btn-secondary" name="edit" value="1" %}
+                                    <button type="submit" class="btn btn-secondary" aria-label="Annuler la suspension du PASS IAE de {{ approval.user.get_full_name }}" name="edit" value="1">
+                                        Annuler
+                                    </button>
                                     {# Create a suspension: save=1. #}
-                                    {# FIXME Find how to put back aria-label="Confirmer la suspension du PASS IAE de {{ approval.user.get_full_name }}" #}
-                                    {% bootstrap_button "Confirmer la suspension" button_type="submit" button_class="btn btn-primary" name="save" value="1" %}
+                                    <button type="submit" class="btn btn-primary" aria-label="Confirmer la suspension du PASS IAE de {{ approval.user.get_full_name }}"name="save" value="1">
+                                        Confirmer la suspension
+                                    </button>
                                 </div>
 
                             </form>

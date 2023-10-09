@@ -47,7 +47,6 @@
                             {% csrf_token %}
                             <div class="form-group text-end">
                                 <a class="btn btn-outline-primary" aria-label="Retour à la page précédente" href="{% url "siaes_views:edit_job_description_details" %}">Retour</a>
-                                {# FIXME Find how to put back aria-label="Publier la fiche de poste" #}
                                 {% bootstrap_button "Publier la fiche de poste" button_type="submit" button_class="btn btn-primary" %}
                             </div>
                         </form>

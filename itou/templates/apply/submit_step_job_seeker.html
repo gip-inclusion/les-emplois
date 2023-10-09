@@ -45,8 +45,9 @@
                 </div>
                 <div class="form-group mb-0 col-6 col-lg-auto">
                     {# Reload this page and show a modal containing more information about the job seeker. #}
-                    {# FIXME Find how to put back aria-label="Passer à l'étape suivante"#}
-                    {% bootstrap_button "Suivant" button_type="submit" button_class="btn btn-primary btn-block" name="preview" value="1" %}
+                    <button type="submit" class="btn btn-primary btn-block" name="preview" value="1" aria-label="Passer à l'étape suivante">
+                        Suivant
+                    </button>
                 </div>
             </div>
         </div>
