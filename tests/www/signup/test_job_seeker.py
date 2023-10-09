@@ -193,7 +193,7 @@ class JobSeekerSignupTest(TestCase):
         url = reverse("signup:job_seeker")
         response = self.client.get(url)
         assert response.status_code == 200
-        self.assertContains(response, '<button class="btn btn-primary">Inscription</button>', html=True)
+        self.assertContains(response, '<button type="submit" class="btn btn-primary">Inscription</button>', html=True)
 
         address_line_1 = "Test adresse"
         address_line_2 = "Test adresse complémentaire"
