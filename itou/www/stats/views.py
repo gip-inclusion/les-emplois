@@ -509,6 +509,14 @@ def stats_dreets_iae_hiring(request):
     )
 
 
+@login_required
+def stats_dreets_iae_state(request):
+    return render_stats_dreets_iae(
+        request=request,
+        page_title="Suivi des prescriptions des AHI de ma région",
+    )
+
+
 def render_stats_dgefp(request, page_title, extra_params=None, extra_context=None):
     if extra_context is None:
         # Do not use mutable default arguments,

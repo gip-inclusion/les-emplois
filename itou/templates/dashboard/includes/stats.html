@@ -175,6 +175,12 @@
                             <span>Voir les données facilitation de l'embauche</span>
                         </a>
                     </li>
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'stats:stats_dreets_iae_state' %}" class="btn-link btn-ico">
+                            <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
+                            <span>Suivre les prescriptions des AHI de ma région</span>
+                        </a>
+                    </li>
                 {% endif %}
                 {% if can_view_stats_dgefp %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
