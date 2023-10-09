@@ -1,4 +1,3 @@
-import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertContains
 
@@ -7,9 +6,6 @@ from tests.prescribers.factories import (
     PrescriberMembershipFactory,
     PrescriberOrganizationFactory,
 )
-
-
-pytestmark = pytest.mark.ignore_template_errors
 
 
 def test_list_accredited_organizations(client):
