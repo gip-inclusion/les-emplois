@@ -20,7 +20,7 @@ export PATH := $(VIRTUAL_ENV)/bin:$(PATH)
 
 VENV_REQUIREMENT := $(VIRTUAL_ENV)
 
-.PHONY: runserver venv migrate clean quality fix compile-deps
+.PHONY: runserver venv clean quality fix compile-deps
 
 runserver: $(VIRTUAL_ENV)
 	python manage.py runserver $(RUNSERVER_DOMAIN)
