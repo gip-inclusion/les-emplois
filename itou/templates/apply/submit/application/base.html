@@ -100,8 +100,7 @@
                                 {% endif %}
                                 {% block form_submit_button %}
                                     <div class="form-group mb-0 col-6 col-lg-auto">
-                                        {# FIXME Find how to put back  aria-label="Passer à l'étape suivante" #}
-                                        {% bootstrap_button "Suivant" button_type="submit" button_class="btn btn-primary btn-block" %}
+                                        <button type="submit" class="btn btn-primary btn-block" aria-label="Passer à l'étape suivante">Suivant</button>
                                     </div>
                                 {% endblock %}
                             </div>
