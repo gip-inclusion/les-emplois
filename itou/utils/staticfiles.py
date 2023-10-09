@@ -12,7 +12,6 @@ import httpx
 from django.conf import settings
 from django.contrib.staticfiles.finders import BaseFinder
 
-
 # ITOU_CACHE is used in demo/prod with a sensible XDG compatible default
 _CACHE_HOME = os.getenv("ITOU_CACHE", os.getenv("XDG_CACHE_HOME", os.path.join(os.getenv("HOME"), ".cache")))
 # Where the downloaded assets (NPM packages, zip files, etc) will be stored
@@ -64,11 +63,11 @@ ASSET_INFOS = {
     },
     "bootstrap": {
         "download": {
-            "url": "https://github.com/twbs/bootstrap/releases/download/v4.6.2/bootstrap-4.6.2-dist.zip",
-            "sha256": "dc9b29fe7100e69d1a512860497bd2237eadccde6e813e588416429359832dce",
+            "url": "https://github.com/twbs/bootstrap/archive/refs/tags/v5.3.2.zip",
+            "sha256": "5542fdffc10ab7590709c5cbb2a5f8c3e33af534db491bb9aab7e8c46573ce8f",
         },
         "extract": {
-            "origin": "bootstrap-4.6.2-dist/js",
+            "origin": "bootstrap-5.3.2/dist/js",
             "destination": "vendor/bootstrap",
             "files": [
                 "bootstrap.min.js",
@@ -171,8 +170,8 @@ ASSET_INFOS = {
     },
     "popper.js": {
         "download": {
-            "url": "https://registry.npmjs.org/popper.js/-/popper.js-1.16.1.tgz",
-            "sha256": "756d507afd865981073a5b3c204239196c33f87b39a7c5c65d5e2ecac1d73271",
+            "url": "https://registry.npmjs.org/@popperjs/core/-/core-2.11.8.tgz",
+            "sha256": "8e09bdfa912035668e62cea61321bce27cbd011b85672055db25d271bd63af49",
         },
         "extract": {
             "origin": "package/dist/umd",
@@ -206,8 +205,8 @@ ASSET_INFOS = {
     },
     "tarteaucitronjs": {
         "download": {
-            "url": "https://registry.npmjs.org/tarteaucitronjs/-/tarteaucitronjs-1.11.0.tgz",
-            "sha256": "b5110111677f8974e4f136a15bed3b435813a700b0f4d39c9036c5e40d376d7f",
+            "url": "https://registry.npmjs.org/tarteaucitronjs/-/tarteaucitronjs-1.14.0.tgz",
+            "sha256": "e7d635b081b165d297809e3e86077c4219b022105e3a0a6a25e3c1f9657a2231",
         },
         "extract": {
             "origin": "package",
@@ -223,17 +222,18 @@ ASSET_INFOS = {
     },
     "theme-inclusion": {
         "download": {
-            "url": "https://github.com/gip-inclusion/itou-theme-bs4/archive/refs/tags/v0.7.5.zip",
-            "sha256": "a7f42bf9b2efd9c1369bd7602f4bb2e81dc5711216061a99c20277d4b96f3115",
+            "url": "https://github.com/betagouv/itou-theme/archive/refs/tags/v1.0.7.zip",
+            "sha256": "b59fbec1f6f1340e11a66c64590adce2aa5a69481090705b034bd261d6145397",
         },
         "extract": {
-            "origin": "itou-theme-bs4-0.7.5/dist",
+            "origin": "itou-theme-1.0.7/dist",
             "destination": "vendor/theme-inclusion/",
             "files": [
                 "javascripts/app.js",
                 "stylesheets/app.css",
                 "fonts/marianne/*",
                 "fonts/remixicon/*",
+                "fonts/coveredbyyourgrace/*",
                 "images/*",
                 "images/metabase/*",
             ],
