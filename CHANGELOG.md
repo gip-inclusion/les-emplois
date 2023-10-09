@@ -1,5 +1,30 @@
 # Journal des modifications
 
+## [73] - 2023-10-23
+
+### Ajouté
+- Admin : Ajout du lien vers le profil de demandeur d'emploi sur la page d'utilisateur
+- Admin : Ajout de la recherche par NIR pour les PASS IAE et prolongations
+- Candidatures : Ajout d'actions pour les nouvelles candidatures
+- Demandes de prolongations : Affichage du nom du prescripteur habilité sollicité dans la liste de demandes
+- Stats : Ajout de stats sur les demandes de prolongations pour les DDETS IAE et DREETS IAE
+
+### Modifié
+- Admin : Ne pas définir de mot de passe pour les nouveaux utilisateurs créés via l'admin
+- API: Correction de l'inversion nom/prénom de l'API candidats
+- Candidatures : Repositionner les boutons actions en haut à droite
+- Contrôle a posteriori : Correction du mail de rappel des institutions
+- Contrôle a posteriori : Amélioration du statut en phase 3
+- Demandes de prolongations : Correction de la redirection pour les utilisateurs non-connectés
+- Demandes de prolongations : Ne plus proposer les organisations auxquelles les prescripteurs n'appartiennent plus
+- Espace connecté : Changement de l'url de base du site
+- Import ASP : Correction de l'inférence du format de date
+- Pôle Emploi Connect : Refonte technique du connecteur
+- Performances : Améliorations du temps d'affichages de certaines pages
+- Tableau de bord : Correction du nom de l'admin à contacter en cas d'adresse mal géolocalisée
+- Tableau de bord : Correction du fil d'ariane
+- Tableau de bord : Suppression d'un badge nouveau
+
 ## [72] - 2023-09-25
 
 ### Ajouté
