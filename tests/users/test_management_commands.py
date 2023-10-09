@@ -194,6 +194,7 @@ class TestSyncPermsTestCase(TestCase):
             "change_approval",
             "delete_approval",
             "view_approval",
+            "view_cancelledapproval",
             "view_poleemploiapproval",
             "add_prolongation",
             "change_prolongation",
@@ -277,6 +278,7 @@ class TestSyncPermsTestCase(TestCase):
         assert [perm.codename for perm in support_group.permissions.all()] == [
             "view_emailaddress",
             "view_approval",
+            "view_cancelledapproval",
             "view_poleemploiapproval",
             "view_prolongation",
             "view_suspension",
