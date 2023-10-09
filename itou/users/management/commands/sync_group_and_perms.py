@@ -36,6 +36,7 @@ def get_permissions_dict():
             analytics_models.Datum: PERMS_READ,
             analytics_models.StatsDashboardVisit: PERMS_READ,
             approvals_models.Approval: PERMS_ALL,
+            approvals_models.CancelledApproval: PERMS_READ,
             approvals_models.PoleEmploiApproval: PERMS_READ,
             approvals_models.Suspension: PERMS_ALL,
             approvals_models.Prolongation: PERMS_ALL,
@@ -77,6 +78,7 @@ def get_permissions_dict():
             for model in (
                 account_models.EmailAddress,
                 approvals_models.Approval,
+                approvals_models.CancelledApproval,
                 approvals_models.PoleEmploiApproval,
                 approvals_models.Suspension,
                 approvals_models.Prolongation,

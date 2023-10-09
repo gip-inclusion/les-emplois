@@ -519,3 +519,34 @@ class PoleEmploiApprovalAdmin(ItouModelAdmin):
     @admin.display(boolean=True, description="en cours de validité")
     def is_valid(self, obj):
         return obj.is_valid()
+
+
+@admin.register(models.CancelledApproval)
+class CancelledApprovalAdmin(ItouModelAdmin):
+    list_display = (
+        "number",
+        "start_at",
+        "end_at",
+        "user_last_name",
+        "user_first_name",
+        "user_nir",
+        "siae_siret",
+        "created_at",
+    )
+    search_fields = (
+        "number",
+        "user_first_name",
+        "user_last_name",
+        "user_nir",
+        "siae_siret",
+    )
+    list_filter = ("siae_kind", "sender_kind", "prescriber_kind")
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
