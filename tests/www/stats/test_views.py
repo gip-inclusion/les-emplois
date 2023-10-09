@@ -203,6 +203,7 @@ def test_stats_ddets_iae_log_visit(client, view_name):
         "stats_dreets_iae_follow_prolongation",
         "stats_dreets_iae_iae",
         "stats_dreets_iae_hiring",
+        "stats_dreets_iae_state",
     ],
 )
 def test_stats_dreets_iae_log_visit(client, view_name):

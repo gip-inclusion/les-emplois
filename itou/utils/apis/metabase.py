@@ -142,6 +142,11 @@ METABASE_DASHBOARDS = {
         "tally_popup_form_id": "mVLBXv",
         "tally_embed_form_id": "nPpXpQ",
     },
+    "stats_dreets_iae_state": {
+        "dashboard_id": 310,
+        "tally_popup_form_id": "w2az2j",
+        "tally_embed_form_id": "3Nlvzl",
+    },
     #
     # Institution stats - DGEFP - nation level.
     #
