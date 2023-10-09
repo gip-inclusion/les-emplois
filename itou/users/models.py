@@ -1109,9 +1109,11 @@ class JobSeekerProfile(models.Model):
         self._clean_job_seeker_situation()
         self._clean_job_seeker_hexa_address()
 
-    def update_hexa_address(self):
+    def update_hexa_address(self, should_save=True):
         """
         This method tries to fill the HEXA address fields based the current address of the job seeker (`User` model).
+
+        Calling this method should be done in a try/except block catching ValidationError.
         """
         result, error = format_address(self.user)
 
@@ -1135,9 +1137,19 @@ class JobSeekerProfile(models.Model):
         except Commune.DoesNotExist:
             raise ValidationError(f"Le code INSEE {insee_code} n'est pas référencé par l'ASP")
 
-        self.save()
-
-        return self
+        if should_save:
+            self.save(
+                update_fields=[
+                    "hexa_lane_type",
+                    "hexa_lane_number",
+                    "hexa_std_extension",
+                    "hexa_non_std_extension",
+                    "hexa_lane_name",
+                    "hexa_additional_address",
+                    "hexa_post_code",
+                    "hexa_commune",
+                ]
+            )
 
     def clear_hexa_address(self):
         """
