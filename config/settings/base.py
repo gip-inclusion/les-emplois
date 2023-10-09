@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 
 from ..sentry import sentry_init
 
+
 load_dotenv()
 
 # Django settings
@@ -335,7 +336,6 @@ BOOTSTRAP5 = {
     "field_renderers": {"default": "itou.utils.custom_renderer.CustomFieldRenderer"},
     "wrapper_class": "form-group",
     "error_css_class": "is-invalid",
-    "success_css_class": "",
 }
 
 SELECT2_THEME = "bootstrap-5"
