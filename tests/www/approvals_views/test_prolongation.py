@@ -92,8 +92,6 @@ class ApprovalProlongationTest(TestCase):
             "email": self.prescriber.email,
             "contact_email": self.faker.email(),
             "contact_phone": self.faker.phone_number(),
-            "report_file_path": "prolongation_report/memento-mori.xslx",
-            "uploaded_file_name": "report_file.xlsx",
             "prescriber_organization": self.prescriber_organization.pk,
             # Preview.
             "preview": "1",
@@ -118,6 +116,7 @@ class ApprovalProlongationTest(TestCase):
         assert prolongation_request.declared_by_siae == self.job_application.to_siae
         assert prolongation_request.validated_by == self.prescriber
         assert prolongation_request.reason == post_data["reason"]
+        assert not prolongation_request.report_file
 
         # An email should have been sent to the chosen authorized prescriber.
         assert len(mail.outbox) == 1
@@ -388,8 +387,6 @@ class ApprovalProlongationTest(TestCase):
             "email": self.prescriber.email,
             "contact_email": self.faker.email(),
             "contact_phone": self.faker.phone_number(),
-            "report_file_path": "prolongation_report/memento-mori.xslx",
-            "uploaded_file_name": "report_file.xlsx",
             "edit": "1",
         }
         response = self.client.post(url, data=post_data)
@@ -415,8 +412,6 @@ class ApprovalProlongationTest(TestCase):
             "email": self.prescriber.email,
             "contact_email": self.faker.email(),
             "contact_phone": self.faker.phone_number(),
-            "report_file_path": "prolongation_report/memento-mori.xslx",
-            "uploaded_file_name": "report_file.xlsx",
             "edit": "1",
         }
         response = self.client.post(url, data=post_data)
@@ -444,45 +439,9 @@ class ApprovalProlongationTest(TestCase):
             "email": prescriber.email,
             "contact_email": self.faker.email(),
             "contact_phone": self.faker.phone_number(),
-            "report_file_path": "prolongation_report/memento-mori.xslx",
-            "uploaded_file_name": "report_file.xlsx",
             "edit": "1",
         }
         response = self.client.post(url, data=post_data)
 
         error_msg = parse_response_to_soup(response, selector="input#id_email + .invalid-feedback")
         assert str(error_msg) == self.snapshot(name="unknown authorized prescriber")
-
-    def test_prolongation_without_report_file(self):
-        # Check with default setup kind: EI
-        self.client.force_login(self.siae_user)
-        url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
-        response = self.client.get(url)
-
-        reason = ProlongationReason.SENIOR
-        end_at = self.approval.end_at + relativedelta(days=30)
-
-        post_data = {
-            "end_at": end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "reason": reason,
-            "email": self.prescriber.email,
-            "contact_email": self.faker.email(),
-            "contact_phone": self.faker.phone_number(),
-            "prescriber_organization": self.prescriber_organization.pk,
-            "save": "1",
-        }
-
-        response = self.client.post(url, data=post_data)
-
-        assert response.status_code == 302
-        assert len(mail.outbox) == 1
-
-        email = mail.outbox[0]
-
-        assert len(email.to) == 1
-        assert email.to[0] == post_data["email"]
-        assert email.subject == f"Demande de prolongation du PASS IAE de {self.approval.user.get_full_name()}"
-
-        prolongation_request = self.approval.prolongationrequest_set.get()
-        assert not prolongation_request.report_file
-        assert self.PROLONGATION_EMAIL_REPORT_TEXT not in email.body
