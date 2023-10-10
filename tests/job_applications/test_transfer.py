@@ -19,10 +19,11 @@ from tests.utils.test import TestCase
 
 class JobApplicationTransferModelTest(TestCase):
     def test_is_in_transferable_state(self):
-        # If job application is in NEW or ACCEPTED state
+        # If job application is in ACCEPTED state
         # it can't be transfered
-        evil_states = [JobApplicationWorkflow.STATE_NEW, JobApplicationWorkflow.STATE_ACCEPTED]
+        evil_states = [JobApplicationWorkflow.STATE_ACCEPTED]
         good_states = [
+            JobApplicationWorkflow.STATE_NEW,
             JobApplicationWorkflow.STATE_PROCESSING,
             JobApplicationWorkflow.STATE_POSTPONED,
             JobApplicationWorkflow.STATE_REFUSED,
@@ -52,7 +53,7 @@ class JobApplicationTransferModelTest(TestCase):
         lambda_user = JobSeekerFactory()
         target_siae.members.add(origin_user)
 
-        job_application = JobApplicationFactory(to_siae=origin_siae)
+        job_application = JobApplicationFactory(to_siae=origin_siae, state=JobApplicationWorkflow.STATE_ACCEPTED)
 
         assert origin_user.kind == UserKind.SIAE_STAFF
         assert target_user.kind == UserKind.SIAE_STAFF
@@ -79,7 +80,11 @@ class JobApplicationTransferModelTest(TestCase):
         lambda_user = JobSeekerFactory()
         target_siae.members.add(origin_user)
 
-        job_application = JobApplicationFactory(to_siae=origin_siae, sent_by_authorized_prescriber_organisation=True)
+        job_application = JobApplicationFactory(
+            to_siae=origin_siae,
+            sent_by_authorized_prescriber_organisation=True,
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+        )
 
         # Conditions hould be covered by previous test, but does not hurt (and tests raise)
         with pytest.raises(ValidationError):

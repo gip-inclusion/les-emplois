@@ -3,10 +3,13 @@
 
 <div class="c-box mb-4 hide-if-empty" id="transition_buttons_{{ job_application.pk }}"{% if out_of_band_swap %} hx-swap-oob="true"{% endif %} data-disable-btn-if=".editing-prior-action">
     {% if job_application.state.is_new %}
-        <form method="post" action="{% url 'apply:process' job_application_id=job_application.id %}" class="js-prevent-multiple-submit">
-            {% csrf_token %}
-            <button class="btn btn-primary btn-block">Étudier cette candidature</button>
-        </form>
+        <div class="my-2">
+            <form method="post" action="{% url 'apply:process' job_application_id=job_application.id %}" class="js-prevent-multiple-submit">
+                {% csrf_token %}
+                <button class="btn btn-primary btn-block">Étudier cette candidature</button>
+            </form>
+        </div>
+        {% include "apply/includes/buttons/refuse.html" %}
     {% endif %}
 
     {# Possible next steps when the state is processing / prior_to_hire ------------------------------------- #}
