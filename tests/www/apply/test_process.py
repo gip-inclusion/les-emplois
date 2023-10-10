@@ -257,49 +257,60 @@ class ProcessViewsTest(TestCase):
     def test_refuse(self, *args, **kwargs):
         """Ensure that the `refuse` transition is triggered."""
 
-        job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True, state=JobApplicationWorkflow.STATE_PROCESSING
-        )
-        assert job_application.state.is_processing
-        siae_user = job_application.to_siae.members.first()
-        self.client.force_login(siae_user)
+        states = [
+            JobApplicationWorkflow.STATE_NEW,
+            JobApplicationWorkflow.STATE_PROCESSING,
+            JobApplicationWorkflow.STATE_PRIOR_TO_HIRE,
+            JobApplicationWorkflow.STATE_POSTPONED,
+        ]
 
-        url = reverse("apply:refuse", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url)
-        assert response.status_code == 200
+        for state in states:
+            with self.subTest(state=state):
+                job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True, state=state)
 
-        post_data = {
-            "refusal_reason": job_applications_enums.RefusalReason.OTHER,
-            "answer": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-        }
-        response = self.client.post(url, data=post_data)
-        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
-        self.assertRedirects(response, next_url)
+                siae_user = job_application.to_siae.members.first()
+                self.client.force_login(siae_user)
 
-        job_application = JobApplication.objects.get(pk=job_application.pk)
-        assert job_application.state.is_refused
+                url = reverse("apply:refuse", kwargs={"job_application_id": job_application.pk})
+                response = self.client.get(url)
+                assert response.status_code == 200
+
+                post_data = {
+                    "refusal_reason": job_applications_enums.RefusalReason.OTHER,
+                    "answer": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                }
+                response = self.client.post(url, data=post_data)
+                next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+                self.assertRedirects(response, next_url)
+
+                job_application = JobApplication.objects.get(pk=job_application.pk)
+                assert job_application.state.is_refused
 
     def test_postpone(self, *args, **kwargs):
         """Ensure that the `postpone` transition is triggered."""
 
-        job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True, state=JobApplicationWorkflow.STATE_PROCESSING
-        )
-        assert job_application.state.is_processing
-        siae_user = job_application.to_siae.members.first()
-        self.client.force_login(siae_user)
+        states = [
+            JobApplicationWorkflow.STATE_PROCESSING,
+            JobApplicationWorkflow.STATE_PRIOR_TO_HIRE,
+        ]
 
-        url = reverse("apply:postpone", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url)
-        assert response.status_code == 200
+        for state in states:
+            with self.subTest(state=state):
+                job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True, state=state)
+                siae_user = job_application.to_siae.members.first()
+                self.client.force_login(siae_user)
 
-        post_data = {"answer": ""}
-        response = self.client.post(url, data=post_data)
-        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
-        self.assertRedirects(response, next_url)
+                url = reverse("apply:postpone", kwargs={"job_application_id": job_application.pk})
+                response = self.client.get(url)
+                assert response.status_code == 200
 
-        job_application = JobApplication.objects.get(pk=job_application.pk)
-        assert job_application.state.is_postponed
+                post_data = {"answer": ""}
+                response = self.client.post(url, data=post_data)
+                next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+                self.assertRedirects(response, next_url)
+
+                job_application = JobApplication.objects.get(pk=job_application.pk)
+                assert job_application.state.is_postponed
 
     def test_accept(self, *args, **kwargs):
         cities = create_test_cities(["54", "57"], num_per_department=2)
@@ -1226,7 +1237,7 @@ class ProcessTemplatesTest(TestCase):
         # Test template content.
         self.assertContains(response, self.url_process)
         self.assertNotContains(response, self.url_eligibility)
-        self.assertNotContains(response, self.url_refuse)
+        self.assertContains(response, self.url_refuse)
         self.assertNotContains(response, self.url_postpone)
         self.assertNotContains(response, self.url_accept)
 

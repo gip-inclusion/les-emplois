@@ -105,7 +105,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
         (TRANSITION_ACCEPT, CAN_BE_ACCEPTED_STATES, STATE_ACCEPTED),
         (TRANSITION_MOVE_TO_PRIOR_TO_HIRE, CAN_ADD_PRIOR_ACTION_STATES, STATE_PRIOR_TO_HIRE),
         (TRANSITION_CANCEL_PRIOR_TO_HIRE, [STATE_PRIOR_TO_HIRE], STATE_PROCESSING),
-        (TRANSITION_REFUSE, [STATE_PROCESSING, STATE_PRIOR_TO_HIRE, STATE_POSTPONED], STATE_REFUSED),
+        (TRANSITION_REFUSE, [STATE_NEW, STATE_PROCESSING, STATE_PRIOR_TO_HIRE, STATE_POSTPONED], STATE_REFUSED),
         (TRANSITION_CANCEL, STATE_ACCEPTED, STATE_CANCELLED),
         (TRANSITION_RENDER_OBSOLETE, [STATE_NEW, STATE_PROCESSING, STATE_POSTPONED], STATE_OBSOLETE),
         (TRANSITION_TRANSFER, CAN_BE_TRANSFERRED_STATES, STATE_NEW),
@@ -822,7 +822,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     @property
     def is_in_transferable_state(self):
-        return self.state not in [JobApplicationWorkflow.STATE_ACCEPTED, JobApplicationWorkflow.STATE_NEW]
+        return self.state != JobApplicationWorkflow.STATE_ACCEPTED
 
     def can_be_transferred(self, user, target_siae):
         # User must be member of both origin and target SIAE to make a transfer
