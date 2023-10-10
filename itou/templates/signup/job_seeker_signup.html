@@ -51,17 +51,17 @@
 
                             {# bootstrap_form_errors form alert_error_type="all" #}
 
-                            {% bootstrap_field form.email form_group_class="form-group mb-1" %}
+                            {% bootstrap_field form.email wrapper_class="form-group mb-1" %}
                             <div class="text-end small font-italic mb-0">{% include "signup/includes/no_email_link.html" %}</div>
 
-                            {% bootstrap_field form.title form_group_class="form-group mt-1" %}
+                            {% bootstrap_field form.title wrapper_class="form-group mt-1" %}
                             {% bootstrap_field form.last_name %}
                             {% bootstrap_field form.first_name %}
                             {% bootstrap_field form.password1 %}
                             {% bootstrap_field form.password2 %}
 
                             {% if form.nir %}
-                                {% bootstrap_field form.nir form_group_class="form-group mt-1" %}
+                                {% bootstrap_field form.nir wrapper_class="form-group mt-1" %}
                             {% endif %}
 
                             <div class="small pb-4 text-secondary">

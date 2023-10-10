@@ -29,7 +29,7 @@
                                 {% for form in formset %}
                                     {% bootstrap_form_errors form type="non_field_errors" %}
                                     <div class="inline-form-row row align-items-top mb-2 g-0">
-                                        {% bootstrap_form form show_label=False form_group_class="col-md pe-md-3 mb-2 inline-col" %}
+                                        {% bootstrap_form form show_label=False wrapper_class="col-md pe-md-3 mb-2 inline-col" %}
                                     </div>
                                 {% endfor %}
                             </fieldset>

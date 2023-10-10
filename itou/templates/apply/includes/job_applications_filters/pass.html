@@ -3,7 +3,7 @@
 {% if filters_form.pass_iae_suspended %}
     <fieldset>
         <legend>Statut du PASS IAE</legend>
-        {% bootstrap_field filters_form.pass_iae_active form_group_class="mb-2" %}
-        {% bootstrap_field filters_form.pass_iae_suspended form_group_class="" %}
+        {% bootstrap_field filters_form.pass_iae_active wrapper_class="mb-2" %}
+        {% bootstrap_field filters_form.pass_iae_suspended wrapper_class="" %}
     </fieldset>
 {% endif %}

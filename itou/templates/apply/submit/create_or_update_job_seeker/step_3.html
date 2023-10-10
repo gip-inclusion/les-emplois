@@ -14,16 +14,16 @@
         {% bootstrap_field form.pole_emploi %}
         <div id="subfields_pole_emploi" class="collapse{% if form.pole_emploi.value %} show{% endif %}">
             <div id="subfields_pole_emploi_id_forgotten" class="collapse{% if not form.pole_emploi_id_forgotten.value %} show{% endif %}">
-                {% bootstrap_field form.pole_emploi_id form_group_class='form-group ms-4' %}
+                {% bootstrap_field form.pole_emploi_id wrapper_class='form-group ms-4' %}
             </div>
-            {% bootstrap_field form.pole_emploi_id_forgotten form_group_class='form-group ms-4' %}
-            {% bootstrap_field form.pole_emploi_since form_group_class='form-group ms-4' %}
+            {% bootstrap_field form.pole_emploi_id_forgotten wrapper_class='form-group ms-4' %}
+            {% bootstrap_field form.pole_emploi_since wrapper_class='form-group ms-4' %}
             <hr class="my-5">
         </div>
 
         {% bootstrap_field form.unemployed %}
         <div id="subfields_unemployed" class="collapse{% if form.unemployed.value %} show{% endif %}">
-            {% bootstrap_field form.unemployed_since form_group_class='form-group ms-4' %}
+            {% bootstrap_field form.unemployed_since wrapper_class='form-group ms-4' %}
             <hr class="my-5">
         </div>
 
@@ -32,20 +32,20 @@
 
         {% bootstrap_field form.rsa_allocation %}
         <div id="subfields_rsa_allocation" class="collapse{% if form.rsa_allocation.value %} show{% endif %}">
-            {% bootstrap_field form.has_rsa_allocation form_group_class='form-group ms-4' %}
-            {% bootstrap_field form.rsa_allocation_since form_group_class='form-group ms-4' %}
+            {% bootstrap_field form.has_rsa_allocation wrapper_class='form-group ms-4' %}
+            {% bootstrap_field form.rsa_allocation_since wrapper_class='form-group ms-4' %}
             <hr class="my-5">
         </div>
 
         {% bootstrap_field form.ass_allocation %}
         <div id="subfields_ass_allocation" class="collapse{% if form.ass_allocation.value %} show{% endif %}">
-            {% bootstrap_field form.ass_allocation_since form_group_class='form-group ms-4' %}
+            {% bootstrap_field form.ass_allocation_since wrapper_class='form-group ms-4' %}
             <hr class="my-5">
         </div>
 
         {% bootstrap_field form.aah_allocation %}
         <div id="subfields_aah_allocation" class="collapse{% if form.aah_allocation.value %} show{% endif %}">
-            {% bootstrap_field form.aah_allocation_since form_group_class='form-group ms-4' %}
+            {% bootstrap_field form.aah_allocation_since wrapper_class='form-group ms-4' %}
             <hr class="my-5">
         </div>
     </fieldset>
