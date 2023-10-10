@@ -46,6 +46,7 @@ from itou.www.approvals_views.forms import (
     get_prolongation_form,
 )
 
+
 SUSPENSION_DURATION_BEFORE_APPROVAL_DELETABLE = timedelta(days=365)
 
 

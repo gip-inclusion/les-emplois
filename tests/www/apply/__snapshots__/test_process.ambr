@@ -11,7 +11,7 @@
   
   <div class="form-text">Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche</div>
   </div>
-      <div class="form-group form-group-required"><label class="form-label" for="id_contract_type">Type de contrat</label><select name="contract_type" hx-post="/apply/10/accept/reload_contract_type_and_options" hx-swap="outerHTML" hx-target="#geiq_contract_type_and_options_block" class="form-select" required id="id_contract_type">
+      <div class="form-group form-group-required"><label class="form-label" for="id_contract_type">Type de contrat</label><select name="contract_type" hx-trigger="change" hx-post="/apply/10/accept/reload_contract_type_and_options" hx-swap="outerHTML" hx-target="#geiq_contract_type_and_options_block" class="form-select" required id="id_contract_type">
     <option value="">---------</option>
   
     <option value="APPRENTICESHIP" selected>Contrat d&#x27;apprentissage</option>
@@ -41,7 +41,7 @@
   
   <div class="form-text">Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche</div>
   </div>
-      <div class="form-group form-group-required"><label class="form-label" for="id_contract_type">Type de contrat</label><select name="contract_type" hx-post="/apply/10/accept/reload_contract_type_and_options" hx-swap="outerHTML" hx-target="#geiq_contract_type_and_options_block" class="form-select" required id="id_contract_type">
+      <div class="form-group form-group-required"><label class="form-label" for="id_contract_type">Type de contrat</label><select name="contract_type" hx-trigger="change" hx-post="/apply/10/accept/reload_contract_type_and_options" hx-swap="outerHTML" hx-target="#geiq_contract_type_and_options_block" class="form-select" required id="id_contract_type">
     <option value="">---------</option>
   
     <option value="APPRENTICESHIP">Contrat d&#x27;apprentissage</option>
@@ -74,7 +74,7 @@
   
   <div class="form-text">Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche</div>
   </div>
-      <div class="form-group form-group-required"><label class="form-label" for="id_contract_type">Type de contrat</label><select name="contract_type" hx-post="/apply/10/accept/reload_contract_type_and_options" hx-swap="outerHTML" hx-target="#geiq_contract_type_and_options_block" class="form-select" required id="id_contract_type">
+      <div class="form-group form-group-required"><label class="form-label" for="id_contract_type">Type de contrat</label><select name="contract_type" hx-trigger="change" hx-post="/apply/10/accept/reload_contract_type_and_options" hx-swap="outerHTML" hx-target="#geiq_contract_type_and_options_block" class="form-select" required id="id_contract_type">
     <option value="">---------</option>
   
     <option value="APPRENTICESHIP">Contrat d&#x27;apprentissage</option>
@@ -99,7 +99,7 @@
   '''
   
   <div id="geiq_qualification_fields_block">
-      <div class="form-group form-group-required"><label class="form-label" for="id_qualification_type">Type de qualification visé</label><select name="qualification_type" hx-post="/apply/10/accept/reload_qualification_fields" hx-swap="outerHTML" hx-target="#geiq_qualification_fields_block" class="form-select" required id="id_qualification_type">
+      <div class="form-group form-group-required"><label class="form-label" for="id_qualification_type">Type de qualification visé</label><select name="qualification_type" hx-trigger="change" hx-post="/apply/10/accept/reload_qualification_fields" hx-swap="outerHTML" hx-target="#geiq_qualification_fields_block" class="form-select" required id="id_qualification_type">
     <option value="">---------</option>
   
     <option value="STATE_DIPLOMA">Diplôme d&#x27;état ou titre homologué</option>
@@ -130,7 +130,7 @@
   '''
   
   <div id="geiq_qualification_fields_block">
-      <div class="form-group form-group-required"><label class="form-label" for="id_qualification_type">Type de qualification visé</label><select name="qualification_type" hx-post="/apply/10/accept/reload_qualification_fields" hx-swap="outerHTML" hx-target="#geiq_qualification_fields_block" class="form-select" required id="id_qualification_type">
+      <div class="form-group form-group-required"><label class="form-label" for="id_qualification_type">Type de qualification visé</label><select name="qualification_type" hx-trigger="change" hx-post="/apply/10/accept/reload_qualification_fields" hx-swap="outerHTML" hx-target="#geiq_qualification_fields_block" class="form-select" required id="id_qualification_type">
     <option value="">---------</option>
   
     <option value="STATE_DIPLOMA">Diplôme d&#x27;état ou titre homologué</option>
@@ -161,7 +161,7 @@
   '''
   
   <div id="geiq_qualification_fields_block">
-      <div class="form-group form-group-required"><label class="form-label" for="id_qualification_type">Type de qualification visé</label><select name="qualification_type" hx-post="/apply/10/accept/reload_qualification_fields" hx-swap="outerHTML" hx-target="#geiq_qualification_fields_block" class="form-select" required id="id_qualification_type">
+      <div class="form-group form-group-required"><label class="form-label" for="id_qualification_type">Type de qualification visé</label><select name="qualification_type" hx-trigger="change" hx-post="/apply/10/accept/reload_qualification_fields" hx-swap="outerHTML" hx-target="#geiq_qualification_fields_block" class="form-select" required id="id_qualification_type">
     <option value="">---------</option>
   
     <option value="STATE_DIPLOMA" selected>Diplôme d&#x27;état ou titre homologué</option>

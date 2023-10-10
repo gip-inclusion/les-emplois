@@ -2137,11 +2137,10 @@ class InstitutionEvaluatedSiaeNotifyViewStep1Test(InstitutionEvaluatedSiaeNotify
             response,
             f"""
             <div class="form-group is-invalid form-group-required">
-                <label for="id_notification_text">Commentaire</label>
+                <label class="form-label" for="id_notification_text">Commentaire</label>
                 <textarea name="notification_text" cols="40" rows="10"
                     placeholder="{placeholder}"
                     class="form-control is-invalid"
-                    title=""
                     required
                     id="id_notification_text">
                 </textarea>
@@ -2153,7 +2152,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep1Test(InstitutionEvaluatedSiaeNotify
         )
         self.assertContains(
             response,
-            '<div class="form-group is-invalid form-group-required"><label>Raison principale</label>',
+            '<label class="form-label">Raison principale</label>',
             count=1,
         )
         self.assertContains(
@@ -2485,7 +2484,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
             response,
             """
             <div class="form-group is-invalid form-group-required">
-             <label for="id_temporary_suspension_from">
+             <label class="form-label" for="id_temporary_suspension_from">
               À partir du
              </label>
              <duet-date-picker aria-label="Retrait temporaire de la capacité d’auto-prescription à partir du"
@@ -2494,7 +2493,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
                                min="2022-11-24"
                                name="temporary_suspension_from"
                                required
-                               title=""></duet-date-picker>
+                               ></duet-date-picker>
               <div class="invalid-feedback">
                Ce champ est obligatoire.
               </div>
@@ -2529,7 +2528,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
             response,
             """
             <div class="form-group is-invalid form-group-required">
-             <label for="id_temporary_suspension_to">
+             <label class="form-label" for="id_temporary_suspension_to">
               Jusqu’au
              </label>
              <duet-date-picker aria-label="Retrait temporaire de la capacité d’auto-prescription jusqu’au"
@@ -2538,7 +2537,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
                                min="2022-11-24"
                                name="temporary_suspension_to"
                                required
-                               title=""></duet-date-picker>
+                               ></duet-date-picker>
               <div class="invalid-feedback">
                Ce champ est obligatoire.
               </div>
@@ -2581,7 +2580,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
             response,
             """
             <div class="form-group is-invalid form-group-required">
-             <label for="id_temporary_suspension_from">
+             <label class="form-label" for="id_temporary_suspension_from">
               À partir du
              </label>
              <duet-date-picker aria-label="Retrait temporaire de la capacité d’auto-prescription à partir du"
@@ -2590,7 +2589,6 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
                                min="2022-11-24"
                                name="temporary_suspension_from"
                                required
-                               title=""
                                value="invalid"></duet-date-picker>
               <div class="invalid-feedback">
                Saisissez une date valide.
@@ -2604,7 +2602,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
             response,
             """
             <div class="form-group is-invalid form-group-required">
-             <label for="id_temporary_suspension_to">
+             <label class="form-label" for="id_temporary_suspension_to">
               Jusqu’au
              </label>
              <duet-date-picker aria-label="Retrait temporaire de la capacité d’auto-prescription jusqu’au"
@@ -2613,7 +2611,6 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
                                min="2022-11-24"
                                name="temporary_suspension_to"
                                required
-                               title=""
                                value="invalid"></duet-date-picker>
               <div class="invalid-feedback">
                Saisissez une date valide.
@@ -2652,7 +2649,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
             response,
             """
             <div class="form-group is-invalid form-group-required">
-             <label for="id_temporary_suspension_from">
+             <label class="form-label" for="id_temporary_suspension_from">
               À partir du
              </label>
              <duet-date-picker aria-label="Retrait temporaire de la capacité d’auto-prescription à partir du"
@@ -2661,7 +2658,6 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
                                min="2022-11-24"
                                name="temporary_suspension_from"
                                required
-                               title=""
                                value="2022-11-20"></duet-date-picker>
               <div class="invalid-feedback">
                Assurez-vous que cette valeur est supérieure ou égale à 24/11/2022.
@@ -2675,7 +2671,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
             response,
             """
             <div class="form-group is-invalid form-group-required">
-             <label for="id_temporary_suspension_to">
+             <label class="form-label" for="id_temporary_suspension_to">
               Jusqu’au
              </label>
              <duet-date-picker aria-label="Retrait temporaire de la capacité d’auto-prescription jusqu’au"
@@ -2684,7 +2680,6 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
                                min="2022-11-24"
                                name="temporary_suspension_to"
                                required
-                               title=""
                                value="2022-11-20"></duet-date-picker>
               <div class="invalid-feedback">
                Assurez-vous que cette valeur est supérieure ou égale à 24/11/2022.
@@ -2779,7 +2774,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
             response,
             """
             <div class="form-group is-invalid form-group-required">
-             <label for="id_permanent_suspension">
+             <label class="form-label" for="id_permanent_suspension">
               À partir du
              </label>
              <duet-date-picker aria-label="Retrait définitif de la capacité d’auto-prescription à partir du"
@@ -2788,7 +2783,6 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
                                min="2022-11-24"
                                name="permanent_suspension"
                                required
-                               title=""
                                value="invalid"></duet-date-picker>
               <div class="invalid-feedback">
                Saisissez une date valide.
@@ -2891,7 +2885,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
             response,
             """
             <div class="form-group is-invalid form-group-required">
-             <label for="id_subsidy_cut_percent">
+             <label class="form-label" for="id_subsidy_cut_percent">
               Pourcentage d’aide retiré à la SIAE
              </label>
              <input aria-label="Suppression d’une partie de l’aide au poste à partir du"
@@ -2903,7 +2897,6 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
                     placeholder="Pourcentage d’aide retiré à la SIAE"
                     required
                     step="1"
-                    title=""
                     type="number"
                     value="110" />
              <div class="invalid-feedback">
@@ -2911,7 +2904,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
              </div>
             </div>
             <div class="form-group is-invalid form-group-required">
-             <label for="id_subsidy_cut_from">
+             <label class="form-label" for="id_subsidy_cut_from">
               À partir du
              </label>
              <duet-date-picker aria-label="Suppression d’une partie de l’aide au poste à partir du"
@@ -2919,14 +2912,13 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
                                identifier="id_subsidy_cut_from"
                                name="subsidy_cut_from"
                                required
-                               title=""
                                value="invalid"></duet-date-picker>
               <div class="invalid-feedback">
                Saisissez une date valide.
               </div>
             </div>
             <div class="form-group is-invalid form-group-required">
-             <label for="id_subsidy_cut_to">
+             <label class="form-label" for="id_subsidy_cut_to">
               Jusqu’au
              </label>
              <duet-date-picker aria-label="Suppression d’une partie de l’aide au poste jusqu’au"
@@ -2934,7 +2926,6 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
                                identifier="id_subsidy_cut_to"
                                name="subsidy_cut_to"
                                required
-                               title=""
                                value="invalid"></duet-date-picker>
               <div class="invalid-feedback">
                Saisissez une date valide.
