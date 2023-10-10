@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from itou.files.models import File
-from itou.utils.storage.s3 import s3_client
+from itou.utils.storage.s3 import TEMPORARY_STORAGE_PREFIX, s3_client
 
 
 class Command(BaseCommand):
@@ -13,12 +13,14 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         paginator = s3_client().get_paginator("list_objects_v2")
-        page_iterator = paginator.paginate(Bucket=settings.S3_STORAGE_BUCKET_NAME)
+        page_iterator = paginator.paginate(Bucket=settings.AWS_STORAGE_BUCKET_NAME)
         batch = []
         for page in page_iterator:
             obj_summaries = page["Contents"]
             for obj_summary in obj_summaries:
-                batch.append(File(key=obj_summary["Key"], last_modified=obj_summary["LastModified"]))
+                key = obj_summary["Key"]
+                if not key.startswith(f"{TEMPORARY_STORAGE_PREFIX}/"):
+                    batch.append(File(key=key, last_modified=obj_summary["LastModified"]))
             if len(batch) >= self.BATCH_SIZE:
                 self.insert_or_update_files(batch)
                 batch = []

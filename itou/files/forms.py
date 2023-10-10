@@ -5,6 +5,7 @@ import pypdf.errors
 from django import forms
 from django.utils.formats import localize
 from django.utils.html import format_html
+from openpyxl import load_workbook
 
 from itou.utils.constants import ITOU_HELP_CENTER_URL, MB
 
@@ -29,7 +30,49 @@ class ItouFileInput(forms.FileInput):
         return context
 
 
+class ContentTypeValidator:
+    content_type = None
+    extension = None
+
+    def __call__(self, data):
+        if pathlib.Path(data.name).suffix.lower() != f".{self.extension}":
+            raise forms.ValidationError(f"Le fichier doit avoir l’extension “.{self.extension}”.")
+        if data.content_type != self.content_type:
+            raise forms.ValidationError(f"Le fichier doit être de type “{self.content_type}”.")
+        self.validate(data)
+
+    def validate(self, data):
+        raise NotImplementedError
+
+
+class PdfValidator(ContentTypeValidator):
+    content_type = "application/pdf"
+    extension = "pdf"
+
+    def validate(self, data):
+        try:
+            pypdf.PdfReader(data)
+        except pypdf.errors.PyPdfError:
+            raise forms.ValidationError("Le fichier doit être un fichier PDF valide.")
+
+
+class XlsxValidator(ContentTypeValidator):
+    content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    extension = "xlsx"
+
+    def validate(self, data):
+        try:
+            load_workbook(data, read_only=True)
+        except ValueError:
+            raise forms.ValidationError("Le fichier doit être un fichier Excel (extension .xlsx) valide.")
+
+
 class ItouFileField(forms.FileField):
+    CONTENT_TYPE_TO_VALIDATOR = {
+        "application/pdf": PdfValidator(),
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": XlsxValidator(),
+    }
+
     def __init__(self, *args, content_type, max_upload_size, **kwargs):
         max_upload_size_mb = max_upload_size / MB
         kwargs.setdefault("widget", ItouFileInput(content_type=content_type, max_upload_size_mb=max_upload_size_mb))
@@ -63,15 +106,6 @@ class ItouFileField(forms.FileField):
         if data:
             if data.size > self.max_upload_size:
                 raise forms.ValidationError(f"Le fichier doit faire moins de {localize(self.max_upload_size_mb)} Mo.")
-            if self.content_type == "application/pdf":
-                if pathlib.Path(data.name).suffix != ".pdf":
-                    raise forms.ValidationError("Le fichier doit avoir l’extension “.pdf”.")
-                if data.content_type != self.content_type:
-                    raise forms.ValidationError("Le fichier doit être de type “application/pdf”.")
-                try:
-                    pypdf.PdfReader(data)
-                except pypdf.errors.PyPdfError:
-                    raise forms.ValidationError("Le fichier doit être un fichier PDF valide.")
-            else:
-                raise NotImplementedError
+            validator = self.CONTENT_TYPE_TO_VALIDATOR[self.content_type]
+            validator(data)
         return cleaned_data

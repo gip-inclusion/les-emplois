@@ -8,6 +8,9 @@ from django.conf import settings
 from storages.backends.s3boto3 import S3Boto3Storage
 
 
+TEMPORARY_STORAGE_PREFIX = "temporary_storage"
+
+
 def s3_client():
     return boto3.client(
         "s3",

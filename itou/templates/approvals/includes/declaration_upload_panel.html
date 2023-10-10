@@ -20,36 +20,8 @@
                     <span>Télécharger le modèle</span>
                 </a>
 
-                {% bootstrap_field form.report_file_path %}
-                {% bootstrap_field form.uploaded_file_name %}
-
                 <h4>Téléverser le modèle complété</h4>
-
-                <div class="form-group">
-                    {% if form.report_file_path %}
-                        <p>
-                            Bilan ajouté : <strong><span id="uploaded_file_name_display">{{ form.uploaded_file_name.value|default:"Aucun" }}</span></strong>
-                        </p>
-                    {% endif %}
-                    <div class="js-display-if-javascript-enabled d-block">
-                        <div id="report_file_form" class="dropzone dz-clickable text-center">
-                            <div class="dz-message">
-                                <p class="mb-1 text-nuance-06">
-                                    <i class="ri-upload-cloud-2-line ri-2x"></i>
-                                </p>
-                                <p class="mb-2">
-                                    Glisser votre fichier de bilan ici ou <strong>rechercher</strong> dans vos fichiers
-                                </p>
-                                <a href="" class="js-prevent-default btn-link btn-sm btn-ico mb-2">
-                                    <i class="ri-folder-line ri-xl"></i>
-                                    <span>Rechercher dans vos fichiers</span>
-                                </a>
-                                <p class="small text-nuance-06">Taille maximale : {{ s3_upload.config.max_file_size }} Mo</p>
-                            </div>
-                        </div>
-                        <p class="small text-muted">Type de fichier : Excel / XLSX</p>
-                    </div>
-                </div>
+                {% bootstrap_field form.report_file %}
             </div>
             <hr />
         {% endif %}

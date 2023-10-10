@@ -1,5 +1,7 @@
 import datetime
 
+from django.core.files.storage import default_storage
+
 from itou.approvals import notifications
 
 from ..users.factories import PrescriberFactory
@@ -8,6 +10,7 @@ from .factories import ProlongationRequestDenyInformationFactory, ProlongationRe
 
 def test_prolongation_request_created(snapshot):
     prolongation_request = ProlongationRequestFactory(for_snapshot=True)
+    default_storage.location = "snapshot"
     email = notifications.ProlongationRequestCreated(prolongation_request).email
 
     assert email.to == [prolongation_request.validated_by.email]
@@ -20,6 +23,7 @@ def test_prolongation_request_created_reminder(snapshot):
     other_prescribers = PrescriberFactory.create_batch(
         3, membership__organization=prolongation_request.prescriber_organization
     )
+    default_storage.location = "snapshot"
     email = notifications.ProlongationRequestCreatedReminder(prolongation_request).email
 
     assert email.to == [prolongation_request.validated_by.email]

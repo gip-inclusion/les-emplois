@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+import httpx
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.core import mail
@@ -13,7 +14,6 @@ from freezegun import freeze_time
 from itou.approvals.enums import ProlongationReason
 from itou.approvals.models import Prolongation
 from itou.siaes.enums import SiaeKind
-from itou.utils.storage.s3 import S3Upload
 from itou.utils.widgets import DuetDatePickerWidget
 from tests.approvals.factories import ProlongationFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -310,32 +310,11 @@ class ApprovalProlongationTest(TestCase):
         # No email should have been sent.
         assert len(mail.outbox) == 0
 
-    def test_prolongation_report_file_fields(self):
-        # Check S3 parameters / hidden fields mandatory for report file upload
-
-        self._setup_with_siae_kind(SiaeKind.AI)
-        self.client.force_login(self.siae_user)
-        url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
-        response = self.client.get(url)
-
-        assert response.status_code == 200
-
-        s3_upload = S3Upload(kind="prolongation_report")
-
-        # Check target S3 bucket URL
-        self.assertContains(response, s3_upload.form_values["url"])
-
-        # Config variables: same tests as for apply/resume
-        s3_upload.config.pop("upload_expiration")
-        for value in s3_upload.config.values():
-            self.assertContains(response, value)
-
-        assert s3_upload.config["key_path"] == "prolongation_report"
-        assert (
-            s3_upload.config["allowed_mime_types"]
-            == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
-
+    # Boto3 uses the current time to sign the request, and cannot be ignored due to
+    # https://github.com/spulec/freezegun/pull/430
+    # TODO: Consider switching to time-machine:
+    # https://github.com/adamchainz/time-machine
+    @freeze_time()
     def test_prolongation_report_file(self):
         # Check that report file object is saved and linked to prolongation
         # Bad reason types are checked by UI (JS) and ultimately by DB constraints
@@ -354,18 +333,29 @@ class ApprovalProlongationTest(TestCase):
             "email": self.prescriber.email,
             "contact_email": self.faker.email(),
             "contact_phone": self.faker.phone_number(),
-            "report_file_path": "prolongation_report/memento-mori.xslx",
-            "uploaded_file_name": "report_file.xlsx",
+            "report_file": self.xlsx_file,
             "prescriber_organization": self.prescriber_organization.pk,
-            "save": "1",
+            "preview": "1",
         }
 
         response = self.client.post(url, data=post_data)
+        assert response.status_code == 200
+        assert response.context["preview"] is True
+
+        # Save to DB.
+        del post_data["preview"]
+        del post_data["report_file"]
+        post_data["save"] = 1
+
+        response = self.client.post(url, data=post_data)
         assert response.status_code == 302
+        self.assertRedirects(response, reverse("dashboard:index"))
 
         prolongation_request = self.approval.prolongationrequest_set.get()
         assert prolongation_request.report_file
-        assert prolongation_request.report_file.key == "prolongation_report/memento-mori.xslx"
+        assert prolongation_request.report_file.key == "prolongation_report/empty.xlsx"
+        self.xlsx_file.seek(0)
+        assert httpx.get(prolongation_request.report_file.link).content == self.xlsx_file.read()
 
         [email] = mail.outbox
         assert email.to == [post_data["email"]]

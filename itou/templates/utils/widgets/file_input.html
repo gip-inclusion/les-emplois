@@ -17,6 +17,9 @@
             {% if widget.content_type == "application/pdf" %}
                 <br>
                 Type de fichier : PDF
+            {% elif widget.content_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" %}
+                <br>
+                Type de fichier : Excel / XLSX
             {% endif %}
         </p>
     </div>
