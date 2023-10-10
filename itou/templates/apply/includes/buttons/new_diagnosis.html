@@ -6,12 +6,12 @@
                     data-placement="top"
                     title="Vous ne pouvez pas valider les critères d'éligibilité suite aux mesures prises dans le cadre du contrôle a posteriori. {{ suspension }}">
                 <i class="ri-check-line font-weight-medium" aria-hidden="true"></i>
-                <span>Valider les critères d’éligibilité IAE</span>
+                <span>Accepter cette candidature</span>
             </button>
         {% else %}
             <a href="{% url 'apply:eligibility' job_application_id=job_application %}" class="btn btn-primary btn-block btn-ico">
                 <i class="ri-check-line font-weight-medium" aria-hidden="true"></i>
-                <span>Valider les critères d’éligibilité IAE</span>
+                <span>Accepter cette candidature</span>
             </a>
         {% endif %}
     {% endwith %}
