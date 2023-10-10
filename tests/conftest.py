@@ -81,10 +81,16 @@ def preload_spatial_reference(django_db_setup, django_db_blocker):
 @pytest.fixture(autouse=True, scope="session")
 def test_settings():
     with override_settings(
+        # Legacy.
         S3_STORAGE_ENDPOINT_DOMAIN="localhost",
-        S3_STORAGE_BUCKET_NAME="test",
+        S3_STORAGE_BUCKET_NAME="tests",
         S3_STORAGE_ACCESS_KEY_ID="minioadmin",
         S3_STORAGE_SECRET_ACCESS_KEY="minioadmin",
+        # django-storages.
+        AWS_S3_ENDPOINT_URL="http://localhost:9000/",
+        AWS_STORAGE_BUCKET_NAME="tests",
+        AWS_S3_ACCESS_KEY_ID="minioadmin",
+        AWS_S3_SECRET_ACCESS_KEY="minioadmin",
     ):
         call_command("configure_bucket", autoexpire=True)
         yield

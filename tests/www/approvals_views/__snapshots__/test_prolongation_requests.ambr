@@ -637,7 +637,7 @@
                                   Le bilan des actions réalisées et actions prévues avec le salarié, rempli par l’employeur est présent sur le document excel téléchargeable ci-dessous.
                               </p>
                               <p>
-                                  <a class="btn btn-secondary btn-ico" download="Bilan prolongation PASS IAE 999999999999 John DOE.xlsx" href="https://localhost/test/f0r_5n4p5h07">
+                                  <a class="btn btn-secondary btn-ico" download="Bilan prolongation PASS IAE 999999999999 John DOE.xlsx" href="https://localhost/tests/f0r_5n4p5h07">
                                       <i class="ri-download-line ri-lg font-weight-normal"></i>
                                       <span>Télécharger le bilan</span>
                                   </a>
