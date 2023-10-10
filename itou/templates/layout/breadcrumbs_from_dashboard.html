@@ -1,7 +1,9 @@
 {# This template needs a 'breadcrumbs' dict in context, format : {label: url,...} #}
 <nav class="c-breadcrumb" aria-label="Fil d'Ariane">
     <ol class="breadcrumb">
-        <a href="{% url 'dashboard:index' %}">Tableau de bord</a>
+        <li class="breadcrumb-item">
+            <a href="{% url 'dashboard:index' %}">Tableau de bord</a>
+        </li>
         {# Dynamic breadcrumbs #}
         {% for breadcrumb_label, breadcrumb_url in breadcrumbs.items %}
             {% if forloop.last %}

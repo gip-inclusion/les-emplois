@@ -1,6 +1,8 @@
 <nav class="c-breadcrumb c-breadcrumb--emploi" aria-label="Fil d'Ariane">
     <ol class="breadcrumb">
-        <a href="{% url 'dashboard:index' %}">Tableau de bord</a>
+        <li class="breadcrumb-item">
+            <a href="{% url 'dashboard:index' %}">Tableau de bord</a>
+        </li>
         <li class="breadcrumb-item active" aria-current="page">
             <a href="{% url 'siaes_views:edit_siae_step_contact_infos' %}">Fiche structure</a>
         </li>
