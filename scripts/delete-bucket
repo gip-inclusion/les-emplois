@@ -41,10 +41,12 @@ def main():
     paginator = s3_client.get_paginator("list_objects_v2")
     try:
         for page in paginator.paginate(Bucket=bucket_name):
-            s3_client.delete_objects(
-                Bucket=bucket_name,
-                Delete={"Objects": [{"Key": obj["Key"]} for obj in page["Contents"]]},
-            )
+            # Empty pages don’t have a Contents key.
+            if "Contents" in page:
+                s3_client.delete_objects(
+                    Bucket=bucket_name,
+                    Delete={"Objects": [{"Key": obj["Key"]} for obj in page["Contents"]]},
+                )
         s3_client.delete_bucket(Bucket=bucket_name)
     except s3_client.exceptions.NoSuchBucket:
         pass
