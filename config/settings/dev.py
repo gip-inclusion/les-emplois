@@ -74,4 +74,7 @@ METABASE_DATABASE = os.getenv("PGDATABASE", "metabase")  # noqa: F405
 
 FORCE_IC_LOGIN = os.getenv("FORCE_IC_LOGIN", "True") == "True"
 
+AWS_S3_ENDPOINT_URL = f"http://{os.getenv('CELLAR_ADDON_HOST', 'localhost:9000')}/"
+AWS_S3_ACCESS_KEY_ID = "minioadmin"
+AWS_S3_SECRET_ACCESS_KEY = "minioadmin"
 AWS_STORAGE_BUCKET_NAME = "dev"
