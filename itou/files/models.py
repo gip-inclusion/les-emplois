@@ -1,4 +1,4 @@
-from django.conf import settings
+from django.core.files.storage import default_storage
 from django.db import models
 from django.utils import timezone
 
@@ -16,4 +16,4 @@ class File(models.Model):
 
     @property
     def link(self):
-        return f"https://{settings.S3_STORAGE_ENDPOINT_DOMAIN}/{settings.S3_STORAGE_BUCKET_NAME}/{self.key}"
+        return default_storage.url(self.key)

@@ -1,3 +1,4 @@
+import pathlib
 import urllib.parse
 from datetime import date, timedelta
 
@@ -5,6 +6,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
+from django.core.files.storage import default_storage
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -29,7 +31,7 @@ from itou.utils import constants as global_constants
 from itou.utils.pagination import ItouPaginator, pager
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
-from itou.utils.storage.s3 import S3Upload
+from itou.utils.storage.s3 import TEMPORARY_STORAGE_PREFIX
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import UserExistsForm
 from itou.www.approvals_views.forms import (
@@ -226,21 +228,52 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
     back_url = prolongation_back_url(request)
     preview = False
 
-    form = get_prolongation_form(approval=approval, siae=siae, data=request.POST or None)
+    form = get_prolongation_form(
+        approval=approval,
+        siae=siae,
+        data=request.POST or None,
+        files=request.FILES or None,
+    )
+
+    # The file was saved before the preview step, and its reference is stored in the session.
+    # Don’t validate it.
+    if request.POST.get("save"):
+        try:
+            del form.fields["report_file"]
+        except KeyError:
+            pass
 
     if request.method == "POST" and form.is_valid():
         prolongation = form.save(commit=False)
         prolongation.created_by = request.user
         prolongation.declared_by = request.user
+        session_key = f"declare_prolongation:{siae.pk}:{approval.pk}"
 
         if request.POST.get("preview"):
             preview = True
+            # The file cannot be re-submitted and is stored for the duration of the preview.
+            try:
+                prolongation_report = form.cleaned_data["report_file"]
+            except KeyError:
+                pass
+            else:
+                request.session[session_key] = default_storage.save(
+                    f"{TEMPORARY_STORAGE_PREFIX}/{prolongation_report.name}", prolongation_report
+                )
         elif request.POST.get("save"):
             if siae.can_upload_prolongation_report:
-                if key := form.cleaned_data.get("report_file_path"):
-                    prolongation.report_file = File(key)
-                    prolongation.report_file.save()
-
+                try:
+                    tmpfile_key = request.session.pop(session_key)
+                except KeyError:
+                    pass
+                else:
+                    filename = pathlib.Path(tmpfile_key).name
+                    with default_storage.open(tmpfile_key) as prolongation_report:
+                        prolongation_report_key = default_storage.save(
+                            f"prolongation_report/{filename}", prolongation_report
+                        )
+                    default_storage.delete(tmpfile_key)
+                    prolongation.report_file = File.objects.create(key=prolongation_report_key)
             prolongation.save()
             prolongation.notify_authorized_prescriber()
             messages.success(request, "Déclaration de prolongation enregistrée.")
@@ -253,7 +286,6 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
         "preview": preview,
         "unfold_details": form.data.get("reason") in PROLONGATION_REPORT_FILE_REASONS,
         "can_upload_prolongation_report": siae.can_upload_prolongation_report,
-        "s3_upload": S3Upload(kind="prolongation_report") if siae.can_upload_prolongation_report else None,
     }
 
     return render(request, template_name, context)
@@ -282,14 +314,18 @@ class DeclareProlongationHTMXFragmentView(TemplateView):
         if not self.approval.can_be_prolonged:
             raise PermissionDenied()
 
-        self.form = get_prolongation_form(approval=self.approval, siae=self.siae, data=request.POST or None)
+        self.form = get_prolongation_form(
+            approval=self.approval,
+            siae=self.siae,
+            data=request.POST or None,
+            files=request.FILES or None,
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context |= {
             "approval": self.approval,
             "form": self.form,
-            "s3_upload": S3Upload(kind="prolongation_report") if self.siae.can_upload_prolongation_report else None,
         }
         return context
 
@@ -312,7 +348,7 @@ class DeclareProlongationHTMXFragmentView(TemplateView):
 
 class UpdateFormForReasonView(DeclareProlongationHTMXFragmentView):
     template_name = "approvals/includes/prolongation_declaration_form.html"
-    clear_errors = ("email", "end_at")
+    clear_errors = ("email", "end_at", "report_file")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

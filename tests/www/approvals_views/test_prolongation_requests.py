@@ -1,6 +1,7 @@
 import factory
 import pytest
 from django.contrib import messages
+from django.core.files.storage import default_storage
 from django.template import loader
 from django.urls import reverse
 from pytest_django.asserts import assertNumQueries, assertRedirects
@@ -99,6 +100,7 @@ def test_show_view(snapshot, client):
     prolongation_request = approvals_factories.ProlongationRequestFactory(for_snapshot=True)
     client.force_login(prolongation_request.validated_by)
 
+    default_storage.location = "snapshot"
     response = client.get(
         reverse("approvals:prolongation_request_show", kwargs={"prolongation_request_id": prolongation_request.pk})
     )

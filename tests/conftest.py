@@ -24,6 +24,7 @@ from pytest_django.plugin import INVALID_TEMPLATE_VARS_ENV
 pytest.register_assert_rewrite("tests.utils.test", "tests.utils.htmx.test")
 
 from itou.utils import faker_providers  # noqa: E402
+from itou.utils.storage.s3 import s3_client  # noqa: E402
 from tests.users.factories import ItouStaffFactory  # noqa: E402
 from tests.utils.htmx.test import HtmxClient  # noqa: E402
 from tests.utils.test import NoInlineClient  # noqa: E402
@@ -104,6 +105,26 @@ def storage_prefix_per_test(test_settings):
     default_storage.location = original_location
 
 
+@pytest.fixture
+def temporary_bucket(test_settings):
+    with override_settings(AWS_STORAGE_BUCKET_NAME=f"tests-{uuid.uuid4()}"):
+        call_command("configure_bucket")
+        yield
+        client = s3_client()
+        paginator = client.get_paginator("list_objects_v2")
+        try:
+            for page in paginator.paginate(Bucket=settings.AWS_STORAGE_BUCKET_NAME):
+                # Empty pages don’t have a Contents key.
+                if "Contents" in page:
+                    client.delete_objects(
+                        Bucket=settings.AWS_STORAGE_BUCKET_NAME,
+                        Delete={"Objects": [{"Key": obj["Key"]} for obj in page["Contents"]]},
+                    )
+            client.delete_bucket(Bucket=settings.AWS_STORAGE_BUCKET_NAME)
+        except s3_client.exceptions.NoSuchBucket:
+            pass
+
+
 @pytest.fixture(autouse=True, scope="session", name="django_loaddata")
 def django_loaddata_fixture(django_db_setup, django_db_blocker):
     with django_db_blocker.unblock():
@@ -137,11 +158,12 @@ def itou_faker_provider(_session_faker):
 
 
 @pytest.fixture(scope="function")
-def unittest_compatibility(request, faker, pdf_file, snapshot, mocker):
+def unittest_compatibility(request, faker, pdf_file, snapshot, mocker, xlsx_file):
     request.instance.faker = faker
     request.instance.pdf_file = pdf_file
     request.instance.snapshot = snapshot
     request.instance.mocker = mocker
+    request.instance.xlsx_file = xlsx_file
 
 
 @pytest.fixture(autouse=True)
@@ -264,3 +286,9 @@ def make_unordered_queries_randomly_ordered():
 def pdf_file():
     with open("tests/data/empty.pdf", "rb") as pdf:
         yield pdf
+
+
+@pytest.fixture
+def xlsx_file():
+    with open("tests/data/empty.xlsx", "rb") as xlsx:
+        yield xlsx

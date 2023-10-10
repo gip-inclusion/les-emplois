@@ -22,10 +22,12 @@ from itou.approvals.models import (
     ProlongationRequestDenyInformation,
     Suspension,
 )
+from itou.files.forms import ItouFileField
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import UserKind
 from itou.users.models import User
+from itou.utils.constants import MB
 from itou.utils.validators import MaxDateValidator, MinDateValidator
 from itou.utils.widgets import DuetDatePickerWidget
 
@@ -218,8 +220,6 @@ class CreateProlongationForm(forms.ModelForm):
 class CreateProlongationRequestForm(CreateProlongationForm):
     """Request a prolongation. Used when the reason need to be validated by a prescriber."""
 
-    report_file_path = forms.CharField(required=False, disabled=True, widget=forms.HiddenInput())
-    uploaded_file_name = forms.CharField(required=False, disabled=True, widget=forms.HiddenInput())
     email = forms.EmailField(
         label="Adresse e-mail du prescripteur habilité sollicité pour cette prolongation",
         help_text=(
@@ -264,8 +264,6 @@ class CreateProlongationRequestForm(CreateProlongationForm):
     class Meta(CreateProlongationForm.Meta):
         model = ProlongationRequest
         fields = CreateProlongationForm.Meta.fields + [
-            "report_file_path",
-            "uploaded_file_name",
             "email",
             "prescriber_organization",
             "require_phone_interview",
@@ -276,16 +274,21 @@ class CreateProlongationRequestForm(CreateProlongationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Customize "report_file_path" and "uploaded_file_name" field
+        # Customize "report_file" field
+        unvalidated_reason = self.data.get("reason")
         if (
-            self.data.get("reason") in PROLONGATION_REPORT_FILE_REASONS
+            unvalidated_reason in PROLONGATION_REPORT_FILE_REASONS
             and self.instance.declared_by_siae.can_upload_prolongation_report
         ):
-            self.fields["report_file_path"].required = self.fields["uploaded_file_name"].required = True
-            self.fields["report_file_path"].disabled = self.fields["uploaded_file_name"].disabled = False
+            report_file_field = ItouFileField(
+                content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                max_upload_size=MB,
+                label="Fichier bilan du candidat",
+            )
+            self.fields["report_file"] = report_file_field
 
         # Customize "email" and "prescriber_organization" fields
-        if self.data.get("reason") not in Prolongation.REASONS_NOT_NEED_PRESCRIBER_OPINION:
+        if unvalidated_reason not in Prolongation.REASONS_NOT_NEED_PRESCRIBER_OPINION:
             self.fields["email"].required = True
         self.fields["email"].widget.attrs.update({"placeholder": "Adresse e-mail du prescripteur habilité"})
         self.fields["prescriber_organization"].widget.attrs.update(
@@ -341,17 +344,6 @@ class CreateProlongationRequestForm(CreateProlongationForm):
                     "Ce prescripteur n'a pas de compte sur les emplois de l'inclusion. "
                     "Merci de renseigner l'e-mail d'un conseiller inscrit sur le service.",
                 )
-
-        # Prolongation report :
-        # - is only mandatory for these reasons
-        # - is temporarily limited to AI kind
-        if (
-            self.cleaned_data.get("reason") in PROLONGATION_REPORT_FILE_REASONS
-            and self.instance.declared_by_siae.can_upload_prolongation_report
-        ):
-            if not self.cleaned_data.get("report_file_path") or not self.cleaned_data.get("uploaded_file_name"):
-                # No visible field for this form field
-                raise ValidationError("Vous devez fournir un fichier de bilan renseigné")
 
 
 class ProlongationRequestFilterForm(forms.Form):

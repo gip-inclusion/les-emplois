@@ -561,11 +561,6 @@ STORAGE_UPLOAD_KINDS = {
     "evaluations": {
         "key_path": "evaluations",
     },
-    "prolongation_report": {
-        "allowed_mime_types": ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"],
-        "max_file_size": 1,
-        "key_path": "prolongation_report",
-    },
 }
 
 HIJACK_PERMISSION_CHECK = "itou.utils.perms.user.has_hijack_perm"

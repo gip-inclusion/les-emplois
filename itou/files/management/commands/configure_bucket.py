@@ -4,7 +4,7 @@ import httpx
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from itou.utils.storage.s3 import s3_client
+from itou.utils.storage.s3 import TEMPORARY_STORAGE_PREFIX, s3_client
 
 
 class Command(BaseCommand):
@@ -61,20 +61,22 @@ class Command(BaseCommand):
                 },
             )
 
+        auto_expire_rule_filter = {"Prefix": TEMPORARY_STORAGE_PREFIX}
         if autoexpire:
             assert settings.ITOU_ENVIRONMENT == "DEV"
-            client.put_bucket_lifecycle_configuration(
-                Bucket=bucket,
-                LifecycleConfiguration={
-                    "Rules": [
-                        {
-                            "Expiration": {"Days": 7},
-                            "Filter": {},
-                            "Status": "Enabled",
-                        },
-                    ],
-                },
-            )
+            auto_expire_rule_filter = {}
+        client.put_bucket_lifecycle_configuration(
+            Bucket=bucket,
+            LifecycleConfiguration={
+                "Rules": [
+                    {
+                        "Expiration": {"Days": 7},
+                        "Filter": auto_expire_rule_filter,
+                        "Status": "Enabled",
+                    }
+                ]
+            },
+        )
 
     def check_minio(self):
         response = httpx.head(settings.AWS_S3_ENDPOINT_URL)
