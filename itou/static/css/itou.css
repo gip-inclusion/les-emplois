@@ -355,25 +355,6 @@ _:-ms-fullscreen,
     width: 100px;
 }
 
-/* Welcoming tour.
---------------------------------------------------------------------------- */
-#welcoming_tour {
-    margin-bottom: 16px;
-}
-
-#welcoming_tour .carousel-indicators {
-    margin-bottom: 0;
-    bottom: -16px;
-}
-
-#welcoming_tour .carousel-indicators li {
-    background-color: #3f3e62;
-}
-
-#welcoming_tour .carousel-indicators li.active {
-    background-color: #000638;
-}
-
 /* HTMX
 --------------------------------------------------------------------------- */
 .htmx-indicator {

@@ -2,7 +2,7 @@
 {% load static %}
 {% load django_bootstrap5 %}
 
-{% block title %}Bienvenue sur les emplois de l'inclusion ! {{ block.super }}{% endblock %}
+{% block title %}BB Bienvenue sur les emplois de l'inclusion ! {{ block.super }}{% endblock %}
 
 {% block content_title_wrapper %}{% endblock %}
 
@@ -12,11 +12,12 @@
             <div class="row">
                 <div class="col-12">
                     <div id="welcoming_tour" class="carousel">
-                        <ol class="carousel-indicators">
-                            <li data-bs-target="#welcoming_tour" data-bs-slide-to="0" class="active"></li>
-                            <li data-bs-target="#welcoming_tour" data-bs-slide-to="1"></li>
-                        </ol>
-                        <div class="carousel-inner">
+                        <div class="carousel-indicators">
+                            <button type="button" data-bs-target="#welcoming_tour" data-bs-slide-to="0" class="active" aria-current="true">
+                            </button>
+                            <button type="button" data-bs-target="#welcoming_tour" data-bs-slide-to="1"></button>
+                        </div>
+                        <div class="carousel-inner pb-5">
                             <div class="carousel-item active">
                                 <div class="d-block w-100 text-center">
                                     <h1 class="h1-hero-c1">Bienvenue sur les emplois de l'inclusion !</h1>
