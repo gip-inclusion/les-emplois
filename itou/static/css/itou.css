@@ -215,15 +215,6 @@ _:-ms-fullscreen,
     display: block;
 }
 
-/* JavaScript disabled.
----------------------------------------------------------------------------- */
-
-/* Element is shown with JavaScript. See static > js > utils.js */
-
-.js-display-if-javascript-enabled {
-    display: none;
-}
-
 /* CSS for js-shroud.
 ---------------------------------------------------------------------------- */
 
