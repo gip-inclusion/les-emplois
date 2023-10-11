@@ -3,8 +3,6 @@ htmx.onLoad((target) => {
         event.preventDefault();
     });
 
-    $(".js-display-if-javascript-enabled", target).css("display", "block");
-
   /**
    * JS to swap elements based on CSS selectors
    */
