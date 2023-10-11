@@ -1,17 +1,17 @@
 from dateutil.relativedelta import relativedelta
 from django import forms
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 
+from itou.files.forms import ItouFileField
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.models import (
-    EvaluatedAdministrativeCriteria,
     EvaluatedJobApplication,
     EvaluatedSiae,
     EvaluationCampaign,
 )
+from itou.utils.constants import MB
 from itou.utils.types import InclusiveDateRange
 from itou.utils.validators import MinDateValidator
 from itou.utils.widgets import DuetDatePickerWidget
@@ -35,30 +35,8 @@ class SetChosenPercentForm(forms.ModelForm):
         }
 
 
-class SubmitEvaluatedAdministrativeCriteriaProofForm(forms.ModelForm):
-    class Meta:
-        model = EvaluatedAdministrativeCriteria
-        fields = ["proof_url"]
-
-    def save(self):
-        instance = super().save(commit=False)
-        instance.uploaded_at = timezone.now()
-        instance.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
-        instance.submitted_at = None
-        instance.save(update_fields=["proof_url", "uploaded_at", "review_state", "submitted_at"])
-        return instance
-
-    def clean_proof_url(self):
-        # re-use of itou.common_apps.resume.ResumeFormMixin.clean_resume_link
-        # could be refatored later if we switch from URLField to FileField
-        proof_url = self.cleaned_data.get("proof_url")
-        # ensure the doc has been uploaded via our S3 platform and is not a link to a 3rd party website
-        if proof_url and settings.S3_STORAGE_ENDPOINT_DOMAIN not in proof_url:
-            self.add_error(
-                "proof_url",
-                forms.ValidationError("Le document sélectionné ne provient pas d'une source de confiance."),
-            )
-        return proof_url
+class SubmitEvaluatedAdministrativeCriteriaProofForm(forms.Form):
+    proof = ItouFileField(content_type="application/pdf", max_upload_size=5 * MB, label="Justificatif")
 
 
 class LaborExplanationForm(forms.ModelForm):

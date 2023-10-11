@@ -3,6 +3,7 @@ import datetime
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.files.storage import default_storage
 from django.db.models import Q
 from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_list_or_404, get_object_or_404, render
@@ -26,7 +27,6 @@ from itou.siaes.models import Siae
 from itou.utils.emails import send_email_messages
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
-from itou.utils.storage.s3 import S3Upload
 from itou.utils.urls import get_safe_url
 from itou.www.eligibility_views.forms import AdministrativeCriteriaOfJobApplicationForm
 from itou.www.siae_evaluations_views.forms import (
@@ -654,9 +654,7 @@ def siae_upload_doc(
     if not evaluated_administrative_criteria.can_upload():
         return HttpResponseForbidden()
 
-    form = SubmitEvaluatedAdministrativeCriteriaProofForm(
-        instance=evaluated_administrative_criteria, data=request.POST or None
-    )
+    form = SubmitEvaluatedAdministrativeCriteriaProofForm(data=request.POST or None, files=request.FILES or None)
 
     url = (
         reverse(
@@ -669,14 +667,21 @@ def siae_upload_doc(
     )
 
     if request.method == "POST" and form.is_valid():
-        form.save()
+        proof_file = form.cleaned_data["proof"]
+        proof_key = default_storage.save(f"evaluations/{proof_file.name}", proof_file)
+        evaluated_administrative_criteria.proof_url = default_storage.url(proof_key)
+        evaluated_administrative_criteria.uploaded_at = timezone.now()
+        evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
+        evaluated_administrative_criteria.submitted_at = None
+        evaluated_administrative_criteria.save(
+            update_fields=["proof_url", "uploaded_at", "review_state", "submitted_at"]
+        )
         return HttpResponseRedirect(url)
 
     back_url = get_safe_url(request, "back_url", fallback_url=url)
 
     context = {
         "evaluated_administrative_criteria": evaluated_administrative_criteria,
-        "s3_upload": S3Upload(kind="evaluations"),
         "form": form,
         "back_url": back_url,
         "matomo_custom_title": "Contrôle a posteriori : téléversement des justificatifs",

@@ -70,7 +70,7 @@ class Command(BaseCommand):
             with os.fdopen(fd, "wb") as fileobj:
                 for _ in range(5):
                     try:
-                        client.download_fileobj(settings.S3_STORAGE_BUCKET_NAME, key, fileobj)
+                        client.download_fileobj(settings.AWS_STORAGE_BUCKET_NAME, key, fileobj)
                     except (BotoConnectionError, HTTPClientError):
                         pass
                     else:

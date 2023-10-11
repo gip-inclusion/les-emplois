@@ -76,21 +76,6 @@ ASSET_INFOS = {
             ],
         },
     },
-    "dropzone": {
-        "download": {
-            "url": "https://registry.npmjs.org/dropzone/-/dropzone-5.9.2.tgz",
-            "sha256": "3f5a46d160faec41c834f00379444fe172b5b7793c3a4230307941728bd1a8f1",
-        },
-        "extract": {
-            "origin": "package",
-            "destination": "vendor/dropzone",
-            "files": [
-                "LICENSE",
-                ("dist/min/dropzone.min.css", "dropzone.min.css"),
-                ("dist/min/dropzone.min.js", "dropzone.min.js"),
-            ],
-        },
-    },
     "htmx.org": {
         "download": {
             "url": "https://registry.npmjs.org/htmx.org/-/htmx.org-1.9.6.tgz",

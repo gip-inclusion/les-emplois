@@ -533,11 +533,6 @@ ASP_FS_KNOWN_HOSTS = os.getenv("ASP_FS_KNOWN_HOSTS")
 
 # S3 uploads
 # ------------------------------------------------------------------------------
-S3_STORAGE_ACCESS_KEY_ID = os.getenv("CELLAR_ADDON_KEY_ID")
-S3_STORAGE_SECRET_ACCESS_KEY = os.getenv("CELLAR_ADDON_KEY_SECRET")
-S3_STORAGE_ENDPOINT_DOMAIN = os.getenv("CELLAR_ADDON_HOST")
-S3_STORAGE_BUCKET_NAME = os.getenv("S3_STORAGE_BUCKET_NAME")
-S3_STORAGE_BUCKET_REGION = "eu-west-3"
 # django-storages
 AWS_S3_ACCESS_KEY_ID = os.getenv("CELLAR_ADDON_KEY_ID")
 AWS_S3_SECRET_ACCESS_KEY = os.getenv("CELLAR_ADDON_KEY_SECRET")
@@ -548,20 +543,6 @@ AWS_S3_MAX_MEMORY_SIZE = 5 * 1024 * 1024
 AWS_S3_FILE_OVERWRITE = False
 AWS_S3_REGION_NAME = "eu-west-3"
 AWS_S3_ENDPOINT_URL = f"https://{os.getenv('CELLAR_ADDON_HOST')}/"
-
-STORAGE_UPLOAD_KINDS = {
-    "default": {
-        "allowed_mime_types": ["application/pdf"],
-        "upload_expiration": 90 * 60,  # in seconds
-        "key_path": "",  # appended before the file key. No backslash!
-        "max_files": 1,
-        "max_file_size": 5,  # in mb
-        "timeout": 20000,  # in ms
-    },
-    "evaluations": {
-        "key_path": "evaluations",
-    },
-}
 
 HIJACK_PERMISSION_CHECK = "itou.utils.perms.user.has_hijack_perm"
 HIJACK_ALLOWED_USER_EMAILS = [s.lower() for s in os.getenv("HIJACK_ALLOWED_USER_EMAILS", "").split(",") if s]
@@ -638,11 +619,6 @@ if MATOMO_BASE_URL:
 CSP_WORKER_SRC = [
     "'self' blob:",  # Redoc seems to use blob:https://emplois.inclusion.beta.gouv.fr/some-ran-dom-uu-id
 ]
-# TODO: Remove with dropzone.js, once all documents transit through the application.
-if S3_STORAGE_ENDPOINT_DOMAIN:
-    CSP_CONNECT_SRC += [
-        f"https://{S3_STORAGE_ENDPOINT_DOMAIN}",
-    ]
 CSP_INCLUDE_NONCE_IN = ["script-src", "script-src-elem"]
 CSP_REPORT_URI = os.getenv("CSP_REPORT_URI", None)
 
