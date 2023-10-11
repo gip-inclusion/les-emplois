@@ -1,6 +1,7 @@
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.core import mail
+from django.core.files.storage import default_storage
 from django.urls import reverse
 from django.utils import dateformat, timezone
 from freezegun import freeze_time
@@ -9,7 +10,6 @@ from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria
-from itou.utils.storage.s3 import S3Upload
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.siae_evaluations.factories import (
@@ -700,6 +700,7 @@ class SiaeSelectCriteriaViewTest(TestCase):
                 assert "checked" not in response.context["level_2_fields"][i].subwidgets[0].data["attrs"]
 
 
+@pytest.mark.usefixtures("unittest_compatibility")
 class SiaeUploadDocsViewTest(TestCase):
     def setUp(self):
         super().setUp()
@@ -771,8 +772,6 @@ class SiaeUploadDocsViewTest(TestCase):
             administrative_criteria=criterion.administrative_criteria,
         )
 
-        s3_upload = S3Upload(kind="evaluations")
-
         url = reverse(
             "siae_evaluations_views:siae_upload_doc",
             kwargs={"evaluated_administrative_criteria_pk": evaluated_administrative_criteria.pk},
@@ -790,14 +789,6 @@ class SiaeUploadDocsViewTest(TestCase):
             == response.context["back_url"]
         )
         assert evaluated_administrative_criteria == response.context["evaluated_administrative_criteria"]
-
-        for k, v in s3_upload.form_values.items():
-            with self.subTest("s3_upload.form_values", k=k):
-                assert v == response.context["s3_upload"].form_values[k]
-
-        for k, v in s3_upload.config.items():
-            with self.subTest("s3_upload.config", k=k):
-                assert v == response.context["s3_upload"].config[k]
 
     def test_post(self):
         fake_now = timezone.now()
@@ -819,20 +810,7 @@ class SiaeUploadDocsViewTest(TestCase):
         )
         response = self.client.get(url)
 
-        # Test fields mandatory to upload to S3
-        s3_upload = S3Upload(kind="evaluations")
-
-        # Don't test S3 form fields as it led to flaky tests and
-        # it's already done by the Boto library.
-        self.assertContains(response, s3_upload.form_values["url"])
-
-        # Config variables
-        for _, value in s3_upload.config.items():
-            self.assertContains(response, value)
-
-        post_data = {
-            "proof_url": "http://localhost/rocky-balboa.pdf",
-        }
+        post_data = {"proof": self.pdf_file}
         response = self.client.post(url, data=post_data)
         assert response.status_code == 302
 
@@ -853,6 +831,7 @@ class SiaeUploadDocsViewTest(TestCase):
             evaluated_administrative_criteria.review_state
             == evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
         )
+        assert evaluated_administrative_criteria.proof_url == default_storage.url("evaluations/empty.pdf")
 
     def test_post_with_submission_freezed_at(self):
         fake_now = timezone.now()
@@ -877,9 +856,7 @@ class SiaeUploadDocsViewTest(TestCase):
             kwargs={"evaluated_administrative_criteria_pk": evaluated_administrative_criteria.pk},
         )
 
-        post_data = {
-            "proof_url": "https://server.com/rocky-balboa.pdf",
-        }
+        post_data = {"proof": self.pdf_file}
         response = self.client.post(url, data=post_data)
         assert response.status_code == 403
         evaluated_administrative_criteria.refresh_from_db()

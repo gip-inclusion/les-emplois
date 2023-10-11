@@ -3,11 +3,6 @@
 {% load i18n %}
 {% load static %}
 
-{% block extra_head %}
-    <!-- Dropzone -->
-    <link rel="stylesheet" type="text/css" href='{% static "vendor/dropzone/dropzone.min.css" %}'>
-{% endblock extra_head %}
-
 {% block title %}
     Auto-prescriptions à justifier pour
     {{ full_name|title }}
@@ -45,13 +40,9 @@
 
                             <div class="row mt-3">
                                 <div class="col-md-12">
-                                    <form method="post" class="js-prevent-multiple-submit">
+                                    <form method="post" class="js-prevent-multiple-submit"{% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
                                         {% csrf_token %}
-                                        {% bootstrap_form_errors form alert_error_type="all" %}
-                                        {{ form.proof_url.as_hidden }}
-                                        <label for="resume_form" class="js-display-if-javascript-enabled"></label>
-                                        {% include "storage/s3_upload_form.html" with dropzone_form_id="resume_form" %}
-
+                                        {% bootstrap_form form alert_error_type="all" %}
                                         <div class="mt-3 alert alert-info small" role="status">
                                             <div class="row">
                                                 <div class="col-auto pr-0">
@@ -90,23 +81,4 @@
             </div>
         </div>
     </section>
-{% endblock %}
-
-{% block script %}
-    {{ block.super }}
-    <script src='{% static "vendor/dropzone/dropzone.min.js" %}'></script>
-    <script src='{% static "js/s3_upload.js" %}'></script>
-    {{ s3_upload.form_values|json_script:"s3-form-values" }}
-    {{ s3_upload.config|json_script:"s3-upload-config" }}
-    <script nonce="{{ CSP_NONCE }}">
-        s3UploadInit({
-            dropzoneSelector: "#resume_form",
-            callbackLocationSelector: "#{{ form.proof_url.id_for_label }}",
-            s3FormValuesId: "s3-form-values",
-            s3UploadConfigId: "s3-upload-config",
-            // Not really nice
-            sentryInternalUrl: "{% url 'home:sentry_debug' %}",
-            sentryCsrfToken: "{{ csrf_token }}"
-        });
-    </script>
 {% endblock %}
