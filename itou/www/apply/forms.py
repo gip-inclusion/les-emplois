@@ -390,8 +390,6 @@ class SubmitJobApplicationForm(forms.Form):
             help_text = "Message obligatoire et non modifiable après l’envoi."
         message.help_text = help_text
 
-        self.fields["resume"].widget.attrs["accept"] = "application/pdf"
-
 
 class RefusalForm(forms.Form):
     ANSWER_INITIAL = (

@@ -13,6 +13,11 @@ class ItouFileInput(forms.FileInput):
     template_name = "utils/widgets/file_input.html"
 
     def __init__(self, *, attrs=None, content_type, max_upload_size_mb):
+        if attrs is None:
+            attrs = {}
+        else:
+            attrs = attrs.copy()
+        attrs.setdefault("accept", content_type)
         super().__init__(attrs=attrs)
         self.content_type = content_type
         self.max_upload_size_mb = max_upload_size_mb
