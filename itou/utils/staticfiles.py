@@ -109,8 +109,8 @@ ASSET_INFOS = {
     },
     "jquery": {
         "download": {
-            "url": "https://registry.npmjs.org/jquery/-/jquery-3.6.1.tgz",
-            "sha256": "06be03afa548debcfef4f5773b044ed2a9ace7541b4d422a8c28cbb3498e900f",
+            "url": "https://registry.npmjs.org/jquery/-/jquery-3.7.1.tgz",
+            "sha256": "68a9f787516da47c680e09c187bcbac4536b6f85d90eb882844e12919e583f53",
         },
         "extract": {
             "origin": "package",
