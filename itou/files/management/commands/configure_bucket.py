@@ -73,13 +73,12 @@ class Command(BaseCommand):
             allowed_origins.append(f"{protocol}://{origin}")
         if not is_minio:
             # MinIO does not support setting CORS.
-            allowed_headers = ["Cache-Control", "X-Requested-With"]
             client.put_bucket_cors(
                 Bucket=bucket,
                 CORSConfiguration={
                     "CORSRules": [
                         {
-                            "AllowedHeaders": allowed_headers,
+                            "AllowedHeaders": ["Cache-Control", "X-Requested-With"],
                             "AllowedMethods": ["GET", "PUT", "POST", "DELETE", "HEAD"],
                             "AllowedOrigins": allowed_origins,
                             "ExposeHeaders": ["ETag", "Location"],
