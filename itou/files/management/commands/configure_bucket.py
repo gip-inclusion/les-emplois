@@ -65,14 +65,14 @@ class Command(BaseCommand):
             ),
         )
 
-        protocol = "https" if settings.ITOU_ENVIRONMENT != "DEV" else "http"
-        allowed_origins = []
-        for origin in settings.ALLOWED_HOSTS:
-            if origin.startswith("."):
-                origin = f"*{origin}"
-            allowed_origins.append(f"{protocol}://{origin}")
+        # MinIO does not support setting CORS.
         if not is_minio:
-            # MinIO does not support setting CORS.
+            protocol = "https" if settings.ITOU_ENVIRONMENT != "DEV" else "http"
+            allowed_origins = []
+            for origin in settings.ALLOWED_HOSTS:
+                if origin.startswith("."):
+                    origin = f"*{origin}"
+                allowed_origins.append(f"{protocol}://{origin}")
             client.put_bucket_cors(
                 Bucket=bucket,
                 CORSConfiguration={
