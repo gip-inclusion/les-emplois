@@ -14,6 +14,7 @@ class ItouLoginForm(LoginForm):
         self.fields["password"].widget.attrs["placeholder"] = "**********"
         self.fields["login"].widget.attrs["placeholder"] = "adresse@email.fr"
         self.fields["login"].label = "Adresse e-mail"
+        self.fields["login"].widget.attrs["autofocus"] = True
 
     def clean(self):
         # Parent method performs authentication on form success.
