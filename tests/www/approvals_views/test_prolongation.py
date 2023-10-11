@@ -337,7 +337,7 @@ class ApprovalProlongationTest(TestCase):
             == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
 
-    def test_prolongation_report_file_saved(self):
+    def test_prolongation_report_file(self):
         # Check that report file object is saved and linked to prolongation
         # Bad reason types are checked by UI (JS) and ultimately by DB constraints
 
@@ -368,42 +368,9 @@ class ApprovalProlongationTest(TestCase):
         assert prolongation_request.report_file
         assert prolongation_request.report_file.key == "prolongation_report/memento-mori.xslx"
 
-    def test_prolongation_notification_contains_report_link(self):
-        # Check that report file object is saved and linked to prolongation
-        # Bad reason types are checked by UI (JS) and ultimately by DB constraints
-
-        self._setup_with_siae_kind(SiaeKind.AI)
-        self.client.force_login(self.siae_user)
-        url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
-        response = self.client.get(url)
-
-        reason = ProlongationReason.SENIOR
-        end_at = self.approval.end_at + relativedelta(days=30)
-
-        post_data = {
-            "end_at": end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "reason": reason,
-            "email": self.prescriber.email,
-            "contact_email": self.faker.email(),
-            "contact_phone": self.faker.phone_number(),
-            "report_file_path": "prolongation_report/memento-mori.xslx",
-            "uploaded_file_name": "report_file.xlsx",
-            "prescriber_organization": self.prescriber_organization.pk,
-            "save": "1",
-        }
-
-        response = self.client.post(url, data=post_data)
-
-        assert response.status_code == 302
-        assert len(mail.outbox) == 1
-
-        email = mail.outbox[0]
-
-        assert len(email.to) == 1
-        assert email.to[0] == post_data["email"]
+        [email] = mail.outbox
+        assert email.to == [post_data["email"]]
         assert email.subject == f"Demande de prolongation du PASS IAE de {self.approval.user.get_full_name()}"
-
-        prolongation_request = self.approval.prolongationrequest_set.get()
         assert prolongation_request.report_file.link in email.body
         assert self.PROLONGATION_EMAIL_REPORT_TEXT in email.body
 
