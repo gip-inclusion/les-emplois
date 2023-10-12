@@ -4,6 +4,7 @@ from django.utils import timezone
 
 from itou.eligibility.models import AdministrativeCriteria
 from itou.siae_evaluations import models
+from tests.files.factories import FileFactory
 from tests.institutions.factories import InstitutionFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.siaes.factories import SiaeFactory
@@ -98,3 +99,4 @@ class EvaluatedAdministrativeCriteriaFactory(factory.django.DjangoModelFactory):
 
     administrative_criteria = factory.Iterator(AdministrativeCriteria.objects.all())
     proof_url = "https://server.com/rocky-balboa.pdf"
+    proof = factory.SubFactory(FileFactory)

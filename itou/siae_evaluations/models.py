@@ -764,6 +764,7 @@ class EvaluatedAdministrativeCriteria(models.Model):
     )
 
     proof_url = models.URLField(max_length=500, verbose_name="lien vers le justificatif", blank=True)
+    proof = models.ForeignKey("files.File", on_delete=models.CASCADE, blank=True, null=True)
     uploaded_at = models.DateTimeField(verbose_name="téléversé le", blank=True, null=True)
     submitted_at = models.DateTimeField(verbose_name="transmis le", blank=True, null=True)
     review_state = models.CharField(
