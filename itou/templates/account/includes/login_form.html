@@ -8,7 +8,7 @@
             <div class="col-12">
                 <p class="h4">Se connecter avec vos identifiants</p>
                 {% bootstrap_form_errors form type="all" %}
-                {% redirection_input_field name=redirect_field_name value=redirect_field_value %}
+                {% redirection_input_field value=redirect_field_value %}
                 {% bootstrap_field form.login %}
                 {% bootstrap_field form.password form_group_class="form-group mb-2" %}
                 <div class="form-group">

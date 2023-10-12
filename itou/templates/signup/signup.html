@@ -20,7 +20,7 @@
                                 </h3>
                             </div>
                             <div class="card-footer">
-                                <a class="btn btn-primary stretched-link" href="{% url 'signup:siae_select' %}{% redirection_url name=redirect_field_name value=redirect_field_value %}">
+                                <a class="btn btn-primary stretched-link" href="{% url 'signup:siae_select' %}{% redirection_url value=redirect_field_value %}">
                                     Créer un compte
                                 </a>
                             </div>
@@ -30,7 +30,7 @@
                                 <h3 class="h4 card-title font-weight-light">Vous êtes prescripteur ou orienteur</h3>
                             </div>
                             <div class="card-footer">
-                                <a class="btn btn-primary stretched-link" href="{% url 'signup:prescriber_check_already_exists' %}{% redirection_url name=redirect_field_name value=redirect_field_value %}">
+                                <a class="btn btn-primary stretched-link" href="{% url 'signup:prescriber_check_already_exists' %}{% redirection_url value=redirect_field_value %}">
                                     Créer un compte
                                 </a>
                             </div>
@@ -40,7 +40,7 @@
                                 <h3 class="h4 card-title font-weight-light">Vous êtes en recherche d'un emploi et souhaitez postuler</h3>
                             </div>
                             <div class="card-footer">
-                                <a class="btn btn-primary stretched-link" href="{% url 'signup:job_seeker_situation' %}{% redirection_url name=redirect_field_name value=redirect_field_value %}">
+                                <a class="btn btn-primary stretched-link" href="{% url 'signup:job_seeker_situation' %}{% redirection_url value=redirect_field_value %}">
                                     Créer un compte
                                 </a>
                             </div>

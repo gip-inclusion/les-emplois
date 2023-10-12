@@ -58,14 +58,13 @@ class ItouPasswordResetView(PasswordResetView):
 
 
 @require_GET
-def signup(request, template_name="signup/signup.html", redirect_field_name=REDIRECT_FIELD_NAME):
+def signup(request, template_name="signup/signup.html"):
     """
     Override allauth `account_signup` URL
     (the route is defined in config.urls).
     """
     context = {
-        "redirect_field_name": redirect_field_name,
-        "redirect_field_value": get_safe_url(request, redirect_field_name),
+        "redirect_field_value": get_safe_url(request, REDIRECT_FIELD_NAME),
     }
     return render(request, template_name, context)
 
@@ -99,9 +98,7 @@ class JobSeekerSignupView(SignupView):
         return kwargs
 
 
-def job_seeker_situation(
-    request, template_name="signup/job_seeker_situation.html", redirect_field_name=REDIRECT_FIELD_NAME
-):
+def job_seeker_situation(request, template_name="signup/job_seeker_situation.html"):
     """
     Second step of the signup process for jobseeker.
 
@@ -118,20 +115,19 @@ def job_seeker_situation(
             next_url = reverse("signup:job_seeker_nir")
 
         # forward next page
-        if redirect_field_name in form.data:
-            next_url = f"{next_url}?{redirect_field_name}={form.data[redirect_field_name]}"
+        if REDIRECT_FIELD_NAME in form.data:
+            next_url = f"{next_url}?{REDIRECT_FIELD_NAME}={form.data[REDIRECT_FIELD_NAME]}"
 
         return HttpResponseRedirect(next_url)
 
     context = {
         "form": form,
-        "redirect_field_name": redirect_field_name,
-        "redirect_field_value": get_safe_url(request, redirect_field_name),
+        "redirect_field_value": get_safe_url(request, REDIRECT_FIELD_NAME),
     }
     return render(request, template_name, context)
 
 
-def job_seeker_nir(request, template_name="signup/job_seeker_nir.html", redirect_field_name=REDIRECT_FIELD_NAME):
+def job_seeker_nir(request, template_name="signup/job_seeker_nir.html"):
     form = forms.JobSeekerNirForm(data=request.POST or None)
 
     if request.method == "POST":
@@ -140,8 +136,8 @@ def job_seeker_nir(request, template_name="signup/job_seeker_nir.html", redirect
             request.session[global_constants.ITOU_SESSION_NIR_KEY] = form.cleaned_data["nir"]
 
             # forward next page
-            if redirect_field_name in form.data:
-                next_url = f"{next_url}?{redirect_field_name}={form.data[redirect_field_name]}"
+            if REDIRECT_FIELD_NAME in form.data:
+                next_url = f"{next_url}?{REDIRECT_FIELD_NAME}={form.data[REDIRECT_FIELD_NAME]}"
 
             return HttpResponseRedirect(next_url)
 
@@ -150,8 +146,7 @@ def job_seeker_nir(request, template_name="signup/job_seeker_nir.html", redirect
 
     context = {
         "form": form,
-        "redirect_field_name": redirect_field_name,
-        "redirect_field_value": get_safe_url(request, redirect_field_name),
+        "redirect_field_value": get_safe_url(request, REDIRECT_FIELD_NAME),
     }
     return render(request, template_name, context)
 
