@@ -559,6 +559,8 @@ STORAGE_UPLOAD_KINDS = {
 
 HIJACK_PERMISSION_CHECK = "itou.utils.perms.user.has_hijack_perm"
 HIJACK_ALLOWED_USER_EMAILS = [s.lower() for s in os.getenv("HIJACK_ALLOWED_USER_EMAILS", "").split(",") if s]
+# Replaced by ACCOUNT_ADAPTER (see above) for general purpose. We still need it to redirect after hijack
+LOGIN_REDIRECT_URL = "/dashboard/"
 
 EXPORT_DIR = os.getenv("SCRIPT_EXPORT_PATH", f"{ROOT_DIR}/exports")
 IMPORT_DIR = os.getenv("SCRIPT_IMPORT_PATH", f"{ROOT_DIR}/imports")

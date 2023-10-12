@@ -109,7 +109,7 @@ class UserHijackPermTestCase(TestCase):
 
         response = self.client.post(reverse("hijack:acquire"), {"user_pk": hijacked.pk}, HTTP_REFERER=initial_url)
         assert response.status_code == 302
-        assert response["Location"] == "/accounts/profile/"
+        assert response["Location"] == "/dashboard/"
 
         response = self.client.post(reverse("hijack:release"), {"user_pk": hijacked.pk})
         assert response.status_code == 302
