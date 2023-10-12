@@ -28,33 +28,7 @@ class Command(BaseCommand):
                 "Action": "s3:GetObject",
                 "Resource": f"arn:aws:s3:::{bucket}/*",
             },
-            {
-                "Sid": "AllowPublish",
-                "Effect": "Allow",
-                "Principal": {"AWS": "*"},
-                "Action": "s3:PutObject",
-                "Resource": [
-                    f"arn:aws:s3:::{bucket}/*.pdf",
-                    f"arn:aws:s3:::{bucket}/*.PDF",
-                    f"arn:aws:s3:::{bucket}/*.xlsx",
-                    f"arn:aws:s3:::{bucket}/*.XLSX",
-                ],
-            },
-            {
-                "Sid": "DenyPublish",
-                "Effect": "Deny",
-                "Principal": {"AWS": "*"},
-                "Action": "s3:PutObject",
-                "NotResource": [
-                    f"arn:aws:s3:::{bucket}/*.pdf",
-                    f"arn:aws:s3:::{bucket}/*.PDF",
-                    f"arn:aws:s3:::{bucket}/*.xlsx",
-                    f"arn:aws:s3:::{bucket}/*.XLSX",
-                ],
-            },
         ]
-        if is_minio:
-            policy_statements = [stmt for stmt in policy_statements if "NotResource" not in stmt]
         client.put_bucket_policy(
             Bucket=bucket,
             Policy=json.dumps(

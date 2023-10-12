@@ -1,4 +1,8 @@
+import io
+
+import httpx
 from django.conf import settings
+from django.core.files.storage import default_storage
 from django.utils import timezone
 
 from itou.approvals.enums import ProlongationReason
@@ -22,3 +26,16 @@ def test_report_file_link():
         prolongation.report_file.link
         == f"https://{settings.S3_STORAGE_ENDPOINT_DOMAIN}/{settings.S3_STORAGE_BUCKET_NAME}/{file_path}"
     )
+
+
+def test_bucket_policy_for_anonymous_user():
+    base_url = f"{settings.AWS_S3_ENDPOINT_URL}{settings.AWS_STORAGE_BUCKET_NAME}/{default_storage.location}"
+    response = httpx.head(f"{base_url}/test_file.pdf")
+    assert response.status_code == 404
+    with io.BytesIO() as content:
+        default_storage.save("test_file.pdf", content)
+    response = httpx.head(f"{base_url}/test_file.pdf")
+    assert response.status_code == 200
+    with io.BytesIO() as content:
+        response = httpx.put(base_url, content=content)
+    assert response.status_code == 403
