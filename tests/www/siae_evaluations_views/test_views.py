@@ -1,6 +1,5 @@
 import datetime
 
-import pytest
 from django.urls import reverse
 from django.utils import timezone
 
@@ -11,9 +10,6 @@ from tests.institutions.factories import InstitutionMembershipFactory
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
 from tests.siaes.factories import SiaeMembershipFactory
 from tests.utils.test import TestCase
-
-
-pytestmark = pytest.mark.ignore_template_errors
 
 
 class EvaluatedSiaeSanctionViewTest(TestCase):

@@ -128,22 +128,22 @@
             <div class="dropdown-menu" id="loginUserDropdown{% if is_mobile %}Mobile{% endif %}">
                 <ul class="list-unstyled">
                     <li>
-                        <a class="dropdown-item" href="{% url 'login:job_seeker' %}{% redirection_url value=redirect_field_value %}">
+                        <a class="dropdown-item" href="{% url 'login:job_seeker' %}{% redirection_url value=redirect_field_value|default:"" %}">
                             Candidat
                         </a>
                     </li>
                     <li>
-                        <a class="dropdown-item" href="{% url 'login:prescriber' %}{% redirection_url value=redirect_field_value %}">
+                        <a class="dropdown-item" href="{% url 'login:prescriber' %}{% redirection_url value=redirect_field_value|default:"" %}">
                             Prescripteur
                         </a>
                     </li>
                     <li>
-                        <a class="dropdown-item" href="{% url 'login:siae_staff' %}{% redirection_url value=redirect_field_value %}">
+                        <a class="dropdown-item" href="{% url 'login:siae_staff' %}{% redirection_url value=redirect_field_value|default:"" %}">
                             Employeur solidaire
                         </a>
                     </li>
                     <li>
-                        <a class="dropdown-item" href="{% url 'login:labor_inspector' %}{% redirection_url value=redirect_field_value %}">
+                        <a class="dropdown-item" href="{% url 'login:labor_inspector' %}{% redirection_url value=redirect_field_value|default:"" %}">
                             Institution partenaire
                         </a>
                     </li>
