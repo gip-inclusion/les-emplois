@@ -166,7 +166,7 @@ def invite_prescriber_with_org(request, template_name="invitations_views/create.
 
     form_post_url = reverse("invitations_views:invite_prescriber_with_org")
     back_url = reverse("prescribers_views:members")
-    context = {"back_url": back_url, "form_post_url": form_post_url, "formset": formset}
+    context = {"back_url": back_url, "form_post_url": form_post_url, "formset": formset, "organization": organization}
 
     return render(request, template_name, context)
 
@@ -228,7 +228,7 @@ def invite_siae_staff(request, template_name="invitations_views/create.html"):
 
     form_post_url = reverse("invitations_views:invite_siae_staff")
     back_url = reverse("siaes_views:members")
-    context = {"back_url": back_url, "form_post_url": form_post_url, "formset": formset}
+    context = {"back_url": back_url, "form_post_url": form_post_url, "formset": formset, "organization": siae}
 
     return render(request, template_name, context)
 
@@ -289,7 +289,7 @@ def invite_labor_inspector(request, template_name="invitations_views/create.html
 
     form_post_url = reverse("invitations_views:invite_labor_inspector")
     back_url = reverse("institutions_views:members")
-    context = {"back_url": back_url, "form_post_url": form_post_url, "formset": formset}
+    context = {"back_url": back_url, "form_post_url": form_post_url, "formset": formset, "organization": institution}
 
     return render(request, template_name, context)
 
