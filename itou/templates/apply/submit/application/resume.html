@@ -115,112 +115,110 @@
 
 {% block form_content %}
     {{ form.selected_jobs.as_hidden }}
-    <div class="d-flex flex-column flex-lg-row">
-        <div class="col-12 col-lg-7 ps-0">{% bootstrap_field form.message %}</div>
-        <div>
-            <div class="alert alert-primary bg-white mt-5 py-0">
-                <div class="row">
-                    <div class="col-auto pe-0">
-                        <i class="ri-lightbulb-line ri-xl"></i>
-                    </div>
-                    <div class="col">
-                        <p class="mb-2">
-                            <strong>Bon à savoir</strong>
-                        </p>
-                        {% if request.user.is_employer %}
-                            <p class="mb-0">Précisez dans le message :</p>
-                            <ul class="mb-0">
-                                <li>les motivations du candidat,</li>
-                                <li>ses compétences,</li>
-                                <li>ses disponibilités</li>
-                            </ul>
-                        {% else %}
-                            <p class="mb-0">
-                                {% if is_subject_to_eligibility_rules %}
-                                    {% if request.user.is_job_seeker %}
-                                        Pour retenir l’attention du recruteur, décrivez votre situation,
-                                        votre parcours, vos compétences et expliquez les freins socio-professionnels rencontrés.
-                                        <br />
-                                        Vous pouvez vous appuyer sur le document
-                                        <a class="text-important"
-                                           href="{{ ITOU_HELP_CENTER_URL }}/articles/14733750518161--Diagnostic-socio-professionnel-de-référence/"
-                                           target="_blank"
-                                           rel="noreferrer noopener"
-                                           aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
-                                        <br />
-                                        Précisez également dans le message, vos motivations, vos compétences, ainsi que vos disponibilités.
-                                    {% else %}
-                                        Pour retenir l’attention du recruteur, décrivez la situation actuelle du candidat,
-                                        son parcours, ses compétences et expliquez les freins socio-professionnels rencontrés.
-                                        <br />
-                                        Vous pouvez vous appuyer sur le document
-                                        <a class="text-important"
-                                           href="{{ ITOU_HELP_CENTER_URL }}/articles/14733750518161--Diagnostic-socio-professionnel-de-référence/"
-                                           target="_blank"
-                                           rel="noreferrer noopener"
-                                           aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
-                                        <br />
-                                        Précisez également dans le message, ses motivations, ses compétences, ainsi que ses disponibilités.
-                                    {% endif %}
-                                {% elif is_subject_to_geiq_eligibility_rules %}
-                                    {% if request.user.is_job_seeker %}
-                                        Pour retenir l’attention du recruteur, décrivez votre situation actuelle,
-                                        votre parcours, vos compétences et expliquez les freins socio-professionnels rencontrés.
-                                        <br />
-                                        Vous pouvez également vous appuyer sur les conseils donnés sur
-                                        <a href="https://www.lesgeiq.fr/orienter-un-candidat-vers-un-geiq-de-votre-territoire"
-                                           target="_blank"
-                                           rel="noreferrer noopener"
-                                           aria-label="Orienter un candidat vers un Geiq de votre territoire (ouverture dans un nouvel onglet)">https://www.lesgeiq.fr/orienter-un-candidat-vers-un-geiq-de-votre-territoire</a>.
-                                        <br />
-                                        Précisez également dans le message, vos motivations, vos compétences ainsi que vos disponibilités.
-                                    {% else %}
-                                        Pour retenir l’attention du recruteur, décrivez la situation actuelle du candidat,
-                                        son parcours, ses compétences et expliquez les freins socio-professionnels rencontrés.
-                                        <br />
-                                        Vous pouvez également vous appuyer sur les conseils donnés sur
-                                        <a href="https://www.lesgeiq.fr/orienter-un-candidat-vers-un-geiq-de-votre-territoire"
-                                           target="_blank"
-                                           rel="noreferrer noopener"
-                                           aria-label="Orienter un candidat vers un Geiq de votre territoire (ouverture dans un nouvel onglet)">https://www.lesgeiq.fr/orienter-un-candidat-vers-un-geiq-de-votre-territoire</a>.
-                                        <br />
-                                        Précisez également dans le message, ses motivations, ses compétences ainsi que ses disponibilités.
-                                    {% endif %}
+    <div class="row">
+        <div class="col-12 col-lg-8">{% bootstrap_field form.message %}</div>
+        <div class="col-12 col-lg-4">
+            <div class="c-form-conseil">
+                <div>
+                    <p class="mb-0">
+                        <i class="ri-lightbulb-line ri-lg me-1"></i><strong>Bon à savoir</strong>
+                    </p>
+                    {% if request.user.is_employer %}
+                        <p class="mb-0">Précisez dans le message :</p>
+                        <ul class="mb-0">
+                            <li>les motivations du candidat,</li>
+                            <li>ses compétences,</li>
+                            <li>ses disponibilités</li>
+                        </ul>
+                    {% else %}
+                        <p class="mb-0">
+                            {% if is_subject_to_eligibility_rules %}
+                                {% if request.user.is_job_seeker %}
+                                    Pour retenir l’attention du recruteur, décrivez votre situation,
+                                    votre parcours, vos compétences et expliquez les freins socio-professionnels rencontrés.
+                                    <br />
+                                    Vous pouvez vous appuyer sur le document
+                                    <a class="text-important"
+                                       href="{{ ITOU_HELP_CENTER_URL }}/articles/14733750518161--Diagnostic-socio-professionnel-de-référence/"
+                                       target="_blank"
+                                       rel="noreferrer noopener"
+                                       aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
+                                    <br />
+                                    Précisez également dans le message, vos motivations, vos compétences, ainsi que vos disponibilités.
+                                {% else %}
+                                    Pour retenir l’attention du recruteur, décrivez la situation actuelle du candidat,
+                                    son parcours, ses compétences et expliquez les freins socio-professionnels rencontrés.
+                                    <br />
+                                    Vous pouvez vous appuyer sur le document
+                                    <a class="text-important"
+                                       href="{{ ITOU_HELP_CENTER_URL }}/articles/14733750518161--Diagnostic-socio-professionnel-de-référence/"
+                                       target="_blank"
+                                       rel="noreferrer noopener"
+                                       aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
+                                    <br />
+                                    Précisez également dans le message, ses motivations, ses compétences, ainsi que ses disponibilités.
                                 {% endif %}
-                            </p>
-                        {% endif %}
-                    </div>
+                            {% elif is_subject_to_geiq_eligibility_rules %}
+                                {% if request.user.is_job_seeker %}
+                                    Pour retenir l’attention du recruteur, décrivez votre situation actuelle,
+                                    votre parcours, vos compétences et expliquez les freins socio-professionnels rencontrés.
+                                    <br />
+                                    Vous pouvez également vous appuyer sur les conseils donnés sur
+                                    <a href="https://www.lesgeiq.fr/orienter-un-candidat-vers-un-geiq-de-votre-territoire"
+                                       target="_blank"
+                                       rel="noreferrer noopener"
+                                       aria-label="Orienter un candidat vers un Geiq de votre territoire (ouverture dans un nouvel onglet)">https://www.lesgeiq.fr/orienter-un-candidat-vers-un-geiq-de-votre-territoire</a>.
+                                    <br />
+                                    Précisez également dans le message, vos motivations, vos compétences ainsi que vos disponibilités.
+                                {% else %}
+                                    Pour retenir l’attention du recruteur, décrivez la situation actuelle du candidat,
+                                    son parcours, ses compétences et expliquez les freins socio-professionnels rencontrés.
+                                    <br />
+                                    Vous pouvez également vous appuyer sur les conseils donnés sur
+                                    <a href="https://www.lesgeiq.fr/orienter-un-candidat-vers-un-geiq-de-votre-territoire"
+                                       target="_blank"
+                                       rel="noreferrer noopener"
+                                       aria-label="Orienter un candidat vers un Geiq de votre territoire (ouverture dans un nouvel onglet)">https://www.lesgeiq.fr/orienter-un-candidat-vers-un-geiq-de-votre-territoire</a>.
+                                    <br />
+                                    Précisez également dans le message, ses motivations, ses compétences ainsi que ses disponibilités.
+                                {% endif %}
+                            {% endif %}
+                        </p>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
-
-    <div class="col-12 col-lg-7 ps-0">
-        {% bootstrap_field form.resume %}
-        {% if resume_is_recommended %}
-            <div class="alert alert-warning">
-                <div class="row">
-                    <div class="col-auto pr-0">
-                        <i class="ri-information-line ri-xl text-warning"></i>
-                    </div>
-                    <div class="col">
-                        <p class="mb-2">
-                            <strong>Le CV est fortement recommandé</strong>
-                        </p>
-                        <p class="mb-0">
-                            L’ajout du Curriculum Vitae (CV) est fortement recommandé pour que la candidature soit étudiée par ce recruteur.
-                        </p>
+    <div class="row">
+        <div class="col-12 col-lg-8">
+            {% bootstrap_field form.resume %}
+            {% if resume_is_recommended %}
+                <div class="alert alert-warning">
+                    <div class="row">
+                        <div class="col-auto pr-0">
+                            <i class="ri-information-line ri-xl text-warning"></i>
+                        </div>
+                        <div class="col">
+                            <p class="mb-2">
+                                <strong>Le CV est fortement recommandé</strong>
+                            </p>
+                            <p class="mb-0">
+                                L’ajout du Curriculum Vitae (CV) est fortement recommandé pour que la candidature soit étudiée par ce recruteur.
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
-        {% endif %}
+            {% endif %}
+        </div>
     </div>
 {% endblock %}
 
 {% block form_submit_button %}
-    {% if request.user.is_employer %}
-        <button class="btn btn-primary">Enregistrer</button>
-    {% else %}
-        <button class="btn btn-primary">Envoyer la candidature</button>
-    {% endif %}
+    <div class="form-group mb-0 col-6 col-lg-auto">
+        {% if request.user.is_employer %}
+            <button class="btn btn-primary">Enregistrer</button>
+        {% else %}
+            <button class="btn btn-primary">Envoyer la candidature</button>
+        {% endif %}
+    </div>
 {% endblock %}

@@ -9,7 +9,7 @@
                 {% if siae != request.current_organization %}
                     <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#transfer_confirmation_modal_{{ siae.pk }}">
                         <div>
-                            <span class="badge badge-pill badge-primary">{{ siae.kind }}</span> <span>{{ siae.display_name }}</span>
+                            <span class="badge badge-xs rounded-pill bg-primary">{{ siae.kind }}</span> <span>{{ siae.display_name }}</span>
                         </div>
                     </a>
                 {% endif %}
@@ -30,9 +30,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="modal_title">Confirmation du transfert</h5>
-                            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Fermer">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                         </div>
                         <div class="modal-body">
                             <p>
@@ -41,12 +39,12 @@
                             {% include "siaes/includes/_siae_info.html" %}
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Retour</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Retour</button>
                             <form method="post" action="{% url 'apply:transfer' job_application_id=job_application.id %}">
                                 {% csrf_token %}
                                 <input type="hidden" name="target_siae_id" value="{{ siae.pk }}" />
                                 <input type="hidden" name="back_url" value="{{ back_url }}" />
-                                <button class="btn btn-primary">Confirmer</button>
+                                <button class="btn btn-sm btn-primary">Confirmer</button>
                             </form>
                         </div>
                     </div>

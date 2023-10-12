@@ -25,7 +25,7 @@
                         Complétée le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
                     </span>
                 {% elif form.status.value == "DISABLED" %}
-                    <span class="badge rounded-pill badge-sm bg-emploi-lightest">
+                    <span class="badge rounded-pill badge-sm bg-emploi-lightest text-primary">
                         Désactivée le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
                     </span>
                 {% endif %}
