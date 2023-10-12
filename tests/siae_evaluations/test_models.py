@@ -847,17 +847,16 @@ class EvaluatedSiaeModelTest(TestCase):
         del evaluated_siae.state_from_applications
 
         # one evaluated_administrative_criterion
-        # empty : proof_url and submitted_at empty)
+        # empty : proof and submitted_at empty)
         evaluated_administrative_criteria0 = EvaluatedAdministrativeCriteriaFactory(
-            evaluated_job_application=evaluated_job_application, proof_url="", proof=None
+            evaluated_job_application=evaluated_job_application, proof=None
         )
         assert evaluation_enums.EvaluatedSiaeState.PENDING == evaluated_siae.state
         del evaluated_siae.state_from_applications
 
-        # with proof_url
-        evaluated_administrative_criteria0.proof_url = "https://server.com/rocky-balboa.pdf"
+        # with proof
         evaluated_administrative_criteria0.proof = FileFactory()
-        evaluated_administrative_criteria0.save(update_fields=["proof_url", "proof"])
+        evaluated_administrative_criteria0.save(update_fields=["proof"])
         assert evaluation_enums.EvaluatedSiaeState.SUBMITTABLE == evaluated_siae.state
         del evaluated_siae.state_from_applications
 
@@ -1240,13 +1239,12 @@ class EvaluatedJobApplicationModelTest(TestCase):
         assert evaluation_enums.EvaluatedJobApplicationsState.PENDING == evaluated_job_application.compute_state()
 
         evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
-            evaluated_job_application=evaluated_job_application, proof_url="", proof=None
+            evaluated_job_application=evaluated_job_application, proof=None
         )
         assert evaluation_enums.EvaluatedJobApplicationsState.PROCESSING == evaluated_job_application.compute_state()
 
-        evaluated_administrative_criteria.proof_url = "https://www.test.com"
         evaluated_administrative_criteria.proof = FileFactory()
-        evaluated_administrative_criteria.save(update_fields=["proof_url", "proof"])
+        evaluated_administrative_criteria.save(update_fields=["proof"])
         assert evaluation_enums.EvaluatedJobApplicationsState.UPLOADED == evaluated_job_application.compute_state()
 
         evaluated_administrative_criteria.submitted_at = timezone.now()
@@ -1396,7 +1394,6 @@ class EvaluatedAdministrativeCriteriaModelTest(TestCase):
 
         evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
             evaluated_job_application=EvaluatedJobApplicationFactory(),
-            proof_url="",
             proof=None,
         )
         assert evaluated_administrative_criteria.can_upload()

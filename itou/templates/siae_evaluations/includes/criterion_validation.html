@@ -2,7 +2,10 @@
     <div class="card-body">
         <div class="row align-items-center">
             <div class="col-lg-8 col-md-8 col-12">
-                <a href="{{ evaluated_administrative_criteria.proof_url }}" rel="noopener" target="_blank" aria-label="Vérifier ce justificatif (ouverture dans un nouvel onglet)">
+                <a href="{% url "siae_evaluations_views:view_proof" evaluated_administrative_criteria_id=evaluated_administrative_criteria.pk %}"
+                   rel="noopener"
+                   target="_blank"
+                   aria-label="Vérifier ce justificatif (ouverture dans un nouvel onglet)">
                     <i class="ri-file-copy-2-line ri-lg mr-1"></i>
                     {% if evaluated_siae.state == "SUBMITTED" or evaluated_siae.state == "ACCEPTED" or evaluated_siae.state == "REFUSED" %}
                         Vérifier ce justificatif

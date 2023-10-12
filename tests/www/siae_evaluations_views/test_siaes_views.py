@@ -134,7 +134,6 @@ class SiaeJobApplicationListViewTest(TestCase):
         # at least one criterion selected
         evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
             evaluated_job_application=evaluated_job_application,
-            proof_url="",
             proof=None,
         )
         response = self.client.get(self.url(evaluated_siae))
@@ -176,7 +175,6 @@ class SiaeJobApplicationListViewTest(TestCase):
         # at least one criterion selected
         evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
             evaluated_job_application=evaluated_job_application,
-            proof_url="",
             proof=None,
         )
         assert not evaluated_administrative_criteria.can_upload()
@@ -194,13 +192,18 @@ class SiaeJobApplicationListViewTest(TestCase):
         response = self.client.get(siae_upload_doc_url)
         assert response.status_code == 403
 
-        # If the criteria had a proof_url, it should be present
-        evaluated_administrative_criteria.proof_url = "http://example.com/fake_one.pdf"
+        # If the criteria had a proof, it should be present
         evaluated_administrative_criteria.proof = FileFactory()
-        evaluated_administrative_criteria.save(update_fields=("proof_url", "proof"))
+        evaluated_administrative_criteria.save(update_fields=("proof",))
         response = self.client.get(self.url(evaluated_siae))
         self.assertContains(response, SHOW_PROOF_URL_LABEL)
-        self.assertContains(response, evaluated_administrative_criteria.proof_url)
+        self.assertContains(
+            response,
+            reverse(
+                "siae_evaluations_views:view_proof",
+                kwargs={"evaluated_administrative_criteria_id": evaluated_administrative_criteria.pk},
+            ),
+        )
 
     def test_state_hidden_with_submission_freezed_at(self):
         not_in_output = "This string should not be in output."
@@ -364,7 +367,7 @@ class SiaeJobApplicationListViewTest(TestCase):
     def test_content_with_selected_criteria(self):
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
         evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
-            evaluated_job_application=evaluated_job_application, proof_url="", proof=None
+            evaluated_job_application=evaluated_job_application, proof=None
         )
         self.client.force_login(self.user)
 
@@ -422,7 +425,7 @@ class SiaeJobApplicationListViewTest(TestCase):
 
         # criterion selected
         evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
-            evaluated_job_application=evaluated_job_application, proof_url="", proof=None
+            evaluated_job_application=evaluated_job_application, proof=None
         )
         upload_proof = reverse(
             "siae_evaluations_views:siae_upload_doc",
@@ -434,9 +437,8 @@ class SiaeJobApplicationListViewTest(TestCase):
         self.assertContains(response, upload_proof)
 
         # criterion with uploaded proof
-        evaluated_administrative_criteria.proof_url = "https://server.com/rocky-balboa.pdf"
         evaluated_administrative_criteria.proof = FileFactory()
-        evaluated_administrative_criteria.save(update_fields=["proof_url", "proof"])
+        evaluated_administrative_criteria.save(update_fields=["proof"])
         response = self.client.get(self.url(evaluated_job_application.evaluated_siae))
         self.assertContains(response, submit_active, html=True, count=2)
         self.assertContains(response, select_criteria)
@@ -484,7 +486,6 @@ class SiaeJobApplicationListViewTest(TestCase):
         # criterion selected with uploaded proof
         evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
             evaluated_job_application=evaluated_job_application,
-            proof_url="https://server.com/rocky-balboa.pdf",
             proof=FileFactory(),
         )
         upload_proof = reverse(
@@ -838,7 +839,9 @@ class SiaeUploadDocsViewTest(TestCase):
             evaluated_administrative_criteria.review_state
             == evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
         )
-        assert evaluated_administrative_criteria.proof_url == default_storage.url("evaluations/empty.pdf")
+        self.pdf_file.seek(0)
+        with default_storage.open(evaluated_administrative_criteria.proof_id) as saved_file:
+            assert saved_file.read() == self.pdf_file.read()
 
     def test_post_with_submission_freezed_at(self):
         fake_now = timezone.now()
@@ -854,7 +857,6 @@ class SiaeUploadDocsViewTest(TestCase):
             administrative_criteria=criterion.administrative_criteria,
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING,
             uploaded_at=fake_now - relativedelta(days=1),
-            proof_url="https://example.com",
             proof=proof,
         )
         # Freeze submission
@@ -870,7 +872,6 @@ class SiaeUploadDocsViewTest(TestCase):
         assert response.status_code == 403
         evaluated_administrative_criteria.refresh_from_db()
         assert evaluated_administrative_criteria.uploaded_at == fake_now - relativedelta(days=1)
-        assert evaluated_administrative_criteria.proof_url == "https://example.com"
         assert evaluated_administrative_criteria.proof == proof
 
 
@@ -916,9 +917,7 @@ class SiaeSubmitProofsViewTest(TestCase):
 
     def test_is_not_submittable(self):
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
-        EvaluatedAdministrativeCriteriaFactory(
-            evaluated_job_application=evaluated_job_application, proof_url="", proof=None
-        )
+        EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_application, proof=None)
         self.client.force_login(self.user)
 
         response = self.client.post(self.url(evaluated_job_application.evaluated_siae))
@@ -963,7 +962,6 @@ class SiaeSubmitProofsViewTest(TestCase):
         not_yet_submitted_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
         EvaluatedAdministrativeCriteriaFactory(
             evaluated_job_application=not_yet_submitted_job_application,
-            proof_url="http://something.com/good",
             proof=FileFactory(),
             submitted_at=None,
         )
@@ -973,7 +971,6 @@ class SiaeSubmitProofsViewTest(TestCase):
         )
         EvaluatedAdministrativeCriteriaFactory(
             evaluated_job_application=submitted_job_application,
-            proof_url="http://something.com/other_good",
             proof=FileFactory(),
             submitted_at=fake_now,
         )

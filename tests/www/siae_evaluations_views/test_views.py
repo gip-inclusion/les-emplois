@@ -1,14 +1,25 @@
 import datetime
 
+import httpx
+from django.core.files.storage import default_storage
 from django.urls import reverse
 from django.utils import timezone
+from freezegun import freeze_time
+from pytest_django.asserts import assertRedirects
 
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.models import Sanctions
 from itou.utils.types import InclusiveDateRange
+from tests.files.factories import FileFactory
 from tests.institutions.factories import InstitutionMembershipFactory
-from tests.siae_evaluations.factories import EvaluatedSiaeFactory
+from tests.siae_evaluations.factories import (
+    EvaluatedAdministrativeCriteriaFactory,
+    EvaluatedJobApplicationFactory,
+    EvaluatedSiaeFactory,
+    EvaluationCampaignFactory,
+)
 from tests.siaes.factories import SiaeMembershipFactory
+from tests.users.factories import EmployerFactory
 from tests.utils.test import TestCase
 
 
@@ -412,3 +423,82 @@ class EvaluatedSiaeSanctionViewTest(TestCase):
 def test_sanctions_helper_view(client):
     response = client.get(reverse("siae_evaluations_views:sanctions_helper"))
     assert response.status_code == 200
+
+
+class TestViewProof:
+    def test_anonymous_access(self, client):
+        job_app = EvaluatedJobApplicationFactory()
+        crit = EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=job_app)
+        url = reverse("siae_evaluations_views:view_proof", kwargs={"evaluated_administrative_criteria_id": crit.pk})
+        response = client.get(url)
+        assertRedirects(response, f"{reverse('account_login')}?next={url}")
+
+    def test_access_nonexistent_id(self, client):
+        client.force_login(EmployerFactory(with_siae=True))
+        url = reverse("siae_evaluations_views:view_proof", kwargs={"evaluated_administrative_criteria_id": 0})
+        response = client.get(url)
+        assert response.status_code == 404
+
+    def test_access_no_proof(self, client):
+        job_app = EvaluatedJobApplicationFactory()
+        crit = EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=job_app, proof=None)
+        membership = SiaeMembershipFactory(siae_id=job_app.evaluated_siae.siae_id)
+        client.force_login(membership.user)
+        url = reverse("siae_evaluations_views:view_proof", kwargs={"evaluated_administrative_criteria_id": crit.pk})
+        response = client.get(url)
+        assert response.status_code == 404
+
+    def test_access_siae(self, client, pdf_file):
+        job_app = EvaluatedJobApplicationFactory()
+        key = default_storage.save("evaluations/test.pdf", pdf_file)
+        crit = EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=job_app, proof=FileFactory(key=key))
+        membership = SiaeMembershipFactory(siae_id=job_app.evaluated_siae.siae_id)
+        url = reverse("siae_evaluations_views:view_proof", kwargs={"evaluated_administrative_criteria_id": crit.pk})
+        client.force_login(membership.user)
+        # Boto3 signed requests depend on the current date, with a second resolution.
+        # See X-Amz-Date in
+        # https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-query-string-auth.html
+        with freeze_time():
+            response = client.get(url)
+            assertRedirects(response, default_storage.url(crit.proof_id), fetch_redirect_response=False)
+        pdf_file.seek(0)
+        assert httpx.get(response.url).content == pdf_file.read()
+
+    def test_access_other_siae(self, client):
+        job_app = EvaluatedJobApplicationFactory()
+        crit = EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=job_app)
+        other_evaluated_siae = EvaluatedSiaeFactory()
+        membership = SiaeMembershipFactory(siae=other_evaluated_siae.siae)
+        url = reverse("siae_evaluations_views:view_proof", kwargs={"evaluated_administrative_criteria_id": crit.pk})
+        client.force_login(membership.user)
+        response = client.get(url)
+        assert response.status_code == 404
+
+    def test_access_institution(self, client, pdf_file):
+        membership = InstitutionMembershipFactory()
+        job_app = EvaluatedJobApplicationFactory(
+            evaluated_siae__evaluation_campaign__institution=membership.institution
+        )
+        key = default_storage.save("evaluations/test.pdf", pdf_file)
+        crit = EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=job_app, proof=FileFactory(key=key))
+        EvaluationCampaignFactory(institution=membership.institution)
+        url = reverse("siae_evaluations_views:view_proof", kwargs={"evaluated_administrative_criteria_id": crit.pk})
+        client.force_login(membership.user)
+        # Boto3 signed requests depend on the current date, with a second resolution.
+        # See X-Amz-Date in
+        # https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-query-string-auth.html
+        with freeze_time():
+            response = client.get(url)
+            assertRedirects(response, default_storage.url(crit.proof_id), fetch_redirect_response=False)
+        pdf_file.seek(0)
+        assert httpx.get(response.url).content == pdf_file.read()
+
+    def test_access_other_institution(self, client):
+        job_app = EvaluatedJobApplicationFactory()
+        crit = EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=job_app)
+        membership = InstitutionMembershipFactory()
+        EvaluationCampaignFactory(institution=membership.institution)
+        url = reverse("siae_evaluations_views:view_proof", kwargs={"evaluated_administrative_criteria_id": crit.pk})
+        client.force_login(membership.user)
+        response = client.get(url)
+        assert response.status_code == 404

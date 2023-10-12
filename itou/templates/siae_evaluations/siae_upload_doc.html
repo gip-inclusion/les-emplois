@@ -29,10 +29,10 @@
                                 </div>
                             </div>
 
-                            {% if evaluated_administrative_criteria.proof_url %}
+                            {% if evaluated_administrative_criteria.proof_id %}
                                 <div class="row mt-3">
                                     <div class="col-md-12">
-                                        <a href="{{ evaluated_administrative_criteria.proof_url }}" target="_blank">Visualiser le justificatif précédemment téléversé</a>
+                                        <a href="{% url "siae_evaluations_views:view_proof" evaluated_administrative_criteria_id=evaluated_administrative_criteria.pk %}" target="_blank">Visualiser le justificatif précédemment téléversé</a>
                                     </div>
                                 </div>
                             {% endif %}
@@ -57,7 +57,7 @@
                                         </div>
 
                                         <button class="btn btn-primary float-right">
-                                            {% if evaluated_administrative_criteria.proof_url %}
+                                            {% if evaluated_administrative_criteria.proof_id %}
                                                 Enregistrer le nouveau justificatif
                                             {% else %}
                                                 Enregistrer le justificatif
