@@ -86,7 +86,7 @@ duet-date-picker.is-invalid ~ .invalid-feedback {
 }
 
 .form-group.is-invalid > .file-dropzone {
-    border: 2px dashed var(--danger);
+    border: 2px dashed var(--bs-danger);
 }
 
 .file-dropzone {
@@ -211,16 +211,16 @@ _:-ms-fullscreen,
     opacity: 1;
     pointer-events: auto;
     top: -15px;
-    background: var(--red);
+    background: var(--bs-red);
 }
 
 .dz-error-mark {
-    background: var(--red);
+    background: var(--bs-red);
     border-radius: 50%;
 }
 
 .dropzone .dz-preview .dz-error-message::after {
-    border-top: 6px solid var(--red);
+    border-top: 6px solid var(--bs-red);
     border-bottom: 0 solid #be2626 !important;
     bottom: -5px !important;
     top: auto !important;
