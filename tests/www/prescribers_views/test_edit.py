@@ -1,6 +1,5 @@
 from unittest import mock
 
-import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertContains
 
@@ -9,9 +8,6 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from tests.prescribers.factories import PrescriberOrganizationFactory, PrescriberOrganizationWithMembershipFactory
 from tests.utils.test import TestCase, parse_response_to_soup
-
-
-pytestmark = pytest.mark.ignore_template_errors
 
 
 class CardViewTest(TestCase):

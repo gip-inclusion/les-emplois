@@ -1,6 +1,5 @@
 from urllib.parse import urlencode
 
-import pytest
 import respx
 from django.contrib import messages
 from django.test import override_settings
@@ -25,9 +24,6 @@ from tests.users.factories import (
     SiaeStaffFactory,
 )
 from tests.utils.test import TestCase, assertMessages, reload_module
-
-
-pytestmark = pytest.mark.ignore_template_errors
 
 
 class ItouLoginTest(TestCase):
