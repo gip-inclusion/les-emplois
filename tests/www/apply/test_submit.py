@@ -7,7 +7,7 @@ import pytest
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib import messages
-from django.core.files.storage import default_storage
+from django.core.files.storage import storages
 from django.urls import resolve, reverse
 from django.utils import timezone
 from pytest_django.asserts import assertContains, assertRedirects
@@ -421,7 +421,7 @@ class ApplyAsJobSeekerTest(TestCase):
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         assert list(job_application.selected_jobs.all()) == [siae.job_description_through.first()]
         assert job_application.resume_link == (
-            f"http://localhost:9000/tests/{default_storage.location}"
+            f"http://localhost:9000/tests/{storages['public'].location}"
             "/resume/11111111-1111-1111-1111-111111111111.pdf"
         )
 
@@ -834,7 +834,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         ]
         assert (
             job_application.resume_link == f"{settings.AWS_S3_ENDPOINT_URL}"
-            f"tests/{default_storage.location}/resume/11111111-1111-1111-1111-111111111111.pdf"
+            f"tests/{storages['public'].location}/resume/11111111-1111-1111-1111-111111111111.pdf"
         )
 
         assert f"job_application-{siae.pk}" not in self.client.session
@@ -1079,7 +1079,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
             siae.job_description_through.last(),
         ]
         assert job_application.resume_link == (
-            f"http://localhost:9000/tests/{default_storage.location}"
+            f"http://localhost:9000/tests/{storages['public'].location}"
             "/resume/11111111-1111-1111-1111-111111111111.pdf"
         )
 
@@ -1358,7 +1358,7 @@ class ApplyAsPrescriberTest(TestCase):
             siae.job_description_through.last(),
         ]
         assert job_application.resume_link == (
-            f"http://localhost:9000/tests/{default_storage.location}"
+            f"http://localhost:9000/tests/{storages['public'].location}"
             "/resume/11111111-1111-1111-1111-111111111111.pdf"
         )
 
@@ -1786,7 +1786,7 @@ class ApplyAsSiaeTest(TestCase):
             siae.job_description_through.last(),
         ]
         assert job_application.resume_link == (
-            f"http://localhost:9000/tests/{default_storage.location}"
+            f"http://localhost:9000/tests/{storages['public'].location}"
             "/resume/11111111-1111-1111-1111-111111111111.pdf"
         )
 

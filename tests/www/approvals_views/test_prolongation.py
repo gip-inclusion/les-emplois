@@ -1,6 +1,5 @@
 from datetime import timedelta
 
-import httpx
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.core import mail
@@ -354,13 +353,17 @@ class ApprovalProlongationTest(TestCase):
         prolongation_request = self.approval.prolongationrequest_set.get()
         assert prolongation_request.report_file
         assert prolongation_request.report_file.key == "prolongation_report/empty.xlsx"
-        self.xlsx_file.seek(0)
-        assert httpx.get(prolongation_request.report_file.link).content == self.xlsx_file.read()
 
         [email] = mail.outbox
         assert email.to == [post_data["email"]]
         assert email.subject == f"Demande de prolongation du PASS IAE de {self.approval.user.get_full_name()}"
-        assert prolongation_request.report_file.link in email.body
+        assert (
+            reverse(
+                "approvals:prolongation_request_report_file",
+                kwargs={"prolongation_request_id": prolongation_request.pk},
+            )
+            in email.body
+        )
         assert self.PROLONGATION_EMAIL_REPORT_TEXT in email.body
 
     def test_check_single_prescriber_organization(self):

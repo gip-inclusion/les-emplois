@@ -23,7 +23,7 @@ L'employeur souhaite vous apporter des explications supplémentaires par télép
 - Début de la prolongation : {{ prolongation_request.start_at|date:"d/m/Y" }}
 - Fin de la prolongation : {{ prolongation_request.end_at|date:"d/m/Y" }}
 - Motif de prolongation : {{ prolongation_request.get_reason_display }}
-{% if prolongation_request.report_file %}- Fiche bilan : {{ prolongation_request.report_file.link }}{% endif %}
+{% if prolongation_request.report_file %}- Fiche bilan : {{ report_file_url }}{% endif %}
 
 Vous pouvez valider ou refuser cette prolongation en vous connectant à votre espace prescripteur {{ prolongation_request.prescriber_organization.display_name }} sur les emplois de l'inclusion, à la rubrique "Gérer mes prolongations de PASS IAE".
 

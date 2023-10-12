@@ -10,7 +10,7 @@ from django.conf import settings
 from django.contrib.gis.db.models.fields import get_srid_info
 from django.core import management
 from django.core.cache import cache
-from django.core.files.storage import default_storage
+from django.core.files.storage import default_storage, storages
 from django.core.management import call_command
 from django.db import connection
 from django.template import base as base_template
@@ -93,10 +93,15 @@ def test_settings():
 
 @pytest.fixture(autouse=True)
 def storage_prefix_per_test(test_settings):
-    original_location = default_storage.location
-    default_storage.location = f"{uuid.uuid4()}"
+    public_storage = storages["public"]
+    original_default_location = default_storage.location
+    original_public_location = public_storage.location
+    namespace = f"{uuid.uuid4()}"
+    default_storage.location = namespace
+    public_storage.location = namespace
     yield
-    default_storage.location = original_location
+    default_storage.location = original_default_location
+    public_storage.location = original_public_location
 
 
 @pytest.fixture
