@@ -14,6 +14,7 @@ from django.views import generic
 from django.views.decorators.http import require_POST
 from django.views.generic.detail import SingleObjectMixin
 
+from itou.files.models import File
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.emails import InstitutionEmailFactory, SIAEEmailFactory
 from itou.siae_evaluations.models import (
@@ -669,12 +670,13 @@ def siae_upload_doc(
     if request.method == "POST" and form.is_valid():
         proof_file = form.cleaned_data["proof"]
         proof_key = default_storage.save(f"evaluations/{proof_file.name}", proof_file)
+        evaluated_administrative_criteria.proof = File.objects.create(key=proof_key)
         evaluated_administrative_criteria.proof_url = default_storage.url(proof_key)
         evaluated_administrative_criteria.uploaded_at = timezone.now()
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
         evaluated_administrative_criteria.submitted_at = None
         evaluated_administrative_criteria.save(
-            update_fields=["proof_url", "uploaded_at", "review_state", "submitted_at"]
+            update_fields=["proof_url", "proof", "uploaded_at", "review_state", "submitted_at"]
         )
         return HttpResponseRedirect(url)
 

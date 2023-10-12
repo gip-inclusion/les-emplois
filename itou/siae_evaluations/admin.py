@@ -284,6 +284,7 @@ class EvaluatedAdministrativeCriteriaAdmin(ItouModelAdmin):
         "administrative_criteria",
         "uploaded_at",
         "proof_url",
+        "proof",
         "submitted_at",
         "review_state",
     )
