@@ -60,9 +60,6 @@ from tests.users.factories import ItouStaffFactory, JobSeekerFactory, Prescriber
 from tests.utils.test import TestCase, get_rows_from_streaming_response
 
 
-pytestmark = pytest.mark.ignore_template_errors
-
-
 @override_settings(
     API_ESD={
         "BASE_URL": "https://base.domain",

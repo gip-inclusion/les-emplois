@@ -43,10 +43,10 @@ Le candidat lui même.
 {% endif %}
 
 {% if job_application.sender_kind == SenderKind.PRESCRIBER %}
-
-- {{ job_application.sender.get_full_name }}{% if job_application.sender_prescriber_organization %}
-- {{ job_application.sender_prescriber_organization.display_name }}{% endif %}
-- {{ job_application.sender.email }}{% if job_application.sender.phone %}
+{% if job_application.sender %}
+- {{ job_application.sender.get_full_name }}{% endif %}{% if job_application.sender_prescriber_organization %}
+- {{ job_application.sender_prescriber_organization.display_name }}{% endif %}{% if job_application.sender and job_application.sender.email %}
+- {{ job_application.sender.email }}{% endif %}{% if job_application.sender and job_application.sender.phone %}
 - {{ job_application.sender.phone|format_phone }}{% endif %}
 
 {% endif %}
