@@ -46,7 +46,6 @@ class ItouLoginView(LoginView):
             "login_url": login_url,
             "signup_url": signup_url,
             "signup_allowed": True,
-            "redirect_field_name": REDIRECT_FIELD_NAME,
             "redirect_field_value": get_safe_url(self.request, REDIRECT_FIELD_NAME),
             "inclusion_connect_url": self._get_inclusion_connect_url(context),
         }

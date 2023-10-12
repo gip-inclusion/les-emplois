@@ -663,11 +663,11 @@ class UtilsTemplateTagsTestCase(TestCase):
         redirect_field_value = reverse("search:siaes_home")
 
         # Redirection value.
-        context = {"redirect_field_name": "next", "redirect_field_value": redirect_field_value}
+        context = {"redirect_field_value": redirect_field_value}
         template = Template(
             """
             {% load redirection_fields %}
-            {% url "dashboard:index" %}{% redirection_url name=redirect_field_name value=redirect_field_value %}
+            {% url "dashboard:index" %}{% redirection_url value=redirect_field_value %}
         """
         )
         out = template.render(Context(context)).strip()
@@ -678,7 +678,7 @@ class UtilsTemplateTagsTestCase(TestCase):
         template = Template(
             """
             {% load redirection_fields %}
-            {% url "dashboard:index" %}{% redirection_url name=redirect_field_name value=redirect_field_value %}
+            {% url "dashboard:index" %}{% redirection_url value=redirect_field_value %}
         """
         )
         out = template.render(Context()).strip()
@@ -690,11 +690,11 @@ class UtilsTemplateTagsTestCase(TestCase):
         value = reverse("search:siaes_home")
 
         # Redirection value.
-        context = {"redirect_field_name": name, "redirect_field_value": value}
+        context = {"redirect_field_value": value}
         template = Template(
             """
             {% load redirection_fields %}
-            {% redirection_input_field name=redirect_field_name value=redirect_field_value %}
+            {% redirection_input_field value=redirect_field_value %}
         """
         )
         out = template.render(Context(context)).strip()
@@ -705,7 +705,7 @@ class UtilsTemplateTagsTestCase(TestCase):
         template = Template(
             """
             {% load redirection_fields %}
-            {% redirection_input_field name=redirect_field_name value=redirect_field_value %}
+            {% redirection_input_field value=redirect_field_value %}
         """
         )
         out = template.render(Context()).strip()
