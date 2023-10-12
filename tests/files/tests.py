@@ -4,31 +4,10 @@ import httpx
 from django.conf import settings
 from django.core.files.storage import default_storage
 from django.core.management import call_command
-from django.utils import timezone
 from pytest_django.asserts import assertQuerySetEqual
 
-from itou.approvals.enums import ProlongationReason
 from itou.files.models import File
 from itou.utils.storage.s3 import s3_client
-from tests.approvals.factories import ProlongationFactory
-
-
-def test_report_file_link():
-    prolongation = ProlongationFactory(reason=ProlongationReason.RQTH)
-
-    assert prolongation.report_file is None
-
-    file_path = "prolongation_report/test.xslx"
-    report_file = File(file_path, timezone.now())
-    report_file.save()
-
-    prolongation.report_file = report_file
-    prolongation.save()
-
-    assert (
-        prolongation.report_file.link
-        == f"{settings.AWS_S3_ENDPOINT_URL}{settings.AWS_STORAGE_BUCKET_NAME}/{default_storage.location}/{file_path}"
-    )
 
 
 def test_sync_files_ignores_temporary_storage(temporary_bucket):

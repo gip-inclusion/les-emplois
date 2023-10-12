@@ -1,4 +1,3 @@
-from django.core.files.storage import default_storage
 from django.db import models
 from django.utils import timezone
 
@@ -13,7 +12,3 @@ class File(models.Model):
 
     class Meta:
         verbose_name = "fichier"
-
-    @property
-    def link(self):
-        return default_storage.url(self.key)

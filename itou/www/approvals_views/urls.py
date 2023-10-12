@@ -34,6 +34,11 @@ urlpatterns = [
         name="prolongation_request_show",
     ),
     path(
+        "prolongation/request/<int:prolongation_request_id>/report-file/",
+        views.prolongation_request_report_file,
+        name="prolongation_request_report_file",
+    ),
+    path(
         "prolongation/request/<int:prolongation_request_id>/grant",
         views.ProlongationRequestGrantView.as_view(),
         name="prolongation_request_grant",

@@ -1,8 +1,10 @@
 from django.db.models import F
+from django.urls import reverse
 
 from itou.common_apps.notifications.base_class import BaseNotification
 from itou.prescribers.models import PrescriberMembership
 from itou.utils.emails import get_email_message
+from itou.utils.urls import get_absolute_url
 
 
 class ProlongationRequestCreated(BaseNotification):
@@ -16,7 +18,15 @@ class ProlongationRequestCreated(BaseNotification):
     @property
     def email(self):
         to = [self.prolongation_request.validated_by.email]
-        context = {"prolongation_request": self.prolongation_request}
+        context = {
+            "prolongation_request": self.prolongation_request,
+            "report_file_url": get_absolute_url(
+                reverse(
+                    "approvals:prolongation_request_report_file",
+                    kwargs={"prolongation_request_id": self.prolongation_request.pk},
+                )
+            ),
+        }
         subject = "approvals/email/prolongation_request/created_subject.txt"
         body = "approvals/email/prolongation_request/created_body.txt"
         return get_email_message(to, context, subject, body)
@@ -41,6 +51,12 @@ class ProlongationRequestCreatedReminder(BaseNotification):
         )
         context = {
             "prolongation_request": self.prolongation_request,
+            "report_file_url": get_absolute_url(
+                reverse(
+                    "approvals:prolongation_request_report_file",
+                    kwargs={"prolongation_request_id": self.prolongation_request.pk},
+                )
+            ),
         }
         subject = "approvals/email/prolongation_request/created_reminder_subject.txt"
         body = "approvals/email/prolongation_request/created_reminder_body.txt"

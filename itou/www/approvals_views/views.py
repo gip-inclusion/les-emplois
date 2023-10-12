@@ -11,6 +11,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views import View
+from django.views.decorators.http import require_safe
 from django.views.generic import DetailView, ListView, TemplateView
 from formtools.wizard.views import NamedUrlSessionWizardView
 
@@ -389,6 +390,19 @@ def prolongation_requests_list(request, template_name="approvals/prolongation_re
         "pager": pager(queryset, request.GET.get("page"), items_per_page=10),
     }
     return render(request, template_name, context)
+
+
+@require_safe
+@login_required
+def prolongation_request_report_file(request, prolongation_request_id):
+    prolongation_request = get_object_or_404(
+        ProlongationRequest,
+        pk=prolongation_request_id,
+        report_file__isnull=False,
+    )
+    if prolongation_request.prescriber_organization_id not in [org.pk for org in request.organizations]:
+        raise Http404
+    return HttpResponseRedirect(default_storage.url(prolongation_request.report_file_id))
 
 
 class ProlongationRequestViewMixin(LoginRequiredMixin):

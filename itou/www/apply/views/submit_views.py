@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
-from django.core.files.storage import default_storage
+from django.core.files.storage import storages
 from django.db import transaction
 from django.forms import ValidationError
 from django.http import Http404, HttpResponseRedirect
@@ -1052,8 +1052,9 @@ class ApplicationResumeView(ApplicationBaseView):
             if resume := self.form.cleaned_data.get("resume"):
                 key = f"resume/{uuid.uuid4()}.pdf"
                 File.objects.create(key=key)
-                name = default_storage.save(key, resume)
-                job_application.resume_link = default_storage.url(name)
+                public_storage = storages["public"]
+                name = public_storage.save(key, resume)
+                job_application.resume_link = public_storage.url(name)
 
             # Save the job application
             with transaction.atomic():

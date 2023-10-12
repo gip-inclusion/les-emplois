@@ -1,17 +1,22 @@
 import factory
+import httpx
 import pytest
 from django.contrib import messages
 from django.core.files.storage import default_storage
 from django.template import loader
 from django.urls import reverse
+from freezegun import freeze_time
 from pytest_django.asserts import assertNumQueries, assertRedirects
 
 from itou.approvals.enums import (
+    ProlongationReason,
     ProlongationRequestDenyProposedAction,
     ProlongationRequestDenyReason,
     ProlongationRequestStatus,
 )
+from itou.files.models import File
 from tests.approvals import factories as approvals_factories
+from tests.prescribers import factories as prescribers_factories
 from tests.users import factories as users_factories
 from tests.utils.test import BASE_NUM_QUERIES, assertMessages, parse_response_to_soup
 
@@ -223,3 +228,66 @@ def test_template_status_card(snapshot, status):
         )
         == snapshot
     )
+
+
+class TestProlongationReportFileView:
+    def test_anonymous(self, client):
+        url = reverse("approvals:prolongation_request_report_file", kwargs={"prolongation_request_id": 0})
+        response = client.get(url)
+        assertRedirects(response, reverse("account_login") + f"?next={url}")
+
+    def test_nonexistent(self, client):
+        prescriber = users_factories.PrescriberFactory(membership__organization__authorized=True)
+        client.force_login(prescriber)
+        response = client.get(
+            reverse("approvals:prolongation_request_report_file", kwargs={"prolongation_request_id": 0})
+        )
+        assert response.status_code == 404
+
+    def test_other_organization(self, client):
+        prescriber = users_factories.PrescriberFactory(membership__organization__authorized=True)
+        request = approvals_factories.ProlongationRequestFactory()
+        client.force_login(prescriber)
+        response = client.get(
+            reverse(
+                "approvals:prolongation_request_report_file",
+                kwargs={"prolongation_request_id": request.pk},
+            )
+        )
+        assert response.status_code == 404
+
+    def test_no_report_file(self, client):
+        org = prescribers_factories.PrescriberOrganizationFactory(authorized=True)
+        prescriber = users_factories.PrescriberFactory(membership__organization=org)
+        request = approvals_factories.ProlongationRequestFactory(prescriber_organization=org, report_file=None)
+        client.force_login(prescriber)
+        response = client.get(
+            reverse(
+                "approvals:prolongation_request_report_file",
+                kwargs={"prolongation_request_id": request.pk},
+            )
+        )
+        assert response.status_code == 404
+
+    def test_ok(self, client, xlsx_file):
+        org = prescribers_factories.PrescriberOrganizationFactory(authorized=True)
+        prescriber = users_factories.PrescriberFactory(membership__organization=org)
+        key = default_storage.save("prolongation_report/empty.xlsx", xlsx_file)
+        file = File.objects.create(key=key)
+        request = approvals_factories.ProlongationRequestFactory(
+            prescriber_organization=org, reason=ProlongationReason.RQTH, report_file=file
+        )
+        client.force_login(prescriber)
+        # Boto3 signed requests depend on the current date, with a second resolution.
+        # See X-Amz-Date in
+        # https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-query-string-auth.html
+        with freeze_time():
+            response = client.get(
+                reverse(
+                    "approvals:prolongation_request_report_file",
+                    kwargs={"prolongation_request_id": request.pk},
+                )
+            )
+            assertRedirects(response, default_storage.url(file.pk), fetch_redirect_response=False)
+        xlsx_file.seek(0)
+        assert httpx.get(response.url).content == xlsx_file.read()

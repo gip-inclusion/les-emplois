@@ -18,6 +18,7 @@ def s3_client():
     )
 
 
-class S3Storage(S3Boto3Storage):
-    # Don’t expose S3 credentials through the default_storage.url().
+class PublicStorage(S3Boto3Storage):
+    # Not using the S3StaticStorage backend to ensure the listdir() operation remains forbidden.
+    # Don’t sign URLs, objects are public.
     querystring_auth = False
