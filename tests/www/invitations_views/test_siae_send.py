@@ -1,4 +1,3 @@
-import pytest
 from django.core import mail
 from django.shortcuts import reverse
 from django.utils import timezone
@@ -11,9 +10,6 @@ from tests.prescribers.factories import PrescriberOrganizationWithMembershipFact
 from tests.siaes.factories import SiaeFactory, SiaeMembershipFactory
 from tests.users.factories import JobSeekerFactory, SiaeStaffFactory
 from tests.utils.test import TestCase
-
-
-pytestmark = pytest.mark.ignore_template_errors
 
 
 INVITATION_URL = reverse("invitations_views:invite_siae_staff")
