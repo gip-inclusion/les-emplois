@@ -22,7 +22,10 @@
                                     {% for evaluated_administrative_criteria in evaluated_job_application.evaluated_administrative_criteria.all %}
                                         {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_administrative_criteria.administrative_criteria review_state=evaluated_administrative_criteria.review_state %}
                                         {% if evaluated_siae.evaluation_is_final %}
-                                            <a href="{{ evaluated_administrative_criteria.proof_url }}" rel="noopener" target="_blank" aria-label="Revoir ce justificatif (ouverture dans un nouvel onglet)">
+                                            <a href="{% url "siae_evaluations_views:view_proof" evaluated_administrative_criteria_id=evaluated_administrative_criteria.pk %}"
+                                               rel="noopener"
+                                               target="_blank"
+                                               aria-label="Revoir ce justificatif (ouverture dans un nouvel onglet)">
                                                 Revoir ce justificatif
                                             </a>
                                         {% else %}

@@ -11,7 +11,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.views import generic
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_safe
 from django.views.generic.detail import SingleObjectMixin
 
 from itou.files.models import File
@@ -671,13 +671,10 @@ def siae_upload_doc(
         proof_file = form.cleaned_data["proof"]
         proof_key = default_storage.save(f"evaluations/{proof_file.name}", proof_file)
         evaluated_administrative_criteria.proof = File.objects.create(key=proof_key)
-        evaluated_administrative_criteria.proof_url = default_storage.url(proof_key)
         evaluated_administrative_criteria.uploaded_at = timezone.now()
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
         evaluated_administrative_criteria.submitted_at = None
-        evaluated_administrative_criteria.save(
-            update_fields=["proof_url", "proof", "uploaded_at", "review_state", "submitted_at"]
-        )
+        evaluated_administrative_criteria.save(update_fields=["proof", "uploaded_at", "review_state", "submitted_at"])
         return HttpResponseRedirect(url)
 
     back_url = get_safe_url(request, "back_url", fallback_url=url)
@@ -737,6 +734,25 @@ def siae_submit_proofs(request, evaluated_siae_pk):
         ),
     )
     return HttpResponseRedirect(back_url)
+
+
+@login_required
+@require_safe
+def view_proof(request, evaluated_administrative_criteria_id):
+    if request.user.is_employer:
+        org_lookup = "evaluated_job_application__evaluated_siae__siae__in"
+    elif request.user.is_labor_inspector:
+        org_lookup = "evaluated_job_application__evaluated_siae__evaluation_campaign__institution__in"
+    else:
+        raise Http404(request.user.kind)
+    org_filter = {org_lookup: request.organizations}
+    criteria = get_object_or_404(
+        EvaluatedAdministrativeCriteria,
+        pk=evaluated_administrative_criteria_id,
+        proof__isnull=False,
+        **org_filter,
+    )
+    return HttpResponseRedirect(default_storage.url(criteria.proof_id))
 
 
 def sanctions_helper_view(request):

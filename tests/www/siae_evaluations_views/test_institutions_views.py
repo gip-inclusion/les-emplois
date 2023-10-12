@@ -481,7 +481,6 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
 
         EvaluatedAdministrativeCriteria.objects.update(
             submitted_at=timezone.now(),
-            proof_url="https://server.com/rocky-balboa.pdf",
             proof=FileFactory(),
         )
         response = self.client.get(url)
@@ -518,7 +517,6 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             evaluated_job_application__evaluated_siae=evaluated_siae,
         ).update(
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING,
-            proof_url="https://server.com/rocky-balboa-v2.pdf",
             proof=FileFactory(),
             submitted_at=None,
         )
@@ -582,9 +580,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
 
         # Simulate the SUBMITTABLE state
         del evaluated_siae.state_from_applications
-        EvaluatedAdministrativeCriteria.objects.update(
-            proof_url="https://server.com/rocky-balboa.pdf", proof=FileFactory()
-        )
+        EvaluatedAdministrativeCriteria.objects.update(proof=FileFactory())
         assert evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.SUBMITTABLE
         response = self.client.get(url)
         self.assertContains(response, evaluated_siae)
@@ -989,9 +985,8 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         # EvaluatedAdministrativeCriteria uploaded
         uploaded_status = "Justificatifs téléversés"
         evaluated_administrative_criteria = evaluated_job_application.evaluated_administrative_criteria.first()
-        evaluated_administrative_criteria.proof_url = "https://server.com/rocky-balboa.pdf"
         evaluated_administrative_criteria.proof = FileFactory()
-        evaluated_administrative_criteria.save(update_fields=["proof_url", "proof"])
+        evaluated_administrative_criteria.save(update_fields=["proof"])
         response = self.client.get(url)
         self.assertContains(response, back_url)
         self.assertContains(response, uploaded_status)
@@ -1113,14 +1108,11 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         adversarial_phase_start = evaluated_siae.reviewed_at
 
         # EvaluatedAdministrativeCriteriaState.UPLOADED (again)
-        evaluated_administrative_criteria.proof_url = "https://server.com/rocky-balboa.pdf"
         evaluated_administrative_criteria.proof = FileFactory()
         evaluated_administrative_criteria.uploaded_at = timezone.now()
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
         evaluated_administrative_criteria.submitted_at = None
-        evaluated_administrative_criteria.save(
-            update_fields=["proof_url", "proof", "review_state", "submitted_at", "uploaded_at"]
-        )
+        evaluated_administrative_criteria.save(update_fields=["proof", "review_state", "submitted_at", "uploaded_at"])
         response = self.client.get(url)
         self.assertContains(response, validation_button_disabled, html=True, count=1)
         self.assertContains(response, back_url)
@@ -1286,9 +1278,8 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
 
         # EvaluatedAdministrativeCriteria uploaded
         evaluated_administrative_criteria = evaluated_job_application.evaluated_administrative_criteria.first()
-        evaluated_administrative_criteria.proof_url = "https://server.com/rocky-balboa.pdf"
         evaluated_administrative_criteria.proof = FileFactory()
-        evaluated_administrative_criteria.save(update_fields=["proof_url", "proof"])
+        evaluated_administrative_criteria.save(update_fields=["proof"])
         response = self.client.get(url)
         self.assertContains(response, back_url)
         self.assertContains(
@@ -1332,14 +1323,11 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluated_siae.save(update_fields=["reviewed_at"])
 
         # EvaluatedAdministrativeCriteriaState.UPLOADED (again)
-        evaluated_administrative_criteria.proof_url = "https://server.com/rocky-balboa.pdf"
         evaluated_administrative_criteria.proof = FileFactory()
         evaluated_administrative_criteria.uploaded_at = timezone.now()
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
         evaluated_administrative_criteria.submitted_at = None
-        evaluated_administrative_criteria.save(
-            update_fields=["proof_url", "proof", "review_state", "submitted_at", "uploaded_at"]
-        )
+        evaluated_administrative_criteria.save(update_fields=["proof", "review_state", "submitted_at", "uploaded_at"])
         response = self.client.get(url)
         self.assertContains(response, validation_button_disabled, html=True, count=1)
         self.assertContains(response, back_url)
@@ -1388,7 +1376,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=evaluation_campaign)
         evaluated_job_app = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
         EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_app)
-        EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_app, proof_url="", proof=None)
+        EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_app, proof=None)
         self.client.force_login(self.user)
         response = self.client.get(
             reverse(
@@ -1594,7 +1582,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         # submittable by SIAE
         EvaluatedAdministrativeCriteria.objects.filter(
             evaluated_job_application__evaluated_siae=evaluated_siae
-        ).update(proof_url="https://server.com/rocky-balboa.pdf", proof=FileFactory())
+        ).update(proof=FileFactory())
 
         response = self.client.get(url)
         self.assertContains(response, uploaded)
@@ -1649,7 +1637,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         # submittable by SIAE
         EvaluatedAdministrativeCriteria.objects.filter(
             evaluated_job_application__evaluated_siae=evaluated_siae
-        ).update(proof_url="https://server.com/rocky-balboa.pdf", proof=FileFactory())
+        ).update(proof=FileFactory())
 
         response = self.client.get(url)
         self.assertContains(response, not_transmitted)
@@ -3294,6 +3282,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
             evaluation_campaign__institution=self.institution,
         )
         job_app = evaluated_siae.evaluated_job_applications.get()
+        crit = job_app.evaluated_administrative_criteria.get()
         self.client.force_login(self.user)
         response = self.client.get(
             reverse(
@@ -3301,10 +3290,14 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
                 kwargs={"evaluated_job_application_pk": job_app.pk},
             )
         )
+        proof_url = reverse(
+            "siae_evaluations_views:view_proof",
+            kwargs={"evaluated_administrative_criteria_id": crit.pk},
+        )
         self.assertContains(
             response,
-            """
-            <a href="https://server.com/rocky-balboa.pdf"
+            f"""
+            <a href="{proof_url}"
                rel="noopener"
                target="_blank"
                aria-label="Revoir ce justificatif (ouverture dans un nouvel onglet)"
@@ -3427,6 +3420,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
             evaluation_campaign__institution=self.institution,
         )
         past_job_application = evaluated_siae.evaluated_job_applications.get()
+        crit = past_job_application.evaluated_administrative_criteria.get()
 
         self.client.force_login(self.user)
         response = self.client.get(
@@ -3436,10 +3430,14 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
             )
         )
         self.assertNotContains(response, self.save_text)
+        proof_url = reverse(
+            "siae_evaluations_views:view_proof",
+            kwargs={"evaluated_administrative_criteria_id": crit.pk},
+        )
         self.assertContains(
             response,
-            """
-            <a href="https://server.com/rocky-balboa.pdf"
+            f"""
+            <a href="{proof_url}"
                rel="noopener"
                target="_blank"
                aria-label="Revoir ce justificatif (ouverture dans un nouvel onglet)"
@@ -3485,9 +3483,8 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
 
         # unverified evaluated_administrative_criteria
         evaluated_administrative_criteria.submitted_at = timezone.now()
-        evaluated_administrative_criteria.proof_url = "https://server.com/rocky-balboa.pdf"
         evaluated_administrative_criteria.proof = FileFactory()
-        evaluated_administrative_criteria.save(update_fields=["submitted_at", "proof_url", "proof"])
+        evaluated_administrative_criteria.save(update_fields=["submitted_at", "proof"])
         response = self.client.get(url_view)
         self.assertContains(response, refuse_url)
         self.assertContains(response, accepte_url)
@@ -3642,10 +3639,9 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         self.client.force_login(self.user)
         # fixme vincentporte : use EvaluatedAdministrativeCriteria instead
         evaluated_administrative_criteria = get_evaluated_administrative_criteria(self.institution)
-        evaluated_administrative_criteria.proof_url = "https://www.test.com"
         evaluated_administrative_criteria.proof = FileFactory()
         evaluated_administrative_criteria.submitted_at = timezone.now()
-        evaluated_administrative_criteria.save(update_fields=["submitted_at", "proof_url", "proof"])
+        evaluated_administrative_criteria.save(update_fields=["submitted_at", "proof"])
 
         url_view = reverse(
             "siae_evaluations_views:institution_evaluated_job_application",
@@ -3873,7 +3869,7 @@ class InstitutionEvaluatedSiaeValidationViewTest(TestCase):
         self.evaluation_campaign.save(update_fields=["evaluations_asked_at"])
         EvaluatedAdministrativeCriteria.objects.filter(
             evaluated_job_application__evaluated_siae=self.evaluated_siae
-        ).update(submitted_at=timezone.now(), proof_url="https://server.com/rocky-balboa.pdf", proof=FileFactory())
+        ).update(submitted_at=timezone.now(), proof=FileFactory())
 
         url = reverse(
             "siae_evaluations_views:institution_evaluated_siae_validation",

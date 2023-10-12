@@ -1,4 +1,5 @@
 from django.contrib import admin, messages
+from django.core.files.storage import default_storage
 from django.utils import timezone
 from django.utils.html import format_html
 
@@ -283,11 +284,20 @@ class EvaluatedAdministrativeCriteriaAdmin(ItouModelAdmin):
         "evaluated_job_application",
         "administrative_criteria",
         "uploaded_at",
-        "proof_url",
-        "proof",
+        "proof_link",
         "submitted_at",
         "review_state",
     )
+
+    @admin.display(description="lien du fichier bilan")
+    def proof_link(self, obj):
+        if obj.proof_id:
+            return format_html(
+                "<a href='{}'>{}</a>",
+                default_storage.url(obj.proof_id),
+                obj.proof_id,
+            )
+        return ""
 
 
 @admin.register(models.Sanctions)

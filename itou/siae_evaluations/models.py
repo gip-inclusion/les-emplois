@@ -650,7 +650,7 @@ class EvaluatedJobApplication(models.Model):
 
     def compute_state(self):
         def state_from(criteria):
-            if criteria.proof_url == "":
+            if criteria.proof_id is None:
                 return evaluation_enums.EvaluatedJobApplicationsState.PROCESSING
             if criteria.submitted_at is None:
                 return evaluation_enums.EvaluatedJobApplicationsState.UPLOADED
@@ -763,7 +763,6 @@ class EvaluatedAdministrativeCriteria(models.Model):
         related_name="evaluated_administrative_criteria",
     )
 
-    proof_url = models.URLField(max_length=500, verbose_name="lien vers le justificatif", blank=True)
     proof = models.ForeignKey("files.File", on_delete=models.CASCADE, blank=True, null=True)
     uploaded_at = models.DateTimeField(verbose_name="téléversé le", blank=True, null=True)
     submitted_at = models.DateTimeField(verbose_name="transmis le", blank=True, null=True)

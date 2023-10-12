@@ -82,4 +82,5 @@ urlpatterns = [
         name="siae_upload_doc",
     ),
     path("siae_submit_proofs/<int:evaluated_siae_pk>/", views.siae_submit_proofs, name="siae_submit_proofs"),
+    path("view_proof/<int:evaluated_administrative_criteria_id>/", views.view_proof, name="view_proof"),
 ]

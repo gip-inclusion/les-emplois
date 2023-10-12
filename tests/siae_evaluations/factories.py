@@ -98,5 +98,4 @@ class EvaluatedAdministrativeCriteriaFactory(factory.django.DjangoModelFactory):
         model = models.EvaluatedAdministrativeCriteria
 
     administrative_criteria = factory.Iterator(AdministrativeCriteria.objects.all())
-    proof_url = "https://server.com/rocky-balboa.pdf"
     proof = factory.SubFactory(FileFactory)
