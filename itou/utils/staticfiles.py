@@ -223,11 +223,11 @@ ASSET_INFOS = {
     },
     "theme-inclusion": {
         "download": {
-            "url": "https://github.com/betagouv/itou-theme/archive/refs/tags/v1.0.8.zip",
-            "sha256": "045a51de2a7670e522709b10cab788763b04d0dd1704b2c8b43f984af4142a29",
+            "url": "https://github.com/betagouv/itou-theme/archive/refs/tags/v1.0.9.zip",
+            "sha256": "971d813a65d4c1acf21f386af29d7b7e27b87be7c06150f034f4cb43365d8407",
         },
         "extract": {
-            "origin": "itou-theme-1.0.8/dist",
+            "origin": "itou-theme-1.0.9/dist",
             "destination": "vendor/theme-inclusion/",
             "files": [
                 "javascripts/app.js",
