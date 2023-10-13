@@ -55,8 +55,8 @@ class JobApplicationTransferModelTest(TestCase):
 
         job_application = JobApplicationFactory(to_siae=origin_siae, state=JobApplicationWorkflow.STATE_ACCEPTED)
 
-        assert origin_user.kind == UserKind.SIAE_STAFF
-        assert target_user.kind == UserKind.SIAE_STAFF
+        assert origin_user.kind == UserKind.EMPLOYER
+        assert target_user.kind == UserKind.EMPLOYER
         assert not job_application.can_be_transferred(target_user, job_application.to_siae)
         assert not job_application.can_be_transferred(lambda_user, target_siae)
         assert not job_application.can_be_transferred(target_user, target_siae)

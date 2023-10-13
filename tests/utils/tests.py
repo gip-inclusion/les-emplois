@@ -73,11 +73,11 @@ from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory, PrescriberOrganizationWithMembershipFactory
 from tests.siaes.factories import SiaeFactory, SiaeMembershipFactory, SiaePendingGracePeriodFactory
 from tests.users.factories import (
+    EmployerFactory,
     ItouStaffFactory,
     JobSeekerFactory,
     LaborInspectorFactory,
     PrescriberFactory,
-    SiaeStaffFactory,
 )
 from tests.utils.test import TestCase, assertMessagesFromRequest, parse_response_to_soup
 
@@ -144,7 +144,7 @@ class TestItouCurrentOrganizationMiddleware:
     def test_siae_no_member(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
         request = factory.get("/")
-        request.user = SiaeStaffFactory()
+        request.user = EmployerFactory()
         SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
         MessageMiddleware(get_response_for_middlewaremixin).process_request(request)
         with assertNumQueries(1):  # Retrieve user memberships
@@ -951,7 +951,7 @@ class SiaeSignupTokenGeneratorTest(TestCase):
         p0 = SiaeSignupTokenGenerator()
         tk1 = p0.make_token(siae)
         assert p0.check_token(siae, tk1) is True
-        user = User(kind=UserKind.SIAE_STAFF)
+        user = User(kind=UserKind.EMPLOYER)
         user.save()
         membership = SiaeMembership()
         membership.user = user

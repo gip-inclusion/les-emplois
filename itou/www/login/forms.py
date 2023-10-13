@@ -6,7 +6,7 @@ from itou.users.models import User
 
 
 class ItouLoginForm(LoginForm):
-    # Hidden field allowing demo prescriber and siae staff to log in using the banner form
+    # Hidden field allowing demo prescribers and employers to log in using the banner form
     demo_banner_account = forms.BooleanField(widget=forms.HiddenInput(), required=False)
 
     def __init__(self, *args, **kwargs):

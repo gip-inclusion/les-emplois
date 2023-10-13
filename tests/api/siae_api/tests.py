@@ -6,7 +6,7 @@ from rest_framework.test import APIClient, APITestCase
 from itou.siaes.enums import SiaeKind
 from tests.cities.factories import create_city_guerande, create_city_saint_andre
 from tests.siaes.factories import SiaeFactory
-from tests.users.factories import SiaeStaffFactory
+from tests.users.factories import EmployerFactory
 from tests.utils.test import BASE_NUM_QUERIES
 
 
@@ -17,7 +17,7 @@ class SiaeAPIFetchListTest(APITestCase):
     def setUp(self):
         super().setUp()
         self.client = APIClient()
-        self.user = SiaeStaffFactory()
+        self.user = EmployerFactory()
 
         # We create 2 cities and 2 siaes in Saint-Andre.
         self.saint_andre = create_city_saint_andre()

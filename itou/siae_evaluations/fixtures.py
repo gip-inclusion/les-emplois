@@ -98,7 +98,7 @@ def load_data():
             AdministrativeCriteria.objects.filter(pk__in=pks_list)
             eligibility_diagnosis = EligibilityDiagnosis.objects.create(
                 author=employer,
-                author_kind=users_enums.KIND_SIAE_STAFF,
+                author_kind=users_enums.KIND_EMPLOYER,
                 author_siae=controlled_siae,
                 job_seeker=job_seeker,
                 created_at=datetime_within_period_range,
@@ -122,7 +122,7 @@ def load_data():
                     job_seeker=job_seeker,
                     sender_siae=controlled_siae,
                     sender=employer,
-                    sender_kind=users_enums.KIND_SIAE_STAFF,
+                    sender_kind=users_enums.KIND_EMPLOYER,
                     state=JobApplicationWorkflow.STATE_ACCEPTED,
                     to_siae=controlled_siae,
                 ).id

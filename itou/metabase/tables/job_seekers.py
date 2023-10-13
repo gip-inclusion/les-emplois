@@ -22,7 +22,7 @@ from itou.users.enums import IdentityProvider
 # Reword the original EligibilityDiagnosis.AUTHOR_KIND_CHOICES
 AUTHOR_KIND_CHOICES = (
     (AuthorKind.PRESCRIBER, "Prescripteur"),
-    (AuthorKind.SIAE_STAFF, "Employeur"),
+    (AuthorKind.EMPLOYER, "Employeur"),
 )
 
 
@@ -38,7 +38,7 @@ def get_user_signup_kind(user):
         return "autonome"
     if creator.is_prescriber:
         return "par prescripteur"
-    if creator.is_siae_staff:
+    if creator.is_employer:
         return "par employeur"
     if creator.is_staff:
         return "par administrateur"
@@ -64,7 +64,7 @@ def get_latest_diagnosis_author_sub_kind(job_seeker):
     if latest_diagnosis:
         author_kind = get_choice(choices=AUTHOR_KIND_CHOICES, key=latest_diagnosis.author_kind)
         author_sub_kind = None
-        if latest_diagnosis.author_kind == AuthorKind.SIAE_STAFF and latest_diagnosis.author_siae:
+        if latest_diagnosis.author_kind == AuthorKind.EMPLOYER and latest_diagnosis.author_siae:
             author_sub_kind = latest_diagnosis.author_siae.kind
         elif latest_diagnosis.author_kind == AuthorKind.PRESCRIBER and latest_diagnosis.author_prescriber_organization:
             author_sub_kind = latest_diagnosis.author_prescriber_organization.kind
@@ -75,7 +75,7 @@ def get_latest_diagnosis_author_sub_kind(job_seeker):
 def get_latest_diagnosis_author_display_name(job_seeker):
     latest_diagnosis = get_latest_diagnosis(job_seeker)
     if latest_diagnosis:
-        if latest_diagnosis.author_kind == AuthorKind.SIAE_STAFF and latest_diagnosis.author_siae:
+        if latest_diagnosis.author_kind == AuthorKind.EMPLOYER and latest_diagnosis.author_siae:
             return latest_diagnosis.author_siae.display_name
         elif latest_diagnosis.author_kind == AuthorKind.PRESCRIBER and latest_diagnosis.author_prescriber_organization:
             return latest_diagnosis.author_prescriber_organization.display_name
@@ -313,7 +313,7 @@ def get_table():
                 "comment": "ID auteur diagnostic si employeur",
                 "fn": lambda o: get_latest_diagnosis(o).author_siae.id
                 if get_latest_diagnosis(o)
-                and get_latest_diagnosis(o).author_kind == AuthorKind.SIAE_STAFF
+                and get_latest_diagnosis(o).author_kind == AuthorKind.EMPLOYER
                 and get_latest_diagnosis(o).author_siae
                 else None,
             },

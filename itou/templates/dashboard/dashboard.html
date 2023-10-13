@@ -6,7 +6,7 @@
 {% block messages %}
     {{ block.super }}
 
-    {% if user.is_siae_staff and request.current_organization and not request.current_organization.jobs.exists %}
+    {% if user.is_employer and request.current_organization and not request.current_organization.jobs.exists %}
         <div class="alert alert-warning">
             <p class="mb-0">
                 Pour optimiser la réception de vos candidatures, pensez à renseigner le descriptif de vos postes et leurs prérequis.
@@ -15,7 +15,7 @@
     {% endif %}
 
     {# Alerte pour les employeurs en cas d'absence ou de mauvais score de geocoding. #}
-    {% if user.is_siae_staff and request.current_organization and not request.current_organization.has_reliable_coords_legacy %}
+    {% if user.is_employer and request.current_organization and not request.current_organization.has_reliable_coords_legacy %}
         <div class="alert alert-warning mb-0" role="status">
             <p class="mb-0">
                 Nous n'avons pas pu géolocaliser votre établissement.
@@ -55,7 +55,7 @@
         </div>
     {% endif %}
 
-    {% if user.is_siae_staff and request.current_organization and not request.current_organization.is_active %}
+    {% if user.is_employer and request.current_organization and not request.current_organization.is_active %}
         <div class="alert alert-warning mb-0" role="status">
             <p class="mb-0">
                 Votre structure
@@ -193,7 +193,7 @@
                                         </a>
                                     </div>
                                 </div>
-                            {% elif user.is_siae_staff %}
+                            {% elif user.is_employer %}
                                 <p class="h2">Donnez de la visibilité à votre offre d’insertion</p>
                                 <p>
                                     <strong>DORA</strong> est une cartographie numérique de l'offre d'insertion nationale. Rendez vos services visibles sur votre territoire et sur tous les sites partenaires, grâce à notre démarche collective d'ouverture des données.
@@ -252,7 +252,7 @@
                             </p>
                         {% endif %}
 
-                        {% if user.is_siae_staff and request.current_organization %}
+                        {% if user.is_employer and request.current_organization %}
                             <p class="mb-0">SIRET {{ request.current_organization.siret|format_siret }}</p>
                         {% endif %}
                     </div>
@@ -286,7 +286,7 @@
                 {% endif %}
                 {# end of if user.is_prescriber #}
 
-                {% if user.is_siae_staff %}
+                {% if user.is_employer %}
                     {% include "dashboard/includes/siae_card.html" %}
                     {% include "dashboard/includes/siae_job_applications_card.html" %}
                     {% if request.current_organization.is_subject_to_eligibility_rules %}
@@ -298,7 +298,7 @@
                     {% endif %}
 
                 {% endif %}
-                {# end of if user.is_siae_staff #}
+                {# end of if user.is_employer #}
 
                 {% if user.is_labor_inspector %}
                     {% include "dashboard/includes/labor_inspector_organization_card.html" %}
@@ -310,20 +310,20 @@
                 {% endif %}
             </div>
 
-            {% if can_view_stats_dashboard_widget or user.is_siae_staff or user.is_prescriber %}
+            {% if can_view_stats_dashboard_widget or user.is_employer or user.is_prescriber %}
                 <h2>Services partenaires</h2>
                 <div class="row row-cols-1 row-cols-md-2 mt-3">
                     {% if can_view_stats_dashboard_widget %}
                         {% include "dashboard/includes/stats.html" %}
                     {% endif %}
 
-                    {% if user.is_siae_staff or user.is_prescriber %}
+                    {% if user.is_employer or user.is_prescriber %}
                         {% include "dashboard/includes/dora_card.html" with siret=current_org.siret tracker="utm_source=LesEmplois&utm_medium=blocLesEmplois&utm_campaign=dashboard" %}
                     {% endif %}
                 </div>
             {% endif %}
 
-            {% if user.is_siae_staff or user.is_prescriber %}
+            {% if user.is_employer or user.is_prescriber %}
                 <h2>Actualités</h2>
                 <div class="row row-cols-1">
                     <div class="container">

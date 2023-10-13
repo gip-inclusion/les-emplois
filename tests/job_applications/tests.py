@@ -56,7 +56,7 @@ from tests.job_applications.factories import (
 )
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.siaes.factories import SiaeFactory, SiaeWithMembershipAndJobsFactory
-from tests.users.factories import ItouStaffFactory, JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
+from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerFactory, PrescriberFactory
 from tests.utils.test import TestCase, get_rows_from_streaming_response
 
 
@@ -1063,7 +1063,7 @@ class NewQualifiedJobAppEmployersNotificationTest(TestCase):
             recipient=membership, subscribed_pks=[job_descriptions[0].pk]
         )
 
-        user = SiaeStaffFactory(siae=siae)
+        user = EmployerFactory(siae=siae)
         siae.members.add(user)
         membership = siae.siaemembership_set.get(user=user)
         NewQualifiedJobAppEmployersNotification.subscribe(
@@ -1081,7 +1081,7 @@ class NewQualifiedJobAppEmployersNotificationTest(TestCase):
         Unset recipients should receive new job application notifications.
         """
         siae = SiaeWithMembershipAndJobsFactory()
-        user = SiaeStaffFactory(siae=siae)
+        user = EmployerFactory(siae=siae)
         siae.members.add(user)
 
         selected_job = siae.job_description_through.first()
@@ -1525,17 +1525,17 @@ class JobApplicationWorkflowTest(TestCase):
         )
 
         to_siae = job_application.to_siae
-        to_siae_staff_member = to_siae.members.first()
+        to_employer_member = to_siae.members.first()
         job_seeker = job_application.job_seeker
 
         eligibility_diagnosis = EligibilityDiagnosisMadeBySiaeFactory(
-            job_seeker=job_seeker, author=to_siae_staff_member, author_siae=to_siae
+            job_seeker=job_seeker, author=to_employer_member, author_siae=to_siae
         )
 
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         assert job_seeker.pole_emploi_id != ""
 
-        job_application.accept(user=to_siae_staff_member)
+        job_application.accept(user=to_employer_member)
         assert job_application.to_siae.is_subject_to_eligibility_rules
         assert job_application.eligibility_diagnosis == eligibility_diagnosis
         # Approval delivered -> Pole Emploi is notified

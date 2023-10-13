@@ -144,7 +144,7 @@ class Command(BaseCommand):
 
             # Don't move invitations for existing members
             # The goal is to keep information about the original information
-            invitations = invitations_models.SiaeStaffInvitation.objects.filter(siae_id=from_id).exclude(
+            invitations = invitations_models.EmployerInvitation.objects.filter(siae_id=from_id).exclude(
                 email__in=users_models.User.objects.filter(siaemembership__siae_id=to_id).values_list(
                     "email", flat=True
                 )

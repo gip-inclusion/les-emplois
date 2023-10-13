@@ -80,7 +80,7 @@ def test_get_fields_to_transfer_for_job_seekers():
         "prolongations_validated",  # Prolongation.validated_by
         "reactivated_siae_convention_set",  # SiaeConvention.reactivated_by
         "siae",  # Siae.members
-        "siae_invitations",  # SiaeStaffInvitation.sender
+        "siae_invitations",  # EmployerInvitation.sender
         "siaemembership",  # SiaeMembership.user
         "socialaccount",  # allauth.socialaccount.models.SocialAccount.user
         "suspension",  # Suspension.updated_by

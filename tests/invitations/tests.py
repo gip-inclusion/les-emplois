@@ -2,30 +2,31 @@ import pytest
 from django.test import SimpleTestCase
 from django.utils import timezone
 
-from itou.invitations.models import InvitationAbstract, SiaeStaffInvitation
+from itou.invitations.models import EmployerInvitation, InvitationAbstract
+from itou.users.enums import KIND_EMPLOYER
 from tests.invitations.factories import (
-    ExpiredSiaeStaffInvitationFactory,
+    EmployerInvitationFactory,
+    ExpiredEmployerInvitationFactory,
     PrescriberWithOrgSentInvitationFactory,
-    SentSiaeStaffInvitationFactory,
-    SiaeStaffInvitationFactory,
+    SentEmployerInvitationFactory,
 )
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.siaes.factories import SiaeMembershipFactory
-from tests.users.factories import PrescriberFactory, SiaeStaffFactory
+from tests.users.factories import EmployerFactory, PrescriberFactory
 from tests.utils.test import TestCase
 
 
-class SiaeStaffInvitationQuerySetTest(TestCase):
+class EmployerInvitationQuerySetTest(TestCase):
     def test_pending(self):
         # Create some non-expired invitations.
-        invitation1 = SentSiaeStaffInvitationFactory()
-        invitation2 = SentSiaeStaffInvitationFactory()
-        invitation3 = SentSiaeStaffInvitationFactory()
+        invitation1 = SentEmployerInvitationFactory()
+        invitation2 = SentEmployerInvitationFactory()
+        invitation3 = SentEmployerInvitationFactory()
 
         # Add one expired invitation.
-        invitation4 = ExpiredSiaeStaffInvitationFactory()
+        invitation4 = ExpiredEmployerInvitationFactory()
 
-        pending_invitations = SiaeStaffInvitation.objects.pending()
+        pending_invitations = EmployerInvitation.objects.pending()
 
         assert 3 == pending_invitations.count()
         assert invitation1.pk in pending_invitations.values_list("pk", flat=True)
@@ -37,35 +38,35 @@ class SiaeStaffInvitationQuerySetTest(TestCase):
 
 class InvitationModelTest(SimpleTestCase):
     def test_acceptance_link(self):
-        invitation = SentSiaeStaffInvitationFactory.build()
+        invitation = SentEmployerInvitationFactory.build()
         assert str(invitation.pk) in invitation.acceptance_link
 
         # Must be an absolute URL
         assert invitation.acceptance_link.startswith("http")
 
     def has_expired(self):
-        invitation = ExpiredSiaeStaffInvitationFactory.build()
+        invitation = ExpiredEmployerInvitationFactory.build()
         assert invitation.has_expired
 
-        invitation = SentSiaeStaffInvitationFactory.build()
+        invitation = SentEmployerInvitationFactory.build()
         assert not invitation.has_expired
 
     def test_can_be_accepted(self):
-        invitation = ExpiredSiaeStaffInvitationFactory.build()
+        invitation = ExpiredEmployerInvitationFactory.build()
         assert not invitation.can_be_accepted
 
-        invitation = SiaeStaffInvitationFactory.build(sent_at=timezone.now())
+        invitation = EmployerInvitationFactory.build(sent_at=timezone.now())
         assert not invitation.can_be_accepted
 
-        invitation = SentSiaeStaffInvitationFactory.build(accepted=True)
+        invitation = SentEmployerInvitationFactory.build(accepted=True)
         assert not invitation.can_be_accepted
 
-        invitation = SentSiaeStaffInvitationFactory.build()
+        invitation = SentEmployerInvitationFactory.build()
         assert invitation.can_be_accepted
 
     def test_get_model_from_string(self):
-        invitation_type = InvitationAbstract.get_model_from_string("siae_staff")
-        assert invitation_type == SiaeStaffInvitation
+        invitation_type = InvitationAbstract.get_model_from_string(KIND_EMPLOYER)
+        assert invitation_type == EmployerInvitation
 
         with pytest.raises(TypeError):
             InvitationAbstract.get_model_from_string("wrong_type")
@@ -76,7 +77,7 @@ class InvitationModelTest(SimpleTestCase):
 
 class InvitationEmailsTest(SimpleTestCase):
     def test_send_invitation(self):
-        invitation = SentSiaeStaffInvitationFactory.build()
+        invitation = SentEmployerInvitationFactory.build()
         email = invitation.email_invitation
 
         # Subject
@@ -158,15 +159,15 @@ class TestPrescriberWithOrgInvitationEmails(SimpleTestCase):
 
 class TestSiaeInvitation(TestCase):
     def test_add_member_to_siae(self):
-        invitation = SentSiaeStaffInvitationFactory(email="hey@you.com")
-        SiaeStaffFactory(email=invitation.email)
+        invitation = SentEmployerInvitationFactory(email="hey@you.com")
+        EmployerFactory(email=invitation.email)
         siae_members = invitation.siae.members.count()
         invitation.add_invited_user_to_siae()
         siae_members_after = invitation.siae.members.count()
         assert siae_members + 1 == siae_members_after
 
     def test_add_inactive_member_back_to_siae(self):
-        invitation = SentSiaeStaffInvitationFactory(email="hey@you.com")
+        invitation = SentEmployerInvitationFactory(email="hey@you.com")
         SiaeMembershipFactory(siae=invitation.siae, user__email=invitation.email, is_active=False)
         siae_members = invitation.siae.members.count()
         siae_active_members = invitation.siae.active_members.count()
@@ -179,7 +180,7 @@ class TestSiaeInvitation(TestCase):
 
 class TestSiaeInvitationEmails(SimpleTestCase):
     def test_accepted_notif_sender(self):
-        invitation = SentSiaeStaffInvitationFactory.build()
+        invitation = SentEmployerInvitationFactory.build()
         email = invitation.email_accepted_notif_sender
 
         # Subject
@@ -196,7 +197,7 @@ class TestSiaeInvitationEmails(SimpleTestCase):
         assert invitation.sender.email in email.to
 
     def test_email_invitation(self):
-        invitation = SentSiaeStaffInvitationFactory.build()
+        invitation = SentEmployerInvitationFactory.build()
         email = invitation.email_invitation
 
         # Subject

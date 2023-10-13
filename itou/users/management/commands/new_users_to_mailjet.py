@@ -119,7 +119,7 @@ class Command(BaseCommand):
             )
             .order_by("email")
         )
-        employers = users.filter(kind=UserKind.SIAE_STAFF).filter(
+        employers = users.filter(kind=UserKind.EMPLOYER).filter(
             Exists(
                 SiaeMembership.objects.filter(
                     user_id=OuterRef("pk"),

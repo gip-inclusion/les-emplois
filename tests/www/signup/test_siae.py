@@ -14,7 +14,7 @@ from freezegun import freeze_time
 
 from itou.siaes.enums import SiaeKind
 from itou.siaes.models import Siae
-from itou.users.enums import KIND_SIAE_STAFF, UserKind
+from itou.users.enums import KIND_EMPLOYER, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
@@ -24,7 +24,7 @@ from itou.utils.urls import get_tally_form_url
 from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
 from tests.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
 from tests.siaes.factories import SiaeFactory, SiaeMembershipFactory, SiaeWithMembershipAndJobsFactory
-from tests.users.factories import DEFAULT_PASSWORD, PrescriberFactory, SiaeStaffFactory
+from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory, PrescriberFactory
 from tests.utils.test import BASE_NUM_QUERIES, TestCase, assertMessages
 
 
@@ -37,7 +37,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         response = self.client.get(url)
         self.assertContains(response, "Employeur solidaire")
 
-        response = self.client.post(url, data={"kind": UserKind.SIAE_STAFF})
+        response = self.client.post(url, data={"kind": UserKind.EMPLOYER})
         self.assertRedirects(response, reverse("signup:siae_select"))
 
     @freeze_time("2022-09-15 15:53:54")
@@ -81,7 +81,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         previous_url = reverse("signup:siae_user", args=(siae.pk, token))
         next_url = reverse("signup:siae_join", args=(siae.pk, token))
         params = {
-            "user_kind": KIND_SIAE_STAFF,
+            "user_kind": KIND_EMPLOYER,
             "previous_url": previous_url,
             "next_url": next_url,
         }
@@ -90,21 +90,21 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
 
         response = mock_oauth_dance(
             self.client,
-            KIND_SIAE_STAFF,
+            KIND_EMPLOYER,
             previous_url=previous_url,
             next_url=next_url,
         )
         response = self.client.get(response.url)
         # Check user is redirected to the welcoming tour
         self.assertRedirects(response, reverse("welcoming_tour:index"))
-        # Check user sees the siae staff tour
+        # Check user sees the employer tour
         response = self.client.get(response.url)
         self.assertContains(response, "Publiez vos offres, augmentez votre visibilité")
 
         user = User.objects.get(email=OIDC_USERINFO["email"])
 
         # Check `User` state.
-        assert user.kind == UserKind.SIAE_STAFF
+        assert user.kind == UserKind.EMPLOYER
         assert user.is_active
         assert siae.has_admin(user)
         assert 1 == siae.members.count()
@@ -122,14 +122,14 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
 
     @freeze_time("2022-09-15 15:53:54")
     @respx.mock
-    def test_join_an_siae_without_members_as_an_existing_siae_staff(self):
+    def test_join_an_siae_without_members_as_an_existing_employer(self):
         """
         A user joins an SIAE without members.
         """
         siae = SiaeFactory(kind=SiaeKind.ETTI)
         assert 0 == siae.members.count()
 
-        user = SiaeStaffFactory(email=OIDC_USERINFO["email"], has_completed_welcoming_tour=True)
+        user = EmployerFactory(email=OIDC_USERINFO["email"], has_completed_welcoming_tour=True)
         SiaeMembershipFactory(user=user)
         assert 1 == user.siae_set.count()
 
@@ -142,7 +142,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         previous_url = reverse("signup:siae_user", args=(siae.pk, token))
         next_url = reverse("signup:siae_join", args=(siae.pk, token))
         params = {
-            "user_kind": KIND_SIAE_STAFF,
+            "user_kind": KIND_EMPLOYER,
             "previous_url": previous_url,
             "next_url": next_url,
         }
@@ -151,7 +151,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
 
         response = mock_oauth_dance(
             self.client,
-            KIND_SIAE_STAFF,
+            KIND_EMPLOYER,
             previous_url=previous_url,
             next_url=next_url,
         )
@@ -166,13 +166,13 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
 
     @freeze_time("2022-09-15 15:53:54")
     @respx.mock
-    def test_join_an_siae_without_members_as_an_existing_siae_staff_returns_on_other_browser(self):
+    def test_join_an_siae_without_members_as_an_existing_employer_returns_on_other_browser(self):
         """
         A user joins an SIAE without members.
         """
         siae = SiaeFactory(kind=SiaeKind.ETTI)
 
-        user = SiaeStaffFactory(email=OIDC_USERINFO["email"], has_completed_welcoming_tour=True)
+        user = EmployerFactory(email=OIDC_USERINFO["email"], has_completed_welcoming_tour=True)
         SiaeMembershipFactory(user=user)
 
         magic_link = siae.signup_magic_link
@@ -184,7 +184,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         previous_url = reverse("signup:siae_user", args=(siae.pk, token))
         next_url = reverse("signup:siae_join", args=(siae.pk, token))
         params = {
-            "user_kind": KIND_SIAE_STAFF,
+            "user_kind": KIND_EMPLOYER,
             "previous_url": previous_url,
             "next_url": next_url,
         }
@@ -194,7 +194,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         other_client = Client()
         response = mock_oauth_dance(
             self.client,
-            KIND_SIAE_STAFF,
+            KIND_EMPLOYER,
             previous_url=previous_url,
             next_url=next_url,
             other_client=other_client,
@@ -223,7 +223,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         )
 
     def test_join_invalid_siae_id(self):
-        user = SiaeStaffFactory(with_siae=True)
+        user = EmployerFactory(with_siae=True)
         self.client.force_login(user)
         siae = SiaeFactory(kind=SiaeKind.ETTI)
         response = self.client.get(
@@ -289,7 +289,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         previous_url = reverse("signup:facilitator_user")
         next_url = reverse("signup:facilitator_join")
         params = {
-            "user_kind": KIND_SIAE_STAFF,
+            "user_kind": KIND_EMPLOYER,
             "previous_url": previous_url,
             "next_url": next_url,
         }
@@ -298,21 +298,21 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
 
         response = mock_oauth_dance(
             self.client,
-            KIND_SIAE_STAFF,
+            KIND_EMPLOYER,
             previous_url=previous_url,
             next_url=next_url,
         )
         response = self.client.get(response.url)
         # Check user is redirected to the welcoming tour
         self.assertRedirects(response, reverse("welcoming_tour:index"))
-        # Check user sees the siae staff tour
+        # Check user sees the employer tour
         response = self.client.get(response.url)
         self.assertContains(response, "Publiez vos offres, augmentez votre visibilité")
 
         user = User.objects.get(email=OIDC_USERINFO["email"])
 
         # Check `User` state.
-        assert user.kind == UserKind.SIAE_STAFF
+        assert user.kind == UserKind.EMPLOYER
         assert user.is_active
         siae = Siae.objects.get(siret=FAKE_SIRET)
         assert siae.has_admin(user)

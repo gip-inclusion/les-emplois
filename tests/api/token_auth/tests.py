@@ -1,11 +1,11 @@
 from django.urls import reverse
 from rest_framework.authtoken.models import Token
 
-from tests.users.factories import DEFAULT_PASSWORD, SiaeStaffFactory
+from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory
 
 
 def test_token_auth_with_login_password(client):
-    user = SiaeStaffFactory()
+    user = EmployerFactory()
     assert Token.objects.count() == 0
 
     url = reverse("v1:token-auth")
@@ -16,7 +16,7 @@ def test_token_auth_with_login_password(client):
 
 
 def test_token_auth_with_token(client):
-    user = SiaeStaffFactory()
+    user = EmployerFactory()
     token = Token(user=user)
     assert Token.objects.count() == 0
 

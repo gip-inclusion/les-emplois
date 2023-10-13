@@ -130,7 +130,7 @@ class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
         on_delete=models.CASCADE,
         related_name="eligibility_diagnoses",
     )
-    # When the author is an SIAE staff member, keep a track of his current SIAE.
+    # When the author is an SIAE member, keep a track of his current SIAE.
     author_siae = models.ForeignKey(
         "siaes.Siae",
         verbose_name="SIAE de l'auteur",
@@ -188,7 +188,7 @@ class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
             job_seeker=job_seeker,
             author=author,
             author_kind=author.kind,
-            author_siae=author_organization if author.is_siae_staff else None,
+            author_siae=author_organization if author.is_employer else None,
             author_prescriber_organization=author_organization if author.is_prescriber else None,
         )
         if administrative_criteria:

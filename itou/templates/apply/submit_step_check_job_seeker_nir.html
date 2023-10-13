@@ -6,7 +6,7 @@
 
 {% block title_messages %}
 
-    {% if request.user.is_siae_staff %}
+    {% if request.user.is_employer %}
         {% if siae.is_subject_to_eligibility_rules or siae.kind == SiaeKind.GEIQ %}
             <div class="alert alert-info alert-dismissible fade show">
                 <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">

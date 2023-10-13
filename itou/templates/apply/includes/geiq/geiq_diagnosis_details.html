@@ -29,7 +29,7 @@
         <p>
             <b>Durée de validité du diagnostic :</b> du {{ diagnosis.created_at|date:"d/m/Y" }} au {{ diagnosis.expires_at|date:"d/m/Y" }}.
         </p>
-        {% if request.user.is_siae_staff %}
+        {% if request.user.is_employer %}
             <div class="alert alert-info" role="status">
                 <div class="row">
                     <div class="col-auto pr-0">
@@ -76,7 +76,7 @@
     {% endif %}
 {% else %}
     {# Diagnosis either does not exist or has expired : this part is for GEIQ only #}
-    {% if request.user.is_siae_staff %}
+    {% if request.user.is_employer %}
         <hr>
         <div class="row ">
             <div class="col-auto pt-2">

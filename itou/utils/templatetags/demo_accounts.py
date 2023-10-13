@@ -7,7 +7,7 @@ register = template.Library()
 
 @register.simple_tag
 def employers_accounts_tag():
-    action_url = reverse("login:siae_staff")
+    action_url = reverse("login:employer")
     return [
         {
             "email": "test+etti@inclusion.beta.gouv.fr",

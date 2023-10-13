@@ -57,7 +57,7 @@ class EligibilityDiagnosisMadeBySiaeFactory(factory.django.DjangoModelFactory):
 
     created_at = factory.LazyFunction(timezone.now)
     author = factory.LazyAttribute(lambda obj: obj.author_siae.members.first())
-    author_kind = AuthorKind.SIAE_STAFF
+    author_kind = AuthorKind.EMPLOYER
     author_siae = factory.SubFactory(SiaeFactory, with_membership=True)
     job_seeker = factory.SubFactory(JobSeekerFactory)
 

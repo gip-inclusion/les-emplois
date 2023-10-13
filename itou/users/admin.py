@@ -441,7 +441,7 @@ class ItouUserAdmin(UserAdmin):
         inlines.insert(0, EmailAddressInline)
 
         conditional_inlines = {
-            "is_siae_staff": {
+            "is_employer": {
                 "siaemembership_set": SiaeMembershipInline,
                 "job_applications_sent": SentJobApplicationInline,
             },

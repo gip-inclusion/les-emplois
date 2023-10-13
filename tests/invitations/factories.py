@@ -6,26 +6,26 @@ from django.utils import timezone
 from itou.invitations import models
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.siaes.factories import SiaeFactory
-from tests.users.factories import PrescriberFactory, SiaeStaffFactory
+from tests.users.factories import EmployerFactory, PrescriberFactory
 
 
-class SiaeStaffInvitationFactory(factory.django.DjangoModelFactory):
+class EmployerInvitationFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = models.SiaeStaffInvitation
+        model = models.EmployerInvitation
 
-    email = factory.Sequence("email{}@siaestaff.com".format)
+    email = factory.Sequence("email{}@employer.com".format)
     first_name = factory.Sequence("first_name{}".format)
     last_name = factory.Sequence("last_name{}".format)
-    sender = factory.SubFactory(SiaeStaffFactory)
+    sender = factory.SubFactory(EmployerFactory)
     siae = factory.SubFactory(SiaeFactory, with_membership=True)
 
 
-class SentSiaeStaffInvitationFactory(SiaeStaffInvitationFactory):
+class SentEmployerInvitationFactory(EmployerInvitationFactory):
     sent = True
     sent_at = factory.LazyFunction(timezone.now)
 
 
-class ExpiredSiaeStaffInvitationFactory(SiaeStaffInvitationFactory):
+class ExpiredEmployerInvitationFactory(EmployerInvitationFactory):
     sent = True
     sent_at = factory.LazyFunction(
         lambda: timezone.now() - timedelta(days=models.InvitationAbstract.DEFAULT_VALIDITY_DAYS)

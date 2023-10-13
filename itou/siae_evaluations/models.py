@@ -15,7 +15,7 @@ from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.emails import CampaignEmailFactory, SIAEEmailFactory
 from itou.siaes.models import Siae
-from itou.users.enums import KIND_SIAE_STAFF
+from itou.users.enums import KIND_EMPLOYER
 from itou.utils.emails import send_email_messages
 from itou.utils.models import InclusiveDateRangeField
 from itou.utils.validators import validate_html
@@ -219,7 +219,7 @@ class EvaluationCampaign(models.Model):
                 to_siae__department=self.institution.department,
                 to_siae__kind__in=evaluation_enums.EvaluationSiaesKind.Evaluable,
                 state=JobApplicationWorkflow.STATE_ACCEPTED,
-                eligibility_diagnosis__author_kind=KIND_SIAE_STAFF,
+                eligibility_diagnosis__author_kind=KIND_EMPLOYER,
                 eligibility_diagnosis__author_siae=F("to_siae"),
                 hiring_start_at__gte=self.evaluated_period_start_at,
                 hiring_start_at__lte=self.evaluated_period_end_at,

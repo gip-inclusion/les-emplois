@@ -377,12 +377,12 @@ class SubmitJobApplicationForm(forms.Form):
         selected_jobs.label = "Métiers recherchés"
 
         message = self.fields["message"]
-        message.required = not user.is_siae_staff
+        message.required = not user.is_employer
         message.widget.attrs["placeholder"] = ""
         if user.is_job_seeker:
             message.label = "Message à l’employeur"
             help_text = "Message obligatoire à destination de l’employeur et non modifiable après l’envoi."
-        elif user.is_siae_staff:
+        elif user.is_employer:
             message.label = "Message d’information"
             help_text = "Ce message ne sera plus modifiable après l’envoi et une copie sera transmise au candidat."
         else:

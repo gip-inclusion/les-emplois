@@ -6,7 +6,7 @@ from itou.siaes.enums import SiaeKind
 from itou.siaes.models import Siae
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.siaes.factories import SiaeConventionFactory, SiaeFactory
-from tests.users.factories import PrescriberFactory, SiaeStaffFactory
+from tests.users.factories import EmployerFactory, PrescriberFactory
 from tests.utils.test import BASE_NUM_QUERIES
 
 
@@ -23,7 +23,7 @@ class DataInclusionStructureTest(APITestCase):
     maxDiff = None
 
     def test_list_missing_type_query_param(self):
-        user = SiaeStaffFactory()
+        user = EmployerFactory()
         authenticated_client = APIClient()
         authenticated_client.force_authenticate(user)
         url = reverse("v1:structures-list")
@@ -38,7 +38,7 @@ class DataInclusionSiaeStructureTest(APITestCase):
 
     def setUp(self):
         super().setUp()
-        self.user = SiaeStaffFactory()
+        self.user = EmployerFactory()
         self.client = APIClient()
         self.authenticated_client = APIClient()
         self.authenticated_client.force_authenticate(self.user)

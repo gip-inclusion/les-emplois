@@ -28,7 +28,7 @@ from tests.prescribers.factories import (
     PrescriberOrganizationWithMembershipFactory,
     PrescriberPoleEmploiFactory,
 )
-from tests.users.factories import PrescriberFactory, SiaeStaffFactory
+from tests.users.factories import EmployerFactory, PrescriberFactory
 from tests.utils.test import assertMessages
 
 
@@ -930,7 +930,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
         The user is still created and can try again.
         """
         org = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.OTHER)
-        SiaeStaffFactory(email=OIDC_USERINFO["email"], with_siae=True)
+        EmployerFactory(email=OIDC_USERINFO["email"], with_siae=True)
 
         response = self.client.get(reverse("signup:prescriber_check_already_exists"))
         assert response.status_code == 200
@@ -1006,7 +1006,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
         Raise an exception.
         """
         org = PrescriberOrganizationFactory.build(kind=PrescriberOrganizationKind.OTHER)
-        user = SiaeStaffFactory(email=OIDC_USERINFO["email"])
+        user = EmployerFactory(email=OIDC_USERINFO["email"])
         self.client.get(reverse("signup:prescriber_check_already_exists"))
 
         session_signup_data = self.client.session.get(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)

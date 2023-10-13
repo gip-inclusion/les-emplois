@@ -21,8 +21,8 @@ from pytest_django.asserts import assertRedirects
 from itou.openid_connect.constants import OIDC_STATE_CLEANUP
 from itou.openid_connect.inclusion_connect import constants
 from itou.openid_connect.inclusion_connect.models import (
+    InclusionConnectEmployerData,
     InclusionConnectPrescriberData,
-    InclusionConnectSiaeStaffData,
     InclusionConnectState,
 )
 from itou.openid_connect.inclusion_connect.views import InclusionConnectSession
@@ -35,10 +35,10 @@ from itou.utils.urls import add_url_params, get_absolute_url
 from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
 from tests.users.factories import (
     DEFAULT_PASSWORD,
+    EmployerFactory,
     JobSeekerFactory,
     LaborInspectorFactory,
     PrescriberFactory,
-    SiaeStaffFactory,
     UserFactory,
 )
 from tests.utils.test import assertMessages
@@ -253,7 +253,7 @@ class InclusionConnectModelTest(InclusionConnectBaseTestCase):
     def test_create_or_update_prescriber_raise_too_many_kind_exception(self):
         ic_user_data = InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)
 
-        for kind in [UserKind.JOB_SEEKER, UserKind.SIAE_STAFF, UserKind.LABOR_INSPECTOR]:
+        for kind in [UserKind.JOB_SEEKER, UserKind.EMPLOYER, UserKind.LABOR_INSPECTOR]:
             user = UserFactory(username=ic_user_data.username, email=ic_user_data.email, kind=kind)
 
             with pytest.raises(InvalidKindException):
@@ -261,8 +261,8 @@ class InclusionConnectModelTest(InclusionConnectBaseTestCase):
 
             user.delete()
 
-    def test_create_or_update_siae_staff_raise_too_many_kind_exception(self):
-        ic_user_data = InclusionConnectSiaeStaffData.from_user_info(OIDC_USERINFO)
+    def test_create_or_update_employer_raise_too_many_kind_exception(self):
+        ic_user_data = InclusionConnectEmployerData.from_user_info(OIDC_USERINFO)
 
         for kind in [UserKind.JOB_SEEKER, UserKind.PRESCRIBER, UserKind.LABOR_INSPECTOR]:
             user = UserFactory(username=ic_user_data.username, email=ic_user_data.email, kind=kind)
@@ -433,7 +433,7 @@ class InclusionConnectCallbackViewTest(InclusionConnectBaseTestCase):
         self.assertEqual(user.username, OIDC_USERINFO["sub"])
         self.assertTrue(user.has_sso_provider)
         self.assertTrue(user.is_prescriber)
-        self.assertFalse(user.is_siae_staff)
+        self.assertFalse(user.is_employer)
         self.assertEqual(user.identity_provider, users_enums.IdentityProvider.INCLUSION_CONNECT)
 
     @respx.mock
@@ -450,16 +450,16 @@ class InclusionConnectCallbackViewTest(InclusionConnectBaseTestCase):
         assert user.identity_provider == users_enums.IdentityProvider.INCLUSION_CONNECT
 
     @respx.mock
-    def test_callback_siae_staff_created(self):
+    def test_callback_employer_created(self):
         ### User does not exist.
-        mock_oauth_dance(self.client, UserKind.SIAE_STAFF)
+        mock_oauth_dance(self.client, UserKind.EMPLOYER)
         assert User.objects.count() == 1
         user = User.objects.get(email=OIDC_USERINFO["email"])
         assert user.first_name == OIDC_USERINFO["given_name"]
         assert user.last_name == OIDC_USERINFO["family_name"]
         assert user.username == OIDC_USERINFO["sub"]
         assert user.has_sso_provider
-        assert user.kind == "siae_staff"
+        assert user.kind == UserKind.EMPLOYER
         assert user.identity_provider == users_enums.IdentityProvider.INCLUSION_CONNECT
 
     @respx.mock
@@ -483,9 +483,9 @@ class InclusionConnectCallbackViewTest(InclusionConnectBaseTestCase):
         assert user.identity_provider == users_enums.IdentityProvider.INCLUSION_CONNECT
 
     @respx.mock
-    def test_callback_allows_siae_staff_on_prescriber_login_only(self):
+    def test_callback_allows_employer_on_prescriber_login_only(self):
         ic_user_data = InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)
-        user = UserFactory(username=ic_user_data.username, email=ic_user_data.email, kind=UserKind.SIAE_STAFF)
+        user = UserFactory(username=ic_user_data.username, email=ic_user_data.email, kind=UserKind.EMPLOYER)
 
         response = mock_oauth_dance(
             self.client,
@@ -501,17 +501,17 @@ class InclusionConnectCallbackViewTest(InclusionConnectBaseTestCase):
 
         response = mock_oauth_dance(self.client, UserKind.PRESCRIBER, register=False)
         user.refresh_from_db()
-        assert user.kind == UserKind.SIAE_STAFF
+        assert user.kind == UserKind.EMPLOYER
         assert get_user(self.client).is_authenticated is True
 
     @respx.mock
-    def test_callback_allows_prescriber_on_siae_staff_login_only(self):
-        ic_user_data = InclusionConnectSiaeStaffData.from_user_info(OIDC_USERINFO)
+    def test_callback_allows_prescriber_on_employer_login_only(self):
+        ic_user_data = InclusionConnectEmployerData.from_user_info(OIDC_USERINFO)
         user = UserFactory(username=ic_user_data.username, email=ic_user_data.email, kind=UserKind.PRESCRIBER)
 
         response = mock_oauth_dance(
             self.client,
-            UserKind.SIAE_STAFF,
+            UserKind.EMPLOYER,
             expected_redirect_url=add_url_params(
                 reverse("inclusion_connect:logout"), {"redirect_url": reverse("search:siaes_home")}
             ),
@@ -521,14 +521,14 @@ class InclusionConnectCallbackViewTest(InclusionConnectBaseTestCase):
         self.assertContains(response, "pour devenir employeur sur la plateforme")
         assert get_user(self.client).is_authenticated is False
 
-        response = mock_oauth_dance(self.client, UserKind.SIAE_STAFF, register=False)
+        response = mock_oauth_dance(self.client, UserKind.EMPLOYER, register=False)
         user.refresh_from_db()
         assert user.kind == UserKind.PRESCRIBER
         assert get_user(self.client).is_authenticated is True
 
     @respx.mock
     def test_callback_refuses_job_seekers(self):
-        ic_user_data = InclusionConnectSiaeStaffData.from_user_info(OIDC_USERINFO)
+        ic_user_data = InclusionConnectEmployerData.from_user_info(OIDC_USERINFO)
         user = UserFactory(username=ic_user_data.username, email=ic_user_data.email, kind=UserKind.JOB_SEEKER)
 
         expected_redirect_url = add_url_params(
@@ -545,12 +545,12 @@ class InclusionConnectCallbackViewTest(InclusionConnectBaseTestCase):
         assert user.kind == UserKind.JOB_SEEKER
         assert get_user(self.client).is_authenticated is False
 
-        mock_oauth_dance(self.client, UserKind.SIAE_STAFF, expected_redirect_url=expected_redirect_url)
+        mock_oauth_dance(self.client, UserKind.EMPLOYER, expected_redirect_url=expected_redirect_url)
         user.refresh_from_db()
         assert user.kind == UserKind.JOB_SEEKER
         assert get_user(self.client).is_authenticated is False
 
-        mock_oauth_dance(self.client, UserKind.SIAE_STAFF, expected_redirect_url=expected_redirect_url, register=False)
+        mock_oauth_dance(self.client, UserKind.EMPLOYER, expected_redirect_url=expected_redirect_url, register=False)
         user.refresh_from_db()
         assert user.kind == UserKind.JOB_SEEKER
         assert get_user(self.client).is_authenticated is False
@@ -574,15 +574,15 @@ class InclusionConnectCallbackViewTest(InclusionConnectBaseTestCase):
             user.delete()
 
     @respx.mock
-    def test_callback_redirect_siae_staff_on_too_many_kind_exception(self):
-        ic_user_data = InclusionConnectSiaeStaffData.from_user_info(OIDC_USERINFO)
+    def test_callback_redirect_employer_on_too_many_kind_exception(self):
+        ic_user_data = InclusionConnectEmployerData.from_user_info(OIDC_USERINFO)
 
         for kind in [UserKind.JOB_SEEKER, UserKind.LABOR_INSPECTOR]:
             user = UserFactory(username=ic_user_data.username, email=ic_user_data.email, kind=kind)
             # Don't check redirection as the user isn't an siae member yet, so it won't work.
             response = mock_oauth_dance(
                 self.client,
-                UserKind.SIAE_STAFF,
+                UserKind.EMPLOYER,
                 expected_redirect_url=add_url_params(
                     reverse("inclusion_connect:logout"), {"redirect_url": reverse("search:siaes_home")}
                 ),
@@ -656,8 +656,8 @@ class InclusionConnectAccountActivationTest(InclusionConnectBaseTestCase):
         assert f"login_hint={quote(user.email)}" in response.url
 
     def test_bad_user_kind(self):
-        for user in [JobSeekerFactory(), PrescriberFactory(), SiaeStaffFactory(), LaborInspectorFactory()]:
-            user_kind = UserKind.PRESCRIBER if user.kind != UserKind.PRESCRIBER else UserKind.SIAE_STAFF
+        for user in [JobSeekerFactory(), PrescriberFactory(), EmployerFactory(), LaborInspectorFactory()]:
+            user_kind = UserKind.PRESCRIBER if user.kind != UserKind.PRESCRIBER else UserKind.EMPLOYER
             with self.subTest(user_kind=user_kind):
                 params = {"user_email": user.email, "user_kind": user_kind}
                 url = f"{reverse('inclusion_connect:activate_account')}?{urlencode(params)}"

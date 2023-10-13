@@ -141,7 +141,7 @@ class OIDConnectUserData:
 
         if not created:
             for key, value in user_data_dict.items():
-                # Don't update kind on login, it allows prescribers to log through siae staff form
+                # Don't update kind on login, it allows prescribers to log through employer form
                 # which happens a lot...
                 if is_login and key == "kind":
                     continue

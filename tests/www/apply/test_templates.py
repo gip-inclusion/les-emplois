@@ -8,7 +8,7 @@ from itou.jobs.models import Appellation
 from itou.utils.context_processors import expose_enums
 from tests.job_applications.factories import JobApplicationSentByJobSeekerFactory, JobApplicationSentBySiaeFactory
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.users.factories import JobSeekerWithAddressFactory, SiaeStaffFactory
+from tests.users.factories import EmployerFactory, JobSeekerWithAddressFactory
 
 
 def load_template(path):
@@ -17,7 +17,7 @@ def load_template(path):
 
 def get_request():
     request = RequestFactory()
-    request.user = SiaeStaffFactory()
+    request.user = EmployerFactory()
     return request
 
 

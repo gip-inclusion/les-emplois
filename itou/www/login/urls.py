@@ -8,7 +8,7 @@ app_name = "login"
 
 urlpatterns = [
     path("prescriber", views.PrescriberLoginView.as_view(), name="prescriber"),
-    path("siae_staff", views.SiaeStaffLoginView.as_view(), name="siae_staff"),
+    path("employer", views.EmployerLoginView.as_view(), name="employer"),
     path("labor_inspector", views.LaborInspectorLoginView.as_view(), name="labor_inspector"),
     path("job_seeker", views.JobSeekerLoginView.as_view(), name="job_seeker"),
 ]

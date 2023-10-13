@@ -57,10 +57,10 @@ def add_url_params(url: str, params: dict[str, str]) -> str:
     :param params: dict containing requested params to be added
     :return: string with updated URL
 
-    >> url = 'http://localhost:8000/login/activate_siae_staff_account?next_url=%2Finvitations
+    >> url = 'http://localhost:8000/login/activate_employer_account?next_url=%2Finvitations
     >> new_params = {'test': 'value' }
     >> add_url_params(url, new_params)
-    'http://localhost:8000/login/activate_siae_staff_account?next_url=%2Finvitations&test=value
+    'http://localhost:8000/login/activate_employer_account?next_url=%2Finvitations&test=value
     """
 
     # Remove params with None values

@@ -5,7 +5,7 @@ from allauth.account.models import EmailConfirmationHMAC
 from django.core import mail
 from django.urls import reverse
 
-from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF
+from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
@@ -93,7 +93,7 @@ class WelcomingTourTest(InclusionConnectBaseTestCase):
         next_url = reverse("signup:siae_join", args=(siae.pk, token))
         response = mock_oauth_dance(
             self.client,
-            KIND_SIAE_STAFF,
+            KIND_EMPLOYER,
             previous_url=previous_url,
             next_url=next_url,
         )
@@ -101,10 +101,10 @@ class WelcomingTourTest(InclusionConnectBaseTestCase):
 
         # User should be redirected to the welcoming tour as he just signed up
         assert response.wsgi_request.path == reverse("welcoming_tour:index")
-        self.assertTemplateUsed(response, "welcoming_tour/siae_staff.html")
+        self.assertTemplateUsed(response, "welcoming_tour/employer.html")
 
         self.client.logout()
-        response = mock_oauth_dance(self.client, KIND_SIAE_STAFF, expected_redirect_url=reverse("dashboard:index"))
+        response = mock_oauth_dance(self.client, KIND_EMPLOYER, expected_redirect_url=reverse("dashboard:index"))
         response = self.client.get(response.url, follow=True)
         self.assertContains(response, "Revoir le message")
 

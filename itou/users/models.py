@@ -307,7 +307,7 @@ class User(AbstractUser, AddressMixin):
                     models.Q(kind=UserKind.ITOU_STAFF)
                     | models.Q(kind=UserKind.JOB_SEEKER)
                     | models.Q(kind=UserKind.PRESCRIBER)
-                    | models.Q(kind=UserKind.SIAE_STAFF)
+                    | models.Q(kind=UserKind.EMPLOYER)
                     | models.Q(kind=UserKind.LABOR_INSPECTOR)
                 ),
             ),
@@ -345,7 +345,7 @@ class User(AbstractUser, AddressMixin):
 
         if self.identity_provider == IdentityProvider.INCLUSION_CONNECT and self.kind not in [
             UserKind.PRESCRIBER,
-            UserKind.SIAE_STAFF,
+            UserKind.EMPLOYER,
         ]:
             raise ValidationError("Inclusion connect n'est utilisable que par un prescripteur ou employeur.")
 
@@ -410,8 +410,8 @@ class User(AbstractUser, AddressMixin):
         return self.is_prescriber and not self.is_prescriber_with_authorized_org
 
     @property
-    def is_siae_staff(self):
-        return self.kind == UserKind.SIAE_STAFF
+    def is_employer(self):
+        return self.kind == UserKind.EMPLOYER
 
     @property
     def is_labor_inspector(self):
@@ -429,7 +429,7 @@ class User(AbstractUser, AddressMixin):
                 return user.is_handled_by_proxy
             else:
                 return user.is_handled_by_proxy and user.is_created_by(self)
-        elif self.is_siae_staff:
+        elif self.is_employer:
             return user.is_handled_by_proxy
 
         return False
@@ -444,13 +444,13 @@ class User(AbstractUser, AddressMixin):
                     return True
                 else:
                     return user.is_handled_by_proxy and user.is_created_by(self)
-            elif self.is_siae_staff:
+            elif self.is_employer:
                 return True
 
         return False
 
     def can_add_nir(self, job_seeker):
-        return (self.is_prescriber_with_authorized_org or self.is_siae_staff) and (job_seeker and not job_seeker.nir)
+        return (self.is_prescriber_with_authorized_org or self.is_employer) and (job_seeker and not job_seeker.nir)
 
     def is_created_by(self, user):
         return bool(self.created_by_id and self.created_by_id == user.pk)
@@ -659,7 +659,7 @@ class User(AbstractUser, AddressMixin):
         a given territory and thus would not need to join others.
         """
         return (
-            self.is_siae_staff
+            self.is_employer
             and parent_siae.is_active
             and parent_siae.has_admin(self)
             and (

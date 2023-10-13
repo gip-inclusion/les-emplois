@@ -157,7 +157,7 @@ class Command(BaseCommand):
                 ),
                 total_auto_prescriptions=Count(
                     "job_applications_received",
-                    filter=Q(job_applications_received__sender_kind=SenderKind.SIAE_STAFF),
+                    filter=Q(job_applications_received__sender_kind=SenderKind.EMPLOYER),
                     distinct=True,
                 ),
                 total_candidatures_autonomes=Count(
@@ -405,7 +405,7 @@ class Command(BaseCommand):
 
     def populate_users(self):
         queryset = User.objects.filter(
-            kind__in=[UserKind.SIAE_STAFF, UserKind.PRESCRIBER, UserKind.LABOR_INSPECTOR], is_active=True
+            kind__in=[UserKind.EMPLOYER, UserKind.PRESCRIBER, UserKind.LABOR_INSPECTOR], is_active=True
         )
         populate_table(users.TABLE, batch_size=1000, querysets=[queryset])
 

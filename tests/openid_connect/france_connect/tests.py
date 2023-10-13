@@ -248,7 +248,7 @@ class FranceConnectTest(TestCase):
     def test_create_or_update_user_raise_too_many_kind_exception(self):
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
 
-        for kind in [UserKind.PRESCRIBER, UserKind.SIAE_STAFF, UserKind.LABOR_INSPECTOR]:
+        for kind in [UserKind.PRESCRIBER, UserKind.EMPLOYER, UserKind.LABOR_INSPECTOR]:
             user = UserFactory(username=fc_user_data.username, email=fc_user_data.email, kind=kind)
 
             with pytest.raises(InvalidKindException):
@@ -286,9 +286,12 @@ class FranceConnectTest(TestCase):
     def test_callback_redirect_on_too_many_kind_exception(self):
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
 
-        for kind in [UserKind.PRESCRIBER, UserKind.SIAE_STAFF, UserKind.LABOR_INSPECTOR]:
+        for kind in [UserKind.PRESCRIBER, UserKind.EMPLOYER, UserKind.LABOR_INSPECTOR]:
             user = UserFactory(username=fc_user_data.username, email=fc_user_data.email, kind=kind)
-            mock_oauth_dance(self.client, expected_route=f"login:{kind}")
+            if kind == UserKind.EMPLOYER:
+                mock_oauth_dance(self.client, expected_route="login:employer")
+            else:
+                mock_oauth_dance(self.client, expected_route=f"login:{kind}")
             user.delete()
 
     def test_logout_no_id_token(self):

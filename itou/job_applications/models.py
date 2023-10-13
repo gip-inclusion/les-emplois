@@ -499,7 +499,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         default=SenderKind.PRESCRIBER,
     )
 
-    # When the sender is an SIAE staff member, keep a track of his current SIAE.
+    # When the sender is an SIAE member, keep a track of his current SIAE.
     sender_siae = models.ForeignKey(
         "siaes.Siae", verbose_name="SIAE émettrice", null=True, blank=True, on_delete=models.CASCADE
     )
@@ -691,7 +691,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def clean(self):
         super().clean()
 
-        # We have severals cases of job_applications on job_seekers or siae_staff
+        # We have severals cases of job_applications on job_seekers or employer
         # We don't know how it happened, so we'll just add a sanity check here
         if self.job_seeker_id and self.job_seeker.kind != UserKind.JOB_SEEKER:
             raise ValidationError(
@@ -814,7 +814,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             not self.sender_prescriber_organization or not self.sender_prescriber_organization.is_authorized
         ):
             return "Orienteur"
-        elif self.sender_kind == SenderKind.SIAE_STAFF and self.to_siae.kind not in SIAE_WITH_CONVENTION_KINDS:
+        elif self.sender_kind == SenderKind.EMPLOYER and self.to_siae.kind not in SIAE_WITH_CONVENTION_KINDS:
             # Not an SIAE per se
             return "Employeur"
         else:
@@ -832,7 +832,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         if target_siae == self.to_siae:
             return False
         # User must be SIAE user / employee
-        if not user.is_siae_staff:
+        if not user.is_employer:
             return False
         return self.is_in_transferable_state
 
@@ -853,7 +853,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         # Delete eligibility diagnosis if not provided by an authorized prescriber
         eligibility_diagnosis = self.eligibility_diagnosis
         is_eligibility_diagnosis_made_by_siae = (
-            eligibility_diagnosis and eligibility_diagnosis.author_kind == AuthorKind.SIAE_STAFF
+            eligibility_diagnosis and eligibility_diagnosis.author_kind == AuthorKind.EMPLOYER
         )
         if is_eligibility_diagnosis_made_by_siae:
             self.eligibility_diagnosis = None

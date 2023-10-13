@@ -51,7 +51,7 @@ def create_batch_of_job_applications(siae):
         with_approval=True,
         to_siae=siae,
         sender_siae=siae,
-        eligibility_diagnosis__author_kind=AuthorKind.SIAE_STAFF,
+        eligibility_diagnosis__author_kind=AuthorKind.EMPLOYER,
         eligibility_diagnosis__author_siae=siae,
         hiring_start_at=timezone.now() - relativedelta(months=2),
     )
@@ -150,7 +150,7 @@ def campaign_eligible_job_app_objects():
     approval = ApprovalFactory(user=job_seeker)
     diag = EligibilityDiagnosisFactory(
         job_seeker=job_seeker,
-        author_kind=AuthorKind.SIAE_STAFF,
+        author_kind=AuthorKind.EMPLOYER,
         author_siae=siae,
         author=siae.members.first(),
     )
@@ -213,7 +213,7 @@ class TestEvaluationCampaignManagerEligibleJobApplication:
         job_app.save()
         assert [] == list(evaluation_campaign.eligible_job_applications())
 
-    def test_eligibility_diag_not_made_by_siae_staff(self, campaign_eligible_job_app_objects):
+    def test_eligibility_diag_not_made_by_employer(self, campaign_eligible_job_app_objects):
         evaluation_campaign = EvaluationCampaignFactory()
         diag = campaign_eligible_job_app_objects["diag"]
         diag.author_kind = AuthorKind.PRESCRIBER
@@ -317,7 +317,7 @@ class EvaluationCampaignManagerTest(TestCase):
             with_approval=True,
             to_siae=siae1,
             sender_siae=siae1,
-            eligibility_diagnosis__author_kind=AuthorKind.SIAE_STAFF,
+            eligibility_diagnosis__author_kind=AuthorKind.EMPLOYER,
             eligibility_diagnosis__author_siae=siae1,
             hiring_start_at=timezone.now() - relativedelta(months=2),
         )

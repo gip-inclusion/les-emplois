@@ -217,7 +217,7 @@ class TestPoleEmploiConnect:
     def test_create_or_update_user_raise_too_many_kind_exception(self):
         peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
 
-        for kind in [UserKind.PRESCRIBER, UserKind.SIAE_STAFF, UserKind.LABOR_INSPECTOR]:
+        for kind in [UserKind.PRESCRIBER, UserKind.EMPLOYER, UserKind.LABOR_INSPECTOR]:
             user = UserFactory(username=peamu_user_data.username, email=peamu_user_data.email, kind=kind)
 
             with pytest.raises(InvalidKindException):
@@ -288,9 +288,12 @@ class TestPoleEmploiConnect:
     def test_callback_redirect_on_too_many_kind_exception(self, client):
         peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
 
-        for kind in [UserKind.PRESCRIBER, UserKind.SIAE_STAFF, UserKind.LABOR_INSPECTOR]:
+        for kind in [UserKind.PRESCRIBER, UserKind.EMPLOYER, UserKind.LABOR_INSPECTOR]:
             user = UserFactory(username=peamu_user_data.username, email=peamu_user_data.email, kind=kind)
-            mock_oauth_dance(client, expected_route=f"login:{kind}")
+            if kind == UserKind.EMPLOYER:
+                mock_oauth_dance(client, expected_route="login:employer")
+            else:
+                mock_oauth_dance(client, expected_route=f"login:{kind}")
             user.delete()
 
     def test_logout_no_id_token(self, client):

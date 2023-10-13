@@ -508,7 +508,7 @@ class EmployeeRecord(ASPExchangeInformation):
             # the jobseeker applied directly
             return PrescriberType.SPONTANEOUS_APPLICATION
 
-        if sender_kind == SenderKind.SIAE_STAFF:
+        if sender_kind == SenderKind.EMPLOYER:
             # SIAE applications also fall into the SPONTANEOUS_APPLICATION type
             return PrescriberType.SPONTANEOUS_APPLICATION
 

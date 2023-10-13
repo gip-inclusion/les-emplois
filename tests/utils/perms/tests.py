@@ -10,11 +10,11 @@ from itou.users.enums import IdentityProvider
 from itou.utils.perms import employee_record
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.users.factories import (
+    EmployerFactory,
     ItouStaffFactory,
     JobSeekerFactory,
     LaborInspectorFactory,
     PrescriberFactory,
-    SiaeStaffFactory,
 )
 from tests.utils.test import TestCase
 
@@ -125,8 +125,8 @@ class UserHijackPermTestCase(TestCase):
         (JobSeekerFactory, IdentityProvider.FRANCE_CONNECT, False),
         (PrescriberFactory, IdentityProvider.DJANGO, True),
         (PrescriberFactory, IdentityProvider.INCLUSION_CONNECT, False),
-        (partial(SiaeStaffFactory, with_siae=True), IdentityProvider.DJANGO, True),
-        (partial(SiaeStaffFactory, with_siae=True), IdentityProvider.INCLUSION_CONNECT, False),
+        (partial(EmployerFactory, with_siae=True), IdentityProvider.DJANGO, True),
+        (partial(EmployerFactory, with_siae=True), IdentityProvider.INCLUSION_CONNECT, False),
         (LaborInspectorFactory, IdentityProvider.DJANGO, False),
     ],
 )

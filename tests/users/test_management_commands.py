@@ -35,7 +35,7 @@ from tests.prescribers.factories import (
     PrescriberPoleEmploiFactory,
 )
 from tests.siaes.factories import SiaeMembershipFactory
-from tests.users.factories import JobSeekerFactory, JobSeekerWithAddressFactory, SiaeStaffFactory
+from tests.users.factories import EmployerFactory, JobSeekerFactory, JobSeekerWithAddressFactory
 from tests.utils.test import TestCase
 
 
@@ -226,15 +226,15 @@ class TestSyncPermsTestCase(TestCase):
             "change_institutionmembership",
             "delete_institutionmembership",
             "view_institutionmembership",
+            "change_employerinvitation",
+            "delete_employerinvitation",
+            "view_employerinvitation",
             "change_laborinspectorinvitation",
             "delete_laborinspectorinvitation",
             "view_laborinspectorinvitation",
             "change_prescriberwithorginvitation",
             "delete_prescriberwithorginvitation",
             "view_prescriberwithorginvitation",
-            "change_siaestaffinvitation",
-            "delete_siaestaffinvitation",
-            "view_siaestaffinvitation",
             "change_jobapplication",
             "delete_jobapplication",
             "view_jobapplication",
@@ -292,9 +292,9 @@ class TestSyncPermsTestCase(TestCase):
             "view_employeerecord",
             "view_institution",
             "view_institutionmembership",
+            "view_employerinvitation",
             "view_laborinspectorinvitation",
             "view_prescriberwithorginvitation",
-            "view_siaestaffinvitation",
             "view_jobapplication",
             "view_jobapplicationtransitionlog",
             "view_appellation",
@@ -363,31 +363,31 @@ class TestCommandNewUsersToMailJet:
         changed_email.email = "changed@mailinator.com"
         changed_email.save(update_fields=["email"])
 
-        annie = SiaeStaffFactory(
+        annie = EmployerFactory(
             first_name="Annie",
             last_name="Amma",
             email="annie.amma@mailinator.com",
             with_verified_email=True,
         )
-        bob = SiaeStaffFactory(
+        bob = EmployerFactory(
             first_name="Bob",
             last_name="Bailey",
             email="bob.bailey@mailinator.com",
             with_verified_email=True,
         )
-        cindy = SiaeStaffFactory(
+        cindy = EmployerFactory(
             first_name="Cindy",
             last_name="Cinnamon",
             email="cindy.cinnamon@mailinator.com",
             with_verified_email=True,
         )
-        dave = SiaeStaffFactory(
+        dave = EmployerFactory(
             first_name="Dave",
             last_name="Doll",
             email="dave.doll@mailinator.com",
             with_verified_email=True,
         )
-        eve = SiaeStaffFactory(
+        eve = EmployerFactory(
             first_name="Eve",
             last_name="Ebi",
             email="eve.ebi@mailinator.com",
@@ -683,13 +683,13 @@ class TestCommandNewUsersToMailJet:
         settings.MAILJET_API_KEY = "MAILJET_KEY"
         settings.MAILJET_SECRET_KEY = "MAILJET_SECRET_KEY"
 
-        annie = SiaeStaffFactory(
+        annie = EmployerFactory(
             first_name="Annie",
             last_name="Amma",
             email="annie.amma@mailinator.com",
             with_verified_email=True,
         )
-        bob = SiaeStaffFactory(
+        bob = EmployerFactory(
             first_name="Bob",
             last_name="Bailey",
             email="bob.bailey@mailinator.com",
@@ -781,7 +781,7 @@ class TestCommandNewUsersToMailJet:
         settings.MAILJET_API_KEY = "MAILJET_KEY"
         settings.MAILJET_SECRET_KEY = "MAILJET_SECRET_KEY"
 
-        annie = SiaeStaffFactory(
+        annie = EmployerFactory(
             first_name="Annie",
             last_name="Amma",
             email="annie.amma@mailinator.com",

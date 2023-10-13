@@ -7,8 +7,8 @@ def index(request):
     user = request.user
     template_name = "welcoming_tour/job_seeker.html"
 
-    if user.is_siae_staff:
-        template_name = "welcoming_tour/siae_staff.html"
+    if user.is_employer:
+        template_name = "welcoming_tour/employer.html"
 
     if user.is_prescriber:
         template_name = "welcoming_tour/prescriber.html"

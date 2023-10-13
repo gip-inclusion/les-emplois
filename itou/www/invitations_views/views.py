@@ -10,23 +10,23 @@ from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import formats, safestring
 
 from itou.invitations.models import (
+    EmployerInvitation,
     InvitationAbstract,
     LaborInspectorInvitation,
     PrescriberWithOrgInvitation,
-    SiaeStaffInvitation,
 )
 from itou.openid_connect.inclusion_connect.enums import InclusionConnectChannel
-from itou.users.enums import KIND_LABOR_INSPECTOR, KIND_PRESCRIBER, KIND_SIAE_STAFF
+from itou.users.enums import KIND_EMPLOYER, KIND_LABOR_INSPECTOR, KIND_PRESCRIBER, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.www.invitations_views.forms import (
+    EmployerInvitationFormSet,
     LaborInspectorInvitationFormSet,
     NewUserInvitationForm,
     PrescriberWithOrgInvitationFormSet,
-    SiaeStaffInvitationFormSet,
 )
 from itou.www.signup import forms as signup_forms
 
@@ -63,7 +63,10 @@ def handle_invited_user_registration_with_inclusion_connect(request, invitation,
 
 
 def new_user(request, invitation_type, invitation_id):
-    if invitation_type not in [KIND_LABOR_INSPECTOR, KIND_PRESCRIBER, KIND_SIAE_STAFF]:
+    # FIXME(alaurent) remove in january 2024 (check that there's no valid invitations from before the merge)
+    if invitation_type == "siae_staff":
+        invitation_type = KIND_EMPLOYER
+    if invitation_type not in [KIND_LABOR_INSPECTOR, KIND_PRESCRIBER, KIND_EMPLOYER]:
         raise Http404
     invitation_class = InvitationAbstract.get_model_from_string(invitation_type)
     invitation = get_object_or_404(invitation_class, pk=invitation_id)
@@ -85,7 +88,7 @@ def new_user(request, invitation_type, invitation_id):
         messages.error(request, "Cette invitation n'est plus valide.")
         return render(request, "invitations_views/invitation_errors.html", context={"invitation": invitation})
 
-    if invitation_type == KIND_SIAE_STAFF and not invitation.siae.is_active:
+    if invitation_type == KIND_EMPLOYER and not invitation.siae.is_active:
         messages.error(request, "La structure que vous souhaitez rejoindre n'est plus active.")
         return render(request, "invitations_views/invitation_errors.html", context={"invitation": invitation})
 
@@ -96,7 +99,10 @@ def new_user(request, invitation_type, invitation_id):
             return redirect(invitation.acceptance_url_for_existing_user)
 
         # The user exists but he should log in first.
-        login_url = reverse(f"login:{invitation.USER_KIND}")
+        if invitation.USER_KIND == UserKind.EMPLOYER:
+            login_url = reverse("login:employer")
+        else:
+            login_url = reverse(f"login:{invitation.USER_KIND}")
         next_step_url = "{url}?next={redirect_to}".format(
             url=login_url,
             redirect_to=invitation.acceptance_url_for_existing_user,
@@ -106,7 +112,7 @@ def new_user(request, invitation_type, invitation_id):
     # A new user should be created before joining
     handle_registration = {
         KIND_PRESCRIBER: handle_invited_user_registration_with_inclusion_connect,
-        KIND_SIAE_STAFF: handle_invited_user_registration_with_inclusion_connect,
+        KIND_EMPLOYER: handle_invited_user_registration_with_inclusion_connect,
         KIND_LABOR_INSPECTOR: handle_invited_user_registration_with_django,
     }[invitation_type]
     return handle_registration(request, invitation, invitation_type)
@@ -193,10 +199,10 @@ def join_prescriber_organization(request, invitation_id):
 
 
 @login_required
-def invite_siae_staff(request, template_name="invitations_views/create.html"):
+def invite_employer(request, template_name="invitations_views/create.html"):
     siae = get_current_siae_or_404(request)
     form_kwargs = {"sender": request.user, "siae": siae}
-    formset = SiaeStaffInvitationFormSet(data=request.POST or None, form_kwargs=form_kwargs)
+    formset = EmployerInvitationFormSet(data=request.POST or None, form_kwargs=form_kwargs)
     if request.POST:
         if formset.is_valid():
             # We don't need atomicity here (invitations are independent)
@@ -226,7 +232,7 @@ def invite_siae_staff(request, template_name="invitations_views/create.html"):
 
             return redirect(request.path)
 
-    form_post_url = reverse("invitations_views:invite_siae_staff")
+    form_post_url = reverse("invitations_views:invite_employer")
     back_url = reverse("siaes_views:members")
     context = {"back_url": back_url, "form_post_url": form_post_url, "formset": formset, "organization": siae}
 
@@ -235,7 +241,7 @@ def invite_siae_staff(request, template_name="invitations_views/create.html"):
 
 @login_required
 def join_siae(request, invitation_id):
-    invitation = get_object_or_404(SiaeStaffInvitation, pk=invitation_id)
+    invitation = get_object_or_404(EmployerInvitation, pk=invitation_id)
     if not invitation.guest_can_join_siae(request):
         raise PermissionDenied()
 
