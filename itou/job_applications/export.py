@@ -71,7 +71,7 @@ def _get_readable_sender_kind(job_application):
     Converts itou internal prescriber kinds into something readable
     """
     kind = "Candidature spontanée"
-    if job_application.sender_kind == SenderKind.SIAE_STAFF:
+    if job_application.sender_kind == SenderKind.EMPLOYER:
         kind = "Auto-prescription"
     elif job_application.sender_kind == SenderKind.PRESCRIBER:
         kind = "Orienteur"

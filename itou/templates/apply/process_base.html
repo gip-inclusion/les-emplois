@@ -22,7 +22,7 @@
             <div class="row">
                 <div class="col-12 col-lg-8">
                     {% if job_application.to_siae.is_subject_to_eligibility_rules %}
-                        {% if request.user.is_siae_staff %}
+                        {% if request.user.is_employer %}
                             {% if not job_application.state.is_accepted and not job_application.state.is_cancelled %}
                                 {# Employers need to know the expiration date of an approval #}
                                 {# to decide whether they may accept a job application or not. #}

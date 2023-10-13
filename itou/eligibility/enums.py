@@ -1,6 +1,6 @@
 from django.db import models
 
-from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF
+from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER
 
 
 class AdministrativeCriteriaAnnex(models.TextChoices):
@@ -22,5 +22,5 @@ class AdministrativeCriteriaLevelPrefix(models.TextChoices):
 
 class AuthorKind(models.TextChoices):
     PRESCRIBER = KIND_PRESCRIBER, "Prescripteur"
-    SIAE_STAFF = KIND_SIAE_STAFF, "Employeur (SIAE)"
+    EMPLOYER = KIND_EMPLOYER, "Employeur (SIAE)"
     GEIQ = "geiq", "GEIQ"

@@ -92,15 +92,15 @@ class ApplyStepBaseView(LoginRequiredMixin, TemplateView):
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            if self.hire_process and request.user.kind != UserKind.SIAE_STAFF:
+            if self.hire_process and request.user.kind != UserKind.EMPLOYER:
                 raise PermissionDenied("Seuls les employeurs sont autorisés à déclarer des embauches")
             elif request.user.kind not in [
                 UserKind.JOB_SEEKER,
                 UserKind.PRESCRIBER,
-                UserKind.SIAE_STAFF,
+                UserKind.EMPLOYER,
             ]:
                 raise PermissionDenied("Vous n'êtes pas autorisé à déposer de candidature.")
-            elif request.user.is_siae_staff and not self.siae.has_member(request.user):
+            elif request.user.is_employer and not self.siae.has_member(request.user):
                 raise PermissionDenied("Vous ne pouvez postuler pour un candidat que dans votre structure.")
 
         if not self.siae.has_active_members:
@@ -176,7 +176,7 @@ class ApplyStepForSenderBaseView(ApplyStepBaseView):
         self.sender = request.user
 
     def dispatch(self, request, *args, **kwargs):
-        if self.sender.is_authenticated and self.sender.kind not in [UserKind.PRESCRIBER, UserKind.SIAE_STAFF]:
+        if self.sender.is_authenticated and self.sender.kind not in [UserKind.PRESCRIBER, UserKind.EMPLOYER]:
             return HttpResponseRedirect(reverse("apply:start", kwargs={"siae_pk": self.siae.pk}))
         return super().dispatch(request, *args, **kwargs)
 
@@ -190,7 +190,7 @@ class ApplyStepForSenderBaseView(ApplyStepBaseView):
 class StartView(ApplyStepBaseView):
     def get(self, request, *args, **kwargs):
         # SIAE members can only submit a job application to their SIAE
-        if request.user.is_siae_staff:
+        if request.user.is_employer:
             if suspension_explanation := self.siae.get_active_suspension_text_with_dates():
                 raise PermissionDenied(
                     "Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle "
@@ -761,7 +761,7 @@ class CheckPreviousApplications(ApplicationBaseView):
             return HttpResponseRedirect(self.get_next_url())
 
         # Limit the possibility of applying to the same SIAE for 24 hours.
-        if not request.user.is_siae_staff and self.previous_applications.created_in_past(hours=24).exists():
+        if not request.user.is_employer and self.previous_applications.created_in_past(hours=24).exists():
             if request.user == self.job_seeker:
                 msg = "Vous avez déjà postulé chez cet employeur durant les dernières 24 heures."
             else:
@@ -1046,7 +1046,7 @@ class ApplicationResumeView(ApplicationBaseView):
             )
             if request.user.is_prescriber:
                 job_application.sender_prescriber_organization = request.current_organization
-            if request.user.is_siae_staff:
+            if request.user.is_employer:
                 job_application.sender_siae = request.current_organization
 
             if resume := self.form.cleaned_data.get("resume"):

@@ -16,7 +16,7 @@
 
     {% bootstrap_form_errors form_administrative_criteria type="all" %}
 
-    {% if request.user.is_siae_staff %}<h3>Critères administratifs de niveau 1</h3>{% endif %}
+    {% if request.user.is_employer %}<h3>Critères administratifs de niveau 1</h3>{% endif %}
 
     {% for field in form_administrative_criteria %}
         {% if form_administrative_criteria.LEVEL_1_PREFIX in field.name %}
@@ -24,7 +24,7 @@
         {% endif %}
     {% endfor %}
 
-    {% if request.user.is_siae_staff %}<h3>Critères administratifs de niveau 2</h3>{% endif %}
+    {% if request.user.is_employer %}<h3>Critères administratifs de niveau 2</h3>{% endif %}
 
     {% for field in form_administrative_criteria %}
         {% if form_administrative_criteria.LEVEL_2_PREFIX in field.name %}

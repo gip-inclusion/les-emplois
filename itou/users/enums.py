@@ -7,7 +7,7 @@ from django.db import models
 
 KIND_JOB_SEEKER = "job_seeker"
 KIND_PRESCRIBER = "prescriber"
-KIND_SIAE_STAFF = "siae_staff"
+KIND_EMPLOYER = "siae_staff"
 KIND_LABOR_INSPECTOR = "labor_inspector"
 KIND_ITOU_STAFF = "itou_staff"
 
@@ -15,7 +15,7 @@ KIND_ITOU_STAFF = "itou_staff"
 class UserKind(models.TextChoices):
     JOB_SEEKER = KIND_JOB_SEEKER, "candidat"
     PRESCRIBER = KIND_PRESCRIBER, "prescripteur"
-    SIAE_STAFF = KIND_SIAE_STAFF, "employeur"
+    EMPLOYER = KIND_EMPLOYER, "employeur"
     LABOR_INSPECTOR = KIND_LABOR_INSPECTOR, "inspecteur du travail"
     ITOU_STAFF = KIND_ITOU_STAFF, "administrateur"
 

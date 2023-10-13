@@ -33,12 +33,12 @@ from tests.prescribers.factories import (
 )
 from tests.siaes.factories import SiaeFactory
 from tests.users.factories import (
+    EmployerFactory,
     ItouStaffFactory,
     JobSeekerFactory,
     JobSeekerWithAddressFactory,
     LaborInspectorFactory,
     PrescriberFactory,
-    SiaeStaffFactory,
     UserFactory,
 )
 from tests.utils.test import TestCase
@@ -104,8 +104,8 @@ class ModelTest(TestCase):
         job_seeker = JobSeekerFactory()
         assert job_seeker.is_orienter is False
 
-        siae_staff = SiaeStaffFactory()
-        assert siae_staff.is_orienter is False
+        employer = EmployerFactory()
+        assert employer.is_orienter is False
 
         label_inspector = LaborInspectorFactory()
         assert label_inspector.is_orienter is False
@@ -485,8 +485,8 @@ class ModelTest(TestCase):
         logged_user_created_by_prescriber = JobSeekerFactory(
             created_by=unauthorized_prescriber, last_login=timezone.now()
         )
-        user_created_by_siae_staff = JobSeekerFactory(created_by=siae_member, last_login=None)
-        logged_user_created_by_siae_staff = JobSeekerFactory(created_by=siae_member, last_login=timezone.now())
+        user_created_by_employer = JobSeekerFactory(created_by=siae_member, last_login=None)
+        logged_user_created_by_employer = JobSeekerFactory(created_by=siae_member, last_login=timezone.now())
 
         specs = {
             "authorized_prescriber": {
@@ -496,8 +496,8 @@ class ModelTest(TestCase):
                 "job_seeker": False,
                 "user_created_by_prescriber": True,
                 "logged_user_created_by_prescriber": False,
-                "user_created_by_siae_staff": True,
-                "logged_user_created_by_siae_staff": False,
+                "user_created_by_employer": True,
+                "logged_user_created_by_employer": False,
             },
             "unauthorized_prescriber": {
                 "authorized_prescriber": False,
@@ -506,8 +506,8 @@ class ModelTest(TestCase):
                 "job_seeker": False,
                 "user_created_by_prescriber": True,
                 "logged_user_created_by_prescriber": False,
-                "user_created_by_siae_staff": False,
-                "logged_user_created_by_siae_staff": False,
+                "user_created_by_employer": False,
+                "logged_user_created_by_employer": False,
             },
             "siae_member": {
                 "authorized_prescriber": False,
@@ -516,8 +516,8 @@ class ModelTest(TestCase):
                 "job_seeker": False,
                 "user_created_by_prescriber": True,
                 "logged_user_created_by_prescriber": False,
-                "user_created_by_siae_staff": True,
-                "logged_user_created_by_siae_staff": False,
+                "user_created_by_employer": True,
+                "logged_user_created_by_employer": False,
             },
             "job_seeker": {
                 "authorized_prescriber": False,
@@ -526,8 +526,8 @@ class ModelTest(TestCase):
                 "job_seeker": True,
                 "user_created_by_prescriber": False,
                 "logged_user_created_by_prescriber": False,
-                "user_created_by_siae_staff": False,
-                "logged_user_created_by_siae_staff": False,
+                "user_created_by_employer": False,
+                "logged_user_created_by_employer": False,
             },
         }
         for user_type, user_specs in specs.items():
@@ -542,7 +542,7 @@ class ModelTest(TestCase):
         siae_member = SiaeFactory(with_membership=True).members.first()
         job_seeker = JobSeekerFactory()
         user_created_by_prescriber = JobSeekerFactory(created_by=unauthorized_prescriber, last_login=None)
-        user_created_by_siae_staff = JobSeekerFactory(created_by=siae_member, last_login=None)
+        user_created_by_employer = JobSeekerFactory(created_by=siae_member, last_login=None)
 
         specs = {
             "authorized_prescriber": {
@@ -551,7 +551,7 @@ class ModelTest(TestCase):
                 "siae_member": False,
                 "job_seeker": True,
                 "user_created_by_prescriber": True,
-                "user_created_by_siae_staff": True,
+                "user_created_by_employer": True,
             },
             "unauthorized_prescriber": {
                 "authorized_prescriber": False,
@@ -559,7 +559,7 @@ class ModelTest(TestCase):
                 "siae_member": False,
                 "job_seeker": False,
                 "user_created_by_prescriber": True,
-                "user_created_by_siae_staff": False,
+                "user_created_by_employer": False,
             },
             "siae_member": {
                 "authorized_prescriber": False,
@@ -567,7 +567,7 @@ class ModelTest(TestCase):
                 "siae_member": True,
                 "job_seeker": True,
                 "user_created_by_prescriber": True,
-                "user_created_by_siae_staff": True,
+                "user_created_by_employer": True,
             },
             "job_seeker": {
                 "authorized_prescriber": False,
@@ -575,7 +575,7 @@ class ModelTest(TestCase):
                 "siae_member": False,
                 "job_seeker": True,
                 "user_created_by_prescriber": False,
-                "user_created_by_siae_staff": False,
+                "user_created_by_employer": False,
             },
         }
         for user_type, user_specs in specs.items():
@@ -586,7 +586,7 @@ class ModelTest(TestCase):
 
     def test_can_add_nir(self):
         siae = SiaeFactory(with_membership=True)
-        siae_staff = siae.members.first()
+        employer = siae.members.first()
         prescriber_org = PrescriberOrganizationWithMembershipFactory(authorized=True)
         authorized_prescriber = prescriber_org.members.first()
         unauthorized_prescriber = PrescriberFactory()
@@ -595,7 +595,7 @@ class ModelTest(TestCase):
 
         assert authorized_prescriber.can_add_nir(job_seeker_no_nir)
         assert not unauthorized_prescriber.can_add_nir(job_seeker_no_nir)
-        assert siae_staff.can_add_nir(job_seeker_no_nir)
+        assert employer.can_add_nir(job_seeker_no_nir)
         assert not authorized_prescriber.can_add_nir(job_seeker_with_nir)
 
     def test_is_account_creator(self):
@@ -652,7 +652,7 @@ class ModelTest(TestCase):
         non_staff_kinds = [
             UserKind.JOB_SEEKER,
             UserKind.PRESCRIBER,
-            UserKind.SIAE_STAFF,
+            UserKind.EMPLOYER,
             UserKind.LABOR_INSPECTOR,
         ]
 
@@ -669,8 +669,8 @@ class ModelTest(TestCase):
         prescriber = PrescriberFactory()
         assert "prescripteur" == prescriber.get_kind_display()
 
-        siae_staff = SiaeStaffFactory()
-        assert "employeur" == siae_staff.get_kind_display()
+        employer = EmployerFactory()
+        assert "employeur" == employer.get_kind_display()
 
         labor_inspector = LaborInspectorFactory()
         assert "inspecteur du travail" == labor_inspector.get_kind_display()
@@ -702,10 +702,10 @@ class ModelTest(TestCase):
             [PrescriberFactory, IdentityProvider.PE_CONNECT, True],
             [PrescriberFactory, IdentityProvider.FRANCE_CONNECT, True],
             [PrescriberFactory, IdentityProvider.INCLUSION_CONNECT, False],
-            [SiaeStaffFactory, IdentityProvider.DJANGO, False],
-            [SiaeStaffFactory, IdentityProvider.PE_CONNECT, True],
-            [SiaeStaffFactory, IdentityProvider.FRANCE_CONNECT, True],
-            [SiaeStaffFactory, IdentityProvider.INCLUSION_CONNECT, False],
+            [EmployerFactory, IdentityProvider.DJANGO, False],
+            [EmployerFactory, IdentityProvider.PE_CONNECT, True],
+            [EmployerFactory, IdentityProvider.FRANCE_CONNECT, True],
+            [EmployerFactory, IdentityProvider.INCLUSION_CONNECT, False],
             [LaborInspectorFactory, IdentityProvider.DJANGO, False],
             [LaborInspectorFactory, IdentityProvider.PE_CONNECT, True],
             [LaborInspectorFactory, IdentityProvider.FRANCE_CONNECT, True],
@@ -1180,7 +1180,7 @@ class LatestApprovalTestCase(TestCase):
     [
         (JobSeekerFactory, "08b4e9f755a688b554a6487d96d2a0"),
         (PrescriberFactory, None),
-        (SiaeStaffFactory, None),
+        (EmployerFactory, None),
         (LaborInspectorFactory, None),
     ],
 )
@@ -1224,7 +1224,7 @@ def test_user_asp_uid_when_its_kind_changes(from_kind, to_kind):
     [
         JobSeekerFactory,
         PrescriberFactory,
-        SiaeStaffFactory,
+        EmployerFactory,
         LaborInspectorFactory,
     ],
 )
@@ -1266,7 +1266,7 @@ def test_user_invalid_kind():
     [
         (UserKind.JOB_SEEKER, True),
         (UserKind.PRESCRIBER, False),
-        (UserKind.SIAE_STAFF, False),
+        (UserKind.EMPLOYER, False),
         (UserKind.LABOR_INSPECTOR, False),
     ],
 )

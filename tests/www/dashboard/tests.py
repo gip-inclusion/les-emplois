@@ -57,7 +57,7 @@ from tests.siaes.factories import (
     SiaePendingGracePeriodFactory,
     SiaeWithMembershipAndJobsFactory,
 )
-from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
+from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory, JobSeekerFactory, PrescriberFactory
 from tests.utils.test import BASE_NUM_QUERIES, TestCase, parse_response_to_soup
 
 
@@ -82,7 +82,7 @@ class DashboardViewTest(TestCase):
 
     def test_user_with_inactive_siae_can_still_login_during_grace_period(self):
         siae = SiaePendingGracePeriodFactory()
-        user = SiaeStaffFactory()
+        user = EmployerFactory()
         siae.members.add(user)
         self.client.force_login(user)
 
@@ -92,7 +92,7 @@ class DashboardViewTest(TestCase):
 
     def test_user_with_inactive_siae_cannot_login_after_grace_period(self):
         siae = SiaeAfterGracePeriodFactory()
-        user = SiaeStaffFactory()
+        user = EmployerFactory()
         siae.members.add(user)
         self.client.force_login(user)
 
@@ -1736,8 +1736,8 @@ TOKEN_MENU_STR = "Accès aux APIs"
 
 
 def test_api_token_view_for_siae_admin(client):
-    siae_staff = SiaeMembershipFactory().user
-    client.force_login(siae_staff)
+    employer = SiaeMembershipFactory().user
+    client.force_login(employer)
 
     assert not Token.objects.exists()
 
@@ -1753,18 +1753,18 @@ def test_api_token_view_for_siae_admin(client):
     assertContains(response, "Créer un token d'API")
 
     response = client.post(url)
-    token = Token.objects.filter(user=siae_staff).get()
+    token = Token.objects.filter(user=employer).get()
     assertContains(response, token.key)
     assertContains(response, "Copier le token")
 
     # Check multi-posts
     response = client.post(url)
-    assert Token.objects.filter(user=siae_staff).count() == 1
+    assert Token.objects.filter(user=employer).count() == 1
 
 
 def test_api_token_view_for_non_siae_admin(client):
-    siae_staff = SiaeMembershipFactory(is_admin=False).user
-    client.force_login(siae_staff)
+    employer = SiaeMembershipFactory(is_admin=False).user
+    client.force_login(employer)
 
     assert not Token.objects.exists()
 
@@ -1806,15 +1806,15 @@ def test_prescriber_using_django_has_to_activate_ic_account(client):
 
 @respx.mock
 @override_inclusion_connect_settings
-def test_siae_staff_using_django_has_to_activate_ic_account(client):
-    user = SiaeStaffFactory(with_siae=True, identity_provider=IdentityProvider.DJANGO, email=OIDC_USERINFO["email"])
+def test_employer_using_django_has_to_activate_ic_account(client):
+    user = EmployerFactory(with_siae=True, identity_provider=IdentityProvider.DJANGO, email=OIDC_USERINFO["email"])
     client.force_login(user)
     url = reverse("dashboard:index")
     response = client.get(url, follow=True)
     activate_ic_account_url = reverse("dashboard:activate_ic_account")
     assertRedirects(response, activate_ic_account_url)
     params = {
-        "user_kind": UserKind.SIAE_STAFF,
+        "user_kind": UserKind.EMPLOYER,
         "previous_url": activate_ic_account_url,
         "user_email": user.email,
     }
@@ -1822,7 +1822,7 @@ def test_siae_staff_using_django_has_to_activate_ic_account(client):
     assertContains(response, url + '"')
     response = mock_oauth_dance(
         client,
-        UserKind.SIAE_STAFF,
+        UserKind.EMPLOYER,
         previous_url=activate_ic_account_url,
     )
     user.refresh_from_db()
@@ -1833,7 +1833,7 @@ def test_siae_staff_using_django_has_to_activate_ic_account(client):
     "factory,expected",
     [
         pytest.param(JobSeekerFactory, assertNotContains, id="JobSeeker"),
-        pytest.param(partial(SiaeStaffFactory, with_siae=True), assertNotContains, id="SiaeStaff"),
+        pytest.param(partial(EmployerFactory, with_siae=True), assertNotContains, id="Employer"),
         pytest.param(partial(LaborInspectorFactory, membership=True), assertNotContains, id="LaborInspector"),
         pytest.param(PrescriberFactory, assertNotContains, id="PrescriberWithoutOrganization"),
         pytest.param(

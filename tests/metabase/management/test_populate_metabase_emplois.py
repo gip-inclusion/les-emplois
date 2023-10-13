@@ -15,7 +15,7 @@ from itou.geo.utils import coords_to_geometry
 from itou.metabase.tables.utils import hash_content
 from itou.siaes.enums import ContractType
 from itou.siaes.models import SiaeJobDescription
-from itou.users.enums import IdentityProvider
+from itou.users.enums import IdentityProvider, UserKind
 from tests.analytics.factories import DatumFactory, StatsDashboardVisitFactory
 from tests.approvals.factories import (
     ApprovalFactory,
@@ -35,7 +35,7 @@ from tests.siae_evaluations.factories import (
     EvaluationCampaignFactory,
 )
 from tests.siaes.factories import SiaeFactory, SiaeJobDescriptionFactory
-from tests.users.factories import JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
+from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
 
 
 @freeze_time("2023-03-10")
@@ -146,11 +146,11 @@ def test_populate_job_seekers():
     )
     # Second user
     #  - job_application / approval from ai stock
-    #  - created by siae staff
+    #  - created by an employer
     #  - outside QPV
     user_2 = JobSeekerFactory(
         pk=15752,
-        created_by=SiaeStaffFactory(),
+        created_by=EmployerFactory(),
         nir="271049232724647",
         geocoding_score=1,
         coords=Point(0, 0),  # QPV utils is mocked
@@ -166,7 +166,7 @@ def test_populate_job_seekers():
 
     # Third user
     #  - multiple eligibility diagnosis
-    #  - last eligibility diagnosis from siae staff
+    #  - last eligibility diagnosis from an employer
     #  - not an AI
     user_3 = JobSeekerFactory(
         pk=26587,
@@ -176,7 +176,7 @@ def test_populate_job_seekers():
         job_seeker=user_3,
         created_at=datetime.datetime(2023, 1, 1, tzinfo=datetime.UTC),
         with_approval=True,
-        eligibility_diagnosis__author_kind="siae_staff",
+        eligibility_diagnosis__author_kind=UserKind.EMPLOYER,
         eligibility_diagnosis__author_prescriber_organization=None,
         eligibility_diagnosis__author_siae=SiaeFactory(),
         to_siae__kind="ETTI",
@@ -862,7 +862,7 @@ def test_populate_users_exclude_job_seekers():
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
 def test_populate_users():
-    pro_user = SiaeStaffFactory()
+    pro_user = EmployerFactory()
 
     num_queries = 1  # Count users
     num_queries += 1  # COMMIT Queryset counts (autocommit mode)
@@ -925,7 +925,7 @@ def test_data_inconsistencies(capsys):
     assert "timeit: method=report_data_inconsistencies completed in seconds=" in out_lines[1]
     assert "timeit: method=handle completed in seconds=" in out_lines[2]
 
-    approval.user.kind = "siae_staff"
+    approval.user.kind = UserKind.EMPLOYER
     approval.user.save()
 
     with pytest.raises(RuntimeError):

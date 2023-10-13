@@ -11,7 +11,7 @@ from django.utils import crypto
 from django.utils.html import format_html
 from django.utils.http import urlencode
 
-from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF, IdentityProvider, UserKind
+from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.constants import ITOU_HELP_CENTER_URL
@@ -20,7 +20,7 @@ from itou.utils.urls import add_url_params, get_absolute_url
 from ..models import InvalidKindException, MultipleUsersFoundException
 from . import constants
 from .enums import InclusionConnectChannel
-from .models import InclusionConnectPrescriberData, InclusionConnectSiaeStaffData, InclusionConnectState
+from .models import InclusionConnectEmployerData, InclusionConnectPrescriberData, InclusionConnectState
 
 
 logger = logging.getLogger(__name__)
@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 USER_DATA_CLASSES = {
     KIND_PRESCRIBER: InclusionConnectPrescriberData,
-    KIND_SIAE_STAFF: InclusionConnectSiaeStaffData,
+    KIND_EMPLOYER: InclusionConnectEmployerData,
 }
 
 

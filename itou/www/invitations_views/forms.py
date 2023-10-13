@@ -4,7 +4,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.forms.models import modelformset_factory
 
-from itou.invitations.models import LaborInspectorInvitation, PrescriberWithOrgInvitation, SiaeStaffInvitation
+from itou.invitations.models import EmployerInvitation, LaborInspectorInvitation, PrescriberWithOrgInvitation
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
@@ -101,14 +101,14 @@ PrescriberWithOrgInvitationFormSet = modelformset_factory(
 
 
 #############################################################
-###################### SiaeStaffInvitation ##################
+###################### EmployerInvitation ##################
 #############################################################
 
 
-class SiaeStaffInvitationForm(forms.ModelForm):
+class EmployerInvitationForm(forms.ModelForm):
     class Meta:
         fields = ["first_name", "last_name", "email"]
-        model = SiaeStaffInvitation
+        model = EmployerInvitation
 
     def __init__(self, sender, siae, *args, **kwargs):
         self.sender = sender
@@ -121,7 +121,7 @@ class SiaeStaffInvitationForm(forms.ModelForm):
         """
         user = User.objects.filter(email__iexact=email).first()
         if user:
-            if not user.is_siae_staff:
+            if not user.is_employer:
                 error = forms.ValidationError("Cet utilisateur n'est pas un employeur.")
                 self.add_error("email", error)
             else:
@@ -143,14 +143,14 @@ class SiaeStaffInvitationForm(forms.ModelForm):
         return invitation
 
 
-class BaseSiaeStaffInvitationFormSet(BaseInvitationFormSet):
+class BaseEmployerInvitationFormSet(BaseInvitationFormSet):
     def __init__(self, *args, **kwargs):
         """
         By default, BaseModelFormSet show the objects stored in the DB.
         See https://docs.djangoproject.com/en/3.0/topics/forms/modelforms/#changing-the-queryset
         """
         super().__init__(*args, **kwargs)
-        self.queryset = SiaeStaffInvitation.objects.none()
+        self.queryset = EmployerInvitation.objects.none()
         # Any access to `self.forms` must be performed after any access to `self.queryset`,
         # otherwise `self.queryset` will have no effect.
         # https://code.djangoproject.com/ticket/31879
@@ -160,8 +160,8 @@ class BaseSiaeStaffInvitationFormSet(BaseInvitationFormSet):
 #
 # Formset used when an employer invites other employers to join his structure.
 #
-SiaeStaffInvitationFormSet = modelformset_factory(
-    SiaeStaffInvitation, form=SiaeStaffInvitationForm, formset=BaseSiaeStaffInvitationFormSet, extra=1, max_num=30
+EmployerInvitationFormSet = modelformset_factory(
+    EmployerInvitation, form=EmployerInvitationForm, formset=BaseEmployerInvitationFormSet, extra=1, max_num=30
 )
 
 #############################################################

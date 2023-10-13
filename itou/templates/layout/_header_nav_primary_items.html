@@ -74,7 +74,7 @@
                     <li>
                         <a class="dropdown-item" href="{% url 'dashboard:index' %}">Tableau de bord</a>
                     </li>
-                    {% if user.is_siae_staff %}
+                    {% if user.is_employer %}
                         <li>
                             <a class="dropdown-item" href="{% url 'dashboard:edit_user_notifications' %}">Mes notifications</a>
                         </li>
@@ -96,7 +96,7 @@
                     <li>
                         <div class="dropdown-divider"></div>
                     </li>
-                    {% if user.is_siae_staff and request.is_current_organization_admin %}
+                    {% if user.is_employer and request.is_current_organization_admin %}
                         <li>
                             <a class="dropdown-item text-primary" href="{% url 'dashboard:api_token' %}">Accès aux APIs</a>
                         </li>
@@ -138,7 +138,7 @@
                         </a>
                     </li>
                     <li>
-                        <a class="dropdown-item" href="{% url 'login:siae_staff' %}{% redirection_url value=redirect_field_value|default:"" %}">
+                        <a class="dropdown-item" href="{% url 'login:employer' %}{% redirection_url value=redirect_field_value|default:"" %}">
                             Employeur solidaire
                         </a>
                     </li>

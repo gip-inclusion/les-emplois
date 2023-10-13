@@ -8,7 +8,7 @@ from django.db import models
 from django.shortcuts import get_object_or_404, reverse
 from django.utils import timezone
 
-from itou.users.enums import KIND_LABOR_INSPECTOR, KIND_PRESCRIBER, KIND_SIAE_STAFF, UserKind
+from itou.users.enums import KIND_EMPLOYER, KIND_LABOR_INSPECTOR, KIND_PRESCRIBER, UserKind
 from itou.users.models import User
 from itou.utils.emails import get_email_message
 from itou.utils.urls import get_absolute_url
@@ -69,11 +69,11 @@ class InvitationAbstract(models.Model):
         """
         Retrieve the model to use depending on a string.
         Usage:
-        invitation_model = Invitation.get_model_from_string("siae_staff")
+        invitation_model = Invitation.get_model_from_string("employer")
         invitation_model.objects.count()
         """
-        if model_string == KIND_SIAE_STAFF:
-            return SiaeStaffInvitation
+        if model_string == KIND_EMPLOYER:
+            return EmployerInvitation
         elif model_string == KIND_PRESCRIBER:
             return PrescriberWithOrgInvitation
         elif model_string == KIND_LABOR_INSPECTOR:
@@ -217,8 +217,8 @@ class PrescriberWithOrgInvitation(InvitationAbstract):
         return get_email_message(to, context, subject, body)
 
 
-class SiaeStaffInvitation(InvitationAbstract):
-    USER_KIND = UserKind.SIAE_STAFF
+class EmployerInvitation(InvitationAbstract):
+    USER_KIND = UserKind.EMPLOYER
     sender = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="parrain ou marraine",
@@ -230,13 +230,12 @@ class SiaeStaffInvitation(InvitationAbstract):
     class Meta:
         verbose_name = "invitation employeur"
         verbose_name_plural = "invitations employeurs"
+        db_table = "invitations_siaestaffinvitation"
 
     @property
     def acceptance_link(self):
         return get_absolute_url(
-            reverse(
-                "invitations_views:new_user", kwargs={"invitation_type": KIND_SIAE_STAFF, "invitation_id": self.pk}
-            )
+            reverse("invitations_views:new_user", kwargs={"invitation_type": KIND_EMPLOYER, "invitation_id": self.pk})
         )
 
     @property
@@ -256,7 +255,7 @@ class SiaeStaffInvitation(InvitationAbstract):
 
     def guest_can_join_siae(self, request):
         user = get_object_or_404(User, email=self.email)
-        return user == request.user and user.is_siae_staff
+        return user == request.user and user.is_employer
 
     # Emails
     @property

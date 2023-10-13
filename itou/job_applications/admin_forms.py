@@ -22,14 +22,14 @@ class JobApplicationAdminForm(forms.ModelForm):
             if not sender.is_job_seeker:
                 raise ValidationError("Emetteur du mauvais type.")
 
-        if sender_kind == SenderKind.SIAE_STAFF:
+        if sender_kind == SenderKind.EMPLOYER:
             if sender_siae is None:
                 raise ValidationError("SIAE émettrice manquante.")
             if sender is None:
                 raise ValidationError("Emetteur SIAE manquant.")
             else:
                 # Sender is optional, but if it exists, check its role.
-                if not sender.is_siae_staff:
+                if not sender.is_employer:
                     raise ValidationError("Emetteur du mauvais type.")
 
         elif sender_siae is not None:

@@ -130,7 +130,7 @@ def pe_connect_callback(request):
         messages.info(request, "Ce compte existe déjà, veuillez vous connecter.")
         url = {
             UserKind.PRESCRIBER: reverse("login:prescriber"),
-            UserKind.SIAE_STAFF: reverse("login:siae_staff"),
+            UserKind.EMPLOYER: reverse("login:employer"),
             UserKind.LABOR_INSPECTOR: reverse("login:labor_inspector"),
         }[e.user.kind]
         return HttpResponseRedirect(url)

@@ -70,17 +70,17 @@ class PrescriberLoginView(ItouLoginView):
         return context | extra_context
 
 
-class SiaeStaffLoginView(ItouLoginView):
+class EmployerLoginView(ItouLoginView):
     template_name = "account/login_generic.html"
-    user_kind = UserKind.SIAE_STAFF
+    user_kind = UserKind.EMPLOYER
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         extra_context = {
             "account_type_display_name": "employeur solidaire",
-            "matomo_account_type": UserKind.SIAE_STAFF,
-            "login_url": reverse("login:siae_staff"),
+            "matomo_account_type": UserKind.EMPLOYER,
+            "login_url": reverse("login:employer"),
             "signup_url": reverse("signup:siae_select"),
             "signup_allowed": True,
             "uses_inclusion_connect": True,

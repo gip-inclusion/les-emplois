@@ -36,10 +36,10 @@
                     {% endif %}
                 {% endif %}
 
-                {% if job_application.sender_kind == SenderKind.SIAE_STAFF %}
+                {% if job_application.sender_kind == SenderKind.EMPLOYER %}
                     <br>
                     <b>{{ job_application.sender_siae.display_name }}</b>
-                    {% if request.user.is_siae_staff %}
+                    {% if request.user.is_employer %}
                         <br>
                         <span class="badge badge-pill badge-sm badge-info">
                             {% if job_application.origin == JobApplicationOrigin.PE_APPROVAL %}

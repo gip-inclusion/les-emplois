@@ -18,10 +18,10 @@ from tests.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_da
 from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
 from tests.users.factories import (
     DEFAULT_PASSWORD,
+    EmployerFactory,
     JobSeekerFactory,
     LaborInspectorFactory,
     PrescriberFactory,
-    SiaeStaffFactory,
 )
 from tests.utils.test import TestCase, assertMessages, reload_module
 
@@ -116,13 +116,13 @@ class PrescriberLoginTest(InclusionConnectBaseTestCase):
         )
 
 
-class SiaeStaffLoginTest(InclusionConnectBaseTestCase):
+class EmployerLoginTest(InclusionConnectBaseTestCase):
     def test_login_options(self):
-        url = reverse("login:siae_staff")
+        url = reverse("login:employer")
         response = self.client.get(url)
         self.assertContains(response, "Se connecter avec Inclusion Connect")
         params = {
-            "user_kind": UserKind.SIAE_STAFF,
+            "user_kind": UserKind.EMPLOYER,
             "previous_url": url,
         }
         inclusion_connect_url = escape(add_url_params(reverse("inclusion_connect:authorize"), params))
@@ -130,10 +130,10 @@ class SiaeStaffLoginTest(InclusionConnectBaseTestCase):
         self.assertContains(response, "Adresse e-mail")
         self.assertContains(response, "Mot de passe")
 
-        url_with_next = add_url_params(reverse("login:siae_staff"), {"next": "/next_url"})
+        url_with_next = add_url_params(reverse("login:employer"), {"next": "/next_url"})
         response = self.client.get(url_with_next)
         params = {
-            "user_kind": UserKind.SIAE_STAFF,
+            "user_kind": UserKind.EMPLOYER,
             "previous_url": url_with_next,
             "next_url": "/next_url",
         }
@@ -141,8 +141,8 @@ class SiaeStaffLoginTest(InclusionConnectBaseTestCase):
         self.assertContains(response, inclusion_connect_url + '"')
 
     def test_login_using_django(self):
-        user = SiaeStaffFactory(identity_provider=IdentityProvider.DJANGO)
-        url = reverse("login:siae_staff")
+        user = EmployerFactory(identity_provider=IdentityProvider.DJANGO)
+        url = reverse("login:employer")
         response = self.client.get(url)
         assert response.status_code == 200
 
@@ -154,8 +154,8 @@ class SiaeStaffLoginTest(InclusionConnectBaseTestCase):
         self.assertRedirects(response, reverse("account_email_verification_sent"))
 
     def test_login_using_django_but_has_sso_provider(self):
-        user = SiaeStaffFactory(identity_provider=users_enums.IdentityProvider.INCLUSION_CONNECT)
-        url = reverse("login:siae_staff")
+        user = EmployerFactory(identity_provider=users_enums.IdentityProvider.INCLUSION_CONNECT)
+        url = reverse("login:employer")
         response = self.client.get(url)
         assert response.status_code == 200
 
@@ -265,15 +265,15 @@ def test_prescriber_account_activation_view_with_next(client):
     assertContains(response, f'{ic_auhtorize_url}"')
 
 
-def test_siae_staff_account_activation_view(client):
-    user = SiaeStaffFactory(with_siae=True, identity_provider=IdentityProvider.DJANGO)
+def test_employer_account_activation_view(client):
+    user = EmployerFactory(with_siae=True, identity_provider=IdentityProvider.DJANGO)
     client.force_login(user)
 
     url = reverse("dashboard:activate_ic_account")
     response = client.get(url)
     # Check the href link
     params = {
-        "user_kind": UserKind.SIAE_STAFF,
+        "user_kind": UserKind.EMPLOYER,
         "previous_url": url,
         "user_email": user.email,
     }

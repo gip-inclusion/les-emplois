@@ -8,7 +8,7 @@ from itou.prescribers.enums import PrescriberOrganizationKind
 SENDER_KIND_CHOICES = (
     (SenderKind.JOB_SEEKER, "Candidat"),
     (SenderKind.PRESCRIBER, "Prescripteur"),
-    (SenderKind.SIAE_STAFF, "Employeur"),
+    (SenderKind.EMPLOYER, "Employeur"),
 )
 
 
@@ -34,7 +34,7 @@ def get_job_application_detailed_origin(ja):
     # Start with the regular origin.
     detailed_origin = get_job_application_origin(ja)
     # Add the relevant detailed origin depending on the origin.
-    if ja.sender_kind == SenderKind.SIAE_STAFF:
+    if ja.sender_kind == SenderKind.EMPLOYER:
         detailed_origin += f" {ja.sender_siae.kind}"
     if ja.sender_kind == SenderKind.PRESCRIBER:
         if ja.sender_prescriber_organization:

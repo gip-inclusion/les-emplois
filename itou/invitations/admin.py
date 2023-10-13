@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from ..utils.admin import ItouModelAdmin
-from .models import LaborInspectorInvitation, PrescriberWithOrgInvitation, SiaeStaffInvitation
+from .models import EmployerInvitation, LaborInspectorInvitation, PrescriberWithOrgInvitation
 
 
 class IsValidFilter(admin.SimpleListFilter):
@@ -40,8 +40,8 @@ class BaseInvitationAdmin(ItouModelAdmin):
         return obj.acceptance_link
 
 
-@admin.register(SiaeStaffInvitation)
-class SiaeStaffInvitationAdmin(BaseInvitationAdmin):
+@admin.register(EmployerInvitation)
+class EmployerInvitationAdmin(BaseInvitationAdmin):
     list_display = BaseInvitationAdmin.list_display + ("siae",)
     raw_id_fields = BaseInvitationAdmin.raw_id_fields + ("siae",)
     search_fields = BaseInvitationAdmin.search_fields + ("siae__siret",)

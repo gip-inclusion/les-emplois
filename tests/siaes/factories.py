@@ -11,7 +11,7 @@ from itou.jobs.models import Appellation
 from itou.siaes import models
 from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS, ContractType, SiaeKind
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.users.factories import SiaeStaffFactory
+from tests.users.factories import EmployerFactory
 
 
 NAF_CODES = ["9522Z", "7820Z", "6312Z", "8130Z", "1071A", "5510Z"]
@@ -141,7 +141,7 @@ class SiaeMembershipFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.SiaeMembership
 
-    user = factory.SubFactory(SiaeStaffFactory)
+    user = factory.SubFactory(EmployerFactory)
     siae = factory.SubFactory(SiaeFactory)
     is_admin = True
 

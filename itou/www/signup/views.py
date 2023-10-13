@@ -26,7 +26,7 @@ from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.siaes.enums import SiaeKind
 from itou.siaes.models import Siae, SiaeMembership
 from itou.users.adapter import UserAdapter
-from itou.users.enums import KIND_PRESCRIBER, KIND_SIAE_STAFF, UserKind
+from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, UserKind
 from itou.utils import constants as global_constants
 from itou.utils.nav_history import get_prev_url_from_history, push_url_in_history
 from itou.utils.tokens import siae_signup_token_generator
@@ -77,7 +77,7 @@ class ChooseUserKindSignupView(FormView):
         urls = {
             UserKind.JOB_SEEKER: reverse("signup:job_seeker_situation"),
             UserKind.PRESCRIBER: reverse("signup:prescriber_check_already_exists"),
-            UserKind.SIAE_STAFF: reverse("signup:siae_select"),
+            UserKind.EMPLOYER: reverse("signup:siae_select"),
         }
         return HttpResponseRedirect(urls[form.cleaned_data["kind"]])
 
@@ -246,7 +246,7 @@ class SiaeUserView(SiaeBaseView, TemplateView):
 
     def get_context_data(self, **kwargs):
         ic_params = {
-            "user_kind": KIND_SIAE_STAFF,
+            "user_kind": KIND_EMPLOYER,
             "previous_url": self.request.get_full_path(),
             "next_url": reverse("signup:siae_join", args=(self.siae.pk, self.token)),
         }
@@ -263,7 +263,7 @@ class SiaeUserView(SiaeBaseView, TemplateView):
 
 class SiaeJoinView(LoginRequiredMixin, SiaeBaseView):
     def get(self, request, *args, **kwargs):
-        if not request.user.is_siae_staff:
+        if not request.user.is_employer:
             logger.error("A non staff user tried to join a SIAE")
             messages.error(
                 request, "Vous ne pouvez pas rejoindre une SIAE avec ce compte car vous n'êtes pas employeur."
@@ -809,7 +809,7 @@ class FacilitatorUserView(FacilitatorBaseMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         ic_params = {
-            "user_kind": KIND_SIAE_STAFF,
+            "user_kind": KIND_EMPLOYER,
             "previous_url": self.request.get_full_path(),
             "next_url": reverse("signup:facilitator_join"),
         }

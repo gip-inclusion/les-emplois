@@ -16,7 +16,7 @@
                         </div>
 
                         {# Approval actions. #}
-                        {% if approval and request.user.is_siae_staff %}
+                        {% if approval and request.user.is_employer %}
                             <div class="d-flex justify-content-between mb-3">
                                 {% if approval_can_be_suspended_by_siae %}
                                     <a href="{% url 'approvals:suspend' approval_id=approval.id %}?back_url={{ request.get_full_path|urlencode }}"

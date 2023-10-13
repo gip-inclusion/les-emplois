@@ -10,7 +10,7 @@
         <li>Les modifications et ajouts réalisés sont toujours accessibles par les autres membres de votre organisation.</li>
         <li>Cet utilisateur sera notifié par e-mail de son retrait de votre organisation.</li>
         <li>En cas d'erreur, vous pourrez toujours lui renvoyer une invitation pour rejoindre votre organisation.</li>
-        {% if current_user.is_siae_staff or current_user.is_prescriber %}
+        {% if current_user.is_employer or current_user.is_prescriber %}
             <li>
                 Toutes les candidatures effectuées par ce collaborateur resteront dans le tableau de bord de l'organisation. Ce collaborateur sera notifié par mail des éventuelles suites données aux candidatures qu'il a transmises.
             </li>

@@ -13,7 +13,7 @@
             </div>
         {% endif %}
         {# Nothing is displayed to SIAE members when the job seeker is not eligible to the IAE #}
-        {% if not request.user.is_siae_staff or job_seeker.has_valid_common_approval or eligibility_diagnosis %}
+        {% if not request.user.is_employer or job_seeker.has_valid_common_approval or eligibility_diagnosis %}
             <div class="alert alert-info mb-5">
                 <div class="row">
                     <div class="col-auto pr-0">
@@ -25,7 +25,7 @@
                                 <strong>Date de fin de validité du pass IAE : {{ job_seeker.latest_common_approval.end_at|date:"d/m/Y" }}</strong>
                             </p>
                             <p class="mb-0">
-                                {% if request.user.is_prescriber_with_authorized_org or request.user.is_siae_staff %}
+                                {% if request.user.is_prescriber_with_authorized_org or request.user.is_employer %}
                                     Tant que le Pass IAE est valide, vous n’avez pas à valider la situation administrative du candidat.
                                 {% elif request.user.is_prescriber %}
                                     Tant que le pass IAE est valide, l’employeur n’aura pas à vérifier l’éligibilité IAE du candidat.
@@ -40,7 +40,7 @@
                             <p class="mb-0">
                                 {% if request.user.is_prescriber %}
                                     Tant que l’éligibilité IAE est valide, l’employeur n’aura pas à vérifier les critères administratifs du candidat.
-                                {% elif request.user.is_siae_staff %}
+                                {% elif request.user.is_employer %}
                                     Tant que l’éligibilité IAE est valide, vous n’aurez pas à vérifier les critères administratifs du candidat.
                                 {% elif request.user.is_job_seeker %}
                                     Tant que votre éligibilité IAE est valide, l’employeur n’aura pas à vérifier vos critères administratifs.
@@ -71,7 +71,7 @@
             </div>
         {% endif %}
         {# Nothing is displayed to GEIQ members when the job seeker is not eligible #}
-        {% if not request.user.is_siae_staff or geiq_eligibility_diagnosis %}
+        {% if not request.user.is_employer or geiq_eligibility_diagnosis %}
             <div class="alert alert-info mb-5">
                 <div class="row">
                     <div class="col-auto pr-0">
@@ -85,7 +85,7 @@
                             <p class="mb-0">
                                 {% if request.user.is_prescriber %}
                                     Tant que l’éligibilité GEIQ est valide, l’employeur n’aura pas à valider les critères administratifs du candidat.
-                                {% elif request.user.is_siae_staff %}
+                                {% elif request.user.is_employer %}
                                     Tant que l’éligibilité GEIQ est valide, vous n’aurez pas à valider les critères administratifs du candidat.
                                 {% elif request.user.is_job_seeker %}
                                     Tant que votre éligibilité GEIQ est valide, l’employeur n’aura pas à valider votre éligibilité à un accompagnement par le GEIQ.
@@ -127,7 +127,7 @@
                         <p class="mb-2">
                             <strong>Bon à savoir</strong>
                         </p>
-                        {% if request.user.is_siae_staff %}
+                        {% if request.user.is_employer %}
                             <p class="mb-0">Précisez dans le message :</p>
                             <ul class="mb-0">
                                 <li>les motivations du candidat,</li>
@@ -218,7 +218,7 @@
 {% endblock %}
 
 {% block form_submit_button %}
-    {% if request.user.is_siae_staff %}
+    {% if request.user.is_employer %}
         <button class="btn btn-primary">Enregistrer</button>
     {% else %}
         <button class="btn btn-primary">Envoyer la candidature</button>

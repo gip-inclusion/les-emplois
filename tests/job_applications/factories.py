@@ -141,7 +141,7 @@ class JobApplicationSentByJobSeekerFactory(JobApplicationFactory):
 class JobApplicationSentBySiaeFactory(JobApplicationFactory):
     """Generates a JobApplication() object sent by an Siae."""
 
-    sender_kind = SenderKind.SIAE_STAFF
+    sender_kind = SenderKind.EMPLOYER
     # Currently an Siae can only postulate for itself,
     # this is the default behavior here.
     sender_siae = factory.SelfAttribute("to_siae")

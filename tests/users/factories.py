@@ -82,8 +82,8 @@ class PrescriberFactory(UserFactory):
             PrescriberMembershipFactory(user=self, **kwargs)
 
 
-class SiaeStaffFactory(UserFactory):
-    kind = UserKind.SIAE_STAFF
+class EmployerFactory(UserFactory):
+    kind = UserKind.EMPLOYER
     identity_provider = IdentityProvider.INCLUSION_CONNECT
 
     @factory.post_generation

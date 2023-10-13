@@ -198,12 +198,12 @@ class EligibilityDiagnosisManagerTest(TestCase):
         ExpiredEligibilityDiagnosisFactory(
             job_seeker=self.job_seeker,
             author_siae=siae,
-            author_kind=AuthorKind.SIAE_STAFF,
+            author_kind=AuthorKind.EMPLOYER,
         )
         new_diag = EligibilityDiagnosisFactory(
             job_seeker=self.job_seeker,
             author_siae=siae,
-            author_kind=AuthorKind.SIAE_STAFF,
+            author_kind=AuthorKind.EMPLOYER,
         )
         # An approval causes the system to ignore expires_at.
         ApprovalFactory(user=self.job_seeker, eligibility_diagnosis=new_diag)
@@ -235,7 +235,7 @@ class EligibilityDiagnosisModelTest(TestCase):
 
         assert diagnosis.job_seeker == job_seeker
         assert diagnosis.author == user
-        assert diagnosis.author_kind == AuthorKind.SIAE_STAFF
+        assert diagnosis.author_kind == AuthorKind.EMPLOYER
         assert diagnosis.author_siae == siae
         assert diagnosis.author_prescriber_organization is None
         assert diagnosis.administrative_criteria.count() == 0
@@ -283,7 +283,7 @@ class EligibilityDiagnosisModelTest(TestCase):
         assert new_diagnosis.job_seeker == current_diagnosis.job_seeker
         # ... or updated.
         assert new_diagnosis.author == siae.members.first()
-        assert new_diagnosis.author_kind == AuthorKind.SIAE_STAFF
+        assert new_diagnosis.author_kind == AuthorKind.EMPLOYER
         assert new_diagnosis.author_siae == siae
         assert new_diagnosis.author_prescriber_organization is None
         assert new_diagnosis.administrative_criteria.count() == 0

@@ -503,7 +503,7 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
             },
         )
 
-    def test_siae_staff_card_actions(self):
+    def test_employer_card_actions(self):
         # Checks if SIAE can update their job descriptions
         response = self._login(self.user)
 

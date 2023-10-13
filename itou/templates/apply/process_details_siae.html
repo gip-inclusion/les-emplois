@@ -61,7 +61,7 @@
 {% block actions %}
     {% include "apply/includes/siae_hiring_actions.html" with job_application=job_application %}
 
-    {% if job_application.to_siae.is_subject_to_eligibility_rules and request.user.is_siae_staff and job_application.state.is_accepted and job_application.approval %}
+    {% if job_application.to_siae.is_subject_to_eligibility_rules and request.user.is_employer and job_application.state.is_accepted and job_application.approval %}
         <div class="c-box mb-4">
             <p>
                 <b>PASS IAE</b>

@@ -11,7 +11,7 @@
                 {% if job_seeker.address_in_qpv %}
                     <li>
                         <strong>Résident QPV</strong> : l'adresse
-                        {% if request.user.is_siae_staff %}
+                        {% if request.user.is_employer %}
                             déclarée pour le
                         {% else %}
                             du
@@ -33,7 +33,7 @@
                 {% endif %}
             </ul>
             <p>Vous pouvez cocher ce(s) critère(s) dans la liste ci-dessous.</p>
-            {% if request.user.is_siae_staff %}
+            {% if request.user.is_employer %}
                 <p>
                     <strong>Important :</strong> ce message d'information ne permet pas de certifier ces critères en cas de contrôle.
                     Vous devez conserver les justificatifs mentionnés ci-dessous.

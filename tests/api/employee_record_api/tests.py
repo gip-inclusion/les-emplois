@@ -11,7 +11,7 @@ from itou.employee_record.models import EmployeeRecord
 from itou.utils.mocks.address_format import mock_get_geocoding_data
 from tests.employee_record.factories import EmployeeRecordWithProfileFactory
 from tests.job_applications.factories import JobApplicationWithCompleteJobSeekerProfileFactory
-from tests.users.factories import DEFAULT_PASSWORD, SiaeStaffFactory
+from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory
 from tests.utils.test import BASE_NUM_QUERIES
 
 
@@ -32,7 +32,7 @@ class EmployeeRecordAPIPermissionsTest(APITestCase):
         )
 
         self.user = self.employee_record_ready.job_application.to_siae.members.first()
-        self.unauthorized_user = SiaeStaffFactory()
+        self.unauthorized_user = EmployerFactory()
 
     def test_permissions_ok_with_token(self):
         """

@@ -10,6 +10,7 @@ from itou.api.models import SiaeApiToken
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
 from itou.siaes.enums import SiaeKind
 from itou.siaes.models import Siae
+from itou.users.enums import UserKind
 from tests.job_applications.factories import JobApplicationFactory, PriorActionFactory
 from tests.siaes.factories import SiaeFactory
 from tests.users.factories import ItouStaffFactory, JobSeekerWithAddressFactory
@@ -124,7 +125,7 @@ def test_candidatures_geiq_nominal(snapshot):
         with_geiq_eligibility_diagnosis_from_prescriber=True,
         state="accepted",
         job_seeker=job_seeker,
-        sender_kind="siae_staff",
+        sender_kind=UserKind.EMPLOYER,
         to_siae__siret="11832575966666",  # same SIREN, different SIRET
         to_siae__kind=SiaeKind.GEIQ,
         prehiring_guidance_days=28,

@@ -3,16 +3,16 @@ from django.shortcuts import reverse
 from django.utils import timezone
 from django.utils.html import escape
 
-from itou.invitations.models import SiaeStaffInvitation
+from itou.invitations.models import EmployerInvitation
 from itou.users.enums import UserKind
-from itou.www.invitations_views.forms import SiaeStaffInvitationForm
+from itou.www.invitations_views.forms import EmployerInvitationForm
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.siaes.factories import SiaeFactory, SiaeMembershipFactory
-from tests.users.factories import JobSeekerFactory, SiaeStaffFactory
+from tests.users.factories import EmployerFactory, JobSeekerFactory
 from tests.utils.test import TestCase
 
 
-INVITATION_URL = reverse("invitations_views:invite_siae_staff")
+INVITATION_URL = reverse("invitations_views:invite_employer")
 
 
 class TestSendSingleSiaeInvitation(TestCase):
@@ -37,7 +37,7 @@ class TestSendSingleSiaeInvitation(TestCase):
         response = self.client.get(INVITATION_URL)
 
         # Assert form is present
-        form = SiaeStaffInvitationForm(sender=self.sender, siae=self.siae)
+        form = EmployerInvitationForm(sender=self.sender, siae=self.siae)
         self.assertContains(response, form["first_name"].label)
         self.assertContains(response, form["last_name"].label)
         self.assertContains(response, form["email"].label)
@@ -45,7 +45,7 @@ class TestSendSingleSiaeInvitation(TestCase):
         response = self.client.post(INVITATION_URL, data=self.post_data, follow=True)
         self.assertContains(response, "Votre invitation a été envoyée par courriel.")
 
-        invitations = SiaeStaffInvitation.objects.all()
+        invitations = EmployerInvitation.objects.all()
         assert len(invitations) == 1
 
         invitation = invitations[0]
@@ -57,7 +57,7 @@ class TestSendSingleSiaeInvitation(TestCase):
         assert self.post_data["form-0-email"] in outbox_emails
 
     def test_send_invitation_user_already_exists(self):
-        guest = SiaeStaffFactory(
+        guest = EmployerFactory(
             first_name=self.guest_data["first_name"],
             last_name=self.guest_data["last_name"],
             email=self.guest_data["email"],
@@ -67,7 +67,7 @@ class TestSendSingleSiaeInvitation(TestCase):
         assert response.status_code == 200
 
         # The guest will be able to join the structure
-        invitations = SiaeStaffInvitation.objects.all()
+        invitations = EmployerInvitation.objects.all()
         assert len(invitations) == 1
 
         invitation = invitations[0]
@@ -80,7 +80,7 @@ class TestSendSingleSiaeInvitation(TestCase):
         assert invitation.email == guest.email
         assert invitation.sender == self.sender
         assert invitation.siae == self.siae
-        assert invitation.USER_KIND == "siae_staff"
+        assert invitation.USER_KIND == UserKind.EMPLOYER
 
     def test_send_invitation_to_not_employer(self):
         user = JobSeekerFactory(**self.guest_data)
@@ -100,15 +100,15 @@ class TestSendSingleSiaeInvitation(TestCase):
         # SIAE 1 invites guest.
         self.client.force_login(self.sender)
         self.client.post(INVITATION_URL, data=self.post_data, follow=True)
-        assert SiaeStaffInvitation.objects.count() == 1
+        assert EmployerInvitation.objects.count() == 1
 
         # SIAE 2 invites guest as well.
         siae_2 = SiaeFactory(with_membership=True)
         sender_2 = siae_2.members.first()
         self.client.force_login(sender_2)
         self.client.post(INVITATION_URL, data=self.post_data)
-        assert SiaeStaffInvitation.objects.count() == 2
-        invitation = SiaeStaffInvitation.objects.get(siae=siae_2)
+        assert EmployerInvitation.objects.count() == 2
+        invitation = EmployerInvitation.objects.get(siae=siae_2)
         assert invitation.first_name == self.guest_data["first_name"]
         assert invitation.last_name == self.guest_data["last_name"]
         assert invitation.email == self.guest_data["email"]
@@ -120,8 +120,8 @@ class TestSendMultipleSiaeInvitation(TestCase):
         # The sender is a member of the SIAE
         self.sender = self.siae.members.first()
         # Define instances not created in DB
-        self.invited_user = SiaeStaffFactory.build()
-        self.second_invited_user = SiaeStaffFactory.build()
+        self.invited_user = EmployerFactory.build()
+        self.second_invited_user = EmployerFactory.build()
         self.post_data = {
             "form-TOTAL_FORMS": "2",
             "form-INITIAL_FORMS": "0",
@@ -141,7 +141,7 @@ class TestSendMultipleSiaeInvitation(TestCase):
 
         assert response.context["formset"]
         self.client.post(INVITATION_URL, data=self.post_data)
-        invitations = SiaeStaffInvitation.objects.count()
+        invitations = EmployerInvitation.objects.count()
         assert invitations == 2
 
     def test_send_multiple_invitations_duplicated_email(self):
@@ -163,7 +163,7 @@ class TestSendMultipleSiaeInvitation(TestCase):
             response,
             escape("Les invitations doivent avoir des adresses e-mail différentes."),
         )
-        invitations = SiaeStaffInvitation.objects.count()
+        invitations = EmployerInvitation.objects.count()
         assert invitations == 0
 
 
@@ -196,7 +196,7 @@ class TestSendInvitationToSpecialGuest(TestCase):
         )
         response = self.client.post(INVITATION_URL, data=self.post_data, follow=True)
         assert response.status_code == 200
-        assert SiaeStaffInvitation.objects.count() == 1
+        assert EmployerInvitation.objects.count() == 1
 
     def test_invite_former_siae_member(self):
         """
@@ -219,7 +219,7 @@ class TestSendInvitationToSpecialGuest(TestCase):
         )
         response = self.client.post(INVITATION_URL, data=self.post_data, follow=True)
         assert response.status_code == 200
-        assert SiaeStaffInvitation.objects.count() == 1
+        assert EmployerInvitation.objects.count() == 1
 
     def test_invite_existing_user_is_prescriber(self):
         guest = PrescriberOrganizationWithMembershipFactory().members.first()
@@ -236,7 +236,7 @@ class TestSendInvitationToSpecialGuest(TestCase):
         assert not response.context["formset"].is_valid()
         assert "email" in response.context["formset"].errors[0]
         assert response.context["formset"].errors[0]["email"][0] == "Cet utilisateur n'est pas un employeur."
-        assert SiaeStaffInvitation.objects.count() == 0
+        assert EmployerInvitation.objects.count() == 0
 
     def test_invite_existing_user_is_job_seeker(self):
         guest = JobSeekerFactory()
@@ -253,7 +253,7 @@ class TestSendInvitationToSpecialGuest(TestCase):
         assert not response.context["formset"].is_valid()
         assert "email" in response.context["formset"].errors[0]
         assert response.context["formset"].errors[0]["email"][0] == "Cet utilisateur n'est pas un employeur."
-        assert SiaeStaffInvitation.objects.count() == 0
+        assert EmployerInvitation.objects.count() == 0
 
     def test_already_a_member(self):
         # The invited user is already a member
@@ -275,4 +275,4 @@ class TestSendInvitationToSpecialGuest(TestCase):
             response.context["formset"].errors[0]["email"][0] == "Cette personne fait déjà partie de votre structure."
         )
 
-        assert SiaeStaffInvitation.objects.count() == 0
+        assert EmployerInvitation.objects.count() == 0

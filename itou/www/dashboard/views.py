@@ -60,7 +60,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
     # `current_org` can be a Siae, a PrescriberOrganization or an Institution.
     current_org = None
 
-    if request.user.is_siae_staff:
+    if request.user.is_employer:
         current_org = get_current_siae_or_404(request)
         can_show_financial_annexes = current_org.convention_can_be_accessed_by(request.user)
         can_show_employee_records = current_org.can_use_employee_record
@@ -191,7 +191,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "precriber_kind_pe": PrescriberOrganizationKind.PE,
         "precriber_kind_dept": PrescriberOrganizationKind.DEPT,
         "show_dora_banner": (
-            any([request.user.is_siae_staff, request.user.is_prescriber])
+            any([request.user.is_employer, request.user.is_prescriber])
             and current_org
             and current_org.department in ["91", "26", "74", "30"]
         ),
@@ -331,7 +331,7 @@ def edit_job_seeker_info(
 def switch_organization(request):
     pk = request.POST["organization_id"]
     match request.user.kind:
-        case UserKind.SIAE_STAFF:
+        case UserKind.EMPLOYER:
             queryset = Siae.objects.active_or_in_grace_period().member_required(request.user)
         case UserKind.PRESCRIBER:
             queryset = PrescriberOrganization.objects.member_required(request.user)
@@ -347,7 +347,7 @@ def switch_organization(request):
 
 @login_required
 def edit_user_notifications(request, template_name="dashboard/edit_user_notifications.html"):
-    if not request.user.is_siae_staff:
+    if not request.user.is_employer:
         raise PermissionDenied
 
     current_siae_pk = request.session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY)
@@ -376,7 +376,7 @@ def edit_user_notifications(request, template_name="dashboard/edit_user_notifica
 
 @login_required
 def api_token(request, template_name="dashboard/api_token.html"):
-    if not (request.user.is_siae_staff and request.is_current_organization_admin):
+    if not (request.user.is_employer and request.is_current_organization_admin):
         raise PermissionDenied
 
     if request.method == "POST":

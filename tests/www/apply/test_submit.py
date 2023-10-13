@@ -39,12 +39,12 @@ from tests.prescribers.factories import PrescriberOrganizationWithMembershipFact
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
 from tests.siaes.factories import SiaeFactory, SiaeWithMembershipAndJobsFactory
 from tests.users.factories import (
+    EmployerFactory,
     ItouStaffFactory,
     JobSeekerFactory,
     JobSeekerProfileWithHexaAddressFactory,
     JobSeekerWithAddressFactory,
     PrescriberFactory,
-    SiaeStaffFactory,
 )
 from tests.utils.test import TestCase, assertMessages
 
@@ -1776,7 +1776,7 @@ class ApplyAsSiaeTest(TestCase):
 
         job_application = JobApplication.objects.get(sender=user, to_siae=siae)
         assert job_application.job_seeker == new_job_seeker
-        assert job_application.sender_kind == SenderKind.SIAE_STAFF
+        assert job_application.sender_kind == SenderKind.EMPLOYER
         assert job_application.sender_siae == siae
         assert job_application.sender_prescriber_organization is None
         assert job_application.state == job_application.state.workflow.STATE_NEW
@@ -2051,7 +2051,7 @@ class DirectHireFullProcessTest(TestCase):
         self.assertRedirects(response, next_url, status_code=200, fetch_redirect_response=False)
 
         assert job_application.job_seeker == new_job_seeker
-        assert job_application.sender_kind == SenderKind.SIAE_STAFF
+        assert job_application.sender_kind == SenderKind.EMPLOYER
         assert job_application.sender_siae == siae
         assert job_application.sender_prescriber_organization is None
         assert job_application.state == job_application.state.workflow.STATE_ACCEPTED
@@ -2182,7 +2182,7 @@ class DirectHireFullProcessTest(TestCase):
         self.assertRedirects(response, next_url, status_code=200, fetch_redirect_response=False)
 
         assert job_application.job_seeker == job_seeker
-        assert job_application.sender_kind == SenderKind.SIAE_STAFF
+        assert job_application.sender_kind == SenderKind.EMPLOYER
         assert job_application.sender_siae == siae
         assert job_application.sender_prescriber_organization is None
         assert job_application.state == job_application.state.workflow.STATE_ACCEPTED
@@ -2785,7 +2785,7 @@ class UpdateJobSeekerTestCase(UpdateJobSeekerBaseTestCase):
 
     def test_as_siae_with_proxied_job_seeker(self):
         # Make sure the job seeker does not manage its own account
-        self.job_seeker.created_by = SiaeStaffFactory()
+        self.job_seeker.created_by = EmployerFactory()
         self.job_seeker.last_login = None
         self.job_seeker.save(update_fields=["created_by", "last_login"])
         self._check_everything_allowed(self.siae.members.first())
@@ -2810,7 +2810,7 @@ class UpdateJobSeekerTestCase(UpdateJobSeekerBaseTestCase):
         # Make sure the job seeker does not manage its own account (and has no nir)
         self.job_seeker.nir = ""
         self.job_seeker.lack_of_nir_reason = ""
-        self.job_seeker.created_by = SiaeStaffFactory()
+        self.job_seeker.created_by = EmployerFactory()
         self.job_seeker.last_login = None
         self.job_seeker.save(update_fields=["created_by", "last_login", "nir", "lack_of_nir_reason"])
         self._check_everything_allowed(
@@ -2822,7 +2822,7 @@ class UpdateJobSeekerTestCase(UpdateJobSeekerBaseTestCase):
 
     def test_as_siae_that_last_step_doesnt_crash_with_direct_access(self):
         # Make sure the job seeker does not manage its own account
-        self.job_seeker.created_by = SiaeStaffFactory()
+        self.job_seeker.created_by = EmployerFactory()
         self.job_seeker.last_login = None
         self.job_seeker.save(update_fields=["created_by", "last_login"])
         self._check_that_last_step_doesnt_crash_with_direct_access(self.siae.members.first())
@@ -2890,7 +2890,7 @@ class UpdateJobSeekerForHireTestCase(UpdateJobSeekerBaseTestCase):
 
     def test_as_siae_with_proxied_job_seeker(self):
         # Make sure the job seeker does not manage its own account
-        self.job_seeker.created_by = SiaeStaffFactory()
+        self.job_seeker.created_by = EmployerFactory()
         self.job_seeker.last_login = None
         self.job_seeker.save(update_fields=["created_by", "last_login"])
         self._check_everything_allowed(self.siae.members.first())
@@ -2915,7 +2915,7 @@ class UpdateJobSeekerForHireTestCase(UpdateJobSeekerBaseTestCase):
         # Make sure the job seeker does not manage its own account (and has no nir)
         self.job_seeker.nir = ""
         self.job_seeker.lack_of_nir_reason = ""
-        self.job_seeker.created_by = SiaeStaffFactory()
+        self.job_seeker.created_by = EmployerFactory()
         self.job_seeker.last_login = None
         self.job_seeker.save(update_fields=["created_by", "last_login", "nir", "lack_of_nir_reason"])
         self._check_everything_allowed(
@@ -2927,7 +2927,7 @@ class UpdateJobSeekerForHireTestCase(UpdateJobSeekerBaseTestCase):
 
     def test_as_siae_that_last_step_doesnt_crash_with_direct_access(self):
         # Make sure the job seeker does not manage its own account
-        self.job_seeker.created_by = SiaeStaffFactory()
+        self.job_seeker.created_by = EmployerFactory()
         self.job_seeker.last_login = None
         self.job_seeker.save(update_fields=["created_by", "last_login"])
         self._check_that_last_step_doesnt_crash_with_direct_access(self.siae.members.first())
@@ -3381,7 +3381,7 @@ class CheckPreviousApplicationsViewTestCase(TestCase):
         self.assertNotContains(response, self.check_infos_url)
         self.assertContains(response, self.check_prev_applications_url)
 
-    def test_no_previous_as_siae_staff(self):
+    def test_no_previous_as_employer(self):
         self._login_and_setup_session(self.siae.members.first())
 
         response = self.client.get(self.check_prev_applications_url)
@@ -3391,7 +3391,7 @@ class CheckPreviousApplicationsViewTestCase(TestCase):
         self.assertContains(response, self.check_infos_url)
         self.assertNotContains(response, self.check_prev_applications_url)
 
-    def test_with_previous_as_siae_staff(self):
+    def test_with_previous_as_employer(self):
         JobApplicationFactory(job_seeker=self.job_seeker, to_siae=self.siae)
         self._login_and_setup_session(self.siae.members.first())
 
@@ -3598,14 +3598,14 @@ class CheckPreviousApplicationsForHireViewTestCase(TestCase):
     def _reverse(self, view_name):
         return reverse(view_name, kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk})
 
-    def test_no_previous_as_siae_staff(self):
+    def test_no_previous_as_employer(self):
         self.siae = SiaeFactory(subject_to_eligibility=True, with_membership=True)
         self.client.force_login(self.siae.members.first())
 
         response = self.client.get(self._reverse("apply:check_prev_applications_for_hire"))
         self.assertRedirects(response, self._reverse("apply:eligibility_for_hire"))
 
-    def test_with_previous_as_siae_staff(self):
+    def test_with_previous_as_employer(self):
         self.siae = SiaeFactory(subject_to_eligibility=True, with_membership=True)
         JobApplicationFactory(job_seeker=self.job_seeker, to_siae=self.siae, eligibility_diagnosis=None)
         self.client.force_login(self.siae.members.first())
@@ -3797,7 +3797,7 @@ class HireConfirmationTestCase(TestCase):
         self.assertRedirects(response, next_url, status_code=200)
 
         assert job_application.job_seeker == self.job_seeker
-        assert job_application.sender_kind == SenderKind.SIAE_STAFF
+        assert job_application.sender_kind == SenderKind.EMPLOYER
         assert job_application.sender_siae == self.siae
         assert job_application.sender_prescriber_organization is None
         assert job_application.state == job_application.state.workflow.STATE_ACCEPTED
@@ -3852,7 +3852,7 @@ class HireConfirmationTestCase(TestCase):
         self.assertRedirects(response, next_url, status_code=200)
 
         assert job_application.job_seeker == self.job_seeker
-        assert job_application.sender_kind == SenderKind.SIAE_STAFF
+        assert job_application.sender_kind == SenderKind.EMPLOYER
         assert job_application.sender_siae == self.siae
         assert job_application.sender_prescriber_organization is None
         assert job_application.state == job_application.state.workflow.STATE_ACCEPTED

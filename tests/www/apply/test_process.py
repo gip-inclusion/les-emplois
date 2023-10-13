@@ -1026,7 +1026,7 @@ class ProcessViewsTest(TestCase):
         # Check diagnosis.
         eligibility_diagnosis = job_application.get_eligibility_diagnosis()
         assert eligibility_diagnosis.author == siae_user
-        assert eligibility_diagnosis.author_kind == AuthorKind.SIAE_STAFF
+        assert eligibility_diagnosis.author_kind == AuthorKind.EMPLOYER
         assert eligibility_diagnosis.author_siae == job_application.to_siae
         # Check administrative criteria.
         administrative_criteria = eligibility_diagnosis.administrative_criteria.all()

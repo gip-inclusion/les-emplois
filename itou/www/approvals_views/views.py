@@ -712,7 +712,7 @@ def pe_approval_create(request, pe_approval_id):
         approval=approval_from_pe,
         origin=Origin.PE_APPROVAL,  # This origin is specific to this process.
         sender=request.user,
-        sender_kind=SenderKind.SIAE_STAFF,
+        sender_kind=SenderKind.EMPLOYER,
         sender_siae=siae,
     )
     job_application.save()

@@ -8,16 +8,16 @@ from django.shortcuts import reverse
 from django.test import Client
 from django.utils.html import escape
 
-from itou.users.enums import KIND_SIAE_STAFF, UserKind
+from itou.users.enums import KIND_EMPLOYER, UserKind
 from itou.users.models import User
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import add_url_params
-from tests.invitations.factories import ExpiredSiaeStaffInvitationFactory, SentSiaeStaffInvitationFactory
+from tests.invitations.factories import ExpiredEmployerInvitationFactory, SentEmployerInvitationFactory
 from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
 from tests.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.siaes.factories import SiaeFactory
-from tests.users.factories import SiaeStaffFactory
+from tests.users.factories import EmployerFactory
 from tests.utils.test import assertMessages
 
 
@@ -25,7 +25,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
     def assert_accepted_invitation(self, response, invitation, user):
         user.refresh_from_db()
         invitation.refresh_from_db()
-        assert user.kind == UserKind.SIAE_STAFF
+        assert user.kind == UserKind.EMPLOYER
         assert invitation.accepted
         assert invitation.accepted_at
 
@@ -46,7 +46,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
 
     @respx.mock
     def test_accept_invitation_signup(self):
-        invitation = SentSiaeStaffInvitationFactory(email=OIDC_USERINFO["email"])
+        invitation = SentEmployerInvitationFactory(email=OIDC_USERINFO["email"])
         response = self.client.get(invitation.acceptance_link, follow=True)
         self.assertContains(response, "logo-inclusion-connect-one-line.svg")
 
@@ -54,7 +54,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
         next_url = reverse("invitations_views:join_siae", args=(invitation.pk,))
         params = {
-            "user_kind": KIND_SIAE_STAFF,
+            "user_kind": KIND_EMPLOYER,
             "user_email": invitation.email,
             "channel": "invitation",
             "previous_url": previous_url,
@@ -67,7 +67,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
 
         response = mock_oauth_dance(
             self.client,
-            KIND_SIAE_STAFF,
+            KIND_EMPLOYER,
             user_email=invitation.email,
             channel="invitation",
             previous_url=previous_url,
@@ -86,7 +86,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
 
     @respx.mock
     def test_accept_invitation_signup_returns_on_other_browser(self):
-        invitation = SentSiaeStaffInvitationFactory(email=OIDC_USERINFO["email"])
+        invitation = SentEmployerInvitationFactory(email=OIDC_USERINFO["email"])
         response = self.client.get(invitation.acceptance_link, follow=True)
         self.assertContains(response, "logo-inclusion-connect-one-line.svg")
 
@@ -94,7 +94,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
         next_url = reverse("invitations_views:join_siae", args=(invitation.pk,))
         params = {
-            "user_kind": KIND_SIAE_STAFF,
+            "user_kind": KIND_EMPLOYER,
             "user_email": invitation.email,
             "channel": "invitation",
             "previous_url": previous_url,
@@ -108,7 +108,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         other_client = Client()
         response = mock_oauth_dance(
             self.client,
-            KIND_SIAE_STAFF,
+            KIND_EMPLOYER,
             user_email=invitation.email,
             channel="invitation",
             previous_url=previous_url,
@@ -128,7 +128,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
 
     @respx.mock
     def test_accept_invitation_signup_bad_email_case(self):
-        invitation = SentSiaeStaffInvitationFactory(email=OIDC_USERINFO["email"].upper())
+        invitation = SentEmployerInvitationFactory(email=OIDC_USERINFO["email"].upper())
         response = self.client.get(invitation.acceptance_link, follow=True)
         self.assertContains(response, "logo-inclusion-connect-one-line.svg")
 
@@ -136,7 +136,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
         next_url = reverse("invitations_views:join_siae", args=(invitation.pk,))
         params = {
-            "user_kind": KIND_SIAE_STAFF,
+            "user_kind": KIND_EMPLOYER,
             "user_email": invitation.email,
             "channel": "invitation",
             "previous_url": previous_url,
@@ -149,7 +149,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
 
         response = mock_oauth_dance(
             self.client,
-            KIND_SIAE_STAFF,
+            KIND_EMPLOYER,
             # Using the same email with a different case should not fail
             user_email=invitation.email.lower(),
             channel="invitation",
@@ -166,15 +166,15 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
 
     @respx.mock
     def test_accept_existing_user_not_logged_in_using_IC(self):
-        invitation = SentSiaeStaffInvitationFactory(email=OIDC_USERINFO["email"])
-        user = SiaeStaffFactory(email=OIDC_USERINFO["email"], has_completed_welcoming_tour=True)
+        invitation = SentEmployerInvitationFactory(email=OIDC_USERINFO["email"])
+        user = EmployerFactory(email=OIDC_USERINFO["email"], has_completed_welcoming_tour=True)
         response = self.client.get(invitation.acceptance_link, follow=True)
-        assert reverse("login:siae_staff") in response.wsgi_request.get_full_path()
+        assert reverse("login:employer") in response.wsgi_request.get_full_path()
         assert not invitation.accepted
         next_url = reverse("invitations_views:join_siae", args=(invitation.pk,))
-        previous_url = f"{reverse('login:siae_staff')}?{urlencode({'next': next_url})}"
+        previous_url = f"{reverse('login:employer')}?{urlencode({'next': next_url})}"
         params = {
-            "user_kind": UserKind.SIAE_STAFF,
+            "user_kind": UserKind.EMPLOYER,
             "previous_url": previous_url,
             "next_url": next_url,
         }
@@ -183,7 +183,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
 
         response = mock_oauth_dance(
             self.client,
-            UserKind.SIAE_STAFF,
+            UserKind.EMPLOYER,
             user_email=user.email,
             channel="invitation",
             previous_url=previous_url,
@@ -197,16 +197,16 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
 
     def test_accept_invitation_logged_in_user(self):
         # A logged in user should log out before accepting an invitation.
-        logged_in_user = SiaeStaffFactory()
+        logged_in_user = EmployerFactory()
         self.client.force_login(logged_in_user)
         # Invitation for another user
-        invitation = SentSiaeStaffInvitationFactory(email="loutre@example.com")
+        invitation = SentEmployerInvitationFactory(email="loutre@example.com")
         response = self.client.get(invitation.acceptance_link, follow=True)
         self.assertRedirects(response, reverse("account_logout"))
 
     @respx.mock
     def test_accept_invitation_signup_wrong_email(self):
-        invitation = SentSiaeStaffInvitationFactory()
+        invitation = SentEmployerInvitationFactory()
         response = self.client.get(invitation.acceptance_link, follow=True)
         self.assertContains(response, "logo-inclusion-connect-one-line.svg")
 
@@ -214,7 +214,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
         next_url = reverse("invitations_views:join_siae", args=(invitation.pk,))
         params = {
-            "user_kind": KIND_SIAE_STAFF,
+            "user_kind": KIND_EMPLOYER,
             "user_email": invitation.email,
             "channel": "invitation",
             "previous_url": previous_url,
@@ -226,7 +226,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         url = reverse("dashboard:index")
         response = mock_oauth_dance(
             self.client,
-            KIND_SIAE_STAFF,
+            KIND_EMPLOYER,
             # the login hint is different from OIDC_USERINFO["email"] which is used to create the IC account
             user_email=invitation.email,
             channel="invitation",
@@ -252,14 +252,14 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         assert not User.objects.filter(email=invitation.email).exists()
 
     def test_expired_invitation(self):
-        invitation = ExpiredSiaeStaffInvitationFactory()
+        invitation = ExpiredEmployerInvitationFactory()
         assert invitation.has_expired
 
         # User wants to join our website but it's too late!
         response = self.client.get(invitation.acceptance_link, follow=True)
         self.assertContains(response, "expirée")
 
-        user = SiaeStaffFactory(email=invitation.email)
+        user = EmployerFactory(email=invitation.email)
         self.client.force_login(user)
         join_url = reverse("invitations_views:join_siae", kwargs={"invitation_id": invitation.id})
         response = self.client.get(join_url, follow=True)
@@ -267,22 +267,22 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
 
     def test_inactive_siae(self):
         siae = SiaeFactory(convention__is_active=False)
-        invitation = SentSiaeStaffInvitationFactory(siae=siae)
-        user = SiaeStaffFactory(email=invitation.email)
+        invitation = SentEmployerInvitationFactory(siae=siae)
+        user = EmployerFactory(email=invitation.email)
         self.client.force_login(user)
         join_url = reverse("invitations_views:join_siae", kwargs={"invitation_id": invitation.id})
         response = self.client.get(join_url, follow=True)
         self.assertContains(response, escape("Cette structure n'est plus active."))
 
     def test_non_existent_invitation(self):
-        invitation = SentSiaeStaffInvitationFactory.build(
+        invitation = SentEmployerInvitationFactory.build(
             first_name="Léonie", last_name="Bathiat", email="leonie@bathiat.com"
         )
         response = self.client.get(invitation.acceptance_link, follow=True)
         assert response.status_code == 404
 
     def test_accepted_invitation(self):
-        invitation = SentSiaeStaffInvitationFactory(accepted=True)
+        invitation = SentEmployerInvitationFactory(accepted=True)
         response = self.client.get(invitation.acceptance_link, follow=True)
         self.assertContains(response, escape("Invitation acceptée"))
 
@@ -295,7 +295,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         siae = SiaeFactory(with_membership=True)
         sender = siae.members.first()
         user = SiaeFactory(convention__is_active=False, with_membership=True).members.first()
-        invitation = SentSiaeStaffInvitationFactory(
+        invitation = SentEmployerInvitationFactory(
             sender=sender,
             siae=siae,
             first_name=user.first_name,
@@ -316,7 +316,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
     def test_accept_new_user_to_inactive_siae(self):
         siae = SiaeFactory(convention__is_active=False, with_membership=True)
         sender = siae.members.first()
-        invitation = SentSiaeStaffInvitationFactory(
+        invitation = SentEmployerInvitationFactory(
             sender=sender,
             siae=siae,
             email=OIDC_USERINFO["email"],
@@ -330,7 +330,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         next_url = reverse("invitations_views:join_siae", args=(invitation.pk,))
         response = mock_oauth_dance(
             self.client,
-            KIND_SIAE_STAFF,
+            KIND_EMPLOYER,
             user_email=invitation.email,
             channel="invitation",
             previous_url=previous_url,
@@ -344,7 +344,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
 
     def test_accept_existing_user_is_not_employer(self):
         user = PrescriberOrganizationWithMembershipFactory().members.first()
-        invitation = SentSiaeStaffInvitationFactory(
+        invitation = SentEmployerInvitationFactory(
             first_name=user.first_name,
             last_name=user.last_name,
             email=user.email,
@@ -357,7 +357,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         assert not invitation.accepted
 
     def test_accept_connected_user_is_not_the_invited_user(self):
-        invitation = SentSiaeStaffInvitationFactory()
+        invitation = SentEmployerInvitationFactory()
         self.client.force_login(invitation.sender)
         response = self.client.get(invitation.acceptance_link, follow=True)
 
@@ -366,10 +366,27 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         self.assertContains(response, "Un utilisateur est déjà connecté.")
 
     def test_accept_existing_user_email_different_case(self):
-        user = SiaeStaffFactory(has_completed_welcoming_tour=True, email="HEY@example.com")
-        invitation = SentSiaeStaffInvitationFactory(
+        user = EmployerFactory(has_completed_welcoming_tour=True, email="HEY@example.com")
+        invitation = SentEmployerInvitationFactory(
             email="hey@example.com",
         )
         self.client.force_login(user)
         response = self.client.get(invitation.acceptance_link, follow=True)
         self.assert_accepted_invitation(response, invitation, user)
+
+    def test_invitatin_old_link(self):
+        # A logged in user should log out before accepting an invitation.
+        logged_in_user = EmployerFactory()
+        self.client.force_login(logged_in_user)
+        # Invitation for another user
+        invitation = SentEmployerInvitationFactory(email=logged_in_user.email)
+        acceptance_link = reverse(
+            "invitations_views:new_user",
+            kwargs={
+                "invitation_type": "siae_staff",
+                "invitation_id": invitation.pk,
+            },
+        )
+        response = self.client.get(acceptance_link, follow=True)
+        self.assertRedirects(response, reverse("welcoming_tour:index"))
+        self.assert_accepted_invitation(response, invitation, logged_in_user)

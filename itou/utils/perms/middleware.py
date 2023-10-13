@@ -52,7 +52,7 @@ class ItouCurrentOrganizationMiddleware:
 
         redirect_message = None
         if user.is_authenticated:
-            if user.is_siae_staff:
+            if user.is_employer:
                 active_memberships = list(user.siaemembership_set.filter(is_active=True).order_by("created_at"))
                 siaes = {
                     siae.pk: siae
@@ -142,7 +142,7 @@ class ItouCurrentOrganizationMiddleware:
         skip_middleware_conditions = [
             request.path in login_routes,
             request.path.startswith("/invitations/") and not request.path.startswith("/invitations/invite"),
-            request.path.startswith("/signup/siae/join"),  # siae staff about to join an siae
+            request.path.startswith("/signup/siae/join"),  # employer about to join an siae
             request.path.startswith("/signup/facilitator/join"),  # facilitator about to join an siae
             request.path == reverse("account_logout"),
             request.path.startswith("/hijack/release"),  # Allow to release hijack
@@ -154,7 +154,7 @@ class ItouCurrentOrganizationMiddleware:
         if (
             user.is_authenticated
             and user.identity_provider != IdentityProvider.INCLUSION_CONNECT
-            and user.kind in [UserKind.PRESCRIBER, UserKind.SIAE_STAFF]
+            and user.kind in [UserKind.PRESCRIBER, UserKind.EMPLOYER]
             and not request.path.startswith("/dashboard/activate_ic_account")  # Allow to access ic activation view
             and not request.path.startswith("/inclusion_connect")  # Allow to access ic views
             and settings.FORCE_IC_LOGIN  # Allow to disable on dev setup

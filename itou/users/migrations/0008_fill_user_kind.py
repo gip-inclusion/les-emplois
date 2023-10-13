@@ -13,9 +13,7 @@ def fill_user_kind(apps, _schema_editor):
     User.objects.filter(is_prescriber=True).exclude(kind=enums.UserKind.PRESCRIBER).update(
         kind=enums.UserKind.PRESCRIBER
     )
-    User.objects.filter(is_siae_staff=True).exclude(kind=enums.UserKind.SIAE_STAFF).update(
-        kind=enums.UserKind.SIAE_STAFF
-    )
+    User.objects.filter(is_siae_staff=True).exclude(kind="siae_staff").update(kind="siae_staff")
     User.objects.filter(is_labor_inspector=True).exclude(kind=enums.UserKind.LABOR_INSPECTOR).update(
         kind=enums.UserKind.LABOR_INSPECTOR
     )
