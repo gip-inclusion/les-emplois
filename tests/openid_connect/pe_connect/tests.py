@@ -290,10 +290,7 @@ class TestPoleEmploiConnect:
 
         for kind in [UserKind.PRESCRIBER, UserKind.EMPLOYER, UserKind.LABOR_INSPECTOR]:
             user = UserFactory(username=peamu_user_data.username, email=peamu_user_data.email, kind=kind)
-            if kind == UserKind.EMPLOYER:
-                mock_oauth_dance(client, expected_route="login:employer")
-            else:
-                mock_oauth_dance(client, expected_route=f"login:{kind}")
+            mock_oauth_dance(client, expected_route=f"login:{kind}")
             user.delete()
 
     def test_logout_no_id_token(self, client):

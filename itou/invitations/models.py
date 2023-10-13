@@ -230,7 +230,6 @@ class EmployerInvitation(InvitationAbstract):
     class Meta:
         verbose_name = "invitation employeur"
         verbose_name_plural = "invitations employeurs"
-        db_table = "invitations_siaestaffinvitation"
 
     @property
     def acceptance_link(self):

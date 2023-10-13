@@ -74,7 +74,7 @@ with siae_data as (
             on (siae_membership.user_id=u.id)
         inner join siaes_siae as siae
             on (siae.id=siae_membership.siae_id)
-    where u.kind='siae_staff' and siae_membership.is_active
+    where u.kind='employer' and siae_membership.is_active
 ),
 
 org_data as (

@@ -2,7 +2,7 @@
   {
     "fields": {
       "author": 6,
-      "author_kind": "siae_staff",
+      "author_kind": "employer",
       "author_prescriber_organization": null,
       "author_siae": 3850,
       "created_at": "2022-02-08T10:57:46.994Z",
@@ -16,7 +16,7 @@
   {
     "fields": {
       "author": 6,
-      "author_kind": "siae_staff",
+      "author_kind": "employer",
       "author_prescriber_organization": 996,
       "author_siae": 3850,
       "created_at": "2022-02-08T10:59:58.777Z",
