@@ -16,7 +16,7 @@ from itou.invitations.models import (
     PrescriberWithOrgInvitation,
 )
 from itou.openid_connect.inclusion_connect.enums import InclusionConnectChannel
-from itou.users.enums import KIND_EMPLOYER, KIND_LABOR_INSPECTOR, KIND_PRESCRIBER, UserKind
+from itou.users.enums import KIND_EMPLOYER, KIND_LABOR_INSPECTOR, KIND_PRESCRIBER
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.perms.institution import get_current_institution_or_404
@@ -99,10 +99,7 @@ def new_user(request, invitation_type, invitation_id):
             return redirect(invitation.acceptance_url_for_existing_user)
 
         # The user exists but he should log in first.
-        if invitation.USER_KIND == UserKind.EMPLOYER:
-            login_url = reverse("login:employer")
-        else:
-            login_url = reverse(f"login:{invitation.USER_KIND}")
+        login_url = reverse(f"login:{invitation.USER_KIND}")
         next_step_url = "{url}?next={redirect_to}".format(
             url=login_url,
             redirect_to=invitation.acceptance_url_for_existing_user,

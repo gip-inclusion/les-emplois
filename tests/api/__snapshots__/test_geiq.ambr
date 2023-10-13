@@ -151,7 +151,7 @@
         'prequalifications': list([
         ]),
         'siret_employeur': '11832575966666',
-        'source_orientation': 'siae_staff',
+        'source_orientation': 'employer',
         'type_contrat': 'APPRENTICESHIP',
         'type_prescripteur': 'PE',
         'type_qualification': 'CCN',

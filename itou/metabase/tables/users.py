@@ -11,6 +11,13 @@ TABLE.add_columns(
     [
         get_column_from_field(get_field("id"), name="id"),
         get_column_from_field(get_field("email"), name="email"),
-        get_column_from_field(get_field("kind"), name="type"),
+        # FIXME(alaurent) put back default code
+        # get_column_from_field(get_field("kind"), name="type"),
+        {
+            "name": "kind",
+            "type": "varchar",
+            "comment": "type",
+            "fn": lambda o: {"employer": "siae_staff"}.get(o.kind, o.kind),
+        },
     ]
 )

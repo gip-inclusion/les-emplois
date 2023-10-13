@@ -884,7 +884,7 @@ def test_populate_users():
             (
                 pro_user.id,
                 pro_user.email,
-                pro_user.kind,
+                "siae_staff",
                 datetime.date(2023, 2, 1),
             ),
         ]

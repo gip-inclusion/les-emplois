@@ -274,7 +274,7 @@
         3
       ],
       "sender": 4,
-      "sender_kind": "siae_staff",
+      "sender_kind": "employer",
       "sender_prescriber_organization": null,
       "sender_siae": 2653,
       "state": "processing",
