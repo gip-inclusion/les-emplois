@@ -253,6 +253,7 @@ django==4.2.6 \
     #   django-appconf
     #   django-bootstrap5
     #   django-csp
+    #   django-datadog-logger
     #   django-filter
     #   django-formtools
     #   django-hijack
@@ -282,6 +283,10 @@ django-bootstrap5==23.3 \
 django-csp==3.7 \
     --hash=sha256:01443a07723f9a479d498bd7bb63571aaa771e690f64bde515db6cdb76e8041a \
     --hash=sha256:01eda02ad3f10261c74131cdc0b5a6a62b7c7ad4fd017fbefb7a14776e0a9727
+    # via -r requirements/base.in
+django-datadog-logger==0.6.2 \
+    --hash=sha256:ede870b7e937cfa2bfc62baf2b56a05b6f37453cb2c1dc0c6ed2689e3ae9913a \
+    --hash=sha256:fa2b6d66f7c224ef0d872ce52e61ff89f43a2c3ff5ca986161b0128ef0a42653
     # via -r requirements/base.in
 django-filter==23.3 \
     --hash=sha256:015fe155582e1805b40629344e4a6cf3cc40450827d294d040b4b8c1749a9fa6 \
@@ -324,6 +329,7 @@ djangorestframework==3.14.0 \
     --hash=sha256:eb63f58c9f218e1a7d064d17a70751f528ed4e1d35547fdade9aaf4cd103fd08
     # via
     #   -r requirements/base.in
+    #   django-datadog-logger
     #   drf-spectacular
 drf-spectacular==0.26.5 \
     --hash=sha256:aee55330a774ba8a9cbdb125714d1c9ee05a8aafd3ce3be8bfd26527649aeb44 \
@@ -369,6 +375,9 @@ jmespath==1.0.1 \
     # via
     #   boto3
     #   botocore
+json-log-formatter==0.5.2 \
+    --hash=sha256:7b191ae4056468baf2b7445c5ce651bd9ee6b76b4162a479a7d85db6ae029f2d
+    # via django-datadog-logger
 jsonschema==4.18.3 \
     --hash=sha256:64b7104d72efe856bea49ca4af37a14a9eba31b40bb7238179f3803130fd34d9 \
     --hash=sha256:aab78b34c2de001c6b692232f08c21a97b436fe18e0b817bf0511046924fceef
