@@ -306,6 +306,7 @@ class CreateProlongationRequestForm(CreateProlongationForm):
                 orgs = PrescriberOrganization.objects.filter(
                     members__email=email,
                     members__is_active=True,
+                    prescribermembership__is_active=True,
                     is_authorized=True,
                 )
                 self.fields["prescriber_organization"].queryset = orgs
