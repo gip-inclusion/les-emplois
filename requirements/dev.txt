@@ -416,9 +416,9 @@ django-select2==8.1.2 \
     --hash=sha256:dc09e09299988dd7cc1f31c27582976377f0e1479101be1f3bb0d1f24216477f \
     --hash=sha256:f44685ee1c39090aade01e3ebc256702f05620f3c78a3c268440ad9a66070876
     # via -r requirements/test.txt
-django-storages==1.14.1 \
-    --hash=sha256:18cb6c305fbb2f114c11b5b7b647b6271aa251972dcd4a5651b9cee2b0bd3a8a \
-    --hash=sha256:a2c327d67792eec04c7f5f5bb2900b21f426de8a3a811cea85fac7904bdccf36
+django-storages==1.14.2 \
+    --hash=sha256:1db759346b52ada6c2efd9f23d8241ecf518813eb31db9e2589207174f58f6ad \
+    --hash=sha256:51b36af28cc5813b98d5f3dfe7459af638d84428c8df4a03990c7d74d1bea4e5
     # via -r requirements/test.txt
 django-xworkflows==1.0.0 \
     --hash=sha256:b233b5244fb864f95ba935bd3f2214c55600db6294dbca544a6f9eb14918fb06 \
