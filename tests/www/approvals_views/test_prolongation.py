@@ -17,7 +17,7 @@ from itou.utils.storage.s3 import S3Upload
 from itou.utils.widgets import DuetDatePickerWidget
 from tests.approvals.factories import ProlongationFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationWithMembershipFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import parse_response_to_soup
 
@@ -399,6 +399,13 @@ class ApprovalProlongationTest(TestCase):
         other_prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
         other_prescriber_organization.members.add(self.prescriber)
 
+        inactive_prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
+        PrescriberMembershipFactory(
+            user=self.prescriber,
+            organization=inactive_prescriber_organization,
+            is_active=False,
+        )
+
         self.client.force_login(self.siae_user)
         url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
         self.client.get(url)
@@ -418,6 +425,7 @@ class ApprovalProlongationTest(TestCase):
 
         self.assertContains(response, self.prescriber_organization)
         self.assertContains(response, other_prescriber_organization)
+        self.assertNotContains(response, inactive_prescriber_organization)
 
         error_msg = parse_response_to_soup(response, selector="div#check_prescriber_email .invalid-feedback")
         assert str(error_msg) == self.snapshot(name="prescriber is member of many organizations")
