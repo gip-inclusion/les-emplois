@@ -462,6 +462,21 @@ class TestCommandNewUsersToMailJet:
             ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Prescribers count: 0"),
             ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Orienteurs count: 0"),
             (
+                "httpx",
+                logging.INFO,
+                f'HTTP Request: POST https://api.mailjet.com/v3/REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts "HTTP/1.1 201 Created"',  # noqa: E501
+            ),
+            (
+                "httpx",
+                logging.INFO,
+                f'HTTP Request: GET https://api.mailjet.com/v3/REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts/123456789 "HTTP/1.1 200 OK"',  # noqa: E501
+            ),
+            (
+                "httpx",
+                logging.INFO,
+                f'HTTP Request: GET https://api.mailjet.com/v3/REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts/123456789 "HTTP/1.1 200 OK"',  # noqa: E501
+            ),
+            (
                 "itou.users.management.commands.new_users_to_mailjet",
                 logging.INFO,
                 f"MailJet processed batch for list ID {NEW_SIAE_LISTID} in 5025 seconds.",
@@ -577,9 +592,29 @@ class TestCommandNewUsersToMailJet:
             ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Prescribers count: 2"),
             ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Orienteurs count: 0"),
             (
+                "httpx",
+                logging.INFO,
+                f'HTTP Request: POST https://api.mailjet.com/v3/REST/contactslist/{NEW_PE_LISTID}/managemanycontacts "HTTP/1.1 201 Created"',  # noqa: E501
+            ),
+            (
+                "httpx",
+                logging.INFO,
+                f'HTTP Request: GET https://api.mailjet.com/v3/REST/contactslist/{NEW_PE_LISTID}/managemanycontacts/123456789 "HTTP/1.1 200 OK"',  # noqa: E501
+            ),
+            (
                 "itou.users.management.commands.new_users_to_mailjet",
                 logging.INFO,
                 f"MailJet processed batch for list ID {NEW_PE_LISTID} in 45 seconds.",
+            ),
+            (
+                "httpx",
+                logging.INFO,
+                f'HTTP Request: POST https://api.mailjet.com/v3/REST/contactslist/{NEW_PRESCRIBERS_LISTID}/managemanycontacts "HTTP/1.1 201 Created"',  # noqa: E501
+            ),
+            (
+                "httpx",
+                logging.INFO,
+                f'HTTP Request: GET https://api.mailjet.com/v3/REST/contactslist/{NEW_PRESCRIBERS_LISTID}/managemanycontacts/123456789 "HTTP/1.1 200 OK"',  # noqa: E501
             ),
             (
                 "itou.users.management.commands.new_users_to_mailjet",
@@ -671,6 +706,16 @@ class TestCommandNewUsersToMailJet:
             ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "PE prescribers count: 0"),
             ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Prescribers count: 0"),
             ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Orienteurs count: 3"),
+            (
+                "httpx",
+                logging.INFO,
+                f'HTTP Request: POST https://api.mailjet.com/v3/REST/contactslist/{NEW_ORIENTEURS_LISTID}/managemanycontacts "HTTP/1.1 201 Created"',  # noqa: E501
+            ),
+            (
+                "httpx",
+                logging.INFO,
+                f'HTTP Request: GET https://api.mailjet.com/v3/REST/contactslist/{NEW_ORIENTEURS_LISTID}/managemanycontacts/123456789 "HTTP/1.1 200 OK"',  # noqa: E501
+            ),
             (
                 "itou.users.management.commands.new_users_to_mailjet",
                 logging.INFO,
@@ -765,9 +810,29 @@ class TestCommandNewUsersToMailJet:
             ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Prescribers count: 0"),
             ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Orienteurs count: 0"),
             (
+                "httpx",
+                logging.INFO,
+                f'HTTP Request: POST https://api.mailjet.com/v3/REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts "HTTP/1.1 201 Created"',  # noqa: E501
+            ),
+            (
+                "httpx",
+                logging.INFO,
+                f'HTTP Request: GET https://api.mailjet.com/v3/REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts/1 "HTTP/1.1 200 OK"',  # noqa: E501
+            ),
+            (
                 "itou.users.management.commands.new_users_to_mailjet",
                 logging.INFO,
                 f"MailJet processed batch for list ID {NEW_SIAE_LISTID} in 49 seconds.",
+            ),
+            (
+                "httpx",
+                logging.INFO,
+                f'HTTP Request: POST https://api.mailjet.com/v3/REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts "HTTP/1.1 201 Created"',  # noqa: E501
+            ),
+            (
+                "httpx",
+                logging.INFO,
+                f'HTTP Request: GET https://api.mailjet.com/v3/REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts/2 "HTTP/1.1 200 OK"',  # noqa: E501
             ),
             (
                 "itou.users.management.commands.new_users_to_mailjet",
@@ -825,6 +890,16 @@ class TestCommandNewUsersToMailJet:
             ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "PE prescribers count: 0"),
             ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Prescribers count: 0"),
             ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Orienteurs count: 0"),
+            (
+                "httpx",
+                logging.INFO,
+                f'HTTP Request: POST https://api.mailjet.com/v3/REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts "HTTP/1.1 201 Created"',  # noqa: E501
+            ),
+            (
+                "httpx",
+                logging.INFO,
+                f'HTTP Request: GET https://api.mailjet.com/v3/REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts/1 "HTTP/1.1 200 OK"',  # noqa: E501
+            ),
             (
                 "itou.users.management.commands.new_users_to_mailjet",
                 logging.ERROR,

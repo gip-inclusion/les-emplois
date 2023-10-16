@@ -106,7 +106,10 @@ INSTALLED_APPS = [
 ]
 
 
-DJANGO_MIDDLEWARES = [
+MIDDLEWARE = [
+    # Generate request Id
+    "django_datadog_logger.middleware.request_id.RequestIdMiddleware",
+    # Django stack
     "django.middleware.gzip.GZipMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -115,22 +118,19 @@ DJANGO_MIDDLEWARES = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-]
-
-THIRD_PARTY_MIDDLEWARES = [
+    # Third party
     "allauth.account.middleware.AccountMiddleware",
     "csp.middleware.CSPMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
     "hijack.middleware.HijackUserMiddleware",
-]
-
-ITOU_MIDDLEWARES = [
+    # Itou specific
     "itou.utils.new_dns.middleware.NewDnsRedirectMiddleware",
     "itou.utils.perms.middleware.ItouCurrentOrganizationMiddleware",
     "itou.www.middleware.never_cache",
+    # Final logger
+    "django_datadog_logger.middleware.error_log.ErrorLoggingMiddleware",
+    "django_datadog_logger.middleware.request_log.RequestLoggingMiddleware",
 ]
-
-MIDDLEWARE = DJANGO_MIDDLEWARES + THIRD_PARTY_MIDDLEWARES + ITOU_MIDDLEWARES
 
 ROOT_URLCONF = "config.urls"
 
@@ -261,26 +261,20 @@ SESSION_SERIALIZER = "itou.utils.session.JSONSerializer"
 
 X_FRAME_OPTIONS = "DENY"
 
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "handlers": {
-        "console": {"class": "logging.StreamHandler"},
-        "null": {"class": "logging.NullHandler"},
-        "api_console": {
-            "class": "logging.StreamHandler",
-            "formatter": "api_simple",
-        },
-    },
     "formatters": {
-        "api_simple": {
-            "format": "{levelname} {asctime} {pathname} : {message}",
-            "style": "{",
-        },
+        "json": {"()": "itou.utils.logging.ItouDataDogJSONFormatter"},
+    },
+    "handlers": {
+        "console": {"class": "logging.StreamHandler", "formatter": "json"},
+        "null": {"class": "logging.NullHandler"},
     },
     "loggers": {
+        "": {"handlers": ["console"], "level": "INFO"},
         "django": {
-            "handlers": ["console"],
             "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
         },
         # Silence `Invalid HTTP_HOST header` errors.
@@ -291,18 +285,15 @@ LOGGING = {
             "propagate": False,
         },
         "itou": {
-            "handlers": ["console"],
             "level": os.getenv("ITOU_LOG_LEVEL", "INFO"),
         },
         # Logger for DRF API application
         # Will be "log-drained": may need to adjust format
         "api_drf": {
-            "handlers": ["api_console"],
             "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
         },
         # Huey; async tasks
         "huey": {
-            "handlers": ["console"],
             "level": os.getenv("HUEY_LOG_LEVEL", "WARNING"),
         },
     },
