@@ -44,6 +44,9 @@ django-formtools  # https://django-formtools.readthedocs.io/en/latest/
 # Django storages (storing files on S3-like services)
 django-storages  # https://github.com/jschneier/django-storages
 
+# Datadog logger (who could have guessed?!)
+django-datadog-logger
+
 # Front-end
 # ------------------------------------------------------------------------------
 
