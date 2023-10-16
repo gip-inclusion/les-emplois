@@ -507,7 +507,7 @@ class ApplyAsJobSeekerTest(TestCase):
             """
             <div id="form_errors">
                 <div class="alert alert-danger" role="alert">
-                    Le fichier doit avoir l’extension “.pdf”.
+                    L&#x27;extension de fichier « txt » n’est pas autorisée. Les extensions autorisées sont : pdf.
                 </div>
             </div>
             """,

@@ -1,8 +1,7 @@
-import pathlib
-
 import pypdf
 import pypdf.errors
 from django import forms
+from django.core.validators import FileExtensionValidator
 from django.utils.formats import localize
 from django.utils.html import format_html
 from openpyxl import load_workbook
@@ -34,9 +33,11 @@ class ContentTypeValidator:
     content_type = None
     extension = None
 
+    def __init__(self):
+        self.extension_validator = FileExtensionValidator(allowed_extensions=[self.extension])
+
     def __call__(self, data):
-        if pathlib.Path(data.name).suffix.lower() != f".{self.extension}":
-            raise forms.ValidationError(f"Le fichier doit avoir l’extension “.{self.extension}”.")
+        self.extension_validator(data)
         if data.content_type != self.content_type:
             raise forms.ValidationError(f"Le fichier doit être de type “{self.content_type}”.")
         self.validate(data)
