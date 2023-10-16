@@ -408,9 +408,9 @@ django-import-export==3.3.1 \
     --hash=sha256:88ecaf06be06bd95d97cf34f3c911c56c012a7a81712a8956740e5bfc2465162 \
     --hash=sha256:d02e31908c965d512cc6f7ef6e72935177647b15d3846050d0f094177fca0d86
     # via -r requirements/test.txt
-django-pgtrigger==4.7.0 \
-    --hash=sha256:20a4139cccb17b75d065fbfd2cc8f47e3696379d7be4139ef6a67c8d14897a8d \
-    --hash=sha256:978e998f5c7bdfaf3edbb01c2075be329ce679bd87a89c5bfdf95405905885bd
+django-pgtrigger==4.9.0 \
+    --hash=sha256:45220796e1aae68893df4490c5d5a386dd293254bf619bd51898d26ee13372d3 \
+    --hash=sha256:d079566bd6d4a2235149754d7b7fb64f880905f54628865ae4ea1eb12d34779c
     # via -r requirements/test.txt
 django-select2==8.1.2 \
     --hash=sha256:dc09e09299988dd7cc1f31c27582976377f0e1479101be1f3bb0d1f24216477f \
