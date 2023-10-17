@@ -1,7 +1,7 @@
 import re
 
 from django.conf import settings
-from django.db import migrations, models, transaction
+from django.db import migrations, transaction
 
 
 def forwards(apps, schema_editor):
@@ -34,15 +34,5 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunPython(forwards, migrations.RunPython.noop, elidable=True),
-        migrations.AlterField(
-            model_name="evaluatedadministrativecriteria",
-            name="proof_url",
-            field=models.URLField(blank=True, null=True, max_length=500, verbose_name="lien vers le justificatif"),
-        ),
-        migrations.SeparateDatabaseAndState(
-            database_operations=[],
-            state_operations=[
-                migrations.RemoveField(model_name="evaluatedadministrativecriteria", name="proof_url"),
-            ],
-        ),
+        migrations.RemoveField(model_name="evaluatedadministrativecriteria", name="proof_url"),
     ]
