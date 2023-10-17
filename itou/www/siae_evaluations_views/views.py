@@ -24,7 +24,6 @@ from itou.siae_evaluations.models import (
     EvaluationCampaign,
     Sanctions,
 )
-from itou.siaes.models import Siae
 from itou.utils.emails import send_email_messages
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
@@ -83,7 +82,7 @@ def campaign_calendar(request, evaluation_campaign_pk, template_name="siae_evalu
 
     back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
 
-    if isinstance(request.current_organization, Siae):
+    if request.user.is_employer:
         evaluated_siae = get_object_or_404(
             EvaluatedSiae,
             evaluation_campaign=evaluation_campaign,
