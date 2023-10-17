@@ -350,11 +350,14 @@ class JobApplicationQuerySet(models.QuerySet):
             )
             .filter(
                 # Must be linked to an approval with a Suspension or a Prolongation
-                Q(has_recent_suspension=True) | Q(has_recent_prolongation=True),
+                # Bypass the `create_employee_record` flag for Prolongation because:
+                # - Job applications created for the AI stock all have the flag, but we need to send the new end date.
+                # - Enabling it for Suspension will create *a lot* of "FS actualisation" which will create a lot of
+                #   messages to the support, like when we introduced them the first time.
+                # - Prolongation will always block the employer, it's a much rarer case for Suspension.
+                Q(has_recent_suspension=True, create_employee_record=True) | Q(has_recent_prolongation=True),
                 # Only for that SIAE
                 to_siae=siae,
-                # Admin control: can prevent creation of employee record
-                create_employee_record=True,
                 # There must be **NO** employee record linked in this part
                 employee_record__isnull=True,
             )
