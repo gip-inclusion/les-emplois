@@ -27,6 +27,6 @@ htmx.onLoad((target) => {
         noLoading.removeClass('d-none').addClass('d-block')
       }
     }).keydown(e => {
-      searchButton.prop('"disabled', true)
+      searchButton.prop('disabled', true)
     })
 });
