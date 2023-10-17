@@ -109,6 +109,9 @@ def _add_user_kind_error_message(request, existing_user, new_user_kind):
 def inclusion_connect_authorize(request):
     # Start a new session.
     user_kind = request.GET.get("user_kind")
+    # FIXME(alaurent) Remove in november
+    if user_kind == "siae_staff":
+        user_kind = UserKind.EMPLOYER
     previous_url = request.GET.get("previous_url", reverse("search:siaes_home"))
     next_url = request.GET.get("next_url")
     register = request.GET.get("register")
@@ -282,6 +285,9 @@ def inclusion_connect_callback(request):
         return _redirect_to_login_page_on_error(error_msg="Sub parameter error.", request=request)
 
     user_kind = ic_state.data["user_kind"]
+    # FIXME(alaurent) Remove in november
+    if user_kind == "siae_staff":
+        user_kind = UserKind.EMPLOYER
     is_successful = True
     ic_user_data = USER_DATA_CLASSES[user_kind].from_user_info(user_data)
     ic_session_email = ic_state.data.get("user_email")
