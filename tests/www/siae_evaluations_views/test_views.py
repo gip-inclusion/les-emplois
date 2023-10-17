@@ -502,3 +502,31 @@ class TestViewProof:
         client.force_login(membership.user)
         response = client.get(url)
         assert response.status_code == 404
+
+
+def test_active_campaign_calendar_for_admin_no_crash(admin_client):
+    calendar_html = """
+        <table class="table">
+            <thead class="thead-light">
+                <tr>
+                    <th></th>
+                    <th scope="col">Dates</th>
+                    <th scope="col">Acteurs</th>
+                    <th scope="col">Actions attendues</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row">Phase 1</th>
+                    <td>Du 15 mai 2023 au 11 juin 2023</td>
+
+                    <td>DDETS</td>
+                    <td>Sélection du taux de SIAE</td>
+                </tr>
+            </tbody>
+        </table>
+    """
+    evaluation_campaign = EvaluationCampaignFactory(calendar__html=calendar_html)
+    calendar_url = reverse("siae_evaluations_views:campaign_calendar", args=[evaluation_campaign.pk])
+    response = admin_client.get(calendar_url)
+    assert response.status_code == 200
