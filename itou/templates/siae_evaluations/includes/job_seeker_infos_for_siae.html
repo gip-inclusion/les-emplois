@@ -19,6 +19,8 @@
                 <p class="badge badge-pill badge-communaute-light float-right">transmis</p>
             {% elif state == "REFUSED" %}
                 <p class="badge badge-pill badge-danger float-right">problème constaté</p>
+            {% elif state == "PROCESSING" %}
+                <p class="badge badge-pill badge-pilotage float-right">à traiter</p>
             {% else %}
                 <p class="badge badge-pill badge-pilotage float-right">nouveaux justificatifs à traiter</p>
             {% endif %}
