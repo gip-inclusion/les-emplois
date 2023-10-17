@@ -516,11 +516,35 @@ class JobApplicationQuerySetTest(TestCase):
             approval=job_app.approval,
         )
         assert job_app in JobApplication.objects.eligible_as_employee_record(job_app.to_siae)
+        # No employee record, but with a suspension, and `create_employee_record` is False
+        job_app = JobApplicationFactory(
+            with_approval=True,
+            hiring_start_at=None,
+            create_employee_record=False,
+        )
+        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_siae)
+        SuspensionFactory(
+            siae=job_app.to_siae,
+            approval=job_app.approval,
+        )
+        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_siae)
         # No employee record, but with a prolongation
         job_app = JobApplicationFactory(
             with_approval=True,
             state=JobApplicationWorkflow.STATE_ACCEPTED,
             hiring_start_at=None,
+        )
+        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_siae)
+        ProlongationFactory(
+            declared_by_siae=job_app.to_siae,
+            approval=job_app.approval,
+        )
+        assert job_app in JobApplication.objects.eligible_as_employee_record(job_app.to_siae)
+        # No employee record, but with a prolongation, and `create_employee_record` is False
+        job_app = JobApplicationFactory(
+            with_approval=True,
+            hiring_start_at=None,
+            create_employee_record=False,
         )
         assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_siae)
         ProlongationFactory(
