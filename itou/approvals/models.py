@@ -1031,21 +1031,23 @@ class Suspension(models.Model):
                 }
             )
 
-        # The start of a suspension must be contained in its approval boundaries.
-        if not self.start_in_approval_boundaries:
-            raise ValidationError(
-                {
-                    "start_at": (
-                        "La suspension ne peut pas commencer en dehors des limites du PASS IAE "
-                        f"{self.approval.start_at:%d/%m/%Y} - {self.approval.end_at:%d/%m/%Y}."
-                    )
-                }
-            )
+        # Don't compate to approval if not present : it crashes.
+        if self.approval_id:
+            # The start of a suspension must be contained in its approval boundaries.
+            if not self.start_in_approval_boundaries:
+                raise ValidationError(
+                    {
+                        "start_at": (
+                            "La suspension ne peut pas commencer en dehors des limites du PASS IAE "
+                            f"{self.approval.start_at:%d/%m/%Y} - {self.approval.end_at:%d/%m/%Y}."
+                        )
+                    }
+                )
 
-        referent_date = self.created_at.date() if self.pk else None
-        next_min_start_at = self.next_min_start_at(self.approval, self.pk, referent_date, False)
-        if next_min_start_at and self.start_at < next_min_start_at:
-            raise ValidationError({"start_at": (f"La date de début minimum est : {next_min_start_at:%d/%m/%Y}.")})
+            referent_date = self.created_at.date() if self.pk else None
+            next_min_start_at = self.next_min_start_at(self.approval, self.pk, referent_date, False)
+            if next_min_start_at and self.start_at < next_min_start_at:
+                raise ValidationError({"start_at": (f"La date de début minimum est : {next_min_start_at:%d/%m/%Y}.")})
 
     @property
     def duration(self):

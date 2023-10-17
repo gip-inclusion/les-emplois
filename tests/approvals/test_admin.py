@@ -62,3 +62,11 @@ def test_prolongation_report_file_filter(admin_client):
     response = admin_client.get(reverse("admin:approvals_prolongation_changelist") + "?report_file=no", follow=True)
     assertNotContains(response, prolongation.approval.number)
     assertNotContains(response, prolongation.declared_by)
+
+
+def test_create_suspensionç_with_no_approval_does_raise_500(admin_client):
+    response = admin_client.post(
+        reverse("admin:approvals_suspension_add"),
+        data={},
+    )
+    assert response.status_code == 200
