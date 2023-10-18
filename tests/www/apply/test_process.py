@@ -17,8 +17,7 @@ from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siae_evaluations.models import Sanctions
 from itou.siaes.enums import ContractType, SiaeKind
-from itou.users.enums import LackOfNIRReason, UserKind
-from itou.users.models import User
+from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId, UserKind
 from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.format_filters import format_nir
 from itou.utils.widgets import DuetDatePickerWidget
@@ -555,7 +554,7 @@ class ProcessViewsTest(TestCase):
             # The state of the 3 `pole_emploi_*` fields will trigger a manual delivery.
             job_seeker__nir="",
             job_seeker__pole_emploi_id="",
-            job_seeker__lack_of_pole_emploi_id_reason=User.REASON_FORGOTTEN,
+            job_seeker__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
         )
 
         siae_user = job_application.to_siae.members.first()

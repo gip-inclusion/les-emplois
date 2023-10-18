@@ -37,7 +37,7 @@ from itou.utils.apis.exceptions import AddressLookupError
 from itou.utils.models import UniqueConstraintWithErrorCode
 from itou.utils.validators import validate_birthdate, validate_nir, validate_pole_emploi_id
 
-from .enums import IdentityProvider, LackOfNIRReason, Title, UserKind
+from .enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title, UserKind
 
 
 class ApprovalAlreadyExistsError(Exception):
@@ -155,13 +155,6 @@ class User(AbstractUser, AddressMixin):
     More details in `itou.external_data.models` module
     """
 
-    REASON_FORGOTTEN = "FORGOTTEN"
-    REASON_NOT_REGISTERED = "NOT_REGISTERED"
-    REASON_CHOICES = (
-        (REASON_FORGOTTEN, "Identifiant Pôle emploi oublié"),
-        (REASON_NOT_REGISTERED, "Non inscrit auprès de Pôle emploi"),
-    )
-
     ERROR_EMAIL_ALREADY_EXISTS = "Cet e-mail existe déjà."
 
     title = models.CharField(
@@ -240,7 +233,7 @@ class User(AbstractUser, AddressMixin):
             "pour effectuer manuellement les vérifications d’usage."
         ),
         max_length=30,
-        choices=REASON_CHOICES,
+        choices=LackOfPoleEmploiId.choices,
         blank=True,
     )
     resume_link = models.URLField(max_length=500, verbose_name="lien vers un CV", blank=True)

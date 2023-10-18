@@ -33,7 +33,7 @@ from itou.job_applications.models import JobApplication, JobApplicationTransitio
 from itou.job_applications.notifications import NewQualifiedJobAppEmployersNotification
 from itou.jobs.models import Appellation
 from itou.siaes.enums import ContractType, SiaeKind
-from itou.users.enums import Title
+from itou.users.enums import LackOfPoleEmploiId, Title
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.templatetags import format_filters
@@ -942,7 +942,7 @@ class JobApplicationNotificationsTest(TestCase):
     def test_manually_deliver_approval(self, *args, **kwargs):
         staff_member = ItouStaffFactory()
         job_seeker = JobSeekerFactory(
-            nir="", pole_emploi_id="", lack_of_pole_emploi_id_reason=JobSeekerFactory._meta.model.REASON_FORGOTTEN
+            nir="", pole_emploi_id="", lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN
         )
         approval = ApprovalFactory(user=job_seeker)
         job_application = JobApplicationFactory(
@@ -965,7 +965,7 @@ class JobApplicationNotificationsTest(TestCase):
     def test_manually_refuse_approval(self):
         staff_member = ItouStaffFactory()
         job_seeker = JobSeekerFactory(
-            nir="", pole_emploi_id="", lack_of_pole_emploi_id_reason=JobSeekerFactory._meta.model.REASON_FORGOTTEN
+            nir="", pole_emploi_id="", lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN
         )
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
@@ -1261,7 +1261,7 @@ class JobApplicationWorkflowTest(TestCase):
         When a Pôle emploi ID is forgotten, a manual approval delivery is triggered.
         """
         job_seeker = JobSeekerFactory(
-            nir="", pole_emploi_id="", lack_of_pole_emploi_id_reason=JobSeekerFactory._meta.model.REASON_FORGOTTEN
+            nir="", pole_emploi_id="", lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN
         )
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_PROCESSING
@@ -1314,7 +1314,7 @@ class JobApplicationWorkflowTest(TestCase):
 
     def test_accept_job_application_sent_by_job_seeker_unregistered_no_pe_approval(self, notify_mock):
         job_seeker = JobSeekerFactory(
-            nir="", pole_emploi_id="", lack_of_pole_emploi_id_reason=JobSeekerFactory._meta.model.REASON_NOT_REGISTERED
+            nir="", pole_emploi_id="", lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_NOT_REGISTERED
         )
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker,

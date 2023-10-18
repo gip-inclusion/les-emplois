@@ -39,3 +39,8 @@ class LackOfNIRReason(models.TextChoices):
         "NIR_ASSOCIATED_TO_OTHER",
         "Le numéro de sécurité sociale est associé à quelqu'un d'autre",
     )
+
+
+class LackOfPoleEmploiId(models.TextChoices):
+    REASON_FORGOTTEN = "FORGOTTEN", "Identifiant Pôle emploi oublié"
+    REASON_NOT_REGISTERED = "NOT_REGISTERED", "Non inscrit auprès de Pôle emploi"

@@ -23,7 +23,7 @@ from itou.job_applications.enums import QualificationLevel, QualificationType, S
 from itou.job_applications.models import JobApplication
 from itou.siae_evaluations.models import Sanctions
 from itou.siaes.enums import ContractType, SiaeKind
-from itou.users.enums import LackOfNIRReason
+from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId
 from itou.users.models import User
 from itou.utils.models import InclusiveDateRange
 from itou.utils.session import SessionNamespace
@@ -754,7 +754,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         }
         expected_job_seeker_session["user"] |= {
             "pole_emploi_id": "",
-            "lack_of_pole_emploi_id_reason": User.REASON_NOT_REGISTERED,
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
         }
         assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -994,7 +994,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         }
         expected_job_seeker_session["user"] |= {
             "pole_emploi_id": "",
-            "lack_of_pole_emploi_id_reason": User.REASON_NOT_REGISTERED,
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
         }
         assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -1265,7 +1265,7 @@ class ApplyAsPrescriberTest(TestCase):
         }
         expected_job_seeker_session["user"] |= {
             "pole_emploi_id": "",
-            "lack_of_pole_emploi_id_reason": User.REASON_NOT_REGISTERED,
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
         }
         assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -1706,7 +1706,7 @@ class ApplyAsSiaeTest(TestCase):
         }
         expected_job_seeker_session["user"] |= {
             "pole_emploi_id": "",
-            "lack_of_pole_emploi_id_reason": User.REASON_NOT_REGISTERED,
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
         }
         assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -1968,7 +1968,7 @@ class DirectHireFullProcessTest(TestCase):
         }
         expected_job_seeker_session["user"] |= {
             "pole_emploi_id": "",
-            "lack_of_pole_emploi_id_reason": User.REASON_NOT_REGISTERED,
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
         }
         assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -2599,7 +2599,7 @@ class UpdateJobSeekerBaseTestCase(TestCase):
         }
         expected_job_seeker_session["user"] |= {
             "pole_emploi_id": "",
-            "lack_of_pole_emploi_id_reason": User.REASON_NOT_REGISTERED,
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
         }
         assert self.client.session[self.job_seeker_session_key] == expected_job_seeker_session
         self.job_seeker.refresh_from_db()
@@ -2692,7 +2692,7 @@ class UpdateJobSeekerBaseTestCase(TestCase):
         }
         expected_job_seeker_session["user"] |= {
             "pole_emploi_id": "",
-            "lack_of_pole_emploi_id_reason": User.REASON_NOT_REGISTERED,
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
         }
         assert self.client.session[self.job_seeker_session_key] == expected_job_seeker_session
         self.job_seeker.refresh_from_db()

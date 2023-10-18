@@ -28,7 +28,7 @@ from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.constants import CAMPAIGN_VIEWABLE_DURATION
 from itou.siae_evaluations.models import Sanctions
 from itou.siaes.enums import SiaeKind
-from itou.users.enums import IdentityProvider, LackOfNIRReason, UserKind
+from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.models import InclusiveDateRange
@@ -751,7 +751,7 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
             "last_name": "Saint Clar",
             "birthdate": "20/12/1978",
             "phone": "0610203050",
-            "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
             "address_line_1": "10, rue du Gué",
             "address_line_2": "Sous l'escalier",
             "post_code": "35400",
@@ -790,7 +790,7 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
             "last_name": "Saint Clar",
             "birthdate": "20/12/1978",
             "phone": "0610203050",
-            "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
             "address_line_1": "10, rue du Gué",
             "address_line_2": "Sous l'escalier",
             "post_code": "35400",
@@ -821,7 +821,7 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
             "last_name": "Saint Clar",
             "birthdate": "20/12/1978",
             "phone": "0610203050",
-            "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
             "address_line_1": "10, rue du Gué",
             "address_line_2": "Sous l'escalier",
             "post_code": "35400",
@@ -854,7 +854,7 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
             "last_name": "Saint Clar",
             "birthdate": "20/12/1978",
             "phone": "0610203050",
-            "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
             "address_line_1": "10, rue du Gué",
             "address_line_2": "Sous l'escalier",
             "post_code": "35400",
@@ -978,7 +978,7 @@ class EditJobSeekerInfo(TestCase):
             "first_name": "Bob",
             "last_name": "Saint Clar",
             "birthdate": "20/12/1978",
-            "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
             "address_line_1": "10, rue du Gué",
             "post_code": "35400",
             "city": "Saint-Malo",
@@ -1038,7 +1038,7 @@ class EditJobSeekerInfo(TestCase):
             "first_name": "Bob",
             "last_name": "Saint Clar",
             "birthdate": "20/12/1978",
-            "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
             "address_line_1": "10, rue du Gué",
             "post_code": "35400",
             "city": "Saint-Malo",
@@ -1082,7 +1082,7 @@ class EditJobSeekerInfo(TestCase):
             "first_name": "Bob",
             "last_name": "Saint Clar",
             "birthdate": "20/12/1978",
-            "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
             "address_line_1": "10, rue du Gué",
             "post_code": "35400",
             "city": "Saint-Malo",
@@ -1222,7 +1222,7 @@ class EditJobSeekerInfo(TestCase):
         post_data = {
             "email": new_email,
             "birthdate": "20/12/1978",
-            "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
             "address_line_1": "10, rue du Gué",
             "post_code": "35400",
             "city": "Saint-Malo",
@@ -1272,7 +1272,7 @@ class EditJobSeekerInfo(TestCase):
         post_data = {
             "email": new_email,
             "birthdate": "20/12/1978",
-            "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
             "address_line_1": "10, rue du Gué",
             "post_code": "35400",
             "city": "Saint-Malo",
@@ -1314,7 +1314,7 @@ class EditJobSeekerInfo(TestCase):
         post_data = {
             "email": user.email,
             "birthdate": "20/12/1978",
-            "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
             "address_line_1": "",
             "post_code": "35400",
             "city": "Saint-Malo",
