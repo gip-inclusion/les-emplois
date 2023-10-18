@@ -61,25 +61,35 @@ def cities_autocomplete(request):
 
 def jobs_autocomplete(request):
     """
-    Returns JSON data compliant with the jQuery UI Autocomplete Widget:
-    https://api.jqueryui.com/autocomplete/#option-source
+    Returns JSON data compliant with either the jQuery UI Autocomplete Widget or Select2
     """
 
     term = request.GET.get("term", "").strip()
+    # TODO(xfernandez): drop legacy support in a few weeks and only keep select2 mode
+    select2_mode = "select2" in request.GET
     appellations = []
 
     if term:
-        appellations = [
-            {
-                "value": f"{appellation.name} ({appellation.rome.code})",
-                "code": appellation.code,
-                "rome": appellation.rome.code,
-                "name": appellation.name,
-            }
-            for appellation in Appellation.objects.autocomplete(term, limit=10)
-        ]
+        if select2_mode:
+            appellations = [
+                {
+                    "text": f"{appellation.name} ({appellation.rome.code})",
+                    "id": appellation.pk,
+                }
+                for appellation in Appellation.objects.autocomplete(term, limit=10)
+            ]
+        else:
+            appellations = [
+                {
+                    "value": f"{appellation.name} ({appellation.rome.code})",
+                    "code": appellation.code,
+                    "rome": appellation.rome.code,
+                    "name": appellation.name,
+                }
+                for appellation in Appellation.objects.autocomplete(term, limit=10)
+            ]
 
-    return JsonResponse(appellations, safe=False)
+    return JsonResponse({"results": appellations} if select2_mode else appellations, safe=False)
 
 
 def communes_autocomplete(request):
