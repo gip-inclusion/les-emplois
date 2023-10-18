@@ -420,7 +420,7 @@ ASP_ITOU_PREFIX = "99999"
 PILOTAGE_DASHBOARDS_WHITELIST = json.loads(
     os.getenv(
         "PILOTAGE_DASHBOARDS_WHITELIST",
-        "[63, 90, 32, 52, 54, 116, 43, 136, 140, 129, 150, 217, 218, 216, 300, 306, 336]",
+        "[90, 32, 52, 54, 116, 43, 136, 140, 129, 150, 217, 218, 216, 236, 300, 306, 336]",
     )
 )
 
