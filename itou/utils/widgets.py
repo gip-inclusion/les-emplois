@@ -2,9 +2,13 @@
 Specific widgets used in forms.
 """
 import datetime
+import operator
 
 from django import forms
 from django.contrib.gis.forms import widgets as gis_widgets
+from django.db.models import Q
+from django.forms.models import ModelChoiceIterator
+from django_select2.forms import Select2Widget
 
 from itou.utils.validators import get_max_birthdate, get_min_birthdate
 
@@ -107,3 +111,39 @@ class OSMWidget(gis_widgets.OSMWidget):
             "all": ["vendor/ol/ol.css"],
         }
         js = ["vendor/ol/ol.js"]
+
+
+class RemoteAutocompleteSelect2Widget(Select2Widget):
+    def __init__(self, *args, label_from_instance=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        # This function must match what the autocomplete view specified via data-ajax--url returns as text
+        if label_from_instance is None:
+            label_from_instance = operator.methodcaller("autocomplete_display")
+        self.label_from_instance = label_from_instance
+
+    # This comes directly from django_select2's ModelSelect2Mixin
+    # and avoid the inclusion of all the possible values in the rendered HTML
+    def optgroups(self, name, value, attrs=None):
+        """Return only selected options and set QuerySet from `ModelChoicesIterator`."""
+        default = (None, [], 0)
+        groups = [default]
+        has_selected = False
+        selected_choices = {str(v) for v in value}
+        if not self.is_required and not self.allow_multiple_selected:
+            default[1].append(self.create_option(name, "", "", False, 0))
+        if not isinstance(self.choices, ModelChoiceIterator):
+            return super().optgroups(name, value, attrs=attrs)
+        selected_choices = {c for c in selected_choices if c not in self.choices.field.empty_values}
+        field_name = self.choices.field.to_field_name or "pk"
+        query = Q(**{"%s__in" % field_name: selected_choices})
+        for obj in self.choices.queryset.filter(query):
+            option_value = self.choices.choice(obj)[0]
+            option_label = self.label_from_instance(obj)
+
+            selected = str(option_value) in value and (has_selected is False or self.allow_multiple_selected)
+            if selected is True and has_selected is False:
+                has_selected = True
+            index = len(default[1])
+            subgroup = default[1]
+            subgroup.append(self.create_option(name, option_value, option_label, selected_choices, index))
+        return groups
