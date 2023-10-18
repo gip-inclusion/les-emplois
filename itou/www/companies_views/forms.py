@@ -3,6 +3,7 @@ from django.db.models.fields import BLANK_CHOICE_DASH
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.safestring import mark_safe
+from django.utils.text import format_lazy
 
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS, department_from_postcode
@@ -11,6 +12,7 @@ from itou.companies.models import Siae, SiaeJobDescription, SiaeMembership
 from itou.jobs.models import Appellation
 from itou.utils import constants as global_constants
 from itou.utils.urls import get_external_link_markup
+from itou.utils.widgets import RemoteAutocompleteSelect2Widget
 
 
 class CreateSiaeForm(forms.ModelForm):
@@ -221,24 +223,18 @@ class JobAppellationAndLocationMixin(forms.Form):
     # NB we need to inherit from forms.Form if we want the attributes
     # to be added to the a Form using this mixin (django magic)
 
-    # See: itou/static/js/job_autocomplete.js
-    job_appellation = forms.CharField(
+    job_appellation = forms.ModelChoiceField(
+        queryset=Appellation.objects,
         label="Poste (code ROME)",
-        widget=forms.TextInput(
+        widget=RemoteAutocompleteSelect2Widget(
             attrs={
-                "class": "js-job-autocomplete-input form-control",
-                "data-autosubmit-on-enter-pressed": 0,
-                "data-autocomplete-source-url": reverse_lazy("autocomplete:jobs"),
-                "placeholder": "Ex. K2204 ou agent/agente d'entretien en crèche.",
-                "autocomplete": "off",
-            }
+                "data-ajax--url": format_lazy("{}?select2=", reverse_lazy("autocomplete:jobs")),
+                "data-ajax--cache": "true",
+                "data-ajax--type": "GET",
+                "data-minimum-input-length": 2,
+                "data-placeholder": "Ex. K2204 ou agent/agente d'entretien en crèche.",
+            },
         ),
-        required=False,
-    )
-    # Hidden placeholder field for "real" job appellation.
-    job_appellation_code = forms.CharField(
-        max_length=6,
-        widget=forms.HiddenInput(attrs={"class": "js-job-autocomplete-hidden form-control"}),
         required=False,
     )
 
@@ -267,7 +263,6 @@ class JobAppellationAndLocationMixin(forms.Form):
         model = SiaeJobDescription
         fields = [
             "job_appellation",
-            "job_appellation_code",
             "custom_name",
             "location_label",
             "location_code",
@@ -288,15 +283,6 @@ class JobAppellationAndLocationMixin(forms.Form):
             "other_contract_type": "Veuillez préciser quel est le type de contrat.",
         }
 
-    def clean_job_appellation_code(self):
-        if job_appellation_code := self.cleaned_data.get("job_appellation_code"):
-            try:
-                Appellation.objects.get(code=job_appellation_code)
-            except Appellation.DoesNotExist:
-                raise forms.ValidationError("Le poste n'est pas correctement renseigné")
-            else:
-                return job_appellation_code
-
 
 # SIAE job descriptions forms (2 steps and session based)
 class EditJobDescriptionForm(JobAppellationAndLocationMixin, forms.ModelForm):
@@ -305,11 +291,9 @@ class EditJobDescriptionForm(JobAppellationAndLocationMixin, forms.ModelForm):
         self.instance.siae = current_siae
 
         self.fields["job_appellation"].required = True
-        self.fields["job_appellation_code"].required = True
 
         if self.instance.pk:
-            self.fields["job_appellation"].initial = self.instance.appellation.name
-            self.fields["job_appellation_code"].initial = self.instance.appellation.code
+            self.fields["job_appellation"].initial = self.instance.appellation.pk
 
             if self.instance.location:
                 # Optional field
@@ -340,7 +324,6 @@ class EditJobDescriptionForm(JobAppellationAndLocationMixin, forms.ModelForm):
         model = SiaeJobDescription
         fields = [
             "job_appellation",
-            "job_appellation_code",
             "custom_name",
             "location_label",
             "location_code",
@@ -361,12 +344,6 @@ class EditJobDescriptionForm(JobAppellationAndLocationMixin, forms.ModelForm):
             "other_contract_type": "Veuillez préciser quel est le type de contrat.",
         }
 
-    def clean_job_appellation_code(self):
-        job_appellation_code = self.cleaned_data.get("job_appellation_code")
-        if not job_appellation_code:
-            raise forms.ValidationError("Le poste n'est pas correctement renseigné.")
-        return int(job_appellation_code)
-
     def clean_open_positions(self):
         open_positions = self.cleaned_data.get("open_positions")
         if open_positions is not None and open_positions < 1:
@@ -374,11 +351,7 @@ class EditJobDescriptionForm(JobAppellationAndLocationMixin, forms.ModelForm):
         return open_positions
 
     def clean(self):
-        # Bind `Appellation` and `City` objects
-        appellation_code = self.cleaned_data.get("job_appellation_code")
-        if appellation_code:
-            self.instance.appellation = Appellation.objects.get(code=appellation_code)
-
+        # Bind `City` object
         location_code = self.cleaned_data.get("location_code")
         if location_code:
             self.instance.location = City.objects.get(slug=location_code)

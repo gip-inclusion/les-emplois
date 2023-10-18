@@ -2233,7 +2233,7 @@ def test_select_other_job_description_for_job_application(client):
     assert response.status_code == 200
 
     appellation = Appellation.objects.order_by("?").first()
-    data |= {"job_appellation_code": appellation.pk}
+    data |= {"job_appellation": appellation.pk}
     response = client.post(url, data=data)
     assert response.status_code == 200
 

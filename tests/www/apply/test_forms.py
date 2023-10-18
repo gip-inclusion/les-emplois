@@ -102,7 +102,6 @@ class TestAcceptForm:
             "hiring_end_at",
             "hiring_start_at",
             "job_appellation",
-            "job_appellation_code",
             "location_code",
             "location_label",
         ]
@@ -118,7 +117,6 @@ class TestAcceptForm:
             "hiring_start_at",
             "inverted_vae_contract",
             "job_appellation",
-            "job_appellation_code",
             "location_code",
             "location_label",
             "nb_hours_per_week",
