@@ -20,7 +20,7 @@ from itou.asp.models import AllocationDuration, EducationLevel, EmployerType
 from itou.job_applications.enums import Origin
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.enums import SiaeKind
-from itou.users.enums import IdentityProvider, LackOfNIRReason, Title, UserKind
+from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title, UserKind
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, RESULTS_BY_ADDRESS
 from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
@@ -166,7 +166,7 @@ class ModelTest(TestCase):
         # If both fields are present at the same time, `pole_emploi_id` takes precedence.
         job_seeker = JobSeekerFactory(
             pole_emploi_id="69970749",
-            lack_of_pole_emploi_id_reason=User.REASON_FORGOTTEN,
+            lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
         )
         cleaned_data = {
             "pole_emploi_id": job_seeker.pole_emploi_id,
@@ -185,7 +185,9 @@ class ModelTest(TestCase):
         }
         User.clean_pole_emploi_fields(cleaned_data)
 
-        job_seeker = JobSeekerFactory(pole_emploi_id="", lack_of_pole_emploi_id_reason=User.REASON_FORGOTTEN)
+        job_seeker = JobSeekerFactory(
+            pole_emploi_id="", lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN
+        )
         cleaned_data = {
             "pole_emploi_id": job_seeker.pole_emploi_id,
             "lack_of_pole_emploi_id_reason": job_seeker.lack_of_pole_emploi_id_reason,

@@ -29,6 +29,7 @@ from itou.employee_record.enums import Status
 from itou.files.models import File
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.enums import SiaeKind
+from itou.users.enums import LackOfPoleEmploiId
 from tests.approvals.factories import (
     ApprovalFactory,
     PoleEmploiApprovalFactory,
@@ -901,7 +902,7 @@ class CustomApprovalAdminViewsTest(TestCase):
         job_seeker = JobSeekerFactory(
             nir="",
             pole_emploi_id="",
-            lack_of_pole_emploi_id_reason=JobSeekerFactory._meta.model.REASON_FORGOTTEN,
+            lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
         )
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker,

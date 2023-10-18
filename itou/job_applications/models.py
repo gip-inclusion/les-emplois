@@ -31,7 +31,7 @@ from itou.job_applications.enums import (
 from itou.job_applications.tasks import huey_notify_pole_emploi
 from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS, ContractType, SiaeKind
 from itou.siaes.models import Siae
-from itou.users.enums import UserKind
+from itou.users.enums import LackOfPoleEmploiId, UserKind
 from itou.utils.emails import get_email_message, send_email_messages
 from itou.utils.models import InclusiveDateRangeField
 from itou.utils.urls import get_absolute_url
@@ -953,7 +953,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 self.job_seeker.has_no_common_approval and (self.job_seeker.nir or self.job_seeker.pole_emploi_id)
             ) or (
                 self.job_seeker.pole_emploi_id
-                or self.job_seeker.lack_of_pole_emploi_id_reason == self.job_seeker.REASON_NOT_REGISTERED
+                or self.job_seeker.lack_of_pole_emploi_id_reason == LackOfPoleEmploiId.REASON_NOT_REGISTERED
             ):
                 # Security check: it's supposed to be blocked upstream.
                 if self.eligibility_diagnosis is None:
@@ -970,7 +970,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 emails.append(self.email_deliver_approval(accepted_by))
             elif not self.job_seeker.nir or (
                 not self.job_seeker.pole_emploi_id
-                and self.job_seeker.lack_of_pole_emploi_id_reason == self.job_seeker.REASON_FORGOTTEN
+                and self.job_seeker.lack_of_pole_emploi_id_reason == LackOfPoleEmploiId.REASON_FORGOTTEN
             ):
                 # Trigger a manual approval creation.
                 self.approval_delivery_mode = self.APPROVAL_DELIVERY_MODE_MANUAL

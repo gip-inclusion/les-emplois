@@ -23,7 +23,7 @@ from itou.files.forms import ItouFileField
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow, PriorAction
 from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS, ContractType, SiaeKind
-from itou.users.enums import UserKind
+from itou.users.enums import LackOfPoleEmploiId, UserKind
 from itou.users.models import JobSeekerProfile, User
 from itou.utils import constants as global_constants
 from itou.utils.emails import redact_email_address
@@ -295,7 +295,7 @@ class CreateOrUpdateJobSeekerStep3Form(forms.ModelForm):
         # Handle Pole Emploi extra fields
         if self.cleaned_data["pole_emploi"]:
             if self.cleaned_data["pole_emploi_id_forgotten"]:
-                self.cleaned_data["lack_of_pole_emploi_id_reason"] = User.REASON_FORGOTTEN
+                self.cleaned_data["lack_of_pole_emploi_id_reason"] = LackOfPoleEmploiId.REASON_FORGOTTEN
                 self.cleaned_data["pole_emploi_id"] = ""
             elif self.cleaned_data.get("pole_emploi_id"):
                 self.cleaned_data["lack_of_pole_emploi_id_reason"] = ""
@@ -309,7 +309,7 @@ class CreateOrUpdateJobSeekerStep3Form(forms.ModelForm):
         else:
             self.cleaned_data["pole_emploi_id_forgotten"] = ""
             self.cleaned_data["pole_emploi_id"] = ""
-            self.cleaned_data["lack_of_pole_emploi_id_reason"] = User.REASON_NOT_REGISTERED
+            self.cleaned_data["lack_of_pole_emploi_id_reason"] = LackOfPoleEmploiId.REASON_NOT_REGISTERED
 
         # Handle RSA extra fields
         if self.cleaned_data["rsa_allocation"]:
