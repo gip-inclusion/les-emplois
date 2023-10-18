@@ -201,9 +201,13 @@ def edit_job_description_details(request, template_name="siaes/edit_job_descript
 
     job_description = _get_job_description(session_data)
 
-    rome = get_object_or_404(
-        Appellation.objects.select_related("rome"), code=session_data.get("job_appellation_code")
-    ).rome.code
+    if job_appellation_code := session_data.get("job_appellation_code"):
+        # TODO(xfernandez): Legacy code, remove me in a few days (time for session to expire)
+        rome = get_object_or_404(Appellation.objects.select_related("rome"), pk=job_appellation_code).rome.code
+    else:
+        rome = get_object_or_404(
+            Appellation.objects.select_related("rome"), pk=session_data.get("job_appellation")
+        ).rome.code
 
     form = siaes_forms.EditJobDescriptionDetailsForm(
         siae, instance=job_description, data=request.POST or None, initial=session_data
@@ -256,7 +260,12 @@ def edit_job_description_preview(request, template_name="siaes/edit_job_descript
 
     if location_code := session_data.get("location_code"):
         job_description.location = City.objects.get(slug=location_code)
-    job_description.appellation = Appellation.objects.get(code=session_data.get("job_appellation_code"))
+    if job_appellation_code := session_data.get("job_appellation_code"):
+        # TODO(xfernandez): Legacy code, remove me in a few days (time for session to expire)
+        appellation = Appellation.objects.get(pk=job_appellation_code)
+    else:
+        appellation = Appellation.objects.get(pk=session_data.get("job_appellation"))
+    job_description.appellation = appellation
     job_description.siae = siae
 
     if request.method == "POST":

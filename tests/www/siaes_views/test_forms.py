@@ -17,8 +17,7 @@ class EditSiaeJobDescriptionFormTest(TestCase):
     def test_clean_contract_type(self):
         siae = SiaeFactory()
         post_data = {
-            "job_appellation_code": "10357",
-            "job_appellation": "Whatever",  # job_appellation_code prevails
+            "job_appellation": "10357",
             "contract_type": ContractType.OTHER.value,
             "other_contract_type": None,
             "open_positions": "1",
@@ -36,8 +35,7 @@ class EditSiaeJobDescriptionFormTest(TestCase):
     def test_clean_open_positions(self):
         siae = SiaeFactory()
         post_data = {
-            "job_appellation_code": "10357",
-            "job_appellation": "Whatever appellation",
+            "job_appellation": "10357",
             "contract_type": ContractType.OTHER.value,
             "other_contract_type": "Whatever contract type",
             "open_positions": None,
@@ -60,13 +58,11 @@ class EditSiaeJobDescriptionFormTest(TestCase):
 
         form = EditJobDescriptionForm(current_siae=siae, data=post_data)
         assert form.errors is not None
-        assert "job_appellation_code" in form.errors.keys()
         assert "job_appellation" in form.errors.keys()
 
         post_data.update(
             {
-                "job_appellation_code": "10357",
-                "job_appellation": "Whatever",
+                "job_appellation": "10357",
             }
         )
 
@@ -76,8 +72,7 @@ class EditSiaeJobDescriptionFormTest(TestCase):
 
         post_data.update(
             {
-                "job_appellation_code": "10357",
-                "job_appellation": "Whatever",
+                "job_appellation": "10357",
                 "contract_type": ContractType.OTHER.value,
                 "other_contract_type": "Whatever contract type",
                 "open_positions": None,
@@ -100,8 +95,7 @@ class EditSiaeJobDescriptionFormTest(TestCase):
     def test_siae_fields(self):
         siae = SiaeFactory()
         post_data = {
-            "job_appellation_code": "10357",
-            "job_appellation": "Whatever",
+            "job_appellation": "10357",
             "custom_name": "custom_name",
             "location_code": "guerande-44",
             "hours_per_week": 35,
@@ -148,8 +142,7 @@ class EditSiaeJobDescriptionFormTest(TestCase):
     def test_opcs_errors(self):
         opcs = SiaeFactory(kind=CompanyKind.OPCS)
         post_data = {
-            "job_appellation_code": "10357",
-            "job_appellation": "Whatever",
+            "job_appellation": "10357",
             "custom_name": "custom_name",
             "location_code": "guerande-44",
             "hours_per_week": 35,
@@ -178,8 +171,7 @@ class EditSiaeJobDescriptionFormTest(TestCase):
     def test_opcs_fields(self):
         siae = SiaeFactory(kind=CompanyKind.OPCS)
         post_data = {
-            "job_appellation_code": "10357",
-            "job_appellation": "Whatever",
+            "job_appellation": "10357",
             "custom_name": "custom_name",
             "location_code": "guerande-44",
             "market_context_description": "market_context_description",
