@@ -106,6 +106,105 @@ class JobsAutocompleteTest(TestCase):
         assert response.json() == expected
 
 
+class Select2JobsAutocompleteTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        # Set up data for the whole TestCase.
+        create_test_romes_and_appellations(["N1101", "N4105"])
+        # Update:
+        # - autocomplete URL now needs a SIAE parameter (for existing ROME filtering)
+        # - this URL does not accept create / update / delete of elements (removed some some tests)
+        cls.siae = SiaeFactory()
+        cls.url = reverse("autocomplete:jobs")
+
+    def test_search_multi_words(self):
+        response = self.client.get(
+            self.url,
+            {
+                "term": "cariste ferroviaire",
+                "select2": "",
+            },
+        )
+        assert response.status_code == 200
+        expected = {
+            "results": [
+                {
+                    "text": "Agent / Agente cariste de livraison ferroviaire (N1101)",
+                    "id": "10357",
+                }
+            ]
+        }
+        assert response.json() == expected
+
+    def test_search_case_insensitive_and_explicit_rome_code(self):
+        response = self.client.get(
+            self.url,
+            {
+                "term": "CHAUFFEUR livreuse n4105",
+                "select2": "",
+            },
+        )
+        assert response.status_code == 200
+        expected = {
+            "results": [
+                {
+                    "text": "Chauffeur-livreur / Chauffeuse-livreuse (N4105)",
+                    "id": "11999",
+                }
+            ]
+        }
+        assert response.json() == expected
+
+    def test_search_empty_chars(self):
+        response = self.client.get(
+            self.url,
+            {
+                "term": "    ",
+                "select2": "",
+            },
+        )
+        assert response.status_code == 200
+        assert response.json() == {"results": []}
+
+    def test_search_full_label(self):
+        response = self.client.get(
+            self.url,
+            {
+                "term": "Conducteur / Conductrice de chariot élévateur de l'armée (N1101)",
+                "select2": "",
+            },
+        )
+        assert response.status_code == 200
+        expected = {
+            "results": [
+                {
+                    "text": "Conducteur / Conductrice de chariot élévateur de l'armée (N1101)",
+                    "id": "12918",
+                }
+            ]
+        }
+        assert response.json() == expected
+
+    def test_search_special_chars(self):
+        response = self.client.get(
+            self.url,
+            {
+                "term": "conducteur:* & & de:* & !chariot:* & <eleva:*>>>> & armee:* & `(((()))`):*",
+                "select2": "",
+            },
+        )
+        assert response.status_code == 200
+        expected = {
+            "results": [
+                {
+                    "text": "Conducteur / Conductrice de chariot élévateur de l'armée (N1101)",
+                    "id": "12918",
+                }
+            ]
+        }
+        assert response.json() == expected
+
+
 class CitiesAutocompleteTest(TestCase):
     def test_autocomplete(self):
         create_test_cities(["01", "75", "93"], num_per_department=20)
