@@ -395,7 +395,7 @@ class SiaeJobApplicationListViewTest(TestCase):
         self.assertContains(
             response, f"<h3>{evaluated_administrative_criteria.administrative_criteria.name}</h3>", html=True
         )
-        self.assertContains(response, '<p class="badge badge-pill badge-pilotage float-right">en cours</p>')
+        self.assertContains(response, '<p class="badge rounded-pill bg-pilotage float-end">en cours</p>')
         self.assertNotContains(response, siae_upload_doc_url)
 
         # Transition to adversarial phase
@@ -404,7 +404,7 @@ class SiaeJobApplicationListViewTest(TestCase):
         self.assertContains(
             response, f"<h3>{evaluated_administrative_criteria.administrative_criteria.name}</h3>", html=True
         )
-        self.assertContains(response, '<p class="badge badge-pill badge-pilotage float-right">à traiter</p>')
+        self.assertContains(response, '<p class="badge rounded-pill bg-pilotage float-end">à traiter</p>')
         self.assertNotContains(response, siae_select_criteria_url)
         self.assertContains(response, siae_upload_doc_url)
 
