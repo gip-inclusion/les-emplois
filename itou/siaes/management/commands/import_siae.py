@@ -127,6 +127,8 @@ class Command(BaseCommand):
     def update_siae_siret(self, siae, new_siret):
         assert siae.siret != new_siret
         self.stdout.write(f"siae.id={siae.id} has changed siret from {siae.siret} to {new_siret} (will be updated)")
+        if not siae.siret_history or siae.siret != siae.siret_history[-1]:
+            siae.siret_history.append(siae.siret)
         siae.siret = new_siret
         siae.save()
 
