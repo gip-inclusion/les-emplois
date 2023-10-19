@@ -45,9 +45,6 @@ from tests.users.factories import ItouStaffFactory, JobSeekerFactory
 from tests.utils.test import TestCase, assertMessages
 
 
-pytestmark = pytest.mark.ignore_template_errors
-
-
 class CommonApprovalQuerySetTest(TestCase):
     def test_valid_for_pole_emploi_approval_model(self):
         start_at = timezone.localdate() - relativedelta(years=1)
