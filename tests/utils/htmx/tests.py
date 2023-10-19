@@ -9,9 +9,6 @@ from tests.utils.htmx.test import HtmxTestCase, assertSoupEqual, update_page_wit
 from tests.utils.test import parse_response_to_soup
 
 
-pytestmark = pytest.mark.ignore_template_errors
-
-
 # Unittest style
 class HtmxRequestFactoryTest(HtmxTestCase):
     def test_get(self):
