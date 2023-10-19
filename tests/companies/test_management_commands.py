@@ -4,7 +4,7 @@ import io
 from django.core import management
 from freezegun import freeze_time
 
-from itou.companies.enums import SiaeKind
+from itou.companies.enums import CompanyKind
 from itou.employee_record.models import EmployeeRecord
 from tests.companies import factories as siaes_factories
 from tests.employee_record.factories import EmployeeRecordFactory
@@ -29,8 +29,8 @@ class MoveSiaeDataTest(TestCase):
         assert siae2.members.count() == 1
 
     def test_does_not_stop_if_kind_is_different(self):
-        siae1 = siaes_factories.SiaeWithMembershipAndJobsFactory(kind=SiaeKind.ACI)
-        siae2 = siaes_factories.SiaeFactory(kind=SiaeKind.EATT)
+        siae1 = siaes_factories.SiaeWithMembershipAndJobsFactory(kind=CompanyKind.ACI)
+        siae2 = siaes_factories.SiaeFactory(kind=CompanyKind.EATT)
         management.call_command("move_siae_data", from_id=siae1.pk, to_id=siae2.pk, wet_run=True)
         assert siae1.jobs.count() == 0
         assert siae1.members.count() == 0

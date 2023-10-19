@@ -7,7 +7,7 @@ from django.shortcuts import render
 from django.views.generic import FormView
 
 from itou.common_apps.address.departments import DEPARTMENTS_WITH_DISTRICTS
-from itou.companies.enums import ContractNature, JobSource, SiaeKind
+from itou.companies.enums import CompanyKind, ContractNature, JobSource
 from itou.companies.models import Siae, SiaeJobDescription
 from itou.prescribers.models import PrescriberOrganization
 from itou.utils.pagination import pager
@@ -101,7 +101,7 @@ class EmployerSearchBaseView(FormView):
 
         context = {
             "form": form,
-            "ea_eatt_kinds": [SiaeKind.EA, SiaeKind.EATT],
+            "ea_eatt_kinds": [CompanyKind.EA, CompanyKind.EATT],
             "city": city,
             "distance": distance,
             "filters_query_string": urlencode(

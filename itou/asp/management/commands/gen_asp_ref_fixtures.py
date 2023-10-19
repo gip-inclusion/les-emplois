@@ -74,7 +74,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
         """
         Write fixture file
         filename_prefix add a prefix to the filename for ordering concerns
-        if any (i.e. for SiaeKind objects references)
+        if any (i.e. for CompanyKind objects references)
         """
         self.log(f"Formatted {len(records)} element(s)")
         self.log(f"Writing JSON fixture to: {path}")
@@ -210,7 +210,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
         """
         Generates ASP SIAE kinds fixture.
 
-        Fixture prefix is important for this case, because SiaeKind must be
+        Fixture prefix is important for this case, because CompanyKind must be
         imported before EducationLevel and EmployerType entries
         """
         path = os.path.join(settings.IMPORT_DIR, filename)
@@ -221,7 +221,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
             return
 
         export_path = os.path.join(_FIXTURES_DIR, "asp_siae_kinds.json")
-        model = "asp.SiaeKind"
+        model = "asp.CompanyKind"
         df = self.load_dataframe(path)
         records = []
 

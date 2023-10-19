@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand
 from django.db.models import F
 
 from itou.common_apps.address.departments import DEPARTMENTS
-from itou.companies.enums import SiaeKind
+from itou.companies.enums import CompanyKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.users.enums import KIND_EMPLOYER
 from itou.utils.management_commands import XlsxExportMixin
@@ -27,7 +27,7 @@ class Command(XlsxExportMixin, BaseCommand):
             )
             .filter(
                 state=JobApplicationWorkflow.STATE_ACCEPTED,
-                to_siae__kind__in=[SiaeKind.ACI, SiaeKind.EI, SiaeKind.ETTI, SiaeKind.AI],
+                to_siae__kind__in=[CompanyKind.ACI, CompanyKind.EI, CompanyKind.ETTI, CompanyKind.AI],
                 eligibility_diagnosis__author_kind=KIND_EMPLOYER,
                 eligibility_diagnosis__author_siae=F("to_siae"),
                 approval__start_at__range=[start_at_min, start_at_max],

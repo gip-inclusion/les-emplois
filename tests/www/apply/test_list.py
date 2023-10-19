@@ -6,7 +6,7 @@ from django.utils.http import urlencode
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNumQueries
 
-from itou.companies.enums import SiaeKind
+from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria
 from itou.job_applications.enums import SenderKind
@@ -346,17 +346,17 @@ class ProcessListSiaeTest(ProcessListTest):
         url = f"{self.siae_base_url}?{params}"
 
         expect_to_see_criteria = {
-            SiaeKind.EA: False,
-            SiaeKind.EATT: False,
-            SiaeKind.EI: True,
-            SiaeKind.GEIQ: False,
-            SiaeKind.OPCS: False,
-            SiaeKind.ACI: True,
-            SiaeKind.AI: True,
-            SiaeKind.EITI: True,
-            SiaeKind.ETTI: True,
+            CompanyKind.EA: False,
+            CompanyKind.EATT: False,
+            CompanyKind.EI: True,
+            CompanyKind.GEIQ: False,
+            CompanyKind.OPCS: False,
+            CompanyKind.ACI: True,
+            CompanyKind.AI: True,
+            CompanyKind.EITI: True,
+            CompanyKind.ETTI: True,
         }
-        for kind in SiaeKind:
+        for kind in CompanyKind:
             with self.subTest(kind=kind):
                 self.hit_pit.kind = kind
                 self.hit_pit.save(update_fields=("kind",))
@@ -400,7 +400,7 @@ class ProcessListSiaeTest(ProcessListTest):
         assert len(applications) == 9
 
         # With a GEIQ user, the filter is present and works
-        self.hit_pit.kind = SiaeKind.GEIQ
+        self.hit_pit.kind = CompanyKind.GEIQ
         self.hit_pit.save()
         response = self.client.get(url)
         self.assertContains(response, PRIOR_TO_HIRE_LABEL)

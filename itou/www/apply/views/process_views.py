@@ -13,7 +13,7 @@ from django.views.decorators.http import require_POST
 from django.views.generic.base import TemplateView
 from django_xworkflows import models as xwf_models
 
-from itou.companies.enums import ContractType, SiaeKind
+from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import Siae
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
@@ -86,7 +86,7 @@ def details_for_siae(request, job_application_id, template_name="apply/process_d
     back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("apply:list_for_siae"))
     geiq_eligibility_diagnosis = None
 
-    if job_application.to_siae.kind == SiaeKind.GEIQ:
+    if job_application.to_siae.kind == CompanyKind.GEIQ:
         geiq_eligibility_diagnosis = _get_geiq_eligibility_diagnosis_for_siae(job_application)
 
     context = {
@@ -142,7 +142,7 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
 
     # Latest GEIQ diagnosis for this job seeker created by a *prescriber*
     geiq_eligibility_diagnosis = (
-        job_application.to_siae.kind == SiaeKind.GEIQ
+        job_application.to_siae.kind == CompanyKind.GEIQ
         and GEIQEligibilityDiagnosis.objects.valid()
         .filter(author_prescriber_organization__isnull=False)
         .for_job_seeker(job_application.job_seeker)
@@ -496,7 +496,7 @@ def delete_prior_action(request, job_application_id, prior_action_id):
                 "transition_logs": job_application.logs.select_related("user").all().order_by("timestamp"),
                 "geiq_eligibility_diagnosis": (
                     _get_geiq_eligibility_diagnosis_for_siae(job_application)
-                    if job_application.to_siae.kind == SiaeKind.GEIQ
+                    if job_application.to_siae.kind == CompanyKind.GEIQ
                     else None
                 ),
             },
@@ -560,7 +560,7 @@ def add_or_modify_prior_action(request, job_application_id, prior_action_id=None
                     state_update = True
             form.save()
             geiq_eligibility_diagnosis = None
-            if state_update and job_application.to_siae.kind == SiaeKind.GEIQ:
+            if state_update and job_application.to_siae.kind == CompanyKind.GEIQ:
                 geiq_eligibility_diagnosis = _get_geiq_eligibility_diagnosis_for_siae(job_application)
             return render(
                 request,

@@ -1,7 +1,7 @@
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 
-from itou.companies.enums import SiaeKind
+from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm, AdministrativeCriteriaOfJobApplicationForm
@@ -27,7 +27,7 @@ class AdministrativeCriteriaFormTest(TestCase):
         assert form.cleaned_data == expected_cleaned_data
 
     def test_valid_for_siae(self):
-        siae = SiaeFactory(kind=SiaeKind.ACI, with_membership=True)
+        siae = SiaeFactory(kind=CompanyKind.ACI, with_membership=True)
         user = siae.members.first()
 
         criterion1 = AdministrativeCriteria.objects.get(pk=1)
@@ -64,7 +64,7 @@ class AdministrativeCriteriaFormTest(TestCase):
         """
         Test errors for SIAEs.
         """
-        siae = SiaeFactory(kind=SiaeKind.ACI, with_membership=True)
+        siae = SiaeFactory(kind=CompanyKind.ACI, with_membership=True)
         user = siae.members.first()
 
         criterion1 = AdministrativeCriteria.objects.get(pk=1)
@@ -85,7 +85,7 @@ class AdministrativeCriteriaFormTest(TestCase):
         assert form.ERROR_CRITERIA_NUMBER in form.errors["__all__"]
 
     def test_valid_for_siae_of_kind_etti(self):
-        siae = SiaeFactory(kind=SiaeKind.ETTI, with_membership=True)
+        siae = SiaeFactory(kind=CompanyKind.ETTI, with_membership=True)
         user = siae.members.first()
 
         criterion1 = AdministrativeCriteria.objects.get(pk=1)
@@ -113,7 +113,7 @@ class AdministrativeCriteriaFormTest(TestCase):
         """
         Test errors for SIAEs of kind ETTI.
         """
-        siae = SiaeFactory(kind=SiaeKind.ETTI, with_membership=True)
+        siae = SiaeFactory(kind=CompanyKind.ETTI, with_membership=True)
         user = siae.members.first()
 
         criterion1 = AdministrativeCriteria.objects.get(pk=1)
@@ -221,7 +221,7 @@ class AdministrativeCriteriaOfJobApplicationFormTest(TestCase):
         )
 
     def test_num_level2_admin_criteria(self):
-        for kind in SiaeKind:
+        for kind in CompanyKind:
             with self.subTest(kind):
                 siae = SiaeFactory(kind=kind, with_membership=True)
                 user = siae.members.first()
@@ -234,7 +234,7 @@ class AdministrativeCriteriaOfJobApplicationFormTest(TestCase):
                 )
                 form = AdministrativeCriteriaOfJobApplicationForm(user, siae, job_application=job_application)
 
-                if kind in [SiaeKind.ETTI, SiaeKind.AI]:
+                if kind in [CompanyKind.ETTI, CompanyKind.AI]:
                     assert 2 == form.num_level2_admin_criteria
                 else:
                     assert 3 == form.num_level2_admin_criteria

@@ -6,7 +6,7 @@ import pandas as pd
 from django.core.management.base import BaseCommand
 
 from itou.common_apps.address.departments import department_from_postcode
-from itou.companies.enums import SiaeKind
+from itou.companies.enums import CompanyKind
 from itou.companies.management.commands._import_siae.utils import (
     clean_string,
     geocode_siae,
@@ -21,9 +21,9 @@ from itou.utils.validators import validate_siret
 
 def convert_kind(raw_kind):
     if raw_kind == "Entreprise Adaptée":
-        return SiaeKind.EA
+        return CompanyKind.EA
     elif raw_kind == "Entreprise Adaptée Travail Temporaire":
-        return SiaeKind.EATT
+        return CompanyKind.EATT
     raise ValueError(f"Unexpected raw_kind value: {raw_kind}")
 
 
@@ -134,7 +134,7 @@ def build_ea_eatt(row):
     siae = Siae()
     siae.siret = row.siret
     siae.kind = row.kind
-    assert siae.kind in [SiaeKind.EA, SiaeKind.EATT]
+    assert siae.kind in [CompanyKind.EA, CompanyKind.EATT]
     siae.source = Siae.SOURCE_EA_EATT
 
     siae.name = row["name"]  # row.name returns row index.
@@ -185,7 +185,7 @@ class Command(BaseCommand):
         info_stats |= sync_structures(
             df=ea_eatt_df,
             source=Siae.SOURCE_EA_EATT,
-            kinds=[SiaeKind.EA, SiaeKind.EATT],
+            kinds=[CompanyKind.EA, CompanyKind.EATT],
             build_structure=build_ea_eatt,
             wet_run=wet_run,
         )

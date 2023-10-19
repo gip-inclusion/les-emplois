@@ -16,10 +16,10 @@ from itou.siaes.enums import (
     POLE_EMPLOI_SIRET,
     SIAE_WITH_CONVENTION_CHOICES,
     SIAE_WITH_CONVENTION_KINDS,
+    CompanyKind,
     ContractNature,
     ContractType,
     JobSource,
-    SiaeKind,
 )
 from itou.utils.emails import get_email_message
 from itou.utils.tokens import siae_signup_token_generator
@@ -199,7 +199,7 @@ class Siae(AddressMixin, OrganizationAbstract):
     )
 
     # These kinds of SIAE can use employee record app to send data to ASP
-    ASP_EMPLOYEE_RECORD_KINDS = [SiaeKind.EI, SiaeKind.ACI, SiaeKind.AI, SiaeKind.ETTI]
+    ASP_EMPLOYEE_RECORD_KINDS = [CompanyKind.EI, CompanyKind.ACI, CompanyKind.AI, CompanyKind.ETTI]
 
     # SIAE structures have two different SIRET numbers in ASP FluxIAE data ("Vue Structure").
     # The first one is the "SIRET actualisé" which we store as `siae.siret`. It changes rather frequently
@@ -209,7 +209,7 @@ class Siae(AddressMixin, OrganizationAbstract):
     # Both SIRET numbers are kept up to date by the weekly `import_siae.py` script.
     siret = models.CharField(verbose_name="siret", max_length=14, validators=[validate_siret], db_index=True)
     naf = models.CharField(verbose_name="naf", max_length=5, validators=[validate_naf], blank=True)
-    kind = models.CharField(verbose_name="type", max_length=8, choices=SiaeKind.choices, default=SiaeKind.EI)
+    kind = models.CharField(verbose_name="type", max_length=8, choices=CompanyKind.choices, default=CompanyKind.EI)
     # `brand` (or `enseigne` in French) is used to override `name` if needed.
     brand = models.CharField(verbose_name="enseigne", max_length=255, blank=True)
     phone = models.CharField(verbose_name="téléphone", max_length=20, blank=True)
@@ -312,7 +312,7 @@ class Siae(AddressMixin, OrganizationAbstract):
 
     @property
     def is_opcs(self):
-        return self.kind == SiaeKind.OPCS
+        return self.kind == CompanyKind.OPCS
 
     @property
     def obfuscated_auth_email(self):
@@ -346,7 +346,7 @@ class Siae(AddressMixin, OrganizationAbstract):
 
     @property
     def should_have_convention(self):
-        # .values is needed since Python considers the members of SiaeKind to be different
+        # .values is needed since Python considers the members of CompanyKind to be different
         # instances than SiaeWithConventionKind
         return self.kind in SIAE_WITH_CONVENTION_KINDS
 
@@ -408,7 +408,7 @@ class Siae(AddressMixin, OrganizationAbstract):
 
     @property
     def can_have_prior_action(self):
-        return self.kind == SiaeKind.GEIQ
+        return self.kind == CompanyKind.GEIQ
 
     @property
     def can_use_employee_record(self):
@@ -424,7 +424,7 @@ class Siae(AddressMixin, OrganizationAbstract):
         Is this SIAE allowed to use / upload a prolongation report file ?
         (temporary: limited to AI only)
         """
-        return self.kind == SiaeKind.AI
+        return self.kind == CompanyKind.AI
 
     def convention_can_be_accessed_by(self, user):
         """
@@ -754,7 +754,7 @@ class SiaeConvention(models.Model):
         verbose_name="type",
         max_length=4,
         choices=SIAE_WITH_CONVENTION_CHOICES,
-        default=SiaeKind.EI.value,
+        default=CompanyKind.EI.value,
     )
 
     # SIAE structures have two different SIRET numbers in ASP FluxIAE data ("Vue Structure").

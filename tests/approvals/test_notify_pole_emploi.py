@@ -11,7 +11,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 
 from itou.approvals.models import Approval
-from itou.companies.enums import SiaeKind, siae_kind_to_pe_type_siae
+from itou.companies.enums import CompanyKind, siae_kind_to_pe_type_siae
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.utils.mocks.pole_emploi import (
@@ -80,7 +80,7 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
         approval = ApprovalFactory(
             with_jobapplication=True,
-            with_jobapplication__to_siae__kind=SiaeKind.ACI,
+            with_jobapplication__to_siae__kind=CompanyKind.ACI,
         )
         approval.notify_pole_emploi(at=now)
         approval.refresh_from_db()
@@ -111,7 +111,7 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
         approval = ApprovalFactory(
             with_jobapplication=True,
-            with_jobapplication__to_siae__kind=SiaeKind.ACI,
+            with_jobapplication__to_siae__kind=CompanyKind.ACI,
         )
         approval.user.jobseeker_profile.pe_obfuscated_nir = "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ"
         approval.user.jobseeker_profile.save()
@@ -142,7 +142,7 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
         approval = ApprovalFactory(
             with_jobapplication=True,
-            with_jobapplication__to_siae__kind=SiaeKind.ACI,
+            with_jobapplication__to_siae__kind=CompanyKind.ACI,
             with_jobapplication__sent_by_authorized_prescriber_organisation=True,
             with_jobapplication__sender_prescriber_organization__kind=PrescriberOrganizationKind.CAF,
         )
@@ -174,7 +174,7 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
         approval = ApprovalFactory(
             with_jobapplication=True,
-            with_jobapplication__to_siae__kind=SiaeKind.ACI,
+            with_jobapplication__to_siae__kind=CompanyKind.ACI,
             with_jobapplication__sent_by_authorized_prescriber_organisation=True,
             with_jobapplication__sender_prescriber_organization__kind=PrescriberOrganizationKind.SPIP,
         )
@@ -360,7 +360,7 @@ class PoleEmploiApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         )
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
         pe_approval = PoleEmploiApprovalFactory(
-            nir="FOOBAR2000", siae_kind=SiaeKind.ACI.value
+            nir="FOOBAR2000", siae_kind=CompanyKind.ACI.value
         )  # avoid the OPCS, not mapped yet
         pe_approval.notify_pole_emploi(at=now)
         pe_approval.refresh_from_db()

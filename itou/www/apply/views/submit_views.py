@@ -17,7 +17,7 @@ from django.utils.html import format_html
 from django.views.generic import TemplateView
 
 from itou.approvals.models import Approval
-from itou.companies.enums import SiaeKind
+from itou.companies.enums import CompanyKind
 from itou.companies.models import Siae, SiaeJobDescription
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
@@ -135,7 +135,7 @@ class ApplicationBaseView(ApplyStepBaseView):
             return
         self.job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), pk=kwargs["job_seeker_pk"])
         _check_job_seeker_approval(request, self.job_seeker, self.siae)
-        if self.siae.kind == SiaeKind.GEIQ:
+        if self.siae.kind == CompanyKind.GEIQ:
             self.geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
                 self.job_seeker, self.siae
             ).first()
@@ -151,7 +151,7 @@ class ApplicationBaseView(ApplyStepBaseView):
             "eligibility_diagnosis": self.eligibility_diagnosis,
             "is_subject_to_eligibility_rules": self.siae.is_subject_to_eligibility_rules,
             "geiq_eligibility_diagnosis": self.geiq_eligibility_diagnosis,
-            "is_subject_to_geiq_eligibility_rules": self.siae.kind == SiaeKind.GEIQ,
+            "is_subject_to_geiq_eligibility_rules": self.siae.kind == CompanyKind.GEIQ,
             "can_edit_personal_information": self.request.user.can_edit_personal_information(self.job_seeker),
             "can_view_personal_information": self.request.user.can_view_personal_information(self.job_seeker),
             # Do not show the warning for job seekers
@@ -617,7 +617,7 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
 
     def get_next_url(self):
         if self.hire_process:
-            if self.siae.kind == SiaeKind.GEIQ:
+            if self.siae.kind == CompanyKind.GEIQ:
                 view_name = "apply:geiq_eligibility_for_hire"
             else:
                 view_name = "apply:eligibility_for_hire"
@@ -750,7 +750,9 @@ class CheckPreviousApplications(ApplicationBaseView):
     def get_next_url(self):
         if self.hire_process:
             view_name = (
-                "apply:geiq_eligibility_for_hire" if self.siae.kind == SiaeKind.GEIQ else "apply:eligibility_for_hire"
+                "apply:geiq_eligibility_for_hire"
+                if self.siae.kind == CompanyKind.GEIQ
+                else "apply:eligibility_for_hire"
             )
         else:
             view_name = "apply:application_jobs"
@@ -809,7 +811,7 @@ class ApplicationJobsView(ApplicationBaseView):
             self.apply_session.set("selected_jobs", self.form.cleaned_data.get("selected_jobs", []))
             # dispatching to IAE or GEIQ eligibility
             path_name = (
-                "application_geiq_eligibility" if self.siae.kind == SiaeKind.GEIQ else "application_eligibility"
+                "application_geiq_eligibility" if self.siae.kind == CompanyKind.GEIQ else "application_eligibility"
             )
             return HttpResponseRedirect(
                 reverse("apply:" + path_name, kwargs={"siae_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk})
@@ -1091,9 +1093,9 @@ class ApplicationResumeView(ApplicationBaseView):
 
     def get_back_url(self):
         view_name = "apply:application_jobs"
-        if self.siae.kind == SiaeKind.GEIQ and self.request.user.is_prescriber_with_authorized_org:
+        if self.siae.kind == CompanyKind.GEIQ and self.request.user.is_prescriber_with_authorized_org:
             view_name = "apply:application_geiq_eligibility"
-        elif self.siae.kind != SiaeKind.GEIQ:
+        elif self.siae.kind != CompanyKind.GEIQ:
             bypass_eligibility_conditions = [
                 # Don't perform an eligibility diagnosis is the SIAE doesn't need it,
                 not self.siae.is_subject_to_eligibility_rules,
@@ -1476,7 +1478,7 @@ def eligibility_for_hire(request, siae_pk, job_seeker_pk, template_name="apply/s
 def geiq_eligibility_for_hire(
     request, siae_pk, job_seeker_pk, template_name="apply/submit/geiq_eligibility_for_hire.html"
 ):
-    siae = get_object_or_404(Siae.objects.member_required(request.user).filter(kind=SiaeKind.GEIQ), pk=siae_pk)
+    siae = get_object_or_404(Siae.objects.member_required(request.user).filter(kind=CompanyKind.GEIQ), pk=siae_pk)
     job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), pk=job_seeker_pk)
     next_url = reverse("apply:hire_confirmation", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk})
     if GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(job_seeker, siae).exists():
@@ -1499,7 +1501,7 @@ def geiq_eligibility_for_hire(
 
 @login_required
 def geiq_eligibility_criteria_for_hire(request, siae_pk, job_seeker_pk):
-    siae = get_object_or_404(Siae.objects.member_required(request.user).filter(kind=SiaeKind.GEIQ), pk=siae_pk)
+    siae = get_object_or_404(Siae.objects.member_required(request.user).filter(kind=CompanyKind.GEIQ), pk=siae_pk)
     job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), pk=job_seeker_pk)
     return common_views._geiq_eligibility_criteria(
         request,
@@ -1512,7 +1514,7 @@ def geiq_eligibility_criteria_for_hire(request, siae_pk, job_seeker_pk):
 def hire_confirmation(request, siae_pk, job_seeker_pk, template_name="apply/submit/hire_confirmation.html"):
     siae = get_object_or_404(Siae.objects.member_required(request.user), pk=siae_pk)
     job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), pk=job_seeker_pk)
-    if siae.kind == SiaeKind.GEIQ:
+    if siae.kind == CompanyKind.GEIQ:
         geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(job_seeker, siae).first()
         eligibility_diagnosis = None
     else:
@@ -1533,6 +1535,6 @@ def hire_confirmation(request, siae_pk, job_seeker_pk, template_name="apply/subm
             "is_subject_to_eligibility_rules": siae.is_subject_to_eligibility_rules,
             "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
             "eligibility_diagnosis": eligibility_diagnosis,
-            "is_subject_to_geiq_eligibility_rules": siae.kind == SiaeKind.GEIQ,
+            "is_subject_to_geiq_eligibility_rules": siae.kind == CompanyKind.GEIQ,
         },
     )

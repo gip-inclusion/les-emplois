@@ -1,6 +1,6 @@
 [
    {
-      "model": "asp.SiaeKind",
+      "model": "asp.CompanyKind",
       "pk": 1,
       "fields": {
          "code": "AI_DC",
@@ -13,7 +13,7 @@
       }
    },
    {
-      "model": "asp.SiaeKind",
+      "model": "asp.CompanyKind",
       "pk": 2,
       "fields": {
          "code": "ACI_DC",
@@ -26,7 +26,7 @@
       }
    },
    {
-      "model": "asp.SiaeKind",
+      "model": "asp.CompanyKind",
       "pk": 3,
       "fields": {
          "code": "EI_DC",
@@ -39,7 +39,7 @@
       }
    },
    {
-      "model": "asp.SiaeKind",
+      "model": "asp.CompanyKind",
       "pk": 4,
       "fields": {
          "code": "ETTI_DC",
@@ -52,7 +52,7 @@
       }
    },
    {
-      "model": "asp.SiaeKind",
+      "model": "asp.CompanyKind",
       "pk": 5,
       "fields": {
          "code": "FDI_DC",
@@ -65,7 +65,7 @@
       }
    },
    {
-      "model": "asp.SiaeKind",
+      "model": "asp.CompanyKind",
       "pk": 6,
       "fields": {
          "code": "EI_MP",
@@ -78,7 +78,7 @@
       }
    },
    {
-      "model": "asp.SiaeKind",
+      "model": "asp.CompanyKind",
       "pk": 7,
       "fields": {
          "code": "ACI_MP",
@@ -91,7 +91,7 @@
       }
    },
    {
-      "model": "asp.SiaeKind",
+      "model": "asp.CompanyKind",
       "pk": 8,
       "fields": {
          "code": "EITI_DC",

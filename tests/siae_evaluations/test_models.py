@@ -10,7 +10,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 
 from itou.approvals.enums import Origin
-from itou.companies.enums import SiaeKind
+from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import AdministrativeCriteriaLevel, AuthorKind
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.institutions.enums import InstitutionKind
@@ -191,7 +191,9 @@ class TestEvaluationCampaignManagerEligibleJobApplication:
         siae.save()
         assert [] == list(evaluation_campaign.eligible_job_applications())
 
-    @pytest.mark.parametrize("kind", [k for k in SiaeKind if k not in evaluation_enums.EvaluationSiaesKind.Evaluable])
+    @pytest.mark.parametrize(
+        "kind", [k for k in CompanyKind if k not in evaluation_enums.EvaluationSiaesKind.Evaluable]
+    )
     def test_siae_not_eligible_kind(self, kind, campaign_eligible_job_app_objects):
         evaluation_campaign = EvaluationCampaignFactory()
         siae = campaign_eligible_job_app_objects["siae"]

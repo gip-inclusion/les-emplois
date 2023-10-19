@@ -15,7 +15,7 @@ from django.utils import timezone
 from django_xworkflows import models as xwf_models
 
 from itou.approvals.models import CancelledApproval
-from itou.companies.enums import ContractType, SiaeKind
+from itou.companies.enums import CompanyKind, ContractType
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.employee_record.enums import Status
@@ -72,7 +72,7 @@ class JobApplicationModelTest(TestCase):
     def test_eligibility_diagnosis_by_siae_required(self):
         job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
-            to_siae__kind=SiaeKind.GEIQ,
+            to_siae__kind=CompanyKind.GEIQ,
             eligibility_diagnosis=None,
         )
         has_considered_valid_diagnoses = EligibilityDiagnosis.objects.has_considered_valid(
@@ -83,7 +83,7 @@ class JobApplicationModelTest(TestCase):
 
         job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
-            to_siae__kind=SiaeKind.EI,
+            to_siae__kind=CompanyKind.EI,
             eligibility_diagnosis=None,
         )
         has_considered_valid_diagnoses = EligibilityDiagnosis.objects.has_considered_valid(
@@ -145,7 +145,7 @@ class JobApplicationModelTest(TestCase):
     def test_get_sender_kind_display(self):
         non_siae_items = [
             (JobApplicationSentBySiaeFactory(to_siae__kind=kind), "Employeur")
-            for kind in [SiaeKind.EA, SiaeKind.EATT, SiaeKind.GEIQ, SiaeKind.OPCS]
+            for kind in [CompanyKind.EA, CompanyKind.EATT, CompanyKind.GEIQ, CompanyKind.OPCS]
         ]
         items = [
             [JobApplicationFactory(sent_by_authorized_prescriber_organisation=True), "Prescripteur"],
@@ -163,38 +163,40 @@ class JobApplicationModelTest(TestCase):
         with self.assertRaisesRegex(
             ValidationError, "Le nombre d'heures par semaine ne peut être saisi que pour un GEIQ"
         ):
-            JobApplicationFactory(to_siae__kind=SiaeKind.EI, nb_hours_per_week=20)
+            JobApplicationFactory(to_siae__kind=CompanyKind.EI, nb_hours_per_week=20)
 
         with self.assertRaisesRegex(
             ValidationError, "Les précisions sur le type de contrat ne peuvent être saisies que pour un GEIQ"
         ):
-            JobApplicationFactory(to_siae__kind=SiaeKind.EI, contract_type_details="foo")
+            JobApplicationFactory(to_siae__kind=CompanyKind.EI, contract_type_details="foo")
 
         with self.assertRaisesRegex(ValidationError, "Le type de contrat ne peut être saisi que pour un GEIQ"):
-            JobApplicationFactory(to_siae__kind=SiaeKind.EI, contract_type=ContractType.OTHER)
+            JobApplicationFactory(to_siae__kind=CompanyKind.EI, contract_type=ContractType.OTHER)
 
         # Constraints
         with self.assertRaisesRegex(ValidationError, "Incohérence dans les champs concernant le contrat GEIQ"):
             JobApplicationFactory(
-                to_siae__kind=SiaeKind.GEIQ,
+                to_siae__kind=CompanyKind.GEIQ,
                 contract_type=ContractType.PROFESSIONAL_TRAINING,
                 contract_type_details="foo",
             )
 
         with self.assertRaisesRegex(ValidationError, "Incohérence dans les champs concernant le contrat GEIQ"):
-            JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, nb_hours_per_week=1)
+            JobApplicationFactory(to_siae__kind=CompanyKind.GEIQ, nb_hours_per_week=1)
 
         with self.assertRaisesRegex(ValidationError, "Incohérence dans les champs concernant le contrat GEIQ"):
-            JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, contract_type=ContractType.OTHER)
+            JobApplicationFactory(to_siae__kind=CompanyKind.GEIQ, contract_type=ContractType.OTHER)
 
         with self.assertRaisesRegex(ValidationError, "Incohérence dans les champs concernant le contrat GEIQ"):
-            JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, contract_type_details="foo")
+            JobApplicationFactory(to_siae__kind=CompanyKind.GEIQ, contract_type_details="foo")
 
         with self.assertRaisesRegex(ValidationError, "Incohérence dans les champs concernant le contrat GEIQ"):
-            JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, contract_type_details="foo", nb_hours_per_week=1)
+            JobApplicationFactory(to_siae__kind=CompanyKind.GEIQ, contract_type_details="foo", nb_hours_per_week=1)
 
         with self.assertRaisesRegex(ValidationError, "Incohérence dans les champs concernant le contrat GEIQ"):
-            JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, contract_type=ContractType.OTHER, nb_hours_per_week=1)
+            JobApplicationFactory(
+                to_siae__kind=CompanyKind.GEIQ, contract_type=ContractType.OTHER, nb_hours_per_week=1
+            )
 
         # Mind the parens in RE...
         with self.assertRaisesRegex(
@@ -209,23 +211,25 @@ class JobApplicationModelTest(TestCase):
             ValidationError,
             f"Assurez-vous que cette valeur est supérieure ou égale à {GEIQ_MIN_HOURS_PER_WEEK}.",
         ):
-            JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, nb_hours_per_week=0)
+            JobApplicationFactory(to_siae__kind=CompanyKind.GEIQ, nb_hours_per_week=0)
 
         with self.assertRaisesRegex(
             ValidationError,
             f"Assurez-vous que cette valeur est inférieure ou égale à {GEIQ_MAX_HOURS_PER_WEEK}.",
         ):
-            JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, nb_hours_per_week=49)
+            JobApplicationFactory(to_siae__kind=CompanyKind.GEIQ, nb_hours_per_week=49)
 
         # Should pass: normal cases
         JobApplicationFactory()
 
         for contract_type in [ContractType.APPRENTICESHIP, ContractType.PROFESSIONAL_TRAINING]:
             with self.subTest(contract_type):
-                JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, contract_type=contract_type, nb_hours_per_week=35)
+                JobApplicationFactory(
+                    to_siae__kind=CompanyKind.GEIQ, contract_type=contract_type, nb_hours_per_week=35
+                )
 
         JobApplicationFactory(
-            to_siae__kind=SiaeKind.GEIQ,
+            to_siae__kind=CompanyKind.GEIQ,
             contract_type=ContractType.OTHER,
             nb_hours_per_week=30,
             contract_type_details="foo",
@@ -239,13 +243,13 @@ class JobApplicationModelTest(TestCase):
             JobApplicationFactory(job_seeker=PrescriberFactory())
 
     def test_inverted_vae_contract(self):
-        JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, inverted_vae_contract=True)
-        JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, inverted_vae_contract=False)
-        JobApplicationFactory(to_siae__kind=SiaeKind.EI, inverted_vae_contract=None)
+        JobApplicationFactory(to_siae__kind=CompanyKind.GEIQ, inverted_vae_contract=True)
+        JobApplicationFactory(to_siae__kind=CompanyKind.GEIQ, inverted_vae_contract=False)
+        JobApplicationFactory(to_siae__kind=CompanyKind.EI, inverted_vae_contract=None)
         with self.assertRaisesRegex(
             ValidationError, "Un contrat associé à une VAE inversée n'est possible que pour les GEIQ"
         ):
-            JobApplicationFactory(to_siae__kind=SiaeKind.AI, inverted_vae_contract=True)
+            JobApplicationFactory(to_siae__kind=CompanyKind.AI, inverted_vae_contract=True)
 
 
 def test_can_be_cancelled():
@@ -261,14 +265,14 @@ def test_geiq_qualification_fields_contraint():
         Exception, match="Incohérence dans les champs concernant la qualification pour le contrat GEIQ"
     ):
         JobApplicationFactory(
-            to_siae__kind=SiaeKind.GEIQ,
+            to_siae__kind=CompanyKind.GEIQ,
             qualification_type=QualificationType.STATE_DIPLOMA,
             qualification_level=QualificationLevel.NOT_RELEVANT,
         )
 
     for qualification_type in [QualificationType.CQP, QualificationType.CCN]:
         JobApplicationFactory(
-            to_siae__kind=SiaeKind.GEIQ,
+            to_siae__kind=CompanyKind.GEIQ,
             qualification_type=qualification_type,
             qualification_level=QualificationLevel.NOT_RELEVANT,
         )
@@ -282,8 +286,8 @@ def test_can_be_cancelled_when_an_employee_record_exists(status):
 
 
 def test_can_have_prior_action():
-    geiq = SiaeFactory.build(kind=SiaeKind.GEIQ)
-    non_geiq = SiaeFactory.build(kind=SiaeKind.AI)
+    geiq = SiaeFactory.build(kind=CompanyKind.GEIQ)
+    non_geiq = SiaeFactory.build(kind=CompanyKind.AI)
 
     assert (
         JobApplicationFactory.build(to_siae=geiq, state=JobApplicationWorkflow.STATE_NEW).can_have_prior_action
@@ -302,8 +306,8 @@ def test_can_have_prior_action():
 
 
 def test_can_change_prior_actions():
-    geiq = SiaeFactory(kind=SiaeKind.GEIQ)
-    non_geiq = SiaeFactory(kind=SiaeKind.ACI)
+    geiq = SiaeFactory(kind=CompanyKind.GEIQ)
+    non_geiq = SiaeFactory(kind=CompanyKind.ACI)
 
     assert (
         JobApplicationFactory.build(to_siae=geiq, state=JobApplicationWorkflow.STATE_NEW).can_change_prior_actions
@@ -1497,7 +1501,7 @@ class JobApplicationWorkflowTest(TestCase):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             state=JobApplicationWorkflow.STATE_PROCESSING,
-            to_siae__kind=SiaeKind.GEIQ,
+            to_siae__kind=CompanyKind.GEIQ,
         )
         job_application.accept(user=job_application.to_siae.members.first())
         assert not job_application.to_siae.is_subject_to_eligibility_rules
@@ -1520,7 +1524,7 @@ class JobApplicationWorkflowTest(TestCase):
         """
         job_application = JobApplicationSentBySiaeFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
-            to_siae__kind=SiaeKind.EI,
+            to_siae__kind=CompanyKind.EI,
             eligibility_diagnosis=None,
         )
 

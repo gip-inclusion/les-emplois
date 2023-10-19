@@ -57,13 +57,13 @@ def test_management_command_wet_run(command):
 def test_management_command_when_the_new_asp_id_is_used_by_multiple_convention(command):
     employee_record = factories.EmployeeRecordFactory(
         orphan=True,
-        job_application__to_siae__kind=companies_enums.SiaeKind.EI,
+        job_application__to_siae__kind=companies_enums.CompanyKind.EI,
     )
     siae = employee_record.job_application.to_siae
 
     # Create a non-orphan employee record that use the same convention
     factories.EmployeeRecordFactory(
-        job_application__to_siae__kind=companies_enums.SiaeKind.ACI,
+        job_application__to_siae__kind=companies_enums.CompanyKind.ACI,
         job_application__to_siae__convention__asp_id=siae.convention.asp_id,
     )
     # SiaeConventionFactory() use the `django_get_or_create` option to match the ("asp_id", "kind")` unique
@@ -88,7 +88,7 @@ def test_management_command_when_the_new_asp_id_is_used_by_multiple_convention(c
 def test_management_command_do_not_try_to_create_multiple_records_for_the_same_approval(command):
     first_employee_record = factories.EmployeeRecordFactory(
         orphan=True,
-        job_application__to_siae__kind=companies_enums.SiaeKind.EI,
+        job_application__to_siae__kind=companies_enums.CompanyKind.EI,
     )
     second_employee_record = first_employee_record.clone()  # Use clone to create the most perfect duplicate
     siae = second_employee_record.job_application.to_siae

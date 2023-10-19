@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import dateformat, timezone
 
-from itou.companies.enums import SiaeKind
+from itou.companies.enums import CompanyKind
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
 from tests.companies.factories import SiaeWithMembershipAndJobsFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory
@@ -20,7 +20,7 @@ class JobApplicationGEIQEligibilityDetailsTest(TestCase):
         cls.prescriber = cls.diagnosis.author_prescriber_organization
         cls.author = cls.prescriber.members.first()
         cls.job_seeker = cls.diagnosis.job_seeker
-        cls.siae = SiaeWithMembershipAndJobsFactory(kind=SiaeKind.GEIQ)
+        cls.siae = SiaeWithMembershipAndJobsFactory(kind=CompanyKind.GEIQ)
         cls.job_application = JobApplicationFactory(to_siae=cls.siae, job_seeker=cls.job_seeker)
         cls.url = reverse("apply:details_for_siae", kwargs={"job_application_id": cls.job_application.pk})
 

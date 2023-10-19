@@ -3,7 +3,7 @@ from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
-from itou.companies.enums import SiaeKind
+from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import AdministrativeCriteriaAnnex, AdministrativeCriteriaLevel
 from itou.eligibility.models import GEIQAdministrativeCriteria, GEIQEligibilityDiagnosis
 from tests.companies.factories import SiaeWithMembershipAndJobsFactory
@@ -35,12 +35,12 @@ def administrative_criteria_both_annexes():
 
 @pytest.fixture
 def new_geiq():
-    return SiaeWithMembershipAndJobsFactory(kind=SiaeKind.GEIQ)
+    return SiaeWithMembershipAndJobsFactory(kind=CompanyKind.GEIQ)
 
 
 def test_create_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
     prescriber_org = PrescriberOrganizationWithMembershipFactory()
-    geiq = SiaeWithMembershipAndJobsFactory(kind=SiaeKind.GEIQ)
+    geiq = SiaeWithMembershipAndJobsFactory(kind=CompanyKind.GEIQ)
 
     # good cops:
 
@@ -65,7 +65,7 @@ def test_create_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
     # bad cops:
 
     # Author is SIAE, not GEIQ
-    siae = SiaeWithMembershipAndJobsFactory(kind=SiaeKind.EI)
+    siae = SiaeWithMembershipAndJobsFactory(kind=CompanyKind.EI)
     with pytest.raises(
         ValueError,
         match="Impossible de créer un diagnostic GEIQ avec une structure de type",
@@ -124,12 +124,12 @@ def test_geiq_eligibility_diagnosis_validation():
     diagnosis.clean()
 
     # Only prescriber org or GEIQ are possible authors
-    diagnosis.author_geiq = SiaeWithMembershipAndJobsFactory(kind=SiaeKind.EI)
+    diagnosis.author_geiq = SiaeWithMembershipAndJobsFactory(kind=CompanyKind.EI)
     with pytest.raises(ValidationError, match="L'auteur du diagnostic n'est pas un GEIQ"):
         diagnosis.clean()
 
     # Contraint: both author kinds are not allowed
-    geiq = SiaeWithMembershipAndJobsFactory(kind=SiaeKind.GEIQ)
+    geiq = SiaeWithMembershipAndJobsFactory(kind=CompanyKind.GEIQ)
 
     with pytest.raises(
         ValidationError,

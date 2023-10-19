@@ -32,7 +32,7 @@ from itou.asp.models import (
 from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.address.format import format_address
 from itou.common_apps.address.models import AddressMixin
-from itou.companies.enums import SiaeKind
+from itou.companies.enums import CompanyKind
 from itou.utils.apis.exceptions import AddressLookupError
 from itou.utils.models import UniqueConstraintWithErrorCode
 from itou.utils.validators import validate_birthdate, validate_nir, validate_pole_emploi_id
@@ -656,7 +656,7 @@ class User(AbstractUser, AddressMixin):
             and parent_siae.is_active
             and parent_siae.has_admin(self)
             and (
-                parent_siae.kind == SiaeKind.GEIQ
+                parent_siae.kind == CompanyKind.GEIQ
                 or (parent_siae.should_have_convention and parent_siae.convention is not None)
             )
         )

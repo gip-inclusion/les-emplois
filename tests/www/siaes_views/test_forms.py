@@ -1,4 +1,4 @@
-from itou.companies.enums import ContractType, SiaeKind
+from itou.companies.enums import CompanyKind, ContractType
 from itou.www.companies_views.forms import EditJobDescriptionDetailsForm, EditJobDescriptionForm
 from tests.cities.factories import create_city_guerande
 from tests.companies.factories import SiaeFactory
@@ -146,7 +146,7 @@ class EditSiaeJobDescriptionFormTest(TestCase):
         assert not cleaned_data.get("is_resume_mandatory")
 
     def test_opcs_errors(self):
-        opcs = SiaeFactory(kind=SiaeKind.OPCS)
+        opcs = SiaeFactory(kind=CompanyKind.OPCS)
         post_data = {
             "job_appellation_code": "10357",
             "job_appellation": "Whatever",
@@ -176,7 +176,7 @@ class EditSiaeJobDescriptionFormTest(TestCase):
         assert form.is_valid()
 
     def test_opcs_fields(self):
-        siae = SiaeFactory(kind=SiaeKind.OPCS)
+        siae = SiaeFactory(kind=CompanyKind.OPCS)
         post_data = {
             "job_appellation_code": "10357",
             "job_appellation": "Whatever",
@@ -262,7 +262,7 @@ class EditJobDescriptionDetailsFormTest(TestCase):
         assert not cleaned_data.get("is_resume_mandatory")
 
     def test_opcs_fields(self):
-        siae = SiaeFactory(kind=SiaeKind.OPCS)
+        siae = SiaeFactory(kind=CompanyKind.OPCS)
 
         post_data = {
             "description": "description",

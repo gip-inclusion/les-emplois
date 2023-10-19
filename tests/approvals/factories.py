@@ -21,7 +21,7 @@ from itou.approvals.models import (
     ProlongationRequestDenyInformation,
     Suspension,
 )
-from itou.companies.enums import SiaeKind
+from itou.companies.enums import CompanyKind
 from itou.job_applications.models import JobApplicationWorkflow
 from tests.companies.factories import SiaeFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory
@@ -186,7 +186,7 @@ class PoleEmploiApprovalFactory(factory.django.DjangoModelFactory):
     start_at = factory.LazyFunction(datetime.date.today)
     end_at = factory.LazyAttribute(lambda obj: obj.start_at + relativedelta(years=2) - relativedelta(days=1))
     siae_siret = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
-    siae_kind = factory.fuzzy.FuzzyChoice(SiaeKind.values)
+    siae_kind = factory.fuzzy.FuzzyChoice(CompanyKind.values)
 
     @factory.lazy_attribute
     def first_name(self):

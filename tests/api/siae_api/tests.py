@@ -3,7 +3,7 @@ import json
 from django.urls import reverse
 from rest_framework.test import APIClient, APITestCase
 
-from itou.companies.enums import SiaeKind
+from itou.companies.enums import CompanyKind
 from tests.cities.factories import create_city_guerande, create_city_saint_andre
 from tests.companies.factories import SiaeFactory
 from tests.users.factories import EmployerFactory
@@ -22,7 +22,7 @@ class SiaeAPIFetchListTest(APITestCase):
         # We create 2 cities and 2 siaes in Saint-Andre.
         self.saint_andre = create_city_saint_andre()
         self.guerande = create_city_guerande()
-        self.siae_a = SiaeFactory(kind=SiaeKind.EI, department="44", coords=self.saint_andre.coords)
+        self.siae_a = SiaeFactory(kind=CompanyKind.EI, department="44", coords=self.saint_andre.coords)
         self.siae_b = SiaeFactory(
             with_jobs=True, romes=("N1101", "N1105", "N1103", "N4105"), department="44", coords=self.saint_andre.coords
         )

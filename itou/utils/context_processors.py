@@ -19,7 +19,7 @@ def expose_enums(*args):
         "ProlongationRequestStatus": approvals_enums.ProlongationRequestStatus,
         "RefusalReason": job_applications_enums.RefusalReason,
         "SenderKind": job_applications_enums.SenderKind,
-        "SiaeKind": companies_enums.SiaeKind,
+        "CompanyKind": companies_enums.CompanyKind,
     }
 
 

@@ -5,7 +5,7 @@ from django.db import models, transaction
 from django.utils import timezone
 from django.utils.text import slugify
 
-from itou.companies.enums import SiaeKind
+from itou.companies.enums import CompanyKind
 from itou.companies.models import Siae
 from itou.eligibility.enums import AdministrativeCriteriaAnnex, AdministrativeCriteriaLevel, AuthorKind
 from itou.eligibility.utils import geiq_allowance_amount
@@ -77,7 +77,7 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
         related_name="geiq_eligibilitydiagnosis_set",
         null=True,
         blank=True,
-        limit_choices_to={"kind": SiaeKind.GEIQ},
+        limit_choices_to={"kind": CompanyKind.GEIQ},
         on_delete=models.CASCADE,
     )
     administrative_criteria = models.ManyToManyField(
@@ -110,7 +110,7 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
     objects = GEIQEligibilityDiagnosisQuerySet.as_manager()
 
     def clean(self):
-        if self.author_geiq and self.author_geiq.kind != SiaeKind.GEIQ:
+        if self.author_geiq and self.author_geiq.kind != CompanyKind.GEIQ:
             raise ValidationError("L'auteur du diagnostic n'est pas un GEIQ")
 
         if self.pk:
@@ -185,7 +185,7 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
         if isinstance(author_structure, PrescriberOrganization):
             author_org = author_structure
             author_kind = AuthorKind.PRESCRIBER
-        elif isinstance(author_structure, Siae) and author_structure.kind == SiaeKind.GEIQ:
+        elif isinstance(author_structure, Siae) and author_structure.kind == CompanyKind.GEIQ:
             if not administrative_criteria:
                 raise ValueError("Un diagnostic effectué par un GEIQ doit avoir au moins un critère d'éligibilité")
             author_geiq = author_structure

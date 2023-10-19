@@ -331,7 +331,7 @@ class CancelledApproval(PENotificationMixin, CommonApprovalMixin):
     user_id_national_pe = models.CharField(verbose_name="identifiant national PE", blank=True, null=True)
 
     siae_siret = models.CharField(verbose_name="siret siae", max_length=14)
-    siae_kind = models.CharField(verbose_name="type siae", choices=companies_enums.SiaeKind.choices)
+    siae_kind = models.CharField(verbose_name="type siae", choices=companies_enums.CompanyKind.choices)
 
     sender_kind = models.CharField(
         verbose_name="origine de la candidature",
@@ -887,7 +887,7 @@ class Suspension(models.Model):
                 Suspension.Reason.FINISHED_CONTRACT,
                 Suspension.Reason.APPROVAL_BETWEEN_CTA_MEMBERS,
             ]
-            if siae.kind in [companies_enums.SiaeKind.ACI, companies_enums.SiaeKind.EI]:
+            if siae.kind in [companies_enums.CompanyKind.ACI, companies_enums.CompanyKind.EI]:
                 reasons.append(Suspension.Reason.CONTRAT_PASSERELLE)
             return [(reason.value, reason.label) for reason in reasons]
 
@@ -1284,8 +1284,8 @@ class CommonProlongation(models.Model):
 
         if self.reason == enums.ProlongationReason.PARTICULAR_DIFFICULTIES.value:
             if not self.declared_by_siae or self.declared_by_siae.kind not in [
-                companies_enums.SiaeKind.AI,
-                companies_enums.SiaeKind.ACI,
+                companies_enums.CompanyKind.AI,
+                companies_enums.CompanyKind.ACI,
             ]:
                 raise ValidationError(f"Le motif « {self.get_reason_display()} » est réservé aux AI et ACI.")
 
@@ -1683,7 +1683,7 @@ class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
     siae_kind = models.CharField(
         verbose_name="type de la SIAE",
         max_length=6,
-        choices=companies_enums.SiaeKind.choices,
+        choices=companies_enums.CompanyKind.choices,
         null=True,
         blank=True,
     )

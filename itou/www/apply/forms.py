@@ -18,7 +18,7 @@ from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS, department_from_postcode
 from itou.common_apps.address.forms import MandatoryAddressFormMixin
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
-from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, ContractType, SiaeKind
+from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind, ContractType
 from itou.eligibility.models import AdministrativeCriteria
 from itou.files.forms import ItouFileField
 from itou.job_applications import enums as job_applications_enums
@@ -422,7 +422,7 @@ class RefusalForm(forms.Form):
 
     def __init__(self, job_application, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if job_application.to_siae.kind == SiaeKind.GEIQ:
+        if job_application.to_siae.kind == CompanyKind.GEIQ:
             self.fields["refusal_reason"].choices = job_applications_enums.RefusalReason.displayed_choices(
                 extra_exclude_enums=[
                     job_applications_enums.RefusalReason.PREVENT_OBJECTIVES,
@@ -502,7 +502,7 @@ class AcceptForm(forms.ModelForm):
 
     def __init__(self, *args, siae, **kwargs):
         super().__init__(*args, **kwargs)
-        self.is_geiq = siae.kind == SiaeKind.GEIQ
+        self.is_geiq = siae.kind == CompanyKind.GEIQ
 
         self.fields["hiring_start_at"].required = True
         for field in ["hiring_start_at", "hiring_end_at"]:

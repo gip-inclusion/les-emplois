@@ -40,7 +40,7 @@ class ProlongationReason(models.TextChoices):
             cls.RQTH,
             cls.SENIOR,
         ]
-        if siae.kind in [companies_enums.SiaeKind.AI, companies_enums.SiaeKind.ACI]:
+        if siae.kind in [companies_enums.CompanyKind.AI, companies_enums.CompanyKind.ACI]:
             enums.append(cls.PARTICULAR_DIFFICULTIES)
 
         empty = [(None, cls.__empty__)] if hasattr(cls, "__empty__") else []

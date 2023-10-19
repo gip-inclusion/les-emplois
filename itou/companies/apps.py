@@ -20,7 +20,7 @@ def create_pole_emploi_siae(*args, **kwargs):
         siret=enums.POLE_EMPLOI_SIRET,
         defaults={
             "name": "POLE EMPLOI",
-            "kind": enums.SIAE_KIND_RESERVED,
-            "source": enums.SIAE_SOURCE_ADMIN_CREATED,
+            "kind": enums.COMPANY_KIND_RESERVED,
+            "source": enums.COMPANY_SOURCE_ADMIN_CREATED,
         },
     )

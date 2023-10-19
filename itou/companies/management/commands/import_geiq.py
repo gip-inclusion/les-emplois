@@ -5,7 +5,7 @@ import pandas as pd
 from django.core.management.base import BaseCommand
 
 from itou.common_apps.address.departments import department_from_postcode
-from itou.companies.enums import SiaeKind
+from itou.companies.enums import CompanyKind
 from itou.companies.management.commands._import_siae.utils import (
     clean_string,
     geocode_siae,
@@ -81,7 +81,7 @@ def get_geiq_df():
 def build_geiq(row):
     siae = Siae()
     siae.siret = row.siret
-    siae.kind = SiaeKind.GEIQ
+    siae.kind = CompanyKind.GEIQ
     siae.source = Siae.SOURCE_GEIQ
     siae.name = row["name"]  # row.name returns row index.
     assert not siae.name.isnumeric()
@@ -125,7 +125,7 @@ class Command(BaseCommand):
         info_stats |= sync_structures(
             df=geiq_df,
             source=Siae.SOURCE_GEIQ,
-            kinds=[SiaeKind.GEIQ],
+            kinds=[CompanyKind.GEIQ],
             build_structure=build_geiq,
             wet_run=wet_run,
         )

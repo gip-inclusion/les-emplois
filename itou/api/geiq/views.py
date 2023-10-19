@@ -6,7 +6,7 @@ from drf_spectacular.utils import extend_schema
 from rest_framework import authentication, exceptions, generics, permissions, status
 
 from itou.api.models import SiaeApiToken
-from itou.companies.enums import SiaeKind
+from itou.companies.enums import CompanyKind
 from itou.companies.models import Siae
 from itou.job_applications.enums import Prequalification, ProfessionalSituationExperience
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow, PriorAction
@@ -55,7 +55,7 @@ class GeiqJobApplicationListView(generics.ListAPIView):
         if api_token:
             geiqs = api_token.siaes.all()
             antennas = (
-                Siae.objects.filter(source=Siae.SOURCE_USER_CREATED, kind=SiaeKind.GEIQ)
+                Siae.objects.filter(source=Siae.SOURCE_USER_CREATED, kind=CompanyKind.GEIQ)
                 .annotate(siren=Substr("siret", pos=1, length=9))
                 .filter(siren__in=[geiq.siret[:9] for geiq in geiqs])
             )
@@ -70,7 +70,7 @@ class GeiqJobApplicationListView(generics.ListAPIView):
         return (
             JobApplication.objects.filter(
                 state=JobApplicationWorkflow.STATE_ACCEPTED,
-                to_siae__kind=SiaeKind.GEIQ,
+                to_siae__kind=CompanyKind.GEIQ,
                 **extra_filters,
             )
             .select_related(
