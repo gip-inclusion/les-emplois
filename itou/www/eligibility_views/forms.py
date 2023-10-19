@@ -1,6 +1,6 @@
 from django import forms
 
-from itou.companies.enums import SiaeKind
+from itou.companies.enums import CompanyKind
 from itou.eligibility import enums as eligibilty_enums
 from itou.eligibility.models import AdministrativeCriteria
 
@@ -69,7 +69,7 @@ class AdministrativeCriteriaForm(forms.Form):
         ]
 
         # For ETTI and AI: 1 criterion level 1 OR 2 level 2 criteria.
-        if self.siae.kind == SiaeKind.ETTI or self.siae.kind == SiaeKind.AI:
+        if self.siae.kind == CompanyKind.ETTI or self.siae.kind == CompanyKind.AI:
             len_valid = len(level_1) or len(level_2) >= 2
             if not len_valid:
                 raise forms.ValidationError(self.ERROR_CRITERIA_NUMBER_ETTI_AI)
@@ -90,7 +90,7 @@ class AdministrativeCriteriaOfJobApplicationForm(AdministrativeCriteriaForm):
         self.job_application = job_application
 
         self.siae = siae
-        if self.siae.kind == SiaeKind.ETTI or self.siae.kind == SiaeKind.AI:
+        if self.siae.kind == CompanyKind.ETTI or self.siae.kind == CompanyKind.AI:
             self.num_level2_admin_criteria = 2
         else:
             self.num_level2_admin_criteria = 3

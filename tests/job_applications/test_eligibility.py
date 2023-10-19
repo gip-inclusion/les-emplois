@@ -41,7 +41,7 @@ class EmployeeRecordEligibilityTest(TestCase):
     def test_siae_kind(self):
         # Hiring SIAE must be of a specific kind to use employee record feature
         siae_good = SiaeFactory()
-        siae_bad = SiaeFactory(kind=companies_enums.SiaeKind.EATT)
+        siae_bad = SiaeFactory(kind=companies_enums.CompanyKind.EATT)
         # job application created with a fake approval
         # to avoid filtering criteria with empty approval
         non_eligible_job_application = JobApplicationFactory(with_approval=True, to_siae=siae_bad)

@@ -2,7 +2,7 @@ from django.urls import reverse
 from django.utils import timezone
 from rest_framework.test import APIClient, APITestCase
 
-from itou.companies.enums import SiaeKind
+from itou.companies.enums import CompanyKind
 from itou.companies.models import Siae
 from tests.companies.factories import SiaeConventionFactory, SiaeFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
@@ -170,8 +170,8 @@ class DataInclusionSiaeStructureTest(APITestCase):
         assert structure_data_list[0]["siret"] == siae.siret[:9]  # fake nic is removed
 
     def test_list_structures_duplicated_siret(self):
-        siae_1 = SiaeFactory(siret="10000000000001", kind=SiaeKind.ACI)
-        siae_2 = SiaeFactory(siret=siae_1.siret, kind=SiaeKind.EI)
+        siae_1 = SiaeFactory(siret="10000000000001", kind=CompanyKind.ACI)
+        siae_2 = SiaeFactory(siret=siae_1.siret, kind=CompanyKind.EI)
 
         with self.assertNumQueries(NUM_QUERIES):
             response = self.authenticated_client.get(

@@ -5,7 +5,7 @@ from django.urls import reverse
 from faker import Faker
 from pytest_django.asserts import assertContains, assertNotContains
 
-from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, ContractType, SiaeKind
+from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind, ContractType
 from itou.job_applications.enums import QualificationLevel, QualificationType
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.www.apply import forms as apply_forms
@@ -90,7 +90,7 @@ class TestAcceptForm:
     @pytest.mark.parametrize("with_job_application", [True, False])
     def test_accept_form_without_geiq(self, with_job_application):
         # Job application accept form for a "standard" SIAE
-        job_application = JobApplicationFactory(to_siae__kind=SiaeKind.EI)
+        job_application = JobApplicationFactory(to_siae__kind=CompanyKind.EI)
         form = apply_forms.AcceptForm(
             instance=job_application if with_job_application else None, siae=job_application.to_siae
         )
@@ -114,7 +114,7 @@ class TestAcceptForm:
             "qualification_type",
         ]
         # Job application accept form for a GEIQ: more fields
-        job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ)
+        job_application = JobApplicationFactory(to_siae__kind=CompanyKind.GEIQ)
         form = apply_forms.AcceptForm(
             instance=job_application if with_job_application else None, siae=job_application.to_siae
         )
@@ -122,7 +122,7 @@ class TestAcceptForm:
         assert sorted(form.fields.keys()) == EXPECTED_FIELDS
 
         # Dynamic contract type details field
-        job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ)
+        job_application = JobApplicationFactory(to_siae__kind=CompanyKind.GEIQ)
         form = apply_forms.AcceptForm(
             instance=job_application if with_job_application else None,
             siae=job_application.to_siae,
@@ -132,7 +132,7 @@ class TestAcceptForm:
 
     @pytest.mark.parametrize("with_job_application", [True, False])
     def test_accept_form_geiq_required_fields_validation(self, faker, with_job_application):
-        job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ)
+        job_application = JobApplicationFactory(to_siae__kind=CompanyKind.GEIQ)
 
         post_data = {"hiring_start_at": f"{datetime.now():%Y-%m-%d}"}
         form = apply_forms.AcceptForm(
@@ -186,7 +186,7 @@ class TestAcceptForm:
 
     @pytest.mark.parametrize("with_job_application", [True, False])
     def test_accept_form_geiq_contract_type_field_validation(self, faker, with_job_application):
-        job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ)
+        job_application = JobApplicationFactory(to_siae__kind=CompanyKind.GEIQ)
         post_data = {
             "hiring_start_at": f"{datetime.now():%Y-%m-%d}",
             "prehiring_guidance_days": faker.pyint(),
@@ -256,7 +256,7 @@ class TestAcceptForm:
 class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
     def test_save_geiq_form_fields_from_view(self):
         # non-GEIQ accept case tests are in `tests_process.py`
-        job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, state="processing")
+        job_application = JobApplicationFactory(to_siae__kind=CompanyKind.GEIQ, state="processing")
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
         self.client.force_login(job_application.to_siae.members.first())
@@ -296,7 +296,7 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
         assert not job_application.inverted_vae_contract
 
     def test_geiq_inverted_vae_fields(self):
-        job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, state="processing")
+        job_application = JobApplicationFactory(to_siae__kind=CompanyKind.GEIQ, state="processing")
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
         self.client.force_login(job_application.to_siae.members.first())
@@ -331,7 +331,7 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
         # GEIQ can temporarily accept job applications with a past hiring date
 
         # with a SIAE
-        job_application = JobApplicationFactory(to_siae__kind=SiaeKind.EI, state="processing")
+        job_application = JobApplicationFactory(to_siae__kind=CompanyKind.EI, state="processing")
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
         self.client.force_login(job_application.to_siae.members.first())
@@ -362,7 +362,7 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
         assert job_application.state == JobApplicationWorkflow.STATE_PROCESSING
 
         # with a GEIQ
-        job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, state="processing")
+        job_application = JobApplicationFactory(to_siae__kind=CompanyKind.GEIQ, state="processing")
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
         self.client.force_login(job_application.to_siae.members.first())
         response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data, follow=True)
@@ -397,6 +397,6 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
             assertContains(_response(kind), self.HELP_START_AT)
             assertContains(_response(kind), self.HELP_END_AT)
 
-        for kind in (SiaeKind.EA, SiaeKind.EATT, SiaeKind.GEIQ, SiaeKind.OPCS):
+        for kind in (CompanyKind.EA, CompanyKind.EATT, CompanyKind.GEIQ, CompanyKind.OPCS):
             assertNotContains(_response(kind), self.HELP_START_AT)
             assertNotContains(_response(kind), self.HELP_END_AT)

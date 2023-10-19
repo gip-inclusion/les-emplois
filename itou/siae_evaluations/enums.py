@@ -1,6 +1,6 @@
 from django.db import models
 
-from itou.companies.enums import SiaeKind
+from itou.companies.enums import CompanyKind
 
 
 class EvaluationChosenPercent:
@@ -10,7 +10,7 @@ class EvaluationChosenPercent:
 
 
 class EvaluationSiaesKind:
-    Evaluable = [SiaeKind.AI, SiaeKind.EI, SiaeKind.ACI, SiaeKind.ETTI]
+    Evaluable = [CompanyKind.AI, CompanyKind.EI, CompanyKind.ACI, CompanyKind.ETTI]
 
 
 class EvaluationJobApplicationsBoundariesNumber:

@@ -17,7 +17,7 @@ from django.utils import timezone
 import tests.asp.factories as asp
 from itou.approvals.models import Approval
 from itou.asp.models import AllocationDuration, EducationLevel, EmployerType
-from itou.companies.enums import SiaeKind
+from itou.companies.enums import CompanyKind
 from itou.job_applications.enums import Origin
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title, UserKind
@@ -641,11 +641,11 @@ class ModelTest(TestCase):
         assert not user.can_create_siae_antenna(siae)
 
     def test_admin_ability_to_create_siae_antenna(self):
-        for kind in SiaeKind:
+        for kind in CompanyKind:
             with self.subTest(kind=kind):
                 siae = SiaeFactory(kind=kind, with_membership=True, membership__is_admin=True)
                 user = siae.members.get()
-                if kind == SiaeKind.GEIQ:
+                if kind == CompanyKind.GEIQ:
                     assert user.can_create_siae_antenna(siae)
                 else:
                     assert user.can_create_siae_antenna(siae) == siae.should_have_convention
@@ -1092,37 +1092,37 @@ class LatestApprovalTestCase(TestCase):
         # Waiting period cannot be bypassed for SIAE if no prescriber
         # and there is no valid eligibility diagnosis this in period
         assert user.approval_can_be_renewed_by(
-            siae=SiaeFactory(kind=SiaeKind.ETTI), sender_prescriber_organization=None
+            siae=SiaeFactory(kind=CompanyKind.ETTI), sender_prescriber_organization=None
         )
 
         # Waiting period cannot be bypassed for SIAE if unauthorized prescriber
         # and there is no valid eligibility diagnosis this in period
         assert user.approval_can_be_renewed_by(
-            siae=SiaeFactory(kind=SiaeKind.ETTI),
+            siae=SiaeFactory(kind=CompanyKind.ETTI),
             sender_prescriber_organization=PrescriberOrganizationFactory(),
         )
 
         # Waiting period is bypassed for SIAE if authorized prescriber.
         assert not user.approval_can_be_renewed_by(
-            siae=SiaeFactory(kind=SiaeKind.ETTI),
+            siae=SiaeFactory(kind=CompanyKind.ETTI),
             sender_prescriber_organization=PrescriberOrganizationFactory(authorized=True),
         )
 
         # Waiting period is bypassed for GEIQ even if no prescriber.
         assert not user.approval_can_be_renewed_by(
-            siae=SiaeFactory(kind=SiaeKind.GEIQ), sender_prescriber_organization=None
+            siae=SiaeFactory(kind=CompanyKind.GEIQ), sender_prescriber_organization=None
         )
 
         # Waiting period is bypassed for GEIQ even if unauthorized prescriber.
         assert not user.approval_can_be_renewed_by(
-            siae=SiaeFactory(kind=SiaeKind.GEIQ),
+            siae=SiaeFactory(kind=CompanyKind.GEIQ),
             sender_prescriber_organization=PrescriberOrganizationFactory(),
         )
 
         # Waiting period is bypassed if a valid diagnosis made by an authorized prescriber exists.
         diag = EligibilityDiagnosisFactory(job_seeker=user)
         assert not user.approval_can_be_renewed_by(
-            siae=SiaeFactory(kind=SiaeKind.ETTI),
+            siae=SiaeFactory(kind=CompanyKind.ETTI),
             sender_prescriber_organization=None,
         )
         diag.delete()
@@ -1131,7 +1131,7 @@ class LatestApprovalTestCase(TestCase):
         # but was not made by an authorized prescriber.
         diag = EligibilityDiagnosisMadeBySiaeFactory(job_seeker=user)
         assert user.approval_can_be_renewed_by(
-            siae=SiaeFactory(kind=SiaeKind.ETTI),
+            siae=SiaeFactory(kind=CompanyKind.ETTI),
             sender_prescriber_organization=None,
         )
 

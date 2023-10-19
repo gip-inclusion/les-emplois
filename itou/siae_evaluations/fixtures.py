@@ -16,7 +16,7 @@ from django.utils import timezone
 
 import itou.users.enums as users_enums
 from itou.approvals.models import Approval
-from itou.companies.enums import SiaeKind
+from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria
 from itou.eligibility.models.iae import EligibilityDiagnosis
@@ -91,7 +91,7 @@ def load_data():
             )
             level = str((i % 2) + 1)
             # See AdministrativeCriteriaForm
-            level2_criteria_count = 2 if controlled_siae.kind in [SiaeKind.AI, SiaeKind.ETTI] else 3
+            level2_criteria_count = 2 if controlled_siae.kind in [CompanyKind.AI, CompanyKind.ETTI] else 3
             min_selected_criteria = 1 if level == AdministrativeCriteriaLevel.LEVEL_1 else level2_criteria_count
             pks_list = random.sample(level_to_criteria_pks[level], k=random.randint(min_selected_criteria, 4))
 

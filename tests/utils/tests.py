@@ -29,7 +29,7 @@ from pytest_django.asserts import assertContains, assertNumQueries, assertRedire
 import itou.utils.json
 import itou.utils.session
 from itou.approvals.models import Suspension
-from itou.companies.enums import SiaeKind
+from itou.companies.enums import CompanyKind
 from itou.companies.models import Siae, SiaeMembership
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.users.enums import UserKind
@@ -277,7 +277,7 @@ class TestItouCurrentOrganizationMiddleware:
         request.user = SiaeMembershipFactory(siae=siae).user
         # OPCS ensures that the siae is active (since it is not subject to eligibility) and also that
         # the ordering based on kind will put it in second position for request.organizations
-        active_siae = SiaeMembershipFactory(user=request.user, siae__kind=SiaeKind.OPCS, siae__name="2").siae
+        active_siae = SiaeMembershipFactory(user=request.user, siae__kind=CompanyKind.OPCS, siae__name="2").siae
         SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
         MessageMiddleware(get_response_for_middlewaremixin).process_request(request)
         with assertNumQueries(

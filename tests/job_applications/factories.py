@@ -4,7 +4,7 @@ import factory
 import factory.fuzzy
 from dateutil.relativedelta import relativedelta
 
-from itou.companies.enums import SiaeKind
+from itou.companies.enums import CompanyKind
 from itou.companies.models import SiaeJobDescription
 from itou.eligibility.enums import AuthorKind
 from itou.job_applications import models
@@ -44,7 +44,7 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
         )
         # GEIQ diagnosis created by a GEIQ
         with_geiq_eligibility_diagnosis = factory.Trait(
-            to_siae=factory.SubFactory(SiaeFactory, with_membership=True, kind=SiaeKind.GEIQ),
+            to_siae=factory.SubFactory(SiaeFactory, with_membership=True, kind=CompanyKind.GEIQ),
             sender=factory.LazyAttribute(lambda obj: obj.to_siae.members.first()),
             geiq_eligibility_diagnosis=factory.SubFactory(
                 GEIQEligibilityDiagnosisFactory,
@@ -56,7 +56,7 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
             eligibility_diagnosis=None,
         )
         with_geiq_eligibility_diagnosis_from_prescriber = factory.Trait(
-            to_siae=factory.SubFactory(SiaeFactory, with_membership=True, kind=SiaeKind.GEIQ),
+            to_siae=factory.SubFactory(SiaeFactory, with_membership=True, kind=CompanyKind.GEIQ),
             sender=factory.LazyAttribute(lambda obj: obj.sender_prescriber_organization.members.first()),
             geiq_eligibility_diagnosis=factory.SubFactory(
                 GEIQEligibilityDiagnosisFactory,

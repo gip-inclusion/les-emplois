@@ -8,7 +8,7 @@ from django.utils import timezone
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS, department_from_postcode
 from itou.companies import models
-from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, ContractType, SiaeKind
+from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind, ContractType
 from itou.jobs.models import Appellation
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import EmployerFactory
@@ -45,7 +45,7 @@ class SiaeConventionFactory(factory.django.DjangoModelFactory):
     # Don't start a SIRET with 0.
     siret_signature = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
     # FIXME(vperron): this should be made random
-    kind = SiaeKind.EI
+    kind = CompanyKind.EI
     # factory.Sequence() start with 0 and an ASP ID should be greater than 0
     asp_id = factory.Sequence(lambda n: n + 1)
     is_active = True
@@ -91,7 +91,7 @@ class SiaeFactory(factory.django.DjangoModelFactory):
             kind=factory.fuzzy.FuzzyChoice(SIAE_WITH_CONVENTION_KINDS),
         )
         not_subject_to_eligibility = factory.Trait(
-            kind=factory.fuzzy.FuzzyChoice([kind for kind in SiaeKind if kind not in SIAE_WITH_CONVENTION_KINDS]),
+            kind=factory.fuzzy.FuzzyChoice([kind for kind in CompanyKind if kind not in SIAE_WITH_CONVENTION_KINDS]),
         )
         use_employee_record = factory.Trait(kind=factory.fuzzy.FuzzyChoice(models.Siae.ASP_EMPLOYEE_RECORD_KINDS))
         with_membership = factory.Trait(
@@ -119,7 +119,7 @@ class SiaeFactory(factory.django.DjangoModelFactory):
     siret = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
     naf = factory.fuzzy.FuzzyChoice(NAF_CODES)
     # FIXME(vperron): this should be made random
-    kind = SiaeKind.EI
+    kind = CompanyKind.EI
     name = factory.Faker("company", locale="fr_FR")
     phone = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     email = factory.Faker("email", locale="fr_FR")

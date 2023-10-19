@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 from django.utils.html import escape
 
-from itou.companies.enums import ContractType, SiaeKind
+from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import Siae
 from itou.jobs.models import Appellation
 from itou.utils import constants as global_constants
@@ -657,7 +657,7 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         assert response.status_code == 403
 
     def test_import_created_geiq_admin_cannot_see_nor_select_af(self):
-        siae = SiaeFactory(kind=SiaeKind.GEIQ, source=Siae.SOURCE_GEIQ, with_membership=True)
+        siae = SiaeFactory(kind=CompanyKind.GEIQ, source=Siae.SOURCE_GEIQ, with_membership=True)
         user = siae.members.first()
         assert siae.has_admin(user)
         assert not siae.should_have_convention
@@ -675,7 +675,7 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         assert response.status_code == 403
 
     def test_user_created_geiq_admin_cannot_see_nor_select_af(self):
-        siae = SiaeFactory(kind=SiaeKind.GEIQ, source=Siae.SOURCE_USER_CREATED, with_membership=True)
+        siae = SiaeFactory(kind=CompanyKind.GEIQ, source=Siae.SOURCE_USER_CREATED, with_membership=True)
         user = siae.members.first()
         assert siae.has_admin(user)
         assert not siae.should_have_convention
@@ -807,7 +807,7 @@ class CreateSiaeViewTest(TestCase):
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
     def test_cannot_create_siae_with_same_siret_and_different_kind(self, _mock_call_ban_geocoding_api):
         siae = SiaeFactory(with_membership=True)
-        siae.kind = SiaeKind.ETTI
+        siae.kind = CompanyKind.ETTI
         siae.save()
         user = siae.members.first()
 
@@ -819,7 +819,7 @@ class CreateSiaeViewTest(TestCase):
 
         post_data = {
             "siret": siae.siret,
-            "kind": SiaeKind.ACI,
+            "kind": CompanyKind.ACI,
             "name": "FAMOUS SIAE SUB STRUCTURE",
             "source": Siae.SOURCE_USER_CREATED,
             "address_line_1": "2 Rue de Soufflenheim",
@@ -839,7 +839,7 @@ class CreateSiaeViewTest(TestCase):
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
     def test_cannot_create_siae_with_same_siren_and_different_kind(self, _mock_call_ban_geocoding_api):
         siae = SiaeFactory(with_membership=True)
-        siae.kind = SiaeKind.ETTI
+        siae.kind = CompanyKind.ETTI
         siae.save()
         user = siae.members.first()
 
@@ -854,7 +854,7 @@ class CreateSiaeViewTest(TestCase):
 
         post_data = {
             "siret": new_siret,
-            "kind": SiaeKind.ACI,
+            "kind": CompanyKind.ACI,
             "name": "FAMOUS SIAE SUB STRUCTURE",
             "source": Siae.SOURCE_USER_CREATED,
             "address_line_1": "2 Rue de Soufflenheim",

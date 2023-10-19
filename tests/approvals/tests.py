@@ -25,7 +25,7 @@ from itou.approvals.admin_forms import ApprovalAdminForm
 from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
 from itou.approvals.enums import ApprovalStatus, Origin, ProlongationReason
 from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, Suspension
-from itou.companies.enums import SiaeKind
+from itou.companies.enums import CompanyKind
 from itou.employee_record.enums import Status
 from itou.files.models import File
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
@@ -1032,7 +1032,7 @@ class CustomApprovalAdminViewsTest(TestCase):
         assert msg == "Date de début du contrat avant l'interopérabilité"
 
         # When employee records are allowed (or not) for the SIAE
-        for kind in SiaeKind:
+        for kind in CompanyKind:
             with self.subTest("SIAE doesn't use employee records", kind=kind):
                 job_application = JobApplicationFactory(with_approval=True, to_siae__kind=kind)
                 msg = JobApplicationInline.employee_record_status(job_application)
@@ -1146,14 +1146,14 @@ class SuspensionModelTest(TestCase):
 
     def test_displayed_choices_for_siae(self):
         # EI and ACI kind have one more choice
-        for kind in [SiaeKind.EI, SiaeKind.ACI]:
+        for kind in [CompanyKind.EI, CompanyKind.ACI]:
             siae = SiaeFactory(kind=kind)
             result = Suspension.Reason.displayed_choices_for_siae(siae)
             assert len(result) == 5
             assert result[-1][0] == Suspension.Reason.CONTRAT_PASSERELLE.value
 
         # Some other cases
-        for kind in [SiaeKind.ETTI, SiaeKind.AI]:
+        for kind in [CompanyKind.ETTI, CompanyKind.AI]:
             siae = SiaeFactory(kind=kind)
             result = Suspension.Reason.displayed_choices_for_siae(siae)
             assert len(result) == 4
@@ -1468,7 +1468,7 @@ class ProlongationModelTest(TestCase):
                     end_at=factory.LazyAttribute(
                         lambda obj: obj.start_at + info["duration"] + datetime.timedelta(days=1)
                     ),
-                    declared_by_siae__kind=SiaeKind.AI,
+                    declared_by_siae__kind=CompanyKind.AI,
                 )
                 with pytest.raises(ValidationError) as error:
                     prolongation.clean()
@@ -1508,10 +1508,10 @@ class ProlongationModelTest(TestCase):
             reason=ProlongationReason.PARTICULAR_DIFFICULTIES,
         )
 
-        for kind in SiaeKind:
+        for kind in CompanyKind:
             with self.subTest(kind=kind):
                 prolongation.declared_by_siae.kind = kind
-                if kind in [SiaeKind.AI, SiaeKind.ACI]:
+                if kind in [CompanyKind.AI, CompanyKind.ACI]:
                     prolongation.clean()
                 else:
                     with pytest.raises(ValidationError) as error:
@@ -1783,7 +1783,7 @@ def test_prolongation_report_file_constraint_invalid_reasons_ko():
 def test_mandatory_contact_fields_validation(reason, faker):
     # Contact details are mandatory for these reasons
     prolongation = ProlongationFactory(
-        reason=reason, declared_by_siae__kind=SiaeKind.ACI, require_phone_interview=True
+        reason=reason, declared_by_siae__kind=CompanyKind.ACI, require_phone_interview=True
     )
 
     for phone, email in [
@@ -1810,7 +1810,7 @@ def test_mandatory_contact_fields_validation(reason, faker):
 def test_optional_contact_fields_validation(reason, faker):
     # ProlongationReason.COMPLETE_TRAINING is a specific case
     prolongation = ProlongationFactory(
-        reason=reason, declared_by_siae__kind=SiaeKind.ACI, require_phone_interview=False
+        reason=reason, declared_by_siae__kind=CompanyKind.ACI, require_phone_interview=False
     )
     prolongation.clean()
 

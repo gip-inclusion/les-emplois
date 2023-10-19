@@ -12,7 +12,7 @@ from django.utils import timezone
 from django_xworkflows import models as xwf_models
 
 from itou.approvals.models import Approval, Prolongation, Suspension
-from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, ContractType, SiaeKind
+from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind, ContractType
 from itou.companies.models import Siae
 from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models import EligibilityDiagnosis, SelectedAdministrativeCriteria
@@ -609,7 +609,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     contract_type = models.CharField(
         verbose_name="type de contrat",
         max_length=30,
-        choices=ContractType.choices_for_siae_kind(SiaeKind.GEIQ),
+        choices=ContractType.choices_for_siae_kind(CompanyKind.GEIQ),
         blank=True,
     )
     nb_hours_per_week = models.PositiveSmallIntegerField(
@@ -702,7 +702,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
         # `to_siae` is not guaranteed to exist if a `full_clean` is performed in some occasions (f.i. in an admin form)
         # checking existence of `to_siae_id` keeps us safe here
-        if self.to_siae_id and self.to_siae.kind != SiaeKind.GEIQ:
+        if self.to_siae_id and self.to_siae.kind != CompanyKind.GEIQ:
             if self.contract_type:
                 raise ValidationError("Le type de contrat ne peut être saisi que pour un GEIQ")
             if self.contract_type_details:

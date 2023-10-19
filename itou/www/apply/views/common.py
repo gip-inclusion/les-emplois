@@ -10,7 +10,7 @@ from django.utils.safestring import mark_safe
 from django_htmx.http import HttpResponseClientRedirect
 from django_xworkflows import models as xwf_models
 
-from itou.companies.enums import ContractType, SiaeKind
+from itou.companies.enums import CompanyKind, ContractType
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.utils import geiq_allowance_amount
@@ -167,7 +167,7 @@ def _accept(request, siae, job_seeker, error_url, back_url, template_name, extra
                         f"{external_link}."
                     ),
                 )
-        elif job_application.to_siae.kind == SiaeKind.GEIQ:
+        elif job_application.to_siae.kind == CompanyKind.GEIQ:
             # If job seeker has as valid GEIQ diagnosis issued by a GEIQ or a prescriber
             # link this diagnosis to the current job application
             if geiq_eligibility_diagnosis := GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(

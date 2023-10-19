@@ -16,7 +16,7 @@ from django.test import TransactionTestCase, override_settings
 from django.urls import reverse
 from freezegun import freeze_time
 
-from itou.companies.enums import SiaeKind
+from itou.companies.enums import CompanyKind
 from itou.companies.management.commands._import_siae.utils import anonymize_fluxiae_df, could_siae_be_deleted
 from itou.companies.models import Siae
 from tests.approvals.factories import ApprovalFactory
@@ -91,7 +91,7 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         SIRET = SIRET_SIGNATURE = "21540323900019"
         ASP_ID = 112
 
-        siae = SiaeFactory(source=Siae.SOURCE_ASP, siret=SIRET, kind=SiaeKind.ACI, convention=None)
+        siae = SiaeFactory(source=Siae.SOURCE_ASP, siret=SIRET, kind=CompanyKind.ACI, convention=None)
         results = self.mod.get_creatable_conventions()
 
         assert len(results) == 1
@@ -104,14 +104,14 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
             convention.is_active,
             convention.deactivated_at,
         ) == (ASP_ID, siae.kind, SIRET_SIGNATURE, True, None)
-        assert (siae.source, siae.siret, siae.kind) == (Siae.SOURCE_ASP, SIRET, SiaeKind.ACI)
+        assert (siae.source, siae.siret, siae.kind) == (Siae.SOURCE_ASP, SIRET, CompanyKind.ACI)
 
     def test_creatable_conventions_for_active_siae_where_siret_not_equals_siret_signature(self):
         SIRET = "34950857200055"
         SIRET_SIGNATURE = "34950857200048"
         ASP_ID = 768
 
-        siae = SiaeFactory(source=Siae.SOURCE_ASP, siret=SIRET, kind=SiaeKind.AI, convention=None)
+        siae = SiaeFactory(source=Siae.SOURCE_ASP, siret=SIRET, kind=CompanyKind.AI, convention=None)
         results = self.mod.get_creatable_conventions()
 
         assert len(results) == 1
@@ -124,12 +124,12 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
             convention.is_active,
             convention.deactivated_at,
         ) == (ASP_ID, siae.kind, SIRET_SIGNATURE, True, None)
-        assert (siae.source, siae.siret, siae.kind) == (Siae.SOURCE_ASP, SIRET, SiaeKind.AI)
+        assert (siae.source, siae.siret, siae.kind) == (Siae.SOURCE_ASP, SIRET, CompanyKind.AI)
 
     def test_creatable_conventions_inactive_siae(self):
         SIRET = SIRET_SIGNATURE = "41294123900011"
         ASP_ID = 1780
-        siae = SiaeFactory(source=Siae.SOURCE_ASP, siret=SIRET, kind=SiaeKind.ACI, convention=None)
+        siae = SiaeFactory(source=Siae.SOURCE_ASP, siret=SIRET, kind=CompanyKind.ACI, convention=None)
         results = self.mod.get_creatable_conventions()
 
         assert len(results) == 1
@@ -142,10 +142,10 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
             convention.is_active,
             convention.deactivated_at.to_pydatetime(),
         ) == (ASP_ID, siae.kind, SIRET_SIGNATURE, False, datetime.datetime(2020, 2, 29, 0, 0))
-        assert (siae.source, siae.siret, siae.kind) == (Siae.SOURCE_ASP, SIRET, SiaeKind.ACI)
+        assert (siae.source, siae.siret, siae.kind) == (Siae.SOURCE_ASP, SIRET, CompanyKind.ACI)
 
     def test_get_creatable_and_deletable_afs(self):
-        existing_convention = SiaeConventionFactory(kind=SiaeKind.ACI, asp_id=2855)
+        existing_convention = SiaeConventionFactory(kind=CompanyKind.ACI, asp_id=2855)
         # Get AF created by SiaeConventionFactory
         deletable_af = existing_convention.financial_annexes.first()
         financial_annex = importlib.import_module("itou.companies.management.commands._import_siae.financial_annex")

@@ -10,7 +10,7 @@ from django.utils.http import urlencode
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects, assertTemplateUsed
 
 from itou.approvals.models import Approval, Suspension
-from itou.companies.enums import ContractType, SiaeKind
+from itou.companies.enums import CompanyKind, ContractType
 from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.employee_record.enums import Status
@@ -1040,7 +1040,7 @@ class ProcessViewsTest(TestCase):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             state=JobApplicationWorkflow.STATE_PROCESSING,
-            to_siae__kind=SiaeKind.GEIQ,
+            to_siae__kind=CompanyKind.GEIQ,
         )
         siae_user = job_application.to_siae.members.first()
         self.client.force_login(siae_user)
@@ -1539,7 +1539,7 @@ def test_refuse_jobapplication_geiq_reasons(client, reason):
     job_application = JobApplicationFactory(
         sent_by_authorized_prescriber_organisation=True,
         state=JobApplicationWorkflow.STATE_PROCESSING,
-        to_siae__kind=SiaeKind.GEIQ,
+        to_siae__kind=CompanyKind.GEIQ,
     )
     assert job_application.state.is_processing
     siae_user = job_application.to_siae.members.first()
@@ -1578,7 +1578,7 @@ def test_details_for_prescriber_geiq(client):
 def test_accept_button(client):
     job_application = JobApplicationFactory(
         state=JobApplicationWorkflow.STATE_PROCESSING,
-        to_siae__kind=SiaeKind.GEIQ,
+        to_siae__kind=CompanyKind.GEIQ,
     )
     accept_url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
     DIRECT_ACCEPT_BUTTON = f"""<a href="{accept_url}" class="btn btn-primary btn-block btn-ico">
@@ -1590,7 +1590,7 @@ def test_accept_button(client):
     # GEIQ without GEIQ diagnosis: we get the modals
     assertNotContains(response, DIRECT_ACCEPT_BUTTON)
 
-    job_application.to_siae.kind = SiaeKind.AI
+    job_application.to_siae.kind = CompanyKind.AI
     job_application.to_siae.save(update_fields=("kind",))
 
     response = client.get(reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk}))
@@ -1599,7 +1599,7 @@ def test_accept_button(client):
 
 def test_add_prior_action_new(client):
     # State is new
-    job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ)
+    job_application = JobApplicationFactory(to_siae__kind=CompanyKind.GEIQ)
     client.force_login(job_application.to_siae.members.first())
     add_prior_action_url = reverse("apply:add_prior_action", kwargs={"job_application_id": job_application.pk})
     response = client.post(
@@ -1615,7 +1615,9 @@ def test_add_prior_action_new(client):
 
 
 def test_add_prior_action_processing(client):
-    job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, state=JobApplicationWorkflow.STATE_PROCESSING)
+    job_application = JobApplicationFactory(
+        to_siae__kind=CompanyKind.GEIQ, state=JobApplicationWorkflow.STATE_PROCESSING
+    )
     client.force_login(job_application.to_siae.members.first())
     add_prior_action_url = reverse("apply:add_prior_action", kwargs={"job_application_id": job_application.pk})
     today = timezone.localdate()
@@ -1650,7 +1652,9 @@ def test_add_prior_action_processing(client):
     assert not job_application.prior_actions.filter(action=job_applications_enums.Prequalification.POE).exists()
 
     # State is processing but SIAE is not a GEIQ
-    job_application = JobApplicationFactory(to_siae__kind=SiaeKind.AI, state=JobApplicationWorkflow.STATE_PROCESSING)
+    job_application = JobApplicationFactory(
+        to_siae__kind=CompanyKind.AI, state=JobApplicationWorkflow.STATE_PROCESSING
+    )
     client.force_login(job_application.to_siae.members.first())
     response = client.post(
         add_prior_action_url,
@@ -1665,7 +1669,9 @@ def test_add_prior_action_processing(client):
 
 
 def test_modify_prior_action(client):
-    job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, state=JobApplicationWorkflow.STATE_POSTPONED)
+    job_application = JobApplicationFactory(
+        to_siae__kind=CompanyKind.GEIQ, state=JobApplicationWorkflow.STATE_POSTPONED
+    )
     prior_action = PriorActionFactory(
         job_application=job_application, action=job_applications_enums.Prequalification.AFPR
     )
@@ -1706,7 +1712,9 @@ def test_modify_prior_action(client):
 
 
 def test_delete_prior_action_accepted(client):
-    job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, state=JobApplicationWorkflow.STATE_ACCEPTED)
+    job_application = JobApplicationFactory(
+        to_siae__kind=CompanyKind.GEIQ, state=JobApplicationWorkflow.STATE_ACCEPTED
+    )
     prior_action = PriorActionFactory(
         job_application=job_application, action=job_applications_enums.Prequalification.AFPR
     )
@@ -1723,7 +1731,9 @@ def test_delete_prior_action_accepted(client):
 
 @pytest.mark.parametrize("with_geiq_diagnosis", [True, False])
 def test_delete_prior_action(client, with_geiq_diagnosis):
-    job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, state=JobApplicationWorkflow.STATE_PROCESSING)
+    job_application = JobApplicationFactory(
+        to_siae__kind=CompanyKind.GEIQ, state=JobApplicationWorkflow.STATE_PROCESSING
+    )
     prior_action1 = PriorActionFactory(
         job_application=job_application, action=job_applications_enums.Prequalification.AFPR
     )
@@ -1787,7 +1797,9 @@ def test_delete_prior_action(client, with_geiq_diagnosis):
 
 
 def test_htmx_add_prior_action_and_cancel(client):
-    job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, state=JobApplicationWorkflow.STATE_PROCESSING)
+    job_application = JobApplicationFactory(
+        to_siae__kind=CompanyKind.GEIQ, state=JobApplicationWorkflow.STATE_PROCESSING
+    )
     client.force_login(job_application.to_siae.members.first())
     details_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
     response = client.get(details_url)
@@ -1815,7 +1827,9 @@ def test_htmx_add_prior_action_and_cancel(client):
 
 
 def test_htmx_modify_prior_action_and_cancel(client):
-    job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, state=JobApplicationWorkflow.STATE_PROCESSING)
+    job_application = JobApplicationFactory(
+        to_siae__kind=CompanyKind.GEIQ, state=JobApplicationWorkflow.STATE_PROCESSING
+    )
     prior_action = PriorActionFactory(job_application=job_application)
     client.force_login(job_application.to_siae.members.first())
     details_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
@@ -1843,7 +1857,7 @@ def test_htmx_modify_prior_action_and_cancel(client):
 
 @pytest.mark.parametrize("with_geiq_diagnosis", [True, False])
 def test_details_for_siae_with_prior_action(client, with_geiq_diagnosis):
-    job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ)
+    job_application = JobApplicationFactory(to_siae__kind=CompanyKind.GEIQ)
     user = job_application.to_siae.members.first()
     client.force_login(user)
     if with_geiq_diagnosis:
@@ -1977,7 +1991,7 @@ def test_details_for_geiq_with_inverted_vae_contract(client, inverted_vae_contra
     # GEIQ: check that contract type is displayed in details
     job_application = JobApplicationFactory(
         state=JobApplicationWorkflow.STATE_ACCEPTED,
-        to_siae__kind=SiaeKind.GEIQ,
+        to_siae__kind=CompanyKind.GEIQ,
         contract_type=ContractType.PROFESSIONAL_TRAINING,
         inverted_vae_contract=inverted_vae_contract,
     )
@@ -1995,7 +2009,7 @@ def test_details_for_geiq_with_inverted_vae_contract(client, inverted_vae_contra
 
 @pytest.mark.parametrize("qualification_type", job_applications_enums.QualificationType)
 def test_reload_qualification_fields(qualification_type, client, snapshot):
-    siae = SiaeFactory(pk=10, kind=SiaeKind.GEIQ, with_membership=True)
+    siae = SiaeFactory(pk=10, kind=CompanyKind.GEIQ, with_membership=True)
     siae_member = siae.members.first()
     client.force_login(siae_member)
     url = reverse("apply:reload_qualification_fields", kwargs={"siae_pk": siae.pk})
@@ -2018,7 +2032,7 @@ def test_reload_qualification_fields(qualification_type, client, snapshot):
 
 
 def test_reload_qualification_fields_404(client):
-    siae = SiaeFactory(kind=SiaeKind.GEIQ, with_membership=True)
+    siae = SiaeFactory(kind=CompanyKind.GEIQ, with_membership=True)
     siae_member = siae.members.first()
     client.force_login(siae_member)
     url = reverse("apply:reload_qualification_fields", kwargs={"siae_pk": 0})
@@ -2041,10 +2055,10 @@ def test_reload_qualification_fields_404(client):
 
 
 @pytest.mark.parametrize(
-    "contract_type", [value for value, _label in ContractType.choices_for_siae_kind(SiaeKind.GEIQ)]
+    "contract_type", [value for value, _label in ContractType.choices_for_siae_kind(CompanyKind.GEIQ)]
 )
 def test_reload_contract_type_and_options(contract_type, client, snapshot):
-    siae = SiaeFactory(pk=10, kind=SiaeKind.GEIQ, with_membership=True)
+    siae = SiaeFactory(pk=10, kind=CompanyKind.GEIQ, with_membership=True)
     siae_member = siae.members.first()
     client.force_login(siae_member)
     url = reverse("apply:reload_contract_type_and_options", kwargs={"siae_pk": siae.pk})
@@ -2067,7 +2081,7 @@ def test_reload_contract_type_and_options(contract_type, client, snapshot):
 
 
 def test_reload_contract_type_and_options_404(client):
-    siae = SiaeFactory(kind=SiaeKind.GEIQ, with_membership=True)
+    siae = SiaeFactory(kind=CompanyKind.GEIQ, with_membership=True)
     siae_member = siae.members.first()
     client.force_login(siae_member)
     url = reverse("apply:reload_contract_type_and_options", kwargs={"siae_pk": 0})
@@ -2090,7 +2104,9 @@ def test_reload_contract_type_and_options_404(client):
 
 
 def test_htmx_reload_contract_type_and_options(client, snapshot):
-    job_application = JobApplicationFactory(to_siae__kind=SiaeKind.GEIQ, state=JobApplicationWorkflow.STATE_PROCESSING)
+    job_application = JobApplicationFactory(
+        to_siae__kind=CompanyKind.GEIQ, state=JobApplicationWorkflow.STATE_PROCESSING
+    )
     siae_member = job_application.to_siae.members.first()
     client.force_login(siae_member)
     accept_url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})

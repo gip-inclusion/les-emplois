@@ -2,7 +2,7 @@ from django.conf import settings
 from django.db import models
 
 
-class SiaeKind(models.TextChoices):
+class CompanyKind(models.TextChoices):
     EI = "EI", "Entreprise d'insertion"  # Regroupées au sein de la fédération des entreprises d'insertion.
     AI = "AI", "Association intermédiaire"
     ACI = "ACI", "Atelier chantier d'insertion"
@@ -19,14 +19,14 @@ class SiaeKind(models.TextChoices):
 # Ported older comment: ASP data is used to keep the siae data of these kinds in sync.
 # These kinds and only these kinds thus have convention/AF logic.
 SIAE_WITH_CONVENTION_KINDS = [
-    SiaeKind.EI.value,
-    SiaeKind.AI.value,
-    SiaeKind.ACI.value,
-    SiaeKind.ETTI.value,
-    SiaeKind.EITI.value,
+    CompanyKind.EI.value,
+    CompanyKind.AI.value,
+    CompanyKind.ACI.value,
+    CompanyKind.ETTI.value,
+    CompanyKind.EITI.value,
 ]
 
-SIAE_WITH_CONVENTION_CHOICES = [(k, v) for k, v in SiaeKind.choices if k in SIAE_WITH_CONVENTION_KINDS]
+SIAE_WITH_CONVENTION_CHOICES = [(k, v) for k, v in CompanyKind.choices if k in SIAE_WITH_CONVENTION_KINDS]
 
 
 class ContractNature(models.TextChoices):
@@ -68,9 +68,9 @@ class ContractType(models.TextChoices):
         choices = []
 
         match kind:
-            case SiaeKind.GEIQ:
+            case CompanyKind.GEIQ:
                 choices = [cls.APPRENTICESHIP, cls.PROFESSIONAL_TRAINING, cls.OTHER]
-            case SiaeKind.EA | SiaeKind.EATT:
+            case CompanyKind.EA | CompanyKind.EATT:
                 choices = [
                     cls.PERMANENT,
                     cls.FIXED_TERM,
@@ -80,11 +80,11 @@ class ContractType(models.TextChoices):
                     cls.PROFESSIONAL_TRAINING,
                     cls.OTHER,
                 ]
-            case SiaeKind.EITI:
+            case CompanyKind.EITI:
                 choices = [cls.BUSINESS_CREATION, cls.OTHER]
-            case SiaeKind.OPCS:
+            case CompanyKind.OPCS:
                 choices = [cls.PERMANENT, cls.FIXED_TERM, cls.APPRENTICESHIP, cls.PROFESSIONAL_TRAINING, cls.OTHER]
-            case SiaeKind.ACI | SiaeKind.EI | SiaeKind.AI | SiaeKind.ETTI:
+            case CompanyKind.ACI | CompanyKind.EI | CompanyKind.AI | CompanyKind.ETTI:
                 # SIAE_WITH_CONVENTION_KINDS but without EITI.
                 choices = [cls.FIXED_TERM_I, cls.FIXED_TERM_USAGE, cls.TEMPORARY, cls.PROFESSIONAL_TRAINING, cls.OTHER]
             case _:
@@ -93,7 +93,7 @@ class ContractType(models.TextChoices):
                 choices.remove(cls.FIXED_TERM_I_PHC)
                 choices.remove(cls.FIXED_TERM_I_CVG)
 
-        if kind == SiaeKind.ACI and aci_convergence:
+        if kind == CompanyKind.ACI and aci_convergence:
             choices[-1:-1] = [
                 cls.FIXED_TERM_I_PHC,
                 cls.FIXED_TERM_I_CVG,
@@ -110,14 +110,14 @@ def siae_kind_to_pe_type_siae(siae_kind):
     # « 839 – IAE ITOU ETT »
     # « 840 – IAE ITOU EIT »
     return {
-        SiaeKind.EI: 838,
-        SiaeKind.AI: 837,
-        SiaeKind.ACI: 836,
-        SiaeKind.ETTI: 839,
-        SiaeKind.EITI: 840,
-        SiaeKind.GEIQ: 838,
-        SiaeKind.EA: 838,
-        SiaeKind.EATT: 840,
+        CompanyKind.EI: 838,
+        CompanyKind.AI: 837,
+        CompanyKind.ACI: 836,
+        CompanyKind.ETTI: 839,
+        CompanyKind.EITI: 840,
+        CompanyKind.GEIQ: 838,
+        CompanyKind.EA: 838,
+        CompanyKind.EATT: 840,
     }.get(siae_kind)
 
 
@@ -128,10 +128,10 @@ class JobSource(models.TextChoices):
 # SIRET of the POLE EMPLOI structure as of January 2023
 POLE_EMPLOI_SIRET = "13000548100010"
 
-# Not within the SiaeKind TextChoices, it is a special value reserved for special
+# Not within the CompanyKind TextChoices, it is a special value reserved for special
 # siaes that are managed by the software.
-SIAE_KIND_RESERVED = "RESERVED"
+COMPANY_KIND_RESERVED = "RESERVED"
 
 # not in Siae.SOURCE_XXX choices deliberately: this value can't be selected in
 # the admin and must be set by software.
-SIAE_SOURCE_ADMIN_CREATED = "ADMIN_CREATED"
+COMPANY_SOURCE_ADMIN_CREATED = "ADMIN_CREATED"

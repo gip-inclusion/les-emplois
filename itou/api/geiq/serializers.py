@@ -6,7 +6,7 @@ from rest_framework import serializers
 
 import itou.job_applications.enums as enums
 from itou.asp.models import EducationLevel
-from itou.companies.enums import ContractType, SiaeKind
+from itou.companies.enums import CompanyKind, ContractType
 from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
 from itou.job_applications.models import JobApplication, PriorAction
@@ -109,7 +109,7 @@ class GeiqJobApplicationSerializer(serializers.ModelSerializer):
     jours_accompagnement = serializers.IntegerField(source="prehiring_guidance_days", min_value=0)
     type_contrat = serializers.ChoiceField(
         source="contract_type",
-        choices=ContractType.choices_for_siae_kind(SiaeKind.GEIQ),
+        choices=ContractType.choices_for_siae_kind(CompanyKind.GEIQ),
     )
     poste_occupe = serializers.SerializerMethodField()
     duree_hebdo = serializers.IntegerField(

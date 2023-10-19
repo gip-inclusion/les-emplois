@@ -7,7 +7,7 @@
 {% block title_messages %}
 
     {% if request.user.is_employer %}
-        {% if siae.is_subject_to_eligibility_rules or siae.kind == SiaeKind.GEIQ %}
+        {% if siae.is_subject_to_eligibility_rules or siae.kind == CompanyKind.GEIQ %}
             <div class="alert alert-info alert-dismissible fade show">
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
                 <p class="mb-2">
@@ -16,14 +16,14 @@
                 <p class="mb-0">
                     {% if hire_process %}
                         Cet espace vous permet maintenant de déclarer directement une embauche sans avoir à créer une candidature au préalable.
-                        {% if siae.kind == SiaeKind.GEIQ %}
+                        {% if siae.kind == CompanyKind.GEIQ %}
                             Si vous souhaitez créer une candidature à traiter plus tard (avec la possibilité d’enregistrer une action préalable au recrutement), veuillez vous rendre
                             sur <a href="{% url 'apply:start' siae_pk=siae.pk %}">Enregistrer une candidature</a> depuis le tableau de bord.
                         {% else %}
                             Pour la création d’une candidature, veuillez vous rendre sur <a href="{% url 'apply:start' siae_pk=siae.pk %}">Enregistrer une candidature</a> depuis le tableau de bord.
                         {% endif %}
                     {% else %}
-                        {% if siae.kind == SiaeKind.GEIQ %}
+                        {% if siae.kind == CompanyKind.GEIQ %}
                             Cet espace vous permet d’enregistrer une candidature à traiter plus tard (avec la possibilité d’enregistrer une action préalable au recrutement).
                         {% else %}
                             Cet espace vous permet d’enregistrer une nouvelle candidature.

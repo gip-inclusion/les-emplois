@@ -5,7 +5,7 @@ from django.test import override_settings
 from django.urls import reverse
 
 from itou.cities.models import City
-from itou.companies.enums import POLE_EMPLOI_SIRET, ContractNature, ContractType, JobSource, SiaeKind
+from itou.companies.enums import POLE_EMPLOI_SIRET, CompanyKind, ContractNature, ContractType, JobSource
 from itou.companies.models import Siae
 from itou.jobs.models import Appellation, Rome
 from tests.cities.factories import create_city_guerande, create_city_saint_andre, create_city_vannes
@@ -83,31 +83,33 @@ class SearchSiaeTest(TestCase):
 
     def test_kind(self):
         city = create_city_saint_andre()
-        SiaeFactory(department="44", coords=city.coords, post_code="44117", kind=SiaeKind.AI)
+        SiaeFactory(department="44", coords=city.coords, post_code="44117", kind=CompanyKind.AI)
 
-        response = self.client.get(self.url, {"city": city.slug, "kinds": [SiaeKind.AI]})
+        response = self.client.get(self.url, {"city": city.slug, "kinds": [CompanyKind.AI]})
         self.assertContains(
             response,
             """Employeur <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>""",
             html=True,
         )
 
-        response = self.client.get(self.url, {"city": city.slug, "kinds": [SiaeKind.EI]})
+        response = self.client.get(self.url, {"city": city.slug, "kinds": [CompanyKind.EI]})
         self.assertContains(response, "Aucun résultat")
 
     def test_distance(self):
         # 3 SIAEs in two departments to test distance and department filtering
         vannes = create_city_vannes()
         SIAE_VANNES = "SIAE Vannes"
-        SiaeFactory(name=SIAE_VANNES, department="56", coords=vannes.coords, post_code="56760", kind=SiaeKind.AI)
+        SiaeFactory(name=SIAE_VANNES, department="56", coords=vannes.coords, post_code="56760", kind=CompanyKind.AI)
 
         guerande = create_city_guerande()
         SIAE_GUERANDE = "SIAE Guérande"
-        SiaeFactory(name=SIAE_GUERANDE, department="44", coords=guerande.coords, post_code="44350", kind=SiaeKind.AI)
+        SiaeFactory(
+            name=SIAE_GUERANDE, department="44", coords=guerande.coords, post_code="44350", kind=CompanyKind.AI
+        )
         saint_andre = create_city_saint_andre()
         SIAE_SAINT_ANDRE = "SIAE Saint André des Eaux"
         SiaeFactory(
-            name=SIAE_SAINT_ANDRE, department="44", coords=saint_andre.coords, post_code="44117", kind=SiaeKind.AI
+            name=SIAE_SAINT_ANDRE, department="44", coords=saint_andre.coords, post_code="44117", kind=CompanyKind.AI
         )
 
         # 100 km
@@ -197,7 +199,7 @@ class SearchSiaeTest(TestCase):
 
     def test_opcs_displays_card_differently(self):
         city = create_city_saint_andre()
-        SiaeFactory(department="44", coords=city.coords, post_code="44117", kind=SiaeKind.OPCS)
+        SiaeFactory(department="44", coords=city.coords, post_code="44117", kind=CompanyKind.OPCS)
 
         response = self.client.get(self.url, {"city": city.slug})
         self.assertContains(
@@ -323,16 +325,16 @@ class JobDescriptionSearchViewTest(TestCase):
     def test_kind(self):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         city = create_city_saint_andre()
-        SiaeFactory(department="44", coords=city.coords, post_code="44117", kind=SiaeKind.AI)
+        SiaeFactory(department="44", coords=city.coords, post_code="44117", kind=CompanyKind.AI)
 
-        response = self.client.get(self.url, {"city": city.slug, "kinds": [SiaeKind.AI, SiaeKind.ETTI]})
+        response = self.client.get(self.url, {"city": city.slug, "kinds": [CompanyKind.AI, CompanyKind.ETTI]})
         self.assertContains(
             response,
             """Employeur <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>""",
             html=True,
         )
 
-        response = self.client.get(self.url, {"city": city.slug, "kinds": [SiaeKind.EI]})
+        response = self.client.get(self.url, {"city": city.slug, "kinds": [CompanyKind.EI]})
         self.assertContains(response, "Aucun résultat")
 
     def test_distance(self):
@@ -345,7 +347,7 @@ class JobDescriptionSearchViewTest(TestCase):
             department="56",
             coords=vannes.coords,
             post_code="56760",
-            kind=SiaeKind.AI,
+            kind=CompanyKind.AI,
             with_jobs=True,
         )
 
@@ -356,7 +358,7 @@ class JobDescriptionSearchViewTest(TestCase):
             department="44",
             coords=guerande.coords,
             post_code="44350",
-            kind=SiaeKind.AI,
+            kind=CompanyKind.AI,
             with_jobs=True,
         )
         saint_andre = create_city_saint_andre()
@@ -366,7 +368,7 @@ class JobDescriptionSearchViewTest(TestCase):
             department="44",
             coords=saint_andre.coords,
             post_code="44117",
-            kind=SiaeKind.AI,
+            kind=CompanyKind.AI,
             with_jobs=True,
         )
 
@@ -463,8 +465,8 @@ class JobDescriptionSearchViewTest(TestCase):
     def test_no_department(self):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         st_andre = create_city_saint_andre()
-        siae_without_dpt = SiaeFactory(department="", coords=st_andre.coords, post_code="44117", kind=SiaeKind.AI)
-        siae = SiaeFactory(department="44", coords=st_andre.coords, post_code="44117", kind=SiaeKind.AI)
+        siae_without_dpt = SiaeFactory(department="", coords=st_andre.coords, post_code="44117", kind=CompanyKind.AI)
+        siae = SiaeFactory(department="44", coords=st_andre.coords, post_code="44117", kind=CompanyKind.AI)
         SiaeJobDescriptionFactory(siae=siae_without_dpt, location=None)
         SiaeJobDescriptionFactory(siae=siae)
         response = self.client.get(self.url, {"city": st_andre.slug})
@@ -484,7 +486,7 @@ class JobDescriptionSearchViewTest(TestCase):
         )
 
         inactive_siae = SiaeFactory(
-            department="45", coords=city.coords, post_code="44117", kind=SiaeKind.EI, convention=None
+            department="45", coords=city.coords, post_code="44117", kind=CompanyKind.EI, convention=None
         )
         job3 = SiaeJobDescriptionFactory(
             siae=inactive_siae,
@@ -577,7 +579,7 @@ class JobDescriptionSearchViewTest(TestCase):
         )
 
         inactive_siae = SiaeFactory(
-            department="45", coords=city.coords, post_code="44117", kind=SiaeKind.EI, convention=None
+            department="45", coords=city.coords, post_code="44117", kind=CompanyKind.EI, convention=None
         )
         job3 = SiaeJobDescriptionFactory(
             siae=inactive_siae, contract_type=ContractType.APPRENTICESHIP, custom_name="Métier Inutilisé"

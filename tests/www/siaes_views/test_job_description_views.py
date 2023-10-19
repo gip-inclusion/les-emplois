@@ -6,7 +6,7 @@ from django.urls import reverse
 from freezegun import freeze_time
 
 from itou.cities.models import City
-from itou.companies.enums import ContractType, SiaeKind
+from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import SiaeJobDescription
 from itou.jobs.models import Appellation
 from itou.www.companies_views.views import ITOU_SESSION_JOB_DESCRIPTION_KEY
@@ -321,7 +321,7 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
             department="75",
             coords=self.paris_city.coords,
             post_code="75001",
-            kind=SiaeKind.OPCS,
+            kind=CompanyKind.OPCS,
             with_membership=True,
         )
         user_opcs = opcs.members.first()

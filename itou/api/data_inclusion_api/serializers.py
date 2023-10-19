@@ -3,7 +3,7 @@ import re
 from django.utils import text, timezone
 from rest_framework import serializers
 
-from itou.companies.enums import SiaeKind
+from itou.companies.enums import CompanyKind
 from itou.companies.models import Siae
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
@@ -16,7 +16,7 @@ class SiaeStructureSerializer(serializers.ModelSerializer):
     """
 
     id = serializers.UUIDField(source="uid")
-    typologie = serializers.ChoiceField(source="kind", choices=SiaeKind.choices)
+    typologie = serializers.ChoiceField(source="kind", choices=CompanyKind.choices)
     nom = serializers.CharField(source="display_name")
     siret = serializers.SerializerMethodField()
     rna = serializers.CharField(default="")

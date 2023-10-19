@@ -1,7 +1,7 @@
 import factory
 from django.utils import timezone
 
-from itou.companies.enums import SiaeKind
+from itou.companies.enums import CompanyKind
 from itou.eligibility import models
 from itou.eligibility.enums import AuthorKind
 from tests.companies.factories import SiaeFactory, SiaeWith2MembershipsFactory
@@ -20,7 +20,7 @@ class GEIQEligibilityDiagnosisFactory(factory.django.DjangoModelFactory):
     class Params:
         with_geiq = factory.Trait(
             author_kind=AuthorKind.GEIQ,
-            author_geiq=factory.SubFactory(SiaeWith2MembershipsFactory, kind=SiaeKind.GEIQ),
+            author_geiq=factory.SubFactory(SiaeWith2MembershipsFactory, kind=CompanyKind.GEIQ),
             author=factory.LazyAttribute(lambda obj: obj.author_geiq.members.first()),
         )
         with_prescriber = factory.Trait(

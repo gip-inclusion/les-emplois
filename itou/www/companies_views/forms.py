@@ -5,7 +5,7 @@ from django.utils.safestring import mark_safe
 
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS, department_from_postcode
-from itou.companies.enums import ContractType, SiaeKind
+from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import Siae, SiaeJobDescription, SiaeMembership
 from itou.jobs.models import Appellation
 from itou.utils import constants as global_constants
@@ -43,7 +43,7 @@ class CreateSiaeForm(forms.ModelForm):
         self.current_user = current_user
         super().__init__(*args, **kwargs)
 
-        self.fields["kind"].choices = [(current_siae.kind, dict(SiaeKind.choices)[current_siae.kind])]
+        self.fields["kind"].choices = [(current_siae.kind, dict(CompanyKind.choices)[current_siae.kind])]
 
         self.fields["department"].choices = [("", "---")] + list(DEPARTMENTS.items())
 

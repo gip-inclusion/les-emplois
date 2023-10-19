@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 
 from itou.common_apps.address.departments import DEPARTMENTS, REGIONS
-from itou.companies.enums import SiaeKind
+from itou.companies.enums import CompanyKind
 from itou.companies.models import Siae
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
@@ -54,7 +54,7 @@ def can_view_stats_siae_aci(request):
     """
     return (
         can_view_stats_siae(request)
-        and request.current_organization.kind == SiaeKind.ACI
+        and request.current_organization.kind == CompanyKind.ACI
         and request.current_organization.convention is not None
         and request.current_organization.convention.asp_id in settings.STATS_SIAE_ASP_ID_WHITELIST
     )

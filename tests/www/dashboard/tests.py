@@ -16,7 +16,7 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 from rest_framework.authtoken.models import Token
 
-from itou.companies.enums import SiaeKind
+from itou.companies.enums import CompanyKind
 from itou.employee_record.enums import Status
 from itou.institutions.enums import InstitutionKind
 from itou.job_applications.notifications import (
@@ -106,7 +106,7 @@ class DashboardViewTest(TestCase):
         self.assertContains(response, expected_message)
 
     def test_dashboard_eiti(self):
-        siae = SiaeFactory(kind=SiaeKind.EITI, with_membership=True)
+        siae = SiaeFactory(kind=CompanyKind.EITI, with_membership=True)
         user = siae.members.first()
         self.client.force_login(user)
 
@@ -122,9 +122,9 @@ class DashboardViewTest(TestCase):
         self.assertContains(response, format_siret(prescriber_organization.siret))
 
     def test_dashboard_displays_asp_badge(self):
-        siae = SiaeFactory(kind=SiaeKind.EI, with_membership=True)
-        other_siae = SiaeFactory(kind=SiaeKind.ETTI, with_membership=True)
-        last_siae = SiaeFactory(kind=SiaeKind.ETTI, with_membership=True)
+        siae = SiaeFactory(kind=CompanyKind.EI, with_membership=True)
+        other_siae = SiaeFactory(kind=CompanyKind.ETTI, with_membership=True)
+        last_siae = SiaeFactory(kind=CompanyKind.ETTI, with_membership=True)
 
         user = siae.members.first()
         user.siae_set.add(other_siae)
@@ -177,14 +177,14 @@ class DashboardViewTest(TestCase):
         geiq_url = non_geiq_url + "&amp;states=prior_to_hire"
 
         # Not a GEIQ
-        user = SiaeFactory(kind=SiaeKind.ACI, with_membership=True).members.first()
+        user = SiaeFactory(kind=CompanyKind.ACI, with_membership=True).members.first()
         self.client.force_login(user)
         response = self.client.get(reverse("dashboard:index"))
         self.assertContains(response, non_geiq_url)
         self.assertNotContains(response, geiq_url)
 
         # GEIQ
-        user = SiaeFactory(kind=SiaeKind.GEIQ, with_membership=True).members.first()
+        user = SiaeFactory(kind=CompanyKind.GEIQ, with_membership=True).members.first()
         self.client.force_login(user)
         response = self.client.get(reverse("dashboard:index"))
 
@@ -192,11 +192,11 @@ class DashboardViewTest(TestCase):
 
     def test_dashboard_agreements_and_job_postings(self):
         for kind in [
-            SiaeKind.AI,
-            SiaeKind.EI,
-            SiaeKind.EITI,
-            SiaeKind.ACI,
-            SiaeKind.ETTI,
+            CompanyKind.AI,
+            CompanyKind.EI,
+            CompanyKind.EITI,
+            CompanyKind.ACI,
+            CompanyKind.ETTI,
         ]:
             with self.subTest(f"should display when siae_kind={kind}"):
                 siae = SiaeFactory(kind=kind, with_membership=True)
@@ -206,7 +206,7 @@ class DashboardViewTest(TestCase):
                 response = self.client.get(reverse("dashboard:index"))
                 self.assertContains(response, "Prolonger/suspendre un agrément émis par Pôle emploi")
 
-        for kind in [SiaeKind.EA, SiaeKind.EATT, SiaeKind.GEIQ, SiaeKind.OPCS]:
+        for kind in [CompanyKind.EA, CompanyKind.EATT, CompanyKind.GEIQ, CompanyKind.OPCS]:
             with self.subTest(f"should not display when siae_kind={kind}"):
                 siae = SiaeFactory(kind=kind, with_membership=True)
                 user = siae.members.first()
@@ -214,19 +214,19 @@ class DashboardViewTest(TestCase):
 
                 response = self.client.get(reverse("dashboard:index"))
                 self.assertNotContains(response, "Prolonger/suspendre un agrément émis par Pôle emploi")
-                if kind != SiaeKind.GEIQ:
+                if kind != CompanyKind.GEIQ:
                     self.assertNotContains(response, "Déclarer une embauche")
 
     def test_dashboard_job_applications(self):
         HIRE_LINK_LABEL = "Déclarer une embauche"
         APPLICATION_SAVE_LABEL = "Enregistrer une candidature"
         display_kinds = [
-            SiaeKind.AI,
-            SiaeKind.EI,
-            SiaeKind.EITI,
-            SiaeKind.ACI,
-            SiaeKind.ETTI,
-            SiaeKind.GEIQ,
+            CompanyKind.AI,
+            CompanyKind.EI,
+            CompanyKind.EITI,
+            CompanyKind.ACI,
+            CompanyKind.ETTI,
+            CompanyKind.GEIQ,
         ]
         for kind in display_kinds:
             with self.subTest(f"should display when siae_kind={kind}"):
@@ -240,7 +240,7 @@ class DashboardViewTest(TestCase):
                 self.assertContains(response, HIRE_LINK_LABEL)
                 self.assertContains(response, reverse("apply:check_nir_for_hire", kwargs={"siae_pk": siae.pk}))
 
-        for kind in set(SiaeKind) - set(display_kinds):
+        for kind in set(CompanyKind) - set(display_kinds):
             with self.subTest(f"should not display when siae_kind={kind}"):
                 siae = SiaeFactory(kind=kind, with_membership=True)
                 user = siae.members.first()
@@ -273,7 +273,7 @@ class DashboardViewTest(TestCase):
         )
 
     def test_dashboard_can_create_siae_antenna(self):
-        for kind in SiaeKind:
+        for kind in CompanyKind:
             with self.subTest(kind=kind):
                 siae = SiaeFactory(kind=kind, with_membership=True, membership__is_admin=True)
                 user = siae.members.get()

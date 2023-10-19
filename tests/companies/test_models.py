@@ -10,7 +10,7 @@ from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
 
-from itou.companies.enums import ContractType, SiaeKind
+from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import Siae, SiaeJobDescription
 from itou.job_applications.models import JobApplicationWorkflow
 from tests.companies.factories import (
@@ -62,7 +62,7 @@ class SiaeFactoriesTest(TestCase):
 
 class SiaeModelTest(TestCase):
     def test_accept_survey_url(self):
-        siae = SiaeFactory(kind=SiaeKind.EI, department="57")
+        siae = SiaeFactory(kind=CompanyKind.EI, department="57")
         url = siae.accept_survey_url
         assert url.startswith(f"{settings.TALLY_URL}/r/")
         assert f"id_siae={siae.pk}" in url
@@ -71,7 +71,7 @@ class SiaeModelTest(TestCase):
         assert "departement=57" in url
 
         # Ensure that the URL does not break when there is no department.
-        siae = SiaeFactory(kind=SiaeKind.AI, department="")
+        siae = SiaeFactory(kind=CompanyKind.AI, department="")
         assert url.startswith(f"{settings.TALLY_URL}/r/")
         url = siae.accept_survey_url
         assert f"id_siae={siae.pk}" in url
@@ -85,17 +85,17 @@ class SiaeModelTest(TestCase):
         assert siae.siret_nic == "00001"
 
     def test_is_subject_to_eligibility_rules(self):
-        siae = SiaeFactory(kind=SiaeKind.GEIQ)
+        siae = SiaeFactory(kind=CompanyKind.GEIQ)
         assert not siae.is_subject_to_eligibility_rules
 
-        siae = SiaeFactory(kind=SiaeKind.EI)
+        siae = SiaeFactory(kind=CompanyKind.EI)
         assert siae.is_subject_to_eligibility_rules
 
     def test_should_have_convention(self):
-        siae = SiaeFactory(kind=SiaeKind.GEIQ)
+        siae = SiaeFactory(kind=CompanyKind.GEIQ)
         assert not siae.should_have_convention
 
-        siae = SiaeFactory(kind=SiaeKind.EI)
+        siae = SiaeFactory(kind=CompanyKind.EI)
         assert siae.should_have_convention
 
     def test_has_members(self):
@@ -239,9 +239,9 @@ class SiaeModelTest(TestCase):
         assert siae2.active_members.count() == 3
 
     def test_is_opcs(self):
-        siae = SiaeFactory(kind=SiaeKind.ACI)
+        siae = SiaeFactory(kind=CompanyKind.ACI)
         assert not siae.is_opcs
-        siae.kind = SiaeKind.OPCS
+        siae.kind = CompanyKind.OPCS
         assert siae.is_opcs
 
 
@@ -317,7 +317,7 @@ class SiaeQuerySetTest(TestCase):
     def test_can_have_prior_action(self):
         siae = SiaeFactory()
         assert siae.can_have_prior_action is False
-        geiq = SiaeFactory(kind=SiaeKind.GEIQ)
+        geiq = SiaeFactory(kind=CompanyKind.GEIQ)
         assert geiq.can_have_prior_action is True
 
 
@@ -374,13 +374,13 @@ class SiaeJobDescriptionQuerySetTest(TestCase):
         assert siae_job_description.job_applications_count == 1
 
     def test_is_active(self):
-        siae = SiaeFactory(kind=SiaeKind.EI, convention=None)
+        siae = SiaeFactory(kind=CompanyKind.EI, convention=None)
         job = SiaeJobDescriptionFactory(siae=siae, is_active=False)
         assert SiaeJobDescription.objects.active().count() == 0
         job.is_active = True
         job.save(update_fields=["is_active"])
         assert SiaeJobDescription.objects.active().count() == 0
-        siae.kind = SiaeKind.GEIQ
+        siae.kind = CompanyKind.GEIQ
         siae.save(update_fields=["kind"])
         assert SiaeJobDescription.objects.active().count() == 1
 
@@ -393,7 +393,7 @@ class SiaeContractTypeTest(TestCase):
             ("PROFESSIONAL_TRAINING", "Contrat de professionalisation"),
             ("OTHER", "Autre type de contrat"),
         ]
-        result = ContractType.choices_for_siae(siae=SiaeFactory(kind=SiaeKind.GEIQ))
+        result = ContractType.choices_for_siae(siae=SiaeFactory(kind=CompanyKind.GEIQ))
         assert result == expected
 
         # For any ACI
@@ -404,7 +404,7 @@ class SiaeContractTypeTest(TestCase):
             ("PROFESSIONAL_TRAINING", "Contrat de professionalisation"),
             ("OTHER", "Autre type de contrat"),
         ]
-        result = ContractType.choices_for_siae(siae=SiaeFactory(kind=SiaeKind.ACI))
+        result = ContractType.choices_for_siae(siae=SiaeFactory(kind=CompanyKind.ACI))
         assert result == expected
 
         # For an ACI from Convergence France
@@ -417,7 +417,7 @@ class SiaeContractTypeTest(TestCase):
             ("FIXED_TERM_I_CVG", "CDD-I Convergence"),
             ("OTHER", "Autre type de contrat"),
         ]
-        siae = SiaeFactory(kind=SiaeKind.ACI)
+        siae = SiaeFactory(kind=CompanyKind.ACI)
         with override_settings(ACI_CONVERGENCE_SIRET_WHITELIST=[siae.siret]):
             result = ContractType.choices_for_siae(siae=siae)
         assert result == expected

@@ -13,7 +13,7 @@ from django.utils import timezone
 from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.asp.models import AllocationDuration, EducationLevel, RSAAllocation
-from itou.companies.enums import ContractType, SiaeKind
+from itou.companies.enums import CompanyKind, ContractType
 from itou.eligibility.models import (
     AdministrativeCriteria,
     EligibilityDiagnosis,
@@ -2066,7 +2066,7 @@ class DirectHireFullProcessTest(TestCase):
 
     def test_hire_as_geiq(self):
         """Apply as GEIQ with pre-existing job seeker without previous application"""
-        siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"), kind=SiaeKind.GEIQ)
+        siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"), kind=CompanyKind.GEIQ)
         job_seeker = JobSeekerFactory()
 
         user = siae.members.first()
@@ -3087,11 +3087,11 @@ def test_detect_existing_job_seeker(client):
 class ApplicationGEIQEligibilityViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.geiq = SiaeFactory(with_membership=True, with_jobs=True, kind=SiaeKind.GEIQ)
+        cls.geiq = SiaeFactory(with_membership=True, with_jobs=True, kind=CompanyKind.GEIQ)
         cls.prescriber_org = PrescriberOrganizationWithMembershipFactory(authorized=True)
         cls.orienter = PrescriberFactory()
         cls.job_seeker_with_geiq_diagnosis = GEIQEligibilityDiagnosisFactory(with_prescriber=True).job_seeker
-        cls.siae = SiaeFactory(with_membership=True, kind=SiaeKind.EI)
+        cls.siae = SiaeFactory(with_membership=True, kind=CompanyKind.EI)
 
     def _setup_session(self, siae_pk=None):
         apply_session = SessionNamespace(self.client.session, f"job_application-{siae_pk or self.geiq.pk}")
@@ -3555,7 +3555,7 @@ class CheckJobSeekerInformationsForHireTestCase(TestCase):
         self.assertContains(response, reverse("dashboard:index"))
 
     def test_geiq(self):
-        siae = SiaeFactory(kind=SiaeKind.GEIQ, with_membership=True)
+        siae = SiaeFactory(kind=CompanyKind.GEIQ, with_membership=True)
         job_seeker = JobSeekerFactory(
             first_name="Son prénom",
             last_name="Son nom de famille",
@@ -3619,14 +3619,14 @@ class CheckPreviousApplicationsForHireViewTestCase(TestCase):
         self.assertRedirects(response, self._reverse("apply:eligibility_for_hire"))
 
     def test_no_previous_as_geiq_staff(self):
-        self.siae = SiaeFactory(kind=SiaeKind.GEIQ, with_membership=True)
+        self.siae = SiaeFactory(kind=CompanyKind.GEIQ, with_membership=True)
         self.client.force_login(self.siae.members.first())
 
         response = self.client.get(self._reverse("apply:check_prev_applications_for_hire"))
         self.assertRedirects(response, self._reverse("apply:geiq_eligibility_for_hire"))
 
     def test_with_previous_as_geiq_staff(self):
-        self.siae = SiaeFactory(kind=SiaeKind.GEIQ, with_membership=True)
+        self.siae = SiaeFactory(kind=CompanyKind.GEIQ, with_membership=True)
         JobApplicationFactory(job_seeker=self.job_seeker, to_siae=self.siae, eligibility_diagnosis=None)
         self.client.force_login(self.siae.members.first())
 
@@ -3709,7 +3709,7 @@ class GEIQEligibilityForHireTestCase(TestCase):
         self.assertRedirects(response, self._reverse("apply:hire_confirmation"))
 
     def test_job_seeker_without_valid_diagnosis(self):
-        self.siae = SiaeFactory(kind=SiaeKind.GEIQ, with_membership=True)
+        self.siae = SiaeFactory(kind=CompanyKind.GEIQ, with_membership=True)
         assert not GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(self.job_seeker, self.siae).exists()
         self.client.force_login(self.siae.members.first())
         response = self.client.get(self._reverse("apply:geiq_eligibility_for_hire"))
@@ -3871,7 +3871,7 @@ class NewHireProcessInfoTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.siae = SiaeFactory(subject_to_eligibility=True, with_membership=True)
-        cls.geiq = SiaeFactory(kind=SiaeKind.GEIQ, with_membership=True)
+        cls.geiq = SiaeFactory(kind=CompanyKind.GEIQ, with_membership=True)
         cls.job_seeker = JobSeekerFactory(nir="")
 
     def test_as_job_seeker(self):

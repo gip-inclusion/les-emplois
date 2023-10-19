@@ -7,7 +7,7 @@ from rest_framework.test import APIClient
 from itou.api.geiq.serializers import GeiqJobApplicationSerializer
 from itou.api.geiq.views import GeiqApiAnonymousUser
 from itou.api.models import SiaeApiToken
-from itou.companies.enums import SiaeKind
+from itou.companies.enums import CompanyKind
 from itou.companies.models import Siae
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
 from itou.users.enums import UserKind
@@ -36,8 +36,8 @@ def test_candidatures_geiq_token_authentication():
     token = SiaeApiToken(label="test-token", key=TOKEN_KEY)
     token.save()
 
-    geiq = SiaeFactory(siret="11832575900001", kind=SiaeKind.GEIQ)
-    antenna = SiaeFactory(siret="11832575900037", kind=SiaeKind.GEIQ, source=Siae.SOURCE_USER_CREATED)
+    geiq = SiaeFactory(siret="11832575900001", kind=CompanyKind.GEIQ)
+    antenna = SiaeFactory(siret="11832575900037", kind=CompanyKind.GEIQ, source=Siae.SOURCE_USER_CREATED)
     token.siaes.add(geiq)
 
     JobApplicationFactory(state="accepted", to_siae=geiq)
@@ -109,7 +109,7 @@ def test_candidatures_geiq_nominal(snapshot):
         sender_kind="prescriber",
         sender_prescriber_organization__kind="HUDA",
         to_siae__siret="11832575900001",
-        to_siae__kind=SiaeKind.GEIQ,
+        to_siae__kind=CompanyKind.GEIQ,
         prehiring_guidance_days=42,
         contract_type="PROFESSIONAL_TRAINING",
         nb_hours_per_week=47,
@@ -127,7 +127,7 @@ def test_candidatures_geiq_nominal(snapshot):
         job_seeker=job_seeker,
         sender_kind=UserKind.EMPLOYER,
         to_siae__siret="11832575966666",  # same SIREN, different SIRET
-        to_siae__kind=SiaeKind.GEIQ,
+        to_siae__kind=CompanyKind.GEIQ,
         prehiring_guidance_days=28,
         contract_type="APPRENTICESHIP",
         nb_hours_per_week=35,

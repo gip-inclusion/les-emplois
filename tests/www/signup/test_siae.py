@@ -12,7 +12,7 @@ from django.utils.html import escape
 from django.utils.http import urlencode
 from freezegun import freeze_time
 
-from itou.companies.enums import SiaeKind
+from itou.companies.enums import CompanyKind
 from itou.companies.models import Siae
 from itou.users.enums import KIND_EMPLOYER, UserKind
 from itou.users.models import User
@@ -46,7 +46,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         """
         A user joins an SIAE without members.
         """
-        siae = SiaeFactory(kind=SiaeKind.ETTI)
+        siae = SiaeFactory(kind=CompanyKind.ETTI)
         assert 0 == siae.members.count()
 
         url = reverse("signup:siae_select")
@@ -126,7 +126,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         """
         A user joins an SIAE without members.
         """
-        siae = SiaeFactory(kind=SiaeKind.ETTI)
+        siae = SiaeFactory(kind=CompanyKind.ETTI)
         assert 0 == siae.members.count()
 
         user = EmployerFactory(email=OIDC_USERINFO["email"], has_completed_welcoming_tour=True)
@@ -170,7 +170,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         """
         A user joins an SIAE without members.
         """
-        siae = SiaeFactory(kind=SiaeKind.ETTI)
+        siae = SiaeFactory(kind=CompanyKind.ETTI)
 
         user = EmployerFactory(email=OIDC_USERINFO["email"], has_completed_welcoming_tour=True)
         SiaeMembershipFactory(user=user)
@@ -209,7 +209,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         assert 2 == user.siae_set.count()
 
     def test_user_invalid_siae_id(self):
-        siae = SiaeFactory(kind=SiaeKind.ETTI)
+        siae = SiaeFactory(kind=CompanyKind.ETTI)
         response = self.client.get(reverse("signup:siae_user", kwargs={"siae_id": "0", "token": siae.get_token()}))
         self.assertRedirects(response, reverse("signup:siae_select"))
         assertMessages(
@@ -225,7 +225,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
     def test_join_invalid_siae_id(self):
         user = EmployerFactory(with_siae=True)
         self.client.force_login(user)
-        siae = SiaeFactory(kind=SiaeKind.ETTI)
+        siae = SiaeFactory(kind=CompanyKind.ETTI)
         response = self.client.get(
             reverse("signup:siae_join", kwargs={"siae_id": "0", "token": siae.get_token()}), follow=True
         )
@@ -335,7 +335,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
             SiaeWithMembershipAndJobsFactory(siret="40219166200003"),
             SiaeWithMembershipAndJobsFactory(siret="40219166200004"),
             SiaeWithMembershipAndJobsFactory(siret="40219166200005"),
-            SiaeWithMembershipAndJobsFactory(siret="40219166200005", kind=SiaeKind.AI),
+            SiaeWithMembershipAndJobsFactory(siret="40219166200005", kind=CompanyKind.AI),
         )
         # Add more than one member to all SIAE to test prefetch and distinct
         for siae in siaes:
@@ -364,7 +364,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
 
 class SiaeSignupViewsExceptionsTest(TestCase):
     def test_non_staff_cant_join_a_siae(self):
-        siae = SiaeFactory(kind=SiaeKind.ETTI)
+        siae = SiaeFactory(kind=CompanyKind.ETTI)
         assert 0 == siae.members.count()
 
         user = PrescriberFactory(email=OIDC_USERINFO["email"])
