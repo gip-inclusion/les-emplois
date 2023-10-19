@@ -1,9 +1,9 @@
 from django.core.management.base import BaseCommand
 
 from itou.approvals import enums as approvals_enums
+from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
-from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS
 
 
 # The support team sometimes fixes issues by generating a PASS, filling out the necessary information,

@@ -88,7 +88,7 @@ class EmployerFactory(UserFactory):
 
     @factory.post_generation
     def with_siae(self, created, extracted, **kwargs):
-        from tests.siaes.factories import SiaeMembershipFactory
+        from tests.companies.factories import SiaeMembershipFactory
 
         if created and extracted is True:
             SiaeMembershipFactory(user=self)

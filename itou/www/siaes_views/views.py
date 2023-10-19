@@ -9,8 +9,8 @@ from django.utils.html import format_html
 from itou.cities.models import City
 from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.organizations.views import deactivate_org_member, update_org_admin_role
+from itou.companies.models import Siae, SiaeFinancialAnnex, SiaeJobDescription
 from itou.jobs.models import Appellation
-from itou.siaes.models import Siae, SiaeFinancialAnnex, SiaeJobDescription
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.apis.exceptions import GeocodingDataError

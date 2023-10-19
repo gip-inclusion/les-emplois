@@ -21,10 +21,10 @@ from itou.approvals.models import Approval
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 from itou.common_apps.address.models import BAN_API_RELIANCE_SCORE
+from itou.companies.models import Siae
 from itou.geo.enums import ZRRStatus
 from itou.geo.models import ZRR
 from itou.job_applications.models import JobApplicationWorkflow
-from itou.siaes.models import Siae
 from itou.users.models import User
 
 

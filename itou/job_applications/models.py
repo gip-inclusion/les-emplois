@@ -12,6 +12,8 @@ from django.utils import timezone
 from django_xworkflows import models as xwf_models
 
 from itou.approvals.models import Approval, Prolongation, Suspension
+from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, ContractType, SiaeKind
+from itou.companies.models import Siae
 from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models import EligibilityDiagnosis, SelectedAdministrativeCriteria
 from itou.employee_record import enums as employeerecord_enums
@@ -29,8 +31,6 @@ from itou.job_applications.enums import (
     SenderKind,
 )
 from itou.job_applications.tasks import huey_notify_pole_emploi
-from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS, ContractType, SiaeKind
-from itou.siaes.models import Siae
 from itou.users.enums import LackOfPoleEmploiId, UserKind
 from itou.utils.emails import get_email_message, send_email_messages
 from itou.utils.models import InclusiveDateRangeField
@@ -501,7 +501,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     # When the sender is an SIAE member, keep a track of his current SIAE.
     sender_siae = models.ForeignKey(
-        "siaes.Siae", verbose_name="SIAE émettrice", null=True, blank=True, on_delete=models.CASCADE
+        "companies.Siae", verbose_name="SIAE émettrice", null=True, blank=True, on_delete=models.CASCADE
     )
 
     # When the sender is a prescriber, keep a track of his current organization (if any).
@@ -514,7 +514,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     )
 
     to_siae = models.ForeignKey(
-        "siaes.Siae",
+        "companies.Siae",
         verbose_name="SIAE destinataire",
         on_delete=models.CASCADE,
         related_name="job_applications_received",
@@ -523,7 +523,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     state = xwf_models.StateField(JobApplicationWorkflow, verbose_name="état", db_index=True)
 
     # Jobs in which the job seeker is interested (optional).
-    selected_jobs = models.ManyToManyField("siaes.SiaeJobDescription", verbose_name="métiers recherchés", blank=True)
+    selected_jobs = models.ManyToManyField(
+        "companies.SiaeJobDescription", verbose_name="métiers recherchés", blank=True
+    )
 
     message = models.TextField(verbose_name="message de candidature", blank=True)
     answer = models.TextField(verbose_name="message de réponse", blank=True)
@@ -587,7 +589,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         settings.AUTH_USER_MODEL, verbose_name="transférée par", null=True, blank=True, on_delete=models.SET_NULL
     )
     transferred_from = models.ForeignKey(
-        "siaes.Siae",
+        "companies.Siae",
         verbose_name="SIAE d'origine",
         null=True,
         blank=True,

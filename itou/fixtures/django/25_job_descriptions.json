@@ -24,7 +24,7 @@
       "ui_rank": 32767,
       "updated_at": "2020-04-09T14:44:59.861Z"
     },
-    "model": "siaes.siaejobdescription",
+    "model": "companies.siaejobdescription",
     "pk": 1
   },
   {
@@ -52,7 +52,7 @@
       "ui_rank": 32767,
       "updated_at": "2020-04-09T14:44:59.870Z"
     },
-    "model": "siaes.siaejobdescription",
+    "model": "companies.siaejobdescription",
     "pk": 2
   },
   {
@@ -80,7 +80,7 @@
       "ui_rank": 32767,
       "updated_at": "2020-04-09T14:39:32.610Z"
     },
-    "model": "siaes.siaejobdescription",
+    "model": "companies.siaejobdescription",
     "pk": 3
   },
   {
@@ -108,7 +108,7 @@
       "ui_rank": 32767,
       "updated_at": "2020-04-14T16:09:20Z"
     },
-    "model": "siaes.siaejobdescription",
+    "model": "companies.siaejobdescription",
     "pk": 4
   },
   {
@@ -136,7 +136,7 @@
       "ui_rank": 32767,
       "updated_at": "2020-12-01T10:31:05Z"
     },
-    "model": "siaes.siaejobdescription",
+    "model": "companies.siaejobdescription",
     "pk": 5
   },
   {
@@ -164,7 +164,7 @@
       "ui_rank": 32767,
       "updated_at": "2020-12-01T10:30:23Z"
     },
-    "model": "siaes.siaejobdescription",
+    "model": "companies.siaejobdescription",
     "pk": 6
   },
   {
@@ -192,7 +192,7 @@
       "ui_rank": 32767,
       "updated_at": "2020-04-09T14:44:59.861Z"
     },
-    "model": "siaes.siaejobdescription",
+    "model": "companies.siaejobdescription",
     "pk": 7
   },
   {
@@ -220,7 +220,7 @@
       "ui_rank": 32767,
       "updated_at": "2020-04-09T14:44:59.870Z"
     },
-    "model": "siaes.siaejobdescription",
+    "model": "companies.siaejobdescription",
     "pk": 8
   },
   {
@@ -248,7 +248,7 @@
       "ui_rank": 32767,
       "updated_at": "2020-04-09T14:44:59.861Z"
     },
-    "model": "siaes.siaejobdescription",
+    "model": "companies.siaejobdescription",
     "pk": 9
   },
   {
@@ -276,7 +276,7 @@
       "ui_rank": 32767,
       "updated_at": "2020-04-09T14:44:59.870Z"
     },
-    "model": "siaes.siaejobdescription",
+    "model": "companies.siaejobdescription",
     "pk": 10
   },
   {
@@ -304,7 +304,7 @@
       "ui_rank": 32767,
       "updated_at": "2021-02-22T14:54:17Z"
     },
-    "model": "siaes.siaejobdescription",
+    "model": "companies.siaejobdescription",
     "pk": 11
   },
   {
@@ -332,7 +332,7 @@
       "ui_rank": 32767,
       "updated_at": "2021-11-23T16:18:42.985Z"
     },
-    "model": "siaes.siaejobdescription",
+    "model": "companies.siaejobdescription",
     "pk": 12
   }
 ]

@@ -6,15 +6,16 @@ from django.utils.http import urlencode
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNumQueries
 
+from itou.companies.enums import SiaeKind
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria
 from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.jobs.models import Appellation
-from itou.siaes.enums import SiaeKind
 from itou.utils.widgets import DuetDatePickerWidget
 from tests.approvals.factories import SuspensionFactory
 from tests.cities.factories import create_city_saint_andre
+from tests.companies.factories import SiaeFactory, SiaeJobDescriptionFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
@@ -23,7 +24,6 @@ from tests.job_applications.factories import (
 )
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationWithMembershipFactory
-from tests.siaes.factories import SiaeFactory, SiaeJobDescriptionFactory
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
 from tests.utils.test import BASE_NUM_QUERIES, TestCase, parse_response_to_soup
 

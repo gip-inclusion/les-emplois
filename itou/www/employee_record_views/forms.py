@@ -7,8 +7,8 @@ from django_select2.forms import Select2MultipleWidget
 
 from itou.asp.exceptions import CommuneUnknownInPeriodError, UnknownCommuneError
 from itou.asp.models import Commune, Country, RSAAllocation
+from itou.companies.models import SiaeFinancialAnnex
 from itou.employee_record.enums import Status
-from itou.siaes.models import SiaeFinancialAnnex
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.validators import validate_pole_emploi_id
 from itou.utils.widgets import DuetDatePickerWidget

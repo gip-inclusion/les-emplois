@@ -7,12 +7,12 @@ from rest_framework.test import APIClient
 from itou.api.geiq.serializers import GeiqJobApplicationSerializer
 from itou.api.geiq.views import GeiqApiAnonymousUser
 from itou.api.models import SiaeApiToken
+from itou.companies.enums import SiaeKind
+from itou.companies.models import Siae
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
-from itou.siaes.enums import SiaeKind
-from itou.siaes.models import Siae
 from itou.users.enums import UserKind
+from tests.companies.factories import SiaeFactory
 from tests.job_applications.factories import JobApplicationFactory, PriorActionFactory
-from tests.siaes.factories import SiaeFactory
 from tests.users.factories import ItouStaffFactory, JobSeekerWithAddressFactory
 
 

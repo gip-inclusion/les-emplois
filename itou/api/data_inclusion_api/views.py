@@ -3,8 +3,8 @@ from drf_spectacular.utils import PolymorphicProxySerializer, extend_schema
 from rest_framework import authentication, exceptions, generics
 
 from itou.api.data_inclusion_api import enums, serializers
+from itou.companies.models import Siae
 from itou.prescribers.models import PrescriberOrganization
-from itou.siaes.models import Siae
 
 
 @extend_schema(

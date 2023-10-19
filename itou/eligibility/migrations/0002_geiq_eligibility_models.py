@@ -9,7 +9,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
     dependencies = [
         ("prescribers", "0001_initial"),
-        ("siaes", "0001_initial"),
+        ("companies", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ("eligibility", "0001_initial"),
     ]
@@ -208,7 +208,7 @@ class Migration(migrations.Migration):
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name="geiq_eligibilitydiagnosis_set",
-                to="siaes.siae",
+                to="companies.siae",
                 verbose_name="GEIQ de l'auteur",
             ),
         ),

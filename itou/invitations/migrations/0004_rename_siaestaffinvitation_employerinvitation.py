@@ -6,7 +6,7 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("siaes", "0004_siaejobdescription_field_history"),
+        ("companies", "0004_siaejobdescription_field_history"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ("invitations", "0003_extend_all_ddets_log_invitations"),
     ]

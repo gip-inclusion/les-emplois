@@ -7,6 +7,7 @@ from itou.eligibility.enums import AdministrativeCriteriaLevel, AuthorKind
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.eligibility.models.common import AdministrativeCriteriaQuerySet
 from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
+from tests.companies.factories import SiaeFactory
 from tests.eligibility.factories import (
     EligibilityDiagnosisFactory,
     EligibilityDiagnosisMadeBySiaeFactory,
@@ -15,7 +16,6 @@ from tests.eligibility.factories import (
 )
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from tests.siaes.factories import SiaeFactory
 from tests.users.factories import JobSeekerFactory
 from tests.utils.test import TestCase
 

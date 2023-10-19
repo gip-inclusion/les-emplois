@@ -12,7 +12,7 @@ from freezegun import freeze_time
 
 from itou.approvals.enums import ProlongationReason
 from itou.approvals.models import Prolongation
-from itou.siaes.enums import SiaeKind
+from itou.companies.enums import SiaeKind
 from itou.utils.widgets import DuetDatePickerWidget
 from tests.approvals.factories import ProlongationFactory
 from tests.job_applications.factories import JobApplicationFactory

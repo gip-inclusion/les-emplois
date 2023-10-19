@@ -3,13 +3,13 @@ from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
+from itou.companies.enums import SiaeKind
 from itou.eligibility.enums import AdministrativeCriteriaAnnex, AdministrativeCriteriaLevel
 from itou.eligibility.models import GEIQAdministrativeCriteria, GEIQEligibilityDiagnosis
-from itou.siaes.enums import SiaeKind
+from tests.companies.factories import SiaeWithMembershipAndJobsFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from tests.siaes.factories import SiaeWithMembershipAndJobsFactory
 from tests.users.factories import ItouStaffFactory, JobSeekerFactory
 
 

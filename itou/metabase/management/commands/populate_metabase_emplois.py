@@ -33,6 +33,7 @@ from itou.analytics.models import Datum, StatsDashboardVisit
 from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, ProlongationRequest
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
+from itou.companies.models import Siae, SiaeJobDescription
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.institutions.models import Institution
@@ -70,7 +71,6 @@ from itou.siae_evaluations.models import (
     EvaluatedSiae,
     EvaluationCampaign,
 )
-from itou.siaes.models import Siae, SiaeJobDescription
 from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.python import timeit

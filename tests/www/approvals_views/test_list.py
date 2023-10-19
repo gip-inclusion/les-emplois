@@ -4,7 +4,7 @@ from django.utils import timezone
 from pytest_django.asserts import assertContains, assertNotContains, assertNumQueries, assertRedirects
 
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
-from tests.siaes.factories import SiaeFactory
+from tests.companies.factories import SiaeFactory
 from tests.utils.test import BASE_NUM_QUERIES
 
 

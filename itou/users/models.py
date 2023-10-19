@@ -32,7 +32,7 @@ from itou.asp.models import (
 from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.address.format import format_address
 from itou.common_apps.address.models import AddressMixin
-from itou.siaes.enums import SiaeKind
+from itou.companies.enums import SiaeKind
 from itou.utils.apis.exceptions import AddressLookupError
 from itou.utils.models import UniqueConstraintWithErrorCode
 from itou.utils.validators import validate_birthdate, validate_nir, validate_pole_emploi_id

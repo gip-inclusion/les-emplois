@@ -2,10 +2,10 @@ from django.urls import reverse
 from django.utils import timezone
 from rest_framework.test import APIClient, APITestCase
 
-from itou.siaes.enums import SiaeKind
-from itou.siaes.models import Siae
+from itou.companies.enums import SiaeKind
+from itou.companies.models import Siae
+from tests.companies.factories import SiaeConventionFactory, SiaeFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
-from tests.siaes.factories import SiaeConventionFactory, SiaeFactory
 from tests.users.factories import EmployerFactory, PrescriberFactory
 from tests.utils.test import BASE_NUM_QUERIES
 

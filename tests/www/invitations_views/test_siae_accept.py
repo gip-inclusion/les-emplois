@@ -12,11 +12,11 @@ from itou.users.enums import KIND_EMPLOYER, UserKind
 from itou.users.models import User
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import add_url_params
+from tests.companies.factories import SiaeFactory
 from tests.invitations.factories import ExpiredEmployerInvitationFactory, SentEmployerInvitationFactory
 from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
 from tests.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from tests.siaes.factories import SiaeFactory
 from tests.users.factories import EmployerFactory
 from tests.utils.test import assertMessages
 

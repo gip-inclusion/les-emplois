@@ -1,6 +1,6 @@
 from django.db import models
 
-from itou.siaes import enums as siaes_enums
+from itou.companies import enums as companies_enums
 
 
 class ApprovalStatus(models.TextChoices):
@@ -40,7 +40,7 @@ class ProlongationReason(models.TextChoices):
             cls.RQTH,
             cls.SENIOR,
         ]
-        if siae.kind in [siaes_enums.SiaeKind.AI, siaes_enums.SiaeKind.ACI]:
+        if siae.kind in [companies_enums.SiaeKind.AI, companies_enums.SiaeKind.ACI]:
             enums.append(cls.PARTICULAR_DIFFICULTIES)
 
         empty = [(None, cls.__empty__)] if hasattr(cls, "__empty__") else []

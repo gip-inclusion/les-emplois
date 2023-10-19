@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("job_applications", "0001_initial"),
-        ("siaes", "0001_initial"),
+        ("companies", "0001_initial"),
     ]
 
     operations = [
@@ -68,7 +68,7 @@ class Migration(migrations.Migration):
                     models.ForeignKey(
                         null=True,
                         on_delete=django.db.models.deletion.SET_NULL,
-                        to="siaes.siaefinancialannex",
+                        to="companies.siaefinancialannex",
                         verbose_name="annexe financière",
                     ),
                 ),

@@ -4,8 +4,8 @@ from django.utils.datastructures import MultiValueDict
 
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS, DEPARTMENTS_WITH_DISTRICTS, format_district
+from itou.companies.enums import ContractNature, ContractType, SiaeKind
 from itou.jobs.models import ROME_DOMAINS
-from itou.siaes.enums import ContractNature, ContractType, SiaeKind
 
 
 class SiaeSearchForm(forms.Form):

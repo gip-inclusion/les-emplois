@@ -13,10 +13,10 @@ from django.core.management import call_command
 from django.utils import timezone
 from freezegun import freeze_time
 
+from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, SiaeKind
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication
 from itou.prescribers.enums import PrescriberOrganizationKind
-from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS, SiaeKind
 from itou.users.management.commands.new_users_to_mailjet import (
     MAILJET_API_URL,
     NEW_ORIENTEURS_LISTID,
@@ -27,6 +27,7 @@ from itou.users.management.commands.new_users_to_mailjet import (
 from itou.users.models import User
 from itou.utils.mocks.pole_emploi import API_RECHERCHE_ERROR, API_RECHERCHE_RESULT_KNOWN
 from tests.approvals.factories import ApprovalFactory
+from tests.companies.factories import SiaeMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
 from tests.prescribers.factories import (
     PrescriberFactory,
@@ -34,7 +35,6 @@ from tests.prescribers.factories import (
     PrescriberOrganizationFactory,
     PrescriberPoleEmploiFactory,
 )
-from tests.siaes.factories import SiaeMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, JobSeekerWithAddressFactory
 from tests.utils.test import TestCase
 
@@ -208,6 +208,20 @@ class TestSyncPermsTestCase(TestCase):
             "view_country",
             "view_department",
             "view_city",
+            "add_siae",
+            "change_siae",
+            "view_siae",
+            "change_siaeconvention",
+            "view_siaeconvention",
+            "view_siaefinancialannex",
+            "add_siaejobdescription",
+            "change_siaejobdescription",
+            "delete_siaejobdescription",
+            "view_siaejobdescription",
+            "add_siaemembership",
+            "change_siaemembership",
+            "delete_siaemembership",
+            "view_siaemembership",
             "view_administrativecriteria",
             "add_eligibilitydiagnosis",
             "change_eligibilitydiagnosis",
@@ -254,20 +268,6 @@ class TestSyncPermsTestCase(TestCase):
             "view_evaluatedsiae",
             "view_evaluationcampaign",
             "view_sanctions",
-            "add_siae",
-            "change_siae",
-            "view_siae",
-            "change_siaeconvention",
-            "view_siaeconvention",
-            "view_siaefinancialannex",
-            "add_siaejobdescription",
-            "change_siaejobdescription",
-            "delete_siaejobdescription",
-            "view_siaejobdescription",
-            "add_siaemembership",
-            "change_siaemembership",
-            "delete_siaemembership",
-            "view_siaemembership",
             "change_jobseekerprofile",
             "view_jobseekerprofile",
             "add_user",
@@ -286,6 +286,11 @@ class TestSyncPermsTestCase(TestCase):
             "view_country",
             "view_department",
             "view_city",
+            "view_siae",
+            "view_siaeconvention",
+            "view_siaefinancialannex",
+            "view_siaejobdescription",
+            "view_siaemembership",
             "view_administrativecriteria",
             "view_eligibilitydiagnosis",
             "view_selectedadministrativecriteria",
@@ -301,11 +306,6 @@ class TestSyncPermsTestCase(TestCase):
             "view_rome",
             "view_prescribermembership",
             "view_prescriberorganization",
-            "view_siae",
-            "view_siaeconvention",
-            "view_siaefinancialannex",
-            "view_siaejobdescription",
-            "view_siaemembership",
             "view_jobseekerprofile",
             "view_user",
         ]

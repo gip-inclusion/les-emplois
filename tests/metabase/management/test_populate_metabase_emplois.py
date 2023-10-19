@@ -10,11 +10,11 @@ from pytest_django.asserts import assertNumQueries
 
 from itou.approvals.enums import Origin
 from itou.common_apps.address.departments import DEPARTMENTS
+from itou.companies.enums import ContractType
+from itou.companies.models import SiaeJobDescription
 from itou.eligibility.models import AdministrativeCriteria
 from itou.geo.utils import coords_to_geometry
 from itou.metabase.tables.utils import hash_content
-from itou.siaes.enums import ContractType
-from itou.siaes.models import SiaeJobDescription
 from itou.users.enums import IdentityProvider, UserKind
 from tests.analytics.factories import DatumFactory, StatsDashboardVisitFactory
 from tests.approvals.factories import (
@@ -23,6 +23,7 @@ from tests.approvals.factories import (
     ProlongationRequestDenyInformationFactory,
     ProlongationWithRequestFactory,
 )
+from tests.companies.factories import SiaeFactory, SiaeJobDescriptionFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory
 from tests.geo.factories import QPVFactory
 from tests.institutions.factories import InstitutionFactory
@@ -34,7 +35,6 @@ from tests.siae_evaluations.factories import (
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
 )
-from tests.siaes.factories import SiaeFactory, SiaeJobDescriptionFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
 
 

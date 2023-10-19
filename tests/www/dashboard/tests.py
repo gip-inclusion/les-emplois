@@ -16,6 +16,7 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 from rest_framework.authtoken.models import Token
 
+from itou.companies.enums import SiaeKind
 from itou.employee_record.enums import Status
 from itou.institutions.enums import InstitutionKind
 from itou.job_applications.notifications import (
@@ -27,7 +28,6 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.constants import CAMPAIGN_VIEWABLE_DURATION
 from itou.siae_evaluations.models import Sanctions
-from itou.siaes.enums import SiaeKind
 from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
@@ -35,6 +35,13 @@ from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.format_filters import format_approval_number, format_siret
 from itou.www.dashboard.forms import EditUserEmailForm
 from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactory
+from tests.companies.factories import (
+    SiaeAfterGracePeriodFactory,
+    SiaeFactory,
+    SiaeMembershipFactory,
+    SiaePendingGracePeriodFactory,
+    SiaeWithMembershipAndJobsFactory,
+)
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory, LaborInspectorFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByPrescriberFactory
@@ -49,13 +56,6 @@ from tests.siae_evaluations.factories import (
     EvaluatedJobApplicationFactory,
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
-)
-from tests.siaes.factories import (
-    SiaeAfterGracePeriodFactory,
-    SiaeFactory,
-    SiaeMembershipFactory,
-    SiaePendingGracePeriodFactory,
-    SiaeWithMembershipAndJobsFactory,
 )
 from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory, JobSeekerFactory, PrescriberFactory
 from tests.utils.test import BASE_NUM_QUERIES, TestCase, parse_response_to_soup

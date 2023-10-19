@@ -17,6 +17,8 @@ from django.utils.html import format_html
 from django.views.generic import TemplateView
 
 from itou.approvals.models import Approval
+from itou.companies.enums import SiaeKind
+from itou.companies.models import Siae, SiaeJobDescription
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.files.models import File
@@ -25,8 +27,6 @@ from itou.job_applications.notifications import (
     NewQualifiedJobAppEmployersNotification,
     NewSpontaneousJobAppEmployersNotification,
 )
-from itou.siaes.enums import SiaeKind
-from itou.siaes.models import Siae, SiaeJobDescription
 from itou.users.enums import UserKind
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.apis.exceptions import AddressLookupError

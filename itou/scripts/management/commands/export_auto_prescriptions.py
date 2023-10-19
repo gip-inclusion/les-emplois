@@ -4,8 +4,8 @@ from django.core.management.base import BaseCommand
 from django.db.models import F
 
 from itou.common_apps.address.departments import DEPARTMENTS
+from itou.companies.enums import SiaeKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
-from itou.siaes.enums import SiaeKind
 from itou.users.enums import KIND_EMPLOYER
 from itou.utils.management_commands import XlsxExportMixin
 

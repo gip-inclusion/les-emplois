@@ -1,6 +1,6 @@
 from django.db import models
 
-from itou.siaes.enums import SiaeKind
+from itou.companies.enums import SiaeKind
 
 
 class EvaluationChosenPercent:

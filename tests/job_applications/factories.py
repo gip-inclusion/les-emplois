@@ -4,21 +4,21 @@ import factory
 import factory.fuzzy
 from dateutil.relativedelta import relativedelta
 
+from itou.companies.enums import SiaeKind
+from itou.companies.models import SiaeJobDescription
 from itou.eligibility.enums import AuthorKind
 from itou.job_applications import models
 from itou.job_applications.enums import Prequalification, ProfessionalSituationExperience, SenderKind
 from itou.jobs.models import Appellation
-from itou.siaes.enums import SiaeKind
-from itou.siaes.models import SiaeJobDescription
 from itou.utils.types import InclusiveDateRange
 from tests.approvals.factories import ApprovalFactory
 from tests.asp.factories import CommuneFactory, CountryFranceFactory
+from tests.companies.factories import SiaeFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory
 from tests.prescribers.factories import (
     PrescriberOrganizationWithMembershipFactory,
     PrescriberPoleEmploiWithMembershipFactory,
 )
-from tests.siaes.factories import SiaeFactory
 from tests.users.factories import (
     JobSeekerFactory,
     JobSeekerProfileWithHexaAddressFactory,

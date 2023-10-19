@@ -1,5 +1,5 @@
+from itou.companies.models import SiaeJobDescription
 from itou.metabase.tables.utils import MetabaseTable, get_department_and_region_columns
-from itou.siaes.models import SiaeJobDescription
 
 
 def get_field(name):

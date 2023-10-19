@@ -9,6 +9,7 @@ from freezegun import freeze_time
 
 from itou.siae_evaluations.emails import CampaignEmailFactory, InstitutionEmailFactory, SIAEEmailFactory
 from itou.siae_evaluations.enums import EvaluatedAdministrativeCriteriaState
+from tests.companies.factories import SiaeFactory, SiaeWith2MembershipsFactory
 from tests.institutions.factories import InstitutionWith2MembershipFactory
 from tests.siae_evaluations.factories import (
     EvaluatedAdministrativeCriteriaFactory,
@@ -16,7 +17,6 @@ from tests.siae_evaluations.factories import (
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
 )
-from tests.siaes.factories import SiaeFactory, SiaeWith2MembershipsFactory
 
 
 @pytest.mark.usefixtures("unittest_compatibility")

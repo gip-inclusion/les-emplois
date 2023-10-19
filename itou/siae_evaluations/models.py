@@ -8,13 +8,13 @@ from django.db.models import Count, Exists, F, OuterRef, Q
 from django.utils import timezone
 from django.utils.functional import cached_property
 
+from itou.companies.models import Siae
 from itou.eligibility.models import AdministrativeCriteria
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.emails import CampaignEmailFactory, SIAEEmailFactory
-from itou.siaes.models import Siae
 from itou.users.enums import KIND_EMPLOYER
 from itou.utils.emails import send_email_messages
 from itou.utils.models import InclusiveDateRangeField
@@ -436,7 +436,7 @@ class EvaluatedSiae(models.Model):
         related_name="evaluated_siaes",
     )
     siae = models.ForeignKey(
-        "siaes.Siae",
+        "companies.Siae",
         verbose_name="SIAE",
         on_delete=models.CASCADE,
         related_name="evaluated_siaes",

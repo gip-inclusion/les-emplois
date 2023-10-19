@@ -21,6 +21,7 @@ from itou.siae_evaluations.models import (
 from itou.utils.templatetags.format_filters import format_approval_number
 from itou.utils.types import InclusiveDateRange
 from itou.www.siae_evaluations_views.forms import LaborExplanationForm, SetChosenPercentForm
+from tests.companies.factories import SiaeFactory, SiaeMembershipFactory
 from tests.files.factories import FileFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -30,7 +31,6 @@ from tests.siae_evaluations.factories import (
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
 )
-from tests.siaes.factories import SiaeFactory, SiaeMembershipFactory
 from tests.users.factories import JobSeekerFactory
 from tests.utils.test import BASE_NUM_QUERIES, TestCase, assertMessages, parse_response_to_soup
 

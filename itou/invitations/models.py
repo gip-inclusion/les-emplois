@@ -225,7 +225,7 @@ class EmployerInvitation(InvitationAbstract):
         on_delete=models.CASCADE,
         related_name="siae_invitations",
     )
-    siae = models.ForeignKey("siaes.Siae", on_delete=models.CASCADE, related_name="invitations")
+    siae = models.ForeignKey("companies.Siae", on_delete=models.CASCADE, related_name="invitations")
 
     class Meta:
         verbose_name = "invitation employeur"

@@ -34,7 +34,7 @@ class BaseNotification:
         """
         `recipients_qs`: Django QuerySet leading to this notification recipients
         We should be able to perform a `filter()` with it.
-        e.g. itou.siaes.models.SiaeMembershipQuerySet
+        e.g. itou.companies.models.SiaeMembershipQuerySet
         """
         self.recipients_qs = recipients_qs
 

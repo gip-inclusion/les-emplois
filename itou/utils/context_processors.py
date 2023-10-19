@@ -1,9 +1,9 @@
 from urllib.parse import urlencode
 
 import itou.approvals.enums as approvals_enums
+import itou.companies.enums as companies_enums
 import itou.job_applications.enums as job_applications_enums
 import itou.prescribers.enums as prescribers_enums
-import itou.siaes.enums as siaes_enums
 
 
 def expose_enums(*args):
@@ -19,7 +19,7 @@ def expose_enums(*args):
         "ProlongationRequestStatus": approvals_enums.ProlongationRequestStatus,
         "RefusalReason": job_applications_enums.RefusalReason,
         "SenderKind": job_applications_enums.SenderKind,
-        "SiaeKind": siaes_enums.SiaeKind,
+        "SiaeKind": companies_enums.SiaeKind,
     }
 
 

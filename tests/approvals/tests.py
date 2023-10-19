@@ -25,10 +25,10 @@ from itou.approvals.admin_forms import ApprovalAdminForm
 from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
 from itou.approvals.enums import ApprovalStatus, Origin, ProlongationReason
 from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, Suspension
+from itou.companies.enums import SiaeKind
 from itou.employee_record.enums import Status
 from itou.files.models import File
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
-from itou.siaes.enums import SiaeKind
 from itou.users.enums import LackOfPoleEmploiId
 from tests.approvals.factories import (
     ApprovalFactory,
@@ -37,10 +37,10 @@ from tests.approvals.factories import (
     ProlongationRequestFactory,
     SuspensionFactory,
 )
+from tests.companies.factories import SiaeFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
-from tests.siaes.factories import SiaeFactory
 from tests.users.factories import ItouStaffFactory, JobSeekerFactory
 from tests.utils.test import TestCase, assertMessages
 

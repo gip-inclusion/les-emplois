@@ -5,11 +5,11 @@ from django.db import models, transaction
 from django.utils import timezone
 from django.utils.text import slugify
 
+from itou.companies.enums import SiaeKind
+from itou.companies.models import Siae
 from itou.eligibility.enums import AdministrativeCriteriaAnnex, AdministrativeCriteriaLevel, AuthorKind
 from itou.eligibility.utils import geiq_allowance_amount
 from itou.prescribers.models import PrescriberOrganization
-from itou.siaes.enums import SiaeKind
-from itou.siaes.models import Siae
 from itou.users.models import User
 
 from .common import (
@@ -72,7 +72,7 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
     )
     # Even if GEIQ are technically Siae objects, we keep the same structure as IAE for the author
     author_geiq = models.ForeignKey(
-        "siaes.Siae",
+        "companies.Siae",
         verbose_name="GEIQ de l'auteur",
         related_name="geiq_eligibilitydiagnosis_set",
         null=True,

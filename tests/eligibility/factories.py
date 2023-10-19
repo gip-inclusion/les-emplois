@@ -1,11 +1,11 @@
 import factory
 from django.utils import timezone
 
+from itou.companies.enums import SiaeKind
 from itou.eligibility import models
 from itou.eligibility.enums import AuthorKind
-from itou.siaes.enums import SiaeKind
+from tests.companies.factories import SiaeFactory, SiaeWith2MembershipsFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from tests.siaes.factories import SiaeFactory, SiaeWith2MembershipsFactory
 from tests.users.factories import JobSeekerFactory
 
 

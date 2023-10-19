@@ -4,10 +4,10 @@ from django.utils import timezone
 
 from itou.eligibility.models import AdministrativeCriteria
 from itou.siae_evaluations import models
+from tests.companies.factories import SiaeFactory
 from tests.files.factories import FileFactory
 from tests.institutions.factories import InstitutionFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.siaes.factories import SiaeFactory
 
 
 def before_ended_at(**kwargs):

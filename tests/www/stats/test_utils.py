@@ -6,11 +6,11 @@ from itou.institutions.enums import InstitutionKind
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.utils.perms.middleware import ItouCurrentOrganizationMiddleware
 from itou.www.stats import utils
+from tests.companies.factories import SiaeFactory
 from tests.institutions.factories import InstitutionWithMembershipFactory
 from tests.prescribers.factories import (
     PrescriberOrganizationWithMembershipFactory,
 )
-from tests.siaes.factories import SiaeFactory
 from tests.users.factories import (
     PrescriberFactory,
 )

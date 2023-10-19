@@ -6,11 +6,11 @@ from rest_framework import serializers
 
 import itou.job_applications.enums as enums
 from itou.asp.models import EducationLevel
+from itou.companies.enums import ContractType, SiaeKind
 from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
 from itou.job_applications.models import JobApplication, PriorAction
 from itou.prescribers.enums import PrescriberOrganizationKind
-from itou.siaes.enums import ContractType, SiaeKind
 from itou.users.enums import Title
 
 

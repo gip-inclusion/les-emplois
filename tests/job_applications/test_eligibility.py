@@ -1,12 +1,12 @@
 from django.utils.timezone import timedelta
 
+import itou.companies.enums as companies_enums
 import itou.employee_record.enums as er_enums
-import itou.siaes.enums as siae_enums
 from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
 from itou.job_applications.models import JobApplication
+from tests.companies.factories import SiaeFactory
 from tests.employee_record.factories import EmployeeRecordWithProfileFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationWithoutApprovalFactory
-from tests.siaes.factories import SiaeFactory
 from tests.utils.test import TestCase
 
 
@@ -41,7 +41,7 @@ class EmployeeRecordEligibilityTest(TestCase):
     def test_siae_kind(self):
         # Hiring SIAE must be of a specific kind to use employee record feature
         siae_good = SiaeFactory()
-        siae_bad = SiaeFactory(kind=siae_enums.SiaeKind.EATT)
+        siae_bad = SiaeFactory(kind=companies_enums.SiaeKind.EATT)
         # job application created with a fake approval
         # to avoid filtering criteria with empty approval
         non_eligible_job_application = JobApplicationFactory(with_approval=True, to_siae=siae_bad)

@@ -17,11 +17,11 @@ from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.urls import add_url_params
+from tests.companies.factories import SiaeFactory
 from tests.invitations.factories import PrescriberWithOrgSentInvitationFactory
 from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
 from tests.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory, PrescriberPoleEmploiFactory
-from tests.siaes.factories import SiaeFactory
 from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory
 from tests.utils.test import TestCase, assertMessages
 

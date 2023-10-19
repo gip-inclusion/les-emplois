@@ -4,7 +4,7 @@ from django.urls import reverse
 from rest_framework.test import APIClient, APITestCase
 
 from itou.api.employee_record_api.viewsets import EmployeeRecordRateThrottle
-from tests.siaes.factories import SiaeFactory
+from tests.companies.factories import SiaeFactory
 from tests.users.factories import DEFAULT_PASSWORD
 
 

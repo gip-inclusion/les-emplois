@@ -12,8 +12,8 @@ from django.utils.html import escape
 from django.utils.http import urlencode
 from freezegun import freeze_time
 
-from itou.siaes.enums import SiaeKind
-from itou.siaes.models import Siae
+from itou.companies.enums import SiaeKind
+from itou.companies.models import Siae
 from itou.users.enums import KIND_EMPLOYER, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
@@ -21,9 +21,9 @@ from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.templatetags.format_filters import format_siret
 from itou.utils.urls import get_tally_form_url
+from tests.companies.factories import SiaeFactory, SiaeMembershipFactory, SiaeWithMembershipAndJobsFactory
 from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
 from tests.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
-from tests.siaes.factories import SiaeFactory, SiaeMembershipFactory, SiaeWithMembershipAndJobsFactory
 from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory, PrescriberFactory
 from tests.utils.test import BASE_NUM_QUERIES, TestCase, assertMessages
 

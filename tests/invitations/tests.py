@@ -4,6 +4,7 @@ from django.utils import timezone
 
 from itou.invitations.models import EmployerInvitation, InvitationAbstract
 from itou.users.enums import KIND_EMPLOYER
+from tests.companies.factories import SiaeMembershipFactory
 from tests.invitations.factories import (
     EmployerInvitationFactory,
     ExpiredEmployerInvitationFactory,
@@ -11,7 +12,6 @@ from tests.invitations.factories import (
     SentEmployerInvitationFactory,
 )
 from tests.prescribers.factories import PrescriberMembershipFactory
-from tests.siaes.factories import SiaeMembershipFactory
 from tests.users.factories import EmployerFactory, PrescriberFactory
 from tests.utils.test import TestCase
 

@@ -3,7 +3,7 @@ from django.contrib import admin, messages
 from django.utils import timezone
 
 import itou.employee_record.models as models
-from itou.siaes import models as siaes_models
+from itou.companies import models as siaes_models
 
 from ..utils.admin import ItouModelAdmin, ItouTabularInline, get_admin_view_link
 from ..utils.templatetags.str_filters import pluralizefr

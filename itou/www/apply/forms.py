@@ -18,11 +18,11 @@ from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS, department_from_postcode
 from itou.common_apps.address.forms import MandatoryAddressFormMixin
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
+from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, ContractType, SiaeKind
 from itou.eligibility.models import AdministrativeCriteria
 from itou.files.forms import ItouFileField
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow, PriorAction
-from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS, ContractType, SiaeKind
 from itou.users.enums import LackOfPoleEmploiId, UserKind
 from itou.users.models import JobSeekerProfile, User
 from itou.utils import constants as global_constants

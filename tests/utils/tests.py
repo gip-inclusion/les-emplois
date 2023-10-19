@@ -29,9 +29,9 @@ from pytest_django.asserts import assertContains, assertNumQueries, assertRedire
 import itou.utils.json
 import itou.utils.session
 from itou.approvals.models import Suspension
+from itou.companies.enums import SiaeKind
+from itou.companies.models import Siae, SiaeMembership
 from itou.job_applications.models import JobApplicationWorkflow
-from itou.siaes.enums import SiaeKind
-from itou.siaes.models import Siae, SiaeMembership
 from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants, pagination
@@ -64,6 +64,7 @@ from itou.utils.validators import (
     validate_siret,
 )
 from tests.approvals.factories import SuspensionFactory
+from tests.companies.factories import SiaeFactory, SiaeMembershipFactory, SiaePendingGracePeriodFactory
 from tests.institutions.factories import (
     InstitutionFactory,
     InstitutionMembershipFactory,
@@ -71,7 +72,6 @@ from tests.institutions.factories import (
 )
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory, PrescriberOrganizationWithMembershipFactory
-from tests.siaes.factories import SiaeFactory, SiaeMembershipFactory, SiaePendingGracePeriodFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,

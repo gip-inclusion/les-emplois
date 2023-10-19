@@ -8,9 +8,9 @@ from django.urls import reverse
 from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER
 from itou.users.models import User
 from itou.utils import constants as global_constants
+from tests.companies.factories import SiaeFactory
 from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
 from tests.openid_connect.inclusion_connect.tests import mock_oauth_dance
-from tests.siaes.factories import SiaeFactory
 from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from tests.utils.test import TestCase
 

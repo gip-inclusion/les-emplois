@@ -1,3 +1,4 @@
+from itou.companies.models import Siae
 from itou.metabase.tables.utils import (
     MetabaseTable,
     get_address_columns,
@@ -5,7 +6,6 @@ from itou.metabase.tables.utils import (
     get_establishment_is_active_column,
     get_establishment_last_login_date_column,
 )
-from itou.siaes.models import Siae
 
 
 TABLE = MetabaseTable(name="structures")

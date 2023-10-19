@@ -16,13 +16,13 @@ from django.utils import timezone
 
 import itou.users.enums as users_enums
 from itou.approvals.models import Approval
+from itou.companies.enums import SiaeKind
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria
 from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.institutions.models import Institution
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siae_evaluations.models import Calendar, EvaluationCampaign, create_campaigns_and_calendar
-from itou.siaes.enums import SiaeKind
 from itou.users.models import User
 
 
