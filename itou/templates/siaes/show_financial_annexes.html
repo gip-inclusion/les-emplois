@@ -10,46 +10,57 @@
         <br>
         La gestion de vos annexes financières continue de se faire dans l'extranet 2.0 de l'ASP.
     </p>
+    {% if not siae.is_active %}
+        {% if siae_is_asp %}
+            <div class="alert alert-danger" role="status">
+                <p class="mb-0">
+                    {# Inactive siaes of ASP source cannot be fixed by user. #}
+                    Votre structure est inactive car elle n'est associée à aucune annexe financière valide. Contactez-nous via la rubrique correspondant à votre structure sur
+                    <a href="{{ ITOU_HELP_CENTER_URL }}" target="_blank" rel="noopener" aria-label="{{ ITOU_HELP_CENTER_URL }} (ouverture dans un nouvel onglet)">{{ ITOU_HELP_CENTER_URL }}</a>
+                </p>
+            </div>
+        {% elif siae_is_user_created %}
+            <div class="alert alert-danger" role="status">
+                <p class="mb-0">
+                    {# Inactive user created siaes can be fixed by the user. #}
+                    Votre structure sera prochainement désactivée car elle n'est associée à aucune annexe financière valide. Veuillez dès que possible procéder à la sélection d'une annexe financière valide ci-dessous.
+                </p>
+            </div>
+        {% endif %}
+    {% endif %}
 {% endblock %}
 
 {% block content %}
 
     <section class="s-section">
         <div class="s-section__container container">
-            {% if not siae.is_active %}
-                {% if siae_is_asp %}
-                    <div class="alert alert-danger" role="status">
-                        <p class="mb-0">
-                            {# Inactive siaes of ASP source cannot be fixed by user. #}
-                            Votre structure est inactive car elle n'est associée à aucune annexe financière valide. Contactez-nous via la rubrique correspondant à votre structure sur
-                            <a href="{{ ITOU_HELP_CENTER_URL }}" target="_blank" rel="noopener" aria-label="{{ ITOU_HELP_CENTER_URL }} (ouverture dans un nouvel onglet)">{{ ITOU_HELP_CENTER_URL }}</a>
-                        </p>
-                    </div>
-                {% elif siae_is_user_created %}
-                    <div class="alert alert-danger" role="status">
-                        <p class="mb-0">
-                            {# Inactive user created siaes can be fixed by the user. #}
-                            Votre structure sera prochainement désactivée car elle n'est associée à aucune annexe financière valide. Veuillez dès que possible procéder à la sélection d'une annexe financière valide ci-dessous.
-                        </p>
-                    </div>
-                {% endif %}
-            {% endif %}
-            <h2 class="text-muted">{{ siae.display_name }}</h2>
+            <h2>{{ siae.display_name }}</h2>
             <div class="row">
                 <div class="col-12">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-bordered">
-                            <caption>Liste des annexes financières</caption>
-                            <thead>
-                                <tr>
-                                    <th scope="col">Numéro d'annexe financière</th>
-                                    <th scope="col">Date de début d'effet</th>
-                                    <th scope="col">Date de fin d'effet</th>
-                                    <th scope="col">Validité à ce jour</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% if financial_annexes %}
+                    <div class="c-box">
+                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between">
+                            <h3 class="h4 mb-0">Annexes financières</h3>
+                            {% if can_select_af %}
+                                <div class="flex-column flex-md-row btn-group btn-group-sm btn-group-action" role="group" aria-label="Actions sur les annexes financières">
+                                    <a class="btn btn-primary btn-ico justify-content-center mt-3 mt-md-0" href="{% url 'companies_views:select_financial_annex' %}">
+                                        <i class="ri-share-forward-box-line"></i>
+                                        <span>Sélectionner une autre annexe financière</span>
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="table-responsive-lg mt-3 mt-md-4">
+                            <table class="table">
+                                <caption class="visually-hidden">Liste des annexes financières</caption>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Numéro d'annexe financière</th>
+                                        <th scope="col">Date de début d'effet</th>
+                                        <th scope="col">Date de fin d'effet</th>
+                                        <th scope="col">Validité à ce jour</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
                                     {% for financial_annex in financial_annexes %}
                                         <tr>
                                             <td>{{ financial_annex.number_with_spaces }}</td>
@@ -57,32 +68,23 @@
                                             <td>{{ financial_annex.end_at|date:"d/m/Y" }}</td>
                                             {% if financial_annex.is_active %}
                                                 <td>
-                                                    <span class="badge rounded-pill bg-success">Valide</span>
+                                                    <span class="badge badge-sm rounded-pill bg-success-lighter text-success">Valide</span>
                                                 </td>
                                             {% else %}
                                                 <td>
-                                                    <span class="badge rounded-pill bg-secondary">Inactive</span>
+                                                    <span class="badge badge-sm rounded-pill bg-primary">Inactive</span>
                                                 </td>
                                             {% endif %}
                                         </tr>
+                                    {% empty %}
+                                        <tr>
+                                            <td colspan="4">Aucune annexe financière associée à cette structure.</td>
+                                        </tr>
                                     {% endfor %}
-                                {% else %}
-                                    <tr>
-                                        <td>Aucune annexe financière associée à cette structure.</td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                {% endif %}
-                            </tbody>
-                        </table>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-
-                    {% if can_select_af %}
-                        <a href="{% url 'companies_views:select_financial_annex' %}" class="align-self-center">
-                            <span class="btn btn-primary mb-1 w-100 w-sm-auto mt-2">Sélectionner une autre annexe financière</span>
-                        </a>
-                    {% endif %}
                 </div>
             </div>
         </div>
