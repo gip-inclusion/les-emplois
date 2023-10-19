@@ -567,6 +567,9 @@ class ItouUserAdmin(UserAdmin):
                         kwargs={"object_id": to_user.pk},
                     )
                 )
+        title = f"Transfert des données de { from_user }"
+        if to_user:
+            title += f" vers { to_user}"
         context = self.admin_site.each_context(request) | {
             "media": self.media,
             "opts": self.opts,
@@ -575,6 +578,7 @@ class ItouUserAdmin(UserAdmin):
             "to_user": to_user,
             "nothing_to_transfer": not fields_choices,
             "transfer_data": sorted(transfer_data.values(), key=lambda data: data["title"]),
+            "title": title,
         }
 
         return TemplateResponse(
