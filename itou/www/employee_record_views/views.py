@@ -109,13 +109,13 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         (
             # Don't use count() since we also need the list when status is NEW
             len(eligible_job_applications) if status == Status.NEW else eligible_job_applications.count(),
-            "info",
+            "bg-info",
         ),
-        (employee_record_badges.get(Status.READY, 0), "secondary"),
-        (employee_record_badges.get(Status.SENT, 0), "warning"),
-        (employee_record_badges.get(Status.REJECTED, 0), "danger"),
-        (employee_record_badges.get(Status.PROCESSED, 0), "success"),
-        (employee_record_badges.get(Status.DISABLED, 0), "emploi-lightest"),
+        (employee_record_badges.get(Status.READY, 0), "bg-secondary"),
+        (employee_record_badges.get(Status.SENT, 0), "bg-warning"),
+        (employee_record_badges.get(Status.REJECTED, 0), "bg-danger"),
+        (employee_record_badges.get(Status.PROCESSED, 0), "bg-success"),
+        (employee_record_badges.get(Status.DISABLED, 0), "bg-emploi-lightest text-primary"),
     ]
 
     # Employee records are created with a job application object.
