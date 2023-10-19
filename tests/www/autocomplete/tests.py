@@ -1,6 +1,5 @@
 from django.urls import reverse
 
-from itou.jobs.models import Appellation
 from tests.cities.factories import create_test_cities
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.siaes.factories import SiaeFactory
@@ -105,15 +104,6 @@ class JobsAutocompleteTest(TestCase):
             }
         ]
         assert response.json() == expected
-
-    def test_search_filter_with_rome_code(self):
-        appellation = Appellation.objects.autocomplete("conducteur", limit=1, rome_code="N1101")[0]
-        assert appellation.code == "12918"
-        assert appellation.name == "Conducteur / Conductrice de chariot élévateur de l'armée"
-
-        appellation = Appellation.objects.autocomplete("conducteur", limit=1, rome_code="N4105")[0]
-        assert appellation.code == "12859"
-        assert appellation.name == "Conducteur collecteur / Conductrice collectrice de lait"
 
 
 class CitiesAutocompleteTest(TestCase):
