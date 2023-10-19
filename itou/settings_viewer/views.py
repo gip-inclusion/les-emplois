@@ -18,5 +18,6 @@ def settings_list(request):
     context_data = {
         **admin.site.each_context(request),
         "setting_items": get_settings_list(),
+        "title": "Settings values",
     }
     return render(request, "settings/list.html", context_data)
