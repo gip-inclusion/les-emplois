@@ -79,7 +79,7 @@ class DataInclusionSiaeStructureTest(APITestCase):
                 "source": siae.source,
                 "date_maj": _str_with_tz(siae.updated_at),
                 "antenne": False,
-                "lien_source": f"http://testserver{reverse('siaes_views:card', kwargs={'siae_id': siae.pk})}",
+                "lien_source": f"http://testserver{reverse('companies_views:card', kwargs={'siae_id': siae.pk})}",
                 "horaires_ouverture": "",
                 "accessibilite": "",
                 "labels_nationaux": [],

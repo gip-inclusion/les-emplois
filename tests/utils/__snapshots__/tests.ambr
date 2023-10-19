@@ -59,7 +59,7 @@
                   window._paq.push(['setUserId', '99999']);
   
                   
-                      window._paq.push(['setCustomUrl', new URL('siae/&lt;int:siae_id&gt;/card?city=paris&amp;mtm_bar=bidule&amp;mtm_foo=truc', window.location.origin).href]);
+                      window._paq.push(['setCustomUrl', new URL('company/&lt;int:siae_id&gt;/card?city=paris&amp;mtm_bar=bidule&amp;mtm_foo=truc', window.location.origin).href]);
                   
   
                   

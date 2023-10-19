@@ -38,7 +38,7 @@ class CardViewTest(TestCase):
 
     def test_card(self):
         siae = SiaeFactory(with_membership=True)
-        url = reverse("siaes_views:card", kwargs={"siae_id": siae.pk})
+        url = reverse("companies_views:card", kwargs={"siae_id": siae.pk})
         response = self.client.get(url)
         assert response.context["siae"] == siae
         self.assertContains(response, escape(siae.display_name))
@@ -49,7 +49,7 @@ class CardViewTest(TestCase):
 
     def test_card_no_active_members(self):
         siae = SiaeFactory(with_membership=False, for_snapshot=True)
-        url = reverse("siaes_views:card", kwargs={"siae_id": siae.pk})
+        url = reverse("companies_views:card", kwargs={"siae_id": siae.pk})
         response = self.client.get(url)
         soup = parse_response_to_soup(response, selector="#main")
         assert str(soup) == self.snapshot()
@@ -63,7 +63,7 @@ class CardViewTest(TestCase):
             contract_type=ContractType.PERMANENT,
             is_active=False,
         )
-        url = reverse("siaes_views:card", kwargs={"siae_id": siae.pk})
+        url = reverse("companies_views:card", kwargs={"siae_id": siae.pk})
         response = self.client.get(url)
         self.assertContains(
             response,
@@ -137,7 +137,7 @@ class CardViewTest(TestCase):
                       data-matomo-action="clic"
                       data-matomo-category="candidature"
                       data-matomo-option="clic-metiers"
-                      href="{job_description.get_absolute_url()}?back_url=/siae/{siae.pk}/card">
+                      href="{job_description.get_absolute_url()}?back_url=/company/{siae.pk}/card">
                     Plaquiste
                    </a>
                   </div>
@@ -182,7 +182,7 @@ class CardViewTest(TestCase):
             location=self.vannes,
             contract_type=ContractType.PERMANENT,
         )
-        url = reverse("siaes_views:card", kwargs={"siae_id": siae.pk})
+        url = reverse("companies_views:card", kwargs={"siae_id": siae.pk})
         response = self.client.get(url)
         self.assertContains(
             response,
@@ -237,7 +237,7 @@ class CardViewTest(TestCase):
                       data-matomo-action="clic"
                       data-matomo-category="candidature"
                       data-matomo-option="clic-metiers"
-                      href="{job_description.get_absolute_url()}?back_url=/siae/{siae.pk}/card">
+                      href="{job_description.get_absolute_url()}?back_url=/company/{siae.pk}/card">
                     Plaquiste
                    </a>
                   </div>
@@ -293,7 +293,7 @@ class CardViewTest(TestCase):
             appellation=app2,
             is_active=False,
         )
-        url = reverse("siaes_views:card", kwargs={"siae_id": siae.pk})
+        url = reverse("companies_views:card", kwargs={"siae_id": siae.pk})
         response = self.client.get(url)
         self.assertContains(
             response,
@@ -362,7 +362,7 @@ class CardViewTest(TestCase):
                       data-matomo-action="clic"
                       data-matomo-category="candidature"
                       data-matomo-option="clic-metiers"
-                      href="{active_job_description.get_absolute_url()}?back_url=/siae/{siae.pk}/card">
+                      href="{active_job_description.get_absolute_url()}?back_url=/company/{siae.pk}/card">
                     Plaquiste
                    </a>
                   </div>
@@ -391,7 +391,7 @@ class CardViewTest(TestCase):
                       data-matomo-action="clic"
                       data-matomo-category="candidature"
                       data-matomo-option="clic-metiers"
-                      href="{other_job_description.get_absolute_url()}?back_url=/siae/{siae.pk}/card">
+                      href="{other_job_description.get_absolute_url()}?back_url=/company/{siae.pk}/card">
                     Peintre
                    </a>
                   </div>
@@ -436,7 +436,7 @@ class CardViewTest(TestCase):
             location=self.vannes,
             contract_type=ContractType.PERMANENT,
         )
-        url = reverse("siaes_views:card", kwargs={"siae_id": siae.pk})
+        url = reverse("companies_views:card", kwargs={"siae_id": siae.pk})
         response = self.client.get(url)
         self.assertContains(
             response,
@@ -510,7 +510,7 @@ class CardViewTest(TestCase):
                       data-matomo-action="clic"
                       data-matomo-category="candidature"
                       data-matomo-option="clic-metiers"
-                      href="{job_description.get_absolute_url()}?back_url=/siae/{siae.pk}/card">
+                      href="{job_description.get_absolute_url()}?back_url=/company/{siae.pk}/card">
                     Plaquiste
                    </a>
                   </div>
@@ -544,7 +544,7 @@ class JobDescriptionCardViewTest(TestCase):
         job_description.description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         job_description.open_positions = 1234
         job_description.save()
-        url = reverse("siaes_views:job_description_card", kwargs={"job_description_id": job_description.pk})
+        url = reverse("companies_views:job_description_card", kwargs={"job_description_id": job_description.pk})
         response = self.client.get(url)
         assert response.context["job"] == job_description
         assert response.context["siae"] == siae
@@ -575,10 +575,10 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         url = reverse("dashboard:index")
         response = self.client.get(url)
         assert response.status_code == 200
-        url = reverse("siaes_views:show_financial_annexes")
+        url = reverse("companies_views:show_financial_annexes")
         response = self.client.get(url)
         assert response.status_code == 200
-        url = reverse("siaes_views:select_financial_annex")
+        url = reverse("companies_views:select_financial_annex")
         response = self.client.get(url)
         assert response.status_code == 403
 
@@ -600,10 +600,10 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         url = reverse("dashboard:index")
         response = self.client.get(url)
         assert response.status_code == 200
-        url = reverse("siaes_views:show_financial_annexes")
+        url = reverse("companies_views:show_financial_annexes")
         response = self.client.get(url)
         assert response.status_code == 200
-        url = reverse("siaes_views:select_financial_annex")
+        url = reverse("companies_views:select_financial_annex")
         response = self.client.get(url)
         assert response.status_code == 200
 
@@ -631,10 +631,10 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         url = reverse("dashboard:index")
         response = self.client.get(url)
         assert response.status_code == 200
-        url = reverse("siaes_views:show_financial_annexes")
+        url = reverse("companies_views:show_financial_annexes")
         response = self.client.get(url)
         assert response.status_code == 403
-        url = reverse("siaes_views:select_financial_annex")
+        url = reverse("companies_views:select_financial_annex")
         response = self.client.get(url)
         assert response.status_code == 403
 
@@ -649,10 +649,10 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         url = reverse("dashboard:index")
         response = self.client.get(url)
         assert response.status_code == 200
-        url = reverse("siaes_views:show_financial_annexes")
+        url = reverse("companies_views:show_financial_annexes")
         response = self.client.get(url)
         assert response.status_code == 403
-        url = reverse("siaes_views:select_financial_annex")
+        url = reverse("companies_views:select_financial_annex")
         response = self.client.get(url)
         assert response.status_code == 403
 
@@ -667,10 +667,10 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         url = reverse("dashboard:index")
         response = self.client.get(url)
         assert response.status_code == 200
-        url = reverse("siaes_views:show_financial_annexes")
+        url = reverse("companies_views:show_financial_annexes")
         response = self.client.get(url)
         assert response.status_code == 403
-        url = reverse("siaes_views:select_financial_annex")
+        url = reverse("companies_views:select_financial_annex")
         response = self.client.get(url)
         assert response.status_code == 403
 
@@ -685,10 +685,10 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         url = reverse("dashboard:index")
         response = self.client.get(url)
         assert response.status_code == 200
-        url = reverse("siaes_views:show_financial_annexes")
+        url = reverse("companies_views:show_financial_annexes")
         response = self.client.get(url)
         assert response.status_code == 403
-        url = reverse("siaes_views:select_financial_annex")
+        url = reverse("companies_views:select_financial_annex")
         response = self.client.get(url)
         assert response.status_code == 403
 
@@ -700,7 +700,7 @@ class CreateSiaeViewTest(TestCase):
 
         self.client.force_login(user)
 
-        url = reverse("siaes_views:create_siae")
+        url = reverse("companies_views:create_siae")
         response = self.client.get(url)
         assert response.status_code == 200
 
@@ -738,7 +738,7 @@ class CreateSiaeViewTest(TestCase):
 
         self.client.force_login(user)
 
-        url = reverse("siaes_views:create_siae")
+        url = reverse("companies_views:create_siae")
         response = self.client.get(url)
         assert response.status_code == 200
 
@@ -776,7 +776,7 @@ class CreateSiaeViewTest(TestCase):
 
         self.client.force_login(user)
 
-        url = reverse("siaes_views:create_siae")
+        url = reverse("companies_views:create_siae")
         response = self.client.get(url)
         assert response.status_code == 200
 
@@ -813,7 +813,7 @@ class CreateSiaeViewTest(TestCase):
 
         self.client.force_login(user)
 
-        url = reverse("siaes_views:create_siae")
+        url = reverse("companies_views:create_siae")
         response = self.client.get(url)
         assert response.status_code == 200
 
@@ -848,7 +848,7 @@ class CreateSiaeViewTest(TestCase):
 
         self.client.force_login(user)
 
-        url = reverse("siaes_views:create_siae")
+        url = reverse("companies_views:create_siae")
         response = self.client.get(url)
         assert response.status_code == 200
 
@@ -879,7 +879,7 @@ class CreateSiaeViewTest(TestCase):
 
         self.client.force_login(user)
 
-        url = reverse("siaes_views:create_siae")
+        url = reverse("companies_views:create_siae")
         response = self.client.get(url)
         assert response.status_code == 200
 
@@ -941,7 +941,7 @@ class EditSiaeViewTest(TestCase):
 
         self.client.force_login(user)
 
-        url = reverse("siaes_views:edit_siae_step_contact_infos")
+        url = reverse("companies_views:edit_siae_step_contact_infos")
         response = self.client.get(url)
         self.assertContains(response, "Informations générales")
 
@@ -963,7 +963,7 @@ class EditSiaeViewTest(TestCase):
         # Go to next step: description
         post_data["email"] = "toto@titi.fr"
         response = self.client.post(url, data=post_data)
-        self.assertRedirects(response, reverse("siaes_views:edit_siae_step_description"))
+        self.assertRedirects(response, reverse("companies_views:edit_siae_step_description"))
 
         response = self.client.post(url, data=post_data, follow=True)
         self.assertContains(response, "Présentation de l'activité")
@@ -975,13 +975,13 @@ class EditSiaeViewTest(TestCase):
             "provided_support": "On est très très forts pour tout",
         }
         response = self.client.post(url, data=post_data)
-        self.assertRedirects(response, reverse("siaes_views:edit_siae_step_preview"))
+        self.assertRedirects(response, reverse("companies_views:edit_siae_step_preview"))
 
         response = self.client.post(url, data=post_data, follow=True)
         self.assertContains(response, "Aperçu de la fiche")
 
         # Go back, should not be an issue
-        step_2_url = reverse("siaes_views:edit_siae_step_description")
+        step_2_url = reverse("companies_views:edit_siae_step_description")
         response = self.client.get(step_2_url)
         self.assertContains(response, "Présentation de l'activité")
         assert self.client.session["edit_siae_session_key"] == {
@@ -1038,7 +1038,7 @@ class EditSiaeViewTest(TestCase):
         membership = user.siaemembership_set.first()
         membership.is_admin = False
         membership.save()
-        url = reverse("siaes_views:edit_siae_step_contact_infos")
+        url = reverse("companies_views:edit_siae_step_contact_infos")
         response = self.client.get(url)
         assert response.status_code == 403
 
@@ -1051,7 +1051,7 @@ class EditSiaeViewWithWrongAddressTest(TestCase):
 
         self.client.force_login(user)
 
-        url = reverse("siaes_views:edit_siae_step_contact_infos")
+        url = reverse("companies_views:edit_siae_step_contact_infos")
         response = self.client.get(url)
         self.assertContains(response, "Informations générales")
 
@@ -1067,7 +1067,7 @@ class EditSiaeViewWithWrongAddressTest(TestCase):
         }
         response = self.client.post(url, data=post_data, follow=True)
 
-        self.assertRedirects(response, reverse("siaes_views:edit_siae_step_description"))
+        self.assertRedirects(response, reverse("companies_views:edit_siae_step_description"))
 
         # Go to next step: summary
         url = response.redirect_chain[-1][0]
@@ -1076,7 +1076,7 @@ class EditSiaeViewWithWrongAddressTest(TestCase):
             "provided_support": "On est très très forts pour tout",
         }
         response = self.client.post(url, data=post_data, follow=True)
-        self.assertRedirects(response, reverse("siaes_views:edit_siae_step_preview"))
+        self.assertRedirects(response, reverse("companies_views:edit_siae_step_preview"))
 
         # Save the object for real
         response = self.client.post(response.redirect_chain[-1][0])
@@ -1088,7 +1088,7 @@ class MembersTest(TestCase):
         siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
         self.client.force_login(user)
-        url = reverse("siaes_views:members")
+        url = reverse("companies_views:members")
         response = self.client.get(url)
         assert response.status_code == 200
 
@@ -1105,7 +1105,7 @@ class UserMembershipDeactivationTest(TestCase):
         membership = memberships.first()
 
         self.client.force_login(admin)
-        url = reverse("siaes_views:deactivate_member", kwargs={"user_id": admin.id})
+        url = reverse("companies_views:deactivate_member", kwargs={"user_id": admin.id})
         response = self.client.post(url)
         assert response.status_code == 403
 
@@ -1128,7 +1128,7 @@ class UserMembershipDeactivationTest(TestCase):
         assert admin in siae.active_admin_members
 
         self.client.force_login(admin)
-        url = reverse("siaes_views:deactivate_member", kwargs={"user_id": guest.id})
+        url = reverse("companies_views:deactivate_member", kwargs={"user_id": guest.id})
         response = self.client.post(url)
         assert response.status_code == 302
 
@@ -1153,7 +1153,7 @@ class UserMembershipDeactivationTest(TestCase):
         siae = SiaeWith2MembershipsFactory()
         guest = siae.members.filter(siaemembership__is_admin=False).first()
         self.client.force_login(guest)
-        url = reverse("siaes_views:deactivate_member", kwargs={"user_id": guest.id})
+        url = reverse("companies_views:deactivate_member", kwargs={"user_id": guest.id})
         response = self.client.post(url)
         assert response.status_code == 403
 
@@ -1169,7 +1169,7 @@ class UserMembershipDeactivationTest(TestCase):
         guest = siae.members.filter(siaemembership__is_admin=False).first()
 
         self.client.force_login(admin)
-        url = reverse("siaes_views:deactivate_member", kwargs={"user_id": guest.id})
+        url = reverse("companies_views:deactivate_member", kwargs={"user_id": guest.id})
         response = self.client.post(url)
         assert response.status_code == 302
         self.client.logout()
@@ -1199,7 +1199,7 @@ class UserMembershipDeactivationTest(TestCase):
 
         # Admin remove guest from structure
         self.client.force_login(admin)
-        url = reverse("siaes_views:deactivate_member", kwargs={"user_id": guest.id})
+        url = reverse("companies_views:deactivate_member", kwargs={"user_id": guest.id})
         response = self.client.post(url)
         assert response.status_code == 302
         self.client.logout()
@@ -1226,7 +1226,7 @@ class SIAEAdminMembersManagementTest(TestCase):
         guest = siae.members.filter(siaemembership__is_admin=False).first()
 
         self.client.force_login(admin)
-        url = reverse("siaes_views:update_admin_role", kwargs={"action": "add", "user_id": guest.id})
+        url = reverse("companies_views:update_admin_role", kwargs={"action": "add", "user_id": guest.id})
 
         # Redirection to confirm page
         response = self.client.get(url)
@@ -1260,7 +1260,7 @@ class SIAEAdminMembersManagementTest(TestCase):
         assert guest in siae.active_admin_members
 
         self.client.force_login(admin)
-        url = reverse("siaes_views:update_admin_role", kwargs={"action": "remove", "user_id": guest.id})
+        url = reverse("companies_views:update_admin_role", kwargs={"action": "remove", "user_id": guest.id})
 
         # Redirection to confirm page
         response = self.client.get(url)
@@ -1289,7 +1289,7 @@ class SIAEAdminMembersManagementTest(TestCase):
         guest = siae.members.filter(siaemembership__is_admin=False).first()
 
         self.client.force_login(guest)
-        url = reverse("siaes_views:update_admin_role", kwargs={"action": "remove", "user_id": admin.id})
+        url = reverse("companies_views:update_admin_role", kwargs={"action": "remove", "user_id": admin.id})
 
         # Redirection to confirm page
         response = self.client.get(url)
@@ -1300,7 +1300,7 @@ class SIAEAdminMembersManagementTest(TestCase):
         assert response.status_code == 403
 
         # Add self as admin with no privilege
-        url = reverse("siaes_views:update_admin_role", kwargs={"action": "add", "user_id": guest.id})
+        url = reverse("companies_views:update_admin_role", kwargs={"action": "add", "user_id": guest.id})
 
         response = self.client.get(url)
         assert response.status_code == 403
@@ -1320,4 +1320,4 @@ class SIAEAdminMembersManagementTest(TestCase):
         self.client.force_login(guest)
         # update: less test with RE_PATH
         with pytest.raises(NoReverseMatch):
-            reverse("siaes_views:update_admin_role", kwargs={"action": suspicious_action, "user_id": admin.id})
+            reverse("companies_views:update_admin_role", kwargs={"action": suspicious_action, "user_id": admin.id})

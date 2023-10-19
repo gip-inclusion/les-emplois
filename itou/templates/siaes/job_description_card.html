@@ -24,12 +24,12 @@
                             {% if can_update_job_description %}
                                 <div class="row mb-4">
                                     <div class="col">
-                                        <a href="{% url "siaes_views:update_job_description" job_description_id=job.pk %}" class="btn btn-sm btn-outline-primary" aria-label="Modifier la fiche de poste">
+                                        <a href="{% url "companies_views:update_job_description" job_description_id=job.pk %}" class="btn btn-sm btn-outline-primary" aria-label="Modifier la fiche de poste">
                                             Modifier
                                         </a>
                                     </div>
                                     <div class="col-auto">
-                                        <a href="{% url "siaes_views:job_description_list" %}" class="btn btn-sm btn-primary" aria-label="Retour vers la liste des postes">
+                                        <a href="{% url "companies_views:job_description_list" %}" class="btn btn-sm btn-primary" aria-label="Retour vers la liste des postes">
                                             Fermer
                                         </a>
                                     </div>

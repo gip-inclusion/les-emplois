@@ -9,7 +9,7 @@ from itou.cities.models import City
 from itou.companies.enums import ContractType, SiaeKind
 from itou.companies.models import SiaeJobDescription
 from itou.jobs.models import Appellation
-from itou.www.siaes_views.views import ITOU_SESSION_JOB_DESCRIPTION_KEY
+from itou.www.companies_views.views import ITOU_SESSION_JOB_DESCRIPTION_KEY
 from tests.companies.factories import SiaeFactory, SiaeJobDescriptionFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
@@ -72,10 +72,10 @@ class JobDescriptionAbstractTest(TestCase):
         self.siae = siae
         self.user = user
 
-        self.list_url = reverse("siaes_views:job_description_list")
-        self.edit_url = reverse("siaes_views:edit_job_description")
-        self.edit_details_url = reverse("siaes_views:edit_job_description_details")
-        self.edit_preview_url = reverse("siaes_views:edit_job_description_preview")
+        self.list_url = reverse("companies_views:job_description_list")
+        self.edit_url = reverse("companies_views:edit_job_description")
+        self.edit_details_url = reverse("companies_views:edit_job_description_details")
+        self.edit_preview_url = reverse("companies_views:edit_job_description_preview")
 
     def _login(self, user):
         self.client.force_login(user)
@@ -465,7 +465,7 @@ class UpdateJobDescriptionViewTest(JobDescriptionAbstractTest):
 
         self.job_description = self.siae.job_description_through.first()
         self.update_url = reverse(
-            "siaes_views:update_job_description",
+            "companies_views:update_job_description",
             kwargs={
                 "job_description_id": self.job_description.pk,
             },
@@ -497,7 +497,7 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
         super().setUp()
         self.job_description = self.siae.job_description_through.first()
         self.url = reverse(
-            "siaes_views:job_description_card",
+            "companies_views:job_description_card",
             kwargs={
                 "job_description_id": self.job_description.pk,
             },
@@ -511,12 +511,12 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
         self.assertContains(
             response,
             reverse(
-                "siaes_views:update_job_description",
+                "companies_views:update_job_description",
                 kwargs={"job_description_id": self.job_description.pk},
             ),
         )
         self.assertContains(response, "Retour vers la liste des postes")
-        self.assertContains(response, reverse("siaes_views:job_description_list"))
+        self.assertContains(response, reverse("companies_views:job_description_list"))
         self.assertNotContains(response, reverse("apply:start", kwargs={"siae_pk": self.siae.pk}))
 
     def test_prescriber_card_actions(self):
@@ -541,7 +541,7 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
         self.assertNotContains(
             response,
             reverse(
-                "siaes_views:update_job_description",
+                "companies_views:update_job_description",
                 kwargs={"job_description_id": self.job_description.pk},
             ),
         )
@@ -566,7 +566,7 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
         self.assertNotContains(
             response,
             reverse(
-                "siaes_views:update_job_description",
+                "companies_views:update_job_description",
                 kwargs={"job_description_id": self.job_description.pk},
             ),
         )
@@ -579,7 +579,7 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
         self.assertNotContains(
             response,
             reverse(
-                "siaes_views:update_job_description",
+                "companies_views:update_job_description",
                 kwargs={"job_description_id": self.job_description.pk},
             ),
         )

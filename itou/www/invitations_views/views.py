@@ -230,7 +230,7 @@ def invite_employer(request, template_name="invitations_views/create.html"):
             return redirect(request.path)
 
     form_post_url = reverse("invitations_views:invite_employer")
-    back_url = reverse("siaes_views:members")
+    back_url = reverse("companies_views:members")
     context = {"back_url": back_url, "form_post_url": form_post_url, "formset": formset, "organization": siae}
 
     return render(request, template_name, context)
