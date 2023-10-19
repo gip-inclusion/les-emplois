@@ -43,10 +43,6 @@
 {% endblock %}
 
 {% block content %}
-    <h1>
-        Transfert des données de {{ from_user }}
-        {% if to_user %}vers {{ to_user }}{% endif %}
-    </h1>
     <h2>Données à transférer</h2>
     {% for data in transfer_data %}
         <h3>{{ data.title }}</h3>
