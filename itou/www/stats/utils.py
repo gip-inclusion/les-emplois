@@ -2,6 +2,8 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 
 from itou.common_apps.address.departments import DEPARTMENTS, REGIONS
+from itou.companies.enums import SiaeKind
+from itou.companies.models import Siae
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.prescribers.enums import (
@@ -10,8 +12,6 @@ from itou.prescribers.enums import (
     PrescriberOrganizationKind,
 )
 from itou.prescribers.models import PrescriberOrganization
-from itou.siaes.enums import SiaeKind
-from itou.siaes.models import Siae
 
 
 def can_view_stats_dashboard_widget(request):

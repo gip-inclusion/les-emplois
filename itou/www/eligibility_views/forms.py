@@ -1,8 +1,8 @@
 from django import forms
 
+from itou.companies.enums import SiaeKind
 from itou.eligibility import enums as eligibilty_enums
 from itou.eligibility.models import AdministrativeCriteria
-from itou.siaes.enums import SiaeKind
 
 
 class AdministrativeCriteriaForm(forms.Form):

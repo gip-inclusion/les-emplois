@@ -3,7 +3,7 @@ import uuid
 from django.db import models
 from django.utils import timezone
 
-from itou.siaes.models import Siae
+from itou.companies.models import Siae
 
 
 class SiaeApiToken(models.Model):

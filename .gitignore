@@ -11,7 +11,7 @@ docker/prod/
 # Project specific
 itou/static_collected/
 itou/approvals/management/commands/data/
-itou/siaes/management/commands/data
+itou/companies/management/commands/data/
 itou/static/vendor
 
 # Import files

@@ -6,10 +6,10 @@ from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.text import slugify
 
+from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS
 from itou.eligibility.models import SelectedAdministrativeCriteria
 from itou.job_applications.export import stream_xlsx_export
 from itou.job_applications.models import JobApplicationWorkflow
-from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS
 from itou.utils.pagination import pager
 from itou.utils.perms.prescriber import get_all_available_job_applications_as_prescriber
 from itou.utils.perms.siae import get_current_siae_or_404

@@ -1,10 +1,10 @@
 import faker
 import pytest
 
+from itou.companies.enums import SiaeKind
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
-from itou.siaes.enums import SiaeKind
 from itou.www.geiq_eligibility_views.forms import GEIQAdministrativeCriteriaForGEIQForm, GEIQAdministrativeCriteriaForm
-from tests.siaes.factories import SiaeFactory
+from tests.companies.factories import SiaeFactory
 
 
 _FAKER = faker.Faker()

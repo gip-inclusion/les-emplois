@@ -63,9 +63,9 @@ INSTALLED_APPS = [
     # ITOU apps.
     "itou.utils",
     "itou.cities",
+    "itou.companies",
     "itou.jobs",
     "itou.users",
-    "itou.siaes",
     "itou.prescribers",
     "itou.institutions",
     "itou.files",
@@ -512,7 +512,7 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "Documentation de l'API **emplois.inclusion.beta.gouv.fr**",
     "VERSION": "1.0.0",
     "ENUM_NAME_OVERRIDES": {
-        "SiaeKindEnum": "itou.siaes.enums.SiaeKind",
+        "SiaeKindEnum": "itou.companies.enums.SiaeKind",
         "PrescriberOrganizationKindEnum": "itou.prescribers.enums.PrescriberOrganizationKind",
     },
     # Allows to document the choices of a field even if the serializer has allow_null=True.

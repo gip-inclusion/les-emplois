@@ -19,6 +19,7 @@ from rest_framework.authtoken.models import Token
 from itou.api.token_auth.views import TOKEN_ID_STR
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.models import ProlongationRequest
+from itou.companies.models import Siae
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.institutions.models import Institution
@@ -28,7 +29,6 @@ from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.siae_evaluations.constants import CAMPAIGN_VIEWABLE_DURATION
 from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
-from itou.siaes.models import Siae
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants

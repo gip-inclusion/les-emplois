@@ -1,6 +1,6 @@
 from django.http import Http404
 
-from itou.siaes.models import Siae
+from itou.companies.models import Siae
 
 
 def get_current_siae_or_404(request) -> Siae:  # Set by middleware for employer

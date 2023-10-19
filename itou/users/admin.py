@@ -13,12 +13,12 @@ from django.utils.html import format_html
 
 from itou.approvals.models import Approval
 from itou.common_apps.address.models import BAN_API_RELIANCE_SCORE
+from itou.companies.models import SiaeMembership
 from itou.eligibility.models import EligibilityDiagnosis, GEIQEligibilityDiagnosis
 from itou.geo.models import QPV
 from itou.institutions.models import InstitutionMembership
 from itou.job_applications.models import JobApplication
 from itou.prescribers.models import PrescriberMembership
-from itou.siaes.models import SiaeMembership
 from itou.users import models
 from itou.users.admin_forms import ChooseFieldsToTransfer, ItouUserCreationForm, SelectTargetUserForm, UserAdminForm
 from itou.users.enums import IdentityProvider, UserKind

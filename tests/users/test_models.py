@@ -17,13 +17,14 @@ from django.utils import timezone
 import tests.asp.factories as asp
 from itou.approvals.models import Approval
 from itou.asp.models import AllocationDuration, EducationLevel, EmployerType
+from itou.companies.enums import SiaeKind
 from itou.job_applications.enums import Origin
 from itou.job_applications.models import JobApplicationWorkflow
-from itou.siaes.enums import SiaeKind
 from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title, UserKind
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, RESULTS_BY_ADDRESS
 from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
+from tests.companies.factories import SiaeFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
 from tests.prescribers.factories import (
@@ -31,7 +32,6 @@ from tests.prescribers.factories import (
     PrescriberOrganizationFactory,
     PrescriberOrganizationWithMembershipFactory,
 )
-from tests.siaes.factories import SiaeFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,

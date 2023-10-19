@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
     dependencies = [
         ("files", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ("siaes", "0004_siaejobdescription_field_history"),
+        ("companies", "0004_siaejobdescription_field_history"),
         ("prescribers", "0003_alter_prescribermembership_updated_at_and_more"),
         ("approvals", "0011_prepare_prolongation_for_inheritance"),
     ]
@@ -106,7 +106,7 @@ class Migration(migrations.Migration):
                     models.ForeignKey(
                         null=True,
                         on_delete=django.db.models.deletion.SET_NULL,
-                        to="siaes.siae",
+                        to="companies.siae",
                         verbose_name="SIAE du déclarant",
                     ),
                 ),

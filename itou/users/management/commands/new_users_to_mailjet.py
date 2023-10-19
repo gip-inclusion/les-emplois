@@ -10,10 +10,10 @@ from django.db.models import Exists, OuterRef
 from django.utils import timezone
 from sentry_sdk.crons import monitor
 
+from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS
+from itou.companies.models import SiaeMembership
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership
-from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS
-from itou.siaes.models import SiaeMembership
 from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.iterators import chunks

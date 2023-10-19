@@ -5,9 +5,9 @@ from django.utils.safestring import mark_safe
 
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS, department_from_postcode
+from itou.companies.enums import ContractType, SiaeKind
+from itou.companies.models import Siae, SiaeJobDescription, SiaeMembership
 from itou.jobs.models import Appellation
-from itou.siaes.enums import ContractType, SiaeKind
-from itou.siaes.models import Siae, SiaeJobDescription, SiaeMembership
 from itou.utils import constants as global_constants
 from itou.utils.urls import get_external_link_markup
 

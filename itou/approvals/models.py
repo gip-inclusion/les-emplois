@@ -19,10 +19,10 @@ from unidecode import unidecode
 
 from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
 from itou.approvals.enums import Origin
+from itou.companies import enums as companies_enums
 from itou.files.models import File
 from itou.job_applications import enums as job_application_enums
 from itou.prescribers import enums as prescribers_enums
-from itou.siaes import enums as siae_enums
 from itou.utils.apis import enums as api_enums, pole_emploi_api_client
 from itou.utils.apis.pole_emploi import PoleEmploiAPIBadResponse, PoleEmploiAPIException
 from itou.utils.models import DateRange
@@ -302,7 +302,7 @@ class PENotificationMixin(models.Model):
                 self,
                 id_national_pe,
                 siae_siret,
-                siae_enums.siae_kind_to_pe_type_siae(siae_kind),
+                companies_enums.siae_kind_to_pe_type_siae(siae_kind),
                 origine_candidature=origine_candidature,
                 typologie_prescripteur=typologie_prescripteur,
             )
@@ -331,7 +331,7 @@ class CancelledApproval(PENotificationMixin, CommonApprovalMixin):
     user_id_national_pe = models.CharField(verbose_name="identifiant national PE", blank=True, null=True)
 
     siae_siret = models.CharField(verbose_name="siret siae", max_length=14)
-    siae_kind = models.CharField(verbose_name="type siae", choices=siae_enums.SiaeKind.choices)
+    siae_kind = models.CharField(verbose_name="type siae", choices=companies_enums.SiaeKind.choices)
 
     sender_kind = models.CharField(
         verbose_name="origine de la candidature",
@@ -749,7 +749,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             return
 
         siae = job_application.to_siae
-        type_siae = siae_enums.siae_kind_to_pe_type_siae(siae.kind)
+        type_siae = companies_enums.siae_kind_to_pe_type_siae(siae.kind)
         if not type_siae:
             self.pe_log_err("could not find PE type for siae={} siae_kind={}", siae, siae.kind)
             self.pe_save_error(
@@ -887,7 +887,7 @@ class Suspension(models.Model):
                 Suspension.Reason.FINISHED_CONTRACT,
                 Suspension.Reason.APPROVAL_BETWEEN_CTA_MEMBERS,
             ]
-            if siae.kind in [siae_enums.SiaeKind.ACI, siae_enums.SiaeKind.EI]:
+            if siae.kind in [companies_enums.SiaeKind.ACI, companies_enums.SiaeKind.EI]:
                 reasons.append(Suspension.Reason.CONTRAT_PASSERELLE)
             return [(reason.value, reason.label) for reason in reasons]
 
@@ -903,7 +903,7 @@ class Suspension(models.Model):
     start_at = models.DateField(verbose_name="date de début", default=timezone.localdate, db_index=True)
     end_at = models.DateField(verbose_name="date de fin", default=timezone.localdate, db_index=True)
     siae = models.ForeignKey(
-        "siaes.Siae",
+        "companies.Siae",
         verbose_name="SIAE",
         null=True,
         on_delete=models.SET_NULL,
@@ -1178,7 +1178,7 @@ class CommonProlongation(models.Model):
         related_name="%(class)ss_declared",
     )
     declared_by_siae = models.ForeignKey(
-        "siaes.Siae",
+        "companies.Siae",
         verbose_name="SIAE du déclarant",
         null=True,
         on_delete=models.SET_NULL,
@@ -1284,8 +1284,8 @@ class CommonProlongation(models.Model):
 
         if self.reason == enums.ProlongationReason.PARTICULAR_DIFFICULTIES.value:
             if not self.declared_by_siae or self.declared_by_siae.kind not in [
-                siae_enums.SiaeKind.AI,
-                siae_enums.SiaeKind.ACI,
+                companies_enums.SiaeKind.AI,
+                companies_enums.SiaeKind.ACI,
             ]:
                 raise ValidationError(f"Le motif « {self.get_reason_display()} » est réservé aux AI et ACI.")
 
@@ -1683,7 +1683,7 @@ class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
     siae_kind = models.CharField(
         verbose_name="type de la SIAE",
         max_length=6,
-        choices=siae_enums.SiaeKind.choices,
+        choices=companies_enums.SiaeKind.choices,
         null=True,
         blank=True,
     )

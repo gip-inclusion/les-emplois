@@ -11,9 +11,9 @@ from django.utils import timezone
 from freezegun import freeze_time
 
 from itou.approvals.models import Approval
+from itou.companies.enums import SiaeKind, siae_kind_to_pe_type_siae
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.enums import PrescriberOrganizationKind
-from itou.siaes.enums import SiaeKind, siae_kind_to_pe_type_siae
 from itou.utils.mocks.pole_emploi import (
     API_MAJPASS_RESULT_ERROR,
     API_MAJPASS_RESULT_OK,
@@ -21,8 +21,8 @@ from itou.utils.mocks.pole_emploi import (
     API_RECHERCHE_RESULT_KNOWN,
 )
 from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
+from tests.companies.factories import SiaeFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.siaes.factories import SiaeFactory
 from tests.users.factories import JobSeekerFactory
 from tests.utils.test import TestCase
 

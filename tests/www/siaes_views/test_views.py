@@ -6,20 +6,20 @@ from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 from django.utils.html import escape
 
+from itou.companies.enums import ContractType, SiaeKind
+from itou.companies.models import Siae
 from itou.jobs.models import Appellation
-from itou.siaes.enums import ContractType, SiaeKind
-from itou.siaes.models import Siae
 from itou.utils import constants as global_constants
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_NO_RESULT_MOCK, BAN_GEOCODING_API_RESULT_MOCK
 from tests.cities.factories import create_city_vannes
-from tests.jobs.factories import create_test_romes_and_appellations
-from tests.siaes.factories import (
+from tests.companies.factories import (
     SiaeConventionFactory,
     SiaeFactory,
     SiaeJobDescriptionFactory,
     SiaeWith2MembershipsFactory,
     SiaeWithMembershipAndJobsFactory,
 )
+from tests.jobs.factories import create_test_romes_and_appellations
 from tests.utils.test import TestCase, parse_response_to_soup
 
 

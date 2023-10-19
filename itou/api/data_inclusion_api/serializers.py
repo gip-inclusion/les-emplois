@@ -3,10 +3,10 @@ import re
 from django.utils import text, timezone
 from rest_framework import serializers
 
+from itou.companies.enums import SiaeKind
+from itou.companies.models import Siae
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
-from itou.siaes.enums import SiaeKind
-from itou.siaes.models import Siae
 
 
 class SiaeStructureSerializer(serializers.ModelSerializer):

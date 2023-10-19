@@ -1,7 +1,7 @@
 from django import forms
 
+from itou.companies.enums import SiaeKind
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
-from itou.siaes.enums import SiaeKind
 
 
 class GEIQAdministrativeCriteriaForm(forms.Form):

@@ -5,9 +5,9 @@ from django.urls import reverse
 from faker import Faker
 from pytest_django.asserts import assertContains, assertNotContains
 
+from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, ContractType, SiaeKind
 from itou.job_applications.enums import QualificationLevel, QualificationType
 from itou.job_applications.models import JobApplicationWorkflow
-from itou.siaes.enums import SIAE_WITH_CONVENTION_KINDS, ContractType, SiaeKind
 from itou.www.apply import forms as apply_forms
 from tests.job_applications.factories import (
     JobApplicationFactory,

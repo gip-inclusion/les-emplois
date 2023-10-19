@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
     dependencies = [
         ("institutions", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ("siaes", "0001_initial"),
+        ("companies", "0001_initial"),
         ("prescribers", "0001_initial"),
     ]
 
@@ -51,7 +51,7 @@ class Migration(migrations.Migration):
                 (
                     "siae",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, related_name="invitations", to="siaes.siae"
+                        on_delete=django.db.models.deletion.CASCADE, related_name="invitations", to="companies.siae"
                     ),
                 ),
             ],

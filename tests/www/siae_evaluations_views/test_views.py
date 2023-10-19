@@ -10,6 +10,7 @@ from pytest_django.asserts import assertRedirects
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.models import Sanctions
 from itou.utils.types import InclusiveDateRange
+from tests.companies.factories import SiaeMembershipFactory
 from tests.files.factories import FileFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.siae_evaluations.factories import (
@@ -18,7 +19,6 @@ from tests.siae_evaluations.factories import (
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
 )
-from tests.siaes.factories import SiaeMembershipFactory
 from tests.users.factories import EmployerFactory
 from tests.utils.test import TestCase
 

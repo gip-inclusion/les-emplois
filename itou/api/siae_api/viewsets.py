@@ -10,8 +10,8 @@ from rest_framework.authentication import SessionAuthentication, TokenAuthentica
 from rest_framework.exceptions import NotFound, ValidationError
 
 from itou.cities.models import City
-from itou.siaes.models import Siae, SiaeJobDescription
-from itou.siaes.serializers import SiaeSerializer
+from itou.companies.models import Siae, SiaeJobDescription
+from itou.companies.serializers import SiaeSerializer
 
 
 logger = logging.getLogger("api_drf")

@@ -11,9 +11,9 @@ from itou.users.enums import LackOfNIRReason
 from itou.utils.mocks.address_format import mock_get_geocoding_data
 from itou.utils.widgets import DuetDatePickerWidget
 from tests.asp.factories import CommuneFactory, CountryFranceFactory, CountryOutsideEuropeFactory
+from tests.companies.factories import SiaeWithMembershipAndJobsFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
-from tests.siaes.factories import SiaeWithMembershipAndJobsFactory
 from tests.users.factories import JobSeekerWithAddressFactory, JobSeekerWithMockedAddressFactory
 from tests.utils.test import TestCase
 

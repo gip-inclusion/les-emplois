@@ -10,9 +10,9 @@ from itou.analytics.models import StatsDashboardVisit
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION
 from itou.institutions.enums import InstitutionKind
 from itou.utils.apis.metabase import METABASE_DASHBOARDS
+from tests.companies.factories import SiaeFactory
 from tests.institutions.factories import InstitutionWithMembershipFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from tests.siaes.factories import SiaeFactory
 from tests.users.factories import PrescriberFactory
 from tests.utils.test import TestCase
 

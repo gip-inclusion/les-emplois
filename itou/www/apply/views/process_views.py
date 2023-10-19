@@ -13,11 +13,11 @@ from django.views.decorators.http import require_POST
 from django.views.generic.base import TemplateView
 from django_xworkflows import models as xwf_models
 
+from itou.companies.enums import ContractType, SiaeKind
+from itou.companies.models import Siae
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow, PriorAction
-from itou.siaes.enums import ContractType, SiaeKind
-from itou.siaes.models import Siae
 from itou.utils.htmx import hx_trigger_modal_control
 from itou.utils.perms.prescriber import get_all_available_job_applications_as_prescriber
 from itou.utils.urls import get_safe_url

@@ -10,19 +10,20 @@ from django.utils.http import urlencode
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects, assertTemplateUsed
 
 from itou.approvals.models import Approval, Suspension
+from itou.companies.enums import ContractType, SiaeKind
 from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.employee_record.enums import Status
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siae_evaluations.models import Sanctions
-from itou.siaes.enums import ContractType, SiaeKind
 from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId, UserKind
 from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.format_filters import format_nir
 from itou.utils.widgets import DuetDatePickerWidget
 from tests.approvals.factories import PoleEmploiApprovalFactory, SuspensionFactory
 from tests.cities.factories import create_test_cities
+from tests.companies.factories import SiaeFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import (
@@ -32,7 +33,6 @@ from tests.job_applications.factories import (
     PriorActionFactory,
 )
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
-from tests.siaes.factories import SiaeFactory
 from tests.users.factories import JobSeekerFactory, JobSeekerWithAddressFactory, PrescriberFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import TestCase, parse_response_to_soup

@@ -6,8 +6,8 @@ from django.utils.html import escape
 from itou.invitations.models import EmployerInvitation
 from itou.users.enums import UserKind
 from itou.www.invitations_views.forms import EmployerInvitationForm
+from tests.companies.factories import SiaeFactory, SiaeMembershipFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from tests.siaes.factories import SiaeFactory, SiaeMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory
 from tests.utils.test import TestCase
 

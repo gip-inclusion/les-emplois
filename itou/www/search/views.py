@@ -7,9 +7,9 @@ from django.shortcuts import render
 from django.views.generic import FormView
 
 from itou.common_apps.address.departments import DEPARTMENTS_WITH_DISTRICTS
+from itou.companies.enums import ContractNature, JobSource, SiaeKind
+from itou.companies.models import Siae, SiaeJobDescription
 from itou.prescribers.models import PrescriberOrganization
-from itou.siaes.enums import ContractNature, JobSource, SiaeKind
-from itou.siaes.models import Siae, SiaeJobDescription
 from itou.utils.pagination import pager
 from itou.www.search.forms import JobDescriptionSearchForm, PrescriberSearchForm, SiaeSearchForm
 

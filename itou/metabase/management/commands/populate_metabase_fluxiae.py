@@ -60,14 +60,13 @@ An EMI does not necessarily have a mission.
 """
 from django.core.management.base import BaseCommand
 
-from itou.metabase.dataframes import store_df
-from itou.metabase.db import build_final_tables
-
 # FIXME(vperron): Those helpers are shared between populate_metabase and import_siae.
 # It would make a lot more sense, to avoid eventual circular imports, to move everything
 # related to the fluxiae logic in its own application. Some architecture still needs to be thought of there.
 # Another way to do it would be to rationalize our import (to Itou) & export (to Metabase) logic.
-from itou.siaes.management.commands._import_siae.utils import get_fluxiae_df, get_fluxiae_referential_filenames
+from itou.companies.management.commands._import_siae.utils import get_fluxiae_df, get_fluxiae_referential_filenames
+from itou.metabase.dataframes import store_df
+from itou.metabase.db import build_final_tables
 from itou.utils.python import timeit
 from itou.utils.slack import send_slack_message
 

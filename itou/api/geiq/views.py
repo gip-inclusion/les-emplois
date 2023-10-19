@@ -6,10 +6,10 @@ from drf_spectacular.utils import extend_schema
 from rest_framework import authentication, exceptions, generics, permissions, status
 
 from itou.api.models import SiaeApiToken
+from itou.companies.enums import SiaeKind
+from itou.companies.models import Siae
 from itou.job_applications.enums import Prequalification, ProfessionalSituationExperience
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow, PriorAction
-from itou.siaes.enums import SiaeKind
-from itou.siaes.models import Siae
 from itou.utils.validators import validate_siren
 
 from .serializers import GeiqJobApplicationSerializer

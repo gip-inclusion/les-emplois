@@ -1,6 +1,6 @@
 from rest_framework.permissions import IsAuthenticated
 
-from itou.siaes.models import SiaeMembership
+from itou.companies.models import SiaeMembership
 
 
 class ApplicantsAPIPermission(IsAuthenticated):

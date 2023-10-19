@@ -4,8 +4,8 @@ from django.utils import timezone
 
 from itou.job_applications.models import JobApplication
 from itou.utils.widgets import DuetDatePickerWidget
+from tests.companies.factories import SiaeWithMembershipAndJobsFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.siaes.factories import SiaeWithMembershipAndJobsFactory
 from tests.utils.test import TestCase
 
 

@@ -12,10 +12,10 @@ from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.utils.templatetags.format_filters import format_approval_number
 from tests.approvals.factories import ApprovalFactory, ProlongationFactory, SuspensionFactory
+from tests.companies.factories import SiaeFactory, SiaeMembershipFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByPrescriberOrganizationFactory
 from tests.prescribers.factories import PrescriberFactory, PrescriberOrganizationFactory
-from tests.siaes.factories import SiaeFactory, SiaeMembershipFactory
 from tests.users.factories import JobSeekerFactory
 from tests.utils.test import parse_response_to_soup
 

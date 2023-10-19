@@ -7,8 +7,8 @@ from unidecode import unidecode
 
 from itou.asp.models import Commune
 from itou.cities.models import City
+from itou.companies.models import SiaeJobDescription
 from itou.jobs.models import Appellation
-from itou.siaes.models import SiaeJobDescription
 
 
 # Consider that after 50 matches the user should refine its search.

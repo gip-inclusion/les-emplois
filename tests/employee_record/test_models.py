@@ -17,6 +17,7 @@ from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, val
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.utils.mocks.address_format import mock_get_geocoding_data
 from tests.approvals.factories import ApprovalFactory
+from tests.companies.factories import SiaeFactory
 from tests.employee_record.factories import (
     BareEmployeeRecordFactory,
     BareEmployeeRecordUpdateNotificationFactory,
@@ -33,7 +34,6 @@ from tests.job_applications.factories import (
     JobApplicationWithCompleteJobSeekerProfileFactory,
     JobApplicationWithoutApprovalFactory,
 )
-from tests.siaes.factories import SiaeFactory
 from tests.utils.test import TestCase
 
 

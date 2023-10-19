@@ -2,10 +2,10 @@ from django.urls import reverse
 from rest_framework.test import APIClient, APITestCase
 
 from tests.asp.factories import CommuneFactory, CountryFactory
+from tests.companies.factories import SiaeFactory
 from tests.institutions.factories import InstitutionWithMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from tests.siaes.factories import SiaeFactory
 from tests.users.factories import JobSeekerFactory
 from tests.utils.test import BASE_NUM_QUERIES
 

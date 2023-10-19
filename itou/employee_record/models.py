@@ -13,8 +13,8 @@ from rest_framework.authtoken.admin import User
 
 from itou.approvals.models import Approval
 from itou.asp.models import EmployerType, PrescriberType, SiaeMeasure
+from itou.companies.models import Siae, SiaeFinancialAnnex
 from itou.job_applications.enums import SenderKind
-from itou.siaes.models import Siae, SiaeFinancialAnnex
 from itou.users.models import JobSeekerProfile
 from itou.utils.validators import validate_siret
 

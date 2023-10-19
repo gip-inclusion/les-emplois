@@ -21,12 +21,12 @@ from itou.approvals.models import (
     ProlongationRequestDenyInformation,
     Suspension,
 )
+from itou.companies.enums import SiaeKind
 from itou.job_applications.models import JobApplicationWorkflow
-from itou.siaes.enums import SiaeKind
+from tests.companies.factories import SiaeFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory
 from tests.files.factories import FileFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
-from tests.siaes.factories import SiaeFactory
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
 
 

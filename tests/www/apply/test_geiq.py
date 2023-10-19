@@ -4,13 +4,13 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import dateformat, timezone
 
+from itou.companies.enums import SiaeKind
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
-from itou.siaes.enums import SiaeKind
 from itou.utils.session import SessionNamespace
+from tests.companies.factories import SiaeWithMembershipAndJobsFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from tests.siaes.factories import SiaeWithMembershipAndJobsFactory
 from tests.users.factories import JobSeekerFactory, JobSeekerWithAddressFactory
 
 

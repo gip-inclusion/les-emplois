@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("siaes", "0004_siaejobdescription_field_history"),
+        ("companies", "0004_siaejobdescription_field_history"),
     ]
 
     operations = [
@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 ("created_at", models.DateTimeField(default=django.utils.timezone.now)),
-                ("siaes", models.ManyToManyField(related_name="api_tokens", to="siaes.siae")),
+                ("siaes", models.ManyToManyField(related_name="api_tokens", to="companies.siae")),
             ],
             options={
                 "verbose_name": "jeton d'API SIAE",

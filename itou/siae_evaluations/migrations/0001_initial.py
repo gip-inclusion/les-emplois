@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("siaes", "0001_initial"),
+        ("companies", "0001_initial"),
         ("job_applications", "0001_initial"),
         ("institutions", "0001_initial"),
         ("eligibility", "0001_initial"),
@@ -89,7 +89,7 @@ class Migration(migrations.Migration):
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="evaluated_siaes",
-                        to="siaes.siae",
+                        to="companies.siae",
                         verbose_name="SIAE",
                     ),
                 ),

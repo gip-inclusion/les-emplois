@@ -13,6 +13,7 @@ from django.utils import timezone
 from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.asp.models import AllocationDuration, EducationLevel, RSAAllocation
+from itou.companies.enums import ContractType, SiaeKind
 from itou.eligibility.models import (
     AdministrativeCriteria,
     EligibilityDiagnosis,
@@ -22,7 +23,6 @@ from itou.eligibility.models import (
 from itou.job_applications.enums import QualificationLevel, QualificationType, SenderKind
 from itou.job_applications.models import JobApplication
 from itou.siae_evaluations.models import Sanctions
-from itou.siaes.enums import ContractType, SiaeKind
 from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId
 from itou.users.models import User
 from itou.utils.models import InclusiveDateRange
@@ -31,13 +31,13 @@ from itou.utils.urls import add_url_params
 from itou.utils.widgets import DuetDatePickerWidget
 from tests.approvals.factories import PoleEmploiApprovalFactory
 from tests.cities.factories import create_city_in_zrr, create_test_cities
+from tests.companies.factories import SiaeFactory, SiaeWithMembershipAndJobsFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory
 from tests.geo.factories import ZRRFactory
 from tests.institutions.factories import InstitutionWithMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
-from tests.siaes.factories import SiaeFactory, SiaeWithMembershipAndJobsFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,

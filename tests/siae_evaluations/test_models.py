@@ -10,6 +10,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 
 from itou.approvals.enums import Origin
+from itou.companies.enums import SiaeKind
 from itou.eligibility.enums import AdministrativeCriteriaLevel, AuthorKind
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.institutions.enums import InstitutionKind
@@ -27,9 +28,9 @@ from itou.siae_evaluations.models import (
     select_min_max_job_applications,
     validate_institution,
 )
-from itou.siaes.enums import SiaeKind
 from itou.utils.models import InclusiveDateRange
 from tests.approvals.factories import ApprovalFactory
+from tests.companies.factories import SiaeFactory, SiaeWith2MembershipsFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory
 from tests.files.factories import FileFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionWith2MembershipFactory
@@ -40,7 +41,6 @@ from tests.siae_evaluations.factories import (
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
 )
-from tests.siaes.factories import SiaeFactory, SiaeWith2MembershipsFactory
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
 from tests.utils.test import TestCase
 

@@ -2,7 +2,7 @@ import pytest
 
 from itou.metabase.tables.siaes import TABLE
 from tests.cities.factories import create_city_vannes
-from tests.siaes.factories import SiaeFactory
+from tests.companies.factories import SiaeFactory
 
 
 @pytest.mark.django_db

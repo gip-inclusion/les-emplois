@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("siaes", "0001_initial"),
+        ("companies", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
@@ -424,7 +424,7 @@ class Migration(migrations.Migration):
                         null=True,
                         on_delete=django.db.models.deletion.SET_NULL,
                         related_name="approvals_suspended",
-                        to="siaes.siae",
+                        to="companies.siae",
                         verbose_name="SIAE",
                     ),
                 ),
@@ -536,7 +536,7 @@ class Migration(migrations.Migration):
                     models.ForeignKey(
                         null=True,
                         on_delete=django.db.models.deletion.SET_NULL,
-                        to="siaes.siae",
+                        to="companies.siae",
                         verbose_name="SIAE du déclarant",
                     ),
                 ),

@@ -7,8 +7,8 @@ from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.users.models import User
 from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
+from tests.companies.factories import SiaeFactory, SiaeMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.siaes.factories import SiaeFactory, SiaeMembershipFactory
 from tests.users.factories import JobSeekerFactory
 from tests.utils.test import TestCase, assertMessages
 

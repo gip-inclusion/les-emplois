@@ -19,6 +19,7 @@ def get_permissions_dict():
     import itou.approvals.models as approvals_models
     import itou.asp.models as asp_models
     import itou.cities.models as cities_models
+    import itou.companies.models as siaes_models
     import itou.eligibility.models as eligibility_models
     import itou.employee_record.models as employee_record_models
     import itou.institutions.models as institution_models
@@ -27,7 +28,6 @@ def get_permissions_dict():
     import itou.jobs.models as jobs_models
     import itou.prescribers.models as prescribers_models
     import itou.siae_evaluations.models as siae_evaluations_models
-    import itou.siaes.models as siaes_models
     import itou.users.models as users_models
 
     return {

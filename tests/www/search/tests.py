@@ -5,14 +5,14 @@ from django.test import override_settings
 from django.urls import reverse
 
 from itou.cities.models import City
+from itou.companies.enums import POLE_EMPLOI_SIRET, ContractNature, ContractType, JobSource, SiaeKind
+from itou.companies.models import Siae
 from itou.jobs.models import Appellation, Rome
-from itou.siaes.enums import POLE_EMPLOI_SIRET, ContractNature, ContractType, JobSource, SiaeKind
-from itou.siaes.models import Siae
 from tests.cities.factories import create_city_guerande, create_city_saint_andre, create_city_vannes
+from tests.companies.factories import SiaeFactory, SiaeJobDescriptionFactory, SiaeMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationFactory
-from tests.siaes.factories import SiaeFactory, SiaeJobDescriptionFactory, SiaeMembershipFactory
 from tests.utils.test import BASE_NUM_QUERIES, TestCase
 
 

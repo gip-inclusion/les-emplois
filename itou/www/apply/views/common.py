@@ -10,10 +10,10 @@ from django.utils.safestring import mark_safe
 from django_htmx.http import HttpResponseClientRedirect
 from django_xworkflows import models as xwf_models
 
+from itou.companies.enums import ContractType, SiaeKind
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.utils import geiq_allowance_amount
-from itou.siaes.enums import ContractType, SiaeKind
 from itou.users.enums import UserKind
 from itou.users.models import ApprovalAlreadyExistsError
 from itou.utils import constants as global_constants

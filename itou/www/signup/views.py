@@ -20,11 +20,11 @@ from django.views.decorators.http import require_GET
 from django.views.generic import FormView, TemplateView, View
 
 from itou.common_apps.address.models import lat_lon_to_coords
+from itou.companies.enums import SiaeKind
+from itou.companies.models import Siae, SiaeMembership
 from itou.openid_connect.inclusion_connect.enums import InclusionConnectChannel
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
-from itou.siaes.enums import SiaeKind
-from itou.siaes.models import Siae, SiaeMembership
 from itou.users.adapter import UserAdapter
 from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, UserKind
 from itou.utils import constants as global_constants

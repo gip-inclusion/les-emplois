@@ -6,13 +6,13 @@ from django.urls import reverse
 from freezegun import freeze_time
 
 from itou.cities.models import City
+from itou.companies.enums import ContractType, SiaeKind
+from itou.companies.models import SiaeJobDescription
 from itou.jobs.models import Appellation
-from itou.siaes.enums import ContractType, SiaeKind
-from itou.siaes.models import SiaeJobDescription
 from itou.www.siaes_views.views import ITOU_SESSION_JOB_DESCRIPTION_KEY
+from tests.companies.factories import SiaeFactory, SiaeJobDescriptionFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from tests.siaes.factories import SiaeFactory, SiaeJobDescriptionFactory
 from tests.users.factories import JobSeekerFactory
 from tests.utils.test import BASE_NUM_QUERIES, TestCase, assertMessages
 
