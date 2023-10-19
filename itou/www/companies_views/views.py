@@ -17,7 +17,7 @@ from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.pagination import pager
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
-from itou.www.siaes_views import forms as siaes_forms
+from itou.www.companies_views import forms as siaes_forms
 
 
 # This is a "magic" value for the number of items for paginator objects.
@@ -49,13 +49,13 @@ def job_description_card(request, job_description_id, template_name="siaes/job_d
     breadcrumbs = {}
     if can_update_job_description:
         breadcrumbs = {
-            "Métiers et recrutements": reverse("siaes_views:job_description_list"),
+            "Métiers et recrutements": reverse("companies_views:job_description_list"),
         }
 
     breadcrumbs.update(
         {
             "Détail du poste": reverse(
-                "siaes_views:job_description_card",
+                "companies_views:job_description_card",
                 kwargs={
                     "job_description_id": job_description_id,
                 },
@@ -125,11 +125,11 @@ def job_description_list(request, template_name="siaes/job_description_list.html
             case _:
                 messages.error(request, "Cette action n'est pas supportée")
 
-        return HttpResponseRedirect(f"{reverse('siaes_views:job_description_list')}?page={page}")
+        return HttpResponseRedirect(f"{reverse('companies_views:job_description_list')}?page={page}")
 
     job_pager = pager(job_descriptions, page, items_per_page=NB_ITEMS_PER_PAGE)
     breadcrumbs = {
-        "Métiers et recrutements": reverse("siaes_views:job_description_list"),
+        "Métiers et recrutements": reverse("companies_views:job_description_list"),
     }
 
     context = {
@@ -167,21 +167,21 @@ def edit_job_description(request, template_name="siaes/edit_job_description.html
 
     if request.method == "POST" and form.is_valid():
         request.session[ITOU_SESSION_JOB_DESCRIPTION_KEY] = {**session_data, **form.cleaned_data}
-        return HttpResponseRedirect(reverse("siaes_views:edit_job_description_details"))
+        return HttpResponseRedirect(reverse("companies_views:edit_job_description_details"))
 
     breadcrumbs = {
-        "Métiers et recrutements": reverse("siaes_views:job_description_list"),
+        "Métiers et recrutements": reverse("companies_views:job_description_list"),
     }
     if job_description and job_description.pk:
         kwargs = {"job_description_id": job_description.pk}
         breadcrumbs.update(
             {
-                "Détails du poste": reverse("siaes_views:job_description_card", kwargs=kwargs),
-                "Modifier une fiche de poste": reverse("siaes_views:update_job_description", kwargs=kwargs),
+                "Détails du poste": reverse("companies_views:job_description_card", kwargs=kwargs),
+                "Modifier une fiche de poste": reverse("companies_views:update_job_description", kwargs=kwargs),
             }
         )
     else:
-        breadcrumbs["Créer une fiche de poste"] = reverse("siaes_views:edit_job_description")
+        breadcrumbs["Créer une fiche de poste"] = reverse("companies_views:edit_job_description")
 
     context = {
         "form": form,
@@ -197,7 +197,7 @@ def edit_job_description_details(request, template_name="siaes/edit_job_descript
     session_data = request.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
 
     if not session_data:
-        return HttpResponseRedirect(reverse("siaes_views:edit_job_description"))
+        return HttpResponseRedirect(reverse("companies_views:edit_job_description"))
 
     job_description = _get_job_description(session_data)
 
@@ -215,22 +215,22 @@ def edit_job_description_details(request, template_name="siaes/edit_job_descript
         session_data["is_qpv_mandatory"] = request.POST.get("is_qpv_mandatory", False)
 
         request.session[ITOU_SESSION_JOB_DESCRIPTION_KEY] = {**session_data, **form.cleaned_data}
-        return HttpResponseRedirect(reverse("siaes_views:edit_job_description_preview"))
+        return HttpResponseRedirect(reverse("companies_views:edit_job_description_preview"))
 
     breadcrumbs = {
-        "Métiers et recrutements": reverse("siaes_views:job_description_list"),
+        "Métiers et recrutements": reverse("companies_views:job_description_list"),
     }
 
     if job_description and job_description.pk:
         kwargs = {"job_description_id": job_description.pk}
         breadcrumbs.update(
             {
-                "Détails du poste": reverse("siaes_views:job_description_card", kwargs=kwargs),
-                "Modifier une fiche de poste": reverse("siaes_views:update_job_description", kwargs=kwargs),
+                "Détails du poste": reverse("companies_views:job_description_card", kwargs=kwargs),
+                "Modifier une fiche de poste": reverse("companies_views:update_job_description", kwargs=kwargs),
             }
         )
     else:
-        breadcrumbs["Créer une fiche de poste"] = reverse("siaes_views:edit_job_description")
+        breadcrumbs["Créer une fiche de poste"] = reverse("companies_views:edit_job_description")
 
     context = {
         "form": form,
@@ -248,7 +248,7 @@ def edit_job_description_preview(request, template_name="siaes/edit_job_descript
     session_data = request.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
 
     if not session_data:
-        return HttpResponseRedirect(reverse("siaes_views:edit_job_description"))
+        return HttpResponseRedirect(reverse("companies_views:edit_job_description"))
 
     job_description = _get_job_description(session_data) or SiaeJobDescription()
 
@@ -265,22 +265,22 @@ def edit_job_description_preview(request, template_name="siaes/edit_job_descript
             messages.success(request, "Enregistrement de la fiche de poste effectué.")
         finally:
             request.session.pop(ITOU_SESSION_JOB_DESCRIPTION_KEY)
-            return HttpResponseRedirect(reverse("siaes_views:job_description_list"))
+            return HttpResponseRedirect(reverse("companies_views:job_description_list"))
 
     breadcrumbs = {
-        "Métiers et recrutements": reverse("siaes_views:job_description_list"),
+        "Métiers et recrutements": reverse("companies_views:job_description_list"),
     }
 
     if job_description and job_description.pk:
         kwargs = {"job_description_id": job_description.pk}
         breadcrumbs.update(
             {
-                "Détails du poste": reverse("siaes_views:job_description_card", kwargs=kwargs),
-                "Modifier une fiche de poste": reverse("siaes_views:update_job_description", kwargs=kwargs),
+                "Détails du poste": reverse("companies_views:job_description_card", kwargs=kwargs),
+                "Modifier une fiche de poste": reverse("companies_views:update_job_description", kwargs=kwargs),
             }
         )
     else:
-        breadcrumbs["Créer une fiche de poste"] = reverse("siaes_views:edit_job_description")
+        breadcrumbs["Créer une fiche de poste"] = reverse("companies_views:edit_job_description")
 
     context = {
         "siae": siae,
@@ -294,7 +294,7 @@ def edit_job_description_preview(request, template_name="siaes/edit_job_descript
 @login_required
 def update_job_description(request, job_description_id):
     request.session[ITOU_SESSION_JOB_DESCRIPTION_KEY] = {"pk": job_description_id}
-    return HttpResponseRedirect(reverse("siaes_views:edit_job_description"))
+    return HttpResponseRedirect(reverse("companies_views:edit_job_description"))
 
 
 ### Financial annexes views
@@ -377,7 +377,7 @@ def select_financial_annex(request, template_name="siaes/select_financial_annex.
             f" {financial_annex.number_prefix_with_spaces}."
         )
         messages.success(request, message)
-        return HttpResponseRedirect(reverse("siaes_views:show_financial_annexes"))
+        return HttpResponseRedirect(reverse("companies_views:show_financial_annexes"))
 
     context = {"select_form": select_form}
     return render(request, template_name, context)
@@ -454,7 +454,7 @@ def edit_siae_step_contact_infos(request, template_name="siaes/edit_siae.html"):
     if request.method == "POST" and form.is_valid():
         request.session[ITOU_SESSION_EDIT_SIAE_KEY].update(form.cleaned_data)
         request.session.modified = True
-        return HttpResponseRedirect(reverse("siaes_views:edit_siae_step_description"))
+        return HttpResponseRedirect(reverse("companies_views:edit_siae_step_description"))
 
     context = {"form": form, "siae": siae}
     return render(request, template_name, context)
@@ -463,7 +463,7 @@ def edit_siae_step_contact_infos(request, template_name="siaes/edit_siae.html"):
 @login_required
 def edit_siae_step_description(request, template_name="siaes/edit_siae_description.html"):
     if ITOU_SESSION_EDIT_SIAE_KEY not in request.session:
-        return HttpResponseRedirect(reverse("siaes_views:edit_siae_step_contact_infos"))
+        return HttpResponseRedirect(reverse("companies_views:edit_siae_step_contact_infos"))
 
     siae = get_current_siae_or_404(request)
     if not request.is_current_organization_admin:
@@ -476,16 +476,16 @@ def edit_siae_step_description(request, template_name="siaes/edit_siae_descripti
     if request.method == "POST" and form.is_valid():
         request.session[ITOU_SESSION_EDIT_SIAE_KEY].update(form.cleaned_data)
         request.session.modified = True
-        return HttpResponseRedirect(reverse("siaes_views:edit_siae_step_preview"))
+        return HttpResponseRedirect(reverse("companies_views:edit_siae_step_preview"))
 
-    context = {"form": form, "siae": siae, "prev_url": reverse("siaes_views:edit_siae_step_contact_infos")}
+    context = {"form": form, "siae": siae, "prev_url": reverse("companies_views:edit_siae_step_contact_infos")}
     return render(request, template_name, context)
 
 
 @login_required
 def edit_siae_step_preview(request, template_name="siaes/edit_siae_preview.html"):
     if ITOU_SESSION_EDIT_SIAE_KEY not in request.session:
-        return HttpResponseRedirect(reverse("siaes_views:edit_siae_step_contact_infos"))
+        return HttpResponseRedirect(reverse("companies_views:edit_siae_step_contact_infos"))
 
     siae = get_current_siae_or_404(request)
     if not request.is_current_organization_admin:
@@ -517,11 +517,11 @@ def edit_siae_step_preview(request, template_name="siaes/edit_siae_preview.html"
                 request,
                 format_html(
                     'L\'adresse semble erronée. Veuillez la <a href="{}">corriger</a> avant de pouvoir « Publier ».',
-                    reverse("siaes_views:edit_siae_step_contact_infos"),
+                    reverse("companies_views:edit_siae_step_contact_infos"),
                 ),
             )
 
-    context = {"siae": siae, "form_data": form_data, "prev_url": reverse("siaes_views:edit_siae_step_description")}
+    context = {"siae": siae, "form_data": form_data, "prev_url": reverse("companies_views:edit_siae_step_description")}
     return render(request, template_name, context)
 
 
@@ -551,7 +551,7 @@ def deactivate_member(request, user_id, template_name="siaes/deactivate_member.h
     target_member = User.objects.get(pk=user_id)
 
     if deactivate_org_member(request=request, target_member=target_member):
-        return HttpResponseRedirect(reverse("siaes_views:members"))
+        return HttpResponseRedirect(reverse("companies_views:members"))
 
     context = {
         "structure": siae,
@@ -567,7 +567,7 @@ def update_admin_role(request, action, user_id, template_name="siaes/update_admi
     target_member = User.objects.get(pk=user_id)
 
     if update_org_admin_role(request=request, target_member=target_member, action=action):
-        return HttpResponseRedirect(reverse("siaes_views:members"))
+        return HttpResponseRedirect(reverse("companies_views:members"))
 
     context = {
         "action": action,

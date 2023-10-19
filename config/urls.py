@@ -63,7 +63,8 @@ urlpatterns = [
     path("invitations/", include("itou.www.invitations_views.urls")),
     path("prescribers/", include("itou.www.prescribers_views.urls")),
     path("search/", include("itou.www.search.urls")),
-    path("siae/", include("itou.www.siaes_views.urls")),
+    path("company/", include("itou.www.companies_views.urls")),
+    path("saie/", include("itou.www.companies_views.urls")),  # FIXME(alaurent) Keep until 2023/10/25
     path("siae_evaluation/", include("itou.www.siae_evaluations_views.urls")),
     path("login/", include("itou.www.login.urls")),
     path("signup/", include("itou.www.signup.urls")),

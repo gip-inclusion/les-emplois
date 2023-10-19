@@ -18,21 +18,21 @@
                 </li>
                 {% if request.is_current_organization_admin %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
-                        <a href="{% url 'siaes_views:edit_siae_step_contact_infos' %}" class="btn-link btn-ico">
+                        <a href="{% url 'companies_views:edit_siae_step_contact_infos' %}" class="btn-link btn-ico">
                             <i class="ri-pencil-line ri-lg font-weight-normal"></i>
                             <span>Modifier les informations</span>
                         </a>
                     </li>
                 {% endif %}
                 <li class="d-flex justify-content-between align-items-center mb-3">
-                    <a href="{% url 'siaes_views:job_description_list' %}" class="btn-link btn-ico">
+                    <a href="{% url 'companies_views:job_description_list' %}" class="btn-link btn-ico">
                         <i class="ri-briefcase-line ri-lg font-weight-normal"></i>
                         <span>Gérer les métiers et recrutements</span>
                     </a>
                 </li>
                 {% if request.current_organization.is_active %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
-                        <a href="{% url 'siaes_views:members' %}" class="btn-link btn-ico">
+                        <a href="{% url 'companies_views:members' %}" class="btn-link btn-ico">
                             <i class="ri-team-line ri-lg font-weight-normal"></i>
                             <span>Gérer les collaborateurs</span>
                         </a>
@@ -40,7 +40,7 @@
                 {% endif %}
                 {% if can_create_siae_antenna %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
-                        <a href="{% url 'siaes_views:create_siae' %}" class="btn-link btn-ico">
+                        <a href="{% url 'companies_views:create_siae' %}" class="btn-link btn-ico">
                             <i class="ri-add-line ri-lg font-weight-normal"></i>
                             <span>Créer/rejoindre une autre structure</span>
                         </a>
@@ -48,7 +48,7 @@
                 {% endif %}
                 {% if can_show_financial_annexes %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
-                        <a href="{% url 'siaes_views:show_financial_annexes' %}" class="btn-link btn-ico">
+                        <a href="{% url 'companies_views:show_financial_annexes' %}" class="btn-link btn-ico">
                             <i class="ri-folder-chart-line ri-lg font-weight-normal"></i>
                             <span>Voir les annexes financières</span>
                         </a>

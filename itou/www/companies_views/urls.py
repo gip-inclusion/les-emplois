@@ -1,10 +1,10 @@
 from django.urls import path, re_path
 
-from itou.www.siaes_views import views
+from itou.www.companies_views import views
 
 
 # https://docs.djangoproject.com/en/dev/topics/http/urls/#url-namespaces-and-included-urlconfs
-app_name = "siaes_views"
+app_name = "companies_views"
 
 urlpatterns = [
     path("<int:siae_id>/card", views.card, name="card"),

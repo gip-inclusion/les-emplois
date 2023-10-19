@@ -1445,7 +1445,7 @@ class SwitchSiaeTest(TestCase):
         assert response.status_code == 200
         assert response.context["request"].current_organization == siae
 
-        url = reverse("siaes_views:card", kwargs={"siae_id": siae.pk})
+        url = reverse("companies_views:card", kwargs={"siae_id": siae.pk})
         response = self.client.get(url)
         assert response.status_code == 200
         assert response.context["request"].current_organization == siae
@@ -1460,13 +1460,13 @@ class SwitchSiaeTest(TestCase):
         assert response.status_code == 200
         assert response.context["request"].current_organization == related_siae
 
-        url = reverse("siaes_views:card", kwargs={"siae_id": related_siae.pk})
+        url = reverse("companies_views:card", kwargs={"siae_id": related_siae.pk})
         response = self.client.get(url)
         assert response.status_code == 200
         assert response.context["request"].current_organization == related_siae
         assert response.context["siae"] == related_siae
 
-        url = reverse("siaes_views:job_description_list")
+        url = reverse("companies_views:job_description_list")
         response = self.client.get(url)
         assert response.status_code == 200
         assert response.context["request"].current_organization == related_siae

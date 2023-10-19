@@ -1443,11 +1443,11 @@ def test_matomo_context_processor(client, settings, snapshot):
     assert str(script_content) == snapshot(name="matomo custom init 404")
 
     # canonical case
-    url = reverse("siaes_views:card", kwargs={"siae_id": siae.pk})
+    url = reverse("companies_views:card", kwargs={"siae_id": siae.pk})
     response = client.get(f"{url}?foo=bar&mtm_foo=truc&mtm_bar=bidule&city=paris")
     assert response.status_code == 200
     assert response.context["siae"] == siae
-    assert response.context["matomo_custom_url"] == "siae/<int:siae_id>/card?city=paris&mtm_bar=bidule&mtm_foo=truc"
+    assert response.context["matomo_custom_url"] == "company/<int:siae_id>/card?city=paris&mtm_bar=bidule&mtm_foo=truc"
     assert response.context["matomo_custom_title"] == "Fiche de la structure d'insertion"
     assert response.context["matomo_user_id"] == user.pk
     script_content = parse_response_to_soup(response, selector="#matomo-custom-init")

@@ -78,7 +78,7 @@
                                 <p class="h2">{{ siae.display_name }}</p>
                                 <address class="card-subtitle fs-sm font-weight-bold text-secondary">{{ siae.address_on_one_line }}</address>
                                 {% include "siaes/includes/_siae_details.html" with siae=siae %}
-                                <a class="btn btn-secondary btn-block justify-content-center mt-5" href="{% url 'siaes_views:card' siae_id=siae.pk %}">
+                                <a class="btn btn-secondary btn-block justify-content-center mt-5" href="{% url 'companies_views:card' siae_id=siae.pk %}">
                                     Voir la fiche de l'entreprise
                                 </a>
                             </div>

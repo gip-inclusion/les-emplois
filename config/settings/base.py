@@ -90,7 +90,7 @@ INSTALLED_APPS = [
     "itou.www.home",
     "itou.www.prescribers_views",
     "itou.www.search",
-    "itou.www.siaes_views",
+    "itou.www.companies_views",
     "itou.www.signup",
     "itou.www.invitations_views",
     "itou.www.stats",
