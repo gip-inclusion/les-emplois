@@ -8,6 +8,8 @@ class Migration(migrations.Migration):
         ("companies", "0001_initial"),
     ]
 
+    replaces = [("siaes", "0002_siae_geocoded_label_siae_geocoding_updated_at")]
+
     operations = [
         migrations.AddField(
             model_name="siae",

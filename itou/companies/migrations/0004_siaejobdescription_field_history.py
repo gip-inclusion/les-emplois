@@ -9,6 +9,8 @@ class Migration(migrations.Migration):
         ("companies", "0003_alter_siae_updated_at_and_more"),
     ]
 
+    replaces = [("siaes", "0004_siaejobdescription_field_history")]
+
     operations = [
         migrations.AddField(
             model_name="siaejobdescription",

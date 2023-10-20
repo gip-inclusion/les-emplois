@@ -6,6 +6,8 @@ class Migration(migrations.Migration):
         ("companies", "0002_siae_geocoded_label_siae_geocoding_updated_at"),
     ]
 
+    replaces = [("siaes", "0003_alter_siae_updated_at_and_more")]
+
     operations = [
         migrations.RunSQL(
             """
