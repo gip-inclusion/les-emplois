@@ -128,7 +128,6 @@ MIDDLEWARE = [
     "itou.utils.perms.middleware.ItouCurrentOrganizationMiddleware",
     "itou.www.middleware.never_cache",
     # Final logger
-    "django_datadog_logger.middleware.error_log.ErrorLoggingMiddleware",
     "django_datadog_logger.middleware.request_log.RequestLoggingMiddleware",
 ]
 
