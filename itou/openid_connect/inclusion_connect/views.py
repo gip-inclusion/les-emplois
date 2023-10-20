@@ -149,36 +149,6 @@ def inclusion_connect_authorize(request):
     return HttpResponseRedirect(f"{base_url}?{urlencode(data)}")
 
 
-# TODO(alaurent) Remove a few days after IC django is Live
-def inclusion_connect_resume_registration(request):
-    """
-    Used for users that didn't received the validation e-mail from Inclusion Connect.
-    This view will allow them to resume the account creation flow.
-    The only way to get the URL is to get it from the support team.
-    """
-    ic_session = request.session.get(constants.INCLUSION_CONNECT_SESSION_KEY)
-    # If there's a token in the session then the user already came back to the callback view : nothing to resume.
-    # If there's no session then the user never started a registration on this device : nothing to resume either.
-    if not ic_session or ic_session["token"]:
-        messages.error(request, "Impossible de reprendre la création de compte.")
-        return HttpResponseRedirect(reverse("search:siaes_home"))
-
-    ic_state = InclusionConnectState.get_from_state(ic_session["state"])
-
-    # TODO(alaurent) Remove after a few days (until all users asking for help could follow this link)
-    # Backward compatibility:
-    if ic_state is None or not ic_state.data:
-        data = _generate_inclusion_params_from_session(ic_session)
-        return HttpResponseRedirect(f"{constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE}?{urlencode(data)}")
-
-    if ic_state is None:
-        messages.error(request, "Impossible de reprendre la création de compte.")
-        return HttpResponseRedirect(reverse("search:siaes_home"))
-
-    data = _generate_inclusion_params_from_session(ic_state.data)
-    return HttpResponseRedirect(f"{constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE}?{urlencode(data)}")
-
-
 def inclusion_connect_activate_account(request):
     params = request.GET.copy()
     email = params.get("user_email")
@@ -259,18 +229,8 @@ def inclusion_connect_callback(request):
     ic_state = InclusionConnectState.get_from_state(state)
     if ic_state is None or not ic_state.is_valid():
         return _redirect_to_login_page_on_error(request=request)
-    ic_session = request.session.get(constants.INCLUSION_CONNECT_SESSION_KEY)
-    if ic_session and not ic_state.data:
-        # TODO(alaurent) Backward compatibility: Remove after a few days
-        # Keep token_data["id_token"] to logout from IC.
-        # At this step, we can update the user's fields in DB
-        ic_session["token"] = token_data["id_token"]
-        ic_session["state"] = state
-        request.session.modified = True
-        ic_state.data = ic_session
-    else:
-        ic_session = InclusionConnectSession(state=state, token=token_data["id_token"])
-        ic_session.bind_to_request(request)
+    ic_session = InclusionConnectSession(state=state, token=token_data["id_token"])
+    ic_session.bind_to_request(request)
 
     # A token has been provided so it's time to fetch associated user infos
     # because the token is only valid for 5 seconds.
