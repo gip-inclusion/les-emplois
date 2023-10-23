@@ -217,8 +217,6 @@ class FinancialAnnexSelectForm(forms.Form):
 
 
 class EditJobDescriptionForm(forms.ModelForm):
-    JOBS_AUTOCOMPLETE_URL = reverse_lazy("autocomplete:jobs")
-
     # See: itou/static/js/job_autocomplete.js
     job_appellation = forms.CharField(
         label="Poste (code ROME)",
@@ -226,6 +224,7 @@ class EditJobDescriptionForm(forms.ModelForm):
             attrs={
                 "class": "js-job-autocomplete-input form-control",
                 "data-autosubmit-on-enter-pressed": 0,
+                "data-autocomplete-source-url": reverse_lazy("autocomplete:jobs"),
                 "placeholder": "Ex. K2204 ou agent/agente d'entretien en crèche.",
                 "autocomplete": "off",
             }
@@ -295,13 +294,6 @@ class EditJobDescriptionForm(forms.ModelForm):
 
             if self.instance.contract_type != ContractType.OTHER:
                 self.fields["other_contract_type"].widget.attrs.update({"disabled": "disabled"})
-
-        # Pass SIAE id in autocomplete call
-        self.fields["job_appellation"].widget.attrs.update(
-            {
-                "data-autocomplete-source-url": self.JOBS_AUTOCOMPLETE_URL + f"?siae_id={current_siae.pk}",
-            }
-        )
 
         self.fields["custom_name"].widget.attrs.update({"placeholder": ""})
         self.fields["hours_per_week"].widget.attrs.update({"placeholder": ""})
