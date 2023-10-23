@@ -22,9 +22,6 @@ VENV_REQUIREMENT := $(VIRTUAL_ENV)
 
 .PHONY: runserver venv buckets clean quality fix compile-deps
 
-runserver: $(VIRTUAL_ENV)
-	python manage.py runserver $(RUNSERVER_DOMAIN)
-
 $(VIRTUAL_ENV): $(REQUIREMENTS_PATH)
 	$(PYTHON_VERSION) -m venv $@
 	$@/bin/pip install -r $^
