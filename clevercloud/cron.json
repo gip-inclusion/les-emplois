@@ -2,7 +2,7 @@
   "*/5 * * * * $ROOT/clevercloud/status-probes.sh",
   "*/5 * * * * $ROOT/clevercloud/run_management_command.sh scan_s3_files",
 
-  "0 * * * * $ROOT/clevercloud/send_approvals_to_pe.sh",
+  "*/5 * * * * $ROOT/clevercloud/send_approvals_to_pe.sh",
   "5 * * * * $ROOT/clevercloud/run_management_command.sh sync_pec_offers --wet-run",
   "5 * * * * $ROOT/clevercloud/run_management_command.sh update_siaes_job_app_score",
   "10 * * * * $ROOT/clevercloud/run_management_command.sh pe_certify_users --wet-run",

@@ -328,7 +328,7 @@ class ApprovalsSendToPeManagementTestCase(TestCase):
             stdout=stdout,
         )
         assert stdout.getvalue().split("\n") == [
-            "approvals needing to be sent count=2, batch count=100",
+            "approvals needing to be sent count=2, batch count=10",
             f"approvals={pending_approval} start_at={pending_approval.start_at.isoformat()} "
             "pe_state=notification_pending",
             f"approvals={retry_approval} start_at={retry_approval.start_at.isoformat()} "
