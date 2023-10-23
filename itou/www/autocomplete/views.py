@@ -7,7 +7,6 @@ from unidecode import unidecode
 
 from itou.asp.models import Commune
 from itou.cities.models import City
-from itou.companies.models import SiaeJobDescription
 from itou.jobs.models import Appellation
 
 
@@ -67,16 +66,7 @@ def jobs_autocomplete(request):
     """
 
     term = request.GET.get("term", "").strip()
-    siae_id = request.GET.get("siae_id", "").strip()
     appellations = []
-
-    # Fetch excluded codes:
-    # SIAE already have job descriptions with these codes.
-    excluded_codes = (
-        SiaeJobDescription.objects.filter(siae__id=siae_id)
-        .select_related("appellation", "siae")
-        .values_list("appellation__code", flat=True)
-    )
 
     if term:
         appellations = [
@@ -86,7 +76,7 @@ def jobs_autocomplete(request):
                 "rome": appellation.rome.code,
                 "name": appellation.name,
             }
-            for appellation in Appellation.objects.autocomplete(term, codes_to_exclude=excluded_codes, limit=10)
+            for appellation in Appellation.objects.autocomplete(term, limit=10)
         ]
 
     return JsonResponse(appellations, safe=False)
