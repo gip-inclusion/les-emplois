@@ -1,6 +1,6 @@
 # Contexte
 
-### description du bug
+### :bug: description du bug
 …
 
 ### utilisateurs impactés
