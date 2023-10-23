@@ -1,3 +1,12 @@
+---
+name: Feature request
+about: Suggest an idea for this project
+title: ''
+labels: ''
+assignees: ''
+
+---
+
 # Elements de contexte
 
 ### résumé du besoin
@@ -22,4 +31,3 @@
 
 ### détails du livrable
 …
-
