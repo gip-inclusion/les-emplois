@@ -1,4 +1,4 @@
-# Elements de contexte
+# 📜 Elements de contexte
 
 ### résumé du besoin
 …
@@ -9,7 +9,7 @@
 ### comment répondre à ce besoin ?
 …
 
-# Commande à développer
+# 🛠 Commande à développer
 
 ### utilisateurs concernés
 - [ ] candidats
