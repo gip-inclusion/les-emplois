@@ -41,7 +41,7 @@ class Rome(models.Model):
 
 
 class AppellationQuerySet(models.QuerySet):
-    def autocomplete(self, search_string, codes_to_exclude=None, limit=10, rome_code=None):
+    def autocomplete(self, search_string, limit=10, rome_code=None):
         """
         A `search_string` equals to `foo bar` will match all results beginning with `foo` and `bar`.
         This is achieved via `to_tsquery` and prefix matching:
@@ -54,10 +54,7 @@ class AppellationQuerySet(models.QuerySet):
         queryset = self.filter(full_text=SearchQuery(tsquery, config="french_unaccent", search_type="raw"))
         if rome_code:
             queryset = queryset.filter(rome__code=rome_code)
-        queryset = queryset.select_related("rome")
-        if codes_to_exclude:
-            queryset = queryset.exclude(code__in=codes_to_exclude)
-        return queryset[:limit]
+        return queryset.select_related("rome")[:limit]
 
 
 class Appellation(models.Model):
