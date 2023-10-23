@@ -1,6 +1,5 @@
 import datetime
 import json
-from unittest.mock import patch
 
 import pytest
 from dateutil.relativedelta import relativedelta
@@ -92,8 +91,7 @@ class JobApplicationModelTest(TestCase):
         assert not has_considered_valid_diagnoses
         assert job_application.eligibility_diagnosis_by_siae_required
 
-    @patch("itou.job_applications.models.huey_notify_pole_emploi")
-    def test_accepted_by(self, notification_mock):
+    def test_accepted_by(self):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             state=JobApplicationWorkflow.STATE_PROCESSING,
@@ -101,7 +99,6 @@ class JobApplicationModelTest(TestCase):
         user = job_application.to_siae.members.first()
         job_application.accept(user=user)
         assert job_application.accepted_by == user
-        notification_mock.assert_called()
 
     def test_is_sent_by_authorized_prescriber(self):
         job_application = JobApplicationSentByJobSeekerFactory()
@@ -942,7 +939,6 @@ class JobApplicationNotificationsTest(TestCase):
         assert "PASS IAE" not in email.body
         assert global_constants.ITOU_HELP_CENTER_URL in email.body
 
-    @patch("itou.job_applications.models.huey_notify_pole_emploi")
     def test_manually_deliver_approval(self, *args, **kwargs):
         staff_member = ItouStaffFactory()
         job_seeker = JobSeekerFactory(
@@ -1129,7 +1125,6 @@ class NewQualifiedJobAppEmployersNotificationTest(TestCase):
         "SECRET": "pe-secret",
     }
 )
-@patch("itou.job_applications.models.huey_notify_pole_emploi")
 class JobApplicationWorkflowTest(TestCase):
     def setUp(self):
         super().setUp()
@@ -1137,7 +1132,7 @@ class JobApplicationWorkflowTest(TestCase):
         self.accept_email_subject_proxy = "Candidature acceptée et votre avis sur les emplois de l'inclusion"
         self.accept_email_subject_job_seeker = "Candidature acceptée"
 
-    def test_accept_job_application_sent_by_job_seeker_and_make_others_obsolete(self, notify_mock):
+    def test_accept_job_application_sent_by_job_seeker_and_make_others_obsolete(self):
         """
         When a job seeker's application is accepted, the others are marked obsolete.
         """
@@ -1170,10 +1165,8 @@ class JobApplicationWorkflowTest(TestCase):
         assert self.accept_email_subject_job_seeker in mail.outbox[0].subject
         # Email sent to the employer.
         assert self.sent_pass_email_subject in mail.outbox[1].subject
-        # Approval delivered -> Pole Emploi is notified
-        notify_mock.assert_called()
 
-    def test_accept_obsolete(self, notify_mock):
+    def test_accept_obsolete(self):
         """
         An obsolete job application can be accepted.
         """
@@ -1208,10 +1201,8 @@ class JobApplicationWorkflowTest(TestCase):
         assert self.accept_email_subject_job_seeker in mail.outbox[0].subject
         # Email sent to the employer.
         assert self.sent_pass_email_subject in mail.outbox[1].subject
-        # Approval delivered -> Pole Emploi is notified
-        notify_mock.assert_called()
 
-    def test_accept_job_application_sent_by_job_seeker_with_already_existing_valid_approval(self, notify_mock):
+    def test_accept_job_application_sent_by_job_seeker_with_already_existing_valid_approval(self):
         """
         When a Pôle emploi approval already exists, it is reused.
         """
@@ -1234,12 +1225,8 @@ class JobApplicationWorkflowTest(TestCase):
         assert self.accept_email_subject_job_seeker in mail.outbox[0].subject
         # Email sent to the employer.
         assert self.sent_pass_email_subject in mail.outbox[1].subject
-        # Approval delivered -> Pole Emploi is notified
-        notify_mock.assert_called()
 
-    def test_accept_job_application_sent_by_job_seeker_with_already_existing_valid_approval_with_nir(
-        self, notify_mock
-    ):
+    def test_accept_job_application_sent_by_job_seeker_with_already_existing_valid_approval_with_nir(self):
         job_seeker = JobSeekerFactory(pole_emploi_id="", birthdate=None)
         pe_approval = PoleEmploiApprovalFactory(nir=job_seeker.nir)
         job_application = JobApplicationSentByJobSeekerFactory(
@@ -1257,10 +1244,8 @@ class JobApplicationWorkflowTest(TestCase):
         assert self.accept_email_subject_job_seeker in mail.outbox[0].subject
         # Email sent to the employer.
         assert self.sent_pass_email_subject in mail.outbox[1].subject
-        # Approval delivered -> Pole Emploi is notified
-        notify_mock.assert_called()
 
-    def test_accept_job_application_sent_by_job_seeker_with_forgotten_pole_emploi_id(self, notify_mock):
+    def test_accept_job_application_sent_by_job_seeker_with_forgotten_pole_emploi_id(self):
         """
         When a Pôle emploi ID is forgotten, a manual approval delivery is triggered.
         """
@@ -1279,10 +1264,8 @@ class JobApplicationWorkflowTest(TestCase):
         assert self.accept_email_subject_job_seeker in mail.outbox[0].subject
         # Email sent to the team.
         assert "PASS IAE requis sur Itou" in mail.outbox[1].subject
-        # no approval, so no notification sent to pole emploi
-        notify_mock.assert_not_called()
 
-    def test_accept_job_application_sent_by_job_seeker_with_a_nir_no_pe_approval(self, notify_mock):
+    def test_accept_job_application_sent_by_job_seeker_with_a_nir_no_pe_approval(self):
         job_seeker = JobSeekerFactory(
             pole_emploi_id="",
         )
@@ -1297,9 +1280,8 @@ class JobApplicationWorkflowTest(TestCase):
         assert len(mail.outbox) == 2
         assert "Candidature acceptée" in mail.outbox[0].subject
         assert "PASS IAE pour " in mail.outbox[1].subject
-        notify_mock.assert_called()
 
-    def test_accept_job_application_sent_by_job_seeker_with_a_pole_emploi_id_no_pe_approval(self, notify_mock):
+    def test_accept_job_application_sent_by_job_seeker_with_a_pole_emploi_id_no_pe_approval(self):
         job_seeker = JobSeekerFactory(
             nir="",
         )
@@ -1314,9 +1296,8 @@ class JobApplicationWorkflowTest(TestCase):
         assert len(mail.outbox) == 2
         assert "Candidature acceptée" in mail.outbox[0].subject
         assert "PASS IAE pour " in mail.outbox[1].subject
-        notify_mock.assert_called()
 
-    def test_accept_job_application_sent_by_job_seeker_unregistered_no_pe_approval(self, notify_mock):
+    def test_accept_job_application_sent_by_job_seeker_unregistered_no_pe_approval(self):
         job_seeker = JobSeekerFactory(
             nir="", pole_emploi_id="", lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_NOT_REGISTERED
         )
@@ -1331,9 +1312,8 @@ class JobApplicationWorkflowTest(TestCase):
         assert len(mail.outbox) == 2
         assert "Candidature acceptée" in mail.outbox[0].subject
         assert "PASS IAE pour " in mail.outbox[1].subject
-        notify_mock.assert_called()
 
-    def test_accept_job_application_sent_by_prescriber(self, notify_mock):
+    def test_accept_job_application_sent_by_prescriber(self):
         """
         Accept a job application sent by an "orienteur".
         """
@@ -1354,10 +1334,8 @@ class JobApplicationWorkflowTest(TestCase):
         assert self.accept_email_subject_proxy in mail.outbox[1].subject
         # Email sent to the employer.
         assert self.sent_pass_email_subject in mail.outbox[2].subject
-        # Approval delivered -> Pole Emploi is notified
-        notify_mock.assert_called()
 
-    def test_accept_job_application_sent_by_authorized_prescriber(self, notify_mock):
+    def test_accept_job_application_sent_by_authorized_prescriber(self):
         """
         Accept a job application sent by an authorized prescriber.
         """
@@ -1380,10 +1358,8 @@ class JobApplicationWorkflowTest(TestCase):
         assert self.accept_email_subject_proxy in mail.outbox[1].subject
         # Email sent to the employer.
         assert self.sent_pass_email_subject in mail.outbox[2].subject
-        # Approval delivered -> Pole Emploi is notified
-        notify_mock.assert_called()
 
-    def test_accept_job_application_sent_by_authorized_prescriber_with_approval_in_waiting_period(self, notify_mock):
+    def test_accept_job_application_sent_by_authorized_prescriber_with_approval_in_waiting_period(self):
         """
         An authorized prescriber can bypass the waiting period.
         """
@@ -1414,10 +1390,8 @@ class JobApplicationWorkflowTest(TestCase):
         assert self.accept_email_subject_proxy in mail.outbox[1].subject
         # Email sent to the employer.
         assert self.sent_pass_email_subject in mail.outbox[2].subject
-        # Approval delivered -> Pole Emploi is notified
-        notify_mock.assert_called()
 
-    def test_accept_job_application_sent_by_prescriber_with_approval_in_waiting_period(self, notify_mock):
+    def test_accept_job_application_sent_by_prescriber_with_approval_in_waiting_period(self):
         """
         An "orienteur" cannot bypass the waiting period.
         """
@@ -1436,9 +1410,8 @@ class JobApplicationWorkflowTest(TestCase):
         )
         with pytest.raises(xwf_models.AbortTransition):
             job_application.accept(user=job_application.to_siae.members.first())
-            notify_mock.assert_not_called()
 
-    def test_accept_job_application_sent_by_job_seeker_in_waiting_period_valid_diagnosis(self, notify_mock):
+    def test_accept_job_application_sent_by_job_seeker_in_waiting_period_valid_diagnosis(self):
         """
         A job seeker with a valid diagnosis can start an IAE path
         even if he's in a waiting period.
@@ -1468,10 +1441,8 @@ class JobApplicationWorkflowTest(TestCase):
         assert self.accept_email_subject_job_seeker in mail.outbox[0].subject
         # Email sent to the employer.
         assert self.sent_pass_email_subject in mail.outbox[1].subject
-        # Approval delivered -> Pole Emploi is notified
-        notify_mock.assert_called()
 
-    def test_accept_job_application_by_siae_with_no_approval(self, notify_mock):
+    def test_accept_job_application_by_siae_with_no_approval(self):
         """
         A SIAE can hire somebody without getting approval if they don't want one
         Basically the same as the 'accept' part, except we don't create an approval
@@ -1491,10 +1462,8 @@ class JobApplicationWorkflowTest(TestCase):
         assert self.accept_email_subject_job_seeker in mail.outbox[0].subject
         # Email sent to the proxy.
         assert self.accept_email_subject_proxy in mail.outbox[1].subject
-        # No approval, so no notification is sent to Pole Emploi
-        notify_mock.assert_not_called()
 
-    def test_accept_job_application_by_siae_not_subject_to_eligibility_rules(self, notify_mock):
+    def test_accept_job_application_by_siae_not_subject_to_eligibility_rules(self):
         """
         No approval should be delivered for an employer not subject to eligibility rules.
         """
@@ -1514,10 +1483,8 @@ class JobApplicationWorkflowTest(TestCase):
         assert self.accept_email_subject_job_seeker in mail.outbox[0].subject
         # Email sent to the proxy.
         assert self.accept_email_subject_proxy in mail.outbox[1].subject
-        # No approval, so no notification is sent to Pole Emploi
-        notify_mock.assert_not_called()
 
-    def test_accept_has_link_to_eligibility_diagnosis(self, notify_mock):
+    def test_accept_has_link_to_eligibility_diagnosis(self):
         """
         Given a job application for an SIAE subject to eligibility rules,
         when accepting it, then the eligibility diagnosis is linked to it.
@@ -1542,10 +1509,8 @@ class JobApplicationWorkflowTest(TestCase):
         job_application.accept(user=to_employer_member)
         assert job_application.to_siae.is_subject_to_eligibility_rules
         assert job_application.eligibility_diagnosis == eligibility_diagnosis
-        # Approval delivered -> Pole Emploi is notified
-        notify_mock.assert_called()
 
-    def test_refuse(self, notify_mock):
+    def test_refuse(self):
         user = JobSeekerFactory()
         kwargs = {"job_seeker": user, "sender": user, "sender_kind": SenderKind.JOB_SEEKER}
 
@@ -1561,8 +1526,6 @@ class JobApplicationWorkflowTest(TestCase):
             assert len(mail.outbox) == 1
             assert "Candidature déclinée" in mail.outbox[0].subject
             mail.outbox = []
-            # Approval refused -> Pole Emploi is not notified, because they don’t care
-            notify_mock.assert_not_called()
 
     def test_cancel_delete_linked_approval(self, *args, **kwargs):
         job_application = JobApplicationFactory(with_approval=True)
@@ -1616,7 +1579,6 @@ class JobApplicationWorkflowTest(TestCase):
 
 
 class JobApplicationXlsxExportTest(TestCase):
-    @patch("itou.job_applications.models.huey_notify_pole_emploi")
     def test_xlsx_export_contains_the_necessary_info(self, *args, **kwargs):
         create_test_romes_and_appellations(["M1805"], appellations_per_rome=2)
         job_seeker = JobSeekerFactory(title=Title.MME)

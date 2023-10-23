@@ -1,5 +1,4 @@
 from itertools import product
-from unittest.mock import patch
 
 import pytest
 from dateutil.relativedelta import relativedelta
@@ -42,8 +41,6 @@ DISABLED_NIR = 'disabled id="id_nir"'
 PRIOR_ACTION_SECTION_TITLE = "Action préalable à l'embauche"
 
 
-# patch the one used in the `models` module, not the original one in tasks
-@patch("itou.job_applications.models.huey_notify_pole_emploi", return_value=False)
 class ProcessViewsTest(TestCase):
     def accept_job_application(self, job_application, post_data=None, city=None, assert_successful=True):
         """

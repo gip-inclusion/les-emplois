@@ -30,7 +30,6 @@ from itou.job_applications.enums import (
     RefusalReason,
     SenderKind,
 )
-from itou.job_applications.tasks import huey_notify_pole_emploi
 from itou.users.enums import LackOfPoleEmploiId, UserKind
 from itou.utils.emails import get_email_message, send_email_messages
 from itou.utils.models import InclusiveDateRangeField
@@ -988,12 +987,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             self.approval_number_sent_at = timezone.now()
             self.approval_delivery_mode = self.APPROVAL_DELIVERY_MODE_AUTOMATIC
             self.approval.unsuspend(self.hiring_start_at)
-            # FIXME(vperron): This is an unelegant method to avoid using huey
-            # in local development, thus needing Redis. Maybe some development
-            # settings involving a local, in-memory huey in immediate mode would
-            # be better, but this is a fast fix.
-            if settings.API_ESD["BASE_URL"]:
-                huey_notify_pole_emploi(self)
 
     @xwf_models.transition()
     def refuse(self, *args, **kwargs):
