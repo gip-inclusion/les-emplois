@@ -135,3 +135,8 @@ COMPANY_KIND_RESERVED = "RESERVED"
 # not in Siae.SOURCE_XXX choices deliberately: this value can't be selected in
 # the admin and must be set by software.
 COMPANY_SOURCE_ADMIN_CREATED = "ADMIN_CREATED"
+
+
+class JobDescriptionSource(models.TextChoices):
+    MANUALLY = "MANUALLY", "Fiche de poste créée manuellement"
+    HIRING = "HIRING", "Fiche de poste créée automatiquement à l'embauche"
