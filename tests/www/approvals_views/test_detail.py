@@ -20,9 +20,6 @@ from tests.users.factories import JobSeekerFactory
 from tests.utils.test import parse_response_to_soup
 
 
-pytestmark = pytest.mark.ignore_template_errors
-
-
 class TestApprovalDetailView:
     def test_anonymous_user(self, client):
         approval = ApprovalFactory()
@@ -73,6 +70,7 @@ class TestApprovalDetailView:
         assertContains(response, '<i class="ri-group-line me-2" aria-hidden="true"></i>Prescripteur habilité', count=1)
         assertContains(response, '<i class="ri-group-line me-2" aria-hidden="true"></i>Orienteur', count=1)
 
+    @pytest.mark.ignore_template_errors
     def test_detail_view_no_job_application(self, client):
         siae = SiaeFactory(with_membership=True)
         siae_member = siae.members.first()
@@ -89,6 +87,7 @@ class TestApprovalDetailView:
         assertContains(response, "Informations du salarié")
         assertContains(response, "Candidatures de ce salarié")
 
+    @pytest.mark.ignore_template_errors
     @freeze_time("2023-04-26")
     def test_approval_status_includes(self, client, snapshot):
         """
