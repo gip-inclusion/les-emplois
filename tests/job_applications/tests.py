@@ -1713,6 +1713,7 @@ class JobApplicationAdminFormTest(TestCase):
             "to_siae",
             "state",
             "selected_jobs",
+            "hired_job",
             "message",
             "answer",
             "answer_to_prescriber",

@@ -11,7 +11,7 @@
   
   <div class="form-text">Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche</div>
   </div>
-      <div class="form-group form-group-required"><label class="form-label" for="id_contract_type">Type de contrat</label><select name="contract_type" hx-trigger="change" hx-post="/apply/10/accept/reload_contract_type_and_options" hx-swap="outerHTML" hx-target="#geiq_contract_type_and_options_block" class="form-select" required id="id_contract_type">
+      <div class="form-group form-group-required"><label class="form-label" for="id_contract_type">Type de contrat</label><select name="contract_type" hx-trigger="change" hx-post="/apply/10/accept/reload_contract_type_and_options" hx-swap="outerHTML" hx-select="#geiq_contract_type_and_options_block" hx-target="#geiq_contract_type_and_options_block" class="form-select" required id="id_contract_type">
     <option value="">---------</option>
   
     <option value="APPRENTICESHIP" selected>Contrat d&#x27;apprentissage</option>
@@ -22,11 +22,7 @@
   
   </select></div>
       <div class="form-group"><div class="form-check"><input type="checkbox" name="inverted_vae_contract" class="form-check-input" disabled id="id_inverted_vae_contract"><label class="form-check-label" for="id_inverted_vae_contract">Contrat associé à une VAE inversée</label></div></div>
-      <div id="contractTypeDetails" class="d-none">
-          <div class="form-group"><label class="form-label" for="id_contract_type_details">Précisions sur le type de contrat</label><textarea name="contract_type_details" cols="40" rows="2" class="form-control" placeholder="Précisions sur le type de contrat" id="id_contract_type_details">
-  </textarea><div class="form-text">Si vous avez choisi un autre type de contrat, merci de bien vouloir fournir plus de précisions</div>
-  </div>
-      </div>
+      
       <div class="form-group form-group-required"><label class="form-label" for="id_nb_hours_per_week">Nombre d&#x27;heures par semaine</label><input type="number" name="nb_hours_per_week" min="0" class="form-control" placeholder="Nombre d&#x27;heures par semaine" required id="id_nb_hours_per_week"></div>
   </div>
   
@@ -41,7 +37,7 @@
   
   <div class="form-text">Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche</div>
   </div>
-      <div class="form-group form-group-required"><label class="form-label" for="id_contract_type">Type de contrat</label><select name="contract_type" hx-trigger="change" hx-post="/apply/10/accept/reload_contract_type_and_options" hx-swap="outerHTML" hx-target="#geiq_contract_type_and_options_block" class="form-select" required id="id_contract_type">
+      <div class="form-group form-group-required"><label class="form-label" for="id_contract_type">Type de contrat</label><select name="contract_type" hx-trigger="change" hx-post="/apply/10/accept/reload_contract_type_and_options" hx-swap="outerHTML" hx-select="#geiq_contract_type_and_options_block" hx-target="#geiq_contract_type_and_options_block" class="form-select" required id="id_contract_type">
     <option value="">---------</option>
   
     <option value="APPRENTICESHIP">Contrat d&#x27;apprentissage</option>
@@ -52,14 +48,11 @@
   
   </select></div>
       <div class="form-group"><div class="form-check"><input type="checkbox" name="inverted_vae_contract" class="form-check-input" disabled id="id_inverted_vae_contract"><label class="form-check-label" for="id_inverted_vae_contract">Contrat associé à une VAE inversée</label></div></div>
-      <div id="contractTypeDetails" >
-          <div class="form-group is-invalid"><label class="form-label" for="id_contract_type_details">Précisions sur le type de contrat</label><textarea name="contract_type_details" cols="40" rows="2" class="form-control is-invalid" placeholder="Précisions sur le type de contrat" id="id_contract_type_details">
-  </textarea>
-      <div class="invalid-feedback">Les précisions sont nécessaires pour ce type de contrat</div>
-  
-  <div class="form-text">Si vous avez choisi un autre type de contrat, merci de bien vouloir fournir plus de précisions</div>
-  </div>
-      </div>
+      
+          <div id="contractTypeDetails"><div class="form-group"><label class="form-label" for="id_contract_type_details">Précisions sur le type de contrat</label><textarea name="contract_type_details" cols="40" rows="2" class="form-control" placeholder="Précisions sur le type de contrat" id="id_contract_type_details">
+  </textarea><div class="form-text">Si vous avez choisi un autre type de contrat, merci de bien vouloir fournir plus de précisions</div>
+  </div></div>
+      
       <div class="form-group form-group-required"><label class="form-label" for="id_nb_hours_per_week">Nombre d&#x27;heures par semaine</label><input type="number" name="nb_hours_per_week" min="0" class="form-control" placeholder="Nombre d&#x27;heures par semaine" required id="id_nb_hours_per_week"></div>
   </div>
   
@@ -74,7 +67,7 @@
   
   <div class="form-text">Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche</div>
   </div>
-      <div class="form-group form-group-required"><label class="form-label" for="id_contract_type">Type de contrat</label><select name="contract_type" hx-trigger="change" hx-post="/apply/10/accept/reload_contract_type_and_options" hx-swap="outerHTML" hx-target="#geiq_contract_type_and_options_block" class="form-select" required id="id_contract_type">
+      <div class="form-group form-group-required"><label class="form-label" for="id_contract_type">Type de contrat</label><select name="contract_type" hx-trigger="change" hx-post="/apply/10/accept/reload_contract_type_and_options" hx-swap="outerHTML" hx-select="#geiq_contract_type_and_options_block" hx-target="#geiq_contract_type_and_options_block" class="form-select" required id="id_contract_type">
     <option value="">---------</option>
   
     <option value="APPRENTICESHIP">Contrat d&#x27;apprentissage</option>
@@ -85,11 +78,7 @@
   
   </select></div>
       <div class="form-group"><div class="form-check"><input type="checkbox" name="inverted_vae_contract" class="form-check-input" id="id_inverted_vae_contract"><label class="form-check-label" for="id_inverted_vae_contract">Contrat associé à une VAE inversée</label></div></div>
-      <div id="contractTypeDetails" class="d-none">
-          <div class="form-group"><label class="form-label" for="id_contract_type_details">Précisions sur le type de contrat</label><textarea name="contract_type_details" cols="40" rows="2" class="form-control" placeholder="Précisions sur le type de contrat" id="id_contract_type_details">
-  </textarea><div class="form-text">Si vous avez choisi un autre type de contrat, merci de bien vouloir fournir plus de précisions</div>
-  </div>
-      </div>
+      
       <div class="form-group form-group-required"><label class="form-label" for="id_nb_hours_per_week">Nombre d&#x27;heures par semaine</label><input type="number" name="nb_hours_per_week" min="0" class="form-control" placeholder="Nombre d&#x27;heures par semaine" required id="id_nb_hours_per_week"></div>
   </div>
   
@@ -99,7 +88,7 @@
   '''
   
   <div id="geiq_qualification_fields_block">
-      <div class="form-group form-group-required"><label class="form-label" for="id_qualification_type">Type de qualification visé</label><select name="qualification_type" hx-trigger="change" hx-post="/apply/10/accept/reload_qualification_fields" hx-swap="outerHTML" hx-target="#geiq_qualification_fields_block" class="form-select" required id="id_qualification_type">
+      <div class="form-group form-group-required"><label class="form-label" for="id_qualification_type">Type de qualification visé</label><select name="qualification_type" hx-trigger="change" hx-post="/apply/10/accept/reload_qualification_fields" hx-swap="outerHTML" hx-select="#geiq_qualification_fields_block" hx-target="#geiq_qualification_fields_block" class="form-select" required id="id_qualification_type">
     <option value="">---------</option>
   
     <option value="STATE_DIPLOMA">Diplôme d&#x27;état ou titre homologué</option>
@@ -130,7 +119,7 @@
   '''
   
   <div id="geiq_qualification_fields_block">
-      <div class="form-group form-group-required"><label class="form-label" for="id_qualification_type">Type de qualification visé</label><select name="qualification_type" hx-trigger="change" hx-post="/apply/10/accept/reload_qualification_fields" hx-swap="outerHTML" hx-target="#geiq_qualification_fields_block" class="form-select" required id="id_qualification_type">
+      <div class="form-group form-group-required"><label class="form-label" for="id_qualification_type">Type de qualification visé</label><select name="qualification_type" hx-trigger="change" hx-post="/apply/10/accept/reload_qualification_fields" hx-swap="outerHTML" hx-select="#geiq_qualification_fields_block" hx-target="#geiq_qualification_fields_block" class="form-select" required id="id_qualification_type">
     <option value="">---------</option>
   
     <option value="STATE_DIPLOMA">Diplôme d&#x27;état ou titre homologué</option>
@@ -161,7 +150,7 @@
   '''
   
   <div id="geiq_qualification_fields_block">
-      <div class="form-group form-group-required"><label class="form-label" for="id_qualification_type">Type de qualification visé</label><select name="qualification_type" hx-trigger="change" hx-post="/apply/10/accept/reload_qualification_fields" hx-swap="outerHTML" hx-target="#geiq_qualification_fields_block" class="form-select" required id="id_qualification_type">
+      <div class="form-group form-group-required"><label class="form-label" for="id_qualification_type">Type de qualification visé</label><select name="qualification_type" hx-trigger="change" hx-post="/apply/10/accept/reload_qualification_fields" hx-swap="outerHTML" hx-select="#geiq_qualification_fields_block" hx-target="#geiq_qualification_fields_block" class="form-select" required id="id_qualification_type">
     <option value="">---------</option>
   
     <option value="STATE_DIPLOMA" selected>Diplôme d&#x27;état ou titre homologué</option>

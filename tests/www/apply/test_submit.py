@@ -2164,6 +2164,7 @@ class DirectHireFullProcessTest(TestCase):
             "contract_type": ContractType.APPRENTICESHIP,
             "qualification_type": QualificationType.STATE_DIPLOMA,
             "qualification_level": QualificationLevel.LEVEL_4,
+            "hired_job": siae.job_description_through.first().pk,
         }
         response = self.client.post(
             confirmation_url,
@@ -3827,6 +3828,7 @@ class HireConfirmationTestCase(TestCase):
             "city": self.city.name,
             "city_slug": self.city.slug,
             # GEIQ specific fields
+            "hired_job": self.siae.job_description_through.first().pk,
             "prehiring_guidance_days": 3,
             "nb_hours_per_week": 4,
             "planned_training_hours": 5,

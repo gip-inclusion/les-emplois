@@ -11,7 +11,7 @@ from pytest_django.asserts import assertContains, assertNotContains, assertRedir
 
 from itou.approvals.models import Approval, Suspension
 from itou.cities.models import City
-from itou.companies.enums import CompanyKind, ContractType
+from itou.companies.enums import CompanyKind, ContractType, JobDescriptionSource
 from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.employee_record.enums import Status
@@ -23,9 +23,10 @@ from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId, UserKind
 from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.format_filters import format_nir
 from itou.utils.widgets import DuetDatePickerWidget
+from itou.www.apply.forms import AcceptForm
 from tests.approvals.factories import PoleEmploiApprovalFactory, SuspensionFactory
 from tests.cities.factories import create_test_cities
-from tests.companies.factories import SiaeFactory
+from tests.companies.factories import SiaeFactory, SiaeJobDescriptionFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import (
@@ -54,13 +55,20 @@ class ProcessViewsTest(TestCase):
     def get_random_city(self):
         return random.choice(self.cities)
 
-    def accept_job_application(self, job_application, post_data=None, city=None, assert_successful=True):
+    def accept_job_application(
+        self, job_application, post_data=None, city=None, assert_successful=True, job_description=None
+    ):
         """
         This is not a test. It's a shortcut to process "apply:accept" view steps:
         - GET
         - POST: show the confirmation modal
         - POST: hide the modal and redirect to the next url.
+
+        If needed a job description can be passed as parameter, as it is now mandatory for each hiring.
+        If not provided, a new one will be created and linked to the given job application.
         """
+        job_description = SiaeJobDescriptionFactory(siae=job_application.to_siae)
+
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url_accept)
         self.assertContains(response, "Confirmation de l’embauche")
@@ -79,9 +87,11 @@ class ProcessViewsTest(TestCase):
                 "post_code": job_application.job_seeker.post_code,
                 "city": city.name,
                 "city_slug": city.slug,
+                "hired_job": job_description.pk,
             }
 
         response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
+
         if assert_successful:
             assert (
                 response.headers.get("HX-Trigger")
@@ -99,6 +109,7 @@ class ProcessViewsTest(TestCase):
         # See https://django-htmx.readthedocs.io/en/latest/http.html#django_htmx.http.HttpResponseClientRedirect # noqa
         if assert_successful:
             self.assertRedirects(response, next_url, status_code=200, fetch_redirect_response=False)
+
         return response, next_url
 
     def test_details_for_siae(self, *args, **kwargs):
@@ -2126,11 +2137,11 @@ def test_htmx_reload_contract_type_and_options(client, snapshot):
         "answer": "",
     }
     response = client.post(accept_url, data=data)
-    form_soup = parse_response_to_soup(response, selector="#formTarget")
+    form_soup = parse_response_to_soup(response, selector="#acceptForm")
 
     # Update form soup with htmx call
     reload_url = reverse("apply:reload_contract_type_and_options", kwargs={"siae_pk": job_application.to_siae.pk})
-    data["contract_type"] = ContractType.OTHER
+    data["contract_type"] = ContractType.PERMANENT
     htmx_response = client.post(
         reload_url,
         data=data,
@@ -2139,5 +2150,123 @@ def test_htmx_reload_contract_type_and_options(client, snapshot):
 
     # Check that a complete re-POST returns the exact same form
     response = client.post(accept_url, data=data)
-    reloaded_form_soup = parse_response_to_soup(response, selector="#formTarget")
+    reloaded_form_soup = parse_response_to_soup(response, selector="#acceptForm")
     assertSoupEqual(form_soup, reloaded_form_soup)
+
+
+# Hirings must now be linked to a job description
+
+ACTIVE_JOBS_LABEL = "Postes ouverts au recrutement"
+INACTIVE_JOBS_LABEL = "Postes fermés au recrutement"
+JOB_DETAILS_LABEL = "Préciser le nom du poste (code ROME)"
+
+
+def test_select_job_description_for_job_application(client):
+    create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
+    job_application = JobApplicationFactory(
+        to_siae__kind=CompanyKind.EI, state=JobApplicationWorkflow.STATE_PROCESSING
+    )
+    user = job_application.to_siae.members.first()
+
+    client.force_login(user)
+    response = client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
+
+    # Check optgroup labels
+    job_description = SiaeJobDescriptionFactory(siae=job_application.to_siae, is_active=True)
+    response = client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
+    assert response.status_code == 200
+    assertContains(response, f"{job_description.display_name} - {job_description.display_location}", html=True)
+    assertContains(response, ACTIVE_JOBS_LABEL)
+    assertNotContains(response, INACTIVE_JOBS_LABEL)
+    assertNotContains(response, JOB_DETAILS_LABEL)
+
+    # Inactive job description must also appear in select
+    job_description = SiaeJobDescriptionFactory(siae=job_application.to_siae, is_active=False)
+    response = client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
+    assert response.status_code == 200
+    assertContains(response, f"{job_description.display_name} - {job_description.display_location}", html=True)
+    assertContains(response, ACTIVE_JOBS_LABEL)
+    assertContains(response, INACTIVE_JOBS_LABEL)
+    assertNotContains(response, JOB_DETAILS_LABEL)
+
+
+def test_select_other_job_description_for_job_application(client):
+    create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
+    create_test_cities(["54", "57"], num_per_department=2)
+
+    job_application = JobApplicationFactory(
+        to_siae__kind=CompanyKind.EI, state=JobApplicationWorkflow.STATE_PROCESSING
+    )
+    user = job_application.to_siae.members.first()
+    SiaeJobDescriptionFactory(siae=job_application.to_siae, is_active=True)
+    city = City.objects.order_by("?").first()
+    url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+    data = {
+        "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_FORGOTTEN,
+        "lack_of_nir": True,
+        "lack_of_nir_reason": LackOfNIRReason.TEMPORARY_NUMBER,
+        "address_line_1": "11 rue des Lilas",
+        "post_code": "57000",
+        "city": city.name,
+        "city_slug": city.slug,
+    }
+
+    client.force_login(user)
+    response = client.get(url)
+
+    assertContains(response, ACTIVE_JOBS_LABEL)
+    assertNotContains(response, INACTIVE_JOBS_LABEL)
+    assertNotContains(response, JOB_DETAILS_LABEL)
+
+    # Select "Autre": must provide new job detail fields
+    response = client.post(url, data={"hired_job": AcceptForm.OTHER_HIRED_JOB})
+    assertContains(response, JOB_DETAILS_LABEL)
+
+    # Check form errors
+    data |= {"hired_job": AcceptForm.OTHER_HIRED_JOB}
+
+    response = client.post(url, data=data)
+    assert response.status_code == 200
+
+    data |= {"location_code": city.slug}
+    response = client.post(url, data=data)
+    assert response.status_code == 200
+
+    appellation = Appellation.objects.order_by("?").first()
+    data |= {"job_appellation_code": appellation.pk}
+    response = client.post(url, data=data)
+    assert response.status_code == 200
+
+    tomorrow = timezone.localdate() + relativedelta(days=1)
+    data |= {"hiring_start_at": f"{tomorrow:%Y-%m-%d}"}
+    response = client.post(url, data=data)
+    assert response.status_code == 200
+
+    # Modal window
+    data |= {"confirmed": True}
+    response = client.post(url, data=data, follow=False)
+    # Caution: should redirect after that point, but done via HTMX we get a 200 status code
+    assert response.status_code == 200
+    assert response.url == reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+
+    # Perform some checks on job description now attached to job application
+    job_application.refresh_from_db()
+    assert job_application.hired_job
+    assert job_application.hired_job.creation_source == JobDescriptionSource.HIRING
+    assert not job_application.hired_job.is_active
+    assert job_application.hired_job.description == "La structure n’a pas encore renseigné cette rubrique"
+
+
+def test_no_job_description_for_job_application(client):
+    create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
+    job_application = JobApplicationFactory(
+        to_siae__kind=CompanyKind.EI, state=JobApplicationWorkflow.STATE_PROCESSING
+    )
+    user = job_application.to_siae.members.first()
+
+    client.force_login(user)
+    response = client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
+
+    assertNotContains(response, ACTIVE_JOBS_LABEL)
+    assertNotContains(response, INACTIVE_JOBS_LABEL)
+    assertNotContains(response, JOB_DETAILS_LABEL)
