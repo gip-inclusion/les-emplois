@@ -53,6 +53,7 @@ PUBLIC_DASHBOARDS = {
     "femmes-iae": "tb 216 - Les femmes dans l'IAE",
     "suivi-pass-iae": "tb 217 - Suivi pass IAE",
     "cartographies-iae": "tb 218 - Cartographie de l'IAE",
+    "zoom-esat": "tb 306 - Zoom sur les ESAT",
     "suivi-demandes-prolongation": "tb 336 - Suivi des prolongations",
     # Note: keep those commented for reference. They're not used anymore but if we ever
     # need to regenerate values for the Q1 2022 or before, they're going to be required.
