@@ -32,12 +32,12 @@ if [[ ! -f "$CONTACT_EA_FILE" ]]; then
 fi
 
 # Create the "data" directory inside of the app and clear it of any previously existing data
-mkdir -p itou/siaes/management/commands/data/
-rm -rf itou/siaes/management/commands/data/*
+mkdir -p itou/companies/management/commands/data/
+rm -rf itou/companies/management/commands/data/*
 
 # Unzip ASP files
-unzip -P "$ASP_UNZIP_PASSWORD" "$FLUX_IAE_FILE" -d itou/siaes/management/commands/data/
-unzip -P "$ASP_UNZIP_PASSWORD" "$CONTACT_EA_FILE" -d itou/siaes/management/commands/data/
+unzip -P "$ASP_UNZIP_PASSWORD" "$FLUX_IAE_FILE" -d itou/companies/management/commands/data/
+unzip -P "$ASP_UNZIP_PASSWORD" "$CONTACT_EA_FILE" -d itou/companies/management/commands/data/
 
 # Perform the necessary data imports
 mkdir -p $OUTPUT_PATH/populate_metabase_fluxiae
@@ -49,7 +49,7 @@ time ./manage.py import_siae --verbosity=2 |& tee -a "$OUTPUT_PATH/import_siae/o
 time ./manage.py import_ea_eatt --wet-run --verbosity=2 |& tee -a "$OUTPUT_PATH/import_ea_eatt/output_$(date '+%Y-%m-%d_%H-%M-%S').log"
 
 # Destroy the cleartext ASP data
-rm -rf itou/siaes/management/commands/data/
+rm -rf itou/companies/management/commands/data/
 
 # Remove ASP files from 2 weeks ago
 find asp_shared_bucket/ -name '*.zip' -type f -mtime +13 -delete
