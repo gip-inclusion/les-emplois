@@ -221,9 +221,12 @@
             <script nonce="{{ CSP_NONCE }}">
                 // Show any toasts that is already present in the DOM
                 htmx.onLoad(() => {
-                    $(".toast-placement-wrapper").children(".toast").each(function() {
-                        $(this).toast("show");
+                    const toastContainer = document.querySelector('.toast-container');
+                    const toastElList = [].slice.call(toastContainer.querySelectorAll('.toast'));
+                    let toastList = toastElList.map(function(toastEl) {
+                        return new bootstrap.Toast(toastEl);
                     });
+                    toastList.forEach(toast => toast.show());
                 });
             </script>
 
