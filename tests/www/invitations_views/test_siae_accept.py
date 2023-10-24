@@ -1,5 +1,6 @@
 from urllib.parse import urlencode
 
+import pytest
 import respx
 from django.conf import settings
 from django.contrib import messages
@@ -19,6 +20,9 @@ from tests.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oau
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import EmployerFactory
 from tests.utils.test import assertMessages
+
+
+pytestmark = pytest.mark.ignore_template_errors
 
 
 class TestAcceptInvitation(InclusionConnectBaseTestCase):
