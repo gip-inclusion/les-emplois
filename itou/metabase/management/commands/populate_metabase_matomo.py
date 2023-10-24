@@ -39,20 +39,20 @@ httpx_transport = httpx.HTTPTransport(retries=3)
 client = httpx.Client(transport=httpx_transport)
 
 PUBLIC_DASHBOARDS = {
-    "analyse-des-publics": "tb 129 - Analyse des publics",
     "auto-prescription": "tb 32 - Acceptés en auto-prescription",
-    "etat-suivi-candidatures": "tb 116 - Recrutement",
-    "etp-conventionnes": "tb 140 - ETP conventionnés",
-    "metiers": "tb 90 - Analyse des métiers",
-    "postes-en-tension": "tb 150 - Fiches de poste en tension",
-    "prescripteurs-habilites": "tb 136 - Prescripteurs habilités",
     "statistiques-emplois": "tb 43 - Statistiques des emplois",
-    "zoom-employeurs": "tb 54 - Typologie des employeurs",
     "zoom-prescripteurs": "tb 52 - Typologie de prescripteurs",
+    "zoom-employeurs": "tb 54 - Typologie des employeurs",
+    "metiers": "tb 90 - Analyse des métiers",
+    "etat-suivi-candidatures": "tb 116 - Recrutement",
+    "analyse-des-publics": "tb 129 - Analyse des publics",
+    "prescripteurs-habilites": "tb 136 - Prescripteurs habilités",
+    "etp-conventionnes": "tb 140 - ETP conventionnés",
+    "suivi-controle-a-posteriori": "tb 144 - Contrôle à posteriori",
+    "postes-en-tension": "tb 150 - Fiches de poste en tension",
     "femmes-iae": "tb 216 - Les femmes dans l'IAE",
     "suivi-pass-iae": "tb 217 - Suivi pass IAE",
     "cartographies-iae": "tb 218 - Cartographie de l'IAE",
-    "suivi-controle-a-posteriori": "tb 144 - Contrôle à posteriori",
     "suivi-demandes-prolongation": "tb 336 - Suivi des prolongations",
     # Note: keep those commented for reference. They're not used anymore but if we ever
     # need to regenerate values for the Q1 2022 or before, they're going to be required.
