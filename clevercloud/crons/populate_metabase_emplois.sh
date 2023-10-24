@@ -36,6 +36,7 @@ if [[ "$1" == "--daily" ]]; then
     django-admin populate_metabase_emplois --mode=evaluated_job_applications |& tee -a "$OUTPUT_LOG"
     django-admin populate_metabase_emplois --mode=evaluated_criteria |& tee -a "$OUTPUT_LOG"
     django-admin populate_metabase_emplois --mode=users |& tee -a "$OUTPUT_LOG"
+    django-admin populate_metabase_emplois --mode=memberships |& tee -a "$OUTPUT_LOG"
     django-admin populate_metabase_emplois --mode=final_tables |& tee -a "$OUTPUT_LOG"
     django-admin populate_metabase_emplois --mode=data_inconsistencies |& tee -a "$OUTPUT_LOG"
     django-admin send_slack_message ":white_check_mark: succès mise à jour de données C1 -> Metabase"

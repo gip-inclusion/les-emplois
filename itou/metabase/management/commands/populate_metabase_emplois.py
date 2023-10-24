@@ -33,10 +33,10 @@ from itou.analytics.models import Datum, StatsDashboardVisit
 from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, ProlongationRequest
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
-from itou.companies.models import Siae, SiaeJobDescription
+from itou.companies.models import Siae, SiaeJobDescription, SiaeMembership
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
-from itou.institutions.models import Institution
+from itou.institutions.models import Institution, InstitutionMembership
 from itou.job_applications.enums import Origin, SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.jobs.models import Rome
@@ -55,6 +55,7 @@ from itou.metabase.tables import (
     job_applications,
     job_descriptions,
     job_seekers,
+    memberships,
     organizations,
     prolongation_requests,
     prolongations,
@@ -64,7 +65,7 @@ from itou.metabase.tables import (
     users,
 )
 from itou.metabase.tables.utils import get_active_siae_pks
-from itou.prescribers.models import PrescriberOrganization
+from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.siae_evaluations.models import (
     EvaluatedAdministrativeCriteria,
     EvaluatedJobApplication,
@@ -103,6 +104,7 @@ class Command(BaseCommand):
             "evaluated_job_applications": self.populate_evaluated_job_applications,
             "evaluated_criteria": self.populate_evaluated_criteria,
             "users": self.populate_users,
+            "memberships": self.populate_memberships,
             "rome_codes": self.populate_rome_codes,
             "insee_codes": self.populate_insee_codes,
             "insee_codes_vs_post_codes": self.populate_insee_codes_vs_post_codes,
@@ -408,6 +410,15 @@ class Command(BaseCommand):
             kind__in=[UserKind.EMPLOYER, UserKind.PRESCRIBER, UserKind.LABOR_INSPECTOR], is_active=True
         )
         populate_table(users.TABLE, batch_size=1000, querysets=[queryset])
+
+    def populate_memberships(self):
+        siae_queryset = SiaeMembership.objects.filter(is_active=True)
+        prescriber_queryset = PrescriberMembership.objects.filter(is_active=True)
+        institution_queryset = InstitutionMembership.objects.filter(is_active=True)
+
+        populate_table(
+            memberships.TABLE, batch_size=1000, querysets=[siae_queryset, prescriber_queryset, institution_queryset]
+        )
 
     def populate_rome_codes(self):
         queryset = Rome.objects.all()

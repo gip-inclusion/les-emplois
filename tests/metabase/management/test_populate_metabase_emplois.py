@@ -23,12 +23,13 @@ from tests.approvals.factories import (
     ProlongationRequestDenyInformationFactory,
     ProlongationWithRequestFactory,
 )
-from tests.companies.factories import SiaeFactory, SiaeJobDescriptionFactory
+from tests.companies.factories import SiaeFactory, SiaeJobDescriptionFactory, SiaeMembershipFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory
 from tests.geo.factories import QPVFactory
-from tests.institutions.factories import InstitutionFactory
+from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
+from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.siae_evaluations.factories import (
     EvaluatedAdministrativeCriteriaFactory,
     EvaluatedJobApplicationFactory,
@@ -885,6 +886,76 @@ def test_populate_users():
                 pro_user.id,
                 pro_user.email,
                 "employer",
+                datetime.date(2023, 2, 1),
+            ),
+        ]
+
+
+@freeze_time("2023-02-02")
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.usefixtures("metabase")
+def test_populate_memberships():
+    siae_m = SiaeMembershipFactory()
+    SiaeMembershipFactory(is_active=False)  # Inactive siaes are ignored.
+    prescriber_m = PrescriberMembershipFactory()
+    PrescriberMembershipFactory(is_active=False)
+    institution_m = InstitutionMembershipFactory()
+    InstitutionMembershipFactory(is_active=False)
+
+    num_queries = 1  # Count siae memberships
+    num_queries += 1  # Count prescriber memberships
+    num_queries += 1  # Count institution memberships
+
+    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
+    num_queries += 1  # COMMIT Create table
+
+    num_queries += 1  # Select siae memberships IDs
+    num_queries += 1  # Select one chunk of siae memberships IDs
+    num_queries += 1  # Select siae memberships with columns
+    num_queries += 1  # COMMIT (inject_chunk)
+
+    num_queries += 1  # Select prescriber memberships IDs
+    num_queries += 1  # Select one chunk of prescriber memberships IDs
+    num_queries += 1  # Select prescriber memberships with columns
+    num_queries += 1  # COMMIT (inject_chunk)
+
+    num_queries += 1  # Select institution memberships IDs
+    num_queries += 1  # Select one chunk of institution memberships IDs
+    num_queries += 1  # Select institution memberships with columns
+    num_queries += 1  # COMMIT (inject_chunk)
+
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    with assertNumQueries(num_queries):
+        management.call_command("populate_metabase_emplois", mode="memberships")
+
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM collaborations ORDER BY id_utilisateur")
+        rows = cursor.fetchall()
+        assert rows == [
+            (
+                siae_m.user_id,
+                True,
+                siae_m.siae_id,
+                None,
+                None,
+                datetime.date(2023, 2, 1),
+            ),
+            (
+                prescriber_m.user_id,
+                True,
+                None,
+                prescriber_m.organization_id,
+                None,
+                datetime.date(2023, 2, 1),
+            ),
+            (
+                institution_m.user_id,
+                True,
+                None,
+                None,
+                institution_m.institution_id,
                 datetime.date(2023, 2, 1),
             ),
         ]
