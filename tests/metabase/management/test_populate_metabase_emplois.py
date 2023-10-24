@@ -1060,6 +1060,18 @@ def test_populate_siaes():
                 "EI",
                 "17643069438162",
                 "Export ASP",
+                # Address columns " de la structure mère"
+                "112 rue de la Croix-Nivert",
+                "",
+                "75015",
+                None,
+                "Paris",
+                5.43567,
+                12.123876,
+                "75",
+                "75 - Paris",
+                "Île-de-France",
+                # Address columns " de la structure C1"
                 "112 rue de la Croix-Nivert",
                 "",
                 "75015",
