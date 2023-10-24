@@ -6,6 +6,7 @@ from django.conf import settings
 from django.db.models import JSONField
 from django.db.models.fields import (
     AutoField,
+    BooleanField,
     CharField,
     DateField,
     DateTimeField,
@@ -63,6 +64,8 @@ def get_field_type_from_field(field):
         return get_field_type_from_field(related_pk_field)
     if isinstance(field, JSONField):
         return "jsonb"
+    if isinstance(field, BooleanField):
+        return "boolean"
     raise ValueError("Unexpected field type")
 
 
