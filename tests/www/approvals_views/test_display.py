@@ -1,6 +1,5 @@
 from unittest.mock import PropertyMock, patch
 
-import pytest
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from freezegun import freeze_time
@@ -10,9 +9,6 @@ from itou.job_applications.models import JobApplication
 from itou.utils import constants as global_constants
 from tests.job_applications.factories import JobApplicationFactory
 from tests.utils.test import TestCase
-
-
-pytestmark = pytest.mark.ignore_template_errors
 
 
 @patch.object(JobApplication, "can_be_cancelled", new_callable=PropertyMock, return_value=False)
