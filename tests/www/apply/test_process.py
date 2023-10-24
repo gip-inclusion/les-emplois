@@ -1,3 +1,4 @@
+import random
 from itertools import product
 
 import pytest
@@ -9,12 +10,14 @@ from django.utils.http import urlencode
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects, assertTemplateUsed
 
 from itou.approvals.models import Approval, Suspension
+from itou.cities.models import City
 from itou.companies.enums import CompanyKind, ContractType
 from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.employee_record.enums import Status
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.jobs.models import Appellation
 from itou.siae_evaluations.models import Sanctions
 from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId, UserKind
 from itou.utils.models import InclusiveDateRange
@@ -31,6 +34,7 @@ from tests.job_applications.factories import (
     JobApplicationSentByPrescriberOrganizationFactory,
     PriorActionFactory,
 )
+from tests.jobs.factories import create_test_romes_and_appellations
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
 from tests.users.factories import JobSeekerFactory, JobSeekerWithAddressFactory, PrescriberFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
@@ -42,6 +46,14 @@ PRIOR_ACTION_SECTION_TITLE = "Action préalable à l'embauche"
 
 
 class ProcessViewsTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
+        cls.cities = create_test_cities(["54", "57"], num_per_department=2)
+
+    def get_random_city(self):
+        return random.choice(self.cities)
+
     def accept_job_application(self, job_application, post_data=None, city=None, assert_successful=True):
         """
         This is not a test. It's a shortcut to process "apply:accept" view steps:
@@ -309,8 +321,7 @@ class ProcessViewsTest(TestCase):
                 assert job_application.state.is_postponed
 
     def test_accept(self, *args, **kwargs):
-        cities = create_test_cities(["54", "57"], num_per_department=2)
-        city = cities[0]
+        city = self.get_random_city()
         today = timezone.localdate()
 
         job_seeker = JobSeekerWithAddressFactory(city=city.name)
@@ -477,8 +488,7 @@ class ProcessViewsTest(TestCase):
 
     def test_accept_with_active_suspension(self, *args, **kwargs):
         """Test the `accept` transition with active suspension for active user"""
-        cities = create_test_cities(["54", "57"], num_per_department=2)
-        city = cities[0]
+        city = self.get_random_city()
         today = timezone.localdate()
         # the old job of job seeker
         job_seeker_user = JobSeekerWithAddressFactory()
@@ -544,7 +554,7 @@ class ProcessViewsTest(TestCase):
         """
         Test the "manual approval delivery mode" path of the view.
         """
-        [city] = create_test_cities(["57"], num_per_department=1)
+        city = self.get_random_city()
 
         job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
@@ -581,8 +591,7 @@ class ProcessViewsTest(TestCase):
         assert job_application.approval_delivery_mode == job_application.APPROVAL_DELIVERY_MODE_MANUAL
 
     def test_accept_and_update_hiring_start_date_of_two_job_applications(self, *args, **kwargs):
-        cities = create_test_cities(["54", "57"], num_per_department=2)
-        city = cities[0]
+        city = self.get_random_city()
         job_seeker = JobSeekerWithAddressFactory()
         base_for_post_data = {
             "address_line_1": job_seeker.address_line_1,
@@ -680,8 +689,7 @@ class ProcessViewsTest(TestCase):
         assert job_app_starting_later.approval.start_at == job_app_starting_earlier.hiring_start_at
 
     def test_accept_with_double_user(self, *args, **kwargs):
-        cities = create_test_cities(["54"], num_per_department=1)
-        city = cities[0]
+        city = self.get_random_city()
 
         siae = SiaeFactory(with_membership=True)
         job_seeker = JobSeekerWithAddressFactory(city=city.name)
@@ -761,7 +769,7 @@ class ProcessViewsTest(TestCase):
         )
 
     def test_accept_no_nir_update(self, *args, **kwargs):
-        [city] = create_test_cities(["57"], num_per_department=1)
+        city = self.get_random_city()
 
         job_application = JobApplicationSentByJobSeekerFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
@@ -813,7 +821,7 @@ class ProcessViewsTest(TestCase):
         assert job_application.job_seeker.nir == NEW_NIR
 
     def test_accept_no_nir_other_user(self, *args, **kwargs):
-        [city] = create_test_cities(["57"], num_per_department=1)
+        city = self.get_random_city()
 
         job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
@@ -853,7 +861,7 @@ class ProcessViewsTest(TestCase):
         )
 
     def test_accept_no_nir_update_with_reason(self, *args, **kwargs):
-        [city] = create_test_cities(["57"], num_per_department=1)
+        city = self.get_random_city()
 
         job_application = JobApplicationSentByJobSeekerFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
@@ -895,7 +903,7 @@ class ProcessViewsTest(TestCase):
         assert job_application.job_seeker.lack_of_nir_reason == LackOfNIRReason.NO_NIR
 
     def test_accept_lack_of_nir_reason_update(self, *args, **kwargs):
-        [city] = create_test_cities(["57"], num_per_department=1)
+        city = self.get_random_city()
 
         job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
@@ -941,8 +949,6 @@ class ProcessViewsTest(TestCase):
 
     @override_settings(TALLY_URL="https://tally.so")
     def test_accept_lack_of_nir_reason_other_user(self, *args, **kwargs):
-        [city] = create_test_cities(["57"], num_per_department=1)
-
         job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
             job_seeker__nir="",
@@ -1159,8 +1165,7 @@ class ProcessViewsTest(TestCase):
     def test_accept_after_cancel(self, *args, **kwargs):
         # A canceled job application is not linked to an approval
         # unless the job seeker has an accepted job application.
-        cities = create_test_cities(["54", "57"], num_per_department=2)
-        city = cities[0]
+        city = self.get_random_city()
         job_seeker = JobSeekerWithAddressFactory(city=city.name)
         job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_CANCELLED,
