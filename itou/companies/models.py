@@ -19,6 +19,7 @@ from itou.companies.enums import (
     CompanyKind,
     ContractNature,
     ContractType,
+    JobDescriptionSource,
     JobSource,
 )
 from itou.utils.emails import get_email_message
@@ -615,6 +616,14 @@ class SiaeJobDescription(models.Model):
         null=True,
         encoder=DjangoJSONEncoder,
         default=list,
+    )
+
+    # Job descriptions are now directly linked to job applications / hirings (`hired_job`).
+    # If there's no job description, a new one is automatically created at the end of the hiring process.
+    creation_source = models.CharField(
+        verbose_name="source de création de la fiche de poste",
+        choices=JobDescriptionSource.choices,
+        default=JobDescriptionSource.MANUALLY,
     )
 
     objects = SiaeJobDescriptionQuerySet.as_manager()

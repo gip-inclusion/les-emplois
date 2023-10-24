@@ -528,6 +528,15 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     selected_jobs = models.ManyToManyField(
         "companies.SiaeJobDescription", verbose_name="métiers recherchés", blank=True
     )
+    # Job for which the job seeker was hired (may not be among selected_jobs)
+    hired_job = models.ForeignKey(
+        "companies.SiaeJobDescription",
+        verbose_name="poste retenu",
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="hired_job_applications",
+    )
 
     message = models.TextField(verbose_name="message de candidature", blank=True)
     answer = models.TextField(verbose_name="message de réponse", blank=True)
