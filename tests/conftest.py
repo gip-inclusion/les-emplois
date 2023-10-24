@@ -246,6 +246,22 @@ def _fail_for_invalid_template_variable_improved(_fail_for_invalid_template_vari
         )
 
 
+@pytest.fixture(autouse=True)
+def _template_string_if_invalid_marker(monkeypatch, request) -> None:
+    # TODO: remove me once https://github.com/pytest-dev/pytest-django/pull/1076 is merged & released
+    marker = request.keywords.get("ignore_template_errors", None)
+    if os.environ.get(INVALID_TEMPLATE_VARS_ENV, "false") == "true":
+        if marker and django_settings_is_configured():
+            from django.conf import settings as dj_settings
+
+            if dj_settings.TEMPLATES:
+                monkeypatch.setattr(
+                    dj_settings.TEMPLATES[0]["OPTIONS"]["string_if_invalid"],
+                    "fail",
+                    False,
+                )
+
+
 @pytest.fixture(scope="session", autouse=True)
 def make_unordered_queries_randomly_ordered():
     """

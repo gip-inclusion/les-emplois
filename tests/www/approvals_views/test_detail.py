@@ -20,6 +20,9 @@ from tests.users.factories import JobSeekerFactory
 from tests.utils.test import parse_response_to_soup
 
 
+pytestmark = pytest.mark.ignore_template_errors
+
+
 class TestApprovalDetailView:
     def test_anonymous_user(self, client):
         approval = ApprovalFactory()

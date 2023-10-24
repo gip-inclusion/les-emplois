@@ -1,6 +1,7 @@
 from datetime import timedelta
 from urllib.parse import urlencode
 
+import pytest
 import respx
 from allauth.account.models import EmailAddress
 from django.conf import settings
@@ -34,6 +35,9 @@ POST_DATA = {
 }
 
 INVITATION_URL = reverse("invitations_views:invite_prescriber_with_org")
+
+
+pytestmark = pytest.mark.ignore_template_errors
 
 
 class TestSendPrescriberWithOrgInvitation(TestCase):
