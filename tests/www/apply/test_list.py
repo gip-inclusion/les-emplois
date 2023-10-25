@@ -874,6 +874,7 @@ def test_list_for_unauthorized_prescriber_view(client):
         + 3  # count, list & prefetch of job application
         + 1  # get job seekers approvals
         + 1  # check user authorized membership (can_edit_personal_information)
+        + 3  # get job seekers administrative criteria
         + 3  # update session
     ):
         response = client.get(url)

@@ -36,6 +36,35 @@ def _add_pending_for_weeks(job_applications):
         job_app.pending_for_weeks = pending_for_weeks
 
 
+def _add_administrative_criteria(job_applications):
+    diagnoses_ids = tuple(
+        job_application.jobseeker_eligibility_diagnosis
+        for job_application in job_applications
+        if job_application.jobseeker_eligibility_diagnosis is not None
+    )
+
+    diagnosis_criteria = defaultdict(list)
+    for selected_criteria in (
+        SelectedAdministrativeCriteria.objects.filter(eligibility_diagnosis__in=diagnoses_ids)
+        .select_related("administrative_criteria")
+        .order_by("administrative_criteria__level", "administrative_criteria__name")
+    ):
+        diagnosis_criteria[selected_criteria.eligibility_diagnosis_id].append(
+            selected_criteria.administrative_criteria
+        )
+
+    for job_application in job_applications:
+        ja_criteria = diagnosis_criteria[job_application.jobseeker_eligibility_diagnosis]
+        if len(ja_criteria) > 4:
+            # Only show the 3 first
+            extra_nb = len(ja_criteria) - 3
+            ja_criteria = ja_criteria[:3]
+        else:
+            extra_nb = 0
+        job_application.preloaded_administrative_criteria = ja_criteria
+        job_application.preloaded_administrative_criteria_extra_nb = extra_nb
+
+
 @login_required
 @user_passes_test(lambda u: u.is_job_seeker, login_url=reverse_lazy("search:siaes_home"), redirect_field_name=None)
 def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html"):
@@ -88,6 +117,7 @@ def list_for_prescriber(request, template_name="apply/list_for_prescriber.html")
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=10)
     _add_pending_for_weeks(job_applications_page)
     _add_user_can_view_personal_information(job_applications_page, request.user.can_view_personal_information)
+    _add_administrative_criteria(job_applications_page)
 
     context = {
         "job_applications_page": job_applications_page,
@@ -132,35 +162,6 @@ def list_for_prescriber_exports_download(request, month_identifier=None):
         job_applications = job_applications.created_on_given_year_and_month(year, month)
 
     return stream_xlsx_export(job_applications, filename)
-
-
-def _add_administrative_criteria(job_applications):
-    diagnoses_ids = tuple(
-        job_application.jobseeker_eligibility_diagnosis
-        for job_application in job_applications
-        if job_application.jobseeker_eligibility_diagnosis is not None
-    )
-
-    diagnosis_criteria = defaultdict(list)
-    for selected_criteria in (
-        SelectedAdministrativeCriteria.objects.filter(eligibility_diagnosis__in=diagnoses_ids)
-        .select_related("administrative_criteria")
-        .order_by("administrative_criteria__level", "administrative_criteria__name")
-    ):
-        diagnosis_criteria[selected_criteria.eligibility_diagnosis_id].append(
-            selected_criteria.administrative_criteria
-        )
-
-    for job_application in job_applications:
-        ja_criteria = diagnosis_criteria[job_application.jobseeker_eligibility_diagnosis]
-        if len(ja_criteria) > 4:
-            # Only show the 3 first
-            extra_nb = len(ja_criteria) - 3
-            ja_criteria = ja_criteria[:3]
-        else:
-            extra_nb = 0
-        job_application.preloaded_administrative_criteria = ja_criteria
-        job_application.preloaded_administrative_criteria_extra_nb = extra_nb
 
 
 @login_required
