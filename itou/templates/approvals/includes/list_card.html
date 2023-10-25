@@ -1,4 +1,5 @@
 {% load format_filters %}
+{% load str_filters %}
 
 <div class="c-card card my-4 has-links-inside">
     <div class="card-header pb-3">
@@ -13,6 +14,18 @@
                     PASS IAE {{ approval.get_state_display|lower }}
                 </span>
             </div>
+        </div>
+
+        <div class="fs-sm">
+            Nombre de jours restants sur le PASS IAE :
+            {% if approval.is_valid %}
+                {{ approval.remainder.days }} jour{{ approval.remainder.days|pluralizefr }}
+            {% else %}
+                0 jour
+            {% endif %}
+            <i class="ri-information-line ri-xl text-info"
+               data-bs-toggle="tooltip"
+               title="Le reliquat est calculé sur la base d'un nombre de jours calendaires. Si le PASS IAE n'est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i>
         </div>
     </div>
 
