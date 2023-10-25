@@ -81,6 +81,18 @@ class JobApplicationInline(ItouStackedInline):
                 )
             )
 
+        already_exists = None
+        if obj.approval:
+            already_exists = (
+                EmployeeRecord.objects.for_siae(obj.to_siae).filter(approval_number=obj.approval.number).exists()
+            )
+
+        if JobApplication.objects.eligible_as_employee_record(siae=obj.to_siae).filter(pk=obj.pk).exists():
+            return "En attente de création" + (" (doublon)" if already_exists else "")
+
+        if already_exists:  # Put this check after the eligibility to show that one is proposed but is also a duplicate
+            return "Une fiche salarié existe déjà pour ce candidat"
+
         if not obj.to_siae.can_use_employee_record:
             return "La SIAE n'utilise pas les fiches salarié"
 
@@ -89,16 +101,6 @@ class JobApplicationInline(ItouStackedInline):
 
         if obj.hiring_start_at and obj.hiring_start_at < EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE.date():
             return "Date de début du contrat avant l'interopérabilité"
-
-        already_exists = (
-            EmployeeRecord.objects.for_siae(obj.to_siae).filter(approval_number=obj.approval.number).exists()
-        )
-
-        if JobApplication.objects.eligible_as_employee_record(siae=obj.to_siae).filter(pk=obj.pk).exists():
-            return "En attente de création" + (" (doublon)" if already_exists else "")
-
-        if already_exists:  # Put this check after the eligibility to show that one is proposed but is also a duplicate
-            return "Une fiche salarié existe déjà pour ce candidat"
 
         return "-"
 
