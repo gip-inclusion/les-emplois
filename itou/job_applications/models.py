@@ -303,7 +303,6 @@ class JobApplicationQuerySet(models.QuerySet):
             to_siae=siae,
             employee_record__status=employeerecord_enums.Status.NEW,
             employee_record__asp_id=F("to_siae__convention__asp_id"),
-            employee_record__approval_number=F("approval__number"),
         )
 
     def _eligible_job_applications_without_employee_record(self, siae):
