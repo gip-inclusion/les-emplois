@@ -50,7 +50,8 @@ class Command(BaseCommand):
     def _check_orphans(self, dry_run):
         # Report all orphans employee records (bad asp_id)
 
-        orphans = EmployeeRecord.objects.orphans()
+        # Exclude the one that are already DISABLED, and also the ARCHIVED ones as they are now unusable
+        orphans = EmployeeRecord.objects.orphans().exclude(status__in=[Status.DISABLED, Status.ARCHIVED])
 
         self.stdout.write("* Checking orphans employee records:")
 
