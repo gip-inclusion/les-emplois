@@ -190,6 +190,7 @@ class TestApprovalsListView:
             </span>""",
             html=True,
         )
+
         assertContains(
             response,
             """<span class="badge badge-sm rounded-pill text-wrap bg-success-lighter text-success">
@@ -214,3 +215,12 @@ class TestApprovalsListView:
             </span>""",
             html=True,
         )
+
+        # Check IAE pass remainder days
+        assertContains(response, "365 jours")
+
+        assertContains(response, "366 jours")
+
+        assertContains(response, "730 jours")
+
+        assertContains(response, "0 jour")
