@@ -28,6 +28,9 @@
                 <i class="ri-group-line me-2" aria-hidden="true"></i>Orienteur
             {% endif %}
         {% endif %}
+        {% if request.user.is_prescriber %}
+            chez <a href="{% url 'companies_views:card' siae_id=job_application.to_siae.id %}"><strong>{{ job_application.to_siae.display_name }}</strong></a>
+        {% endif %}
 
     </span>
     {# élément à passer au dessus du précédent en vue mobile #}
