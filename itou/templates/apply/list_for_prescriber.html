@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load django_bootstrap5 %}
 {% load static %}
 {% load str_filters %}
 
@@ -7,9 +8,9 @@
 {% block content_title %}<h1>Candidatures</h1>{% endblock %}
 
 {% block content %}
-    <section class="s-section">
-        <div class="s-section__container container">
-            <div class="row">
+    <section class="s-box">
+        <div class="s-box__container container">
+            <div class="s-box__row row">
                 <div class="col-12 col-md-4 mb-3 mb-md-5">
                     <aside class="c-aside-filters">
                         <button class="c-aside-filters__btn__collapse" data-bs-toggle="collapse" data-bs-target="#asideFiltersCollapse" aria-expanded="true" aria-controls="asideFiltersCollapse">
@@ -49,17 +50,17 @@
 
                 <div class="col-12 col-md-8">
                     <section aria-labelledby="results">
-                        <div class="d-flex flex-column flex-sm-row align-items-sm-center">
-                            <h2 id="results" class="mb-0 flex-grow-1">
+                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
+                            <h3 class="h4 mb-0" id="results">
                                 {% with job_applications_page.paginator.count as counter %}
                                     {{ counter }} <strong>résultat{{ counter|pluralizefr }}</strong>
                                 {% endwith %}
-                            </h2>
-                            <div>
+                            </h3>
+                            <div class="flex-column flex-md-row btn-group btn-group-sm btn-group-action" role="group" aria-label="Actions sur les candidatures">
                                 {% include "apply/includes/job_applications_export_button.html" %}
                                 {% if filters_counter > 0 %}
-                                    <a href="{% url 'apply:list_for_prescriber' %}" class="btn btn-link btn-ico ps-0">
-                                        <i class="ri-close-fill"></i>
+                                    <a href="{% url 'apply:list_for_prescriber' %}" class="btn btn-secondary btn-ico mt-3 mt-md-0">
+                                        <i class="ri-arrow-go-back-line" aria-hidden="true"></i>
                                         <span>Réinitialiser les filtres ({{ filters_counter }})</span>
                                     </a>
                                 {% endif %}
@@ -86,15 +87,19 @@
                             </div>
                         {% else %}
                             {% for job_application in job_applications_page %}
-                                <div class="c-card card my-4 has-links-inside">
-                                    {# TODO: when working on this template in the near future, try to refactor with list_card_body_siae.html #}
-                                    {% include "apply/includes/list_card_header.html" with job_application=job_application %}
-                                    {% include "apply/includes/list_card_body.html" with job_application=job_application %}
-                                    <div class="card-footer text-end">
-                                        <a href="{% url 'apply:details_for_prescriber' job_application_id=job_application.id %}?back_url={{ request.get_full_path|urlencode }}"
-                                           class="btn btn-sm btn-outline-primary"
-                                           aria-label="Plus d’informations sur la candidature de {{ job_application.job_seeker.get_full_name|mask_unless:job_application.user_can_view_personal_information }}">
-                                            Plus d’informations
+                                <div class="c-card card my-3 my-md-4 has-links-inside">
+                                    {% include "apply/includes/list_card_body_siae.html" %}
+                                    <div class="card-footer text-end bg-light">
+                                        {% if job_application.pending_for_weeks >= job_application.WEEKS_BEFORE_CONSIDERED_OLD %}
+                                            <span class="d-inline-flex align-items-center text-warning fs-sm">
+                                                <i class="ri-time-line ri-lg me-1"></i>
+                                                En attente de réponse depuis {{ job_application.pending_for_weeks }} semaines.
+                                            </span>
+                                        {% endif %}
+                                        <a class="btn btn-sm btn-outline-primary bg-white"
+                                           href="{% url 'apply:details_for_prescriber' job_application_id=job_application.id %}?back_url={{ request.get_full_path|urlencode }}"
+                                           aria-label="Gérer la candidature de {{ job_application.job_seeker.get_full_name|mask_unless:job_application.user_can_view_personal_information }}"
+                                           Voir sa candidature
                                         </a>
                                     </div>
                                 </div>

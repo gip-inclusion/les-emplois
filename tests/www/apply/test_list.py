@@ -879,7 +879,7 @@ def test_list_for_unauthorized_prescriber_view(client):
     ):
         response = client.get(url)
 
-    assertContains(response, "<b>S… U…</b>", html=True)
+    assertContains(response, '<h3 class="h3 mb-1">S… U…</h3>', html=True)
     # Unfortunately, the job seeker's name is available in the filters
     # assertNotContains(response, "Supersecretname")
 
