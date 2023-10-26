@@ -3,11 +3,11 @@ import datetime
 import os
 
 from django.conf import settings
-from django.core.management.base import BaseCommand
 
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import InstitutionMembership
+from itou.utils.command import BaseCommand
 
 
 class Command(BaseCommand):

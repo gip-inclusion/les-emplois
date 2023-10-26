@@ -1,5 +1,4 @@
-from django.core.management.base import BaseCommand
-
+from itou.utils.command import BaseCommand
 from itou.utils.slack import send_slack_message
 
 

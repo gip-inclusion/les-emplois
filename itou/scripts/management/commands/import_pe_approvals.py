@@ -1,10 +1,10 @@
 import datetime
 
 import pandas as pd
-from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from itou.approvals.models import PoleEmploiApproval
+from itou.utils.command import BaseCommand
 
 
 FLUSH_SIZE = 5000

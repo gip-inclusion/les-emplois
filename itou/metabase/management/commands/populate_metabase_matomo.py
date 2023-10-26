@@ -10,12 +10,12 @@ import httpx
 import tenacity
 from dateutil.rrule import MO, WEEKLY, rrule
 from django.conf import settings
-from django.core.management.base import BaseCommand
 from psycopg import sql
 from sentry_sdk.crons import monitor
 
 from itou.metabase.db import MetabaseDatabaseCursor, create_table
 from itou.utils import constants
+from itou.utils.command import BaseCommand
 
 
 lock = threading.Lock()

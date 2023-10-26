@@ -1,11 +1,11 @@
 import logging
 
-from django.core.management.base import BaseCommand
 from django.utils import timezone
 from sentry_sdk.crons import monitor
 from tqdm import tqdm
 
 from itou.status import models, probes
+from itou.utils.command import BaseCommand
 
 
 logger = logging.getLogger(__name__)

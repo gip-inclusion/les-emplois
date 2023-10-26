@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import CommandError
 
 from itou.common_apps.address.departments import department_from_postcode
 from itou.companies.enums import CompanyKind
@@ -12,6 +12,7 @@ from itou.companies.management.commands._import_siae.utils import (
     sync_structures,
 )
 from itou.companies.models import Company
+from itou.utils.command import BaseCommand
 from itou.utils.python import timeit
 from itou.utils.validators import validate_siret
 

@@ -3,9 +3,9 @@ from io import StringIO
 from os.path import splitext
 
 import django.db.models as models
-from django.core.management.base import BaseCommand
 
 from itou.approvals.models import Approval
+from itou.utils.command import BaseCommand
 
 
 CSV_SEPARATOR = ";"

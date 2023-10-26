@@ -1,7 +1,7 @@
 from django.conf import settings
-from django.core.management.base import BaseCommand
 
 from itou.files.models import File
+from itou.utils.command import BaseCommand
 from itou.utils.storage.s3 import TEMPORARY_STORAGE_PREFIX, s3_client
 
 

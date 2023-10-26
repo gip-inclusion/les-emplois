@@ -1,6 +1,5 @@
 from time import sleep
 
-from django.core.management.base import BaseCommand
 from django.db import transaction
 
 from itou.cities.models import City
@@ -8,6 +7,7 @@ from itou.companies.enums import POLE_EMPLOI_SIRET, ContractNature, ContractType
 from itou.companies.models import Company, JobDescription
 from itou.jobs.models import Appellation
 from itou.utils.apis import pe_api_enums, pole_emploi_api_client
+from itou.utils.command import BaseCommand
 from itou.utils.sync import DiffItemKind, yield_sync_diff
 
 

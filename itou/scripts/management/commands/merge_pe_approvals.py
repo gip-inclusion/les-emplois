@@ -1,8 +1,8 @@
-from django.core.management.base import BaseCommand
 from django.db import connection
 from tqdm import tqdm
 
 from itou.approvals.models import MergedPoleEmploiApproval, PoleEmploiApproval
+from itou.utils.command import BaseCommand
 
 
 class Command(BaseCommand):

@@ -1,11 +1,11 @@
 from time import sleep
 
-from django.core.management.base import BaseCommand
 from django.db.models import Q
 from django.utils import timezone
 
 from itou.approvals import models as approvals_models
 from itou.utils.apis import enums as api_enums
+from itou.utils.command import BaseCommand
 
 
 class Command(BaseCommand):

@@ -3,7 +3,6 @@ from io import BytesIO
 
 import paramiko
 from django.conf import settings
-from django.core.management.base import BaseCommand
 from django.utils import timezone
 from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
@@ -12,6 +11,7 @@ from itou.employee_record import constants
 from itou.employee_record.enums import NotificationStatus
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, EmployeeRecordUpdateNotification, Status
 from itou.employee_record.serializers import EmployeeRecordSerializer, EmployeeRecordUpdateNotificationSerializer
+from itou.utils.command import BaseCommand
 from itou.utils.iterators import chunks
 
 

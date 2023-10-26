@@ -14,7 +14,7 @@ and thus we need a proper tool to manage columns by their
 name instead of hardcoding column numbers as in `field = row[42]`.
 
 """
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import CommandError
 from django.utils import timezone
 
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS
@@ -30,6 +30,7 @@ from itou.companies.management.commands._import_siae.utils import could_siae_be_
 from itou.companies.management.commands._import_siae.vue_af import ACTIVE_SIAE_KEYS
 from itou.companies.management.commands._import_siae.vue_structure import ASP_ID_TO_SIAE_ROW
 from itou.companies.models import Company, SiaeConvention
+from itou.utils.command import BaseCommand
 from itou.utils.emails import send_email_messages
 from itou.utils.python import timeit
 

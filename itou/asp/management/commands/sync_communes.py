@@ -3,7 +3,6 @@ import json
 from datetime import datetime
 
 from django.contrib.postgres.search import TrigramSimilarity
-from django.core.management.base import BaseCommand
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import transaction
 from django.db.models import F, Q
@@ -12,6 +11,7 @@ from django.db.models.deletion import RestrictedError
 from itou.asp.models import Commune
 from itou.cities.models import City
 from itou.users.models import JobSeekerProfile
+from itou.utils.command import BaseCommand
 from itou.utils.sync import DiffItemKind, yield_sync_diff
 
 

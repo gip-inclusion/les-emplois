@@ -1,7 +1,7 @@
-from django.core.management.base import BaseCommand
 from django.db.models import Q
 
 from itou.approvals.models import Approval, OriginalPoleEmploiApproval, PoleEmploiApproval
+from itou.utils.command import BaseCommand
 
 
 INDENT = " " * 2

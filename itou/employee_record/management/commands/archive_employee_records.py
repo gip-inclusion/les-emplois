@@ -1,7 +1,7 @@
-from django.core.management.base import BaseCommand
 from django.db import transaction
 
 from itou.employee_record.models import EmployeeRecord
+from itou.utils.command import BaseCommand
 
 
 class Command(BaseCommand):

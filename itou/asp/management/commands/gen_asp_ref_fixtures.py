@@ -10,8 +10,8 @@ from datetime import datetime
 
 import pandas as pd
 from django.conf import settings
-from django.core.management.base import BaseCommand
 
+from itou.utils.command import BaseCommand
 from itou.utils.management_commands import DeprecatedLoggerMixin
 
 

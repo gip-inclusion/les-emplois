@@ -1,11 +1,11 @@
 import django.db.transaction as transaction
-from django.core.management.base import BaseCommand
 from django.db.models import F, Max
 from django.db.models.functions import Greatest
 from django.utils import timezone
 
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification
+from itou.utils.command import BaseCommand
 
 
 class Command(BaseCommand):

@@ -1,7 +1,7 @@
 import pandas as pd
-from django.core.management.base import BaseCommand
 
 from itou.approvals.models import PoleEmploiApproval
+from itou.utils.command import BaseCommand
 
 
 def update_approval(row, wet_run, stdout):

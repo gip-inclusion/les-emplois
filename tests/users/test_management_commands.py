@@ -488,6 +488,11 @@ class TestCommandNewUsersToMailJet:
                 logging.INFO,
                 f"MailJet processed batch for list ID {NEW_SIAE_LISTID} in 5025 seconds.",
             ),
+            (
+                "itou.users.management.commands.new_users_to_mailjet",
+                logging.INFO,
+                "Management command itou.users.management.commands.new_users_to_mailjet succeeded in 0.00 seconds",
+            ),
         ]
 
     @freeze_time("2023-05-02")
@@ -634,6 +639,11 @@ class TestCommandNewUsersToMailJet:
                 logging.INFO,
                 f"MailJet processed batch for list ID {NEW_PRESCRIBERS_LISTID} in 45 seconds.",
             ),
+            (
+                "itou.users.management.commands.new_users_to_mailjet",
+                logging.INFO,
+                "Management command itou.users.management.commands.new_users_to_mailjet succeeded in 0.00 seconds",
+            ),
         ]
 
     @freeze_time("2023-05-02")
@@ -733,6 +743,11 @@ class TestCommandNewUsersToMailJet:
                 "itou.users.management.commands.new_users_to_mailjet",
                 logging.INFO,
                 f"MailJet processed batch for list ID {NEW_ORIENTEURS_LISTID} in 45 seconds.",
+            ),
+            (
+                "itou.users.management.commands.new_users_to_mailjet",
+                logging.INFO,
+                "Management command itou.users.management.commands.new_users_to_mailjet succeeded in 0.00 seconds",
             ),
         ]
 
@@ -850,6 +865,11 @@ class TestCommandNewUsersToMailJet:
                 logging.INFO,
                 f"MailJet processed batch for list ID {NEW_SIAE_LISTID} in 60 seconds.",
             ),
+            (
+                "itou.users.management.commands.new_users_to_mailjet",
+                logging.INFO,
+                "Management command itou.users.management.commands.new_users_to_mailjet succeeded in 0.00 seconds",
+            ),
         ]
 
     @freeze_time("2023-05-02")
@@ -925,6 +945,11 @@ class TestCommandNewUsersToMailJet:
                 logging.INFO,
                 f"MailJet processed batch for list ID {NEW_SIAE_LISTID} in 49 seconds.",
             ),
+            (
+                "itou.users.management.commands.new_users_to_mailjet",
+                logging.INFO,
+                "Management command itou.users.management.commands.new_users_to_mailjet succeeded in 0.00 seconds",
+            ),
         ]
 
     @freeze_time("2026-05-02")
@@ -945,6 +970,11 @@ class TestCommandNewUsersToMailJet:
             ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "PE prescribers count: 0"),
             ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Prescribers count: 0"),
             ("itou.users.management.commands.new_users_to_mailjet", logging.INFO, "Orienteurs count: 0"),
+            (
+                "itou.users.management.commands.new_users_to_mailjet",
+                logging.INFO,
+                "Management command itou.users.management.commands.new_users_to_mailjet succeeded in 0.00 seconds",
+            ),
         ]
 
 

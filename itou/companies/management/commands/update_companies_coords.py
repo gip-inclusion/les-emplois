@@ -20,10 +20,9 @@ address of a structure, only stores it upon its creation.
 """
 import logging
 
-from django.core.management.base import BaseCommand
-
 from itou.common_apps.address.models import geolocate_qs
 from itou.companies.models import Company
+from itou.utils.command import BaseCommand
 
 
 logger = logging.getLogger(__name__)
