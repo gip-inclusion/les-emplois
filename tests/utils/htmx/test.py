@@ -1,7 +1,6 @@
 from urllib.parse import urlparse
 
 import pytest
-from bs4 import NavigableString
 from django.test.client import Client
 
 from tests.utils.test import TestCase, parse_response_to_soup
@@ -99,13 +98,5 @@ def update_page_with_htmx(page, select_htmx_element, htmx_response):
     )
 
 
-def _normalize_soup_element(elt):
-    if isinstance(elt, NavigableString):
-        return elt.string.strip()
-    return elt.prettify()
-
-
 def assertSoupEqual(soup1, soup2):
-    pretty_soup1 = [_normalize_soup_element(elt) for elt in soup1.contents]
-    pretty_soup2 = [_normalize_soup_element(elt) for elt in soup2.contents]
-    assert pretty_soup1 == pretty_soup2
+    assert soup1.prettify() == soup2.prettify()
