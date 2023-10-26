@@ -169,6 +169,10 @@ FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 DATABASES = {
     "default": {
         "ATOMIC_REQUESTS": True,
+        # Since we have the health checks enabled, no need to define a max age:
+        # if the connection was closed on the database side, the check will detect it
+        "CONN_MAX_AGE": None,
+        "CONN_HEALTH_CHECKS": True,
         "ENGINE": "django.contrib.gis.db.backends.postgis",
         "NAME": os.getenv("POSTGRESQL_ADDON_DB"),
         # The custom iptables rules forces us to use the direct host and port in production, the
@@ -184,12 +188,6 @@ DATABASES = {
 }
 
 SQL_DEBUG = bool(os.getenv("SQL_DEBUG"))
-
-if os.getenv("DATABASE_PERSISTENT_CONNECTIONS") == "True":
-    # Since we have the health checks enabled, no need to define a max age:
-    # if the connection was closed on the database side, the check will detect it
-    DATABASES["default"]["CONN_MAX_AGE"] = None
-    DATABASES["default"]["CONN_HEALTH_CHECKS"] = True
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
