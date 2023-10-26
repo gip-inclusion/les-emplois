@@ -2,7 +2,6 @@
 envs/dev.env
 envs/prod.env
 envs/secrets.env
-.envrc
 
 # Config
 docker-compose-prod.yml
