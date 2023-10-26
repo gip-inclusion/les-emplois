@@ -54,7 +54,7 @@
         {% if preview_mode %}
             <!-- Modal -->
             <div class="modal" id="email-confirmation-modal" tabindex="-1" role="dialog" aria-labelledby="email-confirmation-label" aria-modal="true">
-                <div class="modal-dialog">
+                <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h3 class="modal-title" id="email-confirmation-label">Email existant</h3>
@@ -78,7 +78,7 @@
                         </div>
                         <div class="modal-footer">
                             {# Reload this page with a new form. #}
-                            {% bootstrap_button "Ce n'est pas mon candidat" button_type="submit" button_class="btn btn-sm btn-secondary" name="cancel" value="1" %}
+                            {% bootstrap_button "Ce n'est pas mon candidat" button_type="submit" button_class="btn btn-sm btn-outline-primary" name="cancel" value="1" %}
                             {# Go to the next step. #}
                             {% bootstrap_button "Continuer" button_type="submit" button_class="btn btn-sm btn-primary" name="confirm" value="1" %}
                         </div>
