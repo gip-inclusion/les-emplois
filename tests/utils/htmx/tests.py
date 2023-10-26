@@ -243,14 +243,10 @@ def test_update_page_with_htmx_hx_target_this():
 
 
 def test_assertSoupEqual():
-    soup = BeautifulSoup(
-        b"""
-          <form hx-post="/somewhere" hx-swap="outerHTML" hx-target="this">
+    first_part = b"""<form hx-post="/somewhere" hx-swap="outerHTML" hx-target="this">
             <input name="csrfmiddlewaretoken" type="hidden" value="1234"/>
-          </form>
-        """,
-        "html5lib",
-    )
-    pretty_soup = BeautifulSoup(soup.prettify().encode(), "html5lib")
-    unpretty_soup = BeautifulSoup(str(soup).encode(), "html5lib")
-    assertSoupEqual(pretty_soup, unpretty_soup)
+          </form>"""
+    second_part = b"""<p>Bla bla bla</p>"""
+    soup_1 = BeautifulSoup(first_part + second_part, "html5lib").body
+    soup_2 = BeautifulSoup(first_part + b"\n\n" + second_part, "html5lib").body
+    assertSoupEqual(soup_2, soup_1)
