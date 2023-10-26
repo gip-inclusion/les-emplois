@@ -5,8 +5,8 @@
 {% include "apply/includes/job_application_accept_form.html" %}
 
 <div class="modal" id="js-confirmation-modal" tabindex="-1" aria-labelledby="confirmation-modal-label" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content modal-centered">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title" id="confirmation-modal-label">Confirmation de l’embauche</h3>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
@@ -18,8 +18,8 @@
                 {% include "siaes/includes/_siae_info.html" with siae=siae %}
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Retour</button>
-                <button class="btn btn-primary" hx-post={{ request.path }} hx-vals='{"confirmed": "True"}' hx-include="#acceptForm">Confirmer
+                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>
+                <button class="btn btn-sm btn-primary" hx-post={{ request.path }} hx-vals='{"confirmed": "True"}' hx-include="#acceptForm">Confirmer
                 </button>
             </div>
         </div>
