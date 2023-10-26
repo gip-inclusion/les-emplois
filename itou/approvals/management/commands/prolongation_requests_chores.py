@@ -1,5 +1,4 @@
 from dateutil.relativedelta import relativedelta
-from django.core.management.base import BaseCommand
 from django.db.models import Q
 from django.template.defaultfilters import pluralize
 from django.utils import timezone
@@ -7,6 +6,7 @@ from django.utils import timezone
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.models import ProlongationRequest
 from itou.approvals.notifications import ProlongationRequestCreatedReminder
+from itou.utils.command import BaseCommand
 
 
 class Command(BaseCommand):

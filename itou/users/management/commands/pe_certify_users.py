@@ -7,7 +7,6 @@ if needed.
 import logging
 
 import tenacity
-from django.core.management.base import BaseCommand
 from django.db.models import Q
 from django.utils import timezone
 from httpx import RequestError
@@ -20,6 +19,7 @@ from itou.utils.apis.pole_emploi import (
     PoleEmploiAPIException,
     PoleEmploiRateLimitException,
 )
+from itou.utils.command import BaseCommand
 
 
 logger = logging.getLogger(__name__)

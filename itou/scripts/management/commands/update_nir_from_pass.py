@@ -9,7 +9,7 @@ import pandas as pd
 import unidecode
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.core.management.base import BaseCommand
+from itou.utils.command import BaseCommand
 from tqdm import tqdm
 
 from itou.approvals.models import Approval

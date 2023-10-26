@@ -7,12 +7,12 @@ import httpx
 import pandas as pd
 from django.conf import settings
 from django.contrib.gis.geos import Point
-from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.db.models import Q
 
 from itou.users.enums import UserKind
 from itou.users.models import User
+from itou.utils.command import BaseCommand
 
 
 CSV_SEPARATOR = ";"

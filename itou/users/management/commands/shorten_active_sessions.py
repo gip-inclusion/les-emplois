@@ -2,8 +2,9 @@ from importlib import import_module
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
-from django.core.management.base import BaseCommand
 from django.utils import timezone
+
+from itou.utils.command import BaseCommand
 
 
 class Command(BaseCommand):

@@ -1,10 +1,10 @@
 import datetime
 
 from dateutil.relativedelta import relativedelta
-from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from itou.approvals.models import Approval
+from itou.utils.command import BaseCommand
 from itou.utils.management_commands import XlsxExportMixin
 
 

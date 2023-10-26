@@ -1,11 +1,11 @@
 import datetime
 import logging
 
-from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from itou.prescribers.models import PrescriberOrganization
 from itou.utils.apis.api_entreprise import etablissement_get_or_error
+from itou.utils.command import BaseCommand
 
 
 class Command(BaseCommand):

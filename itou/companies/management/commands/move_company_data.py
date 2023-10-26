@@ -1,6 +1,5 @@
 import argparse
 
-from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.db.models import Exists, OuterRef, Subquery
 from django.utils import timezone
@@ -13,6 +12,7 @@ from itou.employee_record.models import EmployeeRecord
 from itou.invitations import models as invitations_models
 from itou.job_applications import models as job_applications_models
 from itou.users import models as users_models
+from itou.utils.command import BaseCommand
 
 
 HELP_TEXT = """

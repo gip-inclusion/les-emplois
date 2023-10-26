@@ -1,8 +1,8 @@
-from django.core.management.base import BaseCommand
 from django.db.models import Count, Q
 
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
+from itou.utils.command import BaseCommand
 from itou.utils.management_commands import XlsxExportMixin
 
 

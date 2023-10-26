@@ -1,12 +1,11 @@
 import argparse
 
-from django.core.management.base import BaseCommand
-
 from itou.approvals.enums import Origin
 from itou.approvals.models import Approval
 from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.utils.command import BaseCommand
 
 
 class Command(BaseCommand):

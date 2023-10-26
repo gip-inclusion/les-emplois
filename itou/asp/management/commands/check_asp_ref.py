@@ -1,9 +1,9 @@
 import json
 
-from django.core.management.base import BaseCommand
 from django.utils import dateparse
 
 from itou.asp import models
+from itou.utils.command import BaseCommand
 
 
 class Command(BaseCommand):

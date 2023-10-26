@@ -24,7 +24,6 @@ from collections import OrderedDict
 
 import tenacity
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.core.management.base import BaseCommand
 from django.db.models import Count, Max, Min, Prefetch, Q
 from django.utils import timezone
 from sentry_sdk.crons import monitor
@@ -76,6 +75,7 @@ from itou.siae_evaluations.models import (
 )
 from itou.users.enums import UserKind
 from itou.users.models import User
+from itou.utils.command import BaseCommand
 from itou.utils.python import timeit
 
 

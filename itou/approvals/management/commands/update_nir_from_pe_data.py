@@ -2,10 +2,10 @@ import csv
 from dataclasses import dataclass
 
 from django.core.exceptions import ValidationError
-from django.core.management.base import BaseCommand
 from tqdm import tqdm
 
 from itou.approvals.models import PoleEmploiApproval
+from itou.utils.command import BaseCommand
 from itou.utils.validators import validate_nir
 
 

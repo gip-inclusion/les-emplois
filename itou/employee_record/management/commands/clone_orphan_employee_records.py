@@ -1,8 +1,8 @@
 import django.db.transaction as transaction
-from django.core.management.base import BaseCommand
 
 from itou.companies import models as companies_models
 from itou.employee_record.models import EmployeeRecord
+from itou.utils.command import BaseCommand
 
 
 class Command(BaseCommand):

@@ -2,7 +2,6 @@ import datetime
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
-from django.core.management.base import BaseCommand
 from django.db.models import Case, F, Value, When
 from django.urls import reverse
 from django.utils import timezone
@@ -12,6 +11,7 @@ from tqdm import tqdm
 from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication
 from itou.users.models import User
+from itou.utils.command import BaseCommand
 from itou.utils.management_commands import DeprecatedLoggerMixin, XlsxExportMixin
 from itou.utils.urls import get_absolute_url
 

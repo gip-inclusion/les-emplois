@@ -1,13 +1,13 @@
 import datetime
 
 from dateutil.relativedelta import relativedelta
-from django.core.management import BaseCommand
 from django.db.models import Exists, F, Max, OuterRef, Q
 from django.utils import timezone
 
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.emails import CampaignEmailFactory, SIAEEmailFactory
 from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria, EvaluatedSiae, EvaluationCampaign
+from itou.utils.command import BaseCommand
 from itou.utils.emails import send_email_messages
 
 

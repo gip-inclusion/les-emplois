@@ -4,11 +4,11 @@ import urllib.parse
 import httpx
 from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
-from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.template.defaultfilters import slugify
 
 from itou.cities.models import City, EditionModeChoices
+from itou.utils.command import BaseCommand
 from itou.utils.sync import DiffItemKind, yield_sync_diff
 
 

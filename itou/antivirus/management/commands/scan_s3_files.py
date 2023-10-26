@@ -9,13 +9,14 @@ import time
 from botocore.exceptions import ConnectionError as BotoConnectionError, HTTPClientError
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import CommandError
 from django.db import transaction
 from django.db.models import F
 from django.utils import timezone
 
 from itou.antivirus.models import Scan
 from itou.files.models import File
+from itou.utils.command import BaseCommand
 from itou.utils.storage.s3 import s3_client
 
 

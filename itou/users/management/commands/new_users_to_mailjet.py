@@ -5,7 +5,6 @@ import time
 import httpx
 from allauth.account.models import EmailAddress
 from django.conf import settings
-from django.core.management import BaseCommand
 from django.db.models import Exists, OuterRef, Q
 from django.utils import timezone
 from sentry_sdk.crons import monitor
@@ -16,6 +15,7 @@ from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
+from itou.utils.command import BaseCommand
 from itou.utils.iterators import chunks
 
 
