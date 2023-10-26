@@ -58,8 +58,8 @@
         <script nonce="{{ CSP_NONCE }}">
             // Adding the "show" CSS class is not enough and not documented.
             // A JS initialization is recommended.
-            const emailConfirmationModal = new bootstrap.Modal("#email-confirmation-modal);
-                    emailConfirmationModal.show();
+            const emailConfirmationModal = new bootstrap.Modal("#email-confirmation-modal");
+            emailConfirmationModal.show();
         </script>
     {% endif %}
 {% endblock %}
