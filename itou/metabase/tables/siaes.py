@@ -3,9 +3,14 @@ from itou.metabase.tables.utils import (
     MetabaseTable,
     get_address_columns,
     get_choice,
+    get_column_from_field,
     get_establishment_is_active_column,
     get_establishment_last_login_date_column,
 )
+
+
+def get_field(name):
+    return Siae._meta.get_field(name)
 
 
 TABLE = MetabaseTable(name="structures")
@@ -44,6 +49,9 @@ TABLE.add_columns(
             "comment": "Source des données de la structure",
             "fn": lambda o: get_choice(choices=Siae.SOURCE_CHOICES, key=o.source),
         },
+        get_column_from_field(get_field("naf"), name="code_naf"),
+        get_column_from_field(get_field("email"), name="email_public"),
+        get_column_from_field(get_field("auth_email"), name="email_authentification"),
     ]
 )
 
