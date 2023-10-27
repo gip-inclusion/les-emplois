@@ -76,13 +76,13 @@ def test_preflight_without_object(snapshot, command):
 
 
 def test_preflight_with_error(snapshot, command):
-    notification = EmployeeRecordUpdateNotificationFactory(
+    EmployeeRecordUpdateNotificationFactory(
         ready_for_transfer=True,
+        employee_record__approval_number="",
+        employee_record__job_application__approval=None,
         # Data used by the snapshot
         pk=42,
     )
-    notification.employee_record.job_application.job_seeker.jobseeker_profile.hexa_commune = None
-    notification.employee_record.job_application.job_seeker.jobseeker_profile.save(update_fields=["hexa_commune"])
 
     command.handle(preflight=True, upload=False, download=False, wet_run=False)
     assert command.stdout.getvalue() == snapshot
