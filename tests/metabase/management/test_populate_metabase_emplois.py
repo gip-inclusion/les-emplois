@@ -896,7 +896,7 @@ def test_populate_users():
 @pytest.mark.usefixtures("metabase")
 def test_populate_memberships():
     siae_m = SiaeMembershipFactory()
-    SiaeMembershipFactory(is_active=False)  # Inactive siaes are ignored.
+    SiaeMembershipFactory(is_active=False)  # Inactive siae memberships are ignored.
     prescriber_m = PrescriberMembershipFactory()
     PrescriberMembershipFactory(is_active=False)
     institution_m = InstitutionMembershipFactory()
