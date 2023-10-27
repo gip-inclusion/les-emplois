@@ -895,11 +895,11 @@ def test_populate_users():
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
 def test_populate_memberships():
-    siae_m = SiaeMembershipFactory()
+    siae_membership = SiaeMembershipFactory()
     SiaeMembershipFactory(is_active=False)  # Inactive siae memberships are ignored.
-    prescriber_m = PrescriberMembershipFactory()
+    prescriber_membership = PrescriberMembershipFactory()
     PrescriberMembershipFactory(is_active=False)
-    institution_m = InstitutionMembershipFactory()
+    institution_membership = InstitutionMembershipFactory()
     InstitutionMembershipFactory(is_active=False)
 
     num_queries = 1  # Count siae memberships
@@ -935,27 +935,27 @@ def test_populate_memberships():
         rows = cursor.fetchall()
         assert rows == [
             (
-                siae_m.user_id,
+                siae_membership.user_id,
                 True,
-                siae_m.siae_id,
+                siae_membership.siae_id,
                 None,
                 None,
                 datetime.date(2023, 2, 1),
             ),
             (
-                prescriber_m.user_id,
+                prescriber_membership.user_id,
                 True,
                 None,
-                prescriber_m.organization_id,
+                prescriber_membership.organization_id,
                 None,
                 datetime.date(2023, 2, 1),
             ),
             (
-                institution_m.user_id,
+                institution_membership.user_id,
                 True,
                 None,
                 None,
-                institution_m.institution_id,
+                institution_membership.institution_id,
                 datetime.date(2023, 2, 1),
             ),
         ]
