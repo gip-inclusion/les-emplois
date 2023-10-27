@@ -318,12 +318,13 @@ class ApprovalModelTest(TestCase):
         # With an existing valid `PoleEmploiApproval`.
 
         user = JobSeekerFactory()
+        job_application = JobApplicationFactory(job_seeker=user)
         valid_pe_approval = PoleEmploiApprovalFactory(
             pole_emploi_id=user.pole_emploi_id,
             birthdate=user.birthdate,
             number="625741810182",
         )
-        approval = user.get_or_create_approval()
+        approval = user.get_or_create_approval(origin_job_application=job_application)
 
         assert isinstance(approval, Approval)
         assert approval.start_at == valid_pe_approval.start_at
@@ -332,12 +333,17 @@ class ApprovalModelTest(TestCase):
         assert approval.user == user
         assert approval.created_by is None
         assert approval.origin == Origin.PE_APPROVAL
+        assert approval.origin_siae_kind == job_application.to_company.kind
+        assert approval.origin_siae_siret == job_application.to_company.siret
+        assert approval.origin_sender_kind == job_application.sender_kind
+        assert approval.origin_prescriber_organization_kind == ""
 
         # With an existing valid `Approval`.
 
         user = JobSeekerFactory()
+        job_application = JobApplicationFactory(job_seeker=user, sent_by_authorized_prescriber_organisation=True)
         valid_approval = ApprovalFactory(user=user, start_at=timezone.localdate() - relativedelta(days=1))
-        approval = user.get_or_create_approval()
+        approval = user.get_or_create_approval(origin_job_application=job_application)
         assert isinstance(approval, Approval)
         assert approval == valid_approval
 

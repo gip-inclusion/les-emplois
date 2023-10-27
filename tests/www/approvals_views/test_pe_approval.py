@@ -231,6 +231,10 @@ class PoleEmploiApprovalCreateTest(TestCase):
         converted_approval = new_user.approvals.get()
         assert converted_approval.number == self.pe_approval.number
         assert converted_approval.origin == approvals_enums.Origin.PE_APPROVAL
+        assert converted_approval.origin_siae_kind == self.company.kind
+        assert converted_approval.origin_siae_siret == self.company.siret
+        assert converted_approval.origin_sender_kind == job_applications_enums.SenderKind.EMPLOYER
+        assert converted_approval.origin_prescriber_organization_kind == ""
         assert new_user.last_accepted_job_application.origin == job_applications_enums.Origin.PE_APPROVAL
 
     def test_from_existing_user_without_approval(self):
@@ -255,6 +259,10 @@ class PoleEmploiApprovalCreateTest(TestCase):
         converted_approval = job_seeker.approvals.get()
         assert converted_approval.number == self.pe_approval.number
         assert converted_approval.origin == approvals_enums.Origin.PE_APPROVAL
+        assert converted_approval.origin_siae_kind == self.company.kind
+        assert converted_approval.origin_siae_siret == self.company.siret
+        assert converted_approval.origin_sender_kind == job_applications_enums.SenderKind.EMPLOYER
+        assert converted_approval.origin_prescriber_organization_kind == ""
         assert job_seeker.last_accepted_job_application.origin == job_applications_enums.Origin.PE_APPROVAL
 
     def test_when_pole_emploi_approval_has_already_been_imported(self):

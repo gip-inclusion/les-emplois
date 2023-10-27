@@ -560,7 +560,7 @@ class User(AbstractUser, AddressMixin):
             and not (is_sent_by_authorized_prescriber or has_valid_diagnosis)
         )
 
-    def get_or_create_approval(self):
+    def get_or_create_approval(self, origin_job_application):
         """
         Returns an existing valid Approval or create a new entry from
         a pre-existing valid PoleEmploiApproval by copying its data.
@@ -579,6 +579,7 @@ class User(AbstractUser, AddressMixin):
             user=self,
             number=pe_approval.number,
             origin=Origin.PE_APPROVAL,
+            **Approval.get_origin_kwargs(origin_job_application),
         )
         approval_from_pe.save()
         return approval_from_pe
