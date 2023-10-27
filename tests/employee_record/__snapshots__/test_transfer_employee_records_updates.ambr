@@ -44,9 +44,9 @@
   Found 1 object(s) to check, split in chunks of 700 objects.
   Checking file #1 (chunk of 1 objects)
   ERROR: serialization of EmployeeRecordUpdateNotification object (42) failed!
-  > Got AttributeError when attempting to get a value for field `codeinseecom` on serializer `_AddressSerializer`.
-  > The serializer field might be named incorrectly and not match any attribute or key on the `User` instance.
-  > Original exception text was: 'NoneType' object has no attribute 'code'.
+  > Got AttributeError when attempting to get a value for field `passDateDeb` on serializer `_PersonSerializer`.
+  > The serializer field might be named incorrectly and not match any attribute or key on the `EmployeeRecord` instance.
+  > Original exception text was: 'NoneType' object has no attribute 'start_at'.
   
   '''
 # ---

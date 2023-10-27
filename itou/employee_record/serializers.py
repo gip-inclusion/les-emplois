@@ -51,8 +51,8 @@ class _PersonSerializer(serializers.Serializer):
     dateNaissance = serializers.DateField(format="%d/%m/%Y", source="job_seeker.birthdate")
 
     codeDpt = serializers.CharField(source="job_seeker.birth_place.department_code", required=False)
-    codeInseePays = serializers.CharField(source="job_seeker.jobseeker_profile.birth_country.code")
-    codeGroupePays = serializers.CharField(source="job_seeker.jobseeker_profile.birth_country.group")
+    codeInseePays = serializers.CharField(source="job_seeker.jobseeker_profile.birth_country.code", allow_null=True)
+    codeGroupePays = serializers.CharField(source="job_seeker.jobseeker_profile.birth_country.group", allow_null=True)
 
     # codeComInsee is only mandatory if birth country is France
     codeComInsee = serializers.SerializerMethodField(required=False)
@@ -96,7 +96,7 @@ class _AddressSerializer(serializers.Serializer):
     adrLibelleVoie = serializers.SerializerMethodField()
     adrCpltDistribution = serializers.SerializerMethodField()
 
-    codeinseecom = serializers.CharField(source="jobseeker_profile.hexa_commune.code")
+    codeinseecom = serializers.CharField(source="jobseeker_profile.hexa_commune.code", allow_null=True)
     codepostalcedex = serializers.CharField(source="jobseeker_profile.hexa_post_code")
 
     def get_adrCpltDistribution(self, obj: User) -> str | None:

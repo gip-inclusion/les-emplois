@@ -43,10 +43,10 @@
   Preflight activated, checking for possible serialization errors...
   Found 1 object(s) to check, split in chunks of 700 objects.
   Checking file #1 (chunk of 1 objects)
-  ERROR: serialization of PK:42 PASS:XXXXX3724456 SIRET:17483349486512 JA:49536a29-88b5-49c3-8c46-333bbbc36308 JOBSEEKER:Jonathan MARTINEZ — email@example.com STATUS:READY ASP_ID:21 failed!
-  > Got AttributeError when attempting to get a value for field `codeinseecom` on serializer `_AddressSerializer`.
-  > The serializer field might be named incorrectly and not match any attribute or key on the `User` instance.
-  > Original exception text was: 'NoneType' object has no attribute 'code'.
+  ERROR: serialization of PK:42 PASS: SIRET:17483349486512 JA:49536a29-88b5-49c3-8c46-333bbbc36308 JOBSEEKER:Jonathan MARTINEZ — email@example.com STATUS:READY ASP_ID:21 failed!
+  > Got AttributeError when attempting to get a value for field `passDateDeb` on serializer `_PersonSerializer`.
+  > The serializer field might be named incorrectly and not match any attribute or key on the `EmployeeRecord` instance.
+  > Original exception text was: 'NoneType' object has no attribute 'start_at'.
   
   '''
 # ---
