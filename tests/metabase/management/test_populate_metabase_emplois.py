@@ -1095,6 +1095,9 @@ def test_populate_siaes():
     siae = SiaeFactory(
         for_snapshot=True,
         siret="17643069438162",
+        naf="1071A",
+        email="contact@garaje_el_martinet.es",
+        auth_email="secret.ceo@garaje_el_martinet.es",
         with_membership=True,
         with_jobs=True,
         coords="POINT (5.43567 12.123876)",
@@ -1131,6 +1134,9 @@ def test_populate_siaes():
                 "EI",
                 "17643069438162",
                 "Export ASP",
+                "1071A",
+                "contact@garaje_el_martinet.es",
+                "secret.ceo@garaje_el_martinet.es",
                 # Address columns " de la structure mère"
                 "112 rue de la Croix-Nivert",
                 "",
