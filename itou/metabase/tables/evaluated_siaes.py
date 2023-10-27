@@ -10,8 +10,8 @@ TABLE = MetabaseTable(name="cap_structures")
 TABLE.add_columns(
     [
         get_column_from_field(get_field("id"), name="id"),
-        get_column_from_field(get_field("evaluation_campaign_id"), name="id_cap_campagne"),
-        get_column_from_field(get_field("siae_id"), name="id_structure"),
+        get_column_from_field(get_field("evaluation_campaign"), name="id_cap_campagne"),
+        get_column_from_field(get_field("siae"), name="id_structure"),
         {
             "name": "état",
             "type": "varchar",

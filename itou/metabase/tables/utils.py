@@ -319,7 +319,7 @@ def hash_content(content):
 def get_common_prolongation_columns(get_field_fn):
     return [
         get_column_from_field(get_field_fn("id"), name="id"),
-        get_column_from_field(get_field_fn("approval_id"), name="id_pass_agrément"),
+        get_column_from_field(get_field_fn("approval"), name="id_pass_agrément"),
         get_column_from_field(get_field_fn("start_at"), name="date_début"),
         get_column_from_field(get_field_fn("end_at"), name="date_fin"),
         {
@@ -329,8 +329,8 @@ def get_common_prolongation_columns(get_field_fn):
             "fn": lambda o: get_choice(choices=ProlongationReason.choices, key=o.reason),
         },
         # Do not inject `reason_explanation` as it contains highly sensitive personal information in practice.
-        get_column_from_field(get_field_fn("declared_by_id"), name="id_utilisateur_déclarant"),
-        get_column_from_field(get_field_fn("declared_by_siae_id"), name="id_structure_déclarante"),
-        get_column_from_field(get_field_fn("validated_by_id"), name="id_utilisateur_prescripteur"),
-        get_column_from_field(get_field_fn("prescriber_organization_id"), name="id_organisation_prescripteur"),
+        get_column_from_field(get_field_fn("declared_by"), name="id_utilisateur_déclarant"),
+        get_column_from_field(get_field_fn("declared_by_siae"), name="id_structure_déclarante"),
+        get_column_from_field(get_field_fn("validated_by"), name="id_utilisateur_prescripteur"),
+        get_column_from_field(get_field_fn("prescriber_organization"), name="id_organisation_prescripteur"),
     ]

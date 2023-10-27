@@ -16,6 +16,6 @@ TABLE.add_columns(
             "comment": "Date de création",
             "fn": lambda o: o.created_at.date(),
         },
-        get_column_from_field(get_field("request_id"), name="id_demande_de_prolongation"),
+        get_column_from_field(get_field("request"), name="id_demande_de_prolongation"),
     ]
 )
