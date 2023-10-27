@@ -12,7 +12,7 @@ TABLE = MetabaseTable(name="collaborations")
 TABLE.add_columns(
     [
         # Do not add an `id` field as it would *not* be unique among various kinds of memberships.
-        get_column_from_field(get_field("user_id"), name="id_utilisateur"),
+        get_column_from_field(get_field("user"), name="id_utilisateur"),
         get_column_from_field(get_field("is_admin"), name="administrateur"),
         {
             "name": "id_structure",
