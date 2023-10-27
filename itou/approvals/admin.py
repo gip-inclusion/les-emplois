@@ -214,6 +214,10 @@ class ApprovalAdmin(ItouModelAdmin):
         "pe_notification_endpoint",
         "pe_notification_exit_code",
         "assigned_company",
+        "origin_prescriber_organization_kind",
+        "origin_sender_kind",
+        "origin_siae_kind",
+        "origin_siae_siret",
     )
     date_hierarchy = "start_at"
     inlines = (

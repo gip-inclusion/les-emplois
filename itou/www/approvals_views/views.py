@@ -700,6 +700,17 @@ def pe_approval_create(request, pe_approval_id):
         )
         return HttpResponseRedirect(next_url)
 
+    # Then we build the necessary JobApplication for redirection
+    job_application = JobApplication(
+        job_seeker=job_seeker,
+        to_company=siae,
+        state=JobApplicationWorkflow.STATE_ACCEPTED,
+        origin=Origin.PE_APPROVAL,  # This origin is specific to this process.
+        sender=request.user,
+        sender_kind=SenderKind.EMPLOYER,
+        sender_siae=siae,
+    )
+
     # Then we create an Approval based on the PoleEmploiApproval data
     approval_from_pe = Approval(
         start_at=pe_approval.start_at,
@@ -707,21 +718,12 @@ def pe_approval_create(request, pe_approval_id):
         user=job_seeker,
         # Only store 12 chars numbers.
         number=pe_approval.number,
-        origin=approvals_enums.Origin.PE_APPROVAL,
+        **Approval.get_origin_kwargs(job_application),
     )
     approval_from_pe.save()
 
-    # Then we create the necessary JobApplication for redirection
-    job_application = JobApplication(
-        job_seeker=job_seeker,
-        to_company=siae,
-        state=JobApplicationWorkflow.STATE_ACCEPTED,
-        approval=approval_from_pe,
-        origin=Origin.PE_APPROVAL,  # This origin is specific to this process.
-        sender=request.user,
-        sender_kind=SenderKind.EMPLOYER,
-        sender_siae=siae,
-    )
+    # Link both and save the application
+    job_application.approval = approval_from_pe
     job_application.save()
 
     messages.success(

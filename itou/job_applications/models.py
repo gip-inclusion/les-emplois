@@ -953,7 +953,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
             if self.job_seeker.has_valid_common_approval:
                 # Automatically reuse an existing valid Itou or PE approval.
-                self.approval = self.job_seeker.get_or_create_approval()
+                self.approval = self.job_seeker.get_or_create_approval(origin_job_application=self)
                 if self.approval.start_at > self.hiring_start_at:
                     # As a job seeker can have multiple contracts at the same time,
                     # the approval should start at the same time as most recent contract.
@@ -974,6 +974,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                     end_at=Approval.get_default_end_date(self.hiring_start_at),
                     user=self.job_seeker,
                     eligibility_diagnosis=self.eligibility_diagnosis,
+                    **Approval.get_origin_kwargs(self),
                 )
                 new_approval.save()
                 self.approval = new_approval

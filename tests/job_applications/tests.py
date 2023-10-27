@@ -1247,6 +1247,10 @@ class JobApplicationWorkflowTest(TestCase):
         assert job_application.approval_number_sent_by_email
         assert job_application.approval_delivery_mode == job_application.APPROVAL_DELIVERY_MODE_AUTOMATIC
         assert job_application.approval.origin == Origin.PE_APPROVAL
+        assert job_application.approval.origin_siae_kind == job_application.to_company.kind
+        assert job_application.approval.origin_siae_siret == job_application.to_company.siret
+        assert job_application.approval.origin_sender_kind == job_application.sender_kind
+        assert job_application.approval.origin_prescriber_organization_kind == ""
         # Check sent emails.
         assert len(mail.outbox) == 2
         # Email sent to the job seeker.
@@ -1266,6 +1270,10 @@ class JobApplicationWorkflowTest(TestCase):
         assert job_application.approval_number_sent_by_email
         assert job_application.approval_delivery_mode == job_application.APPROVAL_DELIVERY_MODE_AUTOMATIC
         assert job_application.approval.origin == Origin.PE_APPROVAL
+        assert job_application.approval.origin_siae_kind == job_application.to_company.kind
+        assert job_application.approval.origin_siae_siret == job_application.to_company.siret
+        assert job_application.approval.origin_sender_kind == job_application.sender_kind
+        assert job_application.approval.origin_prescriber_organization_kind == ""
         # Check sent emails.
         assert len(mail.outbox) == 2
         # Email sent to the job seeker.
@@ -1305,6 +1313,10 @@ class JobApplicationWorkflowTest(TestCase):
         job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is not None
         assert job_application.approval_delivery_mode == JobApplication.APPROVAL_DELIVERY_MODE_AUTOMATIC
+        assert job_application.approval.origin_siae_kind == job_application.to_company.kind
+        assert job_application.approval.origin_siae_siret == job_application.to_company.siret
+        assert job_application.approval.origin_sender_kind == job_application.sender_kind
+        assert job_application.approval.origin_prescriber_organization_kind == ""
         assert len(mail.outbox) == 2
         assert "Candidature acceptée" in mail.outbox[0].subject
         assert "PASS IAE pour " in mail.outbox[1].subject
@@ -1337,6 +1349,10 @@ class JobApplicationWorkflowTest(TestCase):
         job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is not None
         assert job_application.approval_delivery_mode == JobApplication.APPROVAL_DELIVERY_MODE_AUTOMATIC
+        assert job_application.approval.origin_siae_kind == job_application.to_company.kind
+        assert job_application.approval.origin_siae_siret == job_application.to_company.siret
+        assert job_application.approval.origin_sender_kind == SenderKind.JOB_SEEKER
+        assert job_application.approval.origin_prescriber_organization_kind == ""
         assert len(mail.outbox) == 2
         assert "Candidature acceptée" in mail.outbox[0].subject
         assert "PASS IAE pour " in mail.outbox[1].subject
@@ -1354,6 +1370,13 @@ class JobApplicationWorkflowTest(TestCase):
         assert job_application.approval is not None
         assert job_application.approval_number_sent_by_email
         assert job_application.approval_delivery_mode == job_application.APPROVAL_DELIVERY_MODE_AUTOMATIC
+        assert job_application.approval.origin_siae_kind == job_application.to_company.kind
+        assert job_application.approval.origin_siae_siret == job_application.to_company.siret
+        assert job_application.approval.origin_sender_kind == SenderKind.PRESCRIBER
+        assert (
+            job_application.approval.origin_prescriber_organization_kind
+            == job_application.sender_prescriber_organization.kind
+        )
         # Check sent email.
         assert len(mail.outbox) == 3
         # Email sent to the job seeker.
@@ -1378,6 +1401,13 @@ class JobApplicationWorkflowTest(TestCase):
         assert job_application.approval is not None
         assert job_application.approval_number_sent_by_email
         assert job_application.approval_delivery_mode == job_application.APPROVAL_DELIVERY_MODE_AUTOMATIC
+        assert job_application.approval.origin_siae_kind == job_application.to_company.kind
+        assert job_application.approval.origin_siae_siret == job_application.to_company.siret
+        assert job_application.approval.origin_sender_kind == SenderKind.PRESCRIBER
+        assert (
+            job_application.approval.origin_prescriber_organization_kind
+            == job_application.sender_prescriber_organization.kind
+        )
         # Check sent email.
         assert len(mail.outbox) == 3
         # Email sent to the job seeker.
@@ -1410,6 +1440,13 @@ class JobApplicationWorkflowTest(TestCase):
         assert job_application.approval is not None
         assert job_application.approval_number_sent_by_email
         assert job_application.approval_delivery_mode == job_application.APPROVAL_DELIVERY_MODE_AUTOMATIC
+        assert job_application.approval.origin_siae_kind == job_application.to_company.kind
+        assert job_application.approval.origin_siae_siret == job_application.to_company.siret
+        assert job_application.approval.origin_sender_kind == SenderKind.PRESCRIBER
+        assert (
+            job_application.approval.origin_prescriber_organization_kind
+            == job_application.sender_prescriber_organization.kind
+        )
         # Check sent emails.
         assert len(mail.outbox) == 3
         # Email sent to the job seeker.
@@ -1463,6 +1500,10 @@ class JobApplicationWorkflowTest(TestCase):
         assert job_application.approval is not None
         assert job_application.approval_number_sent_by_email
         assert job_application.approval_delivery_mode == job_application.APPROVAL_DELIVERY_MODE_AUTOMATIC
+        assert job_application.approval.origin_siae_kind == job_application.to_company.kind
+        assert job_application.approval.origin_siae_siret == job_application.to_company.siret
+        assert job_application.approval.origin_sender_kind == SenderKind.JOB_SEEKER
+        assert job_application.approval.origin_prescriber_organization_kind == ""
         # Check sent emails.
         assert len(mail.outbox) == 2
         # Email sent to the job seeker.

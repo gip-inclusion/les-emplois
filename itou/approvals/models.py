@@ -428,6 +428,21 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
     # 2023-08-17: An experiment to add a denormalized field “last_suspension_ended_at” did not exhibit large
     # performance improvements, nor huge readability boons. https://github.com/betagouv/itou/pull/2746
 
+    # Origin fields stored to enable
+    origin_siae_siret = models.CharField(verbose_name="siret siae à l'origine du PASS IAE", max_length=14, null=True)
+    origin_siae_kind = models.CharField(
+        verbose_name="type siae à l'origine du PASS IAE", choices=companies_enums.CompanyKind.choices, null=True
+    )
+    origin_sender_kind = models.CharField(
+        verbose_name="origine de la candidature à l'origine du PASS IAE",
+        choices=job_application_enums.SenderKind.choices,
+        null=True,
+    )
+    origin_prescriber_organization_kind = models.CharField(
+        verbose_name="typologie prescripteur à l'origine du PASS IAE",
+        choices=prescribers_enums.PrescriberOrganizationKind.choices,
+    )
+
     objects = ApprovalQuerySet.as_manager()
 
     class Meta:
@@ -697,6 +712,19 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             and not self.is_suspended
             and not self.pending_prolongation_request()
         )
+
+    @staticmethod
+    def get_origin_kwargs(origin_job_application):
+        return {
+            "origin_siae_siret": origin_job_application.to_company.siret,
+            "origin_siae_kind": origin_job_application.to_company.kind,
+            "origin_sender_kind": origin_job_application.sender_kind,
+            "origin_prescriber_organization_kind": (
+                origin_job_application.sender_prescriber_organization.kind
+                if origin_job_application.sender_prescriber_organization
+                else ""
+            ),
+        }
 
     @staticmethod
     def get_next_number():
