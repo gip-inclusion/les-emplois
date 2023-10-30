@@ -29,7 +29,7 @@ class JobApplicationInline(ItouStackedInline):
     can_delete = False
     fields = (
         "job_seeker",
-        "to_siae_link",
+        "to_company_link",
         "hiring_start_at",
         "hiring_end_at",
         "approval",
@@ -46,7 +46,7 @@ class JobApplicationInline(ItouStackedInline):
     list_select_related = ("to_siae",)
 
     # Mandatory for "custom" inline fields
-    readonly_fields = ("employee_record_status", "to_siae_link")
+    readonly_fields = ("employee_record_status", "to_company_link")
 
     def has_change_permission(self, request, obj=None):
         return False
@@ -54,8 +54,8 @@ class JobApplicationInline(ItouStackedInline):
     def has_add_permission(self, request, obj=None):
         return False
 
-    @admin.display(description="SIAE destinataire")
-    def to_siae_link(self, obj):
+    @admin.display(description="Entreprises destinataire")
+    def to_company_link(self, obj):
         return format_html(
             "{} — SIRET : {} ({})",
             get_admin_view_link(obj.to_siae, content=obj.to_siae.display_name),
