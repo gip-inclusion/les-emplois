@@ -211,7 +211,7 @@ class JobApplicationAdmin(ItouModelAdmin):
         created, ignored = [], []
 
         for job_application in queryset:
-            if job_application.employee_record.for_siae(job_application.to_siae).exists():
+            if job_application.employee_record.for_company(job_application.to_siae).exists():
                 ignored.append(job_application)
                 continue
 

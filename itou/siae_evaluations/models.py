@@ -405,7 +405,7 @@ class EvaluationCampaign(models.Model):
 
 
 class EvaluatedSiaeQuerySet(models.QuerySet):
-    def for_siae(self, siae):
+    def for_company(self, siae):
         return self.filter(siae=siae)
 
     def in_progress(self):

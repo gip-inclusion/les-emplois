@@ -113,7 +113,7 @@ class EmployeeRecordQuerySet(models.QuerySet):
         )
 
     # Search queries
-    def for_siae(self, siae):
+    def for_company(self, siae):
         return self.filter(
             job_application__to_siae=siae,
             asp_id=F("job_application__to_siae__convention__asp_id"),

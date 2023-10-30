@@ -187,7 +187,7 @@ class CreateProlongationForm(forms.ModelForm):
             self.instance.end_at = None
 
         # Customize "reason" field
-        self.fields["reason"].choices = ProlongationReason.for_siae(self.instance.declared_by_siae)
+        self.fields["reason"].choices = ProlongationReason.for_company(self.instance.declared_by_siae)
         self.fields["reason"].widget.attrs.update(
             {
                 "hx-trigger": "change",
