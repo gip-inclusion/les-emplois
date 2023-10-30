@@ -9,8 +9,8 @@ from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 
 
-class SiaeStructureSerializer(serializers.ModelSerializer):
-    """Serialize SIAE instance to the data.inclusion structure schema.
+class CompanySerializer(serializers.ModelSerializer):
+    """Serialize Company instance to the data.inclusion structure schema.
 
     Fields are based on https://github.com/betagouv/data-inclusion-schema.
     """
