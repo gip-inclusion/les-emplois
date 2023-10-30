@@ -545,6 +545,13 @@ def stats_dgefp_follow_siae_evaluation(request):
 
 
 @login_required
+def stats_dgefp_follow_prolongation(request):
+    return render_stats_dgefp(
+        request=request, page_title="Suivi des demandes de prolongation", extra_params=get_params_for_whole_country()
+    )
+
+
+@login_required
 def stats_dgefp_iae(request):
     return render_stats_dgefp(
         request=request, page_title="Données des régions", extra_params=get_params_for_whole_country()

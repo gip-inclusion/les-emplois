@@ -160,6 +160,9 @@ METABASE_DASHBOARDS = {
         "tally_popup_form_id": "w2XZxV",
         "tally_embed_form_id": "n9Ba6G",
     },
+    "stats_dgefp_follow_prolongation": {
+        "dashboard_id": 357,
+    },
     "stats_dgefp_iae": {
         "dashboard_id": 117,
     },

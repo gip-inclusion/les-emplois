@@ -239,6 +239,7 @@ def test_stats_dreets_iae_log_visit(client, view_name):
     [
         "stats_dgefp_auto_prescription",
         "stats_dgefp_follow_siae_evaluation",
+        "stats_dgefp_follow_prolongation",
         "stats_dgefp_iae",
         "stats_dgefp_siae_evaluation",
         "stats_dgefp_af",
