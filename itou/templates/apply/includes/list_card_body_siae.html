@@ -6,7 +6,7 @@
 
     <hr />
     <div class="row">
-        <div class="col-12 col-lg-5 mb-3 mb-lg-0">
+        <div class="col-12 {% if job_application.preloaded_administrative_criteria %}col-lg-5 mb-3 mb-lg-0{% endif %}">
             <h3 class="h3 mb-1">
                 {{ job_application.job_seeker.get_full_name|mask_unless:job_application.user_can_view_personal_information }}
             </h3>
