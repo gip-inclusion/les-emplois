@@ -12,7 +12,7 @@ from itou.prescribers.models import PrescriberOrganization
         component_name="DataInclusionStructure",
         serializers={
             "orga": serializers.PrescriberOrgStructureSerializer,
-            "siae": serializers.SiaeStructureSerializer,
+            "siae": serializers.CompanySerializer,
         },
         resource_type_field_name="type",
         many=True,
@@ -75,7 +75,7 @@ class DataInclusionStructureView(generics.ListAPIView):
 
         serializer_class_by_structure_type_str = {
             enums.StructureTypeStr.ORGA: serializers.PrescriberOrgStructureSerializer,
-            enums.StructureTypeStr.SIAE: serializers.SiaeStructureSerializer,
+            enums.StructureTypeStr.SIAE: serializers.CompanySerializer,
         }
 
         return serializer_class_by_structure_type_str[valid_type_str]
