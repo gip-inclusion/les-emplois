@@ -29,7 +29,7 @@ from itou.users.adapter import UserAdapter
 from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, UserKind
 from itou.utils import constants as global_constants
 from itou.utils.nav_history import get_prev_url_from_history, push_url_in_history
-from itou.utils.tokens import siae_signup_token_generator
+from itou.utils.tokens import company_signup_token_generator
 from itou.utils.urls import get_safe_url
 from itou.www.signup import forms
 
@@ -226,7 +226,7 @@ class SiaeBaseView(View):
             self.siae = Company.objects.active().get(pk=siae_id)
         except Company.DoesNotExist:
             self.siae = None
-        if self.siae is None or not siae_signup_token_generator.check_token(siae=self.siae, token=self.token):
+        if self.siae is None or not company_signup_token_generator.check_token(company=self.siae, token=self.token):
             messages.warning(
                 request,
                 "Ce lien d'inscription est invalide ou a expiré. Veuillez procéder à une nouvelle inscription.",

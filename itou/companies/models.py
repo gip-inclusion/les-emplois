@@ -23,7 +23,7 @@ from itou.companies.enums import (
     JobSource,
 )
 from itou.utils.emails import get_email_message
-from itou.utils.tokens import siae_signup_token_generator
+from itou.utils.tokens import company_signup_token_generator
 from itou.utils.urls import get_absolute_url, get_tally_form_url
 from itou.utils.validators import validate_af_number, validate_naf, validate_siret
 
@@ -359,7 +359,7 @@ class Company(AddressMixin, OrganizationAbstract):
         return reverse("signup:siae_user", kwargs={"siae_id": self.pk, "token": self.get_token()})
 
     def get_token(self):
-        return siae_signup_token_generator.make_token(self)
+        return company_signup_token_generator.make_token(self)
 
     def new_signup_activation_email_to_official_contact(self, request):
         """

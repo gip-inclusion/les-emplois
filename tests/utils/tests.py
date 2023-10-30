@@ -42,7 +42,7 @@ from itou.utils.perms.middleware import ItouCurrentOrganizationMiddleware
 from itou.utils.sync import DiffItem, DiffItemKind, yield_sync_diff
 from itou.utils.tasks import sanitize_mailjet_recipients
 from itou.utils.templatetags import dict_filters, format_filters, job_applications
-from itou.utils.tokens import SIAE_SIGNUP_MAGIC_LINK_TIMEOUT, SiaeSignupTokenGenerator
+from itou.utils.tokens import COMPANY_SIGNUP_MAGIC_LINK_TIMEOUT, CompanySignupTokenGenerator
 from itou.utils.urls import (
     add_url_params,
     get_absolute_url,
@@ -891,7 +891,7 @@ class UtilsUrlsTestCase(TestCase):
         assert get_external_link_markup(url=url, text=text) == expected
 
 
-class MockedSiaeSignupTokenGenerator(SiaeSignupTokenGenerator):
+class MockedCompanySignupTokenGenerator(CompanySignupTokenGenerator):
     def __init__(self, now):
         self._now_val = now
 
@@ -899,10 +899,10 @@ class MockedSiaeSignupTokenGenerator(SiaeSignupTokenGenerator):
         return self._now_val
 
 
-class SiaeSignupTokenGeneratorTest(TestCase):
+class CompanySignupTokenGeneratorTest(TestCase):
     def test_make_token(self):
         siae = Company.objects.create()
-        p0 = SiaeSignupTokenGenerator()
+        p0 = CompanySignupTokenGenerator()
         tk1 = p0.make_token(siae)
         assert p0.check_token(siae, tk1) is True
 
@@ -913,30 +913,30 @@ class SiaeSignupTokenGeneratorTest(TestCase):
         """
         siae = Company.objects.create(email="itou@example.com")
         siae_reload = Company.objects.get(email="itou@example.com")
-        p0 = MockedSiaeSignupTokenGenerator(datetime.datetime.now())
+        p0 = MockedCompanySignupTokenGenerator(datetime.datetime.now())
         tk1 = p0.make_token(siae)
         tk2 = p0.make_token(siae_reload)
         assert tk1 == tk2
 
     def test_timeout(self):
         """The token is valid after n seconds, but no greater."""
-        # Uses a mocked version of SiaeSignupTokenGenerator so we can change
+        # Uses a mocked version of CompanySignupTokenGenerator so we can change
         # the value of 'now'.
         siae = Company.objects.create()
-        p0 = SiaeSignupTokenGenerator()
+        p0 = CompanySignupTokenGenerator()
         tk1 = p0.make_token(siae)
-        p1 = MockedSiaeSignupTokenGenerator(
-            datetime.datetime.now() + datetime.timedelta(seconds=(SIAE_SIGNUP_MAGIC_LINK_TIMEOUT - 1))
+        p1 = MockedCompanySignupTokenGenerator(
+            datetime.datetime.now() + datetime.timedelta(seconds=(COMPANY_SIGNUP_MAGIC_LINK_TIMEOUT - 1))
         )
         assert p1.check_token(siae, tk1) is True
-        p2 = MockedSiaeSignupTokenGenerator(
-            datetime.datetime.now() + datetime.timedelta(seconds=(SIAE_SIGNUP_MAGIC_LINK_TIMEOUT + 1))
+        p2 = MockedCompanySignupTokenGenerator(
+            datetime.datetime.now() + datetime.timedelta(seconds=(COMPANY_SIGNUP_MAGIC_LINK_TIMEOUT + 1))
         )
         assert p2.check_token(siae, tk1) is False
 
     def test_check_token_with_nonexistent_token_and_user(self):
         siae = Company.objects.create()
-        p0 = SiaeSignupTokenGenerator()
+        p0 = CompanySignupTokenGenerator()
         tk1 = p0.make_token(siae)
         assert p0.check_token(None, tk1) is False
         assert p0.check_token(siae, None) is False
@@ -948,7 +948,7 @@ class SiaeSignupTokenGeneratorTest(TestCase):
         any new signup invalidates past tokens.
         """
         siae = Company.objects.create()
-        p0 = SiaeSignupTokenGenerator()
+        p0 = CompanySignupTokenGenerator()
         tk1 = p0.make_token(siae)
         assert p0.check_token(siae, tk1) is True
         user = User(kind=UserKind.EMPLOYER)
