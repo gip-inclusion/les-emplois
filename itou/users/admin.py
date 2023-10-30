@@ -385,6 +385,33 @@ class ItouUserAdmin(UserAdmin):
     def jobseeker_profile_link(self, obj):
         return get_admin_view_link(obj.jobseeker_profile) if obj.is_job_seeker else None
 
+    @admin.action(description="Désactiver le compte IC pour changement prescripteur <-> employeur")
+    def free_ic_email(self, request, queryset):
+        try:
+            [user] = queryset
+        except ValueError:
+            messages.error(request, "Vous ne pouvez selectionner qu'un seul utilisateur à la fois")
+            return
+
+        if user.identity_provider != IdentityProvider.INCLUSION_CONNECT:
+            messages.error(request, "Vous devez sélectionner un compte Inclusion Connect")
+            return
+
+        if user.username.startswith("old"):
+            messages.error(request, "Ce compte a déjà été libré de l'emprise d'Inclusion Connect")
+            return
+
+        user.email = f"{user.email}_old"
+        user.username = f"old_{user.username}"
+        user.is_active = False
+        user.save(update_fields=("email", "username", "is_active"))
+        user.prescribermembership_set.update(is_active=False)
+        user.siaemembership_set.update(is_active=False)
+
+        messages.success(request, "L'utilisateur peut à présent se créer un nouveau compte")
+
+    actions = [free_ic_email]
+
     def get_queryset(self, request):
         """
         Exclude superusers. The purpose is to prevent staff users
