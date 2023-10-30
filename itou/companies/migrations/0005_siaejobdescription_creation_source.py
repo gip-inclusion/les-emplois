@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AddField(
-            model_name="siaejobdescription",
+            model_name="jobdescription",
             name="creation_source",
             field=models.CharField(
                 choices=[

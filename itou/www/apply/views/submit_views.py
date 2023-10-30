@@ -18,7 +18,7 @@ from django.views.generic import TemplateView
 
 from itou.approvals.models import Approval
 from itou.companies.enums import CompanyKind
-from itou.companies.models import Company, SiaeJobDescription
+from itou.companies.models import Company, JobDescription
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.files.models import File
@@ -1120,7 +1120,7 @@ class ApplicationResumeView(ApplicationBaseView):
         return super().get_context_data(**kwargs) | {
             "form": self.form,
             "resume_is_recommended": any(
-                SiaeJobDescription.objects.filter(pk__in=self.apply_session.get("selected_jobs", [])).values_list(
+                JobDescription.objects.filter(pk__in=self.apply_session.get("selected_jobs", [])).values_list(
                     "is_resume_mandatory", flat=True
                 )
             ),

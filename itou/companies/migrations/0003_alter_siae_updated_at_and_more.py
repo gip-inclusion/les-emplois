@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
             field=models.DateTimeField(auto_now=True, verbose_name="date de modification"),
         ),
         migrations.AlterField(
-            model_name="siaejobdescription",
+            model_name="jobdescription",
             name="updated_at",
             field=models.DateTimeField(auto_now=True, db_index=True, verbose_name="date de modification"),
         ),

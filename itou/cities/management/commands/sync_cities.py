@@ -92,7 +92,7 @@ class Command(BaseCommand):
         if wet_run:
             with transaction.atomic():
                 # Note: for now we'll let the cron remove the cities since there is very little chance that
-                # a City that is linked to one of our SiaeJobDescriptions would suddenly disappear. Handle that
+                # a City that is linked to one of our JobDescriptions would suddenly disappear. Handle that
                 # case as it happens, by "deactivating" the city by instance: the cron would crash.
                 n_objs, _ = City.objects.filter(code_insee__in=cities_removed_by_api).delete()
                 self.stdout.write(f"> successfully deleted count={n_objs} cities insee_codes={cities_removed_by_api}")

@@ -313,7 +313,7 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.CreateModel(
-            name="SiaeJobDescription",
+            name="JobDescription",
             fields=[
                 ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 (
@@ -439,7 +439,7 @@ class Migration(migrations.Migration):
             model_name="company",
             name="jobs",
             field=models.ManyToManyField(
-                blank=True, through="companies.SiaeJobDescription", to="jobs.appellation", verbose_name="métiers"
+                blank=True, through="companies.JobDescription", to="jobs.appellation", verbose_name="métiers"
             ),
         ),
         migrations.CreateModel(
@@ -584,7 +584,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.AddConstraint(
-            model_name="siaejobdescription",
+            model_name="jobdescription",
             constraint=models.UniqueConstraint(
                 condition=models.Q(
                     ("source_kind__isnull", False),

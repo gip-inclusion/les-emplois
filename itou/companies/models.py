@@ -120,7 +120,7 @@ class CompanyQuerySet(OrganizationQuerySet):
         # See `self.with_count_recent_received_job_apps`.
         sub_query = Subquery(
             (
-                SiaeJobDescription.objects.filter(is_active=True, siae=OuterRef("id"))
+                JobDescription.objects.filter(is_active=True, siae=OuterRef("id"))
                 .values("siae")
                 .annotate(count=Count("pk"))
                 .values("count")
@@ -141,7 +141,7 @@ class CompanyQuerySet(OrganizationQuerySet):
         count_recent_received_job_apps = Cast("count_recent_received_job_apps", output_field=models.FloatField())
 
         # Check if a job description exists before computing the score.
-        has_active_job_desc = Exists(SiaeJobDescription.objects.filter(siae=OuterRef("pk"), is_active=True))
+        has_active_job_desc = Exists(JobDescription.objects.filter(siae=OuterRef("pk"), is_active=True))
 
         # Transform integer into a float to avoid any weird side effect.
         # See self.with_count_active_job_descriptions
@@ -182,7 +182,7 @@ class Company(AddressMixin, OrganizationAbstract):
 
     To retrieve jobs of an siae:
         self.jobs.all()             <QuerySet [<Appellation>, ...]>
-        self.job_description_through.all()     <QuerySet [<SiaeJobDescription>, ...]>
+        self.job_description_through.all()     <QuerySet [<JobDescription>, ...]>
     """
 
     SOURCE_ASP = "ASP"
@@ -227,7 +227,7 @@ class Company(AddressMixin, OrganizationAbstract):
         verbose_name="source de données", max_length=20, choices=SOURCE_CHOICES, default=SOURCE_ASP
     )
 
-    jobs = models.ManyToManyField("jobs.Appellation", verbose_name="métiers", through="SiaeJobDescription", blank=True)
+    jobs = models.ManyToManyField("jobs.Appellation", verbose_name="métiers", through="JobDescription", blank=True)
     members = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         verbose_name="membres",
@@ -501,7 +501,7 @@ class CompanyMembership(MembershipAbstract):
         db_table = "siaes_siaemembership"
 
 
-class SiaeJobDescriptionQuerySet(models.QuerySet):
+class JobDescriptionQuerySet(models.QuerySet):
     def with_job_applications_count(self, filters=None):
         if filters:
             filters = Q(**filters)
@@ -555,7 +555,7 @@ class SiaeJobDescriptionQuerySet(models.QuerySet):
         )
 
 
-class SiaeJobDescription(models.Model):
+class JobDescription(models.Model):
     """
     A job description of a position in an SIAE.
     Intermediary model between `jobs.Appellation` and `Company`.
@@ -626,7 +626,7 @@ class SiaeJobDescription(models.Model):
         default=JobDescriptionSource.MANUALLY,
     )
 
-    objects = SiaeJobDescriptionQuerySet.as_manager()
+    objects = JobDescriptionQuerySet.as_manager()
 
     class Meta:
         verbose_name = "fiche de poste"

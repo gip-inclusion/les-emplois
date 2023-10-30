@@ -7,10 +7,10 @@ from freezegun import freeze_time
 
 from itou.cities.models import City
 from itou.companies.enums import CompanyKind, ContractType
-from itou.companies.models import SiaeJobDescription
+from itou.companies.models import JobDescription
 from itou.jobs.models import Appellation
 from itou.www.companies_views.views import ITOU_SESSION_JOB_DESCRIPTION_KEY
-from tests.companies.factories import SiaeFactory, SiaeJobDescriptionFactory
+from tests.companies.factories import JobDescriptionFactory, SiaeFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import JobSeekerFactory
@@ -47,8 +47,8 @@ class JobDescriptionAbstractTest(TestCase):
         )
         siae.jobs.add(*self.appellations)
 
-        # Make sure at least two SiaeJobDescription have a location
-        SiaeJobDescription.objects.filter(pk=siae.job_description_through.last().pk).update(
+        # Make sure at least two JobDescription have a location
+        JobDescription.objects.filter(pk=siae.job_description_through.last().pk).update(
             location=City.objects.create(
                 name="Rennes",
                 slug="rennes",
@@ -58,7 +58,7 @@ class JobDescriptionAbstractTest(TestCase):
                 coords=Point(-1.7, 45),
             )
         )
-        SiaeJobDescription.objects.filter(pk=siae.job_description_through.first().pk).update(
+        JobDescription.objects.filter(pk=siae.job_description_through.first().pk).update(
             location=City.objects.create(
                 name="Lille",
                 slug="lille",
@@ -199,7 +199,7 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
         assertMessages(response, [(messages.ERROR, "La fiche de poste que vous souhaitiez modifier n'existe plus.")])
 
         # Trying to update job description from an other SIAE does nothing
-        other_siae_job_description = SiaeJobDescriptionFactory(is_active=False)
+        other_siae_job_description = JobDescriptionFactory(is_active=False)
         response = self.client.post(
             self.url,
             data={
@@ -228,7 +228,7 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
         assertMessages(response, [(messages.SUCCESS, "La fiche de poste a été supprimée.")])
 
         with pytest.raises(ObjectDoesNotExist):
-            SiaeJobDescription.objects.get(pk=job_description.id)
+            JobDescription.objects.get(pk=job_description.id)
 
         # Second delete does not crash (and simply does nothing)
         response = self.client.post(self.url, data=post_data)
@@ -236,7 +236,7 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
         assertMessages(response, [(messages.WARNING, "La fiche de poste que vous souhaitez supprimer n'existe plus.")])
 
         # Trying to delete job description from an other SIAE does nothing
-        other_siae_job_description = SiaeJobDescriptionFactory()
+        other_siae_job_description = JobDescriptionFactory()
         response = self.client.post(
             self.url,
             data={
@@ -246,7 +246,7 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
         )
         self.assertRedirects(response, self.url)
         assertMessages(response, [(messages.WARNING, "La fiche de poste que vous souhaitez supprimer n'existe plus.")])
-        assert SiaeJobDescription.objects.filter(pk=other_siae_job_description.pk).exists()
+        assert JobDescription.objects.filter(pk=other_siae_job_description.pk).exists()
 
 
 class EditJobDescriptionViewTest(JobDescriptionAbstractTest):

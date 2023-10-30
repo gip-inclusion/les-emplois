@@ -13,9 +13,9 @@ from itou.utils import constants as global_constants
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_NO_RESULT_MOCK, BAN_GEOCODING_API_RESULT_MOCK
 from tests.cities.factories import create_city_vannes
 from tests.companies.factories import (
+    JobDescriptionFactory,
     SiaeConventionFactory,
     SiaeFactory,
-    SiaeJobDescriptionFactory,
     SiaeWith2MembershipsFactory,
     SiaeWithMembershipAndJobsFactory,
 )
@@ -56,7 +56,7 @@ class CardViewTest(TestCase):
 
     def test_card_no_active_jobs(self):
         siae = SiaeFactory(name="les petits jardins", with_membership=True)
-        job_description = SiaeJobDescriptionFactory(
+        job_description = JobDescriptionFactory(
             siae=siae,
             custom_name="Plaquiste",
             location=self.vannes,
@@ -176,7 +176,7 @@ class CardViewTest(TestCase):
 
     def test_card_no_other_jobs(self):
         siae = SiaeFactory(name="les petits jardins", with_membership=True)
-        job_description = SiaeJobDescriptionFactory(
+        job_description = JobDescriptionFactory(
             siae=siae,
             custom_name="Plaquiste",
             location=self.vannes,
@@ -278,14 +278,14 @@ class CardViewTest(TestCase):
         siae = SiaeFactory(name="les petits jardins", with_membership=True)
         # Job appellation must be different, the factory picks one at random.
         app1, app2 = Appellation.objects.filter(code__in=["12001", "12007"]).order_by("code")
-        active_job_description = SiaeJobDescriptionFactory(
+        active_job_description = JobDescriptionFactory(
             siae=siae,
             custom_name="Plaquiste",
             location=self.vannes,
             contract_type=ContractType.PERMANENT,
             appellation=app1,
         )
-        other_job_description = SiaeJobDescriptionFactory(
+        other_job_description = JobDescriptionFactory(
             siae=siae,
             custom_name="Peintre",
             location=self.vannes,
@@ -430,7 +430,7 @@ class CardViewTest(TestCase):
 
     def test_block_job_applications(self):
         siae = SiaeFactory(block_job_applications=True)
-        job_description = SiaeJobDescriptionFactory(
+        job_description = JobDescriptionFactory(
             siae=siae,
             custom_name="Plaquiste",
             location=self.vannes,

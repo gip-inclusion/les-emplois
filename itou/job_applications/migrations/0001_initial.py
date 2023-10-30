@@ -157,7 +157,7 @@ class Migration(migrations.Migration):
                 (
                     "selected_jobs",
                     models.ManyToManyField(
-                        blank=True, to="companies.siaejobdescription", verbose_name="métiers recherchés"
+                        blank=True, to="companies.jobdescription", verbose_name="métiers recherchés"
                     ),
                 ),
                 (

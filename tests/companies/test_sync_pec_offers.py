@@ -4,7 +4,7 @@ from django.test import override_settings
 
 from itou.cities.models import City
 from itou.companies.enums import POLE_EMPLOI_SIRET
-from itou.companies.models import SiaeJobDescription
+from itou.companies.models import JobDescription
 from itou.jobs.models import Appellation, Rome
 from itou.utils.mocks.pole_emploi import API_OFFRES
 
@@ -61,7 +61,7 @@ def test_sync_pec_offers(capsys, respx_mock, monkeypatch):
         "> successfully deleted count=0 PE job offers",
     ]
 
-    job_description = SiaeJobDescription.objects.get()
+    job_description = JobDescription.objects.get()
     assert job_description.custom_name == "Mécanicien de maintenance (F/H)."
     assert job_description.location == city
     assert job_description.appellation == appellation
@@ -105,4 +105,4 @@ def test_sync_pec_offers(capsys, respx_mock, monkeypatch):
         "> successfully updated count=0 PE job offers",
         "> successfully deleted count=1 PE job offers",
     ]
-    assert SiaeJobDescription.objects.count() == 0
+    assert JobDescription.objects.count() == 0

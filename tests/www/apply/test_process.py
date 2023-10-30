@@ -26,7 +26,7 @@ from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.apply.forms import AcceptForm
 from tests.approvals.factories import PoleEmploiApprovalFactory, SuspensionFactory
 from tests.cities.factories import create_test_cities
-from tests.companies.factories import SiaeFactory, SiaeJobDescriptionFactory
+from tests.companies.factories import JobDescriptionFactory, SiaeFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import (
@@ -67,7 +67,7 @@ class ProcessViewsTest(TestCase):
         If needed a job description can be passed as parameter, as it is now mandatory for each hiring.
         If not provided, a new one will be created and linked to the given job application.
         """
-        job_description = SiaeJobDescriptionFactory(siae=job_application.to_siae)
+        job_description = JobDescriptionFactory(siae=job_application.to_siae)
 
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url_accept)
@@ -2172,7 +2172,7 @@ def test_select_job_description_for_job_application(client):
     response = client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
 
     # Check optgroup labels
-    job_description = SiaeJobDescriptionFactory(siae=job_application.to_siae, is_active=True)
+    job_description = JobDescriptionFactory(siae=job_application.to_siae, is_active=True)
     response = client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
     assert response.status_code == 200
     assertContains(response, f"{job_description.display_name} - {job_description.display_location}", html=True)
@@ -2181,7 +2181,7 @@ def test_select_job_description_for_job_application(client):
     assertNotContains(response, JOB_DETAILS_LABEL)
 
     # Inactive job description must also appear in select
-    job_description = SiaeJobDescriptionFactory(siae=job_application.to_siae, is_active=False)
+    job_description = JobDescriptionFactory(siae=job_application.to_siae, is_active=False)
     response = client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
     assert response.status_code == 200
     assertContains(response, f"{job_description.display_name} - {job_description.display_location}", html=True)
@@ -2198,7 +2198,7 @@ def test_select_other_job_description_for_job_application(client):
         to_siae__kind=CompanyKind.EI, state=JobApplicationWorkflow.STATE_PROCESSING
     )
     user = job_application.to_siae.members.first()
-    SiaeJobDescriptionFactory(siae=job_application.to_siae, is_active=True)
+    JobDescriptionFactory(siae=job_application.to_siae, is_active=True)
     city = City.objects.order_by("?").first()
     url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
     data = {

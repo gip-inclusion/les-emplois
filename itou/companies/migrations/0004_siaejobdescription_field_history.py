@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AddField(
-            model_name="siaejobdescription",
+            model_name="jobdescription",
             name="field_history",
             field=models.JSONField(
                 default=list,

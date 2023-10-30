@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
                 null=True,
                 on_delete=django.db.models.deletion.SET_NULL,
                 related_name="hired_job_applications",
-                to="companies.siaejobdescription",
+                to="companies.jobdescription",
                 verbose_name="poste retenu",
             ),
         ),

@@ -5,7 +5,7 @@ import factory.fuzzy
 from dateutil.relativedelta import relativedelta
 
 from itou.companies.enums import CompanyKind
-from itou.companies.models import SiaeJobDescription
+from itou.companies.models import JobDescription
 from itou.eligibility.enums import AuthorKind
 from itou.job_applications import models
 from itou.job_applications.enums import Prequalification, ProfessionalSituationExperience, SenderKind
@@ -111,7 +111,7 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
             # A list of jobs were passed in, use them.
             for siae_job_description in extracted:
                 if isinstance(siae_job_description, Appellation):
-                    siae_job_description, _ = SiaeJobDescription.objects.get_or_create(
+                    siae_job_description, _ = JobDescription.objects.get_or_create(
                         siae=self.to_siae, appellation=siae_job_description
                     )
                 self.selected_jobs.add(siae_job_description)

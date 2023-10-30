@@ -9,7 +9,7 @@ from itou.companies.enums import POLE_EMPLOI_SIRET, CompanyKind, ContractNature,
 from itou.companies.models import Company
 from itou.jobs.models import Appellation, Rome
 from tests.cities.factories import create_city_guerande, create_city_saint_andre, create_city_vannes
-from tests.companies.factories import CompanyMembershipFactory, SiaeFactory, SiaeJobDescriptionFactory
+from tests.companies.factories import CompanyMembershipFactory, JobDescriptionFactory, SiaeFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationFactory
@@ -213,7 +213,7 @@ class SearchSiaeTest(TestCase):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         city = create_city_saint_andre()
         siae = SiaeFactory(department="44", coords=city.coords, post_code="44117", with_membership=True)
-        job = SiaeJobDescriptionFactory(siae=siae)
+        job = JobDescriptionFactory(siae=siae)
         JobApplicationFactory.create_batch(20, to_siae=siae, selected_jobs=[job], state="new")
         response = self.client.get(self.url, {"city": city.slug})
         self.assertNotContains(response, """20+<span class="ms-1">candidatures</span>""", html=True)
@@ -287,7 +287,7 @@ class JobDescriptionSearchViewTest(TestCase):
         )
 
         siae = SiaeFactory(department="75", coords=paris_city.coords, post_code="75001")
-        job = SiaeJobDescriptionFactory(siae=siae)
+        job = JobDescriptionFactory(siae=siae)
 
         # Filter on city
         with self.assertNumQueries(
@@ -420,9 +420,9 @@ class JobDescriptionSearchViewTest(TestCase):
         siae = SiaeFactory(department="44", coords=guerande.coords, post_code="44350")
         appellations = Appellation.objects.all()
         # get a different appellation for every job description, since they share the same SIAE
-        job1 = SiaeJobDescriptionFactory(siae=siae, appellation=appellations[0])
-        job2 = SiaeJobDescriptionFactory(siae=siae, appellation=appellations[1])
-        job3 = SiaeJobDescriptionFactory(siae=siae, appellation=appellations[2])
+        job1 = JobDescriptionFactory(siae=siae, appellation=appellations[0])
+        job2 = JobDescriptionFactory(siae=siae, appellation=appellations[1])
+        job3 = JobDescriptionFactory(siae=siae, appellation=appellations[2])
 
         response = self.client.get(self.url, {"city": guerande.slug})
         siaes_results = response.context["results_page"]
@@ -444,7 +444,7 @@ class JobDescriptionSearchViewTest(TestCase):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         city = create_city_saint_andre()
         siae = SiaeFactory(department="44", coords=city.coords, post_code="44117")
-        job = SiaeJobDescriptionFactory(siae=siae)
+        job = JobDescriptionFactory(siae=siae)
         JobApplicationFactory.create_batch(20, to_siae=siae, selected_jobs=[job], state="new")
         response = self.client.get(self.url, {"city": city.slug})
         self.assertNotContains(response, """20+<span class="ms-1">candidatures</span>""", html=True)
@@ -467,8 +467,8 @@ class JobDescriptionSearchViewTest(TestCase):
         st_andre = create_city_saint_andre()
         siae_without_dpt = SiaeFactory(department="", coords=st_andre.coords, post_code="44117", kind=CompanyKind.AI)
         siae = SiaeFactory(department="44", coords=st_andre.coords, post_code="44117", kind=CompanyKind.AI)
-        SiaeJobDescriptionFactory(siae=siae_without_dpt, location=None)
-        SiaeJobDescriptionFactory(siae=siae)
+        JobDescriptionFactory(siae=siae_without_dpt, location=None)
+        JobDescriptionFactory(siae=siae)
         response = self.client.get(self.url, {"city": st_andre.slug})
         assert response.status_code == 200
 
@@ -478,17 +478,15 @@ class JobDescriptionSearchViewTest(TestCase):
         siae = SiaeFactory(department="44", coords=city.coords, post_code="44117")
         appellations = Appellation.objects.filter(code__in=["10357", "10386", "10479"])
 
-        job1 = SiaeJobDescriptionFactory(
-            siae=siae, appellation=appellations[0], contract_type=ContractType.APPRENTICESHIP
-        )
-        job2 = SiaeJobDescriptionFactory(
+        job1 = JobDescriptionFactory(siae=siae, appellation=appellations[0], contract_type=ContractType.APPRENTICESHIP)
+        job2 = JobDescriptionFactory(
             siae=siae, appellation=appellations[1], contract_type=ContractType.BUSINESS_CREATION
         )
 
         inactive_siae = SiaeFactory(
             department="45", coords=city.coords, post_code="44117", kind=CompanyKind.EI, convention=None
         )
-        job3 = SiaeJobDescriptionFactory(
+        job3 = JobDescriptionFactory(
             siae=inactive_siae,
             appellation=appellations[2],
             contract_type=ContractType.APPRENTICESHIP,
@@ -565,13 +563,13 @@ class JobDescriptionSearchViewTest(TestCase):
         city = create_city_saint_andre()
         siae = SiaeFactory(department="44", coords=city.coords, post_code="44117")
         romes = Rome.objects.all().order_by("code")
-        job1 = SiaeJobDescriptionFactory(
+        job1 = JobDescriptionFactory(
             siae=siae,
             appellation=romes[0].appellations.first(),
             contract_type=ContractType.APPRENTICESHIP,
             custom_name="Eviteur de Flakyness",
         )
-        job2 = SiaeJobDescriptionFactory(
+        job2 = JobDescriptionFactory(
             siae=siae,
             appellation=romes[1].appellations.first(),
             contract_type=ContractType.BUSINESS_CREATION,
@@ -581,7 +579,7 @@ class JobDescriptionSearchViewTest(TestCase):
         inactive_siae = SiaeFactory(
             department="45", coords=city.coords, post_code="44117", kind=CompanyKind.EI, convention=None
         )
-        job3 = SiaeJobDescriptionFactory(
+        job3 = JobDescriptionFactory(
             siae=inactive_siae, contract_type=ContractType.APPRENTICESHIP, custom_name="Métier Inutilisé"
         )
 
@@ -655,11 +653,9 @@ class JobDescriptionSearchViewTest(TestCase):
         city = create_city_saint_andre()
         siae = SiaeFactory(department="44", coords=city.coords, post_code="44117")
         appellations = Appellation.objects.all()
-        job1 = SiaeJobDescriptionFactory(
-            siae=siae, appellation=appellations[0], contract_type=ContractType.APPRENTICESHIP
-        )
+        job1 = JobDescriptionFactory(siae=siae, appellation=appellations[0], contract_type=ContractType.APPRENTICESHIP)
         pe_siae = Company.unfiltered_objects.get(siret=POLE_EMPLOI_SIRET)
-        job_pec = SiaeJobDescriptionFactory(
+        job_pec = JobDescriptionFactory(
             siae=pe_siae,
             location=city,
             source_kind=JobSource.PE_API,

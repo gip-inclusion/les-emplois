@@ -118,11 +118,9 @@ class Command(BaseCommand):
             # Move Job Description not already present in siae destination, Job Applications
             # related will be attached to Job Description present in siae destination
             appellation_subquery = Subquery(
-                siaes_models.SiaeJobDescription.objects.filter(
-                    siae_id=to_id, appellation_id=OuterRef("appellation_id")
-                )
+                siaes_models.JobDescription.objects.filter(siae_id=to_id, appellation_id=OuterRef("appellation_id"))
             )
-            job_descriptions = siaes_models.SiaeJobDescription.objects.filter(siae_id=from_id).exclude(
+            job_descriptions = siaes_models.JobDescription.objects.filter(siae_id=from_id).exclude(
                 Exists(appellation_subquery)
             )
             self.stdout.write(f"| Job descriptions: {job_descriptions.count()}\n")
@@ -192,14 +190,14 @@ class Command(BaseCommand):
             # unlinked to be transfered. Job_description can be different enough to be irrelevant.
             if move_all_data:
                 # find Appellation linked to job_description siae B
-                to_siae_appellation_id = siaes_models.SiaeJobDescription.objects.filter(siae_id=to_id).values_list(
+                to_siae_appellation_id = siaes_models.JobDescription.objects.filter(siae_id=to_id).values_list(
                     "appellation_id", flat=True
                 )
 
                 # find job_applications in siae A, linked with job_description which Appellation is found in siae B
                 job_applications_to_clear = job_applications_models.JobApplication.objects.filter(
                     to_siae_id=from_id,
-                    selected_jobs__in=siaes_models.SiaeJobDescription.objects.filter(
+                    selected_jobs__in=siaes_models.JobDescription.objects.filter(
                         siae_id=from_id, appellation_id__in=to_siae_appellation_id
                     ),
                 )

@@ -201,9 +201,9 @@ class SiaeAfterGracePeriodFactory(SiaeFactory):
     convention = factory.SubFactory(SiaeConventionAfterGracePeriodFactory)
 
 
-class SiaeJobDescriptionFactory(factory.django.DjangoModelFactory):
+class JobDescriptionFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = models.SiaeJobDescription
+        model = models.JobDescription
 
     appellation = factory.LazyAttribute(lambda obj: Appellation.objects.order_by("?").first())
     siae = factory.SubFactory(SiaeFactory)
