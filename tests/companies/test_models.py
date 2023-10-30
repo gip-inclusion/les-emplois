@@ -163,7 +163,7 @@ class SiaeModelTest(TestCase):
     def test_new_signup_activation_email_to_official_contact(self):
         siae = SiaeFactory(with_membership=True)
         token = siae.get_token()
-        with mock.patch("itou.utils.tokens.SiaeSignupTokenGenerator.make_token", return_value=token):
+        with mock.patch("itou.utils.tokens.CompanySignupTokenGenerator.make_token", return_value=token):
             factory = RequestFactory()
             request = factory.get("/")
 
