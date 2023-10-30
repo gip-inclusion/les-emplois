@@ -12,14 +12,14 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AddField(
-            model_name="siae",
+            model_name="company",
             name="ban_api_resolved_address",
             field=models.TextField(
                 blank=True, null=True, verbose_name="libellé d'adresse retourné par le dernier geocoding"
             ),
         ),
         migrations.AddField(
-            model_name="siae",
+            model_name="company",
             name="geocoding_updated_at",
             field=models.DateTimeField(blank=True, null=True, verbose_name="dernière modification du geocoding"),
         ),

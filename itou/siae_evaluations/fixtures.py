@@ -62,7 +62,7 @@ def load_data():
     created_job_applications_pks = []
 
     employer = User.objects.get(email="test+cap@inclusion.beta.gouv.fr")
-    controlled_siaes = employer.siae_set.all()
+    controlled_siaes = employer.company_set.all()
     assert controlled_siaes.count() == 5
     total_administrative_criteria = AdministrativeCriteria.objects.count()
     level_to_criteria_pks = dict(

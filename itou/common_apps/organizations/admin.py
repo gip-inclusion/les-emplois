@@ -6,7 +6,7 @@ from itou.utils.admin import ItouModelAdmin, ItouTabularInline
 
 class MembersInline(ItouTabularInline):
     # Remember to specify the model in child class. Example:
-    # model = models.Siae.members.through
+    # model = models.Company.members.through
     extra = 1
     raw_id_fields = ("user",)
     readonly_fields = ("is_active", "created_at", "updated_at", "updated_by", "joined_at")

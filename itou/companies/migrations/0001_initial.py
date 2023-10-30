@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name="Siae",
+            name="Company",
             fields=[
                 ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 ("address_line_1", models.CharField(blank=True, max_length=255, verbose_name="adresse")),
@@ -221,7 +221,7 @@ class Migration(migrations.Migration):
                         blank=True,
                         null=True,
                         on_delete=django.db.models.deletion.SET_NULL,
-                        related_name="created_siae_set",
+                        related_name="created_company_set",
                         to=settings.AUTH_USER_MODEL,
                         verbose_name="créé par",
                     ),
@@ -280,7 +280,7 @@ class Migration(migrations.Migration):
                 ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 ("joined_at", models.DateTimeField(default=django.utils.timezone.now, verbose_name="date d'adhésion")),
                 ("is_admin", models.BooleanField(default=False, verbose_name="administrateur")),
-                ("siae", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="companies.siae")),
+                ("siae", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="companies.Company")),
                 ("user", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
                 ("notifications", models.JSONField(blank=True, default=dict, verbose_name="notifications")),
                 ("is_active", models.BooleanField(default=True, verbose_name="rattachement actif")),
@@ -306,7 +306,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.AddField(
-            model_name="siae",
+            model_name="company",
             name="members",
             field=models.ManyToManyField(
                 blank=True, through="companies.SiaeMembership", to=settings.AUTH_USER_MODEL, verbose_name="membres"
@@ -330,7 +330,7 @@ class Migration(migrations.Migration):
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="job_description_through",
-                        to="companies.siae",
+                        to="companies.Company",
                     ),
                 ),
                 (
@@ -436,7 +436,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.AddField(
-            model_name="siae",
+            model_name="company",
             name="jobs",
             field=models.ManyToManyField(
                 blank=True, through="companies.SiaeJobDescription", to="jobs.appellation", verbose_name="métiers"
@@ -520,7 +520,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.AddField(
-            model_name="siae",
+            model_name="company",
             name="convention",
             field=models.ForeignKey(
                 blank=True,

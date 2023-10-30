@@ -8,7 +8,7 @@ from django.views.generic import FormView
 
 from itou.common_apps.address.departments import DEPARTMENTS_WITH_DISTRICTS
 from itou.companies.enums import CompanyKind, ContractNature, JobSource
-from itou.companies.models import Siae, SiaeJobDescription
+from itou.companies.models import Company, SiaeJobDescription
 from itou.prescribers.models import PrescriberOrganization
 from itou.utils.pagination import pager
 from itou.www.search.forms import JobDescriptionSearchForm, PrescriberSearchForm, SiaeSearchForm
@@ -47,7 +47,7 @@ class EmployerSearchBaseView(FormView):
         contract_types = form.cleaned_data.get("contract_types", self.request.GET.getlist("contract_types", []))
 
         siaes = (
-            Siae.objects.active()
+            Company.objects.active()
             .within(city.coords, distance)
             .annotate(distance=Distance("coords", city.coords) / 1000)
         )

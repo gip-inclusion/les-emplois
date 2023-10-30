@@ -10,7 +10,7 @@ from itou.utils.emails import get_email_message
 
 class OrganizationQuerySet(models.QuerySet):
     """
-    Common methods used by Siae, PrescriberOrganization and Institution models query sets.
+    Common methods used by Company, PrescriberOrganization and Institution models query sets.
     """
 
     def member_required(self, user):
@@ -25,7 +25,7 @@ class OrganizationQuerySet(models.QuerySet):
 
 class OrganizationAbstract(models.Model):
     """
-    Base model for Siae, Prescriber Organization and Institution models.
+    Base model for Company, Prescriber Organization and Institution models.
     """
 
     name = models.CharField(verbose_name="nom", max_length=255)

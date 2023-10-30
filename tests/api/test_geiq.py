@@ -8,7 +8,7 @@ from itou.api.geiq.serializers import GeiqJobApplicationSerializer
 from itou.api.geiq.views import GeiqApiAnonymousUser
 from itou.api.models import SiaeApiToken
 from itou.companies.enums import CompanyKind
-from itou.companies.models import Siae
+from itou.companies.models import Company
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
 from itou.users.enums import UserKind
 from tests.companies.factories import SiaeFactory
@@ -37,7 +37,7 @@ def test_candidatures_geiq_token_authentication():
     token.save()
 
     geiq = SiaeFactory(siret="11832575900001", kind=CompanyKind.GEIQ)
-    antenna = SiaeFactory(siret="11832575900037", kind=CompanyKind.GEIQ, source=Siae.SOURCE_USER_CREATED)
+    antenna = SiaeFactory(siret="11832575900037", kind=CompanyKind.GEIQ, source=Company.SOURCE_USER_CREATED)
     token.siaes.add(geiq)
 
     JobApplicationFactory(state="accepted", to_siae=geiq)

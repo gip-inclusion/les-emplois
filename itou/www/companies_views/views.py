@@ -9,7 +9,7 @@ from django.utils.html import format_html
 from itou.cities.models import City
 from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.organizations.views import deactivate_org_member, update_org_admin_role
-from itou.companies.models import Siae, SiaeFinancialAnnex, SiaeJobDescription
+from itou.companies.models import Company, SiaeFinancialAnnex, SiaeJobDescription
 from itou.jobs.models import Appellation
 from itou.users.models import User
 from itou.utils import constants as global_constants
@@ -350,8 +350,8 @@ def show_financial_annexes(request, template_name="siaes/show_financial_annexes.
         "convention": current_siae.convention,
         "financial_annexes": financial_annexes,
         "can_select_af": current_siae.convention_can_be_changed_by(request.user),
-        "siae_is_asp": current_siae.source == Siae.SOURCE_ASP,
-        "siae_is_user_created": current_siae.source == Siae.SOURCE_USER_CREATED,
+        "siae_is_asp": current_siae.source == Company.SOURCE_ASP,
+        "siae_is_user_created": current_siae.source == Company.SOURCE_USER_CREATED,
     }
     return render(request, template_name, context)
 
@@ -399,7 +399,7 @@ def select_financial_annex(request, template_name="siaes/select_financial_annex.
 
 
 def card(request, siae_id, template_name="siaes/card.html"):
-    siae = get_object_or_404(Siae.objects.with_has_active_members(), pk=siae_id)
+    siae = get_object_or_404(Company.objects.with_has_active_members(), pk=siae_id)
     jobs_descriptions = SiaeJobDescription.objects.filter(siae=siae).select_related("appellation", "location")
     back_url = get_safe_url(request, "back_url")
     active_jobs_descriptions = []

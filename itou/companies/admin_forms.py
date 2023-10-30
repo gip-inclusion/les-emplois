@@ -1,9 +1,9 @@
 from django import forms
 
-from itou.companies.models import Siae
+from itou.companies.models import Company
 
 
-class SiaeAdminForm(forms.ModelForm):
+class CompanyAdminForm(forms.ModelForm):
     # Add a custom form field that is not part of the model in the admin.
     extra_field_refresh_geocoding = forms.BooleanField(
         label="Recalculer le geocoding",
@@ -15,5 +15,5 @@ class SiaeAdminForm(forms.ModelForm):
     )
 
     class Meta:
-        model = Siae
+        model = Company
         fields = "__all__"

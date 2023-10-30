@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
             elidable=True,
         ),
         migrations.AlterField(
-            model_name="siae",
+            model_name="company",
             name="updated_at",
             field=models.DateTimeField(auto_now=True, verbose_name="date de modification"),
         ),

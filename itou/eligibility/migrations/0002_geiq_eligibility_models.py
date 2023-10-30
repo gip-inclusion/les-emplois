@@ -208,7 +208,7 @@ class Migration(migrations.Migration):
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name="geiq_eligibilitydiagnosis_set",
-                to="companies.siae",
+                to="companies.Company",
                 verbose_name="GEIQ de l'auteur",
             ),
         ),

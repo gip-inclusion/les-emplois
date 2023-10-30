@@ -21,7 +21,7 @@ from django.views.generic import FormView, TemplateView, View
 
 from itou.common_apps.address.models import lat_lon_to_coords
 from itou.companies.enums import CompanyKind
-from itou.companies.models import Siae, SiaeMembership
+from itou.companies.models import Company, SiaeMembership
 from itou.openid_connect.inclusion_connect.enums import InclusionConnectChannel
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
@@ -174,7 +174,7 @@ def siae_select(request, template_name="signup/siae_select.html"):
     if request.method in ["GET", "POST"] and siren_form.is_valid():
         # Make sure to look only for active structures.
         siaes_for_siren = (
-            Siae.objects.active().filter(siret__startswith=siren_form.cleaned_data["siren"]).distinct("pk")
+            Company.objects.active().filter(siret__startswith=siren_form.cleaned_data["siren"]).distinct("pk")
         )
         # A user cannot join structures that already have members.
         # Show these structures in the template to make that clear.
@@ -223,8 +223,8 @@ class SiaeBaseView(View):
 
     def dispatch(self, request, *args, siae_id, **kwargs):
         try:
-            self.siae = Siae.objects.active().get(pk=siae_id)
-        except Siae.DoesNotExist:
+            self.siae = Company.objects.active().get(pk=siae_id)
+        except Company.DoesNotExist:
             self.siae = None
         if self.siae is None or not siae_signup_token_generator.check_token(siae=self.siae, token=self.token):
             messages.warning(
@@ -766,9 +766,9 @@ class FacilitatorBaseMixin:
 
     def _get_session_siae(self):
         org_data = self.request.session[ITOU_SESSION_FACILITATOR_SIGNUP_KEY]
-        self.siae_to_create = Siae(
+        self.siae_to_create = Company(
             kind=CompanyKind.OPCS,
-            source=Siae.SOURCE_USER_CREATED,
+            source=Company.SOURCE_USER_CREATED,
             siret=org_data["siret"],
             name=org_data["name"],
             address_line_1=org_data["address_line_1"] or "",

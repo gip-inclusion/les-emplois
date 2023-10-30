@@ -14,9 +14,9 @@ class CompaniesAppConfig(AppConfig):
 
 
 def create_pole_emploi_siae(*args, **kwargs):
-    from itou.companies.models import Siae
+    from itou.companies.models import Company
 
-    Siae._base_manager.get_or_create(
+    Company._base_manager.get_or_create(
         siret=enums.POLE_EMPLOI_SIRET,
         defaults={
             "name": "POLE EMPLOI",

@@ -23,7 +23,7 @@ import logging
 from django.core.management.base import BaseCommand
 
 from itou.common_apps.address.models import geolocate_qs
-from itou.companies.models import Siae
+from itou.companies.models import Company
 
 
 logger = logging.getLogger(__name__)
@@ -38,11 +38,11 @@ class Command(BaseCommand):
         )
 
     def handle(self, wet_run, **options):
-        siaes = Siae.objects.all()
+        siaes = Company.objects.all()
 
         siaes_to_save = list(geolocate_qs(siaes, is_verbose=True))
         if wet_run:
-            Siae.objects.bulk_update(
+            Company.objects.bulk_update(
                 siaes_to_save,
                 ["coords", "geocoding_score", "ban_api_resolved_address", "geocoding_updated_at"],
             )

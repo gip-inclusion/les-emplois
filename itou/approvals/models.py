@@ -922,7 +922,7 @@ class Suspension(models.Model):
     start_at = models.DateField(verbose_name="date de début", default=timezone.localdate, db_index=True)
     end_at = models.DateField(verbose_name="date de fin", default=timezone.localdate, db_index=True)
     siae = models.ForeignKey(
-        "companies.Siae",
+        "companies.Company",
         verbose_name="SIAE",
         null=True,
         on_delete=models.SET_NULL,
@@ -1197,7 +1197,7 @@ class CommonProlongation(models.Model):
         related_name="%(class)ss_declared",
     )
     declared_by_siae = models.ForeignKey(
-        "companies.Siae",
+        "companies.Company",
         verbose_name="SIAE du déclarant",
         null=True,
         on_delete=models.SET_NULL,

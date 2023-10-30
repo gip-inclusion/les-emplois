@@ -51,7 +51,7 @@ class Migration(migrations.Migration):
                 (
                     "siae",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, related_name="invitations", to="companies.siae"
+                        on_delete=django.db.models.deletion.CASCADE, related_name="invitations", to="companies.Company"
                     ),
                 ),
             ],

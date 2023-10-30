@@ -28,7 +28,7 @@ from itou.utils.urls import get_absolute_url, get_tally_form_url
 from itou.utils.validators import validate_af_number, validate_naf, validate_siret
 
 
-class SiaeQuerySet(OrganizationQuerySet):
+class CompanyQuerySet(OrganizationQuerySet):
     @property
     def active_lookup(self):
         # Prefer a sub query to a join for performance reasons.
@@ -42,7 +42,7 @@ class SiaeQuerySet(OrganizationQuerySet):
             # converted to ASP source siaes by import_siae script.
             # Such siaes are created by our staff when ASP data is lacking
             # the most recent data about them.
-            | Q(source=Siae.SOURCE_STAFF_CREATED)
+            | Q(source=Company.SOURCE_STAFF_CREATED)
             # ASP source siaes and user created siaes are active if and only
             # if they have an active convention.
             | has_active_convention
@@ -171,12 +171,12 @@ class SiaeQuerySet(OrganizationQuerySet):
         )
 
 
-class SiaeManager(models.Manager.from_queryset(SiaeQuerySet)):
+class CompanyManager(models.Manager.from_queryset(CompanyQuerySet)):
     def get_queryset(self):
         return super().get_queryset().exclude(siret=POLE_EMPLOI_SIRET)
 
 
-class Siae(AddressMixin, OrganizationAbstract):
+class Company(AddressMixin, OrganizationAbstract):
     """
     Structures d'insertion par l'activité économique.
 
@@ -199,13 +199,13 @@ class Siae(AddressMixin, OrganizationAbstract):
         (SOURCE_STAFF_CREATED, "Staff Itou"),
     )
 
-    # These kinds of SIAE can use employee record app to send data to ASP
+    # These kinds of Companies can use employee record app to send data to ASP
     ASP_EMPLOYEE_RECORD_KINDS = [CompanyKind.EI, CompanyKind.ACI, CompanyKind.AI, CompanyKind.ETTI]
 
-    # SIAE structures have two different SIRET numbers in ASP FluxIAE data ("Vue Structure").
-    # The first one is the "SIRET actualisé" which we store as `siae.siret`. It changes rather frequently
-    # e.g. each time a SIAE moves to a new location.
-    # The second one is the "SIRET à la signature" which we store as `siae.convention.siret_signature`. By design it
+    # Companies have two different SIRET numbers in ASP FluxIAE data ("Vue Structure").
+    # The first one is the "SIRET actualisé" which we store as `Company.siret`. It changes rather frequently
+    # e.g. each time a Company moves to a new location.
+    # The second one is the "SIRET à la signature" which we store as `Company.convention.siret_signature`. By design it
     # almost never changes.
     # Both SIRET numbers are kept up to date by the weekly `import_siae.py` script.
     siret = models.CharField(verbose_name="siret", max_length=14, validators=[validate_siret], db_index=True)
@@ -215,8 +215,8 @@ class Siae(AddressMixin, OrganizationAbstract):
     brand = models.CharField(verbose_name="enseigne", max_length=255, blank=True)
     phone = models.CharField(verbose_name="téléphone", max_length=20, blank=True)
     email = models.EmailField(verbose_name="e-mail", blank=True)
-    # All siaes without any existing user require this auth_email
-    # for the siae secure signup process to be possible.
+    # All companies without any existing user require this auth_email
+    # for the company secure signup process to be possible.
     # Comes from external exports (ASP, GEIQ...)
     auth_email = models.EmailField(verbose_name="e-mail d'authentification", blank=True)
     website = models.URLField(verbose_name="site web", blank=True)
@@ -239,7 +239,7 @@ class Siae(AddressMixin, OrganizationAbstract):
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="créé par",
-        related_name="created_siae_set",
+        related_name="created_company_set",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -264,8 +264,8 @@ class Siae(AddressMixin, OrganizationAbstract):
         verbose_name="score de recommandation (ratio de candidatures récentes vs nombre d'offres d'emploi)", null=True
     )
 
-    objects = SiaeManager()
-    unfiltered_objects = SiaeQuerySet.as_manager()
+    objects = CompanyManager()
+    unfiltered_objects = CompanyQuerySet.as_manager()
 
     class Meta:
         verbose_name = "entreprise"
@@ -296,13 +296,13 @@ class Siae(AddressMixin, OrganizationAbstract):
         if not self.should_have_convention:
             # GEIQ, EA, EATT, OPCS, ... have no convention logic and thus are always active.
             return True
-        if self.source == Siae.SOURCE_STAFF_CREATED:
-            # Staff created siaes are always active until eventually
-            # converted to ASP source siaes by import_siae script.
-            # Such siaes are created by our staff when ASP data is lacking
+        if self.source == Company.SOURCE_STAFF_CREATED:
+            # Staff created companies are always active until eventually
+            # converted to ASP source companies by import_siae script.
+            # Such commanies are created by our staff when ASP data is lacking
             # the most recent data about them.
             return True
-        # ASP source siaes and user created siaes are active if and only
+        # ASP source companies and user created companies are active if and only
         # if they have an active convention.
         return self.convention and self.convention.is_active
 
@@ -319,7 +319,7 @@ class Siae(AddressMixin, OrganizationAbstract):
     @property
     def obfuscated_auth_email(self):
         """
-        Used during the SIAE secure signup process to avoid
+        Used during the Company secure signup process to avoid
         showing the full auth_email to the new user trying
         to signup, as a pseudo security measure.
 
@@ -377,7 +377,7 @@ class Siae(AddressMixin, OrganizationAbstract):
 
     def activate_your_account_email(self):
         if self.has_members or not self.auth_email:
-            raise ValidationError("Siae cannot be signed up for, this should never happen.")
+            raise ValidationError("Company cannot be signed up for, this should never happen.")
         to = [self.auth_email]
         context = {"siae": self, "signup_url": reverse("signup:siae_select")}
         subject = "siaes/email/activate_your_account_subject.txt"
@@ -484,9 +484,9 @@ class Siae(AddressMixin, OrganizationAbstract):
 
 
 class SiaeMembership(MembershipAbstract):
-    """Intermediary model between `User` and `Siae`."""
+    """Intermediary model between `User` and `Company`."""
 
-    siae = models.ForeignKey(Siae, on_delete=models.CASCADE)
+    siae = models.ForeignKey(Company, on_delete=models.CASCADE)
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         related_name="updated_siaemembership_set",
@@ -511,7 +511,7 @@ class SiaeJobDescriptionQuerySet(models.QuerySet):
         # Sub queries referencing a unique parent are understandable but when it comes to a "couple",
         # it may be easier to just write raw SQL. But then you lose the ORM benefits.
         # Make sure it's worth the hassle.
-        # See `SiaeQuerySet.with_count_recent_received_job_apps`
+        # See `CompanyQuerySet.with_count_recent_received_job_apps`
         return self.annotate(
             job_applications_count=Count(
                 "jobapplication",
@@ -538,7 +538,7 @@ class SiaeJobDescriptionQuerySet(models.QuerySet):
 
     def active(self):
         subquery = Subquery(
-            Siae.unfiltered_objects.filter(
+            Company.unfiltered_objects.filter(
                 pk=OuterRef("siae"),
             ).active()
         )
@@ -558,7 +558,7 @@ class SiaeJobDescriptionQuerySet(models.QuerySet):
 class SiaeJobDescription(models.Model):
     """
     A job description of a position in an SIAE.
-    Intermediary model between `jobs.Appellation` and `Siae`.
+    Intermediary model between `jobs.Appellation` and `Company`.
     https://docs.djangoproject.com/en/dev/ref/models/relations/
     """
 
@@ -568,7 +568,7 @@ class SiaeJobDescription(models.Model):
     MAX_WORKED_HOURS_PER_WEEK = 48
 
     appellation = models.ForeignKey("jobs.Appellation", on_delete=models.CASCADE)
-    siae = models.ForeignKey(Siae, on_delete=models.CASCADE, related_name="job_description_through")
+    siae = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="job_description_through")
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True, db_index=True)
     is_active = models.BooleanField(verbose_name="recrutement ouvert", default=True)
@@ -740,22 +740,22 @@ class SiaeConvention(models.Model):
     One ASP SIAE has one ASP convention with 3 financial annexes.
 
     Result:
-    One Siae has one SiaeConvention with 3 SiaeFinancialAnnex instances.
+    One Company has one SiaeConvention with 3 SiaeFinancialAnnex instances.
 
     Example 2)
     One ASP SIAE has 3 ASP conventions each one having 3 financial annexes.
 
     Result:
-    One Siae has one SiaeConvention with 3x3=9 SiaeFinancialAnnex instances.
+    One Company has one SiaeConvention with 3x3=9 SiaeFinancialAnnex instances.
 
     Example 3)
     One ASP SIAE having 2 "mesures" (EI+AI) has 2 ASP conventions (1 for each "mesure")
     and each ASP Convention has 3 financial annexes.
 
     Result:
-    Two Siae instances:
-    - one EI Siae with one SiaeConvention (EI) having 3 SiaeFinancialAnnex instances.
-    - one AI Siae with one SiaeConvention (AI) having 3 SiaeFinancialAnnex instances.
+    Two Company instances:
+    - one EI Company with one SiaeConvention (EI) having 3 SiaeFinancialAnnex instances.
+    - one AI COmpany with one SiaeConvention (AI) having 3 SiaeFinancialAnnex instances.
     """
 
     # When a convention is deactivated its siaes still have a partial access

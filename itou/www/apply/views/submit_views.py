@@ -18,7 +18,7 @@ from django.views.generic import TemplateView
 
 from itou.approvals.models import Approval
 from itou.companies.enums import CompanyKind
-from itou.companies.models import Siae, SiaeJobDescription
+from itou.companies.models import Company, SiaeJobDescription
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.files.models import File
@@ -85,7 +85,7 @@ class ApplyStepBaseView(LoginRequiredMixin, TemplateView):
         self.hire_process = None
 
     def setup(self, request, *args, **kwargs):
-        self.siae = get_object_or_404(Siae.objects.with_has_active_members(), pk=kwargs["siae_pk"])
+        self.siae = get_object_or_404(Company.objects.with_has_active_members(), pk=kwargs["siae_pk"])
         self.apply_session = SessionNamespace(request.session, f"job_application-{self.siae.pk}")
         self.hire_process = kwargs.pop("hire_process", False)
         super().setup(request, *args, **kwargs)
@@ -1450,7 +1450,7 @@ class UpdateJobSeekerStepEndView(UpdateJobSeekerBaseView):
 
 @login_required
 def eligibility_for_hire(request, siae_pk, job_seeker_pk, template_name="apply/submit/eligibility_for_hire.html"):
-    siae = get_object_or_404(Siae.objects.member_required(request.user), pk=siae_pk)
+    siae = get_object_or_404(Company.objects.member_required(request.user), pk=siae_pk)
     job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), pk=job_seeker_pk)
     next_url = reverse("apply:hire_confirmation", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk})
     bypass_eligibility_conditions = [
@@ -1478,7 +1478,7 @@ def eligibility_for_hire(request, siae_pk, job_seeker_pk, template_name="apply/s
 def geiq_eligibility_for_hire(
     request, siae_pk, job_seeker_pk, template_name="apply/submit/geiq_eligibility_for_hire.html"
 ):
-    siae = get_object_or_404(Siae.objects.member_required(request.user).filter(kind=CompanyKind.GEIQ), pk=siae_pk)
+    siae = get_object_or_404(Company.objects.member_required(request.user).filter(kind=CompanyKind.GEIQ), pk=siae_pk)
     job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), pk=job_seeker_pk)
     next_url = reverse("apply:hire_confirmation", kwargs={"siae_pk": siae.pk, "job_seeker_pk": job_seeker.pk})
     if GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(job_seeker, siae).exists():
@@ -1501,7 +1501,7 @@ def geiq_eligibility_for_hire(
 
 @login_required
 def geiq_eligibility_criteria_for_hire(request, siae_pk, job_seeker_pk):
-    siae = get_object_or_404(Siae.objects.member_required(request.user).filter(kind=CompanyKind.GEIQ), pk=siae_pk)
+    siae = get_object_or_404(Company.objects.member_required(request.user).filter(kind=CompanyKind.GEIQ), pk=siae_pk)
     job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), pk=job_seeker_pk)
     return common_views._geiq_eligibility_criteria(
         request,
@@ -1512,7 +1512,7 @@ def geiq_eligibility_criteria_for_hire(request, siae_pk, job_seeker_pk):
 
 @login_required
 def hire_confirmation(request, siae_pk, job_seeker_pk, template_name="apply/submit/hire_confirmation.html"):
-    siae = get_object_or_404(Siae.objects.member_required(request.user), pk=siae_pk)
+    siae = get_object_or_404(Company.objects.member_required(request.user), pk=siae_pk)
     job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), pk=job_seeker_pk)
     if siae.kind == CompanyKind.GEIQ:
         geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(job_seeker, siae).first()

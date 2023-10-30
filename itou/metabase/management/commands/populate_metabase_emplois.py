@@ -33,7 +33,7 @@ from itou.analytics.models import Datum, StatsDashboardVisit
 from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, ProlongationRequest
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
-from itou.companies.models import Siae, SiaeJobDescription, SiaeMembership
+from itou.companies.models import Company, SiaeJobDescription, SiaeMembership
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.institutions.models import Institution, InstitutionMembership
@@ -124,7 +124,7 @@ class Command(BaseCommand):
     def populate_siaes(self):
         ONE_MONTH_AGO = timezone.now() - timezone.timedelta(days=30)
         queryset = (
-            Siae.objects.active()
+            Company.objects.active()
             .select_related("convention")
             .prefetch_related("convention__siaes", "job_description_through", "members")
             .annotate(

@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 ("created_at", models.DateTimeField(default=django.utils.timezone.now)),
-                ("siaes", models.ManyToManyField(related_name="api_tokens", to="companies.siae")),
+                ("siaes", models.ManyToManyField(related_name="api_tokens", to="companies.Company")),
             ],
             options={
                 "verbose_name": "jeton d'API SIAE",

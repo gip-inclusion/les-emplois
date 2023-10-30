@@ -8,7 +8,7 @@ from itou.approvals import models
 from itou.approvals.admin_forms import ApprovalAdminForm
 from itou.approvals.admin_views import manually_add_approval, manually_refuse_approval
 from itou.approvals.enums import Origin, ProlongationRequestStatus
-from itou.companies.models import Siae
+from itou.companies.models import Company
 from itou.employee_record import enums as employee_record_enums
 from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
 from itou.employee_record.models import EmployeeRecord
@@ -308,11 +308,11 @@ class ApprovalAdmin(ItouModelAdmin):
     @admin.display(description="Entreprise gérant le PASS")
     def assigned_company(self, obj):
         if obj.assigned_company:
-            siae = Siae.objects.get(pk=obj.assigned_company)
+            company = Company.objects.get(pk=obj.assigned_company)
             return format_html(
                 "{} — SIRET : {}",
-                get_admin_view_link(siae, content=siae.display_name),
-                siae.siret,
+                get_admin_view_link(company, content=company.display_name),
+                company.siret,
             )
         return "-"
 
