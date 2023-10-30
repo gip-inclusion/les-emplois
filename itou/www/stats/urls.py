@@ -77,6 +77,11 @@ urlpatterns = [
         views.stats_dgefp_follow_siae_evaluation,
         name="stats_dgefp_follow_siae_evaluation",
     ),
+    path(
+        "dgefp/follow_prolongation",
+        views.stats_dgefp_follow_prolongation,
+        name="stats_dgefp_follow_prolongation",
+    ),
     path("dgefp/iae", views.stats_dgefp_iae, name="stats_dgefp_iae"),
     path("dgefp/siae_evaluation", views.stats_dgefp_siae_evaluation, name="stats_dgefp_siae_evaluation"),
     path("dgefp/af", views.stats_dgefp_af, name="stats_dgefp_af"),
