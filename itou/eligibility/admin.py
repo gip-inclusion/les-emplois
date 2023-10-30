@@ -51,7 +51,7 @@ class JobApplicationInline(ItouTabularInline):
     show_change_link = True
     fields = (
         "job_seeker",
-        "to_siae_link",
+        "to_company_link",
         "hiring_start_at",
         "hiring_end_at",
         "approval",
@@ -65,8 +65,8 @@ class JobApplicationInline(ItouTabularInline):
     def has_add_permission(self, request, obj=None):
         return False
 
-    @admin.display(description="SIAE destinataire")
-    def to_siae_link(self, obj):
+    @admin.display(description="Entreprise destinataire")
+    def to_company_link(self, obj):
         return format_html(
             "{} — SIRET : {} ({})",
             get_admin_view_link(obj.to_siae, content=obj.to_siae.display_name),

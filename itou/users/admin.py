@@ -133,7 +133,7 @@ class JobApplicationInline(ItouTabularInline):
     fk_name = "job_seeker"
     extra = 0
     can_delete = False
-    fields = ("pk_link", "sender_kind", "to_siae_link", "state")
+    fields = ("pk_link", "sender_kind", "to_company_link", "state")
     readonly_fields = fields
     list_select_related = ("to_siae",)
 
@@ -147,8 +147,8 @@ class JobApplicationInline(ItouTabularInline):
     def pk_link(self, obj):
         return get_admin_view_link(obj)
 
-    @admin.display(description="SIAE destinataire")
-    def to_siae_link(self, obj):
+    @admin.display(description="Entreprise destinataire")
+    def to_company_link(self, obj):
         return format_html(
             "{} — SIRET : {}",
             get_admin_view_link(obj.to_siae, content=obj.to_siae.display_name),
@@ -158,7 +158,7 @@ class JobApplicationInline(ItouTabularInline):
 
 class SentJobApplicationInline(JobApplicationInline):
     fk_name = "sender"
-    fields = ("pk_link", "job_seeker_link", "to_siae_link", "state")
+    fields = ("pk_link", "job_seeker_link", "to_company_link", "state")
     readonly_fields = fields
     verbose_name = "candidature envoyée"
     verbose_name_plural = "candidatures envoyées"
