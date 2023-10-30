@@ -23,7 +23,7 @@ class BaseNotification:
     - Override the `__init__` method as well as `email` and `recipients_email` properties. Provide a Notification.NAME.
 
     Live example:
-    - Model: itou/siaes/models.py > SiaeMembership
+    - Model: itou/companies/models.py > CompanyMembership
     - Notifications: itou/job_applications/notifications.py
     """
 
@@ -34,7 +34,7 @@ class BaseNotification:
         """
         `recipients_qs`: Django QuerySet leading to this notification recipients
         We should be able to perform a `filter()` with it.
-        e.g. itou.companies.models.SiaeMembershipQuerySet
+        e.g. itou.companies.models.CompanyMembershipQuerySet
         """
         self.recipients_qs = recipients_qs
 

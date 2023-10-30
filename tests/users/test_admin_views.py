@@ -248,7 +248,7 @@ def test_free_ic_email(admin_client):
     assertContains(response, "L'utilisateur peut à présent se créer un nouveau compte", html=True)
     employer.refresh_from_db()
     assert employer.is_active is False
-    assert employer.siaemembership_set.get().is_active is False
+    assert employer.companymembership_set.get().is_active is False
     assert employer.username == "old_ic_uuid_username"
     assert employer.email == "ic_user@email.com_old"
 

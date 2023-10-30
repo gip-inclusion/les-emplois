@@ -63,7 +63,7 @@ def get_permissions_dict():
             siaes_models.SiaeConvention: PERMS_EDIT,
             siaes_models.SiaeFinancialAnnex: PERMS_READ,
             siaes_models.SiaeJobDescription: PERMS_ALL,
-            siaes_models.SiaeMembership: PERMS_ALL,
+            siaes_models.CompanyMembership: PERMS_ALL,
             siae_evaluations_models.Calendar: PERMS_READ,
             siae_evaluations_models.EvaluationCampaign: PERMS_READ,
             siae_evaluations_models.EvaluatedSiae: PERMS_READ,
@@ -105,7 +105,7 @@ def get_permissions_dict():
                 siaes_models.SiaeConvention,
                 siaes_models.SiaeFinancialAnnex,
                 siaes_models.SiaeJobDescription,
-                siaes_models.SiaeMembership,
+                siaes_models.CompanyMembership,
                 users_models.User,
                 users_models.JobSeekerProfile,
             )

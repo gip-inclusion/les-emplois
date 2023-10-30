@@ -36,9 +36,9 @@ from itou.utils.templatetags.format_filters import format_approval_number, forma
 from itou.www.dashboard.forms import EditUserEmailForm
 from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactory
 from tests.companies.factories import (
+    CompanyMembershipFactory,
     SiaeAfterGracePeriodFactory,
     SiaeFactory,
-    SiaeMembershipFactory,
     SiaePendingGracePeriodFactory,
     SiaeWithMembershipAndJobsFactory,
 )
@@ -287,7 +287,7 @@ class DashboardViewTest(TestCase):
                     self.assertNotContains(response, "Créer/rejoindre une autre structure")
 
     def test_dashboard_siae_stats(self):
-        membershipfactory = SiaeMembershipFactory()
+        membershipfactory = CompanyMembershipFactory()
         self.client.force_login(membershipfactory.user)
         response = self.client.get(reverse("dashboard:index"))
         self.assertContains(response, "Voir les données de candidatures de mes structures")
@@ -390,7 +390,7 @@ class DashboardViewTest(TestCase):
         )
 
     def test_dashboard_siae_evaluation_campaign_notifications(self):
-        membership = SiaeMembershipFactory()
+        membership = CompanyMembershipFactory()
         evaluated_siae_with_final_decision = EvaluatedSiaeFactory(
             evaluation_campaign__name="Final decision reached",
             complete=True,
@@ -1529,7 +1529,7 @@ class EditUserPreferencesTest(TestCase):
     def test_employer_opt_in_siae_no_job_description(self):
         siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
-        recipient = user.siaemembership_set.get(siae=siae)
+        recipient = user.companymembership_set.get(siae=siae)
         form_name = "new_job_app_notification_form"
 
         self.client.force_login(user)
@@ -1558,7 +1558,7 @@ class EditUserPreferencesTest(TestCase):
         siae = SiaeWithMembershipAndJobsFactory()
         user = siae.members.first()
         job_descriptions_pks = list(siae.job_description_through.values_list("pk", flat=True))
-        recipient = user.siaemembership_set.get(siae=siae)
+        recipient = user.companymembership_set.get(siae=siae)
         form_name = "new_job_app_notification_form"
         self.client.force_login(user)
 
@@ -1586,7 +1586,7 @@ class EditUserPreferencesTest(TestCase):
     def test_employer_opt_out_siae_no_job_descriptions(self):
         siae = SiaeFactory(with_membership=True)
         user = siae.members.first()
-        recipient = user.siaemembership_set.get(siae=siae)
+        recipient = user.companymembership_set.get(siae=siae)
         form_name = "new_job_app_notification_form"
         self.client.force_login(user)
 
@@ -1614,7 +1614,7 @@ class EditUserPreferencesTest(TestCase):
         siae = SiaeWithMembershipAndJobsFactory()
         user = siae.members.first()
         job_descriptions_pks = list(siae.job_description_through.values_list("pk", flat=True))
-        recipient = user.siaemembership_set.get(siae=siae)
+        recipient = user.companymembership_set.get(siae=siae)
         form_name = "new_job_app_notification_form"
         self.client.force_login(user)
 
@@ -1736,7 +1736,7 @@ TOKEN_MENU_STR = "Accès aux APIs"
 
 
 def test_api_token_view_for_siae_admin(client):
-    employer = SiaeMembershipFactory().user
+    employer = CompanyMembershipFactory().user
     client.force_login(employer)
 
     assert not Token.objects.exists()
@@ -1763,7 +1763,7 @@ def test_api_token_view_for_siae_admin(client):
 
 
 def test_api_token_view_for_non_siae_admin(client):
-    employer = SiaeMembershipFactory(is_admin=False).user
+    employer = CompanyMembershipFactory(is_admin=False).user
     client.force_login(employer)
 
     assert not Token.objects.exists()

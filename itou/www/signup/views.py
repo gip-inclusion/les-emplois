@@ -21,7 +21,7 @@ from django.views.generic import FormView, TemplateView, View
 
 from itou.common_apps.address.models import lat_lon_to_coords
 from itou.companies.enums import CompanyKind
-from itou.companies.models import Company, SiaeMembership
+from itou.companies.models import Company, CompanyMembership
 from itou.openid_connect.inclusion_connect.enums import InclusionConnectChannel
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
@@ -183,7 +183,7 @@ def siae_select(request, template_name="signup/siae_select.html"):
             # the template directly displays the first membership's user "as the admin".
             # that's why we only select SIAEs that have at least an active admin user.
             # it should always be the case, but lets enforce it anyway.
-            .filter(siaemembership__is_admin=True, siaemembership__user__is_active=True)
+            .filter(companymembership__is_admin=True, companymembership__user__is_active=True)
             # avoid the template issuing requests for every member and user.
             .prefetch_related("memberships__user")
         )
@@ -270,7 +270,7 @@ class SiaeJoinView(LoginRequiredMixin, SiaeBaseView):
             )
             return HttpResponseRedirect(reverse("search:siaes_home"))
 
-        SiaeMembership.objects.create(
+        CompanyMembership.objects.create(
             user=request.user,
             siae=self.siae,
             # Only the first member becomes an admin.
@@ -830,7 +830,7 @@ class FacilitatorJoinView(FacilitatorBaseMixin, View):
         self.siae_to_create.created_by = request.user
         self.siae_to_create.save()
 
-        SiaeMembership.objects.create(
+        CompanyMembership.objects.create(
             user=request.user,
             siae=self.siae_to_create,
             is_admin=True,  # by construction, this user is the first of the SIAE.

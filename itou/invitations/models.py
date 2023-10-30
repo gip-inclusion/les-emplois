@@ -248,7 +248,7 @@ class EmployerInvitation(InvitationAbstract):
         # We must be able to invite a former member of this SIAE
         # however `members.add()` does not update membership status if it already exists
         if user not in self.siae.active_members:
-            membership = user.siaemembership_set.get(is_active=False, siae=self.siae)
+            membership = user.companymembership_set.get(is_active=False, siae=self.siae)
             membership.is_active = True
             membership.save()
 

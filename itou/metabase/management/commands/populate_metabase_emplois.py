@@ -33,7 +33,7 @@ from itou.analytics.models import Datum, StatsDashboardVisit
 from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, ProlongationRequest
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
-from itou.companies.models import Company, SiaeJobDescription, SiaeMembership
+from itou.companies.models import Company, CompanyMembership, SiaeJobDescription
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.institutions.models import Institution, InstitutionMembership
@@ -133,7 +133,7 @@ class Command(BaseCommand):
                     filter=~Q(job_applications_received__logs__to_state=JobApplicationWorkflow.STATE_OBSOLETE),
                 ),
                 first_membership_join_date=Min(
-                    "siaemembership__joined_at",
+                    "companymembership__joined_at",
                 ),
                 total_candidatures=Count(
                     "job_applications_received",
@@ -412,7 +412,7 @@ class Command(BaseCommand):
         populate_table(users.TABLE, batch_size=1000, querysets=[queryset])
 
     def populate_memberships(self):
-        siae_queryset = SiaeMembership.objects.filter(is_active=True)
+        siae_queryset = CompanyMembership.objects.filter(is_active=True)
         prescriber_queryset = PrescriberMembership.objects.filter(is_active=True)
         institution_queryset = InstitutionMembership.objects.filter(is_active=True)
 

@@ -275,7 +275,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name="SiaeMembership",
+            name="CompanyMembership",
             fields=[
                 ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 ("joined_at", models.DateTimeField(default=django.utils.timezone.now, verbose_name="date d'adhésion")),
@@ -294,7 +294,7 @@ class Migration(migrations.Migration):
                     models.ForeignKey(
                         null=True,
                         on_delete=django.db.models.deletion.CASCADE,
-                        related_name="updated_siaemembership_set",
+                        related_name="updated_companymembership_set",
                         to=settings.AUTH_USER_MODEL,
                         verbose_name="mis à jour par",
                     ),
@@ -309,7 +309,7 @@ class Migration(migrations.Migration):
             model_name="company",
             name="members",
             field=models.ManyToManyField(
-                blank=True, through="companies.SiaeMembership", to=settings.AUTH_USER_MODEL, verbose_name="membres"
+                blank=True, through="companies.CompanyMembership", to=settings.AUTH_USER_MODEL, verbose_name="membres"
             ),
         ),
         migrations.CreateModel(

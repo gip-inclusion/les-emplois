@@ -12,7 +12,7 @@ from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.utils.templatetags.format_filters import format_approval_number
 from tests.approvals.factories import ApprovalFactory, ProlongationFactory, SuspensionFactory
-from tests.companies.factories import SiaeFactory, SiaeMembershipFactory
+from tests.companies.factories import CompanyMembershipFactory, SiaeFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByPrescriberOrganizationFactory
 from tests.prescribers.factories import PrescriberFactory, PrescriberOrganizationFactory
@@ -369,7 +369,7 @@ class TestApprovalDetailView:
     @pytest.mark.usefixtures("unittest_compatibility")
     @override_settings(TALLY_URL="https://tally.so")
     def test_remove_approval_button(self, client):
-        membership = SiaeMembershipFactory(
+        membership = CompanyMembershipFactory(
             user__id=123456,
             user__email="oph@dewinter.com",
             user__first_name="Milady",

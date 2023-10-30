@@ -10,7 +10,7 @@ from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria
-from tests.companies.factories import SiaeMembershipFactory
+from tests.companies.factories import CompanyMembershipFactory
 from tests.files.factories import FileFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -72,7 +72,7 @@ class SiaeJobApplicationListViewTest(TestCase):
 
     def setUp(self):
         super().setUp()
-        membership = SiaeMembershipFactory()
+        membership = CompanyMembershipFactory()
         self.user = membership.user
         self.siae = membership.siae
 
@@ -549,7 +549,7 @@ class SiaeJobApplicationListViewTest(TestCase):
 class SiaeSelectCriteriaViewTest(TestCase):
     def setUp(self):
         super().setUp()
-        membership = SiaeMembershipFactory()
+        membership = CompanyMembershipFactory()
         self.user = membership.user
         self.siae = membership.siae
 
@@ -723,7 +723,7 @@ class SiaeSelectCriteriaViewTest(TestCase):
 class SiaeUploadDocsViewTest(TestCase):
     def setUp(self):
         super().setUp()
-        membership = SiaeMembershipFactory()
+        membership = CompanyMembershipFactory()
         self.user = membership.user
         self.siae = membership.siae
 
@@ -738,7 +738,7 @@ class SiaeUploadDocsViewTest(TestCase):
         assert response.status_code == 404
 
     def test_access_without_ownership(self):
-        membership = SiaeMembershipFactory()
+        membership = CompanyMembershipFactory()
         user = membership.user
         siae = membership.siae
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(siae, user)
@@ -889,7 +889,7 @@ class SiaeUploadDocsViewTest(TestCase):
 class SiaeSubmitProofsViewTest(TestCase):
     def setUp(self):
         super().setUp()
-        membership = SiaeMembershipFactory()
+        membership = CompanyMembershipFactory()
         self.user = membership.user
         self.siae = membership.siae
 
@@ -1072,7 +1072,7 @@ class SiaeSubmitProofsViewTest(TestCase):
 class SiaeCalendarViewTest(TestCase):
     def setUp(self):
         super().setUp()
-        membership = SiaeMembershipFactory()
+        membership = CompanyMembershipFactory()
         self.user = membership.user
         self.siae = membership.siae
 

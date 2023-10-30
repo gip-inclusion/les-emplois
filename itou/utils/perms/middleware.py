@@ -53,7 +53,7 @@ class ItouCurrentOrganizationMiddleware:
         redirect_message = None
         if user.is_authenticated:
             if user.is_employer:
-                active_memberships = list(user.siaemembership_set.filter(is_active=True).order_by("created_at"))
+                active_memberships = list(user.companymembership_set.filter(is_active=True).order_by("created_at"))
                 siaes = {
                     siae.pk: siae
                     for siae in user.company_set.filter(

@@ -23,7 +23,7 @@ from tests.approvals.factories import (
     ProlongationRequestDenyInformationFactory,
     ProlongationWithRequestFactory,
 )
-from tests.companies.factories import SiaeFactory, SiaeJobDescriptionFactory, SiaeMembershipFactory
+from tests.companies.factories import CompanyMembershipFactory, SiaeFactory, SiaeJobDescriptionFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory
 from tests.geo.factories import QPVFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
@@ -895,8 +895,8 @@ def test_populate_users():
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
 def test_populate_memberships():
-    siae_membership = SiaeMembershipFactory()
-    SiaeMembershipFactory(is_active=False)  # Inactive siae memberships are ignored.
+    siae_membership = CompanyMembershipFactory()
+    CompanyMembershipFactory(is_active=False)  # Inactive siae memberships are ignored.
     prescriber_membership = PrescriberMembershipFactory()
     PrescriberMembershipFactory(is_active=False)
     institution_membership = InstitutionMembershipFactory()

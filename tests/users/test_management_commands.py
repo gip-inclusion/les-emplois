@@ -27,7 +27,7 @@ from itou.users.management.commands.new_users_to_mailjet import (
 from itou.users.models import User
 from itou.utils.mocks.pole_emploi import API_RECHERCHE_ERROR, API_RECHERCHE_RESULT_KNOWN
 from tests.approvals.factories import ApprovalFactory
-from tests.companies.factories import SiaeMembershipFactory
+from tests.companies.factories import CompanyMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
 from tests.prescribers.factories import (
     PrescriberFactory,
@@ -211,6 +211,10 @@ class TestSyncPermsTestCase(TestCase):
             "add_company",
             "change_company",
             "view_company",
+            "add_companymembership",
+            "change_companymembership",
+            "delete_companymembership",
+            "view_companymembership",
             "change_siaeconvention",
             "view_siaeconvention",
             "view_siaefinancialannex",
@@ -218,10 +222,6 @@ class TestSyncPermsTestCase(TestCase):
             "change_siaejobdescription",
             "delete_siaejobdescription",
             "view_siaejobdescription",
-            "add_siaemembership",
-            "change_siaemembership",
-            "delete_siaemembership",
-            "view_siaemembership",
             "view_administrativecriteria",
             "add_eligibilitydiagnosis",
             "change_eligibilitydiagnosis",
@@ -287,10 +287,10 @@ class TestSyncPermsTestCase(TestCase):
             "view_department",
             "view_city",
             "view_company",
+            "view_companymembership",
             "view_siaeconvention",
             "view_siaefinancialannex",
             "view_siaejobdescription",
-            "view_siaemembership",
             "view_administrativecriteria",
             "view_eligibilitydiagnosis",
             "view_selectedadministrativecriteria",
@@ -343,23 +343,23 @@ class TestCommandNewUsersToMailJet:
         # Job seekers are ignored.
         JobSeekerFactory(with_verified_email=True)
         for kind in set(CompanyKind) - set(SIAE_WITH_CONVENTION_KINDS):
-            SiaeMembershipFactory(user__with_verified_email=True, siae__kind=kind)
+            CompanyMembershipFactory(user__with_verified_email=True, siae__kind=kind)
         # Missing verified email.
-        SiaeMembershipFactory(siae__kind=CompanyKind.EI)
-        not_primary = SiaeMembershipFactory(siae__kind=CompanyKind.EI).user
+        CompanyMembershipFactory(siae__kind=CompanyKind.EI)
+        not_primary = CompanyMembershipFactory(siae__kind=CompanyKind.EI).user
         EmailAddress.objects.create(user=not_primary, email=not_primary.email, primary=False, verified=True)
         # Past users are ignored.
-        SiaeMembershipFactory(
+        CompanyMembershipFactory(
             user__date_joined=datetime.datetime(2023, 1, 12, tzinfo=datetime.UTC),
             user__with_verified_email=True,
             siae__kind=CompanyKind.EI,
         )
         # Inactive memberships are ignored.
-        SiaeMembershipFactory(user__with_verified_email=True, siae__kind=CompanyKind.EI, is_active=False)
+        CompanyMembershipFactory(user__with_verified_email=True, siae__kind=CompanyKind.EI, is_active=False)
         # Inactive users are ignored.
-        SiaeMembershipFactory(user__with_verified_email=True, user__is_active=False, siae__kind=CompanyKind.EI)
+        CompanyMembershipFactory(user__with_verified_email=True, user__is_active=False, siae__kind=CompanyKind.EI)
         # New email not verified is ignored.
-        changed_email = SiaeMembershipFactory(user__with_verified_email=True, siae__kind=CompanyKind.EI).user
+        changed_email = CompanyMembershipFactory(user__with_verified_email=True, siae__kind=CompanyKind.EI).user
         changed_email.email = "changed@mailinator.com"
         changed_email.save(update_fields=["email"])
 
@@ -393,11 +393,11 @@ class TestCommandNewUsersToMailJet:
             email="eve.ebi@mailinator.com",
             with_verified_email=True,
         )
-        SiaeMembershipFactory(user=annie, siae__kind=CompanyKind.EI)
-        SiaeMembershipFactory(user=bob, siae__kind=CompanyKind.AI)
-        SiaeMembershipFactory(user=cindy, siae__kind=CompanyKind.ACI)
-        SiaeMembershipFactory(user=dave, siae__kind=CompanyKind.ETTI)
-        SiaeMembershipFactory(user=eve, siae__kind=CompanyKind.EITI)
+        CompanyMembershipFactory(user=annie, siae__kind=CompanyKind.EI)
+        CompanyMembershipFactory(user=bob, siae__kind=CompanyKind.AI)
+        CompanyMembershipFactory(user=cindy, siae__kind=CompanyKind.ACI)
+        CompanyMembershipFactory(user=dave, siae__kind=CompanyKind.ETTI)
+        CompanyMembershipFactory(user=eve, siae__kind=CompanyKind.EITI)
         post_mock = respx_mock.post(f"{MAILJET_API_URL}REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts").mock(
             return_value=httpx.Response(201, json={"Count": 1, "Data": [{"JobID": 123456789}], "Total": 1})
         )
@@ -740,8 +740,8 @@ class TestCommandNewUsersToMailJet:
             email="bob.bailey@mailinator.com",
             with_verified_email=True,
         )
-        SiaeMembershipFactory(user=annie, siae__kind=CompanyKind.EI)
-        SiaeMembershipFactory(user=bob, siae__kind=CompanyKind.AI)
+        CompanyMembershipFactory(user=annie, siae__kind=CompanyKind.EI)
+        CompanyMembershipFactory(user=bob, siae__kind=CompanyKind.AI)
         post_mock = respx_mock.post(f"{MAILJET_API_URL}REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts").mock(
             side_effect=[
                 httpx.Response(201, json={"Count": 1, "Data": [{"JobID": 1}], "Total": 1}),
@@ -852,7 +852,7 @@ class TestCommandNewUsersToMailJet:
             email="annie.amma@mailinator.com",
             with_verified_email=True,
         )
-        SiaeMembershipFactory(user=annie, siae__kind=CompanyKind.EI)
+        CompanyMembershipFactory(user=annie, siae__kind=CompanyKind.EI)
         post_mock = respx_mock.post(f"{MAILJET_API_URL}REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts").mock(
             return_value=httpx.Response(201, json={"Count": 1, "Data": [{"JobID": 1}], "Total": 1}),
         )
@@ -923,7 +923,7 @@ class TestCommandNewUsersToMailJet:
         settings.MAILJET_SECRET_KEY = "MAILJET_SECRET_KEY"
 
         # Past users are ignored.
-        SiaeMembershipFactory(
+        CompanyMembershipFactory(
             user__date_joined=datetime.datetime(2025, 5, 1, tzinfo=datetime.UTC),
             user__with_verified_email=True,
             siae__kind=CompanyKind.EI,

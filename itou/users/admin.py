@@ -13,7 +13,7 @@ from django.utils.html import format_html
 
 from itou.approvals.models import Approval
 from itou.common_apps.address.models import BAN_API_RELIANCE_SCORE
-from itou.companies.models import SiaeMembership
+from itou.companies.models import CompanyMembership
 from itou.eligibility.models import EligibilityDiagnosis, GEIQEligibilityDiagnosis
 from itou.geo.models import QPV
 from itou.institutions.models import InstitutionMembership
@@ -44,8 +44,8 @@ class EmailAddressInline(ItouTabularInline):
         return get_admin_view_link(obj, content=obj.email)
 
 
-class SiaeMembershipInline(ItouTabularInline):
-    model = SiaeMembership
+class CompanyMembershipInline(ItouTabularInline):
+    model = CompanyMembership
     extra = 0
     raw_id_fields = ("siae",)
     readonly_fields = (
@@ -406,7 +406,7 @@ class ItouUserAdmin(UserAdmin):
         user.is_active = False
         user.save(update_fields=("email", "username", "is_active"))
         user.prescribermembership_set.update(is_active=False)
-        user.siaemembership_set.update(is_active=False)
+        user.companymembership_set.update(is_active=False)
 
         messages.success(request, "L'utilisateur peut à présent se créer un nouveau compte")
 
@@ -469,7 +469,7 @@ class ItouUserAdmin(UserAdmin):
 
         conditional_inlines = {
             "is_employer": {
-                "siaemembership_set": SiaeMembershipInline,
+                "companymembership_set": CompanyMembershipInline,
                 "job_applications_sent": SentJobApplicationInline,
             },
             "is_prescriber": {

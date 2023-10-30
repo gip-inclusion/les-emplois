@@ -139,7 +139,7 @@ class User(AbstractUser, AddressMixin):
 
     To retrieve SIAEs this user belongs to:
         self.company_set.all()
-        self.siaemembership_set.all()
+        self.companymembership_set.all()
 
     To retrieve prescribers this user belongs to:
         self.prescriberorganization_set.all()
@@ -629,10 +629,10 @@ class User(AbstractUser, AddressMixin):
         or in grace period, with a minimum of database queries.
         """
         # Unfortunately we need two queries here, no solution was found to combine both
-        # `company_set.active_or_in_grace_period()` and `siaemembership_set.active()` in a single query.
+        # `company_set.active_or_in_grace_period()` and `companymembership_set.active()` in a single query.
         user_company_set_pks = self.company_set.active_or_in_grace_period().values_list("pk", flat=True)
         memberships = (
-            self.siaemembership_set.active().select_related("siae").filter(siae__pk__in=user_company_set_pks).all()
+            self.companymembership_set.active().select_related("siae").filter(siae__pk__in=user_company_set_pks).all()
         )
         return memberships
 

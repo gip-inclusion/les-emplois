@@ -8,7 +8,7 @@ from django.utils.text import format_lazy
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS, department_from_postcode
 from itou.companies.enums import CompanyKind, ContractType
-from itou.companies.models import Company, SiaeJobDescription, SiaeMembership
+from itou.companies.models import Company, CompanyMembership, SiaeJobDescription
 from itou.jobs.models import Appellation
 from itou.utils import constants as global_constants
 from itou.utils.urls import get_external_link_markup
@@ -92,7 +92,7 @@ class CreateSiaeForm(forms.ModelForm):
         siae.convention = self.current_siae.convention
         siae.save()
 
-        SiaeMembership.objects.create(siae=siae, is_admin=True, user=self.current_user)
+        CompanyMembership.objects.create(siae=siae, is_admin=True, user=self.current_user)
 
         return siae
 
