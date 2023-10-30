@@ -2068,7 +2068,7 @@ def test_reload_qualification_fields_404(client):
 
 
 @pytest.mark.parametrize(
-    "contract_type", [value for value, _label in ContractType.choices_for_siae_kind(CompanyKind.GEIQ)]
+    "contract_type", [value for value, _label in ContractType.choices_for_company_kind(CompanyKind.GEIQ)]
 )
 def test_reload_contract_type_and_options(contract_type, client, snapshot):
     siae = SiaeFactory(pk=10, kind=CompanyKind.GEIQ, with_membership=True)
