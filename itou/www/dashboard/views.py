@@ -65,7 +65,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         can_show_financial_annexes = current_org.convention_can_be_accessed_by(request.user)
         can_show_employee_records = current_org.can_use_employee_record
         active_campaigns = (
-            EvaluatedSiae.objects.for_siae(current_org)
+            EvaluatedSiae.objects.for_company(current_org)
             .in_progress()
             .select_related("evaluation_campaign")
             .prefetch_related(
@@ -74,7 +74,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
             )
         )
         evaluated_siae_notifications = (
-            EvaluatedSiae.objects.for_siae(current_org)
+            EvaluatedSiae.objects.for_company(current_org)
             .exclude(notified_at=None)
             .filter(
                 Q(evaluation_campaign__ended_at=None)
@@ -109,7 +109,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
             ] = f"{reverse('apply:list_for_siae')}?{'&'.join([f'states={c}' for c in category['states']])}"
 
         num_rejected_employee_records = (
-            EmployeeRecord.objects.for_siae(current_org).filter(status=Status.REJECTED).count()
+            EmployeeRecord.objects.for_company(current_org).filter(status=Status.REJECTED).count()
         )
         if current_org.is_subject_to_eligibility_rules:
             # Otherwise they cannot be suspended

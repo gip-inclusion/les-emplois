@@ -395,7 +395,7 @@ class JobApplicationQuerySet(models.QuerySet):
 
         # Return the approvals that are already linked to an employee records of the SIAE
         approvals_to_exclude = (
-            EmployeeRecord.objects.for_siae(siae)
+            EmployeeRecord.objects.for_company(siae)
             # We need to exclude NEW employee records otherwise we are shooting ourselves in the foot by excluding
             # job applications selected in `._eligible_job_applications_with_employee_record()`
             .exclude(status__in=[employeerecord_enums.Status.NEW]).values("approval_number")

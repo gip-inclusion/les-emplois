@@ -814,8 +814,8 @@ class EvaluatedSiaeQuerySetTest(TestCase):
         siae2 = SiaeFactory()
         EvaluatedSiaeFactory(siae=siae2)
 
-        assert 0 == EvaluatedSiae.objects.for_siae(siae1).count()
-        assert 1 == EvaluatedSiae.objects.for_siae(siae2).count()
+        assert 0 == EvaluatedSiae.objects.for_company(siae1).count()
+        assert 1 == EvaluatedSiae.objects.for_company(siae2).count()
 
     def test_in_progress(self):
         fake_now = timezone.now()
