@@ -109,7 +109,7 @@ class GeiqJobApplicationSerializer(serializers.ModelSerializer):
     jours_accompagnement = serializers.IntegerField(source="prehiring_guidance_days", min_value=0)
     type_contrat = serializers.ChoiceField(
         source="contract_type",
-        choices=ContractType.choices_for_siae_kind(CompanyKind.GEIQ),
+        choices=ContractType.choices_for_company_kind(CompanyKind.GEIQ),
     )
     poste_occupe = serializers.SerializerMethodField()
     duree_hebdo = serializers.IntegerField(

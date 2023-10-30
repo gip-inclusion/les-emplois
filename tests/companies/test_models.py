@@ -391,7 +391,7 @@ class SiaeContractTypeTest(TestCase):
             ("PROFESSIONAL_TRAINING", "Contrat de professionalisation"),
             ("OTHER", "Autre type de contrat"),
         ]
-        result = ContractType.choices_for_siae(siae=SiaeFactory(kind=CompanyKind.GEIQ))
+        result = ContractType.choices_for_company(company=SiaeFactory(kind=CompanyKind.GEIQ))
         assert result == expected
 
         # For any ACI
@@ -402,7 +402,7 @@ class SiaeContractTypeTest(TestCase):
             ("PROFESSIONAL_TRAINING", "Contrat de professionalisation"),
             ("OTHER", "Autre type de contrat"),
         ]
-        result = ContractType.choices_for_siae(siae=SiaeFactory(kind=CompanyKind.ACI))
+        result = ContractType.choices_for_company(company=SiaeFactory(kind=CompanyKind.ACI))
         assert result == expected
 
         # For an ACI from Convergence France
@@ -415,9 +415,9 @@ class SiaeContractTypeTest(TestCase):
             ("FIXED_TERM_I_CVG", "CDD-I Convergence"),
             ("OTHER", "Autre type de contrat"),
         ]
-        siae = SiaeFactory(kind=CompanyKind.ACI)
-        with override_settings(ACI_CONVERGENCE_SIRET_WHITELIST=[siae.siret]):
-            result = ContractType.choices_for_siae(siae=siae)
+        company = SiaeFactory(kind=CompanyKind.ACI)
+        with override_settings(ACI_CONVERGENCE_SIRET_WHITELIST=[company.siret]):
+            result = ContractType.choices_for_company(company=company)
         assert result == expected
 
     def test_choices_for_siae_new_siae_kind(self):
@@ -429,7 +429,7 @@ class SiaeContractTypeTest(TestCase):
 
         expected.remove(("FED_TERM_I_PHC", "CDD-I Premières heures en Chantier"))
         expected.remove(("FIXED_TERM_I_CVG", "CDD-I Convergence"))
-        result = ContractType.choices_for_siae(siae=SiaeFactory(kind="NEW"))
+        result = ContractType.choices_for_company(company=SiaeFactory(kind="NEW"))
         assert result == expected
 
 

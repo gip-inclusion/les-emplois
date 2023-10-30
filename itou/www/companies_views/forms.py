@@ -302,7 +302,9 @@ class EditJobDescriptionForm(JobAppellationAndLocationMixin, forms.ModelForm):
         else:
             del self.fields["market_context_description"]
 
-        self.fields["contract_type"].choices = BLANK_CHOICE_DASH + ContractType.choices_for_siae(siae=current_siae)
+        self.fields["contract_type"].choices = BLANK_CHOICE_DASH + ContractType.choices_for_company(
+            company=current_siae
+        )
 
     class Meta:
         model = JobDescription

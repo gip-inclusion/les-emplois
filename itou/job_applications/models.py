@@ -617,7 +617,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     contract_type = models.CharField(
         verbose_name="type de contrat",
         max_length=30,
-        choices=ContractType.choices_for_siae_kind(CompanyKind.GEIQ),
+        choices=ContractType.choices_for_company_kind(CompanyKind.GEIQ),
         blank=True,
     )
     nb_hours_per_week = models.PositiveSmallIntegerField(

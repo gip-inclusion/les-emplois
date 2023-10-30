@@ -60,11 +60,11 @@ class ContractType(models.TextChoices):
         return empty + [(enum.value, enum.label) for enum in enums]
 
     @classmethod
-    def choices_for_siae(cls, siae):
-        return cls.choices_for_siae_kind(siae.kind, siae.siret in settings.ACI_CONVERGENCE_SIRET_WHITELIST)
+    def choices_for_company(cls, company):
+        return cls.choices_for_company_kind(company.kind, company.siret in settings.ACI_CONVERGENCE_SIRET_WHITELIST)
 
     @classmethod
-    def choices_for_siae_kind(cls, kind, aci_convergence=False):
+    def choices_for_company_kind(cls, kind, aci_convergence=False):
         choices = []
 
         match kind:
