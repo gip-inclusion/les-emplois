@@ -1,3 +1,4 @@
+from django.contrib.admin import helpers
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
@@ -9,7 +10,12 @@ from itou.users.enums import UserKind
 from itou.users.models import IdentityProvider, User
 from itou.utils.models import PkSupportRemark
 from tests.job_applications.factories import JobApplicationFactory
-from tests.users.factories import ItouStaffFactory, JobSeekerFactory
+from tests.users.factories import (
+    EmployerFactory,
+    ItouStaffFactory,
+    JobSeekerFactory,
+    PrescriberFactory,
+)
 from tests.utils.test import assertMessages
 
 
@@ -196,3 +202,67 @@ def test_app_model_change_url(admin_client):
         reverse("admin:users_jobseekerprofile_change", kwargs={"object_id": user.jobseeker_profile.pk})
     )
     assert response.status_code == 200
+
+
+def test_free_ic_email(admin_client):
+    employer = EmployerFactory(with_siae=True, username="ic_uuid_username", email="ic_user@email.com")
+    prescriber = PrescriberFactory(identity_provider=IdentityProvider.DJANGO)
+
+    # only:one user at a time
+    response = admin_client.post(
+        reverse("admin:users_user_changelist"),
+        {
+            "action": "free_ic_email",
+            helpers.ACTION_CHECKBOX_NAME: [prescriber.pk, employer.pk],
+        },
+        follow=True,
+    )
+    assertContains(response, "Vous ne pouvez selectionner qu'un seul utilisateur à la fois", html=True)
+    prescriber.refresh_from_db()
+    assert prescriber.is_active is True
+    employer.refresh_from_db()
+    assert employer.is_active is True
+
+    # only IC accounts
+    response = admin_client.post(
+        reverse("admin:users_user_changelist"),
+        {
+            "action": "free_ic_email",
+            helpers.ACTION_CHECKBOX_NAME: [prescriber.pk],
+        },
+        follow=True,
+    )
+    assertContains(response, "Vous devez sélectionner un compte Inclusion Connect")
+    prescriber.refresh_from_db()
+    assert prescriber.is_active is True
+
+    # When it works
+    response = admin_client.post(
+        reverse("admin:users_user_changelist"),
+        {
+            "action": "free_ic_email",
+            helpers.ACTION_CHECKBOX_NAME: [employer.pk],
+        },
+        follow=True,
+    )
+    assertContains(response, "L'utilisateur peut à présent se créer un nouveau compte", html=True)
+    employer.refresh_from_db()
+    assert employer.is_active is False
+    assert employer.siaemembership_set.get().is_active is False
+    assert employer.username == "old_ic_uuid_username"
+    assert employer.email == "ic_user@email.com_old"
+
+    # It won't work twice on the same user
+    response = admin_client.post(
+        reverse("admin:users_user_changelist"),
+        {
+            "action": "free_ic_email",
+            helpers.ACTION_CHECKBOX_NAME: [employer.pk],
+        },
+        follow=True,
+    )
+    assertContains(response, "Ce compte a déjà été libré de l'emprise d'Inclusion Connect", html=True)
+    employer.refresh_from_db()
+    assert employer.is_active is False
+    assert employer.username == "old_ic_uuid_username"
+    assert employer.email == "ic_user@email.com_old"
