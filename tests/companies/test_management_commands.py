@@ -50,9 +50,9 @@ class MoveSiaeDataTest(TestCase):
             wet_run=True,
         )
 
-        assert EmployeeRecord.objects.for_siae(old_siae).count() == 0
+        assert EmployeeRecord.objects.for_company(old_siae).count() == 0
         assert EmployeeRecord.objects.orphans().count() == 1
-        assert EmployeeRecord.objects.for_siae(new_siae).count() == 1
+        assert EmployeeRecord.objects.for_company(new_siae).count() == 1
         assert EmployeeRecord.objects.count() == 2
 
     def test_employee_records_are_accessible_when_the_convention_is_the_same(self):
@@ -69,9 +69,9 @@ class MoveSiaeDataTest(TestCase):
             wet_run=True,
         )
 
-        assert EmployeeRecord.objects.for_siae(old_siae).count() == 0
+        assert EmployeeRecord.objects.for_company(old_siae).count() == 0
         assert EmployeeRecord.objects.orphans().count() == 0
-        assert EmployeeRecord.objects.for_siae(new_siae).count() == 1
+        assert EmployeeRecord.objects.for_company(new_siae).count() == 1
         assert EmployeeRecord.objects.count() == 1
 
 

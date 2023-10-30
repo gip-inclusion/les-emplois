@@ -30,7 +30,7 @@ class Command(BaseCommand):
 
         orphans = EmployeeRecord.objects.filter(job_application__to_siae=siae).orphans()
         to_clone = (
-            orphans.exclude(approval_number__in=EmployeeRecord.objects.for_siae(siae).values("approval_number"))
+            orphans.exclude(approval_number__in=EmployeeRecord.objects.for_company(siae).values("approval_number"))
             .distinct("approval_number")
             .order_by("approval_number", "-job_application__hiring_start_at", "-pk")
         )

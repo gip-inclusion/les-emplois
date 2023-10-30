@@ -33,7 +33,7 @@ class ProlongationReason(models.TextChoices):
     HEALTH_CONTEXT = "HEALTH_CONTEXT", "Contexte sanitaire"
 
     @classmethod
-    def for_siae(cls, siae):
+    def for_company(cls, siae):
         enums = [
             cls.SENIOR_CDI,
             cls.COMPLETE_TRAINING,

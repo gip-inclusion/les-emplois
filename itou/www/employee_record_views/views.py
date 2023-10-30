@@ -91,7 +91,7 @@ def list_employee_records(request, template_name="employee_record/list.html"):
 
     employee_record_badges = {
         row["status"]: row["cnt"]
-        for row in EmployeeRecord.objects.for_siae(siae).values("status").annotate(cnt=Count("status"))
+        for row in EmployeeRecord.objects.for_company(siae).values("status").annotate(cnt=Count("status"))
     }
 
     eligible_job_applications = JobApplication.objects.eligible_as_employee_record(siae)
@@ -147,7 +147,7 @@ def list_employee_records(request, template_name="employee_record/list.html"):
     else:
         data = (
             EmployeeRecord.objects.full_fetch()
-            .for_siae(siae)
+            .for_company(siae)
             .filter(status=status)
             .order_by(*employee_record_order_by)
         )
