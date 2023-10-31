@@ -150,6 +150,18 @@ class TestApprovalsListView:
             start_at=now - relativedelta(days=1),
             end_at=now + relativedelta(days=1),
         )
+        # Add 2 suspensions on valid approval because it used to cause duplicates
+        # when valid and suspended filters were selected
+        SuspensionFactory(
+            approval=valid_approval,
+            start_at=now - relativedelta(days=10),
+            end_at=now - relativedelta(days=9),
+        )
+        SuspensionFactory(
+            approval=valid_approval,
+            start_at=now - relativedelta(days=3),
+            end_at=now - relativedelta(days=2),
+        )
 
         siae_member = siae.members.first()
         client.force_login(siae_member)
@@ -217,7 +229,7 @@ class TestApprovalsListView:
         )
 
         # Check IAE pass remainder days
-        assertContains(response, "365 jours")
+        assertContains(response, "367 jours")
 
         assertContains(response, "366 jours")
 
