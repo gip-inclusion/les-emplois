@@ -159,12 +159,12 @@ class ApprovalListView(ApprovalBaseViewMixin, ListView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         if self.siae:
-            self.form = ApprovalForm(self.siae.pk, self.request.GET)
+            self.form = ApprovalForm(self.siae.pk, self.request.GET or None)
 
     def get_queryset(self):
-        form_filters = []
+        form_filters = [self.form.get_approvals_qs_filter()]
         if self.form.is_valid():
-            form_filters = self.form.get_qs_filters()
+            form_filters += self.form.get_qs_filters()
         return (
             super()
             .get_queryset()
