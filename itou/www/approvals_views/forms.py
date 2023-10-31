@@ -1,5 +1,8 @@
+import operator
 from datetime import timedelta
+from functools import reduce
 
+from dateutil.relativedelta import relativedelta
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db.models import Exists, OuterRef, Q
@@ -39,12 +42,20 @@ class ApprovalForm(forms.Form):
     status_future = forms.BooleanField(label="PASS IAE valide (non démarré)", required=False)
     status_expired = forms.BooleanField(label="PASS IAE expiré", required=False)
 
-    def __init__(self, siae_pk, *args, **kwargs):
+    EXPIRY_CHOICES = [("1", "Moins d'1 mois"), ("3", "Moins de 3 mois"), ("7", "Moins de 7 mois"), ("0", "Tous")]
+    expiry = forms.ChoiceField(
+        label="Fin du parcours en IAE",
+        choices=EXPIRY_CHOICES,
+        widget=forms.RadioSelect,
+        initial="0",
+    )
+
+    def __init__(self, siae_pk, data, *args, **kwargs):
         self.siae_pk = siae_pk
-        super().__init__(*args, **kwargs)
+        super().__init__(data, *args, **kwargs)
         self.fields["users"].choices = self._get_choices_for_job_seekers()
 
-    def _get_approvals_qs_filter(self):
+    def get_approvals_qs_filter(self):
         return Exists(
             JobApplication.objects.filter(
                 approval=OuterRef("pk"),
@@ -54,7 +65,7 @@ class ApprovalForm(forms.Form):
         )
 
     def _get_choices_for_job_seekers(self):
-        approvals_qs = Approval.objects.filter(self._get_approvals_qs_filter())
+        approvals_qs = Approval.objects.filter(self.get_approvals_qs_filter())
         users_qs = User.objects.filter(kind=UserKind.JOB_SEEKER, approvals__in=approvals_qs)
         return [
             (user.pk, user.get_full_name().title())
@@ -66,7 +77,7 @@ class ApprovalForm(forms.Form):
         return len(self.data)
 
     def get_qs_filters(self):
-        qs_filters_list = [self._get_approvals_qs_filter()]
+        qs_filters_list = []
         data = self.cleaned_data
 
         if users := data.get("users"):
@@ -83,11 +94,10 @@ class ApprovalForm(forms.Form):
             status_filters_list.append(Q(start_at__gt=now))
         if data.get("status_expired"):
             status_filters_list.append(Q(end_at__lt=now))
-        if status_filters_list:
-            status_filters = Q()
-            for status_filter in status_filters_list:
-                status_filters |= status_filter
-            qs_filters_list.append(status_filters)
+        qs_filters_list.append(Q(reduce(operator.or_, status_filters_list, Q())))
+
+        if expiry := int(data.get("expiry")):
+            qs_filters_list.append(Q(end_at__lt=now + relativedelta(months=expiry), end_at__gte=now))
 
         return qs_filters_list
 

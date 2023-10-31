@@ -106,14 +106,14 @@ class TestApprovalsListView:
             (approval_same_siae.user_id, "Seb Tambre"),
         ]
 
-        url = f"{reverse('approvals:list')}?users={approval.user_id}"
+        url = f"{reverse('approvals:list')}?users={approval.user_id}&expiry=0"
         response = client.get(url)
         assertContains(response, "1 résultat")
         assertContains(response, reverse("approvals:detail", kwargs={"pk": approval.pk}))
         assertNotContains(response, reverse("approvals:detail", kwargs={"pk": approval_same_siae.pk}))
         assertNotContains(response, reverse("approvals:detail", kwargs={"pk": approval_other_siae.pk}))
 
-        url = f"{reverse('approvals:list')}?users={approval.user_id}&users={approval_same_siae.user_id}"
+        url = f"{reverse('approvals:list')}?users={approval.user_id}&users={approval_same_siae.user_id}&expiry=0"
         response = client.get(url)
         assertContains(response, "2 résultats")
         assertContains(response, reverse("approvals:detail", kwargs={"pk": approval.pk}))
@@ -165,28 +165,29 @@ class TestApprovalsListView:
 
         siae_member = siae.members.first()
         client.force_login(siae_member)
+        list_url = reverse("approvals:list")
 
-        url = f"{reverse('approvals:list')}?status_valid=on"
+        url = f"{list_url}?status_valid=on&expiry=0"
         response = client.get(url)
         assertContains(response, "1 résultat")
         assertContains(response, reverse("approvals:detail", kwargs={"pk": valid_approval.pk}))
 
-        url = f"{reverse('approvals:list')}?status_suspended=on"
+        url = f"{list_url}?status_suspended=on&expiry=0"
         response = client.get(url)
         assertContains(response, "1 résultat")
         assertContains(response, reverse("approvals:detail", kwargs={"pk": suspended_approval.pk}))
 
-        url = f"{reverse('approvals:list')}?status_future=on"
+        url = f"{list_url}?status_future=on&expiry=0"
         response = client.get(url)
         assertContains(response, "1 résultat")
         assertContains(response, reverse("approvals:detail", kwargs={"pk": future_approval.pk}))
 
-        url = f"{reverse('approvals:list')}?status_expired=on"
+        url = f"{list_url}?status_expired=on&expiry=0"
         response = client.get(url)
         assertContains(response, "1 résultat")
         assertContains(response, reverse("approvals:detail", kwargs={"pk": expired_approval.pk}))
 
-        url = f"{reverse('approvals:list')}?status_expired=on&status_suspended=on&status_future=on&status_valid=on"
+        url = f"{list_url}?status_expired=on&status_suspended=on&status_future=on&status_valid=on&expiry=0"
         response = client.get(url)
         assertContains(response, "4 résultats")
         assertContains(response, reverse("approvals:detail", kwargs={"pk": valid_approval.pk}))
@@ -236,3 +237,59 @@ class TestApprovalsListView:
         assertContains(response, "730 jours")
 
         assertContains(response, "0 jour")
+
+    def test_approval_expiry_filters(self, client):
+        now = timezone.localdate()
+        siae = SiaeFactory(with_membership=True)
+
+        in_less_than_1_month = now + relativedelta(days=20)
+        approval_1 = ApprovalFactory(
+            start_at=in_less_than_1_month - relativedelta(years=2),
+            end_at=in_less_than_1_month,
+            with_jobapplication=True,
+            with_jobapplication__to_siae=siae,
+        )
+        in_less_than_3_months = now + relativedelta(days=80)
+        approval_3 = ApprovalFactory(
+            start_at=in_less_than_3_months - relativedelta(years=2),
+            end_at=in_less_than_3_months,
+            with_jobapplication=True,
+            with_jobapplication__to_siae=siae,
+        )
+        in_less_than_7_mmonths = now + relativedelta(days=200)
+        approval_7 = ApprovalFactory(
+            start_at=in_less_than_7_mmonths - relativedelta(years=2),
+            end_at=in_less_than_7_mmonths,
+            with_jobapplication=True,
+            with_jobapplication__to_siae=siae,
+        )
+        ApprovalFactory(
+            start_at=now - relativedelta(years=1),
+            with_jobapplication=True,
+            with_jobapplication__to_siae=siae,
+        )
+
+        siae_member = siae.members.first()
+        client.force_login(siae_member)
+
+        url = f"{reverse('approvals:list')}?expiry=7"
+        response = client.get(url)
+        assertContains(response, "3 résultats")
+        assertContains(response, reverse("approvals:detail", kwargs={"pk": approval_7.pk}))
+        assertContains(response, reverse("approvals:detail", kwargs={"pk": approval_3.pk}))
+        assertContains(response, reverse("approvals:detail", kwargs={"pk": approval_1.pk}))
+
+        url = f"{reverse('approvals:list')}?expiry=3"
+        response = client.get(url)
+        assertContains(response, "2 résultats")
+        assertContains(response, reverse("approvals:detail", kwargs={"pk": approval_3.pk}))
+        assertContains(response, reverse("approvals:detail", kwargs={"pk": approval_1.pk}))
+
+        url = f"{reverse('approvals:list')}?expiry=1"
+        response = client.get(url)
+        assertContains(response, "1 résultat")
+        assertContains(response, reverse("approvals:detail", kwargs={"pk": approval_1.pk}))
+
+        url = f"{reverse('approvals:list')}?expiry=7&status_expired=on"
+        response = client.get(url)
+        assertContains(response, "0 résultat")
