@@ -1,12 +1,14 @@
 import datetime
 
 from django.contrib import admin, messages
+from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.timezone import now
 from import_export import resources
 from import_export.admin import ExportActionMixin
 from import_export.fields import Field
 
+from itou.approvals.models import Approval
 from itou.common_apps.organizations.admin import HasMembersFilter, MembersInline, OrganizationAdmin
 from itou.companies import enums, models
 from itou.companies.admin_forms import SiaeAdminForm
@@ -18,6 +20,7 @@ from itou.utils.admin import (
     get_admin_view_link,
 )
 from itou.utils.apis.exceptions import GeocodingDataError
+from itou.utils.urls import add_url_params
 
 
 class SiaeMembersInline(MembersInline):
@@ -160,6 +163,7 @@ class SiaeAdmin(ItouGISMixin, ExportActionMixin, OrganizationAdmin):
                     "updated_at",
                     "block_job_applications",
                     "job_applications_blocked_at",
+                    "approvals_list",
                 )
             },
         ),
@@ -194,6 +198,7 @@ class SiaeAdmin(ItouGISMixin, ExportActionMixin, OrganizationAdmin):
             "updated_at",
             "job_applications_blocked_at",
             "geocoding_score",
+            "approvals_list",
         ]
         if obj:
             readonly_fields.append("kind")
@@ -245,6 +250,13 @@ class SiaeAdmin(ItouGISMixin, ExportActionMixin, OrganizationAdmin):
         if obj and obj.siret == enums.POLE_EMPLOI_SIRET:
             return False
         return super().has_change_permission(request, obj)
+
+    @admin.display(description="Liste des PASS IAE pour cette SIAE")
+    def approvals_list(self, obj):
+        url = add_url_params(reverse("admin:approvals_approval_changelist"), {"assigned_company": obj.id, "o": -6})
+        count = Approval.objects.is_assigned_to(obj.id).count()
+        valid_count = Approval.objects.is_assigned_to(obj.id).valid().count()
+        return format_html('<a href="{}">Liste des {} Pass IAE (dont {} valides)</a>', url, count, valid_count)
 
 
 @admin.register(models.SiaeJobDescription)

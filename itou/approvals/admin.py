@@ -222,6 +222,12 @@ class ApprovalAdmin(ItouModelAdmin):
         PkSupportRemarkInline,
     )
 
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        if company_id := request.GET.get("assigned_company"):
+            queryset = queryset.is_assigned_to(company_id)
+        return queryset
+
     def get_readonly_fields(self, request, obj=None):
         if obj:
             return ("origin",) + self.readonly_fields

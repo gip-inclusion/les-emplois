@@ -11,7 +11,7 @@ from django.contrib.postgres.fields import ArrayField, RangeBoundary, RangeOpera
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.db import models, transaction
-from django.db.models import Case, Count, Q, When
+from django.db.models import Case, Count, OuterRef, Q, Subquery, When
 from django.db.models.functions import Now, TruncDate
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -200,6 +200,25 @@ class ApprovalQuerySet(CommonApprovalQuerySet):
         # and trace the errors to see it happens frequently enough to warrant the implementation
         # of a proper handling method, through `post_delete` for example?
         raise NotImplementedError("Supprimer des PASS IAE en masse est interdit, veuillez les annuler un par un.")
+
+    def with_assigned_company(self):
+        job_application_model = self.model._meta.get_field("jobapplication").related_model
+        return self.annotate(
+            assigned_company=Subquery(
+                job_application_model.objects.accepted()
+                .with_accepted_at()
+                .filter(job_seeker=OuterRef("user"))
+                .order_by("-accepted_at", "-hiring_start_at")
+                .values("to_siae")[:1]
+            )
+        )
+
+    def is_assigned_to(self, company_id):
+        return (
+            self.filter(user__job_applications__to_siae=company_id)
+            .with_assigned_company()
+            .filter(assigned_company=company_id)
+        )
 
 
 class PENotificationMixin(models.Model):
