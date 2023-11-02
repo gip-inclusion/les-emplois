@@ -1,6 +1,6 @@
 # serializer version: 1
 # name: ProcessTransferJobApplicationTest.test_job_application_transfer_redirection[job application transfer message]
-  '<p>La candidature de <b>&lt;&gt;html escaped&lt;&gt; Doe</b> a bien été transférée à la SIAE <b>Acme inc.</b>, 112 rue de la Croix-Nivert, 75015 Paris.</p><p>Pour la consulter, rendez-vous sur son tableau de bord en changeant de structure.</p>'
+  'La candidature de <>Html Escaped<> DOE a bien été transférée à Acme inc.||Pour la consulter, rendez-vous sur son tableau de bord en changeant de structure'
 # ---
 # name: test_reload_contract_type_and_options[APPRENTICESHIP]
   '''
