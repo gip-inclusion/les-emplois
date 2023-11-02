@@ -43,7 +43,7 @@ class TestSendSingleSiaeInvitation(TestCase):
         self.assertContains(response, form["email"].label)
 
         response = self.client.post(INVITATION_URL, data=self.post_data, follow=True)
-        self.assertContains(response, "Votre invitation a été envoyée par courriel.")
+        self.assertContains(response, "Invitation envoyée")
 
         invitations = EmployerInvitation.objects.all()
         assert len(invitations) == 1
