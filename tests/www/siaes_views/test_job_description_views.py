@@ -266,7 +266,7 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
         assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in self.client.session
 
         post_data = {
-            "job_appellation": "11076",  # Must be a non existing one for the SIAE
+            "appellation": "11076",  # Must be a non existing one for the SIAE
             "custom_name": "custom_name",
             "location_code": "paris-75",
             "hours_per_week": 35,
@@ -336,7 +336,7 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
         assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in self.client.session
 
         post_data = {
-            "job_appellation": "11076",  # Must be a non existing one for the SIAE
+            "appellation": "11076",  # Must be a non existing one for the SIAE
             "market_context_description": "Whatever market description",
             "custom_name": "custom_name",
             "location_code": "paris-75",
@@ -405,7 +405,7 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
         assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in self.client.session
 
         post_data = {
-            "job_appellation": 11076,  # Must be a non existing one for the SIAE
+            "appellation": "11076",  # Must be a non existing one for the SIAE
             "custom_name": "custom_name",
             "location_code": "paris-75",
             "hours_per_week": 35,

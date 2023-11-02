@@ -461,7 +461,7 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
         "hired_job",
         "location_label",
         "location_code",
-        "job_appellation",
+        "appellation",
     )
 
     GEIQ_REQUIRED_FIELDS = (
@@ -640,7 +640,7 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
             }
         )
 
-        self.fields["job_appellation"].label = "Préciser le nom du poste (code ROME)"
+        self.fields["appellation"].label = "Préciser le nom du poste (code ROME)"
         self.fields["location_label"].label = "Localisation du poste"
 
     def clean_hiring_start_at(self):
@@ -673,11 +673,11 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
                 self.cleaned_data["inverted_vae_contract"] = bool(self.cleaned_data.get("inverted_vae_contract"))
 
         location_code = self.cleaned_data.get("location_code")
-        job_appellation = self.cleaned_data.get("job_appellation")
+        appellation = self.cleaned_data.get("appellation")
 
         if self.cleaned_data.get("hired_job") == self.OTHER_HIRED_JOB:
-            if not job_appellation:
-                self.add_error("job_appellation", forms.ValidationError("Un poste doit être saisi en cas de création"))
+            if not appellation:
+                self.add_error("appellation", forms.ValidationError("Un poste doit être saisi en cas de création"))
             elif not location_code:
                 # location becomes mandatory in this case only:
                 self.add_error(
@@ -690,14 +690,14 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
         # so we need to wrap the call to save in a atomic transaction
         instance = super().save(commit)
         location_code = self.cleaned_data.get("location_code")
-        job_appellation = self.cleaned_data.get("job_appellation")
+        appellation = self.cleaned_data.get("appellation")
 
         if self.cleaned_data.get("hired_job") == self.OTHER_HIRED_JOB:
             city = City.objects.get(slug=location_code)
 
             # Check that the new job application is not a duplicate from the list
             if existing_job_description := SiaeJobDescription.objects.filter(
-                siae=self.siae, location=city, appellation=job_appellation
+                siae=self.siae, location=city, appellation=appellation
             ).first():
                 # Found one matching: reuse it and don't create a new one
                 self.instance.hired_job = existing_job_description
@@ -708,7 +708,7 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
                 # - associated to current job application
                 new_job_description = SiaeJobDescription(
                     siae=self.siae,
-                    appellation=job_appellation,
+                    appellation=appellation,
                     location=city,
                     is_active=False,
                     description="La structure n’a pas encore renseigné cette rubrique",

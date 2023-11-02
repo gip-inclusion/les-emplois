@@ -206,7 +206,7 @@ def edit_job_description_details(request, template_name="siaes/edit_job_descript
         rome = get_object_or_404(Appellation.objects.select_related("rome"), pk=job_appellation_code).rome.code
     else:
         rome = get_object_or_404(
-            Appellation.objects.select_related("rome"), pk=session_data.get("job_appellation")
+            Appellation.objects.select_related("rome"), pk=session_data.get("appellation")
         ).rome.code
 
     form = siaes_forms.EditJobDescriptionDetailsForm(
@@ -264,7 +264,7 @@ def edit_job_description_preview(request, template_name="siaes/edit_job_descript
         # TODO(xfernandez): Legacy code, remove me in a few days (time for session to expire)
         appellation = Appellation.objects.get(pk=job_appellation_code)
     else:
-        appellation = Appellation.objects.get(pk=session_data.get("job_appellation"))
+        appellation = Appellation.objects.get(pk=session_data.get("appellation"))
     job_description.appellation = appellation
     job_description.siae = siae
 
