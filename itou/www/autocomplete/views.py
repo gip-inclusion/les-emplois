@@ -73,7 +73,7 @@ def jobs_autocomplete(request):
         if select2_mode:
             appellations = [
                 {
-                    "text": f"{appellation.name} ({appellation.rome.code})",
+                    "text": appellation.autocomplete_display(),
                     "id": appellation.pk,
                 }
                 for appellation in Appellation.objects.autocomplete(term, limit=10)
@@ -81,7 +81,7 @@ def jobs_autocomplete(request):
         else:
             appellations = [
                 {
-                    "value": f"{appellation.name} ({appellation.rome.code})",
+                    "value": appellation.autocomplete_display(),
                     "code": appellation.code,
                     "rome": appellation.rome.code,
                     "name": appellation.name,
