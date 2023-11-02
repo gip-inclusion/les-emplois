@@ -101,7 +101,7 @@ def job_description_list(request, template_name="siaes/job_description_list.html
                 job_description = JobDescription.objects.filter(siae_id=siae.pk, pk=job_description_id).first()
                 if job_description is not None:
                     job_description.delete()
-                    messages.success(request, "La fiche de poste a été supprimée.")
+                    messages.success(request, "La fiche de poste a été supprimée.", extra_tags="toast")
                 else:
                     messages.warning(request, "La fiche de poste que vous souhaitez supprimer n'existe plus.")
             case "toggle_active":
@@ -109,17 +109,37 @@ def job_description_list(request, template_name="siaes/job_description_list.html
                 if job_description := JobDescription.objects.filter(siae_id=siae.pk, pk=job_description_id).first():
                     job_description.is_active = is_active
                     job_description.save(update_fields=["is_active"])
-                    messages.success(request, f"Le recrutement est maintenant {'ouvert' if is_active else 'fermé'}.")
+                    if is_active:
+                        messages.success(
+                            request,
+                            "Le recrutement est maintenant ouvert.",
+                            extra_tags="toast",
+                        )
+                    else:
+                        messages.warning(
+                            request,
+                            "Le recrutement est maintenant fermé.",
+                            extra_tags="toast",
+                        )
                 else:
                     messages.error(request, "La fiche de poste que vous souhaitiez modifier n'existe plus.")
             case "block_job_applications":
                 siae = form.save()
-                messages.success(
-                    request,
-                    "La réception de candidature est temporairement bloquée."
-                    if siae.block_job_applications
-                    else "La structure peut recevoir des candidatures.",
-                )
+                if siae.block_job_applications:
+                    messages.warning(
+                        request,
+                        (
+                            "La réception de candidatures est temporairement bloquée.||"
+                            "Pour recevoir de nouvelles candidatures, veuillez désactiver le blocage"
+                        ),
+                        extra_tags="toast",
+                    )
+                else:
+                    messages.success(
+                        request,
+                        "La structure peut maintenant recevoir de nouvelles candidatures.",
+                        extra_tags="toast",
+                    )
             case _:
                 messages.error(request, "Cette action n'est pas supportée")
 
@@ -275,7 +295,11 @@ def edit_job_description_preview(request, template_name="siaes/edit_job_descript
     if request.method == "POST":
         try:
             job_description.save()
-            messages.success(request, "Enregistrement de la fiche de poste effectué.")
+            messages.success(
+                request,
+                "Fiche de poste enregistrée",
+                extra_tags="toast",
+            )
         finally:
             request.session.pop(ITOU_SESSION_JOB_DESCRIPTION_KEY)
             return HttpResponseRedirect(reverse("companies_views:job_description_list"))
