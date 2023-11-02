@@ -7,16 +7,17 @@
     {{ block.super }}
 
     {% if user.is_employer and request.current_organization and not request.current_organization.jobs.exists %}
-        <div class="alert alert-warning">
+        <div class="alert alert-warning alert-dismissible show" role="status">
             <p class="mb-0">
                 Pour optimiser la réception de vos candidatures, pensez à renseigner le descriptif de vos postes et leurs prérequis.
             </p>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
         </div>
     {% endif %}
 
     {# Alerte pour les employeurs en cas d'absence ou de mauvais score de geocoding. #}
     {% if user.is_employer and request.current_organization and not request.current_organization.has_reliable_coords_legacy %}
-        <div class="alert alert-warning mb-0" role="status">
+        <div class="alert alert-warning alert-dismissible show" role="status">
             <p class="mb-0">
                 Nous n'avons pas pu géolocaliser votre établissement.
                 <br>
@@ -31,13 +32,14 @@
                 {% endif %}
                 ou <a href="{{ ITOU_HELP_CENTER_URL }}" target="_blank" rel="noopener" aria-label="Contactez-nous en cas de problème (ouverture dans un nouvel onglet)">contactez-nous</a> en cas de problème.
             </p>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
         </div>
     {% endif %}
 
     {# Alerte pour les prescripteurs en cas d'absence ou de mauvais score de geocoding. #}
     {# Seuls les prescripteurs habilités apparaissent dans le moteur de recherche. #}
     {% if user.is_prescriber and request.current_organization and request.current_organization.is_authorized and not request.current_organization.has_reliable_coords_legacy %}
-        <div class="alert alert-warning mb-0" role="status">
+        <div class="alert alert-warning alert-dismissible show" role="status">
             <p class="mb-0">
                 Nous n'avons pas pu géolocaliser votre établissement.
                 <br>
@@ -52,11 +54,12 @@
                 {% endif %}
                 ou <a href="{{ ITOU_HELP_CENTER_URL }}" target="_blank" rel="noopener" aria-label="Contactez-nous en cas de problème (ouverture dans un nouvel onglet)">contactez-nous</a> en cas de problème.
             </p>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
         </div>
     {% endif %}
 
     {% if user.is_employer and request.current_organization and not request.current_organization.is_active %}
-        <div class="alert alert-warning mb-0" role="status">
+        <div class="alert alert-warning alert-dismissible show" role="status">
             <p class="mb-0">
                 Votre structure
                 {% if request.current_organization.siret %}
@@ -79,11 +82,12 @@
                     {% endwith %}
                 {% endif %}
             </p>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
         </div>
     {% endif %}
 
     {% if user.is_prescriber and request.current_organization and request.current_organization.has_pending_authorization %}
-        <div class="alert alert-warning" role="status">
+        <div class="alert alert-warning alert-dismissible show" role="status">
             <p class="mb-0">
                 Votre habilitation à valider l'éligibilité d'une personne candidate au dispositif d'Insertion par l'Activité Économique est en cours de vérification par nos équipes. Vous ne pouvez pas encore réaliser le diagnostic d'éligibilité des candidats.
             </p>
@@ -99,6 +103,7 @@
                     </a>
                 </p>
             {% endif %}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
         </div>
     {% endif %}
 
