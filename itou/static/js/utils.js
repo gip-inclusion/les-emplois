@@ -4,6 +4,11 @@ htmx.onLoad((target) => {
     });
 
   /**
+   * Force select2 initialization after htmx swaps
+   */
+  $('.django-select2', target).djangoSelect2()
+
+  /**
    * JS to swap elements based on CSS selectors
    */
   function swapElements(e) {
