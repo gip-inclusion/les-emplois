@@ -725,12 +725,11 @@ def siae_submit_proofs(request, evaluated_siae_pk):
 
     messages.success(
         request,
-        mark_safe(
-            "<b>Justificatifs transmis !</b><br>"
-            "Merci d'avoir pris le temps de transmettre vos pièces justificatives.<br>"
-            "Le contrôle de celles-ci est à la charge de votre DDETS maintenant, vous serez notifié du résultat "
-            "(qu'il soit positif ou négatif) par mail lorsque celui-ci sera finalisé."
+        (
+            "Justificatifs transmis !||Leur contrôle est à la charge de votre DDETS."
+            "Une fois finalisée, vous serez notifié du résultat par email."
         ),
+        extra_tags="toast",
     )
     return HttpResponseRedirect(back_url)
 
