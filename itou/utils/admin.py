@@ -56,7 +56,7 @@ class ItouStackedInline(StackedInline, ItouTabularInline):
 
 
 class ItouModelAdmin(ModelAdmin):
-    def __get_queryset_with_relations(self, request):
+    def _get_queryset_with_relations(self, request):
         select_related_fields, prefetch_related_fields = set(), set()
         for field in self.model._meta.get_fields():
             if not field.is_relation or field.auto_created:
@@ -76,5 +76,5 @@ class ItouModelAdmin(ModelAdmin):
 
     def get_object(self, request, object_id, from_field=None):
         # Eager-loading all relations, but only when editing one object because `list_select_related` exists
-        with mock.patch.object(self, "get_queryset", self.__get_queryset_with_relations):
+        with mock.patch.object(self, "get_queryset", self._get_queryset_with_relations):
             return super().get_object(request, object_id, from_field)

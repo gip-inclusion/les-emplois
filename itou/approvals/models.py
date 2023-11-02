@@ -209,7 +209,7 @@ class ApprovalQuerySet(CommonApprovalQuerySet):
                 .with_accepted_at()
                 .filter(job_seeker=OuterRef("user"))
                 .order_by("-accepted_at", "-hiring_start_at")
-                .values("to_siae")[:1]
+                .values("to_siae")[:1],
             )
         )
 
