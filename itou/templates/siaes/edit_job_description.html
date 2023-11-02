@@ -38,7 +38,7 @@
                             {% csrf_token %}
 
                             {# Not using compact form because of `other_contract_type` field dynamic behaviour #}
-                            {% bootstrap_field form.job_appellation %}
+                            {% bootstrap_field form.appellation %}
                             {% bootstrap_field form.custom_name %}
                             {% bootstrap_field form.location_label %}
                             {% bootstrap_field form.location_code %}

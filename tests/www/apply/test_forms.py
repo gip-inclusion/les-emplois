@@ -98,10 +98,10 @@ class TestAcceptForm:
 
         assert sorted(form.fields.keys()) == [
             "answer",
+            "appellation",
             "hired_job",
             "hiring_end_at",
             "hiring_start_at",
-            "job_appellation",
             "location_code",
             "location_label",
         ]
@@ -110,13 +110,13 @@ class TestAcceptForm:
     def test_accept_form_with_geiq(self):
         EXPECTED_FIELDS = [
             "answer",
+            "appellation",
             "contract_type",
             "contract_type_details",
             "hired_job",
             "hiring_end_at",
             "hiring_start_at",
             "inverted_vae_contract",
-            "job_appellation",
             "location_code",
             "location_label",
             "nb_hours_per_week",

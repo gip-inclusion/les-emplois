@@ -223,7 +223,7 @@ class JobAppellationAndLocationMixin(forms.Form):
     # NB we need to inherit from forms.Form if we want the attributes
     # to be added to the a Form using this mixin (django magic)
 
-    job_appellation = forms.ModelChoiceField(
+    appellation = forms.ModelChoiceField(
         queryset=Appellation.objects,
         label="Poste (code ROME)",
         widget=RemoteAutocompleteSelect2Widget(
@@ -262,7 +262,7 @@ class JobAppellationAndLocationMixin(forms.Form):
     class Meta:
         model = SiaeJobDescription
         fields = [
-            "job_appellation",
+            "appellation",
             "custom_name",
             "location_label",
             "location_code",
@@ -290,11 +290,9 @@ class EditJobDescriptionForm(JobAppellationAndLocationMixin, forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.instance.siae = current_siae
 
-        self.fields["job_appellation"].required = True
+        self.fields["appellation"].required = True
 
         if self.instance.pk:
-            self.fields["job_appellation"].initial = self.instance.appellation.pk
-
             if self.instance.location:
                 # Optional field
                 self.fields["location_label"].initial = self.instance.location.name
@@ -323,7 +321,7 @@ class EditJobDescriptionForm(JobAppellationAndLocationMixin, forms.ModelForm):
     class Meta:
         model = SiaeJobDescription
         fields = [
-            "job_appellation",
+            "appellation",
             "custom_name",
             "location_label",
             "location_code",
