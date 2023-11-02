@@ -129,27 +129,7 @@ def _accept(request, siae, job_seeker, error_url, back_url, template_name, extra
         if job_application.to_siae.is_subject_to_eligibility_rules:
             # Automatic approval delivery mode.
             if job_application.approval:
-                external_link = get_external_link_markup(
-                    url=(
-                        "https://www.pole-emploi.fr/employeur/aides-aux-recrutements/"
-                        "les-aides-a-lembauche/insertion-par-lactivite-economiq.html"
-                    ),
-                    text="l’aide spécifique de Pôle emploi",
-                )
-                messages.success(
-                    request,
-                    mark_safe(
-                        "Embauche acceptée ! Pour un contrat de professionnalisation, vous pouvez "
-                        f"demander l'aide au poste ou {external_link}."
-                    ),
-                )
-                messages.success(
-                    request,
-                    (
-                        "Le numéro de PASS IAE peut être utilisé pour la déclaration "
-                        "de la personne dans l'extranet IAE 2.0 de l'ASP."
-                    ),
-                )
+                messages.success(request, "Candidature acceptée !", extra_tags="toast")
             # Manual approval delivery mode.
             elif not job_application.hiring_without_approval:
                 external_link = get_external_link_markup(

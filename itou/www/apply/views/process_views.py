@@ -7,7 +7,6 @@ from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirec
 from django.shortcuts import get_object_or_404, render
 from django.template import loader
 from django.urls import reverse, reverse_lazy
-from django.utils.html import format_html
 from django.utils.http import urlencode
 from django.views.decorators.http import require_POST
 from django.views.generic.base import TemplateView
@@ -322,7 +321,7 @@ def cancel(request, job_application_id, template_name="apply/process_cancel.html
         try:
             # After each successful transition, a save() is performed by django-xworkflows.
             job_application.cancel(user=request.user)
-            messages.success(request, "L'embauche a bien été annulée.")
+            messages.success(request, "L'embauche a bien été annulée.", extra_tags="toast")
         except xwf_models.InvalidTransitionError:
             messages.error(request, "Action déjà effectuée.")
         return HttpResponseRedirect(next_url)
@@ -386,16 +385,12 @@ def transfer(request, job_application_id):
         job_application.transfer_to(request.user, target_siae)
         messages.success(
             request,
-            format_html(
-                (
-                    "<p>La candidature de <b>{} {}</b> a bien été transférée à la SIAE <b>{}</b>, {}.</p>"
-                    "<p>Pour la consulter, rendez-vous sur son tableau de bord en changeant de structure.</p>"
-                ),
-                job_application.job_seeker.first_name,
-                job_application.job_seeker.last_name,
-                target_siae.display_name,
-                target_siae.address_on_one_line,
+            (
+                f"La candidature de {job_application.job_seeker.get_full_name()} "
+                f"a bien été transférée à {target_siae.display_name}||"
+                "Pour la consulter, rendez-vous sur son tableau de bord en changeant de structure"
             ),
+            extra_tags="toast",
         )
     except Exception as ex:
         messages.error(
