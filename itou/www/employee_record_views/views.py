@@ -415,7 +415,7 @@ def disable(request, employee_record_id, template_name="employee_record/disable.
 
     if request.method == "POST" and request.POST.get("confirm") == "true":
         employee_record.update_as_disabled()
-        messages.success(request, "La fiche salarié a bien été désactivée.")
+        messages.success(request, "La fiche salarié a bien été désactivée.", extra_tags="toast")
         return HttpResponseRedirect(back_url)
 
     context = {
