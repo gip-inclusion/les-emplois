@@ -100,3 +100,6 @@ class Appellation(models.Model):
 
     def __str__(self):
         return self.name
+
+    def autocomplete_display(self):
+        return f"{self.name} ({self.rome.code})"
