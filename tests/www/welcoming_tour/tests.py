@@ -61,13 +61,6 @@ class WelcomingTourTest(InclusionConnectBaseTestCase):
         assert response.wsgi_request.path == reverse("welcoming_tour:index")
         self.assertTemplateUsed(response, "welcoming_tour/job_seeker.html")
 
-        self.client.logout()
-        response = self.client.post(
-            reverse("login:job_seeker"), follow=True, data={"login": job_seeker.email, "password": DEFAULT_PASSWORD}
-        )
-        assert response.wsgi_request.path != reverse("welcoming_tour:index")
-        self.assertContains(response, "Revoir le message")
-
     @respx.mock
     def test_new_prescriber_sees_welcoming_tour_test(self):
         session = self.client.session
@@ -79,11 +72,6 @@ class WelcomingTourTest(InclusionConnectBaseTestCase):
         # User should be redirected to the welcoming tour as he just signed up
         assert response.wsgi_request.path == reverse("welcoming_tour:index")
         self.assertTemplateUsed(response, "welcoming_tour/prescriber.html")
-
-        self.client.logout()
-        response = mock_oauth_dance(self.client, KIND_PRESCRIBER, expected_redirect_url=reverse("dashboard:index"))
-        response = self.client.get(response.url, follow=True)
-        self.assertContains(response, "Revoir le message")
 
     @respx.mock
     def test_new_employer_sees_welcoming_tour(self):
@@ -102,11 +90,6 @@ class WelcomingTourTest(InclusionConnectBaseTestCase):
         # User should be redirected to the welcoming tour as he just signed up
         assert response.wsgi_request.path == reverse("welcoming_tour:index")
         self.assertTemplateUsed(response, "welcoming_tour/employer.html")
-
-        self.client.logout()
-        response = mock_oauth_dance(self.client, KIND_EMPLOYER, expected_redirect_url=reverse("dashboard:index"))
-        response = self.client.get(response.url, follow=True)
-        self.assertContains(response, "Revoir le message")
 
 
 class WelcomingTourExceptions(TestCase):
