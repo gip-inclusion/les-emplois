@@ -10,14 +10,7 @@
                 </button>
             </div>
             {% with toast_message=message|itou_toast_content %}
-                {% if toast_message %}
-                    <div class="toast-body">
-                        {{ toast_message }}
-                        <button class="btn btn-block btn-outline-primary mt-3 d-block d-sm-none" data-bs-dismiss="toast" aria-label="Fermer">
-                            J'ai compris
-                        </button>
-                    </div>
-                {% endif %}
+                {% if toast_message %}<div class="toast-body">{{ toast_message }}</div>{% endif %}
             {% endwith %}
         </div>
     {% endif %}
