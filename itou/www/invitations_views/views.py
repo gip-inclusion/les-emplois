@@ -22,6 +22,7 @@ from itou.utils import constants as global_constants
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
+from itou.utils.templatetags.str_filters import pluralizefr
 from itou.www.invitations_views.forms import (
     EmployerInvitationFormSet,
     LaborInspectorInvitationFormSet,
@@ -208,24 +209,8 @@ def invite_employer(request, template_name="invitations_views/create.html"):
             for invitation in invitations:
                 invitation.send()
 
-            count = len(formset.forms)
-            if count == 1:
-                message = (
-                    "Votre invitation a été envoyée par courriel.<br>"
-                    "Pour rejoindre votre organisation, l'invité(e) peut désormais cliquer "
-                    "sur le lien de validation reçu dans le courriel.<br>"
-                )
-            else:
-                message = (
-                    "Vos invitations ont été envoyées par courriel.<br>"
-                    "Pour rejoindre votre organisation, vos invités peuvent désormais "
-                    "cliquer sur le lien de validation reçu dans le courriel.<br>"
-                )
-
-            expiration_date = formats.date_format(invitations[0].expiration_date)
-            message += f"Le lien de validation est valable jusqu'au {expiration_date}."
-            message = safestring.mark_safe(message)
-            messages.success(request, message)
+            s = pluralizefr(len(formset.forms))
+            messages.success(request, f"Invitation{s} envoyée{s}", extra_tags="toasts")
 
             return redirect(request.path)
 
