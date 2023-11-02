@@ -118,12 +118,6 @@
             </p>
         </div>
     {% endif %}
-
-    {# welcoming_tour desactivé spécifiquement pour les institutions partenaires #}
-    {# en attendant une carte plus globale sur le sujet #}
-    {% if user.joined_recently and not user.is_labor_inspector %}
-        {% include "welcoming_tour/includes/message.html" %}
-    {% endif %}
 {% endblock %}
 
 {% block content_title_wrapper %}{% endblock %}
