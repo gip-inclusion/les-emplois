@@ -8,6 +8,7 @@ from itou.approvals import models
 from itou.approvals.admin_forms import ApprovalAdminForm
 from itou.approvals.admin_views import manually_add_approval, manually_refuse_approval
 from itou.approvals.enums import Origin, ProlongationRequestStatus
+from itou.companies.models import Siae
 from itou.employee_record import enums as employee_record_enums
 from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
 from itou.employee_record.models import EmployeeRecord
@@ -212,6 +213,7 @@ class ApprovalAdmin(ItouModelAdmin):
         "pe_notification_time",
         "pe_notification_endpoint",
         "pe_notification_exit_code",
+        "assigned_company",
     )
     date_hierarchy = "start_at"
     inlines = (
@@ -227,6 +229,10 @@ class ApprovalAdmin(ItouModelAdmin):
         if company_id := request.GET.get("assigned_company"):
             queryset = queryset.is_assigned_to(company_id)
         return queryset
+
+    def _get_queryset_with_relations(self, request):
+        queryset = super()._get_queryset_with_relations(request)
+        return queryset.with_assigned_company()
 
     def get_readonly_fields(self, request, obj=None):
         if obj:
@@ -298,6 +304,17 @@ class ApprovalAdmin(ItouModelAdmin):
 
         """
         return obj.user.birthdate
+
+    @admin.display(description="Entreprise gérant le PASS")
+    def assigned_company(self, obj):
+        if obj.assigned_company:
+            siae = Siae.objects.get(pk=obj.assigned_company)
+            return format_html(
+                "{} — SIRET : {}",
+                get_admin_view_link(siae, content=siae.display_name),
+                siae.siret,
+            )
+        return "-"
 
 
 class IsInProgressFilter(admin.SimpleListFilter):

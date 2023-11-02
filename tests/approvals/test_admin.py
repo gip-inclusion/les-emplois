@@ -7,6 +7,7 @@ from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.approvals.enums import ProlongationReason
 from itou.files.models import File
+from itou.utils.admin import get_admin_view_link
 from tests.approvals.factories import ApprovalFactory, ProlongationFactory, SuspensionFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import ItouStaffFactory
@@ -70,3 +71,10 @@ def test_create_suspensionç_with_no_approval_does_raise_500(admin_client):
         data={},
     )
     assert response.status_code == 200
+
+
+def test_assigned_company(admin_client):
+    approval = ApprovalFactory(with_jobapplication=True)
+    siae = approval.jobapplication_set.get().to_siae
+    response = admin_client.get(reverse("admin:approvals_approval_change", kwargs={"object_id": approval.pk}))
+    assertContains(response, get_admin_view_link(siae, content=siae.display_name), count=2)
