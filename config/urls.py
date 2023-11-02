@@ -3,6 +3,7 @@ from django.contrib import admin
 from django.urls import include, path, re_path, register_converter
 from django.views.generic import TemplateView
 
+from itou.utils import redirect_legacy_views
 from itou.utils.urls import SiretConverter
 from itou.www.dashboard import views as dashboard_views
 from itou.www.login import views as login_views
@@ -64,6 +65,7 @@ urlpatterns = [
     path("prescribers/", include("itou.www.prescribers_views.urls")),
     path("search/", include("itou.www.search.urls")),
     path("company/", include("itou.www.companies_views.urls")),
+    re_path(r"^siae/.*$", redirect_legacy_views.redirect_siaes_views),
     path("siae_evaluation/", include("itou.www.siae_evaluations_views.urls")),
     path("login/", include("itou.www.login.urls")),
     path("signup/", include("itou.www.signup.urls")),
