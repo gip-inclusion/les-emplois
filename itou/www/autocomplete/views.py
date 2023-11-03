@@ -46,6 +46,9 @@ def cities_autocomplete(request):
     """
 
     term = request.GET.get("term", "").strip()
+    # TODO(xfernandez): drop legacy support a few weeks after all autocomplete fields have migrated
+    # and only keep select2 mode
+    select2_mode = "select2" in request.GET
     cities = []
 
     if term:
@@ -54,9 +57,12 @@ def cities_autocomplete(request):
         else:
             cities = autocomplete_name(City.objects.all(), term, extra_ordering_by="department")
 
-        cities = [{"value": city.display_name, "slug": city.slug} for city in cities[:MAX_CITIES_TO_RETURN]]
+        if select2_mode:
+            cities = [{"text": city.autocomplete_display(), "id": city.pk} for city in cities[:MAX_CITIES_TO_RETURN]]
+        else:
+            cities = [{"value": city.display_name, "slug": city.slug} for city in cities[:MAX_CITIES_TO_RETURN]]
 
-    return JsonResponse(cities, safe=False)
+    return JsonResponse({"results": cities} if select2_mode else cities, safe=False)
 
 
 def jobs_autocomplete(request):

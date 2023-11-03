@@ -61,6 +61,9 @@ class City(models.Model):
     def display_name(self):
         return f"{self.name} ({self.department})"
 
+    def autocomplete_display(self):
+        return self.display_name
+
     @property
     def latitude(self):
         if self.coords:
