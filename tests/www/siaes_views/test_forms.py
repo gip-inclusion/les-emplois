@@ -12,7 +12,7 @@ class EditSiaeJobDescriptionFormTest(TestCase):
         # Needed to create sample ROME codes and job appellations (no fixture for ROME codes)
         create_test_romes_and_appellations(["M1805", "N1101"], appellations_per_rome=2)
         # Same for location field
-        create_city_guerande()
+        self.guerande_city = create_city_guerande()
 
     def test_clean_contract_type(self):
         siae = SiaeFactory()
@@ -97,7 +97,7 @@ class EditSiaeJobDescriptionFormTest(TestCase):
         post_data = {
             "appellation": "10357",
             "custom_name": "custom_name",
-            "location_code": "guerande-44",
+            "location": self.guerande_city.pk,
             "hours_per_week": 35,
             "contract_type": ContractType.OTHER.value,
             "other_contract_type": "other_contract_type",
@@ -114,7 +114,7 @@ class EditSiaeJobDescriptionFormTest(TestCase):
         cleaned_data = form.cleaned_data
 
         assert "custom_name" == cleaned_data.get("custom_name")
-        assert "guerande-44" == cleaned_data.get("location_code")
+        assert self.guerande_city == cleaned_data.get("location")
         assert 35 == cleaned_data.get("hours_per_week")
         assert 5 == cleaned_data.get("open_positions")
 
@@ -144,7 +144,7 @@ class EditSiaeJobDescriptionFormTest(TestCase):
         post_data = {
             "appellation": "10357",
             "custom_name": "custom_name",
-            "location_code": "guerande-44",
+            "location": self.guerande_city.pk,
             "hours_per_week": 35,
             "contract_type": ContractType.OTHER.value,
             "other_contract_type": "other_contract_type",
@@ -173,7 +173,7 @@ class EditSiaeJobDescriptionFormTest(TestCase):
         post_data = {
             "appellation": "10357",
             "custom_name": "custom_name",
-            "location_code": "guerande-44",
+            "location": self.guerande_city.pk,
             "market_context_description": "market_context_description",
             "hours_per_week": 35,
             "contract_type": ContractType.OTHER.value,
@@ -192,7 +192,7 @@ class EditSiaeJobDescriptionFormTest(TestCase):
         cleaned_data = form.cleaned_data
 
         assert "custom_name" == cleaned_data.get("custom_name")
-        assert "guerande-44" == cleaned_data.get("location_code")
+        assert self.guerande_city == cleaned_data.get("location")
         assert 35 == cleaned_data.get("hours_per_week")
         assert 5 == cleaned_data.get("open_positions")
         assert "market_context_description" == cleaned_data.get("market_context_description")

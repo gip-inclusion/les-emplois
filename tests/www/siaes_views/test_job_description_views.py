@@ -268,7 +268,7 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
         post_data = {
             "appellation": "11076",  # Must be a non existing one for the SIAE
             "custom_name": "custom_name",
-            "location_code": "paris-75",
+            "location": self.paris_city.pk,
             "hours_per_week": 35,
             "contract_type": ContractType.OTHER.value,
             "other_contract_type": "other_contract_type",
@@ -339,7 +339,7 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
             "appellation": "11076",  # Must be a non existing one for the SIAE
             "market_context_description": "Whatever market description",
             "custom_name": "custom_name",
-            "location_code": "paris-75",
+            "location": self.paris_city.pk,
             "hours_per_week": 35,
             "contract_type": ContractType.OTHER.value,
             "other_contract_type": "other_contract_type",
@@ -407,7 +407,7 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
         post_data = {
             "appellation": "11076",  # Must be a non existing one for the SIAE
             "custom_name": "custom_name",
-            "location_code": "paris-75",
+            "location": self.paris_city.pk,
             "hours_per_week": 35,
             "contract_type": ContractType.OTHER.value,
             "other_contract_type": "other_contract_type",
@@ -507,7 +507,7 @@ class UpdateJobDescriptionViewTest(JobDescriptionAbstractTest):
         post_data = {
             "appellation": self.job_description.appellation.code,
             "custom_name": "custom_name",
-            "location_code": "",  # Remove location
+            "location": "",  # Remove location
             "hours_per_week": 35,
             "contract_type": ContractType.OTHER.value,
             "other_contract_type": "other_contract_type",
@@ -520,7 +520,11 @@ class UpdateJobDescriptionViewTest(JobDescriptionAbstractTest):
         session_data = self.client.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
         for k, v in post_data.items():
             with self.subTest(k):
-                assert v == session_data.get(k)
+                if k == "location":
+                    # We cannot send None in post_data
+                    assert session_data.get(k) is None
+                else:
+                    assert v == session_data.get(k)
 
         # Step 2: edit job description details
         post_data = {

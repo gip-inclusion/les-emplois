@@ -2228,7 +2228,7 @@ def test_select_other_job_description_for_job_application(client):
     response = client.post(url, data=data)
     assert response.status_code == 200
 
-    data |= {"location_code": city.slug}
+    data |= {"location": city.pk}
     response = client.post(url, data=data)
     assert response.status_code == 200
 
