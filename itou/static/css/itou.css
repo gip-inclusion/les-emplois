@@ -396,3 +396,11 @@ _:-ms-fullscreen,
     border-top-left-radius: 0.5rem;
     border-top-right-radius: 0.5rem;
 }
+
+
+.maze-survey {
+    bottom: 60px !important;
+    width: 441px !important;
+    border-radius: .5rem;
+    padding-right: 1rem;
+}

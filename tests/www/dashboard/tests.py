@@ -1865,3 +1865,23 @@ def test_prolongation_requests_badge(client):
         f"""a[href^='{reverse("approvals:prolongation_requests_list")}'] + .badge""",
     )
     assert soup.text == "3"
+
+
+def test_maze_survey(client, snapshot):
+    maze_link = "https://t.maze.co/197820845"
+
+    for user in [
+        JobSeekerFactory(),
+        PrescriberFactory(),
+        LaborInspectorFactory(membership=True),
+    ]:
+        client.force_login(user)
+        client.session.clear()
+        response = client.get(reverse("dashboard:index"))
+        assertNotContains(response, maze_link)
+
+    employer = EmployerFactory(with_siae=True)
+    client.force_login(employer)
+    client.session.clear()
+    response = client.get(reverse("dashboard:index"))
+    assert str(parse_response_to_soup(response, ".maze-survey")) == snapshot
