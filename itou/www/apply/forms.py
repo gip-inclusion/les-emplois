@@ -459,8 +459,7 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
 
     SIAE_OPTIONAL_FIELDS = (
         "hired_job",
-        "location_label",
-        "location_code",
+        "location",
         "appellation",
     )
 
@@ -488,8 +487,7 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
         model = JobApplication
         fields = [
             "prehiring_guidance_days",
-            "location_label",
-            "location_code",
+            "location",
             "contract_type",
             "contract_type_details",
             "nb_hours_per_week",
@@ -641,7 +639,7 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
         )
 
         self.fields["appellation"].label = "Préciser le nom du poste (code ROME)"
-        self.fields["location_label"].label = "Localisation du poste"
+        self.fields["location"].label = "Localisation du poste"
 
     def clean_hiring_start_at(self):
         hiring_start_at = self.cleaned_data["hiring_start_at"]
@@ -672,16 +670,16 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
             if contract_type == ContractType.PROFESSIONAL_TRAINING:
                 self.cleaned_data["inverted_vae_contract"] = bool(self.cleaned_data.get("inverted_vae_contract"))
 
-        location_code = self.cleaned_data.get("location_code")
+        location = self.cleaned_data.get("location")
         appellation = self.cleaned_data.get("appellation")
 
         if self.cleaned_data.get("hired_job") == self.OTHER_HIRED_JOB:
             if not appellation:
                 self.add_error("appellation", forms.ValidationError("Un poste doit être saisi en cas de création"))
-            elif not location_code:
+            elif not location:
                 # location becomes mandatory in this case only:
                 self.add_error(
-                    "location_label",
+                    "location",
                     forms.ValidationError("La localisation du poste est obligatoire en cas de création"),
                 )
 
@@ -689,15 +687,13 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
         # We might create a JobDescription here even with atomic==False
         # so we need to wrap the call to save in a atomic transaction
         instance = super().save(commit)
-        location_code = self.cleaned_data.get("location_code")
+        location = self.cleaned_data.get("location")
         appellation = self.cleaned_data.get("appellation")
 
         if self.cleaned_data.get("hired_job") == self.OTHER_HIRED_JOB:
-            city = City.objects.get(slug=location_code)
-
             # Check that the new job application is not a duplicate from the list
             if existing_job_description := SiaeJobDescription.objects.filter(
-                siae=self.siae, location=city, appellation=appellation
+                siae=self.siae, location=location, appellation=appellation
             ).first():
                 # Found one matching: reuse it and don't create a new one
                 self.instance.hired_job = existing_job_description
@@ -709,7 +705,7 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
                 new_job_description = SiaeJobDescription(
                     siae=self.siae,
                     appellation=appellation,
-                    location=city,
+                    location=location,
                     is_active=False,
                     description="La structure n’a pas encore renseigné cette rubrique",
                     creation_source=JobDescriptionSource.HIRING,

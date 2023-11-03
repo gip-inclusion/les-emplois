@@ -259,7 +259,10 @@ def edit_job_description_preview(request, template_name="siaes/edit_job_descript
     job_description.__dict__.update(**session_data)
 
     if location_code := session_data.get("location_code"):
+        # TODO(xfernandez): Legacy code, remove me in a few days (time for session to expire)
         job_description.location = City.objects.get(slug=location_code)
+    elif location_pk := session_data.get("location"):
+        job_description.location = City.objects.get(pk=location_pk)
     else:
         job_description.location = None
 

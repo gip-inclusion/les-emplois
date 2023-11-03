@@ -238,24 +238,18 @@ class JobAppellationAndLocationMixin(forms.Form):
         required=False,
     )
 
-    # See: itou/static/js/city_autocomplete_field.js
-
-    location_label = forms.CharField(
-        label="Localisation du poste (si différent du siège)",
-        widget=forms.TextInput(
+    location = forms.ModelChoiceField(
+        queryset=City.objects,
+        label="Localisation du poste (si différente du siège)",
+        widget=RemoteAutocompleteSelect2Widget(
             attrs={
-                "class": "js-city4jobs-autocomplete-input form-control",
-                "data-autosubmit-on-enter-pressed": 0,
-                "data-autocomplete-source-url": reverse_lazy("autocomplete:cities"),
-                "placeholder": "Ex. Poitiers",
-                "autocomplete": "off",
-            }
+                "data-ajax--url": format_lazy("{}?select2=", reverse_lazy("autocomplete:cities")),
+                "data-ajax--cache": "true",
+                "data-ajax--type": "GET",
+                "data-minimum-input-length": 2,
+                "data-placeholder": "Ex. Poitiers",
+            },
         ),
-        required=False,
-    )
-    # Hidden placeholder field for "real" city
-    location_code = forms.CharField(
-        widget=forms.HiddenInput(attrs={"class": "js-city4jobs-autocomplete-hidden"}),
         required=False,
     )
 
@@ -264,8 +258,7 @@ class JobAppellationAndLocationMixin(forms.Form):
         fields = [
             "appellation",
             "custom_name",
-            "location_label",
-            "location_code",
+            "location",
             "market_context_description",
             "contract_type",
             "other_contract_type",
@@ -274,7 +267,6 @@ class JobAppellationAndLocationMixin(forms.Form):
         ]
         labels = {
             "custom_name": "Nom du poste à afficher",
-            "location_label": "Localisation du poste (si différente du siège)",
             "hours_per_week": "Nombre d'heures par semaine",
             "open_positions": "Nombre de poste(s) ouvert(s) au recrutement",
         }
@@ -292,14 +284,8 @@ class EditJobDescriptionForm(JobAppellationAndLocationMixin, forms.ModelForm):
 
         self.fields["appellation"].required = True
 
-        if self.instance.pk:
-            if self.instance.location:
-                # Optional field
-                self.fields["location_label"].initial = self.instance.location.name
-                self.fields["location_code"].initial = self.instance.location.slug
-
-            if self.instance.contract_type != ContractType.OTHER:
-                self.fields["other_contract_type"].widget.attrs.update({"disabled": "disabled"})
+        if self.instance.pk and self.instance.contract_type != ContractType.OTHER:
+            self.fields["other_contract_type"].widget.attrs.update({"disabled": "disabled"})
 
         self.fields["custom_name"].widget.attrs.update({"placeholder": ""})
         self.fields["hours_per_week"].widget.attrs.update({"placeholder": ""})
@@ -323,8 +309,7 @@ class EditJobDescriptionForm(JobAppellationAndLocationMixin, forms.ModelForm):
         fields = [
             "appellation",
             "custom_name",
-            "location_label",
-            "location_code",
+            "location",
             "market_context_description",
             "contract_type",
             "other_contract_type",
@@ -333,7 +318,6 @@ class EditJobDescriptionForm(JobAppellationAndLocationMixin, forms.ModelForm):
         ]
         labels = {
             "custom_name": "Nom du poste à afficher",
-            "location_label": "Localisation du poste (si différente du siège)",
             "hours_per_week": "Nombre d'heures par semaine",
             "open_positions": "Nombre de poste(s) ouvert(s) au recrutement",
         }
@@ -347,12 +331,6 @@ class EditJobDescriptionForm(JobAppellationAndLocationMixin, forms.ModelForm):
         if open_positions is not None and open_positions < 1:
             raise forms.ValidationError("Il doit y avoir au moins un poste ouvert.")
         return open_positions
-
-    def clean(self):
-        # Bind `City` object
-        location_code = self.cleaned_data.get("location_code")
-        if location_code:
-            self.instance.location = City.objects.get(slug=location_code)
 
 
 class EditJobDescriptionDetailsForm(forms.ModelForm):

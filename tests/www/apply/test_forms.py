@@ -102,8 +102,7 @@ class TestAcceptForm:
             "hired_job",
             "hiring_end_at",
             "hiring_start_at",
-            "location_code",
-            "location_label",
+            "location",
         ]
         # Nothing more to see, move on...
 
@@ -117,8 +116,7 @@ class TestAcceptForm:
             "hiring_end_at",
             "hiring_start_at",
             "inverted_vae_contract",
-            "location_code",
-            "location_label",
+            "location",
             "nb_hours_per_week",
             "planned_training_hours",
             "prehiring_guidance_days",
@@ -140,6 +138,7 @@ class TestAcceptForm:
         assert sorted(form.fields.keys()) == EXPECTED_FIELDS
 
     def test_accept_form_geiq_required_fields_validation(self, faker):
+        [city] = create_test_cities(["54"], num_per_department=1)
         create_test_romes_and_appellations(["N4105"], appellations_per_rome=2)
         job_application = JobApplicationFactory(to_siae__kind=CompanyKind.GEIQ)
         job_description = SiaeJobDescriptionFactory(siae=job_application.to_siae, location=None)
@@ -169,7 +168,7 @@ class TestAcceptForm:
         }
 
         # Add job related fields
-        post_data |= {"hired_job": job_description.pk, "location_code": 1, "location_label": 1}
+        post_data |= {"hired_job": job_description.pk, "location": city.pk}
 
         post_data |= {"contract_type": ContractType.APPRENTICESHIP}
         form = apply_forms.AcceptForm(siae=job_application.to_siae, data=post_data)
@@ -285,8 +284,7 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
             "qualification_type": QualificationType.CCN,
             "qualification_level": QualificationLevel.NOT_RELEVANT,
             "planned_training_hours": self.faker.pyint(),
-            "location_label": city.name,
-            "location_code": city.slug,
+            "location": city.pk,
             "answer": "foo",
             "hired_job": job_description.pk,
             "confirmed": True,

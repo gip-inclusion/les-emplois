@@ -301,7 +301,7 @@ class ReloadContractTypeAndOptions(AcceptHTMXFragmentView):
 
 class ReloadJobDescriptionFields(AcceptHTMXFragmentView):
     template_name = "apply/includes/job_description_fields.html"
-    NO_ERROR_FIELDS = ("appellation", "location_label")
+    NO_ERROR_FIELDS = ("appellation", "location")
 
 
 @login_required
