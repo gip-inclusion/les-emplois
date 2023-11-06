@@ -40,7 +40,13 @@ from tests.job_applications.factories import (
 )
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
-from tests.users.factories import JobSeekerFactory, JobSeekerWithAddressFactory, PrescriberFactory
+from tests.users.factories import (
+    EmployerFactory,
+    JobSeekerFactory,
+    JobSeekerWithAddressFactory,
+    LaborInspectorFactory,
+    PrescriberFactory,
+)
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import TestCase, parse_response_to_soup
 
@@ -269,6 +275,48 @@ class ProcessViewsTest(TestCase):
         self.assertNotContains(response, "Supersecretname")
         self.assertNotContains(response, "Unknown")
 
+    def test_details_for_job_seeker(self, *args, **kwargs):
+        """As a job seeker, I can access the job_applications details for job seekers."""
+        job_seeker = JobSeekerFactory()
+
+        job_application = JobApplicationFactory(job_seeker=job_seeker, job_seeker_with_address=True)
+        job_application.process()
+
+        self.client.force_login(job_seeker)
+
+        url = reverse("apply:details_for_jobseeker", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url)
+        self.assertContains(response, format_nir(job_seeker.nir))
+        self.assertContains(response, job_seeker.email)
+        self.assertContains(response, job_seeker.post_code)
+        self.assertContains(response, job_seeker.address_line_1)
+        self.assertContains(response, job_seeker.city)
+        self.assertContains(response, f"Prénom : <b>{job_seeker.first_name}</b>", html=True)
+        self.assertContains(response, f"Nom : <b>{job_seeker.last_name}</b>", html=True)
+        self.assertContains(
+            response,
+            f'<span class="text-muted">{job_seeker.first_name} {job_seeker.last_name.upper()}</span>',
+            html=True,
+        )
+
+        # phone sender is hidden for job seeker
+        self.assertNotContains(response, format_phone(job_application.sender.phone))
+
+    def test_details_for_job_seeker_as_other_user(self, *args, **kwargs):
+        job_application = JobApplicationFactory()
+        url = reverse("apply:details_for_jobseeker", kwargs={"job_application_id": job_application.pk})
+
+        for user in [
+            JobSeekerFactory(),
+            EmployerFactory(with_siae=True),
+            PrescriberFactory(),
+            LaborInspectorFactory(membership=True),
+        ]:
+            with self.subTest(user=user):
+                self.client.force_login(user)
+                response = self.client.get(url)
+                assert response.status_code == 404
+
     def test_details_for_prescriber_with_transition_logs(self, *args, **kwargs):
         """As a prescriber, I can access transition logs for job_applications details for prescribers."""
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
@@ -288,6 +336,39 @@ class ProcessViewsTest(TestCase):
         self.assertEqual(html_fragment.b.string, jatl.pretty_to_state)
         self.assertTrue(html_fragment.find("li", string=f"Par {jatl.user.get_full_name()}"))
         self.assertTrue(html_fragment.find("li", string=f'Le {date_format(localtime(jatl.timestamp), "d F Y à H:i")}'))
+
+    def test_details_for_job_seeker_with_transition_logs(self, *args, **kwargs):
+        """As a prescriber, I can access transition logs for job_applications details for prescribers."""
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
+
+        # transition logs setup
+        job_application.process(user=job_application.to_siae.active_members.first())
+
+        self.client.force_login(job_application.job_seeker)
+
+        url = reverse("apply:details_for_jobseeker", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url)
+        html_fragment = self._get_transition_logs_content(response, job_application)
+
+        self.assertIsNone(html_fragment)
+        # upcoming tests when job seeker can see transition logs
+
+    def test_details_for_job_seeker_when_refused(self, *args, **kwargs):
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
+            state=JobApplicationWorkflow.STATE_REFUSED,
+            answer="abc",
+            answer_to_prescriber="undisclosed",
+            refusal_reason="other",
+        )
+        self.client.force_login(job_application.job_seeker)
+        url = reverse("apply:details_for_jobseeker", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url)
+        self.assertContains(response, '<h4 class="h6 mt-3">Message envoyé au candidat</h4>', html=True)
+        self.assertContains(response, f"<p>{job_application.answer}</p>", html=True)
+        self.assertNotContains(response, '<h4 class="h6 mt-3">Commentaire privé de l\'employeur</h4>')
+        self.assertNotContains(response, f"<p>{job_application.answer_to_prescriber}</p>", html=True)
+        self.assertNotContains(response, "<b>Motif de refus :</b> Autre (détails dans le message ci-dessous)")
 
     def test_details_for_prescriber_when_refused(self, *args, **kwargs):
         job_application = JobApplicationFactory(

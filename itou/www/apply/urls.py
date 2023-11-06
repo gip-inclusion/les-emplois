@@ -225,6 +225,11 @@ urlpatterns = [
     ),
     # Process.
     path(
+        "<uuid:job_application_id>/jobseeker/details",
+        process_views.details_for_jobseeker,
+        name="details_for_jobseeker",
+    ),
+    path(
         "<uuid:job_application_id>/prescriber/details",
         process_views.details_for_prescriber,
         name="details_for_prescriber",

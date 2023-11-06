@@ -51,6 +51,39 @@ def _get_geiq_eligibility_diagnosis_for_siae(job_application):
 
 
 @login_required
+def details_for_jobseeker(request, job_application_id, template_name="apply/process_details.html"):
+    """
+    Detail of an application for a JOBSEEKER
+    """
+    job_application = get_object_or_404(
+        JobApplication, id=job_application_id, job_seeker=request.user, hidden_for_siae=False
+    )
+
+    expired_eligibility_diagnosis = EligibilityDiagnosis.objects.last_expired(
+        job_seeker=job_application.job_seeker, for_siae=job_application.to_company
+    )
+
+    back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("apply:list_for_job_seeker"))
+    geiq_eligibility_diagnosis = None
+
+    if job_application.to_company.kind == CompanyKind.GEIQ:
+        geiq_eligibility_diagnosis = _get_geiq_eligibility_diagnosis_for_siae(job_application)
+
+    context = {
+        "can_view_personal_information": request.user.can_view_personal_information(job_application.job_seeker),
+        "can_edit_personal_information": request.user.can_edit_personal_information(job_application.job_seeker),
+        "eligibility_diagnosis": job_application.get_eligibility_diagnosis(),
+        "expired_eligibility_diagnosis": expired_eligibility_diagnosis,
+        "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
+        "job_application": job_application,
+        "back_url": back_url,
+        "matomo_custom_title": "Candidature",
+    }
+
+    return render(request, template_name, context)
+
+
+@login_required
 def details_for_siae(request, job_application_id, template_name="apply/process_details_siae.html"):
     """
     Detail of an application for an SIAE with the ability:
