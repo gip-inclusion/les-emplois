@@ -226,7 +226,7 @@ class SiaeModelTest(TestCase):
 
     def test_active_member_with_many_memberships(self):
         siae1 = SiaeWith2MembershipsFactory(membership2__is_active=False)
-        user = siae1.members.filter(siaemembership__is_admin=False).first()
+        user = siae1.members.filter(companymembership__is_admin=False).first()
         siae2 = SiaeWith2MembershipsFactory()
         siae2.members.add(user)
 
@@ -307,7 +307,7 @@ class SiaeQuerySetTest(TestCase):
         # Deactivate members
         siae = Company.objects.last()
         assert siae.members.count() == 1
-        membership = siae.siaemembership_set.first()
+        membership = siae.companymembership_set.first()
         membership.is_active = False
         membership.save()
 

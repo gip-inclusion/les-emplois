@@ -11,7 +11,7 @@ from django.utils import timezone
 from sentry_sdk.crons import monitor
 
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS
-from itou.companies.models import SiaeMembership
+from itou.companies.models import CompanyMembership
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import UserKind
@@ -121,7 +121,7 @@ class Command(BaseCommand):
         )
         employers = users.filter(kind=UserKind.EMPLOYER).filter(
             Exists(
-                SiaeMembership.objects.filter(
+                CompanyMembership.objects.filter(
                     user_id=OuterRef("pk"),
                     is_active=True,
                     siae__kind__in=SIAE_WITH_CONVENTION_KINDS,

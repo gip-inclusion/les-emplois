@@ -4,7 +4,7 @@ from django.utils import timezone
 
 from itou.invitations.models import EmployerInvitation, InvitationAbstract
 from itou.users.enums import KIND_EMPLOYER
-from tests.companies.factories import SiaeMembershipFactory
+from tests.companies.factories import CompanyMembershipFactory
 from tests.invitations.factories import (
     EmployerInvitationFactory,
     ExpiredEmployerInvitationFactory,
@@ -168,7 +168,7 @@ class TestSiaeInvitation(TestCase):
 
     def test_add_inactive_member_back_to_siae(self):
         invitation = SentEmployerInvitationFactory(email="hey@you.com")
-        SiaeMembershipFactory(siae=invitation.siae, user__email=invitation.email, is_active=False)
+        CompanyMembershipFactory(siae=invitation.siae, user__email=invitation.email, is_active=False)
         siae_members = invitation.siae.members.count()
         siae_active_members = invitation.siae.active_members.count()
         invitation.add_invited_user_to_siae()

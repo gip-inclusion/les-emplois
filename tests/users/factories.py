@@ -88,10 +88,10 @@ class EmployerFactory(UserFactory):
 
     @factory.post_generation
     def with_siae(self, created, extracted, **kwargs):
-        from tests.companies.factories import SiaeMembershipFactory
+        from tests.companies.factories import CompanyMembershipFactory
 
         if created and extracted is True:
-            SiaeMembershipFactory(user=self)
+            CompanyMembershipFactory(user=self)
 
 
 class LaborInspectorFactory(UserFactory):

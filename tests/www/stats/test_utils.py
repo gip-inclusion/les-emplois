@@ -35,7 +35,7 @@ def test_can_view_stats_siae():
     assert utils.can_view_stats_siae(request)
 
     # Even non admin members can view their SIAE stats.
-    user.siaemembership_set.update(is_admin=False)
+    user.companymembership_set.update(is_admin=False)
     request = get_request(user)
     assert utils.can_view_stats_siae(request)
 

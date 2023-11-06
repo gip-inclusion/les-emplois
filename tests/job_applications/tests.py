@@ -1051,7 +1051,7 @@ class NewQualifiedJobAppEmployersNotificationTest(TestCase):
         selected_job = job_descriptions[0]
         job_application = JobApplicationFactory(to_siae=siae, selected_jobs=[selected_job])
 
-        membership = siae.siaemembership_set.first()
+        membership = siae.companymembership_set.first()
         assert not membership.notifications
         NewQualifiedJobAppEmployersNotification.subscribe(recipient=membership, subscribed_pks=[selected_job.pk])
         assert NewQualifiedJobAppEmployersNotification.is_subscribed(
@@ -1082,14 +1082,14 @@ class NewQualifiedJobAppEmployersNotificationTest(TestCase):
         siae = SiaeWithMembershipAndJobsFactory()
         job_descriptions = siae.job_description_through.all()[:2]
 
-        membership = siae.siaemembership_set.first()
+        membership = siae.companymembership_set.first()
         NewQualifiedJobAppEmployersNotification.subscribe(
             recipient=membership, subscribed_pks=[job_descriptions[0].pk]
         )
 
         user = EmployerFactory()
         siae.members.add(user)
-        membership = siae.siaemembership_set.get(user=user)
+        membership = siae.companymembership_set.get(user=user)
         NewQualifiedJobAppEmployersNotification.subscribe(
             recipient=membership, subscribed_pks=[job_descriptions[1].pk]
         )
@@ -1122,7 +1122,7 @@ class NewQualifiedJobAppEmployersNotificationTest(TestCase):
         job_application = JobApplicationFactory(to_siae=siae, selected_jobs=[selected_job])
         assert siae.members.count() == 1
 
-        recipient = siae.siaemembership_set.first()
+        recipient = siae.companymembership_set.first()
 
         NewQualifiedJobAppEmployersNotification.subscribe(recipient=recipient, subscribed_pks=[selected_job.pk])
         assert NewQualifiedJobAppEmployersNotification.is_subscribed(

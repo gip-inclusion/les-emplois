@@ -7,7 +7,7 @@ from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.users.models import User
 from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
-from tests.companies.factories import SiaeFactory, SiaeMembershipFactory
+from tests.companies.factories import CompanyMembershipFactory, SiaeFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import JobSeekerFactory
 from tests.utils.test import TestCase, assertMessages
@@ -41,7 +41,7 @@ class PoleEmploiApprovalSearchTest(TestCase):
         """
         The search for PE approval screen should not crash ;)
         """
-        siae = SiaeMembershipFactory()
+        siae = CompanyMembershipFactory()
         self.client.force_login(siae.user)
 
         response = self.client.get(self.url)
@@ -63,7 +63,7 @@ class PoleEmploiApprovalSearchTest(TestCase):
         """
         Don't accept approval suffixes (example: 1234567890123P01).
         """
-        siae = SiaeMembershipFactory()
+        siae = CompanyMembershipFactory()
         self.client.force_login(siae.user)
 
         response = self.client.get(self.url, {"number": "1234567890123P01"})
@@ -74,7 +74,7 @@ class PoleEmploiApprovalSearchTest(TestCase):
         The search for PE approval screen should display that there is no results
         if a PE approval number was searched for but nothing was found
         """
-        siae = SiaeMembershipFactory()
+        siae = CompanyMembershipFactory()
         self.client.force_login(siae.user)
 
         response = self.client.get(self.url, {"number": 123123123123})

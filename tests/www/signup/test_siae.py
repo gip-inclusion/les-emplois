@@ -21,7 +21,7 @@ from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.templatetags.format_filters import format_siret
 from itou.utils.urls import get_tally_form_url
-from tests.companies.factories import SiaeFactory, SiaeMembershipFactory, SiaeWithMembershipAndJobsFactory
+from tests.companies.factories import CompanyMembershipFactory, SiaeFactory, SiaeWithMembershipAndJobsFactory
 from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
 from tests.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
 from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory, PrescriberFactory
@@ -130,7 +130,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         assert 0 == siae.members.count()
 
         user = EmployerFactory(email=OIDC_USERINFO["email"], has_completed_welcoming_tour=True)
-        SiaeMembershipFactory(user=user)
+        CompanyMembershipFactory(user=user)
         assert 1 == user.company_set.count()
 
         magic_link = siae.signup_magic_link
@@ -173,7 +173,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         siae = SiaeFactory(kind=CompanyKind.ETTI)
 
         user = EmployerFactory(email=OIDC_USERINFO["email"], has_completed_welcoming_tour=True)
-        SiaeMembershipFactory(user=user)
+        CompanyMembershipFactory(user=user)
 
         magic_link = siae.signup_magic_link
         response = self.client.get(magic_link)
@@ -339,7 +339,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         )
         # Add more than one member to all SIAE to test prefetch and distinct
         for siae in siaes:
-            SiaeMembershipFactory.create_batch(2, siae=siae)
+            CompanyMembershipFactory.create_batch(2, siae=siae)
 
         url = reverse("signup:siae_select")
         # ensure we only perform 4 requests, whatever the number of SIAEs sharing the

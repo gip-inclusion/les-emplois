@@ -6,7 +6,7 @@ from django.utils.html import escape
 from itou.invitations.models import EmployerInvitation
 from itou.users.enums import UserKind
 from itou.www.invitations_views.forms import EmployerInvitationForm
-from tests.companies.factories import SiaeFactory, SiaeMembershipFactory
+from tests.companies.factories import CompanyMembershipFactory, SiaeFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory
 from tests.utils.test import TestCase
@@ -206,7 +206,7 @@ class TestSendInvitationToSpecialGuest(TestCase):
         guest = SiaeFactory(with_membership=True).members.first()
 
         # Deactivate user
-        membership = guest.siaemembership_set.first()
+        membership = guest.companymembership_set.first()
         membership.deactivate_membership_by_user(self.sender_siae.members.first())
         membership.save()
 
@@ -257,7 +257,7 @@ class TestSendInvitationToSpecialGuest(TestCase):
 
     def test_already_a_member(self):
         # The invited user is already a member
-        SiaeMembershipFactory(siae=self.sender_siae, is_admin=False)
+        CompanyMembershipFactory(siae=self.sender_siae, is_admin=False)
         guest = self.sender_siae.members.exclude(email=self.sender.email).first()
         self.client.force_login(self.sender)
         self.post_data.update(

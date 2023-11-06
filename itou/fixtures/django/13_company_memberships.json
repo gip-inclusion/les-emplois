@@ -11,7 +11,7 @@
       "updated_by": null,
       "user": 4
     },
-    "model": "companies.siaemembership",
+    "model": "companies.companymembership",
     "pk": 1
   },
   {
@@ -26,7 +26,7 @@
       "updated_by": null,
       "user": 6
     },
-    "model": "companies.siaemembership",
+    "model": "companies.companymembership",
     "pk": 2
   },
   {
@@ -41,7 +41,7 @@
       "updated_by": null,
       "user": 4
     },
-    "model": "companies.siaemembership",
+    "model": "companies.companymembership",
     "pk": 3
   },
   {
@@ -56,7 +56,7 @@
       "updated_by": null,
       "user": 9
     },
-    "model": "companies.siaemembership",
+    "model": "companies.companymembership",
     "pk": 5
   },
   {
@@ -71,7 +71,7 @@
       "updated_by": null,
       "user": 6
     },
-    "model": "companies.siaemembership",
+    "model": "companies.companymembership",
     "pk": 6
   },
   {
@@ -86,7 +86,7 @@
       "updated_by": null,
       "user": 4
     },
-    "model": "companies.siaemembership",
+    "model": "companies.companymembership",
     "pk": 7
   },
   {
@@ -101,7 +101,7 @@
       "updated_by": null,
       "user": 4
     },
-    "model": "companies.siaemembership",
+    "model": "companies.companymembership",
     "pk": 8
   },
   {
@@ -116,7 +116,7 @@
       "updated_by": null,
       "user": 6
     },
-    "model": "companies.siaemembership",
+    "model": "companies.companymembership",
     "pk": 9
   },
   {
@@ -131,7 +131,7 @@
       "updated_by": null,
       "user": 6
     },
-    "model": "companies.siaemembership",
+    "model": "companies.companymembership",
     "pk": 10
   },
   {
@@ -146,7 +146,7 @@
       "updated_by": null,
       "user": 16
     },
-    "model": "companies.siaemembership",
+    "model": "companies.companymembership",
     "pk": 11
   },
   {
@@ -161,7 +161,7 @@
       "updated_by": null,
       "user": 25
     },
-    "model": "companies.siaemembership",
+    "model": "companies.companymembership",
     "pk": 12
   },
   {
@@ -176,7 +176,7 @@
       "updated_by": null,
       "user": 28
     },
-    "model": "companies.siaemembership",
+    "model": "companies.companymembership",
     "pk": 23
   },
   {
@@ -191,7 +191,7 @@
       "updated_by": null,
       "user": 28
     },
-    "model": "companies.siaemembership",
+    "model": "companies.companymembership",
     "pk": 24
   },
   {
@@ -206,7 +206,7 @@
       "updated_by": null,
       "user": 28
     },
-    "model": "companies.siaemembership",
+    "model": "companies.companymembership",
     "pk": 25
   },
   {
@@ -221,7 +221,7 @@
       "updated_by": null,
       "user": 28
     },
-    "model": "companies.siaemembership",
+    "model": "companies.companymembership",
     "pk": 26
   },
   {
@@ -236,7 +236,7 @@
       "updated_by": null,
       "user": 28
     },
-    "model": "companies.siaemembership",
+    "model": "companies.companymembership",
     "pk": 27
   }
 ]

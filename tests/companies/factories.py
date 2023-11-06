@@ -95,7 +95,7 @@ class SiaeFactory(factory.django.DjangoModelFactory):
         )
         use_employee_record = factory.Trait(kind=factory.fuzzy.FuzzyChoice(models.Company.ASP_EMPLOYEE_RECORD_KINDS))
         with_membership = factory.Trait(
-            membership=factory.RelatedFactory("tests.companies.factories.SiaeMembershipFactory", "siae"),
+            membership=factory.RelatedFactory("tests.companies.factories.CompanyMembershipFactory", "siae"),
         )
         with_jobs = factory.Trait(romes=factory.PostGeneration(_create_job_from_rome_code))
         for_snapshot = factory.Trait(
@@ -106,7 +106,7 @@ class SiaeFactory(factory.django.DjangoModelFactory):
             membership=factory.Maybe(
                 "with_membership",
                 yes_declaration=factory.RelatedFactory(
-                    "tests.companies.factories.SiaeMembershipFactory",
+                    "tests.companies.factories.CompanyMembershipFactory",
                     "siae",
                     user__for_snapshot=True,
                 ),
@@ -132,14 +132,14 @@ class SiaeFactory(factory.django.DjangoModelFactory):
     department = factory.LazyAttribute(lambda o: department_from_postcode(o.post_code))
 
 
-class SiaeMembershipFactory(factory.django.DjangoModelFactory):
+class CompanyMembershipFactory(factory.django.DjangoModelFactory):
     """
-    Generate an SiaeMembership() object (with its related Siae() and User() objects) for unit tests.
+    Generate an CompanyMembership() object (with its related Siae() and User() objects) for unit tests.
     https://factoryboy.readthedocs.io/en/latest/recipes.html#many-to-many-relation-with-a-through
     """
 
     class Meta:
-        model = models.SiaeMembership
+        model = models.CompanyMembership
 
     user = factory.SubFactory(EmployerFactory)
     siae = factory.SubFactory(SiaeFactory)
@@ -152,8 +152,8 @@ class SiaeWith2MembershipsFactory(SiaeFactory):
     https://factoryboy.readthedocs.io/en/latest/recipes.html#many-to-many-relation-with-a-through
     """
 
-    membership1 = factory.RelatedFactory(SiaeMembershipFactory, "siae")
-    membership2 = factory.RelatedFactory(SiaeMembershipFactory, "siae", is_admin=False)
+    membership1 = factory.RelatedFactory(CompanyMembershipFactory, "siae")
+    membership2 = factory.RelatedFactory(CompanyMembershipFactory, "siae", is_admin=False)
 
 
 class SiaeWith4MembershipsFactory(SiaeFactory):
@@ -163,13 +163,13 @@ class SiaeWith4MembershipsFactory(SiaeFactory):
     """
 
     # active admin user
-    membership1 = factory.RelatedFactory(SiaeMembershipFactory, "siae")
+    membership1 = factory.RelatedFactory(CompanyMembershipFactory, "siae")
     # active normal user
-    membership2 = factory.RelatedFactory(SiaeMembershipFactory, "siae", is_admin=False)
+    membership2 = factory.RelatedFactory(CompanyMembershipFactory, "siae", is_admin=False)
     # inactive admin user
-    membership3 = factory.RelatedFactory(SiaeMembershipFactory, "siae", user__is_active=False)
+    membership3 = factory.RelatedFactory(CompanyMembershipFactory, "siae", user__is_active=False)
     # inactive normal user
-    membership4 = factory.RelatedFactory(SiaeMembershipFactory, "siae", is_admin=False, user__is_active=False)
+    membership4 = factory.RelatedFactory(CompanyMembershipFactory, "siae", is_admin=False, user__is_active=False)
 
 
 SiaeWithMembershipAndJobsFactory = functools.partial(SiaeFactory, with_membership=True, with_jobs=True)

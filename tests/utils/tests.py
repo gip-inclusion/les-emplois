@@ -30,7 +30,7 @@ import itou.utils.json
 import itou.utils.session
 from itou.approvals.models import Suspension
 from itou.companies.enums import CompanyKind
-from itou.companies.models import Company, SiaeMembership
+from itou.companies.models import Company, CompanyMembership
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.users.enums import UserKind
 from itou.users.models import User
@@ -64,7 +64,7 @@ from itou.utils.validators import (
     validate_siret,
 )
 from tests.approvals.factories import SuspensionFactory
-from tests.companies.factories import SiaeFactory, SiaeMembershipFactory, SiaePendingGracePeriodFactory
+from tests.companies.factories import CompanyMembershipFactory, SiaeFactory, SiaePendingGracePeriodFactory
 from tests.institutions.factories import (
     InstitutionFactory,
     InstitutionMembershipFactory,
@@ -123,7 +123,7 @@ class TestItouCurrentOrganizationMiddleware:
     def test_siae_member(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
         request = factory.get("/")
-        siae = SiaeMembershipFactory().siae
+        siae = CompanyMembershipFactory().siae
         request.user = siae.members.first()
         SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
         with assertNumQueries(
@@ -169,7 +169,7 @@ class TestItouCurrentOrganizationMiddleware:
     def test_siae_member_multiple_memberships(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
         request = factory.get("/")
-        siae1 = SiaeMembershipFactory(siae__name="1").siae
+        siae1 = CompanyMembershipFactory(siae__name="1").siae
         request.user = siae1.members.first()
         siae2 = SiaeFactory(name="2")
         siae2.members.add(request.user)
@@ -193,7 +193,7 @@ class TestItouCurrentOrganizationMiddleware:
     def test_siae_member_multiple_memberships_and_one_active(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
         request = factory.get("/")
-        siae1 = SiaeMembershipFactory(siae__name="1").siae
+        siae1 = CompanyMembershipFactory(siae__name="1").siae
         request.user = siae1.members.first()
         siae2 = SiaeFactory(name="2")
         siae2.members.add(request.user)
@@ -219,7 +219,7 @@ class TestItouCurrentOrganizationMiddleware:
     def test_siae_member_of_inactive_siae(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
         request = factory.get("/")
-        siae = SiaeMembershipFactory(siae__subject_to_eligibility=True, siae__convention=None).siae
+        siae = CompanyMembershipFactory(siae__subject_to_eligibility=True, siae__convention=None).siae
         request.user = siae.members.first()
         SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
         MessageMiddleware(get_response_for_middlewaremixin).process_request(request)
@@ -252,7 +252,7 @@ class TestItouCurrentOrganizationMiddleware:
         factory = RequestFactory()
         request = factory.get("/")
         siae = SiaePendingGracePeriodFactory()
-        request.user = SiaeMembershipFactory(siae=siae).user
+        request.user = CompanyMembershipFactory(siae=siae).user
         SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
         MessageMiddleware(get_response_for_middlewaremixin).process_request(request)
         with assertNumQueries(
@@ -274,10 +274,10 @@ class TestItouCurrentOrganizationMiddleware:
         factory = RequestFactory()
         request = factory.get("/")
         siae = SiaePendingGracePeriodFactory(name="1")
-        request.user = SiaeMembershipFactory(siae=siae).user
+        request.user = CompanyMembershipFactory(siae=siae).user
         # OPCS ensures that the siae is active (since it is not subject to eligibility) and also that
         # the ordering based on kind will put it in second position for request.organizations
-        active_siae = SiaeMembershipFactory(user=request.user, siae__kind=CompanyKind.OPCS, siae__name="2").siae
+        active_siae = CompanyMembershipFactory(user=request.user, siae__kind=CompanyKind.OPCS, siae__name="2").siae
         SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
         MessageMiddleware(get_response_for_middlewaremixin).process_request(request)
         with assertNumQueries(
@@ -953,7 +953,7 @@ class SiaeSignupTokenGeneratorTest(TestCase):
         assert p0.check_token(siae, tk1) is True
         user = User(kind=UserKind.EMPLOYER)
         user.save()
-        membership = SiaeMembership()
+        membership = CompanyMembership()
         membership.user = user
         membership.siae = siae
         membership.save()

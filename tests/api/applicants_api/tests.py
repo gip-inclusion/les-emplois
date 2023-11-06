@@ -50,7 +50,7 @@ class ApplicantsAPITest(APITestCase):
     def test_api_user_is_admin(self):
         # Connected user must only be admin of target SIAE
         user = SiaeFactory(with_membership=True).members.first()
-        membership = user.siaemembership_set.first()
+        membership = user.companymembership_set.first()
         membership.is_admin = False
         membership.save()
 
@@ -66,8 +66,8 @@ class ApplicantsAPITest(APITestCase):
 
         with self.assertNumQueries(
             BASE_NUM_QUERIES
-            + 1  # siaemembership check (ApplicantsAPIPermission)
-            + 1  # siaes_siaemembership fetch for request.user (get_queryset)
+            + 1  # companymembership check (ApplicantsAPIPermission)
+            + 1  # siaes_companymembership fetch for request.user (get_queryset)
             + 1  # count users
         ):
             response = self.client.get(self.url, format="json")
@@ -106,8 +106,8 @@ class ApplicantsAPITest(APITestCase):
         self.client.force_authenticate(user)
         with self.assertNumQueries(
             BASE_NUM_QUERIES
-            + 1  # siaemembership check (ApplicantsAPIPermission)
-            + 1  # siaes_siaemembership fetch for request.user (get_queryset)
+            + 1  # companymembership check (ApplicantsAPIPermission)
+            + 1  # siaes_companymembership fetch for request.user (get_queryset)
             + 1  # count users
             + 1  # fetch users
             + 1  # prefetch linked job applications

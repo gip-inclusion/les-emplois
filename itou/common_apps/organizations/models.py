@@ -100,7 +100,7 @@ class OrganizationAbstract(models.Model):
         """
         Get memberships linked to this organization.
         In short, self.memberships.get(user=user.pk)
-        is the same as siae.siaemembership_set.get(user=user.pk).
+        is the same as company.companymembership_set.get(user=user.pk).
         ---
         At this level, we don't know the organization model as it is defined later in the child class.
         Using self.members.though is a trap as it returns the model Manager and not a query set!
@@ -175,7 +175,7 @@ class MembershipQuerySet(models.QuerySet):
         Return a User QuerySet. Useful to iterate over User objects instead of Membership ones.
         """
         user_field = memberships.model._meta.get_field("user")
-        remote_field_lookup = user_field.remote_field.name  # for exemple "siaememberships"
+        remote_field_lookup = user_field.remote_field.name  # for exemple "companymemberships"
         return user_field.related_model.objects.filter(**{f"{remote_field_lookup}__in": memberships})
 
 
