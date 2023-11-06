@@ -8,7 +8,7 @@ from django.utils.text import format_lazy
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS, department_from_postcode
 from itou.companies.enums import CompanyKind, ContractType
-from itou.companies.models import Siae, SiaeJobDescription, SiaeMembership
+from itou.companies.models import Company, SiaeJobDescription, SiaeMembership
 from itou.jobs.models import Appellation
 from itou.utils import constants as global_constants
 from itou.utils.urls import get_external_link_markup
@@ -17,7 +17,7 @@ from itou.utils.widgets import RemoteAutocompleteSelect2Widget
 
 class CreateSiaeForm(forms.ModelForm):
     class Meta:
-        model = Siae
+        model = Company
         fields = [
             "siret",
             "kind",
@@ -60,7 +60,7 @@ class CreateSiaeForm(forms.ModelForm):
     def clean(self):
         siret = self.cleaned_data.get("siret")
         kind = self.cleaned_data.get("kind")
-        existing_siae_query = Siae.objects.filter(siret=siret, kind=kind)
+        existing_siae_query = Company.objects.filter(siret=siret, kind=kind)
 
         if existing_siae_query.exists():
             error_message = """
@@ -88,7 +88,7 @@ class CreateSiaeForm(forms.ModelForm):
         siae = super().save(commit=False)
         siae.set_coords(siae.geocoding_address, post_code=siae.post_code)
         siae.created_by = self.current_user
-        siae.source = Siae.SOURCE_USER_CREATED
+        siae.source = Company.SOURCE_USER_CREATED
         siae.convention = self.current_siae.convention
         siae.save()
 
@@ -99,7 +99,7 @@ class CreateSiaeForm(forms.ModelForm):
 
 class EditSiaeForm(forms.ModelForm):
     class Meta:
-        model = Siae
+        model = Company
         fields = [
             "brand",
             "address_line_1",
@@ -143,7 +143,7 @@ class EditSiaeForm(forms.ModelForm):
 
 class EditSiaeDescriptionForm(forms.ModelForm):
     class Meta:
-        model = Siae
+        model = Company
         fields = [
             "description",
             "provided_support",
@@ -169,7 +169,7 @@ class BlockJobApplicationsForm(forms.ModelForm):
     """
 
     class Meta:
-        model = Siae
+        model = Company
         fields = ["block_job_applications"]
         labels = {
             "block_job_applications": "Bloquer temporairement la réception de candidatures "
@@ -278,7 +278,7 @@ class JobAppellationAndLocationMixin(forms.Form):
 
 # SIAE job descriptions forms (2 steps and session based)
 class EditJobDescriptionForm(JobAppellationAndLocationMixin, forms.ModelForm):
-    def __init__(self, current_siae: Siae, *args, **kwargs):
+    def __init__(self, current_siae: Company, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.instance.siae = current_siae
 
@@ -350,7 +350,7 @@ class EditJobDescriptionDetailsForm(forms.ModelForm):
             "bénéficier en priorité aux publics résidant en Quartier Prioritaire de la Ville.",
         }
 
-    def __init__(self, current_siae: Siae, *args, **kwargs):
+    def __init__(self, current_siae: Company, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.instance.siae = current_siae
 

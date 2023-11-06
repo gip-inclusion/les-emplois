@@ -3,7 +3,7 @@ from drf_spectacular.utils import PolymorphicProxySerializer, extend_schema
 from rest_framework import authentication, exceptions, generics
 
 from itou.api.data_inclusion_api import enums, serializers
-from itou.companies.models import Siae
+from itou.companies.models import Company
 from itou.prescribers.models import PrescriberOrganization
 
 
@@ -52,11 +52,11 @@ class DataInclusionStructureView(generics.ListAPIView):
 
         qs_by_structure_type_str = {
             enums.StructureTypeStr.ORGA: PrescriberOrganization.objects.all(),
-            enums.StructureTypeStr.SIAE: Siae.objects.active()
+            enums.StructureTypeStr.SIAE: Company.objects.active()
             .select_related("convention")
             .annotate(
                 same_siret_count=Subquery(
-                    Siae.objects.filter(siret=OuterRef("siret"))
+                    Company.objects.filter(siret=OuterRef("siret"))
                     .values("siret")
                     .annotate(count=Count("pk"))
                     .values("count")

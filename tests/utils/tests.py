@@ -30,7 +30,7 @@ import itou.utils.json
 import itou.utils.session
 from itou.approvals.models import Suspension
 from itou.companies.enums import CompanyKind
-from itou.companies.models import Siae, SiaeMembership
+from itou.companies.models import Company, SiaeMembership
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.users.enums import UserKind
 from itou.users.models import User
@@ -901,7 +901,7 @@ class MockedSiaeSignupTokenGenerator(SiaeSignupTokenGenerator):
 
 class SiaeSignupTokenGeneratorTest(TestCase):
     def test_make_token(self):
-        siae = Siae.objects.create()
+        siae = Company.objects.create()
         p0 = SiaeSignupTokenGenerator()
         tk1 = p0.make_token(siae)
         assert p0.check_token(siae, tk1) is True
@@ -911,8 +911,8 @@ class SiaeSignupTokenGeneratorTest(TestCase):
         The token generated for a siae created in the same request
         will work correctly.
         """
-        siae = Siae.objects.create(email="itou@example.com")
-        siae_reload = Siae.objects.get(email="itou@example.com")
+        siae = Company.objects.create(email="itou@example.com")
+        siae_reload = Company.objects.get(email="itou@example.com")
         p0 = MockedSiaeSignupTokenGenerator(datetime.datetime.now())
         tk1 = p0.make_token(siae)
         tk2 = p0.make_token(siae_reload)
@@ -922,7 +922,7 @@ class SiaeSignupTokenGeneratorTest(TestCase):
         """The token is valid after n seconds, but no greater."""
         # Uses a mocked version of SiaeSignupTokenGenerator so we can change
         # the value of 'now'.
-        siae = Siae.objects.create()
+        siae = Company.objects.create()
         p0 = SiaeSignupTokenGenerator()
         tk1 = p0.make_token(siae)
         p1 = MockedSiaeSignupTokenGenerator(
@@ -935,7 +935,7 @@ class SiaeSignupTokenGeneratorTest(TestCase):
         assert p2.check_token(siae, tk1) is False
 
     def test_check_token_with_nonexistent_token_and_user(self):
-        siae = Siae.objects.create()
+        siae = Company.objects.create()
         p0 = SiaeSignupTokenGenerator()
         tk1 = p0.make_token(siae)
         assert p0.check_token(None, tk1) is False
@@ -947,7 +947,7 @@ class SiaeSignupTokenGeneratorTest(TestCase):
         Tokens are based on siae.members.count() so that
         any new signup invalidates past tokens.
         """
-        siae = Siae.objects.create()
+        siae = Company.objects.create()
         p0 = SiaeSignupTokenGenerator()
         tk1 = p0.make_token(siae)
         assert p0.check_token(siae, tk1) is True

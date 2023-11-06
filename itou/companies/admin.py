@@ -11,7 +11,7 @@ from import_export.fields import Field
 from itou.approvals.models import Approval
 from itou.common_apps.organizations.admin import HasMembersFilter, MembersInline, OrganizationAdmin
 from itou.companies import enums, models
-from itou.companies.admin_forms import SiaeAdminForm
+from itou.companies.admin_forms import CompanyAdminForm
 from itou.utils.admin import (
     ItouGISMixin,
     ItouModelAdmin,
@@ -24,13 +24,13 @@ from itou.utils.urls import add_url_params
 
 
 class SiaeMembersInline(MembersInline):
-    model = models.Siae.members.through
+    model = models.Company.members.through
     readonly_fields = ("is_active", "created_at", "updated_at", "updated_by", "joined_at", "notifications")
     raw_id_fields = ("user",)
 
 
 class JobsInline(ItouTabularInline):
-    model = models.Siae.jobs.through
+    model = models.Company.jobs.through
     extra = 1
     fields = (
         "jobdescription_id_link",
@@ -73,10 +73,10 @@ class FinancialAnnexesInline(ItouTabularInline):
         return False
 
 
-class SiaesInline(ItouTabularInline):
-    model = models.Siae
-    fields = ("siae_id_link", "kind", "siret", "source", "name", "brand")
-    readonly_fields = ("siae_id_link", "kind", "siret", "source", "name", "brand")
+class CompaniesInline(ItouTabularInline):
+    model = models.Company
+    fields = ("company_id_link", "kind", "siret", "source", "name", "brand")
+    readonly_fields = ("company_id_link", "kind", "siret", "source", "name", "brand")
     can_delete = False
 
     def has_change_permission(self, request, obj=None):
@@ -85,11 +85,11 @@ class SiaesInline(ItouTabularInline):
     def has_add_permission(self, request, obj=None):
         return False
 
-    def siae_id_link(self, obj):
+    def company_id_link(self, obj):
         return get_admin_view_link(obj)
 
 
-class SiaeResource(resources.ModelResource):
+class CompanyResource(resources.ModelResource):
     siret = Field(attribute="siret", column_name="SIRET")
     name = Field(attribute="name", column_name="Nom")
     address_line_1 = Field(attribute="address_line_1", column_name="Adresse")
@@ -103,7 +103,7 @@ class SiaeResource(resources.ModelResource):
     created_at = Field(attribute="created_at", column_name="Date de création")
 
     class Meta:
-        model = models.Siae
+        model = models.Company
         fields = (
             "siret",
             "name",
@@ -132,16 +132,16 @@ class SiaeResource(resources.ModelResource):
         )
 
 
-@admin.register(models.Siae)
-class SiaeAdmin(ItouGISMixin, ExportActionMixin, OrganizationAdmin):
-    resource_class = SiaeResource
-    form = SiaeAdminForm
+@admin.register(models.Company)
+class CompanyAdmin(ItouGISMixin, ExportActionMixin, OrganizationAdmin):
+    resource_class = CompanyResource
+    form = CompanyAdminForm
     list_display = ("pk", "siret", "kind", "name", "department", "geocoding_score", "member_count", "created_at")
     list_filter = (HasMembersFilter, "kind", "block_job_applications", "source", "department")
     raw_id_fields = ("created_by", "convention")
     fieldsets = (
         (
-            "SIAE",
+            "Entreprise",
             {
                 "fields": (
                     "pk",
@@ -207,7 +207,7 @@ class SiaeAdmin(ItouGISMixin, ExportActionMixin, OrganizationAdmin):
     def save_model(self, request, obj, form, change):
         if not change:
             obj.created_by = request.user
-            obj.source = models.Siae.SOURCE_STAFF_CREATED
+            obj.source = models.Company.SOURCE_STAFF_CREATED
             if not obj.geocoding_score and obj.geocoding_address:
                 try:
                     # Set geocoding.
@@ -246,7 +246,7 @@ class SiaeAdmin(ItouGISMixin, ExportActionMixin, OrganizationAdmin):
         # we specifically target Pole Emploi and not a "RESERVED" kind nor the "ADMIN_CREATED" source.
         # The reason behind this is that at the time of writing, what we want to avoid is to modify
         # Pole Emploi in the admin; we can't make assumptions about the future ADMIN_CREATED or
-        # RESERVED Siaes that might be created someday.
+        # RESERVED Companies that might be created someday.
         if obj and obj.siret == enums.POLE_EMPLOI_SIRET:
             return False
         return super().has_change_permission(request, obj)
@@ -340,7 +340,7 @@ class SiaeConventionAdmin(ItouModelAdmin):
         ),
     )
     search_fields = ("pk", "siret_signature", "asp_id")
-    inlines = (FinancialAnnexesInline, SiaesInline, PkSupportRemarkInline)
+    inlines = (FinancialAnnexesInline, CompaniesInline, PkSupportRemarkInline)
 
     def has_add_permission(self, request):
         return False

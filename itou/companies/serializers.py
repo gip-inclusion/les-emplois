@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from itou.companies.enums import CompanyKind
-from itou.companies.models import Siae, SiaeJobDescription
+from itou.companies.models import Company, SiaeJobDescription
 
 
 class _JobDescriptionSerializer(serializers.ModelSerializer):
@@ -43,7 +43,7 @@ class SiaeSerializer(serializers.ModelSerializer):
     postes = _JobDescriptionSerializer(source="job_description_through", many=True, label="Les postes disponibles")
 
     class Meta:
-        model = Siae
+        model = Company
         fields = [
             "cree_le",
             "mis_a_jour_le",

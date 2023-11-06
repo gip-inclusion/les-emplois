@@ -22,7 +22,7 @@ from itou.approvals.models import Approval
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 from itou.common_apps.address.models import BAN_API_RELIANCE_SCORE
-from itou.companies.models import Siae
+from itou.companies.models import Company
 from itou.geo.enums import ZRRStatus
 from itou.geo.models import ZRR
 from itou.job_applications.models import JobApplicationWorkflow
@@ -287,7 +287,7 @@ def get_active_siae_pks():
     than 10k integers thus should not use much memory. The end result being both simpler code
     and better performance.
     """
-    return list(Siae.objects.active().values_list("pk", flat=True))
+    return list(Company.objects.active().values_list("pk", flat=True))
 
 
 @functools.cache

@@ -56,7 +56,7 @@ class ItouCurrentOrganizationMiddleware:
                 active_memberships = list(user.siaemembership_set.filter(is_active=True).order_by("created_at"))
                 siaes = {
                     siae.pk: siae
-                    for siae in user.siae_set.filter(
+                    for siae in user.company_set.filter(
                         pk__in=[membership.siae_id for membership in active_memberships]
                     ).active_or_in_grace_period()
                 }

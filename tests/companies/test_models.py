@@ -11,7 +11,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 
 from itou.companies.enums import CompanyKind, ContractType
-from itou.companies.models import Siae, SiaeJobDescription
+from itou.companies.models import Company, SiaeJobDescription
 from itou.job_applications.models import JobApplicationWorkflow
 from tests.companies.factories import (
     SiaeAfterGracePeriodFactory,
@@ -204,25 +204,25 @@ class SiaeModelTest(TestCase):
 
     def test_deactivation_queryset_methods(self):
         siae = SiaeFactory()
-        assert Siae.objects.count() == 1
-        assert Siae.objects.active().count() == 1
-        assert Siae.objects.active_or_in_grace_period().count() == 1
+        assert Company.objects.count() == 1
+        assert Company.objects.active().count() == 1
+        assert Company.objects.active_or_in_grace_period().count() == 1
         siae.delete()
-        assert Siae.objects.count() == 0
+        assert Company.objects.count() == 0
 
         siae = SiaePendingGracePeriodFactory()
-        assert Siae.objects.count() == 1
-        assert Siae.objects.active().count() == 0
-        assert Siae.objects.active_or_in_grace_period().count() == 1
+        assert Company.objects.count() == 1
+        assert Company.objects.active().count() == 0
+        assert Company.objects.active_or_in_grace_period().count() == 1
         siae.delete()
-        assert Siae.objects.count() == 0
+        assert Company.objects.count() == 0
 
         siae = SiaeAfterGracePeriodFactory()
-        assert Siae.objects.count() == 1
-        assert Siae.objects.active().count() == 0
-        assert Siae.objects.active_or_in_grace_period().count() == 0
+        assert Company.objects.count() == 1
+        assert Company.objects.active().count() == 0
+        assert Company.objects.active_or_in_grace_period().count() == 0
         siae.delete()
-        assert Siae.objects.count() == 0
+        assert Company.objects.count() == 0
 
     def test_active_member_with_many_memberships(self):
         siae1 = SiaeWith2MembershipsFactory(membership2__is_active=False)
@@ -256,7 +256,7 @@ class SiaeQuerySetTest(TestCase):
         for _ in range(expected):
             JobApplicationFactory(to_siae=siae)
 
-        result = Siae.objects.with_count_recent_received_job_apps().get(pk=siae.pk)
+        result = Company.objects.with_count_recent_received_job_apps().get(pk=siae.pk)
 
         assert expected == result.count_recent_received_job_apps
 
@@ -267,14 +267,14 @@ class SiaeQuerySetTest(TestCase):
         JobApplicationFactory(to_siae=siae)
 
         expected_score = siae.job_applications_received.count() / siae.job_description_through.count()
-        result = Siae.objects.with_computed_job_app_score().get(pk=siae.pk)
+        result = Company.objects.with_computed_job_app_score().get(pk=siae.pk)
 
         active_job_descriptions = (
-            Siae.objects.with_count_active_job_descriptions().get(pk=siae.pk).count_active_job_descriptions
+            Company.objects.with_count_active_job_descriptions().get(pk=siae.pk).count_active_job_descriptions
         )
         assert active_job_descriptions == 4
         recent_job_apps = (
-            Siae.objects.with_count_recent_received_job_apps().get(pk=siae.pk).count_recent_received_job_apps
+            Company.objects.with_count_recent_received_job_apps().get(pk=siae.pk).count_recent_received_job_apps
         )
         assert recent_job_apps == 2
         assert expected_score == result.computed_job_app_score
@@ -285,7 +285,7 @@ class SiaeQuerySetTest(TestCase):
         JobApplicationFactory(to_siae=siae)
 
         expected_score = None
-        result = Siae.objects.with_computed_job_app_score().get(pk=siae.pk)
+        result = Company.objects.with_computed_job_app_score().get(pk=siae.pk)
 
         assert expected_score == result.computed_job_app_score
 
@@ -295,23 +295,23 @@ class SiaeQuerySetTest(TestCase):
         for job_description in job_descriptions:
             job_description.is_active = False
         SiaeJobDescription.objects.bulk_update(job_descriptions, ["is_active"])
-        result = Siae.objects.with_count_active_job_descriptions().get(pk=siae.pk)
+        result = Company.objects.with_count_active_job_descriptions().get(pk=siae.pk)
 
         assert 1 == result.count_active_job_descriptions
 
     def test_with_has_active_members(self):
         siae = SiaeFactory(with_membership=True)
-        result = Siae.objects.with_has_active_members().get(pk=siae.pk)
+        result = Company.objects.with_has_active_members().get(pk=siae.pk)
         assert result.has_active_members
 
         # Deactivate members
-        siae = Siae.objects.last()
+        siae = Company.objects.last()
         assert siae.members.count() == 1
         membership = siae.siaemembership_set.first()
         membership.is_active = False
         membership.save()
 
-        result = Siae.objects.with_has_active_members().get(pk=siae.pk)
+        result = Company.objects.with_has_active_members().get(pk=siae.pk)
         assert not result.has_active_members
 
     def test_can_have_prior_action(self):

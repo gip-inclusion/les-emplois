@@ -3,7 +3,7 @@ from django.core.exceptions import PermissionDenied
 
 from itou.common_apps.address.departments import DEPARTMENTS, REGIONS
 from itou.companies.enums import CompanyKind
-from itou.companies.models import Siae
+from itou.companies.models import Company
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.prescribers.enums import (
@@ -40,7 +40,7 @@ def can_view_stats_siae(request):
     """
     return (
         request.user.is_employer
-        and isinstance(request.current_organization, Siae)
+        and isinstance(request.current_organization, Company)
         # Metabase expects a filter on the SIAE ASP id (technically `siae.convention.asp_id`) which is why
         # we require a convention object to exist here.
         # Some SIAE don't have a convention (SIAE created by support, GEIQ, EA...).

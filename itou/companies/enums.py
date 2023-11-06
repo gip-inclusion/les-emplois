@@ -14,7 +14,7 @@ class CompanyKind(models.TextChoices):
     OPCS = "OPCS", "Organisation porteuse de la clause sociale"
 
 
-# This used to be the ASP_MANAGED_KINDS list in siaes.models; but it's clearer to talk about
+# This used to be the ASP_MANAGED_KINDS list in companies.models; but it's clearer to talk about
 # SIAEs that have a convention.
 # Ported older comment: ASP data is used to keep the siae data of these kinds in sync.
 # These kinds and only these kinds thus have convention/AF logic.
@@ -35,7 +35,7 @@ class ContractNature(models.TextChoices):
 
 class ContractType(models.TextChoices):
     """
-    A list of possible work contract types for SIAE.
+    A list of possible work contract types for Companies.
     Not included as an intern class of SiaeJobDescription because of possible reuse cases.
     """
 

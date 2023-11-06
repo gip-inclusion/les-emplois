@@ -9,7 +9,7 @@ from itou.common_apps.address.departments import department_from_postcode
 from itou.companies.management.commands._import_siae.utils import geocode_siae
 from itou.companies.management.commands._import_siae.vue_af import ACTIVE_SIAE_KEYS
 from itou.companies.management.commands._import_siae.vue_structure import SIRET_TO_ASP_ID
-from itou.companies.models import Siae
+from itou.companies.models import Company
 
 
 def does_siae_have_an_active_convention(siae):
@@ -28,11 +28,11 @@ def build_siae(row, kind):
 
     Only for SIAE, not for GEIQ nor EA nor EATT.
     """
-    siae = Siae()
+    siae = Company()
     siae.siret = row.siret
     siae.kind = kind
     siae.naf = row.naf
-    siae.source = Siae.SOURCE_ASP
+    siae.source = Company.SOURCE_ASP
     siae.name = row["name"]  # row.name surprisingly returns the row index.
     assert not siae.name.isnumeric()
 

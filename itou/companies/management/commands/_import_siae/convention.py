@@ -9,7 +9,7 @@ from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS
 from itou.companies.management.commands._import_siae.siae import does_siae_have_an_active_convention
 from itou.companies.management.commands._import_siae.vue_af import INACTIVE_SIAE_LIST
 from itou.companies.management.commands._import_siae.vue_structure import ASP_ID_TO_SIRET_SIGNATURE, SIRET_TO_ASP_ID
-from itou.companies.models import Siae, SiaeConvention
+from itou.companies.models import Company, SiaeConvention
 
 
 CONVENTION_DEACTIVATION_THRESHOLD = 200
@@ -24,7 +24,9 @@ def update_existing_conventions():
     reactivations = 0
     three_months_ago = timezone.now() - timezone.timedelta(days=90)
 
-    for siae in Siae.objects.filter(source=Siae.SOURCE_ASP, convention__isnull=False).select_related("convention"):
+    for siae in Company.objects.filter(source=Company.SOURCE_ASP, convention__isnull=False).select_related(
+        "convention"
+    ):
         convention = siae.convention
         assert convention.kind == siae.kind
         assert convention.siren_signature == siae.siren
@@ -112,7 +114,7 @@ def get_creatable_conventions():
     """
     creatable_conventions = []
 
-    for siae in Siae.objects.filter(source=Siae.SOURCE_ASP, convention__isnull=True):
+    for siae in Company.objects.filter(source=Company.SOURCE_ASP, convention__isnull=True):
         asp_id = SIRET_TO_ASP_ID.get(siae.siret)
         if asp_id not in ASP_ID_TO_SIRET_SIGNATURE:
             # Some inactive siaes are absent in the latest ASP exports but
@@ -164,7 +166,7 @@ def check_convention_data_consistency():
     for convention in SiaeConvention.objects.prefetch_related("siaes").all():
         # Check that each active convention has exactly one siae of ASP source.
         # Unfortunately some inactive conventions have lost their ASP siae.
-        asp_siaes = [siae for siae in convention.siaes.all() if siae.source == Siae.SOURCE_ASP]
+        asp_siaes = [siae for siae in convention.siaes.all() if siae.source == Company.SOURCE_ASP]
         if convention.is_active:
             assert len(asp_siaes) == 1
         else:
@@ -179,14 +181,14 @@ def check_convention_data_consistency():
             assert siae.siren == convention.siren_signature
             assert siae.kind == convention.kind
 
-    asp_siaes_without_convention = Siae.objects.filter(
-        kind__in=SIAE_WITH_CONVENTION_KINDS, source=Siae.SOURCE_ASP, convention__isnull=True
+    asp_siaes_without_convention = Company.objects.filter(
+        kind__in=SIAE_WITH_CONVENTION_KINDS, source=Company.SOURCE_ASP, convention__isnull=True
     ).count()
     assert asp_siaes_without_convention == 0
 
-    user_created_siaes_without_convention = Siae.objects.filter(
+    user_created_siaes_without_convention = Company.objects.filter(
         kind__in=SIAE_WITH_CONVENTION_KINDS,
-        source=Siae.SOURCE_USER_CREATED,
+        source=Company.SOURCE_USER_CREATED,
         convention__isnull=True,
     ).count()
     assert user_created_siaes_without_convention == 0

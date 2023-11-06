@@ -83,7 +83,7 @@ class SiaeFactory(factory.django.DjangoModelFactory):
     """
 
     class Meta:
-        model = models.Siae
+        model = models.Company
         skip_postgeneration_save = True
 
     class Params:
@@ -93,7 +93,7 @@ class SiaeFactory(factory.django.DjangoModelFactory):
         not_subject_to_eligibility = factory.Trait(
             kind=factory.fuzzy.FuzzyChoice([kind for kind in CompanyKind if kind not in SIAE_WITH_CONVENTION_KINDS]),
         )
-        use_employee_record = factory.Trait(kind=factory.fuzzy.FuzzyChoice(models.Siae.ASP_EMPLOYEE_RECORD_KINDS))
+        use_employee_record = factory.Trait(kind=factory.fuzzy.FuzzyChoice(models.Company.ASP_EMPLOYEE_RECORD_KINDS))
         with_membership = factory.Trait(
             membership=factory.RelatedFactory("tests.companies.factories.SiaeMembershipFactory", "siae"),
         )
@@ -127,7 +127,7 @@ class SiaeFactory(factory.django.DjangoModelFactory):
     address_line_1 = factory.Faker("street_address", locale="fr_FR")
     post_code = factory.LazyFunction(_create_fake_postcode)
     city = factory.Faker("city", locale="fr_FR")
-    source = models.Siae.SOURCE_ASP
+    source = models.Company.SOURCE_ASP
     convention = factory.SubFactory(SiaeConventionFactory, kind=factory.SelfAttribute("..kind"))
     department = factory.LazyAttribute(lambda o: department_from_postcode(o.post_code))
 

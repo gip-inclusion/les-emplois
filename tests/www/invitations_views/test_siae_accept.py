@@ -46,7 +46,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         # Assert the user sees his new siae dashboard
         current_siae = get_current_siae_or_404(response.wsgi_request)
         # A user can be member of one or more siae
-        assert current_siae in user.siae_set.all()
+        assert current_siae in user.company_set.all()
 
     @respx.mock
     def test_accept_invitation_signup(self):
@@ -344,7 +344,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         response = self.client.get(response.url, follow=True)
         self.assertContains(response, escape("Cette structure n'est plus active."))
         user = User.objects.get(email=invitation.email)
-        assert user.siae_set.count() == 0
+        assert user.company_set.count() == 0
 
     def test_accept_existing_user_is_not_employer(self):
         user = PrescriberOrganizationWithMembershipFactory().members.first()

@@ -13,7 +13,7 @@ from rest_framework.authtoken.admin import User
 
 from itou.approvals.models import Approval
 from itou.asp.models import EmployerType, PrescriberType, SiaeMeasure
-from itou.companies.models import Siae, SiaeFinancialAnnex
+from itou.companies.models import Company, SiaeFinancialAnnex
 from itou.job_applications.enums import SenderKind
 from itou.users.models import JobSeekerProfile
 from itou.utils.validators import validate_siret
@@ -538,8 +538,8 @@ class EmployeeRecord(ASPExchangeInformation):
         """
         Fetch SIRET number of ASP source structure ("mother" SIAE)
         """
-        if siae.source != Siae.SOURCE_ASP:
-            main_siae = Siae.objects.get(convention=siae.convention, source=Siae.SOURCE_ASP)
+        if siae.source != Company.SOURCE_ASP:
+            main_siae = Company.objects.get(convention=siae.convention, source=Company.SOURCE_ASP)
             return main_siae.siret
 
         return siae.siret

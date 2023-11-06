@@ -13,7 +13,7 @@ from django_xworkflows import models as xwf_models
 
 from itou.approvals.models import Approval, Prolongation, Suspension
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind, ContractType
-from itou.companies.models import Siae
+from itou.companies.models import Company
 from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models import EligibilityDiagnosis, SelectedAdministrativeCriteria
 from itou.employee_record import enums as employeerecord_enums
@@ -384,7 +384,7 @@ class JobApplicationQuerySet(models.QuerySet):
             - adds correctness to result
         Each query is commented according to the newest Whimsical schemas.
         """
-        if siae.kind not in Siae.ASP_EMPLOYEE_RECORD_KINDS:
+        if siae.kind not in Company.ASP_EMPLOYEE_RECORD_KINDS:
             return self.none()
 
         eligible_job_applications = JobApplicationQuerySet.union(
@@ -502,7 +502,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     # When the sender is an SIAE member, keep a track of his current SIAE.
     sender_siae = models.ForeignKey(
-        "companies.Siae", verbose_name="SIAE émettrice", null=True, blank=True, on_delete=models.CASCADE
+        "companies.Company", verbose_name="SIAE émettrice", null=True, blank=True, on_delete=models.CASCADE
     )
 
     # When the sender is a prescriber, keep a track of his current organization (if any).
@@ -515,7 +515,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     )
 
     to_siae = models.ForeignKey(
-        "companies.Siae",
+        "companies.Company",
         verbose_name="SIAE destinataire",
         on_delete=models.CASCADE,
         related_name="job_applications_received",
@@ -599,7 +599,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         settings.AUTH_USER_MODEL, verbose_name="transférée par", null=True, blank=True, on_delete=models.SET_NULL
     )
     transferred_from = models.ForeignKey(
-        "companies.Siae",
+        "companies.Company",
         verbose_name="SIAE d'origine",
         null=True,
         blank=True,
