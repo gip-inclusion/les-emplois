@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.utils.text import slugify
 
 from itou.companies.enums import CompanyKind
-from itou.companies.models import Siae
+from itou.companies.models import Company
 from itou.eligibility.enums import AdministrativeCriteriaAnnex, AdministrativeCriteriaLevel, AuthorKind
 from itou.eligibility.utils import geiq_allowance_amount
 from itou.prescribers.models import PrescriberOrganization
@@ -72,7 +72,7 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
     )
     # Even if GEIQ are technically Siae objects, we keep the same structure as IAE for the author
     author_geiq = models.ForeignKey(
-        "companies.Siae",
+        "companies.Company",
         verbose_name="GEIQ de l'auteur",
         related_name="geiq_eligibilitydiagnosis_set",
         null=True,
@@ -177,7 +177,7 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
         cls,
         job_seeker: User,
         author: User,
-        author_structure: Siae | PrescriberOrganization,
+        author_structure: Company | PrescriberOrganization,
         administrative_criteria=(),
     ):
         author_org = author_geiq = author_kind = None
@@ -185,7 +185,7 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
         if isinstance(author_structure, PrescriberOrganization):
             author_org = author_structure
             author_kind = AuthorKind.PRESCRIBER
-        elif isinstance(author_structure, Siae) and author_structure.kind == CompanyKind.GEIQ:
+        elif isinstance(author_structure, Company) and author_structure.kind == CompanyKind.GEIQ:
             if not administrative_criteria:
                 raise ValueError("Un diagnostic effectué par un GEIQ doit avoir au moins un critère d'éligibilité")
             author_geiq = author_structure

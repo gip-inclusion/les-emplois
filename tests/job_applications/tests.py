@@ -1087,7 +1087,7 @@ class NewQualifiedJobAppEmployersNotificationTest(TestCase):
             recipient=membership, subscribed_pks=[job_descriptions[0].pk]
         )
 
-        user = EmployerFactory(siae=siae)
+        user = EmployerFactory()
         siae.members.add(user)
         membership = siae.siaemembership_set.get(user=user)
         NewQualifiedJobAppEmployersNotification.subscribe(
@@ -1105,7 +1105,7 @@ class NewQualifiedJobAppEmployersNotificationTest(TestCase):
         Unset recipients should receive new job application notifications.
         """
         siae = SiaeWithMembershipAndJobsFactory()
-        user = EmployerFactory(siae=siae)
+        user = EmployerFactory()
         siae.members.add(user)
 
         selected_job = siae.job_description_through.first()

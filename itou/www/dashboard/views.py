@@ -19,7 +19,7 @@ from rest_framework.authtoken.models import Token
 from itou.api.token_auth.views import TOKEN_ID_STR
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.models import ProlongationRequest
-from itou.companies.models import Siae
+from itou.companies.models import Company
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.institutions.models import Institution
@@ -332,7 +332,7 @@ def switch_organization(request):
     pk = request.POST["organization_id"]
     match request.user.kind:
         case UserKind.EMPLOYER:
-            queryset = Siae.objects.active_or_in_grace_period().member_required(request.user)
+            queryset = Company.objects.active_or_in_grace_period().member_required(request.user)
         case UserKind.PRESCRIBER:
             queryset = PrescriberOrganization.objects.member_required(request.user)
         case UserKind.LABOR_INSPECTOR:
@@ -351,7 +351,7 @@ def edit_user_notifications(request, template_name="dashboard/edit_user_notifica
         raise PermissionDenied
 
     current_siae_pk = request.session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY)
-    siae = get_object_or_404(Siae, pk=current_siae_pk)
+    siae = get_object_or_404(Company, pk=current_siae_pk)
     membership = request.user.siaemembership_set.get(siae=siae)
     new_job_app_notification_form = EditNewJobAppEmployersNotificationForm(
         recipient=membership, siae=siae, data=request.POST or None

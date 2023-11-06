@@ -78,17 +78,17 @@ class Command(BaseCommand):
             self.stderr.write(f"Unable to use the same siae as source and destination (ID {from_id})\n")
             return
 
-        from_siae_qs = siaes_models.Siae.objects.filter(pk=from_id)
+        from_siae_qs = siaes_models.Company.objects.filter(pk=from_id)
         try:
             from_siae = from_siae_qs.get()
-        except siaes_models.Siae.DoesNotExist:
+        except siaes_models.Company.DoesNotExist:
             self.stderr.write(f"Unable to find the siae ID {from_id}\n")
             return
 
-        to_siae_qs = siaes_models.Siae.objects.filter(pk=to_id)
+        to_siae_qs = siaes_models.Company.objects.filter(pk=to_id)
         try:
             to_siae = to_siae_qs.get()
-        except siaes_models.Siae.DoesNotExist:
+        except siaes_models.Company.DoesNotExist:
             self.stderr.write(f"Unable to find the siae ID {to_id}\n")
             return
 

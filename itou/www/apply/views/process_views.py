@@ -14,7 +14,7 @@ from django.views.generic.base import TemplateView
 from django_xworkflows import models as xwf_models
 
 from itou.companies.enums import CompanyKind, ContractType
-from itou.companies.models import Siae
+from itou.companies.models import Company
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow, PriorAction
@@ -265,7 +265,7 @@ class AcceptHTMXFragmentView(TemplateView):
         super().setup(request, *args, **kwargs)
 
         if siae_pk is not None:
-            siae = get_object_or_404(Siae.objects.member_required(request.user), pk=siae_pk)
+            siae = get_object_or_404(Company.objects.member_required(request.user), pk=siae_pk)
             job_application = None
         elif job_application_id:
             # TODO(xfernandez): remove this version in a week
@@ -379,7 +379,7 @@ def archive(request, job_application_id):
 def transfer(request, job_application_id):
     queryset = JobApplication.objects.siae_member_required(request.user)
     job_application = get_object_or_404(queryset, pk=job_application_id)
-    target_siae = get_object_or_404(Siae.objects, pk=request.POST.get("target_siae_id"))
+    target_siae = get_object_or_404(Company.objects, pk=request.POST.get("target_siae_id"))
     back_url = request.POST.get("back_url", reverse("apply:list_for_siae"))
 
     try:

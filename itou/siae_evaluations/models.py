@@ -8,7 +8,7 @@ from django.db.models import Count, Exists, F, OuterRef, Q
 from django.utils import timezone
 from django.utils.functional import cached_property
 
-from itou.companies.models import Siae
+from itou.companies.models import Company
 from itou.eligibility.models import AdministrativeCriteria
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
@@ -258,7 +258,7 @@ class EvaluationCampaign(models.Model):
             self.save(update_fields=["percent_set_at", "evaluations_asked_at"])
 
             evaluated_siaes = EvaluatedSiae.objects.bulk_create(
-                EvaluatedSiae(evaluation_campaign=self, siae=Siae.objects.get(pk=pk))
+                EvaluatedSiae(evaluation_campaign=self, siae=Company.objects.get(pk=pk))
                 for pk in self.eligible_siaes_under_ratio()
             )
 
@@ -436,7 +436,7 @@ class EvaluatedSiae(models.Model):
         related_name="evaluated_siaes",
     )
     siae = models.ForeignKey(
-        "companies.Siae",
+        "companies.Company",
         verbose_name="SIAE",
         on_delete=models.CASCADE,
         related_name="evaluated_siaes",

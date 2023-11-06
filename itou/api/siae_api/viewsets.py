@@ -10,7 +10,7 @@ from rest_framework.authentication import SessionAuthentication, TokenAuthentica
 from rest_framework.exceptions import NotFound, ValidationError
 
 from itou.cities.models import City
-from itou.companies.models import Siae, SiaeJobDescription
+from itou.companies.models import Company, SiaeJobDescription
 from itou.companies.serializers import SiaeSerializer
 
 
@@ -82,7 +82,7 @@ class SiaeViewSet(viewsets.ReadOnlyModelViewSet):
     # No permission is required on this API and everybody can query anything − it’s read-only.
     permission_classes = []
 
-    queryset = Siae.objects.prefetch_related(
+    queryset = Company.objects.prefetch_related(
         Prefetch(
             "job_description_through",
             queryset=(

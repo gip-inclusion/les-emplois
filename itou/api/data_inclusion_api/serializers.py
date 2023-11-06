@@ -4,7 +4,7 @@ from django.utils import text, timezone
 from rest_framework import serializers
 
 from itou.companies.enums import CompanyKind
-from itou.companies.models import Siae
+from itou.companies.models import Company
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 
@@ -42,7 +42,7 @@ class SiaeStructureSerializer(serializers.ModelSerializer):
     thematiques = serializers.ListSerializer(child=serializers.CharField(), default=[])
 
     class Meta:
-        model = Siae
+        model = Company
         fields = [
             "id",
             "typologie",
@@ -74,7 +74,7 @@ class SiaeStructureSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
     def get_siret(self, obj) -> str:
-        if obj.source == Siae.SOURCE_USER_CREATED:
+        if obj.source == Company.SOURCE_USER_CREATED:
             if re.search(r"999\d\d$", obj.siret) is None:
                 # Though this siae may refer to another siae with its asp_id, it owns a proper siret,
                 # which makes it a structure in its own right according to data.inclusion
@@ -83,7 +83,7 @@ class SiaeStructureSerializer(serializers.ModelSerializer):
             # The `999\d\d` pattern should not be published. There might be a valid siret available
             # for this asp_id on another siae : use the oldest.
             a_parent_siae = (
-                Siae.objects.exclude(source=Siae.SOURCE_USER_CREATED)
+                Company.objects.exclude(source=Company.SOURCE_USER_CREATED)
                 .filter(convention__asp_id=obj.asp_id)
                 .order_by("created_at", "pk")
                 .first()
@@ -107,7 +107,7 @@ class SiaeStructureSerializer(serializers.ModelSerializer):
         return obj.description
 
     def get_antenne(self, obj) -> bool:
-        if obj.source == Siae.SOURCE_USER_CREATED and re.search(r"999\d\d$", obj.siret) is not None:
+        if obj.source == Company.SOURCE_USER_CREATED and re.search(r"999\d\d$", obj.siret) is not None:
             return True
 
         return obj.same_siret_count >= 2

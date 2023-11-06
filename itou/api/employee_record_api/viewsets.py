@@ -155,7 +155,7 @@ class EmployeeRecordViewSet(AbstractEmployeeRecordViewSet):
         # leading to ghastly performance issues.
         # Using a list gives a 20-50x speed gain on the query.
         siaes = list(
-            self.request.user.siae_set.filter(siaemembership__is_active=True, siaemembership__is_admin=True)
+            self.request.user.company_set.filter(siaemembership__is_active=True, siaemembership__is_admin=True)
             .active_or_in_grace_period()
             .values_list("pk", flat=True)
         )

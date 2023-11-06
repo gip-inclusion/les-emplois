@@ -13,7 +13,7 @@ from itou.companies.management.commands._import_siae.utils import (
     remap_columns,
     sync_structures,
 )
-from itou.companies.models import Siae
+from itou.companies.models import Company
 from itou.utils.python import timeit
 from itou.utils.validators import validate_siret
 
@@ -79,10 +79,10 @@ def get_geiq_df():
 
 
 def build_geiq(row):
-    siae = Siae()
+    siae = Company()
     siae.siret = row.siret
     siae.kind = CompanyKind.GEIQ
-    siae.source = Siae.SOURCE_GEIQ
+    siae.source = Company.SOURCE_GEIQ
     siae.name = row["name"]  # row.name returns row index.
     assert not siae.name.isnumeric()
     siae.email = ""  # Do not make the authentification email public!
@@ -124,7 +124,7 @@ class Command(BaseCommand):
         geiq_df, info_stats = get_geiq_df()
         info_stats |= sync_structures(
             df=geiq_df,
-            source=Siae.SOURCE_GEIQ,
+            source=Company.SOURCE_GEIQ,
             kinds=[CompanyKind.GEIQ],
             build_structure=build_geiq,
             wet_run=wet_run,

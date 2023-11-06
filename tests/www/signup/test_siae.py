@@ -13,7 +13,7 @@ from django.utils.http import urlencode
 from freezegun import freeze_time
 
 from itou.companies.enums import CompanyKind
-from itou.companies.models import Siae
+from itou.companies.models import Company
 from itou.users.enums import KIND_EMPLOYER, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
@@ -131,7 +131,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
 
         user = EmployerFactory(email=OIDC_USERINFO["email"], has_completed_welcoming_tour=True)
         SiaeMembershipFactory(user=user)
-        assert 1 == user.siae_set.count()
+        assert 1 == user.company_set.count()
 
         magic_link = siae.signup_magic_link
         response = self.client.get(magic_link)
@@ -162,7 +162,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         # Check `User` state.
         assert siae.has_admin(user)
         assert 1 == siae.members.count()
-        assert 2 == user.siae_set.count()
+        assert 2 == user.company_set.count()
 
     @freeze_time("2022-09-15 15:53:54")
     @respx.mock
@@ -206,7 +206,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         # Check `User` state.
         assert siae.has_admin(user)
         assert 1 == siae.members.count()
-        assert 2 == user.siae_set.count()
+        assert 2 == user.company_set.count()
 
     def test_user_invalid_siae_id(self):
         siae = SiaeFactory(kind=CompanyKind.ETTI)
@@ -314,7 +314,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         # Check `User` state.
         assert user.kind == UserKind.EMPLOYER
         assert user.is_active
-        siae = Siae.objects.get(siret=FAKE_SIRET)
+        siae = Company.objects.get(siret=FAKE_SIRET)
         assert siae.has_admin(user)
         assert 1 == siae.members.count()
 

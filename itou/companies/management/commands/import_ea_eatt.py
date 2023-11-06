@@ -14,7 +14,7 @@ from itou.companies.management.commands._import_siae.utils import (
     remap_columns,
     sync_structures,
 )
-from itou.companies.models import Siae
+from itou.companies.models import Company
 from itou.utils.python import timeit
 from itou.utils.validators import validate_siret
 
@@ -131,11 +131,11 @@ def get_ea_eatt_df():
 
 
 def build_ea_eatt(row):
-    siae = Siae()
+    siae = Company()
     siae.siret = row.siret
     siae.kind = row.kind
     assert siae.kind in [CompanyKind.EA, CompanyKind.EATT]
-    siae.source = Siae.SOURCE_EA_EATT
+    siae.source = Company.SOURCE_EA_EATT
 
     siae.name = row["name"]  # row.name returns row index.
     assert not siae.name.isnumeric()
@@ -184,7 +184,7 @@ class Command(BaseCommand):
         ea_eatt_df, info_stats = get_ea_eatt_df()
         info_stats |= sync_structures(
             df=ea_eatt_df,
-            source=Siae.SOURCE_EA_EATT,
+            source=Company.SOURCE_EA_EATT,
             kinds=[CompanyKind.EA, CompanyKind.EATT],
             build_structure=build_ea_eatt,
             wet_run=wet_run,

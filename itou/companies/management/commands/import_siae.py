@@ -29,7 +29,7 @@ from itou.companies.management.commands._import_siae.siae import build_siae, sho
 from itou.companies.management.commands._import_siae.utils import could_siae_be_deleted
 from itou.companies.management.commands._import_siae.vue_af import ACTIVE_SIAE_KEYS
 from itou.companies.management.commands._import_siae.vue_structure import ASP_ID_TO_SIAE_ROW
-from itou.companies.models import Siae, SiaeConvention
+from itou.companies.models import Company, SiaeConvention
 from itou.utils.emails import send_email_messages
 from itou.utils.python import timeit
 
@@ -57,8 +57,8 @@ class Command(BaseCommand):
         Those siaes cannot be joined by any way and thus are useless.
         Let's clean them up when possible.
         """
-        for siae in Siae.objects.prefetch_related("memberships").filter(
-            members__isnull=True, source=Siae.SOURCE_USER_CREATED
+        for siae in Company.objects.prefetch_related("memberships").filter(
+            members__isnull=True, source=Company.SOURCE_USER_CREATED
         ):
             if not siae.has_members:
                 if could_siae_be_deleted(siae):
@@ -85,17 +85,17 @@ class Command(BaseCommand):
         """
         # Sometimes our staff creates a siae then later attaches it manually to the correct convention. In that
         # case it should be converted to a regular user created siae so that the usual convention logic applies.
-        for siae in Siae.objects.filter(
-            kind__in=SIAE_WITH_CONVENTION_KINDS, source=Siae.SOURCE_STAFF_CREATED, convention__isnull=False
+        for siae in Company.objects.filter(
+            kind__in=SIAE_WITH_CONVENTION_KINDS, source=Company.SOURCE_STAFF_CREATED, convention__isnull=False
         ):
             self.stdout.write(f"converted staff created siae.id={siae.id} to user created siae as it has a convention")
-            siae.source = Siae.SOURCE_USER_CREATED
+            siae.source = Company.SOURCE_USER_CREATED
             siae.save()
 
         three_months_ago = timezone.now() - timezone.timedelta(days=90)
-        staff_created_siaes = Siae.objects.filter(
+        staff_created_siaes = Company.objects.filter(
             kind__in=SIAE_WITH_CONVENTION_KINDS,
-            source=Siae.SOURCE_STAFF_CREATED,
+            source=Company.SOURCE_STAFF_CREATED,
         )
 
         recent_unconfirmed_siaes = staff_created_siaes.filter(created_at__gte=three_months_ago)
@@ -133,7 +133,9 @@ class Command(BaseCommand):
     @timeit
     def update_siret_and_auth_email_of_existing_siaes(self):
         auth_email_updates = 0
-        for siae in Siae.objects.select_related("convention").filter(source=Siae.SOURCE_ASP, convention__isnull=False):
+        for siae in Company.objects.select_related("convention").filter(
+            source=Company.SOURCE_ASP, convention__isnull=False
+        ):
             assert siae.should_have_convention
 
             asp_id = siae.asp_id
@@ -154,7 +156,7 @@ class Command(BaseCommand):
 
             new_siret = row.siret
             assert siae.siren == new_siret[:9]
-            existing_siae = Siae.objects.filter(siret=new_siret, kind=siae.kind).first()
+            existing_siae = Company.objects.filter(siret=new_siret, kind=siae.kind).first()
 
             if not existing_siae:
                 self.update_siae_siret(siae, new_siret)
@@ -179,7 +181,7 @@ class Command(BaseCommand):
         blocked_deletions = 0
         deletions = 0
 
-        for siae in Siae.objects.select_related("convention"):
+        for siae in Company.objects.select_related("convention"):
             if not siae.grace_period_has_expired:
                 continue
             if could_siae_be_deleted(siae):
@@ -201,7 +203,7 @@ class Command(BaseCommand):
             row = ASP_ID_TO_SIAE_ROW.get(asp_id)
             siret = row.siret
 
-            existing_siae_query = Siae.objects.select_related("convention").filter(
+            existing_siae_query = Company.objects.select_related("convention").filter(
                 convention__asp_id=asp_id, kind=kind
             )
             if existing_siae_query.exists():
@@ -209,33 +211,33 @@ class Command(BaseCommand):
                 total_existing_siaes_with_asp_source = 0
                 for existing_siae in existing_siae_query.all():
                     assert existing_siae.should_have_convention
-                    if existing_siae.source == Siae.SOURCE_ASP:
+                    if existing_siae.source == Company.SOURCE_ASP:
                         total_existing_siaes_with_asp_source += 1
                         # Siret should have been fixed by update_siret_and_auth_email_of_existing_siaes().
                         assert existing_siae.siret == siret
                     else:
-                        assert existing_siae.source == Siae.SOURCE_USER_CREATED
+                        assert existing_siae.source == Company.SOURCE_USER_CREATED
 
                 # Duplicate siaes should have been deleted.
                 assert total_existing_siaes_with_asp_source == 1
                 continue
 
-            existing_siae_query = Siae.objects.filter(siret=siret, kind=kind)
+            existing_siae_query = Company.objects.filter(siret=siret, kind=kind)
             if existing_siae_query.exists():
                 existing_siae = existing_siae_query.get()
-                if existing_siae.source == Siae.SOURCE_ASP:
+                if existing_siae.source == Company.SOURCE_ASP:
                     # Sometimes the siae already exists but was not detected in the first queryset above because it
                     # has the wrong asp_id. Such an edge case is fixed in another method `update_existing_conventions`.
                     continue
                 # Siae with this siret+kind already exists but with wrong source.
-                assert existing_siae.source in [Siae.SOURCE_USER_CREATED, Siae.SOURCE_STAFF_CREATED]
+                assert existing_siae.source in [Company.SOURCE_USER_CREATED, Company.SOURCE_STAFF_CREATED]
                 assert existing_siae.should_have_convention
                 self.stdout.write(
                     f"siae.id={existing_siae.id} already exists "
                     f"with wrong source={existing_siae.source} "
                     f"(source will be fixed to ASP)"
                 )
-                existing_siae.source = Siae.SOURCE_ASP
+                existing_siae.source = Company.SOURCE_ASP
                 existing_siae.convention = None
                 existing_siae.save()
                 continue
@@ -263,7 +265,7 @@ class Command(BaseCommand):
     @timeit
     def check_whether_signup_is_possible_for_all_siaes(self):
         for siae in (
-            Siae.objects.filter(
+            Company.objects.filter(
                 auth_email="",
             )
             .exclude(  # Exclude siae which have at least one active member.
@@ -288,7 +290,7 @@ class Command(BaseCommand):
             assert convention.siaes.count() == 0
             siae.convention = convention
             siae.save()
-            assert convention.siaes.filter(source=Siae.SOURCE_ASP).count() == 1
+            assert convention.siaes.filter(source=Company.SOURCE_ASP).count() == 1
 
     @timeit
     def delete_conventions(self):

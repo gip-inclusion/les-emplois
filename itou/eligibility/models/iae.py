@@ -132,7 +132,7 @@ class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
     )
     # When the author is an SIAE member, keep a track of his current SIAE.
     author_siae = models.ForeignKey(
-        "companies.Siae",
+        "companies.Company",
         verbose_name="SIAE de l'auteur",
         null=True,
         blank=True,

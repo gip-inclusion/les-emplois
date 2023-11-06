@@ -7,7 +7,7 @@ from django.urls.exceptions import NoReverseMatch
 from django.utils.html import escape
 
 from itou.companies.enums import CompanyKind, ContractType
-from itou.companies.models import Siae
+from itou.companies.models import Company
 from itou.jobs.models import Appellation
 from itou.utils import constants as global_constants
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_NO_RESULT_MOCK, BAN_GEOCODING_API_RESULT_MOCK
@@ -569,7 +569,7 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         user = siae.members.first()
         assert siae.has_admin(user)
         assert siae.should_have_convention
-        assert siae.source == Siae.SOURCE_ASP
+        assert siae.source == Company.SOURCE_ASP
 
         self.client.force_login(user)
         url = reverse("dashboard:index")
@@ -584,7 +584,7 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
 
     def test_user_created_siae_admin_can_see_and_select_af(self):
         siae = SiaeFactory(
-            source=Siae.SOURCE_USER_CREATED,
+            source=Company.SOURCE_USER_CREATED,
             with_membership=True,
         )
         user = siae.members.first()
@@ -594,7 +594,7 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
 
         assert siae.has_admin(user)
         assert siae.should_have_convention
-        assert siae.source == Siae.SOURCE_USER_CREATED
+        assert siae.source == Company.SOURCE_USER_CREATED
 
         self.client.force_login(user)
         url = reverse("dashboard:index")
@@ -621,11 +621,11 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         assert siae.convention == new_convention
 
     def test_staff_created_siae_admin_cannot_see_nor_select_af(self):
-        siae = SiaeFactory(source=Siae.SOURCE_STAFF_CREATED, with_membership=True)
+        siae = SiaeFactory(source=Company.SOURCE_STAFF_CREATED, with_membership=True)
         user = siae.members.first()
         assert siae.has_admin(user)
         assert siae.should_have_convention
-        assert siae.source == Siae.SOURCE_STAFF_CREATED
+        assert siae.source == Company.SOURCE_STAFF_CREATED
 
         self.client.force_login(user)
         url = reverse("dashboard:index")
@@ -643,7 +643,7 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         user = siae.members.first()
         assert not siae.has_admin(user)
         assert siae.should_have_convention
-        assert siae.source == Siae.SOURCE_ASP
+        assert siae.source == Company.SOURCE_ASP
 
         self.client.force_login(user)
         url = reverse("dashboard:index")
@@ -657,11 +657,11 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         assert response.status_code == 403
 
     def test_import_created_geiq_admin_cannot_see_nor_select_af(self):
-        siae = SiaeFactory(kind=CompanyKind.GEIQ, source=Siae.SOURCE_GEIQ, with_membership=True)
+        siae = SiaeFactory(kind=CompanyKind.GEIQ, source=Company.SOURCE_GEIQ, with_membership=True)
         user = siae.members.first()
         assert siae.has_admin(user)
         assert not siae.should_have_convention
-        assert siae.source == Siae.SOURCE_GEIQ
+        assert siae.source == Company.SOURCE_GEIQ
 
         self.client.force_login(user)
         url = reverse("dashboard:index")
@@ -675,11 +675,11 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         assert response.status_code == 403
 
     def test_user_created_geiq_admin_cannot_see_nor_select_af(self):
-        siae = SiaeFactory(kind=CompanyKind.GEIQ, source=Siae.SOURCE_USER_CREATED, with_membership=True)
+        siae = SiaeFactory(kind=CompanyKind.GEIQ, source=Company.SOURCE_USER_CREATED, with_membership=True)
         user = siae.members.first()
         assert siae.has_admin(user)
         assert not siae.should_have_convention
-        assert siae.source == Siae.SOURCE_USER_CREATED
+        assert siae.source == Company.SOURCE_USER_CREATED
 
         self.client.force_login(user)
         url = reverse("dashboard:index")
@@ -707,13 +707,13 @@ class CreateSiaeViewTest(TestCase):
         new_siren = "9876543210"
         new_siret = f"{new_siren}1234"
         assert siae.siren != new_siren
-        assert not Siae.objects.filter(siret=new_siret).exists()
+        assert not Company.objects.filter(siret=new_siret).exists()
 
         post_data = {
             "siret": new_siret,
             "kind": siae.kind,
             "name": "FAMOUS SIAE SUB STRUCTURE",
-            "source": Siae.SOURCE_USER_CREATED,
+            "source": Company.SOURCE_USER_CREATED,
             "address_line_1": "2 Rue de Soufflenheim",
             "city": "Betschdorf",
             "post_code": "67660",
@@ -730,7 +730,7 @@ class CreateSiaeViewTest(TestCase):
         expected_message = "La structure à laquelle vous souhaitez vous rattacher est déjà"
         self.assertNotContains(response, escape(expected_message))
 
-        assert not Siae.objects.filter(siret=post_data["siret"]).exists()
+        assert not Company.objects.filter(siret=post_data["siret"]).exists()
 
     def test_create_preexisting_siae_outside_of_siren_fails(self):
         siae = SiaeFactory(with_membership=True)
@@ -745,13 +745,13 @@ class CreateSiaeViewTest(TestCase):
         preexisting_siae = SiaeFactory()
         new_siret = preexisting_siae.siret
         assert siae.siren != preexisting_siae.siren
-        assert Siae.objects.filter(siret=new_siret).exists()
+        assert Company.objects.filter(siret=new_siret).exists()
 
         post_data = {
             "siret": new_siret,
             "kind": preexisting_siae.kind,
             "name": "FAMOUS SIAE SUB STRUCTURE",
-            "source": Siae.SOURCE_USER_CREATED,
+            "source": Company.SOURCE_USER_CREATED,
             "address_line_1": "2 Rue de Soufflenheim",
             "city": "Betschdorf",
             "post_code": "67660",
@@ -768,7 +768,7 @@ class CreateSiaeViewTest(TestCase):
         expected_message = "La structure à laquelle vous souhaitez vous rattacher est déjà"
         self.assertContains(response, escape(expected_message))
 
-        assert Siae.objects.filter(siret=post_data["siret"]).count() == 1
+        assert Company.objects.filter(siret=post_data["siret"]).count() == 1
 
     def test_cannot_create_siae_with_same_siret_and_same_kind(self):
         siae = SiaeFactory(with_membership=True)
@@ -784,7 +784,7 @@ class CreateSiaeViewTest(TestCase):
             "siret": siae.siret,
             "kind": siae.kind,
             "name": "FAMOUS SIAE SUB STRUCTURE",
-            "source": Siae.SOURCE_USER_CREATED,
+            "source": Company.SOURCE_USER_CREATED,
             "address_line_1": "2 Rue de Soufflenheim",
             "city": "Betschdorf",
             "post_code": "67660",
@@ -802,7 +802,7 @@ class CreateSiaeViewTest(TestCase):
         self.assertContains(response, escape(expected_message))
         self.assertContains(response, escape(global_constants.ITOU_HELP_CENTER_URL))
 
-        assert Siae.objects.filter(siret=post_data["siret"]).count() == 1
+        assert Company.objects.filter(siret=post_data["siret"]).count() == 1
 
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
     def test_cannot_create_siae_with_same_siret_and_different_kind(self, _mock_call_ban_geocoding_api):
@@ -821,7 +821,7 @@ class CreateSiaeViewTest(TestCase):
             "siret": siae.siret,
             "kind": CompanyKind.ACI,
             "name": "FAMOUS SIAE SUB STRUCTURE",
-            "source": Siae.SOURCE_USER_CREATED,
+            "source": Company.SOURCE_USER_CREATED,
             "address_line_1": "2 Rue de Soufflenheim",
             "city": "Betschdorf",
             "post_code": "67660",
@@ -834,7 +834,7 @@ class CreateSiaeViewTest(TestCase):
         response = self.client.post(url, data=post_data)
         assert response.status_code == 200
 
-        assert Siae.objects.filter(siret=post_data["siret"]).count() == 1
+        assert Company.objects.filter(siret=post_data["siret"]).count() == 1
 
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
     def test_cannot_create_siae_with_same_siren_and_different_kind(self, _mock_call_ban_geocoding_api):
@@ -856,7 +856,7 @@ class CreateSiaeViewTest(TestCase):
             "siret": new_siret,
             "kind": CompanyKind.ACI,
             "name": "FAMOUS SIAE SUB STRUCTURE",
-            "source": Siae.SOURCE_USER_CREATED,
+            "source": Company.SOURCE_USER_CREATED,
             "address_line_1": "2 Rue de Soufflenheim",
             "city": "Betschdorf",
             "post_code": "67660",
@@ -869,8 +869,8 @@ class CreateSiaeViewTest(TestCase):
         response = self.client.post(url, data=post_data)
         assert response.status_code == 200
 
-        assert Siae.objects.filter(siret=siae.siret).count() == 1
-        assert Siae.objects.filter(siret=new_siret).count() == 0
+        assert Company.objects.filter(siret=siae.siret).count() == 1
+        assert Company.objects.filter(siret=new_siret).count() == 0
 
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
     def test_create_siae_with_same_siren_and_same_kind(self, mock_call_ban_geocoding_api):
@@ -890,7 +890,7 @@ class CreateSiaeViewTest(TestCase):
             "siret": new_siret,
             "kind": siae.kind,
             "name": "FAMOUS SIAE SUB STRUCTURE",
-            "source": Siae.SOURCE_USER_CREATED,
+            "source": Company.SOURCE_USER_CREATED,
             "address_line_1": "2 Rue de Soufflenheim",
             "city": "Betschdorf",
             "post_code": "67660",
@@ -905,10 +905,10 @@ class CreateSiaeViewTest(TestCase):
 
         mock_call_ban_geocoding_api.assert_called_once()
 
-        new_siae = Siae.objects.get(siret=new_siret)
+        new_siae = Company.objects.get(siret=new_siret)
         assert new_siae.has_admin(user)
-        assert siae.source == Siae.SOURCE_ASP
-        assert new_siae.source == Siae.SOURCE_USER_CREATED
+        assert siae.source == Company.SOURCE_ASP
+        assert new_siae.source == Company.SOURCE_USER_CREATED
         assert new_siae.siret == post_data["siret"]
         assert new_siae.kind == post_data["kind"]
         assert new_siae.name == post_data["name"]
@@ -921,7 +921,7 @@ class CreateSiaeViewTest(TestCase):
         assert new_siae.website == post_data["website"]
         assert new_siae.description == post_data["description"]
         assert new_siae.created_by == user
-        assert new_siae.source == Siae.SOURCE_USER_CREATED
+        assert new_siae.source == Company.SOURCE_USER_CREATED
         assert new_siae.is_active
         assert new_siae.convention is not None
         assert siae.convention == new_siae.convention
@@ -1008,7 +1008,7 @@ class EditSiaeViewTest(TestCase):
         self.assertRedirects(response, reverse("dashboard:index"))
 
         # refresh Siae, but using the siret to be sure we didn't mess with the PK
-        siae = Siae.objects.get(siret=siae.siret)
+        siae = Company.objects.get(siret=siae.siret)
 
         assert siae.brand == "NEW FAMOUS SIAE BRAND NAME"
         assert siae.description == "Le meilleur des SIAEs !"

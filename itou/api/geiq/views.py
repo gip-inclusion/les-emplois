@@ -7,7 +7,7 @@ from rest_framework import authentication, exceptions, generics, permissions, st
 
 from itou.api.models import SiaeApiToken
 from itou.companies.enums import CompanyKind
-from itou.companies.models import Siae
+from itou.companies.models import Company
 from itou.job_applications.enums import Prequalification, ProfessionalSituationExperience
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow, PriorAction
 from itou.utils.validators import validate_siren
@@ -55,7 +55,7 @@ class GeiqJobApplicationListView(generics.ListAPIView):
         if api_token:
             geiqs = api_token.siaes.all()
             antennas = (
-                Siae.objects.filter(source=Siae.SOURCE_USER_CREATED, kind=CompanyKind.GEIQ)
+                Company.objects.filter(source=Company.SOURCE_USER_CREATED, kind=CompanyKind.GEIQ)
                 .annotate(siren=Substr("siret", pos=1, length=9))
                 .filter(siren__in=[geiq.siret[:9] for geiq in geiqs])
             )

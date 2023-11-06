@@ -1,4 +1,4 @@
-from itou.companies.models import Siae
+from itou.companies.models import Company
 from itou.metabase.tables.utils import (
     MetabaseTable,
     get_address_columns,
@@ -10,7 +10,7 @@ from itou.metabase.tables.utils import (
 
 
 def get_field(name):
-    return Siae._meta.get_field(name)
+    return Company._meta.get_field(name)
 
 
 TABLE = MetabaseTable(name="structures")
@@ -47,7 +47,7 @@ TABLE.add_columns(
             "name": "source",
             "type": "varchar",
             "comment": "Source des données de la structure",
-            "fn": lambda o: get_choice(choices=Siae.SOURCE_CHOICES, key=o.source),
+            "fn": lambda o: get_choice(choices=Company.SOURCE_CHOICES, key=o.source),
         },
         get_column_from_field(get_field("naf"), name="code_naf"),
         get_column_from_field(get_field("email"), name="email_public"),
@@ -57,10 +57,10 @@ TABLE.add_columns(
 
 
 def get_parent_siae(siae):
-    if siae.convention_id and siae.source == Siae.SOURCE_USER_CREATED:
+    if siae.convention_id and siae.source == Company.SOURCE_USER_CREATED:
         # NOTE: siae.convention.siaes should absolutely be prefetched !
         for convention_siae in siae.convention.siaes.all():
-            if convention_siae.source == Siae.SOURCE_ASP:
+            if convention_siae.source == Company.SOURCE_ASP:
                 return convention_siae
     return siae
 

@@ -6,7 +6,7 @@ from django.urls import reverse
 
 from itou.cities.models import City
 from itou.companies.enums import POLE_EMPLOI_SIRET, CompanyKind, ContractNature, ContractType, JobSource
-from itou.companies.models import Siae
+from itou.companies.models import Company
 from itou.jobs.models import Appellation, Rome
 from tests.cities.factories import create_city_guerande, create_city_saint_andre, create_city_vannes
 from tests.companies.factories import SiaeFactory, SiaeJobDescriptionFactory, SiaeMembershipFactory
@@ -658,7 +658,7 @@ class JobDescriptionSearchViewTest(TestCase):
         job1 = SiaeJobDescriptionFactory(
             siae=siae, appellation=appellations[0], contract_type=ContractType.APPRENTICESHIP
         )
-        pe_siae = Siae.unfiltered_objects.get(siret=POLE_EMPLOI_SIRET)
+        pe_siae = Company.unfiltered_objects.get(siret=POLE_EMPLOI_SIRET)
         job_pec = SiaeJobDescriptionFactory(
             siae=pe_siae,
             location=city,

@@ -143,7 +143,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         assert 1 == user.prescriberorganization_set.count()
         assert user.prescribermembership_set.count() == 1
         assert user.prescribermembership_set.get().organization_id == organization.pk
-        assert user.siae_set.count() == 0
+        assert user.company_set.count() == 0
 
         # No email has been sent to support (validation/refusal of authorisation not needed).
         assert len(mail.outbox) == 0

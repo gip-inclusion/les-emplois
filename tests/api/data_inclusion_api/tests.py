@@ -3,7 +3,7 @@ from django.utils import timezone
 from rest_framework.test import APIClient, APITestCase
 
 from itou.companies.enums import CompanyKind
-from itou.companies.models import Siae
+from itou.companies.models import Company
 from tests.companies.factories import SiaeConventionFactory, SiaeFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import EmployerFactory, PrescriberFactory
@@ -91,7 +91,7 @@ class DataInclusionSiaeStructureTest(APITestCase):
     def test_list_structures_antenne_with_user_created_with_proper_siret(self):
         siae_1 = SiaeFactory(siret="10000000000001")
         siae_2 = SiaeFactory(siret="10000000000002", convention=siae_1.convention)
-        siae_3 = SiaeFactory(siret="10000000000003", source=Siae.SOURCE_USER_CREATED, convention=siae_1.convention)
+        siae_3 = SiaeFactory(siret="10000000000003", source=Company.SOURCE_USER_CREATED, convention=siae_1.convention)
 
         with self.assertNumQueries(NUM_QUERIES):
             response = self.authenticated_client.get(
@@ -121,8 +121,8 @@ class DataInclusionSiaeStructureTest(APITestCase):
 
     def test_list_structures_antenne_with_user_created_and_999(self):
         siae_1 = SiaeFactory(siret="10000000000001")
-        siae_2 = SiaeFactory(siret="10000000000002", source=Siae.SOURCE_ASP, convention=siae_1.convention)
-        siae_3 = SiaeFactory(siret="10000000099991", source=Siae.SOURCE_USER_CREATED, convention=siae_1.convention)
+        siae_2 = SiaeFactory(siret="10000000000002", source=Company.SOURCE_ASP, convention=siae_1.convention)
+        siae_3 = SiaeFactory(siret="10000000099991", source=Company.SOURCE_USER_CREATED, convention=siae_1.convention)
 
         num_queries = NUM_QUERIES
         num_queries += 1  # get parent siae
@@ -152,7 +152,7 @@ class DataInclusionSiaeStructureTest(APITestCase):
                 assert structure_data["antenne"] == antenne
 
     def test_list_structures_siret_with_999_and_no_other_siret_available(self):
-        siae = SiaeFactory(siret="10000000099991", source=Siae.SOURCE_USER_CREATED)
+        siae = SiaeFactory(siret="10000000099991", source=Company.SOURCE_USER_CREATED)
 
         num_queries = NUM_QUERIES
         num_queries += 1  # get parent siae

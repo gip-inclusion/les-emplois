@@ -49,8 +49,9 @@ def test_get_fields_to_transfer_for_job_seekers():
         "approvals_suspended_set",  # Suspension.created_by
         "auth_token",  # rest_framework.authtoken.models.Token.user
         "authorization_status_set",  # PrescriberOrganization.authorization_updated_by
+        "company",  # Company.members
         "created_prescriber_organization_set",  # PrescriberOrganization.created_by
-        "created_siae_set",  # Siae.created_by
+        "created_company_set",  # Siae.created_by
         "eligibilitydiagnosis",  # EligibilityDiagnosis.author
         "emailaddress",  # allauth.account.models.EmailAddress.user
         "externaldataimport",  # ExternalDataImport.user: this seems largely unused
@@ -79,7 +80,6 @@ def test_get_fields_to_transfer_for_job_seekers():
         "prolongations_updated",  # Prolongation.updated_by
         "prolongations_validated",  # Prolongation.validated_by
         "reactivated_siae_convention_set",  # SiaeConvention.reactivated_by
-        "siae",  # Siae.members
         "siae_invitations",  # EmployerInvitation.sender
         "siaemembership",  # SiaeMembership.user
         "socialaccount",  # allauth.socialaccount.models.SocialAccount.user

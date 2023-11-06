@@ -127,8 +127,8 @@ class DashboardViewTest(TestCase):
         last_siae = SiaeFactory(kind=CompanyKind.ETTI, with_membership=True)
 
         user = siae.members.first()
-        user.siae_set.add(other_siae)
-        user.siae_set.add(last_siae)
+        user.company_set.add(other_siae)
+        user.company_set.add(last_siae)
 
         self.client.force_login(user)
 

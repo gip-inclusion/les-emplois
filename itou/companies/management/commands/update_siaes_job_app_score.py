@@ -12,7 +12,7 @@ class Command(BaseCommand):
     def handle(self, **options):
         start = time.perf_counter()
         nb_updated = (
-            models.Siae.objects.with_computed_job_app_score()
+            models.Company.objects.with_computed_job_app_score()
             # Do not update if nothing changes (NULL values have to be handled separately because NULL)
             .exclude(
                 Q(job_app_score=F("computed_job_app_score"))

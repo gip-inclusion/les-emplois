@@ -12,7 +12,7 @@ import pandas as pd
 from django.utils import timezone
 
 from itou.common_apps.address.models import AddressMixin
-from itou.companies.models import Siae
+from itou.companies.models import Company
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.metabase.tables.utils import hash_content
 from itou.utils.apis.exceptions import GeocodingDataError
@@ -109,7 +109,7 @@ def could_siae_be_deleted(siae):
     if siae.eligibilitydiagnosis_set.exclude(approval=None).exists():
         return False
     # An ASP siae can only be deleted when all its antennas have been deleted.
-    if siae.source == Siae.SOURCE_ASP:
+    if siae.source == Company.SOURCE_ASP:
         return siae.convention.siaes.count() == 1
     return True
 
@@ -154,7 +154,7 @@ def sync_structures(df, source, kinds, build_structure, wet_run=False):
     """
     print(f"Loaded {len(df)} {source} from export.")
 
-    db_sirets = {siae.siret for siae in Siae.objects.filter(kind__in=kinds)}
+    db_sirets = {siae.siret for siae in Company.objects.filter(kind__in=kinds)}
     df_sirets = set(df.siret.tolist())
 
     creatable_sirets = df_sirets - db_sirets
@@ -183,7 +183,7 @@ def sync_structures(df, source, kinds, build_structure, wet_run=False):
     structures_updated = 0
     # Update structures which already exist in database.
     for siret in updatable_sirets:
-        siae = Siae.objects.get(siret=siret, kind__in=kinds)
+        siae = Company.objects.get(siret=siret, kind__in=kinds)
         if siae.source != source:
             # If a user/staff created structure already exists in db and its siret is later found in an export,
             # it makes sense to convert it.
@@ -198,15 +198,15 @@ def sync_structures(df, source, kinds, build_structure, wet_run=False):
     undeletable_count = 0
     deletable_skipped_count = 0
     for siret in deletable_sirets:
-        siae = Siae.objects.get(siret=siret, kind__in=kinds)
+        siae = Company.objects.get(siret=siret, kind__in=kinds)
 
         one_week_ago = timezone.now() - timezone.timedelta(days=7)
-        if siae.source == Siae.SOURCE_STAFF_CREATED and siae.created_at >= one_week_ago:
+        if siae.source == Company.SOURCE_STAFF_CREATED and siae.created_at >= one_week_ago:
             # When our staff creates a structure, let's give the user sufficient time to join it before deleting it.
             deletable_skipped_count += 1
             continue
 
-        if siae.source == Siae.SOURCE_USER_CREATED:
+        if siae.source == Company.SOURCE_USER_CREATED:
             # When an employer creates an antenna, it is normal that this antenna cannot be found in official exports.
             # Thus we never attempt to delete it, as long as it has data.
             deletable_skipped_count += 1
