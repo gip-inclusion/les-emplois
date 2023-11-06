@@ -14,8 +14,8 @@
     <script src="{% static "js/city_autocomplete_field_for_jobs.js" %}"></script>
 
     <!-- Needed to use the Datepicker JS widget. -->
-    {{ form_accept.media }}
-    {% if form_personal_data %}{{ form_personal_data.media }}{% endif %}
+    {{ form_accept.media.js }}
+    {% if form_personal_data %}{{ form_personal_data.media.js }}{% endif %}
 
     {# HTMX: dynamic contract type details field, must be reloaded at each DOM swap (otherwise invalidated) #}
     <script nonce="{{ CSP_NONCE }}">
