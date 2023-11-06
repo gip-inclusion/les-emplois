@@ -1,8 +1,8 @@
 # serializer version: 1
 # name: test_maze_survey
   '''
-  <div class="maze-survey bg-white shadow fixed-sm-bottom m-4 py-3 alert-dismissible alert-dismissible-once d-none" id="maze-survey">
-                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" data-bs-target="#maze-survey" type="button">
+  <div class="maze-survey bg-white shadow fixed-sm-bottom m-3 py-3 alert alert-dismissible alert-dismissible-once d-none" id="alertMazeSurvey">
+                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" data-bs-target="#alertMazeSurvey" type="button">
                   </button>
                   <p>
                       <strong>Les emplois de l’inclusion évoluent !</strong>
