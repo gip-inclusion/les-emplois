@@ -36,7 +36,7 @@ class ContractNature(models.TextChoices):
 class ContractType(models.TextChoices):
     """
     A list of possible work contract types for Companies.
-    Not included as an intern class of SiaeJobDescription because of possible reuse cases.
+    Not included as an intern class of JobDescription because of possible reuse cases.
     """
 
     PERMANENT = "PERMANENT", "CDI"

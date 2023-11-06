@@ -524,12 +524,10 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     state = xwf_models.StateField(JobApplicationWorkflow, verbose_name="état", db_index=True)
 
     # Jobs in which the job seeker is interested (optional).
-    selected_jobs = models.ManyToManyField(
-        "companies.SiaeJobDescription", verbose_name="métiers recherchés", blank=True
-    )
+    selected_jobs = models.ManyToManyField("companies.JobDescription", verbose_name="métiers recherchés", blank=True)
     # Job for which the job seeker was hired (may not be among selected_jobs)
     hired_job = models.ForeignKey(
-        "companies.SiaeJobDescription",
+        "companies.JobDescription",
         verbose_name="poste retenu",
         blank=True,
         null=True,

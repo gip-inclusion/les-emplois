@@ -10,7 +10,7 @@ from rest_framework.authentication import SessionAuthentication, TokenAuthentica
 from rest_framework.exceptions import NotFound, ValidationError
 
 from itou.cities.models import City
-from itou.companies.models import Company, SiaeJobDescription
+from itou.companies.models import Company, JobDescription
 from itou.companies.serializers import SiaeSerializer
 
 
@@ -86,7 +86,7 @@ class SiaeViewSet(viewsets.ReadOnlyModelViewSet):
         Prefetch(
             "job_description_through",
             queryset=(
-                SiaeJobDescription.objects.filter(is_active=True)
+                JobDescription.objects.filter(is_active=True)
                 .select_related("appellation__rome")
                 .order_by("-updated_at", "-created_at")
             ),

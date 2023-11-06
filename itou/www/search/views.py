@@ -8,7 +8,7 @@ from django.views.generic import FormView
 
 from itou.common_apps.address.departments import DEPARTMENTS_WITH_DISTRICTS
 from itou.companies.enums import CompanyKind, ContractNature, JobSource
-from itou.companies.models import Company, SiaeJobDescription
+from itou.companies.models import Company, JobDescription
 from itou.prescribers.models import PrescriberOrganization
 from itou.utils.pagination import pager
 from itou.www.search.forms import JobDescriptionSearchForm, PrescriberSearchForm, SiaeSearchForm
@@ -52,7 +52,7 @@ class EmployerSearchBaseView(FormView):
             .annotate(distance=Distance("coords", city.coords) / 1000)
         )
         job_descriptions = (
-            SiaeJobDescription.objects.active()
+            JobDescription.objects.active()
             .within(city.coords, distance)
             .select_related("siae", "location", "appellation")
             .exclude(siae__block_job_applications=True)
@@ -161,7 +161,7 @@ class EmployerSearchView(EmployerSearchBaseView):
             siaes.prefetch_related(
                 Prefetch(
                     lookup="job_description_through",
-                    queryset=SiaeJobDescription.objects.with_annotation_is_popular()
+                    queryset=JobDescription.objects.with_annotation_is_popular()
                     .filter(siae__in=siaes, is_active=True)
                     .select_related("appellation", "location", "siae"),
                     to_attr="active_job_descriptions",

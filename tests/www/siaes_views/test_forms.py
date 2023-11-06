@@ -6,7 +6,7 @@ from tests.jobs.factories import create_test_romes_and_appellations
 from tests.utils.test import TestCase
 
 
-class EditSiaeJobDescriptionFormTest(TestCase):
+class EditJobDescriptionFormTest(TestCase):
     def setUp(self):
         super().setUp()
         # Needed to create sample ROME codes and job appellations (no fixture for ROME codes)

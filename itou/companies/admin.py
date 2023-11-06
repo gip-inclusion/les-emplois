@@ -259,8 +259,8 @@ class CompanyAdmin(ItouGISMixin, ExportActionMixin, OrganizationAdmin):
         return format_html('<a href="{}">Liste des {} Pass IAE (dont {} valides)</a>', url, count, valid_count)
 
 
-@admin.register(models.SiaeJobDescription)
-class SiaeJobDescriptionAdmin(ItouModelAdmin):
+@admin.register(models.JobDescription)
+class JobDescriptionAdmin(ItouModelAdmin):
     list_display = (
         "display_name",
         "siae",

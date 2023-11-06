@@ -33,7 +33,7 @@ from itou.analytics.models import Datum, StatsDashboardVisit
 from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, ProlongationRequest
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
-from itou.companies.models import Company, CompanyMembership, SiaeJobDescription
+from itou.companies.models import Company, CompanyMembership, JobDescription
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.institutions.models import Institution, InstitutionMembership
@@ -191,7 +191,7 @@ class Command(BaseCommand):
 
     def populate_job_descriptions(self):
         queryset = (
-            SiaeJobDescription.objects.select_related(
+            JobDescription.objects.select_related(
                 "siae",
                 "appellation__rome",
             )

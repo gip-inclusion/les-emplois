@@ -11,7 +11,7 @@ from pytest_django.asserts import assertNumQueries
 from itou.approvals.enums import Origin
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.companies.enums import ContractType
-from itou.companies.models import SiaeJobDescription
+from itou.companies.models import JobDescription
 from itou.eligibility.models import AdministrativeCriteria
 from itou.geo.utils import coords_to_geometry
 from itou.metabase.tables.utils import hash_content
@@ -23,7 +23,7 @@ from tests.approvals.factories import (
     ProlongationRequestDenyInformationFactory,
     ProlongationWithRequestFactory,
 )
-from tests.companies.factories import CompanyMembershipFactory, SiaeFactory, SiaeJobDescriptionFactory
+from tests.companies.factories import CompanyMembershipFactory, JobDescriptionFactory, SiaeFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory
 from tests.geo.factories import QPVFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
@@ -416,7 +416,7 @@ def test_populate_job_applications():
         # this would also be a source of flakyness if not enforced.
         kind="GEIQ",
     )
-    job = SiaeJobDescriptionFactory(is_active=True, siae=siae)
+    job = JobDescriptionFactory(is_active=True, siae=siae)
     ja = JobApplicationFactory(with_geiq_eligibility_diagnosis=True, contract_type=ContractType.APPRENTICESHIP)
     ja.selected_jobs.add(job)
 
@@ -1020,19 +1020,19 @@ def test_populate_fiches_de_poste():
         # this would also be a source of flakyness if not enforced.
         kind="GEIQ",
     )
-    job = SiaeJobDescriptionFactory(is_active=False, siae=siae)
+    job = JobDescriptionFactory(is_active=False, siae=siae)
 
     # trigger the first .from_db() call and populate _old_is_active.
     # please note that .refresh_from_db() would call .from_db() but _old_is_active
     # would not be populated since the instances in memory would be different.
-    job = SiaeJobDescription.objects.get(pk=job.pk)
+    job = JobDescription.objects.get(pk=job.pk)
     assert job._old_is_active is False
     assert job.field_history == []
 
     # modify the field
     job.is_active = True
     job.save(update_fields=["is_active"])
-    job = SiaeJobDescription.objects.get(pk=job.pk)
+    job = JobDescription.objects.get(pk=job.pk)
     assert job.field_history == [
         {
             "field": "is_active",
