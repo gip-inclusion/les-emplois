@@ -423,6 +423,9 @@ class Commune(PrettyPrintMixin, AbstractPeriod):
         # But in most of the cases:
         return f"0{self.code[0:2]}"
 
+    def autocomplete_display(self):
+        return f"{self.name} ({self.department_code})"
+
 
 class Department(PrettyPrintMixin, AbstractPeriod):
     """

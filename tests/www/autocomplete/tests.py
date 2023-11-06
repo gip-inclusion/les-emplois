@@ -1,5 +1,6 @@
 from django.urls import reverse
 
+from itou.asp.models import Commune
 from tests.cities.factories import create_test_cities
 from tests.companies.factories import CompanyFactory
 from tests.jobs.factories import create_test_romes_and_appellations
@@ -515,3 +516,42 @@ class CommunesAutocompleteTest(TestCase):
             {"code": "13200", "department": "013", "value": "MARSEILLE (013)"},
             {"code": "83100", "department": "083", "value": "PUGET-VILLE (083)"},
         ]
+
+
+class Select2CommunesAutocompleteTest(TestCase):
+    def test_autocomplete(self):
+        url = reverse("autocomplete:communes")
+
+        response = self.client.get(url, {"term": "sai", "select2": ""})
+        assert response.status_code == 200
+        assert response.json() == {
+            "results": [
+                {"id": Commune.objects.by_insee_code("64483").pk, "text": "SAINT-JEAN-DE-LUZ (064)"},
+                {"id": Commune.objects.by_insee_code("62758").pk, "text": "SAINT-MARTIN-BOULOGNE (062)"},
+            ]
+        }
+
+        # the request still finds results when dashes were forgotten
+        response = self.client.get(url, {"term": "saint j", "select2": ""})
+        assert response.status_code == 200
+        assert response.json() == {
+            "results": [
+                {"id": Commune.objects.by_insee_code("64483").pk, "text": "SAINT-JEAN-DE-LUZ (064)"},
+            ]
+        }
+
+        response = self.client.get(url, {"term": "    ", "select2": ""})
+        assert response.status_code == 200
+        assert response.json() == {"results": []}
+
+        response = self.client.get(url, {"term": "ILL", "select2": ""})
+        assert response.status_code == 200
+        assert response.json() == {
+            "results": [
+                {"id": Commune.objects.by_insee_code("59350").pk, "text": "LILLE (059)"},
+                {"id": Commune.objects.by_insee_code("37273").pk, "text": "VILLE-AUX-DAMES (037)"},
+                {"id": Commune.objects.by_insee_code("07141").pk, "text": "LENTILLERES (007)"},
+                {"id": Commune.objects.by_insee_code("13200").pk, "text": "MARSEILLE (013)"},
+                {"id": Commune.objects.by_insee_code("83100").pk, "text": "PUGET-VILLE (083)"},
+            ]
+        }
