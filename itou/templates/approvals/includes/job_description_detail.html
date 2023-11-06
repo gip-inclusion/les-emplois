@@ -1,0 +1,11 @@
+<span class="d-flex flex-wrap align-items-center text-decoration-none">
+    <span class="font-weight-bold me-1 me-md-2">{{ job.display_name }}</span>
+    <span class="ms-auto fs-sm text-nowrap">
+        <i class="ri-map-pin-2-line ri-sm me-1"></i>
+        {% if job.location %}
+            {{ job.location }}
+        {% else %}
+            {{ job.display_location }}
+        {% endif %}
+    </span>
+</span>
