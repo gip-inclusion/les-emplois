@@ -8,7 +8,7 @@ from django.utils.text import format_lazy
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS, department_from_postcode
 from itou.companies.enums import CompanyKind, ContractType
-from itou.companies.models import Company, CompanyMembership, SiaeJobDescription
+from itou.companies.models import Company, CompanyMembership, JobDescription
 from itou.jobs.models import Appellation
 from itou.utils import constants as global_constants
 from itou.utils.urls import get_external_link_markup
@@ -254,7 +254,7 @@ class JobAppellationAndLocationMixin(forms.Form):
     )
 
     class Meta:
-        model = SiaeJobDescription
+        model = JobDescription
         fields = [
             "appellation",
             "custom_name",
@@ -305,7 +305,7 @@ class EditJobDescriptionForm(JobAppellationAndLocationMixin, forms.ModelForm):
         self.fields["contract_type"].choices = BLANK_CHOICE_DASH + ContractType.choices_for_siae(siae=current_siae)
 
     class Meta:
-        model = SiaeJobDescription
+        model = JobDescription
         fields = [
             "appellation",
             "custom_name",
@@ -335,7 +335,7 @@ class EditJobDescriptionForm(JobAppellationAndLocationMixin, forms.ModelForm):
 
 class EditJobDescriptionDetailsForm(forms.ModelForm):
     class Meta:
-        model = SiaeJobDescription
+        model = JobDescription
         fields = [
             "description",
             "profile_description",

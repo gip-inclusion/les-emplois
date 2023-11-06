@@ -9,7 +9,7 @@ from django.utils.html import format_html
 from itou.cities.models import City
 from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.organizations.views import deactivate_org_member, update_org_admin_role
-from itou.companies.models import Company, SiaeFinancialAnnex, SiaeJobDescription
+from itou.companies.models import Company, JobDescription, SiaeFinancialAnnex
 from itou.jobs.models import Appellation
 from itou.users.models import User
 from itou.utils import constants as global_constants
@@ -31,7 +31,7 @@ ITOU_SESSION_JOB_DESCRIPTION_KEY = "edit_job_description_key"
 
 
 def job_description_card(request, job_description_id, template_name="siaes/job_description_card.html"):
-    job_description = get_object_or_404(SiaeJobDescription.objects.select_related("location"), pk=job_description_id)
+    job_description = get_object_or_404(JobDescription.objects.select_related("location"), pk=job_description_id)
     back_url = get_safe_url(request, "back_url")
     siae = job_description.siae
     can_update_job_description = (
@@ -40,7 +40,7 @@ def job_description_card(request, job_description_id, template_name="siaes/job_d
 
     # select_related on siae, location useful for _list_siae_actives_jobs_row.html template
     others_active_jobs = (
-        SiaeJobDescription.objects.select_related("appellation", "location", "siae")
+        JobDescription.objects.select_related("appellation", "location", "siae")
         .filter(is_active=True, siae=siae)
         .exclude(id=job_description_id)
         .order_by("-updated_at", "-created_at")
@@ -79,7 +79,7 @@ def job_description_card(request, job_description_id, template_name="siaes/job_d
 def job_description_list(request, template_name="siaes/job_description_list.html"):
     siae = get_current_siae_or_404(request)
     job_descriptions = (
-        SiaeJobDescription.objects.filter(siae__pk=siae.pk)
+        JobDescription.objects.filter(siae__pk=siae.pk)
         .select_related("location")
         .prefetch_related("appellation", "appellation__rome", "siae")
         .order_by_most_recent()
@@ -98,7 +98,7 @@ def job_description_list(request, template_name="siaes/job_description_list.html
         match (request.POST.get("action")):
             case "delete":
                 # delete method via htmx would be nice
-                job_description = SiaeJobDescription.objects.filter(siae_id=siae.pk, pk=job_description_id).first()
+                job_description = JobDescription.objects.filter(siae_id=siae.pk, pk=job_description_id).first()
                 if job_description is not None:
                     job_description.delete()
                     messages.success(request, "La fiche de poste a été supprimée.")
@@ -106,9 +106,7 @@ def job_description_list(request, template_name="siaes/job_description_list.html
                     messages.warning(request, "La fiche de poste que vous souhaitez supprimer n'existe plus.")
             case "toggle_active":
                 is_active = bool(request.POST.get("job_description_is_active", False))
-                if job_description := SiaeJobDescription.objects.filter(
-                    siae_id=siae.pk, pk=job_description_id
-                ).first():
+                if job_description := JobDescription.objects.filter(siae_id=siae.pk, pk=job_description_id).first():
                     job_description.is_active = is_active
                     job_description.save(update_fields=["is_active"])
                     messages.success(request, f"Le recrutement est maintenant {'ouvert' if is_active else 'fermé'}.")
@@ -145,7 +143,7 @@ def job_description_list(request, template_name="siaes/job_description_list.html
 def _get_job_description(session_data):
     if pk := session_data.get("pk"):
         job_description = get_object_or_404(
-            SiaeJobDescription.objects.select_related(
+            JobDescription.objects.select_related(
                 "appellation",
                 "location",
             ),
@@ -254,7 +252,7 @@ def edit_job_description_preview(request, template_name="siaes/edit_job_descript
     if not session_data:
         return HttpResponseRedirect(reverse("companies_views:edit_job_description"))
 
-    job_description = _get_job_description(session_data) or SiaeJobDescription()
+    job_description = _get_job_description(session_data) or JobDescription()
 
     job_description.__dict__.update(**session_data)
 
@@ -403,7 +401,7 @@ def select_financial_annex(request, template_name="siaes/select_financial_annex.
 
 def card(request, siae_id, template_name="siaes/card.html"):
     siae = get_object_or_404(Company.objects.with_has_active_members(), pk=siae_id)
-    jobs_descriptions = SiaeJobDescription.objects.filter(siae=siae).select_related("appellation", "location")
+    jobs_descriptions = JobDescription.objects.filter(siae=siae).select_related("appellation", "location")
     back_url = get_safe_url(request, "back_url")
     active_jobs_descriptions = []
     if siae.block_job_applications:

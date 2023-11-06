@@ -40,7 +40,7 @@ class JobsInline(ItouTabularInline):
     model = models.JobApplication.selected_jobs.through
     verbose_name_plural = "fiches de poste"
     extra = 1
-    raw_id_fields = ("siaejobdescription",)
+    raw_id_fields = ("jobdescription",)
 
 
 class ManualApprovalDeliveryRequiredFilter(admin.SimpleListFilter):

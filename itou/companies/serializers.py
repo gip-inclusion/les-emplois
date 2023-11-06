@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from itou.companies.enums import CompanyKind
-from itou.companies.models import Company, SiaeJobDescription
+from itou.companies.models import Company, JobDescription
 
 
 class _JobDescriptionSerializer(serializers.ModelSerializer):
@@ -12,7 +12,7 @@ class _JobDescriptionSerializer(serializers.ModelSerializer):
     mis_a_jour_le = serializers.DateTimeField(source="updated_at", label="Date de mise à jour")
 
     class Meta:
-        model = SiaeJobDescription
+        model = JobDescription
         fields = [
             "id",
             "rome",

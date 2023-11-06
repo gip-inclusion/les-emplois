@@ -23,7 +23,7 @@ echo "Dump models data into $FIXTURES_DIRECTORY"
 ./manage.py dumpdata employee_record.employeerecord > "$FIXTURES_DIRECTORY/22_employee_records.json"
 ./manage.py dumpdata approvals.poleemploiapproval > "$FIXTURES_DIRECTORY/23_pe_approvals.json"
 ./manage.py dumpdata job_applications.jobapplication > "$FIXTURES_DIRECTORY/24_job_applications.json"
-./manage.py dumpdata companies.siaejobdescription > "$FIXTURES_DIRECTORY/25_job_descriptions.json"
+./manage.py dumpdata companies.jobdescription > "$FIXTURES_DIRECTORY/25_job_descriptions.json"
 
 
 for file in $(find "$FIXTURES_DIRECTORY" -iname '*.json' | sort); do

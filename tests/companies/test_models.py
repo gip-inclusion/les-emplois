@@ -11,12 +11,12 @@ from django.utils import timezone
 from freezegun import freeze_time
 
 from itou.companies.enums import CompanyKind, ContractType
-from itou.companies.models import Company, SiaeJobDescription
+from itou.companies.models import Company, JobDescription
 from itou.job_applications.models import JobApplicationWorkflow
 from tests.companies.factories import (
+    JobDescriptionFactory,
     SiaeAfterGracePeriodFactory,
     SiaeFactory,
-    SiaeJobDescriptionFactory,
     SiaePendingGracePeriodFactory,
     SiaeWith2MembershipsFactory,
     SiaeWith4MembershipsFactory,
@@ -294,7 +294,7 @@ class SiaeQuerySetTest(TestCase):
         job_descriptions = siae.job_description_through.all()[:3]
         for job_description in job_descriptions:
             job_description.is_active = False
-        SiaeJobDescription.objects.bulk_update(job_descriptions, ["is_active"])
+        JobDescription.objects.bulk_update(job_descriptions, ["is_active"])
         result = Company.objects.with_count_active_job_descriptions().get(pk=siae.pk)
 
         assert 1 == result.count_active_job_descriptions
@@ -321,7 +321,7 @@ class SiaeQuerySetTest(TestCase):
         assert geiq.can_have_prior_action is True
 
 
-class SiaeJobDescriptionQuerySetTest(TestCase):
+class JobDescriptionQuerySetTest(TestCase):
     def setUp(self):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         super().setUp()
@@ -332,28 +332,26 @@ class SiaeJobDescriptionQuerySetTest(TestCase):
         siae_job_descriptions = siae.job_description_through.all()
 
         # Test attribute presence
-        siae_job_description = SiaeJobDescription.objects.with_annotation_is_popular().first()
+        siae_job_description = JobDescription.objects.with_annotation_is_popular().first()
         assert hasattr(siae_job_description, "is_popular")
 
         # Test popular threshold: popular job description
         popular_job_description = siae_job_descriptions[0]
-        for _ in range(SiaeJobDescription.POPULAR_THRESHOLD + 1):
+        for _ in range(JobDescription.POPULAR_THRESHOLD + 1):
             JobApplicationFactory(to_siae=siae, selected_jobs=[popular_job_description], job_seeker=job_seeker)
 
-        assert SiaeJobDescription.objects.with_annotation_is_popular().get(pk=popular_job_description.pk).is_popular
+        assert JobDescription.objects.with_annotation_is_popular().get(pk=popular_job_description.pk).is_popular
 
         # Test popular threshold: unpopular job description
         unpopular_job_description = siae_job_descriptions[1]
         JobApplicationFactory(to_siae=siae, selected_jobs=[unpopular_job_description])
 
-        assert (
-            not SiaeJobDescription.objects.with_annotation_is_popular().get(pk=unpopular_job_description.pk).is_popular
-        )
+        assert not JobDescription.objects.with_annotation_is_popular().get(pk=unpopular_job_description.pk).is_popular
 
         # Popular job descriptions count related **pending** job applications.
         # They should ignore other states.
         job_description = siae_job_descriptions[2]
-        threshold_exceeded = SiaeJobDescription.POPULAR_THRESHOLD + 1
+        threshold_exceeded = JobDescription.POPULAR_THRESHOLD + 1
 
         JobApplicationFactory.create_batch(
             threshold_exceeded,
@@ -363,26 +361,26 @@ class SiaeJobDescriptionQuerySetTest(TestCase):
             state=JobApplicationWorkflow.STATE_ACCEPTED,
         )
 
-        assert not SiaeJobDescription.objects.with_annotation_is_popular().get(pk=job_description.pk).is_popular
+        assert not JobDescription.objects.with_annotation_is_popular().get(pk=job_description.pk).is_popular
 
     def test_with_job_applications_count(self):
         siae = SiaeFactory(with_jobs=True)
         job_description = siae.job_description_through.first()
         JobApplicationFactory(to_siae=siae, selected_jobs=[job_description])
-        siae_job_description = SiaeJobDescription.objects.with_job_applications_count().get(pk=job_description.pk)
+        siae_job_description = JobDescription.objects.with_job_applications_count().get(pk=job_description.pk)
         assert hasattr(siae_job_description, "job_applications_count")
         assert siae_job_description.job_applications_count == 1
 
     def test_is_active(self):
         siae = SiaeFactory(kind=CompanyKind.EI, convention=None)
-        job = SiaeJobDescriptionFactory(siae=siae, is_active=False)
-        assert SiaeJobDescription.objects.active().count() == 0
+        job = JobDescriptionFactory(siae=siae, is_active=False)
+        assert JobDescription.objects.active().count() == 0
         job.is_active = True
         job.save(update_fields=["is_active"])
-        assert SiaeJobDescription.objects.active().count() == 0
+        assert JobDescription.objects.active().count() == 0
         siae.kind = CompanyKind.GEIQ
         siae.save(update_fields=["kind"])
-        assert SiaeJobDescription.objects.active().count() == 1
+        assert JobDescription.objects.active().count() == 1
 
 
 class SiaeContractTypeTest(TestCase):
@@ -436,20 +434,20 @@ class SiaeContractTypeTest(TestCase):
 
 
 @freeze_time("2020-06-21T08:29:34")
-def test_siaejobdescription_is_active_field_history():
+def test_jobdescription_is_active_field_history():
     create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
-    job = SiaeJobDescriptionFactory(is_active=False)
+    job = JobDescriptionFactory(is_active=False)
     # trigger the first .from_db() call and populate _old_is_active.
     # please note that .refresh_from_db() would call .from_db() but _old_is_active
     # would not be populated since the instances in memory would be different.
-    job = SiaeJobDescription.objects.get(pk=job.pk)
+    job = JobDescription.objects.get(pk=job.pk)
     assert job._old_is_active is False
     assert job.field_history == []
 
     # modify the field
     job.is_active = True
     job.save(update_fields=["is_active"])
-    job = SiaeJobDescription.objects.get(pk=job.pk)
+    job = JobDescription.objects.get(pk=job.pk)
     assert job.field_history == [
         {
             "field": "is_active",
@@ -462,7 +460,7 @@ def test_siaejobdescription_is_active_field_history():
     # non-modifying "change"
     job.is_active = True
     job.save(update_fields=["is_active"])
-    job = SiaeJobDescription.objects.get(pk=job.pk)
+    job = JobDescription.objects.get(pk=job.pk)
     assert job.field_history == [
         {
             "field": "is_active",
@@ -475,7 +473,7 @@ def test_siaejobdescription_is_active_field_history():
     # modify again
     job.is_active = False
     job.save()
-    job = SiaeJobDescription.objects.get(pk=job.pk)
+    job = JobDescription.objects.get(pk=job.pk)
     assert job.field_history == [
         {
             "field": "is_active",

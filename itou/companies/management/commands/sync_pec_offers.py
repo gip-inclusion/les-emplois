@@ -5,7 +5,7 @@ from django.db import transaction
 
 from itou.cities.models import City
 from itou.companies.enums import POLE_EMPLOI_SIRET, ContractNature, ContractType, JobSource
-from itou.companies.models import Company, SiaeJobDescription
+from itou.companies.models import Company, JobDescription
 from itou.jobs.models import Appellation
 from itou.utils.apis import pe_api_enums, pole_emploi_api_client
 from itou.utils.sync import DiffItemKind, yield_sync_diff
@@ -76,7 +76,7 @@ def pe_offer_to_job_description(data):
         city = City.objects.get(code_insee="13055")
     else:
         city = City.objects.get(code_insee=data["lieuTravail"]["commune"])
-    return SiaeJobDescription(
+    return JobDescription(
         appellation=appellation,
         created_at=data["dateCreation"],  # from iso8601
         updated_at=data["dateActualisation"],  # same
@@ -133,7 +133,7 @@ class Command(BaseCommand):
         with transaction.atomic():
             # get the weakest possible lock on these rows, as we don't want to block the entire system
             # but still avoid creating concurrent rows in the same time while we inspect their keys
-            pe_offers = SiaeJobDescription.objects.filter(source_kind=JobSource.PE_API).select_for_update(
+            pe_offers = JobDescription.objects.filter(source_kind=JobSource.PE_API).select_for_update(
                 of=["self"], skip_locked=True, no_key=True
             )
             for item in yield_sync_diff(raw_offers, "id", pe_offers, "source_id", []):
@@ -150,9 +150,9 @@ class Command(BaseCommand):
                     offers_to_remove.add(item.key)
 
             if wet_run:
-                objs = SiaeJobDescription.objects.bulk_create(added_offers)
+                objs = JobDescription.objects.bulk_create(added_offers)
                 self.stdout.write(f"> successfully created count={len(objs)} PE job offers")
-                n_objs = SiaeJobDescription.objects.bulk_update(
+                n_objs = JobDescription.objects.bulk_update(
                     updated_offers,
                     fields=[
                         "appellation",
@@ -173,7 +173,7 @@ class Command(BaseCommand):
                 # Do not deactivate: for now it's not very relevant to keep objects that we
                 # are not the source or master of. We'll see if that makes sense on the analytics
                 # side someday, but remove them entirely for now.
-                n_objs, _ = SiaeJobDescription.objects.filter(
+                n_objs, _ = JobDescription.objects.filter(
                     source_kind=JobSource.PE_API, source_id__in=offers_to_remove
                 ).delete()
                 self.stdout.write(f"> successfully deleted count={n_objs} PE job offers")
