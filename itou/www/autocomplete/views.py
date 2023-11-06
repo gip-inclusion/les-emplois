@@ -111,6 +111,8 @@ def communes_autocomplete(request):
     """
     communes = []
     term = request.GET.get("term", "").strip()
+    # TODO(xfernandez): drop legacy support in a few weeks and only keep select2 mode
+    select2_mode = "select2" in request.GET
 
     try:
         dt = datetime.fromisoformat(request.GET.get("date", ""))
@@ -125,13 +127,22 @@ def communes_autocomplete(request):
         else:
             communes = autocomplete_name(active_communes_qs, term, extra_ordering_by="code")
 
-        communes = [
-            {
-                "value": f"{commune.name} ({commune.department_code})",
-                "code": commune.code,
-                "department": commune.department_code,
-            }
-            for commune in communes[:MAX_CITIES_TO_RETURN]
-        ]
+        if select2_mode:
+            communes = [
+                {
+                    "text": commune.autocomplete_display(),
+                    "id": commune.pk,
+                }
+                for commune in communes[:MAX_CITIES_TO_RETURN]
+            ]
+        else:
+            communes = [
+                {
+                    "value": f"{commune.name} ({commune.department_code})",
+                    "code": commune.code,
+                    "department": commune.department_code,
+                }
+                for commune in communes[:MAX_CITIES_TO_RETURN]
+            ]
 
-    return JsonResponse(communes, safe=False)
+    return JsonResponse({"results": communes} if select2_mode else communes, safe=False)
