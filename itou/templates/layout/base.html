@@ -276,6 +276,20 @@
                 </a>
             </div>
         {% endif %}
+        {% if request.path == "/dashboard/" and user.is_employer %}
+            <div id="maze-survey" class="maze-survey bg-white shadow fixed-sm-bottom m-4 py-3 alert-dismissible alert-dismissible-once">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" data-bs-target="#maze-survey" aria-label="Fermer">
+                </button>
+                <p>
+                    <strong>Les emplois de l’inclusion évoluent !</strong>
+                </p>
+                <p>Nous faisons évoluer l'interface des Emplois de l'inclusion et avons besoins de vos retours.</p>
+                <a href="https://t.maze.co/197820845" rel="noopener" target="_blank" class="btn btn-block btn-primary btn-ico">
+                    <i class="ri-star-smile-line font-weight-medium" aria-hidden="true"></i>
+                    <span>Accéder au test</span>
+                </a>
+            </div>
+        {% endif %}
 
     </body>
 </html>
