@@ -270,7 +270,6 @@ class Siae(AddressMixin, OrganizationAbstract):
     class Meta:
         verbose_name = "entreprise"
         unique_together = ("siret", "kind")
-        db_table = "siaes_siae"
 
     @property
     def accept_survey_url(self):
@@ -498,7 +497,6 @@ class SiaeMembership(MembershipAbstract):
 
     class Meta:
         unique_together = ("user_id", "siae_id")
-        db_table = "siaes_siaemembership"
 
 
 class SiaeJobDescriptionQuerySet(models.QuerySet):
@@ -639,7 +637,6 @@ class SiaeJobDescription(models.Model):
                 name="source_id_kind_unique_without_null_values",
             ),
         ]
-        db_table = "siaes_siaejobdescription"
 
     def __str__(self):
         return self.display_name
@@ -841,7 +838,6 @@ class SiaeConvention(models.Model):
             # It is the only exception. Both structures are active.
             # ("siret_signature", "kind"),
         )
-        db_table = "siaes_siaeconvention"
 
     @property
     def siren_signature(self):
@@ -919,7 +915,6 @@ class SiaeFinancialAnnex(models.Model):
     class Meta:
         verbose_name = "annexe financière"
         verbose_name_plural = "annexes financières"
-        db_table = "siaes_siaefinancialannex"
 
     def __str__(self):
         return self.number
