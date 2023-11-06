@@ -40,7 +40,7 @@ class EmployeeRecordAPIPermission(IsAuthenticated):
         # - admin
         # If a SIAE is not eligible, there will be no result available (defensive enough)
         has_memberships = (
-            request.user.company_set.filter(siaemembership__is_active=True, siaemembership__is_admin=True)
+            request.user.company_set.filter(companymembership__is_active=True, companymembership__is_admin=True)
             .active_or_in_grace_period()
             .exists()
         )

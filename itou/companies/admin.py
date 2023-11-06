@@ -23,7 +23,7 @@ from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.urls import add_url_params
 
 
-class SiaeMembersInline(MembersInline):
+class CompanyMembersInline(MembersInline):
     model = models.Company.members.through
     readonly_fields = ("is_active", "created_at", "updated_at", "updated_by", "joined_at", "notifications")
     raw_id_fields = ("user",)
@@ -184,7 +184,7 @@ class CompanyAdmin(ItouGISMixin, ExportActionMixin, OrganizationAdmin):
         ),
     )
     search_fields = ("pk", "siret", "name", "city", "department", "post_code", "address_line_1")
-    inlines = (SiaeMembersInline, JobsInline, PkSupportRemarkInline)
+    inlines = (CompanyMembersInline, JobsInline, PkSupportRemarkInline)
 
     def get_export_filename(self, request, queryset, file_format):
         return f"Entreprises-{now():%Y-%m-%d}.{file_format.get_extension()}"

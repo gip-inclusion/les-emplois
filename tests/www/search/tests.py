@@ -9,7 +9,7 @@ from itou.companies.enums import POLE_EMPLOI_SIRET, CompanyKind, ContractNature,
 from itou.companies.models import Company
 from itou.jobs.models import Appellation, Rome
 from tests.cities.factories import create_city_guerande, create_city_saint_andre, create_city_vannes
-from tests.companies.factories import SiaeFactory, SiaeJobDescriptionFactory, SiaeMembershipFactory
+from tests.companies.factories import CompanyMembershipFactory, SiaeFactory, SiaeJobDescriptionFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationFactory
@@ -243,7 +243,7 @@ class SearchSiaeTest(TestCase):
         self.assertNotContains(response, hiring_str)
         self.assertContains(response, no_hiring_str)
 
-        SiaeMembershipFactory(siae=siae)
+        CompanyMembershipFactory(siae=siae)
         response = self.client.get(self.url, {"city": city.slug})
         self.assertContains(response, hiring_str)
         self.assertNotContains(response, no_hiring_str)

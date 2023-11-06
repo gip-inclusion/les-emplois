@@ -1485,7 +1485,7 @@ class ProcessTransferJobApplicationTest(TestCase):
             state=JobApplicationWorkflow.STATE_PROCESSING,
         )
 
-        assert 2 == user.siaemembership_set.count()
+        assert 2 == user.companymembership_set.count()
 
         self.client.force_login(user)
         response = self.client.get(

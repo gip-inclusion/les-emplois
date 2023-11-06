@@ -44,7 +44,7 @@ class ApplicantsView(generics.ListAPIView):
 
     def get_queryset(self):
         # unique siae asserted by permission class
-        siae_id = self.request.user.siaemembership_set.get().siae_id
+        siae_id = self.request.user.companymembership_set.get().siae_id
 
         return (
             User.objects.filter(job_applications__to_siae_id=siae_id, kind=UserKind.JOB_SEEKER)

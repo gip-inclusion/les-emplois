@@ -167,7 +167,7 @@ class CompanyQuerySet(OrganizationQuerySet):
         # Prefer a sub query to a join for performance reasons.
         # See `self.with_count_recent_received_job_apps`.
         return self.annotate(
-            has_active_members=Exists(SiaeMembership.objects.filter(siae=OuterRef("pk"), is_active=True))
+            has_active_members=Exists(CompanyMembership.objects.filter(siae=OuterRef("pk"), is_active=True))
         )
 
 
@@ -231,7 +231,7 @@ class Company(AddressMixin, OrganizationAbstract):
     members = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         verbose_name="membres",
-        through="SiaeMembership",
+        through="CompanyMembership",
         through_fields=("siae", "user"),
         blank=True,
     )
@@ -482,13 +482,13 @@ class Company(AddressMixin, OrganizationAbstract):
         )
 
 
-class SiaeMembership(MembershipAbstract):
+class CompanyMembership(MembershipAbstract):
     """Intermediary model between `User` and `Company`."""
 
     siae = models.ForeignKey(Company, on_delete=models.CASCADE)
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        related_name="updated_siaemembership_set",
+        related_name="updated_companymembership_set",
         null=True,
         on_delete=models.CASCADE,
         verbose_name="mis à jour par",

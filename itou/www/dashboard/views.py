@@ -352,7 +352,7 @@ def edit_user_notifications(request, template_name="dashboard/edit_user_notifica
 
     current_siae_pk = request.session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY)
     siae = get_object_or_404(Company, pk=current_siae_pk)
-    membership = request.user.siaemembership_set.get(siae=siae)
+    membership = request.user.companymembership_set.get(siae=siae)
     new_job_app_notification_form = EditNewJobAppEmployersNotificationForm(
         recipient=membership, siae=siae, data=request.POST or None
     )
@@ -387,7 +387,7 @@ def api_token(request, template_name="dashboard/api_token.html"):
     context = {
         "login_string": TOKEN_ID_STR,
         "token": token,
-        "siaes_names": request.user.siaemembership_set.active_admin().values_list("siae__name", flat=True),
+        "siaes_names": request.user.companymembership_set.active_admin().values_list("siae__name", flat=True),
     }
 
     return render(request, template_name, context)

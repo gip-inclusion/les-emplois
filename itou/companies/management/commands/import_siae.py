@@ -269,7 +269,7 @@ class Command(BaseCommand):
                 auth_email="",
             )
             .exclude(  # Exclude siae which have at least one active member.
-                siaemembership__is_active=True,
+                companymembership__is_active=True,
             )
             .distinct()
         ):

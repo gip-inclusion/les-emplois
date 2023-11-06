@@ -1,7 +1,7 @@
 from django.core import mail
 
 from itou.job_applications.notifications import NewSpontaneousJobAppEmployersNotification
-from tests.companies.factories import SiaeFactory, SiaeMembershipFactory
+from tests.companies.factories import CompanyMembershipFactory, SiaeFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.utils.test import TestCase
 
@@ -16,8 +16,8 @@ class NotificationsBaseClassTest(TestCase):
         self.notification = NewSpontaneousJobAppEmployersNotification(job_application=self.job_application)
 
         # Make sure notifications are empty
-        self.siaemembership_set = self.siae.siaemembership_set
-        self.membership = self.siaemembership_set.first()
+        self.companymembership_set = self.siae.companymembership_set
+        self.membership = self.companymembership_set.first()
         assert not self.membership.notifications
 
     def test_subscribe(self):
@@ -51,21 +51,21 @@ class NotificationsBaseClassTest(TestCase):
 
     def test_recipients_email(self):
         recipients_emails = self.notification.recipients_emails
-        assert self.siaemembership_set.filter(user__email__in=recipients_emails).count() == len(recipients_emails)
+        assert self.companymembership_set.filter(user__email__in=recipients_emails).count() == len(recipients_emails)
 
     def test_inactive_user_not_in_recipients(self):
-        SiaeMembershipFactory(siae=self.siae, user__is_active=False, is_admin=False)
-        assert self.siaemembership_set.count() == 2
+        CompanyMembershipFactory(siae=self.siae, user__is_active=False, is_admin=False)
+        assert self.companymembership_set.count() == 2
 
         recipients = self.notification.get_recipients()
         assert len(recipients) == 1
 
     def test_get_recipients_default_send_to_unset_recipients(self):
         # Unset recipients are present in get_recipients if SEND_TO_UNSET_RECIPIENTS = True
-        SiaeMembershipFactory(siae=self.siae, user__is_active=False, is_admin=False)
+        CompanyMembershipFactory(siae=self.siae, user__is_active=False, is_admin=False)
         recipients = self.notification.get_recipients()
 
-        assert self.siaemembership_set.count() == 2
+        assert self.companymembership_set.count() == 2
         assert len(recipients) == 1
 
     def test_get_recipients_default_dont_send_to_unset_recipients(self):

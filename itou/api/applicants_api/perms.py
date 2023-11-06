@@ -1,6 +1,6 @@
 from rest_framework.permissions import IsAuthenticated
 
-from itou.companies.models import SiaeMembership
+from itou.companies.models import CompanyMembership
 
 
 class ApplicantsAPIPermission(IsAuthenticated):
@@ -17,5 +17,5 @@ class ApplicantsAPIPermission(IsAuthenticated):
 
         try:
             return memberships.get().is_admin
-        except (SiaeMembership.DoesNotExist, SiaeMembership.MultipleObjectsReturned):
+        except (CompanyMembership.DoesNotExist, CompanyMembership.MultipleObjectsReturned):
             return False
