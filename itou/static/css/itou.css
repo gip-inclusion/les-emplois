@@ -92,17 +92,17 @@ duet-date-picker.is-invalid ~ .invalid-feedback {
 .file-dropzone {
     width: 100%;
     border: 2px dashed #80829c;
-    border-radius: .25rem;
+    border-radius: 0.25rem;
     text-align: center;
     padding: 1rem;
-    margin-bottom: .5rem;
+    margin-bottom: 0.5rem;
 }
 
 .file-dropzone.highlighted {
     opacity: 0.5;
 }
 
-input[type=file] {
+input[type="file"] {
     opacity: 0;
     position: absolute;
     z-index: -1;
@@ -397,10 +397,13 @@ _:-ms-fullscreen,
     border-top-right-radius: 0.5rem;
 }
 
-
 .maze-survey {
-    width: 441px !important;
-    border-radius: .5rem;
-    padding: 1rem !important;
+    padding-right: 1rem;
     z-index: 100000 !important;
+}
+
+@media (min-width: 768px) {
+    .maze-survey {
+        width: 441px !important;
+    }
 }
