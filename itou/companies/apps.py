@@ -6,7 +6,7 @@ from itou.companies import enums
 
 class CompaniesAppConfig(AppConfig):
     name = "itou.companies"
-    verbose_name = "Companies"
+    verbose_name = "Entreprises"
 
     def ready(self):
         super().ready()
