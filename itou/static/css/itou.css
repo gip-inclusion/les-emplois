@@ -399,8 +399,8 @@ _:-ms-fullscreen,
 
 
 .maze-survey {
-    bottom: 60px !important;
     width: 441px !important;
     border-radius: .5rem;
-    padding-right: 1rem;
+    padding: 1rem !important;
+    z-index: 100000 !important;
 }
