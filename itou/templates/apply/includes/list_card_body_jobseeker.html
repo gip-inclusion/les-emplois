@@ -1,0 +1,28 @@
+{% load str_filters %}
+
+<div class="card-body">
+    {% include "approvals/includes/job_description_creation.html" with job_application=job_application %}
+    <h3 class="h3 mb-1">
+        <a href="{% url 'companies_views:card' siae_id=job_application.to_company.id %}"><strong>{{ job_application.to_company.display_name }}</strong></a>
+    </h3>
+
+    <hr />
+    <div class="row">
+        <div class="col-12 col-lg-12 mb-3 mb-lg-0">
+            {% include "approvals/includes/job_description_list.html" with job_application=job_application %}
+
+        </div>
+        {% if job_application.preloaded_administrative_criteria %}
+            <div class="col-12 col-lg-7 mb-3 mb-lg-0">
+                <h4 class="h5 mb-2">Critères administratifs IAE</h4>
+                <ul class="mb-2">
+                    {% for criteria in job_application.preloaded_administrative_criteria %}<li>{{ criteria.name }}</li>{% endfor %}
+                </ul>
+                {% if job_application.preloaded_administrative_criteria_extra_nb %}
+                    + {{ job_application.preloaded_administrative_criteria_extra_nb }} autres critères
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+</div>

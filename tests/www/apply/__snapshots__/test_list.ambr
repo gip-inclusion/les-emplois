@@ -40,13 +40,13 @@
 # name: TestListForSiae.test_warns_about_long_awaiting_applications[JOB SEEKER - no warnings]
   '''
   <section aria-labelledby="results">
-                          <div class="d-flex flex-column flex-sm-row align-items-sm-center">
-                              <h2 class="mb-0 flex-grow-1" id="results">
+                          <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
+                              <h3 class="h4 mb-0" id="results">
                                   
                                       3 <strong>résultats</strong>
                                   
-                              </h2>
-                              <div>
+                              </h3>
+                              <div aria-label="Actions sur les candidatures" class="flex-column flex-md-row btn-group btn-group-sm btn-group-action" role="group">
                                   
   
                                   
@@ -55,207 +55,172 @@
   
                           
                               
-                                  <div class="c-card card my-4 has-links-inside">
-                                      
-                                      
-  
-  <div class="card-header">
-      <p class="mb-0">
-          <b>Jacques HENRY</b>
-          chez
-          <b>
-              <a href="/company/42/card?back_url=/apply/job_seeker/list">
-                  Hit pit
-              </a>
-          </b>
-          
-      </p>
-      <p class="mb-0">
-          <span class="text-secondary fs-sm">30 mars 2023 à 02:00</span>
-          
-      </p>
-      <hr class="mb-0"/>
-  </div>
-  
+                                  <div class="c-card card my-3 my-md-4 has-links-inside">
                                       
   
   <div class="card-body">
-      <div class="row">
-          <div class="col-12 col-md-6 col-lg-4 mb-3 mb-lg-0">
-              
-                  <p class="font-weight-bold mb-1">Métier recherché :</p>
-                  
-                      <p class="fs-sm card-text">Candidature spontanée</p>
-                  
-              
-          </div>
-          <div class="col-12 col-md-6 col-lg-4 mb-3 mb-lg-0">
-              <p class="font-weight-bold mb-1">Envoyée par :</p>
-              <p class="fs-sm card-text">
-                  
-                      Max THROUGHPUT
-                  
+      
+  <div class="fs-sm d-flex flex-column flex-md-row align-items-center mb-3">
+      <span class="text-secondary order-2 order-md-1 me-auto">
+          Émise le 30 mars 2023 par
   
-                  
-                      
-                  
+          
+              
+                  <strong class="me-2">Max THROUGHPUT</strong>
+              
+              
+                  <i aria-hidden="true" class="ri-group-line me-2"></i>Orienteur
+              
+          
   
-                  
-              </p>
-          </div>
-          <div class="col-12 col-md-12 col-lg-4 ps-lg-0">
-              <p class="font-weight-bold mb-1">Statut :</p>
-              <p class="fs-sm card-text">
-                  <span class="badge badge-sm rounded-pill text-wrap mb-1 bg-info" id="state_11111111-1111-1111-1111-111111111111">Nouvelle candidature</span>
-                  
-              </p>
-          </div>
-      </div>
+      </span>
+      
+      <span class="order-1 order-md-2 ms-auto"><span class="badge badge-sm rounded-pill text-wrap mb-1 bg-info" id="state_11111111-1111-1111-1111-111111111111">Nouvelle candidature</span></span>
   </div>
   
-                                      <div class="card-body collapse" id="answer0">
-                                          <p class="font-weight-bold mb-1">Message de candidature :</p>
-                                          <div class="fs-sm"><p>Third application</p></div>
+      <h3 class="h3 mb-1">
+          <a href="/company/42/card"><strong>Hit pit</strong></a>
+      </h3>
+  
+      <hr/>
+      <div class="row">
+          <div class="col-12 col-lg-12 mb-3 mb-lg-0">
+              
+      <div>
+          
+              <i class="ri-briefcase-line ri-xl me-1"></i><span class="font-weight-bold me-1 me-md-2">Candidature spontanée</span>
+          
+      </div>
+  
+  
+  
+          </div>
+          
+      </div>
+  
+  </div>
+  
+                                      <div class="card-footer text-end bg-light">
                                           
-                                      </div>
-                                      <div class="card-footer text-end">
-                                          <a aria-controls="answer0" aria-expanded="false" aria-label="Plus d'informations sur cette candidature" class="btn btn-sm btn-outline-primary" data-bs-target="#answer0" data-bs-toggle="collapse" href="#">Plus d'informations</a>
+                                          <a aria-label="Plus d'informations sur Jacques HENRY" class="btn btn-sm btn-outline-primary bg-white" href="/apply/11111111-1111-1111-1111-111111111111/jobseeker/details?back_url=/apply/job_seeker/list">
+                                              Plus d'informations
+                                          </a>
                                       </div>
                                   </div>
                               
-                                  <div class="c-card card my-4 has-links-inside">
-                                      
-                                      
-  
-  <div class="card-header">
-      <p class="mb-0">
-          <b>Jacques HENRY</b>
-          chez
-          <b>
-              <a href="/company/42/card?back_url=/apply/job_seeker/list">
-                  Hit pit
-              </a>
-          </b>
-          
-      </p>
-      <p class="mb-0">
-          <span class="text-secondary fs-sm">18 mars 2023 à 01:00</span>
-          
-      </p>
-      <hr class="mb-0"/>
-  </div>
-  
+                                  <div class="c-card card my-3 my-md-4 has-links-inside">
                                       
   
   <div class="card-body">
-      <div class="row">
-          <div class="col-12 col-md-6 col-lg-4 mb-3 mb-lg-0">
-              
-                  <p class="font-weight-bold mb-1">Métier recherché :</p>
-                  
-                      <p class="fs-sm card-text">Candidature spontanée</p>
-                  
-              
-          </div>
-          <div class="col-12 col-md-6 col-lg-4 mb-3 mb-lg-0">
-              <p class="font-weight-bold mb-1">Envoyée par :</p>
-              <p class="fs-sm card-text">
-                  
-                      Max THROUGHPUT
-                  
+      
+  <div class="fs-sm d-flex flex-column flex-md-row align-items-center mb-3">
+      <span class="text-secondary order-2 order-md-1 me-auto">
+          Émise le 18 mars 2023 par
   
-                  
-                      
-                  
+          
+              
+                  <strong class="me-2">Max THROUGHPUT</strong>
+              
+              
+                  <i aria-hidden="true" class="ri-group-line me-2"></i>Orienteur
+              
+          
   
-                  
-              </p>
-          </div>
-          <div class="col-12 col-md-12 col-lg-4 ps-lg-0">
-              <p class="font-weight-bold mb-1">Statut :</p>
-              <p class="fs-sm card-text">
-                  <span class="badge badge-sm rounded-pill text-wrap mb-1 bg-info" id="state_22222222-2222-2222-2222-222222222222">Nouvelle candidature</span>
-                  
-              </p>
-          </div>
-      </div>
+      </span>
+      
+      <span class="order-1 order-md-2 ms-auto"><span class="badge badge-sm rounded-pill text-wrap mb-1 bg-info" id="state_22222222-2222-2222-2222-222222222222">Nouvelle candidature</span></span>
   </div>
   
-                                      <div class="card-body collapse" id="answer1">
-                                          <p class="font-weight-bold mb-1">Message de candidature :</p>
-                                          <div class="fs-sm"><p>Second application</p></div>
+      <h3 class="h3 mb-1">
+          <a href="/company/42/card"><strong>Hit pit</strong></a>
+      </h3>
+  
+      <hr/>
+      <div class="row">
+          <div class="col-12 col-lg-12 mb-3 mb-lg-0">
+              
+      <div>
+          
+              <i class="ri-briefcase-line ri-xl me-1"></i><span class="font-weight-bold me-1 me-md-2">Candidature spontanée</span>
+          
+      </div>
+  
+  
+  
+          </div>
+          
+      </div>
+  
+  </div>
+  
+                                      <div class="card-footer text-end bg-light">
                                           
-                                      </div>
-                                      <div class="card-footer text-end">
-                                          <a aria-controls="answer1" aria-expanded="false" aria-label="Plus d'informations sur cette candidature" class="btn btn-sm btn-outline-primary" data-bs-target="#answer1" data-bs-toggle="collapse" href="#">Plus d'informations</a>
+                                              <span class="d-inline-flex align-items-center text-warning fs-sm">
+                                                  <i class="ri-time-line ri-lg me-1"></i>
+                                                  En attente de réponse depuis 3 semaines.
+                                              </span>
+                                          
+                                          <a aria-label="Plus d'informations sur Jacques HENRY" class="btn btn-sm btn-outline-primary bg-white" href="/apply/22222222-2222-2222-2222-222222222222/jobseeker/details?back_url=/apply/job_seeker/list">
+                                              Plus d'informations
+                                          </a>
                                       </div>
                                   </div>
                               
-                                  <div class="c-card card my-4 has-links-inside">
-                                      
-                                      
-  
-  <div class="card-header">
-      <p class="mb-0">
-          <b>Jacques HENRY</b>
-          chez
-          <b>
-              <a href="/company/42/card?back_url=/apply/job_seeker/list">
-                  Hit pit
-              </a>
-          </b>
-          
-      </p>
-      <p class="mb-0">
-          <span class="text-secondary fs-sm">16 février 2023 à 01:00</span>
-          
-      </p>
-      <hr class="mb-0"/>
-  </div>
-  
+                                  <div class="c-card card my-3 my-md-4 has-links-inside">
                                       
   
   <div class="card-body">
-      <div class="row">
-          <div class="col-12 col-md-6 col-lg-4 mb-3 mb-lg-0">
-              
-                  <p class="font-weight-bold mb-1">Métier recherché :</p>
-                  
-                      <p class="fs-sm card-text">Candidature spontanée</p>
-                  
-              
-          </div>
-          <div class="col-12 col-md-6 col-lg-4 mb-3 mb-lg-0">
-              <p class="font-weight-bold mb-1">Envoyée par :</p>
-              <p class="fs-sm card-text">
-                  
-                      Max THROUGHPUT
-                  
+      
+  <div class="fs-sm d-flex flex-column flex-md-row align-items-center mb-3">
+      <span class="text-secondary order-2 order-md-1 me-auto">
+          Émise le 16 février 2023 par
   
-                  
-                      
-                  
+          
+              
+                  <strong class="me-2">Max THROUGHPUT</strong>
+              
+              
+                  <i aria-hidden="true" class="ri-group-line me-2"></i>Orienteur
+              
+          
   
-                  
-              </p>
-          </div>
-          <div class="col-12 col-md-12 col-lg-4 ps-lg-0">
-              <p class="font-weight-bold mb-1">Statut :</p>
-              <p class="fs-sm card-text">
-                  <span class="badge badge-sm rounded-pill text-wrap mb-1 bg-info" id="state_33333333-3333-3333-3333-333333333333">Nouvelle candidature</span>
-                  
-              </p>
-          </div>
-      </div>
+      </span>
+      
+      <span class="order-1 order-md-2 ms-auto"><span class="badge badge-sm rounded-pill text-wrap mb-1 bg-info" id="state_33333333-3333-3333-3333-333333333333">Nouvelle candidature</span></span>
   </div>
   
-                                      <div class="card-body collapse" id="answer2">
-                                          <p class="font-weight-bold mb-1">Message de candidature :</p>
-                                          <div class="fs-sm"><p>First application</p></div>
+      <h3 class="h3 mb-1">
+          <a href="/company/42/card"><strong>Hit pit</strong></a>
+      </h3>
+  
+      <hr/>
+      <div class="row">
+          <div class="col-12 col-lg-12 mb-3 mb-lg-0">
+              
+      <div>
+          
+              <i class="ri-briefcase-line ri-xl me-1"></i><span class="font-weight-bold me-1 me-md-2">Candidature spontanée</span>
+          
+      </div>
+  
+  
+  
+          </div>
+          
+      </div>
+  
+  </div>
+  
+                                      <div class="card-footer text-end bg-light">
                                           
-                                      </div>
-                                      <div class="card-footer text-end">
-                                          <a aria-controls="answer2" aria-expanded="false" aria-label="Plus d'informations sur cette candidature" class="btn btn-sm btn-outline-primary" data-bs-target="#answer2" data-bs-toggle="collapse" href="#">Plus d'informations</a>
+                                              <span class="d-inline-flex align-items-center text-warning fs-sm">
+                                                  <i class="ri-time-line ri-lg me-1"></i>
+                                                  En attente de réponse depuis 8 semaines.
+                                              </span>
+                                          
+                                          <a aria-label="Plus d'informations sur Jacques HENRY" class="btn btn-sm btn-outline-primary bg-white" href="/apply/33333333-3333-3333-3333-333333333333/jobseeker/details?back_url=/apply/job_seeker/list">
+                                              Plus d'informations
+                                          </a>
                                       </div>
                                   </div>
                               
@@ -297,7 +262,6 @@
                                       
   
   <div class="card-body">
-  
       
   <div class="fs-sm d-flex flex-column flex-md-row align-items-center mb-3">
       <span class="text-secondary order-2 order-md-1 me-auto">
@@ -306,16 +270,13 @@
           
               <strong>Vous</strong>
           
-          
-              chez <a href="/company/42/card"><strong>Hit pit</strong></a>
-          
   
       </span>
       
       <span class="order-1 order-md-2 ms-auto"><span class="badge badge-sm rounded-pill text-wrap mb-1 bg-info" id="state_11111111-1111-1111-1111-111111111111">Nouvelle candidature</span></span>
   </div>
-  <hr class="my-3"/>
   
+      
       <div>
           
               <i class="ri-briefcase-line ri-xl me-1"></i><span class="font-weight-bold me-1 me-md-2">Candidature spontanée</span>
@@ -361,7 +322,6 @@
                                       
   
   <div class="card-body">
-  
       
   <div class="fs-sm d-flex flex-column flex-md-row align-items-center mb-3">
       <span class="text-secondary order-2 order-md-1 me-auto">
@@ -370,16 +330,13 @@
           
               <strong>Vous</strong>
           
-          
-              chez <a href="/company/42/card"><strong>Hit pit</strong></a>
-          
   
       </span>
       
       <span class="order-1 order-md-2 ms-auto"><span class="badge badge-sm rounded-pill text-wrap mb-1 bg-info" id="state_22222222-2222-2222-2222-222222222222">Nouvelle candidature</span></span>
   </div>
-  <hr class="my-3"/>
   
+      
       <div>
           
               <i class="ri-briefcase-line ri-xl me-1"></i><span class="font-weight-bold me-1 me-md-2">Candidature spontanée</span>
@@ -430,7 +387,6 @@
                                       
   
   <div class="card-body">
-  
       
   <div class="fs-sm d-flex flex-column flex-md-row align-items-center mb-3">
       <span class="text-secondary order-2 order-md-1 me-auto">
@@ -439,16 +395,13 @@
           
               <strong>Vous</strong>
           
-          
-              chez <a href="/company/42/card"><strong>Hit pit</strong></a>
-          
   
       </span>
       
       <span class="order-1 order-md-2 ms-auto"><span class="badge badge-sm rounded-pill text-wrap mb-1 bg-info" id="state_33333333-3333-3333-3333-333333333333">Nouvelle candidature</span></span>
   </div>
-  <hr class="my-3"/>
   
+      
       <div>
           
               <i class="ri-briefcase-line ri-xl me-1"></i><span class="font-weight-bold me-1 me-md-2">Candidature spontanée</span>
@@ -533,7 +486,6 @@
                                       
   
   <div class="card-body">
-  
       
   <div class="fs-sm d-flex flex-column flex-md-row align-items-center mb-3">
       <span class="text-secondary order-2 order-md-1 me-auto">
@@ -547,14 +499,13 @@
                   <i aria-hidden="true" class="ri-group-line me-2"></i>Orienteur
               
           
-          
   
       </span>
       
       <span class="order-1 order-md-2 ms-auto"><span class="badge badge-sm rounded-pill text-wrap mb-1 bg-info" id="state_11111111-1111-1111-1111-111111111111">Nouvelle candidature</span></span>
   </div>
-  <hr class="my-3"/>
   
+      
       <div>
           
               <i class="ri-briefcase-line ri-xl me-1"></i><span class="font-weight-bold me-1 me-md-2">Candidature spontanée</span>
@@ -633,7 +584,6 @@
                                       
   
   <div class="card-body">
-  
       
   <div class="fs-sm d-flex flex-column flex-md-row align-items-center mb-3">
       <span class="text-secondary order-2 order-md-1 me-auto">
@@ -647,14 +597,13 @@
                   <i aria-hidden="true" class="ri-group-line me-2"></i>Orienteur
               
           
-          
   
       </span>
       
       <span class="order-1 order-md-2 ms-auto"><span class="badge badge-sm rounded-pill text-wrap mb-1 bg-info" id="state_22222222-2222-2222-2222-222222222222">Nouvelle candidature</span></span>
   </div>
-  <hr class="my-3"/>
   
+      
       <div>
           
               <i class="ri-briefcase-line ri-xl me-1"></i><span class="font-weight-bold me-1 me-md-2">Candidature spontanée</span>
@@ -708,7 +657,6 @@
                                       
   
   <div class="card-body">
-  
       
   <div class="fs-sm d-flex flex-column flex-md-row align-items-center mb-3">
       <span class="text-secondary order-2 order-md-1 me-auto">
@@ -722,14 +670,13 @@
                   <i aria-hidden="true" class="ri-group-line me-2"></i>Orienteur
               
           
-          
   
       </span>
       
       <span class="order-1 order-md-2 ms-auto"><span class="badge badge-sm rounded-pill text-wrap mb-1 bg-info" id="state_33333333-3333-3333-3333-333333333333">Nouvelle candidature</span></span>
   </div>
-  <hr class="my-3"/>
   
+      
       <div>
           
               <i class="ri-briefcase-line ri-xl me-1"></i><span class="font-weight-bold me-1 me-md-2">Candidature spontanée</span>
