@@ -2,11 +2,14 @@ import random
 from itertools import product
 
 import pytest
+from bs4 import BeautifulSoup
 from dateutil.relativedelta import relativedelta
 from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.formats import date_format
 from django.utils.http import urlencode
+from django.utils.timezone import localtime
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects, assertTemplateUsed
 
 from itou.approvals.models import Approval, Suspension
@@ -21,7 +24,7 @@ from itou.jobs.models import Appellation
 from itou.siae_evaluations.models import Sanctions
 from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId, UserKind
 from itou.utils.models import InclusiveDateRange
-from itou.utils.templatetags.format_filters import format_nir
+from itou.utils.templatetags.format_filters import format_nir, format_phone
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.apply.forms import AcceptForm
 from tests.approvals.factories import PoleEmploiApprovalFactory, SuspensionFactory
@@ -54,6 +57,10 @@ class ProcessViewsTest(TestCase):
 
     def get_random_city(self):
         return random.choice(self.cities)
+
+    def _get_transition_logs_content(self, response, job_application):
+        soup = BeautifulSoup(response.content, "html5lib", from_encoding=response.charset or "utf-8")
+        return soup.find("ul", attrs={"id": "transition_logs_" + str(job_application.id)})
 
     def accept_job_application(
         self, job_application, post_data=None, city=None, assert_successful=True, job_description=None
@@ -198,7 +205,9 @@ class ProcessViewsTest(TestCase):
         """As a prescriber, I can access the job_applications details for prescribers."""
 
         job_application = JobApplicationFactory(
-            with_approval=True, resume_link="", sent_by_authorized_prescriber_organisation=True
+            with_approval=True,
+            resume_link="",
+            sent_by_authorized_prescriber_organisation=True,
         )
         prescriber = job_application.sender_prescriber_organization.members.first()
 
@@ -210,6 +219,8 @@ class ProcessViewsTest(TestCase):
         self.assertContains(response, format_nir(job_application.job_seeker.nir))
         # Approval is displayed
         self.assertContains(response, "Numéro de PASS IAE")
+        # Sender phone is displayed
+        self.assertContains(response, format_phone(job_application.sender.phone))
 
         self.assertContains(response, "Adresse : <span>Non renseignée</span>", html=True)
         self.assertContains(response, "CV : <span>Non renseigné</span>", html=True)
@@ -257,6 +268,44 @@ class ProcessViewsTest(TestCase):
         self.assertNotContains(response, job_application.job_seeker.post_code)
         self.assertNotContains(response, "Supersecretname")
         self.assertNotContains(response, "Unknown")
+
+    def test_details_for_prescriber_with_transition_logs(self, *args, **kwargs):
+        """As a prescriber, I can access transition logs for job_applications details for prescribers."""
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
+
+        # transition logs setup
+        job_application.process(user=job_application.to_company.active_members.first())
+        jatl = job_application.logs.first()
+
+        prescriber = job_application.sender_prescriber_organization.members.first()
+        self.client.force_login(prescriber)
+
+        url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url)
+        html_fragment = self._get_transition_logs_content(response, job_application)
+
+        self.assertIsNotNone(html_fragment)
+        self.assertEqual(html_fragment.b.string, jatl.pretty_to_state)
+        self.assertTrue(html_fragment.find("li", string=f"Par {jatl.user.get_full_name()}"))
+        self.assertTrue(html_fragment.find("li", string=f'Le {date_format(localtime(jatl.timestamp), "d F Y à H:i")}'))
+
+    def test_details_for_prescriber_when_refused(self, *args, **kwargs):
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
+            state=JobApplicationWorkflow.STATE_REFUSED,
+            answer="abc",
+            answer_to_prescriber="undisclosed",
+            refusal_reason="other",
+        )
+        prescriber = job_application.sender_prescriber_organization.members.first()
+        self.client.force_login(prescriber)
+        url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url)
+        self.assertContains(response, '<h4 class="h6 mt-3">Message envoyé au candidat</h4>', html=True)
+        self.assertContains(response, f"<p>{job_application.answer}</p>", html=True)
+        self.assertContains(response, '<h4 class="h6 mt-3">Commentaire privé de l\'employeur</h4>')
+        self.assertContains(response, f"<p>{job_application.answer_to_prescriber}</p>", html=True)
+        self.assertContains(response, "<b>Motif de refus :</b> Autre (détails dans le message ci-dessous)")
 
     def test_process(self, *args, **kwargs):
         """Ensure that the `process` transition is triggered."""
