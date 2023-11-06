@@ -2,13 +2,13 @@
 {% if job_application.answer or job_application.state.is_refused %}
     <hr>
     <h3>Réponse de l'employeur</h3>
-    {% if job_application.refusal_reason %}
+    {% if job_application.refusal_reason and not request.user.is_job_seeker %}
         <p>
             <b>Motif de refus :</b> {{ job_application.get_refusal_reason_display }}
         </p>
     {% endif %}
 
-    {% if job_application.answer_to_prescriber %}
+    {% if job_application.answer_to_prescriber and not request.user.is_job_seeker %}
         <h4 class="h6 mt-3">Commentaire privé de l'employeur</h4>
         <blockquote class="bg-info-lightest rounded font-italic px-3 pt-3 pb-1 mb-3">
             {{ job_application.answer_to_prescriber|linebreaks }}
@@ -16,7 +16,7 @@
     {% endif %}
 
     {% if job_application.answer %}
-        <h4 class="h6 mt-3">Copie du message envoyé au candidat</h4>
+        <h4 class="h6 mt-3">Message envoyé au candidat</h4>
         <blockquote class="bg-info-lightest rounded font-italic px-3 pt-3 pb-1">
             {{ job_application.answer|linebreaks }}
         </blockquote>
