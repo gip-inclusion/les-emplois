@@ -85,9 +85,9 @@ boto3==1.28.54 \
     --hash=sha256:22e37d8c4f2d97b5e5c6ccc1d9edc7760717990b0ba8b8ea17a58cc87e57c5c9 \
     --hash=sha256:3cb2aee317a1b8686e3b23674e4099b8ff7451bd8acc61b9719acff86fa024d1
     # via -r requirements/test.txt
-botocore==1.31.68 \
-    --hash=sha256:0813f02d00e46051364d9b5d5e697a90e988b336b87e949888c1444a59b8ba59 \
-    --hash=sha256:7b7065c502f5faa6cc2aa4b42b5fa34e5c0cd171e2952d6a9aeb26bfd44a54c3
+botocore==1.31.78 \
+    --hash=sha256:320c70bc412157813c2cf60217a592b4b345f8e97e4bf3b1ce49b6be69ed8965 \
+    --hash=sha256:a9ca8deeb3f47a10a25637859fee8d81cac2db37ace819d24471279e44879547
     # via
     #   -r requirements/test.txt
     #   boto3
@@ -843,7 +843,9 @@ prompt-toolkit==3.0.39 \
 psycopg[binary]==3.1.10 \
     --hash=sha256:15b25741494344c24066dc2479b0f383dd1b82fa5e75612fa4fa5bb30726e9b6 \
     --hash=sha256:8bbeddae5075c7890b2fa3e3553440376d3c5e28418335dee3c3656b06fa2b52
-    # via -r requirements/test.txt
+    # via
+    #   -r requirements/test.txt
+    #   psycopg
 psycopg-binary==3.1.10 \
     --hash=sha256:0471869e658d0c6b8c3ed53153794739c18d7dad2dd5b8e6ff023a364c20f7df \
     --hash=sha256:0f062f20256708929a58c41d44f350efced4c00a603323d1413f6dc0b84d95a5 \
@@ -926,6 +928,7 @@ pyjwt[crypto]==2.7.0 \
     # via
     #   -r requirements/test.txt
     #   django-allauth
+    #   pyjwt
 pynacl==1.5.0 \
     --hash=sha256:06b8f6fa7f5de8d5d2f7573fe8c863c051225a27b61e6860fd047b1775807858 \
     --hash=sha256:0c84947a22519e013607c9be43706dd42513f9e6ae5d39d3613ca1e142fba44d \
@@ -1357,6 +1360,7 @@ tablib[html,ods,xls,xlsx,yaml]==3.5.0 \
     # via
     #   -r requirements/test.txt
     #   django-import-export
+    #   tablib
 tenacity==8.2.3 \
     --hash=sha256:5398ef0d78e63f40007c1fb4c0bff96e1911394d2fa8d194f77619c05ff6cc8a \
     --hash=sha256:ce510e327a630c9e1beaf17d42e6ffacc88185044ad85cf74c0a8887c6a0f88c
