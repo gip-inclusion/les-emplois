@@ -1,5 +1,6 @@
 <div class="card c-card has-links-inside my-4">
     <div class="card-body">
+        {% include "approvals/includes/job_description_creation.html" with job_application=job_application %}
         {% include "approvals/includes/job_description_list.html" with job_application=job_application %}
     </div>
 

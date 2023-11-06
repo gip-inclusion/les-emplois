@@ -1,7 +1,7 @@
 {% load str_filters %}
 
 <div class="card-body">
-
+    {% include "approvals/includes/job_description_creation.html" with job_application=job_application %}
     {% include "approvals/includes/job_description_list.html" with job_application=job_application %}
 
     <hr />
