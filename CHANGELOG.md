@@ -1,5 +1,20 @@
 # Journal des modifications
 
+## [74] - 2023-11-06
+
+### Ajouté
+- Admin : Lister les PASS IAE d'une SIAE sur la page d'admin
+- Admin : Permettre à un employeur de desactiver son compte pour devenir prescripteur (ou l'inverse)
+- Embauche : l'employeur précise le poste à l'embauche
+- Profil salarié : Ajout des dates de PASS IAE sur les cartes
+
+### Modifié
+- Carte candidature : harmonisation de la carte en vue prescripteur (avec celle des employeurs)
+- Fiches de poste : permettre la suppression de la localisation (pour réutiliser celle du siège, par défaut)
+- Fiches de poste : permettre de choisir un poste (code ROME) déjà existant pour créer un poste avec une autre localisation (par exemple).
+- PASS IAE : modification de la logique d'envoi à PE : envoi des PASS démarrés, par une tâche planifiée toutes les 5 minutes.
+- Annexes financières : Amélioration UI de la liste
+
 ## [73] - 2023-10-23
 
 ### Ajouté
