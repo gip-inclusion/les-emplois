@@ -1074,28 +1074,28 @@ class PrescriberFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsFor
     Job applications filters for Prescribers only.
     """
 
-    to_siaes = forms.MultipleChoiceField(required=False, label="Structure", widget=Select2MultipleWidget)
+    to_companies = forms.MultipleChoiceField(required=False, label="Structure", widget=Select2MultipleWidget)
 
     def __init__(self, job_applications_qs, *args, **kwargs):
         super().__init__(job_applications_qs, *args, **kwargs)
-        self.fields["to_siaes"].choices += self.get_to_siaes_choices()
+        self.fields["to_companies"].choices += self.get_to_companies_choices()
 
     def get_qs_filters(self):
         qs_list = super().get_qs_filters()
         data = self.cleaned_data
-        to_siaes = data.get("to_siaes")
+        to_companies = data.get("to_companies")
 
-        if to_siaes:
-            qs = Q(to_company__id__in=to_siaes)
+        if to_companies:
+            qs = Q(to_company__id__in=to_companies)
             qs_list.append(qs)
 
         return qs_list
 
-    def get_to_siaes_choices(self):
-        to_siaes = self.job_applications_qs.get_unique_fk_objects("to_company")
-        to_siaes = [siae for siae in to_siaes if siae.display_name]
-        to_siaes = [(siae.id, siae.display_name.title()) for siae in to_siaes]
-        return sorted(to_siaes, key=lambda siae: siae[1])
+    def get_to_companies_choices(self):
+        to_companies = self.job_applications_qs.get_unique_fk_objects("to_company")
+        to_companies = [siae for siae in to_companies if siae.display_name]
+        to_companies = [(siae.id, siae.display_name.title()) for siae in to_companies]
+        return sorted(to_companies, key=lambda siae: siae[1])
 
 
 class CheckJobSeekerGEIQEligibilityForm(forms.Form):
