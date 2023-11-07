@@ -78,7 +78,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
 
         # Check IC will redirect to the correct url
         token = company.get_token()
-        previous_url = reverse("signup:siae_user", args=(company.pk, token))
+        previous_url = reverse("signup:employer", args=(company.pk, token))
         next_url = reverse("signup:siae_join", args=(company.pk, token))
         params = {
             "user_kind": KIND_EMPLOYER,
@@ -139,7 +139,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
 
         # Check IC will redirect to the correct url
         token = company.get_token()
-        previous_url = reverse("signup:siae_user", args=(company.pk, token))
+        previous_url = reverse("signup:employer", args=(company.pk, token))
         next_url = reverse("signup:siae_join", args=(company.pk, token))
         params = {
             "user_kind": KIND_EMPLOYER,
@@ -181,7 +181,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
 
         # Check IC will redirect to the correct url
         token = company.get_token()
-        previous_url = reverse("signup:siae_user", args=(company.pk, token))
+        previous_url = reverse("signup:employer", args=(company.pk, token))
         next_url = reverse("signup:siae_join", args=(company.pk, token))
         params = {
             "user_kind": KIND_EMPLOYER,
@@ -210,7 +210,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
 
     def test_user_invalid_siae_id(self):
         company = CompanyFactory(kind=CompanyKind.ETTI)
-        response = self.client.get(reverse("signup:siae_user", kwargs={"siae_id": "0", "token": company.get_token()}))
+        response = self.client.get(reverse("signup:employer", kwargs={"siae_id": "0", "token": company.get_token()}))
         self.assertRedirects(response, reverse("signup:siae_select"))
         assertMessages(
             response,

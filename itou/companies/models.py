@@ -359,7 +359,7 @@ class Company(AddressMixin, OrganizationAbstract):
 
     @property
     def signup_magic_link(self):
-        return reverse("signup:siae_user", kwargs={"siae_id": self.pk, "token": self.get_token()})
+        return reverse("signup:employer", kwargs={"siae_id": self.pk, "token": self.get_token()})
 
     def get_token(self):
         return company_signup_token_generator.make_token(self)

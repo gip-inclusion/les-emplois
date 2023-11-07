@@ -48,7 +48,7 @@ class ApprovalProlongationTest(TestCase):
             to_company__kind=siae_kind,
         )
         self.siae = self.job_application.to_company
-        self.siae_user = self.job_application.to_company.members.first()
+        self.employer = self.job_application.to_company.members.first()
         self.approval = self.job_application.approval
         assert 0 == self.approval.prolongation_set.count()
 
@@ -57,7 +57,7 @@ class ApprovalProlongationTest(TestCase):
         Test the creation of a prolongation.
         """
 
-        self.client.force_login(self.siae_user)
+        self.client.force_login(self.employer)
 
         back_url = reverse("search:siaes_home")
         params = urlencode({"back_url": back_url})
@@ -110,8 +110,8 @@ class ApprovalProlongationTest(TestCase):
         self.assertRedirects(response, back_url)
 
         prolongation_request = self.approval.prolongationrequest_set.get()
-        assert prolongation_request.created_by == self.siae_user
-        assert prolongation_request.declared_by == self.siae_user
+        assert prolongation_request.created_by == self.employer
+        assert prolongation_request.declared_by == self.employer
         assert prolongation_request.declared_by_siae == self.job_application.to_company
         assert prolongation_request.validated_by == self.prescriber
         assert prolongation_request.reason == post_data["reason"]
@@ -124,7 +124,7 @@ class ApprovalProlongationTest(TestCase):
         assert email.to[0] == post_data["email"]
 
     def test_prolong_approval_view_prepopulates_SENIOR_CDI(self):
-        self.client.force_login(self.siae_user)
+        self.client.force_login(self.employer)
         response = self.client.post(
             reverse("approvals:prolongation_form_for_reason", kwargs={"approval_id": self.approval.pk}),
             {"reason": ProlongationReason.SENIOR_CDI},
@@ -134,7 +134,7 @@ class ApprovalProlongationTest(TestCase):
         assert str(end_at_field.parent) == self.snapshot(name="value is set to max_end_at")
 
     def test_prolong_approval_view_bad_reason(self):
-        self.client.force_login(self.siae_user)
+        self.client.force_login(self.employer)
         end_at = timezone.localdate() + relativedelta(months=1)
         response = self.client.post(
             reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk}),
@@ -151,7 +151,7 @@ class ApprovalProlongationTest(TestCase):
         )
 
     def test_prolong_approval_view_no_end_at(self):
-        self.client.force_login(self.siae_user)
+        self.client.force_login(self.employer)
         response = self.client.post(
             reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk}),
             {
@@ -165,7 +165,7 @@ class ApprovalProlongationTest(TestCase):
         assert str(end_at_field.parent) == self.snapshot()
 
     def test_htmx_on_reason(self):
-        self.client.force_login(self.siae_user)
+        self.client.force_login(self.employer)
         response = self.client.get(
             reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk}),
         )
@@ -198,7 +198,7 @@ class ApprovalProlongationTest(TestCase):
     def test_end_at_limits(self):
         assert len(ProlongationReason.choices) == 6
 
-        self.client.force_login(self.siae_user)
+        self.client.force_login(self.employer)
         for end_at, reason in [
             (self.approval.end_at + timedelta(days=10 * 365), ProlongationReason.SENIOR_CDI),
             (self.approval.end_at + timedelta(days=365), ProlongationReason.COMPLETE_TRAINING),
@@ -233,7 +233,7 @@ class ApprovalProlongationTest(TestCase):
             reason=reason,
         )
         with freeze_time(end_at):
-            self.client.force_login(self.siae_user)
+            self.client.force_login(self.employer)
             url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
             response = self.client.post(
                 url,
@@ -263,7 +263,7 @@ class ApprovalProlongationTest(TestCase):
         Test the creation of a prolongation without prescriber.
         """
 
-        self.client.force_login(self.siae_user)
+        self.client.force_login(self.employer)
 
         back_url = reverse("search:siaes_home")
         params = urlencode({"back_url": back_url})
@@ -300,8 +300,8 @@ class ApprovalProlongationTest(TestCase):
         assert 1 == self.approval.prolongation_set.count()
 
         prolongation = self.approval.prolongation_set.first()
-        assert prolongation.created_by == self.siae_user
-        assert prolongation.declared_by == self.siae_user
+        assert prolongation.created_by == self.employer
+        assert prolongation.declared_by == self.employer
         assert prolongation.declared_by_siae == self.job_application.to_company
         assert prolongation.validated_by is None
         assert prolongation.reason == post_data["reason"]
@@ -319,7 +319,7 @@ class ApprovalProlongationTest(TestCase):
         # Bad reason types are checked by UI (JS) and ultimately by DB constraints
 
         self._setup_with_siae_kind(CompanyKind.AI)
-        self.client.force_login(self.siae_user)
+        self.client.force_login(self.employer)
         url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
         response = self.client.get(url)
 
@@ -367,7 +367,7 @@ class ApprovalProlongationTest(TestCase):
         assert self.PROLONGATION_EMAIL_REPORT_TEXT in email.body
 
     def test_check_single_prescriber_organization(self):
-        self.client.force_login(self.siae_user)
+        self.client.force_login(self.employer)
         url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
         self.client.get(url)
 
@@ -399,7 +399,7 @@ class ApprovalProlongationTest(TestCase):
             is_active=False,
         )
 
-        self.client.force_login(self.siae_user)
+        self.client.force_login(self.employer)
         url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
         self.client.get(url)
 
@@ -427,7 +427,7 @@ class ApprovalProlongationTest(TestCase):
         unauthorized_prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=False)
         prescriber = unauthorized_prescriber_organization.members.first()
 
-        self.client.force_login(self.siae_user)
+        self.client.force_login(self.employer)
         url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
         self.client.get(url)
 

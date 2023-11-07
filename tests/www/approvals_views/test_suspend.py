@@ -32,8 +32,8 @@ class ApprovalSuspendViewTest(TestCase):
         approval = job_application.approval
         assert 0 == approval.suspension_set.count()
 
-        siae_user = job_application.to_company.members.first()
-        self.client.force_login(siae_user)
+        employer = job_application.to_company.members.first()
+        self.client.force_login(employer)
 
         back_url = reverse("search:siaes_home")
         params = urlencode({"back_url": back_url})
@@ -71,7 +71,7 @@ class ApprovalSuspendViewTest(TestCase):
 
         assert 1 == approval.suspension_set.count()
         suspension = approval.suspension_set.first()
-        assert suspension.created_by == siae_user
+        assert suspension.created_by == employer
 
         # Ensure suspension reason is not displayed in details page
         detail_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
@@ -149,13 +149,13 @@ class ApprovalSuspendViewTest(TestCase):
         )
 
         approval = job_application.approval
-        siae_user = job_application.to_company.members.first()
+        employer = job_application.to_company.members.first()
         start_at = today
         end_at = today + relativedelta(days=10)
 
-        suspension = SuspensionFactory(approval=approval, start_at=start_at, end_at=end_at, created_by=siae_user)
+        suspension = SuspensionFactory(approval=approval, start_at=start_at, end_at=end_at, created_by=employer)
 
-        self.client.force_login(siae_user)
+        self.client.force_login(employer)
 
         back_url = reverse("search:siaes_home")
         params = urlencode({"back_url": back_url})
@@ -180,7 +180,7 @@ class ApprovalSuspendViewTest(TestCase):
 
         assert 1 == approval.suspension_set.count()
         suspension = approval.suspension_set.first()
-        assert suspension.updated_by == siae_user
+        assert suspension.updated_by == employer
         assert suspension.end_at == new_end_at
 
     def test_delete_suspension(self):
@@ -197,13 +197,13 @@ class ApprovalSuspendViewTest(TestCase):
         )
 
         approval = job_application.approval
-        siae_user = job_application.to_company.members.first()
+        employer = job_application.to_company.members.first()
         start_at = today
         end_at = today + relativedelta(days=10)
 
-        suspension = SuspensionFactory(approval=approval, start_at=start_at, end_at=end_at, created_by=siae_user)
+        suspension = SuspensionFactory(approval=approval, start_at=start_at, end_at=end_at, created_by=employer)
 
-        self.client.force_login(siae_user)
+        self.client.force_login(employer)
 
         back_url = reverse("search:siaes_home")
         params = urlencode({"back_url": back_url})
