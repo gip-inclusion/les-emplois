@@ -24,7 +24,7 @@ from itou.approvals.admin import JobApplicationInline
 from itou.approvals.admin_forms import ApprovalAdminForm
 from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
 from itou.approvals.enums import ApprovalStatus, Origin, ProlongationReason
-from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, Suspension
+from itou.approvals.models import Approval, CancelledApproval, PoleEmploiApproval, Prolongation, Suspension
 from itou.companies.enums import CompanyKind
 from itou.employee_record.enums import Status
 from itou.files.models import File
@@ -606,6 +606,58 @@ class ApprovalModelTest(TestCase):
         assertQuerySetEqual(user.approvals.all(), Approval.objects.none())
         job_application = JobApplication.objects.get(pk=job_application.pk)
         assert job_application.approval is None
+
+    def test_deleting_an_approval_prefer_origin_values(self):
+        job_application = JobApplicationFactory(
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            to_company__kind=CompanyKind.EI,
+        )
+        job_application.accept(user=job_application.to_company.members.first())
+
+        approval = job_application.approval
+
+        assert approval.origin_siae_siret == job_application.to_company.siret
+
+        other_application = JobApplicationFactory(
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            to_company__kind=CompanyKind.ETTI,
+            job_seeker_id=job_application.job_seeker_id,  # Use pk to avoid cached_property invalidations
+        )
+        other_application.accept(user=other_application.to_company.members.first())
+
+        job_application.cancel(user=job_application.to_company.members.first())
+        job_application.delete()
+
+        origin_siae = job_application.to_company
+        approval.delete()
+        # Approval was successfully deleted
+        assert Approval.objects.first() is None
+        # And the cancelled approval kept the original values (from the first application)
+        cancelled_approval = CancelledApproval.objects.get()
+        assert cancelled_approval.siae_kind == CompanyKind.EI
+        assert cancelled_approval.siae_siret == origin_siae.siret
+
+    def test_deleting_an_approval_without_application_linked(self):
+        job_application = JobApplicationFactory(
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+        )
+        job_application.accept(user=job_application.to_company.members.first())
+
+        approval = job_application.approval
+
+        assert approval.origin_siae_siret == job_application.to_company.siret
+        origin_siae = job_application.to_company
+
+        # Admin action
+        job_application.delete()
+
+        approval.delete()
+        # Approval was successfully deleted
+        assert Approval.objects.first() is None
+        # And the cancelled approval kept the original values (from the first application)
+        cancelled_approval = CancelledApproval.objects.get()
+        assert cancelled_approval.siae_kind == origin_siae.kind
+        assert cancelled_approval.siae_siret == origin_siae.siret
 
 
 class PoleEmploiApprovalModelTest(TestCase):
