@@ -4,7 +4,7 @@ from django.utils import timezone
 from pytest_django.asserts import assertContains, assertNotContains, assertNumQueries, assertRedirects
 
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
-from tests.companies.factories import SiaeFactory
+from tests.companies.factories import CompanyFactory
 from tests.utils.test import BASE_NUM_QUERIES
 
 
@@ -18,16 +18,16 @@ class TestApprovalsListView:
         approval = ApprovalFactory(with_jobapplication=True)
         job_application = approval.jobapplication_set.get()
 
-        approval_for_other_siae = ApprovalFactory(with_jobapplication=True)
+        approval_for_other_company = ApprovalFactory(with_jobapplication=True)
 
-        siae_member = job_application.to_siae.members.first()
-        client.force_login(siae_member)
+        employer = job_application.to_siae.members.first()
+        client.force_login(employer)
         url = reverse("approvals:list")
         response = client.get(url)
 
         assertContains(response, "1 résultat")
         assertContains(response, approval.user.get_full_name())
-        assertNotContains(response, approval_for_other_siae.user.get_full_name())
+        assertNotContains(response, approval_for_other_company.user.get_full_name())
         assertContains(response, reverse("approvals:detail", kwargs={"pk": approval.pk}))
 
     def test_multiple_approvals_for_the_same_user(self, client):
@@ -39,8 +39,8 @@ class TestApprovalsListView:
             with_jobapplication__to_siae=job_application.to_siae,
         )
 
-        siae_member = job_application.to_siae.members.first()
-        client.force_login(siae_member)
+        employer = job_application.to_siae.members.first()
+        client.force_login(employer)
         url = reverse("approvals:list")
         response = client.get(url)
 
@@ -57,8 +57,8 @@ class TestApprovalsListView:
         job_application.pk = None
         job_application.save()
 
-        siae_member = job_application.to_siae.members.first()
-        client.force_login(siae_member)
+        employer = job_application.to_siae.members.first()
+        client.force_login(employer)
         url = reverse("approvals:list")
         response = client.get(url)
 
@@ -71,16 +71,16 @@ class TestApprovalsListView:
             user__last_name="Vier",
         )
         job_application = approval.jobapplication_set.get()
-        approval_same_siae = ApprovalFactory(
+        approval_same_company = ApprovalFactory(
             with_jobapplication=True,
             with_jobapplication__to_siae=job_application.to_siae,
             user__first_name="Seb",
             user__last_name="Tambre",
         )
-        approval_other_siae = ApprovalFactory(with_jobapplication=True)
+        approval_other_company = ApprovalFactory(with_jobapplication=True)
 
-        siae_member = job_application.to_siae.members.first()
-        client.force_login(siae_member)
+        employer = job_application.to_siae.members.first()
+        client.force_login(employer)
 
         url = reverse("approvals:list")
         with assertNumQueries(
@@ -97,53 +97,53 @@ class TestApprovalsListView:
             response = client.get(url)
         assertContains(response, "2 résultats")
         assertContains(response, reverse("approvals:detail", kwargs={"pk": approval.pk}))
-        assertContains(response, reverse("approvals:detail", kwargs={"pk": approval_same_siae.pk}))
-        assertNotContains(response, reverse("approvals:detail", kwargs={"pk": approval_other_siae.pk}))
+        assertContains(response, reverse("approvals:detail", kwargs={"pk": approval_same_company.pk}))
+        assertNotContains(response, reverse("approvals:detail", kwargs={"pk": approval_other_company.pk}))
 
         form = response.context["filters_form"]
         assert form.fields["users"].choices == [
             (approval.user_id, "Jean Vier"),
-            (approval_same_siae.user_id, "Seb Tambre"),
+            (approval_same_company.user_id, "Seb Tambre"),
         ]
 
         url = f"{reverse('approvals:list')}?users={approval.user_id}&expiry=0"
         response = client.get(url)
         assertContains(response, "1 résultat")
         assertContains(response, reverse("approvals:detail", kwargs={"pk": approval.pk}))
-        assertNotContains(response, reverse("approvals:detail", kwargs={"pk": approval_same_siae.pk}))
-        assertNotContains(response, reverse("approvals:detail", kwargs={"pk": approval_other_siae.pk}))
+        assertNotContains(response, reverse("approvals:detail", kwargs={"pk": approval_same_company.pk}))
+        assertNotContains(response, reverse("approvals:detail", kwargs={"pk": approval_other_company.pk}))
 
-        url = f"{reverse('approvals:list')}?users={approval.user_id}&users={approval_same_siae.user_id}&expiry=0"
+        url = f"{reverse('approvals:list')}?users={approval.user_id}&users={approval_same_company.user_id}&expiry=0"
         response = client.get(url)
         assertContains(response, "2 résultats")
         assertContains(response, reverse("approvals:detail", kwargs={"pk": approval.pk}))
-        assertContains(response, reverse("approvals:detail", kwargs={"pk": approval_same_siae.pk}))
-        assertNotContains(response, reverse("approvals:detail", kwargs={"pk": approval_other_siae.pk}))
+        assertContains(response, reverse("approvals:detail", kwargs={"pk": approval_same_company.pk}))
+        assertNotContains(response, reverse("approvals:detail", kwargs={"pk": approval_other_company.pk}))
 
     def test_approval_state_filters(self, client):
         now = timezone.localdate()
-        siae = SiaeFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True)
 
         expired_approval = ApprovalFactory(
             start_at=now - relativedelta(years=3),
             end_at=now - relativedelta(years=1),
             with_jobapplication=True,
-            with_jobapplication__to_siae=siae,
+            with_jobapplication__to_siae=company,
         )
         future_approval = ApprovalFactory(
             start_at=now + relativedelta(days=1),
             with_jobapplication=True,
-            with_jobapplication__to_siae=siae,
+            with_jobapplication__to_siae=company,
         )
         valid_approval = ApprovalFactory(
             start_at=now - relativedelta(years=1),
             with_jobapplication=True,
-            with_jobapplication__to_siae=siae,
+            with_jobapplication__to_siae=company,
         )
         suspended_approval = ApprovalFactory(
             start_at=now - relativedelta(years=1),
             with_jobapplication=True,
-            with_jobapplication__to_siae=siae,
+            with_jobapplication__to_siae=company,
         )
         SuspensionFactory(
             approval=suspended_approval,
@@ -163,8 +163,8 @@ class TestApprovalsListView:
             end_at=now - relativedelta(days=2),
         )
 
-        siae_member = siae.members.first()
-        client.force_login(siae_member)
+        employer = company.members.first()
+        client.force_login(employer)
         list_url = reverse("approvals:list")
 
         url = f"{list_url}?status_valid=on&expiry=0"
@@ -240,37 +240,37 @@ class TestApprovalsListView:
 
     def test_approval_expiry_filters(self, client):
         now = timezone.localdate()
-        siae = SiaeFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True)
 
         in_less_than_1_month = now + relativedelta(days=20)
         approval_1 = ApprovalFactory(
             start_at=in_less_than_1_month - relativedelta(years=2),
             end_at=in_less_than_1_month,
             with_jobapplication=True,
-            with_jobapplication__to_siae=siae,
+            with_jobapplication__to_siae=company,
         )
         in_less_than_3_months = now + relativedelta(days=80)
         approval_3 = ApprovalFactory(
             start_at=in_less_than_3_months - relativedelta(years=2),
             end_at=in_less_than_3_months,
             with_jobapplication=True,
-            with_jobapplication__to_siae=siae,
+            with_jobapplication__to_siae=company,
         )
         in_less_than_7_mmonths = now + relativedelta(days=200)
         approval_7 = ApprovalFactory(
             start_at=in_less_than_7_mmonths - relativedelta(years=2),
             end_at=in_less_than_7_mmonths,
             with_jobapplication=True,
-            with_jobapplication__to_siae=siae,
+            with_jobapplication__to_siae=company,
         )
         ApprovalFactory(
             start_at=now - relativedelta(years=1),
             with_jobapplication=True,
-            with_jobapplication__to_siae=siae,
+            with_jobapplication__to_siae=company,
         )
 
-        siae_member = siae.members.first()
-        client.force_login(siae_member)
+        employer = company.members.first()
+        client.force_login(employer)
 
         url = f"{reverse('approvals:list')}?expiry=7"
         response = client.get(url)

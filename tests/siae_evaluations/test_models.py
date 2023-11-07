@@ -30,7 +30,7 @@ from itou.siae_evaluations.models import (
 )
 from itou.utils.models import InclusiveDateRange
 from tests.approvals.factories import ApprovalFactory
-from tests.companies.factories import SiaeFactory, SiaeWith2MembershipsFactory
+from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory
 from tests.files.factories import FileFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionWith2MembershipFactory
@@ -59,7 +59,7 @@ def create_batch_of_job_applications(siae):
 
 class EvaluationCampaignMiscMethodsTest(TestCase):
     def test_select_min_max_job_applications(self):
-        siae = SiaeFactory()
+        company = CompanyFactory()
         job_seeker = JobSeekerFactory()
         sender = PrescriberFactory()
         eligibility_diagnosis = EligibilityDiagnosisFactory(job_seeker=job_seeker)
@@ -67,38 +67,40 @@ class EvaluationCampaignMiscMethodsTest(TestCase):
         def create_job_apps(count):
             return JobApplicationFactory.create_batch(
                 count,
-                to_siae=siae,
+                to_siae=company,
                 job_seeker=job_seeker,
                 eligibility_diagnosis=eligibility_diagnosis,
                 sender=sender,
             )
 
         # zero job application
-        qs = select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae))
+        qs = select_min_max_job_applications(JobApplication.objects.filter(to_siae=company))
         assert isinstance(qs, JobApplicationQuerySet)
         assert 0 == qs.count()
 
         # one job applications made by SIAE
         [job_application] = create_job_apps(1)
-        assert job_application == select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae)).first()
-        assert 1 == select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae)).count()
+        assert (
+            job_application == select_min_max_job_applications(JobApplication.objects.filter(to_siae=company)).first()
+        )
+        assert 1 == select_min_max_job_applications(JobApplication.objects.filter(to_siae=company)).count()
 
         # under 10 job applications, 20% is below the minimum value of 2 -> select 2
         create_job_apps(5)
         assert (
             evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN
-            == select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae)).count()
+            == select_min_max_job_applications(JobApplication.objects.filter(to_siae=company)).count()
         )
 
         # from 20 job applications to 100 we have the correct percentage
         create_job_apps(55)
-        assert 12 == select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae)).count()
+        assert 12 == select_min_max_job_applications(JobApplication.objects.filter(to_siae=company)).count()
 
         # Over 100, stop at the max number -> 20
         create_job_apps(50)
         assert (
             evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MAX
-            == select_min_max_job_applications(JobApplication.objects.filter(to_siae=siae)).count()
+            == select_min_max_job_applications(JobApplication.objects.filter(to_siae=company)).count()
         )
 
 
@@ -145,20 +147,20 @@ class EvaluationCampaignQuerySetTest(TestCase):
 
 @pytest.fixture
 def campaign_eligible_job_app_objects():
-    siae = SiaeWith2MembershipsFactory(department="14")
+    company = CompanyWith2MembershipsFactory(department="14")
     job_seeker = JobSeekerFactory()
     approval = ApprovalFactory(user=job_seeker)
     diag = EligibilityDiagnosisFactory(
         job_seeker=job_seeker,
         author_kind=AuthorKind.EMPLOYER,
-        author_siae=siae,
-        author=siae.members.first(),
+        author_siae=company,
+        author=company.members.first(),
     )
     job_app = JobApplicationFactory(
         job_seeker=job_seeker,
         approval=approval,
-        to_siae=siae,
-        sender_siae=siae,
+        to_siae=company,
+        sender_siae=company,
         eligibility_diagnosis=diag,
         hiring_start_at=timezone.now() - relativedelta(months=2),
         state=JobApplicationWorkflow.STATE_ACCEPTED,
@@ -167,7 +169,7 @@ def campaign_eligible_job_app_objects():
         "approval": approval,
         "diag": diag,
         "job_app": job_app,
-        "siae": siae,
+        "siae": company,
     }
 
 
@@ -225,7 +227,7 @@ class TestEvaluationCampaignManagerEligibleJobApplication:
     def test_eligibility_diag_made_by_another_siae(self, campaign_eligible_job_app_objects):
         evaluation_campaign = EvaluationCampaignFactory()
         diag = campaign_eligible_job_app_objects["diag"]
-        diag.author_siae = SiaeFactory()
+        diag.author_siae = CompanyFactory()
         diag.save()
         assert [] == list(evaluation_campaign.eligible_job_applications())
 
@@ -313,35 +315,35 @@ class EvaluationCampaignManagerTest(TestCase):
     def test_eligible_siaes(self):
         evaluation_campaign = EvaluationCampaignFactory()
 
-        # siae1 got 1 job application
-        siae1 = SiaeFactory(department="14")
+        # company_1 got 1 job application
+        company_1 = CompanyFactory(department="14")
         JobApplicationFactory(
             with_approval=True,
-            to_siae=siae1,
-            sender_siae=siae1,
+            to_siae=company_1,
+            sender_siae=company_1,
             eligibility_diagnosis__author_kind=AuthorKind.EMPLOYER,
-            eligibility_diagnosis__author_siae=siae1,
+            eligibility_diagnosis__author_siae=company_1,
             hiring_start_at=timezone.now() - relativedelta(months=2),
         )
 
-        # siae2 got 2 job applications
-        siae2 = SiaeFactory(department="14")
-        create_batch_of_job_applications(siae2)
+        # company_2 got 2 job applications
+        company_2 = CompanyFactory(department="14")
+        create_batch_of_job_applications(company_2)
 
         eligible_siaes_res = evaluation_campaign.eligible_siaes()
         assert 1 == eligible_siaes_res.count()
         assert {
-            "to_siae": siae2.id,
+            "to_siae": company_2.id,
             "to_siae_count": evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN,
         } in eligible_siaes_res
 
-        # adding 2 more job applications to siae2
-        create_batch_of_job_applications(siae2)
+        # adding 2 more job applications to company_2
+        create_batch_of_job_applications(company_2)
 
         eligible_siaes_res = evaluation_campaign.eligible_siaes()
         assert 1 == eligible_siaes_res.count()
         assert {
-            "to_siae": siae2.id,
+            "to_siae": company_2.id,
             "to_siae_count": evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN * 2,
         } in eligible_siaes_res
 
@@ -350,14 +352,14 @@ class EvaluationCampaignManagerTest(TestCase):
         assert 0 == evaluation_campaign.number_of_siaes_to_select()
 
         for _ in range(3):
-            siae = SiaeFactory(department="14")
-            create_batch_of_job_applications(siae)
+            company = CompanyFactory(department="14")
+            create_batch_of_job_applications(company)
 
         assert 1 == evaluation_campaign.number_of_siaes_to_select()
 
         for _ in range(3):
-            siae = SiaeFactory(department="14")
-            create_batch_of_job_applications(siae)
+            company = CompanyFactory(department="14")
+            create_batch_of_job_applications(company)
 
         assert 2 == evaluation_campaign.number_of_siaes_to_select()
 
@@ -365,28 +367,28 @@ class EvaluationCampaignManagerTest(TestCase):
         evaluation_campaign = EvaluationCampaignFactory()
 
         for _ in range(6):
-            siae = SiaeFactory(department="14")
-            create_batch_of_job_applications(siae)
+            company = CompanyFactory(department="14")
+            create_batch_of_job_applications(company)
 
         assert 2 == evaluation_campaign.eligible_siaes_under_ratio().count()
 
     def test_populate(self):
         # integration tests
         evaluation_campaign = EvaluationCampaignFactory()
-        siae = SiaeFactory(department=evaluation_campaign.institution.department, with_membership=True)
+        company = CompanyFactory(department=evaluation_campaign.institution.department, with_membership=True)
         job_seeker = JobSeekerFactory()
-        user = siae.members.first()
+        user = company.members.first()
         criteria1 = AdministrativeCriteria.objects.get(
             level=AdministrativeCriteriaLevel.LEVEL_1, name="Bénéficiaire du RSA"
         )
         eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
-            job_seeker, author=user, author_organization=siae, administrative_criteria=[criteria1]
+            job_seeker, author=user, author_organization=company, administrative_criteria=[criteria1]
         )
         JobApplicationFactory.create_batch(
             evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN,
             with_approval=True,
-            to_siae=siae,
-            sender_siae=siae,
+            to_siae=company,
+            sender_siae=company,
             eligibility_diagnosis=eligibility_diagnosis,
             hiring_start_at=timezone.now() - relativedelta(months=2),
         )
@@ -810,12 +812,12 @@ class EvaluationCampaignManagerTest(TestCase):
 
 class EvaluatedSiaeQuerySetTest(TestCase):
     def test_for_siae(self):
-        siae1 = SiaeFactory()
-        siae2 = SiaeFactory()
-        EvaluatedSiaeFactory(siae=siae2)
+        company_1 = CompanyFactory()
+        company_2 = CompanyFactory()
+        EvaluatedSiaeFactory(siae=company_2)
 
-        assert 0 == EvaluatedSiae.objects.for_company(siae1).count()
-        assert 1 == EvaluatedSiae.objects.for_company(siae2).count()
+        assert 0 == EvaluatedSiae.objects.for_company(company_1).count()
+        assert 1 == EvaluatedSiae.objects.for_company(company_2).count()
 
     def test_in_progress(self):
         fake_now = timezone.now()
@@ -1421,18 +1423,18 @@ class EvaluatedAdministrativeCriteriaModelTest(TestCase):
 
 
 def test_siae_get_active_suspension_functions():
-    siae = SiaeFactory()
-    assert siae.get_active_suspension_dates() is None
+    company = CompanyFactory()
+    assert company.get_active_suspension_dates() is None
 
     # Suspension in the past is inactive and not returned
     Sanctions.objects.create(
-        evaluated_siae=EvaluatedSiaeFactory(siae=siae),
+        evaluated_siae=EvaluatedSiaeFactory(siae=company),
         suspension_dates=InclusiveDateRange(
             timezone.localdate() - relativedelta(years=2), timezone.localdate() - relativedelta(years=1)
         ),
     )
-    assert siae.get_active_suspension_dates() is None
-    assert siae.get_active_suspension_text_with_dates() == ""
+    assert company.get_active_suspension_dates() is None
+    assert company.get_active_suspension_text_with_dates() == ""
 
     # Active suspension
     active_suspension = InclusiveDateRange(
@@ -1442,17 +1444,17 @@ def test_siae_get_active_suspension_functions():
         timezone.localdate() - relativedelta(years=1), timezone.localdate() + relativedelta(years=1)
     )
     Sanctions.objects.create(
-        evaluated_siae=EvaluatedSiaeFactory(siae=siae),
+        evaluated_siae=EvaluatedSiaeFactory(siae=company),
         suspension_dates=active_suspension,
     )
-    assert siae.get_active_suspension_dates() == active_suspension
+    assert company.get_active_suspension_dates() == active_suspension
     Sanctions.objects.create(
-        evaluated_siae=EvaluatedSiaeFactory(siae=siae),
+        evaluated_siae=EvaluatedSiaeFactory(siae=company),
         suspension_dates=active_suspension2,
     )
     # We still get active_suspension that ends after active_suspension2
-    assert siae.get_active_suspension_dates() == active_suspension
-    explanation = siae.get_active_suspension_text_with_dates()
+    assert company.get_active_suspension_dates() == active_suspension
+    explanation = company.get_active_suspension_text_with_dates()
     assert "retrait temporaire" in explanation
     assert (
         f"est effectif depuis le {active_suspension.lower:%d/%m/%Y} "
@@ -1462,11 +1464,11 @@ def test_siae_get_active_suspension_functions():
     # Suspension without end is prefered
     final_suspension = InclusiveDateRange(timezone.localdate() - relativedelta(years=2))
     Sanctions.objects.create(
-        evaluated_siae=EvaluatedSiaeFactory(siae=siae),
+        evaluated_siae=EvaluatedSiaeFactory(siae=company),
         suspension_dates=final_suspension,
     )
-    assert siae.get_active_suspension_dates() == final_suspension
-    explanation = siae.get_active_suspension_text_with_dates()
+    assert company.get_active_suspension_dates() == final_suspension
+    explanation = company.get_active_suspension_text_with_dates()
     assert "retrait définitif" in explanation
     assert f"est effectif depuis le {final_suspension.lower:%d/%m/%Y}." in explanation
 

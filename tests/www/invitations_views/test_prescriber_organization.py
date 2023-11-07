@@ -18,7 +18,7 @@ from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.urls import add_url_params
-from tests.companies.factories import SiaeFactory
+from tests.companies.factories import CompanyFactory
 from tests.invitations.factories import PrescriberWithOrgSentInvitationFactory
 from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
 from tests.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
@@ -121,7 +121,7 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
         assert not PrescriberWithOrgInvitation.objects.exists()
 
     def test_invite_existing_user_is_employer(self):
-        guest = SiaeFactory(with_membership=True).members.first()
+        guest = CompanyFactory(with_membership=True).members.first()
         self.client.force_login(self.sender)
         self.post_data.update(
             {"form-0-first_name": guest.first_name, "form-0-last_name": guest.last_name, "form-0-email": guest.email}
@@ -444,7 +444,7 @@ class TestAcceptPrescriberWithOrgInvitationExceptions(TestCase):
         self.sender = self.organization.members.first()
 
     def test_existing_user_is_not_prescriber(self):
-        user = SiaeFactory(with_membership=True).members.first()
+        user = CompanyFactory(with_membership=True).members.first()
         invitation = PrescriberWithOrgSentInvitationFactory(
             sender=self.sender,
             organization=self.organization,

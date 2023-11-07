@@ -37,7 +37,7 @@ from tests.approvals.factories import (
     ProlongationRequestFactory,
     SuspensionFactory,
 )
-from tests.companies.factories import SiaeFactory
+from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
@@ -1147,15 +1147,15 @@ class SuspensionModelTest(TestCase):
     def test_displayed_choices_for_siae(self):
         # EI and ACI kind have one more choice
         for kind in [CompanyKind.EI, CompanyKind.ACI]:
-            siae = SiaeFactory(kind=kind)
-            result = Suspension.Reason.displayed_choices_for_siae(siae)
+            company = CompanyFactory(kind=kind)
+            result = Suspension.Reason.displayed_choices_for_siae(company)
             assert len(result) == 5
             assert result[-1][0] == Suspension.Reason.CONTRAT_PASSERELLE.value
 
         # Some other cases
         for kind in [CompanyKind.ETTI, CompanyKind.AI]:
-            siae = SiaeFactory(kind=kind)
-            result = Suspension.Reason.displayed_choices_for_siae(siae)
+            company = CompanyFactory(kind=kind)
+            result = Suspension.Reason.displayed_choices_for_siae(company)
             assert len(result) == 4
 
     def test_next_min_start_date(self):
@@ -1190,8 +1190,8 @@ class SuspensionModelTest(TestCase):
     def test_next_min_start_date_without_job_application(self):
         today = timezone.localdate()
         approval = ApprovalFactory()
-        siae = SiaeFactory()
-        suspension = Suspension(approval=approval, siae=siae, start_at=today, end_at=today)
+        company = CompanyFactory()
+        suspension = Suspension(approval=approval, siae=company, start_at=today, end_at=today)
         suspension.clean()
 
     def test_overlapping_dates(self):

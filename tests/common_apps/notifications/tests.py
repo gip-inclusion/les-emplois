@@ -1,7 +1,7 @@
 from django.core import mail
 
 from itou.job_applications.notifications import NewSpontaneousJobAppEmployersNotification
-from tests.companies.factories import CompanyMembershipFactory, SiaeFactory
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.utils.test import TestCase
 
@@ -11,12 +11,12 @@ class NotificationsBaseClassTest(TestCase):
 
     def setUp(self):
         super().setUp()
-        self.siae = SiaeFactory(with_membership=True)
-        self.job_application = JobApplicationFactory(to_siae=self.siae)
+        self.company = CompanyFactory(with_membership=True)
+        self.job_application = JobApplicationFactory(to_siae=self.company)
         self.notification = NewSpontaneousJobAppEmployersNotification(job_application=self.job_application)
 
         # Make sure notifications are empty
-        self.companymembership_set = self.siae.companymembership_set
+        self.companymembership_set = self.company.companymembership_set
         self.membership = self.companymembership_set.first()
         assert not self.membership.notifications
 
@@ -54,7 +54,7 @@ class NotificationsBaseClassTest(TestCase):
         assert self.companymembership_set.filter(user__email__in=recipients_emails).count() == len(recipients_emails)
 
     def test_inactive_user_not_in_recipients(self):
-        CompanyMembershipFactory(siae=self.siae, user__is_active=False, is_admin=False)
+        CompanyMembershipFactory(siae=self.company, user__is_active=False, is_admin=False)
         assert self.companymembership_set.count() == 2
 
         recipients = self.notification.get_recipients()
@@ -62,7 +62,7 @@ class NotificationsBaseClassTest(TestCase):
 
     def test_get_recipients_default_send_to_unset_recipients(self):
         # Unset recipients are present in get_recipients if SEND_TO_UNSET_RECIPIENTS = True
-        CompanyMembershipFactory(siae=self.siae, user__is_active=False, is_admin=False)
+        CompanyMembershipFactory(siae=self.company, user__is_active=False, is_admin=False)
         recipients = self.notification.get_recipients()
 
         assert self.companymembership_set.count() == 2
@@ -83,17 +83,17 @@ class NotificationsBaseClassTest(TestCase):
 
 class NewSpontaneousJobAppEmployersNotificationTest(TestCase):
     def test_mail_content_when_subject_to_eligibility_rules(self):
-        siae = SiaeFactory(subject_to_eligibility=True, with_membership=True)
+        company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
         notification = NewSpontaneousJobAppEmployersNotification(
-            job_application=JobApplicationFactory(to_siae=siae),
+            job_application=JobApplicationFactory(to_siae=company),
         )
 
         assert "PASS IAE" in notification.email.body
 
     def test_mail_content_when_not_subject_to_eligibility_rules(self):
-        siae = SiaeFactory(not_subject_to_eligibility=True, with_membership=True)
+        company = CompanyFactory(not_subject_to_eligibility=True, with_membership=True)
         notification = NewSpontaneousJobAppEmployersNotification(
-            job_application=JobApplicationFactory(to_siae=siae),
+            job_application=JobApplicationFactory(to_siae=company),
         )
 
         assert "PASS IAE" not in notification.email.body

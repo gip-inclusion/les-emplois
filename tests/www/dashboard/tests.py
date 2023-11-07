@@ -36,11 +36,11 @@ from itou.utils.templatetags.format_filters import format_approval_number, forma
 from itou.www.dashboard.forms import EditUserEmailForm
 from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactory
 from tests.companies.factories import (
+    CompanyAfterGracePeriodFactory,
+    CompanyFactory,
     CompanyMembershipFactory,
-    SiaeAfterGracePeriodFactory,
-    SiaeFactory,
-    SiaePendingGracePeriodFactory,
-    SiaeWithMembershipAndJobsFactory,
+    CompanyPendingGracePeriodFactory,
+    CompanyWithMembershipAndJobsFactory,
 )
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory, LaborInspectorFactory
@@ -72,8 +72,8 @@ class DashboardViewTest(TestCase):
     )
 
     def test_dashboard(self):
-        siae = SiaeFactory(with_membership=True)
-        user = siae.members.first()
+        company = CompanyFactory(with_membership=True)
+        user = company.members.first()
         self.client.force_login(user)
 
         url = reverse("dashboard:index")
@@ -81,9 +81,9 @@ class DashboardViewTest(TestCase):
         assert response.status_code == 200
 
     def test_user_with_inactive_siae_can_still_login_during_grace_period(self):
-        siae = SiaePendingGracePeriodFactory()
+        company = CompanyPendingGracePeriodFactory()
         user = EmployerFactory()
-        siae.members.add(user)
+        company.members.add(user)
         self.client.force_login(user)
 
         url = reverse("dashboard:index")
@@ -91,9 +91,9 @@ class DashboardViewTest(TestCase):
         assert response.status_code == 200
 
     def test_user_with_inactive_siae_cannot_login_after_grace_period(self):
-        siae = SiaeAfterGracePeriodFactory()
+        company = CompanyAfterGracePeriodFactory()
         user = EmployerFactory()
-        siae.members.add(user)
+        company.members.add(user)
         self.client.force_login(user)
 
         url = reverse("dashboard:index")
@@ -106,13 +106,13 @@ class DashboardViewTest(TestCase):
         self.assertContains(response, expected_message)
 
     def test_dashboard_eiti(self):
-        siae = SiaeFactory(kind=CompanyKind.EITI, with_membership=True)
-        user = siae.members.first()
+        company = CompanyFactory(kind=CompanyKind.EITI, with_membership=True)
+        user = company.members.first()
         self.client.force_login(user)
 
         url = reverse("dashboard:index")
         response = self.client.get(url)
-        self.assertContains(response, format_siret(siae.siret))
+        self.assertContains(response, format_siret(company.siret))
 
     def test_dashboard_for_prescriber(self):
         prescriber_organization = prescribers_factories.PrescriberOrganizationWithMembershipFactory()
@@ -122,13 +122,13 @@ class DashboardViewTest(TestCase):
         self.assertContains(response, format_siret(prescriber_organization.siret))
 
     def test_dashboard_displays_asp_badge(self):
-        siae = SiaeFactory(kind=CompanyKind.EI, with_membership=True)
-        other_siae = SiaeFactory(kind=CompanyKind.ETTI, with_membership=True)
-        last_siae = SiaeFactory(kind=CompanyKind.ETTI, with_membership=True)
+        company = CompanyFactory(kind=CompanyKind.EI, with_membership=True)
+        other_company = CompanyFactory(kind=CompanyKind.ETTI, with_membership=True)
+        last_company = CompanyFactory(kind=CompanyKind.ETTI, with_membership=True)
 
-        user = siae.members.first()
-        user.company_set.add(other_siae)
-        user.company_set.add(last_siae)
+        user = company.members.first()
+        user.company_set.add(other_company)
+        user.company_set.add(last_company)
 
         self.client.force_login(user)
 
@@ -139,34 +139,34 @@ class DashboardViewTest(TestCase):
         assert response.context["num_rejected_employee_records"] == 0
 
         # create rejected job applications
-        job_application = JobApplicationFactory(with_approval=True, to_siae=siae)
+        job_application = JobApplicationFactory(with_approval=True, to_siae=company)
         EmployeeRecordFactory(job_application=job_application, status=Status.REJECTED)
         # You can't create 2 employee records with the same job application
         # Factories were allowing it until a recent fix was applied
-        job_application = JobApplicationFactory(with_approval=True, to_siae=siae)
+        job_application = JobApplicationFactory(with_approval=True, to_siae=company)
         EmployeeRecordFactory(job_application=job_application, status=Status.REJECTED)
 
-        other_job_application = JobApplicationFactory(with_approval=True, to_siae=other_siae)
+        other_job_application = JobApplicationFactory(with_approval=True, to_siae=other_company)
         EmployeeRecordFactory(job_application=other_job_application, status=Status.REJECTED)
 
         session = self.client.session
 
         # select the first SIAE's in the session
-        session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = siae.pk
+        session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = company.pk
         session.save()
         response = self.client.get(url)
         self.assertContains(response, "bg-danger")
         assert response.context["num_rejected_employee_records"] == 2
 
         # select the second SIAE's in the session
-        session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = other_siae.pk
+        session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = other_company.pk
         session.save()
         response = self.client.get(url)
         self.assertContains(response, "bg-danger")
         assert response.context["num_rejected_employee_records"] == 1
 
         # select the third SIAE's in the session
-        session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = last_siae.pk
+        session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = last_company.pk
         session.save()
         response = self.client.get(url)
         assert response.status_code == 200
@@ -177,14 +177,14 @@ class DashboardViewTest(TestCase):
         geiq_url = non_geiq_url + "&amp;states=prior_to_hire"
 
         # Not a GEIQ
-        user = SiaeFactory(kind=CompanyKind.ACI, with_membership=True).members.first()
+        user = CompanyFactory(kind=CompanyKind.ACI, with_membership=True).members.first()
         self.client.force_login(user)
         response = self.client.get(reverse("dashboard:index"))
         self.assertContains(response, non_geiq_url)
         self.assertNotContains(response, geiq_url)
 
         # GEIQ
-        user = SiaeFactory(kind=CompanyKind.GEIQ, with_membership=True).members.first()
+        user = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True).members.first()
         self.client.force_login(user)
         response = self.client.get(reverse("dashboard:index"))
 
@@ -199,8 +199,8 @@ class DashboardViewTest(TestCase):
             CompanyKind.ETTI,
         ]:
             with self.subTest(f"should display when siae_kind={kind}"):
-                siae = SiaeFactory(kind=kind, with_membership=True)
-                user = siae.members.first()
+                company = CompanyFactory(kind=kind, with_membership=True)
+                user = company.members.first()
                 self.client.force_login(user)
 
                 response = self.client.get(reverse("dashboard:index"))
@@ -208,8 +208,8 @@ class DashboardViewTest(TestCase):
 
         for kind in [CompanyKind.EA, CompanyKind.EATT, CompanyKind.GEIQ, CompanyKind.OPCS]:
             with self.subTest(f"should not display when siae_kind={kind}"):
-                siae = SiaeFactory(kind=kind, with_membership=True)
-                user = siae.members.first()
+                company = CompanyFactory(kind=kind, with_membership=True)
+                user = company.members.first()
                 self.client.force_login(user)
 
                 response = self.client.get(reverse("dashboard:index"))
@@ -230,42 +230,42 @@ class DashboardViewTest(TestCase):
         ]
         for kind in display_kinds:
             with self.subTest(f"should display when siae_kind={kind}"):
-                siae = SiaeFactory(kind=kind, with_membership=True)
-                user = siae.members.first()
+                company = CompanyFactory(kind=kind, with_membership=True)
+                user = company.members.first()
                 self.client.force_login(user)
 
                 response = self.client.get(reverse("dashboard:index"))
                 self.assertContains(response, APPLICATION_SAVE_LABEL)
-                self.assertContains(response, reverse("apply:start", kwargs={"siae_pk": siae.pk}))
+                self.assertContains(response, reverse("apply:start", kwargs={"siae_pk": company.pk}))
                 self.assertContains(response, HIRE_LINK_LABEL)
-                self.assertContains(response, reverse("apply:check_nir_for_hire", kwargs={"siae_pk": siae.pk}))
+                self.assertContains(response, reverse("apply:check_nir_for_hire", kwargs={"siae_pk": company.pk}))
 
         for kind in set(CompanyKind) - set(display_kinds):
             with self.subTest(f"should not display when siae_kind={kind}"):
-                siae = SiaeFactory(kind=kind, with_membership=True)
-                user = siae.members.first()
+                company = CompanyFactory(kind=kind, with_membership=True)
+                user = company.members.first()
                 self.client.force_login(user)
                 response = self.client.get(reverse("dashboard:index"))
                 self.assertNotContains(response, APPLICATION_SAVE_LABEL)
-                self.assertNotContains(response, reverse("apply:start", kwargs={"siae_pk": siae.pk}))
+                self.assertNotContains(response, reverse("apply:start", kwargs={"siae_pk": company.pk}))
                 self.assertNotContains(response, HIRE_LINK_LABEL)
-                self.assertNotContains(response, reverse("apply:check_nir_for_hire", kwargs={"siae_pk": siae.pk}))
+                self.assertNotContains(response, reverse("apply:check_nir_for_hire", kwargs={"siae_pk": company.pk}))
 
     def test_dashboard_agreements_with_suspension_sanction(self):
-        siae = SiaeFactory(subject_to_eligibility=True, with_membership=True)
+        company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
         Sanctions.objects.create(
-            evaluated_siae=EvaluatedSiaeFactory(siae=siae),
+            evaluated_siae=EvaluatedSiaeFactory(siae=company),
             suspension_dates=InclusiveDateRange(timezone.localdate() - relativedelta(days=1)),
         )
 
-        user = siae.members.first()
+        user = company.members.first()
         self.client.force_login(user)
 
         response = self.client.get(reverse("dashboard:index"))
         self.assertContains(response, "Prolonger/suspendre un agrément émis par Pôle emploi")
         # Check that "Déclarer une embauche" is here, but not its matching link
         self.assertContains(response, "Déclarer une embauche")
-        self.assertNotContains(response, reverse("apply:start", kwargs={"siae_pk": siae.pk}))
+        self.assertNotContains(response, reverse("apply:start", kwargs={"siae_pk": company.pk}))
         # Check that the button tooltip is there
         self.assertContains(
             response,
@@ -275,13 +275,13 @@ class DashboardViewTest(TestCase):
     def test_dashboard_can_create_siae_antenna(self):
         for kind in CompanyKind:
             with self.subTest(kind=kind):
-                siae = SiaeFactory(kind=kind, with_membership=True, membership__is_admin=True)
-                user = siae.members.get()
+                company = CompanyFactory(kind=kind, with_membership=True, membership__is_admin=True)
+                user = company.members.get()
 
                 self.client.force_login(user)
                 response = self.client.get(reverse("dashboard:index"))
 
-                if user.can_create_siae_antenna(siae):
+                if user.can_create_siae_antenna(company):
                     self.assertContains(response, "Créer/rejoindre une autre structure")
                 else:
                     self.assertNotContains(response, "Créer/rejoindre une autre structure")
@@ -497,15 +497,15 @@ class DashboardViewTest(TestCase):
 
     def test_dashboard_siae_evaluations_siae_access(self):
         # preset for incoming new pages
-        siae = SiaeFactory(with_membership=True)
-        user = siae.members.first()
+        company = CompanyFactory(with_membership=True)
+        user = company.members.first()
         self.client.force_login(user)
 
         response = self.client.get(reverse("dashboard:index"))
         self.assertNotContains(response, "Contrôle a posteriori")
 
         fake_now = timezone.now()
-        evaluated_siae = EvaluatedSiaeFactory(siae=siae, evaluation_campaign__evaluations_asked_at=fake_now)
+        evaluated_siae = EvaluatedSiaeFactory(siae=company, evaluation_campaign__evaluations_asked_at=fake_now)
         response = self.client.get(reverse("dashboard:index"))
         self.assertContains(response, "Contrôle a posteriori")
         TODO_BADGE = (
@@ -553,8 +553,8 @@ class DashboardViewTest(TestCase):
         self.assertNotContains(response, "DORA")
 
     def test_dora_card_is_shown_for_siae(self):
-        siae = SiaeFactory(with_membership=True)
-        self.client.force_login(siae.members.first())
+        company = CompanyFactory(with_membership=True)
+        self.client.force_login(company.members.first())
 
         response = self.client.get(reverse("dashboard:index"))
         self.assertContains(response, "DORA")
@@ -583,12 +583,12 @@ class DashboardViewTest(TestCase):
     def test_dora_banner_is_shown_for_siae(self):
         for department in ["91", "26", "74", "30"]:
             with self.subTest(department=department):
-                siae = SiaeFactory(
+                company = CompanyFactory(
                     with_membership=True,
                     department=department,
                     membership__user__identity_provider=IdentityProvider.INCLUSION_CONNECT,
                 )
-                self.client.force_login(siae.members.first())
+                self.client.force_login(company.members.first())
 
                 response = self.client.get(reverse("dashboard:index"))
                 self.assertContains(response, "Donnez de la visibilité à votre offre d’insertion")
@@ -606,8 +606,8 @@ class DashboardViewTest(TestCase):
                 self.assertContains(response, "Consultez l’offre de service de vos partenaires")
 
     def test_dora_banner_is_not_shown_for_other_department(self):
-        siae = SiaeFactory(with_membership=True, department="01")
-        self.client.force_login(siae.members.first())
+        company = CompanyFactory(with_membership=True, department="01")
+        self.client.force_login(company.members.first())
 
         response = self.client.get(reverse("dashboard:index"))
         self.assertNotContains(response, "Donnez de la visibilité à votre offre d’insertion")
@@ -661,8 +661,8 @@ class DashboardViewTest(TestCase):
         response = self.client.get(reverse("dashboard:index"))
         self.assertNotContains(response, "Suspendre un PASS IAE")
 
-        siae = SiaeFactory(with_membership=True)
-        user = siae.members.first()
+        company = CompanyFactory(with_membership=True)
+        user = company.members.first()
         self.client.force_login(user)
         response = self.client.get(reverse("dashboard:index"))
         self.assertNotContains(response, "Suspendre un PASS IAE")
@@ -1206,9 +1206,9 @@ class EditJobSeekerInfo(TestCase):
         The SIAE can edit the email of a jobseeker it works with, provided he did not confirm its email.
         """
         new_email = "bidou@yopmail.com"
-        siae = SiaeFactory(with_membership=True)
-        user = siae.members.first()
-        job_application = JobApplicationSentByPrescriberFactory(to_siae=siae, job_seeker__created_by=user)
+        company = CompanyFactory(with_membership=True)
+        user = company.members.first()
+        job_application = JobApplicationSentByPrescriberFactory(to_siae=company, job_seeker__created_by=user)
 
         self.client.force_login(user)
 
@@ -1433,103 +1433,103 @@ class EditUserEmailFormTest(TestCase):
 
 class SwitchSiaeTest(TestCase):
     def test_switch_siae(self):
-        siae = SiaeFactory(with_membership=True)
-        user = siae.members.first()
+        company = CompanyFactory(with_membership=True)
+        user = company.members.first()
         self.client.force_login(user)
 
-        related_siae = SiaeFactory()
-        related_siae.members.add(user)
+        related_company = CompanyFactory()
+        related_company.members.add(user)
 
         url = reverse("dashboard:index")
         response = self.client.get(url)
         assert response.status_code == 200
-        assert response.context["request"].current_organization == siae
+        assert response.context["request"].current_organization == company
 
-        url = reverse("companies_views:card", kwargs={"siae_id": siae.pk})
+        url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
         response = self.client.get(url)
         assert response.status_code == 200
-        assert response.context["request"].current_organization == siae
-        assert response.context["siae"] == siae
+        assert response.context["request"].current_organization == company
+        assert response.context["siae"] == company
 
         url = reverse("dashboard:switch_organization")
-        response = self.client.post(url, data={"organization_id": related_siae.pk})
+        response = self.client.post(url, data={"organization_id": related_company.pk})
         assert response.status_code == 302
 
         url = reverse("dashboard:index")
         response = self.client.get(url)
         assert response.status_code == 200
-        assert response.context["request"].current_organization == related_siae
+        assert response.context["request"].current_organization == related_company
 
-        url = reverse("companies_views:card", kwargs={"siae_id": related_siae.pk})
+        url = reverse("companies_views:card", kwargs={"siae_id": related_company.pk})
         response = self.client.get(url)
         assert response.status_code == 200
-        assert response.context["request"].current_organization == related_siae
-        assert response.context["siae"] == related_siae
+        assert response.context["request"].current_organization == related_company
+        assert response.context["siae"] == related_company
 
         url = reverse("companies_views:job_description_list")
         response = self.client.get(url)
         assert response.status_code == 200
-        assert response.context["request"].current_organization == related_siae
+        assert response.context["request"].current_organization == related_company
 
         url = reverse("apply:list_for_siae")
         response = self.client.get(url)
         assert response.status_code == 200
-        assert response.context["request"].current_organization == related_siae
+        assert response.context["request"].current_organization == related_company
 
     def test_can_still_switch_to_inactive_siae_during_grace_period(self):
-        siae = SiaeFactory(with_membership=True)
-        user = siae.members.first()
+        company = CompanyFactory(with_membership=True)
+        user = company.members.first()
         self.client.force_login(user)
 
-        related_siae = SiaePendingGracePeriodFactory()
-        related_siae.members.add(user)
+        related_company = CompanyPendingGracePeriodFactory()
+        related_company.members.add(user)
 
         url = reverse("dashboard:index")
         response = self.client.get(url)
         assert response.status_code == 200
-        assert response.context["request"].current_organization == siae
+        assert response.context["request"].current_organization == company
 
         url = reverse("dashboard:switch_organization")
-        response = self.client.post(url, data={"organization_id": related_siae.pk})
+        response = self.client.post(url, data={"organization_id": related_company.pk})
         assert response.status_code == 302
 
         # User has indeed switched.
         url = reverse("dashboard:index")
         response = self.client.get(url)
         assert response.status_code == 200
-        assert response.context["request"].current_organization == related_siae
+        assert response.context["request"].current_organization == related_company
 
     def test_cannot_switch_to_inactive_siae_after_grace_period(self):
-        siae = SiaeFactory(with_membership=True)
-        user = siae.members.first()
+        company = CompanyFactory(with_membership=True)
+        user = company.members.first()
         self.client.force_login(user)
 
-        related_siae = SiaeAfterGracePeriodFactory()
-        related_siae.members.add(user)
+        related_company = CompanyAfterGracePeriodFactory()
+        related_company.members.add(user)
 
         url = reverse("dashboard:index")
         response = self.client.get(url)
         assert response.status_code == 200
-        assert response.context["request"].current_organization == siae
+        assert response.context["request"].current_organization == company
 
         # Switching to that siae is not even possible in practice because
         # it does not even show up in the menu.
         url = reverse("dashboard:switch_organization")
-        response = self.client.post(url, data={"organization_id": related_siae.pk})
+        response = self.client.post(url, data={"organization_id": related_company.pk})
         assert response.status_code == 404
 
         # User is still working on the main active siae.
         url = reverse("dashboard:index")
         response = self.client.get(url)
         assert response.status_code == 200
-        assert response.context["request"].current_organization == siae
+        assert response.context["request"].current_organization == company
 
 
 class EditUserPreferencesTest(TestCase):
     def test_employer_opt_in_siae_no_job_description(self):
-        siae = SiaeFactory(with_membership=True)
-        user = siae.members.first()
-        recipient = user.companymembership_set.get(siae=siae)
+        company = CompanyFactory(with_membership=True)
+        user = company.members.first()
+        recipient = user.companymembership_set.get(siae=company)
         form_name = "new_job_app_notification_form"
 
         self.client.force_login(user)
@@ -1555,10 +1555,10 @@ class EditUserPreferencesTest(TestCase):
         assert NewSpontaneousJobAppEmployersNotification.is_subscribed(recipient=recipient)
 
     def test_employer_opt_in_siae_with_job_descriptions(self):
-        siae = SiaeWithMembershipAndJobsFactory()
-        user = siae.members.first()
-        job_descriptions_pks = list(siae.job_description_through.values_list("pk", flat=True))
-        recipient = user.companymembership_set.get(siae=siae)
+        company = CompanyWithMembershipAndJobsFactory()
+        user = company.members.first()
+        job_descriptions_pks = list(company.job_description_through.values_list("pk", flat=True))
+        recipient = user.companymembership_set.get(siae=company)
         form_name = "new_job_app_notification_form"
         self.client.force_login(user)
 
@@ -1584,9 +1584,9 @@ class EditUserPreferencesTest(TestCase):
             assert NewQualifiedJobAppEmployersNotification.is_subscribed(recipient=recipient, subscribed_pk=pk)
 
     def test_employer_opt_out_siae_no_job_descriptions(self):
-        siae = SiaeFactory(with_membership=True)
-        user = siae.members.first()
-        recipient = user.companymembership_set.get(siae=siae)
+        company = CompanyFactory(with_membership=True)
+        user = company.members.first()
+        recipient = user.companymembership_set.get(siae=company)
         form_name = "new_job_app_notification_form"
         self.client.force_login(user)
 
@@ -1611,10 +1611,10 @@ class EditUserPreferencesTest(TestCase):
         assert not NewSpontaneousJobAppEmployersNotification.is_subscribed(recipient=recipient)
 
     def test_employer_opt_out_siae_with_job_descriptions(self):
-        siae = SiaeWithMembershipAndJobsFactory()
-        user = siae.members.first()
-        job_descriptions_pks = list(siae.job_description_through.values_list("pk", flat=True))
-        recipient = user.companymembership_set.get(siae=siae)
+        company = CompanyWithMembershipAndJobsFactory()
+        user = company.members.first()
+        job_descriptions_pks = list(company.job_description_through.values_list("pk", flat=True))
+        recipient = user.companymembership_set.get(siae=company)
         form_name = "new_job_app_notification_form"
         self.client.force_login(user)
 

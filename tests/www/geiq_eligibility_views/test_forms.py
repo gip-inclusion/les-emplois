@@ -4,7 +4,7 @@ import pytest
 from itou.companies.enums import CompanyKind
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
 from itou.www.geiq_eligibility_views.forms import GEIQAdministrativeCriteriaForGEIQForm, GEIQAdministrativeCriteriaForm
-from tests.companies.factories import SiaeFactory
+from tests.companies.factories import CompanyFactory
 
 
 _FAKER = faker.Faker()
@@ -12,7 +12,7 @@ _FAKER = faker.Faker()
 
 @pytest.fixture
 def new_geiq():
-    return SiaeFactory(kind=CompanyKind.GEIQ)
+    return CompanyFactory(kind=CompanyKind.GEIQ)
 
 
 @pytest.fixture

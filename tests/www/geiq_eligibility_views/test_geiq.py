@@ -5,7 +5,7 @@ from django.utils import dateformat, timezone
 
 from itou.companies.enums import CompanyKind
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
-from tests.companies.factories import SiaeWithMembershipAndJobsFactory
+from tests.companies.factories import CompanyWithMembershipAndJobsFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
 
@@ -20,29 +20,29 @@ class JobApplicationGEIQEligibilityDetailsTest(TestCase):
         cls.prescriber = cls.diagnosis.author_prescriber_organization
         cls.author = cls.prescriber.members.first()
         cls.job_seeker = cls.diagnosis.job_seeker
-        cls.siae = SiaeWithMembershipAndJobsFactory(kind=CompanyKind.GEIQ)
-        cls.job_application = JobApplicationFactory(to_siae=cls.siae, job_seeker=cls.job_seeker)
+        cls.company = CompanyWithMembershipAndJobsFactory(kind=CompanyKind.GEIQ)
+        cls.job_application = JobApplicationFactory(to_siae=cls.company, job_seeker=cls.job_seeker)
         cls.url = reverse("apply:details_for_siae", kwargs={"job_application_id": cls.job_application.pk})
 
     def test_with_geiq_eligibility_details(self):
-        self.client.force_login(self.siae.members.first())
+        self.client.force_login(self.company.members.first())
         response = self.client.get(self.url)
 
         assert response.status_code == 200
         self.assertTemplateUsed("apply/includes/geiq_diagnosis_details.html")
 
     def test_without_geiq_eligibility_details(self):
-        job_application = JobApplicationFactory(to_siae=self.siae)
+        job_application = JobApplicationFactory(to_siae=self.company)
         url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
 
-        self.client.force_login(self.siae.members.first())
+        self.client.force_login(self.company.members.first())
         response = self.client.get(url)
 
         assert response.status_code == 200
         self.assertTemplateNotUsed("apply/includes/geiq_diagnosis_details.html")
 
     def test_details_as_authorized_prescriber_with_valid_diagnosis(self):
-        self.client.force_login(self.siae.members.first())
+        self.client.force_login(self.company.members.first())
         response = self.client.get(self.url)
 
         self.assertContains(
@@ -56,7 +56,7 @@ class JobApplicationGEIQEligibilityDetailsTest(TestCase):
         )
 
     def test_allowance_details_for_prescriber(self):
-        self.client.force_login(self.siae.members.first())
+        self.client.force_login(self.company.members.first())
         response = self.client.get(self.url)
 
         self.assertContains(
@@ -106,10 +106,10 @@ class JobApplicationGEIQEligibilityDetailsTest(TestCase):
         )
 
     def test_details_as_authorized_prescriber_with_expired_diagnosis(self):
-        job_application = JobApplicationFactory(to_siae=self.siae, job_seeker=self.expired_diagnosis.job_seeker)
+        job_application = JobApplicationFactory(to_siae=self.company, job_seeker=self.expired_diagnosis.job_seeker)
         url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
 
-        self.client.force_login(self.siae.members.first())
+        self.client.force_login(self.company.members.first())
         response = self.client.get(url)
 
         self.assertContains(

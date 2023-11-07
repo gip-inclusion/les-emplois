@@ -26,7 +26,7 @@ from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.apply.forms import AcceptForm
 from tests.approvals.factories import PoleEmploiApprovalFactory, SuspensionFactory
 from tests.cities.factories import create_test_cities
-from tests.companies.factories import JobDescriptionFactory, SiaeFactory
+from tests.companies.factories import CompanyFactory, JobDescriptionFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import (
@@ -116,8 +116,8 @@ class ProcessViewsTest(TestCase):
         """Display the details of a job application."""
 
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True, resume_link="")
-        siae = job_application.to_siae
-        siae_user = siae.members.first()
+        company = job_application.to_siae
+        siae_user = company.members.first()
         self.client.force_login(siae_user)
 
         url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
@@ -154,7 +154,7 @@ class ProcessViewsTest(TestCase):
         # 1/ Job seeker has a personal resume (technical debt).
         resume_link = "https://server.com/rockie-balboa.pdf"
         job_application = JobApplicationSentByJobSeekerFactory(
-            job_seeker__resume_link=resume_link, resume_link="", to_siae=siae
+            job_seeker__resume_link=resume_link, resume_link="", to_siae=company
         )
         url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
@@ -163,7 +163,7 @@ class ProcessViewsTest(TestCase):
 
         # 2/ Job application was sent with an attached resume
         new_resume_link = "https://server.com/sylvester-stallone.pdf"
-        job_application = JobApplicationSentByJobSeekerFactory(to_siae=siae, resume_link=new_resume_link)
+        job_application = JobApplicationSentByJobSeekerFactory(to_siae=company, resume_link=new_resume_link)
         url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
         self.assertContains(response, new_resume_link)
@@ -342,8 +342,8 @@ class ProcessViewsTest(TestCase):
             "city": city.name,
             "city_slug": city.slug,
         }
-        siae = SiaeFactory(with_membership=True)
-        siae_user = siae.members.first()
+        company = CompanyFactory(with_membership=True)
+        siae_user = company.members.first()
         self.client.force_login(siae_user)
 
         hiring_end_dates = [
@@ -357,7 +357,7 @@ class ProcessViewsTest(TestCase):
                 job_application = JobApplicationFactory(
                     state=state,
                     job_seeker=job_seeker,
-                    to_siae=siae,
+                    to_siae=company,
                 )
                 previous_last_checked_at = job_seeker.last_checked_at
 
@@ -397,7 +397,7 @@ class ProcessViewsTest(TestCase):
         job_application = JobApplicationFactory(
             state=state,
             job_seeker=job_seeker,
-            to_siae=siae,
+            to_siae=company,
         )
 
         # Wrong dates.
@@ -433,7 +433,7 @@ class ProcessViewsTest(TestCase):
         # No address provided.
         job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
-            to_siae=siae,
+            to_siae=company,
         )
 
         hiring_start_at = today
@@ -457,7 +457,7 @@ class ProcessViewsTest(TestCase):
         job_application = JobApplicationSentByJobSeekerFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
             job_seeker=job_seeker,
-            to_siae=siae,
+            to_siae=company,
             eligibility_diagnosis=None,
         )
         post_data = {
@@ -474,7 +474,7 @@ class ProcessViewsTest(TestCase):
         job_application = JobApplicationSentByJobSeekerFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
             job_seeker=job_seeker,
-            to_siae=siae,
+            to_siae=company,
             eligibility_diagnosis=None,
         )
         for approval in job_application.job_seeker.approvals.all():
@@ -524,12 +524,12 @@ class ProcessViewsTest(TestCase):
         )
 
         # Now, another Siae wants to hire the job seeker
-        other_siae = SiaeFactory(with_membership=True)
+        other_company = CompanyFactory(with_membership=True)
         job_application = JobApplicationFactory(
             approval=approval_job_seeker,
             state=JobApplicationWorkflow.STATE_PROCESSING,
             job_seeker=job_seeker_user,
-            to_siae=other_siae,
+            to_siae=other_company,
         )
         other_siae_user = job_application.to_siae.members.first()
 
@@ -702,12 +702,12 @@ class ProcessViewsTest(TestCase):
     def test_accept_with_double_user(self, *args, **kwargs):
         city = self.get_random_city()
 
-        siae = SiaeFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True)
         job_seeker = JobSeekerWithAddressFactory(city=city.name)
         job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
             job_seeker=job_seeker,
-            to_siae=siae,
+            to_siae=company,
         )
 
         # Create a "PE Approval" that will be converted to a PASS IAE when accepting the process
@@ -716,7 +716,7 @@ class ProcessViewsTest(TestCase):
         )
 
         # Accept the job application for the first job seeker.
-        self.client.force_login(siae.members.first())
+        self.client.force_login(company.members.first())
         _, next_url = self.accept_job_application(job_application=job_application, city=city)
         response = self.client.get(next_url)
         assert "Un PASS IAE lui a déjà été délivré mais il est associé à un autre compte. " not in str(
@@ -734,7 +734,7 @@ class ProcessViewsTest(TestCase):
         another_job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
             job_seeker=almost_same_job_seeker,
-            to_siae=siae,
+            to_siae=company,
         )
 
         # Gracefully display a message instead of just plain crashing
@@ -1087,9 +1087,11 @@ class ProcessViewsTest(TestCase):
     def test_eligibility_state_for_job_application(self, *args, **kwargs):
         """The eligibility diagnosis page must only be accessible
         in JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES states."""
-        siae = SiaeFactory(with_membership=True)
-        siae_user = siae.members.first()
-        job_application = JobApplicationSentByJobSeekerFactory(to_siae=siae, job_seeker=JobSeekerWithAddressFactory())
+        company = CompanyFactory(with_membership=True)
+        siae_user = company.members.first()
+        job_application = JobApplicationSentByJobSeekerFactory(
+            to_siae=company, job_seeker=JobSeekerWithAddressFactory()
+        )
 
         # Right states
         for state in JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES:
@@ -1434,11 +1436,11 @@ class ProcessTransferJobApplicationTest(TestCase):
     def test_job_application_transfer_disabled_for_lone_users(self):
         # A user member of only one SIAE
         # must not be able to transfer a job application to another SIAE
-        siae = SiaeFactory(with_membership=True)
-        user = siae.members.first()
+        company = CompanyFactory(with_membership=True)
+        user = company.members.first()
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
-            to_siae=siae,
+            to_siae=company,
             state=JobApplicationWorkflow.STATE_PROCESSING,
         )
 
@@ -1452,13 +1454,15 @@ class ProcessTransferJobApplicationTest(TestCase):
     def test_job_application_transfer_disabled_for_bad_state(self):
         # A user member of only one SIAE must not be able to transfert
         # to another SIAE
-        siae = SiaeFactory(with_membership=True)
-        user = siae.members.first()
+        company = CompanyFactory(with_membership=True)
+        user = company.members.first()
         job_application_1 = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True, to_siae=siae, state=JobApplicationWorkflow.STATE_NEW
+            sent_by_authorized_prescriber_organisation=True, to_siae=company, state=JobApplicationWorkflow.STATE_NEW
         )
         job_application_2 = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True, to_siae=siae, state=JobApplicationWorkflow.STATE_ACCEPTED
+            sent_by_authorized_prescriber_organisation=True,
+            to_siae=company,
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
         )
 
         self.client.force_login(user)
@@ -1475,13 +1479,13 @@ class ProcessTransferJobApplicationTest(TestCase):
 
     def test_job_application_transfer_enabled(self):
         # A user member of several SIAE can transfer a job application
-        siae = SiaeFactory(with_membership=True)
-        other_siae = SiaeFactory(with_membership=True)
-        user = siae.members.first()
-        other_siae.members.add(user)
+        company = CompanyFactory(with_membership=True)
+        other_company = CompanyFactory(with_membership=True)
+        user = company.members.first()
+        other_company.members.add(user)
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
-            to_siae=siae,
+            to_siae=company,
             state=JobApplicationWorkflow.STATE_PROCESSING,
         )
 
@@ -1497,13 +1501,13 @@ class ProcessTransferJobApplicationTest(TestCase):
         # After transfering a job application,
         # user must be redirected to job application list
         # with a nice message
-        siae = SiaeFactory(with_membership=True)
-        other_siae = SiaeFactory(with_membership=True, for_snapshot=True)
-        user = siae.members.first()
-        other_siae.members.add(user)
+        company = CompanyFactory(with_membership=True)
+        other_company = CompanyFactory(with_membership=True, for_snapshot=True)
+        user = company.members.first()
+        other_company.members.add(user)
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
-            to_siae=siae,
+            to_siae=company,
             state=JobApplicationWorkflow.STATE_PROCESSING,
             job_seeker__for_snapshot=True,
             job_seeker__first_name="<>html escaped<>",
@@ -1516,12 +1520,12 @@ class ProcessTransferJobApplicationTest(TestCase):
         )
 
         self.assertContains(response, self.TRANSFER_TO_OTHER_SIAE_SENTENCE)
-        self.assertContains(response, f"transfer_confirmation_modal_{other_siae.pk}")
+        self.assertContains(response, f"transfer_confirmation_modal_{other_company.pk}")
         self.assertContains(response, "target_siae_id")
         self.assertContains(response, transfer_url)
 
         # Confirm from modal window
-        post_data = {"target_siae_id": other_siae.pk}
+        post_data = {"target_siae_id": other_company.pk}
         response = self.client.post(transfer_url, data=post_data, follow=True)
         messages = list(response.context.get("messages"))
 
@@ -1531,17 +1535,17 @@ class ProcessTransferJobApplicationTest(TestCase):
         assert str(messages[0]) == self.snapshot(name="job application transfer message")
 
     def test_job_application_transfer_without_rights(self):
-        siae = SiaeFactory()
-        other_siae = SiaeFactory()
+        company = CompanyFactory()
+        other_company = CompanyFactory()
         user = JobSeekerFactory()
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
-            to_siae=siae,
+            to_siae=company,
             state=JobApplicationWorkflow.STATE_PROCESSING,
         )
         # Forge query
         self.client.force_login(user)
-        post_data = {"target_siae_id": other_siae.pk}
+        post_data = {"target_siae_id": other_company.pk}
         transfer_url = reverse("apply:transfer", kwargs={"job_application_id": job_application.pk})
         response = self.client.post(transfer_url, data=post_data)
         assert response.status_code == 404
@@ -2022,10 +2026,10 @@ def test_details_for_geiq_with_inverted_vae_contract(client, inverted_vae_contra
 
 @pytest.mark.parametrize("qualification_type", job_applications_enums.QualificationType)
 def test_reload_qualification_fields(qualification_type, client, snapshot):
-    siae = SiaeFactory(pk=10, kind=CompanyKind.GEIQ, with_membership=True)
-    siae_member = siae.members.first()
-    client.force_login(siae_member)
-    url = reverse("apply:reload_qualification_fields", kwargs={"siae_pk": siae.pk})
+    company = CompanyFactory(pk=10, kind=CompanyKind.GEIQ, with_membership=True)
+    employer = company.members.first()
+    client.force_login(employer)
+    url = reverse("apply:reload_qualification_fields", kwargs={"siae_pk": company.pk})
     response = client.post(
         url,
         data={
@@ -2045,9 +2049,9 @@ def test_reload_qualification_fields(qualification_type, client, snapshot):
 
 
 def test_reload_qualification_fields_404(client):
-    siae = SiaeFactory(kind=CompanyKind.GEIQ, with_membership=True)
-    siae_member = siae.members.first()
-    client.force_login(siae_member)
+    company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
+    employer = company.members.first()
+    client.force_login(employer)
     url = reverse("apply:reload_qualification_fields", kwargs={"siae_pk": 0})
     response = client.post(
         url,
@@ -2071,10 +2075,10 @@ def test_reload_qualification_fields_404(client):
     "contract_type", [value for value, _label in ContractType.choices_for_company_kind(CompanyKind.GEIQ)]
 )
 def test_reload_contract_type_and_options(contract_type, client, snapshot):
-    siae = SiaeFactory(pk=10, kind=CompanyKind.GEIQ, with_membership=True)
-    siae_member = siae.members.first()
-    client.force_login(siae_member)
-    url = reverse("apply:reload_contract_type_and_options", kwargs={"siae_pk": siae.pk})
+    company = CompanyFactory(pk=10, kind=CompanyKind.GEIQ, with_membership=True)
+    employer = company.members.first()
+    client.force_login(employer)
+    url = reverse("apply:reload_contract_type_and_options", kwargs={"siae_pk": company.pk})
     response = client.post(
         url,
         data={
@@ -2094,9 +2098,9 @@ def test_reload_contract_type_and_options(contract_type, client, snapshot):
 
 
 def test_reload_contract_type_and_options_404(client):
-    siae = SiaeFactory(kind=CompanyKind.GEIQ, with_membership=True)
-    siae_member = siae.members.first()
-    client.force_login(siae_member)
+    company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
+    employer = company.members.first()
+    client.force_login(employer)
     url = reverse("apply:reload_contract_type_and_options", kwargs={"siae_pk": 0})
     response = client.post(
         url,
@@ -2120,8 +2124,8 @@ def test_htmx_reload_contract_type_and_options(client, snapshot):
     job_application = JobApplicationFactory(
         to_siae__kind=CompanyKind.GEIQ, state=JobApplicationWorkflow.STATE_PROCESSING
     )
-    siae_member = job_application.to_siae.members.first()
-    client.force_login(siae_member)
+    employer = job_application.to_siae.members.first()
+    client.force_login(employer)
     accept_url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
     data = {
         "guidance_days": "1",

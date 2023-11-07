@@ -9,7 +9,7 @@ from freezegun import freeze_time
 
 from itou.siae_evaluations.emails import CampaignEmailFactory, InstitutionEmailFactory, SIAEEmailFactory
 from itou.siae_evaluations.enums import EvaluatedAdministrativeCriteriaState
-from tests.companies.factories import SiaeFactory, SiaeWith2MembershipsFactory
+from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory
 from tests.institutions.factories import InstitutionWith2MembershipFactory
 from tests.siae_evaluations.factories import (
     EvaluatedAdministrativeCriteriaFactory,
@@ -33,8 +33,8 @@ class TestInstitutionEmailFactory:
         assert "Vous disposez de 4 semaines pour sélectionner votre échantillon." in email.subject
 
     def test_selected(self):
-        siae = SiaeWith2MembershipsFactory()
-        evaluated_siae = EvaluatedSiaeFactory(siae=siae, evaluation_campaign__evaluations_asked_at=timezone.now())
+        company = CompanyWith2MembershipsFactory()
+        evaluated_siae = EvaluatedSiaeFactory(siae=company, evaluation_campaign__evaluations_asked_at=timezone.now())
         email = SIAEEmailFactory(evaluated_siae).selected()
 
         assert email.to == list(u.email for u in evaluated_siae.siae.active_admin_members)
@@ -43,9 +43,9 @@ class TestInstitutionEmailFactory:
             + f"du {dateformat.format(evaluated_siae.evaluation_campaign.evaluated_period_start_at, 'd E Y')} "
             + f"au {dateformat.format(evaluated_siae.evaluation_campaign.evaluated_period_end_at, 'd E Y')}"
         )
-        assert siae.name in email.body
-        assert siae.kind in email.body
-        assert siae.convention.siret_signature in email.body
+        assert company.name in email.body
+        assert company.kind in email.body
+        assert company.convention.siret_signature in email.body
 
     def test_selected_siae(self):
         fake_now = timezone.now()
@@ -64,9 +64,9 @@ class TestInstitutionEmailFactory:
     def test_close_notifies_when_siae_has_negative_result(self, mailoutbox):
         institution = InstitutionWith2MembershipFactory(name="DDETS 01")
         campaign = EvaluationCampaignFactory(pk=1, institution=institution)
-        siae = SiaeWith2MembershipsFactory(pk=1000, name="les petits jardins")
+        company = CompanyWith2MembershipsFactory(pk=1000, name="les petits jardins")
         evaluated_siae = EvaluatedSiaeFactory(
-            siae=siae,
+            siae=company,
             evaluation_campaign=campaign,
             reviewed_at=timezone.now() - relativedelta(days=60),
             final_reviewed_at=timezone.now() - relativedelta(days=20),
@@ -93,9 +93,9 @@ class TestInstitutionEmailFactory:
     def test_close_does_not_notify_when_siae_has_been_notified(self, mailoutbox):
         institution = InstitutionWith2MembershipFactory(name="DDETS 01")
         campaign = EvaluationCampaignFactory(institution=institution)
-        siae = SiaeWith2MembershipsFactory(name="les petits jardins")
+        company = CompanyWith2MembershipsFactory(name="les petits jardins")
         evaluated_siae = EvaluatedSiaeFactory(
-            siae=siae,
+            siae=company,
             evaluation_campaign=campaign,
             reviewed_at=timezone.now() - relativedelta(days=60),
             final_reviewed_at=timezone.now() - relativedelta(days=20),
@@ -117,9 +117,9 @@ class TestInstitutionEmailFactory:
     def test_close_notify_when_siae_has_positive_result_in_adversarial_phase(self, mailoutbox):
         institution = InstitutionWith2MembershipFactory(name="DDETS 01")
         campaign = EvaluationCampaignFactory(institution=institution)
-        siae = SiaeWith2MembershipsFactory(pk=1000, name="les petits jardins")
+        company = CompanyWith2MembershipsFactory(pk=1000, name="les petits jardins")
         evaluated_siae = EvaluatedSiaeFactory(
-            siae=siae,
+            siae=company,
             evaluation_campaign=campaign,
             reviewed_at=timezone.now() - relativedelta(days=55),
             final_reviewed_at=timezone.now() - relativedelta(days=50),
@@ -141,10 +141,10 @@ class TestInstitutionEmailFactory:
     def test_close_does_not_notify_when_siae_has_positive_result_in_amicable_phase(self, mailoutbox):
         institution = InstitutionWith2MembershipFactory(name="DDETS 01")
         campaign = EvaluationCampaignFactory(institution=institution)
-        siae = SiaeWith2MembershipsFactory(pk=1000, name="les petits jardins")
+        company = CompanyWith2MembershipsFactory(pk=1000, name="les petits jardins")
         reviewed_at = timezone.now() - relativedelta(days=50)
         evaluated_siae = EvaluatedSiaeFactory(
-            siae=siae,
+            siae=company,
             evaluation_campaign=campaign,
             reviewed_at=reviewed_at,
             final_reviewed_at=reviewed_at,
@@ -175,8 +175,8 @@ class TestInstitutionEmailFactory:
 
 class TestSIAEEmails:
     def test_accepted(self):
-        siae = SiaeFactory(with_membership=True)
-        evaluated_siae = EvaluatedSiaeFactory(siae=siae)
+        company = CompanyFactory(with_membership=True)
+        evaluated_siae = EvaluatedSiaeFactory(siae=company)
         email = SIAEEmailFactory(evaluated_siae).accepted()
 
         assert email.from_email == settings.DEFAULT_FROM_EMAIL
@@ -197,8 +197,8 @@ class TestSIAEEmails:
         assert "la conformité des nouveaux justificatifs que vous avez" in email.body
 
     def test_refused(self):
-        siae = SiaeFactory(with_membership=True)
-        evaluated_siae = EvaluatedSiaeFactory(siae=siae)
+        company = CompanyFactory(with_membership=True)
+        evaluated_siae = EvaluatedSiaeFactory(siae=company)
         email = SIAEEmailFactory(evaluated_siae).refused()
 
         assert email.from_email == settings.DEFAULT_FROM_EMAIL
@@ -215,8 +215,8 @@ class TestSIAEEmails:
         assert dateformat.format(evaluated_siae.evaluation_campaign.evaluated_period_end_at, "d E Y") in email.body
 
     def test_adversarial_stage(self):
-        siae = SiaeFactory(with_membership=True)
-        evaluated_siae = EvaluatedSiaeFactory(siae=siae)
+        company = CompanyFactory(with_membership=True)
+        evaluated_siae = EvaluatedSiaeFactory(siae=company)
         email = SIAEEmailFactory(evaluated_siae).adversarial_stage()
 
         assert email.from_email == settings.DEFAULT_FROM_EMAIL

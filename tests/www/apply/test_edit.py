@@ -4,7 +4,7 @@ from django.utils import timezone
 
 from itou.job_applications.models import JobApplication
 from itou.utils.widgets import DuetDatePickerWidget
-from tests.companies.factories import SiaeWithMembershipAndJobsFactory
+from tests.companies.factories import CompanyWithMembershipAndJobsFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.utils.test import TestCase
 
@@ -18,29 +18,31 @@ class EditContractTest(TestCase):
 
     def setUp(self):
         super().setUp()
-        siae1 = SiaeWithMembershipAndJobsFactory(name="Evil Corp.", membership__user__first_name="Elliot")
-        siae2 = SiaeWithMembershipAndJobsFactory(name="Duke of Hazard Corp.", membership__user__first_name="Roscoe")
+        company_1 = CompanyWithMembershipAndJobsFactory(name="Evil Corp.", membership__user__first_name="Elliot")
+        company_2 = CompanyWithMembershipAndJobsFactory(
+            name="Duke of Hazard Corp.", membership__user__first_name="Roscoe"
+        )
 
-        self.user1 = siae1.members.get(first_name="Elliot")
-        self.user2 = siae2.members.get(first_name="Roscoe")
+        self.user1 = company_1.members.get(first_name="Elliot")
+        self.user2 = company_2.members.get(first_name="Roscoe")
 
         # JA with creation of a new approval
         tomorrow = (timezone.now() + relativedelta(days=1)).date()
         self.job_application_1 = JobApplicationFactory(
-            with_approval=True, to_siae=siae1, hiring_start_at=tomorrow, approval__start_at=tomorrow
+            with_approval=True, to_siae=company_1, hiring_start_at=tomorrow, approval__start_at=tomorrow
         )
 
         # JA with an old approval
         delta = relativedelta(months=23)
         self.old_job_application = JobApplicationFactory(
-            with_approval=True, to_siae=siae2, created_at=timezone.now() - delta
+            with_approval=True, to_siae=company_2, created_at=timezone.now() - delta
         )
         approval = self.old_job_application.approval
         approval.start_at = self.old_job_application.created_at.date()
 
         self.job_application_2 = JobApplicationFactory(
             with_approval=True,
-            to_siae=siae2,
+            to_siae=company_2,
             job_seeker=self.old_job_application.job_seeker,
             approval=approval,
         )

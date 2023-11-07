@@ -15,7 +15,7 @@ from itou.jobs.models import Appellation
 from itou.utils.widgets import DuetDatePickerWidget
 from tests.approvals.factories import SuspensionFactory
 from tests.cities.factories import create_city_saint_andre
-from tests.companies.factories import JobDescriptionFactory, SiaeFactory
+from tests.companies.factories import CompanyFactory, JobDescriptionFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
@@ -63,7 +63,7 @@ class ProcessListTest(TestCase):
         audrey_envol = l_envol.members.get(first_name="Audrey")
 
         # Hit Pit
-        hit_pit = SiaeFactory(name="Hit Pit", with_membership=True, membership__user__first_name="Eddie")
+        hit_pit = CompanyFactory(name="Hit Pit", with_membership=True, membership__user__first_name="Eddie")
         eddie_hit_pit = hit_pit.members.get(first_name="Eddie")
 
         # Now send applications
@@ -281,8 +281,8 @@ class ProcessListSiaeTest(ProcessListTest):
         self.assertContains(response, promo_text)
 
         # Check with an other SIAE without applications - the promo is there too
-        other_siae = SiaeFactory(with_membership=True)
-        self.client.force_login(other_siae.members.first())
+        other_company = CompanyFactory(with_membership=True)
+        self.client.force_login(other_company.members.first())
         response = self.client.get(self.siae_base_url)
         self.assertContains(response, "Aucune candidature pour le moment")
         self.assertContains(response, promo_text)
@@ -681,7 +681,7 @@ class ProcessListSiaeTest(ProcessListTest):
 class TestListForSiae:
     @freeze_time("2023-04-13")
     def test_warns_about_long_awaiting_applications(self, client, snapshot):
-        hit_pit = SiaeFactory(pk=42, name="Hit Pit", with_membership=True)
+        hit_pit = CompanyFactory(pk=42, name="Hit Pit", with_membership=True)
 
         now = timezone.now()
         org = PrescriberOrganizationWithMembershipFactory(

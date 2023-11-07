@@ -10,7 +10,7 @@ from itou.employee_record.enums import Status
 from itou.users.enums import LackOfNIRReason
 from itou.utils.templatetags import format_filters
 from tests.approvals import factories as approvals_factories
-from tests.companies.factories import SiaeWithMembershipAndJobsFactory
+from tests.companies.factories import CompanyWithMembershipAndJobsFactory
 from tests.employee_record import factories as employee_record_factories
 from tests.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
 from tests.utils.test import BASE_NUM_QUERIES, TestCase
@@ -24,13 +24,13 @@ class ListEmployeeRecordsTest(TestCase):
     def setUp(self):
         super().setUp()
         # User must be super user for UI first part (tmp)
-        self.siae = SiaeWithMembershipAndJobsFactory(name="Evil Corp.", membership__user__first_name="Elliot")
-        self.siae_without_perms = SiaeWithMembershipAndJobsFactory(
+        self.company = CompanyWithMembershipAndJobsFactory(name="Evil Corp.", membership__user__first_name="Elliot")
+        self.company_without_perms = CompanyWithMembershipAndJobsFactory(
             kind="EITI", name="A-Team", membership__user__first_name="Hannibal"
         )
-        self.user = self.siae.members.get(first_name="Elliot")
-        self.user_without_perms = self.siae_without_perms.members.get(first_name="Hannibal")
-        self.job_application = JobApplicationWithApprovalNotCancellableFactory(to_siae=self.siae)
+        self.user = self.company.members.get(first_name="Elliot")
+        self.user_without_perms = self.company_without_perms.members.get(first_name="Hannibal")
+        self.job_application = JobApplicationWithApprovalNotCancellableFactory(to_siae=self.company)
         self.job_seeker = self.job_application.job_seeker
         self.url = reverse("employee_record_views:list")
 
@@ -76,7 +76,7 @@ class ListEmployeeRecordsTest(TestCase):
 
     def test_job_seeker_filter(self):
         approval_number_formatted = format_filters.format_approval_number(self.job_application.approval.number)
-        other_job_application = JobApplicationWithApprovalNotCancellableFactory(to_siae=self.siae)
+        other_job_application = JobApplicationWithApprovalNotCancellableFactory(to_siae=self.company)
         other_approval_number_formatted = format_filters.format_approval_number(other_job_application.approval.number)
         self.client.force_login(self.user)
 
@@ -182,7 +182,7 @@ class ListEmployeeRecordsTest(TestCase):
     def test_rejected_without_custom_message(self):
         self.client.force_login(self.user)
 
-        record = employee_record_factories.EmployeeRecordWithProfileFactory(job_application__to_siae=self.siae)
+        record = employee_record_factories.EmployeeRecordWithProfileFactory(job_application__to_siae=self.company)
         record.update_as_ready()
         record.update_as_sent(self.faker.asp_batch_filename(), 1, None)
         record.update_as_rejected("0012", "JSON Invalide", None)
@@ -194,7 +194,7 @@ class ListEmployeeRecordsTest(TestCase):
     def test_rejected_custom_messages(self):
         self.client.force_login(self.user)
 
-        record = employee_record_factories.EmployeeRecordWithProfileFactory(job_application__to_siae=self.siae)
+        record = employee_record_factories.EmployeeRecordWithProfileFactory(job_application__to_siae=self.company)
 
         tests_specs = [
             (
@@ -247,10 +247,14 @@ class ListEmployeeRecordsTest(TestCase):
         self.client.force_login(self.user)
 
         job_applicationA = JobApplicationWithApprovalNotCancellableFactory(
-            to_siae=self.siae, job_seeker__last_name="Aaaaa", hiring_start_at=timezone.now() - relativedelta(days=15)
+            to_siae=self.company,
+            job_seeker__last_name="Aaaaa",
+            hiring_start_at=timezone.now() - relativedelta(days=15),
         )
         job_applicationZ = JobApplicationWithApprovalNotCancellableFactory(
-            to_siae=self.siae, job_seeker__last_name="Zzzzz", hiring_start_at=timezone.now() - relativedelta(days=10)
+            to_siae=self.company,
+            job_seeker__last_name="Zzzzz",
+            hiring_start_at=timezone.now() - relativedelta(days=10),
         )
 
         # Zzzzz's hiring start is more recent
@@ -279,12 +283,12 @@ class ListEmployeeRecordsTest(TestCase):
         self.client.force_login(self.user)
 
         recordA = employee_record_factories.EmployeeRecordWithProfileFactory(
-            job_application__to_siae=self.siae,
+            job_application__to_siae=self.company,
             job_application__job_seeker__last_name="Aaaaa",
             job_application__hiring_start_at=timezone.now() - relativedelta(days=15),
         )
         recordZ = employee_record_factories.EmployeeRecordWithProfileFactory(
-            job_application__to_siae=self.siae,
+            job_application__to_siae=self.company,
             job_application__job_seeker__last_name="Zzzzz",
             job_application__hiring_start_at=timezone.now() - relativedelta(days=10),
         )
@@ -326,12 +330,12 @@ class ListEmployeeRecordsTest(TestCase):
         self.client.force_login(self.user)
 
         recordA = employee_record_factories.EmployeeRecordWithProfileFactory(
-            job_application__to_siae=self.siae,
+            job_application__to_siae=self.company,
             job_application__job_seeker__last_name="Aaaaa",
             job_application__hiring_start_at=timezone.now() - relativedelta(days=15),
         )
         recordZ = employee_record_factories.EmployeeRecordWithProfileFactory(
-            job_application__to_siae=self.siae,
+            job_application__to_siae=self.company,
             job_application__job_seeker__last_name="Zzzzz",
             job_application__hiring_start_at=timezone.now() - relativedelta(days=10),
         )
@@ -370,7 +374,7 @@ class ListEmployeeRecordsTest(TestCase):
         response = self.client.get(self.url + "?status=NEW")
         self.assertContains(response, "1 résultat")
 
-        JobApplicationWithApprovalNotCancellableFactory(to_siae=self.siae)
+        JobApplicationWithApprovalNotCancellableFactory(to_siae=self.company)
         response = self.client.get(self.url + "?status=NEW")
         self.assertContains(response, "2 résultats")
 

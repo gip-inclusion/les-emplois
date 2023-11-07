@@ -28,14 +28,14 @@ class EvaluatedSiaeSanctionViewTest(TestCase):
     def setUpTestData(cls):
         institution_membership = InstitutionMembershipFactory(institution__name="DDETS 87")
         cls.institution_user = institution_membership.user
-        siae_membership = CompanyMembershipFactory(siae__name="Les petits jardins")
-        cls.siae_user = siae_membership.user
+        company_membership = CompanyMembershipFactory(siae__name="Les petits jardins")
+        cls.employer = company_membership.user
         cls.evaluated_siae = EvaluatedSiaeFactory(
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
             evaluation_campaign__institution=institution_membership.institution,
             evaluation_campaign__name="Contrôle 2022",
-            siae=siae_membership.siae,
+            siae=company_membership.siae,
             notified_at=timezone.now(),
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat. Séparé de son chat pendant une journée.",
@@ -133,7 +133,7 @@ class EvaluatedSiaeSanctionViewTest(TestCase):
         assert response.status_code == 404
 
     def test_view_as_siae(self):
-        self.client.force_login(self.siae_user)
+        self.client.force_login(self.employer)
         response = self.client.get(
             reverse(
                 "siae_evaluations_views:siae_sanction",
@@ -154,8 +154,8 @@ class EvaluatedSiaeSanctionViewTest(TestCase):
         )
 
     def test_view_as_other_siae(self):
-        siae_membership = CompanyMembershipFactory()
-        self.client.force_login(siae_membership.user)
+        company_membership = CompanyMembershipFactory()
+        self.client.force_login(company_membership.user)
         response = self.client.get(
             reverse(
                 "siae_evaluations_views:siae_sanction",

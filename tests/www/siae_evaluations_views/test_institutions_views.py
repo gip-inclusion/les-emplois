@@ -21,7 +21,7 @@ from itou.siae_evaluations.models import (
 from itou.utils.templatetags.format_filters import format_approval_number
 from itou.utils.types import InclusiveDateRange
 from itou.www.siae_evaluations_views.forms import LaborExplanationForm, SetChosenPercentForm
-from tests.companies.factories import CompanyMembershipFactory, SiaeFactory
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.files.factories import FileFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -1795,7 +1795,7 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
 
     @freeze_time("2023-01-24 11:11:00")
     def test_data_card_statistics(self):
-        siae = SiaeFactory()
+        company = CompanyFactory()
         previous_campaign = EvaluationCampaignFactory(
             institution=self.institution,
             ended_at=timezone.now() - relativedelta(years=1),
@@ -1804,7 +1804,7 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
         )
         previous_evaluated_siae = EvaluatedSiaeFactory(
             evaluation_campaign=previous_campaign,
-            siae=siae,
+            siae=company,
             reviewed_at=timezone.now() - relativedelta(years=1, months=3),
         )
         # SIAE didn’t answer for that evaluation campaign.
@@ -1816,7 +1816,7 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
         other_evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=campaign)
         EvaluatedJobApplicationFactory(evaluated_siae=other_evaluated_siae)
 
-        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=campaign, siae=siae)
+        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=campaign, siae=company)
         # SIAE didn’t bother justifying this application.
         EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
         inprogress_evaluated_job_app = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
@@ -1916,7 +1916,7 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
 
     @freeze_time("2023-06-24 11:11:00")
     def test_data_card_statistics_multiple_previous_campaigns_check_sanctions(self):
-        siae = SiaeFactory()
+        company = CompanyFactory()
         previous_campaign_1 = EvaluationCampaignFactory(
             institution=self.institution,
             ended_at=timezone.make_aware(datetime.datetime(2022, 3, 24)),
@@ -1926,7 +1926,7 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
         # This SIAE didn’t answer for that evaluation campaign.
         previous_evaluated_siae_1 = EvaluatedSiaeFactory(
             evaluation_campaign=previous_campaign_1,
-            siae=siae,
+            siae=company,
             reviewed_at=timezone.make_aware(datetime.datetime(2022, 2, 24)),
         )
         EvaluatedJobApplicationFactory.create_batch(2, evaluated_siae=previous_evaluated_siae_1)
@@ -1943,7 +1943,7 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
         # It didn’t answer for that evaluation campaign either.
         previous_evaluated_siae_2 = EvaluatedSiaeFactory(
             evaluation_campaign=previous_campaign_2,
-            siae=siae,
+            siae=company,
             reviewed_at=timezone.make_aware(datetime.datetime(2022, 7, 24)),
         )
         EvaluatedJobApplicationFactory.create_batch(2, evaluated_siae=previous_evaluated_siae_2)
@@ -1954,7 +1954,7 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
         campaign = EvaluationCampaignFactory(
             institution=self.institution, ended_at=timezone.now() - relativedelta(hours=1)
         )
-        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=campaign, siae=siae)
+        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=campaign, siae=company)
         self.login(evaluated_siae)
         with self.assertNumQueries(
             BASE_NUM_QUERIES
@@ -2082,9 +2082,11 @@ class InstitutionEvaluatedSiaeNotifyViewStep1Test(InstitutionEvaluatedSiaeNotify
 
     @freeze_time("2022-10-24 11:11:00")
     def test_post(self):
-        siae_membership = CompanyMembershipFactory(siae__name="Les petits jardins", user__email="siae@mailinator.com")
+        company_membership = CompanyMembershipFactory(
+            siae__name="Les petits jardins", user__email="siae@mailinator.com"
+        )
         evaluated_siae = EvaluatedSiaeFactory(
-            siae=siae_membership.siae,
+            siae=company_membership.siae,
             evaluation_campaign__institution=self.institution,
             evaluation_campaign__name="Campagne 2022",
             evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(weeks=4),
@@ -2320,11 +2322,13 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
 
     @freeze_time("2022-10-24 11:11:00")
     def test_post_training(self):
-        siae_membership = CompanyMembershipFactory(siae__name="Les petits jardins", user__email="siae@mailinator.com")
+        company_membership = CompanyMembershipFactory(
+            siae__name="Les petits jardins", user__email="siae@mailinator.com"
+        )
         evaluated_siae = EvaluatedSiaeFactory(
             evaluation_campaign__name="Campagne 2022",
             evaluation_campaign__institution=self.institution,
-            siae=siae_membership.siae,
+            siae=company_membership.siae,
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
@@ -2371,11 +2375,13 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
 
     @freeze_time("2022-10-24 11:11:00")
     def test_post_temporary_suspension(self):
-        siae_membership = CompanyMembershipFactory(siae__name="Les petits jardins", user__email="siae@mailinator.com")
+        company_membership = CompanyMembershipFactory(
+            siae__name="Les petits jardins", user__email="siae@mailinator.com"
+        )
         evaluated_siae = EvaluatedSiaeFactory(
             evaluation_campaign__name="Campagne 2022",
             evaluation_campaign__institution=self.institution,
-            siae=siae_membership.siae,
+            siae=company_membership.siae,
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
@@ -2430,11 +2436,13 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
 
     @freeze_time("2022-10-24 11:11:00")
     def test_post_temporary_suspension_incorrect_date_order(self):
-        siae_membership = CompanyMembershipFactory(siae__name="Les petits jardins", user__email="siae@mailinator.com")
+        company_membership = CompanyMembershipFactory(
+            siae__name="Les petits jardins", user__email="siae@mailinator.com"
+        )
         evaluated_siae = EvaluatedSiaeFactory(
             evaluation_campaign__name="Campagne 2022",
             evaluation_campaign__institution=self.institution,
-            siae=siae_membership.siae,
+            siae=company_membership.siae,
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
@@ -2465,11 +2473,13 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
 
     @freeze_time("2022-10-24 11:11:00")
     def test_post_temporary_suspension_missing_lower_date(self):
-        siae_membership = CompanyMembershipFactory(siae__name="Les petits jardins", user__email="siae@mailinator.com")
+        company_membership = CompanyMembershipFactory(
+            siae__name="Les petits jardins", user__email="siae@mailinator.com"
+        )
         evaluated_siae = EvaluatedSiaeFactory(
             evaluation_campaign__name="Campagne 2022",
             evaluation_campaign__institution=self.institution,
-            siae=siae_membership.siae,
+            siae=company_membership.siae,
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
@@ -2509,11 +2519,13 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
 
     @freeze_time("2022-10-24 11:11:00")
     def test_post_temporary_suspension_missing_upper_date(self):
-        siae_membership = CompanyMembershipFactory(siae__name="Les petits jardins", user__email="siae@mailinator.com")
+        company_membership = CompanyMembershipFactory(
+            siae__name="Les petits jardins", user__email="siae@mailinator.com"
+        )
         evaluated_siae = EvaluatedSiaeFactory(
             evaluation_campaign__name="Campagne 2022",
             evaluation_campaign__institution=self.institution,
-            siae=siae_membership.siae,
+            siae=company_membership.siae,
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
@@ -2553,11 +2565,13 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
 
     @freeze_time("2022-10-24 11:11:00")
     def test_post_temporary_suspension_bad_input(self):
-        siae_membership = CompanyMembershipFactory(siae__name="Les petits jardins", user__email="siae@mailinator.com")
+        company_membership = CompanyMembershipFactory(
+            siae__name="Les petits jardins", user__email="siae@mailinator.com"
+        )
         evaluated_siae = EvaluatedSiaeFactory(
             evaluation_campaign__name="Campagne 2022",
             evaluation_campaign__institution=self.institution,
-            siae=siae_membership.siae,
+            siae=company_membership.siae,
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
@@ -2627,11 +2641,13 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
 
     @freeze_time("2022-10-24 11:11:00")
     def test_post_temporary_suspension_starts_in_less_than_a_month(self):
-        siae_membership = CompanyMembershipFactory(siae__name="Les petits jardins", user__email="siae@mailinator.com")
+        company_membership = CompanyMembershipFactory(
+            siae__name="Les petits jardins", user__email="siae@mailinator.com"
+        )
         evaluated_siae = EvaluatedSiaeFactory(
             evaluation_campaign__name="Campagne 2022",
             evaluation_campaign__institution=self.institution,
-            siae=siae_membership.siae,
+            siae=company_membership.siae,
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
@@ -2696,11 +2712,13 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
 
     @freeze_time("2022-10-24 11:11:00")
     def test_post_permanent_suspension(self):
-        siae_membership = CompanyMembershipFactory(siae__name="Les petits jardins", user__email="siae@mailinator.com")
+        company_membership = CompanyMembershipFactory(
+            siae__name="Les petits jardins", user__email="siae@mailinator.com"
+        )
         evaluated_siae = EvaluatedSiaeFactory(
             evaluation_campaign__name="Campagne 2022",
             evaluation_campaign__institution=self.institution,
-            siae=siae_membership.siae,
+            siae=company_membership.siae,
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
@@ -2751,11 +2769,13 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
 
     @freeze_time("2022-10-24 11:11:00")
     def test_post_permanent_suspension_bad_input(self):
-        siae_membership = CompanyMembershipFactory(siae__name="Les petits jardins", user__email="siae@mailinator.com")
+        company_membership = CompanyMembershipFactory(
+            siae__name="Les petits jardins", user__email="siae@mailinator.com"
+        )
         evaluated_siae = EvaluatedSiaeFactory(
             evaluation_campaign__name="Campagne 2022",
             evaluation_campaign__institution=self.institution,
-            siae=siae_membership.siae,
+            siae=company_membership.siae,
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
@@ -2799,11 +2819,13 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
 
     @freeze_time("2022-10-24 11:11:00")
     def test_post_subsidy_cut_percent(self):
-        siae_membership = CompanyMembershipFactory(siae__name="Les petits jardins", user__email="siae@mailinator.com")
+        company_membership = CompanyMembershipFactory(
+            siae__name="Les petits jardins", user__email="siae@mailinator.com"
+        )
         evaluated_siae = EvaluatedSiaeFactory(
             evaluation_campaign__name="Campagne 2022",
             evaluation_campaign__institution=self.institution,
-            siae=siae_membership.siae,
+            siae=company_membership.siae,
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
@@ -2862,11 +2884,13 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
 
     @freeze_time("2022-10-24 11:11:00")
     def test_post_subsidy_percent_invalid_date_and_percent(self):
-        siae_membership = CompanyMembershipFactory(siae__name="Les petits jardins", user__email="siae@mailinator.com")
+        company_membership = CompanyMembershipFactory(
+            siae__name="Les petits jardins", user__email="siae@mailinator.com"
+        )
         evaluated_siae = EvaluatedSiaeFactory(
             evaluation_campaign__name="Campagne 2022",
             evaluation_campaign__institution=self.institution,
-            siae=siae_membership.siae,
+            siae=company_membership.siae,
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
@@ -2942,11 +2966,13 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
 
     @freeze_time("2022-10-24 11:11:00")
     def test_post_subsidy_cut_full(self):
-        siae_membership = CompanyMembershipFactory(siae__name="Les petits jardins", user__email="siae@mailinator.com")
+        company_membership = CompanyMembershipFactory(
+            siae__name="Les petits jardins", user__email="siae@mailinator.com"
+        )
         evaluated_siae = EvaluatedSiaeFactory(
             evaluation_campaign__name="Campagne 2022",
             evaluation_campaign__institution=self.institution,
-            siae=siae_membership.siae,
+            siae=company_membership.siae,
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
@@ -3005,11 +3031,13 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
 
     @freeze_time("2022-10-24 11:11:00")
     def test_post_deactivation(self):
-        siae_membership = CompanyMembershipFactory(siae__name="Les petits jardins", user__email="siae@mailinator.com")
+        company_membership = CompanyMembershipFactory(
+            siae__name="Les petits jardins", user__email="siae@mailinator.com"
+        )
         evaluated_siae = EvaluatedSiaeFactory(
             evaluation_campaign__name="Campagne 2022",
             evaluation_campaign__institution=self.institution,
-            siae=siae_membership.siae,
+            siae=company_membership.siae,
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
@@ -3060,11 +3088,13 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
 
     @freeze_time("2022-10-24 11:11:00")
     def test_post_no_sanction(self):
-        siae_membership = CompanyMembershipFactory(siae__name="Les petits jardins", user__email="siae@mailinator.com")
+        company_membership = CompanyMembershipFactory(
+            siae__name="Les petits jardins", user__email="siae@mailinator.com"
+        )
         evaluated_siae = EvaluatedSiaeFactory(
             evaluation_campaign__name="Campagne 2022",
             evaluation_campaign__institution=self.institution,
-            siae=siae_membership.siae,
+            siae=company_membership.siae,
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
@@ -3111,11 +3141,13 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
 
     @freeze_time("2022-10-24 11:11:00")
     def test_post_combined_sanctions(self):
-        siae_membership = CompanyMembershipFactory(siae__name="Les petits jardins", user__email="siae@mailinator.com")
+        company_membership = CompanyMembershipFactory(
+            siae__name="Les petits jardins", user__email="siae@mailinator.com"
+        )
         evaluated_siae = EvaluatedSiaeFactory(
             evaluation_campaign__name="Campagne 2022",
             evaluation_campaign__institution=self.institution,
-            siae=siae_membership.siae,
+            siae=company_membership.siae,
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,

@@ -51,7 +51,7 @@ class TestManagementCommand:
             institution__name="DDETS 01",
             name="Campagne 1",
         )
-        evaluated_siae1 = EvaluatedSiaeFactory.create(
+        evaluated_company_1 = EvaluatedSiaeFactory.create(
             evaluation_campaign=campaign1,
             siae__name="les petits jardins",
             siae__convention__siret_signature="00000000000032",
@@ -63,7 +63,7 @@ class TestManagementCommand:
             institution__name="DDETS 02",
             name="Campagne 1",
         )
-        evaluated_siae2 = EvaluatedSiaeFactory.create(
+        evaluated_company_2 = EvaluatedSiaeFactory.create(
             evaluation_campaign=campaign2,
             siae__name="Bazar antique",
             siae__convention__siret_signature="12345678900012",
@@ -85,7 +85,7 @@ class TestManagementCommand:
             "Plus que quelques jours pour transmettre vos justificatifs à la DDETS 01"
         )
         assert (
-            f"Nous vous rappelons que votre structure EI les petits jardins ID-{evaluated_siae1.siae_id} "
+            f"Nous vous rappelons que votre structure EI les petits jardins ID-{evaluated_company_1.siae_id} "
             "(SIRET : 00000000000032) est soumise à la procédure de contrôle a posteriori sur les embauches réalisées "
             "en auto-prescription du 1 janvier 2022 au 30 septembre 2022.\n\n"
             "Vous devrez fournir les justificatifs des critères administratifs d’éligibilité IAE que vous aviez "
@@ -93,13 +93,15 @@ class TestManagementCommand:
             "Nous vous rappelons que ce contrôle des DDETS doit être réalisé dans un délai de 6 semaines à compter du "
             "7 novembre 2022.\n\n" in mail1.body
         )
-        assert f"http://localhost:8000/siae_evaluation/siae_job_applications_list/{evaluated_siae1.pk}/" in mail1.body
+        assert (
+            f"http://localhost:8000/siae_evaluation/siae_job_applications_list/{evaluated_company_1.pk}/" in mail1.body
+        )
         assert mail2.subject == (
             "Contrôle a posteriori des auto-prescriptions : "
             "Plus que quelques jours pour transmettre vos justificatifs à la DDETS 02"
         )
         assert (
-            f"Nous vous rappelons que votre structure EI Bazar antique ID-{evaluated_siae2.siae_id} "
+            f"Nous vous rappelons que votre structure EI Bazar antique ID-{evaluated_company_2.siae_id} "
             "(SIRET : 12345678900012) est soumise à la procédure de contrôle a posteriori sur les embauches réalisées "
             "en auto-prescription du 1 janvier 2022 au 30 septembre 2022.\n\n"
             "Vous devrez fournir les justificatifs des critères administratifs d’éligibilité IAE que vous aviez "
@@ -107,7 +109,9 @@ class TestManagementCommand:
             "Nous vous rappelons que ce contrôle des DDETS doit être réalisé dans un délai de 6 semaines à compter du "
             "7 novembre 2022.\n\n" in mail2.body
         )
-        assert f"http://localhost:8000/siae_evaluation/siae_job_applications_list/{evaluated_siae2.pk}/" in mail2.body
+        assert (
+            f"http://localhost:8000/siae_evaluation/siae_job_applications_list/{evaluated_company_2.pk}/" in mail2.body
+        )
         assert mail3.subject == (
             "Contrôle a posteriori des auto-prescriptions : "
             "Plus que quelques jours pour transmettre vos justificatifs à la DDETS 02"
@@ -480,8 +484,8 @@ class TestManagementCommand:
             institution__name="DDETS 01",
             name="Campagne de test",
         )
-        siae = EvaluatedSiaeFactory(evaluation_campaign=campaign)
-        EvaluatedJobApplicationFactory(evaluated_siae=siae, complete=True)
+        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=campaign)
+        EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae, complete=True)
         campaign.freeze(timezone.now())
 
         call_command("evaluation_campaign_notify")
@@ -501,8 +505,10 @@ class TestManagementCommand:
             institution__name="DDETS 01",
             name="Campagne de test",
         )
-        siae = EvaluatedSiaeFactory(evaluation_campaign=campaign, reviewed_at=timezone.now() - relativedelta(days=15))
-        EvaluatedJobApplicationFactory(evaluated_siae=siae, complete=True)
+        evaluated_ = EvaluatedSiaeFactory(
+            evaluation_campaign=campaign, reviewed_at=timezone.now() - relativedelta(days=15)
+        )
+        EvaluatedJobApplicationFactory(evaluated_siae=evaluated_, complete=True)
         campaign.freeze(timezone.now())
 
         call_command("evaluation_campaign_notify")
@@ -522,8 +528,8 @@ class TestManagementCommand:
             institution__name="DDETS 01",
             name="Campagne de test",
         )
-        siae = EvaluatedSiaeFactory(evaluation_campaign=campaign)
-        EvaluatedJobApplicationFactory(evaluated_siae=siae, complete=True)
+        evaluated_ = EvaluatedSiaeFactory(evaluation_campaign=campaign)
+        EvaluatedJobApplicationFactory(evaluated_siae=evaluated_, complete=True)
         campaign.freeze(timezone.now())
 
         call_command("evaluation_campaign_notify")
@@ -543,8 +549,8 @@ class TestManagementCommand:
             institution__name="DDETS 01",
             name="Campagne de test",
         )
-        siae = EvaluatedSiaeFactory(evaluation_campaign=campaign, reviewed_at=reviewed_at)
-        EvaluatedJobApplicationFactory(evaluated_siae=siae, complete=True)
+        evaluated_ = EvaluatedSiaeFactory(evaluation_campaign=campaign, reviewed_at=reviewed_at)
+        EvaluatedJobApplicationFactory(evaluated_siae=evaluated_, complete=True)
         campaign.freeze(timezone.now())
 
         call_command("evaluation_campaign_notify")
@@ -561,8 +567,8 @@ class TestManagementCommand:
             institution__name="DDETS 01",
             name="Campagne de test",
         )
-        siae = EvaluatedSiaeFactory(evaluation_campaign=campaign)
-        EvaluatedJobApplicationFactory(evaluated_siae=siae, complete=True)
+        evaluated_ = EvaluatedSiaeFactory(evaluation_campaign=campaign)
+        EvaluatedJobApplicationFactory(evaluated_siae=evaluated_, complete=True)
         campaign.freeze(timezone.now())
 
         call_command("evaluation_campaign_notify")
@@ -576,8 +582,8 @@ class TestManagementCommand:
     @freeze_time("2023-01-18 11:11:11")
     def test_institution_submission_freeze_no_reminder_without_docs(self, capsys, mailoutbox, snapshot):
         campaign = EvaluationCampaignFactory(evaluations_asked_at=timezone.now() - relativedelta(weeks=3))
-        siae = EvaluatedSiaeFactory(evaluation_campaign=campaign)
-        EvaluatedJobApplicationFactory(evaluated_siae=siae)
+        evaluated_ = EvaluatedSiaeFactory(evaluation_campaign=campaign)
+        EvaluatedJobApplicationFactory(evaluated_siae=evaluated_)
         campaign.freeze(timezone.now())
 
         call_command("evaluation_campaign_notify")
@@ -594,8 +600,8 @@ class TestManagementCommand:
             institution__name="DDETS 01",
             name="Campagne de test",
         )
-        siae = EvaluatedSiaeFactory(evaluation_campaign=campaign)
-        EvaluatedJobApplicationFactory(evaluated_siae=siae, complete=True)
+        evaluated_ = EvaluatedSiaeFactory(evaluation_campaign=campaign)
+        EvaluatedJobApplicationFactory(evaluated_siae=evaluated_, complete=True)
         campaign.freeze(timezone.now())
 
         call_command("evaluation_campaign_notify")
@@ -615,12 +621,12 @@ class TestManagementCommand:
             institution__name="DDETS 01",
             name="Campagne de test",
         )
-        siae = EvaluatedSiaeFactory(
+        evaluated_ = EvaluatedSiaeFactory(
             evaluation_campaign=campaign,
             reviewed_at=timezone.now() - relativedelta(days=20),
             final_reviewed_at=timezone.now() - relativedelta(days=20),
         )
-        EvaluatedJobApplicationFactory(evaluated_siae=siae, complete=True)
+        EvaluatedJobApplicationFactory(evaluated_siae=evaluated_, complete=True)
         campaign.freeze(timezone.now())
 
         call_command("evaluation_campaign_notify")

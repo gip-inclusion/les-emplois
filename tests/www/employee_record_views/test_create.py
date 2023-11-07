@@ -11,7 +11,7 @@ from itou.users.enums import LackOfNIRReason
 from itou.utils.mocks.address_format import mock_get_geocoding_data
 from itou.utils.widgets import DuetDatePickerWidget
 from tests.asp.factories import CommuneFactory, CountryFranceFactory, CountryOutsideEuropeFactory
-from tests.companies.factories import SiaeWithMembershipAndJobsFactory
+from tests.companies.factories import CompanyWithMembershipAndJobsFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
 from tests.users.factories import JobSeekerWithAddressFactory, JobSeekerWithMockedAddressFactory
@@ -39,22 +39,22 @@ def _get_user_form_data(user):
 class AbstractCreateEmployeeRecordTest(TestCase):
     def setUp(self):
         super().setUp()
-        self.siae = SiaeWithMembershipAndJobsFactory(
+        self.company = CompanyWithMembershipAndJobsFactory(
             name="Evil Corp.", membership__user__first_name="Elliot", kind="EI"
         )
-        self.siae_without_perms = SiaeWithMembershipAndJobsFactory(
+        self.company_without_perms = CompanyWithMembershipAndJobsFactory(
             kind="EI", name="A-Team", membership__user__first_name="Hannibal"
         )
-        self.siae_bad_kind = SiaeWithMembershipAndJobsFactory(
+        self.company_bad_kind = CompanyWithMembershipAndJobsFactory(
             kind="EA", name="A-Team", membership__user__first_name="Barracus"
         )
 
-        self.user = self.siae.members.get(first_name="Elliot")
-        self.user_without_perms = self.siae_without_perms.members.get(first_name="Hannibal")
-        self.user_siae_bad_kind = self.siae_bad_kind.members.get(first_name="Barracus")
+        self.user = self.company.members.get(first_name="Elliot")
+        self.user_without_perms = self.company_without_perms.members.get(first_name="Hannibal")
+        self.user_siae_bad_kind = self.company_bad_kind.members.get(first_name="Barracus")
 
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
-            to_siae=self.siae,
+            to_siae=self.company,
             job_seeker_with_address=True,
         )
 
@@ -113,7 +113,7 @@ class AbstractCreateEmployeeRecordTest(TestCase):
         self.client.get(url)
 
         # Do not use financial annex number om ModelChoiceField: must pass an ID !
-        data = {"financial_annex": self.siae.convention.financial_annexes.first().id}
+        data = {"financial_annex": self.company.convention.financial_annexes.first().id}
         response = self.client.post(url, data)
 
         assert response.status_code == 302
@@ -267,7 +267,7 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
 
     def test_job_seeker_without_address(self):
         # Job seeker has no address filled (which should not happen without admin operation)
-        self.job_application = JobApplicationWithApprovalNotCancellableFactory(to_siae=self.siae)
+        self.job_application = JobApplicationWithApprovalNotCancellableFactory(to_siae=self.company)
 
         response = self.client.get(self.url)
         url = reverse("employee_record_views:create_step_2", args=(self.job_application.pk,))
@@ -292,7 +292,7 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
     def test_job_seeker_address_not_geolocated(self):
         # Job seeker has an address filled but can't be geolocated
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
-            to_siae=self.siae,
+            to_siae=self.company,
             job_seeker=JobSeekerWithAddressFactory(),
         )
         self.job_seeker = self.job_application.job_seeker
@@ -422,7 +422,7 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
     def setUp(self):
         super().setUp()
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
-            to_siae=self.siae,
+            to_siae=self.company,
             job_seeker=JobSeekerWithMockedAddressFactory(born_in_france=True),
         )
         self.job_seeker = self.job_application.job_seeker
@@ -558,7 +558,7 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
         # but incorrect context :
         # create another employee record with similar features
         dup_job_application = JobApplicationWithApprovalNotCancellableFactory(
-            to_siae=self.siae,
+            to_siae=self.company,
             job_seeker=self.job_seeker,
             approval=self.job_application.approval,
         )
@@ -591,7 +591,7 @@ class CreateEmployeeRecordStep4Test(AbstractCreateEmployeeRecordTest):
     def setUp(self):
         super().setUp()
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
-            to_siae=self.siae,
+            to_siae=self.company,
             job_seeker=JobSeekerWithMockedAddressFactory(born_in_france=True),
         )
         self.job_seeker = self.job_application.job_seeker
@@ -621,7 +621,7 @@ class CreateEmployeeRecordStep5Test(AbstractCreateEmployeeRecordTest):
     def setUp(self):
         super().setUp()
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
-            to_siae=self.siae,
+            to_siae=self.company,
             job_seeker=JobSeekerWithMockedAddressFactory(born_in_france=True),
         )
         self.job_seeker = self.job_application.job_seeker
@@ -669,7 +669,7 @@ class UpdateRejectedEmployeeRecordTest(AbstractCreateEmployeeRecordTest):
     def setUp(self):
         super().setUp()
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
-            to_siae=self.siae,
+            to_siae=self.company,
             job_seeker=JobSeekerWithMockedAddressFactory(born_in_france=True),
         )
         self.job_seeker = self.job_application.job_seeker

@@ -4,7 +4,7 @@ from django.utils.html import escape
 
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
-from tests.companies.factories import SiaeWithMembershipAndJobsFactory
+from tests.companies.factories import CompanyWithMembershipAndJobsFactory
 from tests.employee_record.factories import EmployeeRecordWithProfileFactory
 from tests.job_applications.factories import JobApplicationWithCompleteJobSeekerProfileFactory
 from tests.utils.test import TestCase
@@ -18,9 +18,9 @@ class DisableEmployeeRecordsTest(TestCase):
     def setUp(self):
         super().setUp()
         # User must be super user for UI first part (tmp)
-        self.siae = SiaeWithMembershipAndJobsFactory(name="Wanna Corp.", membership__user__first_name="Billy")
-        self.user = self.siae.members.get(first_name="Billy")
-        self.job_application = JobApplicationWithCompleteJobSeekerProfileFactory(to_siae=self.siae)
+        self.company = CompanyWithMembershipAndJobsFactory(name="Wanna Corp.", membership__user__first_name="Billy")
+        self.user = self.company.members.get(first_name="Billy")
+        self.job_application = JobApplicationWithCompleteJobSeekerProfileFactory(to_siae=self.company)
         self.employee_record = EmployeeRecordWithProfileFactory(job_application=self.job_application)
         self.url = reverse("employee_record_views:disable", args=(self.employee_record.id,))
         self.next_url = reverse("employee_record_views:list")

@@ -24,7 +24,7 @@ from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploi
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, RESULTS_BY_ADDRESS
 from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
-from tests.companies.factories import SiaeFactory
+from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
 from tests.prescribers.factories import (
@@ -398,10 +398,10 @@ class ModelTest(TestCase):
     def test_last_hire_was_made_by_siae(self):
         job_application = JobApplicationSentByJobSeekerFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
         user = job_application.job_seeker
-        siae = job_application.to_siae
-        assert user.last_hire_was_made_by_siae(siae)
-        siae2 = SiaeFactory()
-        assert not user.last_hire_was_made_by_siae(siae2)
+        company_1 = job_application.to_siae
+        assert user.last_hire_was_made_by_siae(company_1)
+        company_2 = CompanyFactory()
+        assert not user.last_hire_was_made_by_siae(company_2)
 
     def test_last_accepted_job_application(self):
         # Set 2 job applications with:
@@ -481,20 +481,20 @@ class ModelTest(TestCase):
     def test_can_edit_personal_information(self):
         authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
         unauthorized_prescriber = PrescriberFactory()
-        siae_member = SiaeFactory(with_membership=True).members.first()
+        employer = CompanyFactory(with_membership=True).members.first()
         job_seeker = JobSeekerFactory()
         user_created_by_prescriber = JobSeekerFactory(created_by=unauthorized_prescriber, last_login=None)
         logged_user_created_by_prescriber = JobSeekerFactory(
             created_by=unauthorized_prescriber, last_login=timezone.now()
         )
-        user_created_by_employer = JobSeekerFactory(created_by=siae_member, last_login=None)
-        logged_user_created_by_employer = JobSeekerFactory(created_by=siae_member, last_login=timezone.now())
+        user_created_by_employer = JobSeekerFactory(created_by=employer, last_login=None)
+        logged_user_created_by_employer = JobSeekerFactory(created_by=employer, last_login=timezone.now())
 
         specs = {
             "authorized_prescriber": {
                 "authorized_prescriber": True,
                 "unauthorized_prescriber": False,
-                "siae_member": False,
+                "employer": False,
                 "job_seeker": False,
                 "user_created_by_prescriber": True,
                 "logged_user_created_by_prescriber": False,
@@ -504,17 +504,17 @@ class ModelTest(TestCase):
             "unauthorized_prescriber": {
                 "authorized_prescriber": False,
                 "unauthorized_prescriber": True,
-                "siae_member": False,
+                "employer": False,
                 "job_seeker": False,
                 "user_created_by_prescriber": True,
                 "logged_user_created_by_prescriber": False,
                 "user_created_by_employer": False,
                 "logged_user_created_by_employer": False,
             },
-            "siae_member": {
+            "employer": {
                 "authorized_prescriber": False,
                 "unauthorized_prescriber": False,
-                "siae_member": True,
+                "employer": True,
                 "job_seeker": False,
                 "user_created_by_prescriber": True,
                 "logged_user_created_by_prescriber": False,
@@ -524,7 +524,7 @@ class ModelTest(TestCase):
             "job_seeker": {
                 "authorized_prescriber": False,
                 "unauthorized_prescriber": False,
-                "siae_member": False,
+                "employer": False,
                 "job_seeker": True,
                 "user_created_by_prescriber": False,
                 "logged_user_created_by_prescriber": False,
@@ -541,16 +541,16 @@ class ModelTest(TestCase):
     def test_can_view_personal_information(self):
         authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
         unauthorized_prescriber = PrescriberFactory()
-        siae_member = SiaeFactory(with_membership=True).members.first()
+        employer = CompanyFactory(with_membership=True).members.first()
         job_seeker = JobSeekerFactory()
         user_created_by_prescriber = JobSeekerFactory(created_by=unauthorized_prescriber, last_login=None)
-        user_created_by_employer = JobSeekerFactory(created_by=siae_member, last_login=None)
+        user_created_by_employer = JobSeekerFactory(created_by=employer, last_login=None)
 
         specs = {
             "authorized_prescriber": {
                 "authorized_prescriber": True,
                 "unauthorized_prescriber": False,
-                "siae_member": False,
+                "employer": False,
                 "job_seeker": True,
                 "user_created_by_prescriber": True,
                 "user_created_by_employer": True,
@@ -558,15 +558,15 @@ class ModelTest(TestCase):
             "unauthorized_prescriber": {
                 "authorized_prescriber": False,
                 "unauthorized_prescriber": True,
-                "siae_member": False,
+                "employer": False,
                 "job_seeker": False,
                 "user_created_by_prescriber": True,
                 "user_created_by_employer": False,
             },
-            "siae_member": {
+            "employer": {
                 "authorized_prescriber": False,
                 "unauthorized_prescriber": False,
-                "siae_member": True,
+                "employer": True,
                 "job_seeker": True,
                 "user_created_by_prescriber": True,
                 "user_created_by_employer": True,
@@ -574,7 +574,7 @@ class ModelTest(TestCase):
             "job_seeker": {
                 "authorized_prescriber": False,
                 "unauthorized_prescriber": False,
-                "siae_member": False,
+                "employer": False,
                 "job_seeker": True,
                 "user_created_by_prescriber": False,
                 "user_created_by_employer": False,
@@ -587,8 +587,8 @@ class ModelTest(TestCase):
                 ), f"{user_type}.can_view_personal_information({other_user_type})"
 
     def test_can_add_nir(self):
-        siae = SiaeFactory(with_membership=True)
-        employer = siae.members.first()
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
         prescriber_org = PrescriberOrganizationWithMembershipFactory(authorized=True)
         authorized_prescriber = prescriber_org.members.first()
         unauthorized_prescriber = PrescriberFactory()
@@ -626,29 +626,29 @@ class ModelTest(TestCase):
         assert user.has_verified_email
 
     def test_siae_admin_can_create_siae_antenna(self):
-        siae = SiaeFactory(with_membership=True, membership__is_admin=True)
-        user = siae.members.get()
-        assert user.can_create_siae_antenna(siae)
+        company = CompanyFactory(with_membership=True, membership__is_admin=True)
+        user = company.members.get()
+        assert user.can_create_siae_antenna(company)
 
     def test_siae_normal_member_cannot_create_siae_antenna(self):
-        siae = SiaeFactory(with_membership=True, membership__is_admin=False)
-        user = siae.members.get()
-        assert not user.can_create_siae_antenna(siae)
+        company = CompanyFactory(with_membership=True, membership__is_admin=False)
+        user = company.members.get()
+        assert not user.can_create_siae_antenna(company)
 
     def test_siae_admin_without_convention_cannot_create_siae_antenna(self):
-        siae = SiaeFactory(with_membership=True, convention=None)
-        user = siae.members.get()
-        assert not user.can_create_siae_antenna(siae)
+        company = CompanyFactory(with_membership=True, convention=None)
+        user = company.members.get()
+        assert not user.can_create_siae_antenna(company)
 
     def test_admin_ability_to_create_siae_antenna(self):
         for kind in CompanyKind:
             with self.subTest(kind=kind):
-                siae = SiaeFactory(kind=kind, with_membership=True, membership__is_admin=True)
-                user = siae.members.get()
+                company = CompanyFactory(kind=kind, with_membership=True, membership__is_admin=True)
+                user = company.members.get()
                 if kind == CompanyKind.GEIQ:
-                    assert user.can_create_siae_antenna(siae)
+                    assert user.can_create_siae_antenna(company)
                 else:
-                    assert user.can_create_siae_antenna(siae) == siae.should_have_convention
+                    assert user.can_create_siae_antenna(company) == company.should_have_convention
 
     def test_user_kind(self):
         non_staff_kinds = [
@@ -1107,37 +1107,37 @@ class LatestApprovalTestCase(TestCase):
         # Waiting period cannot be bypassed for SIAE if no prescriber
         # and there is no valid eligibility diagnosis this in period
         assert user.approval_can_be_renewed_by(
-            siae=SiaeFactory(kind=CompanyKind.ETTI), sender_prescriber_organization=None
+            siae=CompanyFactory(kind=CompanyKind.ETTI), sender_prescriber_organization=None
         )
 
         # Waiting period cannot be bypassed for SIAE if unauthorized prescriber
         # and there is no valid eligibility diagnosis this in period
         assert user.approval_can_be_renewed_by(
-            siae=SiaeFactory(kind=CompanyKind.ETTI),
+            siae=CompanyFactory(kind=CompanyKind.ETTI),
             sender_prescriber_organization=PrescriberOrganizationFactory(),
         )
 
         # Waiting period is bypassed for SIAE if authorized prescriber.
         assert not user.approval_can_be_renewed_by(
-            siae=SiaeFactory(kind=CompanyKind.ETTI),
+            siae=CompanyFactory(kind=CompanyKind.ETTI),
             sender_prescriber_organization=PrescriberOrganizationFactory(authorized=True),
         )
 
         # Waiting period is bypassed for GEIQ even if no prescriber.
         assert not user.approval_can_be_renewed_by(
-            siae=SiaeFactory(kind=CompanyKind.GEIQ), sender_prescriber_organization=None
+            siae=CompanyFactory(kind=CompanyKind.GEIQ), sender_prescriber_organization=None
         )
 
         # Waiting period is bypassed for GEIQ even if unauthorized prescriber.
         assert not user.approval_can_be_renewed_by(
-            siae=SiaeFactory(kind=CompanyKind.GEIQ),
+            siae=CompanyFactory(kind=CompanyKind.GEIQ),
             sender_prescriber_organization=PrescriberOrganizationFactory(),
         )
 
         # Waiting period is bypassed if a valid diagnosis made by an authorized prescriber exists.
         diag = EligibilityDiagnosisFactory(job_seeker=user)
         assert not user.approval_can_be_renewed_by(
-            siae=SiaeFactory(kind=CompanyKind.ETTI),
+            siae=CompanyFactory(kind=CompanyKind.ETTI),
             sender_prescriber_organization=None,
         )
         diag.delete()
@@ -1146,7 +1146,7 @@ class LatestApprovalTestCase(TestCase):
         # but was not made by an authorized prescriber.
         diag = EligibilityDiagnosisMadeBySiaeFactory(job_seeker=user)
         assert user.approval_can_be_renewed_by(
-            siae=SiaeFactory(kind=CompanyKind.ETTI),
+            siae=CompanyFactory(kind=CompanyKind.ETTI),
             sender_prescriber_organization=None,
         )
 

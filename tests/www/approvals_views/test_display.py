@@ -17,8 +17,8 @@ class TestDisplayApproval(TestCase):
     def test_display_job_app_approval(self, *args, **kwargs):
         job_application = JobApplicationFactory(with_approval=True)
 
-        siae_member = job_application.to_siae.members.first()
-        self.client.force_login(siae_member)
+        employer = job_application.to_siae.members.first()
+        self.client.force_login(employer)
 
         response = self.client.get(
             reverse("approvals:display_printable_approval", kwargs={"approval_id": job_application.approval_id})
@@ -42,8 +42,8 @@ class TestDisplayApproval(TestCase):
             created_at=job_application.created_at - relativedelta(days=1),
         )
 
-        siae_member = job_application.to_siae.members.first()
-        self.client.force_login(siae_member)
+        employer = job_application.to_siae.members.first()
+        self.client.force_login(employer)
 
         response = self.client.get(
             reverse("approvals:display_printable_approval", kwargs={"approval_id": job_application.approval_id})
@@ -61,8 +61,8 @@ class TestDisplayApproval(TestCase):
             with_approval=True, eligibility_diagnosis=None, approval__number="625741810181"
         )
 
-        siae_member = job_application.to_siae.members.first()
-        self.client.force_login(siae_member)
+        employer = job_application.to_siae.members.first()
+        self.client.force_login(employer)
 
         response = self.client.get(
             reverse("approvals:display_printable_approval", kwargs={"approval_id": job_application.approval_id})
@@ -83,8 +83,8 @@ class TestDisplayApproval(TestCase):
             origin=Origin.AI_STOCK,
         )
 
-        siae_member = job_application.to_siae.members.first()
-        self.client.force_login(siae_member)
+        employer = job_application.to_siae.members.first()
+        self.client.force_login(employer)
 
         response = self.client.get(
             reverse("approvals:display_printable_approval", kwargs={"approval_id": job_application.approval_id})
@@ -103,8 +103,8 @@ class TestDisplayApproval(TestCase):
             approval__origin=Origin.AI_STOCK,
         )
 
-        siae_member = job_application.to_siae.members.first()
-        self.client.force_login(siae_member)
+        employer = job_application.to_siae.members.first()
+        self.client.force_login(employer)
 
         response = self.client.get(
             reverse("approvals:display_printable_approval", kwargs={"approval_id": job_application.approval_id})

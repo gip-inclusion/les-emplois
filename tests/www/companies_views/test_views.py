@@ -13,11 +13,11 @@ from itou.utils import constants as global_constants
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_NO_RESULT_MOCK, BAN_GEOCODING_API_RESULT_MOCK
 from tests.cities.factories import create_city_vannes
 from tests.companies.factories import (
+    CompanyFactory,
+    CompanyWith2MembershipsFactory,
+    CompanyWithMembershipAndJobsFactory,
     JobDescriptionFactory,
     SiaeConventionFactory,
-    SiaeFactory,
-    SiaeWith2MembershipsFactory,
-    SiaeWithMembershipAndJobsFactory,
 )
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.utils.test import TestCase, parse_response_to_soup
@@ -37,33 +37,33 @@ class CardViewTest(TestCase):
         cls.vannes = create_city_vannes()
 
     def test_card(self):
-        siae = SiaeFactory(with_membership=True)
-        url = reverse("companies_views:card", kwargs={"siae_id": siae.pk})
+        company = CompanyFactory(with_membership=True)
+        url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
         response = self.client.get(url)
-        assert response.context["siae"] == siae
-        self.assertContains(response, escape(siae.display_name))
-        self.assertContains(response, siae.email)
-        self.assertContains(response, siae.phone)
+        assert response.context["siae"] == company
+        self.assertContains(response, escape(company.display_name))
+        self.assertContains(response, company.email)
+        self.assertContains(response, company.phone)
         self.assertNotContains(response, self.OTHER_TAB_ID)
         self.assertContains(response, self.APPLY)
 
     def test_card_no_active_members(self):
-        siae = SiaeFactory(with_membership=False, for_snapshot=True)
-        url = reverse("companies_views:card", kwargs={"siae_id": siae.pk})
+        company = CompanyFactory(with_membership=False, for_snapshot=True)
+        url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
         response = self.client.get(url)
         soup = parse_response_to_soup(response, selector="#main")
         assert str(soup) == self.snapshot()
 
     def test_card_no_active_jobs(self):
-        siae = SiaeFactory(name="les petits jardins", with_membership=True)
+        company = CompanyFactory(name="les petits jardins", with_membership=True)
         job_description = JobDescriptionFactory(
-            siae=siae,
+            siae=company,
             custom_name="Plaquiste",
             location=self.vannes,
             contract_type=ContractType.PERMANENT,
             is_active=False,
         )
-        url = reverse("companies_views:card", kwargs={"siae_id": siae.pk})
+        url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
         response = self.client.get(url)
         self.assertContains(
             response,
@@ -137,7 +137,7 @@ class CardViewTest(TestCase):
                       data-matomo-action="clic"
                       data-matomo-category="candidature"
                       data-matomo-option="clic-metiers"
-                      href="{job_description.get_absolute_url()}?back_url=/company/{siae.pk}/card">
+                      href="{job_description.get_absolute_url()}?back_url=/company/{company.pk}/card">
                     Plaquiste
                    </a>
                   </div>
@@ -158,7 +158,7 @@ class CardViewTest(TestCase):
              </div>
              <div class="d-flex justify-content-end mt-3">
               <a class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0"
-                 href="/apply/{siae.pk}/start"
+                 href="/apply/{company.pk}/start"
                  aria-label="Postuler aupr&egrave;s de l'employeur solidaire Les petits jardins">
                <i class="ri-draft-line">
                </i>
@@ -175,14 +175,14 @@ class CardViewTest(TestCase):
         self.assertContains(response, self.APPLY)
 
     def test_card_no_other_jobs(self):
-        siae = SiaeFactory(name="les petits jardins", with_membership=True)
+        company = CompanyFactory(name="les petits jardins", with_membership=True)
         job_description = JobDescriptionFactory(
-            siae=siae,
+            siae=company,
             custom_name="Plaquiste",
             location=self.vannes,
             contract_type=ContractType.PERMANENT,
         )
-        url = reverse("companies_views:card", kwargs={"siae_id": siae.pk})
+        url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
         response = self.client.get(url)
         self.assertContains(
             response,
@@ -237,7 +237,7 @@ class CardViewTest(TestCase):
                       data-matomo-action="clic"
                       data-matomo-category="candidature"
                       data-matomo-option="clic-metiers"
-                      href="{job_description.get_absolute_url()}?back_url=/company/{siae.pk}/card">
+                      href="{job_description.get_absolute_url()}?back_url=/company/{company.pk}/card">
                     Plaquiste
                    </a>
                   </div>
@@ -258,7 +258,7 @@ class CardViewTest(TestCase):
              </div>
              <div class="d-flex justify-content-end mt-3">
               <a class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0"
-                 href="/apply/{siae.pk}/start"
+                 href="/apply/{company.pk}/start"
                  aria-label="Postuler aupr&egrave;s de l'employeur solidaire Les petits jardins">
                <i class="ri-draft-line">
                </i>
@@ -275,25 +275,25 @@ class CardViewTest(TestCase):
         self.assertContains(response, self.APPLY)
 
     def test_card_active_and_other_jobs(self):
-        siae = SiaeFactory(name="les petits jardins", with_membership=True)
+        company = CompanyFactory(name="les petits jardins", with_membership=True)
         # Job appellation must be different, the factory picks one at random.
         app1, app2 = Appellation.objects.filter(code__in=["12001", "12007"]).order_by("code")
         active_job_description = JobDescriptionFactory(
-            siae=siae,
+            siae=company,
             custom_name="Plaquiste",
             location=self.vannes,
             contract_type=ContractType.PERMANENT,
             appellation=app1,
         )
         other_job_description = JobDescriptionFactory(
-            siae=siae,
+            siae=company,
             custom_name="Peintre",
             location=self.vannes,
             contract_type=ContractType.PERMANENT,
             appellation=app2,
             is_active=False,
         )
-        url = reverse("companies_views:card", kwargs={"siae_id": siae.pk})
+        url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
         response = self.client.get(url)
         self.assertContains(
             response,
@@ -362,7 +362,7 @@ class CardViewTest(TestCase):
                       data-matomo-action="clic"
                       data-matomo-category="candidature"
                       data-matomo-option="clic-metiers"
-                      href="{active_job_description.get_absolute_url()}?back_url=/company/{siae.pk}/card">
+                      href="{active_job_description.get_absolute_url()}?back_url=/company/{company.pk}/card">
                     Plaquiste
                    </a>
                   </div>
@@ -391,7 +391,7 @@ class CardViewTest(TestCase):
                       data-matomo-action="clic"
                       data-matomo-category="candidature"
                       data-matomo-option="clic-metiers"
-                      href="{other_job_description.get_absolute_url()}?back_url=/company/{siae.pk}/card">
+                      href="{other_job_description.get_absolute_url()}?back_url=/company/{company.pk}/card">
                     Peintre
                    </a>
                   </div>
@@ -412,7 +412,7 @@ class CardViewTest(TestCase):
              </div>
              <div class="d-flex justify-content-end mt-3">
               <a class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0"
-                 href="/apply/{siae.pk}/start"
+                 href="/apply/{company.pk}/start"
                  aria-label="Postuler aupr&egrave;s de l'employeur solidaire Les petits jardins">
                <i class="ri-draft-line">
                </i>
@@ -429,14 +429,14 @@ class CardViewTest(TestCase):
         self.assertContains(response, self.APPLY)
 
     def test_block_job_applications(self):
-        siae = SiaeFactory(block_job_applications=True)
+        company = CompanyFactory(block_job_applications=True)
         job_description = JobDescriptionFactory(
-            siae=siae,
+            siae=company,
             custom_name="Plaquiste",
             location=self.vannes,
             contract_type=ContractType.PERMANENT,
         )
-        url = reverse("companies_views:card", kwargs={"siae_id": siae.pk})
+        url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
         response = self.client.get(url)
         self.assertContains(
             response,
@@ -510,7 +510,7 @@ class CardViewTest(TestCase):
                       data-matomo-action="clic"
                       data-matomo-category="candidature"
                       data-matomo-option="clic-metiers"
-                      href="{job_description.get_absolute_url()}?back_url=/company/{siae.pk}/card">
+                      href="{job_description.get_absolute_url()}?back_url=/company/{company.pk}/card">
                     Plaquiste
                    </a>
                   </div>
@@ -539,18 +539,18 @@ class CardViewTest(TestCase):
 
 class JobDescriptionCardViewTest(TestCase):
     def test_job_description_card(self):
-        siae = SiaeWithMembershipAndJobsFactory()
-        job_description = siae.job_description_through.first()
+        company = CompanyWithMembershipAndJobsFactory()
+        job_description = company.job_description_through.first()
         job_description.description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         job_description.open_positions = 1234
         job_description.save()
         url = reverse("companies_views:job_description_card", kwargs={"job_description_id": job_description.pk})
         response = self.client.get(url)
         assert response.context["job"] == job_description
-        assert response.context["siae"] == siae
+        assert response.context["siae"] == company
         self.assertContains(response, job_description.description)
         self.assertContains(response, escape(job_description.display_name))
-        self.assertContains(response, escape(siae.display_name))
+        self.assertContains(response, escape(company.display_name))
         OPEN_POSITION_TEXT = "1234 postes ouverts au recrutement"
         self.assertContains(response, OPEN_POSITION_TEXT)
 
@@ -559,17 +559,17 @@ class JobDescriptionCardViewTest(TestCase):
         response = self.client.get(url)
         self.assertContains(response, job_description.description)
         self.assertContains(response, escape(job_description.display_name))
-        self.assertContains(response, escape(siae.display_name))
+        self.assertContains(response, escape(company.display_name))
         self.assertNotContains(response, OPEN_POSITION_TEXT)
 
 
 class ShowAndSelectFinancialAnnexTest(TestCase):
     def test_asp_source_siae_admin_can_see_but_cannot_select_af(self):
-        siae = SiaeFactory(with_membership=True)
-        user = siae.members.first()
-        assert siae.has_admin(user)
-        assert siae.should_have_convention
-        assert siae.source == Company.SOURCE_ASP
+        company = CompanyFactory(with_membership=True)
+        user = company.members.first()
+        assert company.has_admin(user)
+        assert company.should_have_convention
+        assert company.source == Company.SOURCE_ASP
 
         self.client.force_login(user)
         url = reverse("dashboard:index")
@@ -583,18 +583,18 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         assert response.status_code == 403
 
     def test_user_created_siae_admin_can_see_and_select_af(self):
-        siae = SiaeFactory(
+        company = CompanyFactory(
             source=Company.SOURCE_USER_CREATED,
             with_membership=True,
         )
-        user = siae.members.first()
-        old_convention = siae.convention
+        user = company.members.first()
+        old_convention = company.convention
         # Only conventions of the same SIREN can be selected.
-        new_convention = SiaeConventionFactory(siret_signature=f"{siae.siren}12345")
+        new_convention = SiaeConventionFactory(siret_signature=f"{company.siren}12345")
 
-        assert siae.has_admin(user)
-        assert siae.should_have_convention
-        assert siae.source == Company.SOURCE_USER_CREATED
+        assert company.has_admin(user)
+        assert company.should_have_convention
+        assert company.source == Company.SOURCE_USER_CREATED
 
         self.client.force_login(user)
         url = reverse("dashboard:index")
@@ -607,8 +607,8 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         response = self.client.get(url)
         assert response.status_code == 200
 
-        assert siae.convention == old_convention
-        assert siae.convention != new_convention
+        assert company.convention == old_convention
+        assert company.convention != new_convention
 
         post_data = {
             "financial_annexes": new_convention.financial_annexes.get().id,
@@ -616,16 +616,16 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         response = self.client.post(url, data=post_data)
         assert response.status_code == 302
 
-        siae.refresh_from_db()
-        assert siae.convention != old_convention
-        assert siae.convention == new_convention
+        company.refresh_from_db()
+        assert company.convention != old_convention
+        assert company.convention == new_convention
 
     def test_staff_created_siae_admin_cannot_see_nor_select_af(self):
-        siae = SiaeFactory(source=Company.SOURCE_STAFF_CREATED, with_membership=True)
-        user = siae.members.first()
-        assert siae.has_admin(user)
-        assert siae.should_have_convention
-        assert siae.source == Company.SOURCE_STAFF_CREATED
+        company = CompanyFactory(source=Company.SOURCE_STAFF_CREATED, with_membership=True)
+        user = company.members.first()
+        assert company.has_admin(user)
+        assert company.should_have_convention
+        assert company.source == Company.SOURCE_STAFF_CREATED
 
         self.client.force_login(user)
         url = reverse("dashboard:index")
@@ -639,11 +639,11 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         assert response.status_code == 403
 
     def test_asp_source_siae_non_admin_cannot_see_nor_select_af(self):
-        siae = SiaeFactory(membership__is_admin=False, with_membership=True)
-        user = siae.members.first()
-        assert not siae.has_admin(user)
-        assert siae.should_have_convention
-        assert siae.source == Company.SOURCE_ASP
+        company = CompanyFactory(membership__is_admin=False, with_membership=True)
+        user = company.members.first()
+        assert not company.has_admin(user)
+        assert company.should_have_convention
+        assert company.source == Company.SOURCE_ASP
 
         self.client.force_login(user)
         url = reverse("dashboard:index")
@@ -657,11 +657,11 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         assert response.status_code == 403
 
     def test_import_created_geiq_admin_cannot_see_nor_select_af(self):
-        siae = SiaeFactory(kind=CompanyKind.GEIQ, source=Company.SOURCE_GEIQ, with_membership=True)
-        user = siae.members.first()
-        assert siae.has_admin(user)
-        assert not siae.should_have_convention
-        assert siae.source == Company.SOURCE_GEIQ
+        company = CompanyFactory(kind=CompanyKind.GEIQ, source=Company.SOURCE_GEIQ, with_membership=True)
+        user = company.members.first()
+        assert company.has_admin(user)
+        assert not company.should_have_convention
+        assert company.source == Company.SOURCE_GEIQ
 
         self.client.force_login(user)
         url = reverse("dashboard:index")
@@ -675,11 +675,11 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         assert response.status_code == 403
 
     def test_user_created_geiq_admin_cannot_see_nor_select_af(self):
-        siae = SiaeFactory(kind=CompanyKind.GEIQ, source=Company.SOURCE_USER_CREATED, with_membership=True)
-        user = siae.members.first()
-        assert siae.has_admin(user)
-        assert not siae.should_have_convention
-        assert siae.source == Company.SOURCE_USER_CREATED
+        company = CompanyFactory(kind=CompanyKind.GEIQ, source=Company.SOURCE_USER_CREATED, with_membership=True)
+        user = company.members.first()
+        assert company.has_admin(user)
+        assert not company.should_have_convention
+        assert company.source == Company.SOURCE_USER_CREATED
 
         self.client.force_login(user)
         url = reverse("dashboard:index")
@@ -695,8 +695,8 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
 
 class CreateSiaeViewTest(TestCase):
     def test_create_non_preexisting_siae_outside_of_siren_fails(self):
-        siae = SiaeFactory(with_membership=True)
-        user = siae.members.first()
+        company = CompanyFactory(with_membership=True)
+        user = company.members.first()
 
         self.client.force_login(user)
 
@@ -706,12 +706,12 @@ class CreateSiaeViewTest(TestCase):
 
         new_siren = "9876543210"
         new_siret = f"{new_siren}1234"
-        assert siae.siren != new_siren
+        assert company.siren != new_siren
         assert not Company.objects.filter(siret=new_siret).exists()
 
         post_data = {
             "siret": new_siret,
-            "kind": siae.kind,
+            "kind": company.kind,
             "name": "FAMOUS SIAE SUB STRUCTURE",
             "source": Company.SOURCE_USER_CREATED,
             "address_line_1": "2 Rue de Soufflenheim",
@@ -725,7 +725,7 @@ class CreateSiaeViewTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
 
-        expected_message = f"Le SIRET doit commencer par le SIREN {siae.siren}"
+        expected_message = f"Le SIRET doit commencer par le SIREN {company.siren}"
         self.assertContains(response, escape(expected_message))
         expected_message = "La structure à laquelle vous souhaitez vous rattacher est déjà"
         self.assertNotContains(response, escape(expected_message))
@@ -733,8 +733,8 @@ class CreateSiaeViewTest(TestCase):
         assert not Company.objects.filter(siret=post_data["siret"]).exists()
 
     def test_create_preexisting_siae_outside_of_siren_fails(self):
-        siae = SiaeFactory(with_membership=True)
-        user = siae.members.first()
+        company = CompanyFactory(with_membership=True)
+        user = company.members.first()
 
         self.client.force_login(user)
 
@@ -742,14 +742,14 @@ class CreateSiaeViewTest(TestCase):
         response = self.client.get(url)
         assert response.status_code == 200
 
-        preexisting_siae = SiaeFactory()
-        new_siret = preexisting_siae.siret
-        assert siae.siren != preexisting_siae.siren
+        preexisting_company = CompanyFactory()
+        new_siret = preexisting_company.siret
+        assert company.siren != preexisting_company.siren
         assert Company.objects.filter(siret=new_siret).exists()
 
         post_data = {
             "siret": new_siret,
-            "kind": preexisting_siae.kind,
+            "kind": preexisting_company.kind,
             "name": "FAMOUS SIAE SUB STRUCTURE",
             "source": Company.SOURCE_USER_CREATED,
             "address_line_1": "2 Rue de Soufflenheim",
@@ -771,8 +771,8 @@ class CreateSiaeViewTest(TestCase):
         assert Company.objects.filter(siret=post_data["siret"]).count() == 1
 
     def test_cannot_create_siae_with_same_siret_and_same_kind(self):
-        siae = SiaeFactory(with_membership=True)
-        user = siae.members.first()
+        company = CompanyFactory(with_membership=True)
+        user = company.members.first()
 
         self.client.force_login(user)
 
@@ -781,8 +781,8 @@ class CreateSiaeViewTest(TestCase):
         assert response.status_code == 200
 
         post_data = {
-            "siret": siae.siret,
-            "kind": siae.kind,
+            "siret": company.siret,
+            "kind": company.kind,
             "name": "FAMOUS SIAE SUB STRUCTURE",
             "source": Company.SOURCE_USER_CREATED,
             "address_line_1": "2 Rue de Soufflenheim",
@@ -806,10 +806,10 @@ class CreateSiaeViewTest(TestCase):
 
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
     def test_cannot_create_siae_with_same_siret_and_different_kind(self, _mock_call_ban_geocoding_api):
-        siae = SiaeFactory(with_membership=True)
-        siae.kind = CompanyKind.ETTI
-        siae.save()
-        user = siae.members.first()
+        company = CompanyFactory(with_membership=True)
+        company.kind = CompanyKind.ETTI
+        company.save()
+        user = company.members.first()
 
         self.client.force_login(user)
 
@@ -818,7 +818,7 @@ class CreateSiaeViewTest(TestCase):
         assert response.status_code == 200
 
         post_data = {
-            "siret": siae.siret,
+            "siret": company.siret,
             "kind": CompanyKind.ACI,
             "name": "FAMOUS SIAE SUB STRUCTURE",
             "source": Company.SOURCE_USER_CREATED,
@@ -838,13 +838,13 @@ class CreateSiaeViewTest(TestCase):
 
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
     def test_cannot_create_siae_with_same_siren_and_different_kind(self, _mock_call_ban_geocoding_api):
-        siae = SiaeFactory(with_membership=True)
-        siae.kind = CompanyKind.ETTI
-        siae.save()
-        user = siae.members.first()
+        company = CompanyFactory(with_membership=True)
+        company.kind = CompanyKind.ETTI
+        company.save()
+        user = company.members.first()
 
-        new_siret = siae.siren + "12345"
-        assert siae.siret != new_siret
+        new_siret = company.siren + "12345"
+        assert company.siret != new_siret
 
         self.client.force_login(user)
 
@@ -869,13 +869,13 @@ class CreateSiaeViewTest(TestCase):
         response = self.client.post(url, data=post_data)
         assert response.status_code == 200
 
-        assert Company.objects.filter(siret=siae.siret).count() == 1
+        assert Company.objects.filter(siret=company.siret).count() == 1
         assert Company.objects.filter(siret=new_siret).count() == 0
 
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
     def test_create_siae_with_same_siren_and_same_kind(self, mock_call_ban_geocoding_api):
-        siae = SiaeFactory(with_membership=True)
-        user = siae.members.first()
+        company = CompanyFactory(with_membership=True)
+        user = company.members.first()
 
         self.client.force_login(user)
 
@@ -883,12 +883,12 @@ class CreateSiaeViewTest(TestCase):
         response = self.client.get(url)
         assert response.status_code == 200
 
-        new_siret = siae.siren + "12345"
-        assert siae.siret != new_siret
+        new_siret = company.siren + "12345"
+        assert company.siret != new_siret
 
         post_data = {
             "siret": new_siret,
-            "kind": siae.kind,
+            "kind": company.kind,
             "name": "FAMOUS SIAE SUB STRUCTURE",
             "source": Company.SOURCE_USER_CREATED,
             "address_line_1": "2 Rue de Soufflenheim",
@@ -905,39 +905,39 @@ class CreateSiaeViewTest(TestCase):
 
         mock_call_ban_geocoding_api.assert_called_once()
 
-        new_siae = Company.objects.get(siret=new_siret)
-        assert new_siae.has_admin(user)
-        assert siae.source == Company.SOURCE_ASP
-        assert new_siae.source == Company.SOURCE_USER_CREATED
-        assert new_siae.siret == post_data["siret"]
-        assert new_siae.kind == post_data["kind"]
-        assert new_siae.name == post_data["name"]
-        assert new_siae.address_line_1 == post_data["address_line_1"]
-        assert new_siae.city == post_data["city"]
-        assert new_siae.post_code == post_data["post_code"]
-        assert new_siae.department == post_data["department"]
-        assert new_siae.email == post_data["email"]
-        assert new_siae.phone == post_data["phone"]
-        assert new_siae.website == post_data["website"]
-        assert new_siae.description == post_data["description"]
-        assert new_siae.created_by == user
-        assert new_siae.source == Company.SOURCE_USER_CREATED
-        assert new_siae.is_active
-        assert new_siae.convention is not None
-        assert siae.convention == new_siae.convention
+        new_company = Company.objects.get(siret=new_siret)
+        assert new_company.has_admin(user)
+        assert company.source == Company.SOURCE_ASP
+        assert new_company.source == Company.SOURCE_USER_CREATED
+        assert new_company.siret == post_data["siret"]
+        assert new_company.kind == post_data["kind"]
+        assert new_company.name == post_data["name"]
+        assert new_company.address_line_1 == post_data["address_line_1"]
+        assert new_company.city == post_data["city"]
+        assert new_company.post_code == post_data["post_code"]
+        assert new_company.department == post_data["department"]
+        assert new_company.email == post_data["email"]
+        assert new_company.phone == post_data["phone"]
+        assert new_company.website == post_data["website"]
+        assert new_company.description == post_data["description"]
+        assert new_company.created_by == user
+        assert new_company.source == Company.SOURCE_USER_CREATED
+        assert new_company.is_active
+        assert new_company.convention is not None
+        assert company.convention == new_company.convention
 
         # This data comes from BAN_GEOCODING_API_RESULT_MOCK.
-        assert new_siae.coords == "SRID=4326;POINT (2.316754 48.838411)"
-        assert new_siae.latitude == 48.838411
-        assert new_siae.longitude == 2.316754
-        assert new_siae.geocoding_score == 0.587663373207207
+        assert new_company.coords == "SRID=4326;POINT (2.316754 48.838411)"
+        assert new_company.latitude == 48.838411
+        assert new_company.longitude == 2.316754
+        assert new_company.geocoding_score == 0.587663373207207
 
 
 class EditSiaeViewTest(TestCase):
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
     def test_edit(self, _unused_mock):
-        siae = SiaeFactory(with_membership=True)
-        user = siae.members.first()
+        company = CompanyFactory(with_membership=True)
+        user = company.members.first()
 
         self.client.force_login(user)
 
@@ -1008,29 +1008,29 @@ class EditSiaeViewTest(TestCase):
         self.assertRedirects(response, reverse("dashboard:index"))
 
         # refresh Siae, but using the siret to be sure we didn't mess with the PK
-        siae = Company.objects.get(siret=siae.siret)
+        company = Company.objects.get(siret=company.siret)
 
-        assert siae.brand == "NEW FAMOUS SIAE BRAND NAME"
-        assert siae.description == "Le meilleur des SIAEs !"
-        assert siae.email == "toto@titi.fr"
-        assert siae.phone == "0610203050"
-        assert siae.website == "https://famous-siae.com"
+        assert company.brand == "NEW FAMOUS SIAE BRAND NAME"
+        assert company.description == "Le meilleur des SIAEs !"
+        assert company.email == "toto@titi.fr"
+        assert company.phone == "0610203050"
+        assert company.website == "https://famous-siae.com"
 
-        assert siae.address_line_1 == "1 Rue Jeanne d'Arc"
-        assert siae.address_line_2 == ""
-        assert siae.post_code == "62000"
-        assert siae.city == "Arras"
-        assert siae.department == "62"
+        assert company.address_line_1 == "1 Rue Jeanne d'Arc"
+        assert company.address_line_2 == ""
+        assert company.post_code == "62000"
+        assert company.city == "Arras"
+        assert company.department == "62"
 
         # This data comes from BAN_GEOCODING_API_RESULT_MOCK.
-        assert siae.coords == "SRID=4326;POINT (2.316754 48.838411)"
-        assert siae.latitude == 48.838411
-        assert siae.longitude == 2.316754
-        assert siae.geocoding_score == 0.587663373207207
+        assert company.coords == "SRID=4326;POINT (2.316754 48.838411)"
+        assert company.latitude == 48.838411
+        assert company.longitude == 2.316754
+        assert company.geocoding_score == 0.587663373207207
 
     def test_permission(self):
-        siae = SiaeFactory(with_membership=True)
-        user = siae.members.first()
+        company = CompanyFactory(with_membership=True)
+        user = company.members.first()
 
         self.client.force_login(user)
 
@@ -1046,8 +1046,8 @@ class EditSiaeViewTest(TestCase):
 class EditSiaeViewWithWrongAddressTest(TestCase):
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_NO_RESULT_MOCK)
     def test_edit(self, _unused_mock):
-        siae = SiaeFactory(with_membership=True)
-        user = siae.members.first()
+        company = CompanyFactory(with_membership=True)
+        user = company.members.first()
 
         self.client.force_login(user)
 
@@ -1085,8 +1085,8 @@ class EditSiaeViewWithWrongAddressTest(TestCase):
 
 class MembersTest(TestCase):
     def test_members(self):
-        siae = SiaeFactory(with_membership=True)
-        user = siae.members.first()
+        company = CompanyFactory(with_membership=True)
+        user = company.members.first()
         self.client.force_login(user)
         url = reverse("companies_views:members")
         response = self.client.get(url)
@@ -1099,8 +1099,8 @@ class UserMembershipDeactivationTest(TestCase):
         A user, even if admin, can't self-deactivate
         (must be done by another admin)
         """
-        siae = SiaeFactory(with_membership=True)
-        admin = siae.members.filter(companymembership__is_admin=True).first()
+        company = CompanyFactory(with_membership=True)
+        admin = company.members.filter(companymembership__is_admin=True).first()
         memberships = admin.companymembership_set.all()
         membership = memberships.first()
 
@@ -1119,13 +1119,13 @@ class UserMembershipDeactivationTest(TestCase):
         Standard use case of user deactivation.
         Everything should be fine ...
         """
-        siae = SiaeWith2MembershipsFactory()
-        admin = siae.members.filter(companymembership__is_admin=True).first()
-        guest = siae.members.filter(companymembership__is_admin=False).first()
+        company = CompanyWith2MembershipsFactory()
+        admin = company.members.filter(companymembership__is_admin=True).first()
+        guest = company.members.filter(companymembership__is_admin=False).first()
 
         membership = guest.companymembership_set.first()
-        assert guest not in siae.active_admin_members
-        assert admin in siae.active_admin_members
+        assert guest not in company.active_admin_members
+        assert admin in company.active_admin_members
 
         self.client.force_login(admin)
         url = reverse("companies_views:deactivate_member", kwargs={"user_id": guest.id})
@@ -1142,7 +1142,7 @@ class UserMembershipDeactivationTest(TestCase):
         # User must have been notified of deactivation (we're human after all)
         assert len(mail.outbox) == 1
         email = mail.outbox[0]
-        assert f"[Désactivation] Vous n'êtes plus membre de {siae.display_name}" == email.subject
+        assert f"[Désactivation] Vous n'êtes plus membre de {company.display_name}" == email.subject
         assert "Un administrateur vous a retiré d'une structure sur les emplois de l'inclusion" in email.body
         assert email.to[0] == guest.email
 
@@ -1150,8 +1150,8 @@ class UserMembershipDeactivationTest(TestCase):
         """
         Non-admin user can't change memberships
         """
-        siae = SiaeWith2MembershipsFactory()
-        guest = siae.members.filter(companymembership__is_admin=False).first()
+        company = CompanyWith2MembershipsFactory()
+        guest = company.members.filter(companymembership__is_admin=False).first()
         self.client.force_login(guest)
         url = reverse("companies_views:deactivate_member", kwargs={"user_id": guest.id})
         response = self.client.post(url)
@@ -1164,9 +1164,9 @@ class UserMembershipDeactivationTest(TestCase):
         They are still "active" technically speaking, so if they
         are activated/invited again, they will be able to log in.
         """
-        siae = SiaeWith2MembershipsFactory()
-        admin = siae.members.filter(companymembership__is_admin=True).first()
-        guest = siae.members.filter(companymembership__is_admin=False).first()
+        company = CompanyWith2MembershipsFactory()
+        admin = company.members.filter(companymembership__is_admin=True).first()
+        guest = company.members.filter(companymembership__is_admin=False).first()
 
         self.client.force_login(admin)
         url = reverse("companies_views:deactivate_member", kwargs={"user_id": guest.id})
@@ -1187,12 +1187,12 @@ class UserMembershipDeactivationTest(TestCase):
         Check that a deactivated member can't access the structure
         from the dashboard selector
         """
-        siae2 = SiaeFactory(with_membership=True)
-        guest = siae2.members.first()
+        company_2 = CompanyFactory(with_membership=True)
+        guest = company_2.members.first()
 
-        siae = SiaeWith2MembershipsFactory()
-        admin = siae.members.first()
-        siae.members.add(guest)
+        company_1 = CompanyWith2MembershipsFactory()
+        admin = company_1.members.first()
+        company_1.members.add(guest)
 
         memberships = guest.companymembership_set.all()
         assert len(memberships) == 2
@@ -1221,9 +1221,9 @@ class SIAEAdminMembersManagementTest(TestCase):
         """
         Check the ability for an admin to add another admin to the siae
         """
-        siae = SiaeWith2MembershipsFactory()
-        admin = siae.members.filter(companymembership__is_admin=True).first()
-        guest = siae.members.filter(companymembership__is_admin=False).first()
+        company = CompanyWith2MembershipsFactory()
+        admin = company.members.filter(companymembership__is_admin=True).first()
+        guest = company.members.filter(companymembership__is_admin=False).first()
 
         self.client.force_login(admin)
         url = reverse("companies_views:update_admin_role", kwargs={"action": "add", "user_id": guest.id})
@@ -1236,13 +1236,13 @@ class SIAEAdminMembersManagementTest(TestCase):
         response = self.client.post(url)
         assert response.status_code == 302
 
-        siae.refresh_from_db()
-        assert guest in siae.active_admin_members
+        company.refresh_from_db()
+        assert guest in company.active_admin_members
 
         # The admin should receive a valid email
         assert len(mail.outbox) == 1
         email = mail.outbox[0]
-        assert f"[Activation] Vous êtes désormais administrateur de {siae.display_name}" == email.subject
+        assert f"[Activation] Vous êtes désormais administrateur de {company.display_name}" == email.subject
         assert "Vous êtes administrateur d'une structure sur les emplois de l'inclusion" in email.body
         assert email.to[0] == guest.email
 
@@ -1250,14 +1250,14 @@ class SIAEAdminMembersManagementTest(TestCase):
         """
         Check the ability for an admin to remove another admin
         """
-        siae = SiaeWith2MembershipsFactory()
-        admin = siae.members.filter(companymembership__is_admin=True).first()
-        guest = siae.members.filter(companymembership__is_admin=False).first()
+        company = CompanyWith2MembershipsFactory()
+        admin = company.members.filter(companymembership__is_admin=True).first()
+        guest = company.members.filter(companymembership__is_admin=False).first()
 
         membership = guest.companymembership_set.first()
         membership.is_admin = True
         membership.save()
-        assert guest in siae.active_admin_members
+        assert guest in company.active_admin_members
 
         self.client.force_login(admin)
         url = reverse("companies_views:update_admin_role", kwargs={"action": "remove", "user_id": guest.id})
@@ -1270,13 +1270,13 @@ class SIAEAdminMembersManagementTest(TestCase):
         response = self.client.post(url)
         assert response.status_code == 302
 
-        siae.refresh_from_db()
-        assert guest not in siae.active_admin_members
+        company.refresh_from_db()
+        assert guest not in company.active_admin_members
 
         # The admin should receive a valid email
         assert len(mail.outbox) == 1
         email = mail.outbox[0]
-        assert f"[Désactivation] Vous n'êtes plus administrateur de {siae.display_name}" == email.subject
+        assert f"[Désactivation] Vous n'êtes plus administrateur de {company.display_name}" == email.subject
         assert "Un administrateur vous a retiré les droits d'administrateur d'une structure" in email.body
         assert email.to[0] == guest.email
 
@@ -1284,9 +1284,9 @@ class SIAEAdminMembersManagementTest(TestCase):
         """
         Non-admin users can't update admin members
         """
-        siae = SiaeWith2MembershipsFactory()
-        admin = siae.members.filter(companymembership__is_admin=True).first()
-        guest = siae.members.filter(companymembership__is_admin=False).first()
+        company = CompanyWith2MembershipsFactory()
+        admin = company.members.filter(companymembership__is_admin=True).first()
+        guest = company.members.filter(companymembership__is_admin=False).first()
 
         self.client.force_login(guest)
         url = reverse("companies_views:update_admin_role", kwargs={"action": "remove", "user_id": admin.id})
@@ -1313,9 +1313,9 @@ class SIAEAdminMembersManagementTest(TestCase):
         Test "suspicious" actions: action code not registered for use (even if admin)
         """
         suspicious_action = "h4ckm3"
-        siae = SiaeWith2MembershipsFactory()
-        admin = siae.members.filter(companymembership__is_admin=True).first()
-        guest = siae.members.filter(companymembership__is_admin=False).first()
+        company = CompanyWith2MembershipsFactory()
+        admin = company.members.filter(companymembership__is_admin=True).first()
+        guest = company.members.filter(companymembership__is_admin=False).first()
 
         self.client.force_login(guest)
         # update: less test with RE_PATH

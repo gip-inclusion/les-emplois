@@ -161,20 +161,20 @@ class TestSiaeInvitation(TestCase):
     def test_add_member_to_siae(self):
         invitation = SentEmployerInvitationFactory(email="hey@you.com")
         EmployerFactory(email=invitation.email)
-        siae_members = invitation.siae.members.count()
+        employers = invitation.siae.members.count()
         invitation.add_invited_user_to_company()
-        siae_members_after = invitation.siae.members.count()
-        assert siae_members + 1 == siae_members_after
+        employers_after = invitation.siae.members.count()
+        assert employers + 1 == employers_after
 
     def test_add_inactive_member_back_to_siae(self):
         invitation = SentEmployerInvitationFactory(email="hey@you.com")
         CompanyMembershipFactory(siae=invitation.siae, user__email=invitation.email, is_active=False)
-        siae_members = invitation.siae.members.count()
+        employers = invitation.siae.members.count()
         siae_active_members = invitation.siae.active_members.count()
         invitation.add_invited_user_to_company()
-        siae_members_after = invitation.siae.members.count()
+        employers_after = invitation.siae.members.count()
         siae_active_members_after = invitation.siae.active_members.count()
-        assert siae_members == siae_members_after
+        assert employers == employers_after
         assert siae_active_members + 1 == siae_active_members_after
 
 

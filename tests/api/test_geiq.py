@@ -11,7 +11,7 @@ from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
 from itou.users.enums import UserKind
-from tests.companies.factories import SiaeFactory
+from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory, PriorActionFactory
 from tests.users.factories import ItouStaffFactory, JobSeekerWithAddressFactory
 
@@ -36,8 +36,8 @@ def test_candidatures_geiq_token_authentication():
     token = CompanyApiToken(label="test-token", key=TOKEN_KEY)
     token.save()
 
-    geiq = SiaeFactory(siret="11832575900001", kind=CompanyKind.GEIQ)
-    antenna = SiaeFactory(siret="11832575900037", kind=CompanyKind.GEIQ, source=Company.SOURCE_USER_CREATED)
+    geiq = CompanyFactory(siret="11832575900001", kind=CompanyKind.GEIQ)
+    antenna = CompanyFactory(siret="11832575900037", kind=CompanyKind.GEIQ, source=Company.SOURCE_USER_CREATED)
     token.siaes.add(geiq)
 
     JobApplicationFactory(state="accepted", to_siae=geiq)

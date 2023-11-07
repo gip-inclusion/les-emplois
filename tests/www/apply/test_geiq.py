@@ -7,7 +7,7 @@ from django.utils import dateformat, timezone
 from itou.companies.enums import CompanyKind
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
 from itou.utils.session import SessionNamespace
-from tests.companies.factories import SiaeWithMembershipAndJobsFactory
+from tests.companies.factories import CompanyWithMembershipAndJobsFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
@@ -20,7 +20,7 @@ pytestmark = pytest.mark.ignore_template_errors
 class JobApplicationGEIQEligibilityDetailsTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.geiq = SiaeWithMembershipAndJobsFactory(kind=CompanyKind.GEIQ)
+        cls.geiq = CompanyWithMembershipAndJobsFactory(kind=CompanyKind.GEIQ)
         cls.valid_diagnosis = GEIQEligibilityDiagnosisFactory(with_prescriber=True)
         cls.expired_diagnosis = GEIQEligibilityDiagnosisFactory(
             with_prescriber=True, expires_at=timezone.now() - relativedelta(months=1)
@@ -207,7 +207,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis(TestCase):
         cls.job_seeker = JobSeekerFactory()
         cls.job_seeker_in_qpv = JobSeekerWithAddressFactory(with_address_in_qpv=True)
         cls.job_seeker_in_zrr = JobSeekerWithAddressFactory(with_city_in_zrr=True)
-        cls.geiq = SiaeWithMembershipAndJobsFactory(kind=CompanyKind.GEIQ, with_jobs=True)
+        cls.geiq = CompanyWithMembershipAndJobsFactory(kind=CompanyKind.GEIQ, with_jobs=True)
         cls.prescriber_org = PrescriberOrganizationWithMembershipFactory(authorized=True)
 
     def _setup_session(self):

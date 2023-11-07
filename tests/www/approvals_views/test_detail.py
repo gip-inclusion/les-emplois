@@ -12,7 +12,7 @@ from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.utils.templatetags.format_filters import format_approval_number
 from tests.approvals.factories import ApprovalFactory, ProlongationFactory, SuspensionFactory
-from tests.companies.factories import CompanyMembershipFactory, SiaeFactory
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByPrescriberOrganizationFactory
 from tests.prescribers.factories import PrescriberFactory, PrescriberOrganizationFactory
@@ -50,8 +50,8 @@ class TestApprovalDetailView:
         # A third job application on another SIAE
         other_siae_job_application = JobApplicationFactory(job_seeker=job_application.job_seeker)
 
-        siae_member = job_application.to_siae.members.first()
-        client.force_login(siae_member)
+        employer = job_application.to_siae.members.first()
+        client.force_login(employer)
 
         url = reverse("approvals:detail", kwargs={"pk": approval.pk})
         response = client.get(url)
@@ -72,13 +72,13 @@ class TestApprovalDetailView:
 
     @pytest.mark.ignore_template_errors
     def test_detail_view_no_job_application(self, client):
-        siae = SiaeFactory(with_membership=True)
-        siae_member = siae.members.first()
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
         # Make sure the job seeker infos can be edited by the siae member
-        approval = ApprovalFactory(user__created_by=siae_member)
-        EligibilityDiagnosisFactory(job_seeker=approval.user, author_siae=siae)
+        approval = ApprovalFactory(user__created_by=employer)
+        EligibilityDiagnosisFactory(job_seeker=approval.user, author_siae=company)
 
-        client.force_login(siae_member)
+        client.force_login(employer)
 
         url = reverse("approvals:detail", kwargs={"pk": approval.pk})
         response = client.get(url)
@@ -285,8 +285,8 @@ class TestApprovalDetailView:
         approval = ApprovalFactory(with_jobapplication=True)
         job_application = approval.jobapplication_set.get()
         siae = job_application.to_siae
-        siae_member = siae.members.first()
-        client.force_login(siae_member)
+        employer = siae.members.first()
+        client.force_login(employer)
 
         url = reverse("approvals:detail", kwargs={"pk": approval.pk})
         assert approval.can_be_suspended_by_siae(siae)
@@ -314,8 +314,8 @@ class TestApprovalDetailView:
         )
         job_application = approval.jobapplication_set.get()
         siae = job_application.to_siae
-        siae_member = siae.members.first()
-        client.force_login(siae_member)
+        employer = siae.members.first()
+        client.force_login(employer)
 
         url = reverse("approvals:detail", kwargs={"pk": approval.pk})
         assert approval.can_be_prolonged
@@ -334,8 +334,8 @@ class TestApprovalDetailView:
     def test_edit_user_info_button(self, client):
         approval = ApprovalFactory(with_jobapplication=True)
         job_application = approval.jobapplication_set.get()
-        siae_member = job_application.to_siae.members.first()
-        client.force_login(siae_member)
+        employer = job_application.to_siae.members.first()
+        client.force_login(employer)
         url = reverse("approvals:detail", kwargs={"pk": approval.pk})
 
         user_info_edit_url = reverse(
