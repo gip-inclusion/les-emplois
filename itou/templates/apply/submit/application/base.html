@@ -92,14 +92,17 @@
                             {% block form_content %}{% endblock %}
 
                             <hr>
-                            <div class="form-row align-items-center justify-content-end">
+                            <div class="form-row align-items-center gx-3">
                                 {% if back_url %}
-                                    <div class="form-group mb-0 col-6 col-lg-auto">
-                                        <a class="btn btn-link btn-block" href="{{ back_url }}" aria-label="Retourner à l'étape précédente">Retour</a>
+                                    <div class="form-group col-12 col-lg order-2 order-lg-1">
+                                        <a class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="{{ back_url }}" aria-label="Retourner à l'étape précédente">
+                                            <i class="ri-arrow-go-back-line ri-lg"></i>
+                                            <span>Retour</span>
+                                        </a>
                                     </div>
                                 {% endif %}
                                 {% block form_submit_button %}
-                                    <div class="form-group mb-0 col-6 col-lg-auto">
+                                    <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
                                         <button type="submit" class="btn btn-primary btn-block" aria-label="Passer à l'étape suivante">Suivant</button>
                                     </div>
                                 {% endblock %}

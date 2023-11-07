@@ -41,14 +41,21 @@
 
                             {% include "apply/includes/profile_infos.html" %}
 
-                            <hr class="my-4">
-                            <div class="form-group text-end">
-                                <a class="btn btn-link" href="{{ back_url }}" aria-label="Retourner à l'étape précédente">Retour</a>
-                                {% if update_job_seeker %}
-                                    {% bootstrap_button "Valider les informations" button_type="submit" button_class="btn btn-primary" %}
-                                {% else %}
-                                    {% bootstrap_button "Créer le compte candidat" button_type="submit" button_class="btn btn-primary" %}
-                                {% endif %}
+                            <hr>
+                            <div class="form-row align-items-center gx-3">
+                                <div class="form-group col-12 col-lg order-2 order-lg-1">
+                                    <a href="{{ back_url }}" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Retourner à l'étape précédente">
+                                        <i class="ri-arrow-go-back-line ri-lg"></i>
+                                        <span>Retour</span>
+                                    </a>
+                                </div>
+                                <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
+                                    {% if update_job_seeker %}
+                                        {% bootstrap_button "Valider les informations" button_type="submit" button_class="btn btn-primary btn-block" %}
+                                    {% else %}
+                                        {% bootstrap_button "Créer le compte candidat" button_type="submit" button_class="btn btn-primary btn-block" %}
+                                    {% endif %}
+                                </div>
                             </div>
                         </form>
                     </div>

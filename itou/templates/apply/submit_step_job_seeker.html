@@ -39,15 +39,15 @@
             </div>
 
             <hr>
-            <div class="form-row align-items-center justify-content-end">
-                <div class="form-group mb-0 col-6 col-lg-auto">
-                    <a href="{{ back_url }}" class="btn btn-link btn-block" aria-label="Retourner à l'étape précédente">Retour</a>
+            <div class="form-row align-items-center gx-3">
+                <div class="form-group col-12 col-lg order-2 order-lg-1">
+                    <a href="{{ back_url }}" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Retourner à l'étape précédente">
+                        <i class="ri-arrow-go-back-line ri-lg"></i>
+                        <span>Retour</span>
+                    </a>
                 </div>
-                <div class="form-group mb-0 col-6 col-lg-auto">
-                    {# Reload this page and show a modal containing more information about the job seeker. #}
-                    <button type="submit" class="btn btn-primary btn-block" name="preview" value="1" aria-label="Passer à l'étape suivante">
-                        Suivant
-                    </button>
+                <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
+                    {% bootstrap_button "Suivant" button_type="submit" button_class="btn btn-primary btn-block" name="preview" value="1" %}
                 </div>
             </div>
         </div>
