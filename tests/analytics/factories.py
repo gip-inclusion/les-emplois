@@ -17,7 +17,7 @@ class StatsDashboardVisitFactory(factory.django.DjangoModelFactory):
     dashboard_id = factory.Faker("pyint")
     department = factory.fuzzy.FuzzyChoice(DEPARTMENTS.keys())
     region = factory.Faker("region", locale="fr_FR")
-    current_siae_id = factory.Faker("pyint")
+    current_company_id = factory.Faker("pyint")
     current_prescriber_organization_id = factory.Faker("pyint")
     current_institution_id = factory.Faker("pyint")
     user_kind = factory.fuzzy.FuzzyChoice(UserKind.values)

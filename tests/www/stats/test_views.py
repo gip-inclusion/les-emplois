@@ -62,7 +62,7 @@ def assert_stats_dashboard_equal(values):
             visit.dashboard_name,
             visit.department,
             visit.region,
-            visit.current_siae_id,
+            visit.current_company_id,
             visit.current_prescriber_organization_id,
             visit.current_institution_id,
             visit.user_kind,

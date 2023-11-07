@@ -40,7 +40,7 @@ class StatsDashboardVisit(models.Model):
     dashboard_name = models.TextField(verbose_name="nom de la vue du tableau de bord")
     department = models.CharField(verbose_name="département", choices=DEPARTMENTS.items(), max_length=3, null=True)
     region = models.TextField(verbose_name="région", null=True)
-    current_siae_id = models.IntegerField(verbose_name="ID SIAE courante", null=True)
+    current_company_id = models.IntegerField(verbose_name="ID entreprise courante", null=True)
     current_prescriber_organization_id = models.IntegerField(
         verbose_name="ID organisation prescriptrice courante", null=True
     )

@@ -60,10 +60,10 @@ DashboardVisitTable.add_columns(
             "fn": lambda o: o.region,
         },
         {
-            "name": "current_siae_id",
+            "name": "current_company_id",
             "type": "integer",
-            "comment": "ID SIAE courante",
-            "fn": lambda o: o.current_siae_id,
+            "comment": "ID entreprise courante",
+            "fn": lambda o: o.current_company_id,
         },
         {
             "name": "current_prescriber_organization_id",
