@@ -245,7 +245,7 @@ def join_siae(request, invitation_id):
     if not invitation.siae.is_active:
         messages.error(request, "Cette structure n'est plus active.")
     elif invitation.can_be_accepted:
-        invitation.add_invited_user_to_siae()
+        invitation.add_invited_user_to_company()
         invitation.accept()
         messages.success(request, f"Vous êtes désormais membre de la structure {invitation.siae.display_name}.")
     else:

@@ -241,7 +241,7 @@ class EmployerInvitation(InvitationAbstract):
     def acceptance_url_for_existing_user(self):
         return reverse("invitations_views:join_siae", kwargs={"invitation_id": self.pk})
 
-    def add_invited_user_to_siae(self):
+    def add_invited_user_to_company(self):
         user = User.objects.get(email=self.email)
         self.siae.members.add(user)
         user.save()
