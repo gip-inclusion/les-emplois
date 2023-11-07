@@ -10,7 +10,7 @@ from itou.analytics.models import StatsDashboardVisit
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION
 from itou.institutions.enums import InstitutionKind
 from itou.utils.apis.metabase import METABASE_DASHBOARDS
-from tests.companies.factories import SiaeFactory
+from tests.companies.factories import CompanyFactory
 from tests.institutions.factories import InstitutionWithMembershipFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import PrescriberFactory
@@ -121,8 +121,8 @@ def test_stats_prescriber_log_visit(client, view_name):
     ],
 )
 def test_stats_siae_log_visit(client, view_name, settings):
-    siae = SiaeFactory(name="El garaje de la esperanza", with_membership=True)
-    user = siae.members.get()
+    company = CompanyFactory(name="El garaje de la esperanza", with_membership=True)
+    user = company.members.get()
 
     settings.METABASE_SITE_URL = "http://metabase.fake"
     settings.METABASE_SECRET_KEY = "foobar"
@@ -139,9 +139,9 @@ def test_stats_siae_log_visit(client, view_name, settings):
         (
             METABASE_DASHBOARDS.get(view_name)["dashboard_id"],
             view_name,
-            siae.department,
-            DEPARTMENT_TO_REGION[siae.department],
-            siae.pk,
+            company.department,
+            DEPARTMENT_TO_REGION[company.department],
+            company.pk,
             None,
             None,
             user.kind,

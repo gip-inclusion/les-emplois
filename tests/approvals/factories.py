@@ -23,7 +23,7 @@ from itou.approvals.models import (
 )
 from itou.companies.enums import CompanyKind
 from itou.job_applications.models import JobApplicationWorkflow
-from tests.companies.factories import SiaeFactory
+from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory
 from tests.files.factories import FileFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
@@ -80,7 +80,7 @@ class SuspensionFactory(factory.django.DjangoModelFactory):
     approval = factory.SubFactory(ApprovalFactory)
     start_at = factory.Faker("date_between", start_date=factory.SelfAttribute("..approval.start_at"))
     end_at = factory.LazyAttribute(lambda obj: Suspension.get_max_end_at(obj.start_at))
-    siae = factory.SubFactory(SiaeFactory)
+    siae = factory.SubFactory(CompanyFactory)
 
 
 class BaseProlongationFactory(factory.django.DjangoModelFactory):
@@ -108,7 +108,7 @@ class BaseProlongationFactory(factory.django.DjangoModelFactory):
     reason = ProlongationReason.COMPLETE_TRAINING.value
     reason_explanation = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
     declared_by = factory.LazyAttribute(lambda obj: obj.declared_by_siae.members.first())
-    declared_by_siae = factory.SubFactory(SiaeFactory, with_membership=True)
+    declared_by_siae = factory.SubFactory(CompanyFactory, with_membership=True)
     validated_by = factory.SubFactory(PrescriberFactory, membership__organization__authorized=True)
     created_by = factory.SelfAttribute("declared_by")
 

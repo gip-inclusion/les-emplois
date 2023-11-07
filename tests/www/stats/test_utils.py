@@ -6,7 +6,7 @@ from itou.institutions.enums import InstitutionKind
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.utils.perms.middleware import ItouCurrentOrganizationMiddleware
 from itou.www.stats import utils
-from tests.companies.factories import SiaeFactory
+from tests.companies.factories import CompanyFactory
 from tests.institutions.factories import InstitutionWithMembershipFactory
 from tests.prescribers.factories import (
     PrescriberOrganizationWithMembershipFactory,
@@ -28,8 +28,8 @@ def get_request(user):
 
 
 def test_can_view_stats_siae():
-    siae = SiaeFactory(with_membership=True)
-    user = siae.members.get()
+    company = CompanyFactory(with_membership=True)
+    user = company.members.get()
 
     request = get_request(user)
     assert utils.can_view_stats_siae(request)

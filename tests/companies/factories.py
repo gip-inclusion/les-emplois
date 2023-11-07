@@ -72,14 +72,14 @@ def _create_fake_postcode():
     return postcode[:5]
 
 
-class SiaeFactory(factory.django.DjangoModelFactory):
-    """Generate a Siae() object for unit tests.
+class CompanyFactory(factory.django.DjangoModelFactory):
+    """Generate a Company() object for unit tests.
 
     Usage:
-        SiaeFactory(subject_to_eligibility=True, ...)
-        SiaeFactory(not_subject_to_eligibility=True, ...)
-        SiaeFactory(with_membership=True, ...)
-        SiaeFactory(with_jobs=True, romes=("N1101", "N1105", "N1103", "N4105"), ...)
+        CompanyFactory(subject_to_eligibility=True, ...)
+        CompanyFactory(not_subject_to_eligibility=True, ...)
+        CompanyFactory(with_membership=True, ...)
+        CompanyFactory(with_jobs=True, romes=("N1101", "N1105", "N1103", "N4105"), ...)
     """
 
     class Meta:
@@ -134,7 +134,7 @@ class SiaeFactory(factory.django.DjangoModelFactory):
 
 class CompanyMembershipFactory(factory.django.DjangoModelFactory):
     """
-    Generate an CompanyMembership() object (with its related Siae() and User() objects) for unit tests.
+    Generate an CompanyMembership() object (with its related Company() and User() objects) for unit tests.
     https://factoryboy.readthedocs.io/en/latest/recipes.html#many-to-many-relation-with-a-through
     """
 
@@ -142,13 +142,13 @@ class CompanyMembershipFactory(factory.django.DjangoModelFactory):
         model = models.CompanyMembership
 
     user = factory.SubFactory(EmployerFactory)
-    siae = factory.SubFactory(SiaeFactory)
+    siae = factory.SubFactory(CompanyFactory)
     is_admin = True
 
 
-class SiaeWith2MembershipsFactory(SiaeFactory):
+class CompanyWith2MembershipsFactory(CompanyFactory):
     """
-    Generates an Siae() object with 2 members for unit tests.
+    Generates an Company() object with 2 members for unit tests.
     https://factoryboy.readthedocs.io/en/latest/recipes.html#many-to-many-relation-with-a-through
     """
 
@@ -156,9 +156,9 @@ class SiaeWith2MembershipsFactory(SiaeFactory):
     membership2 = factory.RelatedFactory(CompanyMembershipFactory, "siae", is_admin=False)
 
 
-class SiaeWith4MembershipsFactory(SiaeFactory):
+class CompanyWith4MembershipsFactory(CompanyFactory):
     """
-    Generates an Siae() object with 4 members for unit tests.
+    Generates an Company() object with 4 members for unit tests.
     https://factoryboy.readthedocs.io/en/latest/recipes.html#many-to-many-relation-with-a-through
     """
 
@@ -172,7 +172,7 @@ class SiaeWith4MembershipsFactory(SiaeFactory):
     membership4 = factory.RelatedFactory(CompanyMembershipFactory, "siae", is_admin=False, user__is_active=False)
 
 
-SiaeWithMembershipAndJobsFactory = functools.partial(SiaeFactory, with_membership=True, with_jobs=True)
+CompanyWithMembershipAndJobsFactory = functools.partial(CompanyFactory, with_membership=True, with_jobs=True)
 
 
 class SiaeConventionPendingGracePeriodFactory(SiaeConventionFactory):
@@ -184,7 +184,7 @@ class SiaeConventionPendingGracePeriodFactory(SiaeConventionFactory):
     deactivated_at = factory.LazyFunction(lambda: timezone.now() - GRACE_PERIOD + ONE_DAY)
 
 
-class SiaePendingGracePeriodFactory(SiaeFactory):
+class CompanyPendingGracePeriodFactory(CompanyFactory):
     convention = factory.SubFactory(SiaeConventionPendingGracePeriodFactory)
 
 
@@ -197,7 +197,7 @@ class SiaeConventionAfterGracePeriodFactory(SiaeConventionFactory):
     deactivated_at = factory.LazyFunction(lambda: timezone.now() - GRACE_PERIOD - ONE_DAY)
 
 
-class SiaeAfterGracePeriodFactory(SiaeFactory):
+class CompanyAfterGracePeriodFactory(CompanyFactory):
     convention = factory.SubFactory(SiaeConventionAfterGracePeriodFactory)
 
 
@@ -206,7 +206,7 @@ class JobDescriptionFactory(factory.django.DjangoModelFactory):
         model = models.JobDescription
 
     appellation = factory.LazyAttribute(lambda obj: Appellation.objects.order_by("?").first())
-    siae = factory.SubFactory(SiaeFactory)
+    siae = factory.SubFactory(CompanyFactory)
     description = factory.Faker("sentence", locale="fr_FR")
     contract_type = factory.fuzzy.FuzzyChoice(ContractType.values)
     location = factory.LazyAttribute(lambda obj: City.objects.order_by("?").first())

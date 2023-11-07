@@ -8,7 +8,7 @@ from django.urls import reverse
 from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER
 from itou.users.models import User
 from itou.utils import constants as global_constants
-from tests.companies.factories import SiaeFactory
+from tests.companies.factories import CompanyFactory
 from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
 from tests.openid_connect.inclusion_connect.tests import mock_oauth_dance
 from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
@@ -87,10 +87,10 @@ class WelcomingTourTest(InclusionConnectBaseTestCase):
 
     @respx.mock
     def test_new_employer_sees_welcoming_tour(self):
-        siae = SiaeFactory(with_membership=True)
-        token = siae.get_token()
-        previous_url = reverse("signup:siae_user", args=(siae.pk, token))
-        next_url = reverse("signup:siae_join", args=(siae.pk, token))
+        company = CompanyFactory(with_membership=True)
+        token = company.get_token()
+        previous_url = reverse("signup:siae_user", args=(company.pk, token))
+        next_url = reverse("signup:siae_join", args=(company.pk, token))
         response = mock_oauth_dance(
             self.client,
             KIND_EMPLOYER,
@@ -118,11 +118,11 @@ class WelcomingTourExceptions(TestCase):
         return response
 
     def test_new_job_seeker_is_redirected_after_welcoming_tour_test(self):
-        siae = SiaeFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True)
         job_seeker = JobSeekerFactory.build()
 
         # First signup step: job seeker NIR.
-        next_to = reverse("apply:start", kwargs={"siae_pk": siae.pk})
+        next_to = reverse("apply:start", kwargs={"siae_pk": company.pk})
         url = f"{reverse('signup:job_seeker_nir')}?next={next_to}"
         self.client.post(url, {"nir": job_seeker.nir, "confirm": 1})
 

@@ -2,7 +2,7 @@ from django.urls import reverse
 from rest_framework.test import APIClient, APITestCase
 
 from tests.asp.factories import CommuneFactory, CountryFactory
-from tests.companies.factories import SiaeFactory
+from tests.companies.factories import CompanyFactory
 from tests.institutions.factories import InstitutionWithMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
@@ -39,8 +39,8 @@ class ApplicantsAPITest(APITestCase):
 
     def test_api_user_has_unique_siae_membership(self):
         # Connected user must only be member of target SIAE
-        user = SiaeFactory(with_membership=True).members.first()
-        SiaeFactory(with_membership=True).members.add(user)
+        user = CompanyFactory(with_membership=True).members.first()
+        CompanyFactory(with_membership=True).members.add(user)
 
         self.client.force_authenticate(user)
         response = self.client.get(self.url, format="json")
@@ -49,7 +49,7 @@ class ApplicantsAPITest(APITestCase):
 
     def test_api_user_is_admin(self):
         # Connected user must only be admin of target SIAE
-        user = SiaeFactory(with_membership=True).members.first()
+        user = CompanyFactory(with_membership=True).members.first()
         membership = user.companymembership_set.first()
         membership.is_admin = False
         membership.save()
@@ -61,7 +61,7 @@ class ApplicantsAPITest(APITestCase):
 
     def test_login_as_siae(self):
         # Connect with an admin user with member of a sigle SIAE
-        user = SiaeFactory(with_membership=True).members.first()
+        user = CompanyFactory(with_membership=True).members.first()
         self.client.force_authenticate(user)
 
         with self.assertNumQueries(
@@ -75,8 +75,8 @@ class ApplicantsAPITest(APITestCase):
         assert response.json().get("results") == []
 
     def test_applicant_data(self):
-        siae = SiaeFactory(with_membership=True)
-        job_seeker1 = JobApplicationFactory(to_siae=siae).job_seeker
+        company = CompanyFactory(with_membership=True)
+        job_seeker1 = JobApplicationFactory(to_siae=company).job_seeker
         # Will not refactor ASP factories:
         # - too long,
         # - not the point
@@ -91,7 +91,7 @@ class ApplicantsAPITest(APITestCase):
         job_seeker1.jobseeker_profile.birth_place = CommuneFactory()
         job_seeker1.jobseeker_profile.birth_country = CountryFactory()
         job_seeker1.jobseeker_profile.save()
-        job_seeker2 = JobApplicationFactory(to_siae=siae).job_seeker
+        job_seeker2 = JobApplicationFactory(to_siae=company).job_seeker
         job_seeker2.address_line_1 = "2nd address test"
         job_seeker2.address_line_2 = "2nd address 2"
         job_seeker2.post_code = "59000"
@@ -101,7 +101,7 @@ class ApplicantsAPITest(APITestCase):
         job_seeker2.jobseeker_profile.birth_place = CommuneFactory()
         job_seeker2.jobseeker_profile.birth_country = CountryFactory()
         job_seeker2.jobseeker_profile.save()
-        user = siae.members.first()
+        user = company.members.first()
 
         self.client.force_authenticate(user)
         with self.assertNumQueries(

@@ -13,7 +13,7 @@ from itou.jobs.models import Appellation
 from itou.utils.types import InclusiveDateRange
 from tests.approvals.factories import ApprovalFactory
 from tests.asp.factories import CommuneFactory, CountryFranceFactory
-from tests.companies.factories import SiaeFactory
+from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory
 from tests.prescribers.factories import (
     PrescriberOrganizationWithMembershipFactory,
@@ -44,7 +44,7 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
         )
         # GEIQ diagnosis created by a GEIQ
         with_geiq_eligibility_diagnosis = factory.Trait(
-            to_siae=factory.SubFactory(SiaeFactory, with_membership=True, kind=CompanyKind.GEIQ),
+            to_siae=factory.SubFactory(CompanyFactory, with_membership=True, kind=CompanyKind.GEIQ),
             sender=factory.LazyAttribute(lambda obj: obj.to_siae.members.first()),
             geiq_eligibility_diagnosis=factory.SubFactory(
                 GEIQEligibilityDiagnosisFactory,
@@ -56,7 +56,7 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
             eligibility_diagnosis=None,
         )
         with_geiq_eligibility_diagnosis_from_prescriber = factory.Trait(
-            to_siae=factory.SubFactory(SiaeFactory, with_membership=True, kind=CompanyKind.GEIQ),
+            to_siae=factory.SubFactory(CompanyFactory, with_membership=True, kind=CompanyKind.GEIQ),
             sender=factory.LazyAttribute(lambda obj: obj.sender_prescriber_organization.members.first()),
             geiq_eligibility_diagnosis=factory.SubFactory(
                 GEIQEligibilityDiagnosisFactory,
@@ -78,7 +78,7 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
         )
 
     job_seeker = factory.SubFactory(JobSeekerFactory)
-    to_siae = factory.SubFactory(SiaeFactory, with_membership=True)
+    to_siae = factory.SubFactory(CompanyFactory, with_membership=True)
     message = factory.Faker("sentence", nb_words=40)
     answer = factory.Faker("sentence", nb_words=40)
     hiring_start_at = factory.LazyFunction(lambda: datetime.now(timezone.utc).date())

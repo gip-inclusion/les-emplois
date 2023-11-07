@@ -1,7 +1,7 @@
 from django.urls import reverse
 
 from tests.cities.factories import create_test_cities
-from tests.companies.factories import SiaeFactory
+from tests.companies.factories import CompanyFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.utils.test import TestCase
 
@@ -14,7 +14,7 @@ class JobsAutocompleteTest(TestCase):
         # Update:
         # - autocomplete URL now needs a SIAE parameter (for existing ROME filtering)
         # - this URL does not accept create / update / delete of elements (removed some some tests)
-        cls.siae = SiaeFactory()
+        cls.company = CompanyFactory()
         cls.url = reverse("autocomplete:jobs")
 
     def test_search_multi_words(self):
@@ -22,7 +22,7 @@ class JobsAutocompleteTest(TestCase):
             self.url,
             {
                 "term": "cariste ferroviaire",
-                "siae_id": self.siae.id,
+                "siae_id": self.company.id,
             },
         )
         assert response.status_code == 200
@@ -41,7 +41,7 @@ class JobsAutocompleteTest(TestCase):
             self.url,
             {
                 "term": "CHAUFFEUR livreuse n4105",
-                "siae_id": self.siae.id,
+                "siae_id": self.company.id,
             },
         )
         assert response.status_code == 200
@@ -60,7 +60,7 @@ class JobsAutocompleteTest(TestCase):
             self.url,
             {
                 "term": "    ",
-                "siae_id": self.siae.id,
+                "siae_id": self.company.id,
             },
         )
         assert response.status_code == 200
@@ -72,7 +72,7 @@ class JobsAutocompleteTest(TestCase):
             self.url,
             {
                 "term": "Conducteur / Conductrice de chariot élévateur de l'armée (N1101)",
-                "siae_id": self.siae.id,
+                "siae_id": self.company.id,
             },
         )
         assert response.status_code == 200
@@ -91,7 +91,7 @@ class JobsAutocompleteTest(TestCase):
             self.url,
             {
                 "term": "conducteur:* & & de:* & !chariot:* & <eleva:*>>>> & armee:* & `(((()))`):*",
-                "siae_id": self.siae.id,
+                "siae_id": self.company.id,
             },
         )
         assert response.status_code == 200
@@ -114,7 +114,7 @@ class Select2JobsAutocompleteTest(TestCase):
         # Update:
         # - autocomplete URL now needs a SIAE parameter (for existing ROME filtering)
         # - this URL does not accept create / update / delete of elements (removed some some tests)
-        cls.siae = SiaeFactory()
+        cls.company = CompanyFactory()
         cls.url = reverse("autocomplete:jobs")
 
     def test_search_multi_words(self):

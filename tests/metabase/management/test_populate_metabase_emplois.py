@@ -23,7 +23,7 @@ from tests.approvals.factories import (
     ProlongationRequestDenyInformationFactory,
     ProlongationWithRequestFactory,
 )
-from tests.companies.factories import CompanyMembershipFactory, JobDescriptionFactory, SiaeFactory
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, JobDescriptionFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory
 from tests.geo.factories import QPVFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
@@ -179,7 +179,7 @@ def test_populate_job_seekers():
         with_approval=True,
         eligibility_diagnosis__author_kind=UserKind.EMPLOYER,
         eligibility_diagnosis__author_prescriber_organization=None,
-        eligibility_diagnosis__author_siae=SiaeFactory(),
+        eligibility_diagnosis__author_siae=CompanyFactory(),
         to_siae__kind="ETTI",
     )
     # Older accepted job_application with no eligibility diagnosis
@@ -409,14 +409,14 @@ def test_populate_criteria():
 @pytest.mark.usefixtures("metabase")
 def test_populate_job_applications():
     create_test_romes_and_appellations(["M1805"], appellations_per_rome=1)
-    siae = SiaeFactory(
+    company = CompanyFactory(
         for_snapshot=True,
         siret="12989128580059",
         # also means that the SIAE will be active, thus the job description also will be.
         # this would also be a source of flakyness if not enforced.
         kind="GEIQ",
     )
-    job = JobDescriptionFactory(is_active=True, siae=siae)
+    job = JobDescriptionFactory(is_active=True, siae=company)
     ja = JobApplicationFactory(with_geiq_eligibility_diagnosis=True, contract_type=ContractType.APPRENTICESHIP)
     ja.selected_jobs.add(job)
 
@@ -895,7 +895,7 @@ def test_populate_users():
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
 def test_populate_memberships():
-    siae_membership = CompanyMembershipFactory()
+    company_membership = CompanyMembershipFactory()
     CompanyMembershipFactory(is_active=False)  # Inactive siae memberships are ignored.
     prescriber_membership = PrescriberMembershipFactory()
     PrescriberMembershipFactory(is_active=False)
@@ -935,9 +935,9 @@ def test_populate_memberships():
         rows = cursor.fetchall()
         assert rows == [
             (
-                siae_membership.user_id,
+                company_membership.user_id,
                 True,
-                siae_membership.siae_id,
+                company_membership.siae_id,
                 None,
                 None,
                 datetime.date(2023, 2, 1),
@@ -1013,14 +1013,14 @@ def test_data_inconsistencies(capsys):
 @pytest.mark.usefixtures("metabase")
 def test_populate_fiches_de_poste():
     create_test_romes_and_appellations(["M1805"], appellations_per_rome=1)
-    siae = SiaeFactory(
+    company = CompanyFactory(
         for_snapshot=True,
         siret="12989128580059",
         # also means that the SIAE will be active, thus the job description also will be.
         # this would also be a source of flakyness if not enforced.
         kind="GEIQ",
     )
-    job = JobDescriptionFactory(is_active=False, siae=siae)
+    job = JobDescriptionFactory(is_active=False, siae=company)
 
     # trigger the first .from_db() call and populate _old_is_active.
     # please note that .refresh_from_db() would call .from_db() but _old_is_active
@@ -1066,7 +1066,7 @@ def test_populate_fiches_de_poste():
                 "M1805",
                 "Études et développement informatique",
                 1,
-                siae.pk,
+                company.pk,
                 "GEIQ",
                 "12989128580059",
                 "Acme inc.",
@@ -1092,7 +1092,7 @@ def test_populate_fiches_de_poste():
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
 def test_populate_siaes():
-    siae = SiaeFactory(
+    company = CompanyFactory(
         for_snapshot=True,
         siret="17643069438162",
         naf="1071A",
@@ -1126,10 +1126,10 @@ def test_populate_siaes():
         assert len(rows) == 1
         assert rows == [
             (
-                siae.pk,
-                siae.convention.asp_id,
+                company.pk,
+                company.convention.asp_id,
                 "Acme inc.",
-                f"EI - ID {siae.pk} - Acme inc.",
+                f"EI - ID {company.pk} - Acme inc.",
                 "",
                 "EI",
                 "17643069438162",

@@ -96,7 +96,7 @@ class EmployeeRecordAPIFetchListTest(APITestCase):
         self.employee_record.update_as_ready()
 
         self.siae = job_application.to_siae
-        self.siae_member = self.siae.members.first()
+        self.employer = self.siae.members.first()
         self.user = job_application.job_seeker
 
     @mock.patch(
@@ -108,7 +108,7 @@ class EmployeeRecordAPIFetchListTest(APITestCase):
         Fetch list of employee records with and without `status` query param
         """
         # Using session auth (same as token but less steps)
-        self.client.force_login(self.siae_member)
+        self.client.force_login(self.employer)
 
         # Get list without filtering by status (PROCESSED)
         # note: there is no way to create a processed employee record
@@ -186,7 +186,7 @@ class EmployeeRecordAPIFetchListTest(APITestCase):
         self.assertContains(response, self.siae.siret)
 
     def test_fetch_employee_record_list_query_count(self):
-        self.client.force_login(self.siae_member)
+        self.client.force_login(self.employer)
 
         with self.assertNumQueries(
             BASE_NUM_QUERIES
@@ -207,7 +207,7 @@ class EmployeeRecordAPIFetchListTest(APITestCase):
         # BUGFIX:
         # Test that employee phone number and email address are passed
         # to API serializer.
-        self.client.force_login(self.siae_member)
+        self.client.force_login(self.employer)
 
         response = self.client.get(ENDPOINT_URL + "?status=READY", format="json")
 

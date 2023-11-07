@@ -7,7 +7,7 @@ from itou.eligibility.enums import AdministrativeCriteriaLevel, AuthorKind
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.eligibility.models.common import AdministrativeCriteriaQuerySet
 from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
-from tests.companies.factories import SiaeFactory
+from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import (
     EligibilityDiagnosisFactory,
     EligibilityDiagnosisMadeBySiaeFactory,
@@ -115,73 +115,75 @@ class EligibilityDiagnosisManagerTest(TestCase):
         assert last_expired is None
 
     def test_itou_diagnosis_by_siae(self):
-        siae1 = SiaeFactory(with_membership=True)
-        siae2 = SiaeFactory(with_membership=True)
-        diagnosis = EligibilityDiagnosisMadeBySiaeFactory(author_siae=siae1, job_seeker=self.job_seeker)
-        # From `siae1` perspective.
+        company_1 = CompanyFactory(with_membership=True)
+        company_2 = CompanyFactory(with_membership=True)
+        diagnosis = EligibilityDiagnosisMadeBySiaeFactory(author_siae=company_1, job_seeker=self.job_seeker)
+        # From `company_1` perspective.
         has_considered_valid = EligibilityDiagnosis.objects.has_considered_valid(
-            job_seeker=diagnosis.job_seeker, for_siae=siae1
+            job_seeker=diagnosis.job_seeker, for_siae=company_1
         )
         last_considered_valid = EligibilityDiagnosis.objects.last_considered_valid(
-            job_seeker=diagnosis.job_seeker, for_siae=siae1
+            job_seeker=diagnosis.job_seeker, for_siae=company_1
         )
-        last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=diagnosis.job_seeker, for_siae=siae1)
+        last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=diagnosis.job_seeker, for_siae=company_1)
         assert has_considered_valid
         assert last_considered_valid == diagnosis
         assert last_expired is None
-        # From `siae2` perspective.
+        # From `company_2` perspective.
         has_considered_valid = EligibilityDiagnosis.objects.has_considered_valid(
-            job_seeker=diagnosis.job_seeker, for_siae=siae2
+            job_seeker=diagnosis.job_seeker, for_siae=company_2
         )
         last_considered_valid = EligibilityDiagnosis.objects.last_considered_valid(
-            job_seeker=diagnosis.job_seeker, for_siae=siae2
+            job_seeker=diagnosis.job_seeker, for_siae=company_2
         )
-        last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=diagnosis.job_seeker, for_siae=siae2)
+        last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=diagnosis.job_seeker, for_siae=company_2)
         assert not has_considered_valid
         assert last_considered_valid is None
         assert last_expired is None
 
     def test_itou_diagnosis_by_prescriber(self):
-        siae = SiaeFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True)
         prescriber_diagnosis = EligibilityDiagnosisFactory(job_seeker=self.job_seeker)
         # From siae perspective.
         has_considered_valid = EligibilityDiagnosis.objects.has_considered_valid(
-            job_seeker=prescriber_diagnosis.job_seeker, for_siae=siae
+            job_seeker=prescriber_diagnosis.job_seeker, for_siae=company
         )
         last_considered_valid = EligibilityDiagnosis.objects.last_considered_valid(
-            job_seeker=prescriber_diagnosis.job_seeker, for_siae=siae
+            job_seeker=prescriber_diagnosis.job_seeker, for_siae=company
         )
         last_expired = EligibilityDiagnosis.objects.last_expired(
-            job_seeker=prescriber_diagnosis.job_seeker, for_siae=siae
+            job_seeker=prescriber_diagnosis.job_seeker, for_siae=company
         )
         assert has_considered_valid
         assert last_considered_valid == prescriber_diagnosis
         assert last_expired is None
 
     def test_itou_diagnosis_both_siae_and_prescriber(self):
-        siae = SiaeFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True)
         prescriber_diagnosis = EligibilityDiagnosisFactory(job_seeker=self.job_seeker)
         # From `siae` perspective.
         has_considered_valid = EligibilityDiagnosis.objects.has_considered_valid(
-            job_seeker=self.job_seeker, for_siae=siae
+            job_seeker=self.job_seeker, for_siae=company
         )
         last_considered_valid = EligibilityDiagnosis.objects.last_considered_valid(
-            job_seeker=self.job_seeker, for_siae=siae
+            job_seeker=self.job_seeker, for_siae=company
         )
-        last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=self.job_seeker, for_siae=siae)
+        last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=self.job_seeker, for_siae=company)
         assert has_considered_valid
         # A diagnosis made by a prescriber takes precedence.
         assert last_considered_valid == prescriber_diagnosis
         assert last_expired is None
 
     def test_expired_itou_diagnosis_by_another_siae(self):
-        siae1 = SiaeFactory(with_membership=True)
-        siae2 = SiaeFactory(with_membership=True)
-        expired_diagnosis = ExpiredEligibilityDiagnosisMadeBySiaeFactory(job_seeker=self.job_seeker, author_siae=siae1)
+        company_1 = CompanyFactory(with_membership=True)
+        company_2 = CompanyFactory(with_membership=True)
+        expired_diagnosis = ExpiredEligibilityDiagnosisMadeBySiaeFactory(
+            job_seeker=self.job_seeker, author_siae=company_1
+        )
         # From `siae` perspective.
-        last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=self.job_seeker, for_siae=siae1)
+        last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=self.job_seeker, for_siae=company_1)
         assert last_expired == expired_diagnosis
-        last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=self.job_seeker, for_siae=siae2)
+        last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=self.job_seeker, for_siae=company_2)
         assert last_expired is None
 
     def test_itou_diagnosis_one_valid_other_expired(self):
@@ -194,21 +196,21 @@ class EligibilityDiagnosisManagerTest(TestCase):
         assert last_expired is None
 
     def test_itou_diagnosis_one_valid_other_expired_same_siae(self):
-        siae = SiaeFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True)
         ExpiredEligibilityDiagnosisFactory(
             job_seeker=self.job_seeker,
-            author_siae=siae,
+            author_siae=company,
             author_kind=AuthorKind.EMPLOYER,
         )
         new_diag = EligibilityDiagnosisFactory(
             job_seeker=self.job_seeker,
-            author_siae=siae,
+            author_siae=company,
             author_kind=AuthorKind.EMPLOYER,
         )
         # An approval causes the system to ignore expires_at.
         ApprovalFactory(user=self.job_seeker, eligibility_diagnosis=new_diag)
         last_considered_valid = EligibilityDiagnosis.objects.last_considered_valid(
-            job_seeker=self.job_seeker, for_siae=siae
+            job_seeker=self.job_seeker, for_siae=company
         )
         assert last_considered_valid == new_diag
 
@@ -228,15 +230,15 @@ class EligibilityDiagnosisManagerTest(TestCase):
 class EligibilityDiagnosisModelTest(TestCase):
     def test_create_diagnosis(self):
         job_seeker = JobSeekerFactory()
-        siae = SiaeFactory(with_membership=True)
-        user = siae.members.first()
+        company = CompanyFactory(with_membership=True)
+        user = company.members.first()
 
-        diagnosis = EligibilityDiagnosis.create_diagnosis(job_seeker, author=user, author_organization=siae)
+        diagnosis = EligibilityDiagnosis.create_diagnosis(job_seeker, author=user, author_organization=company)
 
         assert diagnosis.job_seeker == job_seeker
         assert diagnosis.author == user
         assert diagnosis.author_kind == AuthorKind.EMPLOYER
-        assert diagnosis.author_siae == siae
+        assert diagnosis.author_siae == company
         assert diagnosis.author_prescriber_organization is None
         assert diagnosis.administrative_criteria.count() == 0
 
@@ -271,20 +273,20 @@ class EligibilityDiagnosisModelTest(TestCase):
         assert criteria3 in administrative_criteria
 
     def test_update_diagnosis(self):
-        siae = SiaeFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True)
 
         current_diagnosis = EligibilityDiagnosisFactory()
         new_diagnosis = EligibilityDiagnosis.update_diagnosis(
-            current_diagnosis, author=siae.members.first(), author_organization=siae, administrative_criteria=[]
+            current_diagnosis, author=company.members.first(), author_organization=company, administrative_criteria=[]
         )
         current_diagnosis.refresh_from_db()
 
         # Some information should be copied...
         assert new_diagnosis.job_seeker == current_diagnosis.job_seeker
         # ... or updated.
-        assert new_diagnosis.author == siae.members.first()
+        assert new_diagnosis.author == company.members.first()
         assert new_diagnosis.author_kind == AuthorKind.EMPLOYER
-        assert new_diagnosis.author_siae == siae
+        assert new_diagnosis.author_siae == company
         assert new_diagnosis.author_prescriber_organization is None
         assert new_diagnosis.administrative_criteria.count() == 0
 
@@ -378,30 +380,30 @@ class AdministrativeCriteriaModelTest(TestCase):
         assert level1_criterion not in qs
 
     def test_for_job_application(self):
-        siae = SiaeFactory(department="14", with_membership=True)
+        company = CompanyFactory(department="14", with_membership=True)
 
         job_seeker = JobSeekerFactory()
-        user = siae.members.first()
+        user = company.members.first()
 
         criteria1 = AdministrativeCriteria.objects.get(
             level=AdministrativeCriteriaLevel.LEVEL_1, name="Bénéficiaire du RSA"
         )
         eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
-            job_seeker, author=user, author_organization=siae, administrative_criteria=[criteria1]
+            job_seeker, author=user, author_organization=company, administrative_criteria=[criteria1]
         )
 
         job_application1 = JobApplicationFactory(
             with_approval=True,
-            to_siae=siae,
-            sender_siae=siae,
+            to_siae=company,
+            sender_siae=company,
             eligibility_diagnosis=eligibility_diagnosis,
             hiring_start_at=timezone.now() - relativedelta(months=2),
         )
 
         job_application2 = JobApplicationFactory(
             with_approval=True,
-            to_siae=siae,
-            sender_siae=siae,
+            to_siae=company,
+            sender_siae=company,
             hiring_start_at=timezone.now() - relativedelta(months=2),
         )
 

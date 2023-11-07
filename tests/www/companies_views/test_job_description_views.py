@@ -10,7 +10,7 @@ from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import JobDescription
 from itou.jobs.models import Appellation
 from itou.www.companies_views.views import ITOU_SESSION_JOB_DESCRIPTION_KEY
-from tests.companies.factories import JobDescriptionFactory, SiaeFactory
+from tests.companies.factories import CompanyFactory, JobDescriptionFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import JobSeekerFactory
@@ -28,13 +28,13 @@ class JobDescriptionAbstractTest(TestCase):
             name="Paris", slug=city_slug, department="75", post_codes=["75001"], coords=Point(5, 23)
         )
 
-        siae = SiaeFactory(
+        company = CompanyFactory(
             department="75",
             coords=self.paris_city.coords,
             post_code="75001",
             with_membership=True,
         )
-        user = siae.members.first()
+        user = company.members.first()
 
         create_test_romes_and_appellations(["N1101", "N1105", "N1103", "N4105", "K2401"])
         self.appellations = Appellation.objects.filter(
@@ -45,10 +45,10 @@ class JobDescriptionAbstractTest(TestCase):
                 "Chauffeur-livreur / Chauffeuse-livreuse",
             ]
         )
-        siae.jobs.add(*self.appellations)
+        company.jobs.add(*self.appellations)
 
         # Make sure at least two JobDescription have a location
-        JobDescription.objects.filter(pk=siae.job_description_through.last().pk).update(
+        JobDescription.objects.filter(pk=company.job_description_through.last().pk).update(
             location=City.objects.create(
                 name="Rennes",
                 slug="rennes",
@@ -58,7 +58,7 @@ class JobDescriptionAbstractTest(TestCase):
                 coords=Point(-1.7, 45),
             )
         )
-        JobDescription.objects.filter(pk=siae.job_description_through.first().pk).update(
+        JobDescription.objects.filter(pk=company.job_description_through.first().pk).update(
             location=City.objects.create(
                 name="Lille",
                 slug="lille",
@@ -69,7 +69,7 @@ class JobDescriptionAbstractTest(TestCase):
             )
         )
 
-        self.siae = siae
+        self.siae = company
         self.user = user
 
         self.list_url = reverse("companies_views:job_description_list")
@@ -316,7 +316,7 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
         assert self.siae.job_description_through.count() == 5
 
     def test_edit_job_description_opcs(self):
-        opcs = SiaeFactory(
+        opcs = CompanyFactory(
             department="75",
             coords=self.paris_city.coords,
             post_code="75001",

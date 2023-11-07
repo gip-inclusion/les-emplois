@@ -9,7 +9,7 @@ from itou.companies.enums import POLE_EMPLOI_SIRET, CompanyKind, ContractNature,
 from itou.companies.models import Company
 from itou.jobs.models import Appellation, Rome
 from tests.cities.factories import create_city_guerande, create_city_saint_andre, create_city_vannes
-from tests.companies.factories import CompanyMembershipFactory, JobDescriptionFactory, SiaeFactory
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, JobDescriptionFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationFactory
@@ -44,8 +44,8 @@ class SearchSiaeTest(TestCase):
             name="Paris 10eme", slug="paris-10eme-75", department="75", post_codes=["75010"], coords=Point(5, 23)
         )
 
-        siae_1 = SiaeFactory(department="75", coords=paris_city.coords, post_code="75001")
-        SiaeFactory(department="75", coords=paris_city.coords, post_code="75002")
+        company_1 = CompanyFactory(department="75", coords=paris_city.coords, post_code="75001")
+        CompanyFactory(department="75", coords=paris_city.coords, post_code="75002")
 
         # Filter on city
         with self.assertNumQueries(
@@ -75,7 +75,7 @@ class SearchSiaeTest(TestCase):
             """Employeur <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>""",
             html=True,
         )
-        self.assertContains(response, siae_1.display_name)
+        self.assertContains(response, company_1.display_name)
 
         # Do not get arrondissements when searching the arrondissement directly
         response = self.client.get(self.url, {"city": "paris-10eme-75"})
@@ -83,7 +83,7 @@ class SearchSiaeTest(TestCase):
 
     def test_kind(self):
         city = create_city_saint_andre()
-        SiaeFactory(department="44", coords=city.coords, post_code="44117", kind=CompanyKind.AI)
+        CompanyFactory(department="44", coords=city.coords, post_code="44117", kind=CompanyKind.AI)
 
         response = self.client.get(self.url, {"city": city.slug, "kinds": [CompanyKind.AI]})
         self.assertContains(
@@ -99,16 +99,16 @@ class SearchSiaeTest(TestCase):
         # 3 SIAEs in two departments to test distance and department filtering
         vannes = create_city_vannes()
         SIAE_VANNES = "SIAE Vannes"
-        SiaeFactory(name=SIAE_VANNES, department="56", coords=vannes.coords, post_code="56760", kind=CompanyKind.AI)
+        CompanyFactory(name=SIAE_VANNES, department="56", coords=vannes.coords, post_code="56760", kind=CompanyKind.AI)
 
         guerande = create_city_guerande()
         SIAE_GUERANDE = "SIAE Guérande"
-        SiaeFactory(
+        CompanyFactory(
             name=SIAE_GUERANDE, department="44", coords=guerande.coords, post_code="44350", kind=CompanyKind.AI
         )
         saint_andre = create_city_saint_andre()
         SIAE_SAINT_ANDRE = "SIAE Saint André des Eaux"
-        SiaeFactory(
+        CompanyFactory(
             name=SIAE_SAINT_ANDRE, department="44", coords=saint_andre.coords, post_code="44117", kind=CompanyKind.AI
         )
 
@@ -158,30 +158,32 @@ class SearchSiaeTest(TestCase):
         Don't test sorting by active members to avoid creating too much data.
         """
         guerande = create_city_guerande()
-        created_siaes = []
+        created_companies = []
 
         # Several job descriptions but no job application.
-        siae = SiaeFactory(with_jobs=True, department="44", coords=guerande.coords, post_code="44350")
-        created_siaes.append(siae)
+        company = CompanyFactory(with_jobs=True, department="44", coords=guerande.coords, post_code="44350")
+        created_companies.append(company)
 
         # Many job descriptions and job applications.
-        siae = SiaeFactory(with_jobs=True, department="44", coords=guerande.coords, post_code="44350")
-        JobApplicationFactory(to_siae=siae)
-        created_siaes.append(siae)
+        company = CompanyFactory(with_jobs=True, department="44", coords=guerande.coords, post_code="44350")
+        JobApplicationFactory(to_siae=company)
+        created_companies.append(company)
 
         # Many job descriptions and more job applications than the first one.
-        siae = SiaeFactory(with_jobs=True, department="44", coords=guerande.coords, post_code="44350")
-        JobApplicationFactory(to_siae=siae)
-        JobApplicationFactory(to_siae=siae)
-        created_siaes.append(siae)
+        company = CompanyFactory(with_jobs=True, department="44", coords=guerande.coords, post_code="44350")
+        JobApplicationFactory(to_siae=company)
+        JobApplicationFactory(to_siae=company)
+        created_companies.append(company)
 
         # No job description, no job application.
-        siae = SiaeFactory(department="44", coords=guerande.coords, post_code="44350")
-        created_siaes.append(siae)
+        company = CompanyFactory(department="44", coords=guerande.coords, post_code="44350")
+        created_companies.append(company)
 
         # Does not want to receive any job application.
-        siae = SiaeFactory(department="44", coords=guerande.coords, post_code="44350", block_job_applications=True)
-        created_siaes.append(siae)
+        company = CompanyFactory(
+            department="44", coords=guerande.coords, post_code="44350", block_job_applications=True
+        )
+        created_companies.append(company)
 
         with self.assertNumQueries(
             BASE_NUM_QUERIES
@@ -193,13 +195,13 @@ class SearchSiaeTest(TestCase):
             + 1  # get job descriptions infos
         ):
             response = self.client.get(self.url, {"city": guerande.slug})
-        siaes_results = response.context["results_page"]
+        companies_results = response.context["results_page"]
 
-        assert [siae.pk for siae in siaes_results] == [siae.pk for siae in created_siaes]
+        assert [company.pk for company in companies_results] == [company.pk for company in created_companies]
 
     def test_opcs_displays_card_differently(self):
         city = create_city_saint_andre()
-        SiaeFactory(department="44", coords=city.coords, post_code="44117", kind=CompanyKind.OPCS)
+        CompanyFactory(department="44", coords=city.coords, post_code="44117", kind=CompanyKind.OPCS)
 
         response = self.client.get(self.url, {"city": city.slug})
         self.assertContains(
@@ -212,13 +214,13 @@ class SearchSiaeTest(TestCase):
     def test_is_popular(self):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         city = create_city_saint_andre()
-        siae = SiaeFactory(department="44", coords=city.coords, post_code="44117", with_membership=True)
-        job = JobDescriptionFactory(siae=siae)
-        JobApplicationFactory.create_batch(20, to_siae=siae, selected_jobs=[job], state="new")
+        company = CompanyFactory(department="44", coords=city.coords, post_code="44117", with_membership=True)
+        job = JobDescriptionFactory(siae=company)
+        JobApplicationFactory.create_batch(20, to_siae=company, selected_jobs=[job], state="new")
         response = self.client.get(self.url, {"city": city.slug})
         self.assertNotContains(response, """20+<span class="ms-1">candidatures</span>""", html=True)
 
-        JobApplicationFactory(to_siae=siae, selected_jobs=[job], state="new")
+        JobApplicationFactory(to_siae=company, selected_jobs=[job], state="new")
         response = self.client.get(self.url, {"city": city.slug})
         self.assertContains(
             response,
@@ -238,12 +240,12 @@ class SearchSiaeTest(TestCase):
             "vous ne pouvez pas déposer de candidature en ligne"
         )
         city = create_city_saint_andre()
-        siae = SiaeFactory(department="44", coords=city.coords, post_code="44117", with_jobs=True)
+        company = CompanyFactory(department="44", coords=city.coords, post_code="44117", with_jobs=True)
         response = self.client.get(self.url, {"city": city.slug})
         self.assertNotContains(response, hiring_str)
         self.assertContains(response, no_hiring_str)
 
-        CompanyMembershipFactory(siae=siae)
+        CompanyMembershipFactory(siae=company)
         response = self.client.get(self.url, {"city": city.slug})
         self.assertContains(response, hiring_str)
         self.assertNotContains(response, no_hiring_str)
@@ -286,8 +288,8 @@ class JobDescriptionSearchViewTest(TestCase):
             name="Paris", slug=city_slug, department="75", post_codes=["75001"], coords=Point(5, 23)
         )
 
-        siae = SiaeFactory(department="75", coords=paris_city.coords, post_code="75001")
-        job = JobDescriptionFactory(siae=siae)
+        company = CompanyFactory(department="75", coords=paris_city.coords, post_code="75001")
+        job = JobDescriptionFactory(siae=company)
 
         # Filter on city
         with self.assertNumQueries(
@@ -325,7 +327,7 @@ class JobDescriptionSearchViewTest(TestCase):
     def test_kind(self):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         city = create_city_saint_andre()
-        SiaeFactory(department="44", coords=city.coords, post_code="44117", kind=CompanyKind.AI)
+        CompanyFactory(department="44", coords=city.coords, post_code="44117", kind=CompanyKind.AI)
 
         response = self.client.get(self.url, {"city": city.slug, "kinds": [CompanyKind.AI, CompanyKind.ETTI]})
         self.assertContains(
@@ -342,7 +344,7 @@ class JobDescriptionSearchViewTest(TestCase):
         # 3 SIAEs in two departments to test distance and department filtering
         vannes = create_city_vannes()
         SIAE_VANNES = "SIAE Vannes"
-        SiaeFactory(
+        CompanyFactory(
             name=SIAE_VANNES,
             department="56",
             coords=vannes.coords,
@@ -353,7 +355,7 @@ class JobDescriptionSearchViewTest(TestCase):
 
         guerande = create_city_guerande()
         SIAE_GUERANDE = "SIAE Guérande"
-        SiaeFactory(
+        CompanyFactory(
             name=SIAE_GUERANDE,
             department="44",
             coords=guerande.coords,
@@ -363,7 +365,7 @@ class JobDescriptionSearchViewTest(TestCase):
         )
         saint_andre = create_city_saint_andre()
         SIAE_SAINT_ANDRE = "SIAE Saint André des Eaux"
-        SiaeFactory(
+        CompanyFactory(
             name=SIAE_SAINT_ANDRE,
             department="44",
             coords=saint_andre.coords,
@@ -417,39 +419,39 @@ class JobDescriptionSearchViewTest(TestCase):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         guerande = create_city_guerande()
 
-        siae = SiaeFactory(department="44", coords=guerande.coords, post_code="44350")
+        company = CompanyFactory(department="44", coords=guerande.coords, post_code="44350")
         appellations = Appellation.objects.all()
         # get a different appellation for every job description, since they share the same SIAE
-        job1 = JobDescriptionFactory(siae=siae, appellation=appellations[0])
-        job2 = JobDescriptionFactory(siae=siae, appellation=appellations[1])
-        job3 = JobDescriptionFactory(siae=siae, appellation=appellations[2])
+        job1 = JobDescriptionFactory(siae=company, appellation=appellations[0])
+        job2 = JobDescriptionFactory(siae=company, appellation=appellations[1])
+        job3 = JobDescriptionFactory(siae=company, appellation=appellations[2])
 
         response = self.client.get(self.url, {"city": guerande.slug})
-        siaes_results = response.context["results_page"]
+        jobs_results = response.context["results_page"]
 
-        assert list(siaes_results) == [job3, job2, job1]
+        assert list(jobs_results) == [job3, job2, job1]
 
         # check updated_at sorting also works
         job2.save()
         response = self.client.get(self.url, {"city": guerande.slug})
-        siaes_results = response.context["results_page"]
-        assert list(siaes_results) == [job2, job3, job1]
+        jobs_results = response.context["results_page"]
+        assert list(jobs_results) == [job2, job3, job1]
 
         job1.save()
         response = self.client.get(self.url, {"city": guerande.slug})
-        siaes_results = response.context["results_page"]
-        assert list(siaes_results) == [job1, job2, job3]
+        jobs_results = response.context["results_page"]
+        assert list(jobs_results) == [job1, job2, job3]
 
     def test_is_popular(self):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         city = create_city_saint_andre()
-        siae = SiaeFactory(department="44", coords=city.coords, post_code="44117")
-        job = JobDescriptionFactory(siae=siae)
-        JobApplicationFactory.create_batch(20, to_siae=siae, selected_jobs=[job], state="new")
+        company = CompanyFactory(department="44", coords=city.coords, post_code="44117")
+        job = JobDescriptionFactory(siae=company)
+        JobApplicationFactory.create_batch(20, to_siae=company, selected_jobs=[job], state="new")
         response = self.client.get(self.url, {"city": city.slug})
         self.assertNotContains(response, """20+<span class="ms-1">candidatures</span>""", html=True)
 
-        JobApplicationFactory(to_siae=siae, selected_jobs=[job], state="new")
+        JobApplicationFactory(to_siae=company, selected_jobs=[job], state="new")
         response = self.client.get(self.url, {"city": city.slug})
         self.assertContains(
             response,
@@ -465,29 +467,33 @@ class JobDescriptionSearchViewTest(TestCase):
     def test_no_department(self):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         st_andre = create_city_saint_andre()
-        siae_without_dpt = SiaeFactory(department="", coords=st_andre.coords, post_code="44117", kind=CompanyKind.AI)
-        siae = SiaeFactory(department="44", coords=st_andre.coords, post_code="44117", kind=CompanyKind.AI)
-        JobDescriptionFactory(siae=siae_without_dpt, location=None)
-        JobDescriptionFactory(siae=siae)
+        company_without_dpt = CompanyFactory(
+            department="", coords=st_andre.coords, post_code="44117", kind=CompanyKind.AI
+        )
+        company = CompanyFactory(department="44", coords=st_andre.coords, post_code="44117", kind=CompanyKind.AI)
+        JobDescriptionFactory(siae=company_without_dpt, location=None)
+        JobDescriptionFactory(siae=company)
         response = self.client.get(self.url, {"city": st_andre.slug})
         assert response.status_code == 200
 
     def test_contract_type(self):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         city = create_city_saint_andre()
-        siae = SiaeFactory(department="44", coords=city.coords, post_code="44117")
+        company = CompanyFactory(department="44", coords=city.coords, post_code="44117")
         appellations = Appellation.objects.filter(code__in=["10357", "10386", "10479"])
 
-        job1 = JobDescriptionFactory(siae=siae, appellation=appellations[0], contract_type=ContractType.APPRENTICESHIP)
+        job1 = JobDescriptionFactory(
+            siae=company, appellation=appellations[0], contract_type=ContractType.APPRENTICESHIP
+        )
         job2 = JobDescriptionFactory(
-            siae=siae, appellation=appellations[1], contract_type=ContractType.BUSINESS_CREATION
+            siae=company, appellation=appellations[1], contract_type=ContractType.BUSINESS_CREATION
         )
 
-        inactive_siae = SiaeFactory(
+        inactive_company = CompanyFactory(
             department="45", coords=city.coords, post_code="44117", kind=CompanyKind.EI, convention=None
         )
         job3 = JobDescriptionFactory(
-            siae=inactive_siae,
+            siae=inactive_company,
             appellation=appellations[2],
             contract_type=ContractType.APPRENTICESHIP,
         )
@@ -561,26 +567,26 @@ class JobDescriptionSearchViewTest(TestCase):
     def test_domains(self):
         create_test_romes_and_appellations(("N1101", "M1805"))
         city = create_city_saint_andre()
-        siae = SiaeFactory(department="44", coords=city.coords, post_code="44117")
+        company = CompanyFactory(department="44", coords=city.coords, post_code="44117")
         romes = Rome.objects.all().order_by("code")
         job1 = JobDescriptionFactory(
-            siae=siae,
+            siae=company,
             appellation=romes[0].appellations.first(),
             contract_type=ContractType.APPRENTICESHIP,
             custom_name="Eviteur de Flakyness",
         )
         job2 = JobDescriptionFactory(
-            siae=siae,
+            siae=company,
             appellation=romes[1].appellations.first(),
             contract_type=ContractType.BUSINESS_CREATION,
             custom_name="Forceur de Nom de Métier",
         )
 
-        inactive_siae = SiaeFactory(
+        inactive_company = CompanyFactory(
             department="45", coords=city.coords, post_code="44117", kind=CompanyKind.EI, convention=None
         )
         job3 = JobDescriptionFactory(
-            siae=inactive_siae, contract_type=ContractType.APPRENTICESHIP, custom_name="Métier Inutilisé"
+            siae=inactive_company, contract_type=ContractType.APPRENTICESHIP, custom_name="Métier Inutilisé"
         )
 
         # no filter: returns everything.
@@ -651,12 +657,14 @@ class JobDescriptionSearchViewTest(TestCase):
     def test_pec_display(self):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         city = create_city_saint_andre()
-        siae = SiaeFactory(department="44", coords=city.coords, post_code="44117")
+        company = CompanyFactory(department="44", coords=city.coords, post_code="44117")
         appellations = Appellation.objects.all()
-        job1 = JobDescriptionFactory(siae=siae, appellation=appellations[0], contract_type=ContractType.APPRENTICESHIP)
-        pe_siae = Company.unfiltered_objects.get(siret=POLE_EMPLOI_SIRET)
+        job1 = JobDescriptionFactory(
+            siae=company, appellation=appellations[0], contract_type=ContractType.APPRENTICESHIP
+        )
+        pe_company = Company.unfiltered_objects.get(siret=POLE_EMPLOI_SIRET)
         job_pec = JobDescriptionFactory(
-            siae=pe_siae,
+            siae=pe_company,
             location=city,
             source_kind=JobSource.PE_API,
             source_id="fuuuuuuuu",

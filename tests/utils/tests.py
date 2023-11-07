@@ -64,7 +64,7 @@ from itou.utils.validators import (
     validate_siret,
 )
 from tests.approvals.factories import SuspensionFactory
-from tests.companies.factories import CompanyMembershipFactory, SiaeFactory, SiaePendingGracePeriodFactory
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, CompanyPendingGracePeriodFactory
 from tests.institutions.factories import (
     InstitutionFactory,
     InstitutionMembershipFactory,
@@ -120,11 +120,11 @@ class TestItouCurrentOrganizationMiddleware:
         assert mocked_get_response_for_middlewaremixin.call_count == 1
         assert request.session.is_empty()
 
-    def test_siae_member(self, mocked_get_response_for_middlewaremixin):
+    def test_employer(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
         request = factory.get("/")
-        siae = CompanyMembershipFactory().siae
-        request.user = siae.members.first()
+        company = CompanyMembershipFactory().siae
+        request.user = company.members.first()
         SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
         with assertNumQueries(
             # Retrieve user memberships
@@ -135,10 +135,10 @@ class TestItouCurrentOrganizationMiddleware:
             ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 1
         # Session updated
-        assert request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] == siae.pk
+        assert request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] == company.pk
         # Check new request attributes
-        assert request.current_organization == siae
-        assert request.organizations == [siae]
+        assert request.current_organization == company
+        assert request.organizations == [company]
         assert request.is_current_organization_admin
 
     def test_siae_no_member(self, mocked_get_response_for_middlewaremixin):
@@ -166,13 +166,13 @@ class TestItouCurrentOrganizationMiddleware:
         # Session untouched
         assert request.session.is_empty()
 
-    def test_siae_member_multiple_memberships(self, mocked_get_response_for_middlewaremixin):
+    def test_employer_multiple_memberships(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
         request = factory.get("/")
-        siae1 = CompanyMembershipFactory(siae__name="1").siae
-        request.user = siae1.members.first()
-        siae2 = SiaeFactory(name="2")
-        siae2.members.add(request.user)
+        company_1 = CompanyMembershipFactory(siae__name="1").siae
+        request.user = company_1.members.first()
+        company_2 = CompanyFactory(name="2")
+        company_2.members.add(request.user)
 
         SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
         with assertNumQueries(
@@ -184,22 +184,22 @@ class TestItouCurrentOrganizationMiddleware:
             ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 1
         # Session updated
-        assert request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] == siae1.pk
+        assert request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] == company_1.pk
         # Check new request attributes
-        assert request.current_organization == siae1
-        assert request.organizations == [siae1, siae2]
+        assert request.current_organization == company_1
+        assert request.organizations == [company_1, company_2]
         assert request.is_current_organization_admin
 
-    def test_siae_member_multiple_memberships_and_one_active(self, mocked_get_response_for_middlewaremixin):
+    def test_employer_multiple_memberships_and_one_active(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
         request = factory.get("/")
-        siae1 = CompanyMembershipFactory(siae__name="1").siae
-        request.user = siae1.members.first()
-        siae2 = SiaeFactory(name="2")
-        siae2.members.add(request.user)
+        company_1 = CompanyMembershipFactory(siae__name="1").siae
+        request.user = company_1.members.first()
+        company_2 = CompanyFactory(name="2")
+        company_2.members.add(request.user)
 
         SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
-        request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = siae2.pk
+        request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = company_2.pk
         request.session.save()
         with assertNumQueries(
             # Retrieve user memberships
@@ -210,17 +210,17 @@ class TestItouCurrentOrganizationMiddleware:
             ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 1
         # Session updated
-        assert request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] == siae2.pk
+        assert request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] == company_2.pk
         # Check new request attributes
-        assert request.current_organization == siae2
-        assert request.organizations == [siae1, siae2]
+        assert request.current_organization == company_2
+        assert request.organizations == [company_1, company_2]
         assert not request.is_current_organization_admin
 
-    def test_siae_member_of_inactive_siae(self, mocked_get_response_for_middlewaremixin):
+    def test_employer_of_inactive_siae(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
         request = factory.get("/")
-        siae = CompanyMembershipFactory(siae__subject_to_eligibility=True, siae__convention=None).siae
-        request.user = siae.members.first()
+        company = CompanyMembershipFactory(siae__subject_to_eligibility=True, siae__convention=None).siae
+        request.user = company.members.first()
         SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
         MessageMiddleware(get_response_for_middlewaremixin).process_request(request)
         with assertNumQueries(
@@ -248,11 +248,11 @@ class TestItouCurrentOrganizationMiddleware:
         # Session untouched
         assert request.session.is_empty()
 
-    def test_siae_member_of_siae_in_grace_period(self, mocked_get_response_for_middlewaremixin):
+    def test_employer_of_siae_in_grace_period(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
         request = factory.get("/")
-        siae = SiaePendingGracePeriodFactory()
-        request.user = CompanyMembershipFactory(siae=siae).user
+        company = CompanyPendingGracePeriodFactory()
+        request.user = CompanyMembershipFactory(siae=company).user
         SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
         MessageMiddleware(get_response_for_middlewaremixin).process_request(request)
         with assertNumQueries(
@@ -264,20 +264,20 @@ class TestItouCurrentOrganizationMiddleware:
             ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 1
         # Session updated
-        assert request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] == siae.pk
+        assert request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] == company.pk
         # Check new request attributes
-        assert request.current_organization == siae
-        assert request.organizations == [siae]
+        assert request.current_organization == company
+        assert request.organizations == [company]
         assert request.is_current_organization_admin
 
-    def test_siae_member_of_siae_in_grace_period_and_active_siae(self, mocked_get_response_for_middlewaremixin):
+    def test_employer_of_siae_in_grace_period_and_active_siae(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
         request = factory.get("/")
-        siae = SiaePendingGracePeriodFactory(name="1")
-        request.user = CompanyMembershipFactory(siae=siae).user
+        company = CompanyPendingGracePeriodFactory(name="1")
+        request.user = CompanyMembershipFactory(siae=company).user
         # OPCS ensures that the siae is active (since it is not subject to eligibility) and also that
         # the ordering based on kind will put it in second position for request.organizations
-        active_siae = CompanyMembershipFactory(user=request.user, siae__kind=CompanyKind.OPCS, siae__name="2").siae
+        active_company = CompanyMembershipFactory(user=request.user, siae__kind=CompanyKind.OPCS, siae__name="2").siae
         SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
         MessageMiddleware(get_response_for_middlewaremixin).process_request(request)
         with assertNumQueries(
@@ -289,10 +289,10 @@ class TestItouCurrentOrganizationMiddleware:
             ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 1
         # Session updated
-        assert request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] == active_siae.pk
+        assert request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] == active_company.pk
         # Check new request attributes
-        assert request.current_organization == active_siae
-        assert request.organizations == [siae, active_siae]
+        assert request.current_organization == active_company
+        assert request.organizations == [company, active_company]
         assert request.is_current_organization_admin
 
     def test_prescriber_no_organization(self, mocked_get_response_for_middlewaremixin):
@@ -450,24 +450,24 @@ class TestItouCurrentOrganizationMiddleware:
 
 
 def test_logout_as_siae_multiple_memberships(client):
-    siae1 = SiaeFactory(name="1st siae", with_membership=True)
-    user = siae1.members.first()
-    assert siae1.has_admin(user)
+    company_1 = CompanyFactory(name="1st siae", with_membership=True)
+    user = company_1.members.first()
+    assert company_1.has_admin(user)
 
-    siae2 = SiaeFactory(name="2nd siae")
-    siae2.members.add(user)
-    assert not siae2.has_admin(user)
+    company_2 = CompanyFactory(name="2nd siae")
+    company_2.members.add(user)
+    assert not company_2.has_admin(user)
 
     client.force_login(user)
     # Select the 1st SIAE as current one
     session = client.session
-    session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = siae1.pk
+    session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = company_1.pk
     session.save()
 
     response = client.get(reverse("account_logout"))
-    assert client.session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY) == siae1.pk
+    assert client.session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY) == company_1.pk
     # The dropdown to switch to the 2nd SIAE is available on logout screen
-    assertContains(response, siae2.name)
+    assertContains(response, company_2.name)
 
 
 def test_logout_as_labor_inspector_multiple_institutions(client):
@@ -714,9 +714,9 @@ class UtilsTemplateTagsTestCase(TestCase):
 
     def test_call_method(self):
         """Test `call_method` template tag."""
-        siae = SiaeFactory(with_membership=True)
-        user = siae.members.first()
-        context = {"siae": siae, "user": user}
+        company = CompanyFactory(with_membership=True)
+        user = company.members.first()
+        context = {"siae": company, "user": user}
         template = Template("{% load call_method %}{% call_method siae 'has_member' user %}")
         out = template.render(Context(context))
         expected = "True"
@@ -1431,8 +1431,8 @@ def test_matomo_context_processor(client, settings, snapshot):
     Also ensure the user ID is correctly set.
     """
     settings.MATOMO_BASE_URL = "https://fake.matomo.url"
-    siae = SiaeFactory(with_membership=True, membership__user__pk=99999)
-    user = siae.members.first()
+    company = CompanyFactory(with_membership=True, membership__user__pk=99999)
+    user = company.members.first()
     client.force_login(user)
 
     # check that we don't crash when the route is not resolved
@@ -1443,10 +1443,10 @@ def test_matomo_context_processor(client, settings, snapshot):
     assert str(script_content) == snapshot(name="matomo custom init 404")
 
     # canonical case
-    url = reverse("companies_views:card", kwargs={"siae_id": siae.pk})
+    url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
     response = client.get(f"{url}?foo=bar&mtm_foo=truc&mtm_bar=bidule&city=paris")
     assert response.status_code == 200
-    assert response.context["siae"] == siae
+    assert response.context["siae"] == company
     assert response.context["matomo_custom_url"] == "company/<int:siae_id>/card?city=paris&mtm_bar=bidule&mtm_foo=truc"
     assert response.context["matomo_custom_title"] == "Fiche de la structure d'insertion"
     assert response.context["matomo_user_id"] == user.pk

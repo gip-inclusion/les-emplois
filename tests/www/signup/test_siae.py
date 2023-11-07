@@ -21,7 +21,7 @@ from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.templatetags.format_filters import format_siret
 from itou.utils.urls import get_tally_form_url
-from tests.companies.factories import CompanyMembershipFactory, SiaeFactory, SiaeWithMembershipAndJobsFactory
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, CompanyWithMembershipAndJobsFactory
 from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
 from tests.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
 from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory, PrescriberFactory
@@ -46,21 +46,21 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         """
         A user joins an SIAE without members.
         """
-        siae = SiaeFactory(kind=CompanyKind.ETTI)
-        assert 0 == siae.members.count()
+        company = CompanyFactory(kind=CompanyKind.ETTI)
+        assert 0 == company.members.count()
 
         url = reverse("signup:siae_select")
         response = self.client.get(url)
         assert response.status_code == 200
 
         # Find an SIAE by SIREN.
-        response = self.client.get(url, {"siren": siae.siret[:9]})
+        response = self.client.get(url, {"siren": company.siret[:9]})
         assert response.status_code == 200
 
         # Choose an SIAE between results.
-        post_data = {"siaes": siae.pk}
+        post_data = {"siaes": company.pk}
         # Pass `siren` in request.GET
-        response = self.client.post(f"{url}?siren={siae.siret[:9]}", data=post_data)
+        response = self.client.post(f"{url}?siren={company.siret[:9]}", data=post_data)
         assert response.status_code == 302
         self.assertRedirects(response, reverse("search:siaes_home"))
 
@@ -68,7 +68,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         email = mail.outbox[0]
         assert "Un nouvel utilisateur souhaite rejoindre votre structure" in email.subject
 
-        magic_link = siae.signup_magic_link
+        magic_link = company.signup_magic_link
         response = self.client.get(magic_link)
         assert response.status_code == 200
 
@@ -77,9 +77,9 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         self.assertContains(response, "logo-inclusion-connect-one-line.svg")
 
         # Check IC will redirect to the correct url
-        token = siae.get_token()
-        previous_url = reverse("signup:siae_user", args=(siae.pk, token))
-        next_url = reverse("signup:siae_join", args=(siae.pk, token))
+        token = company.get_token()
+        previous_url = reverse("signup:siae_user", args=(company.pk, token))
+        next_url = reverse("signup:siae_join", args=(company.pk, token))
         params = {
             "user_kind": KIND_EMPLOYER,
             "previous_url": previous_url,
@@ -106,8 +106,8 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         # Check `User` state.
         assert user.kind == UserKind.EMPLOYER
         assert user.is_active
-        assert siae.has_admin(user)
-        assert 1 == siae.members.count()
+        assert company.has_admin(user)
+        assert 1 == company.members.count()
 
         # No new sent email.
         assert len(mail.outbox) == 1
@@ -126,21 +126,21 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         """
         A user joins an SIAE without members.
         """
-        siae = SiaeFactory(kind=CompanyKind.ETTI)
-        assert 0 == siae.members.count()
+        company = CompanyFactory(kind=CompanyKind.ETTI)
+        assert 0 == company.members.count()
 
         user = EmployerFactory(email=OIDC_USERINFO["email"], has_completed_welcoming_tour=True)
         CompanyMembershipFactory(user=user)
         assert 1 == user.company_set.count()
 
-        magic_link = siae.signup_magic_link
+        magic_link = company.signup_magic_link
         response = self.client.get(magic_link)
         self.assertContains(response, "logo-inclusion-connect-one-line.svg")
 
         # Check IC will redirect to the correct url
-        token = siae.get_token()
-        previous_url = reverse("signup:siae_user", args=(siae.pk, token))
-        next_url = reverse("signup:siae_join", args=(siae.pk, token))
+        token = company.get_token()
+        previous_url = reverse("signup:siae_user", args=(company.pk, token))
+        next_url = reverse("signup:siae_join", args=(company.pk, token))
         params = {
             "user_kind": KIND_EMPLOYER,
             "previous_url": previous_url,
@@ -160,8 +160,8 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         self.assertRedirects(response, reverse("dashboard:index"))
 
         # Check `User` state.
-        assert siae.has_admin(user)
-        assert 1 == siae.members.count()
+        assert company.has_admin(user)
+        assert 1 == company.members.count()
         assert 2 == user.company_set.count()
 
     @freeze_time("2022-09-15 15:53:54")
@@ -170,19 +170,19 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         """
         A user joins an SIAE without members.
         """
-        siae = SiaeFactory(kind=CompanyKind.ETTI)
+        company = CompanyFactory(kind=CompanyKind.ETTI)
 
         user = EmployerFactory(email=OIDC_USERINFO["email"], has_completed_welcoming_tour=True)
         CompanyMembershipFactory(user=user)
 
-        magic_link = siae.signup_magic_link
+        magic_link = company.signup_magic_link
         response = self.client.get(magic_link)
         self.assertContains(response, "logo-inclusion-connect-one-line.svg")
 
         # Check IC will redirect to the correct url
-        token = siae.get_token()
-        previous_url = reverse("signup:siae_user", args=(siae.pk, token))
-        next_url = reverse("signup:siae_join", args=(siae.pk, token))
+        token = company.get_token()
+        previous_url = reverse("signup:siae_user", args=(company.pk, token))
+        next_url = reverse("signup:siae_join", args=(company.pk, token))
         params = {
             "user_kind": KIND_EMPLOYER,
             "previous_url": previous_url,
@@ -204,13 +204,13 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         self.assertRedirects(response, reverse("dashboard:index"))
 
         # Check `User` state.
-        assert siae.has_admin(user)
-        assert 1 == siae.members.count()
+        assert company.has_admin(user)
+        assert 1 == company.members.count()
         assert 2 == user.company_set.count()
 
     def test_user_invalid_siae_id(self):
-        siae = SiaeFactory(kind=CompanyKind.ETTI)
-        response = self.client.get(reverse("signup:siae_user", kwargs={"siae_id": "0", "token": siae.get_token()}))
+        company = CompanyFactory(kind=CompanyKind.ETTI)
+        response = self.client.get(reverse("signup:siae_user", kwargs={"siae_id": "0", "token": company.get_token()}))
         self.assertRedirects(response, reverse("signup:siae_select"))
         assertMessages(
             response,
@@ -225,9 +225,9 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
     def test_join_invalid_siae_id(self):
         user = EmployerFactory(with_siae=True)
         self.client.force_login(user)
-        siae = SiaeFactory(kind=CompanyKind.ETTI)
+        company = CompanyFactory(kind=CompanyKind.ETTI)
         response = self.client.get(
-            reverse("signup:siae_join", kwargs={"siae_id": "0", "token": siae.get_token()}), follow=True
+            reverse("signup:siae_join", kwargs={"siae_id": "0", "token": company.get_token()}), follow=True
         )
         self.assertRedirects(response, reverse("signup:siae_select"))
         assertMessages(
@@ -330,12 +330,12 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
 
     def test_siae_select_does_not_die_under_requests(self):
         siaes = (
-            SiaeWithMembershipAndJobsFactory(siret="40219166200001"),
-            SiaeWithMembershipAndJobsFactory(siret="40219166200002"),
-            SiaeWithMembershipAndJobsFactory(siret="40219166200003"),
-            SiaeWithMembershipAndJobsFactory(siret="40219166200004"),
-            SiaeWithMembershipAndJobsFactory(siret="40219166200005"),
-            SiaeWithMembershipAndJobsFactory(siret="40219166200005", kind=CompanyKind.AI),
+            CompanyWithMembershipAndJobsFactory(siret="40219166200001"),
+            CompanyWithMembershipAndJobsFactory(siret="40219166200002"),
+            CompanyWithMembershipAndJobsFactory(siret="40219166200003"),
+            CompanyWithMembershipAndJobsFactory(siret="40219166200004"),
+            CompanyWithMembershipAndJobsFactory(siret="40219166200005"),
+            CompanyWithMembershipAndJobsFactory(siret="40219166200005", kind=CompanyKind.AI),
         )
         # Add more than one member to all SIAE to test prefetch and distinct
         for siae in siaes:
@@ -364,15 +364,15 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
 
 class SiaeSignupViewsExceptionsTest(TestCase):
     def test_non_staff_cant_join_a_siae(self):
-        siae = SiaeFactory(kind=CompanyKind.ETTI)
-        assert 0 == siae.members.count()
+        company = CompanyFactory(kind=CompanyKind.ETTI)
+        assert 0 == company.members.count()
 
         user = PrescriberFactory(email=OIDC_USERINFO["email"])
         self.client.login(email=user.email, password=DEFAULT_PASSWORD)
 
         # Skip IC process and jump to joining the SIAE.
-        token = siae.get_token()
-        url = reverse("signup:siae_join", args=(siae.pk, token))
+        token = company.get_token()
+        url = reverse("signup:siae_join", args=(company.pk, token))
 
         response = self.client.get(url)
         assertMessages(
@@ -382,5 +382,5 @@ class SiaeSignupViewsExceptionsTest(TestCase):
         self.assertRedirects(response, reverse("search:siaes_home"))
 
         # Check `User` state.
-        assert not siae.has_admin(user)
-        assert 0 == siae.members.count()
+        assert not company.has_admin(user)
+        assert 0 == company.members.count()

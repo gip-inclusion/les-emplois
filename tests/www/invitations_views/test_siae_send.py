@@ -6,7 +6,7 @@ from django.utils.html import escape
 from itou.invitations.models import EmployerInvitation
 from itou.users.enums import UserKind
 from itou.www.invitations_views.forms import EmployerInvitationForm
-from tests.companies.factories import CompanyMembershipFactory, SiaeFactory
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory
 from tests.utils.test import TestCase
@@ -18,9 +18,9 @@ INVITATION_URL = reverse("invitations_views:invite_employer")
 class TestSendSingleSiaeInvitation(TestCase):
     def setUp(self):
         super().setUp()
-        self.siae = SiaeFactory(with_membership=True)
+        self.company = CompanyFactory(with_membership=True)
         # The sender is a member of the SIAE
-        self.sender = self.siae.members.first()
+        self.sender = self.company.members.first()
         self.guest_data = {"first_name": "Léonie", "last_name": "Bathiat", "email": "leonie@example.com"}
         self.post_data = {
             "form-TOTAL_FORMS": "1",
@@ -37,7 +37,7 @@ class TestSendSingleSiaeInvitation(TestCase):
         response = self.client.get(INVITATION_URL)
 
         # Assert form is present
-        form = EmployerInvitationForm(sender=self.sender, siae=self.siae)
+        form = EmployerInvitationForm(sender=self.sender, siae=self.company)
         self.assertContains(response, form["first_name"].label)
         self.assertContains(response, form["last_name"].label)
         self.assertContains(response, form["email"].label)
@@ -79,7 +79,7 @@ class TestSendSingleSiaeInvitation(TestCase):
         assert invitation.last_name == guest.last_name
         assert invitation.email == guest.email
         assert invitation.sender == self.sender
-        assert invitation.siae == self.siae
+        assert invitation.siae == self.company
         assert invitation.USER_KIND == UserKind.EMPLOYER
 
     def test_send_invitation_to_not_employer(self):
@@ -103,12 +103,12 @@ class TestSendSingleSiaeInvitation(TestCase):
         assert EmployerInvitation.objects.count() == 1
 
         # SIAE 2 invites guest as well.
-        siae_2 = SiaeFactory(with_membership=True)
-        sender_2 = siae_2.members.first()
+        company = CompanyFactory(with_membership=True)
+        sender_2 = company.members.first()
         self.client.force_login(sender_2)
         self.client.post(INVITATION_URL, data=self.post_data)
         assert EmployerInvitation.objects.count() == 2
-        invitation = EmployerInvitation.objects.get(siae=siae_2)
+        invitation = EmployerInvitation.objects.get(siae=company)
         assert invitation.first_name == self.guest_data["first_name"]
         assert invitation.last_name == self.guest_data["last_name"]
         assert invitation.email == self.guest_data["email"]
@@ -116,9 +116,9 @@ class TestSendSingleSiaeInvitation(TestCase):
 
 class TestSendMultipleSiaeInvitation(TestCase):
     def setUp(self):
-        self.siae = SiaeFactory(with_membership=True)
+        self.company = CompanyFactory(with_membership=True)
         # The sender is a member of the SIAE
-        self.sender = self.siae.members.first()
+        self.sender = self.company.members.first()
         # Define instances not created in DB
         self.invited_user = EmployerFactory.build()
         self.second_invited_user = EmployerFactory.build()
@@ -170,8 +170,8 @@ class TestSendMultipleSiaeInvitation(TestCase):
 class TestSendInvitationToSpecialGuest(TestCase):
     def setUp(self):
         super().setUp()
-        self.sender_siae = SiaeFactory(with_membership=True)
-        self.sender = self.sender_siae.members.first()
+        self.sender_company = CompanyFactory(with_membership=True)
+        self.sender = self.sender_company.members.first()
         self.client.force_login(self.sender)
         self.post_data = {
             "form-TOTAL_FORMS": "1",
@@ -186,7 +186,7 @@ class TestSendInvitationToSpecialGuest(TestCase):
         can only be ressucitated by being invited to a new SIAE.
         We test here that this is indeed possible.
         """
-        guest = SiaeFactory(convention__is_active=False, with_membership=True).members.first()
+        guest = CompanyFactory(convention__is_active=False, with_membership=True).members.first()
         self.post_data.update(
             {
                 "form-0-first_name": guest.first_name,
@@ -198,16 +198,16 @@ class TestSendInvitationToSpecialGuest(TestCase):
         assert response.status_code == 200
         assert EmployerInvitation.objects.count() == 1
 
-    def test_invite_former_siae_member(self):
+    def test_invite_former_employer(self):
         """
         Admins can "deactivate" members of the organization (making the membership inactive).
         A deactivated member must be able to receive new invitations.
         """
-        guest = SiaeFactory(with_membership=True).members.first()
+        guest = CompanyFactory(with_membership=True).members.first()
 
         # Deactivate user
         membership = guest.companymembership_set.first()
-        membership.deactivate_membership_by_user(self.sender_siae.members.first())
+        membership.deactivate_membership_by_user(self.sender_company.members.first())
         membership.save()
 
         self.post_data.update(
@@ -257,8 +257,8 @@ class TestSendInvitationToSpecialGuest(TestCase):
 
     def test_already_a_member(self):
         # The invited user is already a member
-        CompanyMembershipFactory(siae=self.sender_siae, is_admin=False)
-        guest = self.sender_siae.members.exclude(email=self.sender.email).first()
+        CompanyMembershipFactory(siae=self.sender_company, is_admin=False)
+        guest = self.sender_company.members.exclude(email=self.sender.email).first()
         self.client.force_login(self.sender)
         self.post_data.update(
             {

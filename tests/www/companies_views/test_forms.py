@@ -1,7 +1,7 @@
 from itou.companies.enums import CompanyKind, ContractType
 from itou.www.companies_views.forms import EditJobDescriptionDetailsForm, EditJobDescriptionForm
 from tests.cities.factories import create_city_guerande
-from tests.companies.factories import SiaeFactory
+from tests.companies.factories import CompanyFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.utils.test import TestCase
 
@@ -15,7 +15,7 @@ class EditJobDescriptionFormTest(TestCase):
         self.guerande_city = create_city_guerande()
 
     def test_clean_contract_type(self):
-        siae = SiaeFactory()
+        company = CompanyFactory()
         post_data = {
             "appellation": "10357",
             "contract_type": ContractType.OTHER.value,
@@ -23,17 +23,17 @@ class EditJobDescriptionFormTest(TestCase):
             "open_positions": "1",
         }
 
-        form = EditJobDescriptionForm(current_siae=siae, data=post_data)
+        form = EditJobDescriptionForm(current_siae=company, data=post_data)
 
         assert form.errors.get("other_contract_type") is not None
 
         post_data["other_contract_type"] = "CDD new generation"
-        form = EditJobDescriptionForm(current_siae=siae, data=post_data)
+        form = EditJobDescriptionForm(current_siae=company, data=post_data)
 
         assert form.is_valid()
 
     def test_clean_open_positions(self):
-        siae = SiaeFactory()
+        company = CompanyFactory()
         post_data = {
             "appellation": "10357",
             "contract_type": ContractType.OTHER.value,
@@ -41,22 +41,22 @@ class EditJobDescriptionFormTest(TestCase):
             "open_positions": None,
         }
 
-        form = EditJobDescriptionForm(current_siae=siae, data=post_data)
+        form = EditJobDescriptionForm(current_siae=company, data=post_data)
         assert form.errors.get("open_positions") is not None
 
         post_data["open_positions"] = "0"
-        form = EditJobDescriptionForm(current_siae=siae, data=post_data)
+        form = EditJobDescriptionForm(current_siae=company, data=post_data)
         assert form.errors.get("open_positions") is not None
 
         post_data["open_positions"] = "1"
-        form = EditJobDescriptionForm(current_siae=siae, data=post_data)
+        form = EditJobDescriptionForm(current_siae=company, data=post_data)
         assert form.is_valid()
 
     def test_siae_errors(self):
-        siae = SiaeFactory()
+        company = CompanyFactory()
         post_data = {}
 
-        form = EditJobDescriptionForm(current_siae=siae, data=post_data)
+        form = EditJobDescriptionForm(current_siae=company, data=post_data)
         assert form.errors is not None
         assert "appellation" in form.errors.keys()
 
@@ -66,7 +66,7 @@ class EditJobDescriptionFormTest(TestCase):
             }
         )
 
-        form = EditJobDescriptionForm(current_siae=siae, data=post_data)
+        form = EditJobDescriptionForm(current_siae=company, data=post_data)
         assert form.errors is not None
         assert "contract_type" in form.errors.keys()
 
@@ -79,7 +79,7 @@ class EditJobDescriptionFormTest(TestCase):
             }
         )
 
-        form = EditJobDescriptionForm(current_siae=siae, data=post_data)
+        form = EditJobDescriptionForm(current_siae=company, data=post_data)
         assert form.errors is not None
         assert "open_positions" in form.errors.keys()
 
@@ -89,11 +89,11 @@ class EditJobDescriptionFormTest(TestCase):
             }
         )
 
-        form = EditJobDescriptionForm(current_siae=siae, data=post_data)
+        form = EditJobDescriptionForm(current_siae=company, data=post_data)
         assert form.is_valid()
 
     def test_siae_fields(self):
-        siae = SiaeFactory()
+        company = CompanyFactory()
         post_data = {
             "appellation": "10357",
             "custom_name": "custom_name",
@@ -107,7 +107,7 @@ class EditJobDescriptionFormTest(TestCase):
             "is_resume_mandatory": "on",
         }
 
-        form = EditJobDescriptionForm(current_siae=siae, data=post_data)
+        form = EditJobDescriptionForm(current_siae=company, data=post_data)
 
         assert form.is_valid()
 
@@ -118,7 +118,7 @@ class EditJobDescriptionFormTest(TestCase):
         assert 35 == cleaned_data.get("hours_per_week")
         assert 5 == cleaned_data.get("open_positions")
 
-        form = EditJobDescriptionDetailsForm(current_siae=siae, data=post_data)
+        form = EditJobDescriptionDetailsForm(current_siae=company, data=post_data)
 
         assert form.is_valid()
 
@@ -132,7 +132,7 @@ class EditJobDescriptionFormTest(TestCase):
 
         del post_data["is_resume_mandatory"]
 
-        form = EditJobDescriptionDetailsForm(current_siae=siae, data=post_data)
+        form = EditJobDescriptionDetailsForm(current_siae=company, data=post_data)
 
         assert form.is_valid()
 
@@ -140,7 +140,7 @@ class EditJobDescriptionFormTest(TestCase):
         assert not cleaned_data.get("is_resume_mandatory")
 
     def test_opcs_errors(self):
-        opcs = SiaeFactory(kind=CompanyKind.OPCS)
+        opcs = CompanyFactory(kind=CompanyKind.OPCS)
         post_data = {
             "appellation": "10357",
             "custom_name": "custom_name",
@@ -169,7 +169,7 @@ class EditJobDescriptionFormTest(TestCase):
         assert form.is_valid()
 
     def test_opcs_fields(self):
-        siae = SiaeFactory(kind=CompanyKind.OPCS)
+        company = CompanyFactory(kind=CompanyKind.OPCS)
         post_data = {
             "appellation": "10357",
             "custom_name": "custom_name",
@@ -185,7 +185,7 @@ class EditJobDescriptionFormTest(TestCase):
             "is_qpv_mandatory": "on",
         }
 
-        form = EditJobDescriptionForm(current_siae=siae, data=post_data)
+        form = EditJobDescriptionForm(current_siae=company, data=post_data)
 
         assert form.is_valid()
 
@@ -197,7 +197,7 @@ class EditJobDescriptionFormTest(TestCase):
         assert 5 == cleaned_data.get("open_positions")
         assert "market_context_description" == cleaned_data.get("market_context_description")
 
-        form = EditJobDescriptionDetailsForm(current_siae=siae, data=post_data)
+        form = EditJobDescriptionDetailsForm(current_siae=company, data=post_data)
 
         assert form.is_valid()
 
@@ -213,7 +213,7 @@ class EditJobDescriptionFormTest(TestCase):
         del post_data["is_resume_mandatory"]
         del post_data["is_qpv_mandatory"]
 
-        form = EditJobDescriptionDetailsForm(current_siae=siae, data=post_data)
+        form = EditJobDescriptionDetailsForm(current_siae=company, data=post_data)
 
         assert form.is_valid()
 
@@ -224,7 +224,7 @@ class EditJobDescriptionFormTest(TestCase):
 
 class EditJobDescriptionDetailsFormTest(TestCase):
     def test_siae_fields(self):
-        siae = SiaeFactory()
+        company = CompanyFactory()
 
         post_data = {
             "description": "description",
@@ -232,7 +232,7 @@ class EditJobDescriptionDetailsFormTest(TestCase):
             "is_resume_mandatory": "on",
         }
 
-        form = EditJobDescriptionDetailsForm(current_siae=siae, data=post_data)
+        form = EditJobDescriptionDetailsForm(current_siae=company, data=post_data)
 
         assert form.is_valid()
 
@@ -246,7 +246,7 @@ class EditJobDescriptionDetailsFormTest(TestCase):
 
         del post_data["is_resume_mandatory"]
 
-        form = EditJobDescriptionDetailsForm(current_siae=siae, data=post_data)
+        form = EditJobDescriptionDetailsForm(current_siae=company, data=post_data)
 
         assert form.is_valid()
 
@@ -254,7 +254,7 @@ class EditJobDescriptionDetailsFormTest(TestCase):
         assert not cleaned_data.get("is_resume_mandatory")
 
     def test_opcs_fields(self):
-        siae = SiaeFactory(kind=CompanyKind.OPCS)
+        company = CompanyFactory(kind=CompanyKind.OPCS)
 
         post_data = {
             "description": "description",
@@ -263,7 +263,7 @@ class EditJobDescriptionDetailsFormTest(TestCase):
             "is_qpv_mandatory": "on",
         }
 
-        form = EditJobDescriptionDetailsForm(current_siae=siae, data=post_data)
+        form = EditJobDescriptionDetailsForm(current_siae=company, data=post_data)
 
         assert form.is_valid()
 
@@ -279,7 +279,7 @@ class EditJobDescriptionDetailsFormTest(TestCase):
         del post_data["is_resume_mandatory"]
         del post_data["is_qpv_mandatory"]
 
-        form = EditJobDescriptionDetailsForm(current_siae=siae, data=post_data)
+        form = EditJobDescriptionDetailsForm(current_siae=company, data=post_data)
 
         assert form.is_valid()
 

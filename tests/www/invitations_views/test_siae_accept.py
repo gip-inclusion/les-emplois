@@ -13,7 +13,7 @@ from itou.users.enums import KIND_EMPLOYER, UserKind
 from itou.users.models import User
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import add_url_params
-from tests.companies.factories import SiaeFactory
+from tests.companies.factories import CompanyFactory
 from tests.invitations.factories import ExpiredEmployerInvitationFactory, SentEmployerInvitationFactory
 from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
 from tests.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
@@ -44,9 +44,9 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         )
 
         # Assert the user sees his new siae dashboard
-        current_siae = get_current_siae_or_404(response.wsgi_request)
+        current_company = get_current_siae_or_404(response.wsgi_request)
         # A user can be member of one or more siae
-        assert current_siae in user.company_set.all()
+        assert current_company in user.company_set.all()
 
     @respx.mock
     def test_accept_invitation_signup(self):
@@ -270,8 +270,8 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         self.assertContains(response, escape("Cette invitation n'est plus valide."))
 
     def test_inactive_siae(self):
-        siae = SiaeFactory(convention__is_active=False)
-        invitation = SentEmployerInvitationFactory(siae=siae)
+        company = CompanyFactory(convention__is_active=False)
+        invitation = SentEmployerInvitationFactory(siae=company)
         user = EmployerFactory(email=invitation.email)
         self.client.force_login(user)
         join_url = reverse("invitations_views:join_siae", kwargs={"invitation_id": invitation.id})
@@ -296,12 +296,12 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         can only be ressucitated by being invited to a new SIAE.
         We test here that this is indeed possible.
         """
-        siae = SiaeFactory(with_membership=True)
-        sender = siae.members.first()
-        user = SiaeFactory(convention__is_active=False, with_membership=True).members.first()
+        company = CompanyFactory(with_membership=True)
+        sender = company.members.first()
+        user = CompanyFactory(convention__is_active=False, with_membership=True).members.first()
         invitation = SentEmployerInvitationFactory(
             sender=sender,
-            siae=siae,
+            siae=company,
             first_name=user.first_name,
             last_name=user.last_name,
             email=user.email,
@@ -312,17 +312,17 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         # /invitations/<uui>/join_siae then /welcoming_tour/index
         assert len(response.redirect_chain) == 2
 
-        current_siae = get_current_siae_or_404(response.wsgi_request)
-        assert siae.pk == current_siae.pk
+        current_company = get_current_siae_or_404(response.wsgi_request)
+        assert company.pk == current_company.pk
         self.assert_accepted_invitation(response, invitation, user)
 
     @respx.mock
     def test_accept_new_user_to_inactive_siae(self):
-        siae = SiaeFactory(convention__is_active=False, with_membership=True)
-        sender = siae.members.first()
+        company = CompanyFactory(convention__is_active=False, with_membership=True)
+        sender = company.members.first()
         invitation = SentEmployerInvitationFactory(
             sender=sender,
-            siae=siae,
+            siae=company,
             email=OIDC_USERINFO["email"],
         )
         response = self.client.get(invitation.acceptance_link, follow=True)

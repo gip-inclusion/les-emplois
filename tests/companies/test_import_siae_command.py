@@ -20,7 +20,7 @@ from itou.companies.enums import CompanyKind
 from itou.companies.management.commands._import_siae.utils import anonymize_fluxiae_df, could_siae_be_deleted
 from itou.companies.models import Company
 from tests.approvals.factories import ApprovalFactory
-from tests.companies.factories import SiaeConventionFactory, SiaeFactory, SiaeWith2MembershipsFactory
+from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory, SiaeConventionFactory
 from tests.eligibility.factories import EligibilityDiagnosisMadeBySiaeFactory
 
 
@@ -71,8 +71,8 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         cls.mod = None
 
     def test_uncreatable_conventions_for_active_siae_with_active_convention(self):
-        siae = SiaeFactory(source=Company.SOURCE_ASP)
-        assert siae.is_active
+        company = CompanyFactory(source=Company.SOURCE_ASP)
+        assert company.is_active
         assert not self.mod.get_creatable_conventions()
 
     def test_uncreatable_conventions_when_convention_exists_for_asp_id_and_kind(self):
@@ -81,8 +81,8 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         SIRET = "26290411300061"
         ASP_ID = 190
 
-        siae = SiaeFactory(source=Company.SOURCE_ASP, siret=SIRET, convention=None)
-        SiaeConventionFactory(kind=siae.kind, asp_id=ASP_ID)
+        company = CompanyFactory(source=Company.SOURCE_ASP, siret=SIRET, convention=None)
+        SiaeConventionFactory(kind=company.kind, asp_id=ASP_ID)
 
         with pytest.raises(AssertionError):
             self.mod.get_creatable_conventions()
@@ -91,58 +91,58 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         SIRET = SIRET_SIGNATURE = "21540323900019"
         ASP_ID = 112
 
-        siae = SiaeFactory(source=Company.SOURCE_ASP, siret=SIRET, kind=CompanyKind.ACI, convention=None)
+        company = CompanyFactory(source=Company.SOURCE_ASP, siret=SIRET, kind=CompanyKind.ACI, convention=None)
         results = self.mod.get_creatable_conventions()
 
         assert len(results) == 1
 
-        convention, siae = results[0]
+        convention, company = results[0]
         assert (
             convention.asp_id,
             convention.kind,
             convention.siret_signature,
             convention.is_active,
             convention.deactivated_at,
-        ) == (ASP_ID, siae.kind, SIRET_SIGNATURE, True, None)
-        assert (siae.source, siae.siret, siae.kind) == (Company.SOURCE_ASP, SIRET, CompanyKind.ACI)
+        ) == (ASP_ID, company.kind, SIRET_SIGNATURE, True, None)
+        assert (company.source, company.siret, company.kind) == (Company.SOURCE_ASP, SIRET, CompanyKind.ACI)
 
     def test_creatable_conventions_for_active_siae_where_siret_not_equals_siret_signature(self):
         SIRET = "34950857200055"
         SIRET_SIGNATURE = "34950857200048"
         ASP_ID = 768
 
-        siae = SiaeFactory(source=Company.SOURCE_ASP, siret=SIRET, kind=CompanyKind.AI, convention=None)
+        company = CompanyFactory(source=Company.SOURCE_ASP, siret=SIRET, kind=CompanyKind.AI, convention=None)
         results = self.mod.get_creatable_conventions()
 
         assert len(results) == 1
 
-        convention, siae = results[0]
+        convention, company = results[0]
         assert (
             convention.asp_id,
             convention.kind,
             convention.siret_signature,
             convention.is_active,
             convention.deactivated_at,
-        ) == (ASP_ID, siae.kind, SIRET_SIGNATURE, True, None)
-        assert (siae.source, siae.siret, siae.kind) == (Company.SOURCE_ASP, SIRET, CompanyKind.AI)
+        ) == (ASP_ID, company.kind, SIRET_SIGNATURE, True, None)
+        assert (company.source, company.siret, company.kind) == (Company.SOURCE_ASP, SIRET, CompanyKind.AI)
 
     def test_creatable_conventions_inactive_siae(self):
         SIRET = SIRET_SIGNATURE = "41294123900011"
         ASP_ID = 1780
-        siae = SiaeFactory(source=Company.SOURCE_ASP, siret=SIRET, kind=CompanyKind.ACI, convention=None)
-        results = self.mod.get_creatable_conventions()
+        company = CompanyFactory(source=Company.SOURCE_ASP, siret=SIRET, kind=CompanyKind.ACI, convention=None)
+        company = self.mod.get_creatable_conventions()
 
-        assert len(results) == 1
+        assert len(company) == 1
 
-        convention, siae = results[0]
+        convention, company = company[0]
         assert (
             convention.asp_id,
             convention.kind,
             convention.siret_signature,
             convention.is_active,
             convention.deactivated_at.to_pydatetime(),
-        ) == (ASP_ID, siae.kind, SIRET_SIGNATURE, False, datetime.datetime(2020, 2, 29, 0, 0))
-        assert (siae.source, siae.siret, siae.kind) == (Company.SOURCE_ASP, SIRET, CompanyKind.ACI)
+        ) == (ASP_ID, company.kind, SIRET_SIGNATURE, False, datetime.datetime(2020, 2, 29, 0, 0))
+        assert (company.source, company.siret, company.kind) == (Company.SOURCE_ASP, SIRET, CompanyKind.ACI)
 
     def test_get_creatable_and_deletable_afs(self):
         existing_convention = SiaeConventionFactory(kind=CompanyKind.ACI, asp_id=2855)
@@ -175,21 +175,21 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
 
     def test_check_signup_possible_for_a_siae_without_members_but_with_auth_email(self):
         instance = lazy_import_siae_command()
-        SiaeFactory(auth_email="tadaaa")
+        CompanyFactory(auth_email="tadaaa")
         with self.assertNumQueries(1):
             instance.check_whether_signup_is_possible_for_all_siaes()
         assert instance.fatal_errors == 0
 
     def test_check_signup_possible_for_a_siae_without_members_nor_auth_email(self):
         instance = lazy_import_siae_command()
-        SiaeFactory(auth_email="")
+        CompanyFactory(auth_email="")
         with self.assertNumQueries(1):
             instance.check_whether_signup_is_possible_for_all_siaes()
         assert instance.fatal_errors == 1
 
     def test_check_signup_possible_for_a_siae_with_members_but_no_auth_email_case_one(self):
         instance = lazy_import_siae_command()
-        SiaeWith2MembershipsFactory(
+        CompanyWith2MembershipsFactory(
             auth_email="",
             membership1__is_active=False,
             membership1__user__is_active=False,
@@ -200,7 +200,7 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
 
     def test_check_signup_possible_for_a_siae_with_members_but_no_auth_email_case_two(self):
         instance = lazy_import_siae_command()
-        SiaeWith2MembershipsFactory(
+        CompanyWith2MembershipsFactory(
             auth_email="",
             membership1__is_active=False,
             membership1__user__is_active=False,
@@ -213,7 +213,7 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
 
     def test_check_signup_possible_for_a_siae_with_members_but_no_auth_email_case_three(self):
         instance = lazy_import_siae_command()
-        SiaeWith2MembershipsFactory(auth_email="")
+        CompanyWith2MembershipsFactory(auth_email="")
         with self.assertNumQueries(1):
             instance.check_whether_signup_is_possible_for_all_siaes()
         assert instance.fatal_errors == 0
@@ -242,13 +242,13 @@ def test_could_siae_be_deleted_with_eligibility_diagnosis():
     # Check that eligibility diagnoses made by SIAE are blocking its deletion
 
     # No eligibility diagnosis linked
-    siae = SiaeWith2MembershipsFactory()
-    assert could_siae_be_deleted(siae)
+    company = CompanyWith2MembershipsFactory()
+    assert could_siae_be_deleted(company)
 
     # An eligibility diagnosis without related approval
-    EligibilityDiagnosisMadeBySiaeFactory(author_siae=siae, author=siae.members.first())
-    assert could_siae_be_deleted(siae)
+    EligibilityDiagnosisMadeBySiaeFactory(author_siae=company, author=company.members.first())
+    assert could_siae_be_deleted(company)
 
     # Approval with eligibility diagnosis authored by SIAE
-    ApprovalFactory(eligibility_diagnosis__author_siae=siae)
-    assert not could_siae_be_deleted(siae)
+    ApprovalFactory(eligibility_diagnosis__author_siae=company)
+    assert not could_siae_be_deleted(company)

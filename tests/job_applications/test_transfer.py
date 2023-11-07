@@ -6,7 +6,7 @@ from django.utils import timezone
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.users.enums import UserKind
-from tests.companies.factories import SiaeFactory, SiaeWith2MembershipsFactory
+from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
@@ -45,26 +45,26 @@ class JobApplicationTransferModelTest(TestCase):
         # Only users in both origin and target SIAE
         # can transfer a job_application
         # (provided it is in correct state)
-        origin_siae = SiaeFactory(with_membership=True)
-        target_siae = SiaeFactory(with_membership=True)
+        origin_company = CompanyFactory(with_membership=True)
+        target_company = CompanyFactory(with_membership=True)
 
-        origin_user = origin_siae.members.first()
-        target_user = target_siae.members.first()
+        origin_user = origin_company.members.first()
+        target_user = target_company.members.first()
         lambda_user = JobSeekerFactory()
-        target_siae.members.add(origin_user)
+        target_company.members.add(origin_user)
 
-        job_application = JobApplicationFactory(to_siae=origin_siae, state=JobApplicationWorkflow.STATE_ACCEPTED)
+        job_application = JobApplicationFactory(to_siae=origin_company, state=JobApplicationWorkflow.STATE_ACCEPTED)
 
         assert origin_user.kind == UserKind.EMPLOYER
         assert target_user.kind == UserKind.EMPLOYER
         assert not job_application.can_be_transferred(target_user, job_application.to_siae)
-        assert not job_application.can_be_transferred(lambda_user, target_siae)
-        assert not job_application.can_be_transferred(target_user, target_siae)
-        assert not job_application.can_be_transferred(origin_user, target_siae)
+        assert not job_application.can_be_transferred(lambda_user, target_company)
+        assert not job_application.can_be_transferred(target_user, target_company)
+        assert not job_application.can_be_transferred(origin_user, target_company)
 
         job_application.state = JobApplicationWorkflow.STATE_PROCESSING
 
-        assert job_application.can_be_transferred(origin_user, target_siae)
+        assert job_application.can_be_transferred(origin_user, target_company)
 
     def test_transfer_to(self):
         # If all conditions are valid, a user can transfer job applications between SIAE they are member of,
@@ -72,63 +72,63 @@ class JobApplicationTransferModelTest(TestCase):
         # After transfer:
         # - job application is not linked to origin SIAE anymore (only to target SIAE)
         # - eligibility diagnosis is deleted if not created by an authorized prescriber
-        origin_siae = SiaeFactory(with_membership=True)
-        target_siae = SiaeFactory(with_membership=True)
+        origin_company = CompanyFactory(with_membership=True)
+        target_company = CompanyFactory(with_membership=True)
 
-        origin_user = origin_siae.members.first()
-        target_user = target_siae.members.first()
+        origin_user = origin_company.members.first()
+        target_user = target_company.members.first()
         lambda_user = JobSeekerFactory()
-        target_siae.members.add(origin_user)
+        target_company.members.add(origin_user)
 
         job_application = JobApplicationFactory(
-            to_siae=origin_siae,
+            to_siae=origin_company,
             sent_by_authorized_prescriber_organisation=True,
             state=JobApplicationWorkflow.STATE_ACCEPTED,
         )
 
         # Conditions hould be covered by previous test, but does not hurt (and tests raise)
         with pytest.raises(ValidationError):
-            job_application.transfer_to(lambda_user, target_siae)
+            job_application.transfer_to(lambda_user, target_company)
         with pytest.raises(ValidationError):
-            job_application.transfer_to(origin_user, origin_siae)
+            job_application.transfer_to(origin_user, origin_company)
         with pytest.raises(ValidationError):
-            job_application.transfer_to(target_user, target_siae)
+            job_application.transfer_to(target_user, target_company)
         with pytest.raises(ValidationError):
-            job_application.transfer_to(origin_user, target_siae)
+            job_application.transfer_to(origin_user, target_company)
 
         job_application.state = JobApplicationWorkflow.STATE_PROCESSING
-        job_application.transfer_to(origin_user, target_siae)
+        job_application.transfer_to(origin_user, target_company)
         job_application.refresh_from_db()
 
         # "Normal" transfer
-        assert job_application.to_siae == target_siae
+        assert job_application.to_siae == target_company
         assert job_application.state == JobApplicationWorkflow.STATE_NEW
         assert job_application.eligibility_diagnosis is not None
 
         # Eligibilty diagnosis not sent by authorized prescriber must be deleted
         job_application = JobApplicationSentBySiaeFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
-            to_siae=origin_siae,
+            to_siae=origin_company,
             eligibility_diagnosis=EligibilityDiagnosisMadeBySiaeFactory(),
         )
         eligibility_diagnosis_pk = job_application.eligibility_diagnosis.pk
-        job_application.transfer_to(origin_user, target_siae)
+        job_application.transfer_to(origin_user, target_company)
         job_application.refresh_from_db()
 
-        assert job_application.to_siae == target_siae
+        assert job_application.to_siae == target_company
         assert job_application.state == JobApplicationWorkflow.STATE_NEW
         assert job_application.eligibility_diagnosis is None
         assert not EligibilityDiagnosis.objects.filter(pk=eligibility_diagnosis_pk)
 
     def test_transfer_to_without_sender(self):
-        origin_siae = SiaeFactory(with_membership=True)
-        target_siae = SiaeFactory(with_membership=True)
-        origin_user = origin_siae.members.first()
-        target_siae.members.first()
-        target_siae.members.add(origin_user)
+        origin_company = CompanyFactory(with_membership=True)
+        target_company = CompanyFactory(with_membership=True)
+        origin_user = origin_company.members.first()
+        target_company.members.first()
+        target_company.members.add(origin_user)
 
         job_application = JobApplicationFactory(
-            to_siae=origin_siae,
+            to_siae=origin_company,
             sent_by_authorized_prescriber_organisation=True,
             state=JobApplicationWorkflow.STATE_PROCESSING,
         )
@@ -136,24 +136,24 @@ class JobApplicationTransferModelTest(TestCase):
         job_application.sender = None
         job_application.save(update_fields=["sender"])
 
-        job_application.transfer_to(origin_user, target_siae)
+        job_application.transfer_to(origin_user, target_company)
         job_application.refresh_from_db()
 
-        assert job_application.to_siae == target_siae
+        assert job_application.to_siae == target_company
         assert job_application.state == JobApplicationWorkflow.STATE_NEW
 
     def test_model_fields(self):
         # Check new fields in model
-        origin_siae = SiaeFactory(with_membership=True)
-        target_siae = SiaeFactory(with_membership=True)
+        origin_company = CompanyFactory(with_membership=True)
+        target_company = CompanyFactory(with_membership=True)
 
-        origin_user = origin_siae.members.first()
-        target_user = target_siae.members.first()
-        target_siae.members.add(origin_user)
+        origin_user = origin_company.members.first()
+        target_user = target_company.members.first()
+        target_company.members.add(origin_user)
 
         job_application = JobApplicationSentBySiaeFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
-            to_siae=origin_siae,
+            to_siae=origin_company,
             eligibility_diagnosis=EligibilityDiagnosisMadeBySiaeFactory(),
             answer="Answer to job seeker",
             answer_to_prescriber="Answer to prescriber",
@@ -161,7 +161,7 @@ class JobApplicationTransferModelTest(TestCase):
 
         # Failing to transfer must not update new fields
         with pytest.raises(ValidationError):
-            job_application.transfer_to(target_user, target_siae)
+            job_application.transfer_to(target_user, target_company)
         assert job_application.transferred_by is None
         assert job_application.transferred_from is None
         assert job_application.transferred_at is None
@@ -176,14 +176,14 @@ class JobApplicationTransferModelTest(TestCase):
             + 2  # Delete diagnosis and criteria made by the SIAE
             + 1  # Select user for email
         ):
-            job_application.transfer_to(origin_user, target_siae)
+            job_application.transfer_to(origin_user, target_company)
 
         job_application.refresh_from_db()
 
         assert job_application.transferred_by == origin_user
-        assert job_application.transferred_from == origin_siae
+        assert job_application.transferred_from == origin_company
         assert timezone.localdate() == job_application.transferred_at.date()
-        assert job_application.to_siae == target_siae
+        assert job_application.to_siae == target_company
         assert job_application.state == JobApplicationWorkflow.STATE_NEW
         assert job_application.eligibility_diagnosis is None
         assert job_application.answer == ""
@@ -202,20 +202,20 @@ class JobApplicationTransferModelTest(TestCase):
         # - origin SIAE
         # - job seeker
         # - Prescriber (if any linked eligibility diagnosis was not sent by a SIAE)
-        origin_siae = SiaeFactory(with_membership=True)
-        target_siae = SiaeFactory(with_membership=True)
+        origin_company = CompanyFactory(with_membership=True)
+        target_company = CompanyFactory(with_membership=True)
 
-        origin_user = origin_siae.members.first()
-        target_siae.members.add(origin_user)
+        origin_user = origin_company.members.first()
+        target_company.members.add(origin_user)
 
         job_application = JobApplicationSentBySiaeFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
-            to_siae=origin_siae,
+            to_siae=origin_company,
             eligibility_diagnosis=EligibilityDiagnosisMadeBySiaeFactory(),
         )
         job_seeker = job_application.job_seeker
 
-        job_application.transfer_to(origin_user, target_siae)
+        job_application.transfer_to(origin_user, target_company)
 
         # Eligigibility diagnosis is done by SIAE : must not send an email
         assert len(mail.outbox) == 2
@@ -233,21 +233,21 @@ class JobApplicationTransferModelTest(TestCase):
     def test_transfer_must_notify_prescriber(self):
         # Same test and conditions as above, but this time prescriber
         # at the origin of the eligibility disgnosis must be notified
-        origin_siae = SiaeFactory(with_membership=True)
-        target_siae = SiaeFactory(with_membership=True)
+        origin_company = CompanyFactory(with_membership=True)
+        target_company = CompanyFactory(with_membership=True)
 
-        origin_user = origin_siae.members.first()
-        target_siae.members.add(origin_user)
+        origin_user = origin_company.members.first()
+        target_company.members.add(origin_user)
 
         # Eligibility diagnosis was made by a prescriber
         job_application = JobApplicationSentByPrescriberFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
-            to_siae=origin_siae,
+            to_siae=origin_company,
             eligibility_diagnosis=EligibilityDiagnosisFactory(),
         )
         job_seeker = job_application.job_seeker
 
-        job_application.transfer_to(origin_user, target_siae)
+        job_application.transfer_to(origin_user, target_company)
 
         assert len(mail.outbox) == 3
 
@@ -258,24 +258,24 @@ class JobApplicationTransferModelTest(TestCase):
         assert f"La candidature de {job_seeker.get_full_name()} a été transférée" == mail.outbox[2].subject
         assert "a transféré la candidature de :" in mail.outbox[2].body
 
-    def test_transfer_notifications_to_many_siae_members(self):
+    def test_transfer_notifications_to_many_employers(self):
         # Same as test_transfer_must_notify_siae_and_job_seeker
         # but with to recipients for SIAE transfer notification
-        origin_siae = SiaeWith2MembershipsFactory()
-        target_siae = SiaeFactory(with_membership=True)
+        origin_company = CompanyWith2MembershipsFactory()
+        target_company = CompanyFactory(with_membership=True)
 
-        origin_user_1 = origin_siae.members.all()[0]
-        origin_user_2 = origin_siae.members.all()[1]
-        target_siae.members.add(origin_user_1)
+        origin_user_1 = origin_company.members.all()[0]
+        origin_user_2 = origin_company.members.all()[1]
+        target_company.members.add(origin_user_1)
 
         job_application = JobApplicationSentBySiaeFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
-            to_siae=origin_siae,
+            to_siae=origin_company,
             eligibility_diagnosis=EligibilityDiagnosisMadeBySiaeFactory(),
         )
         job_seeker = job_application.job_seeker
 
-        job_application.transfer_to(origin_user_1, target_siae)
+        job_application.transfer_to(origin_user_1, target_company)
 
         # Only checking SIAE email
         assert len(mail.outbox) == 2

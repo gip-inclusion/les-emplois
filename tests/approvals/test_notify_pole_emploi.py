@@ -21,7 +21,7 @@ from itou.utils.mocks.pole_emploi import (
     API_RECHERCHE_RESULT_KNOWN,
 )
 from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
-from tests.companies.factories import SiaeFactory
+from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import JobSeekerFactory
 from tests.utils.test import TestCase
@@ -273,9 +273,9 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         )
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_ERROR)
         job_seeker = JobSeekerFactory()
-        siae = SiaeFactory(kind="FOO")  # unknown kind
+        company = CompanyFactory(kind="FOO")  # unknown kind
         approval = ApprovalFactory(user=job_seeker)
-        JobApplicationFactory(to_siae=siae, approval=approval, state=JobApplicationWorkflow.STATE_ACCEPTED)
+        JobApplicationFactory(to_siae=company, approval=approval, state=JobApplicationWorkflow.STATE_ACCEPTED)
         approval.notify_pole_emploi(at=now)
         approval.refresh_from_db()
         assert approval.pe_notification_status == "notification_error"
@@ -291,9 +291,9 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         )
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_ERROR)
         job_seeker = JobSeekerFactory()
-        siae = SiaeFactory(kind="FOO")  # unknown kind
+        company = CompanyFactory(kind="FOO")  # unknown kind
         approval = ApprovalFactory(user=job_seeker)
-        JobApplicationFactory(to_siae=siae, approval=approval, state=JobApplicationWorkflow.STATE_POSTPONED)
+        JobApplicationFactory(to_siae=company, approval=approval, state=JobApplicationWorkflow.STATE_POSTPONED)
         approval.notify_pole_emploi(at=now)
         approval.refresh_from_db()
         assert approval.pe_notification_status == "notification_pending"

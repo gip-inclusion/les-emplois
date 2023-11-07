@@ -7,7 +7,7 @@ from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.users.models import User
 from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
-from tests.companies.factories import CompanyMembershipFactory, SiaeFactory
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import JobSeekerFactory
 from tests.utils.test import TestCase, assertMessages
@@ -21,14 +21,14 @@ class PoleEmploiApprovalSearchTest(TestCase):
     def set_up_pe_approval(self, with_job_application=True):
         self.pe_approval = PoleEmploiApprovalFactory()
 
-        self.siae = SiaeFactory(with_membership=True)
-        self.siae_user = self.siae.members.first()
+        self.company = CompanyFactory(with_membership=True)
+        self.employer = self.company.members.first()
         if with_job_application:
             self.job_application = JobApplicationFactory(
                 with_approval=True,
                 approval__origin=approvals_enums.Origin.PE_APPROVAL,
                 approval__eligibility_diagnosis=None,
-                to_siae=self.siae,
+                to_siae=self.company,
                 approval__number=self.pe_approval.number,
             )
             self.approval = self.job_application.approval
@@ -41,8 +41,8 @@ class PoleEmploiApprovalSearchTest(TestCase):
         """
         The search for PE approval screen should not crash ;)
         """
-        siae = CompanyMembershipFactory()
-        self.client.force_login(siae.user)
+        company = CompanyMembershipFactory()
+        self.client.force_login(company.user)
 
         response = self.client.get(self.url)
         self.assertContains(response, "Rechercher")
@@ -54,7 +54,7 @@ class PoleEmploiApprovalSearchTest(TestCase):
         but not PASS IAE.
         """
         self.set_up_pe_approval(with_job_application=False)
-        self.client.force_login(self.siae_user)
+        self.client.force_login(self.employer)
 
         response = self.client.get(self.url, {"number": self.pe_approval.number})
         self.assertContains(response, "Continuer")
@@ -63,8 +63,8 @@ class PoleEmploiApprovalSearchTest(TestCase):
         """
         Don't accept approval suffixes (example: 1234567890123P01).
         """
-        siae = CompanyMembershipFactory()
-        self.client.force_login(siae.user)
+        company = CompanyMembershipFactory()
+        self.client.force_login(company.user)
 
         response = self.client.get(self.url, {"number": "1234567890123P01"})
         assert not response.context["form"].is_valid()
@@ -74,8 +74,8 @@ class PoleEmploiApprovalSearchTest(TestCase):
         The search for PE approval screen should display that there is no results
         if a PE approval number was searched for but nothing was found
         """
-        siae = CompanyMembershipFactory()
-        self.client.force_login(siae.user)
+        company = CompanyMembershipFactory()
+        self.client.force_login(company.user)
 
         response = self.client.get(self.url, {"number": 123123123123})
         self.assertNotContains(response, "Continuer")
@@ -87,7 +87,7 @@ class PoleEmploiApprovalSearchTest(TestCase):
         """
         self.set_up_pe_approval()
 
-        self.client.force_login(self.siae_user)
+        self.client.force_login(self.employer)
 
         response = self.client.get(self.url, {"number": self.approval.number})
         assert response.status_code == 302
@@ -104,7 +104,7 @@ class PoleEmploiApprovalSearchTest(TestCase):
         ja.state = JobApplicationWorkflow.STATE_CANCELLED
         ja.save()
 
-        self.client.force_login(self.siae_user)
+        self.client.force_login(self.employer)
         # Our approval should not be usable without a job application
         response = self.client.get(self.url, {"number": self.approval.number})
         self.assertNotContains(response, "Continuer")
@@ -131,11 +131,11 @@ class PoleEmploiApprovalSearchTest(TestCase):
             job_seeker=job_seeker,
         )
 
-        another_siae = job_application.to_siae
-        assert another_siae != self.siae
+        another_company = job_application.to_siae
+        assert another_company != self.company
 
         # This is the current user (NOT a member of `another_siae`).
-        self.client.force_login(self.siae_user)
+        self.client.force_login(self.employer)
 
         # The current user should not be able to use the PASS IAE used by another SIAE.
         response = self.client.get(self.url, {"number": job_application.approval.number})
@@ -197,8 +197,8 @@ class PoleEmploiApprovalCreateTest(TestCase):
     def setUp(self):
         super().setUp()
         self.job_application = JobApplicationFactory(with_approval=True)
-        self.siae = self.job_application.to_siae
-        self.siae_user = self.job_application.to_siae.members.first()
+        self.company = self.job_application.to_siae
+        self.employer = self.job_application.to_siae.members.first()
         self.approval = self.job_application.approval
         self.job_seeker = self.job_application.job_seeker
         self.pe_approval = PoleEmploiApprovalFactory()
@@ -209,7 +209,7 @@ class PoleEmploiApprovalCreateTest(TestCase):
         """
         initial_approval_count = Approval.objects.count()
         initial_user_count = User.objects.count()
-        self.client.force_login(self.siae_user)
+        self.client.force_login(self.employer)
         email = "some.new@email.com"
         url = reverse("approvals:pe_approval_create", kwargs={"pe_approval_id": self.pe_approval.id})
         params = {"email": email}
@@ -239,7 +239,7 @@ class PoleEmploiApprovalCreateTest(TestCase):
         """
         initial_approval_count = Approval.objects.count()
         job_seeker = JobSeekerFactory()
-        self.client.force_login(self.siae_user)
+        self.client.force_login(self.employer)
 
         url = reverse("approvals:pe_approval_create", kwargs={"pe_approval_id": self.pe_approval.id})
         params = {"email": job_seeker.email}
@@ -268,7 +268,7 @@ class PoleEmploiApprovalCreateTest(TestCase):
 
         initial_approval_count = Approval.objects.count()
         job_seeker = JobSeekerFactory()
-        self.client.force_login(self.siae_user)
+        self.client.force_login(self.employer)
 
         url = reverse("approvals:pe_approval_create", kwargs={"pe_approval_id": self.pe_approval.id})
         params = {"email": job_seeker.email}
@@ -285,7 +285,7 @@ class PoleEmploiApprovalCreateTest(TestCase):
         assert self.job_seeker.has_valid_common_approval
 
         initial_approval_count = Approval.objects.count()
-        self.client.force_login(self.siae_user)
+        self.client.force_login(self.employer)
 
         url = reverse("approvals:pe_approval_create", kwargs={"pe_approval_id": self.pe_approval.id})
         params = {"email": self.job_seeker.email}
