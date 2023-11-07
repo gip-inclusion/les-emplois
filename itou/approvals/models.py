@@ -793,19 +793,29 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             )
             return
 
-        job_application = self.jobapplication_set.accepted().order_by("-created_at").first()
-        if not job_application:
-            self.pe_log_err("had no accepted job application")
-            self.pe_save_pending(
-                api_enums.PEApiPreliminaryCheckFailureReason.NO_JOB_APPLICATION,
-                at,
-            )
-            return
+        sender_kind = self.origin_sender_kind
+        prescriber_organization_kind = self.origin_prescriber_organization_kind
+        siae_siret = self.origin_siae_siret
+        siae_kind = self.origin_siae_kind
+        if not all((sender_kind, siae_siret, siae_kind)):
+            job_application = self.jobapplication_set.accepted().order_by("-created_at").first()
+            if not job_application:
+                self.pe_log_err("had no accepted job application")
+                self.pe_save_pending(
+                    api_enums.PEApiPreliminaryCheckFailureReason.NO_JOB_APPLICATION,
+                    at,
+                )
+                return
 
-        company = job_application.to_company
-        type_siae = companies_enums.siae_kind_to_pe_type_siae(company.kind)
+            siae_siret = job_application.to_company.siret
+            siae_kind = job_application.to_company.kind
+            sender_kind = job_application.sender_kind
+            if prescriber_org := job_application.sender_prescriber_organization:
+                prescriber_organization_kind = prescriber_org.kind
+
+        type_siae = companies_enums.siae_kind_to_pe_type_siae(siae_kind)
         if not type_siae:
-            self.pe_log_err("could not find PE type for siae={} siae_kind={}", company, company.kind)
+            self.pe_log_err("could not find PE type for siae_siret={} siae_kind={}", siae_siret, siae_kind)
             self.pe_save_error(
                 None,
                 api_enums.PEApiPreliminaryCheckFailureReason.INVALID_SIAE_KIND,
@@ -844,16 +854,12 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             self.user.jobseeker_profile.pe_last_certification_attempt_at = timezone.now()
             self.user.jobseeker_profile.save(update_fields=["pe_obfuscated_nir", "pe_last_certification_attempt_at"])
 
-        prescriber_kind = None
-        if prescriber_org := job_application.sender_prescriber_organization:
-            prescriber_kind = prescriber_org.kind
-
         self.pe_maj_pass(
             id_national_pe=self.user.jobseeker_profile.pe_obfuscated_nir,
-            siae_siret=company.siret,
-            siae_kind=company.kind,
-            sender_kind=job_application.sender_kind,
-            prescriber_kind=prescriber_kind,
+            siae_siret=siae_siret,
+            siae_kind=siae_kind,
+            sender_kind=sender_kind,
+            prescriber_kind=prescriber_organization_kind,
             at=at,
         )
 
