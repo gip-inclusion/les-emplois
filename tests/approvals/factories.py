@@ -21,7 +21,8 @@ from itou.approvals.models import (
     ProlongationRequestDenyInformation,
     Suspension,
 )
-from itou.companies.enums import CompanyKind
+from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind
+from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplicationWorkflow
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory
@@ -52,6 +53,12 @@ class ApprovalFactory(factory.django.DjangoModelFactory):
             start_at=datetime.date(2000, 1, 1),
             end_at=datetime.date(3000, 1, 1),
             origin_pe_approval=True,
+        )
+        with_origin_values = factory.Trait(
+            origin_siae_kind=factory.fuzzy.FuzzyChoice(SIAE_WITH_CONVENTION_KINDS),
+            origin_siae_siret=factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1"),
+            origin_sender_kind=SenderKind.EMPLOYER,
+            origin_prescriber_organization_kind="",
         )
 
     user = factory.SubFactory(JobSeekerFactory)
