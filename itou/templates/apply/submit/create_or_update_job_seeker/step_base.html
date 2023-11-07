@@ -65,10 +65,19 @@
 
                             {% block form_content %}{% endblock %}
 
-                            <hr class="my-5">
-                            <div class="form-group text-end">
-                                {% if back_url %}<a class="btn btn-link" href="{{ back_url }}">Retour</a>{% endif %}
-                                {% bootstrap_button "Suivant" button_type="submit" button_class="btn btn-primary" %}
+                            <hr>
+                            <div class="form-row align-items-center gx-3">
+                                {% if back_url %}
+                                    <div class="form-group col-12 col-lg order-2 order-lg-1">
+                                        <a href="{{ back_url }}" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Retourner à l'étape précédente">
+                                            <i class="ri-arrow-go-back-line ri-lg"></i>
+                                            <span>Retour</span>
+                                        </a>
+                                    </div>
+                                {% endif %}
+                                <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
+                                    {% bootstrap_button "Suivant" button_type="submit" button_class="btn btn-primary btn-block" %}
+                                </div>
                             </div>
                         </form>
                     </div>

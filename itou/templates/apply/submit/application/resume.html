@@ -214,11 +214,11 @@
 {% endblock %}
 
 {% block form_submit_button %}
-    <div class="form-group mb-0 col-6 col-lg-auto">
+    <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
         {% if request.user.is_employer %}
-            <button class="btn btn-primary">Enregistrer</button>
+            <button class="btn btn-primary btn-block">Enregistrer</button>
         {% else %}
-            <button class="btn btn-primary">Envoyer la candidature</button>
+            <button class="btn btn-primary btn-block">Envoyer la candidature</button>
         {% endif %}
     </div>
 {% endblock %}
