@@ -5,7 +5,7 @@ from django.forms import ValidationError
 from drf_spectacular.utils import extend_schema
 from rest_framework import authentication, exceptions, generics, permissions, status
 
-from itou.api.models import SiaeApiToken
+from itou.api.models import CompanyApiToken
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.job_applications.enums import Prequalification, ProfessionalSituationExperience
@@ -20,7 +20,7 @@ class GeiqApiAnonymousUser(AnonymousUser):
 
 
 class GeiqApiAuthentication(authentication.TokenAuthentication):
-    model = SiaeApiToken
+    model = CompanyApiToken
 
     def authenticate_credentials(self, key):
         try:

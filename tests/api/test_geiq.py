@@ -6,7 +6,7 @@ from rest_framework.test import APIClient
 
 from itou.api.geiq.serializers import GeiqJobApplicationSerializer
 from itou.api.geiq.views import GeiqApiAnonymousUser
-from itou.api.models import SiaeApiToken
+from itou.api.models import CompanyApiToken
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
@@ -24,7 +24,7 @@ def _api_client():
 
 
 def _api_token_for(siaes):
-    token = SiaeApiToken(label="test")
+    token = CompanyApiToken(label="test")
     token.save()
     for siae in siaes:
         token.siaes.add(siae)
@@ -33,7 +33,7 @@ def _api_token_for(siaes):
 
 def test_candidatures_geiq_token_authentication():
     TOKEN_KEY = "00000000-bf01-45d8-adf6-2706d83c78bd"
-    token = SiaeApiToken(label="test-token", key=TOKEN_KEY)
+    token = CompanyApiToken(label="test-token", key=TOKEN_KEY)
     token.save()
 
     geiq = SiaeFactory(siret="11832575900001", kind=CompanyKind.GEIQ)
