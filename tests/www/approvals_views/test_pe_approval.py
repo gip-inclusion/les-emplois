@@ -168,14 +168,14 @@ class PoleEmploiApprovalSearchUserTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.job_application = JobApplicationFactory(with_approval=True)
-        cls.siae_user = cls.job_application.to_company.members.first()
+        cls.employer = cls.job_application.to_company.members.first()
 
     def test_nominal(self):
         """
         The search for PE approval screen should redirect to the matching job application details screen if the
         number matches a PASS IAE attached to a job_application
         """
-        self.client.force_login(self.siae_user)
+        self.client.force_login(self.employer)
         pe_approval = PoleEmploiApprovalFactory()
 
         url = reverse("approvals:pe_approval_search_user", kwargs={"pe_approval_id": pe_approval.id})
@@ -185,7 +185,7 @@ class PoleEmploiApprovalSearchUserTest(TestCase):
         self.assertContains(response, pe_approval.first_name.title())
 
     def test_invalid_pe_approval(self):
-        self.client.force_login(self.siae_user)
+        self.client.force_login(self.employer)
 
         url = reverse("approvals:pe_approval_search_user", kwargs={"pe_approval_id": 123})
 

@@ -242,7 +242,7 @@ class SiaeUserView(SiaeBaseView, TemplateView):
     OAuth callback.
     """
 
-    template_name = "signup/siae_user.html"
+    template_name = "signup/employer.html"
 
     def get_context_data(self, **kwargs):
         ic_params = {
@@ -805,7 +805,7 @@ class FacilitatorUserView(FacilitatorBaseMixin, TemplateView):
     OAuth callback.
     """
 
-    template_name = "signup/siae_user.html"
+    template_name = "signup/employer.html"
 
     def get_context_data(self, **kwargs):
         ic_params = {

@@ -117,8 +117,8 @@ class ProcessViewsTest(TestCase):
 
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True, resume_link="")
         company = job_application.to_company
-        siae_user = company.members.first()
-        self.client.force_login(siae_user)
+        employer = company.members.first()
+        self.client.force_login(employer)
 
         url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
@@ -128,7 +128,7 @@ class ProcessViewsTest(TestCase):
         self.assertContains(response, job_application.job_seeker.phone.replace(" ", ""))
         self.assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)  # the SIAE is not a GEIQ
 
-        job_application.job_seeker.created_by = siae_user
+        job_application.job_seeker.created_by = employer
         job_application.job_seeker.phone = ""
         job_application.job_seeker.nir = ""
         job_application.job_seeker.pole_emploi_id = ""
@@ -175,8 +175,8 @@ class ProcessViewsTest(TestCase):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True, job_seeker__kind=UserKind.JOB_SEEKER, hidden_for_siae=True
         )
-        siae_user = job_application.to_company.members.first()
-        self.client.force_login(siae_user)
+        employer = job_application.to_company.members.first()
+        self.client.force_login(employer)
 
         url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
@@ -228,8 +228,8 @@ class ProcessViewsTest(TestCase):
         """As a SIAE user, I cannot access the job_applications details for prescribers."""
 
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
-        siae_user = job_application.to_company.members.first()
-        self.client.force_login(siae_user)
+        employer = job_application.to_company.members.first()
+        self.client.force_login(employer)
 
         url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
@@ -262,8 +262,8 @@ class ProcessViewsTest(TestCase):
         """Ensure that the `process` transition is triggered."""
 
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
-        siae_user = job_application.to_company.members.first()
-        self.client.force_login(siae_user)
+        employer = job_application.to_company.members.first()
+        self.client.force_login(employer)
 
         url = reverse("apply:process", kwargs={"job_application_id": job_application.pk})
         response = self.client.post(url)
@@ -287,8 +287,8 @@ class ProcessViewsTest(TestCase):
             with self.subTest(state=state):
                 job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True, state=state)
 
-                siae_user = job_application.to_company.members.first()
-                self.client.force_login(siae_user)
+                employer = job_application.to_company.members.first()
+                self.client.force_login(employer)
 
                 url = reverse("apply:refuse", kwargs={"job_application_id": job_application.pk})
                 response = self.client.get(url)
@@ -316,8 +316,8 @@ class ProcessViewsTest(TestCase):
         for state in states:
             with self.subTest(state=state):
                 job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True, state=state)
-                siae_user = job_application.to_company.members.first()
-                self.client.force_login(siae_user)
+                employer = job_application.to_company.members.first()
+                self.client.force_login(employer)
 
                 url = reverse("apply:postpone", kwargs={"job_application_id": job_application.pk})
                 response = self.client.get(url)
@@ -343,8 +343,8 @@ class ProcessViewsTest(TestCase):
             "city_slug": city.slug,
         }
         company = CompanyFactory(with_membership=True)
-        siae_user = company.members.first()
-        self.client.force_login(siae_user)
+        employer = company.members.first()
+        self.client.force_login(employer)
 
         hiring_end_dates = [
             Approval.get_default_end_date(today),
@@ -511,7 +511,7 @@ class ProcessViewsTest(TestCase):
         )
         # create suspension for the job seeker
         approval_job_seeker = old_job_application.approval
-        siae_user = old_job_application.to_company.members.first()
+        employer = old_job_application.to_company.members.first()
         susension_start_at = today
         suspension_end_at = today + relativedelta(days=50)
 
@@ -519,7 +519,7 @@ class ProcessViewsTest(TestCase):
             approval=approval_job_seeker,
             start_at=susension_start_at,
             end_at=suspension_end_at,
-            created_by=siae_user,
+            created_by=employer,
             reason=Suspension.Reason.BROKEN_CONTRACT.value,
         )
 
@@ -531,10 +531,10 @@ class ProcessViewsTest(TestCase):
             job_seeker=job_seeker_user,
             to_company=other_company,
         )
-        other_siae_user = job_application.to_company.members.first()
+        other_employer = job_application.to_company.members.first()
 
         # login with other siae
-        self.client.force_login(other_siae_user)
+        self.client.force_login(other_employer)
         hiring_start_at = today + relativedelta(days=20)
         hiring_end_at = Approval.get_default_end_date(hiring_start_at)
 
@@ -575,8 +575,8 @@ class ProcessViewsTest(TestCase):
             job_seeker__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
         )
 
-        siae_user = job_application.to_company.members.first()
-        self.client.force_login(siae_user)
+        employer = job_application.to_company.members.first()
+        self.client.force_login(employer)
 
         post_data = {
             # Data for `JobSeekerPersonalDataForm`.
@@ -750,8 +750,8 @@ class ProcessViewsTest(TestCase):
             state=JobApplicationWorkflow.STATE_PROCESSING,
         )
 
-        siae_user = job_application.to_company.members.first()
-        self.client.force_login(siae_user)
+        employer = job_application.to_company.members.first()
+        self.client.force_login(employer)
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url_accept)
         self.assertContains(response, "Confirmation de l’embauche")
@@ -788,8 +788,8 @@ class ProcessViewsTest(TestCase):
         )
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
-        siae_user = job_application.to_company.members.first()
-        self.client.force_login(siae_user)
+        employer = job_application.to_company.members.first()
+        self.client.force_login(employer)
 
         response = self.client.get(url_accept)
         self.assertContains(response, "Confirmation de l’embauche")
@@ -841,8 +841,8 @@ class ProcessViewsTest(TestCase):
         other_job_seeker = JobSeekerWithAddressFactory()
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
-        siae_user = job_application.to_company.members.first()
-        self.client.force_login(siae_user)
+        employer = job_application.to_company.members.first()
+        self.client.force_login(employer)
 
         post_data = {
             # Data for `JobSeekerPersonalDataForm`.
@@ -880,8 +880,8 @@ class ProcessViewsTest(TestCase):
         )
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
-        siae_user = job_application.to_company.members.first()
-        self.client.force_login(siae_user)
+        employer = job_application.to_company.members.first()
+        self.client.force_login(employer)
 
         post_data = {
             # Data for `JobSeekerPersonalDataForm`.
@@ -923,8 +923,8 @@ class ProcessViewsTest(TestCase):
         )
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
-        siae_user = job_application.to_company.members.first()
-        self.client.force_login(siae_user)
+        employer = job_application.to_company.members.first()
+        self.client.force_login(employer)
 
         response = self.client.get(url_accept)
         self.assertContains(response, "Confirmation de l’embauche")
@@ -967,8 +967,8 @@ class ProcessViewsTest(TestCase):
         )
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
-        siae_user = job_application.to_company.members.first()
-        self.client.force_login(siae_user)
+        employer = job_application.to_company.members.first()
+        self.client.force_login(employer)
 
         response = self.client.get(url_accept)
         self.assertContains(response, "Confirmation de l’embauche")
@@ -995,8 +995,8 @@ class ProcessViewsTest(TestCase):
         )
 
         assert job_application.state.is_processing
-        siae_user = job_application.to_company.members.first()
-        self.client.force_login(siae_user)
+        employer = job_application.to_company.members.first()
+        self.client.force_login(employer)
 
         has_considered_valid_diagnoses = EligibilityDiagnosis.objects.has_considered_valid(
             job_application.job_seeker, for_siae=job_application.to_company
@@ -1038,7 +1038,7 @@ class ProcessViewsTest(TestCase):
 
         # Check diagnosis.
         eligibility_diagnosis = job_application.get_eligibility_diagnosis()
-        assert eligibility_diagnosis.author == siae_user
+        assert eligibility_diagnosis.author == employer
         assert eligibility_diagnosis.author_kind == AuthorKind.EMPLOYER
         assert eligibility_diagnosis.author_siae == job_application.to_company
         # Check administrative criteria.
@@ -1056,8 +1056,8 @@ class ProcessViewsTest(TestCase):
             state=JobApplicationWorkflow.STATE_PROCESSING,
             to_company__kind=CompanyKind.GEIQ,
         )
-        siae_user = job_application.to_company.members.first()
-        self.client.force_login(siae_user)
+        employer = job_application.to_company.members.first()
+        self.client.force_login(employer)
 
         url = reverse("apply:eligibility", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
@@ -1075,8 +1075,8 @@ class ProcessViewsTest(TestCase):
             suspension_dates=InclusiveDateRange(timezone.localdate()),
         )
 
-        siae_user = job_application.to_company.members.first()
-        self.client.force_login(siae_user)
+        employer = job_application.to_company.members.first()
+        self.client.force_login(employer)
 
         url = reverse("apply:eligibility", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
@@ -1088,7 +1088,7 @@ class ProcessViewsTest(TestCase):
         """The eligibility diagnosis page must only be accessible
         in JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES states."""
         company = CompanyFactory(with_membership=True)
-        siae_user = company.members.first()
+        employer = company.members.first()
         job_application = JobApplicationSentByJobSeekerFactory(
             to_company=company, job_seeker=JobSeekerWithAddressFactory()
         )
@@ -1097,7 +1097,7 @@ class ProcessViewsTest(TestCase):
         for state in JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES:
             job_application.state = state
             job_application.save()
-            self.client.force_login(siae_user)
+            self.client.force_login(employer)
             url = reverse("apply:eligibility", kwargs={"job_application_id": job_application.pk})
             response = self.client.get(url)
             assert response.status_code == 200
@@ -1106,7 +1106,7 @@ class ProcessViewsTest(TestCase):
         # Wrong state
         job_application.state = JobApplicationWorkflow.STATE_ACCEPTED
         job_application.save()
-        self.client.force_login(siae_user)
+        self.client.force_login(employer)
         url = reverse("apply:eligibility", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
         assert response.status_code == 404
@@ -1115,8 +1115,8 @@ class ProcessViewsTest(TestCase):
     def test_cancel(self, *args, **kwargs):
         # Hiring date is today: cancellation should be possible.
         job_application = JobApplicationFactory(with_approval=True, to_company__subject_to_eligibility=True)
-        siae_user = job_application.to_company.members.first()
-        self.client.force_login(siae_user)
+        employer = job_application.to_company.members.first()
+        self.client.force_login(employer)
         url = reverse("apply:cancel", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
         self.assertContains(response, "Confirmer l'annulation de l'embauche")
@@ -1142,8 +1142,8 @@ class ProcessViewsTest(TestCase):
     def test_cancel_saie_not_subject_to_eligibility(self, *args, **kwargs):
         # Hiring date is today: cancellation should be possible.
         job_application = JobApplicationFactory(with_approval=True, to_company__not_subject_to_eligibility=True)
-        siae_user = job_application.to_company.members.first()
-        self.client.force_login(siae_user)
+        employer = job_application.to_company.members.first()
+        self.client.force_login(employer)
         url = reverse("apply:cancel", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
         self.assertContains(response, "Confirmer l'annulation de l'embauche")
@@ -1162,11 +1162,11 @@ class ProcessViewsTest(TestCase):
             with_approval=True,
             hiring_start_at=timezone.localdate() + relativedelta(days=1),
         )
-        siae_user = job_application.to_company.members.first()
+        employer = job_application.to_company.members.first()
         # Add a blocking employee record
         EmployeeRecordFactory(job_application=job_application, status=Status.PROCESSED)
 
-        self.client.force_login(siae_user)
+        self.client.force_login(employer)
         url = reverse("apply:cancel", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
@@ -1184,8 +1184,8 @@ class ProcessViewsTest(TestCase):
             state=JobApplicationWorkflow.STATE_CANCELLED,
             job_seeker=job_seeker,
         )
-        siae_user = job_application.to_company.members.first()
-        self.client.force_login(siae_user)
+        employer = job_application.to_company.members.first()
+        self.client.force_login(employer)
 
         self.accept_job_application(job_application=job_application, city=city)
 
@@ -1202,8 +1202,8 @@ class ProcessViewsTest(TestCase):
             sent_by_authorized_prescriber_organisation=True, state=JobApplicationWorkflow.STATE_CANCELLED
         )
         assert job_application.state.is_cancelled
-        siae_user = job_application.to_company.members.first()
-        self.client.force_login(siae_user)
+        employer = job_application.to_company.members.first()
+        self.client.force_login(employer)
 
         url = reverse("apply:archive", kwargs={"job_application_id": job_application.pk})
 
@@ -1234,7 +1234,7 @@ class ProcessTemplatesTest(TestCase):
     def setUpTestData(cls):
         """Set up data for the whole TestCase."""
         cls.job_application = JobApplicationFactory(eligibility_diagnosis=None)
-        cls.siae_user = cls.job_application.to_company.members.first()
+        cls.employer = cls.job_application.to_company.members.first()
 
         kwargs = {"job_application_id": cls.job_application.pk}
         cls.url_details = reverse("apply:details_for_siae", kwargs=kwargs)
@@ -1246,7 +1246,7 @@ class ProcessTemplatesTest(TestCase):
 
     def test_details_template_for_state_new(self):
         """Test actions available when the state is new."""
-        self.client.force_login(self.siae_user)
+        self.client.force_login(self.employer)
         response = self.client.get(self.url_details)
         # Test template content.
         self.assertContains(response, self.url_process)
@@ -1257,7 +1257,7 @@ class ProcessTemplatesTest(TestCase):
 
     def test_details_template_for_state_processing(self):
         """Test actions available when the state is processing."""
-        self.client.force_login(self.siae_user)
+        self.client.force_login(self.employer)
         self.job_application.state = JobApplicationWorkflow.STATE_PROCESSING
         self.job_application.save()
         response = self.client.get(self.url_details)
@@ -1270,7 +1270,7 @@ class ProcessTemplatesTest(TestCase):
 
     def test_details_template_for_state_prior_to_hire(self):
         """Test actions available when the state is prior_to_hire."""
-        self.client.force_login(self.siae_user)
+        self.client.force_login(self.employer)
         self.job_application.state = JobApplicationWorkflow.STATE_PRIOR_TO_HIRE
         self.job_application.save()
         response = self.client.get(self.url_details)
@@ -1287,7 +1287,7 @@ class ProcessTemplatesTest(TestCase):
             evaluated_siae=EvaluatedSiaeFactory(siae=self.job_application.to_company),
             suspension_dates=InclusiveDateRange(timezone.localdate() - relativedelta(days=1)),
         )
-        self.client.force_login(self.siae_user)
+        self.client.force_login(self.employer)
         self.job_application.state = JobApplicationWorkflow.STATE_PROCESSING
         self.job_application.save()
         response = self.client.get(self.url_details)
@@ -1307,7 +1307,7 @@ class ProcessTemplatesTest(TestCase):
 
     def test_details_template_for_state_postponed(self):
         """Test actions available when the state is postponed."""
-        self.client.force_login(self.siae_user)
+        self.client.force_login(self.employer)
         self.job_application.state = JobApplicationWorkflow.STATE_POSTPONED
         self.job_application.save()
         response = self.client.get(self.url_details)
@@ -1320,7 +1320,7 @@ class ProcessTemplatesTest(TestCase):
 
     def test_details_template_for_state_postponed_valid_diagnosis(self):
         """Test actions available when the state is postponed."""
-        self.client.force_login(self.siae_user)
+        self.client.force_login(self.employer)
         EligibilityDiagnosisFactory(job_seeker=self.job_application.job_seeker)
         self.job_application.state = JobApplicationWorkflow.STATE_POSTPONED
         self.job_application.save()
@@ -1333,7 +1333,7 @@ class ProcessTemplatesTest(TestCase):
         self.assertContains(response, self.url_accept)
 
     def test_details_template_for_state_obsolete(self):
-        self.client.force_login(self.siae_user)
+        self.client.force_login(self.employer)
         self.job_application.state = JobApplicationWorkflow.STATE_OBSOLETE
         self.job_application.save()
 
@@ -1347,7 +1347,7 @@ class ProcessTemplatesTest(TestCase):
         self.assertNotContains(response, self.url_accept)
 
     def test_details_template_for_state_obsolete_valid_diagnosis(self):
-        self.client.force_login(self.siae_user)
+        self.client.force_login(self.employer)
         EligibilityDiagnosisFactory(job_seeker=self.job_application.job_seeker)
         self.job_application.state = JobApplicationWorkflow.STATE_OBSOLETE
         self.job_application.save()
@@ -1363,7 +1363,7 @@ class ProcessTemplatesTest(TestCase):
 
     def test_details_template_for_state_refused(self):
         """Test actions available for other states."""
-        self.client.force_login(self.siae_user)
+        self.client.force_login(self.employer)
         self.job_application.state = JobApplicationWorkflow.STATE_REFUSED
         self.job_application.save()
         response = self.client.get(self.url_details)
@@ -1376,7 +1376,7 @@ class ProcessTemplatesTest(TestCase):
 
     def test_details_template_for_state_refused_valid_diagnosis(self):
         """Test actions available for other states."""
-        self.client.force_login(self.siae_user)
+        self.client.force_login(self.employer)
         EligibilityDiagnosisFactory(job_seeker=self.job_application.job_seeker)
         self.job_application.state = JobApplicationWorkflow.STATE_REFUSED
         self.job_application.save()
@@ -1390,7 +1390,7 @@ class ProcessTemplatesTest(TestCase):
 
     def test_details_template_for_state_canceled(self):
         """Test actions available for other states."""
-        self.client.force_login(self.siae_user)
+        self.client.force_login(self.employer)
         self.job_application.state = JobApplicationWorkflow.STATE_CANCELLED
         self.job_application.save()
         response = self.client.get(self.url_details)
@@ -1403,7 +1403,7 @@ class ProcessTemplatesTest(TestCase):
 
     def test_details_template_for_state_canceled_valid_diagnosis(self):
         """Test actions available for other states."""
-        self.client.force_login(self.siae_user)
+        self.client.force_login(self.employer)
         EligibilityDiagnosisFactory(job_seeker=self.job_application.job_seeker)
         self.job_application.state = JobApplicationWorkflow.STATE_CANCELLED
         self.job_application.save()
@@ -1417,7 +1417,7 @@ class ProcessTemplatesTest(TestCase):
 
     def test_details_template_for_state_accepted(self):
         """Test actions available for other states."""
-        self.client.force_login(self.siae_user)
+        self.client.force_login(self.employer)
         self.job_application.state = JobApplicationWorkflow.STATE_ACCEPTED
         self.job_application.save()
         response = self.client.get(self.url_details)
@@ -1559,8 +1559,8 @@ def test_refuse_jobapplication_geiq_reasons(client, reason):
         to_company__kind=CompanyKind.GEIQ,
     )
     assert job_application.state.is_processing
-    siae_user = job_application.to_company.members.first()
-    client.force_login(siae_user)
+    employer = job_application.to_company.members.first()
+    client.force_login(employer)
 
     url = reverse("apply:refuse", kwargs={"job_application_id": job_application.pk})
     response = client.get(url)
