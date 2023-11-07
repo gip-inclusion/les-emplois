@@ -29,7 +29,7 @@ class StatsDashboardVisitAdmin(ItouModelAdmin):
         "dashboard_name",
         "department",
         "region",
-        "current_siae_id",
+        "current_company_id",
         "current_prescriber_organization_id",
         "current_institution_id",
         "user_kind",
