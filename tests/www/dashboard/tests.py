@@ -1885,3 +1885,15 @@ def test_maze_survey(client, snapshot):
     client.session.clear()
     response = client.get(reverse("dashboard:index"))
     assert str(parse_response_to_soup(response, ".maze-survey")) == snapshot
+
+
+@pytest.mark.parametrize("kind", CompanyKind)
+def test_alert_message_for_ai_stock_prolongation(client, snapshot, kind):
+    employer = CompanyMembershipFactory(siae__kind=kind).user
+    client.force_login(employer)
+
+    response = client.get(reverse("dashboard:index"))
+    if kind is CompanyKind.AI:
+        assert str(parse_response_to_soup(response, "#AIStockProlongationAlert")) == snapshot
+    else:
+        assertNotContains(response, "AIStockProlongationAlert")

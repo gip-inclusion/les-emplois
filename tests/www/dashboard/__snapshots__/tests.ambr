@@ -1,4 +1,22 @@
 # serializer version: 1
+# name: test_alert_message_for_ai_stock_prolongation[AI]
+  '''
+  <div class="alert alert-info" id="AIStockProlongationAlert">
+              <p>
+                  Si votre structure est concernée par la délivrance automatique de PASS IAE qui a eu lieu le 01/12/2021, nous vous invitons à <a href="/approvals/list">vérifier que leur durée de validité couvre bien la période de travail prévue</a>.
+                  <br/>
+                  Si des prolongations de parcours sont nécessaires, nous vous invitons à réaliser vos demandes de prolongation tant que les PASS IAE sont valides.
+              </p>
+              <p class="mb-0">
+                  <i>
+                      Attention : une demande de prolongation n’est plus possible si le PASS IAE est expiré.
+                      <br/>
+                      Prévoir un délai de traitement par le prescripteur habilité d’environ 7 jours.
+                  </i>
+              </p>
+          </div>
+  '''
+# ---
 # name: test_maze_survey
   '''
   <div class="maze-survey bg-white shadow fixed-sm-bottom m-3 py-3 alert alert-dismissible alert-dismissible-once d-none" id="alertMazeSurvey">
