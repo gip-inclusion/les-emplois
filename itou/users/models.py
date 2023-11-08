@@ -33,7 +33,6 @@ from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.address.format import format_address
 from itou.common_apps.address.models import AddressMixin
 from itou.companies.enums import CompanyKind
-from itou.utils.apis.exceptions import AddressLookupError
 from itou.utils.models import UniqueConstraintWithErrorCode
 from itou.utils.validators import validate_birthdate, validate_nir, validate_pole_emploi_id
 
@@ -864,7 +863,6 @@ class JobSeekerProfile(models.Model):
     ERROR_HEXA_LANE_NAME = "Le nom de voie est obligatoire"
     ERROR_HEXA_POST_CODE = "Le code postal est obligatoire"
     ERROR_HEXA_COMMUNE = "La commune INSEE est obligatoire"
-    ERROR_HEXA_LOOKUP_COMMUNE = "Impossible de trouver la commune à partir du code INSEE"
 
     ERROR_JOBSEEKER_TITLE = "La civilité du demandeur d'emploi est obligatoire"
     ERROR_JOBSEEKER_EDUCATION_LEVEL = "Le niveau de formation du demandeur d'emploi est obligatoire"
@@ -1119,18 +1117,6 @@ class JobSeekerProfile(models.Model):
     def update_hexa_address(self):
         """
         This method tries to fill the HEXA address fields based the current address of the job seeker (`User` model).
-
-        Conversion from standard itou address to HEXA is making sync geo API calls.
-
-        Calling this method should be done in a (multiple) try/except block.
-
-        Raises `UnknownCommuneError` or `AddressLookupError` instead of `ValidationError`:
-            - not a validation part
-            - easier to pinpoint issues on frontend side (and correctly notify user)
-
-        Using this method can block user from completing an employee record creation.
-
-        If anything goes wrong here, it must "fail fast" and notify the user in the most accurate way possible.
         """
         result, error = format_address(self.user)
 
@@ -1149,11 +1135,10 @@ class JobSeekerProfile(models.Model):
         # Special field: Commune object contains both city name and INSEE code
         insee_code = result.get("insee_code")
 
-        # This may raise an asp.exceptions.UnknownCommuneError : let it crash if needed
         try:
-            self.hexa_commune = Commune.by_insee_code(insee_code)
-        except AddressLookupError:
-            raise ValidationError(f"Impossible de trouver la commune correspondate: code INSEE {insee_code}")
+            self.hexa_commune = Commune.objects.by_insee_code(insee_code)
+        except Commune.DoesNotExist:
+            raise ValidationError(f"Le code INSEE {insee_code} n'est pas référencé par l'ASP")
 
         self.save()
 

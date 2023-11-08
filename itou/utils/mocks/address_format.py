@@ -311,4 +311,4 @@ def get_random_insee_code():
 
 
 def get_random_asp_commune():
-    return Commune.by_insee_code(get_random_insee_code())
+    return Commune.objects.by_insee_code(get_random_insee_code())

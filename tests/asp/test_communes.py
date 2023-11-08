@@ -66,7 +66,7 @@ class CommuneModelTest(TestCase):
         new_commune = Commune(code=99999, name="ENNUI-SUR-BLASÉ", start_date=datetime.datetime(2022, 1, 1))
         Commune.objects.bulk_create([old_commune, new_commune])
 
-        result = Commune.by_insee_code(99999)
+        result = Commune.objects.by_insee_code(99999)
         assert new_commune == result
 
     def test_by_insee_code_and_period(self):
@@ -79,8 +79,8 @@ class CommuneModelTest(TestCase):
         new_commune = Commune(code=99999, name="ENNUI-SUR-BLASÉ", start_date=datetime.datetime(2022, 1, 1))
         Commune.objects.bulk_create([old_commune, new_commune])
 
-        result = Commune.by_insee_code_and_period(99999, datetime.datetime(1988, 4, 28))
+        result = Commune.objects.by_insee_code_and_period(99999, datetime.datetime(1988, 4, 28))
         assert old_commune == result
 
-        result = Commune.by_insee_code_and_period(99999, datetime.datetime(2022, 11, 28))
+        result = Commune.objects.by_insee_code_and_period(99999, datetime.datetime(2022, 11, 28))
         assert new_commune == result
