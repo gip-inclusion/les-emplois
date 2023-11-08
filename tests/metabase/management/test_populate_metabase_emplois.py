@@ -1121,7 +1121,7 @@ def test_populate_siaes():
         management.call_command("populate_metabase_emplois", mode="siaes")
 
     with connection.cursor() as cursor:
-        cursor.execute("SELECT * FROM structures ORDER BY id")
+        cursor.execute("SELECT * FROM structures_v0 ORDER BY id")
         rows = cursor.fetchall()
         assert len(rows) == 1
         assert rows == [
