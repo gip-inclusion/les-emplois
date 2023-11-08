@@ -5,7 +5,6 @@ from django.urls import reverse_lazy
 from django.utils import timezone
 from django_select2.forms import Select2MultipleWidget
 
-from itou.asp.exceptions import CommuneUnknownInPeriodError, UnknownCommuneError
 from itou.asp.models import Commune, Country, RSAAllocation
 from itou.companies.models import SiaeFinancialAnnex
 from itou.employee_record.enums import Status
@@ -153,10 +152,10 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
 
         if commune_code and birth_date:
             try:
-                self.cleaned_data["birth_place"] = Commune.by_insee_code_and_period(commune_code, birth_date)
-            except CommuneUnknownInPeriodError as ex:
+                self.cleaned_data["birth_place"] = Commune.objects.by_insee_code_and_period(commune_code, birth_date)
+            except Commune.DoesNotExist as ex:
                 raise forms.ValidationError(
-                    f"Le code INSEE {commune_code} n'est pas référencé en date du {birth_date:%d/%m/%Y}"
+                    f"Le code INSEE {commune_code} n'est pas référencé par l'ASP en date du {birth_date:%d/%m/%Y}"
                 ) from ex
 
     def _post_clean(self):
@@ -259,9 +258,9 @@ class NewEmployeeRecordStep2Form(forms.ModelForm):
 
         if commune_code:
             try:
-                commune = Commune.by_insee_code(commune_code)
-            except UnknownCommuneError:
-                raise forms.ValidationError(f"Le code INSEE {commune_code} n'est pas référencé")
+                commune = Commune.objects.by_insee_code(commune_code)
+            except Commune.DoesNotExist:
+                raise forms.ValidationError(f"Le code INSEE {commune_code} n'est pas référencé par l'ASP")
             else:
                 self.cleaned_data["hexa_commune"] = commune
 

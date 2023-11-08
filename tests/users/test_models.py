@@ -820,6 +820,21 @@ class JobSeekerProfileModelTest(TestCase):
         # undefined lane type should fallback to "Lieu-Dit" (LD) as lane type
         assert "LD" == self.profile.hexa_lane_type
 
+    @mock.patch("itou.common_apps.address.format.get_geocoding_data")
+    def test_job_seeker_hexa_address_with_not_referenced_insee_code(self, get_geocoding_data_mock):
+        get_geocoding_data_mock.return_value = {
+            "additional_address": "",
+            "city": "Paris",
+            "insee_code": "75056",
+            "lane": "Paris",
+            "lane_type": "LD",
+            "non_std_extension": "",
+            "number": "",
+            "post_code": "75001",
+        }
+        with pytest.raises(ValidationError, match="Le code INSEE 75056 n'est pas référencé par l'ASP"):
+            self.profile.update_hexa_address()
+
     def test_job_seeker_situation_complete(self):
         # Both PE ID and situation must be filled or none
         self.profile._clean_job_seeker_situation()

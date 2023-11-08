@@ -1,4 +1,3 @@
-import datetime as dt
 import re
 
 from django.contrib.postgres.constraints import ExclusionConstraint
@@ -11,8 +10,6 @@ from django.utils.functional import cached_property
 from unidecode import unidecode
 
 from itou.utils.models import DateRange
-
-from .exceptions import CommuneUnknownInPeriodError, UnknownCommuneError
 
 
 class LaneType(models.TextChoices):
@@ -411,29 +408,6 @@ class Commune(PrettyPrintMixin, AbstractPeriod):
     class Meta(AbstractPeriod.Meta):
         verbose_name = "commune"
         indexes = [GinIndex(fields=["name"], name="aps_communes_name_gin_trgm", opclasses=["gin_trgm_ops"])]
-
-    @staticmethod
-    def by_insee_code(insee_code: str):
-        """Get **current** commune for given INSEE code (no history, single result).
-        Raises `UnknownCommuneError` if code is not found in ASP ref.
-        """
-        try:
-            return Commune.objects.by_insee_code(insee_code)
-        except Commune.DoesNotExist as ex:
-            raise UnknownCommuneError(f"Code INSEE {insee_code} inconnu dans le référentiel ASP") from ex
-
-    @staticmethod
-    def by_insee_code_and_period(insee_code: str, point_in_time: dt.date):
-        """Get a commune at a given point in time.
-        Raises `CommuneUnknowInPeriodError` if not found.
-        """
-        try:
-            return Commune.objects.by_insee_code_and_period(insee_code, point_in_time)
-        except Commune.DoesNotExist as ex:
-            raise CommuneUnknownInPeriodError(
-                f"Période inconnue dans le référentiel ASP pour le code INSEE {insee_code} "
-                f"en date du {point_in_time:%d/%m/%Y}"
-            ) from ex
 
     @cached_property
     def department_code(self):
