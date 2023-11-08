@@ -1,6 +1,5 @@
 {% extends "layout/base.html" %}
 {% load static %}
-{% load django_bootstrap5 %}
 
 {% block title %}Validation de la fiche de poste {{ block.super }}{% endblock %}
 
@@ -47,7 +46,9 @@
                             {% csrf_token %}
                             <div class="form-group text-end">
                                 <a class="btn btn-outline-primary" aria-label="Retour à la page précédente" href="{% url "companies_views:edit_job_description_details" %}">Retour</a>
-                                {% bootstrap_button "Publier la fiche de poste" button_type="submit" button_class="btn btn-primary" %}
+                                <button class="btn btn-primary matomo-event" type="submit" data-matomo-category="employeurs" data-matomo-action="submit" data-matomo-option="publier-fiche-poste">
+                                    Publier la fiche de poste
+                                </button>
                             </div>
                         </form>
                     </div>
