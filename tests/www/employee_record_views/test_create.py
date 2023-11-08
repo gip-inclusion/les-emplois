@@ -5,6 +5,7 @@ import pytest
 from django.contrib.messages import get_messages
 from django.urls import reverse
 
+from itou.asp.models import Commune
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.users.enums import LackOfNIRReason
@@ -341,8 +342,7 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
             "hexa_lane_name": "des colonies",
             "hexa_additional_address": "Bat A",
             "hexa_post_code": "67000",
-            "insee_commune": "STRASBOURG",
-            "insee_commune_code": "67482",
+            "hexa_commune": Commune.objects.by_insee_code("67482").pk,
         }
 
         data = test_data

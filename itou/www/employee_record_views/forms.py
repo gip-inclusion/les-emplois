@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator, RegexValidator
 from django.urls import reverse_lazy
 from django.utils import timezone
+from django.utils.text import format_lazy
 from django_select2.forms import Select2MultipleWidget
 
 from itou.asp.models import Commune, Country, RSAAllocation
@@ -10,7 +11,7 @@ from itou.companies.models import SiaeFinancialAnnex
 from itou.employee_record.enums import Status
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.validators import validate_pole_emploi_id
-from itou.utils.widgets import DuetDatePickerWidget
+from itou.utils.widgets import DuetDatePickerWidget, RemoteAutocompleteSelect2Widget
 
 from .enums import EmployeeRecordOrder
 
@@ -181,23 +182,21 @@ class NewEmployeeRecordStep2Form(forms.ModelForm):
     """
     If the geolocation of address fails, allows user to manually enter
     an address based on ASP internal address format.
-    These fields are *not* mapped directly to a JobSeekerProfile object,
-    mainly because of model level validation concerns (model.clean method)
     """
 
-    insee_commune = forms.CharField(
+    hexa_commune = forms.ModelChoiceField(
+        queryset=Commune.objects,
         label="Commune",
-        widget=forms.TextInput(
+        widget=RemoteAutocompleteSelect2Widget(
             attrs={
-                "class": "js-commune-autocomplete-input form-control",
-                "data-autocomplete-source-url": COMMUNE_AUTOCOMPLETE_SOURCE_URL,
-                "data-autosubmit-on-enter-pressed": 0,
-                "placeholder": "Nom de la commune",
-                "autocomplete": "off",
-            }
+                "data-ajax--url": format_lazy("{}?select2=", reverse_lazy("autocomplete:communes")),
+                "data-ajax--cache": "true",
+                "data-ajax--type": "GET",
+                "data-minimum-input-length": 2,
+                "data-placeholder": "Nom de la commune",
+            },
         ),
     )
-    insee_commune_code = forms.CharField(widget=forms.HiddenInput(attrs={"class": "js-commune-autocomplete-hidden"}))
 
     class Meta:
         model = JobSeekerProfile
@@ -236,33 +235,18 @@ class NewEmployeeRecordStep2Form(forms.ModelForm):
         self.fields["hexa_lane_name"].validators = [address_re_validator]
         self.fields["hexa_additional_address"].validators = [address_re_validator]
 
-        # Pre-fill INSEE commune
-        if self.instance.hexa_commune:
-            self.initial[
-                "insee_commune"
-            ] = f"{self.instance.hexa_commune.name} ({self.instance.hexa_commune.department_code})"
-            self.initial["insee_commune_code"] = self.instance.hexa_commune.code
-
     def clean(self):
         super().clean()
 
         if self.cleaned_data.get("hexa_std_extension") and not self.cleaned_data.get("hexa_lane_number"):
             raise forms.ValidationError("L'extension doit être saisie avec un numéro de voie")
 
-        commune_code = self.cleaned_data.get("insee_commune_code")
+        hexa_commune = self.cleaned_data.get("hexa_commune")
         post_code = self.cleaned_data.get("hexa_post_code")
 
         # Check basic coherence between post-code and INSEE code:
-        if post_code and commune_code and post_code[:2] != commune_code[:2]:
+        if post_code and hexa_commune and post_code[:2] != hexa_commune.code[:2]:
             raise forms.ValidationError("Le code postal ne correspond pas à la commune")
-
-        if commune_code:
-            try:
-                commune = Commune.objects.by_insee_code(commune_code)
-            except Commune.DoesNotExist:
-                raise forms.ValidationError(f"Le code INSEE {commune_code} n'est pas référencé par l'ASP")
-            else:
-                self.cleaned_data["hexa_commune"] = commune
 
 
 class NewEmployeeRecordStep3Form(forms.ModelForm):
