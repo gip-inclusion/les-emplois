@@ -147,7 +147,7 @@ def get_department_and_region_columns(name_suffix="", comment_suffix="", custom_
 
 
 # FIXME @dejafait drop this as soon as data analysts no longer use
-# structures.code_commune nor organisations.code_commune
+# structures_v0.code_commune nor organisations.code_commune
 # because one post_code can actually have *several* insee_codes (╯°□°)╯︵ ┻━┻
 @functools.cache
 def get_post_code_to_insee_code_map():
@@ -162,7 +162,7 @@ def get_post_code_to_insee_code_map():
 
 
 # FIXME @dejafait drop this as soon as data analysts no longer use
-# structures.code_commune nor organisations.code_commune
+# structures_v0.code_commune nor organisations.code_commune
 # because one post_code can actually have *several* insee_codes (╯°□°)╯︵ ┻━┻
 def convert_post_code_to_insee_code(post_code):
     return get_post_code_to_insee_code_map().get(post_code)
@@ -215,7 +215,7 @@ def get_address_columns(name_suffix="", comment_suffix="", custom_fn=lambda o: o
         + [
             {
                 # FIXME @dejafait drop this as soon as data analysts no longer use
-                # structures.code_commune nor organisations.code_commune
+                # structures_v0.code_commune nor organisations.code_commune
                 # because one post_code can actually have *several* insee_codes (╯°□°)╯︵ ┻━┻
                 "name": f"code_commune{name_suffix}",
                 "type": "varchar",

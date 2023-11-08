@@ -13,7 +13,7 @@ def get_field(name):
     return Company._meta.get_field(name)
 
 
-TABLE = MetabaseTable(name="structures")
+TABLE = MetabaseTable(name="structures_v0")
 TABLE.add_columns(
     [
         {"name": "id", "type": "integer", "comment": "ID de la structure", "fn": lambda o: o.id},
