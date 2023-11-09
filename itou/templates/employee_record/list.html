@@ -143,14 +143,12 @@
                         <div class="employee-records-list">
                             {% if employee_records_list %}
                                 {% for employee_record in navigation_pages %}
-                                    {% with item=employee_record.job_application %}
-                                        {% include "employee_record/includes/list_item.html" %}
-                                    {% endwith %}
+                                    {% include "employee_record/includes/list_item.html" with employee_record=employee_record item=employee_record.job_application form=form only %}
                                 {% endfor %}
                                 {# New employee records i.e. job applications #}
                             {% else %}
-                                {% for item in navigation_pages %}
-                                    {% include "employee_record/includes/list_item.html" %}
+                                {% for job_application in navigation_pages %}
+                                    {% include "employee_record/includes/list_item.html" with employee_record=None item=job_application form=form %}
                                 {% endfor %}
                             {% endif %}
                         </div>
